@@ -1,0 +1,373 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.Cursor?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.ToggleButton?>
+<?import javafx.scene.control.Tooltip?>
+<?import javafx.scene.control.TreeView?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane id="AnchorPane" fx:id="MainAnchor" prefHeight="576.0" prefWidth="1050.0" stylesheets="@../css/StyleSheet.css" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1">
+    <children>
+        <StackPane fx:id="MainStack" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+            <children>
+                <BorderPane fx:id="main_container">
+                    <top>
+                        <StackPane fx:id="top_navbar" prefHeight="30.0" style="-fx-background-color: gray;" styleClass="top_navbar" BorderPane.alignment="CENTER">
+                            <children>
+                                <BorderPane styleClass="toolbar">
+                                    <right>
+                                        <HBox alignment="CENTER_RIGHT" prefHeight="30.0" spacing="5.0" BorderPane.alignment="CENTER">
+                                            <children>
+                                                <Button fx:id="btnMinimize" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" styleClass="button_process_nav" textAlignment="CENTER">
+                                                    <graphic>
+                                                        <FontAwesomeIconView glyphName="MINUS" size="18" textAlignment="CENTER" textOrigin="TOP" />
+                                                    </graphic>
+                                                    <tooltip>
+                                                        <Tooltip text="Minimize" />
+                                                    </tooltip>
+                                                </Button>
+                                                <Button fx:id="btnClose" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" styleClass="button_process_nav" textAlignment="CENTER">
+                                                    <graphic>
+                                                        <FontAwesomeIconView glyphName="CLOSE" size="18" textAlignment="CENTER" />
+                                                    </graphic>
+                                                    <tooltip>
+                                                        <Tooltip text="Exit" />
+                                                    </tooltip>
+                                                </Button>
+                                            </children>
+                                            <opaqueInsets>
+                                                <Insets />
+                                            </opaqueInsets>
+                                            <BorderPane.margin>
+                                                <Insets />
+                                            </BorderPane.margin>
+                                        </HBox>
+                                    </right>
+                                    <left>
+                                        <HBox prefHeight="100.0" BorderPane.alignment="CENTER">
+                                            <children>
+                                                <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
+                                                    <image>
+                                                        <Image url="@../images/guanzon_logo_white_small.png" />
+                                                    </image>
+                                                    <HBox.margin>
+                                                        <Insets bottom="5.0" left="15.0" top="5.0" />
+                                                    </HBox.margin>
+                                                </ImageView>
+                                                <Label alignment="CENTER" prefHeight="100.0" text="GUANZON GROUP OF COMPANIES" textFill="WHITE">
+                                                    <font>
+                                                        <Font name="System Bold" size="14.0" />
+                                                    </font>
+                                                    <HBox.margin>
+                                                        <Insets left="10.0" />
+                                                    </HBox.margin>
+                                                </Label>
+                                            </children>
+                                        </HBox>
+                                    </left>
+                                </BorderPane>
+                            </children>
+                        </StackPane>
+                    </top>
+                    <bottom>
+                        <StackPane style="-fx-background-color: #a6a6a6;" BorderPane.alignment="CENTER">
+                            <children>
+                                <BorderPane prefHeight="25.0">
+                                    <right>
+                                        <HBox alignment="CENTER_RIGHT" spacing="5.0" BorderPane.alignment="CENTER">
+                                            <children>
+                                    <AnchorPane fx:id="apClock" prefHeight="23.0" prefWidth="23.0">
+                                       <HBox.margin>
+                                          <Insets top="2.0" />
+                                       </HBox.margin>
+                                    </AnchorPane>
+                                                <Label fx:id="DateAndTime" text="October 1, 2021 08:36 AM" textFill="#141313">
+                                                    <font>
+                                                        <Font name="System Bold" size="12.0" />
+                                                    </font>
+                                                    <HBox.margin>
+                                                        <Insets />
+                                                    </HBox.margin>
+                                                </Label>
+                                            </children>
+                                            <BorderPane.margin>
+                                                <Insets right="18.0" />
+                                            </BorderPane.margin>
+                                        </HBox>
+                                    </right>
+                                    <left>
+                                        <HBox alignment="CENTER_LEFT" BorderPane.alignment="CENTER">
+                                            <children>
+                                                <FontAwesomeIconView glyphName="USER" size="14">
+                                                    <HBox.margin>
+                                                        <Insets right="5.0" />
+                                                    </HBox.margin>
+                                                </FontAwesomeIconView>
+                                                 <Label fx:id="AppUser" text="DE CELIS, TEEJEI F. - MIS | Rank &amp; File" textFill="#141313">
+                                                    <font>
+                                                        <Font name="System Bold" size="12.0" />
+                                                    </font>
+                                                </Label>
+                                            </children>
+                                            <BorderPane.margin>
+                                                <Insets left="20.0" />
+                                            </BorderPane.margin>
+                                        </HBox>
+                                    </left>
+                                    <center>
+                                        <Label fx:id="lblVersion" textFill="#141313" BorderPane.alignment="CENTER">
+                                            <font>
+                                                <Font name="System Bold" size="12.0" />
+                                            </font>
+                                        </Label>
+                                    </center>
+                                </BorderPane>
+                            </children>
+                        </StackPane>
+                    </bottom>
+                    <left>
+                        <AnchorPane prefHeight="0.0" prefWidth="45.0" BorderPane.alignment="CENTER">
+                            <children>
+                                <BorderPane prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                    <left>
+                                        <AnchorPane BorderPane.alignment="CENTER">
+                                            <children>
+                                                <BorderPane style="-fx-background-color: #B6B6B6;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                                    <top>
+                                                        <AnchorPane BorderPane.alignment="CENTER">
+                                                            <children>
+                                                                <AnchorPane fx:id="anchorIconMenu" prefWidth="45.0" style="-fx-background-color: #BFBFBF;">
+                                                                    <children>
+                                                                        <VBox fx:id="nav_bar" prefWidth="50.0" spacing="2.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                                                            <children>
+                                                                                <ToggleButton fx:id="btnInventory" graphicTextGap="15.0" mnemonicParsing="false" onAction="#switchInventory" prefHeight="45.0" prefWidth="190.0" styleClass="side-button">
+                                                                                    <graphic>
+                                                                                        <FontAwesomeIconView fill="#8c8c8c" glyphName="LIST" size="25" styleClass="sidebar-icon" textAlignment="CENTER" />
+                                                                                    </graphic>
+                                                                                    <cursor>
+                                                                                        <Cursor fx:constant="HAND" />
+                                                                                    </cursor>
+                                                                                </ToggleButton>
+                                                                                <ToggleButton fx:id="btnPurchasing" graphicTextGap="15.0" mnemonicParsing="false" onAction="#switchPurchasing" prefHeight="45.0" prefWidth="190.0" styleClass="side-button">
+                                                                                    <graphic>
+                                                                                        <FontAwesomeIconView fill="#111111" glyphName="SHOPPING_BASKET" size="25" styleClass="sidebar-icon" textAlignment="CENTER" />
+                                                                                    </graphic>
+                                                                                    <cursor>
+                                                                                        <Cursor fx:constant="HAND" />
+                                                                                    </cursor>
+                                                                                </ToggleButton>
+                                                                                <ToggleButton fx:id="btnSales" graphicTextGap="15.0" mnemonicParsing="false" onAction="#switchSales" prefHeight="45.0" prefWidth="190.0" styleClass="side-button">
+                                                                                    <graphic>
+                                                                                        <FontAwesomeIconView glyphName="AREA_CHART" size="25" styleClass="sidebar-icon" textAlignment="CENTER" />
+                                                                                    </graphic>
+                                                                                    <cursor>
+                                                                                        <Cursor fx:constant="HAND" />
+                                                                                    </cursor>
+                                                                                </ToggleButton>
+                                                                                <ToggleButton fx:id="btnServiceRepair" graphicTextGap="15.0" mnemonicParsing="false" onAction="#switchServiceRepair" prefHeight="45.0" prefWidth="190.0" styleClass="side-button">
+                                                                                    <graphic>
+                                                                                        <FontAwesomeIconView glyphName="AMBULANCE" size="25" styleClass="sidebar-icon" textAlignment="CENTER" />
+                                                                                    </graphic>
+                                                                                    <cursor>
+                                                                                        <Cursor fx:constant="HAND" />
+                                                                                    </cursor>
+                                                                                </ToggleButton>
+                                                                                <ToggleButton fx:id="btnAccountsReceivable" graphicTextGap="15.0" mnemonicParsing="false" onAction="#switchAccountsReceivable" prefHeight="45.0" prefWidth="190.0" styleClass="side-button">
+                                                                                    <graphic>
+                                                                                        <FontAwesomeIconView glyphName="FILE_TEXT" size="25" styleClass="sidebar-icon" textAlignment="CENTER" />
+                                                                                    </graphic>
+                                                                                    <cursor>
+                                                                                        <Cursor fx:constant="HAND" />
+                                                                                    </cursor>
+                                                                                </ToggleButton>
+                                                                                <ToggleButton fx:id="btnGeneralAccounting" graphicTextGap="15.0" mnemonicParsing="false" onAction="#switchGeneralAccounting" prefHeight="45.0" prefWidth="190.0" styleClass="side-button">
+                                                                                    <graphic>
+                                                                                        <FontAwesomeIconView glyphName="MONEY" size="25" styleClass="sidebar-icon" textAlignment="CENTER" />
+                                                                                    </graphic>
+                                                                                    <cursor>
+                                                                                        <Cursor fx:constant="HAND" />
+                                                                                    </cursor>
+                                                                                </ToggleButton>
+                                                                                <ToggleButton fx:id="btnOthers" graphicTextGap="15.0" mnemonicParsing="false" onAction="#switchOthers" prefHeight="45.0" prefWidth="190.0" styleClass="side-button">
+                                                                                    <graphic>
+                                                                                        <FontAwesomeIconView glyphName="FILE_POWERPOINT_ALT" size="25" styleClass="sidebar-icon" textAlignment="CENTER" />
+                                                                                    </graphic>
+                                                                                    <cursor>
+                                                                                        <Cursor fx:constant="HAND" />
+                                                                                    </cursor>
+                                                                                </ToggleButton>
+                                                            <ToggleButton fx:id="btnDelivery" graphicTextGap="15.0" layoutX="10.0" layoutY="292.0" mnemonicParsing="false" onAction="#switchDelivery" prefHeight="45.0" prefWidth="190.0" styleClass="side-button">
+                                                               <graphic>
+                                                                  <FontAwesomeIconView glyphName="TRUCK" size="25" styleClass="sidebar-icon" textAlignment="CENTER" />
+                                                               </graphic>
+                                                               <cursor>
+                                                                  <Cursor fx:constant="HAND" />
+                                                               </cursor>
+                                                            </ToggleButton>
+                                                                            </children>
+                                                                        </VBox>
+                                                                    </children>
+                                                                </AnchorPane>
+                                                            </children>
+                                                        </AnchorPane>
+                                                    </top>
+                                                    <bottom>
+                                                        <AnchorPane BorderPane.alignment="CENTER">
+                                                            <children>
+                                                                <AnchorPane fx:id="anchorIconMenu1" style="-fx-background-color: #BFBFBF;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                                                    <children>
+                                                                        <VBox fx:id="nav_bar1" prefWidth="50.0" spacing="2.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                                                            <children>
+                                                                                <ToggleButton fx:id="btnHelp" graphicTextGap="15.0" mnemonicParsing="false" onAction="#switchHelp" prefHeight="45.0" prefWidth="190.0" styleClass="side-button">
+                                                                                    <graphic>
+                                                                                        <FontAwesomeIconView glyphName="QUESTION_CIRCLE" size="25" styleClass="sidebar-icon" textAlignment="CENTER" />
+                                                                                    </graphic>
+                                                                                    <cursor>
+                                                                                        <Cursor fx:constant="HAND" />
+                                                                                    </cursor>
+                                                                                </ToggleButton>
+                                                                                <ToggleButton fx:id="btnLogout" graphicTextGap="15.0" mnemonicParsing="false" onAction="#switchLogout" prefHeight="45.0" prefWidth="190.0" styleClass="side-button">
+                                                                                    <graphic>
+                                                                                        <FontAwesomeIconView glyphName="POWER_OFF" size="25" styleClass="sidebar-icon" textAlignment="CENTER" />
+                                                                                    </graphic>
+                                                                                    <cursor>
+                                                                                        <Cursor fx:constant="HAND" />
+                                                                                    </cursor>
+                                                                                </ToggleButton>
+                                                                            </children>
+                                                                        </VBox>
+                                                                    </children>
+                                                                </AnchorPane>
+                                                            </children>
+                                                        </AnchorPane>
+                                                    </bottom>
+                                                </BorderPane>
+                                            </children>
+                                        </AnchorPane>
+                                    </left>
+                                    <center>
+                                        <AnchorPane BorderPane.alignment="CENTER" />
+                                    </center>
+                                </BorderPane>
+                            </children>
+                        </AnchorPane>
+                    </left>
+                    <center>
+                        <AnchorPane fx:id="anchorSpacex" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+                            <children>
+                                <AnchorPane fx:id="anchorSpace" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                    <children>
+                                        <StackPane fx:id="workingSpace" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                            <children>
+                                                <Pane fx:id="pane" maxWidth="1.7976931348623157E308">
+                                                    <children>
+                                                        <TabPane fx:id="tabpane" maxWidth="1.7976931348623157E308" tabClosingPolicy="UNAVAILABLE">
+                                                            <padding>
+                                                                <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                                            </padding>
+                                                        </TabPane>
+                                                    </children>
+                                                </Pane>
+                                            </children>
+                                        </StackPane>
+                                    </children>
+                                </AnchorPane>
+                                <AnchorPane fx:id="anchorRightSideBarMenu" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                    <children>
+                                        <TreeView fx:id="tvRightSideBar" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                                    </children>
+                                </AnchorPane>
+                                <AnchorPane fx:id="anchorLeftSideBarMenu" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                    <children>
+                                        <TreeView fx:id="tvLeftSideBar" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                                    </children>
+                                </AnchorPane>
+                            </children>
+                        </AnchorPane>
+                    </center>
+                    <right>
+                        <AnchorPane BorderPane.alignment="CENTER">
+                            <children>
+                                <BorderPane AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                    <left>
+                                        <AnchorPane BorderPane.alignment="CENTER" />
+                                    </left>
+                                    <right>
+                                        <AnchorPane BorderPane.alignment="CENTER">
+                                            <children>
+                                                <AnchorPane fx:id="anchorIconMenu11" prefWidth="45.0" style="-fx-background-color: #BFBFBF;" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                                    <children>
+                                                        <VBox fx:id="nav_bar11" prefWidth="45.0" spacing="2.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                                            <children>
+                                                                <AnchorPane prefWidth="45.0">
+                                                                    <children>
+                                                                        <ToggleButton fx:id="btnSysMonitor" alignment="CENTER_RIGHT" graphicTextGap="15.0" mnemonicParsing="false" onAction="#switchSysMonitor" prefHeight="45.0" styleClass="right-side-button">
+                                                                            <cursor>
+                                                                                <Cursor fx:constant="HAND" />
+                                                                            </cursor>
+                                                                            <graphic>
+                                                                                <FontAwesomeIconView fill="#8c8c8c" glyphName="EXCLAMATION_CIRCLE" size="25" styleClass="sidebar-icon" textAlignment="RIGHT" />
+                                                                            </graphic>
+                                                                        </ToggleButton>
+                                                                        <AnchorPane fx:id="badgeNotification" layoutX="20.0" layoutY="20.0" prefHeight="18.0" prefWidth="18.0" style="-fx-background-color: red; -fx-background-radius: 150;" AnchorPane.leftAnchor="4.0" AnchorPane.topAnchor="2.0">
+                                                                            <children>
+                                                                                <Label fx:id="lblNotifCount" alignment="CENTER" contentDisplay="CENTER" text="0" textAlignment="JUSTIFY" textFill="WHITE" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                                                                    <font>
+                                                                                        <Font name="System Bold" size="10.0" />
+                                                                                    </font>
+                                                                                </Label>
+                                                                            </children>
+                                                                        </AnchorPane>
+                                                                    </children>
+                                                                </AnchorPane>
+                                                                <AnchorPane prefWidth="45.0">
+                                                                    <children>
+                                                                        <ToggleButton fx:id="btnAddToCart" alignment="CENTER_RIGHT" graphicTextGap="15.0" mnemonicParsing="false" onAction="#switchAddToCart" prefHeight="45.0" styleClass="side-button">
+                                                                            <cursor>
+                                                                                <Cursor fx:constant="HAND" />
+                                                                            </cursor>
+                                                                            <graphic>
+                                                                                <FontAwesomeIconView fill="#8c8c8c" glyphName="SHOPPING_CART" size="25" styleClass="sidebar-icon" textAlignment="RIGHT" />
+                                                                            </graphic>
+                                                                        </ToggleButton>
+                                                                        <AnchorPane fx:id="badgeNotification" layoutX="10.0" layoutY="10.0" prefHeight="18.0" prefWidth="18.0" style="-fx-background-color: red; -fx-background-radius: 150;" AnchorPane.leftAnchor="4.0" AnchorPane.topAnchor="2.0">
+                                                                            <children>
+                                                                                <Label fx:id="lblAddToCartCount" alignment="CENTER" contentDisplay="CENTER" text="999" textAlignment="JUSTIFY" textFill="WHITE" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                                                                    <font>
+                                                                                        <Font name="System Bold" size="10.0" />
+                                                                                    </font>
+                                                                                </Label>
+                                                                            </children>
+                                                                        </AnchorPane>
+                                                                    </children>
+                                                                </AnchorPane>
+                                                            </children>
+                                                        </VBox>
+                                                    </children>
+                                                </AnchorPane>
+
+                                            </children>
+                                        </AnchorPane>
+                                    </right>
+                                </BorderPane>
+                            </children>
+                        </AnchorPane>
+                    </right>
+                </BorderPane>
+            </children>
+        </StackPane>
+    </children>
+</AnchorPane>

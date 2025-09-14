@@ -1,0 +1,50 @@
+.text-field-custom {
+    -fx-font-size: 15px;
+    -fx-background-color:transparent;
+    -fx-border-color: transparent;
+    -fx-textflow: wrap;
+}
+
+.LogInCombobox {
+    -fx-padding: 0 15 0 0;
+    -fx-background-color: #F4F4F4;
+    -fx-border-color: gray;
+    -fx-border-width: 1px;
+    -fx-border-radius: 5px;
+    -fx-background-radius: 5px;
+    -fx-font-size: 15px;
+
+    -fx-min-width: 500px;
+    -fx-pref-width: 500px;
+    -fx-max-width: 500px;
+
+    -fx-min-height: 53px;
+    -fx-pref-height: 53px;
+    -fx-max-height: 53px;
+    -fx-prompt-text-fill: #ff0000;
+}
+
+.LogInCombobox .list-cell {
+    -fx-min-height: 53px;
+    -fx-pref-height: 53px;
+    -fx-max-height: 53px;
+    -fx-padding: 0 10 0 45;
+}
+
+.LogInCombobox .list-cell:hover {
+    -fx-background-color: #FF8201; /* Background color when hovered */
+}
+
+.LogInCombobox .popup .list-cell:selected {
+    -fx-background-color: #FF8201; /* Background color when selected in the drop-down */
+}
+.LogInCombobox .list-cell:empty {
+    -fx-text-fill: red; /* Prompt text color when no item is selected */
+}
+
+.LogInCombobox .text-field {
+    -fx-padding: 0 15 0 45;
+    -fx-font-size: 15px;
+    -fx-background-color: #F4F4F4;
+    -fx-prompt-text-fill: #B2B2B2;
+}
