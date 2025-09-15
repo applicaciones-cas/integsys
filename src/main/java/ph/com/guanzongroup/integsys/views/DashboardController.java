@@ -1,6 +1,7 @@
 package ph.com.guanzongroup.integsys.views;
 
 import java.io.IOException;
+import java.io.StringReader;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.sql.ResultSet;
@@ -8,6 +9,7 @@ import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
@@ -180,7 +182,7 @@ public class DashboardController implements Initializable {
     @FXML
     private AnchorPane anchorLeftSideBarMenu;
     @FXML
-    private TreeView tvLeftSideBar;
+    private TreeView<String> tvLeftSideBar;
     @FXML
     private AnchorPane anchorIconMenu11;
     @FXML
@@ -247,10 +249,16 @@ public class DashboardController implements Initializable {
 
     @FXML
     private void switchInventory(ActionEvent event) {
+        inventoryMenuItems();
+        toggleLeftSideBarMenuButton("switchInventory", 0);
+        toggleSidebarWidth();
     }
 
     @FXML
     private void switchPurchasing(ActionEvent event) {
+        purchasingMenuItems();
+        toggleLeftSideBarMenuButton("switchPurchasing", 1);
+        toggleSidebarWidth();
     }
 
     @FXML
@@ -1332,6 +1340,585 @@ public class DashboardController implements Initializable {
             AppUser.setText(oApp.getLogName() + " || " + getAllIndustries(industryid));
         } catch (SQLException ex) {
             Logger.getLogger(DashboardController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
+    private void toggleLeftSideBarMenuButton(String buttonId, Integer btnIndex) {
+        boolean isNoMenu = false;
+        boolean isSameButton = anchorLeftSideBarMenu.isVisible() && lastClickedBtnLeftSideBar.equals(buttonId);
+
+        if (tvLeftSideBar.getRoot() != null) {
+            if (!tvLeftSideBar.getRoot().getChildren().isEmpty()) {
+                setAnchorPaneVisibleManage(!isSameButton, anchorLeftSideBarMenu);
+            } else {
+                setAnchorPaneVisibleManage(false, anchorLeftSideBarMenu);
+                ShowMessageFX.Warning(null, "Computerized Accounting System", "No Menu's Available");
+                isNoMenu = true;
+            }
+        } else {
+            setAnchorPaneVisibleManage(false, anchorLeftSideBarMenu);
+            ShowMessageFX.Warning(null, "Computerized Accounting System", "No Menu's Available");
+            isNoMenu = true;
+        }
+
+        for (ToggleButton button : toggleBtnLeftUpperSideBar) {
+            button.setSelected(false);
+        }
+        if (!isNoMenu) {
+            toggleBtnLeftUpperSideBar[btnIndex].setSelected(!isSameButton);
+            lastClickedBtnLeftSideBar = isSameButton ? "" : buttonId;
+        }
+    }
+    
+    private void toggleSidebarWidth() {
+        if (tvLeftSideBar != null && tvLeftSideBar.getRoot() != null) {
+            int calculatedWidth = calculateTreeViewWidth(tvLeftSideBar.getRoot());
+
+            Platform.runLater(() -> {
+                anchorLeftSideBarMenu.setPrefWidth(calculatedWidth);
+            });
+        }
+    }
+    
+    private int calculateTreeViewWidth(TreeItem<String> root) {
+        if (root == null) {
+            return 200;
+        }
+        int baseWidth = 200;
+        int textPadding = 20;
+
+        int longestTextWidth = getMaxTextWidth(root);
+
+        double parentWidth = anchorLeftSideBarMenu.getParent().getLayoutBounds().getWidth();
+
+        int calculatedWidth = baseWidth + longestTextWidth + textPadding;
+        return (int) Math.min(calculatedWidth, parentWidth * 0.9);
+    }
+
+    private int getMaxTextWidth(TreeItem<String> item) {
+        if (item == null) {
+            return 0;
+        }
+
+        int maxWidth = getTextWidth(item.getValue());
+
+        for (TreeItem<String> child : item.getChildren()) {
+            maxWidth = Math.max(maxWidth, getMaxTextWidth(child));
+        }
+
+        return maxWidth;
+    }
+    
+    private int getTextWidth(String text) {
+        if (text == null || text.isEmpty()) {
+            return 0;
+        }
+
+        int charWidth = 7;
+        return text.length() * charWidth;
+    }
+    
+    private void inventoryMenuItems() {
+        String jsonString = "["
+                + "  {\"access_level\": \"01 02 03 04 05 06 07\", \"menu_name\": \"Inventory\", \"fxml_path\": \"Inventory\", \"controller_path\": \"sample.controller\", \"menu_id\": \"028\", \"menu_parent\": \"\"},"
+                + "  {\"access_level\": \"01 02 03 04 05 06 07\", \"menu_name\": \"Inventory Maintenance\", \"fxml_path\": \"Inventory/Inventory Maintenance\", \"controller_path\": \"sample.controller\", \"menu_id\": \"45\", \"menu_parent\": \"028\"},"
+                //Entry
+                + "  {\"access_level\": \"01 02 03 04 05 06 07\", \"menu_name\": \"Request\", \"fxml_path\": \"Inventory/Request\", \"controller_path\": \"sample.controller\", \"menu_id\": \"029\", \"menu_parent\": \"028\"},"
+                //Without ROQ 
+                + "  {\"access_level\": \"01 02 03 04 05 06 07\", \"menu_name\": \"Regular Stocks\", \"fxml_path\": \"Inventory/Request/Regular Stocks\", \"controller_path\": \"sample.controller\", \"menu_id\": \"030\", \"menu_parent\": \"029\"},"
+                //Without ROQ Mobile Phones
+                + "  {\"access_level\": \"01\", \"menu_name\": \"Mobile Phones\", \"fxml_path\": \"/com/rmj/guanzongroup/sidebarmenus/views/InvRequest_EntryMp.fxml\", \"controller_path\": \"InvRequest_EntryMP.controller\", \"menu_id\": \"031\", \"menu_parent\": \"030\"},"
+                + "  {\"access_level\": \"01\", \"menu_name\": \"Mobile Phones\", \"fxml_path\": \"/com/rmj/guanzongroup/sidebarmenus/views/InvRequest_ConfirmationMp.fxml\", \"controller_path\": \"InvRequest_ConfrimationMP.controller\", \"menu_id\": \"060\", \"menu_parent\": \"059\"},"
+                + "  {\"access_level\": \"01\", \"menu_name\": \"Mobile Phones\", \"fxml_path\": \"/com/rmj/guanzongroup/sidebarmenus/views/InvRequest_HistoryMp.fxml\", \"controller_path\": \"InvRequest_HistoryMP.controller\", \"menu_id\": \"0118\", \"menu_parent\": \"0117\"},"
+                + "  {\"access_level\": \"01\", \"menu_name\": \"General\", \"fxml_path\": \"/com/rmj/guanzongroup/sidebarmenus/views/InvRequest_EntryMPGeneral.fxml\", \"controller_path\": \"InvRequest_EntryMPGeneral.controller\", \"menu_id\": \"0144\", \"menu_parent\": \"030\"},"
+                + "  {\"access_level\": \"01\", \"menu_name\": \"General\", \"fxml_path\": \"/com/rmj/guanzongroup/sidebarmenus/views/InvRequest_ConfirmationMpGeneral.fxml\", \"controller_path\": \"InvRequest_ConfirmationMPGeneral.controller\", \"menu_id\": \"0145\", \"menu_parent\": \"059\"},"
+                + "  {\"access_level\": \"01\", \"menu_name\": \"General\", \"fxml_path\": \"/com/rmj/guanzongroup/sidebarmenus/views/InvRequest_HistoryMpGeneral.fxml\", \"controller_path\": \"InvRequest_HistoryMPGeneral.controller\", \"menu_id\": \"0147\", \"menu_parent\": \"0117\"},"
+                //Without ROQ
+                //Without ROQ Appliances
+                + "  {\"access_level\": \"07\", \"menu_name\": \"Appliances\", \"fxml_path\": \"/com/rmj/guanzongroup/sidebarmenus/views/InvRequest_EntryAppliances.fxml\", \"controller_path\": \"InvRequest_EntryAppliancesController.controller\", \"menu_id\": \"032\", \"menu_parent\": \"030\"},"
+                + "  {\"access_level\": \"07\", \"menu_name\": \"Appliances\", \"fxml_path\": \"/com/rmj/guanzongroup/sidebarmenus/views/InvRequest_ConfirmationAppliances.fxml\", \"controller_path\": \"InvRequest_ConfirmationAppliances.controller\", \"menu_id\": \"061\", \"menu_parent\": \"059\"},"
+                + "  {\"access_level\": \"07\", \"menu_name\": \"Appliances\", \"fxml_path\": \"/com/rmj/guanzongroup/sidebarmenus/views/InvRequest_HistoryAppliances.fxml\", \"controller_path\": \"InvRequest_HistoryAppliances.controller\", \"menu_id\": \"0118\", \"menu_parent\": \"0117\"},"
+                + "  {\"access_level\": \"07\", \"menu_name\": \"General\", \"fxml_path\": \"/com/rmj/guanzongroup/sidebarmenus/views/InvRequest_EntryAppliancesGeneral.fxml\", \"controller_path\": \"InvRequest_EntryAppliancesGeneral.controller\", \"menu_id\": \"032\", \"menu_parent\": \"030\"},"
+                + "  {\"access_level\": \"07\", \"menu_name\": \"General\", \"fxml_path\": \"/com/rmj/guanzongroup/sidebarmenus/views/InvRequest_ConfirmationAppliancesGeneral.fxml\", \"controller_path\": \"InvRequest_ConfirmationAppliancesGeneral.controller\", \"menu_id\": \"062\", \"menu_parent\": \"059\"},"
+                + "  {\"access_level\": \"07\", \"menu_name\": \"General\", \"fxml_path\": \"/com/rmj/guanzongroup/sidebarmenus/views/InvRequest_HistoryAppliancesGeneral.fxml\", \"controller_path\": \"InvRequest_HistoryAppliancesGeneral.controller\", \"menu_id\": \"0119\", \"menu_parent\": \"0117\"},"
+                //Without ROQ Motorcycle
+
+                + "  {\"access_level\": \"02\", \"menu_name\": \"Motorcycle\", \"fxml_path\": \"/com/rmj/guanzongroup/sidebarmenus/views/InvRequest_EntryMc.fxml\", \"controller_path\": \"InvRequest_EntryMc.controller\", \"menu_id\": \"034\", \"menu_parent\": \"030\"},"
+
+
+                + "  {\"access_level\": \"02\", \"menu_name\": \"Motorcycle\", \"fxml_path\": \"/com/rmj/guanzongroup/sidebarmenus/views/InvRequest_ConfirmationMc.fxml\", \"controller_path\": \"InvRequest_ConfirmationMc.controller\", \"menu_id\": \"063\", \"menu_parent\": \"059\"},"
+                + "  {\"access_level\": \"02\", \"menu_name\": \"Motorcycle\", \"fxml_path\": \"/com/rmj/guanzongroup/sidebarmenus/views/InvRequest_HistoryMc.fxml\", \"controller_path\": \"InvRequest_HistoryMc.controller\", \"menu_id\": \"0120\", \"menu_parent\": \"0117\"},"
+                + "  {\"access_level\": \"02\", \"menu_name\": \"Spareparts\", \"fxml_path\": \"/com/rmj/guanzongroup/sidebarmenus/views/InvRequest_EntryMcSp.fxml\", \"controller_path\": \"InvRequest_EntryMcSp.controller\", \"menu_id\": \"035\", \"menu_parent\": \"030\"},"
+                + "  {\"access_level\": \"02\", \"menu_name\": \"Spareparts\", \"fxml_path\": \"/com/rmj/guanzongroup/sidebarmenus/views/InvRequest_ConfirmationMcSp.fxml\", \"controller_path\": \"InvRequest_ConfirmationMcSp.controller\", \"menu_id\": \"064\", \"menu_parent\": \"059\"},"
+                + "  {\"access_level\": \"02\", \"menu_name\": \"Spareparts\", \"fxml_path\": \"/com/rmj/guanzongroup/sidebarmenus/views/InvRequest_HistoryMcSp.fxml\", \"controller_path\": \"InvRequest_HistoryMcSp.controller\", \"menu_id\": \"0121\", \"menu_parent\": \"0117\"},"
+                + "  {\"access_level\": \"02\", \"menu_name\": \"General\", \"fxml_path\": \"/com/rmj/guanzongroup/sidebarmenus/views/InvRequest_EntryMcGeneral.fxml\", \"controller_path\": \"InvRequest_EntryMcGeneral.controller\", \"menu_id\": \"036\", \"menu_parent\": \"030\"},"
+                + "  {\"access_level\": \"02\", \"menu_name\": \"General\", \"fxml_path\": \"/com/rmj/guanzongroup/sidebarmenus/views/InvRequest_ConfirmationMcGeneral.fxml\", \"controller_path\": \"InvRequest_ConfirmationMcGeneral.controller\", \"menu_id\": \"065\", \"menu_parent\": \"059\"},"
+
+                + "  {\"access_level\": \"02\", \"menu_name\": \"General\", \"fxml_path\": \"/com/rmj/guanzongroup/sidebarmenus/views/InvRequest_HistoryMcGeneral.fxml\", \"controller_path\": \"InvRequest_HistoryMcGeneral.controller\", \"menu_id\": \"0122\", \"menu_parent\": \"0117\"}," 
+
+                //Without ROQ Car
+                + "  {\"access_level\": \"03\", \"menu_name\": \"Car\", \"fxml_path\": \"/com/rmj/guanzongroup/sidebarmenus/views/InvRequest_ConfirmationCar.fxml\", \"controller_path\": \"InvRequest_ConfirmationCar.controller\", \"menu_id\": \"067\", \"menu_parent\": \"059\"},"
+                + "  {\"access_level\": \"03\", \"menu_name\": \"Car\", \"fxml_path\": \"/com/rmj/guanzongroup/sidebarmenus/views/InvRequest_EntryCar.fxml\", \"controller_path\": \"InvRequest_EntryCar.controller\", \"menu_id\": \"067\", \"menu_parent\": \"030\"},"
+                + "  {\"access_level\": \"03\", \"menu_name\": \"Car\", \"fxml_path\": \"/com/rmj/guanzongroup/sidebarmenus/views/InvRequest_HistoryCar.fxml\", \"controller_path\": \"InvRequest_HistoryCar.controller\", \"menu_id\": \"0123\", \"menu_parent\": \"0117\"},"
+                + "  {\"access_level\": \"03\", \"menu_name\": \"Spareparts\", \"fxml_path\": \"/com/rmj/guanzongroup/sidebarmenus/views/InvRequest_EntryCarSp.fxml\", \"controller_path\": \"InvRequest_EntryCarSp.controller\", \"menu_id\": \"038\", \"menu_parent\": \"030\"},"
+                + "  {\"access_level\": \"03\", \"menu_name\": \"Spareparts\", \"fxml_path\": \"/com/rmj/guanzongroup/sidebarmenus/views/InvRequest_ConfirmationCarSp.fxml\", \"controller_path\": \"InvRequest_ConfirmationCarSp.controller\", \"menu_id\": \"068\", \"menu_parent\": \"059\"},"
+
+                + "  {\"access_level\": \"03\", \"menu_name\": \"Spareparts\", \"fxml_path\": \"/com/rmj/guanzongroup/sidebarmenus/views/InvRequest_HistoryCarSp.fxml\", \"controller_path\": \"InvRequest_HistoryCarSp.controller\", \"menu_id\": \"0124\", \"menu_parent\": \"0117\"},"
+                + "  {\"access_level\": \"03\", \"menu_name\": \"General\", \"fxml_path\": \"/com/rmj/guanzongroup/sidebarmenus/views/InvRequest_EntryCarGeneral.fxml\", \"controller_path\": \"InvRequest_EntryCarGeneral.controller\", \"menu_id\": \"039\", \"menu_parent\": \"030\"},"
+                + "  {\"access_level\": \"03\", \"menu_name\": \"General\", \"fxml_path\": \"/com/rmj/guanzongroup/sidebarmenus/views/InvRequest_ConfirmationCarGeneral.fxml\", \"controller_path\": \"InvRequest_ConfirmationCarGeneral.controller\", \"menu_id\": \"069\", \"menu_parent\": \"059\"},"
+                + "  {\"access_level\": \"03\", \"menu_name\": \"General\", \"fxml_path\": \"/com/rmj/guanzongroup/sidebarmenus/views/InvRequest_HistoryCarGeneral.fxml\", \"controller_path\": \"InvRequest_HistoryCarGeneral.controller\", \"menu_id\": \"0125\", \"menu_parent\": \"0117\"},"
+                //Without ROQ Los Pedritos
+                + "  {\"access_level\": \"05\", \"menu_name\": \"LP Food\", \"fxml_path\": \"/com/rmj/guanzongroup/sidebarmenus/views/InvRequest_EntryLpFood.fxml\", \"controller_path\": \"InvRequest_EntryLPFood.controller\", \"menu_id\": \"042\", \"menu_parent\": \"030\"},"
+                + "  {\"access_level\": \"05\", \"menu_name\": \"LP Food\", \"fxml_path\": \"/com/rmj/guanzongroup/sidebarmenus/views/InvRequest_ConfirmationLpFood.fxml\", \"controller_path\": \"InvRequest_ConfirmationLPFood.controller\", \"menu_id\": \"072\", \"menu_parent\": \"059\"},"
+                + "  {\"access_level\": \"05\", \"menu_name\": \"LP Food\", \"fxml_path\": \"/com/rmj/guanzongroup/sidebarmenus/views/InvRequest_HistoryLpFood.fxml\", \"controller_path\": \"InvRequest_HistoryLPFood.controller\", \"menu_id\": \"0128\", \"menu_parent\": \"0117\"},"
+                + "  {\"access_level\": \"05\", \"menu_name\": \"LP General\", \"fxml_path\": \"/com/rmj/guanzongroup/sidebarmenus/views/InvRequest_EntryLpGeneral.fxml\", \"controller_path\": \"InvRequest_EntryLPGeneral.controller\", \"menu_id\": \"0152\", \"menu_parent\": \"030\"},"
+                + "  {\"access_level\": \"05\", \"menu_name\": \"LP General\", \"fxml_path\": \"/com/rmj/guanzongroup/sidebarmenus/views/InvRequest_ConfirmationLpGeneral.fxml\", \"controller_path\": \"InvRequest_ConfirmationLPGeneral.controller\", \"menu_id\": \"073\", \"menu_parent\": \"059\"}," //check
+                + "  {\"access_level\": \"05\", \"menu_name\": \"LP General\", \"fxml_path\": \"/com/rmj/guanzongroup/sidebarmenus/views/InvRequest_HistoryLpGeneral.fxml\", \"controller_path\": \"InvRequest_HistoryLPGeneral.controller\", \"menu_id\": \"0129\", \"menu_parent\": \"0117\"},"
+                //Without ROQ Monarch
+                + "  {\"access_level\": \"04\", \"menu_name\": \"Monarch Food\", \"fxml_path\": \"/com/rmj/guanzongroup/sidebarmenus/views/InvRequest_EntryMonarchFood.fxml\", \"controller_path\": \"InvRequest_EntryMonarchFood.controller\", \"menu_id\": \"040\", \"menu_parent\": \"030\"},"
+                + "  {\"access_level\": \"04\", \"menu_name\": \"Monarch Food\", \"fxml_path\": \"/com/rmj/guanzongroup/sidebarmenus/views/InvRequest_ConfirmationMonarchFood.fxml\", \"controller_path\": \"InvRequest_ConfirmationMonarchFood.controller\", \"menu_id\": \"070\", \"menu_parent\": \"059\"},"
+                + "  {\"access_level\": \"04\", \"menu_name\": \"Monarch Food\", \"fxml_path\": \"/com/rmj/guanzongroup/sidebarmenus/views/InvRequest_HistoryMonarchFood.fxml\", \"controller_path\": \"InvRequest_HistoryMonarchFood.controller\", \"menu_id\": \"0126\", \"menu_parent\": \"0117\"},"
+                + "  {\"access_level\": \"04\", \"menu_name\": \"Monarch General\", \"fxml_path\": \"/com/rmj/guanzongroup/sidebarmenus/views/InvRequest_EntryMonarchGeneral.fxml\", \"controller_path\": \"InvRequest_EntryMonarchGeneral.controller\", \"menu_id\": \"041\", \"menu_parent\": \"030\"},"
+                + "  {\"access_level\": \"04\", \"menu_name\": \"Monarch General\", \"fxml_path\": \"/com/rmj/guanzongroup/sidebarmenus/views/InvRequest_ConfirmationMonarchGeneral.fxml\", \"controller_path\": \"InvRequest_ConfirmationMonarchGeneral.controller\", \"menu_id\": \"071\", \"menu_parent\": \"059\"},"
+                + "  {\"access_level\": \"04\", \"menu_name\": \"Monarch General\", \"fxml_path\": \"/com/rmj/guanzongroup/sidebarmenus/views/InvRequest_HistoryMonarchGeneral.fxml\", \"controller_path\": \"InvRequest_HistoryMonarchGeneral.controller\", \"menu_id\": \"0127\", \"menu_parent\": \"0117\"},"
+                //With ROQ
+                //With ROQ mobile phones
+                + "  {\"access_level\": \"01\", \"menu_name\": \"Mobile Phones\", \"fxml_path\": \"/com/rmj/guanzongroup/sidebarmenus/views/InvRequest_ROQ_EntryMp.fxml\", \"controller_path\": \"InvRequest_ROQ_EntryMP.controller\", \"menu_id\": \"045\", \"menu_parent\": \"044\"},"
+                + "  {\"access_level\": \"01\", \"menu_name\": \"Mobile Phones\", \"fxml_path\": \"/com/rmj/guanzongroup/sidebarmenus/views/InvRequest_ROQ_ConfirmationMp.fxml\", \"controller_path\": \"InvRequest_Roq_ConfirmationMP.controller\", \"menu_id\": \"075\", \"menu_parent\": \"074\"},"
+               
+                + "  {\"access_level\": \"01\", \"menu_name\": \"Mobile Phones\", \"fxml_path\": \"/com/rmj/guanzongroup/sidebarmenus/views/InvRequest_ROQ_HistoryMp.fxml\", \"controller_path\": \"InvRequest_Roq_HistoryMP.controller\", \"menu_id\": \"0131\", \"menu_parent\": \"0130\"},"
+                + "  {\"access_level\": \"01\", \"menu_name\": \"General\", \"fxml_path\": \"/com/rmj/guanzongroup/sidebarmenus/views/InvRequest_ROQ_EntryMpGeneral.fxml\", \"controller_path\": \"InvRequest_Roq_EntryMPGeneral.controller\", \"menu_id\": \"0148\", \"menu_parent\": \"044\"},"
+                + "  {\"access_level\": \"01\", \"menu_name\": \"General\", \"fxml_path\": \"/com/rmj/guanzongroup/sidebarmenus/views/InvRequest_ROQ_ConfirmationMpGeneral.fxml\", \"controller_path\": \"InvRequest_Roq_ConfirmationMPGeneral.controller\", \"menu_id\": \"0149\", \"menu_parent\": \"074\"},"
+                
+                + "  {\"access_level\": \"01\", \"menu_name\": \"General\", \"fxml_path\": \"/com/rmj/guanzongroup/sidebarmenus/views/InvRequest_ROQ_HistoryMpGeneral.fxml\", \"controller_path\": \"InvRequest_Roq_HistoryMPGeneral.controller\", \"menu_id\": \"0151\", \"menu_parent\": \"0130\"},"
+                //With ROQ Appliances 
+                + "  {\"access_level\": \"07\", \"menu_name\": \"Appliances\", \"fxml_path\": \"/com/rmj/guanzongroup/sidebarmenus/views/InvRequest_ROQ_EntryAppliances.fxml\", \"controller_path\": \"InvRequest_ROQ_EntryAppliances.controller\", \"menu_id\": \"046\", \"menu_parent\": \"044\"},"
+                + "  {\"access_level\": \"07\", \"menu_name\": \"Appliances\", \"fxml_path\": \"/com/rmj/guanzongroup/sidebarmenus/views/InvRequest_ROQ_ConfirmationAppliances.fxml\", \"controller_path\": \"InvRequest_ROQ_ConfirmationAppliances.controller\", \"menu_id\": \"076\", \"menu_parent\": \"074\"},"
+       
+                + "  {\"access_level\": \"07\", \"menu_name\": \"Appliances\", \"fxml_path\": \"/com/rmj/guanzongroup/sidebarmenus/views/InvRequest_ROQ_HistoryAppliances.fxml\", \"controller_path\": \"InvRequest_Roq_HistoryAppliances.controller\", \"menu_id\": \"0132\", \"menu_parent\": \"0130\"},"
+                + "  {\"access_level\": \"07\", \"menu_name\": \"General\", \"fxml_path\": \"/com/rmj/guanzongroup/sidebarmenus/views/InvRequest_ROQ_EntryAppliancesGeneral.fxml\", \"controller_path\": \"InvRequest_ROQ_EntryAppliancesGeneral.controller\", \"menu_id\": \"047\", \"menu_parent\": \"044\"},"
+                + "  {\"access_level\": \"07\", \"menu_name\": \"General\", \"fxml_path\": \"/com/rmj/guanzongroup/sidebarmenus/views/InvRequest_ROQ_ConfirmationAppliancesGeneral.fxml\", \"controller_path\": \"InvRequest_ROQ_ConfirmationAppliancesGeneral.controller\", \"menu_id\": \"077\", \"menu_parent\": \"074\"},"
+              
+                + "  {\"access_level\": \"07\", \"menu_name\": \"General\", \"fxml_path\": \"/com/rmj/guanzongroup/sidebarmenus/views/InvRequest_ROQ_HistoryAppliancesGeneral.fxml\", \"controller_path\": \"InvRequest_Roq_HistoryAppliancesGeneral.controller\", \"menu_id\": \"0133\", \"menu_parent\": \"0130\"},"
+                //With ROQ Motorcycles 
+                + "  {\"access_level\": \"02\", \"menu_name\": \"Motorcycle\", \"fxml_path\": \"/com/rmj/guanzongroup/sidebarmenus/views/InvRequest_ROQ_EntryMc.fxml\", \"controller_path\": \"InvRequest_Roq_EntryMc.controller\", \"menu_id\": \"048\", \"menu_parent\": \"044\"},"
+                + "  {\"access_level\": \"02\", \"menu_name\": \"Motorcycle\", \"fxml_path\": \"/com/rmj/guanzongroup/sidebarmenus/views/InvRequest_ROQ_ConfirmationMc.fxml\", \"controller_path\": \"InvRequest_Roq_ConfirmationMc.controller\", \"menu_id\": \"078\", \"menu_parent\": \"074\"},"
+                
+                + "  {\"access_level\": \"02\", \"menu_name\": \"Motorcycle\", \"fxml_path\": \"/com/rmj/guanzongroup/sidebarmenus/views/InvRequest_ROQ_HistoryMc.fxml\", \"controller_path\": \"InvRequest_Roq_HistoryMc.controller\", \"menu_id\": \"0134\", \"menu_parent\": \"0130\"},"
+                + "  {\"access_level\": \"02\", \"menu_name\": \"Spareparts\", \"fxml_path\": \"/com/rmj/guanzongroup/sidebarmenus/views/InvRequest_ROQ_EntryMcSp.fxml\", \"controller_path\": \"InvRequest_ROQ_EntryMcSp.controller\", \"menu_id\": \"49\", \"menu_parent\": \"044\"},"
+                + "  {\"access_level\": \"02\", \"menu_name\": \"Spareparts\", \"fxml_path\": \"/com/rmj/guanzongroup/sidebarmenus/views/InvRequest_ROQ_ConfirmationMcSp.fxml\", \"controller_path\": \"InvRequest_Roq_ConfirmationMcSp.controller\", \"menu_id\": \"79\", \"menu_parent\": \"074\"},"
+
+                + "  {\"access_level\": \"02\", \"menu_name\": \"Spareparts\", \"fxml_path\": \"/com/rmj/guanzongroup/sidebarmenus/views/InvRequest_ROQ_HistoryMcSp.fxml\", \"controller_path\": \"InvRequest_Roq_HistoryMcSp.controller\", \"menu_id\": \"135\", \"menu_parent\": \"0130\"},"
+                + "  {\"access_level\": \"02\", \"menu_name\": \"General\", \"fxml_path\": \"/com/rmj/guanzongroup/sidebarmenus/views/InvRequest_ROQ_EntryMcGeneral.fxml\", \"controller_path\": \"InvRequest_Roq_EntryMcGeneral.controller\", \"menu_id\": \"050\", \"menu_parent\": \"044\"},"
+                + "  {\"access_level\": \"02\", \"menu_name\": \"General\", \"fxml_path\": \"/com/rmj/guanzongroup/sidebarmenus/views/InvRequest_ROQ_ConfirmationMcGeneral.fxml\", \"controller_path\": \"InvRequest_Roq_ConfirmationMcGeneral.controller\", \"menu_id\": \"080\", \"menu_parent\": \"074\"},"
+           
+                + "  {\"access_level\": \"02\", \"menu_name\": \"General\", \"fxml_path\": \"/com/rmj/guanzongroup/sidebarmenus/views/InvRequest_ROQ_HistoryMcGeneral.fxml\", \"controller_path\": \"InvRequest_Roq_HistoryMcGeneral.controller\", \"menu_id\": \"0136\", \"menu_parent\": \"0130\"},"
+                //With ROQ Car
+                + "  {\"access_level\": \"03\", \"menu_name\": \"Car\", \"fxml_path\": \"/com/rmj/guanzongroup/sidebarmenus/views/InvRequest_ROQ_EntryCar.fxml\", \"controller_path\": \"InvRequest_Roq_EntryCar.controller\", \"menu_id\": \"051\", \"menu_parent\": \"044\"},"
+                + "  {\"access_level\": \"03\", \"menu_name\": \"Car\", \"fxml_path\": \"/com/rmj/guanzongroup/sidebarmenus/views/InvRequest_ROQ_ConfirmationCar.fxml\", \"controller_path\": \"InvRequest_Roq_ConfirmationCar.controller\", \"menu_id\": \"081\", \"menu_parent\": \"074\"},"
+        
+                + "  {\"access_level\": \"03\", \"menu_name\": \"Car\", \"fxml_path\": \"/com/rmj/guanzongroup/sidebarmenus/views/InvRequest_ROQ_HistoryCar.fxml\", \"controller_path\": \"InvRequest_Roq_HistoryCar.controller\", \"menu_id\": \"0137\", \"menu_parent\": \"0130\"},"
+                + "  {\"access_level\": \"03\", \"menu_name\": \"Spareparts\", \"fxml_path\": \"/com/rmj/guanzongroup/sidebarmenus/views/InvRequest_ROQ_EntryCarSp.fxml\", \"controller_path\": \"InvRequest_ROQ_EntryCarSP.controller\", \"menu_id\": \"052\", \"menu_parent\": \"044\"},"
+                + "  {\"access_level\": \"03\", \"menu_name\": \"Spareparts\", \"fxml_path\": \"/com/rmj/guanzongroup/sidebarmenus/views/InvRequest_ROQ_ConfirmationCarSp.fxml\", \"controller_path\": \"InvRequest_Roq_ConfirmationCarSp.controller\", \"menu_id\": \"082\", \"menu_parent\": \"074\"},"
+
+                + "  {\"access_level\": \"03\", \"menu_name\": \"Spareparts\", \"fxml_path\": \"/com/rmj/guanzongroup/sidebarmenus/views/InvRequest_ROQ_HistoryCarSp.fxml\", \"controller_path\": \"InvRequest_Roq_HistoryCarSp.controller\", \"menu_id\": \"0138\", \"menu_parent\": \"0130\"},"
+                + "  {\"access_level\": \"03\", \"menu_name\": \"General\", \"fxml_path\": \"/com/rmj/guanzongroup/sidebarmenus/views/InvRequest_ROQ_EntryCarGeneral.fxml\", \"controller_path\": \"InvRequest_Roq_EntryCarGeneral.controller\", \"menu_id\": \"053\", \"menu_parent\": \"044\"},"
+                + "  {\"access_level\": \"03\", \"menu_name\": \"General\", \"fxml_path\": \"/com/rmj/guanzongroup/sidebarmenus/views/InvRequest_ROQ_ConfirmationCarGeneral.fxml\", \"controller_path\": \"InvRequest_Roq_ConfirmationCarGeneral.controller\", \"menu_id\": \"083\", \"menu_parent\": \"074\"},"
+
+                + "  {\"access_level\": \"03\", \"menu_name\": \"General\", \"fxml_path\": \"/com/rmj/guanzongroup/sidebarmenus/views/InvRequest_ROQ_HistoryCarGeneral.fxml\", \"controller_path\": \"InvRequest_Roq_HistoryCarGeneral.controller\", \"menu_id\": \"0139\", \"menu_parent\": \"0130\"},"
+                //With ROQ Los Pedritos
+                + "  {\"access_level\": \"05\", \"menu_name\": \"LP Food\", \"fxml_path\": \"/com/rmj/guanzongroup/sidebarmenus/views/InvRequest_ROQ_EntryLpFood.fxml\", \"controller_path\": \"InvRequest_Roq_EntryLPFood.controller\", \"menu_id\": \"056\", \"menu_parent\": \"044\"},"
+                + "  {\"access_level\": \"05\", \"menu_name\": \"LP Food\", \"fxml_path\": \"/com/rmj/guanzongroup/sidebarmenus/views/InvRequest_ROQ_ConfirmationLpFood.fxml\", \"controller_path\": \"InvRequest_Roq_ConfirmationLpFood.controller\", \"menu_id\": \"086\", \"menu_parent\": \"074\"},"
+
+                + "  {\"access_level\": \"05\", \"menu_name\": \"LP Food\", \"fxml_path\": \"/com/rmj/guanzongroup/sidebarmenus/views/InvRequest_ROQ_HistoryLpFood.fxml\", \"controller_path\": \"InvRequest_Roq_HistoryLPFood.controller\", \"menu_id\": \"0142\", \"menu_parent\": \"0130\"},"
+                + "  {\"access_level\": \"05\", \"menu_name\": \"LP General\", \"fxml_path\": \"/com/rmj/guanzongroup/sidebarmenus/views/InvRequest_ROQ_EntryLpGeneral.fxml\", \"controller_path\": \"InvRequest_Roq_EntryLPGeneral.controller\", \"menu_id\": \"057\", \"menu_parent\": \"044\"},"
+                + "  {\"access_level\": \"05\", \"menu_name\": \"LP General\", \"fxml_path\": \"/com/rmj/guanzongroup/sidebarmenus/views/InvRequest_ROQ_ConfirmationLpGeneral.fxml\", \"controller_path\": \"InvRequest_ROQ_ConfirmationLpGeneral.controller\", \"menu_id\": \"087\", \"menu_parent\": \"074\"},"
+
+                + "  {\"access_level\": \"05\", \"menu_name\": \"LP General\", \"fxml_path\": \"/com/rmj/guanzongroup/sidebarmenus/views/InvRequest_ROQ_HistoryLpGeneral.fxml\", \"controller_path\": \"InvRequest_Roq_HistoryLPGeneral.controller\", \"menu_id\": \"0143\", \"menu_parent\": \"0130\"},"
+                //With ROQ Monarch
+                + "  {\"access_level\": \"04\", \"menu_name\": \"Monarch Food\", \"fxml_path\": \"/com/rmj/guanzongroup/sidebarmenus/views/InvRequest_ROQ_EntryMonarchFood.fxml\", \"controller_path\": \"InvRequest_Roq_EntryMonarchFood.controller\", \"menu_id\": \"054\", \"menu_parent\": \"044\"},"
+                + "  {\"access_level\": \"04\", \"menu_name\": \"Monarch Food\", \"fxml_path\": \"/com/rmj/guanzongroup/sidebarmenus/views/InvRequest_ROQ_ConfirmationMonarchFood.fxml\", \"controller_path\": \"InvRequest_Roq_ConfirmationMonarchFood.controller\", \"menu_id\": \"084\", \"menu_parent\": \"074\"},"
+      
+                + "  {\"access_level\": \"04\", \"menu_name\": \"Monarch Food\", \"fxml_path\": \"/com/rmj/guanzongroup/sidebarmenus/views/InvRequest_ROQ_HistoryMonarchFood.fxml\", \"controller_path\": \"InvRequest_Roq_HistoryMonarchFood.controller\", \"menu_id\": \"0140\", \"menu_parent\": \"0130\"},"
+                + "  {\"access_level\": \"04\", \"menu_name\": \"Monarch General\", \"fxml_path\": \"/com/rmj/guanzongroup/sidebarmenus/views/InvRequest_ROQ_EntryMonarchGeneral.fxml\", \"controller_path\": \"InvRequest_Roq_EntryMonarchGeneral.controller\", \"menu_id\": \"055\", \"menu_parent\": \"044\"},"
+                + "  {\"access_level\": \"04\", \"menu_name\": \"Monarch General\", \"fxml_path\": \"/com/rmj/guanzongroup/sidebarmenus/views/InvRequest_ROQ_ConfirmationMonarchGeneral.fxml\", \"controller_path\": \"InvRequest_Roq_ConfirmationMonarchGeneral.controller\", \"menu_id\": \"085\", \"menu_parent\": \"074\"},"
+
+              
+                + "  {\"access_level\": \"04\", \"menu_name\": \"Monarch General\", \"fxml_path\": \"/com/rmj/guanzongroup/sidebarmenus/views/InvRequest_ROQ_HistoryMonarchGeneral.fxml\", \"controller_path\": \"InvRequest_Roq_HistoryMonarchGeneral.controller\", \"menu_id\": \"0141\", \"menu_parent\": \"0130\"},"      
+               //System recommended
+                + "  {\"access_level\": \"01 02 03 04 05 06 07\", \"menu_name\": \"System Recommend\", \"fxml_path\": \"Inventory/Request/System Recommend\", \"controller_path\": \"sample.controller\", \"menu_id\": \"044\", \"menu_parent\": \"029\"},"   
+               //new tab: Confirmation
+                + "  {\"access_level\": \"01 02 03 04 05 06 07\", \"menu_name\": \"Confirmation\", \"fxml_path\": \"Inventory/Confirmation\", \"controller_path\": \"sample.controller\", \"menu_id\": \"058\", \"menu_parent\": \"028\"},"
+                + "  {\"access_level\": \"01 02 03 04 05 06 07\", \"menu_name\": \"Regular Stocks\", \"fxml_path\": \"Inventory/Confirmation/Regular Stocks\", \"controller_path\": \"sample.controller\", \"menu_id\": \"059\", \"menu_parent\": \"058\"},"
+                + "  {\"access_level\": \"01 02 03 04 05 06 07\", \"menu_name\": \"System Recommend\", \"fxml_path\": \"Inventory/Request/System Recommend\", \"controller_path\": \"sample.controller\", \"menu_id\": \"074\", \"menu_parent\": \"058\"},"              
+                
+               
+
+                //new tab: History
+                + "  {\"access_level\": \"01 02 03 04 05 06 07\", \"menu_name\": \"History\", \"fxml_path\": \"Inventory/History\", \"controller_path\": \"sample.controller\", \"menu_id\": \"0116\", \"menu_parent\": \"028\"},"
+                + "  {\"access_level\": \"01 02 03 04 05 06 07\", \"menu_name\": \"Regular Stocks\", \"fxml_path\": \"Inventory/History/Regular Stocks\", \"controller_path\": \"sample.controller\", \"menu_id\": \"0117\", \"menu_parent\": \"0116\"},"
+                + "  {\"access_level\": \"01 02 03 04 05 06 07\", \"menu_name\": \"System Recommend\", \"fxml_path\": \"Inventory/History/Request/System Recommend\", \"controller_path\": \"sample.controller\", \"menu_id\": \"0130\", \"menu_parent\": \"0116\"},"
+                + "]";
+
+        JSONParser parser = new JSONParser();
+        try {
+            try {
+                flatMenuItems = (JSONArray) parser.parse(new StringReader(jsonString));
+                JSONObject purchasingMainMenu = buildHierarchy("028");
+                dissectLeftSideBarJSON(purchasingMainMenu.toJSONString());
+
+            } catch (IOException ex) {
+                Logger.getLogger(DashboardController.class
+                        .getName()).log(Level.SEVERE, null, ex);
+            }
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+    }
+    
+    private void dissectLeftSideBarJSON(String fsValue) {
+        if (fsValue == null || fsValue.isEmpty()) {
+            System.err.println("Invalid JSON string.");
+            return;
+        }
+
+        JSONParser loParser = new JSONParser();
+        try {
+            Object parsedJson = loParser.parse(fsValue);
+            JSONArray laMaster;
+
+            if (parsedJson instanceof JSONArray) {
+                laMaster = (JSONArray) parsedJson;
+            } else if (parsedJson instanceof JSONObject) {
+                laMaster = new JSONArray();
+                laMaster.add(parsedJson);
+            } else {
+                System.err.println("Invalid JSON format.");
+                return;
+            }
+
+            TreeItem<String> root = new TreeItem<>("root");
+            menuLocationMap.clear();
+//            menuIndustryMap.clear();
+//            menuCategoryMap.clear();
+
+            for (Object objMaster : laMaster) {
+                if (!(objMaster instanceof JSONObject)) {
+                    System.err.println("Skipping invalid entry: " + objMaster);
+                    continue;
+                }
+
+                JSONObject loParent = (JSONObject) objMaster;
+                if (!loParent.containsKey("menu_name")) {
+                    continue;
+                }
+
+                String parentName = String.valueOf(loParent.get("menu_name"));
+                String location = loParent.containsKey("fxml_path") ? String.valueOf(loParent.get("fxml_path")) : "";
+//                String lsIndustryCode = String.valueOf(loParent.get("industry_code"));
+//                String lsCategoryCode = String.valueOf(loParent.get("category_code"));
+
+                TreeItem<String> parentNode = new TreeItem<>(parentName);
+                menuLocationMap.put(parentNode, location); // Store location
+//                menuIndustryMap.put(parentNode, lsIndustryCode); // Store industry code
+//                menuCategoryMap.put(parentNode, lsCategoryCode); // Store category code
+
+                if (loParent.containsKey("child") && loParent.get("child") instanceof JSONArray) {
+                    JSONArray laDetail = (JSONArray) loParent.get("child");
+                    addChildren(parentNode, laDetail);
+                }
+
+                root.getChildren().add(parentNode);
+            }
+
+            if (tvLeftSideBar != null) {
+                tvLeftSideBar.setRoot(root);
+                tvLeftSideBar.setShowRoot(false);
+
+                if (!isListenerLeftAdded) {
+                    isListenerLeftAdded = true;
+                    tvLeftSideBar.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+                        if (newValue != null) {
+                            handleSelection(newValue);
+                        }
+                    });
+                }
+            } else {
+                System.err.println("tvLeftSideBar is not initialized.");
+            }
+        } catch (ParseException ex) {
+            ex.printStackTrace();
+        }
+    }
+    
+    private void handleSelection(TreeItem<String> newValue) {
+        if (newValue == null || !newValue.isLeaf() || newValue.getValue() == null || newValue.getValue().isEmpty()) {
+            System.out.println("Invalid selection or empty value.");
+            return;
+        }
+
+        // Get the location directly from menuLocationMap
+        sformname = menuLocationMap.getOrDefault(newValue, "");
+//        psIndustryID = menuIndustryMap.getOrDefault(newValue, "");
+//        psCategoryID = menuCategoryMap.getOrDefault(newValue, "");
+        if (oApp != null) {
+            boolean isNewTab = (checktabs(SetTabTitle(sformname)) == 1);
+            if (isNewTab) {
+                if (!sformname.isEmpty() && sformname.contains(".fxml")) {
+
+                    System.out.println("industry: " + psIndustryID);
+                    System.out.println("category: " + psCategoryID);
+                    setScene2(loadAnimate(sformname));
+                } else {
+                    ShowMessageFX.Warning("This form is currently unavailable.", "Computerized Accounting System", pxeModuleName);
+                }
+            } else {
+                ShowMessageFX.Warning("This form is already active.", "Computerized Accounting System", pxeModuleName);
+            }
+
+            setAnchorPaneVisibleManage(false, anchorLeftSideBarMenu);
+            for (ToggleButton navButton : toggleBtnLeftUpperSideBar) {
+                navButton.setSelected(false);
+            }
+            pane.requestFocus();
+        }
+    }
+    
+    public JSONObject buildHierarchy(String menuCode) {
+        String userDepartment = psUserIndustryId;
+        Map<String, List<JSONObject>> childMap = new HashMap<>();
+        JSONObject rootMenuItem = null;
+
+        for (JSONObject item : flatMenuItems) {
+            List<String> accessDepartments = getAccessDepartments(item);
+
+            if (!accessDepartments.contains(userDepartment)) {
+                continue;
+            }
+
+            String menuId = (String) item.get("menu_id");
+            String parentId = (String) item.get("menu_parent");
+
+            if (menuCode.equals(menuId) && (parentId == null || parentId.isEmpty())) {
+                rootMenuItem = item;
+            }
+
+            childMap.computeIfAbsent(parentId, k -> new ArrayList<>()).add(item);
+        }
+
+        if (rootMenuItem == null) {
+            return new JSONObject();
+        }
+
+        return buildSubHierarchy(rootMenuItem, childMap, userDepartment);
+    }
+    
+    private JSONObject buildSubHierarchy(JSONObject item, Map<String, List<JSONObject>> childMap, String userDepartment) {
+        JSONObject node = new JSONObject();
+        node.put("menu_id", item.get("menu_id"));
+        node.put("menu_name", item.get("menu_name"));
+        node.put("menu_parent", item.get("menu_parent"));
+        node.put("fxml_path", item.get("fxml_path"));
+        node.put("controller_path", item.get("controller_path"));
+        node.put("access_level", item.get("access_level"));
+
+        List<JSONObject> children = childMap.getOrDefault(item.get("menu_id"), Collections.emptyList());
+
+        JSONArray childrenArray = new JSONArray();
+        for (JSONObject child : children) {
+            List<String> accessDepartments = getAccessDepartments(child);
+            if (accessDepartments.contains(userDepartment)) {
+                childrenArray.add(buildSubHierarchy(child, childMap, userDepartment));
+            }
+        }
+
+        if (!childrenArray.isEmpty()) {
+            node.put("child", childrenArray);
+        } else {
+            node.put("child", new JSONArray());
+        }
+
+        return node;
+    }
+    
+    private List<String> getAccessDepartments(JSONObject item) {
+        Object accessLevelObj = item.get("access_level");
+
+        if (accessLevelObj == null) {
+            return Collections.emptyList();
+        }
+
+        String accessLevelStr = accessLevelObj.toString().trim();
+        if (accessLevelStr.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        return Arrays.asList(accessLevelStr.split("\\s+"));
+    }
+    
+    private void purchasingMenuItems() {
+        String jsonString = "[{\"access_level\":\"01 02 03 04 05 06 07\",\"menu_name\":\"Purchasing\",\"fxml_path\":\"Purchasing\",\"controller_path\":\"purchasing.controller\",\"menu_id\":\"001\",\"menu_parent\":\"\"},"
+                + "{\"access_level\":\"01 02 03 04 05 06 07\",\"menu_name\":\"Entry\",\"fxml_path\":\"Entry\",\"controller_path\":\"entry.controller\",\"menu_id\":\"002\",\"menu_parent\":\"001\"},"
+                // Purchase Order Entry
+                + "{\"access_level\":\"01 02 03 04 05 06 07\",\"menu_name\":\"Purchase Order\",\"fxml_path\":\"Purchase Order\",\"controller_path\":\"po.controller\",\"menu_id\":\"003\",\"menu_parent\":\"002\"},"
+                + "{\"access_level\":\"07\",\"menu_name\":\"Appliances\",\"fxml_path\":\"/com/rmj/guanzongroup/sidebarmenus/views/PurchaseOrder_EntryAppliances.fxml\",\"controller_path\":\"PurchaseOrder_EntryAppliances.controller\",\"menu_id\":\"122\",\"menu_parent\":\"003\"},"
+                + "{\"access_level\":\"03\",\"menu_name\":\"Car\",\"fxml_path\":\"/com/rmj/guanzongroup/sidebarmenus/views/PurchaseOrder_EntryCar.fxml\",\"controller_path\":\"PurchaseOrder_EntryCar.controller\",\"menu_id\":\"004\",\"menu_parent\":\"003\"},"
+                + "{\"access_level\":\"01 02 03 04 05 06 07\",\"menu_name\":\"General\",\"fxml_path\":\"/com/rmj/guanzongroup/sidebarmenus/views/PurchaseOrder_Entry.fxml\",\"controller_path\":\"PurchaseOrder_Entry.controller\",\"menu_id\":\"005\",\"menu_parent\":\"003\"},"
+                + "{\"access_level\":\"05\",\"menu_name\":\"Los Pedritos\",\"fxml_path\":\"/com/rmj/guanzongroup/sidebarmenus/views/PurchaseOrder_EntryLP.fxml\",\"controller_path\":\"PurchaseOrder_EntryLP.controller\",\"menu_id\":\"006\",\"menu_parent\":\"003\"},"
+                + "{\"access_level\":\"04\",\"menu_name\":\"Monarch Restaurant\",\"fxml_path\":\"/com/rmj/guanzongroup/sidebarmenus/views/PurchaseOrder_EntryMonarchFood.fxml\",\"controller_path\":\"PurchaseOrder_EntryMonarchFood.controller\",\"menu_id\":\"007\",\"menu_parent\":\"003\"},"
+                + "{\"access_level\":\"04\",\"menu_name\":\"Monarch Hospitality\",\"fxml_path\":\"/com/rmj/guanzongroup/sidebarmenus/views/PurchaseOrder_EntryMonarchHospitality.fxml\",\"controller_path\":\"PurchaseOrder_EntryMonarchHospitality.controller\",\"menu_id\":\"008\",\"menu_parent\":\"003\"},"
+                + "{\"access_level\":\"02\",\"menu_name\":\"Motorcycle\",\"fxml_path\":\"/com/rmj/guanzongroup/sidebarmenus/views/PurchaseOrder_EntryMC.fxml\",\"controller_path\":\"PurchaseOrder_EntryMC.controller\",\"menu_id\":\"009\",\"menu_parent\":\"003\"},"
+                + "{\"access_level\":\"01\",\"menu_name\":\"Mobile Phone\",\"fxml_path\":\"/com/rmj/guanzongroup/sidebarmenus/views/PurchaseOrder_EntryMP.fxml\",\"controller_path\":\"PurchaseOrder_EntryMP.controller\",\"menu_id\":\"010\",\"menu_parent\":\"003\"},"
+                + "{\"access_level\":\"03\",\"menu_name\":\"Spare Parts Car\",\"fxml_path\":\"/com/rmj/guanzongroup/sidebarmenus/views/PurchaseOrder_EntrySPCar.fxml\",\"controller_path\":\"PurchaseOrder_EntrySPCar.controller\",\"menu_id\":\"01 02 03 04 05 06\",\"menu_parent\":\"003\"},"
+                + "{\"access_level\":\"02\",\"menu_name\":\"Spare Parts Motorycle\",\"fxml_path\":\"/com/rmj/guanzongroup/sidebarmenus/views/PurchaseOrder_EntrySPMC.fxml\",\"controller_path\":\"PurchaseOrder_EntrySPMC.controller\",\"menu_id\":\"012\",\"menu_parent\":\"003\"},"
+                // Purchase Order Receiving Entry
+                + "{\"access_level\":\"01 02 03 04 05 06 07\",\"menu_name\":\"Purchase Order Receiving\",\"fxml_path\":\"Purchase Order Receiving\",\"controller_path\":\"po.controller\",\"menu_id\":\"013\",\"menu_parent\":\"002\"},"
+                + "{\"access_level\":\"07\",\"menu_name\":\"Appliances\",\"fxml_path\":\"/com/rmj/guanzongroup/sidebarmenus/views/DeliveryAcceptance_EntryAppliances.fxml\",\"controller_path\":\"DeliveryAcceptance_EntryAppliances.controller\",\"menu_id\":\"119\",\"menu_parent\":\"013\"},"
+                + "{\"access_level\":\"03\",\"menu_name\":\"Car\",\"fxml_path\":\"/com/rmj/guanzongroup/sidebarmenus/views/DeliveryAcceptance_EntryCar.fxml\",\"controller_path\":\"DeliveryAcceptance_EntryCar.controller\",\"menu_id\":\"014\",\"menu_parent\":\"013\"},"
+                + "{\"access_level\":\"01 02 03 04 05 06 07\",\"menu_name\":\"General\",\"fxml_path\":\"/com/rmj/guanzongroup/sidebarmenus/views/DeliveryAcceptance_Entry.fxml\",\"controller_path\":\"DeliveryAcceptance_Entry.controller\",\"menu_id\":\"015\",\"menu_parent\":\"013\"},"
+                + "{\"access_level\":\"05\",\"menu_name\":\"Los Pedritos\",\"fxml_path\":\"/com/rmj/guanzongroup/sidebarmenus/views/DeliveryAcceptance_EntryLP.fxml\",\"controller_path\":\"DeliveryAcceptance_EntryLP.controller\",\"menu_id\":\"016\",\"menu_parent\":\"013\"},"
+                + "{\"access_level\":\"04\",\"menu_name\":\"Monarch Restaurant\",\"fxml_path\":\"/com/rmj/guanzongroup/sidebarmenus/views/DeliveryAcceptance_EntryMonarchFood.fxml\",\"controller_path\":\"DeliveryAcceptance_EntryMonarchFood.controller\",\"menu_id\":\"017\",\"menu_parent\":\"013\"},"
+                + "{\"access_level\":\"04\",\"menu_name\":\"Monarch Hospitality\",\"fxml_path\":\"/com/rmj/guanzongroup/sidebarmenus/views/DeliveryAcceptance_EntryMonarchHospitality.fxml\",\"controller_path\":\"DeliveryAcceptance_EntryMonarchHospitality.controller\",\"menu_id\":\"018\",\"menu_parent\":\"013\"},"
+                + "{\"access_level\":\"02\",\"menu_name\":\"Motorcycle\",\"fxml_path\":\"/com/rmj/guanzongroup/sidebarmenus/views/DeliveryAcceptance_EntryMC.fxml\",\"controller_path\":\"DeliveryAcceptance_EntryMC.controller\",\"menu_id\":\"019\",\"menu_parent\":\"013\"},"
+                + "{\"access_level\":\"01\",\"menu_name\":\"Mobile Phone\",\"fxml_path\":\"/com/rmj/guanzongroup/sidebarmenus/views/DeliveryAcceptance_EntryMP.fxml\",\"controller_path\":\"DeliveryAcceptance_EntryMP.controller\",\"menu_id\":\"020\",\"menu_parent\":\"013\"},"
+                + "{\"access_level\":\"03\",\"menu_name\":\"Spare Parts Car\",\"fxml_path\":\"/com/rmj/guanzongroup/sidebarmenus/views/DeliveryAcceptance_EntrySPCar.fxml\",\"controller_path\":\"DeliveryAcceptance_SPCar.controller\",\"menu_id\":\"021\",\"menu_parent\":\"013\"},"
+                + "{\"access_level\":\"02\",\"menu_name\":\"Spare Parts Motorycle\",\"fxml_path\":\"/com/rmj/guanzongroup/sidebarmenus/views/DeliveryAcceptance_EntrySPMC.fxml\",\"controller_path\":\"DeliveryAcceptance_EntrySPMC.controller\",\"menu_id\":\"022\",\"menu_parent\":\"013\"},"
+                // Purchase Order Return Entry
+                + "{\"access_level\":\"01 02 03 04 05 06 07\",\"menu_name\":\"Purchase Order Return\",\"fxml_path\":\"Purchase Order Return\",\"controller_path\":\"po.controller\",\"menu_id\":\"086\",\"menu_parent\":\"002\"},"
+                + "{\"access_level\":\"07\",\"menu_name\":\"Appliances\",\"fxml_path\":\"/com/rmj/guanzongroup/sidebarmenus/views/PurchaseOrderReturn_EntryAppliances.fxml\",\"controller_path\":\"PurchaseOrderReturn_EntryAppliances.controller\",\"menu_id\":\"087\",\"menu_parent\":\"086\"},"
+                + "{\"access_level\":\"03\",\"menu_name\":\"Car\",\"fxml_path\":\"/com/rmj/guanzongroup/sidebarmenus/views/PurchaseOrderReturn_EntryCar.fxml\",\"controller_path\":\"PurchaseOrderReturn_EntryCar.controller\",\"menu_id\":\"088\",\"menu_parent\":\"086\"},"
+                + "{\"access_level\":\"01 02 03 04 05 06 07\",\"menu_name\":\"General\",\"fxml_path\":\"/com/rmj/guanzongroup/sidebarmenus/views/PurchaseOrderReturn_Entry.fxml\",\"controller_path\":\"PurchaseOrderReturn_Entry.controller\",\"menu_id\":\"089\",\"menu_parent\":\"086\"},"
+                + "{\"access_level\":\"05\",\"menu_name\":\"Los Pedritos\",\"fxml_path\":\"/com/rmj/guanzongroup/sidebarmenus/views/PurchaseOrderReturn_EntryLP.fxml\",\"controller_path\":\"PurchaseOrderReturn_EntryLP.controller\",\"menu_id\":\"090\",\"menu_parent\":\"086\"},"
+                + "{\"access_level\":\"04\",\"menu_name\":\"Monarch Restaurant\",\"fxml_path\":\"/com/rmj/guanzongroup/sidebarmenus/views/PurchaseOrderReturn_EntryMonarchFood.fxml\",\"controller_path\":\"PurchaseOrderReturn_EntryMonarchFood.controller\",\"menu_id\":\"091\",\"menu_parent\":\"086\"},"
+                + "{\"access_level\":\"04\",\"menu_name\":\"Monarch Hospitality\",\"fxml_path\":\"/com/rmj/guanzongroup/sidebarmenus/views/PurchaseOrderReturn_EntryMonarchHospitality.fxml\",\"controller_path\":\"PurchaseOrderReturn_EntryMonarchHospitality.controller\",\"menu_id\":\"092\",\"menu_parent\":\"086\"},"
+                + "{\"access_level\":\"02\",\"menu_name\":\"Motorcycle\",\"fxml_path\":\"/com/rmj/guanzongroup/sidebarmenus/views/PurchaseOrderReturn_EntryMC.fxml\",\"controller_path\":\"PurchaseOrderReturn_EntryMC.controller\",\"menu_id\":\"093\",\"menu_parent\":\"086\"},"
+                + "{\"access_level\":\"01\",\"menu_name\":\"Mobile Phone\",\"fxml_path\":\"/com/rmj/guanzongroup/sidebarmenus/views/PurchaseOrderReturn_EntryMP.fxml\",\"controller_path\":\"PurchaseOrderReturn_EntryMP.controller\",\"menu_id\":\"094\",\"menu_parent\":\"086\"},"
+                + "{\"access_level\":\"03\",\"menu_name\":\"Spare Parts Car\",\"fxml_path\":\"/com/rmj/guanzongroup/sidebarmenus/views/PurchaseOrderReturn_EntrySPCar.fxml\",\"controller_path\":\"PurchaseOrderReturn_SPCar.controller\",\"menu_id\":\"095\",\"menu_parent\":\"086\"},"
+                + "{\"access_level\":\"02\",\"menu_name\":\"Spare Parts Motorycle\",\"fxml_path\":\"/com/rmj/guanzongroup/sidebarmenus/views/PurchaseOrderReturn_EntrySPMC.fxml\",\"controller_path\":\"PurchaseOrderReturn_EntrySPMC.controller\",\"menu_id\":\"096\",\"menu_parent\":\"086\"},"
+                // Purchase Order Confirmation
+                + "{\"access_level\":\"01 02 03 04 05 06 07\",\"menu_name\":\"Confirmation\",\"fxml_path\":\"Confirmation\",\"controller_path\":\"confirmation.controller\",\"menu_id\":\"023\",\"menu_parent\":\"001\"},"
+                + "{\"access_level\":\"01 02 03 04 05 06 07\",\"menu_name\":\"Purchase Order\",\"fxml_path\":\"Purchase Order\",\"controller_path\":\"po.controller\",\"menu_id\":\"024\",\"menu_parent\":\"023\"},"
+                + "{\"access_level\":\"07\",\"menu_name\":\"Appliances\",\"fxml_path\":\"/com/rmj/guanzongroup/sidebarmenus/views/PurchaseOrder_ConfirmationAppliances.fxml\",\"controller_path\":\"PurchaseOrder_ConfirmationAppliances.controller\",\"menu_id\":\"123\",\"menu_parent\":\"024\"},"
+                + "{\"access_level\":\"03\",\"menu_name\":\"Car\",\"fxml_path\":\"/com/rmj/guanzongroup/sidebarmenus/views/PurchaseOrder_ConfirmationCar.fxml\",\"controller_path\":\"PurchaseOrder_ConfirmationCar.controller\",\"menu_id\":\"025\",\"menu_parent\":\"024\"},"
+                + "{\"access_level\":\"01 02 03 04 05 06 07\",\"menu_name\":\"General\",\"fxml_path\":\"/com/rmj/guanzongroup/sidebarmenus/views/PurchaseOrder_Confirmation.fxml\",\"controller_path\":\"PurchaseOrder_Confirmation.controller\",\"menu_id\":\"026\",\"menu_parent\":\"024\"},"
+                + "{\"access_level\":\"05\",\"menu_name\":\"Los Pedritos\",\"fxml_path\":\"/com/rmj/guanzongroup/sidebarmenus/views/PurchaseOrder_ConfirmationLP.fxml\",\"controller_path\":\"PurchaseOrder_ConfirmationLP.controller\",\"menu_id\":\"027\",\"menu_parent\":\"024\"},"
+                + "{\"access_level\":\"04\",\"menu_name\":\"Monarch Restaurant\",\"fxml_path\":\"/com/rmj/guanzongroup/sidebarmenus/views/PurchaseOrder_ConfirmationMonarchFood.fxml\",\"controller_path\":\"PurchaseOrder_ConfirmationMonarchFood.controller\",\"menu_id\":\"028\",\"menu_parent\":\"024\"},"
+                + "{\"access_level\":\"04\",\"menu_name\":\"Monarch Hospitality\",\"fxml_path\":\"/com/rmj/guanzongroup/sidebarmenus/views/PurchaseOrder_ConfirmationMonarchHospitality.fxml\",\"controller_path\":\"PurchaseOrder_ConfirmationMonarchHospitality.controller\",\"menu_id\":\"029\",\"menu_parent\":\"024\"},"
+                + "{\"access_level\":\"02\",\"menu_name\":\"Motorcycle\",\"fxml_path\":\"/com/rmj/guanzongroup/sidebarmenus/views/PurchaseOrder_ConfirmationMC.fxml\",\"controller_path\":\"PurchaseOrder_ConfirmationMC.controller\",\"menu_id\":\"030\",\"menu_parent\":\"024\"},"
+                + "{\"access_level\":\"01\",\"menu_name\":\"Mobile Phone\",\"fxml_path\":\"/com/rmj/guanzongroup/sidebarmenus/views/PurchaseOrder_ConfirmationMP.fxml\",\"controller_path\":\"PurchaseOrder_ConfirmationMP.controller\",\"menu_id\":\"031\",\"menu_parent\":\"024\"},"
+                + "{\"access_level\":\"03\",\"menu_name\":\"Spare Parts Car\",\"fxml_path\":\"/com/rmj/guanzongroup/sidebarmenus/views/PurchaseOrder_ConfirmationSPCar.fxml\",\"controller_path\":\"PurchaseOrder_ConfirmationSPCar.controller\",\"menu_id\":\"032\",\"menu_parent\":\"024\"},"
+                + "{\"access_level\":\"02\",\"menu_name\":\"Spare Parts Motorycle\",\"fxml_path\":\"/com/rmj/guanzongroup/sidebarmenus/views/PurchaseOrder_ConfirmationSPMC.fxml\",\"controller_path\":\"PurchaseOrder_ConfirmationSPMC.controller\",\"menu_id\":\"033\",\"menu_parent\":\"024\"},"
+                // Purchase Order Receiving Confirmation
+                + "{\"access_level\":\"01 02 03 04 05 06 07\",\"menu_name\":\"Purchase Order Receiving\",\"fxml_path\":\"Purchase Order Receiving\",\"controller_path\":\"po.controller\",\"menu_id\":\"034\",\"menu_parent\":\"023\"},"
+                + "{\"access_level\":\"07\",\"menu_name\":\"Appliances\",\"fxml_path\":\"/com/rmj/guanzongroup/sidebarmenus/views/DeliveryAcceptance_ConfirmationAppliances.fxml\",\"controller_path\":\"DeliveryAcceptance_ConfirmationAppliances.controller\",\"menu_id\":\"120\",\"menu_parent\":\"034\"},"
+                + "{\"access_level\":\"03\",\"menu_name\":\"Car\",\"fxml_path\":\"/com/rmj/guanzongroup/sidebarmenus/views/DeliveryAcceptance_ConfirmationCar.fxml\",\"controller_path\":\"DeliveryAcceptance_ConfirmationCar.controller\",\"menu_id\":\"035\",\"menu_parent\":\"034\"},"
+                + "{\"access_level\":\"01 02 03 04 05 06 07\",\"menu_name\":\"General\",\"fxml_path\":\"/com/rmj/guanzongroup/sidebarmenus/views/DeliveryAcceptance_Confirmation.fxml\",\"controller_path\":\"DeliveryAcceptance_Confirmation.controller\",\"menu_id\":\"036\",\"menu_parent\":\"034\"},"
+                + "{\"access_level\":\"05\",\"menu_name\":\"Los Pedritos\",\"fxml_path\":\"/com/rmj/guanzongroup/sidebarmenus/views/DeliveryAcceptance_ConfirmationLP.fxml\",\"controller_path\":\"DeliveryAcceptance_ConfirmationLP.controller\",\"menu_id\":\"037\",\"menu_parent\":\"034\"},"
+                + "{\"access_level\":\"04\",\"menu_name\":\"Monarch Restaurant\",\"fxml_path\":\"/com/rmj/guanzongroup/sidebarmenus/views/DeliveryAcceptance_ConfirmationMonarchFood.fxml\",\"controller_path\":\"DeliveryAcceptance_ConfirmationMonarchFood.controller\",\"menu_id\":\"038\",\"menu_parent\":\"034\"},"
+                + "{\"access_level\":\"04\",\"menu_name\":\"Monarch Hospitality\",\"fxml_path\":\"/com/rmj/guanzongroup/sidebarmenus/views/DeliveryAcceptance_ConfirmationMonarchHospitality.fxml\",\"controller_path\":\"DeliveryAcceptance_ConfirmationMonarchHospitality.controller\",\"menu_id\":\"039\",\"menu_parent\":\"034\"},"
+                + "{\"access_level\":\"02\",\"menu_name\":\"Motorcycle\",\"fxml_path\":\"/com/rmj/guanzongroup/sidebarmenus/views/DeliveryAcceptance_ConfirmationMC.fxml\",\"controller_path\":\"DeliveryAcceptance_ConfirmationMC.controller\",\"menu_id\":\"040\",\"menu_parent\":\"034\"},"
+                + "{\"access_level\":\"01\",\"menu_name\":\"Mobile Phone\",\"fxml_path\":\"/com/rmj/guanzongroup/sidebarmenus/views/DeliveryAcceptance_ConfirmationMP.fxml\",\"controller_path\":\"DeliveryAcceptance_ConfirmationMP.controller\",\"menu_id\":\"041\",\"menu_parent\":\"034\"},"
+                + "{\"access_level\":\"03\",\"menu_name\":\"Spare Parts Car\",\"fxml_path\":\"/com/rmj/guanzongroup/sidebarmenus/views/DeliveryAcceptance_ConfirmationSPCar.fxml\",\"controller_path\":\"DeliveryAcceptance_ConfirmationSPCar.controller\",\"menu_id\":\"042\",\"menu_parent\":\"034\"},"
+                + "{\"access_level\":\"02\",\"menu_name\":\"Spare Parts Motorycle\",\"fxml_path\":\"/com/rmj/guanzongroup/sidebarmenus/views/DeliveryAcceptance_ConfirmationSPMC.fxml\",\"controller_path\":\"DeliveryAcceptance_ConfirmationSPMC.controller\",\"menu_id\":\"043\",\"menu_parent\":\"034\"},"
+                // Purchase Order Return Confirmation
+                + "{\"access_level\":\"01 02 03 04 05 06 07\",\"menu_name\":\"Purchase Order Return\",\"fxml_path\":\"Purchase Order Return\",\"controller_path\":\"po.controller\",\"menu_id\":\"097\",\"menu_parent\":\"023\"},"
+                + "{\"access_level\":\"07\",\"menu_name\":\"Appliances\",\"fxml_path\":\"/com/rmj/guanzongroup/sidebarmenus/views/PurchaseOrderReturn_ConfirmationAppliances.fxml\",\"controller_path\":\"PurchaseOrderReturn_ConfirmationAppliances.controller\",\"menu_id\":\"098\",\"menu_parent\":\"097\"},"
+                + "{\"access_level\":\"03\",\"menu_name\":\"Car\",\"fxml_path\":\"/com/rmj/guanzongroup/sidebarmenus/views/PurchaseOrderReturn_ConfirmationCar.fxml\",\"controller_path\":\"PurchaseOrderReturn_ConfirmationCar.controller\",\"menu_id\":\"099\",\"menu_parent\":\"097\"},"
+                + "{\"access_level\":\"01 02 03 04 05 06 07\",\"menu_name\":\"General\",\"fxml_path\":\"/com/rmj/guanzongroup/sidebarmenus/views/PurchaseOrderReturn_Confirmation.fxml\",\"controller_path\":\"PurchaseOrderReturn_Confirmation.controller\",\"menu_id\":\"100\",\"menu_parent\":\"097\"},"
+                + "{\"access_level\":\"05\",\"menu_name\":\"Los Pedritos\",\"fxml_path\":\"/com/rmj/guanzongroup/sidebarmenus/views/PurchaseOrderReturn_ConfirmationLP.fxml\",\"controller_path\":\"PurchaseOrderReturn_ConfirmationLP.controller\",\"menu_id\":\"101\",\"menu_parent\":\"097\"},"
+                + "{\"access_level\":\"04\",\"menu_name\":\"Monarch Restaurant\",\"fxml_path\":\"/com/rmj/guanzongroup/sidebarmenus/views/PurchaseOrderReturn_ConfirmationMonarchFood.fxml\",\"controller_path\":\"PurchaseOrderReturn_ConfirmationMonarchFood.controller\",\"menu_id\":\"102\",\"menu_parent\":\"097\"},"
+                + "{\"access_level\":\"04\",\"menu_name\":\"Monarch Hospitality\",\"fxml_path\":\"/com/rmj/guanzongroup/sidebarmenus/views/PurchaseOrderReturn_ConfirmationMonarchHospitality.fxml\",\"controller_path\":\"PurchaseOrderReturn_ConfirmationMonarchHospitality.controller\",\"menu_id\":\"103\",\"menu_parent\":\"097\"},"
+                + "{\"access_level\":\"02\",\"menu_name\":\"Motorcycle\",\"fxml_path\":\"/com/rmj/guanzongroup/sidebarmenus/views/PurchaseOrderReturn_ConfirmationMC.fxml\",\"controller_path\":\"PurchaseOrderReturn_ConfirmationMC.controller\",\"menu_id\":\"104\",\"menu_parent\":\"097\"},"
+                + "{\"access_level\":\"01\",\"menu_name\":\"Mobile Phone\",\"fxml_path\":\"/com/rmj/guanzongroup/sidebarmenus/views/PurchaseOrderReturn_ConfirmationMP.fxml\",\"controller_path\":\"PurchaseOrderReturn_ConfirmationMP.controller\",\"menu_id\":\"105\",\"menu_parent\":\"097\"},"
+                + "{\"access_level\":\"03\",\"menu_name\":\"Spare Parts Car\",\"fxml_path\":\"/com/rmj/guanzongroup/sidebarmenus/views/PurchaseOrderReturn_ConfirmationSPCar.fxml\",\"controller_path\":\"PurchaseOrderReturn_SPCar.controller\",\"menu_id\":\"106\",\"menu_parent\":\"097\"},"
+                + "{\"access_level\":\"02\",\"menu_name\":\"Spare Parts Motorycle\",\"fxml_path\":\"/com/rmj/guanzongroup/sidebarmenus/views/PurchaseOrderReturn_ConfirmationSPMC.fxml\",\"controller_path\":\"PurchaseOrderReturn_ConfirmationSPMC.controller\",\"menu_id\":\"107\",\"menu_parent\":\"097\"},"
+                // Purchase Order Approval
+                + "{\"access_level\":\"01 02 03 04 05 06 07\",\"menu_name\":\"Approval\",\"fxml_path\":\"Approval\",\"controller_path\":\"approval.controller\",\"menu_id\":\"044\",\"menu_parent\":\"001\"},"
+                + "{\"access_level\":\"01 02 03 04 05 06 07\",\"menu_name\":\"Purchase Order\",\"fxml_path\":\"Purchase Order\",\"controller_path\":\"po.controller\",\"menu_id\":\"045\",\"menu_parent\":\"044\"},"
+                + "{\"access_level\":\"07\",\"menu_name\":\"Appliances\",\"fxml_path\":\"/com/rmj/guanzongroup/sidebarmenus/views/PurchaseOrder_ApprovalAppliances.fxml\",\"controller_path\":\"PurchaseOrder_ApprovalAppliances.controller\",\"menu_id\":\"124\",\"menu_parent\":\"045\"},"
+                + "{\"access_level\":\"03\",\"menu_name\":\"Car\",\"fxml_path\":\"/com/rmj/guanzongroup/sidebarmenus/views/PurchaseOrder_ApprovalCar.fxml\",\"controller_path\":\"PurchaseOrder_ApprovalCar.controller\",\"menu_id\":\"046\",\"menu_parent\":\"045\"},"
+                + "{\"access_level\":\"01 02 03 04 05 06 07\",\"menu_name\":\"General\",\"fxml_path\":\"/com/rmj/guanzongroup/sidebarmenus/views/PurchaseOrder_Approval.fxml\",\"controller_path\":\"PurchaseOrder_Approval.controller\",\"menu_id\":\"047\",\"menu_parent\":\"045\"},"
+                + "{\"access_level\":\"05\",\"menu_name\":\"Los Pedritos\",\"fxml_path\":\"/com/rmj/guanzongroup/sidebarmenus/views/PurchaseOrder_ApprovalLP.fxml\",\"controller_path\":\"PurchaseOrder_ApprovalLP.controller\",\"menu_id\":\"048\",\"menu_parent\":\"045\"},"
+                + "{\"access_level\":\"04\",\"menu_name\":\"Monarch Restaurant\",\"fxml_path\":\"/com/rmj/guanzongroup/sidebarmenus/views/PurchaseOrder_ApprovalMonarchFood.fxml\",\"controller_path\":\"PurchaseOrder_ApprovalMonarchFood.controller\",\"menu_id\":\"049\",\"menu_parent\":\"045\"},"
+                + "{\"access_level\":\"04\",\"menu_name\":\"Monarch Hospitality\",\"fxml_path\":\"/com/rmj/guanzongroup/sidebarmenus/views/PurchaseOrder_ApprovalMonarchHospitality.fxml\",\"controller_path\":\"PurchaseOrder_ApprovalMonarchHospitality.controller\",\"menu_id\":\"050\",\"menu_parent\":\"045\"},"
+                + "{\"access_level\":\"02\",\"menu_name\":\"Motorcycle\",\"fxml_path\":\"/com/rmj/guanzongroup/sidebarmenus/views/PurchaseOrder_ApprovalMC.fxml\",\"controller_path\":\"PurchaseOrder_ApprovalMC.controller\",\"menu_id\":\"051\",\"menu_parent\":\"045\"},"
+                + "{\"access_level\":\"01\",\"menu_name\":\"Mobile Phone\",\"fxml_path\":\"/com/rmj/guanzongroup/sidebarmenus/views/PurchaseOrder_ApprovalMP.fxml\",\"controller_path\":\"PurchaseOrder_ApprovalMP.controller\",\"menu_id\":\"052\",\"menu_parent\":\"045\"},"
+                + "{\"access_level\":\"03\",\"menu_name\":\"Spare Parts Car\",\"fxml_path\":\"/com/rmj/guanzongroup/sidebarmenus/views/PurchaseOrder_ApprovalSPCar.fxml\",\"controller_path\":\"PurchaseOrder_ApprovalSPCar.controller\",\"menu_id\":\"053\",\"menu_parent\":\"045\"},"
+                + "{\"access_level\":\"02\",\"menu_name\":\"Spare Parts Motorycle\",\"fxml_path\":\"/com/rmj/guanzongroup/sidebarmenus/views/PurchaseOrder_ApprovalSPMC.fxml\",\"controller_path\":\"PurchaseOrder_ApprovalSPMC.controller\",\"menu_id\":\"054\",\"menu_parent\":\"045\"},"
+                // + "{\"access_level\":\"01 02 03 04 05 06\",\"menu_name\":\"Purchase Order
+                // Receiving\",\"fxml_path\":\"Purchase Order
+                // Receiving\",\"controller_path\":\"po.controller\",\"menu_id\":\"055\",\"menu_parent\":\"044\"},"
+                // +
+                // "{\"access_level\":\"03\",\"menu_name\":\"Car\",\"fxml_path\":\"/com/rmj/guanzongroup/sidebarmenus/views/DeliveryAcceptance_ApprovalCar.fxml\",\"controller_path\":\"DeliveryAcceptance_ApprovalCar.controller\",\"menu_id\":\"056\",\"menu_parent\":\"055\"},"
+                // + "{\"access_level\":\"01 02 03 04 05
+                // 06\",\"menu_name\":\"General\",\"fxml_path\":\"/com/rmj/guanzongroup/sidebarmenus/views/DeliveryAcceptance_Approval.fxml\",\"controller_path\":\"DeliveryAcceptance_Approval.controller\",\"menu_id\":\"057\",\"menu_parent\":\"055\"},"
+                // + "{\"access_level\":\"05\",\"menu_name\":\"Los
+                // Pedritos\",\"fxml_path\":\"/com/rmj/guanzongroup/sidebarmenus/views/DeliveryAcceptance_ApprovalLP.fxml\",\"controller_path\":\"DeliveryAcceptance_ApprovalLP.controller\",\"menu_id\":\"058\",\"menu_parent\":\"055\"},"
+                // + "{\"access_level\":\"04\",\"menu_name\":\"Monarch
+                // Restaurant\",\"fxml_path\":\"/com/rmj/guanzongroup/sidebarmenus/views/DeliveryAcceptance_ApprovalMonarchFood.fxml\",\"controller_path\":\"DeliveryAcceptance_ApprovalMonarchFood.controller\",\"menu_id\":\"059\",\"menu_parent\":\"055\"},"
+                // + "{\"access_level\":\"04\",\"menu_name\":\"Monarch
+                // Hospitality\",\"fxml_path\":\"/com/rmj/guanzongroup/sidebarmenus/views/DeliveryAcceptance_ApprovalMonarchHospitality.fxml\",\"controller_path\":\"DeliveryAcceptance_ApprovalMonarchHospitality.controller\",\"menu_id\":\"060\",\"menu_parent\":\"055\"},"
+                // +
+                // "{\"access_level\":\"02\",\"menu_name\":\"Motorcycle\",\"fxml_path\":\"/com/rmj/guanzongroup/sidebarmenus/views/DeliveryAcceptance_ApprovalMC.fxml\",\"controller_path\":\"DeliveryAcceptance_ApprovalMC.controller\",\"menu_id\":\"061\",\"menu_parent\":\"055\"},"
+                // + "{\"access_level\":\"01\",\"menu_name\":\"Mobile
+                // Phone\",\"fxml_path\":\"/com/rmj/guanzongroup/sidebarmenus/views/DeliveryAcceptance_ApprovalMP.fxml\",\"controller_path\":\"PurchaseOrder_ApprovalMP.controller\",\"menu_id\":\"062\",\"menu_parent\":\"055\"},"
+                // + "{\"access_level\":\"03\",\"menu_name\":\"Spare Parts
+                // Car\",\"fxml_path\":\"/com/rmj/guanzongroup/sidebarmenus/views/DeliveryAcceptance_ApprovalSPCar.fxml\",\"controller_path\":\"DeliveryAcceptance_ApprovalSPCar.controller\",\"menu_id\":\"063\",\"menu_parent\":\"055\"},"
+                // + "{\"access_level\":\"02\",\"menu_name\":\"Spare Parts
+                // Motorycle\",\"fxml_path\":\"/com/rmj/guanzongroup/sidebarmenus/views/DeliveryAcceptance_ApprovalSPMC.fxml\",\"controller_path\":\"DeliveryAcceptance_ApprovalSPMC.controller\",\"menu_id\":\"064\",\"menu_parent\":\"055\"},"
+
+                // Purchase Order History
+                + "{\"access_level\":\"01 02 03 04 05 06 07\",\"menu_name\":\"History\",\"fxml_path\":\"History\",\"controller_path\":\"history.controller\",\"menu_id\":\"065\",\"menu_parent\":\"001\"},"
+                + "{\"access_level\":\"01 02 03 04 05 06 07\",\"menu_name\":\"Purchase Order\",\"fxml_path\":\"Purchase Order\",\"controller_path\":\"po.controller\",\"menu_id\":\"066\",\"menu_parent\":\"065\"},"
+                + "{\"access_level\":\"07\",\"menu_name\":\"Appliances\",\"fxml_path\":\"/com/rmj/guanzongroup/sidebarmenus/views/PurchaseOrder_HistoryAppliances.fxml\",\"controller_path\":\"PurchaseOrder_HistoryAppliances.controller\",\"menu_id\":\"125\",\"menu_parent\":\"066\"},"
+                + "{\"access_level\":\"03\",\"menu_name\":\"Car\",\"fxml_path\":\"/com/rmj/guanzongroup/sidebarmenus/views/PurchaseOrder_HistoryCar.fxml\",\"controller_path\":\"PurchaseOrder_HistoryCar.controller\",\"menu_id\":\"067\",\"menu_parent\":\"066\"},"
+                + "{\"access_level\":\"01 02 03 04 05 06 07\",\"menu_name\":\"General\",\"fxml_path\":\"/com/rmj/guanzongroup/sidebarmenus/views/PurchaseOrder_History.fxml\",\"controller_path\":\"PurchaseOrder_History.controller\",\"menu_id\":\"068\",\"menu_parent\":\"066\"},"
+                + "{\"access_level\":\"05\",\"menu_name\":\"Los Pedritos\",\"fxml_path\":\"/com/rmj/guanzongroup/sidebarmenus/views/PurchaseOrder_HistoryLP.fxml\",\"controller_path\":\"PurchaseOrder_HistoryLP.controller\",\"menu_id\":\"069\",\"menu_parent\":\"066\"},"
+                + "{\"access_level\":\"04\",\"menu_name\":\"Monarch Restaurant\",\"fxml_path\":\"/com/rmj/guanzongroup/sidebarmenus/views/PurchaseOrder_HistoryMonarchFood.fxml\",\"controller_path\":\"PurchaseOrder_HistoryMonarchFood.controller\",\"menu_id\":\"070\",\"menu_parent\":\"066\"},"
+                + "{\"access_level\":\"04\",\"menu_name\":\"Monarch Hospitality\",\"fxml_path\":\"/com/rmj/guanzongroup/sidebarmenus/views/PurchaseOrder_HistoryMonarchHospitality.fxml\",\"controller_path\":\"PurchaseOrder_HistoryMonarchHospitality.controller\",\"menu_id\":\"071\",\"menu_parent\":\"066\"},"
+                + "{\"access_level\":\"02\",\"menu_name\":\"Motorcycle\",\"fxml_path\":\"/com/rmj/guanzongroup/sidebarmenus/views/PurchaseOrder_HistoryMC.fxml\",\"controller_path\":\"PurchaseOrder_HistoryMC.controller\",\"menu_id\":\"072\",\"menu_parent\":\"066\"},"
+                + "{\"access_level\":\"01\",\"menu_name\":\"Mobile Phone\",\"fxml_path\":\"/com/rmj/guanzongroup/sidebarmenus/views/PurchaseOrder_HistoryMP.fxml\",\"controller_path\":\"PurchaseOrder_HistoryMP.controller\",\"menu_id\":\"073\",\"menu_parent\":\"066\"},"
+                + "{\"access_level\":\"03\",\"menu_name\":\"Spare Parts Car\",\"fxml_path\":\"/com/rmj/guanzongroup/sidebarmenus/views/PurchaseOrder_HistorySPCar.fxml\",\"controller_path\":\"PurchaseOrder_HistorySPCar.controller\",\"menu_id\":\"074\",\"menu_parent\":\"066\"},"
+                + "{\"access_level\":\"02\",\"menu_name\":\"Spare Parts Motorycle\",\"fxml_path\":\"/com/rmj/guanzongroup/sidebarmenus/views/PurchaseOrder_HistorySPMC.fxml\",\"controller_path\":\"PurchaseOrder_HistorySPMC.controller\",\"menu_id\":\"075\",\"menu_parent\":\"066\"},"
+                // Purchase Order Receiving History
+                + "{\"access_level\":\"01 02 03 04 05 06 07\",\"menu_name\":\"Purchase Order Receiving\",\"fxml_path\":\"Purchase Order Receiving\",\"controller_path\":\"po.controller\",\"menu_id\":\"076\",\"menu_parent\":\"065\"},"
+                + "{\"access_level\":\"07\",\"menu_name\":\"Appliances\",\"fxml_path\":\"/com/rmj/guanzongroup/sidebarmenus/views/DeliveryAcceptance_HistoryAppliances.fxml\",\"controller_path\":\"DeliveryAcceptance_HistoryAppliances.controller\",\"menu_id\":\"121\",\"menu_parent\":\"076\"},"
+                + "{\"access_level\":\"03\",\"menu_name\":\"Car\",\"fxml_path\":\"/com/rmj/guanzongroup/sidebarmenus/views/DeliveryAcceptance_HistoryCar.fxml\",\"controller_path\":\"DeliveryAcceptance_HistoryCar.controller\",\"menu_id\":\"077\",\"menu_parent\":\"076\"},"
+                + "{\"access_level\":\"01 02 03 04 05 06 07\",\"menu_name\":\"General\",\"fxml_path\":\"/com/rmj/guanzongroup/sidebarmenus/views/DeliveryAcceptance_History.fxml\",\"controller_path\":\"DeliveryAcceptance_History.controller\",\"menu_id\":\"078\",\"menu_parent\":\"076\"},"
+                + "{\"access_level\":\"05\",\"menu_name\":\"Los Pedritos\",\"fxml_path\":\"/com/rmj/guanzongroup/sidebarmenus/views/DeliveryAcceptance_HistoryLP.fxml\",\"controller_path\":\"DeliveryAcceptance_HistoryLP.controller\",\"menu_id\":\"079\",\"menu_parent\":\"076\"},"
+                + "{\"access_level\":\"04\",\"menu_name\":\"Monarch Restaurant\",\"fxml_path\":\"/com/rmj/guanzongroup/sidebarmenus/views/DeliveryAcceptance_HistoryMonarchFood.fxml\",\"controller_path\":\"DeliveryAcceptance_HistoryMonarchFood.controller\",\"menu_id\":\"080\",\"menu_parent\":\"076\"},"
+                + "{\"access_level\":\"04\",\"menu_name\":\"Monarch Hospitality\",\"fxml_path\":\"/com/rmj/guanzongroup/sidebarmenus/views/DeliveryAcceptance_HistoryMonarchHospitality.fxml\",\"controller_path\":\"DeliveryAcceptance_HistoryMonarchHospitality.controller\",\"menu_id\":\"081\",\"menu_parent\":\"076\"},"
+                + "{\"access_level\":\"02\",\"menu_name\":\"Motorcycle\",\"fxml_path\":\"/com/rmj/guanzongroup/sidebarmenus/views/DeliveryAcceptance_HistoryMC.fxml\",\"controller_path\":\"DeliveryAcceptance_HistoryMC.controller\",\"menu_id\":\"082\",\"menu_parent\":\"076\"},"
+                + "{\"access_level\":\"01\",\"menu_name\":\"Mobile Phone\",\"fxml_path\":\"/com/rmj/guanzongroup/sidebarmenus/views/DeliveryAcceptance_HistoryMP.fxml\",\"controller_path\":\"DeliveryAcceptance_HistoryMP.controller\",\"menu_id\":\"083\",\"menu_parent\":\"076\"},"
+                + "{\"access_level\":\"03\",\"menu_name\":\"Spare Parts Car\",\"fxml_path\":\"/com/rmj/guanzongroup/sidebarmenus/views/DeliveryAcceptance_HistorySPCar.fxml\",\"controller_path\":\"DeliveryAcceptance_HistorySPCar.controller\",\"menu_id\":\"084\",\"menu_parent\":\"076\"},"
+                + "{\"access_level\":\"02\",\"menu_name\":\"Spare Parts Motorycle\",\"fxml_path\":\"/com/rmj/guanzongroup/sidebarmenus/views/DeliveryAcceptance_HistorySPMC.fxml\",\"controller_path\":\"DeliveryAcceptance_HistorySPMC.controller\",\"menu_id\":\"085\",\"menu_parent\":\"076\"},"
+                // Purchase Order Return History
+                + "{\"access_level\":\"01 02 03 04 05 06 07\",\"menu_name\":\"Purchase Order Return\",\"fxml_path\":\"Purchase Order Return\",\"controller_path\":\"po.controller\",\"menu_id\":\"108\",\"menu_parent\":\"065\"},"
+                + "{\"access_level\":\"07\",\"menu_name\":\"Appliances\",\"fxml_path\":\"/com/rmj/guanzongroup/sidebarmenus/views/PurchaseOrderReturn_HistoryAppliances.fxml\",\"controller_path\":\"PurchaseOrderReturn_HistoryAppliances.controller\",\"menu_id\":\"109\",\"menu_parent\":\"108\"},"
+                + "{\"access_level\":\"03\",\"menu_name\":\"Car\",\"fxml_path\":\"/com/rmj/guanzongroup/sidebarmenus/views/PurchaseOrderReturn_HistoryCar.fxml\",\"controller_path\":\"PurchaseOrderReturn_HistoryCar.controller\",\"menu_id\":\"110\",\"menu_parent\":\"108\"},"
+                + "{\"access_level\":\"01 02 03 04 05 06 07\",\"menu_name\":\"General\",\"fxml_path\":\"/com/rmj/guanzongroup/sidebarmenus/views/PurchaseOrderReturn_History.fxml\",\"controller_path\":\"PurchaseOrderReturn_History.controller\",\"menu_id\":\"111\",\"menu_parent\":\"108\"},"
+                + "{\"access_level\":\"05\",\"menu_name\":\"Los Pedritos\",\"fxml_path\":\"/com/rmj/guanzongroup/sidebarmenus/views/PurchaseOrderReturn_HistoryLP.fxml\",\"controller_path\":\"PurchaseOrderReturn_HistoryLP.controller\",\"menu_id\":\"112\",\"menu_parent\":\"108\"},"
+                + "{\"access_level\":\"04\",\"menu_name\":\"Monarch Restaurant\",\"fxml_path\":\"/com/rmj/guanzongroup/sidebarmenus/views/PurchaseOrderReturn_HistoryMonarchFood.fxml\",\"controller_path\":\"PurchaseOrderReturn_HistoryMonarchFood.controller\",\"menu_id\":\"113\",\"menu_parent\":\"108\"},"
+                + "{\"access_level\":\"04\",\"menu_name\":\"Monarch Hospitality\",\"fxml_path\":\"/com/rmj/guanzongroup/sidebarmenus/views/PurchaseOrderReturn_HistoryMonarchHospitality.fxml\",\"controller_path\":\"PurchaseOrderReturn_HistoryMonarchHospitality.controller\",\"menu_id\":\"114\",\"menu_parent\":\"108\"},"
+                + "{\"access_level\":\"02\",\"menu_name\":\"Motorcycle\",\"fxml_path\":\"/com/rmj/guanzongroup/sidebarmenus/views/PurchaseOrderReturn_HistoryMC.fxml\",\"controller_path\":\"PurchaseOrderReturn_HistoryMC.controller\",\"menu_id\":\"115\",\"menu_parent\":\"108\"},"
+                + "{\"access_level\":\"01\",\"menu_name\":\"Mobile Phone\",\"fxml_path\":\"/com/rmj/guanzongroup/sidebarmenus/views/PurchaseOrderReturn_HistoryMP.fxml\",\"controller_path\":\"PurchaseOrderReturn_HistoryMP.controller\",\"menu_id\":\"116\",\"menu_parent\":\"108\"},"
+                + "{\"access_level\":\"03\",\"menu_name\":\"Spare Parts Car\",\"fxml_path\":\"/com/rmj/guanzongroup/sidebarmenus/views/PurchaseOrderReturn_HistorySPCar.fxml\",\"controller_path\":\"PurchaseOrderReturn_SPCar.controller\",\"menu_id\":\"117\",\"menu_parent\":\"108\"},"
+                + "{\"access_level\":\"02\",\"menu_name\":\"Spare Parts Motorycle\",\"fxml_path\":\"/com/rmj/guanzongroup/sidebarmenus/views/PurchaseOrderReturn_HistorySPMC.fxml\",\"controller_path\":\"PurchaseOrderReturn_HistorySPMC.controller\",\"menu_id\":\"118\",\"menu_parent\":\"108\"}"
+                + "]";
+
+        JSONParser parser = new JSONParser();
+        try {
+            try {
+                flatMenuItems = (JSONArray) parser.parse(new StringReader(jsonString));
+                JSONObject purchasingMainMenu = buildHierarchy("001");
+                dissectLeftSideBarJSON(purchasingMainMenu.toJSONString());
+
+            } catch (IOException ex) {
+                Logger.getLogger(DashboardController.class
+                        .getName()).log(Level.SEVERE, null, ex);
+            }
+        } catch (ParseException e) {
+            e.printStackTrace();
         }
     }
 }
