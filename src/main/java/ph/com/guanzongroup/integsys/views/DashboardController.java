@@ -66,6 +66,10 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.util.Duration;
 import org.guanzon.appdriver.agent.ShowMessageFX;
+import org.guanzon.appdriver.agent.menu.CommandExecutor;
+import org.guanzon.appdriver.agent.menu.MenuLoader;
+import org.guanzon.appdriver.agent.menu.MenuManager;
+import org.guanzon.appdriver.agent.menu.TreeNode;
 import org.guanzon.appdriver.base.GRiderCAS;
 import org.guanzon.appdriver.base.MiscUtil;
 import org.guanzon.appdriver.base.SQLUtil;
@@ -182,7 +186,7 @@ public class DashboardController implements Initializable {
     @FXML
     private AnchorPane anchorLeftSideBarMenu;
     @FXML
-    private TreeView<String> tvLeftSideBar;
+    private TreeView<TreeNode> tvLeftSideBar;
     @FXML
     private AnchorPane anchorIconMenu11;
     @FXML
@@ -214,7 +218,7 @@ public class DashboardController implements Initializable {
             initButtonClickActions();
             notificationChecker();
             setTreeViewStyle(tvLeftSideBar);
-            setTreeViewStyle(tvRightSideBar);
+//            setTreeViewStyle(tvRightSideBar);
 
             psIndustryID = psUserIndustryId;
             psCompanyID = psUserCompanyId;
@@ -249,16 +253,17 @@ public class DashboardController implements Initializable {
 
     @FXML
     private void switchInventory(ActionEvent event) {
-        inventoryMenuItems();
+        loadMenu();
+//        inventoryMenuItems();
         toggleLeftSideBarMenuButton("switchInventory", 0);
-        toggleSidebarWidth();
+//        toggleSidebarWidth();
     }
 
     @FXML
     private void switchPurchasing(ActionEvent event) {
         purchasingMenuItems();
         toggleLeftSideBarMenuButton("switchPurchasing", 1);
-        toggleSidebarWidth();
+//        toggleSidebarWidth();
     }
 
     @FXML
@@ -594,28 +599,41 @@ public class DashboardController implements Initializable {
         });
     }
     
-    private void setTreeViewStyle(TreeView<String> treeView) {
-        treeView.setCellFactory(tv -> new TreeCell<String>() {
+    private void setTreeViewStyle(TreeView<TreeNode> treeView) {
+        treeView.setCellFactory(tv -> new TreeCell<TreeNode>() {
             @Override
-            protected void updateItem(String item, boolean empty) {
+            protected void updateItem(TreeNode item, boolean empty) {
                 super.updateItem(item, empty);
 
                 if (empty || item == null) {
                     setText(null);
                     setGraphic(null);
+                    setTooltip(null);
                     setStyle("-fx-background-color: #DFDFDF; -fx-border-color: #DFDFDF;");
                     if (!getStyleClass().contains("empty-tree-cell")) {
                         getStyleClass().add("empty-tree-cell");
                     }
                 } else {
-                    setText(item);
+                    // Show the node name
+                    setText(item.getName());
+
+                    // Tooltip shows description if available
+                    if (item.getDescription() != null && !item.getDescription().isEmpty()) {
+                        setTooltip(new Tooltip(item.getDescription()));
+                    } else {
+                        setTooltip(null);
+                    }
+
+                    // Keep any icon/graphic
                     setGraphic(getTreeItem().getGraphic());
+
                     setStyle(null);
                     getStyleClass().remove("empty-tree-cell");
 
-                    setOnMouseClicked(event -> {
+                    // Expand/collapse toggle on click
+                    setOnMouseClicked((MouseEvent event) -> {
                         if (event.getClickCount() == 1) {
-                            TreeItem<String> treeItem = getTreeItem();
+                            TreeItem<TreeNode> treeItem = getTreeItem();
                             if (treeItem != null && !treeItem.isLeaf()) {
                                 treeItem.setExpanded(!treeItem.isExpanded());
                                 event.consume();
@@ -626,6 +644,39 @@ public class DashboardController implements Initializable {
             }
         });
     }
+    
+//    private void setTreeViewStyle(TreeView<String> treeView) {
+//        treeView.setCellFactory(tv -> new TreeCell<String>() {
+//            @Override
+//            protected void updateItem(String item, boolean empty) {
+//                super.updateItem(item, empty);
+//
+//                if (empty || item == null) {
+//                    setText(null);
+//                    setGraphic(null);
+//                    setStyle("-fx-background-color: #DFDFDF; -fx-border-color: #DFDFDF;");
+//                    if (!getStyleClass().contains("empty-tree-cell")) {
+//                        getStyleClass().add("empty-tree-cell");
+//                    }
+//                } else {
+//                    setText(item);
+//                    setGraphic(getTreeItem().getGraphic());
+//                    setStyle(null);
+//                    getStyleClass().remove("empty-tree-cell");
+//
+//                    setOnMouseClicked(event -> {
+//                        if (event.getClickCount() == 1) {
+//                            TreeItem<String> treeItem = getTreeItem();
+//                            if (treeItem != null && !treeItem.isLeaf()) {
+//                                treeItem.setExpanded(!treeItem.isExpanded());
+//                                event.consume();
+//                            }
+//                        }
+//                    });
+//                }
+//            }
+//        });
+//    }
     
     private void setDropShadowEffectsLeftSideBar(AnchorPane anchorPane) {
         DropShadow shadow = new DropShadow();
@@ -1370,15 +1421,15 @@ public class DashboardController implements Initializable {
         }
     }
     
-    private void toggleSidebarWidth() {
-        if (tvLeftSideBar != null && tvLeftSideBar.getRoot() != null) {
-            int calculatedWidth = calculateTreeViewWidth(tvLeftSideBar.getRoot());
-
-            Platform.runLater(() -> {
-                anchorLeftSideBarMenu.setPrefWidth(calculatedWidth);
-            });
-        }
-    }
+//    private void toggleSidebarWidth() {
+//        if (tvLeftSideBar != null && tvLeftSideBar.getRoot() != null) {
+//            int calculatedWidth = calculateTreeViewWidth(tvLeftSideBar.getRoot());
+//
+//            Platform.runLater(() -> {
+//                anchorLeftSideBarMenu.setPrefWidth(calculatedWidth);
+//            });
+//        }
+//    }
     
     private int calculateTreeViewWidth(TreeItem<String> root) {
         if (root == null) {
@@ -1416,6 +1467,42 @@ public class DashboardController implements Initializable {
 
         int charWidth = 7;
         return text.length() * charWidth;
+    }
+    
+    private void loadMenu(){
+        CommandExecutor executor = new CommandExecutor(oApp.getGConnection().getConnection());
+        
+        MenuManager menu = new MenuManager(oApp, "CAS");
+        menu.setIndustryCode("01");
+        
+        try {
+            JSONObject json = menu.getMenu();
+            
+            if ("success".equals((String) json.get("result"))){
+                List<TreeNode> roots = MenuLoader.loadMenuFromDatabase(menu.getMenuResult(), executor);
+                
+                TreeItem<TreeNode> rootItem = new TreeItem<>(new TreeNode("2500000000", null, "Menu", "Root menu", null, null));
+                for (TreeNode node : roots) {
+                    rootItem.getChildren().add(buildTree(node));
+                }
+                rootItem.setExpanded(false);
+                
+                tvLeftSideBar.setRoot(rootItem);
+                tvLeftSideBar.setShowRoot(false);
+            }
+        
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        
+    }
+    
+    private TreeItem<TreeNode> buildTree(TreeNode node) {
+        TreeItem<TreeNode> item = new TreeItem<>(node);
+        for (TreeNode child : node.getChildren()) {
+            item.getChildren().add(buildTree(child));
+        }
+        return item;
     }
     
     private void inventoryMenuItems() {
@@ -1631,21 +1718,21 @@ public class DashboardController implements Initializable {
                 root.getChildren().add(parentNode);
             }
 
-            if (tvLeftSideBar != null) {
-                tvLeftSideBar.setRoot(root);
-                tvLeftSideBar.setShowRoot(false);
-
-                if (!isListenerLeftAdded) {
-                    isListenerLeftAdded = true;
-                    tvLeftSideBar.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
-                        if (newValue != null) {
-                            handleSelection(newValue);
-                        }
-                    });
-                }
-            } else {
-                System.err.println("tvLeftSideBar is not initialized.");
-            }
+//            if (tvLeftSideBar != null) {
+//                tvLeftSideBar.setRoot(root);
+//                tvLeftSideBar.setShowRoot(false);
+//
+//                if (!isListenerLeftAdded) {
+//                    isListenerLeftAdded = true;
+//                    tvLeftSideBar.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+//                        if (newValue != null) {
+//                            handleSelection(newValue);
+//                        }
+//                    });
+//                }
+//            } else {
+//                System.err.println("tvLeftSideBar is not initialized.");
+//            }
         } catch (ParseException ex) {
             ex.printStackTrace();
         }
