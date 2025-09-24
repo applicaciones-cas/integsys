@@ -758,13 +758,19 @@ public class DashboardController implements Initializable {
     }
     
     public int checktabs(String tabtitle) {
+        int ctr = -1;
+        
+        if (tabpane.getTabs().isEmpty()) return ctr;
+        
         for (Tab tab : tabpane.getTabs()) {
+            ctr++;
             if (tab.getText().equals(tabtitle)) {
                 tabpane.getSelectionModel().select(tab);
-                return 0;
+                return ctr;
             }
         }
-        return 1;
+        
+        return -1;
     }
     
     public void setTabPane() {
@@ -1035,7 +1041,7 @@ public class DashboardController implements Initializable {
         }
     }
     
-    public TabPane loadAnimate(String fxmlPath, String controllerClass) {
+    public TabPane loadAnimate(String fxmlPath, String controllerClass, String tabTitle) {
         //set fxml controller class
         if (tabpane.getTabs().isEmpty()) {
             tabpane = new TabPane();
@@ -1059,10 +1065,10 @@ public class DashboardController implements Initializable {
             fxmlLoader.setLocation(fxObj.getClass().getResource(fxmlPath));
             fxmlLoader.setController(fxObj);
 
-            Tab newTab = new Tab(SetTabTitle(fxmlPath));
+            Tab newTab = new Tab(tabTitle);
             newTab.setContent(new javafx.scene.control.Label("Content of Tab " + fxmlPath));
             newTab.setContextMenu(createContextMenu(tabpane, newTab, oApp));
-            tabName.add(SetTabTitle(fxmlPath));
+            tabName.add(tabTitle);
             
             Node content = fxmlLoader.load();
             newTab.setContent(content);
@@ -1070,9 +1076,8 @@ public class DashboardController implements Initializable {
             tabpane.getSelectionModel().select(newTab);
 
             newTab.setOnCloseRequest(event -> {
-                if (ShowMessageFX.YesNo(null, "Close Tab", "Are you sure, do you want to close tab?")) {
+                if (ShowMessageFX.YesNo(null, "Close Tab", "Close this tab?")) {
                     tabName.remove(newTab.getText());
-                    SIPostingWindowKeyEvent(newTab, fxObj, true);
                     Tabclose();
                 } else {
                     event.consume();
@@ -1082,7 +1087,6 @@ public class DashboardController implements Initializable {
 
             newTab.setOnClosed(event -> {
                 if (lbproceed) {
-                    SIPostingWindowKeyEvent(newTab, fxObj, true);
                     lbproceed = false;
                 }
             });
@@ -1093,13 +1097,6 @@ public class DashboardController implements Initializable {
                     if (tab.getText().equals(newTab.getText())) {
                         tabName.remove(newTab.getText());
                         tabName.add(newTab.getText());
-
-                        //applied for specific use//
-                        if (newTab.isSelected()) {
-                            SIPostingWindowKeyEvent(newTab, fxObj, false);
-                        } else {
-                            SIPostingWindowKeyEvent(newTab, fxObj, true);
-                        }
                         break;
                     }
                 }
@@ -1373,7 +1370,7 @@ public class DashboardController implements Initializable {
 
                     System.out.println("industry: " + psIndustryID);
                     System.out.println("category: " + psCategoryID);
-                    setScene2(loadAnimate(sformname, ""));
+                    setScene2(loadAnimate(sformname, "", ""));
                 } else {
                     ShowMessageFX.Warning("This form is currently unavailable.", "Computerized Accounting System", pxeModuleName);
                 }
@@ -1448,16 +1445,16 @@ public class DashboardController implements Initializable {
     
     private void openForm(String fxmlPath, String controllerClassName, String tabTitle) {
         try {
-            boolean isNewTab = (checktabs(tabTitle) == 1);
+            int tabIndex = checktabs(tabTitle);
             
-            if (isNewTab) {
+            if (tabIndex == -1) {
                 if (!fxmlPath.isEmpty() && fxmlPath.contains(".fxml")) {
-                    setScene2(loadAnimate(fxmlPath, controllerClassName));
+                    setScene2(loadAnimate(fxmlPath, controllerClassName, tabTitle));
                 } else {
-                    ShowMessageFX.Warning("This form is currently unavailable.", "Computerized Accounting System", pxeModuleName);
+                    ShowMessageFX.Warning("This form is currently unavailable.", "Computerized Accounting System", pxeModuleName);   
                 }
             } else {
-                ShowMessageFX.Warning("This form is already active.", "Computerized Accounting System", pxeModuleName);
+                tabpane.getSelectionModel().select(tabIndex);
             }
             
             setAnchorPaneVisibleManage(false, anchorLeftSideBarMenu);
