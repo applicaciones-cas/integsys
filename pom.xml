@@ -105,6 +105,29 @@
             <version>0.2-SNAPSHOT</version>
             <type>jar</type>
         </dependency>
+        <dependency>
+            <groupId>org.guanzon</groupId>
+            <artifactId>cas-inv</artifactId>
+            <version>0.2-SNAPSHOT</version>
+            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>org.guanzon</groupId>
+            <artifactId>cas-client</artifactId>
+            <version>0.2-SNAPSHOT</version>
+            <type>jar</type>
+        </dependency>
+        
+        <dependency>
+            <groupId>org.guanzon</groupId>
+            <artifactId>cas-purchasing</artifactId>
+            <version>0.2-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>ph.com.guanzongroup</groupId>
+            <artifactId>cas-purchasing-t2</artifactId>
+            <version>0.2-SNAPSHOT</version>
+        </dependency>
         
         <dependency>
             <groupId>de.jensd</groupId>
