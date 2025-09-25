@@ -1015,32 +1015,6 @@ public class DashboardController implements Initializable {
         }
     }
     
-    private void addChildren(TreeItem<String> parentNode, JSONArray childrenArray) {
-        for (Object obj : childrenArray) {
-            JSONObject loDetail = (JSONObject) obj;
-            if (loDetail == null || !loDetail.containsKey("menu_name")) {
-                continue;
-            }
-
-            String parentName = String.valueOf(loDetail.get("menu_name"));
-            String location = loDetail.containsKey("fxml_path") ? String.valueOf(loDetail.get("fxml_path")) : "";
-//            String lsIndustryCode = String.valueOf(loDetail.get("industry_code"));
-//            String lsCategoryCode = String.valueOf(loDetail.get("category_code"));
-
-            TreeItem<String> childNode = new TreeItem<>(parentName);
-            menuLocationMap.put(childNode, location);
-//            menuIndustryMap.put(childNode, lsIndustryCode); // Store industry code
-//            menuCategoryMap.put(childNode, lsCategoryCode); // Store category code
-
-            if (loDetail.containsKey("child") && loDetail.get("child") instanceof JSONArray) {
-                JSONArray subChildren = (JSONArray) loDetail.get("child");
-                addChildren(childNode, subChildren);
-            }
-
-            parentNode.getChildren().add(childNode);
-        }
-    }
-    
     public TabPane loadAnimate(String fxmlPath, String controllerClass, String tabTitle) {
         //set fxml controller class
         if (tabpane.getTabs().isEmpty()) {
@@ -1105,8 +1079,9 @@ public class DashboardController implements Initializable {
         } catch (IOException e) {
             e.printStackTrace();
         } catch (ClassNotFoundException | NoSuchMethodException | SecurityException | InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
-            Logger.getLogger(DashboardController.class.getName()).log(Level.SEVERE, null, ex);
+            ex.printStackTrace();
         }
+        
         return null;
     }
     
@@ -1450,8 +1425,6 @@ public class DashboardController implements Initializable {
             if (tabIndex == -1) {
                 if (!fxmlPath.isEmpty() && fxmlPath.contains(".fxml")) {
                     setScene2(loadAnimate(fxmlPath, controllerClassName, tabTitle));
-                } else {
-                    ShowMessageFX.Warning("This form is currently unavailable.", "Computerized Accounting System", pxeModuleName);   
                 }
             } else {
                 tabpane.getSelectionModel().select(tabIndex);
