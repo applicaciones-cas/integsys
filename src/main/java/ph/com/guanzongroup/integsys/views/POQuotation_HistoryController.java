@@ -2,8 +2,8 @@ package ph.com.guanzongroup.integsys.views;
 
 import ph.com.guanzongroup.integsys.model.ModelDeliveryAcceptance_Attachment;
 import ph.com.guanzongroup.integsys.model.ModelPOQuotation_Detail;
-import ph.com.guanzongroup.integsys.utilities.CustomCommonUtil;
-import ph.com.guanzongroup.integsys.utilities.JFXUtil;
+import ph.com.guanzongroup.integsys.utility.CustomCommonUtil;
+import ph.com.guanzongroup.integsys.utility.JFXUtil;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Path;

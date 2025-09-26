@@ -36,7 +36,7 @@ import javafx.util.Pair;
 import org.guanzon.appdriver.constant.DocumentType;
 import org.guanzon.cas.purchasing.controller.PurchaseOrderReceiving;
 import ph.com.guanzongroup.integsys.model.ModelDeliveryAcceptance_Attachment;
-import ph.com.guanzongroup.integsys.utilities.JFXUtil;
+import ph.com.guanzongroup.integsys.utility.JFXUtil;
 
 /**
  * FXML Controller class

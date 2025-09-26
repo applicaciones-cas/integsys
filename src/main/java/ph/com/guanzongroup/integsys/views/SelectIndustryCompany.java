@@ -25,7 +25,7 @@ import org.guanzon.appdriver.base.LogWrapper;
 import org.guanzon.appdriver.base.MiscUtil;
 import org.guanzon.appdriver.base.SQLUtil;
 import org.guanzon.appdriver.constant.Logical;
-import ph.com.guanzongroup.integsys.utilities.CustomCommonUtil;
+import ph.com.guanzongroup.integsys.utility.CustomCommonUtil;
 
 /**
  * FXML Controller class

@@ -77,7 +77,7 @@ import org.guanzon.appdriver.base.SQLUtil;
 import org.guanzon.appdriver.constant.Logical;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
-import ph.com.guanzongroup.integsys.utilities.JFXUtil;
+import ph.com.guanzongroup.integsys.utility.JFXUtil;
 
 public class DashboardController implements Initializable {
     private final String pxeModuleName = "Computerized Accounting System";

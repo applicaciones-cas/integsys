@@ -39,7 +39,7 @@ import org.json.simple.JSONObject;
 import ph.com.guanzongroup.integsys.model.ModelLog_In_Company;
 import ph.com.guanzongroup.integsys.model.ModelLog_In_Industry;
 import ph.com.guanzongroup.integsys.model.ModelLog_In_User;
-import ph.com.guanzongroup.integsys.utilities.JFXUtil;
+import ph.com.guanzongroup.integsys.utility.JFXUtil;
 
 /**
  * FXML Controller class
