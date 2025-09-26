@@ -4,6 +4,7 @@ import com.sun.javafx.scene.control.skin.TableHeaderRow;
 import com.sun.javafx.scene.control.skin.TableViewSkin;
 import com.sun.javafx.scene.control.skin.VirtualFlow;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
+import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -773,7 +774,7 @@ public class JFXUtil {
         });
     }
 
-    /* Clears textFields, textAreas, & datepickers by calling its parent anchorpane */
+    /* Clears textFields, textAreas, checkboxes & datepickers by calling its parent anchorpane */
  /* For datepicker it auto set value to null before clearing text input*/
     public static void clearTextFields(AnchorPane... anchorPanes) {
         for (AnchorPane pane : anchorPanes) {
@@ -2505,4 +2506,21 @@ public class JFXUtil {
         }
         return result;
     }
+
+    public static JSONObject checkIfFolderExists(JSONObject poJSON, String lsExportPath ) {
+        File folder = new File(lsExportPath);
+        if (!folder.exists()) {
+            if (folder.mkdirs()) {
+                // Folder successfully created
+                System.out.println("Folder created at: " + folder.getAbsolutePath());
+            } else {
+                // Failed to create folder
+                poJSON.put("result", "error");
+                poJSON.put("message", "Failed to create folder. \n\nEnsure the application has write permissions \"");
+                return poJSON;
+            }
+        }
+        return poJSON;
+    }
+
 }

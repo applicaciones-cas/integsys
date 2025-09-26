@@ -168,7 +168,7 @@ public class POQuotation_EntryController implements Initializable, ScreenInterfa
             System.err.println((String) poJSON.get("message"));
             ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
         }
-
+        JFXUtil.checkIfFolderExists(poJSON, System.getProperty("sys.default.path.temp") + "/Attachments//");
         initTextFields();
         initDatePickers();
         initMainGrid();
@@ -1282,7 +1282,7 @@ public class POQuotation_EntryController implements Initializable, ScreenInterfa
                             filePath2 = imageinfo_temp.get((String) attachment_data.get(pnAttachment).getIndex02());
                         } else {
                             // in server
-                            filePath2 = System.getProperty("sys.default.path.config") + "/temp//attachments//" + (String) attachment_data.get(pnAttachment).getIndex02();
+                            filePath2 = System.getProperty("sys.default.path.temp") + "/Attachments//" + (String) attachment_data.get(pnAttachment).getIndex02();
 
                         }
                         if (filePath != null && !filePath.isEmpty()) {
@@ -1353,7 +1353,7 @@ public class POQuotation_EntryController implements Initializable, ScreenInterfa
 
             tfQuantity.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.POQuotation().Detail(pnDetail).getQuantity(), false));
             tfDiscRateDetail.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.POQuotation().Detail(pnDetail).getDiscountRate(), false));
-            tfAddlDiscAmtDetail.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.POQuotation().Detail(pnDetail).getDiscountAmount(), false));
+            tfAddlDiscAmtDetail.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.POQuotation().Detail(pnDetail).getDiscountAmount(), true));
             tfCost.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.POQuotation().getCost(pnDetail), true));
             cbReverse.setSelected(poController.POQuotation().Detail(pnDetail).isReverse());
             JFXUtil.updateCaretPositions(apDetail);

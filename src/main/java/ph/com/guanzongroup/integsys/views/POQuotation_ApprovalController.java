@@ -168,6 +168,8 @@ public class POQuotation_ApprovalController implements Initializable, ScreenInte
             ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
         }
 
+        JFXUtil.checkIfFolderExists(poJSON, System.getProperty("sys.default.path.temp") + "/Attachments//");
+        
         initTextFields();
         initDatePickers();
         initMainGrid();
@@ -1003,7 +1005,7 @@ public class POQuotation_ApprovalController implements Initializable, ScreenInte
                             filePath2 = imageinfo_temp.get((String) attachment_data.get(pnAttachment).getIndex02());
                         } else {
                             // in server
-                            filePath2 = System.getProperty("sys.default.path.config") + "/temp//attachments//" + (String) attachment_data.get(pnAttachment).getIndex02();
+                            filePath2 = System.getProperty("sys.default.path.temp") + "/Attachments//" + (String) attachment_data.get(pnAttachment).getIndex02();
 
                         }
                         if (filePath != null && !filePath.isEmpty()) {
@@ -1074,7 +1076,7 @@ public class POQuotation_ApprovalController implements Initializable, ScreenInte
 
             tfQuantity.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.POQuotation().Detail(pnDetail).getQuantity(), false));
             tfDiscRateDetail.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.POQuotation().Detail(pnDetail).getDiscountRate(), false));
-            tfAddlDiscAmtDetail.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.POQuotation().Detail(pnDetail).getDiscountAmount(), false));
+            tfAddlDiscAmtDetail.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.POQuotation().Detail(pnDetail).getDiscountAmount(), true));
             tfCost.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.POQuotation().getCost(pnDetail), true));
             cbReverse.setSelected(poController.POQuotation().Detail(pnDetail).isReverse());
             JFXUtil.updateCaretPositions(apDetail);
@@ -1300,7 +1302,7 @@ public class POQuotation_ApprovalController implements Initializable, ScreenInte
                                             String.valueOf(poController.POQuotation().POQuotationList(lnCtr).Branch().getBranchName()),
                                             String.valueOf(poController.POQuotation().POQuotationList(lnCtr).Supplier().getCompanyName()),
                                             String.valueOf(CustomCommonUtil.formatDateToShortString(poController.POQuotation().POQuotationList(lnCtr).getTransactionDate())),
-                                            String.valueOf(poController.POQuotation().POQuotationList(lnCtr).getTransactionNo()),
+                                            String.valueOf(poController.POQuotation().POQuotationList(lnCtr).POQuotationRequest().getTransactionNo()),
                                             String.valueOf(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.POQuotation().POQuotationList(lnCtr).getTransactionTotal(), true))
                                     ));
                                 } catch (GuanzonException | SQLException ex) {

@@ -772,13 +772,6 @@ public class POQuotationRequest_ConfirmationController implements Initializable,
 
                 String lsServerDate, lsTransDate, lsSelectedDate;
                 LocalDate currentDate, selectedDate, transactionDate;
-
-//                String lsServerDate = sdfFormat.format(oApp.getServerDate());
-//                String lsTransDate = sdfFormat.format(poController.POQuotationRequest().Master().getTransactionDate());
-//                String lsSelectedDate = sdfFormat.format(SQLUtil.toDate(JFXUtil.convertToIsoFormat(inputText), SQLUtil.FORMAT_SHORT_DATE));
-//                LocalDate currentDate = LocalDate.parse(lsServerDate, DateTimeFormatter.ofPattern(SQLUtil.FORMAT_SHORT_DATE));
-//                LocalDate selectedDate = LocalDate.parse(lsSelectedDate, DateTimeFormatter.ofPattern(SQLUtil.FORMAT_SHORT_DATE));
-//                LocalDate transactionDate = LocalDate.parse(lsTransDate, DateTimeFormatter.ofPattern(SQLUtil.FORMAT_SHORT_DATE));
                 switch (datePicker.getId()) {
                     case "dpTransactionDate":
                         lsServerDate = sdfFormat.format(oApp.getServerDate());
