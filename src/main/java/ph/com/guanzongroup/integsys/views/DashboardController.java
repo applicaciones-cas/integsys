@@ -15,9 +15,11 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.animation.Animation;
@@ -67,7 +69,6 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.util.Duration;
 import org.guanzon.appdriver.agent.ShowMessageFX;
-import org.guanzon.appdriver.agent.menu.CommandExecutor;
 import org.guanzon.appdriver.agent.menu.MenuManager;
 import org.guanzon.appdriver.agent.menu.TreeNode;
 import org.guanzon.appdriver.base.GRiderCAS;
@@ -75,6 +76,8 @@ import org.guanzon.appdriver.base.MiscUtil;
 import org.guanzon.appdriver.base.SQLUtil;
 import org.json.simple.JSONObject;
 import ph.com.guanzongroup.integsys.utility.JFXUtil;
+import javafx.scene.Cursor;
+import javafx.scene.control.Tooltip;
 
 public class DashboardController implements Initializable {
     private final String pxeModuleName = "Computerized Accounting System";
@@ -120,6 +123,7 @@ public class DashboardController implements Initializable {
     boolean lbproceed = false;
     
     private final Map<String, Runnable> javaCommands = new HashMap<>();
+    private Set<String> allowedMenuIds = new HashSet<>();
     
     @FXML
     private AnchorPane MainAnchor;
@@ -516,6 +520,52 @@ public class DashboardController implements Initializable {
         });
     }
     
+//    private void setTreeViewStyle(TreeView<TreeNode> treeView) {
+//        treeView.setCellFactory(tv -> new TreeCell<TreeNode>() {
+//            @Override
+//            protected void updateItem(TreeNode item, boolean empty) {
+//                super.updateItem(item, empty);
+//
+//                if (empty || item == null) {
+//                    setText(null);
+//                    setGraphic(null);
+//                    setTooltip(null);
+//                    setStyle("-fx-background-color: #DFDFDF; -fx-border-color: #DFDFDF;");
+//                    if (!getStyleClass().contains("empty-tree-cell")) {
+//                        getStyleClass().add("empty-tree-cell");
+//                    }
+//                } else {
+//                    // Show the node name
+//                    setText(item.getName());
+//
+//                    // Tooltip shows description if available
+//                    if (item.getDescription() != null && !item.getDescription().isEmpty()) {
+//                        setTooltip(new Tooltip(item.getDescription()));
+//                    } else {
+//                        setTooltip(null);
+//                    }
+//
+//                    // Keep any icon/graphic
+//                    setGraphic(getTreeItem().getGraphic());
+//
+//                    setStyle(null);
+//                    getStyleClass().remove("empty-tree-cell");
+//
+//                    // Expand/collapse toggle on click
+//                    setOnMouseClicked((MouseEvent event) -> {
+//                        if (event.getClickCount() == 1) {
+//                            TreeItem<TreeNode> treeItem = getTreeItem();
+//                            if (treeItem != null && !treeItem.isLeaf()) {
+//                                treeItem.setExpanded(!treeItem.isExpanded());
+//                                event.consume();
+//                            }
+//                        }
+//                    });
+//                }
+//            }
+//        });
+//    }
+    
     private void setTreeViewStyle(TreeView<TreeNode> treeView) {
         treeView.setCellFactory(tv -> new TreeCell<TreeNode>() {
             @Override
@@ -530,30 +580,66 @@ public class DashboardController implements Initializable {
                     if (!getStyleClass().contains("empty-tree-cell")) {
                         getStyleClass().add("empty-tree-cell");
                     }
+                    setCursor(Cursor.DEFAULT);
+                    setOnMouseEntered(null);
+                    setOnMouseExited(null);
+                    setOnMouseClicked(null);
                 } else {
-                    // Show the node name
                     setText(item.getName());
+                    setGraphic(getTreeItem().getGraphic());
+                    getStyleClass().remove("empty-tree-cell");
 
-                    // Tooltip shows description if available
+                    boolean isContainer = item.getCommandType() == null || item.getCommandType().isEmpty();
+
+                    // ✅ Tooltip with description (if available)
                     if (item.getDescription() != null && !item.getDescription().isEmpty()) {
                         setTooltip(new Tooltip(item.getDescription()));
                     } else {
                         setTooltip(null);
                     }
 
-                    // Keep any icon/graphic
-                    setGraphic(getTreeItem().getGraphic());
+                    if (isContainer) {
+                        // 🎨 Container node styling
+                        setStyle("-fx-font-weight: bold; -fx-text-fill: #555555;");
+                        setCursor(Cursor.DEFAULT);
+                    } else {
+                        // 🎨 Command node styling
+                        setStyle("-fx-font-weight: normal; -fx-text-fill: black;");
+                        setCursor(Cursor.HAND);
+                    }
 
-                    setStyle(null);
-                    getStyleClass().remove("empty-tree-cell");
+                    // ✅ Hover effect only for command nodes
+                    if (!isContainer) {
+                        setOnMouseEntered(e -> {
+                            setStyle("-fx-background-color: #E6F2FF; -fx-font-weight: normal; -fx-text-fill: black;");
+                            setCursor(Cursor.HAND);
+                        });
+                        setOnMouseExited(e -> {
+                            setStyle("-fx-font-weight: normal; -fx-text-fill: black;");
+                            setCursor(Cursor.HAND);
+                        });
+                    } else {
+                        setOnMouseEntered(null);
+                        setOnMouseExited(null);
+                    }
 
-                    // Expand/collapse toggle on click
-                    setOnMouseClicked((MouseEvent event) -> {
+                    // ✅ Handle click actions
+                    setOnMouseClicked(event -> {
                         if (event.getClickCount() == 1) {
-                            TreeItem<TreeNode> treeItem = getTreeItem();
-                            if (treeItem != null && !treeItem.isLeaf()) {
-                                treeItem.setExpanded(!treeItem.isExpanded());
-                                event.consume();
+                            if (isContainer) {
+                                // Container: expand/collapse only
+                                TreeItem<TreeNode> treeItem = getTreeItem();
+                                if (treeItem != null && !treeItem.isLeaf()) {
+                                    treeItem.setExpanded(!treeItem.isExpanded());
+                                    event.consume();
+                                }
+                            } else {
+                                // Executable node: run assigned action
+                                if (item.getAction() != null) {
+                                    item.getAction().run();
+                                } else {
+                                    System.out.println("⚠ No action defined for: " + item.getName());
+                                }
                             }
                         }
                     });
@@ -1009,7 +1095,7 @@ public class DashboardController implements Initializable {
         }
     }
     
-    public TabPane loadAnimate(String fxmlPath, String controllerClass, String tabTitle) {
+    public TabPane loadAnimate(TreeNode node) {
         //set fxml controller class
         if (tabpane.getTabs().isEmpty()) {
             tabpane = new TabPane();
@@ -1019,22 +1105,22 @@ public class DashboardController implements Initializable {
         setPane();
 
         try {
-            Class<?> cls = Class.forName(controllerClass);
+            Class<?> cls = Class.forName(node.getControllerClass());
             ScreenInterface fxObj = (ScreenInterface) cls.getDeclaredConstructor().newInstance();
 
             fxObj.setGRider(oApp);
-            fxObj.setIndustryID(psIndustryID);
+            fxObj.setIndustryID(node.getIndustry());
             fxObj.setCompanyID(psCompanyID);
-            fxObj.setCategoryID(psCategoryID);
+            fxObj.setCategoryID(node.getCategory());
 
             FXMLLoader fxmlLoader = new FXMLLoader();
-            fxmlLoader.setLocation(fxObj.getClass().getResource(fxmlPath));
+            fxmlLoader.setLocation(fxObj.getClass().getResource(node.getFxmlPath()));
             fxmlLoader.setController(fxObj);
 
-            Tab newTab = new Tab(tabTitle);
-            newTab.setContent(new javafx.scene.control.Label("Content of Tab " + fxmlPath));
+            Tab newTab = new Tab(node.getDescription());
+            newTab.setContent(new javafx.scene.control.Label("Content of Tab " + node.getFxmlPath()));
             newTab.setContextMenu(createContextMenu(tabpane, newTab, oApp));
-            tabName.add(tabTitle);
+            tabName.add(node.getDescription());
             
             Node content = fxmlLoader.load();
             newTab.setContent(content);
@@ -1233,6 +1319,95 @@ public class DashboardController implements Initializable {
         int charWidth = 7;
         return text.length() * charWidth;
     }
+//    private void loadMenu(){
+//        MenuManager menu = new MenuManager(oApp, "CAS");
+//        menu.setIndustryCode(psIndustryID);
+//        
+//        try {
+//            JSONObject json = menu.getMenu();
+//            
+//            if ("success".equals((String) json.get("result"))){
+//                List<TreeNode> roots = loadMenuFromDatabase(menu.getMenuResult());
+//                
+//                TreeItem<TreeNode> rootItem = new TreeItem<>(new TreeNode("2500000000",
+//                                null,
+//                                "Menu", 
+//                                "Root menu", 
+//                                null, 
+//                                null,
+//                                null,
+//                                null));
+//                
+//                for (TreeNode node : roots) {
+//                    rootItem.getChildren().add(buildTree(node));
+//                }
+//                rootItem.setExpanded(false);
+//                
+//                tvLeftSideBar.setRoot(rootItem);
+//
+//                // Execute on click
+//                tvLeftSideBar.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
+//                    if (newVal != null) {
+//                        newVal.getValue().runAction();
+//                    }
+//                });
+//                
+//                tvLeftSideBar.setShowRoot(false);
+//            }
+//        } catch (SQLException e) {
+//            e.printStackTrace();
+//        }
+//        
+//    }
+//    private void loadMenu(){
+//        MenuManager menu = new MenuManager(oApp, "CAS");
+//        menu.setIndustryCode(psIndustryID);
+//        
+//        try {
+//            JSONObject json = menu.getMenu();
+//            
+//            if ("success".equals((String) json.get("result"))){
+//                List<TreeNode> roots = loadMenuFromDatabase(menu.getMenuResult());
+//                
+//                TreeItem<TreeNode> rootItem = new TreeItem<>(new TreeNode("2500000000",
+//                                null,
+//                                "Menu", 
+//                                "Root menu", 
+//                                null, 
+//                                null,
+//                                null,
+//                                null));
+//                
+//                for (TreeNode node : roots) {
+//                    rootItem.getChildren().add(buildTree(node));
+//                }
+//                rootItem.setExpanded(false);
+//                
+//                tvLeftSideBar.setRoot(rootItem);
+//
+//                // Execute on click
+//                tvLeftSideBar.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
+//                    if (newVal != null) {
+//                        newVal.getValue().runAction();
+//                    }
+//                });
+//                
+//                tvLeftSideBar.setShowRoot(false);
+//            }
+//        } catch (SQLException e) {
+//            e.printStackTrace();
+//        }
+//        
+//    }
+    
+//    private TreeItem<TreeNode> buildTree(TreeNode node) {
+//        TreeItem<TreeNode> item = new TreeItem<>(node);
+//        for (TreeNode child : node.getChildren()) {
+//            item.getChildren().add(buildTree(child));
+//        }
+//        return item;
+//    }
+    
     
     private void loadMenu(){
         MenuManager menu = new MenuManager(oApp, "CAS");
@@ -1254,7 +1429,7 @@ public class DashboardController implements Initializable {
                                 null));
                 
                 for (TreeNode node : roots) {
-                    rootItem.getChildren().add(buildTree(node));
+                    rootItem.getChildren().add(buildTree(node, allowedMenuIds));
                 }
                 rootItem.setExpanded(false);
                 
@@ -1275,12 +1450,36 @@ public class DashboardController implements Initializable {
         
     }
     
-    private TreeItem<TreeNode> buildTree(TreeNode node) {
-        TreeItem<TreeNode> item = new TreeItem<>(node);
+    private TreeItem<TreeNode> buildTree(TreeNode node, Set<String> allowedMenuIds) {
+        // Node must have a non-empty commandType
+        boolean hasValidCommand = node.getCommandType() != null && !node.getCommandType().isEmpty();
+
+        TreeItem<TreeNode> treeItem = new TreeItem<>(node);
+        boolean hasValidChild = false;
+        
+        // Build children recursively
         for (TreeNode child : node.getChildren()) {
-            item.getChildren().add(buildTree(child));
+            TreeItem<TreeNode> childItem = buildTree(child, allowedMenuIds);
+
+            if (childItem != null) {
+                treeItem.getChildren().add(childItem);
+                hasValidChild = true;
+            }
         }
-        return item;
+
+        // Rules:
+        // 1. If node has a valid command AND is allowed -> show it
+        if (hasValidCommand && allowedMenuIds.contains(node.getId())) {
+            return treeItem;
+        }
+
+        // 2. If node has no command BUT has valid children -> show it as a container
+        if (!hasValidCommand && hasValidChild) {
+            return treeItem;
+        }
+
+        // 3. Otherwise -> hide it
+        return null;
     }
     
     private List<TreeNode> loadMenuFromDatabase(ResultSet menu) throws SQLException {
@@ -1296,14 +1495,17 @@ public class DashboardController implements Initializable {
             String commandType = menu.getString("sCmdTypex");
             String formName = menu.getString("sFormName");
             String controller = menu.getString("sObjectNm");
+            String industryCd = menu.getString("sIndstCdx");
+            String categoryCd = menu.getString("sCategrCd");
 
-            TreeNode node = new TreeNode(id, parentId, name, desc, command, commandType, formName, controller);
+            TreeNode node = new TreeNode(id, parentId, name, desc, command, commandType, formName, controller, industryCd, categoryCd);
 
             if (!command.isEmpty() && !commandType.isEmpty()){
                 node.setAction(createAction(node));
             }
             
             map.put(id, node);
+            allowedMenuIds.add(id);
 
             if (parentId.isEmpty()) {
                 roots.add(node);
@@ -1334,7 +1536,7 @@ public class DashboardController implements Initializable {
             case "JAVA":
                 return () -> {
                     if (node.getFxmlPath() != null) {
-                        openForm(node.getFxmlPath(), node.getControllerClass(), node.getDescription());
+                        openForm(node);
                     } else {
                         runJavaCommand(node.getCommand());
                     }
@@ -1375,13 +1577,13 @@ public class DashboardController implements Initializable {
         }
     }
     
-    private void openForm(String fxmlPath, String controllerClassName, String tabTitle) {
+    private void openForm(TreeNode node) {
         try {
-            int tabIndex = checktabs(tabTitle);
+            int tabIndex = checktabs(node.getDescription());
             
             if (tabIndex == -1) {
-                if (!fxmlPath.isEmpty() && fxmlPath.contains(".fxml")) {
-                    setScene2(loadAnimate(fxmlPath, controllerClassName, tabTitle));
+                if (!node.getFxmlPath().isEmpty() && node.getFxmlPath().contains(".fxml")) {
+                    setScene2(loadAnimate(node));
                 }
             } else {
                 tabpane.getSelectionModel().select(tabIndex);
