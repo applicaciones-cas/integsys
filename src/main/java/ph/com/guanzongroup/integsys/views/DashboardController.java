@@ -48,7 +48,6 @@ import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToggleGroup;
-import javafx.scene.control.Tooltip;
 import javafx.scene.control.TreeCell;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
@@ -1412,6 +1411,7 @@ public class DashboardController implements Initializable {
     private void loadMenu(){
         MenuManager menu = new MenuManager(oApp, "CAS");
         menu.setIndustryCode(psIndustryID);
+        menu.setCategoryCode(oApp.getCategory());
         
         try {
             JSONObject json = menu.getMenu();

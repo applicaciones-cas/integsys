@@ -31,8 +31,6 @@ import org.guanzon.appdriver.base.GuanzonException;
 import org.guanzon.appdriver.base.LogWrapper;
 import org.guanzon.appdriver.base.MiscUtil;
 import org.guanzon.appdriver.base.SQLUtil;
-import org.guanzon.appdriver.constant.Logical;
-import java.util.function.Function;
 import org.json.simple.JSONObject;
 import ph.com.guanzongroup.integsys.model.ModelLog_In_Company;
 import ph.com.guanzongroup.integsys.model.ModelLog_In_Industry;
