@@ -68,14 +68,11 @@ import javafx.stage.StageStyle;
 import javafx.util.Duration;
 import org.guanzon.appdriver.agent.ShowMessageFX;
 import org.guanzon.appdriver.agent.menu.CommandExecutor;
-import org.guanzon.appdriver.agent.menu.MenuLoader;
 import org.guanzon.appdriver.agent.menu.MenuManager;
 import org.guanzon.appdriver.agent.menu.TreeNode;
 import org.guanzon.appdriver.base.GRiderCAS;
 import org.guanzon.appdriver.base.MiscUtil;
 import org.guanzon.appdriver.base.SQLUtil;
-import org.guanzon.appdriver.constant.Logical;
-import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import ph.com.guanzongroup.integsys.utility.JFXUtil;
 
@@ -84,8 +81,10 @@ public class DashboardController implements Initializable {
     private GRiderCAS oApp;
     private String lastClickedBtnLeftSideBar = "";
     private String lastClickedBtnRightSideBar = "";
+    
     private String psDefaultScreenFXML = "/ph/com/guanzongroup/integsys/views/Login.fxml";
     private String psDefaultScreenFXML2 = "/ph/com/guanzongroup/integsys/views/DefaultScreen.fxml";
+    
     private int notificationCount = 0;
     private int cartCount = 0;
 
@@ -111,11 +110,11 @@ public class DashboardController implements Initializable {
     private double xOffset = 0;
     private double yOffset = 0;
     private boolean isFromFilter;
+    
     private String psIndustryID = "";
     private String psCompanyID = "";
     private String psCategoryID = "";
-    public String psUserIndustryId = "";
-    public String psUserCompanyId = "";
+    
     List<String> tabName = new ArrayList<>();
     String sformname = "";
     boolean lbproceed = false;
@@ -205,9 +204,6 @@ public class DashboardController implements Initializable {
             setTreeViewStyle(tvLeftSideBar);
             setTreeViewStyle(tvRightSideBar);
 
-            psIndustryID = psUserIndustryId;
-            psCompanyID = psUserCompanyId;
-
             setDropShadowEffectsLeftSideBar(anchorLeftSideBarMenu);
             setDropShadowEffectsRightSideBar(anchorRightSideBarMenu);
             
@@ -258,11 +254,11 @@ public class DashboardController implements Initializable {
     }
 
     public void setUserIndustry(String lsIndustryId) {
-        psUserIndustryId = lsIndustryId;
+        psIndustryID = lsIndustryId;
     }
 
     public void setUserCompany(String lsCompanyId) {
-        psUserCompanyId = lsCompanyId;
+        psCompanyID = lsCompanyId;
     }
     
     private Pane loadAnimateAnchor(String fxml) {
@@ -420,26 +416,24 @@ public class DashboardController implements Initializable {
             if (nav_bar.isDisabled()) {
                 AppUser.setText("");
             } else {
-                AppUser.setText(oApp.getLogName() + " || " + getAllIndustries(oApp.getIndustry()));
+                AppUser.setText(oApp.getLogName() + " || " + getIndustryName(oApp.getIndustry()));
             }
         } catch (SQLException ex) {
             Logger.getLogger(DashboardController.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
     
-    private String getAllIndustries(String industryid) throws SQLException {
+    private String getIndustryName(String industryid) throws SQLException {
         String industryname = "";
-        String lsSQL = "SELECT * FROM industry";
-        lsSQL = MiscUtil.addCondition(lsSQL, "cRecdStat = " + SQLUtil.toSQL(Logical.YES));
+        
+        String lsSQL = "SELECT * FROM Industry" +
+                        " WHERE cRecdStat = '1'" +
+                            " AND sIndstCdx = " + SQLUtil.toSQL(industryid);
+        
         ResultSet loRS = oApp.executeQuery(lsSQL);
 
-        while (loRS.next()) {
-            String id = loRS.getString("sIndstCdx");
-            String description = loRS.getString("sDescript");
-
-            if (industryid.equals(id)) {
-                industryname = description;
-            }
+        if(loRS.next()) {
+            industryname = loRS.getString("sDescript");
         }
 
         MiscUtil.close(loRS);
@@ -630,8 +624,8 @@ public class DashboardController implements Initializable {
             fxmlLoader.setLocation(getClass().getResource("/com/rmj/guanzongroup/sidebarmenus/views/SelectIndustryCompany.fxml"));
             SelectIndustryCompany loControl = new SelectIndustryCompany();
             loControl.setGRider(oApp);
-            loControl.setOldIndsutryID(psUserIndustryId);
-            loControl.setOldCompanyID(psUserCompanyId);
+            loControl.setOldIndsutryID(psIndustryID);
+            loControl.setOldCompanyID(psCompanyID);
             loControl.setOldCategoryID(psCategoryID);
             fxmlLoader.setController(loControl);
 
@@ -1020,8 +1014,6 @@ public class DashboardController implements Initializable {
         if (tabpane.getTabs().isEmpty()) {
             tabpane = new TabPane();
         }
-        psIndustryID = psUserIndustryId;
-        psCompanyID = psUserCompanyId;
 
         setTabPane();
         setPane();
@@ -1141,9 +1133,9 @@ public class DashboardController implements Initializable {
         }
     }
     
-    public void changeUserInfo(String industryid) {
+    public void changeUserInfo() {
         try {
-            AppUser.setText(oApp.getLogName() + " || " + getAllIndustries(industryid));
+            AppUser.setText(oApp.getLogName() + " || " + getIndustryName(psIndustryID));
         } catch (SQLException ex) {
             Logger.getLogger(DashboardController.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -1243,10 +1235,8 @@ public class DashboardController implements Initializable {
     }
     
     private void loadMenu(){
-        CommandExecutor executor = new CommandExecutor(oApp.getGConnection().getConnection());
-        
         MenuManager menu = new MenuManager(oApp, "CAS");
-        menu.setIndustryCode("01");
+        menu.setIndustryCode(psIndustryID);
         
         try {
             JSONObject json = menu.getMenu();
@@ -1326,39 +1316,6 @@ public class DashboardController implements Initializable {
         }
 
         return roots;
-    }
-    
-    private void handleSelection(TreeItem<String> newValue) {
-        if (newValue == null || !newValue.isLeaf() || newValue.getValue() == null || newValue.getValue().isEmpty()) {
-            System.out.println("Invalid selection or empty value.");
-            return;
-        }
-
-        // Get the location directly from menuLocationMap
-        sformname = menuLocationMap.getOrDefault(newValue, "");
-//        psIndustryID = menuIndustryMap.getOrDefault(newValue, "");
-//        psCategoryID = menuCategoryMap.getOrDefault(newValue, "");
-        if (oApp != null) {
-            boolean isNewTab = (checktabs(SetTabTitle(sformname)) == 1);
-            if (isNewTab) {
-                if (!sformname.isEmpty() && sformname.contains(".fxml")) {
-
-                    System.out.println("industry: " + psIndustryID);
-                    System.out.println("category: " + psCategoryID);
-                    setScene2(loadAnimate(sformname, "", ""));
-                } else {
-                    ShowMessageFX.Warning("This form is currently unavailable.", "Computerized Accounting System", pxeModuleName);
-                }
-            } else {
-                ShowMessageFX.Warning("This form is already active.", "Computerized Accounting System", pxeModuleName);
-            }
-
-            setAnchorPaneVisibleManage(false, anchorLeftSideBarMenu);
-            for (ToggleButton navButton : toggleBtnLeftUpperSideBar) {
-                navButton.setSelected(false);
-            }
-            pane.requestFocus();
-        }
     }
     
     private void toggleSidebarWidth() {

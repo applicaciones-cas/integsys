@@ -16,10 +16,17 @@ public class ModelLog_In_Industry {
     private GRiderCAS oApp;
     private String industryID;
     private String industryName;
+    private String companyID;
 
     public ModelLog_In_Industry(String industryID, String industryName) {
         this.industryID = industryID;
         this.industryName = industryName;
+    }
+    
+    public ModelLog_In_Industry(String industryID, String industryName, String companyID) {
+        this.industryID = industryID;
+        this.industryName = industryName;
+        this.companyID = companyID;
     }
 
     public String getIndustryID() {
@@ -28,6 +35,10 @@ public class ModelLog_In_Industry {
 
     public String getIndustryName() {
         return industryName;
+    }
+    
+    public String getCompanyID(){
+        return companyID;
     }
 
     @Override
