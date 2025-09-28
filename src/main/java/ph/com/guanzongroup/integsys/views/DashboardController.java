@@ -1429,8 +1429,13 @@ public class DashboardController implements Initializable {
                                 null));
                 
                 for (TreeNode node : roots) {
+                    if ("2500000075»2500000076»2500000077".contains(node.getId())){
+                        System.err.println(node.getId());
+                    }
+                    
                     rootItem.getChildren().add(buildTree(node, allowedMenuIds));
                 }
+                rootItem.getChildren().removeIf(child -> child == null || child.getValue() == null);
                 rootItem.setExpanded(false);
                 
                 tvLeftSideBar.setRoot(rootItem);
@@ -1458,7 +1463,7 @@ public class DashboardController implements Initializable {
         boolean hasValidChild = false;
         
         // Build children recursively
-        for (TreeNode child : node.getChildren()) {
+        for (TreeNode child : node.getChildren()) {            
             TreeItem<TreeNode> childItem = buildTree(child, allowedMenuIds);
 
             if (childItem != null) {
