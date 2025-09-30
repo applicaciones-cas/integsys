@@ -1,6 +1,5 @@
 package ph.com.guanzongroup.integsys.views;
 
-import ph.com.guanzongroup.integsys.model.ModelAPPaymentAdjustment;
 import ph.com.guanzongroup.integsys.utility.CustomCommonUtil;
 import ph.com.guanzongroup.integsys.utility.JFXUtil;
 import java.net.URL;
@@ -9,7 +8,6 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.concurrent.atomic.AtomicReference;
@@ -18,19 +16,12 @@ import java.util.logging.Logger;
 import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyBooleanPropertyBase;
 import javafx.beans.value.ChangeListener;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
-import javafx.collections.transformation.FilteredList;
-import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
-import javafx.scene.control.Pagination;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
@@ -54,29 +45,19 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.ParseException;
 import ph.com.guanzongroup.cas.cashflow.services.CashflowControllers;
 
-public class APPaymentAdjustment_ConfirmationController implements Initializable, ScreenInterface {
+public class APPaymentAdjustment_EntryMonarchController implements Initializable, ScreenInterface {
 
     private GRiderCAS oApp;
     static CashflowControllers poAPPaymentAdjustmentController;
     private JSONObject poJSON;
     public int pnEditMode;
-
     private String pxeModuleName = JFXUtil.getFormattedClassTitle(this.getClass());
     private boolean isGeneral = false;
     private String psIndustryId = "";
     private String psCompanyId = "";
-    private String psSupplierId = "";
-    private String psSearchCompanyId = "";
-    private String psSearchSupplierId = "";
-    private String psTransactionNo = "";
-    private static final int ROWS_PER_PAGE = 50;
-    int pnMain = 0;
+    private boolean pbEntered = false;
     AtomicReference<Object> lastFocusedTextField = new AtomicReference<>();
     AtomicReference<Object> previousSearchedTextField = new AtomicReference<>();
-    private boolean pbEntered = false;
-    private ObservableList<ModelAPPaymentAdjustment> main_data = FXCollections.observableArrayList();
-    private FilteredList<ModelAPPaymentAdjustment> filteredData;
-    private final Map<String, List<String>> highlightedRowsMain = new HashMap<>();
 
     @FXML
     private AnchorPane apMainAnchor, apBrowse, apButton, apMaster;
@@ -85,43 +66,38 @@ public class APPaymentAdjustment_ConfirmationController implements Initializable
     @FXML
     private Label lblSource, lblStatus;
     @FXML
-    private Button btnUpdate, btnSearch, btnSave, btnCancel, btnConfirm, btnVoid, btnReturn, btnHistory, btnRetrieve, btnClose;
+    private Button btnBrowse, btnNew, btnUpdate, btnSearch, btnSave, btnCancel, btnHistory, btnClose;
     @FXML
-    private TextField tfSearchSupplier, tfSearchReferenceNo, tfSearchCompany, tfTransactionNo, tfClient, tfIssuedTo, tfCreditAmount, tfDebitAmount, tfReferenceNo, tfCompany;
+    private TextField tfTransactionNo, tfClient, tfIssuedTo, tfCreditAmount, tfDebitAmount, tfReferenceNo, tfCompany;
     @FXML
     private DatePicker dpTransactionDate;
     @FXML
     private TextArea taRemarks;
-    @FXML
-    private TableView tblViewMainList;
-    @FXML
-    private TableColumn tblRowNo, tblSupplier, tblDate, tblReferenceNo;
-    @FXML
-    private Pagination pgPagination;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        psIndustryId = ""; // general
+        
 
         poJSON = new JSONObject();
         poAPPaymentAdjustmentController = new CashflowControllers(oApp, null);
         poAPPaymentAdjustmentController.APPaymentAdjustment().initialize(); // Initialize transaction
+        poAPPaymentAdjustmentController.APPaymentAdjustment().initFields();
         initTextFields();
         initDatePickers();
         clearTextFields();
-        initMainGrid();
-        initTableOnClick();
-        pgPagination.setPageCount(1);
         pnEditMode = EditMode.UNKNOWN;
         initButton(pnEditMode);
+
         Platform.runLater(() -> {
             poAPPaymentAdjustmentController.APPaymentAdjustment().getModel().setIndustryId(psIndustryId);
-            poAPPaymentAdjustmentController.APPaymentAdjustment().getModel().setCompanyId(psSearchCompanyId);
+            poAPPaymentAdjustmentController.APPaymentAdjustment().getModel().setCompanyId(psCompanyId);
             poAPPaymentAdjustmentController.APPaymentAdjustment().setIndustryId(psIndustryId);
-            poAPPaymentAdjustmentController.APPaymentAdjustment().setCompanyId(psSearchCompanyId);
+            poAPPaymentAdjustmentController.APPaymentAdjustment().setCompanyId(psCompanyId);
             poAPPaymentAdjustmentController.APPaymentAdjustment().setWithUI(true);
             loadRecordSearch();
+            btnNew.fire();
         });
+
         JFXUtil.initKeyClickObject(apMainAnchor, lastFocusedTextField, previousSearchedTextField);
     }
 
@@ -132,7 +108,8 @@ public class APPaymentAdjustment_ConfirmationController implements Initializable
 
     @Override
     public void setIndustryID(String fsValue) {
-        psIndustryId = fsValue;
+        System.out.println(fsValue);
+        this.psIndustryId = fsValue;
     }
 
     @Override
@@ -142,45 +119,7 @@ public class APPaymentAdjustment_ConfirmationController implements Initializable
 
     @Override
     public void setCategoryID(String fsValue) {
-        //No Category
-    }
-
-    public void loadTableDetailFromMain() {
-        try {
-            poJSON = new JSONObject();
-
-            ModelAPPaymentAdjustment selected = (ModelAPPaymentAdjustment) tblViewMainList.getSelectionModel().getSelectedItem();
-            if (selected != null) {
-                int pnRowMain = Integer.parseInt(selected.getIndex01()) - 1;
-                pnMain = pnRowMain;
-                JFXUtil.disableAllHighlightByColor(tblViewMainList, "#A7C7E7", highlightedRowsMain);
-                JFXUtil.highlightByKey(tblViewMainList, String.valueOf(pnRowMain + 1), "#A7C7E7", highlightedRowsMain);
-
-                poJSON = poAPPaymentAdjustmentController.APPaymentAdjustment().OpenTransaction(poAPPaymentAdjustmentController.APPaymentAdjustment().APPaymentAdjustmentList(pnMain).getTransactionNo());
-                if ("error".equals((String) poJSON.get("result"))) {
-                    ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-                    return;
-                }
-                loadRecordMaster();
-            }
-        } catch (CloneNotSupportedException | SQLException | GuanzonException ex) {
-            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
-        }
-    }
-
-    public void initTableOnClick() {
-        tblViewMainList.setOnMouseClicked(event -> {
-            pnMain = tblViewMainList.getSelectionModel().getSelectedIndex();
-            if (pnMain >= 0) {
-                if (event.getClickCount() == 2) {
-                    loadTableDetailFromMain();
-                    pnEditMode = poAPPaymentAdjustmentController.APPaymentAdjustment().getEditMode();
-                    initButton(pnEditMode);
-                }
-            }
-        });
-        JFXUtil.applyRowHighlighting(tblViewMainList, item -> ((ModelAPPaymentAdjustment) item).getIndex01(), highlightedRowsMain);
-        JFXUtil.adjustColumnForScrollbar(tblViewMainList);
+        //No category
     }
 
     private void txtField_KeyPressed(KeyEvent event) {
@@ -189,7 +128,6 @@ public class APPaymentAdjustment_ConfirmationController implements Initializable
             String lsID = txtField.getId();
             String lsValue = (txtField.getText() == null ? "" : txtField.getText());
             poJSON = new JSONObject();
-            int lnRow = pnMain;
 
             switch (event.getCode()) {
                 case TAB:
@@ -200,33 +138,6 @@ public class APPaymentAdjustment_ConfirmationController implements Initializable
                     break;
                 case F3:
                     switch (lsID) {
-                        case "tfSearchCompany":
-                            poJSON = poAPPaymentAdjustmentController.APPaymentAdjustment().SearchCompany(lsValue, false);
-                            if ("error".equals(poJSON.get("result"))) {
-                                ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-                                tfSearchCompany.setText("");
-                                psSearchCompanyId = "";
-                                break;
-                            }
-                            psSearchCompanyId = poAPPaymentAdjustmentController.APPaymentAdjustment().getModel().getCompanyId();
-                            loadRecordSearch();
-                            retrieveAPAdjustment();
-                            return;
-                        case "tfSearchSupplier":
-                            poJSON = poAPPaymentAdjustmentController.APPaymentAdjustment().SearchClient(lsValue, false);
-                            if ("error".equals(poJSON.get("result"))) {
-                                ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-                                tfSearchSupplier.setText("");
-                                psSearchSupplierId = "";
-                                break;
-                            }
-                            psSearchSupplierId = poAPPaymentAdjustmentController.APPaymentAdjustment().getModel().getClientId();
-                            loadRecordSearch();
-                            retrieveAPAdjustment();
-                            return;
-                        case "tfSearchReferenceNo":
-                            retrieveAPAdjustment();
-                            return;
                         case "tfCompany":
                             poJSON = poAPPaymentAdjustmentController.APPaymentAdjustment().SearchCompany(lsValue, false);
                             if ("error".equals(poJSON.get("result"))) {
@@ -243,10 +154,8 @@ public class APPaymentAdjustment_ConfirmationController implements Initializable
                             if ("error".equals(poJSON.get("result"))) {
                                 ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                 tfClient.setText("");
-                                psSupplierId = "";
                                 break;
                             }
-                            psSupplierId = poAPPaymentAdjustmentController.APPaymentAdjustment().getModel().getClientId();
                             loadRecordMaster();
                             break;
                         case "tfIssuedTo":
@@ -270,28 +179,11 @@ public class APPaymentAdjustment_ConfirmationController implements Initializable
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
         }
     }
-
-    public void loadRecordSearch() {
-        try {
-            poAPPaymentAdjustmentController.APPaymentAdjustment().getModel().setIndustryId(psIndustryId);
-            if (poAPPaymentAdjustmentController.APPaymentAdjustment().getModel().Industry().getDescription() != null && !"".equals(poAPPaymentAdjustmentController.APPaymentAdjustment().getModel().Industry().getDescription())) {
-                lblSource.setText(poAPPaymentAdjustmentController.APPaymentAdjustment().getModel().Industry().getDescription());
-            } else {
-                lblSource.setText("General");
-            }
-            tfSearchSupplier.setText(psSearchSupplierId.equals("") ? "" : poAPPaymentAdjustmentController.APPaymentAdjustment().getModel().Supplier().getCompanyName());
-            tfSearchCompany.setText(psSearchCompanyId.equals("") ? "" : poAPPaymentAdjustmentController.APPaymentAdjustment().getModel().Company().getCompanyName());
-            JFXUtil.updateCaretPositions(apBrowse);
-        } catch (SQLException | GuanzonException ex) {
-            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
-        }
-    }
     final ChangeListener<? super Boolean> txtMaster_Focus = (o, ov, nv) -> {
         poJSON = new JSONObject();
         TextField txtPersonalInfo = (TextField) ((ReadOnlyBooleanPropertyBase) o).getBean();
         String lsTxtFieldID = txtPersonalInfo.getId();
         String lsValue = (txtPersonalInfo.getText() == null ? "" : txtPersonalInfo.getText());
-
         if (lsValue == null) {
             return;
         }
@@ -299,30 +191,14 @@ public class APPaymentAdjustment_ConfirmationController implements Initializable
         if (!nv) {
             /* Lost Focus */
             switch (lsTxtFieldID) {
-                case "tfSearchSupplier":
-                    if (lsValue.equals("")) {
-                        psSearchSupplierId = "";
-                    }
-                    loadRecordSearch();
-                    break;
-                case "tfSearchCompany":
-                    if (lsValue.equals("")) {
-                        psSearchCompanyId = "";
-                    }
-                    loadRecordSearch();
-                    break;
-                case "tfSearchReferenceNo":
-                    break;
                 case "tfCompany":
                     if (lsValue.isEmpty()) {
                         poJSON = poAPPaymentAdjustmentController.APPaymentAdjustment().getModel().setCompanyId("");
-                        psCompanyId = "";
                     }
                     break;
                 case "tfClient":
                     if (lsValue.isEmpty()) {
                         poJSON = poAPPaymentAdjustmentController.APPaymentAdjustment().getModel().setClientId("");
-                        psSupplierId = "";
                     }
                     break;
                 case "tfIssuedTo":
@@ -404,12 +280,8 @@ public class APPaymentAdjustment_ConfirmationController implements Initializable
                         ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                     }
                     break;
-
             }
-            if (!JFXUtil.isObjectEqualTo(lsTxtFieldID, "tfSearchSupplier", "tfSearchCompany", "tfSearchReferenceNo")) {
-                loadRecordMaster();
-            }
-
+            loadRecordMaster();
         }
     };
     final ChangeListener<? super Boolean> txtArea_Focus = (o, ov, nv) -> {
@@ -427,16 +299,17 @@ public class APPaymentAdjustment_ConfirmationController implements Initializable
             /* Lost Focus */
             lsValue = lsValue.trim();
             switch (lsID) {
-                case "taRemarks":  // Remarks
+                case "taRemarks": { // Remarks
                     poJSON = poAPPaymentAdjustmentController.APPaymentAdjustment().getModel().setRemarks(lsValue);
                     if ("error".equals((String) poJSON.get("result"))) {
                         System.err.println((String) poJSON.get("message"));
                         ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                         return;
                     }
+//                    loadRecordMaster();
                     break;
+                }
             }
-//            loadRecordMaster();
         }
     };
 
@@ -468,6 +341,7 @@ public class APPaymentAdjustment_ConfirmationController implements Initializable
                 if (inputText == null || "".equals(inputText) || "01/01/1900".equals(inputText)) {
                     return;
                 }
+                
 //                selectedDate = ldtResult.selectedDate;
                 switch (datePicker.getId()) {
                     case "dpTransactionDate":
@@ -494,8 +368,8 @@ public class APPaymentAdjustment_ConfirmationController implements Initializable
                                         poJSON = ShowDialogFX.getUserApproval(oApp);
                                         if (!"success".equals((String) poJSON.get("result"))) {
                                             pbSuccess = false;
-                                        } else {
-                                            if (Integer.parseInt(poJSON.get("nUserLevl").toString()) <= UserRight.ENCODER) {
+                                        }else {
+                                            if(Integer.parseInt(poJSON.get("nUserLevl").toString())<= UserRight.ENCODER){
                                                 poJSON.put("result", "error");
                                                 poJSON.put("message", "User is not an authorized approving officer.");
                                                 pbSuccess = false;
@@ -521,6 +395,7 @@ public class APPaymentAdjustment_ConfirmationController implements Initializable
                             pbSuccess = true; //Set to original value
                         }
                         break;
+
                 }
             }
         } catch (Exception e) {
@@ -533,109 +408,31 @@ public class APPaymentAdjustment_ConfirmationController implements Initializable
             JFXUtil.setVerticalScroll(taRemarks);
         });
         JFXUtil.setCommaFormatter(tfDebitAmount, tfCreditAmount);
-        JFXUtil.setFocusListener(txtMaster_Focus, tfReferenceNo, tfCompany, tfClient, tfIssuedTo, tfCreditAmount, tfDebitAmount,
-                tfSearchCompany, tfSearchSupplier);
+        JFXUtil.setFocusListener(txtMaster_Focus, tfReferenceNo, tfCompany, tfClient, tfIssuedTo, tfCreditAmount, tfDebitAmount);
         JFXUtil.setFocusListener(txtArea_Focus, taRemarks);
-        JFXUtil.setKeyPressedListener(this::txtField_KeyPressed, apMaster, apBrowse);
+        JFXUtil.setKeyPressedListener(this::txtField_KeyPressed, apMaster);
     }
 
     public void initDatePickers() {
-        JFXUtil.setDatePickerFormat("MM/dd/yyyy", dpTransactionDate);
+        JFXUtil.setDatePickerFormat("MM/dd/yyyy",dpTransactionDate);
         JFXUtil.setActionListener(this::datepicker_Action, dpTransactionDate);
     }
 
     public void clearTextFields() {
-        psSearchCompanyId = "";
-        psCompanyId = "";
-        psSearchSupplierId = "";
-        psSupplierId = "";
-
-        JFXUtil.setValueToNull(previousSearchedTextField, lastFocusedTextField, dpTransactionDate);
+        JFXUtil.setValueToNull(lastFocusedTextField, previousSearchedTextField, dpTransactionDate);
         JFXUtil.clearTextFields(apMaster);
     }
 
-    public void initMainGrid() {
-        JFXUtil.setColumnCenter(tblRowNo, tblDate, tblReferenceNo);
-        JFXUtil.setColumnLeft(tblSupplier);
-        JFXUtil.setColumnsIndexAndDisableReordering(tblViewMainList);
-
-        filteredData = new FilteredList<>(main_data, b -> true);
-        tblViewMainList.setItems(filteredData);
-    }
-
-    public void loadTableMain() {
-        // Setting data to table detail
-        JFXUtil.LoadScreenComponents loading = JFXUtil.createLoadingComponents();
-        tblViewMainList.setPlaceholder(loading.loadingPane);
-
-        Task<Void> task = new Task<Void>() {
-            @Override
-            protected Void call() throws Exception {
-                Thread.sleep(100);
-//                Thread.sleep(1000);
-                // contains try catch, for loop of loading data to observable list until loadTab()
-                Platform.runLater(() -> {
-                    main_data.clear();
-                    JFXUtil.disableAllHighlight(tblViewMainList, highlightedRowsMain);
-
-                    if (poAPPaymentAdjustmentController.APPaymentAdjustment().getAPPaymentAdjustmentCount() > 0) {
-                        //retreiving using column index
-                        for (int lnCtr = 0; lnCtr <= poAPPaymentAdjustmentController.APPaymentAdjustment().getAPPaymentAdjustmentCount() - 1; lnCtr++) {
-                            try {
-                                main_data.add(new ModelAPPaymentAdjustment(String.valueOf(lnCtr + 1),
-                                        String.valueOf(poAPPaymentAdjustmentController.APPaymentAdjustment().APPaymentAdjustmentList(lnCtr).Supplier().getCompanyName()),
-                                        String.valueOf(poAPPaymentAdjustmentController.APPaymentAdjustment().APPaymentAdjustmentList(lnCtr).getTransactionDate()),
-                                        String.valueOf(poAPPaymentAdjustmentController.APPaymentAdjustment().APPaymentAdjustmentList(lnCtr).getTransactionNo())
-                                ));
-                            } catch (SQLException ex) {
-                                Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
-                            } catch (GuanzonException ex) {
-                                Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
-                            }
-
-                            if (poAPPaymentAdjustmentController.APPaymentAdjustment().APPaymentAdjustmentList(lnCtr).getTransactionStatus().equals(APPaymentAdjustmentStatus.CONFIRMED)) {
-                                JFXUtil.highlightByKey(tblViewMainList, String.valueOf(lnCtr + 1), "#C1E1C1", highlightedRowsMain);
-                            }
-                        }
-                    }
-
-                    if (pnMain < 0 || pnMain
-                            >= main_data.size()) {
-                        if (!main_data.isEmpty()) {
-                            /* FOCUS ON FIRST ROW */
-                            JFXUtil.selectAndFocusRow(tblViewMainList, 0);
-                            pnMain = tblViewMainList.getSelectionModel().getSelectedIndex();
-                        }
-                    } else {
-                        /* FOCUS ON THE ROW THAT pnRowDetail POINTS TO */
-                        JFXUtil.selectAndFocusRow(tblViewMainList, pnMain);
-                    }
-                    JFXUtil.loadTab(pgPagination, main_data.size(), ROWS_PER_PAGE, tblViewMainList, filteredData);
-                });
-
-                return null;
+    public void loadRecordSearch() {
+        try {
+            if(poAPPaymentAdjustmentController.APPaymentAdjustment().getModel().Industry().getDescription() != null && !"".equals(poAPPaymentAdjustmentController.APPaymentAdjustment().getModel().Industry().getDescription())){
+                lblSource.setText(poAPPaymentAdjustmentController.APPaymentAdjustment().getModel().Industry().getDescription());
+            } else {
+                lblSource.setText("General");
             }
-
-            @Override
-            protected void succeeded() {
-                if (main_data == null || main_data.isEmpty()) {
-                    tblViewMainList.setPlaceholder(loading.placeholderLabel);
-                } else {
-                    tblViewMainList.toFront();
-                }
-                loading.progressIndicator.setVisible(false);
-            }
-
-            @Override
-            protected void failed() {
-                if (main_data == null || main_data.isEmpty()) {
-                    tblViewMainList.setPlaceholder(loading.placeholderLabel);
-                }
-                loading.progressIndicator.setVisible(false);
-            }
-
-        };
-        new Thread(task).start(); // Run task in background
+        } catch (SQLException | GuanzonException ex) {
+            Logger.getLogger(DeliveryAcceptance_EntryCarController.class.getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+        }
     }
 
     public void loadRecordMaster() {
@@ -654,6 +451,7 @@ public class APPaymentAdjustment_ConfirmationController implements Initializable
                 String lsStat = statusMap.getOrDefault(lsActive, "UNKNOWN");
                 lblStatus.setText(lsStat);
             });
+
             // Transaction Date
             String lsTransactionDate = CustomCommonUtil.formatDateToShortString(poAPPaymentAdjustmentController.APPaymentAdjustment().getModel().getTransactionDate());
             dpTransactionDate.setValue(CustomCommonUtil.parseDateStringToLocalDate(lsTransactionDate, "yyyy-MM-dd"));
@@ -678,22 +476,42 @@ public class APPaymentAdjustment_ConfirmationController implements Initializable
     @FXML
     private void cmdButton_Click(ActionEvent event) {
         poJSON = new JSONObject();
-        try {
-            Object source = event.getSource();
-            if (source instanceof Button) {
+        Object source = event.getSource();
+        if (source instanceof Button) {
+            try {
                 Button clickedButton = (Button) source;
                 String lsButton = clickedButton.getId();
                 switch (lsButton) {
+                    case "btnBrowse":
+//                        poAPPaymentAdjustmentController.APPaymentAdjustment().getModel().setTransactionStatus(APPaymentAdjustmentStatus.RETURNED + "" + APPaymentAdjustmentStatus.OPEN);
+                        poAPPaymentAdjustmentController.APPaymentAdjustment().setRecordStatus(APPaymentAdjustmentStatus.OPEN);
+                        poJSON = poAPPaymentAdjustmentController.APPaymentAdjustment().searchTransaction();
+                        if ("error".equalsIgnoreCase((String) poJSON.get("result"))) {
+                            ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                            tfTransactionNo.requestFocus();
+                            return;
+                        }
+                        pnEditMode = poAPPaymentAdjustmentController.APPaymentAdjustment().getEditMode();
+                        break;
+                    case "btnNew":
+                        //Clear data
+                        poAPPaymentAdjustmentController.APPaymentAdjustment().resetMaster();
+                        clearTextFields();
+
+                        poJSON = poAPPaymentAdjustmentController.APPaymentAdjustment().NewTransaction();
+                        if ("error".equals((String) poJSON.get("result"))) {
+                            ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                            return;
+                        }
+                        poAPPaymentAdjustmentController.APPaymentAdjustment().initFields();
+                        pnEditMode = poAPPaymentAdjustmentController.APPaymentAdjustment().getEditMode();
+                        break;
                     case "btnUpdate":
-                        poJSON = poAPPaymentAdjustmentController.APPaymentAdjustment().OpenTransaction(poAPPaymentAdjustmentController.APPaymentAdjustment().getModel().getTransactionNo());
                         poJSON = poAPPaymentAdjustmentController.APPaymentAdjustment().UpdateTransaction();
                         if ("error".equals((String) poJSON.get("result"))) {
                             ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                             return;
                         }
-
-                        psSupplierId = poAPPaymentAdjustmentController.APPaymentAdjustment().getModel().getClientId();
-                        psCompanyId = poAPPaymentAdjustmentController.APPaymentAdjustment().getModel().getCompanyId();
                         pnEditMode = poAPPaymentAdjustmentController.APPaymentAdjustment().getEditMode();
                         break;
                     case "btnSearch":
@@ -720,7 +538,6 @@ public class APPaymentAdjustment_ConfirmationController implements Initializable
                         break;
                     case "btnCancel":
                         if (ShowMessageFX.OkayCancel(null, pxeModuleName, "Do you want to disregard changes?") == true) {
-                            JFXUtil.disableAllHighlightByColor(tblViewMainList, "#A7C7E7", highlightedRowsMain);
                             //Clear data
                             poAPPaymentAdjustmentController.APPaymentAdjustment().resetMaster();
                             clearTextFields();
@@ -732,21 +549,15 @@ public class APPaymentAdjustment_ConfirmationController implements Initializable
                         }
                     case "btnHistory":
                         break;
-                    case "btnRetrieve":
-                        retrieveAPAdjustment();
-                        break;
                     case "btnSave":
                         //Validator
                         poJSON = new JSONObject();
                         if (ShowMessageFX.YesNo(null, "Close Tab", "Are you sure you want to save the transaction?") == true) {
-                            poAPPaymentAdjustmentController.APPaymentAdjustment().getModel().setClientId(psSupplierId);
-                            poAPPaymentAdjustmentController.APPaymentAdjustment().getModel().setCompanyId(psCompanyId);
                             poJSON = poAPPaymentAdjustmentController.APPaymentAdjustment().SaveTransaction();
                             if (!"success".equals((String) poJSON.get("result"))) {
                                 ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                 return;
                             } else {
-                                //reshow the highlight
                                 ShowMessageFX.Information(null, pxeModuleName, (String) poJSON.get("message"));
 
                                 // Confirmation Prompt
@@ -763,8 +574,7 @@ public class APPaymentAdjustment_ConfirmationController implements Initializable
                                         }
                                     }
                                 }
-
-                                pnEditMode = poAPPaymentAdjustmentController.APPaymentAdjustment().getEditMode();
+                                btnNew.fire();
                             }
                         } else {
                             return;
@@ -778,131 +588,46 @@ public class APPaymentAdjustment_ConfirmationController implements Initializable
                             return;
                         }
                         break;
-                    case "btnConfirm":
-                        poJSON = new JSONObject();
-                        if (ShowMessageFX.YesNo(null, pxeModuleName, "Are you sure you want to confirm transaction?") == true) {
-                            poJSON = poAPPaymentAdjustmentController.APPaymentAdjustment().ConfirmTransaction("");
-                            if ("error".equals((String) poJSON.get("result"))) {
-                                ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-                                return;
-                            } else {
-                                ShowMessageFX.Information(null, pxeModuleName, (String) poJSON.get("message"));
-                                JFXUtil.disableAllHighlightByColor(tblViewMainList, "#A7C7E7", highlightedRowsMain);
-                                JFXUtil.highlightByKey(tblViewMainList, String.valueOf(pnMain + 1), "#C1E1C1", highlightedRowsMain);
-                            }
-                        } else {
-                            return;
-                        }
-                        break;
-                    case "btnVoid":
-                        poJSON = new JSONObject();
-                        if (ShowMessageFX.YesNo(null, "Close Tab", "Are you sure you want to void transaction?") == true) {
-                            if (poAPPaymentAdjustmentController.APPaymentAdjustment().getModel().getTransactionStatus().equals(APPaymentAdjustmentStatus.OPEN)) {
-                                poJSON = poAPPaymentAdjustmentController.APPaymentAdjustment().VoidTransaction("");
-                            } else {
-                                poJSON = poAPPaymentAdjustmentController.APPaymentAdjustment().CancelTransaction("");
-                            }
-                            if ("error".equals((String) poJSON.get("result"))) {
-                                ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-                                return;
-                            } else {
-                                ShowMessageFX.Information(null, pxeModuleName, (String) poJSON.get("message"));
-                                JFXUtil.disableAllHighlightByColor(tblViewMainList, "#A7C7E7", highlightedRowsMain);
-                                JFXUtil.highlightByKey(tblViewMainList, String.valueOf(pnMain + 1), "#FAA0A0", highlightedRowsMain);
-                            }
-                        } else {
-                            return;
-                        }
-                        break;
-                    case "btnReturn":
-                        poJSON = new JSONObject();
-                        if (ShowMessageFX.YesNo(null, "Close Tab", "Are you sure you want to return transaction?") == true) {
-                            poJSON = poAPPaymentAdjustmentController.APPaymentAdjustment().ReturnTransaction("");
-                            if ("error".equals((String) poJSON.get("result"))) {
-                                ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-                                return;
-                            } else {
-                                ShowMessageFX.Information(null, pxeModuleName, (String) poJSON.get("message"));
-                                JFXUtil.disableAllHighlightByColor(tblViewMainList, "#A7C7E7", highlightedRowsMain);
-                                JFXUtil.highlightByKey(tblViewMainList, String.valueOf(pnMain + 1), "#FAC898", highlightedRowsMain);
-                            }
-                        } else {
-                            return;
-                        }
-                        break;
-
                     default:
                         break;
                 }
 
-                if (JFXUtil.isObjectEqualTo(lsButton, "btnSave", "btnConfirm", "btnReturn", "btnVoid", "btnCancel")) {
-                    poAPPaymentAdjustmentController.APPaymentAdjustment().resetMaster();
-                    pnEditMode = EditMode.UNKNOWN;
-                    clearTextFields();
-                }
-
-                if (lsButton.equals("btnRetrieve")) {
-                } else {
-                    loadRecordMaster();
-                }
+                loadRecordMaster();
                 initButton(pnEditMode);
+            } catch (CloneNotSupportedException ex) {
+                Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+            } catch (SQLException ex) {
+                Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+            } catch (GuanzonException ex) {
+                Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+            } catch (ParseException ex) {
+                Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
             }
-        } catch (ParseException ex) {
-            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
-        } catch (SQLException ex) {
-            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
-        } catch (GuanzonException ex) {
-            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
-        } catch (CloneNotSupportedException ex) {
-            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
-        }
-    }
-
-    public void retrieveAPAdjustment() {
-        poJSON = new JSONObject();
-        poAPPaymentAdjustmentController.APPaymentAdjustment().setRecordStatus(APPaymentAdjustmentStatus.OPEN + "" + APPaymentAdjustmentStatus.CONFIRMED);
-        poJSON = poAPPaymentAdjustmentController.APPaymentAdjustment().loadAPPaymentAdjustment(tfSearchCompany.getText(), tfSearchSupplier.getText(), tfSearchReferenceNo.getText());
-        if (!"success".equals((String) poJSON.get("result"))) {
-            ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-        } else {
-            loadTableMain();
         }
     }
 
     private void initButton(int fnValue) {
+        boolean lbShow = (fnValue == EditMode.ADDNEW || fnValue == EditMode.UPDATE);
+        boolean lbShow2 = fnValue == EditMode.READY;
+        boolean lbShow3 = (fnValue == EditMode.READY || fnValue == EditMode.UNKNOWN);
 
-        boolean lbShow1 = (fnValue == EditMode.UPDATE);
-//        boolean lbShow2 = (fnValue == EditMode.READY || fnValue == EditMode.UPDATE);
-        boolean lbShow3 = (fnValue == EditMode.READY);
-        boolean lbShow4 = (fnValue == EditMode.UNKNOWN || fnValue == EditMode.READY);
         // Manage visibility and managed state of other buttons
-        //Update 
-        JFXUtil.setButtonsVisibility(lbShow1, btnSearch, btnSave, btnCancel);
+        JFXUtil.setButtonsVisibility(!lbShow, btnNew);
+        JFXUtil.setButtonsVisibility(lbShow, btnSearch, btnSave, btnCancel);
+        JFXUtil.setButtonsVisibility(lbShow2, btnUpdate, btnHistory);
+        JFXUtil.setButtonsVisibility(lbShow3, btnBrowse, btnClose);
 
-        //Ready
-        JFXUtil.setButtonsVisibility(lbShow3, btnUpdate, btnHistory, btnConfirm, btnVoid);
-
-        //Unkown || Ready
-        JFXUtil.setDisabled(!lbShow1, apMaster);
-        JFXUtil.setButtonsVisibility(lbShow4, btnClose);
-        JFXUtil.setButtonsVisibility(false, btnReturn);
+//        apMaster.setDisable(!lbShow);
+        JFXUtil.setDisabled(!lbShow, taRemarks);
+        JFXUtil.setDisabled(lbShow3, apMaster);
 
         switch (poAPPaymentAdjustmentController.APPaymentAdjustment().getModel().getTransactionStatus()) {
-            case APPaymentAdjustmentStatus.CONFIRMED:
-                JFXUtil.setButtonsVisibility(false, btnConfirm);
-                if (poAPPaymentAdjustmentController.APPaymentAdjustment().getModel().isProcessed()) {
-                    JFXUtil.setButtonsVisibility(false, btnUpdate, btnVoid);
-                } else {
-//                    JFXUtil.setButtonsVisibility(lbShow3, btnReturn);
-                }
-                break;
             case APPaymentAdjustmentStatus.PAID:
-            case APPaymentAdjustmentStatus.RETURNED:
-                JFXUtil.setButtonsVisibility(false, btnConfirm, btnUpdate, btnReturn, btnVoid);
+                JFXUtil.setButtonsVisibility(false, btnUpdate);
                 break;
             case APPaymentAdjustmentStatus.VOID:
             case APPaymentAdjustmentStatus.CANCELLED:
-                JFXUtil.setButtonsVisibility(false, btnConfirm, btnUpdate, btnReturn, btnVoid);
+                JFXUtil.setButtonsVisibility(false, btnUpdate);
                 break;
         }
     }

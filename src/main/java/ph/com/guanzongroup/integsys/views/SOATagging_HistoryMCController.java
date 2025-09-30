@@ -58,7 +58,7 @@ import ph.com.guanzongroup.cas.cashflow.status.SOATaggingStatic;
  *
  * @author Arsiela & Aldrich Team 2 06102025
  */
-public class SOATagging_HistoryController implements Initializable, ScreenInterface {
+public class SOATagging_HistoryMCController implements Initializable, ScreenInterface {
 
     private GRiderCAS oApp;
     private JSONObject poJSON;
@@ -99,7 +99,7 @@ public class SOATagging_HistoryController implements Initializable, ScreenInterf
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        psIndustryId = ""; // general
+        
 
         poSOATaggingController = new CashflowControllers(oApp, null);
         poJSON = poSOATaggingController.SOATagging().InitTransaction(); // Initialize transaction

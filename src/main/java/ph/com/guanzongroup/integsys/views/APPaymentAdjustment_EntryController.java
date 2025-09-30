@@ -51,7 +51,7 @@ public class APPaymentAdjustment_EntryController implements Initializable, Scree
     static CashflowControllers poAPPaymentAdjustmentController;
     private JSONObject poJSON;
     public int pnEditMode;
-    private String pxeModuleName = "";
+    private String pxeModuleName = JFXUtil.getFormattedClassTitle(this.getClass());
     private boolean isGeneral = false;
     private String psIndustryId = "";
     private String psCompanyId = "";
@@ -74,14 +74,9 @@ public class APPaymentAdjustment_EntryController implements Initializable, Scree
     @FXML
     private TextArea taRemarks;
 
-    public void setTabTitle(String lsTabTitle, boolean isGeneral) {
-        this.pxeModuleName = lsTabTitle;
-        this.isGeneral = isGeneral;
-    }
-
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        psIndustryId = isGeneral ? "" : psIndustryId;
+        psIndustryId = ""; // general
 
         poJSON = new JSONObject();
         poAPPaymentAdjustmentController = new CashflowControllers(oApp, null);
@@ -346,7 +341,7 @@ public class APPaymentAdjustment_EntryController implements Initializable, Scree
                 if (inputText == null || "".equals(inputText) || "01/01/1900".equals(inputText)) {
                     return;
                 }
-                
+
 //                selectedDate = ldtResult.selectedDate;
                 switch (datePicker.getId()) {
                     case "dpTransactionDate":
@@ -373,8 +368,8 @@ public class APPaymentAdjustment_EntryController implements Initializable, Scree
                                         poJSON = ShowDialogFX.getUserApproval(oApp);
                                         if (!"success".equals((String) poJSON.get("result"))) {
                                             pbSuccess = false;
-                                        }else {
-                                            if(Integer.parseInt(poJSON.get("nUserLevl").toString())<= UserRight.ENCODER){
+                                        } else {
+                                            if (Integer.parseInt(poJSON.get("nUserLevl").toString()) <= UserRight.ENCODER) {
                                                 poJSON.put("result", "error");
                                                 poJSON.put("message", "User is not an authorized approving officer.");
                                                 pbSuccess = false;
@@ -419,7 +414,7 @@ public class APPaymentAdjustment_EntryController implements Initializable, Scree
     }
 
     public void initDatePickers() {
-        JFXUtil.setDatePickerFormat("MM/dd/yyyy",dpTransactionDate);
+        JFXUtil.setDatePickerFormat("MM/dd/yyyy", dpTransactionDate);
         JFXUtil.setActionListener(this::datepicker_Action, dpTransactionDate);
     }
 
@@ -430,7 +425,7 @@ public class APPaymentAdjustment_EntryController implements Initializable, Scree
 
     public void loadRecordSearch() {
         try {
-            if(poAPPaymentAdjustmentController.APPaymentAdjustment().getModel().Industry().getDescription() != null && !"".equals(poAPPaymentAdjustmentController.APPaymentAdjustment().getModel().Industry().getDescription())){
+            if (poAPPaymentAdjustmentController.APPaymentAdjustment().getModel().Industry().getDescription() != null && !"".equals(poAPPaymentAdjustmentController.APPaymentAdjustment().getModel().Industry().getDescription())) {
                 lblSource.setText(poAPPaymentAdjustmentController.APPaymentAdjustment().getModel().Industry().getDescription());
             } else {
                 lblSource.setText("General");

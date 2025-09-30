@@ -54,7 +54,7 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.ParseException;
 import ph.com.guanzongroup.cas.cashflow.services.CashflowControllers;
 
-public class APPaymentAdjustment_ConfirmationController implements Initializable, ScreenInterface {
+public class APPaymentAdjustment_ConfirmationMCController implements Initializable, ScreenInterface {
 
     private GRiderCAS oApp;
     static CashflowControllers poAPPaymentAdjustmentController;
@@ -101,7 +101,7 @@ public class APPaymentAdjustment_ConfirmationController implements Initializable
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        psIndustryId = ""; // general
+        
 
         poJSON = new JSONObject();
         poAPPaymentAdjustmentController = new CashflowControllers(oApp, null);
@@ -144,6 +144,7 @@ public class APPaymentAdjustment_ConfirmationController implements Initializable
     public void setCategoryID(String fsValue) {
         //No Category
     }
+
 
     public void loadTableDetailFromMain() {
         try {
@@ -274,7 +275,7 @@ public class APPaymentAdjustment_ConfirmationController implements Initializable
     public void loadRecordSearch() {
         try {
             poAPPaymentAdjustmentController.APPaymentAdjustment().getModel().setIndustryId(psIndustryId);
-            if (poAPPaymentAdjustmentController.APPaymentAdjustment().getModel().Industry().getDescription() != null && !"".equals(poAPPaymentAdjustmentController.APPaymentAdjustment().getModel().Industry().getDescription())) {
+            if(poAPPaymentAdjustmentController.APPaymentAdjustment().getModel().Industry().getDescription() != null && !"".equals(poAPPaymentAdjustmentController.APPaymentAdjustment().getModel().Industry().getDescription())){
                 lblSource.setText(poAPPaymentAdjustmentController.APPaymentAdjustment().getModel().Industry().getDescription());
             } else {
                 lblSource.setText("General");
@@ -475,7 +476,7 @@ public class APPaymentAdjustment_ConfirmationController implements Initializable
                                 || poAPPaymentAdjustmentController.APPaymentAdjustment().getEditMode() == EditMode.UPDATE) {
                             lsServerDate = sdfFormat.format(oApp.getServerDate());
                             lsTransDate = sdfFormat.format(poAPPaymentAdjustmentController.APPaymentAdjustment().getModel().getTransactionDate());
-                            lsSelectedDate = sdfFormat.format(SQLUtil.toDate(JFXUtil.convertToIsoFormat(inputText), SQLUtil.FORMAT_SHORT_DATE));
+                            lsSelectedDate = sdfFormat.format(SQLUtil.toDate(JFXUtil.convertToIsoFormat(inputText),  SQLUtil.FORMAT_SHORT_DATE));
                             currentDate = LocalDate.parse(lsServerDate, DateTimeFormatter.ofPattern(SQLUtil.FORMAT_SHORT_DATE));
                             selectedDate = LocalDate.parse(lsSelectedDate, DateTimeFormatter.ofPattern(SQLUtil.FORMAT_SHORT_DATE));
 
@@ -495,7 +496,7 @@ public class APPaymentAdjustment_ConfirmationController implements Initializable
                                         if (!"success".equals((String) poJSON.get("result"))) {
                                             pbSuccess = false;
                                         } else {
-                                            if (Integer.parseInt(poJSON.get("nUserLevl").toString()) <= UserRight.ENCODER) {
+                                            if(Integer.parseInt(poJSON.get("nUserLevl").toString())<= UserRight.ENCODER){
                                                 poJSON.put("result", "error");
                                                 poJSON.put("message", "User is not an authorized approving officer.");
                                                 pbSuccess = false;
@@ -540,7 +541,7 @@ public class APPaymentAdjustment_ConfirmationController implements Initializable
     }
 
     public void initDatePickers() {
-        JFXUtil.setDatePickerFormat("MM/dd/yyyy", dpTransactionDate);
+        JFXUtil.setDatePickerFormat("MM/dd/yyyy",dpTransactionDate);
         JFXUtil.setActionListener(this::datepicker_Action, dpTransactionDate);
     }
 

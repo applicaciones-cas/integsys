@@ -72,7 +72,7 @@ import ph.com.guanzongroup.cas.cashflow.status.SOATaggingStatic;
  *
  * @author User
  */
-public class SOATagging_ConfirmationController implements Initializable, ScreenInterface {
+public class SOATagging_ConfirmationCarController implements Initializable, ScreenInterface {
 
     private GRiderCAS oApp;
     static CashflowControllers poSOATaggingController;
@@ -131,10 +131,11 @@ public class SOATagging_ConfirmationController implements Initializable, ScreenI
             "PO Receiving"
     );
 
+
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        psIndustryId = ""; // general
         
+
         poSOATaggingController = new CashflowControllers(oApp, null);
         poJSON = new JSONObject();
         poJSON = poSOATaggingController.SOATagging().InitTransaction(); // Initialize transaction

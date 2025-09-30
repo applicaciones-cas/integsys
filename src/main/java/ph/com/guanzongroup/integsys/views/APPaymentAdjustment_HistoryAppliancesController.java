@@ -35,7 +35,7 @@ import ph.com.guanzongroup.cas.cashflow.status.APPaymentAdjustmentStatus;
 import org.json.simple.JSONObject;
 import ph.com.guanzongroup.cas.cashflow.services.CashflowControllers;
 
-public class APPaymentAdjustment_HistoryController implements Initializable, ScreenInterface {
+public class APPaymentAdjustment_HistoryAppliancesController implements Initializable, ScreenInterface {
 
     private GRiderCAS oApp;
     static CashflowControllers poAPPaymentAdjustmentController;
@@ -66,7 +66,7 @@ public class APPaymentAdjustment_HistoryController implements Initializable, Scr
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        psIndustryId = ""; // general
+        
         poJSON = new JSONObject();
         poAPPaymentAdjustmentController = new CashflowControllers(oApp, null);
         poAPPaymentAdjustmentController.APPaymentAdjustment().initialize(); // Initialize transaction
