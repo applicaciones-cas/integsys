@@ -60,6 +60,9 @@ public class Login extends Application {
             System.setProperty("sys.dept.finance", po_props.getProperty("sys.dept.finance"));
             System.setProperty("sys.dept.procurement", po_props.getProperty("sys.dept.procurement"));
             
+            System.setProperty("user.selected.industry", po_props.getProperty("user.selected.industry"));
+            System.setProperty("user.selected.category", po_props.getProperty("user.selected.category"));
+            
             return true;
         } catch (FileNotFoundException ex) {
             ex.printStackTrace();
