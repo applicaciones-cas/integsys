@@ -31,7 +31,7 @@ import org.guanzon.appdriver.base.GuanzonException;
 import org.guanzon.appdriver.base.MiscUtil;
 import org.guanzon.appdriver.constant.EditMode;
 import ph.com.guanzongroup.cas.cashflow.APPaymentAdjustment;
-import ph.com.guanzongroup.cas.cashflow.status.APPaymentAdjustmentStatus;
+import org.guanzon.appdriver.constant.APPaymentAdjustmentStatus;
 import org.json.simple.JSONObject;
 import ph.com.guanzongroup.cas.cashflow.services.CashflowControllers;
 

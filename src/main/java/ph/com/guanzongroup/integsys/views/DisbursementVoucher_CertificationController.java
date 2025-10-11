@@ -58,7 +58,7 @@ import org.json.simple.parser.ParseException;
 import ph.com.guanzongroup.cas.cashflow.Disbursement;
 import ph.com.guanzongroup.cas.cashflow.model.SelectedITems;
 import ph.com.guanzongroup.cas.cashflow.services.CashflowControllers;
-import ph.com.guanzongroup.cas.cashflow.status.DisbursementStatic;
+import org.guanzon.appdriver.constant.DisbursementStatic;
 
 /**
  * FXML Controller class

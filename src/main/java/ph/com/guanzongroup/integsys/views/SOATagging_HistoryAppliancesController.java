@@ -41,7 +41,7 @@ import static javafx.scene.input.KeyCode.UP;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
-import ph.com.guanzongroup.cas.cashflow.status.SOATaggingStatus;
+import org.guanzon.appdriver.constant.SOATaggingStatus;
 import org.guanzon.appdriver.agent.ShowMessageFX;
 import org.guanzon.appdriver.base.CommonUtils;
 import org.guanzon.appdriver.base.GRiderCAS;
@@ -51,7 +51,7 @@ import org.guanzon.appdriver.constant.EditMode;
 import org.json.simple.JSONObject;
 import ph.com.guanzongroup.cas.cashflow.SOATagging;
 import ph.com.guanzongroup.cas.cashflow.services.CashflowControllers;
-import ph.com.guanzongroup.cas.cashflow.status.SOATaggingStatic;
+import org.guanzon.appdriver.constant.SOATaggingStatic;
 
 /**
  * FXML Controller class

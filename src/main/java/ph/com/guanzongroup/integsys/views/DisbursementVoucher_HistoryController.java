@@ -53,8 +53,8 @@ import org.guanzon.appdriver.constant.Logical;
 import org.json.simple.JSONObject;
 import ph.com.guanzongroup.cas.cashflow.Disbursement;
 import ph.com.guanzongroup.cas.cashflow.services.CashflowControllers;
-import ph.com.guanzongroup.cas.cashflow.status.DisbursementStatic;
-import ph.com.guanzongroup.cas.cashflow.status.JournalStatus;
+import org.guanzon.appdriver.constant.DisbursementStatic;
+import org.guanzon.appdriver.constant.JournalStatus;
 
 /**
  * FXML Controller class

@@ -40,7 +40,7 @@ import org.guanzon.appdriver.base.SQLUtil;
 import org.guanzon.appdriver.constant.EditMode;
 import org.guanzon.appdriver.constant.UserRight;
 import ph.com.guanzongroup.cas.cashflow.APPaymentAdjustment;
-import ph.com.guanzongroup.cas.cashflow.status.APPaymentAdjustmentStatus;
+import org.guanzon.appdriver.constant.APPaymentAdjustmentStatus;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.ParseException;
 import ph.com.guanzongroup.cas.cashflow.services.CashflowControllers;

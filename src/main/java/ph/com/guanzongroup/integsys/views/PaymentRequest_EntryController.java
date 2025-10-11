@@ -82,7 +82,7 @@ import org.guanzon.appdriver.constant.Logical;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.ParseException;
 import ph.com.guanzongroup.cas.cashflow.services.CashflowControllers;
-import ph.com.guanzongroup.cas.cashflow.status.PaymentRequestStatus;
+import org.guanzon.appdriver.constant.PaymentRequestStatus;
 
 /**
  * FXML Controller class
