@@ -3,8 +3,6 @@ package ph.com.guanzongroup.integsys.views;
 import ph.com.guanzongroup.integsys.model.ModelDeliveryAcceptance_Attachment;
 import ph.com.guanzongroup.integsys.model.ModelPOQuotation_Detail;
 import ph.com.guanzongroup.integsys.model.ModelPOQuotation_Main;
-import ph.com.guanzongroup.integsys.utility.CustomCommonUtil;
-import ph.com.guanzongroup.integsys.utility.JFXUtil;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Files;
@@ -75,6 +73,8 @@ import org.guanzon.appdriver.agent.ShowDialogFX;
 import org.guanzon.appdriver.constant.UserRight;
 import ph.com.guanzongroup.cas.purchasing.t2.services.QuotationControllers;
 import ph.com.guanzongroup.cas.purchasing.t2.status.POQuotationStatus;
+import ph.com.guanzongroup.integsys.utility.CustomCommonUtil;
+import ph.com.guanzongroup.integsys.utility.JFXUtil;
 
 /**
  *
@@ -409,7 +409,6 @@ public class POQuotation_EntryController implements Initializable, ScreenInterfa
                                 poController.POQuotation().AddDetail();
                                 loadRecordMaster();
                                 loadTableDetail.reload();
-                                poController.POQuotation().loadAttachments();
                                 loadTableAttachment.reload();
                                 return;
                             } else {

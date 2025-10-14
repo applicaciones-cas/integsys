@@ -44,7 +44,7 @@ import org.guanzon.appdriver.constant.Logical;
 import org.json.simple.JSONObject;
 import ph.com.guanzongroup.cas.cashflow.Disbursement;
 import ph.com.guanzongroup.cas.cashflow.services.CashflowControllers;
-import org.guanzon.appdriver.constant.DisbursementStatic;
+import ph.com.guanzongroup.cas.cashflow.status.DisbursementStatic;
 
 /**
  * FXML Controller class
@@ -148,8 +148,6 @@ public class DisbursementVoucher_ViewController implements Initializable {
     @FXML
     private TableView tblVwDetails;
     @FXML
-    private Label txtAccountCode;
-    @FXML
      private TableColumn tblDVRowNo, tblReferenceNo, tblAccountCode, tblTransactionTypeDetail, tblParticulars, tblPurchasedAmount, tblTaxCode, tblTaxAmount, tblNetAmount,
             tblVatableSales, tblVatAmt, tblVatRate, tblVatZeroRatedSales, tblVatExemptSales;
     public void setTransaction(String fsValue) {
@@ -169,7 +167,7 @@ public class DisbursementVoucher_ViewController implements Initializable {
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        txtAccountCode.setVisible(false);
+//        txtAccountCode.setVisible(false);
 //            tfAccountCodeDetail.setVisible(false);
         CustomCommonUtil.setDropShadow(AnchorMain, StackPane);
         if (!psTransactionNo.isEmpty()) {

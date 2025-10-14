@@ -26,6 +26,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import org.guanzon.appdriver.agent.ShowMessageFX;
+import org.guanzon.appdriver.agent.systables.SystemUser;
 import org.guanzon.appdriver.base.GRiderCAS;
 import org.guanzon.appdriver.base.GuanzonException;
 import org.guanzon.appdriver.base.LogWrapper;
@@ -38,7 +39,7 @@ import ph.com.guanzongroup.integsys.model.ModelLog_In_User;
 import ph.com.guanzongroup.integsys.utility.JFXUtil;
 
 public class LoginController implements Initializable, ScreenInterface {
-    private final String pxeModuleName = "Log In";
+    private final String MODULE = "Login";
     
     private GRiderCAS oApp;
     private String psIndustryID = "";
@@ -151,16 +152,15 @@ public class LoginController implements Initializable, ScreenInterface {
             switch (lsButton) {
                 case "btnSignIn":
                     JSONObject poJSON = ValidateLogin();
+                    
                     if (!"success".equals((String) poJSON.get("result"))) {
-                        System.err.println((String) poJSON.get("message"));
-                        ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                        ShowMessageFX.Warning((String) poJSON.get("message"), MODULE, null);
                     } else {
-
-                        if (!oApp.logUser("gRider", (String) poJSON.get("userID"))) {
-                            System.out.println("Log in status: " + oApp.getMessage() + "\nDefault user logged as " + oApp.getUserID() + "\nUser Level " + oApp.getUserLevel());
-                        } else {
-                            System.out.println("Log in status: " + oApp.getMessage() + "\nUser logged as " + oApp.getUserID() + "\nUser Level " + oApp.getUserLevel());
+                        if (!oApp.logUser("gRider", (String) poJSON.get("userId"))) {
+                            ShowMessageFX.Warning(oApp.getMessage(), "Warning", null);
+                            return;
                         }
+                        
                         DashboardController dashboardController = LoginControllerHolder.getMainController();
                         dashboardController.triggervbox2();
                         
@@ -196,10 +196,8 @@ public class LoginController implements Initializable, ScreenInterface {
                 default:
                     break;
             }
-        } catch (SQLException ex) {
-            Logger.getLogger(LoginController.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (GuanzonException ex) {
-            Logger.getLogger(LoginController.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (SQLException | GuanzonException ex) {
+            Logger.getLogger(LoginController.class.getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
         }
     }
 
@@ -224,8 +222,8 @@ public class LoginController implements Initializable, ScreenInterface {
                     if (selectedCompany != null) {
                         psCompanyID = selectedCompany.getCompanyId();
                     }
-                } catch (Exception e) {
-                    e.printStackTrace();
+                } catch (Exception ex) {
+                    Logger.getLogger(LoginController.class.getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
                 }
                 break;
             case "cmbIndustry":
@@ -253,27 +251,31 @@ public class LoginController implements Initializable, ScreenInterface {
 
     private void loadComboBoxItems() {
         try {
-            if (oApp.getIndustry().equals(System.getProperty("sys.main.industry"))){
+            boolean lbShow = oApp.getIndustry().equals(System.getProperty("sys.main.industry")) ||
+                                oApp.getIndustry().equals(System.getProperty("sys.general.industry"));
+            
+            if (lbShow){
                 industryOptions = FXCollections.observableArrayList(getAllIndustries());
                 companyOptions = FXCollections.observableArrayList(getAllCompanies(industryOptions.get(0)));
 
                 cmbIndustry.setItems(industryOptions);
                 if (!cmbIndustry.getItems().isEmpty()){
                     cmbIndustry.getSelectionModel().select(0);
+                    psIndustryID = industryOptions.get(0).getIndustryID();
                 }
-
 
                 cmbCompany.setItems(companyOptions);
                 if (!cmbCompany.getItems().isEmpty()){
                     cmbCompany.getSelectionModel().select(0);
+                    psCompanyID = companyOptions.get(0).getCompanyId();
                 }
             } else {
                 psIndustryID = oApp.getIndustry();
                 psCompanyID = oApp.getCompnyId();
             }
             
-            cmbIndustry.setVisible(oApp.getIndustry().equals(System.getProperty("sys.main.industry")));
-            cmbCompany.setVisible(oApp.getIndustry().equals(System.getProperty("sys.main.industry")));
+            cmbIndustry.setVisible(lbShow);
+            cmbCompany.setVisible(lbShow);
         } catch (SQLException ex) {
             ex.printStackTrace();
         }
@@ -291,25 +293,19 @@ public class LoginController implements Initializable, ScreenInterface {
 
         boolean isPasswordFilled = tfPassword.getText().trim().isEmpty();
         if (!isUsernameFilled && !isPasswordFilled) {
-
             if (psIndustryID.equals("") || psCompanyID.equals("")) {
                 JFXUtil.setJSONError(poJSON, "Please fill all the fields");
             } else {
-                JFXUtil.setJSONSuccess(poJSON, "success");
                 try {
-                    // final log
-                    users.clear();
-                    users = FXCollections.observableArrayList(getAllUsers());
+                    SystemUser sysuser = new SystemUser();
+                    sysuser.setApplicationDriver(oApp);
+                    sysuser.setLogWrapper(null);
 
-                    for (ModelLog_In_User user : users) {
-                        if (user.getUserName().equals(tfUsername.getText().trim()) && user.getUserPassword().equals(tfPassword.getText().trim())) {
-                            System.out.println("Login success for user ID: " + user.getUserID());
-                            poJSON.put("userID", user.getUserID());
-                        }
-                    }
+                    JSONObject loJSON = sysuser.isValidUser(tfUsername.getText().trim(), tfPassword.getText().trim(), oApp.getProductID());
 
-                } catch (SQLException ex) {
-                    Logger.getLogger(LoginController.class.getName()).log(Level.SEVERE, null, ex);
+                    if ("success".equals((String) loJSON.get("result"))) return loJSON;
+                } catch (SQLException | GuanzonException e) {
+                    JFXUtil.setJSONError(poJSON, e.getMessage());
                 }
             }
         } else {
@@ -385,5 +381,4 @@ public class LoginController implements Initializable, ScreenInterface {
         
         return industries;
     }
-
 }

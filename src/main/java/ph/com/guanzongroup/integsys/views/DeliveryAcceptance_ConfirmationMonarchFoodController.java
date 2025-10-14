@@ -1,14 +1,5 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/javafx/FXMLController.java to edit this template
- */
 package ph.com.guanzongroup.integsys.views;
 
-import ph.com.guanzongroup.integsys.model.ModelDeliveryAcceptance_Attachment;
-import ph.com.guanzongroup.integsys.model.ModelDeliveryAcceptance_Detail;
-import ph.com.guanzongroup.integsys.model.ModelDeliveryAcceptance_Main;
-import ph.com.guanzongroup.integsys.utility.CustomCommonUtil;
-import ph.com.guanzongroup.integsys.utility.JFXUtil;
 import com.sun.javafx.scene.control.skin.TableHeaderRow;
 import java.io.IOException;
 import java.net.URL;
@@ -80,7 +71,6 @@ import org.guanzon.appdriver.base.GuanzonException;
 import org.guanzon.appdriver.base.MiscUtil;
 import org.guanzon.appdriver.base.SQLUtil;
 import org.guanzon.appdriver.constant.EditMode;
-import org.guanzon.cas.purchasing.controller.PurchaseOrderReceiving;
 import org.guanzon.cas.purchasing.services.PurchaseOrderReceivingControllers;
 import org.guanzon.cas.purchasing.status.PurchaseOrderReceivingStatus;
 import org.json.simple.JSONObject;
@@ -92,9 +82,13 @@ import javafx.animation.PauseTransition;
 import javafx.scene.Parent;
 import javafx.scene.control.ComboBox;
 import org.guanzon.appdriver.constant.DocumentType;
-import javafx.util.Pair;
 import org.guanzon.appdriver.agent.ShowDialogFX;
 import org.guanzon.appdriver.constant.UserRight;
+import ph.com.guanzongroup.integsys.model.ModelDeliveryAcceptance_Attachment;
+import ph.com.guanzongroup.integsys.model.ModelDeliveryAcceptance_Detail;
+import ph.com.guanzongroup.integsys.model.ModelDeliveryAcceptance_Main;
+import ph.com.guanzongroup.integsys.utility.CustomCommonUtil;
+import ph.com.guanzongroup.integsys.utility.JFXUtil;
 
 /**
  * FXML Controller class
@@ -366,7 +360,7 @@ public class DeliveryAcceptance_ConfirmationMonarchFoodController implements Ini
                     case "btnRetrieve":
                         //Retrieve data from purchase order to table main
                         if (mainSearchListener != null) {
-                            tfOrderNo.textProperty().removeListener(mainSearchListener);
+                            JFXUtil.removeTextFieldListener(mainSearchListener, tfOrderNo);
                             mainSearchListener = null; // Clear reference to avoid memory leaks
                         }
                         retrievePOR();
@@ -922,7 +916,7 @@ public class DeliveryAcceptance_ConfirmationMonarchFoodController implements Ini
                     switch (lsID) {
                         case "tfOrderNo":
                             if (mainSearchListener != null) {
-                                txtField.textProperty().removeListener(mainSearchListener);
+                                JFXUtil.removeTextFieldListener(mainSearchListener, txtField);
                                 mainSearchListener = null; // Clear reference to avoid memory leaks
                                 initDetailsGrid();
                                 initMainGrid();
@@ -1137,7 +1131,7 @@ public class DeliveryAcceptance_ConfirmationMonarchFoodController implements Ini
                     return;
                 }
                 selectedDate = ldtResult.selectedDate;
-                
+
                 switch (datePicker.getId()) {
                     case "dpTransactionDate":
                         if (poPurchaseReceivingController.PurchaseOrderReceiving().getEditMode() == EditMode.ADDNEW
@@ -1793,11 +1787,11 @@ public class DeliveryAcceptance_ConfirmationMonarchFoodController implements Ini
 
     private void goToPageBasedOnSelectedRow(String pnRowMain) {
         if (mainSearchListener != null) {
-            tfOrderNo.textProperty().removeListener(mainSearchListener);
+            JFXUtil.removeTextFieldListener(mainSearchListener, tfOrderNo);
             mainSearchListener = null;
         }
         if (detailSearchListener != null) {
-            tfOrderNo.textProperty().removeListener(detailSearchListener);
+            JFXUtil.removeTextFieldListener(detailSearchListener, tfOrderNo);
             detailSearchListener = null;
         }
         filteredDataDetail.setPredicate(null);
@@ -1882,7 +1876,7 @@ public class DeliveryAcceptance_ConfirmationMonarchFoodController implements Ini
             goToPageBasedOnSelectedRow(String.valueOf(pnMain));
             filteredDataDetail.setPredicate(null);
             lbresetpredicate = false;
-            tfOrderNo.textProperty().removeListener(detailSearchListener);
+            JFXUtil.removeTextFieldListener(detailSearchListener, tfOrderNo);
 
             mainSearchListener = null;
             filteredData.setPredicate(null);
@@ -2153,7 +2147,7 @@ public class DeliveryAcceptance_ConfirmationMonarchFoodController implements Ini
             textField.setOnKeyPressed(this::txtField_KeyPressed);
         }
         JFXUtil.initComboBoxCellDesignColor(cmbAttachmentType, "#FF8201");
-        CustomCommonUtil.inputDecimalOnly(tfDiscountRate, tfDiscountAmount, tfCost, tfReceiveQuantity);
+        CustomCommonUtil.inputDecimalOnly(tfReceiveQuantity, tfDiscountRate, tfDiscountAmount, tfCost, tfReceiveQuantity);
         // Combobox
         cmbAttachmentType.setItems(documentType);
         cmbAttachmentType.setOnAction(event -> {
@@ -2306,8 +2300,8 @@ public class DeliveryAcceptance_ConfirmationMonarchFoodController implements Ini
                     btnVoid.setVisible(false);
                     btnVoid.setManaged(false);
                 } else {
-                    btnReturn.setVisible(lbShow3);
-                    btnReturn.setManaged(lbShow3);
+                    //btnReturn.setVisible(lbShow3);
+                    //btnReturn.setManaged(lbShow3);
                 }
                 break;
             case PurchaseOrderReceivingStatus.POSTED:
@@ -2528,31 +2522,10 @@ public class DeliveryAcceptance_ConfirmationMonarchFoodController implements Ini
     }
 
     public void initDetailsGrid() {
-
-        tblRowNoDetail.setStyle("-fx-alignment: CENTER;");
-        tblOrderNoDetail.setStyle("-fx-alignment: CENTER-LEFT;-fx-padding: 0 5 0 5;");
-        tblBarcodeDetail.setStyle("-fx-alignment: CENTER-LEFT;-fx-padding: 0 5 0 5;");
-        tblDescriptionDetail.setStyle("-fx-alignment: CENTER-LEFT;-fx-padding: 0 5 0 5;");
-        tblCostDetail.setStyle("-fx-alignment: CENTER-RIGHT;-fx-padding: 0 5 0 5;");
-        tblOrderQuantityDetail.setStyle("-fx-alignment: CENTER;");
-        tblReceiveQuantityDetail.setStyle("-fx-alignment: CENTER;");
-        tblTotalDetail.setStyle("-fx-alignment: CENTER-RIGHT;-fx-padding: 0 5 0 5;");
-
-        tblRowNoDetail.setCellValueFactory(new PropertyValueFactory<>("index01"));
-        tblOrderNoDetail.setCellValueFactory(new PropertyValueFactory<>("index02"));
-        tblBarcodeDetail.setCellValueFactory(new PropertyValueFactory<>("index03"));
-        tblDescriptionDetail.setCellValueFactory(new PropertyValueFactory<>("index04"));
-        tblCostDetail.setCellValueFactory(new PropertyValueFactory<>("index05"));
-        tblOrderQuantityDetail.setCellValueFactory(new PropertyValueFactory<>("index06"));
-        tblReceiveQuantityDetail.setCellValueFactory(new PropertyValueFactory<>("index07"));
-        tblTotalDetail.setCellValueFactory(new PropertyValueFactory<>("index08"));
-
-        tblViewOrderDetails.widthProperty().addListener((ObservableValue<? extends Number> source, Number oldWidth, Number newWidth) -> {
-            TableHeaderRow header = (TableHeaderRow) tblViewOrderDetails.lookup("TableHeaderRow");
-            header.reorderingProperty().addListener((ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) -> {
-                header.setReordering(false);
-            });
-        });
+        JFXUtil.setColumnCenter(tblRowNoDetail, tblOrderNoDetail);
+        JFXUtil.setColumnLeft(tblBarcodeDetail, tblDescriptionDetail);
+        JFXUtil.setColumnRight(tblCostDetail, tblOrderQuantityDetail, tblReceiveQuantityDetail, tblTotalDetail);
+        JFXUtil.setColumnsIndexAndDisableReordering(tblViewOrderDetails);
         filteredDataDetail = new FilteredList<>(details_data, b -> true);
         autoSearch(tfOrderNo);
 
@@ -2563,26 +2536,12 @@ public class DeliveryAcceptance_ConfirmationMonarchFoodController implements Ini
     }
 
     public void initMainGrid() {
-        tblRowNo.setStyle("-fx-alignment: CENTER;");
-        tblSupplier.setStyle("-fx-alignment: CENTER-LEFT;-fx-padding: 0 5 0 5;");
-        tblDate.setStyle("-fx-alignment: CENTER;");
-        tblReferenceNo.setStyle("-fx-alignment: CENTER;");
-
-        tblRowNo.setCellValueFactory(new PropertyValueFactory<>("index01"));
-        tblSupplier.setCellValueFactory(new PropertyValueFactory<>("index02"));
-        tblDate.setCellValueFactory(new PropertyValueFactory<>("index03"));
-        tblReferenceNo.setCellValueFactory(new PropertyValueFactory<>("index04"));
-
-        tblViewPuchaseOrder.widthProperty().addListener((ObservableValue<? extends Number> source, Number oldWidth, Number newWidth) -> {
-            TableHeaderRow header = (TableHeaderRow) tblViewPuchaseOrder.lookup("TableHeaderRow");
-            header.reorderingProperty().addListener((ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) -> {
-                header.setReordering(false);
-            });
-        });
+        JFXUtil.setColumnCenter(tblRowNo, tblDate, tblReferenceNo);
+        JFXUtil.setColumnLeft(tblSupplier);
+        JFXUtil.setColumnsIndexAndDisableReordering(tblViewPuchaseOrder);
 
         filteredData = new FilteredList<>(main_data, b -> true);
         tblViewPuchaseOrder.setItems(filteredData);
-
     }
 
     private boolean isImageViewOutOfBounds(ImageView imageView, StackPane stackPane) {
@@ -2757,7 +2716,7 @@ public class DeliveryAcceptance_ConfirmationMonarchFoodController implements Ini
                     return true;
                 }
                 if (mainSearchListener != null) {
-                    txtField.textProperty().removeListener(mainSearchListener);
+                    JFXUtil.removeTextFieldListener(mainSearchListener, txtField);
                     mainSearchListener = null; // Clear reference to avoid memory leaks
                 }
                 String lowerCaseFilter = newValue.toLowerCase();
@@ -2766,7 +2725,7 @@ public class DeliveryAcceptance_ConfirmationMonarchFoodController implements Ini
             // If no results and autoSearchMain is enabled, remove listener and trigger autoSearchMain
             if (filteredDataDetail.isEmpty()) {
                 if (main_data.size() > 0) {
-                    txtField.textProperty().removeListener(detailSearchListener);
+                    JFXUtil.removeTextFieldListener(detailSearchListener, txtField);
                     filteredData = new FilteredList<>(main_data, b -> true);
                     autoSearchMain(txtField); // Trigger autoSearchMain if no results
                     tblViewPuchaseOrder.setItems(filteredData);
@@ -2791,7 +2750,7 @@ public class DeliveryAcceptance_ConfirmationMonarchFoodController implements Ini
                 lbresetpredicate = true;
                 if (newValue == null || newValue.isEmpty()) {
                     if (mainSearchListener != null) {
-                        txtField.textProperty().removeListener(mainSearchListener);
+                        JFXUtil.removeTextFieldListener(mainSearchListener, txtField);
                         mainSearchListener = null; // Clear reference to avoid memory leaks
                         initDetailsGrid();
                     }

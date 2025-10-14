@@ -45,7 +45,7 @@ import static javafx.scene.input.KeyCode.UP;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
-import org.guanzon.appdriver.constant.SOATaggingStatus;
+import ph.com.guanzongroup.cas.cashflow.status.SOATaggingStatus;
 import org.guanzon.appdriver.agent.ShowMessageFX;
 import org.guanzon.appdriver.base.CommonUtils;
 import org.guanzon.appdriver.base.GRiderCAS;
@@ -58,7 +58,7 @@ import org.json.simple.parser.ParseException;
 import javafx.util.Pair;
 import java.util.ArrayList;
 import ph.com.guanzongroup.cas.cashflow.SOATagging;
-import org.guanzon.appdriver.constant.SOATaggingStatic;
+import ph.com.guanzongroup.cas.cashflow.status.SOATaggingStatic;
 import java.text.SimpleDateFormat;
 import java.time.format.DateTimeFormatter;
 import java.util.concurrent.atomic.AtomicReference;
@@ -889,7 +889,7 @@ public class SOATagging_EntryLPController implements Initializable, ScreenInterf
                                     lsPayeeName = poSOATaggingController.SOATagging().PaymentRequestList(lnCtr).Payee().getPayeeName();
                                     lsTransNo = poSOATaggingController.SOATagging().PaymentRequestList(lnCtr).getSeriesNo();
                                     lsTransDate = String.valueOf(poSOATaggingController.SOATagging().PaymentRequestList(lnCtr).getTransactionDate());
-                                    lsTransNoBasis = poSOATaggingController.SOATagging().PaymentRequestList(lnCtr).getSourceNo();
+                                    lsTransNoBasis = poSOATaggingController.SOATagging().PaymentRequestList(lnCtr).getTransactionNo();
                                     lsTransType = "PRF";
                                     break;
                                 case SOATaggingStatic.APPaymentAdjustment:

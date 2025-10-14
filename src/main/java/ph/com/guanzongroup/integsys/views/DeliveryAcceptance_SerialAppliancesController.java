@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/javafx/FXMLController.java to edit this template
- */
 package ph.com.guanzongroup.integsys.views;
 
 import ph.com.guanzongroup.integsys.model.ModelDeliveryAcceptance_SerialMP;
@@ -54,6 +50,7 @@ import org.guanzon.appdriver.base.CommonUtils;
 import org.guanzon.appdriver.base.GRiderCAS;
 import org.guanzon.appdriver.base.GuanzonException;
 import org.guanzon.cas.purchasing.controller.PurchaseOrderReceiving;
+import org.guanzon.cas.purchasing.status.PurchaseOrderReceivingStatus;
 import org.json.simple.JSONObject;
 
 /**
@@ -174,6 +171,7 @@ public class DeliveryAcceptance_SerialAppliancesController implements Initializa
         poJSON = new JSONObject();
         int lnRow = 1;
         String lsMessage = "";
+        String lsSerialId = "";
         boolean inform = false;
         for (int lnCtr = 0; lnCtr <= poPurchaseReceivingController.getPurchaseOrderReceivingSerialCount() - 1; lnCtr++) {
             if (poPurchaseReceivingController.PurchaseOrderReceivingSerialList(lnCtr).getEntryNo() == pnEntryNo) {
@@ -191,6 +189,22 @@ public class DeliveryAcceptance_SerialAppliancesController implements Initializa
                     break;
                 }
 
+                if (lsButton.equals("btnOkay")) {
+                    if(poPurchaseReceivingController.Master().getPurpose().equals(PurchaseOrderReceivingStatus.Purpose.REPLACEMENT)){
+                        if (poPurchaseReceivingController.PurchaseOrderReceivingSerialList(lnCtr).getSerialId() == null || "".equals(poPurchaseReceivingController.PurchaseOrderReceivingSerialList(lnCtr).getSerialId())) {
+                            lsSerialId = poPurchaseReceivingController.getSerialId(lnCtr);
+                            if(!lsSerialId.isEmpty()){
+                                poPurchaseReceivingController.PurchaseOrderReceivingSerialList(lnCtr).setSerialId(lsSerialId);
+                            } else {
+                                poJSON.put("result", "error");
+                                lsMessage = "Please select serial that exists in Purchase Order Return transaction at row "+lnRow+".";
+                                inform = true;
+                            }
+                            break;
+                        }
+                    }
+                }
+                
                 lnRow++;
             }
         }
@@ -289,6 +303,10 @@ public class DeliveryAcceptance_SerialAppliancesController implements Initializa
             ModelDeliveryAcceptance_SerialMP selectedItem = tblViewDetail.getItems().get(pnDetail);
             int pnDetail2 = Integer.valueOf(selectedItem.getIndex04());
 
+            if(poPurchaseReceivingController.Master().getPurpose().equals(PurchaseOrderReceivingStatus.Purpose.REPLACEMENT)){
+                tfIMEI1.promptTextProperty().set("Press F3: Search");
+                tfIMEI2.promptTextProperty().set("Press F3: Search");
+            }
             tfIMEI1.setText(poPurchaseReceivingController.PurchaseOrderReceivingSerialList(pnDetail2).getSerial01());
             tfIMEI2.setText(poPurchaseReceivingController.PurchaseOrderReceivingSerialList(pnDetail2).getSerial02());
             updateCaretPositions(apDetail);
@@ -342,11 +360,13 @@ public class DeliveryAcceptance_SerialAppliancesController implements Initializa
                                 tblViewDetail.getSelectionModel().select(0);
                                 tblViewDetail.getFocusModel().focus(0);
                                 pnDetail = tblViewDetail.getSelectionModel().getSelectedIndex();
+                                loadRecordDetail();
                             }
                         } else {
                             // Check if the item matches the value of pnDetail
                             tblViewDetail.getSelectionModel().select(pnDetail);
                             tblViewDetail.getFocusModel().focus(pnDetail);
+                            loadRecordDetail();
                         }
 
                     } catch (SQLException | GuanzonException ex) {
@@ -475,6 +495,8 @@ public class DeliveryAcceptance_SerialAppliancesController implements Initializa
         String lsValue = (txtField.getText() == null ? "" : txtField.getText());
         poJSON = new JSONObject();
 
+        ModelDeliveryAcceptance_SerialMP selectedItem = tblViewDetail.getItems().get(pnDetail);
+        int pnDetail2 = Integer.valueOf(selectedItem.getIndex04());
         TableView<?> currentTable = tblViewDetail;
         TablePosition<?, ?> focusedCell = currentTable.getFocusModel().getFocusedCell();
         switch (event.getCode()) {
@@ -492,6 +514,29 @@ public class DeliveryAcceptance_SerialAppliancesController implements Initializa
                 pnDetail = moveToNextRow(currentTable, focusedCell);
                 loadRecordDetail();
                 event.consume();
+                break;
+            
+            case F3:
+                if(poPurchaseReceivingController.Master().getPurpose().equals(PurchaseOrderReceivingStatus.Purpose.REPLACEMENT)){
+                    switch (lsID) {
+                        case "tfIMEI1":
+                            poJSON = poPurchaseReceivingController.SearchSerial(lsValue, pnDetail2);
+                            if ("error".equals((String) poJSON.get("result"))) {
+                                ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                                tfIMEI1.setText("");
+                            }
+                            loadTableDetail();
+                            break;
+                        case "tfIMEI2":
+                            poJSON = poPurchaseReceivingController.SearchSerial(lsValue, pnDetail2);
+                            if ("error".equals((String) poJSON.get("result"))) {
+                                ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                                tfIMEI2.setText("");
+                            }
+                            loadTableDetail();
+                            break;
+                    }
+                }
                 break;
             default:
                 break;
