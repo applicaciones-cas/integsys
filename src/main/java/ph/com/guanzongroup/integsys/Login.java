@@ -57,6 +57,8 @@ public class Login extends Application {
             po_props.load(new FileInputStream(System.getProperty("sys.default.path.config") + "/config/cas.properties"));
             
             System.setProperty("sys.main.industry", po_props.getProperty("sys.main.industry"));
+            System.setProperty("sys.general.industry", po_props.getProperty("sys.general.industry"));
+            
             System.setProperty("sys.dept.finance", po_props.getProperty("sys.dept.finance"));
             System.setProperty("sys.dept.procurement", po_props.getProperty("sys.dept.procurement"));
             

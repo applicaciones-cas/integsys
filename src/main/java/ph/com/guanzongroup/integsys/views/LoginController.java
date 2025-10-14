@@ -253,27 +253,31 @@ public class LoginController implements Initializable, ScreenInterface {
 
     private void loadComboBoxItems() {
         try {
-            if (oApp.getIndustry().equals(System.getProperty("sys.main.industry"))){
+            boolean lbShow = oApp.getIndustry().equals(System.getProperty("sys.main.industry")) ||
+                                oApp.getIndustry().equals(System.getProperty("sys.general.industry"));
+            
+            if (lbShow){
                 industryOptions = FXCollections.observableArrayList(getAllIndustries());
                 companyOptions = FXCollections.observableArrayList(getAllCompanies(industryOptions.get(0)));
 
                 cmbIndustry.setItems(industryOptions);
                 if (!cmbIndustry.getItems().isEmpty()){
                     cmbIndustry.getSelectionModel().select(0);
+                    psIndustryID = industryOptions.get(0).getIndustryID();
                 }
-
 
                 cmbCompany.setItems(companyOptions);
                 if (!cmbCompany.getItems().isEmpty()){
                     cmbCompany.getSelectionModel().select(0);
+                    psCompanyID = companyOptions.get(0).getCompanyId();
                 }
             } else {
                 psIndustryID = oApp.getIndustry();
                 psCompanyID = oApp.getCompnyId();
             }
             
-            cmbIndustry.setVisible(oApp.getIndustry().equals(System.getProperty("sys.main.industry")));
-            cmbCompany.setVisible(oApp.getIndustry().equals(System.getProperty("sys.main.industry")));
+            cmbIndustry.setVisible(lbShow);
+            cmbCompany.setVisible(lbShow);
         } catch (SQLException ex) {
             ex.printStackTrace();
         }
