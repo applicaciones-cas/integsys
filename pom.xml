@@ -128,7 +128,16 @@
             <artifactId>cas-purchasing-t2</artifactId>
             <version>0.2-SNAPSHOT</version>
         </dependency>
-        
+        <dependency>
+            <groupId>org.guanzon</groupId>
+            <artifactId>cas-inv-warehouse</artifactId>
+            <version>0.2-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>ph.com.guanzongroup</groupId>
+            <artifactId>cas-inv-warehouse-t4</artifactId>
+            <version>0.2-SNAPSHOT</version>
+        </dependency>
         <dependency>
             <groupId>de.jensd</groupId>
             <artifactId>fontawesomefx</artifactId>

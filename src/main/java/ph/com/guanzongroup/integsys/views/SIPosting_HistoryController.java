@@ -1,3 +1,8 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
 package ph.com.guanzongroup.integsys.views;
 
 import ph.com.guanzongroup.integsys.model.ModelDeliveryAcceptance_Attachment;
@@ -57,6 +62,7 @@ import org.guanzon.appdriver.base.GRiderCAS;
 import org.guanzon.appdriver.base.GuanzonException;
 import org.guanzon.appdriver.base.MiscUtil;
 import org.guanzon.appdriver.constant.EditMode;
+import org.guanzon.cas.purchasing.controller.PurchaseOrderReceiving;
 import org.guanzon.cas.purchasing.services.PurchaseOrderReceivingControllers;
 import org.guanzon.cas.purchasing.status.PurchaseOrderReceivingStatus;
 import org.json.simple.JSONObject;
@@ -135,7 +141,7 @@ public class SIPosting_HistoryController implements Initializable, ScreenInterfa
             tfAddlDiscAmtDetail, tfSRPAmount, tfJETransactionNo, tfJEAcctCode, tfJEAcctDescription, tfCreditAmt, tfDebitAmt, tfTotalCreditAmt,
             tfTotalDebitAmt, tfAttachmentNo, tfAdvancePayment;
     @FXML
-    private DatePicker dpTransactionDate, dpReferenceDate, dpExpiryDate, dpJETransactionDate, dpReportMonthYear;
+    private DatePicker dpTransactionDate, dpReferenceDate, dpSIDate,dpExpiryDate, dpJETransactionDate, dpReportMonthYear;
     @FXML
     private CheckBox cbVatInclusive, cbVatable;
     @FXML
@@ -304,6 +310,7 @@ public class SIPosting_HistoryController implements Initializable, ScreenInterfa
 
         }
         AttachmentDialogController controller = new AttachmentDialogController();
+        controller.setOpenedImage(pnAttachment);
         controller.addData(data);
         try {
             stageAttachment.showDialog((Stage) apMaster.getScene().getWindow(), getClass().getResource("/com/rmj/guanzongroup/sidebarmenus/views/AttachmentDialog.fxml"), controller, "Attachment Dialog", false, false, true);
@@ -625,8 +632,8 @@ public class SIPosting_HistoryController implements Initializable, ScreenInterfa
                     + poPurchaseReceivingController.PurchaseOrderReceiving().Detail(pnDetail).getDiscountAmount().doubleValue()
                     + ldblDiscountRate;
             tfSRPAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(lnTotal, true));
-            tfOrderQuantity.setText(String.valueOf(poPurchaseReceivingController.PurchaseOrderReceiving().Detail(pnDetail).getOrderQty().intValue()));
-            tfReceiveQuantity.setText(String.valueOf(poPurchaseReceivingController.PurchaseOrderReceiving().Detail(pnDetail).getQuantity().intValue()));
+            tfOrderQuantity.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poPurchaseReceivingController.PurchaseOrderReceiving().Detail(pnDetail).getOrderQty().doubleValue()));
+            tfReceiveQuantity.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poPurchaseReceivingController.PurchaseOrderReceiving().Detail(pnDetail).getQuantity().doubleValue()));
 
             cbVatable.setSelected(poPurchaseReceivingController.PurchaseOrderReceiving().Detail(pnDetail).isVatable());
 
@@ -712,7 +719,9 @@ public class SIPosting_HistoryController implements Initializable, ScreenInterfa
             tfTrucking.setText(poPurchaseReceivingController.PurchaseOrderReceiving().Master().Trucking().getCompanyName());
 
             String lsReferenceDate = CustomCommonUtil.formatDateToShortString(poPurchaseReceivingController.PurchaseOrderReceiving().Master().getReferenceDate());
+            String lsSIDate = CustomCommonUtil.formatDateToShortString(poPurchaseReceivingController.PurchaseOrderReceiving().Master().getSalesInvoiceDate());
             dpReferenceDate.setValue(CustomCommonUtil.parseDateStringToLocalDate(lsReferenceDate, "yyyy-MM-dd"));
+            dpSIDate.setValue(JFXUtil.isObjectEqualTo(lsSIDate, "1900-01-01") ? null : CustomCommonUtil.parseDateStringToLocalDate(lsSIDate, "yyyy-MM-dd"));
             tfReferenceNo.setText(poPurchaseReceivingController.PurchaseOrderReceiving().Master().getReferenceNo());
             tfSINo.setText(poPurchaseReceivingController.PurchaseOrderReceiving().Master().getSalesInvoice());
             tfTerm.setText(poPurchaseReceivingController.PurchaseOrderReceiving().Master().Term().getDescription());
@@ -727,7 +736,7 @@ public class SIPosting_HistoryController implements Initializable, ScreenInterfa
             });
             tfDiscountAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poPurchaseReceivingController.PurchaseOrderReceiving().Master().getDiscount().doubleValue(), true));
             tfFreightAmt.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poPurchaseReceivingController.PurchaseOrderReceiving().Master().getFreight().doubleValue()));
-            
+
             cbVatInclusive.setSelected(poPurchaseReceivingController.PurchaseOrderReceiving().Master().isVatTaxable());
             tfVatSales.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poPurchaseReceivingController.PurchaseOrderReceiving().Master().getVatSales().doubleValue(), true));
             tfVatAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poPurchaseReceivingController.PurchaseOrderReceiving().Master().getVatAmount().doubleValue(), true));
@@ -893,15 +902,15 @@ public class SIPosting_HistoryController implements Initializable, ScreenInterfa
                             }
 
                             try {
-                                lnTotal = poPurchaseReceivingController.PurchaseOrderReceiving().Detail(lnCtr).getUnitPrce().doubleValue() * poPurchaseReceivingController.PurchaseOrderReceiving().Detail(lnCtr).getQuantity().intValue();
+                                lnTotal = poPurchaseReceivingController.PurchaseOrderReceiving().Detail(lnCtr).getUnitPrce().doubleValue() * poPurchaseReceivingController.PurchaseOrderReceiving().Detail(lnCtr).getQuantity().doubleValue();
                                 lnDiscountAmt = poPurchaseReceivingController.PurchaseOrderReceiving().Detail(lnCtr).getDiscountAmount().doubleValue()
                                         + (lnTotal * (poPurchaseReceivingController.PurchaseOrderReceiving().Detail(lnCtr).getDiscountRate().doubleValue() / 100));
                             } catch (Exception e) {
                             }
 
                             if ((!poPurchaseReceivingController.PurchaseOrderReceiving().Detail(lnCtr).getOrderNo().equals("") && poPurchaseReceivingController.PurchaseOrderReceiving().Detail(lnCtr).getOrderNo() != null)
-                                    && poPurchaseReceivingController.PurchaseOrderReceiving().Detail(lnCtr).getOrderQty().intValue() != poPurchaseReceivingController.PurchaseOrderReceiving().Detail(lnCtr).getQuantity().intValue()
-                                    && poPurchaseReceivingController.PurchaseOrderReceiving().Detail(lnCtr).getQuantity().intValue() != 0) {
+                                    && poPurchaseReceivingController.PurchaseOrderReceiving().Detail(lnCtr).getOrderQty().doubleValue() != poPurchaseReceivingController.PurchaseOrderReceiving().Detail(lnCtr).getQuantity().doubleValue()
+                                    && poPurchaseReceivingController.PurchaseOrderReceiving().Detail(lnCtr).getQuantity().doubleValue() != 0) {
                                 JFXUtil.highlightByKey(tblViewTransDetailList, String.valueOf(lnCtr + 1), "#FAA0A0", highlightedRowsDetail);
                             }
 
@@ -912,8 +921,8 @@ public class SIPosting_HistoryController implements Initializable, ScreenInterfa
                                                 String.valueOf(poPurchaseReceivingController.PurchaseOrderReceiving().Detail(lnCtr).Inventory().getBarCode()),
                                                 String.valueOf(poPurchaseReceivingController.PurchaseOrderReceiving().Detail(lnCtr).Inventory().getDescription()),
                                                 String.valueOf(CustomCommonUtil.setIntegerValueToDecimalFormat(poPurchaseReceivingController.PurchaseOrderReceiving().Detail(lnCtr).getUnitPrce(), true)),
-                                                String.valueOf(poPurchaseReceivingController.PurchaseOrderReceiving().Detail(lnCtr).getOrderQty().intValue()),
-                                                String.valueOf(poPurchaseReceivingController.PurchaseOrderReceiving().Detail(lnCtr).getQuantity().intValue()),
+                                                String.valueOf(CustomCommonUtil.setIntegerValueToDecimalFormat(poPurchaseReceivingController.PurchaseOrderReceiving().Detail(lnCtr).getOrderQty().doubleValue())),
+                                                String.valueOf(CustomCommonUtil.setIntegerValueToDecimalFormat(poPurchaseReceivingController.PurchaseOrderReceiving().Detail(lnCtr).getQuantity().doubleValue())),
                                                 //                                                String.valueOf(CustomCommonUtil.setIntegerValueToDecimalFormat(lnDiscountAmt, true)),
                                                 String.valueOf(CustomCommonUtil.setIntegerValueToDecimalFormat(lnTotal, true)) //identify total
                                         ));
@@ -1040,7 +1049,7 @@ public class SIPosting_HistoryController implements Initializable, ScreenInterfa
 
     public void initDatePickers() {
         JFXUtil.setDatePickerFormat("MM/dd/yyyy",
-dpTransactionDate, dpReferenceDate, dpExpiryDate, dpJETransactionDate, dpReportMonthYear);
+                dpTransactionDate, dpReferenceDate, dpSIDate,dpExpiryDate, dpJETransactionDate, dpReportMonthYear);
     }
 
     public void initTextFields() {
@@ -1052,8 +1061,8 @@ dpTransactionDate, dpReferenceDate, dpExpiryDate, dpJETransactionDate, dpReportM
                 tfVatAmount, tfZeroVatSales, tfVatExemptSales, tfCost, tfCreditAmt,
                 tfDebitAmt, tfAddlDiscAmtDetail, tfSRPAmount);
 
-        CustomCommonUtil.inputIntegersOnly(tfReceiveQuantity, tfSINo);
-        CustomCommonUtil.inputDecimalOnly(tfDiscountRate, tfDiscRateDetail, tfVatRate);
+        CustomCommonUtil.inputIntegersOnly(tfSINo);
+        CustomCommonUtil.inputDecimalOnly(tfReceiveQuantity, tfDiscountRate, tfDiscRateDetail, tfVatRate);
         // Combobox
         JFXUtil.initComboBoxCellDesignColor(cmbAttachmentType, "#FF8201");
         cmbAttachmentType.setItems(documentType);
@@ -1256,7 +1265,7 @@ dpTransactionDate, dpReferenceDate, dpExpiryDate, dpJETransactionDate, dpReportM
         Platform.runLater(() -> {
             stageAttachment.closeDialog();
             imageinfo_temp.clear();
-            JFXUtil.setValueToNull(previousSearchedTextField, lastFocusedTextField, dpTransactionDate, dpReferenceDate, dpExpiryDate, dpReportMonthYear);
+            JFXUtil.setValueToNull(previousSearchedTextField, lastFocusedTextField, dpTransactionDate, dpReferenceDate, dpSIDate,dpExpiryDate, dpReportMonthYear);
             psSupplierId = "";
             psBranchId = "";
             JFXUtil.clearTextFields(apMaster, apDetail, apJEDetail, apJEMaster, apAttachments);

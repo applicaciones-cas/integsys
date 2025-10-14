@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/javafx/FXMLController.java to edit this template
- */
 package ph.com.guanzongroup.integsys.views;
 
 import ph.com.guanzongroup.integsys.model.ModelDeliveryAcceptance_Attachment;
@@ -1097,31 +1093,10 @@ public class DeliveryAcceptance_HistorySPMCController implements Initializable, 
     }
 
     public void initDetailsGrid() {
-
-        tblRowNoDetail.setStyle("-fx-alignment: CENTER;");
-        tblOrderNoDetail.setStyle("-fx-alignment: CENTER-LEFT;-fx-padding: 0 5 0 5;");
-        tblBarcodeDetail.setStyle("-fx-alignment: CENTER-LEFT;-fx-padding: 0 5 0 5;");
-        tblDescriptionDetail.setStyle("-fx-alignment: CENTER-LEFT;-fx-padding: 0 5 0 5;");
-        tblCostDetail.setStyle("-fx-alignment: CENTER-RIGHT;-fx-padding: 0 5 0 5;");
-        tblOrderQuantityDetail.setStyle("-fx-alignment: CENTER;");
-        tblReceiveQuantityDetail.setStyle("-fx-alignment: CENTER;");
-        tblTotalDetail.setStyle("-fx-alignment: CENTER-RIGHT;-fx-padding: 0 5 0 5;");
-
-        tblRowNoDetail.setCellValueFactory(new PropertyValueFactory<>("index01"));
-        tblOrderNoDetail.setCellValueFactory(new PropertyValueFactory<>("index02"));
-        tblBarcodeDetail.setCellValueFactory(new PropertyValueFactory<>("index03"));
-        tblDescriptionDetail.setCellValueFactory(new PropertyValueFactory<>("index04"));
-        tblCostDetail.setCellValueFactory(new PropertyValueFactory<>("index05"));
-        tblOrderQuantityDetail.setCellValueFactory(new PropertyValueFactory<>("index06"));
-        tblReceiveQuantityDetail.setCellValueFactory(new PropertyValueFactory<>("index07"));
-        tblTotalDetail.setCellValueFactory(new PropertyValueFactory<>("index08"));
-
-        tblViewOrderDetails.widthProperty().addListener((ObservableValue<? extends Number> source, Number oldWidth, Number newWidth) -> {
-            TableHeaderRow header = (TableHeaderRow) tblViewOrderDetails.lookup("TableHeaderRow");
-            header.reorderingProperty().addListener((ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) -> {
-                header.setReordering(false);
-            });
-        });
+        JFXUtil.setColumnCenter(tblRowNoDetail, tblOrderNoDetail);
+        JFXUtil.setColumnLeft(tblBarcodeDetail, tblDescriptionDetail);
+        JFXUtil.setColumnRight(tblCostDetail, tblOrderQuantityDetail, tblReceiveQuantityDetail, tblTotalDetail);
+        JFXUtil.setColumnsIndexAndDisableReordering(tblViewOrderDetails);
         filteredDataDetail = new FilteredList<>(details_data, b -> true);
         autoSearch(tfOrderNo);
 

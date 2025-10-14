@@ -1,7 +1,5 @@
 package ph.com.guanzongroup.integsys.views;
 
-import ph.com.guanzongroup.integsys.utility.CustomCommonUtil;
-import ph.com.guanzongroup.integsys.utility.JFXUtil;
 import java.net.URL;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
@@ -39,11 +37,12 @@ import org.guanzon.appdriver.base.MiscUtil;
 import org.guanzon.appdriver.base.SQLUtil;
 import org.guanzon.appdriver.constant.EditMode;
 import org.guanzon.appdriver.constant.UserRight;
-import ph.com.guanzongroup.cas.cashflow.APPaymentAdjustment;
-import org.guanzon.appdriver.constant.APPaymentAdjustmentStatus;
+import ph.com.guanzongroup.cas.cashflow.status.APPaymentAdjustmentStatus;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.ParseException;
 import ph.com.guanzongroup.cas.cashflow.services.CashflowControllers;
+import ph.com.guanzongroup.integsys.utility.CustomCommonUtil;
+import ph.com.guanzongroup.integsys.utility.JFXUtil;
 
 public class APPaymentAdjustment_EntryCarController implements Initializable, ScreenInterface {
 

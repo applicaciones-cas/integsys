@@ -1,14 +1,5 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/javafx/FXMLController.java to edit this template
- */
 package ph.com.guanzongroup.integsys.views;
 
-import ph.com.guanzongroup.integsys.model.ModelDeliveryAcceptance_Detail;
-import ph.com.guanzongroup.integsys.model.ModelDeliveryAcceptance_Main;
-import ph.com.guanzongroup.integsys.utility.CustomCommonUtil;
-import ph.com.guanzongroup.integsys.utility.JFXUtil;
-import com.sun.javafx.scene.control.skin.TableHeaderRow;
 import java.net.URL;
 import java.sql.Date;
 import java.sql.SQLException;
@@ -23,7 +14,6 @@ import java.util.logging.Logger;
 import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyBooleanPropertyBase;
 import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
@@ -44,7 +34,6 @@ import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
-import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.KeyCode;
 import static javafx.scene.input.KeyCode.DOWN;
 import static javafx.scene.input.KeyCode.ENTER;
@@ -63,11 +52,9 @@ import org.guanzon.appdriver.base.GuanzonException;
 import org.guanzon.appdriver.base.MiscUtil;
 import org.guanzon.appdriver.base.SQLUtil;
 import org.guanzon.appdriver.constant.EditMode;
-import org.guanzon.cas.purchasing.controller.PurchaseOrderReceiving;
 import org.guanzon.cas.purchasing.services.PurchaseOrderReceivingControllers;
 import org.guanzon.cas.purchasing.status.PurchaseOrderReceivingStatus;
 import org.json.simple.JSONObject;
-import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import javafx.animation.PauseTransition;
 import javafx.util.Duration;
@@ -80,6 +67,10 @@ import org.json.simple.parser.ParseException;
 import java.text.SimpleDateFormat;
 import org.guanzon.appdriver.agent.ShowDialogFX;
 import org.guanzon.appdriver.constant.UserRight;
+import ph.com.guanzongroup.integsys.model.ModelDeliveryAcceptance_Detail;
+import ph.com.guanzongroup.integsys.model.ModelDeliveryAcceptance_Main;
+import ph.com.guanzongroup.integsys.utility.CustomCommonUtil;
+import ph.com.guanzongroup.integsys.utility.JFXUtil;
 
 /**
  * FXML Controller class
@@ -354,7 +345,7 @@ public class DeliveryAcceptance_EntryController implements Initializable, Screen
                     case "btnRetrieve":
                         //Retrieve data from purchase order to table main
                         if (mainSearchListener != null) {
-                            tfOrderNo.textProperty().removeListener(mainSearchListener);
+                            JFXUtil.removeTextFieldListener(mainSearchListener, tfOrderNo);
                             mainSearchListener = null; // Clear reference to avoid memory leaks
                         }
                         poJSON = retrievePO();
@@ -595,7 +586,7 @@ public class DeliveryAcceptance_EntryController implements Initializable, Screen
                     lsValue = JFXUtil.removeComma(lsValue);
                     if (poPurchaseReceivingController.PurchaseOrderReceiving().Detail(pnDetail).getOrderNo() != null
                             && !"".equals(poPurchaseReceivingController.PurchaseOrderReceiving().Detail(pnDetail).getOrderNo())) {
-                        if (poPurchaseReceivingController.PurchaseOrderReceiving().Detail(pnDetail).getOrderQty().intValue() < Integer.valueOf(lsValue)) {
+                        if (poPurchaseReceivingController.PurchaseOrderReceiving().Detail(pnDetail).getOrderQty().doubleValue() < Double.valueOf(lsValue)) {
                             ShowMessageFX.Warning(null, pxeModuleName, "Receive quantity cannot be greater than the order quantity.");
                             poPurchaseReceivingController.PurchaseOrderReceiving().Detail(pnDetail).setQuantity(0);
                             tfReceiveQuantity.requestFocus();
@@ -603,8 +594,8 @@ public class DeliveryAcceptance_EntryController implements Initializable, Screen
                         }
                     }
 
-                    int lnOldVal = poPurchaseReceivingController.PurchaseOrderReceiving().Detail(pnDetail).getQuantity().intValue();
-                    poJSON = poPurchaseReceivingController.PurchaseOrderReceiving().Detail(pnDetail).setQuantity((Integer.valueOf(lsValue)));
+                    double lnOldVal = poPurchaseReceivingController.PurchaseOrderReceiving().Detail(pnDetail).getQuantity().doubleValue();
+                    poJSON = poPurchaseReceivingController.PurchaseOrderReceiving().Detail(pnDetail).setQuantity((Double.valueOf(lsValue)));
                     if ("error".equals((String) poJSON.get("result"))) {
                         System.err.println((String) poJSON.get("message"));
                         ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
@@ -616,7 +607,7 @@ public class DeliveryAcceptance_EntryController implements Initializable, Screen
                             System.err.println((String) poJSON.get("message"));
                             ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                             poPurchaseReceivingController.PurchaseOrderReceiving().Detail(pnDetail).setQuantity(lnOldVal);
-                            tfReceiveQuantity.setText(String.valueOf(poPurchaseReceivingController.PurchaseOrderReceiving().Detail(pnDetail).getQuantity().intValue()));
+                            tfReceiveQuantity.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poPurchaseReceivingController.PurchaseOrderReceiving().Detail(pnDetail).getQuantity().doubleValue()));
                             return;
                         }
                     } catch (SQLException | GuanzonException ex) {
@@ -743,9 +734,9 @@ public class DeliveryAcceptance_EntryController implements Initializable, Screen
     };
 
     public void moveNext() {
-        int lnReceiveQty = poPurchaseReceivingController.PurchaseOrderReceiving().Detail(pnDetail).getQuantity().intValue();
+        double lnReceiveQty = poPurchaseReceivingController.PurchaseOrderReceiving().Detail(pnDetail).getQuantity().doubleValue();
         apDetail.requestFocus();
-        int lnNewvalue = poPurchaseReceivingController.PurchaseOrderReceiving().Detail(pnDetail).getQuantity().intValue();
+        double lnNewvalue = poPurchaseReceivingController.PurchaseOrderReceiving().Detail(pnDetail).getQuantity().doubleValue();
         if (lnReceiveQty != lnNewvalue && (lnReceiveQty > 0
                 && poPurchaseReceivingController.PurchaseOrderReceiving().Detail(pnDetail).getStockId() != null
                 && !"".equals(poPurchaseReceivingController.PurchaseOrderReceiving().Detail(pnDetail).getStockId()))) {
@@ -783,9 +774,9 @@ public class DeliveryAcceptance_EntryController implements Initializable, Screen
                     switch (lsID) {
                         case "tfBarcode":
                         case "tfReceiveQuantity":
-                            int lnReceiveQty = poPurchaseReceivingController.PurchaseOrderReceiving().Detail(pnDetail).getQuantity().intValue();
+                            double lnReceiveQty = poPurchaseReceivingController.PurchaseOrderReceiving().Detail(pnDetail).getQuantity().doubleValue();
                             apDetail.requestFocus();
-                            int lnNewvalue = poPurchaseReceivingController.PurchaseOrderReceiving().Detail(pnDetail).getQuantity().intValue();
+                            double lnNewvalue = poPurchaseReceivingController.PurchaseOrderReceiving().Detail(pnDetail).getQuantity().doubleValue();
                             if (lnReceiveQty != lnNewvalue && (lnReceiveQty > 0
                                     && poPurchaseReceivingController.PurchaseOrderReceiving().Detail(pnDetail).getStockId() != null
                                     && !"".equals(poPurchaseReceivingController.PurchaseOrderReceiving().Detail(pnDetail).getStockId()))) {
@@ -819,7 +810,7 @@ public class DeliveryAcceptance_EntryController implements Initializable, Screen
                     switch (lsID) {
                         case "tfOrderNo":
                             if (mainSearchListener != null) {
-                                txtField.textProperty().removeListener(mainSearchListener);
+                                JFXUtil.removeTextFieldListener(mainSearchListener, txtField);
                                 mainSearchListener = null; // Clear reference to avoid memory leaks
                                 initDetailsGrid();
                                 initMainGrid();
@@ -1091,8 +1082,7 @@ public class DeliveryAcceptance_EntryController implements Initializable, Screen
         for (TextField textField : textFields) {
             textField.setOnKeyPressed(this::txtField_KeyPressed);
         }
-        CustomCommonUtil.inputIntegersOnly(tfReceiveQuantity);
-        CustomCommonUtil.inputDecimalOnly(tfDiscountRate, tfDiscountAmount, tfCost);
+        CustomCommonUtil.inputDecimalOnly(tfReceiveQuantity, tfDiscountRate, tfDiscountAmount, tfCost);
     }
 
     boolean pbSuccess = true;
@@ -1366,7 +1356,6 @@ public class DeliveryAcceptance_EntryController implements Initializable, Screen
 //            e.printStackTrace();
 //        }
 //    };
-
     private void setDatePickerFormat(DatePicker datePicker) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         datePicker.setConverter(new StringConverter<LocalDate>() {
@@ -1408,31 +1397,10 @@ public class DeliveryAcceptance_EntryController implements Initializable, Screen
     }
 
     public void initDetailsGrid() {
-
-        tblRowNoDetail.setStyle("-fx-alignment: CENTER;");
-        tblOrderNoDetail.setStyle("-fx-alignment: CENTER-LEFT;-fx-padding: 0 5 0 5;");
-        tblBarcodeDetail.setStyle("-fx-alignment: CENTER-LEFT;-fx-padding: 0 5 0 5;");
-        tblDescriptionDetail.setStyle("-fx-alignment: CENTER-LEFT;-fx-padding: 0 5 0 5;");
-        tblCostDetail.setStyle("-fx-alignment: CENTER-RIGHT;-fx-padding: 0 5 0 5;");
-        tblOrderQuantityDetail.setStyle("-fx-alignment: CENTER;");
-        tblReceiveQuantityDetail.setStyle("-fx-alignment: CENTER;");
-        tblTotalDetail.setStyle("-fx-alignment: CENTER-RIGHT;-fx-padding: 0 5 0 5;");
-
-        tblRowNoDetail.setCellValueFactory(new PropertyValueFactory<>("index01"));
-        tblOrderNoDetail.setCellValueFactory(new PropertyValueFactory<>("index02"));
-        tblBarcodeDetail.setCellValueFactory(new PropertyValueFactory<>("index03"));
-        tblDescriptionDetail.setCellValueFactory(new PropertyValueFactory<>("index04"));
-        tblCostDetail.setCellValueFactory(new PropertyValueFactory<>("index05"));
-        tblOrderQuantityDetail.setCellValueFactory(new PropertyValueFactory<>("index06"));
-        tblReceiveQuantityDetail.setCellValueFactory(new PropertyValueFactory<>("index07"));
-        tblTotalDetail.setCellValueFactory(new PropertyValueFactory<>("index08"));
-
-        tblViewOrderDetails.widthProperty().addListener((ObservableValue<? extends Number> source, Number oldWidth, Number newWidth) -> {
-            TableHeaderRow header = (TableHeaderRow) tblViewOrderDetails.lookup("TableHeaderRow");
-            header.reorderingProperty().addListener((ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) -> {
-                header.setReordering(false);
-            });
-        });
+        JFXUtil.setColumnCenter(tblRowNoDetail, tblOrderNoDetail);
+        JFXUtil.setColumnLeft(tblBarcodeDetail, tblDescriptionDetail);
+        JFXUtil.setColumnRight(tblCostDetail, tblOrderQuantityDetail, tblReceiveQuantityDetail, tblTotalDetail);
+        JFXUtil.setColumnsIndexAndDisableReordering(tblViewOrderDetails);
 
         filteredDataDetail = new FilteredList<>(details_data, b -> true);
         autoSearch(tfOrderNo);
@@ -1443,29 +1411,12 @@ public class DeliveryAcceptance_EntryController implements Initializable, Screen
     }
 
     public void initMainGrid() {
-        tblRowNo.setStyle("-fx-alignment: CENTER;");
-        tblSupplier.setStyle("-fx-alignment: CENTER-LEFT;-fx-padding: 0 5 0 5;");
-        tblDate.setStyle("-fx-alignment: CENTER;");
-        tblReferenceNo.setStyle("-fx-alignment: CENTER;");
-
-        tblRowNo.setCellValueFactory(new PropertyValueFactory<>("index01"));
-        tblSupplier.setCellValueFactory(new PropertyValueFactory<>("index02"));
-        tblDate.setCellValueFactory(new PropertyValueFactory<>("index03"));
-        tblReferenceNo.setCellValueFactory(new PropertyValueFactory<>("index04"));
-
-        tblViewPuchaseOrder.widthProperty().addListener((ObservableValue<? extends Number> source, Number oldWidth, Number newWidth) -> {
-            TableHeaderRow header = (TableHeaderRow) tblViewPuchaseOrder.lookup("TableHeaderRow");
-            try {
-                header.reorderingProperty().addListener((ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) -> {
-                    header.setReordering(false);
-                });
-            } catch (Exception e) {
-            }
-        });
+        JFXUtil.setColumnCenter(tblRowNo, tblDate, tblReferenceNo);
+        JFXUtil.setColumnLeft(tblSupplier);
+        JFXUtil.setColumnsIndexAndDisableReordering(tblViewPuchaseOrder);
 
         filteredData = new FilteredList<>(main_data, b -> true);
         tblViewPuchaseOrder.setItems(filteredData);;
-
     }
 
     public void clearTextFields() {
@@ -1557,8 +1508,8 @@ public class DeliveryAcceptance_EntryController implements Initializable, Screen
 
             tfCost.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poPurchaseReceivingController.PurchaseOrderReceiving().Detail(pnDetail).getUnitPrce(), true));
 //            tfCost.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poPurchaseReceivingController.PurchaseOrderReceiving().Detail(pnDetail).getUnitPrce()));
-            tfOrderQuantity.setText(String.valueOf(poPurchaseReceivingController.PurchaseOrderReceiving().Detail(pnDetail).getOrderQty().intValue()));
-            tfReceiveQuantity.setText(String.valueOf(poPurchaseReceivingController.PurchaseOrderReceiving().Detail(pnDetail).getQuantity().intValue()));
+            tfOrderQuantity.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poPurchaseReceivingController.PurchaseOrderReceiving().Detail(pnDetail).getOrderQty().doubleValue()));
+            tfReceiveQuantity.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poPurchaseReceivingController.PurchaseOrderReceiving().Detail(pnDetail).getQuantity().doubleValue()));
 
             updateCaretPositions(apDetail);
         } catch (SQLException | GuanzonException ex) {
@@ -1644,7 +1595,7 @@ public class DeliveryAcceptance_EntryController implements Initializable, Screen
             //ReferenceDate
             String lsReferenceDate = CustomCommonUtil.formatDateToShortString(poPurchaseReceivingController.PurchaseOrderReceiving().Master().getReferenceDate());
             dpReferenceDate.setValue(CustomCommonUtil.parseDateStringToLocalDate(lsReferenceDate, "yyyy-MM-dd"));
-            
+
             tfTransactionNo.setText(poPurchaseReceivingController.PurchaseOrderReceiving().Master().getTransactionNo());
 
             tfSupplier.setText(poPurchaseReceivingController.PurchaseOrderReceiving().Master().Supplier().getCompanyName());
@@ -1932,11 +1883,11 @@ public class DeliveryAcceptance_EntryController implements Initializable, Screen
 
     private void goToPageBasedOnSelectedRow(String pnRowMain) {
         if (mainSearchListener != null) {
-            tfOrderNo.textProperty().removeListener(mainSearchListener);
+            JFXUtil.removeTextFieldListener(mainSearchListener, tfOrderNo);
             mainSearchListener = null;
         }
         if (detailSearchListener != null) {
-            tfOrderNo.textProperty().removeListener(detailSearchListener);
+            JFXUtil.removeTextFieldListener(detailSearchListener, tfOrderNo);
             detailSearchListener = null;
         }
         filteredDataDetail.setPredicate(null);
@@ -2012,7 +1963,7 @@ public class DeliveryAcceptance_EntryController implements Initializable, Screen
             goToPageBasedOnSelectedRow(String.valueOf(pnMain));
             filteredDataDetail.setPredicate(null);
             lbresetpredicate = false;
-            tfOrderNo.textProperty().removeListener(detailSearchListener);
+            JFXUtil.removeTextFieldListener(detailSearchListener, tfOrderNo);
 
             mainSearchListener = null;
             filteredData.setPredicate(null);
@@ -2058,17 +2009,17 @@ public class DeliveryAcceptance_EntryController implements Initializable, Screen
                         for (lnCtr = 0; lnCtr < poPurchaseReceivingController.PurchaseOrderReceiving().getDetailCount(); lnCtr++) {
                             try {
 
-                                lnTotal = poPurchaseReceivingController.PurchaseOrderReceiving().Detail(lnCtr).getUnitPrce().doubleValue() * poPurchaseReceivingController.PurchaseOrderReceiving().Detail(lnCtr).getQuantity().intValue();
+                                lnTotal = poPurchaseReceivingController.PurchaseOrderReceiving().Detail(lnCtr).getUnitPrce().doubleValue() * poPurchaseReceivingController.PurchaseOrderReceiving().Detail(lnCtr).getQuantity().doubleValue();
                             } catch (Exception e) {
                             }
 
                             if ((!poPurchaseReceivingController.PurchaseOrderReceiving().Detail(lnCtr).getOrderNo().equals("") && poPurchaseReceivingController.PurchaseOrderReceiving().Detail(lnCtr).getOrderNo() != null)
-                                    && poPurchaseReceivingController.PurchaseOrderReceiving().Detail(lnCtr).getOrderQty().intValue() != poPurchaseReceivingController.PurchaseOrderReceiving().Detail(lnCtr).getQuantity().intValue()
-                                    && poPurchaseReceivingController.PurchaseOrderReceiving().Detail(lnCtr).getQuantity().intValue() != 0) {
+                                    && poPurchaseReceivingController.PurchaseOrderReceiving().Detail(lnCtr).getOrderQty().doubleValue() != poPurchaseReceivingController.PurchaseOrderReceiving().Detail(lnCtr).getQuantity().doubleValue()
+                                    && poPurchaseReceivingController.PurchaseOrderReceiving().Detail(lnCtr).getQuantity().doubleValue() != 0) {
                                 highlight(tblViewOrderDetails, lnCtr + 1, "#FAA0A0", highlightedRowsDetail);
                             }
 
-                            plOrderNoPartial.add(new Pair<>(poPurchaseReceivingController.PurchaseOrderReceiving().Detail(lnCtr).getOrderNo(), String.valueOf(poPurchaseReceivingController.PurchaseOrderReceiving().Detail(lnCtr).getQuantity().intValue())));
+                            plOrderNoPartial.add(new Pair<>(poPurchaseReceivingController.PurchaseOrderReceiving().Detail(lnCtr).getOrderNo(), String.valueOf(poPurchaseReceivingController.PurchaseOrderReceiving().Detail(lnCtr).getQuantity().doubleValue())));
 
                             details_data.add(
                                     new ModelDeliveryAcceptance_Detail(String.valueOf(lnCtr + 1),
@@ -2076,8 +2027,8 @@ public class DeliveryAcceptance_EntryController implements Initializable, Screen
                                             String.valueOf(poPurchaseReceivingController.PurchaseOrderReceiving().Detail(lnCtr).Inventory().getBarCode()),
                                             String.valueOf(poPurchaseReceivingController.PurchaseOrderReceiving().Detail(lnCtr).Inventory().getDescription()),
                                             String.valueOf(CustomCommonUtil.setIntegerValueToDecimalFormat(poPurchaseReceivingController.PurchaseOrderReceiving().Detail(lnCtr).getUnitPrce(), true)),
-                                            String.valueOf(poPurchaseReceivingController.PurchaseOrderReceiving().Detail(lnCtr).getOrderQty().intValue()),
-                                            String.valueOf(poPurchaseReceivingController.PurchaseOrderReceiving().Detail(lnCtr).getQuantity().intValue()),
+                                            String.valueOf(CustomCommonUtil.setIntegerValueToDecimalFormat(poPurchaseReceivingController.PurchaseOrderReceiving().Detail(lnCtr).getOrderQty().doubleValue())),
+                                            String.valueOf(CustomCommonUtil.setIntegerValueToDecimalFormat(poPurchaseReceivingController.PurchaseOrderReceiving().Detail(lnCtr).getQuantity().doubleValue())),
                                             String.valueOf(CustomCommonUtil.setIntegerValueToDecimalFormat(lnTotal, true)) //identify total
                                     ));
                         }
@@ -2284,7 +2235,7 @@ public class DeliveryAcceptance_EntryController implements Initializable, Screen
                     return true;
                 }
                 if (mainSearchListener != null) {
-                    txtField.textProperty().removeListener(mainSearchListener);
+                    JFXUtil.removeTextFieldListener(mainSearchListener, txtField);
                     mainSearchListener = null; // Clear reference to avoid memory leaks
                 }
                 String lowerCaseFilter = newValue.toLowerCase();
@@ -2293,7 +2244,7 @@ public class DeliveryAcceptance_EntryController implements Initializable, Screen
             // If no results and autoSearchMain is enabled, remove listener and trigger autoSearchMain
             if (filteredDataDetail.isEmpty()) {
                 if (main_data.size() > 0) {
-                    txtField.textProperty().removeListener(detailSearchListener);
+                    JFXUtil.removeTextFieldListener(detailSearchListener, txtField);
                     filteredData = new FilteredList<>(main_data, b -> true);
                     autoSearchMain(txtField); // Trigger autoSearchMain if no results
                     tblViewPuchaseOrder.setItems(filteredData);
@@ -2318,7 +2269,7 @@ public class DeliveryAcceptance_EntryController implements Initializable, Screen
                 lbresetpredicate = true;
                 if (newValue == null || newValue.isEmpty()) {
                     if (mainSearchListener != null) {
-                        txtField.textProperty().removeListener(mainSearchListener);
+                        JFXUtil.removeTextFieldListener(mainSearchListener, txtField);
                         mainSearchListener = null; // Clear reference to avoid memory leaks
                         initDetailsGrid();
                     }

@@ -68,8 +68,8 @@ import ph.com.guanzongroup.cas.cashflow.Disbursement;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.ParseException;
 import ph.com.guanzongroup.cas.cashflow.services.CashflowControllers;
-import org.guanzon.appdriver.constant.DisbursementStatic;
-import org.guanzon.appdriver.constant.JournalStatus;
+import ph.com.guanzongroup.cas.cashflow.status.DisbursementStatic;
+import ph.com.guanzongroup.cas.cashflow.status.JournalStatus;
 
 /**
  * FXML Controller class
@@ -241,8 +241,6 @@ public class DisbursementVoucher_VerificationController implements Initializable
     @FXML
     private TableView tblVwJournalDetails;
     @FXML
-    private Label txtAccountCode;
-    @FXML
     private TableColumn tblJournalRowNo, tblJournalAccountCode, tblJournalAccountDescription, tblJournalDebitAmount, tblJournalCreditAmount, tblJournalReportMonthYear;
 
     @Override
@@ -271,7 +269,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         try {
-            txtAccountCode.setVisible(false);
+//            txtAccountCode.setVisible(false);
 //            tfAccountCodeDetail.setVisible(false);
             poDisbursementController = new CashflowControllers(oApp, null).Disbursement();
             poDisbursementController.setTransactionStatus(DisbursementStatic.OPEN + DisbursementStatic.VERIFIED + DisbursementStatic.RETURNED);

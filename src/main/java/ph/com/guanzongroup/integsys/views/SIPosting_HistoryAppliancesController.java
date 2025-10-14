@@ -1,3 +1,8 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
 package ph.com.guanzongroup.integsys.views;
 
 import ph.com.guanzongroup.integsys.model.ModelDeliveryAcceptance_Attachment;
@@ -57,6 +62,7 @@ import org.guanzon.appdriver.base.GRiderCAS;
 import org.guanzon.appdriver.base.GuanzonException;
 import org.guanzon.appdriver.base.MiscUtil;
 import org.guanzon.appdriver.constant.EditMode;
+import org.guanzon.cas.purchasing.controller.PurchaseOrderReceiving;
 import org.guanzon.cas.purchasing.services.PurchaseOrderReceivingControllers;
 import org.guanzon.cas.purchasing.status.PurchaseOrderReceivingStatus;
 import org.json.simple.JSONObject;
@@ -134,7 +140,7 @@ public class SIPosting_HistoryAppliancesController implements Initializable, Scr
             tfTaxAmount, tfNetTotal, tfOrderNo, tfBarcode, tfBrand, tfDescription, tfOrderQuantity, tfReceiveQuantity, tfSRPAmount, tfDiscRateDetail, tfAddlDiscAmtDetail, tfCost,
             tfJETransactionNo, tfJEAcctCode, tfJEAcctDescription, tfCreditAmt, tfDebitAmt, tfTotalCreditAmt, tfTotalDebitAmt, tfAttachmentNo, tfAdvancePayment;
     @FXML
-    private DatePicker dpTransactionDate, dpReferenceDate, dpReportMonthYear, dpJETransactionDate;
+    private DatePicker dpTransactionDate, dpReferenceDate, dpReportMonthYear, dpJETransactionDate, dpSIDate;
     @FXML
     private CheckBox cbVatInclusive, cbVatable;
     @FXML
@@ -301,6 +307,7 @@ public class SIPosting_HistoryAppliancesController implements Initializable, Scr
 
         }
         AttachmentDialogController controller = new AttachmentDialogController();
+        controller.setOpenedImage(pnAttachment);
         controller.addData(data);
         try {
             stageAttachment.showDialog((Stage) btnClose.getScene().getWindow(), getClass().getResource("/com/rmj/guanzongroup/sidebarmenus/views/AttachmentDialog.fxml"), controller, "Attachment Dialog", false, false, true);
@@ -809,7 +816,9 @@ public class SIPosting_HistoryAppliancesController implements Initializable, Scr
             tfTrucking.setText(poPurchaseReceivingController.PurchaseOrderReceiving().Master().Trucking().getCompanyName());
 
             String lsReferenceDate = CustomCommonUtil.formatDateToShortString(poPurchaseReceivingController.PurchaseOrderReceiving().Master().getReferenceDate());
+            String lsSIDate = CustomCommonUtil.formatDateToShortString(poPurchaseReceivingController.PurchaseOrderReceiving().Master().getSalesInvoiceDate());
             dpReferenceDate.setValue(CustomCommonUtil.parseDateStringToLocalDate(lsReferenceDate, "yyyy-MM-dd"));
+            dpSIDate.setValue(JFXUtil.isObjectEqualTo(lsSIDate, "1900-01-01") ? null : CustomCommonUtil.parseDateStringToLocalDate(lsSIDate, "yyyy-MM-dd"));
             tfReferenceNo.setText(poPurchaseReceivingController.PurchaseOrderReceiving().Master().getReferenceNo());
             tfSINo.setText(poPurchaseReceivingController.PurchaseOrderReceiving().Master().getSalesInvoice());
             tfTerm.setText(poPurchaseReceivingController.PurchaseOrderReceiving().Master().Term().getDescription());
@@ -1144,7 +1153,7 @@ public class SIPosting_HistoryAppliancesController implements Initializable, Scr
 
     public void initDatePickers() {
         JFXUtil.setDatePickerFormat("MM/dd/yyyy",
-dpTransactionDate, dpReferenceDate, dpJETransactionDate, dpReportMonthYear);
+dpTransactionDate, dpReferenceDate, dpSIDate,dpJETransactionDate, dpReportMonthYear);
     }
 
     public void initTextFields() {
@@ -1376,7 +1385,7 @@ dpTransactionDate, dpReferenceDate, dpJETransactionDate, dpReportMonthYear);
     public void clearTextFields() {
         Platform.runLater(() -> {
             imageinfo_temp.clear();
-            JFXUtil.setValueToNull(previousSearchedTextField, lastFocusedTextField, dpTransactionDate, dpReferenceDate, dpReportMonthYear);
+            JFXUtil.setValueToNull(previousSearchedTextField, lastFocusedTextField, dpTransactionDate, dpReferenceDate, dpSIDate,dpReportMonthYear);
             psSupplierId = "";
             psBranchId = "";
             JFXUtil.clearTextFields(apMaster, apDetail, apJEDetail, apJEMaster, apAttachments);

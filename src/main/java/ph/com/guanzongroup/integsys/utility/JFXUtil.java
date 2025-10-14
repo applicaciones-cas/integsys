@@ -18,8 +18,7 @@ import java.time.Month;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
-import java.util.AbstractMap;
-import java.util.ArrayList;
+import java.util.AbstractMap;import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -32,6 +31,7 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.UnaryOperator;
+import java.util.regex.Pattern;
 import java.util.stream.Stream;
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
@@ -1092,6 +1092,8 @@ public class JFXUtil {
         return new LoadScreenComponents(progressIndicator, loadingPane, placeholderLabel);
     }
 
+    /*Sets in pxeModuleName for dynamic getter of form title*/
+ /*Requires controller class*/
     public static String getFormattedClassTitle(Class<?> javaclass) {
         String className = javaclass.getSimpleName();
 
@@ -1116,6 +1118,35 @@ public class JFXUtil {
         className = className.replace("SP Car", "SPCar");
         className = className.replace("SP MC", "SPMC");
 
+        return className;
+    }
+
+    /*V2, allow modification on naming*/
+    public static String getFormattedClassTitle(Class<?> javaclass, String lsChangeIdentifier) {
+        String className = javaclass.getSimpleName();
+
+        if (className.endsWith("Controller")) {
+            className = className.substring(0, className.length() - "Controller".length());
+        }
+
+        className = className.replace("MonarchFood", "MF");
+        className = className.replace("MonarchHospitality", "MH");
+
+        className = className.replace("_", " ");
+
+        className = className.replaceAll("(?<=[a-z])(?=[A-Z])", " ");
+        className = className.replaceAll("(?<=[A-Z])(?=[A-Z][a-z])", " ");
+
+        className = className.trim();
+
+        className = className.replace("SP Car", "SPCar");
+        className = className.replace("SP MC", "SPMC");
+
+        switch (lsChangeIdentifier) {
+            case "PO":
+                className = className.replaceAll("\\bPO\\b", "Purchase Order");
+                break;
+        }
         return className;
     }
 
@@ -2522,5 +2553,34 @@ public class JFXUtil {
         }
         return poJSON;
     }
-
+    
+    /*Alternative version of inputDecimalOnly; restricts to 1 dot, commas not allowed*/
+    public static void inputDecimalOnly(TextField... foTxtFields) {
+        Pattern pattern = Pattern.compile("\\d*(\\.\\d*)?");
+        for (TextField txtField : foTxtFields) {
+            if (txtField != null) {
+                txtField.setTextFormatter(new TextFormatter<>(change -> {
+                    String newText = change.getControlNewText();
+                    if (newText.isEmpty()) {
+                        return change;
+                    }
+                    if (newText.contains(",")) {
+                        return null;
+                    }
+                    if (!pattern.matcher(newText).matches()) {
+                        return null;
+                    }
+                    return change;
+                }));
+            }
+        }
+    }
+    
+    /*Removes TextField listener*/
+    public static void removeTextFieldListener(ChangeListener<String> searchListener, TextField textField) {
+        if (searchListener != null) {
+            // Remove the listener if already attached
+            textField.textProperty().removeListener(searchListener);
+        }
+    }
 }

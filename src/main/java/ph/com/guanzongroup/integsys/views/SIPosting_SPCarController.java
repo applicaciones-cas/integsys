@@ -1,3 +1,8 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
 package ph.com.guanzongroup.integsys.views;
 
 import ph.com.guanzongroup.integsys.model.ModelDeliveryAcceptance_Attachment;
@@ -13,6 +18,7 @@ import java.nio.file.Paths;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -61,11 +67,13 @@ import org.guanzon.appdriver.base.GuanzonException;
 import org.guanzon.appdriver.base.MiscUtil;
 import org.guanzon.appdriver.base.SQLUtil;
 import org.guanzon.appdriver.constant.EditMode;
+import org.guanzon.cas.purchasing.controller.PurchaseOrderReceiving;
 import org.guanzon.cas.purchasing.services.PurchaseOrderReceivingControllers;
 import org.guanzon.cas.purchasing.status.PurchaseOrderReceivingStatus;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.ParseException;
 import java.time.format.DateTimeFormatter;
+import java.util.Date;
 import java.util.concurrent.atomic.AtomicReference;
 import javafx.animation.PauseTransition;
 import javafx.scene.Scene;
@@ -77,6 +85,8 @@ import javafx.stage.Stage;
 import org.guanzon.appdriver.constant.DocumentType;
 import javafx.util.Pair;
 import javax.script.ScriptException;
+import org.guanzon.appdriver.agent.ShowDialogFX;
+import org.guanzon.appdriver.constant.UserRight;
 
 /**
  *
@@ -143,7 +153,7 @@ public class SIPosting_SPCarController implements Initializable, ScreenInterface
             tfAddlDiscAmtDetail, tfSRPAmount, tfJETransactionNo, tfJEAcctCode, tfJEAcctDescription, tfCreditAmt, tfDebitAmt, tfTotalCreditAmt,
             tfTotalDebitAmt, tfAttachmentNo, tfAdvancePayment;
     @FXML
-    private DatePicker dpTransactionDate, dpReferenceDate, dpJETransactionDate, dpReportMonthYear;
+    private DatePicker dpTransactionDate, dpReferenceDate, dpJETransactionDate, dpReportMonthYear, dpSIDate;
     @FXML
     private CheckBox cbVatInclusive, cbVatable;
     @FXML
@@ -315,6 +325,7 @@ public class SIPosting_SPCarController implements Initializable, ScreenInterface
 
         }
         AttachmentDialogController controller = new AttachmentDialogController();
+        controller.setOpenedImage(pnAttachment);
         controller.addData(data);
         try {
             stageAttachment.showDialog((Stage) btnSave.getScene().getWindow(), getClass().getResource("/com/rmj/guanzongroup/sidebarmenus/views/AttachmentDialog.fxml"), controller, "Attachment Dialog", false, false, true);
@@ -511,7 +522,7 @@ public class SIPosting_SPCarController implements Initializable, ScreenInterface
 
     public void retrievePOR() {
         poJSON = new JSONObject();
-        poJSON = poPurchaseReceivingController.PurchaseOrderReceiving().loadUnPostPurchaseOrderReceiving( tfSearchSupplier.getText(), tfSearchReceiveBranch.getText(), tfSearchReferenceNo.getText());
+        poJSON = poPurchaseReceivingController.PurchaseOrderReceiving().loadUnPostPurchaseOrderReceiving(tfSearchSupplier.getText(), tfSearchReceiveBranch.getText(), tfSearchReferenceNo.getText());
         if (!"success".equals((String) poJSON.get("result"))) {
             ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
         } else {
@@ -1122,7 +1133,7 @@ public class SIPosting_SPCarController implements Initializable, ScreenInterface
                 lsServerDate = sdfFormat.format(oApp.getServerDate());
                 lsTransDate = sdfFormat.format(poPurchaseReceivingController.PurchaseOrderReceiving().Master().getTransactionDate());
                 lsRefDate = sdfFormat.format(poPurchaseReceivingController.PurchaseOrderReceiving().Master().getReferenceDate());
-                lsSelectedDate = sdfFormat.format(SQLUtil.toDate(JFXUtil.convertToIsoFormat(inputText),  SQLUtil.FORMAT_SHORT_DATE));
+                lsSelectedDate = sdfFormat.format(SQLUtil.toDate(JFXUtil.convertToIsoFormat(inputText), SQLUtil.FORMAT_SHORT_DATE));
                 currentDate = LocalDate.parse(lsServerDate, DateTimeFormatter.ofPattern(SQLUtil.FORMAT_SHORT_DATE));
                 selectedDate = LocalDate.parse(lsSelectedDate, DateTimeFormatter.ofPattern(SQLUtil.FORMAT_SHORT_DATE));
                 transactionDate = LocalDate.parse(lsTransDate, DateTimeFormatter.ofPattern(SQLUtil.FORMAT_SHORT_DATE));
@@ -1152,6 +1163,27 @@ public class SIPosting_SPCarController implements Initializable, ScreenInterface
                                 if ("error".equals((String) poJSON.get("result"))) {
                                     ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                 }
+                            }
+                        }
+                        break;
+                    case "dpSIDate":
+                        if (poPurchaseReceivingController.PurchaseOrderReceiving().getEditMode() == EditMode.ADDNEW
+                                || poPurchaseReceivingController.PurchaseOrderReceiving().getEditMode() == EditMode.UPDATE) {
+
+                            if (selectedDate.isAfter(currentDate)) {
+                                poJSON.put("result", "error");
+                                poJSON.put("message", "Future dates are not allowed.");
+                                pbSuccess = false;
+                            }
+
+                            if (pbSuccess && (selectedDate.isAfter(transactionDate))) {
+                                poJSON.put("result", "error");
+                                poJSON.put("message", "SI date cannot be later than the receiving date.");
+                                pbSuccess = false;
+                            }
+
+                            if (pbSuccess) {
+                                poPurchaseReceivingController.PurchaseOrderReceiving().Master().setSalesInvoiceDate((SQLUtil.toDate(lsSelectedDate, SQLUtil.FORMAT_SHORT_DATE)));
                             }
                         }
                         break;
@@ -1466,8 +1498,10 @@ public class SIPosting_SPCarController implements Initializable, ScreenInterface
             tfTrucking.setText(poPurchaseReceivingController.PurchaseOrderReceiving().Master().Trucking().getCompanyName());
 
             String lsReferenceDate = CustomCommonUtil.formatDateToShortString(poPurchaseReceivingController.PurchaseOrderReceiving().Master().getReferenceDate());
-            dpReferenceDate.setValue(CustomCommonUtil.parseDateStringToLocalDate(lsReferenceDate, "yyyy-MM-dd"));
+            dpReferenceDate.setValue(JFXUtil.isObjectEqualTo(lsReferenceDate, "1900-01-01") ? null : CustomCommonUtil.parseDateStringToLocalDate(lsReferenceDate, "yyyy-MM-dd"));
             tfReferenceNo.setText(poPurchaseReceivingController.PurchaseOrderReceiving().Master().getReferenceNo());
+            String lsSIDate = CustomCommonUtil.formatDateToShortString(poPurchaseReceivingController.PurchaseOrderReceiving().Master().getSalesInvoiceDate());
+            dpSIDate.setValue(JFXUtil.isObjectEqualTo(lsSIDate, "1900-01-01") ? null : CustomCommonUtil.parseDateStringToLocalDate(lsSIDate, "yyyy-MM-dd"));
             tfSINo.setText(poPurchaseReceivingController.PurchaseOrderReceiving().Master().getSalesInvoice());
             tfTerm.setText(poPurchaseReceivingController.PurchaseOrderReceiving().Master().Term().getDescription());
             taRemarks.setText(poPurchaseReceivingController.PurchaseOrderReceiving().Master().getRemarks());
@@ -1484,7 +1518,7 @@ public class SIPosting_SPCarController implements Initializable, ScreenInterface
             });
             tfDiscountAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poPurchaseReceivingController.PurchaseOrderReceiving().Master().getDiscount().doubleValue(), true));
             tfFreightAmt.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poPurchaseReceivingController.PurchaseOrderReceiving().Master().getFreight().doubleValue()));
-            
+
             cbVatInclusive.setSelected(poPurchaseReceivingController.PurchaseOrderReceiving().Master().isVatTaxable());
             tfVatSales.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poPurchaseReceivingController.PurchaseOrderReceiving().Master().getVatSales().doubleValue(), true));
             tfVatAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poPurchaseReceivingController.PurchaseOrderReceiving().Master().getVatAmount().doubleValue(), true));
@@ -1527,7 +1561,7 @@ public class SIPosting_SPCarController implements Initializable, ScreenInterface
                     return;
                 }
                 lbSelectTabJE = false;
-                                                                
+
                 psSupplierId = poPurchaseReceivingController.PurchaseOrderReceiving().Master().getSupplierId();
                 psBranchId = poPurchaseReceivingController.PurchaseOrderReceiving().Master().getBranchCode();
             }
@@ -1853,8 +1887,8 @@ public class SIPosting_SPCarController implements Initializable, ScreenInterface
 
     public void initDatePickers() {
         JFXUtil.setDatePickerFormat("MM/dd/yyyy",
-dpTransactionDate, dpReferenceDate, dpJETransactionDate, dpReportMonthYear);
-        JFXUtil.setActionListener(this::datepicker_Action, dpTransactionDate, dpReferenceDate, dpJETransactionDate, dpReportMonthYear);
+                dpTransactionDate, dpReferenceDate, dpJETransactionDate, dpReportMonthYear, dpSIDate);
+        JFXUtil.setActionListener(this::datepicker_Action, dpTransactionDate, dpReferenceDate, dpJETransactionDate, dpReportMonthYear, dpSIDate);
     }
 
     public void initTextFields() {
@@ -2131,7 +2165,7 @@ dpTransactionDate, dpReferenceDate, dpJETransactionDate, dpReportMonthYear);
             stageAttachment.closeDialog();
 
             imageinfo_temp.clear();
-            JFXUtil.setValueToNull(previousSearchedTextField, lastFocusedTextField, dpTransactionDate, dpReferenceDate, dpReportMonthYear);
+            JFXUtil.setValueToNull(previousSearchedTextField, lastFocusedTextField, dpTransactionDate, dpReferenceDate, dpReportMonthYear, dpSIDate);
             psSearchSupplierId = "";
             psSearchBranchId = "";
             psSupplierId = "";
