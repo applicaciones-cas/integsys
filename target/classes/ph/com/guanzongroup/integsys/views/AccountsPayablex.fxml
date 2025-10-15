@@ -231,7 +231,7 @@
                                                 <Insets left="5.0" />
                                              </GridPane.margin>
                                           </TextField>
-                                          <TextField fx:id="tfContactPerson" promptText="Press F3: Search" GridPane.columnIndex="1" GridPane.columnSpan="6" GridPane.rowIndex="6">
+                                          <TextField fx:id="tfContactPerson" GridPane.columnIndex="1" GridPane.columnSpan="6" GridPane.rowIndex="6">
                                              <GridPane.margin>
                                                 <Insets left="5.0" />
                                              </GridPane.margin>
@@ -241,7 +241,7 @@
                                                 <Insets right="5.0" />
                                              </GridPane.margin>
                                           </Label>
-                                          <TextField fx:id="tfCompanyName" promptText="Press F3: Search" GridPane.columnIndex="1" GridPane.columnSpan="6" GridPane.rowIndex="4">
+                                          <TextField fx:id="tfCompanyName" GridPane.columnIndex="1" GridPane.columnSpan="6" GridPane.rowIndex="4">
                                              <GridPane.margin>
                                                 <Insets left="5.0" />
                                              </GridPane.margin>
@@ -276,7 +276,7 @@
                                                 <Insets left="5.0" />
                                              </GridPane.margin>
                                           </TextField>
-                                          <TextField fx:id="tfBegBalanace" GridPane.columnIndex="5" GridPane.columnSpan="2" GridPane.rowIndex="11">
+                                          <TextField fx:id="tfBegBalanace" editable="false" GridPane.columnIndex="5" GridPane.columnSpan="2" GridPane.rowIndex="11">
                                              <GridPane.margin>
                                                 <Insets left="5.0" />
                                              </GridPane.margin>
@@ -291,12 +291,12 @@
                                                 <Insets left="5.0" />
                                              </GridPane.margin>
                                           </TextField>
-                                          <TextField fx:id="tfAvailBalance" GridPane.columnIndex="5" GridPane.columnSpan="2" GridPane.rowIndex="13">
+                                          <TextField fx:id="tfAvailBalance" editable="false" GridPane.columnIndex="5" GridPane.columnSpan="2" GridPane.rowIndex="13">
                                              <GridPane.margin>
                                                 <Insets left="5.0" />
                                              </GridPane.margin>
                                           </TextField>
-                                          <TextField fx:id="tfOutStandingBalance" GridPane.columnIndex="5" GridPane.columnSpan="2" GridPane.rowIndex="14">
+                                          <TextField fx:id="tfOutStandingBalance" editable="false" GridPane.columnIndex="5" GridPane.columnSpan="2" GridPane.rowIndex="14">
                                              <GridPane.margin>
                                                 <Insets left="5.0" />
                                              </GridPane.margin>
@@ -349,7 +349,7 @@
                                                 <Insets left="5.0" />
                                              </GridPane.margin>
                                           </TextField>
-                                          <DatePicker fx:id="dpBegBalance" editable="false" prefHeight="28.0" prefWidth="227.0" promptText="YYYY-MM-DD" GridPane.columnIndex="5" GridPane.columnSpan="2" GridPane.rowIndex="10">
+                                          <DatePicker fx:id="dpBegBalance" disable="true" prefHeight="28.0" prefWidth="227.0" promptText="YYYY-MM-DD" GridPane.columnIndex="5" GridPane.columnSpan="2" GridPane.rowIndex="10">
                                              <GridPane.margin>
                                                 <Insets left="5.0" />
                                              </GridPane.margin>
@@ -364,7 +364,7 @@
                                                 <Insets right="5.0" />
                                              </padding>
                                           </Label>
-                                          <TextField fx:id="tfCategory" promptText="Press F3: Search" GridPane.columnIndex="1" GridPane.columnSpan="3" GridPane.rowIndex="3">
+                                          <TextField fx:id="tfCategory" GridPane.columnIndex="1" GridPane.columnSpan="3" GridPane.rowIndex="3">
                                              <GridPane.margin>
                                                 <Insets left="5.0" />
                                              </GridPane.margin>

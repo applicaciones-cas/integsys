@@ -1,5 +1,12 @@
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/javafx/FXMLController.java to edit this template
+ */
 package ph.com.guanzongroup.integsys.views;
 
+import ph.com.guanzongroup.integsys.model.ModelCheckPrinting;
+import ph.com.guanzongroup.integsys.utility.CustomCommonUtil;
+import ph.com.guanzongroup.integsys.utility.JFXUtil;
 import java.io.IOException;
 import java.net.URL;
 import java.sql.SQLException;
@@ -57,9 +64,6 @@ import ph.com.guanzongroup.cas.cashflow.Disbursement;
 import ph.com.guanzongroup.cas.cashflow.model.SelectedITems;
 import ph.com.guanzongroup.cas.cashflow.services.CashflowControllers;
 import ph.com.guanzongroup.cas.cashflow.status.DisbursementStatic;
-import ph.com.guanzongroup.integsys.model.ModelCheckPrinting;
-import ph.com.guanzongroup.integsys.utility.CustomCommonUtil;
-import ph.com.guanzongroup.integsys.utility.JFXUtil;
 
 /**
  * FXML Controller class
@@ -329,6 +333,8 @@ public class CheckPrintingController implements Initializable, ScreenInterface {
                         getSelectedItems.clear();
                         listOfDVToAssign.clear();
                     }
+                    ShowMessageFX.Warning((String) poJSON.get("message"), pxeModuleName, null);
+//                    ShowMessageFX.YesNo("Do you want to print BIR 2307 Form?", pxeModuleName, null);
                     break;
                 case "btnPrintDV":
                     poJSON =  validateSelectedItem();

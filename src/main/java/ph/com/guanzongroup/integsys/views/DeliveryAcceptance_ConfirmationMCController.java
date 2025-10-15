@@ -1,5 +1,14 @@
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/javafx/FXMLController.java to edit this template
+ */
 package ph.com.guanzongroup.integsys.views;
 
+import ph.com.guanzongroup.integsys.model.ModelDeliveryAcceptance_Attachment;
+import ph.com.guanzongroup.integsys.model.ModelDeliveryAcceptance_Detail;
+import ph.com.guanzongroup.integsys.model.ModelDeliveryAcceptance_Main;
+import ph.com.guanzongroup.integsys.utility.CustomCommonUtil;
+import ph.com.guanzongroup.integsys.utility.JFXUtil;
 import com.sun.javafx.scene.control.skin.TableHeaderRow;
 import java.io.IOException;
 import java.net.URL;
@@ -91,11 +100,6 @@ import org.guanzon.appdriver.constant.DocumentType;
 import javafx.util.Pair;
 import org.guanzon.appdriver.agent.ShowDialogFX;
 import org.guanzon.appdriver.constant.UserRight;
-import ph.com.guanzongroup.integsys.model.ModelDeliveryAcceptance_Attachment;
-import ph.com.guanzongroup.integsys.model.ModelDeliveryAcceptance_Detail;
-import ph.com.guanzongroup.integsys.model.ModelDeliveryAcceptance_Main;
-import ph.com.guanzongroup.integsys.utility.CustomCommonUtil;
-import ph.com.guanzongroup.integsys.utility.JFXUtil;
 
 /**
  * FXML Controller class
@@ -1870,6 +1874,12 @@ public class DeliveryAcceptance_ConfirmationMCController implements Initializabl
                     return;
                 }
                 goToPageBasedOnSelectedRow(String.valueOf(pnMain));
+            }
+            
+            //Populate purhcase receiving serials - Added by Arsiela 10152025 13:53:01
+            //Need to populate serialize for confirmation; need to re-check for redundancy
+            for (int lnCtr = 0; lnCtr <= poPurchaseReceivingController.PurchaseOrderReceiving().getDetailCount() - 1; lnCtr++) {
+                poPurchaseReceivingController.PurchaseOrderReceiving().getPurchaseOrderReceivingSerial(poPurchaseReceivingController.PurchaseOrderReceiving().Detail(lnCtr).getEntryNo());
             }
             poPurchaseReceivingController.PurchaseOrderReceiving().loadAttachments();
             Platform.runLater(() -> {

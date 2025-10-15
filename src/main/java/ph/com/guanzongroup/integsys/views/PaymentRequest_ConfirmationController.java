@@ -1441,8 +1441,8 @@ public class PaymentRequest_ConfirmationController implements Initializable, Scr
                         CustomCommonUtil.setManaged(true, btnConfirm, btnVoid, btnUpdate);
                         break;
                     case PaymentRequestStatus.CONFIRMED:
-                        CustomCommonUtil.setVisible(true, btnReturn, btnVoid, btnUpdate);
-                        CustomCommonUtil.setManaged(true, btnReturn, btnVoid, btnUpdate);
+                        CustomCommonUtil.setVisible(true,  btnVoid, btnUpdate);
+                        CustomCommonUtil.setManaged(true,  btnVoid, btnUpdate);
                         break;
                 }
 

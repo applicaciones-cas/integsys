@@ -1,5 +1,6 @@
 package ph.com.guanzongroup.integsys.views;
 
+import ph.com.guanzongroup.integsys.views.ScreenInterface;
 import java.lang.reflect.Field;
 import java.net.URL;
 import java.sql.SQLException;
