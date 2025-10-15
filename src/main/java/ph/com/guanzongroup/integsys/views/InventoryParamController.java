@@ -174,10 +174,9 @@ public class InventoryParamController implements Initializable, ScreenInterface 
     }
 
     private void initializeObject() {
-
         System.out.println("category == " + category);
         LogWrapper logwrapr = new LogWrapper("CAS", System.getProperty("sys.default.path.temp") + "cas-error.log");
-//        oTrans = new Inventory();
+        oTrans = new Inventory();
         oTrans.setApplicationDriver(oApp);
         oTrans.setWithParentClass(false);
         oTrans.setLogWrapper(logwrapr);

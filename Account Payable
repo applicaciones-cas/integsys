@@ -1,0 +1,10 @@
+Oct 15, 2025 3:06:33 PM org.guanzon.appdriver.base.LogWrapper severe
+SEVERE: Account Payable : No record to load.
+Oct 15, 2025 3:06:35 PM org.guanzon.appdriver.base.LogWrapper severe
+SEVERE: Account Payable : No record to load.
+Oct 15, 2025 3:07:37 PM org.guanzon.appdriver.base.LogWrapper info
+INFO: Account Payable : Success on Initialize Search Category! 
+Oct 15, 2025 3:07:55 PM org.guanzon.appdriver.base.LogWrapper info
+INFO: Account Payable : Success on Initialize Search Client! 
+Oct 15, 2025 3:07:57 PM org.guanzon.appdriver.base.LogWrapper info
+INFO: Account Payable : Success on Initialize Search Client Contact! 

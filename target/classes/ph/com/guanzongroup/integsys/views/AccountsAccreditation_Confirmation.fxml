@@ -20,7 +20,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane id="AnchorPane" fx:id="apMainAnchor" minWidth="1377.0" prefHeight="789.0" prefWidth="1463.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane id="AnchorPane" fx:id="apMainAnchor" minWidth="1377.0" prefHeight="789.0" prefWidth="1463.0" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1">
     <children>
         <StackPane AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
             <children>
@@ -32,36 +32,33 @@
                            <children>
                               <GridPane prefHeight="28.0" prefWidth="1447.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="10.0">
                                 <columnConstraints>
-                                    <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="100.0" />
+                                    <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="10.0" prefWidth="100.0" />
                                     <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="10.0" />
                                     <ColumnConstraints hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="230.0" />
-                                    <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="20.0" />
-                                    <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="57.0" />
                                     <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="10.0" />
-                                    <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="230.0" />
-                                    <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="20.0" />
-                                  <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="95.0" />
+                                  <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="100.0" />
                                     <ColumnConstraints hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="10.0" />
                                   <ColumnConstraints hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="230.0" />
+                                    <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="100.0" />
                                     <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="10.0" />
-                                    <ColumnConstraints halignment="RIGHT" hgrow="ALWAYS" maxWidth="530.0" minWidth="400.0" prefWidth="400.0" />
-                                    <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="10.0" />
+                                    <ColumnConstraints halignment="RIGHT" hgrow="ALWAYS" minWidth="-Infinity" prefWidth="630.0" />
+                                    <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="1.7976931348623157E308" minWidth="-Infinity" prefWidth="10.0" />
                                 </columnConstraints>
                                 <rowConstraints>
                                   <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="28.0" vgrow="SOMETIMES" />
                                 </rowConstraints>
                                  <children>
-                                    <Label fx:id="lblSource" layoutX="367.0" layoutY="14.0" text="Company - Industry" GridPane.columnIndex="12">
+                                    <Label fx:id="lblSource" layoutX="367.0" layoutY="14.0" text="Company - Industry" GridPane.columnIndex="9">
                                        <font>
                                           <Font name="System Bold" size="14.0" />
                                        </font>
                                     </Label>
-                                    <Label layoutX="604.0" layoutY="14.0" text="Company">
+                                    <TextField fx:id="tfSearchCompany" promptText="Press F3: Search" GridPane.columnIndex="2" />
+                                    <Label text="Company">
                                        <font>
                                           <Font name="System Bold" size="14.0" />
                                        </font>
                                     </Label>
-                                    <TextField fx:id="tfSearchCompany" layoutX="512.0" layoutY="11.0" promptText="Press F3: Search" GridPane.columnIndex="2" />
                                  </children>
                               </GridPane>
                            </children>
@@ -72,25 +69,58 @@
                     <bottom>
                         <AnchorPane fx:id="apButton" prefHeight="80.0" BorderPane.alignment="CENTER">
                             <children>
-                                <HBox fx:id="hbButtons" alignment="CENTER_LEFT" spacing="5.0" style="-fx-background-color: E9E9E9;" styleClass="button_process" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                <HBox alignment="CENTER_LEFT" spacing="5.0" style="-fx-background-color: E9E9E9;" styleClass="button_process" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                     <children>
-                              <Button fx:id="btnUpdate" contentDisplay="TOP" ellipsisString="" layoutX="270.0" layoutY="15.0" mnemonicParsing="false" onAction="#cmdButton_Click" prefHeight="70.0" prefWidth="70.0" styleClass="button_process" stylesheets="@../css/StyleSheet.css" text="Update">
-                                 <effect>
-                                    <Blend />
-                                 </effect>
-                                 <graphic>
-                                    <FontAwesomeIconView glyphName="EDIT" size="20" />
-                                 </graphic>
+                                        <Button fx:id="btnBrowse" contentDisplay="TOP" ellipsisString="" mnemonicParsing="false" onAction="#cmdButton_Click" prefHeight="70.0" prefWidth="70.0" styleClass="button_process" stylesheets="@../css/StyleSheet.css" text="Browse">
+                                            <effect>
+                                                <Blend />
+                                            </effect>
+                                            <graphic>
+                                                <FontAwesomeIconView glyphName="FOLDER_OPEN" size="20" />
+                                            </graphic>
                                  <font>
                                     <Font size="12.0" />
                                  </font>
-                              </Button>
+                                        </Button>
                               <Button fx:id="btnSearch" contentDisplay="TOP" ellipsisString="" layoutX="185.0" layoutY="15.0" mnemonicParsing="false" onAction="#cmdButton_Click" prefHeight="70.0" prefWidth="70.0" styleClass="button_process" stylesheets="@../css/StyleSheet.css" text="Search">
                                  <effect>
                                     <Blend />
                                  </effect>
                                  <graphic>
                                     <FontAwesomeIconView glyphName="SEARCH" size="20" />
+                                 </graphic>
+                                 <font>
+                                    <Font size="12.0" />
+                                 </font>
+                              </Button>
+                              <Button fx:id="btnConfirm" contentDisplay="TOP" ellipsisString="" mnemonicParsing="false" onAction="#cmdButton_Click" prefHeight="70.0" prefWidth="70.0" styleClass="button_process" stylesheets="@../css/StyleSheet.css" text="Confirm">
+                                 <effect>
+                                    <Blend />
+                                 </effect>
+                                 <graphic>
+                                    <FontAwesomeIconView glyphName="CHECK" size="20" />
+                                 </graphic>
+                                 <font>
+                                    <Font size="12.0" />
+                                 </font>
+                              </Button>
+                              <Button fx:id="btnVoid" contentDisplay="TOP" ellipsisString="" mnemonicParsing="false" onAction="#cmdButton_Click" prefHeight="70.0" prefWidth="70.0" styleClass="button_process" stylesheets="@../css/StyleSheet.css" text="Void">
+                                 <effect>
+                                    <Blend />
+                                 </effect>
+                                 <graphic>
+                                    <FontAwesomeIconView glyphName="TIMES" size="20" />
+                                 </graphic>
+                                 <font>
+                                    <Font size="12.0" />
+                                 </font>
+                              </Button>
+                              <Button fx:id="btnUpdate" contentDisplay="TOP" ellipsisString="" layoutX="270.0" layoutY="15.0" mnemonicParsing="false" onAction="#cmdButton_Click" prefHeight="70.0" prefWidth="70.0" styleClass="button_process" stylesheets="@../css/StyleSheet.css" text="Update">
+                                 <effect>
+                                    <Blend />
+                                 </effect>
+                                 <graphic>
+                                    <FontAwesomeIconView glyphName="EDIT" size="20" />
                                  </graphic>
                                  <font>
                                     <Font size="12.0" />
@@ -107,18 +137,7 @@
                                     <Font size="12.0" />
                                  </font>
                               </Button>
-                                        <Button fx:id="btnConfirm" contentDisplay="TOP" ellipsisString="" mnemonicParsing="false" onAction="#cmdButton_Click" prefHeight="70.0" prefWidth="70.0" styleClass="button_process" stylesheets="@../css/StyleSheet.css" text="Confirm">
-                                            <effect>
-                                                <Blend />
-                                            </effect>
-                                            <graphic>
-                                                <FontAwesomeIconView glyphName="CHECK" size="20" />
-                                            </graphic>
-                                 <font>
-                                    <Font size="12.0" />
-                                 </font>
-                                        </Button>
-                              <Button fx:id="btnVoid" contentDisplay="TOP" ellipsisString="" mnemonicParsing="false" onAction="#cmdButton_Click" prefHeight="70.0" prefWidth="70.0" styleClass="button_process" stylesheets="@../css/StyleSheet.css" text="Void">
+                              <Button fx:id="btnCancel" contentDisplay="TOP" ellipsisString="" layoutX="185.0" layoutY="15.0" mnemonicParsing="false" onAction="#cmdButton_Click" prefHeight="70.0" prefWidth="70.0" styleClass="button_process" stylesheets="@../css/StyleSheet.css" text="Cancel">
                                  <effect>
                                     <Blend />
                                  </effect>
@@ -129,7 +148,7 @@
                                     <Font size="12.0" />
                                  </font>
                               </Button>
-                              <Button fx:id="btnHistory" contentDisplay="TOP" ellipsisString="" mnemonicParsing="false" onAction="#cmdButton_Click" prefHeight="70.0" prefWidth="70.0" styleClass="button_process" stylesheets="@../css/StyleSheet.css" text="History">
+                              <Button fx:id="btnHistory" contentDisplay="TOP" ellipsisString="" layoutX="695.0" layoutY="15.0" mnemonicParsing="false" onAction="#cmdButton_Click" prefHeight="70.0" prefWidth="70.0" styleClass="button_process" stylesheets="@../css/StyleSheet.css" text="History">
                                  <graphic>
                                     <FontAwesomeIconView glyphName="BOOK" size="20" />
                                  </graphic>
@@ -140,28 +159,17 @@
                                     <Font size="12.0" />
                                  </font>
                               </Button>
-                              <Button fx:id="btnRetrieve" contentDisplay="TOP" ellipsisString="" layoutX="695.0" layoutY="15.0" mnemonicParsing="false" onAction="#cmdButton_Click" prefHeight="70.0" prefWidth="70.0" styleClass="button_process" stylesheets="@../css/StyleSheet.css" text="Retrieve">
-                                 <graphic>
-                                    <FontAwesomeIconView glyphName="LIST_ALT" size="20" />
-                                 </graphic>
+                              <Button fx:id="btnClose" contentDisplay="TOP" ellipsisString="" layoutX="465.0" layoutY="15.0" mnemonicParsing="false" onAction="#cmdButton_Click" prefHeight="70.0" prefWidth="70.0" styleClass="button_process" stylesheets="@../css/StyleSheet.css" text="Close">
                                  <effect>
                                     <Blend />
                                  </effect>
+                                 <graphic>
+                                    <FontAwesomeIconView glyphName="POWER_OFF" size="20" />
+                                 </graphic>
                                  <font>
                                     <Font size="12.0" />
                                  </font>
                               </Button>
-                                        <Button fx:id="btnClose" contentDisplay="TOP" ellipsisString="" mnemonicParsing="false" onAction="#cmdButton_Click" prefHeight="70.0" prefWidth="70.0" styleClass="button_process" stylesheets="@../css/StyleSheet.css" text="Close">
-                                            <graphic>
-                                                <FontAwesomeIconView glyphName="POWER_OFF" size="20" />
-                                            </graphic>
-                                            <effect>
-                                                <Blend />
-                                            </effect>
-                                 <font>
-                                    <Font size="12.0" />
-                                 </font>
-                                        </Button>
                                     </children>
                                     <padding>
                                         <Insets bottom="5.0" left="5.0" top="5.0" />
@@ -179,64 +187,61 @@
                         <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="5.0">
                             <children>
                                 
-                                          <HBox fx:id="hboxid" prefHeight="100.0" prefWidth="200.0" spacing="5.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="0.0">
+                                          <HBox layoutX="5.0" prefHeight="100.0" prefWidth="200.0" spacing="5.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="0.0">
                                              <children>
                                                 
                                                 <VBox maxWidth="885.0" spacing="5.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="0.0">
-                                       <children>
+                                    <children>
                                           <AnchorPane>
-                                             <children>
-                                                <VBox spacing="5.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-                                                   <children>
-                                                      <AnchorPane fx:id="apMaster" style="-fx-border-color: FF8201;">
-                                                         <children>
-                                                            <GridPane layoutX="11.0" layoutY="6.0" AnchorPane.bottomAnchor="6.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="6.0">
-                                                               <columnConstraints>
-                                                                  <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="80.0" />
-                                                                  <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="10.0" />
-                                                                  <ColumnConstraints hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="139.0" />
-                                                                  <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="150.0" />
-                                                               </columnConstraints>
-                                                               <rowConstraints>
-                                                                  <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="28.0" vgrow="SOMETIMES" />
-                                                                  <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="10.0" vgrow="SOMETIMES" />
-                                                                  <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="28.0" vgrow="SOMETIMES" />
+                                              <children>
+                                                  <VBox spacing="5.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                                      <children>
+                                                       <AnchorPane fx:id="apMaster" style="-fx-border-color: FF8201;">
+                                                              <children>
+                                                                  <GridPane layoutX="11.0" layoutY="6.0" AnchorPane.bottomAnchor="6.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="6.0">
+                                                                      <columnConstraints>
+                                                                          <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="80.0" />
+                                                                          <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="10.0" />
+                                                                          <ColumnConstraints hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="139.0" />
+                                                                          <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="150.0" />
+                                                                      </columnConstraints>
+                                                                      <rowConstraints>
+                                                                          <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="28.0" vgrow="SOMETIMES" />
+                                                                              <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="10.0" vgrow="SOMETIMES" />
+                                                                          <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="28.0" vgrow="SOMETIMES" />
                                                                   <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="28.0" vgrow="SOMETIMES" />
                                                                   <RowConstraints maxHeight="-Infinity" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                                                                   <RowConstraints maxHeight="-Infinity" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                                                                   <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="28.0" vgrow="SOMETIMES" />
+                                                                          <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="28.0" vgrow="SOMETIMES" />
                                                                   <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="28.0" vgrow="SOMETIMES" />
-                                                                  <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="28.0" vgrow="SOMETIMES" />
-                                                                  <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="28.0" vgrow="SOMETIMES" />
-                                                                  <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="28.0" vgrow="SOMETIMES" />
-                                                               </rowConstraints>
-                                                               <children>
-                                                                  <AnchorPane maxWidth="-Infinity" minWidth="-Infinity" prefHeight="27.0" prefWidth="140.0" style="-fx-background-color: FF8201;" GridPane.columnIndex="3" />
-                                                                  <Label fx:id="lblStatus" alignment="CENTER" contentDisplay="CENTER" prefHeight="27.0" prefWidth="142.0" text="STATUS" textAlignment="CENTER" GridPane.columnIndex="3">
-                                                                     <font>
-                                                                        <Font name="System Bold" size="14.0" />
-                                                                     </font>
-                                                                  </Label>
-                                                                  <Label text="Trans No.">
-                                                                     <font>
-                                                                        <Font name="System Bold" size="14.0" />
-                                                                     </font>
-                                                                  </Label>
-                                                                  <Label text="Date" GridPane.rowIndex="2">
-                                                                     <font>
-                                                                        <Font size="12.0" />
-                                                                     </font>
-                                                                  </Label>
-                                                                  <Label text="Contact P." GridPane.rowIndex="7">
-                                                                     <font>
-                                                                        <Font size="12.0" />
-                                                                     </font>
-                                                                  </Label>
-                                                                  <Label text="Remarks" GridPane.rowIndex="9">
-                                                                     <font>
-                                                                        <Font size="12.0" />
-                                                                     </font>
-                                                                  </Label>
+                                                                          <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="28.0" vgrow="SOMETIMES" />
+                                                                          <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="28.0" vgrow="SOMETIMES" />
+                                                                      </rowConstraints>
+                                                                      <children>
+                                                      <AnchorPane maxWidth="-Infinity" minWidth="-Infinity" prefHeight="27.0" prefWidth="140.0" style="-fx-background-color: FF8201;" GridPane.columnIndex="3" />
+                                                                            <Label fx:id="lblStatus" alignment="CENTER" contentDisplay="CENTER" prefHeight="27.0" prefWidth="142.0" text="STATUS" textAlignment="CENTER" GridPane.columnIndex="3">
+                                                                                <font>
+                                                                                    <Font name="System Bold" size="14.0" />
+                                                                                </font>
+                                                                            </Label>
+                                                                          <Label text="Trans No.">
+                                                                              <font>
+                                                                                  <Font name="System Bold" size="14.0" />
+                                                                              </font>
+                                                                          </Label>
+                                                                              <Label text="Date" GridPane.rowIndex="2">
+                                                                                 <font>
+                                                                                    <Font size="12.0" />
+                                                                                 </font></Label>
+                                                                          <Label text="Contact P." GridPane.rowIndex="7">
+                                                                                 <font>
+                                                                                    <Font size="12.0" />
+                                                                                 </font></Label>
+                                                                          <Label text="Remarks" GridPane.rowIndex="9">
+                                                                                 <font>
+                                                                                    <Font size="12.0" />
+                                                                                 </font></Label>
                                                                   <Label layoutX="44.0" layoutY="82.0" text="Address" GridPane.rowIndex="8">
                                                                      <font>
                                                                         <Font size="12.0" />
@@ -248,17 +253,17 @@
                                                                         <Font size="12.0" />
                                                                      </font>
                                                                   </Label>
-                                                                  <TextField fx:id="tfTransactionNo" disable="true" editable="false" maxHeight="25.0" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="139.0" style="-fx-font-weight: bold;" styleClass="DisabledTextField" GridPane.columnIndex="2" GridPane.columnSpan="2" />
-                                                                  <DatePicker fx:id="dpTransactionDate" GridPane.columnIndex="2" GridPane.rowIndex="2" />
-                                                                  <TextField fx:id="tfCategory" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.rowIndex="3" />
-                                                                  <TextField fx:id="tfCompany" layoutX="100.0" layoutY="107.0" maxHeight="25.0" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.rowIndex="6" />
-                                                                  <TextField fx:id="tfContactPerson" maxHeight="25.0" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.rowIndex="7" />
+                                                                          <TextField fx:id="tfTransactionNo" disable="true" editable="false" maxHeight="25.0" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="139.0" style="-fx-font-weight: bold;" styleClass="DisabledTextField" GridPane.columnIndex="2" GridPane.columnSpan="2" />
+                                                                              <DatePicker fx:id="dpTransactionDate" GridPane.columnIndex="2" GridPane.rowIndex="2" />
+                                                                  <TextField fx:id="tfCategory" promptText="Press F3: Search" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.rowIndex="3" />
+                                                                  <TextField fx:id="tfCompany" layoutX="100.0" layoutY="107.0" maxHeight="25.0" promptText="Press F3: Search" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.rowIndex="6" />
+                                                                          <TextField fx:id="tfContactPerson" maxHeight="25.0" promptText="Press F3: Search" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.rowIndex="7" />
                                                                   <TextField fx:id="tfAddress" layoutX="85.0" layoutY="78.0" maxHeight="25.0" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.rowIndex="8" />
-                                                                  <TextArea fx:id="taRemarks" wrapText="true" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.rowIndex="9" GridPane.rowSpan="2">
-                                                                     <GridPane.margin>
-                                                                        <Insets top="1.0" />
-                                                                     </GridPane.margin>
-                                                                  </TextArea>
+                                                      <TextArea fx:id="taRemarks" wrapText="true" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.rowIndex="9" GridPane.rowSpan="2">
+                                                         <GridPane.margin>
+                                                            <Insets top="1.0" />
+                                                         </GridPane.margin>
+                                                      </TextArea>
                                                                   <Label text="Acct. Type" GridPane.rowIndex="4">
                                                                      <font>
                                                                         <Font size="12.0" />
@@ -271,16 +276,17 @@
                                                                      </font>
                                                                   </Label>
                                                                   <ComboBox fx:id="cmbTransType" maxWidth="150.0" GridPane.columnIndex="2" GridPane.rowIndex="5" />
-                                                               </children>
-                                                            </GridPane>
-                                                         </children>
-                                                      </AnchorPane>
-                                                   </children>
-                                                </VBox>
-                                             </children>
+                                                                      </children>
+                                                                  </GridPane>
+                                                              </children>
+                                                          </AnchorPane>
+                                                      </children>
+                                                  </VBox>
+                                              </children>
                                           </AnchorPane>
-                                       </children>
+                                    </children>
                                 </VBox>
+                                          
                                              </children>
                                           </HBox>
                             </children>
