@@ -519,52 +519,6 @@ public class DashboardController implements Initializable {
         });
     }
     
-//    private void setTreeViewStyle(TreeView<TreeNode> treeView) {
-//        treeView.setCellFactory(tv -> new TreeCell<TreeNode>() {
-//            @Override
-//            protected void updateItem(TreeNode item, boolean empty) {
-//                super.updateItem(item, empty);
-//
-//                if (empty || item == null) {
-//                    setText(null);
-//                    setGraphic(null);
-//                    setTooltip(null);
-//                    setStyle("-fx-background-color: #DFDFDF; -fx-border-color: #DFDFDF;");
-//                    if (!getStyleClass().contains("empty-tree-cell")) {
-//                        getStyleClass().add("empty-tree-cell");
-//                    }
-//                } else {
-//                    // Show the node name
-//                    setText(item.getName());
-//
-//                    // Tooltip shows description if available
-//                    if (item.getDescription() != null && !item.getDescription().isEmpty()) {
-//                        setTooltip(new Tooltip(item.getDescription()));
-//                    } else {
-//                        setTooltip(null);
-//                    }
-//
-//                    // Keep any icon/graphic
-//                    setGraphic(getTreeItem().getGraphic());
-//
-//                    setStyle(null);
-//                    getStyleClass().remove("empty-tree-cell");
-//
-//                    // Expand/collapse toggle on click
-//                    setOnMouseClicked((MouseEvent event) -> {
-//                        if (event.getClickCount() == 1) {
-//                            TreeItem<TreeNode> treeItem = getTreeItem();
-//                            if (treeItem != null && !treeItem.isLeaf()) {
-//                                treeItem.setExpanded(!treeItem.isExpanded());
-//                                event.consume();
-//                            }
-//                        }
-//                    });
-//                }
-//            }
-//        });
-//    }
-    
     private void setTreeViewStyle(TreeView<TreeNode> treeView) {
         treeView.setCellFactory(tv -> new TreeCell<TreeNode>() {
             @Override
