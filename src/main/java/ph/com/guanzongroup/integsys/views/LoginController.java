@@ -255,6 +255,8 @@ public class LoginController implements Initializable, ScreenInterface {
                                 oApp.getIndustry().equals(System.getProperty("sys.general.industry"));
             
             if (lbShow){
+                psIndustryID = oApp.getIndustry();
+                        
                 industryOptions = FXCollections.observableArrayList(getAllIndustries());
                 companyOptions = FXCollections.observableArrayList(getAllCompanies(industryOptions.get(0)));
 
@@ -304,8 +306,10 @@ public class LoginController implements Initializable, ScreenInterface {
                     JSONObject loJSON = sysuser.isValidUser(tfUsername.getText().trim(), tfPassword.getText().trim(), oApp.getProductID());
 
                     if ("success".equals((String) loJSON.get("result"))) return loJSON;
-                } catch (SQLException | GuanzonException e) {
+                } catch (SQLException e) {
                     JFXUtil.setJSONError(poJSON, e.getMessage());
+                } catch (GuanzonException ex){
+                    JFXUtil.setJSONError(poJSON, "Unable to log user. Please verify your entry.");
                 }
             }
         } else {
@@ -313,21 +317,6 @@ public class LoginController implements Initializable, ScreenInterface {
         }
 
         return poJSON;
-    }
-
-    private List<ModelLog_In_User> getAllUsers() throws SQLException {
-        List<ModelLog_In_User> user = new ArrayList<>();
-        String lsSQL = "SELECT * FROM xxxsysuser";
-        ResultSet rs = oApp.executeQuery(lsSQL);
-
-        while (rs.next()) {
-            String userID = rs.getString("sUserIDxx");
-            String username = rs.getString("sUserName");
-            String userpassword = rs.getString("sPassword");
-            user.add(new ModelLog_In_User(userID, username, userpassword));
-        }
-        MiscUtil.close(rs);
-        return user;
     }
 
     private List<ModelLog_In_Company> getAllCompanies(ModelLog_In_Industry industry) throws SQLException {
@@ -368,6 +357,10 @@ public class LoginController implements Initializable, ScreenInterface {
         String lsSQL = "SELECT * FROM Industry" +
                         " WHERE cRecdStat = '1'" +
                         " ORDER BY sDescript";
+        
+        if (!psIndustryID.isEmpty()) {
+            lsSQL = MiscUtil.addCondition(lsSQL, "sIndstCdx = " + SQLUtil.toSQL(psIndustryID));
+        }
 
         ResultSet loRS = oApp.executeQuery(lsSQL);
 
