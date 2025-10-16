@@ -224,7 +224,7 @@ public class SIPosting_SPMCController implements Initializable, ScreenInterface 
 
     @Override
     public void setIndustryID(String fsValue) {
-        psIndustryId = fsValue;
+        psIndustryId = "02";
     }
 
     @Override
