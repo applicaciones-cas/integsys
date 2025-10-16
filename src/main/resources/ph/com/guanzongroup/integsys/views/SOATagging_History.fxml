@@ -273,7 +273,7 @@
                                                       <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="28.0" vgrow="SOMETIMES" />
                                                                       </rowConstraints>
                                                                       <children>
-                                                                          <Label text="Source No">
+                                                                          <Label text="Source No" GridPane.rowIndex="1">
                                                                                  <font>
                                                                                     <Font size="12.0" />
                                                                                  </font></Label>
@@ -286,8 +286,8 @@
                                                                                   <Font name="System Bold" size="15.0" />
                                                                               </font>
                                                                           </Label>
-                                                                          <TextField fx:id="tfSourceNo" disable="true" editable="false" maxHeight="25.0" GridPane.columnIndex="2" />
-                                                                  <TextField fx:id="tfSourceCode" disable="true" editable="false" layoutX="105.0" layoutY="13.0" maxHeight="25.0" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+                                                                          <TextField fx:id="tfSourceNo" disable="true" editable="false" maxHeight="25.0" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+                                                                  <TextField fx:id="tfSourceCode" disable="true" editable="false" layoutX="105.0" layoutY="13.0" maxHeight="25.0" GridPane.columnIndex="2" />
                                                                   <TextField fx:id="tfReferenceNo" disable="true" editable="false" layoutX="85.0" layoutY="12.0" maxHeight="25.0" GridPane.columnIndex="6" />
                                                                   <TextField fx:id="tfCreditAmount" alignment="CENTER_RIGHT" disable="true" editable="false" layoutX="418.0" layoutY="71.0" promptText="0.0000" styleClass="DisabledTextField" GridPane.columnIndex="10" />
                                                                   <TextField fx:id="tfDebitAmount" alignment="CENTER_RIGHT" disable="true" editable="false" layoutX="733.0" layoutY="13.0" promptText="0.0000" styleClass="DisabledTextField" GridPane.columnIndex="10" GridPane.rowIndex="1" />
@@ -296,7 +296,7 @@
                                                                   </TextField>
                                                                   <Label text="Credit Amount" GridPane.columnIndex="8" />
                                                                   <Label text="Debit Amount" GridPane.columnIndex="8" GridPane.rowIndex="1" />
-                                                                  <Label layoutX="39.0" layoutY="17.0" text="Source Code" GridPane.rowIndex="1">
+                                                                  <Label layoutX="39.0" layoutY="17.0" text="Source Code">
                                                                      <font>
                                                                         <Font size="12.0" />
                                                                      </font>
