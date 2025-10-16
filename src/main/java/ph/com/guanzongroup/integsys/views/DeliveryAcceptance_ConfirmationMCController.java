@@ -626,7 +626,7 @@ public class DeliveryAcceptance_ConfirmationMCController implements Initializabl
                 }
             }
 
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/rmj/guanzongroup/sidebarmenus/views/DeliveryAcceptance_SerialMC.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/ph/com/guanzongroup/integsys/views/DeliveryAcceptance_SerialMC.fxml"));
             DeliveryAcceptance_SerialMCController controller = new DeliveryAcceptance_SerialMCController();
             loader.setController(controller);
 
@@ -859,17 +859,29 @@ public class DeliveryAcceptance_ConfirmationMCController implements Initializabl
 
                     break;
                 case "tfReceiveQuantity":
-                    if (lsValue.isEmpty()) {
-                        lsValue = "0";
-                    }
                     lsValue = JFXUtil.removeComma(lsValue);
                     if (poPurchaseReceivingController.PurchaseOrderReceiving().Detail(pnDetail).getOrderNo() != null
                             && !"".equals(poPurchaseReceivingController.PurchaseOrderReceiving().Detail(pnDetail).getOrderNo())) {
-                        if (poPurchaseReceivingController.PurchaseOrderReceiving().Detail(pnDetail).getOrderQty().intValue() < Integer.valueOf(lsValue)) {
-                            ShowMessageFX.Warning(null, pxeModuleName, "Receive quantity cannot be greater than the order quantity.");
-                            poPurchaseReceivingController.PurchaseOrderReceiving().Detail(pnDetail).setQuantity(0);
-                            tfReceiveQuantity.requestFocus();
-                            break;
+                        if (poPurchaseReceivingController.PurchaseOrderReceiving().Detail(pnDetail).getOrderQty().doubleValue() < Double.valueOf(lsValue)) {
+                            if (oApp.getUserLevel() <= UserRight.ENCODER) {
+                                if (ShowMessageFX.YesNo(null, pxeModuleName, "Receive quantity is greater than the Order quantity, Approval is needed\nDo you want to proceed?") == true) {
+                                    poJSON = ShowDialogFX.getUserApproval(oApp);
+                                    if ("success".equals((String) poJSON.get("result"))) {
+                                        if (Integer.parseInt(poJSON.get("nUserLevl").toString()) <= UserRight.ENCODER) {
+                                            poJSON.put("result", "error");
+                                            poJSON.put("message", "User is not an authorized approving officer.");
+                                        }
+                                    }
+                                    
+                                    if ("error".equals((String) poJSON.get("result"))) {
+                                        ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                                        loadRecordDetail();
+                                        break;
+                                    }
+                                } else {
+                                    break;
+                                }
+                            }
                         }
                     }
 
@@ -1875,7 +1887,7 @@ public class DeliveryAcceptance_ConfirmationMCController implements Initializabl
                 }
                 goToPageBasedOnSelectedRow(String.valueOf(pnMain));
             }
-            
+
             //Populate purhcase receiving serials - Added by Arsiela 10152025 13:53:01
             //Need to populate serialize for confirmation; need to re-check for redundancy
             for (int lnCtr = 0; lnCtr <= poPurchaseReceivingController.PurchaseOrderReceiving().getDetailCount() - 1; lnCtr++) {
@@ -1982,10 +1994,7 @@ public class DeliveryAcceptance_ConfirmationMCController implements Initializabl
                             } catch (Exception e) {
 
                             }
-
-                            if ((!poPurchaseReceivingController.PurchaseOrderReceiving().Detail(lnCtr).getOrderNo().equals("") && poPurchaseReceivingController.PurchaseOrderReceiving().Detail(lnCtr).getOrderNo() != null)
-                                    && poPurchaseReceivingController.PurchaseOrderReceiving().Detail(lnCtr).getOrderQty().intValue() != poPurchaseReceivingController.PurchaseOrderReceiving().Detail(lnCtr).getQuantity().intValue()
-                                    && poPurchaseReceivingController.PurchaseOrderReceiving().Detail(lnCtr).getQuantity().intValue() != 0) {
+                            if (poPurchaseReceivingController.PurchaseOrderReceiving().Detail(lnCtr).getOrderQty().doubleValue() != poPurchaseReceivingController.PurchaseOrderReceiving().Detail(lnCtr).getQuantity().doubleValue()) {
                                 highlight(tblViewOrderDetails, lnCtr + 1, "#FAA0A0", highlightedRowsDetail);
                             }
 

@@ -1,5 +1,13 @@
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/javafx/FXMLController.java to edit this template
+ */
 package ph.com.guanzongroup.integsys.views;
 
+import ph.com.guanzongroup.integsys.model.ModelDeliveryAcceptance_Attachment;
+import ph.com.guanzongroup.integsys.model.ModelDeliveryAcceptance_Detail;
+import ph.com.guanzongroup.integsys.model.ModelDeliveryAcceptance_Main;
+import ph.com.guanzongroup.integsys.utility.CustomCommonUtil;
 import com.sun.javafx.scene.control.skin.TableHeaderRow;
 import java.io.IOException;
 import java.net.URL;
@@ -70,15 +78,12 @@ import org.guanzon.appdriver.base.GRiderCAS;
 import org.guanzon.appdriver.base.GuanzonException;
 import org.guanzon.appdriver.base.MiscUtil;
 import org.guanzon.appdriver.constant.EditMode;
+import org.guanzon.cas.purchasing.controller.PurchaseOrderReceiving;
 import org.guanzon.cas.purchasing.services.PurchaseOrderReceivingControllers;
 import org.guanzon.cas.purchasing.status.PurchaseOrderReceivingStatus;
 import org.json.simple.JSONObject;
 import javafx.scene.control.ComboBox;
 import org.guanzon.appdriver.constant.DocumentType;
-import ph.com.guanzongroup.integsys.model.ModelDeliveryAcceptance_Attachment;
-import ph.com.guanzongroup.integsys.model.ModelDeliveryAcceptance_Detail;
-import ph.com.guanzongroup.integsys.model.ModelDeliveryAcceptance_Main;
-import ph.com.guanzongroup.integsys.utility.CustomCommonUtil;
 import ph.com.guanzongroup.integsys.utility.JFXUtil;
 
 /**
@@ -337,7 +342,7 @@ public class DeliveryAcceptance_HistoryMCController implements Initializable, Sc
                 }
             }
 
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/rmj/guanzongroup/sidebarmenus/views/DeliveryAcceptance_SerialMC.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/ph/com/guanzongroup/integsys/views/DeliveryAcceptance_SerialMC.fxml"));
             DeliveryAcceptance_SerialMCController controller = new DeliveryAcceptance_SerialMCController();
             loader.setController(controller);
 
@@ -944,9 +949,7 @@ public class DeliveryAcceptance_HistoryMCController implements Initializable, Sc
 
                             }
 
-                            if ((!poPurchaseReceivingController.PurchaseOrderReceiving().Detail(lnCtr).getOrderNo().equals("") && poPurchaseReceivingController.PurchaseOrderReceiving().Detail(lnCtr).getOrderNo() != null)
-                                    && poPurchaseReceivingController.PurchaseOrderReceiving().Detail(lnCtr).getOrderQty().intValue() != poPurchaseReceivingController.PurchaseOrderReceiving().Detail(lnCtr).getQuantity().intValue()
-                                    && poPurchaseReceivingController.PurchaseOrderReceiving().Detail(lnCtr).getQuantity().intValue() != 0) {
+                            if (poPurchaseReceivingController.PurchaseOrderReceiving().Detail(lnCtr).getOrderQty().doubleValue() != poPurchaseReceivingController.PurchaseOrderReceiving().Detail(lnCtr).getQuantity().doubleValue()) {
                                 highlight(tblViewOrderDetails, lnCtr + 1, "#FAA0A0", highlightedRowsDetail);
                             }
 
