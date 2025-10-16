@@ -442,7 +442,7 @@ public class POReplacement_EntryMCController implements Initializable, ScreenInt
                         loadTableDetail.reload();
                     });
                 });
-                stageSerialDialog.showDialog((Stage) btnSave.getScene().getWindow(), getClass().getResource("/com/rmj/guanzongroup/sidebarmenus/views/DeliveryAcceptance_SerialMC.fxml"),
+                stageSerialDialog.showDialog((Stage) btnSave.getScene().getWindow(), getClass().getResource("/ph/com/guanzongroup/integsys/views/DeliveryAcceptance_SerialMC.fxml"),
                         controller, "Inventory Serial", true, true, false);
             } catch (IOException ex) {
                 Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);

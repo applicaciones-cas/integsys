@@ -572,7 +572,7 @@ public class POReplacement_ConfirmationCarController implements Initializable, S
                         loadTableDetail.reload();
                     });
                 });
-                stageSerialDialog.showDialog((Stage) btnSave.getScene().getWindow(), getClass().getResource("/com/rmj/guanzongroup/sidebarmenus/views/DeliveryAcceptance_SerialCar.fxml"),
+                stageSerialDialog.showDialog((Stage) btnSave.getScene().getWindow(), getClass().getResource("/ph/com/guanzongroup/integsys/views/DeliveryAcceptance_SerialCar.fxml"),
                         controller, "Inventory Serial", true, true, false);
 
             } catch (IOException ex) {
