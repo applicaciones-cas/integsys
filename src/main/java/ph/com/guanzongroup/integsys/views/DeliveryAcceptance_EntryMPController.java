@@ -251,7 +251,7 @@ public class DeliveryAcceptance_EntryMPController implements Initializable, Scre
                 }
             }
 
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/rmj/guanzongroup/sidebarmenus/views/DeliveryAcceptance_SerialMP.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/ph/com/guanzongroup/integsys/views/DeliveryAcceptance_SerialMP.fxml"));
             DeliveryAcceptance_SerialMPController controller = new DeliveryAcceptance_SerialMPController();
             loader.setController(controller);
 
