@@ -1,6 +1,5 @@
 package ph.com.guanzongroup.integsys.views;
 
-import ph.com.guanzongroup.integsys.views.ScreenInterface;
 import java.lang.reflect.Field;
 import java.net.URL;
 import java.sql.SQLException;
@@ -47,8 +46,6 @@ import org.guanzon.appdriver.constant.TransactionStatus;
 import org.guanzon.cas.client.account.Account_Accreditation;
 import org.guanzon.cas.client.services.ClientControllers;
 import org.json.simple.JSONObject;
-import ph.com.guanzongroup.integsys.views.ScreenInterface;
-import ph.com.guanzongroup.integsys.views.unloadForm;
 
 /**
  * FXML Controller class

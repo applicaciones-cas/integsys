@@ -59,9 +59,12 @@ import org.guanzon.cas.purchasing.services.PurchaseOrderReceivingControllers;
 import org.guanzon.cas.purchasing.status.PurchaseOrderReceivingStatus;
 import org.json.simple.JSONObject;
 import javafx.scene.control.ComboBox;
-import javafx.scene.input.KeyCode;
 import org.guanzon.appdriver.constant.DocumentType;
 import ph.com.guanzongroup.integsys.utility.JFXUtil;
+import java.io.IOException;
+import javafx.scene.input.KeyCode;
+import javafx.stage.Stage;
+import javafx.scene.control.CheckBox;
 
 /**
  * FXML Controller class
@@ -149,7 +152,7 @@ public class POReplacement_HistoryAppliancesController implements Initializable,
             poController.PurchaseOrderReceiving().setCompanyId(psCompanyId);
             poController.PurchaseOrderReceiving().setCategoryId(psCategoryId);
             poController.PurchaseOrderReceiving().initFields();
-            poController.PurchaseOrderReceiving().setWithUI(true);            
+            poController.PurchaseOrderReceiving().setWithUI(true);
             poController.PurchaseOrderReceiving().setPurpose(PurchaseOrderReceivingStatus.Purpose.REPLACEMENT);
             loadRecordSearch();
         });
@@ -636,10 +639,9 @@ public class POReplacement_HistoryAppliancesController implements Initializable,
                                 }
 
                                 if ((!poController.PurchaseOrderReceiving().Detail(lnCtr).getOrderNo().equals("") && poController.PurchaseOrderReceiving().Detail(lnCtr).getOrderNo() != null)
-                                        && poController.PurchaseOrderReceiving().Detail(lnCtr).getOrderQty().intValue() != poController.PurchaseOrderReceiving().Detail(lnCtr).getQuantity().intValue()
-                                        && poController.PurchaseOrderReceiving().Detail(lnCtr).getQuantity().intValue() != 0) {
+                                        && poController.PurchaseOrderReceiving().Detail(lnCtr).getOrderQty().doubleValue() != poController.PurchaseOrderReceiving().Detail(lnCtr).getQuantity().doubleValue()
+                                        && poController.PurchaseOrderReceiving().Detail(lnCtr).getQuantity().doubleValue() != 0) {
                                     JFXUtil.highlightByKey(tblViewTransDetails, String.valueOf(lnCtr + 1), "#FAA0A0", highlightedRowsDetail);
-
                                 }
 
                                 String lsBrand = "";
