@@ -322,7 +322,7 @@ public class POReplacement_HistoryMPController implements Initializable, ScreenI
                         loadTableDetail.reload();
                     });
                 });
-                stageSerialDialog.showDialog((Stage) apMainAnchor.getScene().getWindow(), getClass().getResource("/com/rmj/guanzongroup/sidebarmenus/views/DeliveryAcceptance_SerialMP.fxml"),
+                stageSerialDialog.showDialog((Stage) apMainAnchor.getScene().getWindow(), getClass().getResource("/ph/com/guanzongroup/integsys/views/DeliveryAcceptance_SerialMP.fxml"),
                         controller, "Inventory Serial", true, true, false);
 
             } catch (IOException ex) {

@@ -324,7 +324,7 @@ public class POReplacement_HistoryCarController implements Initializable, Screen
                         loadTableDetail.reload();
                     });
                 });
-                stageSerialDialog.showDialog((Stage) apMainAnchor.getScene().getWindow(), getClass().getResource("/com/rmj/guanzongroup/sidebarmenus/views/DeliveryAcceptance_SerialCar.fxml"),
+                stageSerialDialog.showDialog((Stage) apMainAnchor.getScene().getWindow(), getClass().getResource("/ph/com/guanzongroup/integsys/views/DeliveryAcceptance_SerialCar.fxml"),
                         controller, "Inventory Serial", true, true, false);
             } catch (IOException ex) {
                 Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
