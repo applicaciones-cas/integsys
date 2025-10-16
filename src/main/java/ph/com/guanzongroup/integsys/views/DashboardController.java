@@ -79,7 +79,7 @@ import javafx.scene.Cursor;
 import javafx.scene.control.Tooltip;
 
 public class DashboardController implements Initializable {
-    private final String pxeModuleName = "Computerized Accounting System";
+    private final String MODULE = "Guanzon IntegSys";
     private GRiderCAS oApp;
     private String lastClickedBtnLeftSideBar = "";
     private String lastClickedBtnRightSideBar = "";
@@ -717,10 +717,10 @@ public class DashboardController implements Initializable {
                         if (!sformname.isEmpty() && sformname.contains(".fxml")) {
                             setScene2(loadAnimateExchange(sformname));
                         } else {
-                            ShowMessageFX.Warning("This form is currently unavailable.", "Computerized Accounting System", pxeModuleName);
+                            ShowMessageFX.Warning("This form is currently unavailable.", "Computerized Accounting System", MODULE);
                         }
                     } else {
-                        ShowMessageFX.Warning("This form is already active.", "Computerized Accounting System", pxeModuleName);
+                        ShowMessageFX.Warning("This form is already active.", "Computerized Accounting System", MODULE);
                     }
                     setAnchorPaneVisibleManage(false, anchorLeftSideBarMenu);
                     for (ToggleButton navButton : toggleBtnLeftUpperSideBar) {

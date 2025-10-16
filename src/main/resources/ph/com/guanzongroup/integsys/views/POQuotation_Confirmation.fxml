@@ -37,19 +37,19 @@
                             <children>
                                 <AnchorPane fx:id="apBrowse" style="-fx-background-color: A0A0A0;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                            <children>
-                              <GridPane prefHeight="28.0" prefWidth="1447.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="30.0" AnchorPane.topAnchor="10.0">
+                              <GridPane maxWidth="1447.0" minWidth="1447.0" prefHeight="28.0" prefWidth="1447.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="30.0" AnchorPane.topAnchor="10.0">
                                 <columnConstraints>
                                     <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="85.0" />
                                     <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="10.0" />
-                                    <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="200.0" />
+                                    <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="190.0" />
                                     <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="10.0" />
                                     <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="80.0" />
                                     <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="10.0" />
-                                    <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="200.0" />
-                                    <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="10.0" prefWidth="100.0" />
+                                    <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="190.0" />
+                                    <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="10.0" minWidth="10.0" prefWidth="10.0" />
                                     <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="60.0" />
                                     <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="10.0" />
-                                    <ColumnConstraints hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="200.0" />
+                                    <ColumnConstraints hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="190.0" />
                                     <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="10.0" />
                                     <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="60.0" />
                                     <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="10.0" />
@@ -57,17 +57,16 @@
                                     <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="10.0" />
                                   <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="95.0" />
                                     <ColumnConstraints hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="10.0" />
-                                  <ColumnConstraints hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="200.0" />
-                                    <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="100.0" />
+                                  <ColumnConstraints hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="150.0" />
                                     <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="10.0" />
-                                    <ColumnConstraints halignment="RIGHT" hgrow="ALWAYS" minWidth="200.0" prefWidth="480.0" />
+                                    <ColumnConstraints halignment="RIGHT" hgrow="ALWAYS" maxWidth="200.0" minWidth="200.0" prefWidth="200.0" />
                                     <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="10.0" />
                                 </columnConstraints>
                                 <rowConstraints>
                                     <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="28.0" vgrow="SOMETIMES" />
                                 </rowConstraints>
                                  <children>
-                                    <Label fx:id="lblSource" layoutX="367.0" layoutY="14.0" text="Industry" GridPane.columnIndex="21">
+                                    <Label fx:id="lblSource" layoutX="367.0" layoutY="14.0" text="Industry" GridPane.columnIndex="20">
                                        <font>
                                           <Font name="System Bold" size="14.0" />
                                        </font>
@@ -666,7 +665,7 @@
                                               <children>
                                                   <GridPane AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                                       <columnConstraints>
-                                                          <ColumnConstraints hgrow="ALWAYS" maxWidth="1.7976931348623157E308" minWidth="720.0" />
+                                                          <ColumnConstraints hgrow="ALWAYS" maxWidth="1.7976931348623157E308" minWidth="630.0" />
                                                       </columnConstraints>
                                                       <rowConstraints>
                                                           <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" vgrow="SOMETIMES" />
@@ -690,7 +689,7 @@
                                                               <columns>
                                                                   <TableColumn fx:id="tblRowNo" editable="false" maxWidth="30.0" minWidth="30.0" prefWidth="30.0" resizable="false" sortable="false" style="-fx-font-size: 12;" text="No." />
                                                       <TableColumn fx:id="tblBranch" editable="false" maxWidth="190.0" minWidth="-1.0" prefWidth="190.0" resizable="false" sortable="false" style="-fx-font-size: 12;" text="Branch" />
-                                                                  <TableColumn fx:id="tblSupplier" editable="false" maxWidth="220.0" minWidth="-1.0" prefWidth="220.0" resizable="false" sortable="false" style="-fx-font-size: 12;" text="Supplier" />
+                                                                  <TableColumn fx:id="tblSupplier" editable="false" maxWidth="220.0" minWidth="220.0" prefWidth="220.0" resizable="false" sortable="false" style="-fx-font-size: 12;" text="Supplier" />
                                                                   <TableColumn fx:id="tblDate" editable="false" maxWidth="75.0" minWidth="75.0" prefWidth="75.0" resizable="false" sortable="false" style="-fx-font-size: 12;" text="Date" />
                                                                  <TableColumn fx:id="tblReferenceNo" editable="false" maxWidth="95.0" minWidth="95.0" prefWidth="95.0" resizable="false" sortable="false" style="-fx-font-size: 12;" text="Refer No" />
                                                       <TableColumn fx:id="tblTransactionTotal" editable="false" maxWidth="95.0" minWidth="95.0" prefWidth="95.0" resizable="false" sortable="false" style="-fx-font-size: 12;" text="Total" />

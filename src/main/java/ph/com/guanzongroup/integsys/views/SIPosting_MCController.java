@@ -220,7 +220,7 @@ public class SIPosting_MCController implements Initializable, ScreenInterface {
 
     @Override
     public void setIndustryID(String fsValue) {
-        psIndustryId = fsValue;
+        psIndustryId = "02";
     }
 
     @Override

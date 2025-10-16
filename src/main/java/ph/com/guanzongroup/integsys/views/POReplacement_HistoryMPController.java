@@ -322,7 +322,7 @@ public class POReplacement_HistoryMPController implements Initializable, ScreenI
                         loadTableDetail.reload();
                     });
                 });
-                stageSerialDialog.showDialog((Stage) apMainAnchor.getScene().getWindow(), getClass().getResource("/com/rmj/guanzongroup/sidebarmenus/views/DeliveryAcceptance_SerialMP.fxml"),
+                stageSerialDialog.showDialog((Stage) apMainAnchor.getScene().getWindow(), getClass().getResource("/ph/com/guanzongroup/integsys/views/DeliveryAcceptance_SerialMP.fxml"),
                         controller, "Inventory Serial", true, true, false);
 
             } catch (IOException ex) {
@@ -687,10 +687,9 @@ public class POReplacement_HistoryMPController implements Initializable, ScreenI
                                 }
 
                                 if ((!poController.PurchaseOrderReceiving().Detail(lnCtr).getOrderNo().equals("") && poController.PurchaseOrderReceiving().Detail(lnCtr).getOrderNo() != null)
-                                        && poController.PurchaseOrderReceiving().Detail(lnCtr).getOrderQty().intValue() != poController.PurchaseOrderReceiving().Detail(lnCtr).getQuantity().intValue()
-                                        && poController.PurchaseOrderReceiving().Detail(lnCtr).getQuantity().intValue() != 0) {
+                                        && poController.PurchaseOrderReceiving().Detail(lnCtr).getOrderQty().doubleValue() != poController.PurchaseOrderReceiving().Detail(lnCtr).getQuantity().doubleValue()
+                                        && poController.PurchaseOrderReceiving().Detail(lnCtr).getQuantity().doubleValue() != 0) {
                                     JFXUtil.highlightByKey(tblViewTransDetails, String.valueOf(lnCtr + 1), "#FAA0A0", highlightedRowsDetail);
-
                                 }
 
                                 String lsBrand = "";
