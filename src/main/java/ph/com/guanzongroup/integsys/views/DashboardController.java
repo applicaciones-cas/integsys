@@ -79,6 +79,16 @@ import ph.com.guanzongroup.integsys.utility.JFXUtil;
 import javafx.scene.Cursor;
 import javafx.scene.control.Tooltip;
 
+import javafx.fxml.FXML;
+import javafx.scene.control.TreeItem;
+import javafx.scene.control.TreeView;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 public class DashboardController implements Initializable {
 
     private final String MODULE = "Guanzon IntegSys";
@@ -173,7 +183,7 @@ public class DashboardController implements Initializable {
     @FXML
     private AnchorPane anchorRightSideBarMenu;
     @FXML
-    private TreeView<TreeNode> tvRightSideBar;
+    private TreeView<TreeMonitor> tvRightSideBar;
     @FXML
     private AnchorPane anchorLeftSideBarMenu;
     @FXML
@@ -207,7 +217,7 @@ public class DashboardController implements Initializable {
             initButtonClickActions();
             notificationChecker();
             setTreeViewStyle(tvLeftSideBar);
-            setTreeViewStyle(tvRightSideBar);
+            setTreeViewStyleMonitor(tvRightSideBar);
 
             setDropShadowEffectsLeftSideBar(anchorLeftSideBarMenu);
             setDropShadowEffectsRightSideBar(anchorRightSideBarMenu);
@@ -229,6 +239,19 @@ public class DashboardController implements Initializable {
             JFXUtil.applyToggleHoverAnimation(btnMenu, btnHelp, btnLogout, btnSysMonitor);
             JFXUtil.applyHoverFadeToButtons("#FFFFFF", "#552B00", btnMinimize, btnClose);
             JFXUtil.placeClockInAnchorPane(apClock, 25);
+            
+            switch (System.getProperty("user.selected.industry")) {
+                case "06":
+                    loadDummyMenu();
+                    setAnchorPaneVisibleManage(true, anchorRightSideBarMenu);
+                    break;
+                case "09":
+                    loadDummyMenux();
+                    setAnchorPaneVisibleManage(true, anchorRightSideBarMenu);
+                    break;
+                default:
+                    setAnchorPaneVisibleManage(false, anchorRightSideBarMenu);
+            } 
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -357,7 +380,7 @@ public class DashboardController implements Initializable {
 
     private void initMenu() {
         setAnchorPaneVisibleManage(false, anchorLeftSideBarMenu);
-        setAnchorPaneVisibleManage(false, anchorRightSideBarMenu);
+        //setAnchorPaneVisibleManage(false, anchorRightSideBarMenu);
     }
 
     private void ToggleGroupControlLowerLeftSideBar() {
@@ -600,6 +623,89 @@ public class DashboardController implements Initializable {
             }
         });
     }
+    
+    private void setTreeViewStyleMonitor(TreeView<TreeMonitor> treeView) {
+    treeView.setCellFactory(tv -> new javafx.scene.control.TreeCell<TreeMonitor>() {
+        @Override
+        protected void updateItem(TreeMonitor item, boolean empty) {
+            super.updateItem(item, empty);
+
+            if (empty || item == null) {
+                setText(null);
+                setGraphic(null);
+                setTooltip(null);
+                setStyle("-fx-background-color: #DFDFDF; -fx-border-color: #DFDFDF;");
+                if (!getStyleClass().contains("empty-tree-cell")) {
+                    getStyleClass().add("empty-tree-cell");
+                }
+                setCursor(javafx.scene.Cursor.DEFAULT);
+                setOnMouseEntered(null);
+                setOnMouseExited(null);
+                setOnMouseClicked(null);
+            } else {
+                setText(item.getName());
+                setGraphic(getTreeItem().getGraphic());
+                getStyleClass().remove("empty-tree-cell");
+
+                // Container node: action == null
+                boolean isContainer = item.getAction() == null;
+
+                // Tooltip with description (if available)
+                if (item.getDescription() != null && !item.getDescription().isEmpty()) {
+                    setTooltip(new javafx.scene.control.Tooltip(item.getDescription()));
+                } else {
+                    setTooltip(null);
+                }
+
+                if (isContainer) {
+                    // Container node styling
+                    setStyle("-fx-font-weight: bold; -fx-text-fill: #555555;");
+                    setCursor(javafx.scene.Cursor.DEFAULT);
+                } else {
+                    // Executable node styling
+                    setStyle("-fx-font-weight: normal; -fx-text-fill: black;");
+                    setCursor(javafx.scene.Cursor.HAND);
+                }
+
+                // Hover effect only for command/executable nodes
+                if (!isContainer) {
+                    setOnMouseEntered(e -> {
+                        setStyle("-fx-background-color: #E6F2FF; -fx-font-weight: normal; -fx-text-fill: black;");
+                        setCursor(javafx.scene.Cursor.HAND);
+                    });
+                    setOnMouseExited(e -> {
+                        setStyle("-fx-font-weight: normal; -fx-text-fill: black;");
+                        setCursor(javafx.scene.Cursor.HAND);
+                    });
+                } else {
+                    setOnMouseEntered(null);
+                    setOnMouseExited(null);
+                }
+
+                // Handle click actions
+                setOnMouseClicked(event -> {
+                    if (event.getClickCount() == 1) {
+                        if (isContainer) {
+                            // Expand/collapse only
+                            javafx.scene.control.TreeItem<TreeMonitor> treeItem = getTreeItem();
+                            if (treeItem != null && !treeItem.isLeaf()) {
+                                treeItem.setExpanded(!treeItem.isExpanded());
+                                event.consume();
+                            }
+                        } else {
+                            // Executable node: run assigned action
+                            if (item.getAction() != null) {
+                                item.getAction().run();
+                            } else {
+                                System.out.println("⚠ No action defined for: " + item.getName());
+                            }
+                        }
+                    }
+                });
+            }
+        }
+    });
+}
 
     private void setDropShadowEffectsLeftSideBar(AnchorPane anchorPane) {
         DropShadow shadow = new DropShadow();
@@ -1623,4 +1729,167 @@ public class DashboardController implements Initializable {
         }
     }
     //end menu actions
+    
+    private void loadDummyMenu() {        
+        // Dummy parent modules
+        List<TreeMonitor> modules = Arrays.asList(
+            new TreeMonitor("PAY", "ROOT", "Payables", "Payment Requests", () -> System.out.println("Opening Payables module..."))
+        );
+
+        // Dummy submodules
+        List<TreeMonitor> submodules = Arrays.asList(
+            new TreeMonitor("PY", "PAY", "Payment Vouchers", "List of payment vouchers", null),
+            new TreeMonitor("CH", "PAY", "Check Releases", "List of released checks", null)
+        );
+
+        // Dummy transactions for submodules
+        Map<String, List<TreeMonitor>> transactionsMap = new HashMap<>();
+        transactionsMap.put("PY", Arrays.asList(
+            new TreeMonitor("PY001", "PY", "PV #001", "For Processing", () -> System.out.println("Opening PV #001"))
+        ));
+        transactionsMap.put("CH", Arrays.asList(
+            new TreeMonitor("CH001", "CH", "Check #001", "Released", () -> System.out.println("Opening Check #001"))
+        ));
+
+        // Root node
+        TreeItem<TreeMonitor> rootItem = new TreeItem<>(new TreeMonitor("ROOT", null, "System Monitor", "Root menu", null));
+
+        // Build Module → Submodule → Transactions hierarchy
+        for (TreeMonitor module : modules) {
+            TreeItem<TreeMonitor> moduleItem = new TreeItem<>(module);
+            int subCount = 0;
+
+            for (TreeMonitor sub : submodules) {
+                if (!sub.getParentId().equals(module.getId())) continue;
+
+                TreeItem<TreeMonitor> subItem = new TreeItem<>(sub);
+                int transCount = 0;
+
+                List<TreeMonitor> transList = transactionsMap.getOrDefault(sub.getId(), new ArrayList<TreeMonitor>());
+                for (TreeMonitor trans : transList) {
+                    subItem.getChildren().add(new TreeItem<>(trans));
+                    transCount++;
+                }
+
+                // Update submodule name with transaction count
+                subItem.setValue(new TreeMonitor(
+                    sub.getId(),
+                    sub.getParentId(),
+                    sub.getName() + " (" + transCount + ")",
+                    sub.getDescription(),
+                    sub.getAction()
+                ));
+
+                moduleItem.getChildren().add(subItem);
+                subCount++;
+            }
+
+            // Update module name with submodule count
+            moduleItem.setValue(new TreeMonitor(
+                module.getId(),
+                module.getParentId(),
+                module.getName() + " (" + subCount + ")",
+                module.getDescription(),
+                module.getAction()
+            ));
+
+            rootItem.getChildren().add(moduleItem);
+        }
+
+        rootItem.setExpanded(true);
+        tvRightSideBar.setRoot(rootItem);
+        tvRightSideBar.setShowRoot(false);
+
+        // Handle click actions
+        tvRightSideBar.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
+            if (newVal != null && newVal.getValue() != null) {
+                newVal.getValue().runAction();
+            }
+        });
+    }
+    
+    private void loadDummyMenux() {        
+        // Dummy parent modules
+        List<TreeMonitor> modules = Arrays.asList(
+            new TreeMonitor("PUR", "ROOT", "Purchasing", "Purchase Transactions", () -> System.out.println("Opening Purchasing module..."))
+        );
+
+        // Dummy submodules
+        List<TreeMonitor> submodules = Arrays.asList(
+            new TreeMonitor("PR", "PUR", "Purchase Requests", "List of purchase requests", null),
+            new TreeMonitor("PO", "PUR", "Open Purchase Orders", "List of purchase orders", null),
+            new TreeMonitor("DA", "PUR", "Unposted DA", "List of purchase orders", null)
+        );
+
+        // Dummy transactions for submodules
+        Map<String, List<TreeMonitor>> transactionsMap = new HashMap<>();
+        transactionsMap.put("PO", Arrays.asList(
+            new TreeMonitor("PO001", "PO", "PO #001", "Pending Approval", () -> System.out.println("Opening PO #001")),
+            new TreeMonitor("PO002", "PO", "PO #002", "For Receiving", () -> System.out.println("Opening PO #002"))
+        ));
+        transactionsMap.put("DA", Arrays.asList(
+            new TreeMonitor("DO001", "DA", "DA #001", "Pending Confirmation", () -> System.out.println("Opening DA #001")),
+            new TreeMonitor("DO002", "DA", "DA #002", "Pending Confirmation", () -> System.out.println("Opening DA #002"))
+        ));
+        transactionsMap.put("PR", Arrays.asList(
+            new TreeMonitor("PR001", "PR", "PR #001", "Pending", () -> System.out.println("Opening PR #001")),
+            new TreeMonitor("PR002", "PR", "PR #002", "Approved", () -> System.out.println("Opening PR #002"))
+        ));
+
+        // Root node
+        TreeItem<TreeMonitor> rootItem = new TreeItem<>(new TreeMonitor("ROOT", null, "System Monitor", "Root menu", null));
+
+        // Build Module → Submodule → Transactions hierarchy
+        for (TreeMonitor module : modules) {
+            TreeItem<TreeMonitor> moduleItem = new TreeItem<>(module);
+            int subCount = 0;
+
+            for (TreeMonitor sub : submodules) {
+                if (!sub.getParentId().equals(module.getId())) continue;
+
+                TreeItem<TreeMonitor> subItem = new TreeItem<>(sub);
+                int transCount = 0;
+
+                List<TreeMonitor> transList = transactionsMap.getOrDefault(sub.getId(), new ArrayList<TreeMonitor>());
+                for (TreeMonitor trans : transList) {
+                    subItem.getChildren().add(new TreeItem<>(trans));
+                    transCount++;
+                }
+
+                // Update submodule name with transaction count
+                subItem.setValue(new TreeMonitor(
+                    sub.getId(),
+                    sub.getParentId(),
+                    sub.getName() + " (" + transCount + ")",
+                    sub.getDescription(),
+                    sub.getAction()
+                ));
+
+                moduleItem.getChildren().add(subItem);
+                subCount++;
+            }
+
+            // Update module name with submodule count
+            moduleItem.setValue(new TreeMonitor(
+                module.getId(),
+                module.getParentId(),
+                module.getName() + " (" + subCount + ")",
+                module.getDescription(),
+                module.getAction()
+            ));
+
+            rootItem.getChildren().add(moduleItem);
+        }
+
+        rootItem.setExpanded(true);
+        tvRightSideBar.setRoot(rootItem);
+        tvRightSideBar.setShowRoot(false);
+
+        // Handle click actions
+        tvRightSideBar.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
+            if (newVal != null && newVal.getValue() != null) {
+                newVal.getValue().runAction();
+            }
+        });
+    }
 }
