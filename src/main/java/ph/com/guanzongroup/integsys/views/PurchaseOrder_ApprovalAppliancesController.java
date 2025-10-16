@@ -1,5 +1,12 @@
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/javafx/FXMLController.java to edit this template
+ */
 package ph.com.guanzongroup.integsys.views;
 
+import ph.com.guanzongroup.integsys.model.ModelPurchaseOrder;
+import ph.com.guanzongroup.integsys.model.ModelPurchaseOrderDetail;
+import ph.com.guanzongroup.integsys.utility.CustomCommonUtil;
 import java.net.URL;
 import java.sql.SQLException;
 import java.time.LocalDate;
@@ -59,11 +66,8 @@ import org.guanzon.cas.purchasing.services.PurchaseOrderControllers;
 import org.guanzon.cas.purchasing.status.PurchaseOrderStaticData;
 import org.guanzon.cas.purchasing.status.PurchaseOrderStatus;
 import org.json.simple.JSONObject;
-import org.json.simple.parser.ParseException;
-import ph.com.guanzongroup.integsys.model.ModelPurchaseOrder;
-import ph.com.guanzongroup.integsys.model.ModelPurchaseOrderDetail;
-import ph.com.guanzongroup.integsys.utility.CustomCommonUtil;
 import ph.com.guanzongroup.integsys.utility.JFXUtil;
+import org.json.simple.parser.ParseException;
 
 /**
  * FXML Controller class
@@ -969,8 +973,8 @@ public class PurchaseOrder_ApprovalAppliancesController implements Initializable
         if (fnEditMode == EditMode.READY) {
             switch (poPurchasingController.PurchaseOrder().Master().getTransactionStatus()) {
                 case PurchaseOrderStatus.CONFIRMED:
-                    CustomCommonUtil.setVisible(true, btnApprove, btnReturn, btnVoid, btnUpdate, btnPrint);
-                    CustomCommonUtil.setManaged(true, btnApprove, btnReturn, btnVoid, btnUpdate, btnPrint);
+                    CustomCommonUtil.setVisible(true, btnApprove,  btnVoid, btnUpdate, btnPrint);
+                    CustomCommonUtil.setManaged(true, btnApprove,  btnVoid, btnUpdate, btnPrint);
                     break;
                 case PurchaseOrderStatus.APPROVED:
                     btnPrint.setVisible(true);

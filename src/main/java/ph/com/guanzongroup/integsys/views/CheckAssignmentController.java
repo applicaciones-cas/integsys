@@ -1,5 +1,7 @@
 package ph.com.guanzongroup.integsys.views;
 
+import ph.com.guanzongroup.integsys.utility.CustomCommonUtil;
+import ph.com.guanzongroup.integsys.utility.JFXUtil;
 import java.net.URL;
 import java.sql.SQLException;
 import java.util.Arrays;
@@ -28,8 +30,6 @@ import ph.com.guanzongroup.cas.cashflow.CheckPrinting;
 import ph.com.guanzongroup.cas.cashflow.services.CashflowControllers;
 import ph.com.guanzongroup.cas.cashflow.status.CheckStatus;
 import ph.com.guanzongroup.cas.cashflow.status.DisbursementStatic;
-import ph.com.guanzongroup.integsys.utility.CustomCommonUtil;
-import ph.com.guanzongroup.integsys.utility.JFXUtil;
 
 public class CheckAssignmentController implements Initializable {
 
@@ -155,7 +155,8 @@ public class CheckAssignmentController implements Initializable {
             poCheckPrintingController.Master().setModifiedDate(oApp.getServerDate());
             /* ---------- 1. Save the CURRENT record ---------- */
              poCheckPrintingController.Master().setModifiedDate(oApp.getServerDate());
-            
+             poCheckPrintingController.BankAccountMaster().getModel().setCheckNo(checkNoToCheck);
+//            poJSON = poCheckPrintingController.saveBankAccountMaster();
             poJSON = poCheckPrintingController.SaveTransaction();
             
 

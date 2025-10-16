@@ -7,6 +7,7 @@ package ph.com.guanzongroup.integsys.views;
 import ph.com.guanzongroup.integsys.model.ModelPurchaseOrder;
 import ph.com.guanzongroup.integsys.model.ModelPurchaseOrderDetail;
 import ph.com.guanzongroup.integsys.utility.CustomCommonUtil;
+import com.sun.javafx.scene.control.skin.TableHeaderRow;
 import java.net.URL;
 import java.sql.SQLException;
 import java.time.LocalDate;
@@ -972,8 +973,8 @@ public class PurchaseOrder_ApprovalSPMCController implements Initializable, Scre
         if (fnEditMode == EditMode.READY) {
             switch (poPurchasingController.PurchaseOrder().Master().getTransactionStatus()) {
                 case PurchaseOrderStatus.CONFIRMED:
-                    CustomCommonUtil.setVisible(true, btnApprove, btnReturn, btnVoid, btnUpdate, btnPrint);
-                    CustomCommonUtil.setManaged(true, btnApprove, btnReturn, btnVoid, btnUpdate, btnPrint);
+                    CustomCommonUtil.setVisible(true, btnApprove,  btnVoid, btnUpdate, btnPrint);
+                    CustomCommonUtil.setManaged(true, btnApprove,  btnVoid, btnUpdate, btnPrint);
                     break;
                 case PurchaseOrderStatus.APPROVED:
                     btnPrint.setVisible(true);
