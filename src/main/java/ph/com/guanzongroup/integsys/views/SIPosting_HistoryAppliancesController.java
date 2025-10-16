@@ -310,7 +310,7 @@ public class SIPosting_HistoryAppliancesController implements Initializable, Scr
         controller.setOpenedImage(pnAttachment);
         controller.addData(data);
         try {
-            stageAttachment.showDialog((Stage) btnClose.getScene().getWindow(), getClass().getResource("/com/rmj/guanzongroup/sidebarmenus/views/AttachmentDialog.fxml"), controller, "Attachment Dialog", false, false, true);
+            stageAttachment.showDialog((Stage) btnClose.getScene().getWindow(), getClass().getResource("/ph/com/guanzongroup/integsys/views/AttachmentDialog.fxml"), controller, "Attachment Dialog", false, false, true);
         } catch (IOException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
         }
@@ -343,7 +343,7 @@ public class SIPosting_HistoryAppliancesController implements Initializable, Scr
                 moveNext();
             });
 
-            stageSerial.showDialog((Stage) btnBrowse.getScene().getWindow(), getClass().getResource("/com/rmj/guanzongroup/sidebarmenus/views/DeliveryAcceptance_SerialAppliances.fxml"), controller, "Inventory Serial", true, false, false);
+            stageSerial.showDialog((Stage) btnBrowse.getScene().getWindow(), getClass().getResource("/ph/com/guanzongroup/integsys/views/DeliveryAcceptance_SerialAppliances.fxml"), controller, "Inventory Serial", true, false, false);
             if (stageSerial.getScene() != null) {
                 setKeyEventSerial(stageSerial.getScene());
             } else {
