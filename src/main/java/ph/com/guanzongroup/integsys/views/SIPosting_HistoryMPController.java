@@ -308,7 +308,7 @@ public class SIPosting_HistoryMPController implements Initializable, ScreenInter
         controller.setOpenedImage(pnAttachment);
         controller.addData(data);
         try {
-            stageAttachment.showDialog((Stage) btnClose.getScene().getWindow(), getClass().getResource("/com/rmj/guanzongroup/integsys/views/AttachmentDialog.fxml"), controller, "Attachment Dialog", false, false, true);
+            stageAttachment.showDialog((Stage) btnClose.getScene().getWindow(), getClass().getResource("/ph/com/guanzongroup/integsys/views/AttachmentDialog.fxml"), controller, "Attachment Dialog", false, false, true);
         } catch (IOException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
         }
