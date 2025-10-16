@@ -16,14 +16,18 @@ public class Login extends Application {
     public static void main(String[] args) {
         try {
             String path;
+            String lsTemp;
             if (System.getProperty("os.name").toLowerCase().contains("win")) {
                 path = "D:/GGC_Maven_Systems";
+                lsTemp = "D:/temp";
             } else {
                 path = "/srv/GGC_Maven_Systems";
+                lsTemp = "/srv/temp";
             }
             System.setProperty("sys.default.path.config", path);
             System.setProperty("sys.default.path.metadata", System.getProperty("sys.default.path.config") + "/config/metadata/new/");
-
+            System.setProperty("sys.default.path.temp", lsTemp);
+            
             if (!loadProperties()) {
                 System.err.println("Unable to load config.");
                 System.exit(1);
