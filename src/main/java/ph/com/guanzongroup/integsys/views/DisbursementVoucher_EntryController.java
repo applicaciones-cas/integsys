@@ -266,7 +266,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
 
     @Override
     public void setIndustryID(String fsValue) {
-        psIndustryId = fsValue;
+        psIndustryId = "";
     }
 
     @Override

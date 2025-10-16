@@ -208,7 +208,7 @@ public class DisbursementVoucher_HistoryController implements Initializable, Scr
 
     @Override
     public void setIndustryID(String fsValue) {
-        psIndustryId = fsValue;
+        psIndustryId = "";
     }
 
     @Override
