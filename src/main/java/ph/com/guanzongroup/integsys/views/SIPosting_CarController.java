@@ -369,7 +369,7 @@ public class SIPosting_CarController implements Initializable, ScreenInterface {
                 moveNext();
             });
 
-            stageSerial.showDialog((Stage) btnSave.getScene().getWindow(), getClass().getResource("/com/rmj/guanzongroup/sidebarmenus/views/DeliveryAcceptance_SerialCar.fxml"), controller, "Inventory Serial", true, false, false);
+            stageSerial.showDialog((Stage) btnSave.getScene().getWindow(), getClass().getResource("/ph/com/guanzongroup/integsys/views/DeliveryAcceptance_SerialCar.fxml"), controller, "Inventory Serial", true, false, false);
             if (stageSerial.getScene() != null) {
                 setKeyEventSerial(stageSerial.getScene());
             } else {

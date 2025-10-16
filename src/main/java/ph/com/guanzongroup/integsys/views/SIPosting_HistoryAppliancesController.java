@@ -343,7 +343,7 @@ public class SIPosting_HistoryAppliancesController implements Initializable, Scr
                 moveNext();
             });
 
-            stageSerial.showDialog((Stage) btnBrowse.getScene().getWindow(), getClass().getResource("/com/rmj/guanzongroup/sidebarmenus/views/DeliveryAcceptance_SerialAppliances.fxml"), controller, "Inventory Serial", true, false, false);
+            stageSerial.showDialog((Stage) btnBrowse.getScene().getWindow(), getClass().getResource("/ph/com/guanzongroup/integsys/views/DeliveryAcceptance_SerialAppliances.fxml"), controller, "Inventory Serial", true, false, false);
             if (stageSerial.getScene() != null) {
                 setKeyEventSerial(stageSerial.getScene());
             } else {

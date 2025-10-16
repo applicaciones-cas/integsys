@@ -341,7 +341,7 @@ public class SIPosting_HistoryMPController implements Initializable, ScreenInter
                 moveNext();
             });
 
-            stageSerial.showDialog((Stage) btnBrowse.getScene().getWindow(), getClass().getResource("/com/rmj/guanzongroup/sidebarmenus/views/DeliveryAcceptance_SerialMP.fxml"), controller, "Inventory Serial", true, false, false);
+            stageSerial.showDialog((Stage) btnBrowse.getScene().getWindow(), getClass().getResource("/ph/com/guanzongroup/integsys/views/DeliveryAcceptance_SerialMP.fxml"), controller, "Inventory Serial", true, false, false);
             if (stageSerial.getScene() != null) {
                 setKeyEventSerial(stageSerial.getScene());
             } else {
