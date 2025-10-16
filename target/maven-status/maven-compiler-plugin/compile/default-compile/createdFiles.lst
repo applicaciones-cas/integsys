@@ -141,6 +141,7 @@ ph\com\guanzongroup\integsys\views\PurchaseOrder_HistoryMCController.class
 ph\com\guanzongroup\integsys\views\PurchaseOrderReturn_HistoryCarController.class
 ph\com\guanzongroup\integsys\views\POReplacement_EntrySPMCController.class
 ph\com\guanzongroup\integsys\views\POCancellation_EntryControllerLP_Food$2.class
+ph\com\guanzongroup\integsys\views\TreeMonitor.class
 ph\com\guanzongroup\integsys\views\PurchaseOrder_EntryCarController$4.class
 ph\com\guanzongroup\integsys\utility\JFXUtil$LoadScreenComponents.class
 ph\com\guanzongroup\integsys\views\POCancellation_EntryControllerMonarch_Food.class
@@ -886,6 +887,7 @@ ph\com\guanzongroup\integsys\views\SOATagging_EntryAppliancesController.class
 ph\com\guanzongroup\integsys\views\DeliveryAcceptance_ConfirmationMonarchHospitalityController$1.class
 ph\com\guanzongroup\integsys\views\POReplacement_ConfirmationLPController$1.class
 ph\com\guanzongroup\integsys\views\PurchaseOrder_HistoryMonarchHospitalityController.class
+ph\com\guanzongroup\integsys\views\DashboardController$3.class
 ph\com\guanzongroup\integsys\views\DisbursementVoucher_VerificationController.class
 ph\com\guanzongroup\integsys\views\SIPosting_HistoryMCController.class
 ph\com\guanzongroup\integsys\views\SelectIndustryCompany$Industry.class
