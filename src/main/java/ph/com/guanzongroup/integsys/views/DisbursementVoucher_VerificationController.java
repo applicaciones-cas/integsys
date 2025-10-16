@@ -250,7 +250,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
 
     @Override
     public void setIndustryID(String fsValue) {
-        psIndustryId = "";
+        psIndustryId = fsValue;
     }
 
     @Override
