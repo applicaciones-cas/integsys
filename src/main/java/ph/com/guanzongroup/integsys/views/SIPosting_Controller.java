@@ -220,7 +220,7 @@ public class SIPosting_Controller implements Initializable, ScreenInterface {
 
     @Override
     public void setIndustryID(String fsValue) {
-        psIndustryId = fsValue;
+        psIndustryId = "09";
     }
 
     @Override
