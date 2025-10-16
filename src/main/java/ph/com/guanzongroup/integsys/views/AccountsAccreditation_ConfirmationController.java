@@ -117,7 +117,7 @@ public class AccountsAccreditation_ConfirmationController implements Initializab
             //initlalize and validate record objects from class controller
             //background thread
             Platform.runLater(() -> {
-                poAppController.setRecordStatus("01");
+                poAppController.setRecordStatus("0");
             });
 
             initControlEvents();
