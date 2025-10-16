@@ -1,5 +1,9 @@
 package ph.com.guanzongroup.integsys.utility;
 
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+ */
 import com.sun.javafx.scene.control.skin.TableHeaderRow;
 import com.sun.javafx.scene.control.skin.TableViewSkin;
 import com.sun.javafx.scene.control.skin.VirtualFlow;
@@ -122,7 +126,7 @@ import javafx.css.PseudoClass;
 import ph.com.guanzongroup.integsys.views.ScreenInterface;
 
 /**
- * Date : 4/28/2025
+ * Date : 4/28/2025 Recent update: 10/16/2025
  *
  * @author Aldrich
  */
@@ -784,7 +788,7 @@ public class JFXUtil {
     }
 
     /* Clears textFields, textAreas, checkboxes, combobxes, & datepickers by calling its parent Anchorpane */
- /* For datepicker it auto set value to null before clearing its text input*/
+ /* For datepicker it auto set value to null before clearing its text input; newly added safe operation*/
     public static void clearTextFields(AnchorPane... anchorPanes) {
         for (AnchorPane pane : anchorPanes) {
             clearTextInputsRecursive(pane);
@@ -805,7 +809,12 @@ public class JFXUtil {
                 ((CheckBox) node).setSelected(false); // uncheck
             } else if (node instanceof ComboBox) {
                 ComboBox<?> combo = (ComboBox<?>) node;
+
+                EventHandler<ActionEvent> savedHandler = combo.getOnAction(); // save
+
+                combo.setOnAction(null);
                 combo.getSelectionModel().select(0);
+                combo.setOnAction(savedHandler);
             } else if (node instanceof Parent) {
                 clearTextInputsRecursive((Parent) node);
             }
@@ -1147,6 +1156,36 @@ public class JFXUtil {
         className = className.replace("SP MC", "SPMC");
 
         return className;
+    }
+
+    /*Identifies if general based on title*/
+    public static boolean isGeneral(String title) {
+        if (title == null || title.trim().isEmpty()) {
+            return false;
+        }
+
+        // Trim and normalize spaces
+        title = title.trim();
+
+        String[] generalSuffixes = {
+            "Entry", "Confirmation", "History", "Approval"
+        };
+
+        for (String suffix : generalSuffixes) {
+            // Check if the title ends exactly with one of the general suffixes
+            if (title.endsWith(suffix)) {
+                return true;
+            }
+        }
+
+        // If it contains any of those words but continues after, it's not general
+        for (String suffix : generalSuffixes) {
+            if (title.contains(suffix + " ")) {
+                return false;
+            }
+        }
+
+        return false;
     }
 
     /*V2, allow modification on naming*/
@@ -1623,36 +1662,6 @@ public class JFXUtil {
                 applyToCheckBoxes((Parent) node); // recursively check inner containers
             }
         }
-    }
-
-    /*Identifies if general based on title*/
-    public static boolean isGeneral(String title) {
-        if (title == null || title.trim().isEmpty()) {
-            return false;
-        }
-
-        // Trim and normalize spaces
-        title = title.trim();
-
-        String[] generalSuffixes = {
-            "Entry", "Confirmation", "History", "Approval"
-        };
-
-        for (String suffix : generalSuffixes) {
-            // Check if the title ends exactly with one of the general suffixes
-            if (title.endsWith(suffix)) {
-                return true;
-            }
-        }
-
-        // If it contains any of those words but continues after, it's not general
-        for (String suffix : generalSuffixes) {
-            if (title.contains(suffix + " ")) {
-                return false;
-            }
-        }
-
-        return false;
     }
 
     @FunctionalInterface
@@ -2517,6 +2526,7 @@ public class JFXUtil {
     public static class BreakLoopException extends RuntimeException {
     }
 
+    /*Experimental*/
     public static void ifError(boolean isError, TextField txtField, JSONObject poJSON, String pxeModuleName, Runnable orElse) {
         if (isError) {
             ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
