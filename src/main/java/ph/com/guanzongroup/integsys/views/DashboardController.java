@@ -108,7 +108,7 @@ public class DashboardController implements Initializable {
     private static Tooltip[] sideBarLeftUpperToolTip;
 
     private ToggleGroup toggleGroupLowerBtn;
-    private static ToggleButton[] toggleBtnLeftLowerSideBar;
+    ToggleButton[] toggleBtnLeftLowerSideBar;
     private static Tooltip[] sideBarLeftLowerToolTip;
 
     private ToggleGroup toggleGroupRightSideBar;

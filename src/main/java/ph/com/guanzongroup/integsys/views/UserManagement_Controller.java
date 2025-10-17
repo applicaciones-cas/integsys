@@ -29,12 +29,12 @@ import ph.com.guanzongroup.integsys.model.ModelUserManagement;
 import ph.com.guanzongroup.integsys.utility.JFXUtil;
 
 public class UserManagement_Controller implements Initializable, ScreenInterface {
-
+    
     private GRiderCAS oApp;
 //    static CashflowControllers poAPPaymentAdjustmentController;
     private JSONObject poJSON;
     public int pnEditMode;
-
+    
     private String pxeModuleName = "User Management";
     private boolean isGeneral = false;
     private String psIndustryId = "";
@@ -60,7 +60,7 @@ public class UserManagement_Controller implements Initializable, ScreenInterface
             "SYSMASTER"
     );
     ObservableList<String> UserType = FXCollections.observableArrayList("Local", "Global");
-
+    
     @FXML
     private AnchorPane apMainAnchor, apBrowse, apButton, apMaster;
     @FXML
@@ -73,7 +73,7 @@ public class UserManagement_Controller implements Initializable, ScreenInterface
     private TableView tblMain;
     @FXML
     private TableColumn tblModule, tblRole, tblUserLevel;
-
+    
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         psIndustryId = ""; // general
@@ -89,29 +89,29 @@ public class UserManagement_Controller implements Initializable, ScreenInterface
         initComboboxes();
         pnEditMode = EditMode.UNKNOWN;
         initButton(pnEditMode);
-
+        
     }
-
+    
     @Override
     public void setGRider(GRiderCAS foValue) {
         oApp = foValue;
     }
-
+    
     @Override
     public void setIndustryID(String fsValue) {
         psIndustryId = fsValue;
     }
-
+    
     @Override
     public void setCompanyID(String fsValue) {
         //Company is not autoset
     }
-
+    
     @Override
     public void setCategoryID(String fsValue) {
         //No Category
     }
-
+    
     public void loadTableDetailFromMain() {
 //        try {
 //            poJSON = new JSONObject();
@@ -134,7 +134,7 @@ public class UserManagement_Controller implements Initializable, ScreenInterface
 //            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
 //        }
     }
-
+    
     public void loadRecordMaster() {
         tfUserID.setText("");
         tfLogInName.setText("");
@@ -144,12 +144,12 @@ public class UserManagement_Controller implements Initializable, ScreenInterface
         cmbUserLevel.getSelectionModel().select(0);
         cmbUserType.getSelectionModel().select(0);
     }
-
+    
     public void loadRecordSearch() {
         tfSearchEmployeeName.setText("");
         tfSearchLogInName.setText("");
     }
-
+    
     @FXML
     private void cmdButton_Click(ActionEvent event) {
         poJSON = new JSONObject();
@@ -157,13 +157,14 @@ public class UserManagement_Controller implements Initializable, ScreenInterface
         if (source instanceof Button) {
             Button clickedButton = (Button) source;
             String lsButton = clickedButton.getId();
-
+            
             switch (lsButton) {
                 case "btnClose":
                     unloadForm appUnload = new unloadForm();
                     if (ShowMessageFX.OkayCancel(null, "Close Tab", "Are you sure you want to close this Tab?") == true) {
 //                        appUnload.unloadForm(apMainAnchor, oApp, pxeModuleName);
-
+//
+                        LoginControllerHolder.getMainController().toggleBtnLeftLowerSideBar[0].selectedProperty().set(false);
                         //should go back to log in or in xml form
                         if (LoginControllerHolder.getLogInStatus()) {
                             LoginControllerHolder.getMainController().Tabclose();
@@ -175,21 +176,21 @@ public class UserManagement_Controller implements Initializable, ScreenInterface
                     }
                     break;
             }
-
+            
         }
-
+        
     }
-
+    
     public void retrieveAccount() {
     }
-
+    
     private void txtField_KeyPressed(KeyEvent event) {
         TextField txtField = (TextField) event.getSource();
         String lsID = txtField.getId();
         String lsValue = (txtField.getText() == null ? "" : txtField.getText());
         poJSON = new JSONObject();
         int lnRow = pnMain;
-
+        
         switch (event.getCode()) {
             case TAB:
             case ENTER:
@@ -200,21 +201,21 @@ public class UserManagement_Controller implements Initializable, ScreenInterface
             case F3:
                 switch (lsID) {
                     case "tfSearchEmployeeName":
-
+                        
                         loadRecordSearch();
                         retrieveAccount();
                         return;
                     case "tfSearchLogInName":
-
+                        
                         loadRecordSearch();
                         retrieveAccount();
                         return;
                 }
                 break;
         }
-
+        
     }
-
+    
     ChangeListener<Boolean> txtMaster_Focus = JFXUtil.FocusListener(TextField.class,
             (lsID, lsValue) -> {
                 /* Lost Focus */
@@ -244,7 +245,7 @@ public class UserManagement_Controller implements Initializable, ScreenInterface
                 }
                 loadRecordMaster();
             });
-
+    
     ChangeListener<Boolean> txtField_Focus = JFXUtil.FocusListener(TextField.class,
             (lsID, lsValue) -> {
                 /* Lost Focus */
@@ -264,31 +265,31 @@ public class UserManagement_Controller implements Initializable, ScreenInterface
                 }
                 loadRecordSearch();
             });
-
+    
     public void initTextFields() {
         JFXUtil.setFocusListener(txtMaster_Focus, tfLogInName, tfPassword, tfEmployeeName, tfProduct);
         JFXUtil.setFocusListener(txtField_Focus, tfSearchEmployeeName, tfSearchLogInName);
-
+        
         JFXUtil.setKeyPressedListener(this::txtField_KeyPressed, apBrowse, apMaster);
     }
-
+    
     public void clearTextFields() {
         psSearchCompanyId = "";
         psCompanyId = "";
         psSearchSupplierId = "";
         psSupplierId = "";
-
+        
         JFXUtil.clearTextFields(apMaster);
     }
-
+    
     public void initMainGrid() {
         JFXUtil.setColumnLeft(tblModule, tblRole, tblUserLevel);
         JFXUtil.setColumnsIndexAndDisableReordering(tblMain);
-
+        
         filteredData = new FilteredList<>(main_data, b -> true);
         tblMain.setItems(filteredData);
     }
-
+    
     public void initLoadTable() {
         loadTableMain = new JFXUtil.ReloadableTableTask(
                 tblMain,
@@ -306,9 +307,9 @@ public class UserManagement_Controller implements Initializable, ScreenInterface
                                 ));
                             } catch (Exception e) {
                             }
-
+                            
                         }
-
+                        
                         if (pnMain < 0 || pnMain
                                 >= main_data.size()) {
                             if (!main_data.isEmpty()) {
@@ -316,24 +317,24 @@ public class UserManagement_Controller implements Initializable, ScreenInterface
                                 tblMain.getSelectionModel().select(0);
                                 tblMain.getFocusModel().focus(0);
                                 pnMain = tblMain.getSelectionModel().getSelectedIndex();
-
+                                
                             }
                         } else {
                             /* FOCUS ON THE ROW THAT pnRowDetail POINTS TO */
                             tblMain.getSelectionModel().select(pnMain);
                             tblMain.getFocusModel().focus(pnMain);
-
+                            
                         }
-
+                        
                     });
-
+                    
                 });
     }
     EventHandler<ActionEvent> comboBoxActionListener = JFXUtil.CmbActionListener(
             (cmbId, selectedIndex, selectedValue) -> {
                 switch (cmbId) {
                     case "cmbUserLevel":
-
+                        
                         break;
                     case "cmbUserType":
                         break;
@@ -341,13 +342,13 @@ public class UserManagement_Controller implements Initializable, ScreenInterface
                 loadRecordMaster();
             }
     );
-
+    
     public void initComboboxes() {
         JFXUtil.setComboBoxItems(new JFXUtil.Pairs<>(UserLevel, cmbUserLevel), new JFXUtil.Pairs<>(UserType, cmbUserType));
         JFXUtil.setComboBoxActionListener(comboBoxActionListener, cmbUserLevel, cmbUserType);
         JFXUtil.initComboBoxCellDesignColor("#FF8201", cmbUserLevel, cmbUserType);
     }
-
+    
     public void initTableOnClick() {
         tblMain.setOnMouseClicked(event -> {
             pnMain = tblMain.getSelectionModel().getSelectedIndex();
@@ -361,7 +362,7 @@ public class UserManagement_Controller implements Initializable, ScreenInterface
         });
         JFXUtil.adjustColumnForScrollbar(tblMain);
     }
-
+    
     private void initButton(int fnValue) {
         boolean lbShow = (fnValue == EditMode.ADDNEW || fnValue == EditMode.UPDATE);
         boolean lbShow2 = fnValue == EditMode.READY;
@@ -375,5 +376,5 @@ public class UserManagement_Controller implements Initializable, ScreenInterface
 
 //        JFXUtil.setDisabled(lbShow3, apMaster);
     }
-
+    
 }
