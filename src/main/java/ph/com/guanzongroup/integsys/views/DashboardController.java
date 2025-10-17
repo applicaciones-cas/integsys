@@ -1157,6 +1157,13 @@ public class DashboardController implements Initializable {
         }
     }
 
+    public void TabUserManagement() {
+        int tabsize = tabpane.getTabs().size();
+        if (tabsize == 1) {
+            setScene(loadAnimateAnchor(psUserManagementFXML));
+        }
+    }
+
     public void Tabclose() {
         int tabsize = tabpane.getTabs().size();
         if (tabsize == 1) {

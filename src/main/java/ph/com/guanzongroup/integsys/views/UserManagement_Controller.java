@@ -166,9 +166,9 @@ public class UserManagement_Controller implements Initializable, ScreenInterface
 
                         //should go back to log in or in xml form
                         if (LoginControllerHolder.getLogInStatus()) {
-//                            DashboardController.setScene(DashboardController.loadAnimateAnchor(DashboardController.psDefaultScreenFXML2));
+                            LoginControllerHolder.getMainController().Tabclose();
                         } else {
-//                            DashboardController.setScene(DashboardController.loadAnimateAnchor(DashboardController.psDefaultScreenFXML));
+                            LoginControllerHolder.getMainController().TabUserManagement();
                         }
                     } else {
                         return;
@@ -333,7 +333,7 @@ public class UserManagement_Controller implements Initializable, ScreenInterface
             (cmbId, selectedIndex, selectedValue) -> {
                 switch (cmbId) {
                     case "cmbUserLevel":
-                        
+
                         break;
                     case "cmbUserType":
                         break;
