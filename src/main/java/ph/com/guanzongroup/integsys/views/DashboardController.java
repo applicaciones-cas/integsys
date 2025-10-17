@@ -389,6 +389,7 @@ public class DashboardController implements Initializable {
         //setAnchorPaneVisibleManage(false, anchorRightSideBarMenu);
     }
     ChangeListener<Boolean> toggleSelectedListener = (obs, oldVal, newVal) -> {
+        setAnchorPaneVisibleManage(false, anchorLeftSideBarMenu);
         if (newVal) { //toggle on
             if (savedNodes != null) {
                 savedNodes.clear();
@@ -1173,21 +1174,16 @@ public class DashboardController implements Initializable {
     }
 
     public void TabUserManagement1() { // if logged in
-        int tabsize = tabpane.getTabs().size();
-        if (tabsize == 1) {
-            tabpane.setVisible(true);
-            tabpane.setManaged(true);
-
-            workingSpace.getChildren().clear();
-            workingSpace.getChildren().setAll(savedNodes);
-        }
+        setAnchorPaneVisibleManage(false, anchorLeftSideBarMenu);
+        tabpane.setVisible(true);
+        tabpane.setManaged(true);
+        workingSpace.getChildren().clear();
+        workingSpace.getChildren().setAll(savedNodes);
     }
 
     public void TabUserManagement2() { //if not logged in
-        int tabsize = tabpane.getTabs().size();
-        if (tabsize == 1) {
-            setScene(loadAnimateAnchor(psUserManagementFXML));
-        }
+        setAnchorPaneVisibleManage(false, anchorLeftSideBarMenu);
+        setScene(loadAnimateAnchor(psUserManagementFXML));
     }
 
     public void Tabclose() {
