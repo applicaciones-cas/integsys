@@ -167,9 +167,9 @@ public class UserManagement_Controller implements Initializable, ScreenInterface
                         LoginControllerHolder.getMainController().toggleBtnLeftLowerSideBar[0].selectedProperty().set(false);
                         //should go back to log in or in xml form
                         if (LoginControllerHolder.getLogInStatus()) {
-                            LoginControllerHolder.getMainController().Tabclose();
+                            LoginControllerHolder.getMainController().TabUserManagement1();
                         } else {
-                            LoginControllerHolder.getMainController().TabUserManagement();
+                            LoginControllerHolder.getMainController().TabUserManagement2();
                         }
                     } else {
                         return;

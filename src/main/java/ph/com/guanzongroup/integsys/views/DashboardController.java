@@ -88,6 +88,8 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
+import javafx.beans.value.ChangeListener;
 
 public class DashboardController implements Initializable {
 
@@ -136,6 +138,7 @@ public class DashboardController implements Initializable {
 
     private final Map<String, Runnable> javaCommands = new HashMap<>();
     private Set<String> allowedMenuIds = new HashSet<>();
+    List<Node> savedNodes = null;
 
     @FXML
     private AnchorPane MainAnchor;
@@ -385,6 +388,27 @@ public class DashboardController implements Initializable {
         setAnchorPaneVisibleManage(false, anchorLeftSideBarMenu);
         //setAnchorPaneVisibleManage(false, anchorRightSideBarMenu);
     }
+    ChangeListener<Boolean> toggleSelectedListener = (obs, oldVal, newVal) -> {
+        if (newVal) { //toggle on
+            if (savedNodes != null) {
+                savedNodes.clear();
+            }
+            savedNodes = new ArrayList<>(workingSpace.getChildren());
+            setScene(loadAnimateAnchor(psUserManagementFXML));
+        } else { //toggle off
+            //define also if logged in or not, if logged in
+            if (LoginControllerHolder.getLogInStatus()) {
+                tabpane.setVisible(true);
+                tabpane.setManaged(true);
+
+                workingSpace.getChildren().clear();
+                workingSpace.getChildren().setAll(savedNodes);
+
+            } else {
+                setScene(loadAnimateAnchor(psDefaultScreenFXML));
+            }
+        }
+    };
 
     private void ToggleGroupControlLowerLeftSideBar() {
         toggleGroupLowerBtn = new ToggleGroup();
@@ -402,18 +426,9 @@ public class DashboardController implements Initializable {
             toggleBtnLeftLowerSideBar[i].setTooltip(new Tooltip(tooltipTexts[i]));
             toggleBtnLeftLowerSideBar[i].setToggleGroup(toggleGroupLowerBtn);
         }
-        toggleBtnLeftLowerSideBar[0].selectedProperty().addListener((obs, wasSelected, isNowSelected) -> {
-            if (isNowSelected) {
-                setScene(loadAnimateAnchor(psUserManagementFXML));
-            } else {
-                //define also if logged in or not, if logged in
-                if (LoginControllerHolder.getLogInStatus()) {
-                    setScene(loadAnimateAnchor(psDefaultScreenFXML2));
-                } else {
-                    setScene(loadAnimateAnchor(psDefaultScreenFXML));
-                }
-            }
-        });
+
+        toggleBtnLeftLowerSideBar[0].selectedProperty().removeListener(toggleSelectedListener);
+        toggleBtnLeftLowerSideBar[0].selectedProperty().addListener(toggleSelectedListener);
     }
 
     private void ToggleGroupControlRightSideBar() {
@@ -1157,7 +1172,18 @@ public class DashboardController implements Initializable {
         }
     }
 
-    public void TabUserManagement() {
+    public void TabUserManagement1() { // if logged in
+        int tabsize = tabpane.getTabs().size();
+        if (tabsize == 1) {
+            tabpane.setVisible(true);
+            tabpane.setManaged(true);
+
+            workingSpace.getChildren().clear();
+            workingSpace.getChildren().setAll(savedNodes);
+        }
+    }
+
+    public void TabUserManagement2() { //if not logged in
         int tabsize = tabpane.getTabs().size();
         if (tabsize == 1) {
             setScene(loadAnimateAnchor(psUserManagementFXML));
@@ -1338,18 +1364,8 @@ public class DashboardController implements Initializable {
             toggleBtnLeftLowerSideBar[i].setTooltip(new Tooltip(tooltipTexts[i]));
             toggleBtnLeftLowerSideBar[i].setToggleGroup(toggleGroupLowerBtn);
         }
-        toggleBtnLeftLowerSideBar[0].selectedProperty().addListener((obs, wasSelected, isNowSelected) -> {
-            if (isNowSelected) {
-                setScene(loadAnimateAnchor(psUserManagementFXML));
-            } else {
-                //define also if logged in or not, if logged in
-                if (LoginControllerHolder.getLogInStatus()) {
-                    setScene(loadAnimateAnchor(psDefaultScreenFXML2));
-                } else {
-                    setScene(loadAnimateAnchor(psDefaultScreenFXML));
-                }
-            }
-        });
+        toggleBtnLeftLowerSideBar[0].selectedProperty().removeListener(toggleSelectedListener);
+        toggleBtnLeftLowerSideBar[0].selectedProperty().addListener(toggleSelectedListener);
     }
 
     public void changeUserInfo() {
