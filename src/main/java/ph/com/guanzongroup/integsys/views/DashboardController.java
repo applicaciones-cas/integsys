@@ -88,6 +88,8 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
+import javafx.beans.value.ChangeListener;
 
 public class DashboardController implements Initializable {
 
@@ -98,6 +100,7 @@ public class DashboardController implements Initializable {
 
     private String psDefaultScreenFXML = "/ph/com/guanzongroup/integsys/views/Login.fxml";
     private String psDefaultScreenFXML2 = "/ph/com/guanzongroup/integsys/views/DefaultScreen.fxml";
+    private String psUserManagementFXML = "/ph/com/guanzongroup/integsys/views/UserManagement.fxml";
 
     private int notificationCount = 0;
     private int cartCount = 0;
@@ -107,7 +110,7 @@ public class DashboardController implements Initializable {
     private static Tooltip[] sideBarLeftUpperToolTip;
 
     private ToggleGroup toggleGroupLowerBtn;
-    private static ToggleButton[] toggleBtnLeftLowerSideBar;
+    ToggleButton[] toggleBtnLeftLowerSideBar;
     private static Tooltip[] sideBarLeftLowerToolTip;
 
     private ToggleGroup toggleGroupRightSideBar;
@@ -135,6 +138,7 @@ public class DashboardController implements Initializable {
 
     private final Map<String, Runnable> javaCommands = new HashMap<>();
     private Set<String> allowedMenuIds = new HashSet<>();
+    List<Node> savedNodes = null;
 
     @FXML
     private AnchorPane MainAnchor;
@@ -239,7 +243,7 @@ public class DashboardController implements Initializable {
             JFXUtil.applyToggleHoverAnimation(btnMenu, btnHelp, btnLogout, btnSysMonitor);
             JFXUtil.applyHoverFadeToButtons("#FFFFFF", "#552B00", btnMinimize, btnClose);
             JFXUtil.placeClockInAnchorPane(apClock, 25);
-            
+
             switch (System.getProperty("user.selected.industry")) {
                 case "06":
                     loadDummyMenu();
@@ -251,7 +255,7 @@ public class DashboardController implements Initializable {
                     break;
                 default:
                     setAnchorPaneVisibleManage(false, anchorRightSideBarMenu);
-            } 
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -325,6 +329,8 @@ public class DashboardController implements Initializable {
                 return new LoginController();
             case "/ph/com/guanzongroup/integsys/views/DefaultScreen.fxml":
                 return new DefaultScreenController();
+            case "/ph/com/guanzongroup/integsys/views/UserManagement.fxml":
+                return new UserManagement_Controller();
             default:
                 return null;
         }
@@ -382,6 +388,27 @@ public class DashboardController implements Initializable {
         setAnchorPaneVisibleManage(false, anchorLeftSideBarMenu);
         //setAnchorPaneVisibleManage(false, anchorRightSideBarMenu);
     }
+    ChangeListener<Boolean> toggleSelectedListener = (obs, oldVal, newVal) -> {
+        if (newVal) { //toggle on
+            if (savedNodes != null) {
+                savedNodes.clear();
+            }
+            savedNodes = new ArrayList<>(workingSpace.getChildren());
+            setScene(loadAnimateAnchor(psUserManagementFXML));
+        } else { //toggle off
+            //define also if logged in or not, if logged in
+            if (LoginControllerHolder.getLogInStatus()) {
+                tabpane.setVisible(true);
+                tabpane.setManaged(true);
+
+                workingSpace.getChildren().clear();
+                workingSpace.getChildren().setAll(savedNodes);
+
+            } else {
+                setScene(loadAnimateAnchor(psDefaultScreenFXML));
+            }
+        }
+    };
 
     private void ToggleGroupControlLowerLeftSideBar() {
         toggleGroupLowerBtn = new ToggleGroup();
@@ -399,6 +426,9 @@ public class DashboardController implements Initializable {
             toggleBtnLeftLowerSideBar[i].setTooltip(new Tooltip(tooltipTexts[i]));
             toggleBtnLeftLowerSideBar[i].setToggleGroup(toggleGroupLowerBtn);
         }
+
+        toggleBtnLeftLowerSideBar[0].selectedProperty().removeListener(toggleSelectedListener);
+        toggleBtnLeftLowerSideBar[0].selectedProperty().addListener(toggleSelectedListener);
     }
 
     private void ToggleGroupControlRightSideBar() {
@@ -623,89 +653,89 @@ public class DashboardController implements Initializable {
             }
         });
     }
-    
+
     private void setTreeViewStyleMonitor(TreeView<TreeMonitor> treeView) {
-    treeView.setCellFactory(tv -> new javafx.scene.control.TreeCell<TreeMonitor>() {
-        @Override
-        protected void updateItem(TreeMonitor item, boolean empty) {
-            super.updateItem(item, empty);
+        treeView.setCellFactory(tv -> new javafx.scene.control.TreeCell<TreeMonitor>() {
+            @Override
+            protected void updateItem(TreeMonitor item, boolean empty) {
+                super.updateItem(item, empty);
 
-            if (empty || item == null) {
-                setText(null);
-                setGraphic(null);
-                setTooltip(null);
-                setStyle("-fx-background-color: #DFDFDF; -fx-border-color: #DFDFDF;");
-                if (!getStyleClass().contains("empty-tree-cell")) {
-                    getStyleClass().add("empty-tree-cell");
-                }
-                setCursor(javafx.scene.Cursor.DEFAULT);
-                setOnMouseEntered(null);
-                setOnMouseExited(null);
-                setOnMouseClicked(null);
-            } else {
-                setText(item.getName());
-                setGraphic(getTreeItem().getGraphic());
-                getStyleClass().remove("empty-tree-cell");
-
-                // Container node: action == null
-                boolean isContainer = item.getAction() == null;
-
-                // Tooltip with description (if available)
-                if (item.getDescription() != null && !item.getDescription().isEmpty()) {
-                    setTooltip(new javafx.scene.control.Tooltip(item.getDescription()));
-                } else {
+                if (empty || item == null) {
+                    setText(null);
+                    setGraphic(null);
                     setTooltip(null);
-                }
-
-                if (isContainer) {
-                    // Container node styling
-                    setStyle("-fx-font-weight: bold; -fx-text-fill: #555555;");
+                    setStyle("-fx-background-color: #DFDFDF; -fx-border-color: #DFDFDF;");
+                    if (!getStyleClass().contains("empty-tree-cell")) {
+                        getStyleClass().add("empty-tree-cell");
+                    }
                     setCursor(javafx.scene.Cursor.DEFAULT);
-                } else {
-                    // Executable node styling
-                    setStyle("-fx-font-weight: normal; -fx-text-fill: black;");
-                    setCursor(javafx.scene.Cursor.HAND);
-                }
-
-                // Hover effect only for command/executable nodes
-                if (!isContainer) {
-                    setOnMouseEntered(e -> {
-                        setStyle("-fx-background-color: #E6F2FF; -fx-font-weight: normal; -fx-text-fill: black;");
-                        setCursor(javafx.scene.Cursor.HAND);
-                    });
-                    setOnMouseExited(e -> {
-                        setStyle("-fx-font-weight: normal; -fx-text-fill: black;");
-                        setCursor(javafx.scene.Cursor.HAND);
-                    });
-                } else {
                     setOnMouseEntered(null);
                     setOnMouseExited(null);
-                }
+                    setOnMouseClicked(null);
+                } else {
+                    setText(item.getName());
+                    setGraphic(getTreeItem().getGraphic());
+                    getStyleClass().remove("empty-tree-cell");
 
-                // Handle click actions
-                setOnMouseClicked(event -> {
-                    if (event.getClickCount() == 1) {
-                        if (isContainer) {
-                            // Expand/collapse only
-                            javafx.scene.control.TreeItem<TreeMonitor> treeItem = getTreeItem();
-                            if (treeItem != null && !treeItem.isLeaf()) {
-                                treeItem.setExpanded(!treeItem.isExpanded());
-                                event.consume();
-                            }
-                        } else {
-                            // Executable node: run assigned action
-                            if (item.getAction() != null) {
-                                item.getAction().run();
+                    // Container node: action == null
+                    boolean isContainer = item.getAction() == null;
+
+                    // Tooltip with description (if available)
+                    if (item.getDescription() != null && !item.getDescription().isEmpty()) {
+                        setTooltip(new javafx.scene.control.Tooltip(item.getDescription()));
+                    } else {
+                        setTooltip(null);
+                    }
+
+                    if (isContainer) {
+                        // Container node styling
+                        setStyle("-fx-font-weight: bold; -fx-text-fill: #555555;");
+                        setCursor(javafx.scene.Cursor.DEFAULT);
+                    } else {
+                        // Executable node styling
+                        setStyle("-fx-font-weight: normal; -fx-text-fill: black;");
+                        setCursor(javafx.scene.Cursor.HAND);
+                    }
+
+                    // Hover effect only for command/executable nodes
+                    if (!isContainer) {
+                        setOnMouseEntered(e -> {
+                            setStyle("-fx-background-color: #E6F2FF; -fx-font-weight: normal; -fx-text-fill: black;");
+                            setCursor(javafx.scene.Cursor.HAND);
+                        });
+                        setOnMouseExited(e -> {
+                            setStyle("-fx-font-weight: normal; -fx-text-fill: black;");
+                            setCursor(javafx.scene.Cursor.HAND);
+                        });
+                    } else {
+                        setOnMouseEntered(null);
+                        setOnMouseExited(null);
+                    }
+
+                    // Handle click actions
+                    setOnMouseClicked(event -> {
+                        if (event.getClickCount() == 1) {
+                            if (isContainer) {
+                                // Expand/collapse only
+                                javafx.scene.control.TreeItem<TreeMonitor> treeItem = getTreeItem();
+                                if (treeItem != null && !treeItem.isLeaf()) {
+                                    treeItem.setExpanded(!treeItem.isExpanded());
+                                    event.consume();
+                                }
                             } else {
-                                System.out.println("⚠ No action defined for: " + item.getName());
+                                // Executable node: run assigned action
+                                if (item.getAction() != null) {
+                                    item.getAction().run();
+                                } else {
+                                    System.out.println("⚠ No action defined for: " + item.getName());
+                                }
                             }
                         }
-                    }
-                });
+                    });
+                }
             }
-        }
-    });
-}
+        });
+    }
 
     private void setDropShadowEffectsLeftSideBar(AnchorPane anchorPane) {
         DropShadow shadow = new DropShadow();
@@ -1142,6 +1172,24 @@ public class DashboardController implements Initializable {
         }
     }
 
+    public void TabUserManagement1() { // if logged in
+        int tabsize = tabpane.getTabs().size();
+        if (tabsize == 1) {
+            tabpane.setVisible(true);
+            tabpane.setManaged(true);
+
+            workingSpace.getChildren().clear();
+            workingSpace.getChildren().setAll(savedNodes);
+        }
+    }
+
+    public void TabUserManagement2() { //if not logged in
+        int tabsize = tabpane.getTabs().size();
+        if (tabsize == 1) {
+            setScene(loadAnimateAnchor(psUserManagementFXML));
+        }
+    }
+
     public void Tabclose() {
         int tabsize = tabpane.getTabs().size();
         if (tabsize == 1) {
@@ -1269,10 +1317,10 @@ public class DashboardController implements Initializable {
         new ControllerBinding("CAR SP SI Posting History", SIPosting_HistorySPCarController.class),
         new ControllerBinding("MF SI Posting History", SIPosting_HistoryMonarchFoodController.class),
         new ControllerBinding("MH SI Posting History", SIPosting_HistoryMonarchHospitalityController.class),
-        new ControllerBinding("GENERAL Quotation Entry",POQuotation_EntryController.class),
-        new ControllerBinding("GENERAL Quotation Confirmation",POQuotation_ConfirmationController.class),
-        new ControllerBinding("GENERAL Quotation Approval",POQuotation_ApprovalController.class),
-        new ControllerBinding("GENERAL Quotation History",POQuotation_HistoryController.class)};
+        new ControllerBinding("GENERAL Quotation Entry", POQuotation_EntryController.class),
+        new ControllerBinding("GENERAL Quotation Confirmation", POQuotation_ConfirmationController.class),
+        new ControllerBinding("GENERAL Quotation Approval", POQuotation_ApprovalController.class),
+        new ControllerBinding("GENERAL Quotation History", POQuotation_HistoryController.class)};
 
     private void SIPostingWindowKeyEvent(Tab newTab, ScreenInterface fxObj, boolean isRemove) {
         for (ControllerBinding cb : controllerArray) {
@@ -1316,6 +1364,8 @@ public class DashboardController implements Initializable {
             toggleBtnLeftLowerSideBar[i].setTooltip(new Tooltip(tooltipTexts[i]));
             toggleBtnLeftLowerSideBar[i].setToggleGroup(toggleGroupLowerBtn);
         }
+        toggleBtnLeftLowerSideBar[0].selectedProperty().removeListener(toggleSelectedListener);
+        toggleBtnLeftLowerSideBar[0].selectedProperty().addListener(toggleSelectedListener);
     }
 
     public void changeUserInfo() {
@@ -1729,26 +1779,26 @@ public class DashboardController implements Initializable {
         }
     }
     //end menu actions
-    
-    private void loadDummyMenu() {        
+
+    private void loadDummyMenu() {
         // Dummy parent modules
         List<TreeMonitor> modules = Arrays.asList(
-            new TreeMonitor("PAY", "ROOT", "Payables", "Payment Requests", () -> System.out.println("Opening Payables module..."))
+                new TreeMonitor("PAY", "ROOT", "Payables", "Payment Requests", () -> System.out.println("Opening Payables module..."))
         );
 
         // Dummy submodules
         List<TreeMonitor> submodules = Arrays.asList(
-            new TreeMonitor("PY", "PAY", "Payment Vouchers", "List of payment vouchers", null),
-            new TreeMonitor("CH", "PAY", "Check Releases", "List of released checks", null)
+                new TreeMonitor("PY", "PAY", "Payment Vouchers", "List of payment vouchers", null),
+                new TreeMonitor("CH", "PAY", "Check Releases", "List of released checks", null)
         );
 
         // Dummy transactions for submodules
         Map<String, List<TreeMonitor>> transactionsMap = new HashMap<>();
         transactionsMap.put("PY", Arrays.asList(
-            new TreeMonitor("PY001", "PY", "PV #001", "For Processing", () -> System.out.println("Opening PV #001"))
+                new TreeMonitor("PY001", "PY", "PV #001", "For Processing", () -> System.out.println("Opening PV #001"))
         ));
         transactionsMap.put("CH", Arrays.asList(
-            new TreeMonitor("CH001", "CH", "Check #001", "Released", () -> System.out.println("Opening Check #001"))
+                new TreeMonitor("CH001", "CH", "Check #001", "Released", () -> System.out.println("Opening Check #001"))
         ));
 
         // Root node
@@ -1760,7 +1810,9 @@ public class DashboardController implements Initializable {
             int subCount = 0;
 
             for (TreeMonitor sub : submodules) {
-                if (!sub.getParentId().equals(module.getId())) continue;
+                if (!sub.getParentId().equals(module.getId())) {
+                    continue;
+                }
 
                 TreeItem<TreeMonitor> subItem = new TreeItem<>(sub);
                 int transCount = 0;
@@ -1773,11 +1825,11 @@ public class DashboardController implements Initializable {
 
                 // Update submodule name with transaction count
                 subItem.setValue(new TreeMonitor(
-                    sub.getId(),
-                    sub.getParentId(),
-                    sub.getName() + " (" + transCount + ")",
-                    sub.getDescription(),
-                    sub.getAction()
+                        sub.getId(),
+                        sub.getParentId(),
+                        sub.getName() + " (" + transCount + ")",
+                        sub.getDescription(),
+                        sub.getAction()
                 ));
 
                 moduleItem.getChildren().add(subItem);
@@ -1786,11 +1838,11 @@ public class DashboardController implements Initializable {
 
             // Update module name with submodule count
             moduleItem.setValue(new TreeMonitor(
-                module.getId(),
-                module.getParentId(),
-                module.getName() + " (" + subCount + ")",
-                module.getDescription(),
-                module.getAction()
+                    module.getId(),
+                    module.getParentId(),
+                    module.getName() + " (" + subCount + ")",
+                    module.getDescription(),
+                    module.getAction()
             ));
 
             rootItem.getChildren().add(moduleItem);
@@ -1807,33 +1859,33 @@ public class DashboardController implements Initializable {
             }
         });
     }
-    
-    private void loadDummyMenux() {        
+
+    private void loadDummyMenux() {
         // Dummy parent modules
         List<TreeMonitor> modules = Arrays.asList(
-            new TreeMonitor("PUR", "ROOT", "Purchasing", "Purchase Transactions", () -> System.out.println("Opening Purchasing module..."))
+                new TreeMonitor("PUR", "ROOT", "Purchasing", "Purchase Transactions", () -> System.out.println("Opening Purchasing module..."))
         );
 
         // Dummy submodules
         List<TreeMonitor> submodules = Arrays.asList(
-            new TreeMonitor("PR", "PUR", "Purchase Requests", "List of purchase requests", null),
-            new TreeMonitor("PO", "PUR", "Open Purchase Orders", "List of purchase orders", null),
-            new TreeMonitor("DA", "PUR", "Unposted DA", "List of purchase orders", null)
+                new TreeMonitor("PR", "PUR", "Purchase Requests", "List of purchase requests", null),
+                new TreeMonitor("PO", "PUR", "Open Purchase Orders", "List of purchase orders", null),
+                new TreeMonitor("DA", "PUR", "Unposted DA", "List of purchase orders", null)
         );
 
         // Dummy transactions for submodules
         Map<String, List<TreeMonitor>> transactionsMap = new HashMap<>();
         transactionsMap.put("PO", Arrays.asList(
-            new TreeMonitor("PO001", "PO", "PO #001", "Pending Approval", () -> System.out.println("Opening PO #001")),
-            new TreeMonitor("PO002", "PO", "PO #002", "For Receiving", () -> System.out.println("Opening PO #002"))
+                new TreeMonitor("PO001", "PO", "PO #001", "Pending Approval", () -> System.out.println("Opening PO #001")),
+                new TreeMonitor("PO002", "PO", "PO #002", "For Receiving", () -> System.out.println("Opening PO #002"))
         ));
         transactionsMap.put("DA", Arrays.asList(
-            new TreeMonitor("DO001", "DA", "DA #001", "Pending Confirmation", () -> System.out.println("Opening DA #001")),
-            new TreeMonitor("DO002", "DA", "DA #002", "Pending Confirmation", () -> System.out.println("Opening DA #002"))
+                new TreeMonitor("DO001", "DA", "DA #001", "Pending Confirmation", () -> System.out.println("Opening DA #001")),
+                new TreeMonitor("DO002", "DA", "DA #002", "Pending Confirmation", () -> System.out.println("Opening DA #002"))
         ));
         transactionsMap.put("PR", Arrays.asList(
-            new TreeMonitor("PR001", "PR", "PR #001", "Pending", () -> System.out.println("Opening PR #001")),
-            new TreeMonitor("PR002", "PR", "PR #002", "Approved", () -> System.out.println("Opening PR #002"))
+                new TreeMonitor("PR001", "PR", "PR #001", "Pending", () -> System.out.println("Opening PR #001")),
+                new TreeMonitor("PR002", "PR", "PR #002", "Approved", () -> System.out.println("Opening PR #002"))
         ));
 
         // Root node
@@ -1845,7 +1897,9 @@ public class DashboardController implements Initializable {
             int subCount = 0;
 
             for (TreeMonitor sub : submodules) {
-                if (!sub.getParentId().equals(module.getId())) continue;
+                if (!sub.getParentId().equals(module.getId())) {
+                    continue;
+                }
 
                 TreeItem<TreeMonitor> subItem = new TreeItem<>(sub);
                 int transCount = 0;
@@ -1858,11 +1912,11 @@ public class DashboardController implements Initializable {
 
                 // Update submodule name with transaction count
                 subItem.setValue(new TreeMonitor(
-                    sub.getId(),
-                    sub.getParentId(),
-                    sub.getName() + " (" + transCount + ")",
-                    sub.getDescription(),
-                    sub.getAction()
+                        sub.getId(),
+                        sub.getParentId(),
+                        sub.getName() + " (" + transCount + ")",
+                        sub.getDescription(),
+                        sub.getAction()
                 ));
 
                 moduleItem.getChildren().add(subItem);
@@ -1871,11 +1925,11 @@ public class DashboardController implements Initializable {
 
             // Update module name with submodule count
             moduleItem.setValue(new TreeMonitor(
-                module.getId(),
-                module.getParentId(),
-                module.getName() + " (" + subCount + ")",
-                module.getDescription(),
-                module.getAction()
+                    module.getId(),
+                    module.getParentId(),
+                    module.getName() + " (" + subCount + ")",
+                    module.getDescription(),
+                    module.getAction()
             ));
 
             rootItem.getChildren().add(moduleItem);

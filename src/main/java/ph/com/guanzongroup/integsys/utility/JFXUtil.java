@@ -172,7 +172,7 @@ public class JFXUtil {
                 }
 
                 if (foundColumn == null) {
-                    System.err.println("NO COLUMN WITH minWidth == 0 (USE_COMPUTED_SIZE) found in table: " + tableView.getId());
+//                    System.err.println("NO COLUMN WITH minWidth == 0 (USE_COMPUTED_SIZE) found in table: " + tableView.getId());
                     return;
                 }
 
