@@ -508,7 +508,7 @@ public class CheckStatusUpdateByBatchController implements Initializable, Screen
         try {
             Stage stage = new Stage();
             FXMLLoader fxmlLoader = new FXMLLoader();
-            fxmlLoader.setLocation(getClass().getResource("/com/rmj/guanzongroup/sidebarmenus/views/CheckClearingAssign.fxml"));
+            fxmlLoader.setLocation(getClass().getResource("/ph/com/guanzongroup/integsys/views/CheckClearingAssign.fxml"));
 
             CheckClearingAssignController loControl = new CheckClearingAssignController();
             loControl.setGRider(oApp);
@@ -545,7 +545,7 @@ public class CheckStatusUpdateByBatchController implements Initializable, Screen
         try {
             Stage stage = new Stage();
             FXMLLoader fxmlLoader = new FXMLLoader();
-            fxmlLoader.setLocation(getClass().getResource("/com/rmj/guanzongroup/sidebarmenus/views/DisbursementVoucher_View.fxml"));
+            fxmlLoader.setLocation(getClass().getResource("/ph/com/guanzongroup/integsys/views/DisbursementVoucher_View.fxml"));
             DisbursementVoucher_ViewController loControl = new DisbursementVoucher_ViewController();
             loControl.setGRider(oApp);
             loControl.setDisbursement(poDisbursementController);

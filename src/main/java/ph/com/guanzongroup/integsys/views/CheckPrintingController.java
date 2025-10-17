@@ -605,7 +605,7 @@ public class CheckPrintingController implements Initializable, ScreenInterface {
         try {
             Stage stage = new Stage();
             FXMLLoader fxmlLoader = new FXMLLoader();
-            fxmlLoader.setLocation(getClass().getResource("/com/rmj/guanzongroup/sidebarmenus/views/CheckAssignment.fxml"));
+            fxmlLoader.setLocation(getClass().getResource("/ph/com/guanzongroup/integsys/views/CheckAssignment.fxml"));
 
             CheckAssignmentController loControl = new CheckAssignmentController();
             loControl.setGRider(oApp);
@@ -643,7 +643,7 @@ public class CheckPrintingController implements Initializable, ScreenInterface {
         try {
             Stage stage = new Stage();
             FXMLLoader fxmlLoader = new FXMLLoader();
-            fxmlLoader.setLocation(getClass().getResource("/com/rmj/guanzongroup/sidebarmenus/views/DisbursementVoucher_View.fxml"));
+            fxmlLoader.setLocation(getClass().getResource("/ph/com/guanzongroup/integsys/views/DisbursementVoucher_View.fxml"));
             DisbursementVoucher_ViewController loControl = new DisbursementVoucher_ViewController();
             loControl.setGRider(oApp);
             loControl.setDisbursement(poDisbursementController);
