@@ -529,7 +529,7 @@ public class POQuotation_ConfirmationController implements Initializable, Screen
 
     public void retrievePOQuotation() {
         poJSON = new JSONObject();
-        poController.POQuotation().setTransactionStatus(POQuotationStatus.OPEN + POQuotationStatus.CONFIRMED);
+        poController.POQuotation().setTransactionStatus(POQuotationStatus.OPEN + POQuotationStatus.CONFIRMED + POQuotationStatus.RETURNED);
         poJSON = poController.POQuotation().loadPOQuotationList(tfSearchBranch.getText(), tfSearchDepartment.getText(), tfSearchSupplier.getText(), tfSearchCategory.getText(),
                 tfSearchReferenceNo.getText());
         if (!"success".equals((String) poJSON.get("result"))) {
@@ -1207,6 +1207,7 @@ public class POQuotation_ConfirmationController implements Initializable, Screen
             JFXUtil.setDisabled(!lbShow, dpTransactionDate);
 
             JFXUtil.setStatusValue(lblStatus, POQuotationStatus.class, pnEditMode == EditMode.UNKNOWN ? "-1" : poController.POQuotation().Master().getTransactionStatus());
+          
             poController.POQuotation().computeFields();
 
             tfTransactionNo.setText(poController.POQuotation().Master().getTransactionNo());
