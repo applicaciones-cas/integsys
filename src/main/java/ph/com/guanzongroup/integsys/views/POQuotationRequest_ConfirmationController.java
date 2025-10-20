@@ -1155,12 +1155,17 @@ public class POQuotationRequest_ConfirmationController implements Initializable,
         JFXUtil.setDisabled(!lbShow1, apMaster, apDetail);
         JFXUtil.setButtonsVisibility(lbShow4, btnClose);
 
-        if (JFXUtil.isObjectEqualTo(poController.POQuotationRequest().Master().getTransactionStatus(), POQuotationRequestStatus.OPEN,
-                POQuotationRequestStatus.CONFIRMED)) {
-            JFXUtil.setButtonsVisibility(true, btnReturn);
-        } else {
-            JFXUtil.setButtonsVisibility(false, btnReturn);
+        JFXUtil.setButtonsVisibility(false, btnReturn);
+        try {
+            if (JFXUtil.isObjectEqualTo(poController.POQuotationRequest().Master().getTransactionStatus(), POQuotationRequestStatus.OPEN,
+                    POQuotationRequestStatus.CONFIRMED)) {
+                JFXUtil.setButtonsVisibility(true, btnReturn);
+            } else {
+                JFXUtil.setButtonsVisibility(false, btnReturn);
+            }
+        } catch (Exception e) {
         }
+        
         switch (poController.POQuotationRequest().Master().getTransactionStatus()) {
             case POQuotationRequestStatus.CONFIRMED:
                 JFXUtil.setButtonsVisibility(false, btnConfirm);

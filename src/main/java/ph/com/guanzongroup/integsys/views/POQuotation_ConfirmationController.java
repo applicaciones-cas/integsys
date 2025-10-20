@@ -127,11 +127,11 @@ public class POQuotation_ConfirmationController implements Initializable, Screen
     @FXML
     private Label lblSource, lblStatus;
     @FXML
-    private TextField tfSearchBranch, tfSearchSupplier, tfSearchCategory, tfSearchReferenceNo, tfSearchDepartment, tfTransactionNo, tfReferenceNo, tfBranch, tfDepartment, tfSupplier, tfAddress, tfSourceNo, tfCategory, tfTerm, tfContact, tfGrossAmount, tfDiscRate, tfAddlDiscAmt, tfFreight, tfVATAmount, tfTransactionTotal, tfCompany, tfDescription, tfReplaceId, tfReplaceDescription, tfUnitPrice, tfQuantity, tfDiscRateDetail, tfAddlDiscAmtDetail, tfCost, tfAttachmentNo;
+    private TextField tfSearchBranch, tfSearchSupplier, tfSearchCategory, tfSearchReferenceNo, tfSearchDepartment, tfTransactionNo, tfReferenceNo, tfCompany, tfBranch, tfDepartment, tfSupplier, tfAddress, tfSourceNo, tfCategory, tfTerm, tfContact, tfGrossAmount, tfDiscRate, tfAddlDiscAmt, tfFreight, tfVATAmount, tfTransactionTotal, tfDescription, tfReplaceId, tfReplaceDescription, tfUnitPrice, tfDiscRateDetail, tfAddlDiscAmtDetail, tfQuantity, tfCost, tfAttachmentNo;
     @FXML
     private HBox hbButtons, hboxid;
     @FXML
-    private Button btnUpdate, btnSearch, btnSave, btnCancel, btnConfirm, btnVoid, btnHistory, btnRetrieve, btnClose, btnAddAttachment, btnRemoveAttachment, btnArrowLeft, btnArrowRight, btnReturn;
+    private Button btnUpdate, btnSearch, btnSave, btnCancel, btnConfirm, btnVoid, btnReturn, btnHistory, btnRetrieve, btnClose, btnAddAttachment, btnRemoveAttachment, btnArrowLeft, btnArrowRight;
     @FXML
     private TabPane tabPane;
     @FXML
@@ -145,7 +145,7 @@ public class POQuotation_ConfirmationController implements Initializable, Screen
     @FXML
     private TableView tblViewTransDetails, tblAttachments, tblViewMainList;
     @FXML
-    private TableColumn tblRowNoDetail, tblReplacementDetail, tblDescriptionDetail, tblUnitPriceDetail, tblDiscountDetail, tblQuantityDetail, tblTotalDetail, tblRowNoAttachment, tblFileNameAttachment, tblRowNo, tblBranch, tblSupplier, tblDate, tblReferenceNo, tblTransactionTotal;
+    private TableColumn tblRowNoDetail, tblDescriptionDetail, tblReplacementDetail, tblUnitPriceDetail, tblDiscountDetail, tblQuantityDetail, tblTotalDetail, tblRowNoAttachment, tblFileNameAttachment, tblRowNo, tblBranch, tblSupplier, tblDate, tblReferenceNo, tblTransactionTotal;
     @FXML
     private ComboBox cmbAttachmentType;
     @FXML
@@ -1552,14 +1552,17 @@ public class POQuotation_ConfirmationController implements Initializable, Screen
         //Unkown || Ready
         JFXUtil.setDisabled(!lbShow1, apMaster, apDetail, apAttachments, apAttachmentButtons);
         JFXUtil.setButtonsVisibility(lbShow4, btnClose);
-        
-        if (JFXUtil.isObjectEqualTo(poController.POQuotationRequest().Master().getTransactionStatus(), POQuotationStatus.OPEN,
-                POQuotationStatus.CONFIRMED)) {
-            JFXUtil.setButtonsVisibility(true, btnReturn);
-        } else {
-            JFXUtil.setButtonsVisibility(false, btnReturn);
+
+        JFXUtil.setButtonsVisibility(false, btnReturn);
+        try {
+            if (JFXUtil.isObjectEqualTo(poController.POQuotationRequest().Master().getTransactionStatus(), POQuotationStatus.OPEN,
+                    POQuotationStatus.CONFIRMED)) {
+                JFXUtil.setButtonsVisibility(true, btnReturn);
+            } else {
+                JFXUtil.setButtonsVisibility(false, btnReturn);
+            }
+        } catch (Exception e) {
         }
-        
         switch (poController.POQuotation().Master().getTransactionStatus()) {
             case POQuotationStatus.CONFIRMED:
                 JFXUtil.setButtonsVisibility(false, btnConfirm);
