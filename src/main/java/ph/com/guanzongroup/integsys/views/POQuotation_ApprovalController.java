@@ -130,7 +130,7 @@ public class POQuotation_ApprovalController implements Initializable, ScreenInte
     @FXML
     private HBox hbButtons, hboxid;
     @FXML
-    private Button btnApprove, btnDisapprove, btnHistory, btnRetrieve, btnClose, btnArrowLeft, btnArrowRight;
+    private Button btnApprove, btnDisapprove, btnHistory, btnRetrieve, btnClose, btnArrowLeft, btnArrowRight, btnReturn;
     @FXML
     private TabPane tabPane;
     @FXML
@@ -169,7 +169,7 @@ public class POQuotation_ApprovalController implements Initializable, ScreenInte
         }
 
         JFXUtil.checkIfFolderExists(poJSON, System.getProperty("sys.default.path.temp") + "/Attachments//");
-        
+
         initTextFields();
         initDatePickers();
         initMainGrid();
@@ -341,6 +341,22 @@ public class POQuotation_ApprovalController implements Initializable, ScreenInte
                         break;
                     case "btnRetrieve":
                         retrievePOQuotation();
+                        break;
+                    case "btnReturn":
+                        poJSON = new JSONObject();
+                        if (ShowMessageFX.YesNo(null, pxeModuleName, "Are you sure you want to return transaction?") == true) {
+                            poJSON = poController.POQuotation().ReturnTransaction("");
+                            if ("error".equals((String) poJSON.get("result"))) {
+                                ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                                return;
+                            } else {
+                                ShowMessageFX.Information(null, pxeModuleName, (String) poJSON.get("message"));
+                                JFXUtil.disableAllHighlightByColor(tblViewMainList, "#A7C7E7", highlightedRowsMain);
+                                JFXUtil.highlightByKey(tblViewMainList, String.valueOf(pnMain + 1), "#FAC898", highlightedRowsMain);
+                            }
+                        } else {
+                            return;
+                        }
                         break;
                     case "btnApprove":
                         poJSON = new JSONObject();
