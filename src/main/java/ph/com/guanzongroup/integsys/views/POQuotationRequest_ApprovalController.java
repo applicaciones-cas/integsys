@@ -1135,10 +1135,11 @@ public class POQuotationRequest_ApprovalController implements Initializable, Scr
         JFXUtil.setDisabled(true, apDetail);
         JFXUtil.setButtonsVisibility(lbShow4, btnClose);
         JFXUtil.setButtonsVisibility((poController.POQuotationRequest().getPOQuotationRequestSupplierCount() > 0 && lbShow3), btnExport);
-
+        JFXUtil.setButtonsVisibility(false, btnReturn);
         switch (poController.POQuotationRequest().Master().getTransactionStatus()) {
             case POQuotationRequestStatus.APPROVED:
                 JFXUtil.setButtonsVisibility(false, btnApprove, btnDisapprove);
+                JFXUtil.setButtonsVisibility(true, btnReturn);
                 if (fnValue == EditMode.UPDATE) {
                     JFXUtil.setDisabled(true, apMaster, apDetail);
                     JFXUtil.setDisabled(false, taRemarks, apSupplier);
