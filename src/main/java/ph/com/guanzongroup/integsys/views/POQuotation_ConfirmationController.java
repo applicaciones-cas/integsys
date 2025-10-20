@@ -1557,7 +1557,7 @@ public class POQuotation_ConfirmationController implements Initializable, Screen
         try {
             if (JFXUtil.isObjectEqualTo(poController.POQuotationRequest().Master().getTransactionStatus(), POQuotationStatus.OPEN,
                     POQuotationStatus.CONFIRMED)) {
-                JFXUtil.setButtonsVisibility(true, btnReturn);
+//                JFXUtil.setButtonsVisibility(true, btnReturn);
             } else {
                 JFXUtil.setButtonsVisibility(false, btnReturn);
             }
