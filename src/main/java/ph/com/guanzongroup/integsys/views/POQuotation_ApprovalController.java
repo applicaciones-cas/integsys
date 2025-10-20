@@ -431,7 +431,7 @@ public class POQuotation_ApprovalController implements Initializable, ScreenInte
         poJSON = new JSONObject();
         poController.POQuotation().setTransactionStatus(POQuotationStatus.APPROVED + POQuotationStatus.CONFIRMED);
         poJSON = poController.POQuotation().loadPOQuotationList(tfSearchBranch.getText(), tfSearchDepartment.getText(), tfSearchSupplier.getText(), tfSearchCategory.getText(),
-                tfSearchReferenceNo.getText());
+                tfSearchReferenceNo.getText(), true);
         if (!"success".equals((String) poJSON.get("result"))) {
             ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
         } else {
