@@ -108,7 +108,7 @@ public class POQuotationRequest_ConfirmationController implements Initializable,
     @FXML
     private HBox hbButtons;
     @FXML
-    private Button btnUpdate, btnSearch, btnSave, btnCancel, btnConfirm, btnVoid, btnHistory, btnRetrieve, btnClose;
+    private Button btnUpdate, btnSearch, btnSave, btnCancel, btnConfirm, btnVoid, btnHistory, btnRetrieve, btnClose, btnReturn;
     @FXML
     private TextArea taRemarks;
     @FXML
@@ -310,6 +310,22 @@ public class POQuotationRequest_ConfirmationController implements Initializable,
                                 ShowMessageFX.Information(null, pxeModuleName, (String) poJSON.get("message"));
                                 JFXUtil.disableAllHighlightByColor(tblViewMainList, "#A7C7E7", highlightedRowsMain);
                                 JFXUtil.highlightByKey(tblViewMainList, String.valueOf(pnMain + 1), "#FAA0A0", highlightedRowsMain);
+                            }
+                        } else {
+                            return;
+                        }
+                        break;
+                    case "btnReturn":
+                        poJSON = new JSONObject();
+                        if (ShowMessageFX.YesNo(null, pxeModuleName, "Are you sure you want to return transaction?") == true) {
+                            poJSON = poController.POQuotationRequest().ReturnTransaction("");
+                            if ("error".equals((String) poJSON.get("result"))) {
+                                ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                                return;
+                            } else {
+                                ShowMessageFX.Information(null, pxeModuleName, (String) poJSON.get("message"));
+                                JFXUtil.disableAllHighlightByColor(tblViewMainList, "#A7C7E7", highlightedRowsMain);
+                                JFXUtil.highlightByKey(tblViewMainList, String.valueOf(pnMain + 1), "#FAC898", highlightedRowsMain);
                             }
                         } else {
                             return;
@@ -1139,6 +1155,12 @@ public class POQuotationRequest_ConfirmationController implements Initializable,
         JFXUtil.setDisabled(!lbShow1, apMaster, apDetail);
         JFXUtil.setButtonsVisibility(lbShow4, btnClose);
 
+        if (JFXUtil.isObjectEqualTo(poController.POQuotationRequest().Master().getTransactionStatus(), POQuotationRequestStatus.OPEN,
+                POQuotationRequestStatus.CONFIRMED)) {
+            JFXUtil.setButtonsVisibility(true, btnReturn);
+        } else {
+            JFXUtil.setButtonsVisibility(false, btnReturn);
+        }
         switch (poController.POQuotationRequest().Master().getTransactionStatus()) {
             case POQuotationRequestStatus.CONFIRMED:
                 JFXUtil.setButtonsVisibility(false, btnConfirm);

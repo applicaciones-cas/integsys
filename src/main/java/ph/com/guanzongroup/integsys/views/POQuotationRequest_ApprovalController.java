@@ -374,10 +374,9 @@ public class POQuotationRequest_ApprovalController implements Initializable, Scr
                     loadTableDetail.reload();
                 }
                 initButton(pnEditMode);
+
                 if (lsButton.equals("btnUpdate")) {
-                    if (lsButton.equals("btnUpdate")) {
-                        moveNext(false, false);
-                    }
+                    moveNext(false, false);
                 }
             }
         } catch (CloneNotSupportedException | SQLException | GuanzonException | ParseException ex) {
