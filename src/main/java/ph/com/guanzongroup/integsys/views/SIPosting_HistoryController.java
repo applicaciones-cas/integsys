@@ -334,7 +334,7 @@ public class SIPosting_HistoryController implements Initializable, ScreenInterfa
                 String lsButton = clickedButton.getId();
                 switch (lsButton) {
                     case "btnBrowse":
-                        poJSON = poPurchaseReceivingController.PurchaseOrderReceiving().searchTransaction(psIndustryId, psCompanyId, tfSearchSupplier.getText(), tfSearchReceiveBranch.getText(), tfSearchReferenceNo.getText());
+                        poJSON = poPurchaseReceivingController.PurchaseOrderReceiving().searchTransaction(tfSearchSupplier.getText(), tfSearchReceiveBranch.getText(), tfSearchReferenceNo.getText());
                         if ("error".equalsIgnoreCase((String) poJSON.get("result"))) {
                             ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                             tfTransactionNo.requestFocus();
@@ -342,7 +342,7 @@ public class SIPosting_HistoryController implements Initializable, ScreenInterfa
                         }
                         stageAttachment.closeDialog();
                         pnEditMode = poPurchaseReceivingController.PurchaseOrderReceiving().getEditMode();
-                        psCompanyId = poPurchaseReceivingController.PurchaseOrderReceiving().Master().getCompanyId();
+                        //psCompanyId = poPurchaseReceivingController.PurchaseOrderReceiving().Master().getCompanyId();
                         psSupplierId = poPurchaseReceivingController.PurchaseOrderReceiving().Master().getSupplierId();
                         poPurchaseReceivingController.PurchaseOrderReceiving().populateJournal();
                         poPurchaseReceivingController.PurchaseOrderReceiving().loadAttachments();
@@ -469,7 +469,7 @@ public class SIPosting_HistoryController implements Initializable, ScreenInterfa
                             return;
                         case "tfSearchReferenceNo":
                             stageAttachment.closeDialog();
-                            poJSON = poPurchaseReceivingController.PurchaseOrderReceiving().searchTransaction(psIndustryId, psCompanyId,
+                            poJSON = poPurchaseReceivingController.PurchaseOrderReceiving().searchTransaction(
                                     tfSearchSupplier.getText(), tfSearchReceiveBranch.getText(), tfSearchReferenceNo.getText());
 
                             if ("error".equals(poJSON.get("result"))) {
@@ -479,7 +479,7 @@ public class SIPosting_HistoryController implements Initializable, ScreenInterfa
                             } else {
                                 stageAttachment.closeDialog();
                                 pnEditMode = poPurchaseReceivingController.PurchaseOrderReceiving().getEditMode();
-                                psCompanyId = poPurchaseReceivingController.PurchaseOrderReceiving().Master().getCompanyId();
+                                //psCompanyId = poPurchaseReceivingController.PurchaseOrderReceiving().Master().getCompanyId();
                                 psSupplierId = poPurchaseReceivingController.PurchaseOrderReceiving().Master().getSupplierId();
                                 poPurchaseReceivingController.PurchaseOrderReceiving().populateJournal();
                                 poPurchaseReceivingController.PurchaseOrderReceiving().loadAttachments();

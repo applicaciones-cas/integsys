@@ -191,19 +191,19 @@ public class DeliveryAcceptance_SerialMPController implements Initializable {
                 }
                 
                 if (lsButton.equals("btnOkay")) {
-                    if(poPurchaseReceivingController.Master().getPurpose().equals(PurchaseOrderReceivingStatus.Purpose.REPLACEMENT)){
-                        if (poPurchaseReceivingController.PurchaseOrderReceivingSerialList(lnCtr).getSerialId() == null || "".equals(poPurchaseReceivingController.PurchaseOrderReceivingSerialList(lnCtr).getSerialId())) {
-                            lsSerialId = poPurchaseReceivingController.getSerialId(lnCtr);
-                            if(!lsSerialId.isEmpty()){
-                                poPurchaseReceivingController.PurchaseOrderReceivingSerialList(lnCtr).setSerialId(lsSerialId);
-                            } else {
-                                poJSON.put("result", "error");
-                                lsMessage = "Please select serial that exists in Purchase Order Return transaction at row "+lnRow+".";
-                                inform = true;
-                            }
-                            break;
-                        }
-                    }
+//                    if(poPurchaseReceivingController.Master().getPurpose().equals(PurchaseOrderReceivingStatus.Purpose.REPLACEMENT)){
+//                        if (poPurchaseReceivingController.PurchaseOrderReceivingSerialList(lnCtr).getSerialId() == null || "".equals(poPurchaseReceivingController.PurchaseOrderReceivingSerialList(lnCtr).getSerialId())) {
+//                            lsSerialId = poPurchaseReceivingController.getSerialId(lnCtr);
+//                            if(!lsSerialId.isEmpty()){
+//                                poPurchaseReceivingController.PurchaseOrderReceivingSerialList(lnCtr).setSerialId(lsSerialId);
+//                            } else {
+//                                poJSON.put("result", "error");
+//                                lsMessage = "Please select serial that exists in Purchase Order Return transaction at row "+lnRow+".";
+//                                inform = true;
+//                            }
+//                            break;
+//                        }
+//                    }
                 }
 
                 lnRow++;
@@ -354,10 +354,10 @@ public class DeliveryAcceptance_SerialMPController implements Initializable {
             ModelDeliveryAcceptance_SerialMP selectedItem = tblViewDetail.getItems().get(pnDetail);
             int pnDetail2 = Integer.valueOf(selectedItem.getIndex04());
 
-            if(poPurchaseReceivingController.Master().getPurpose().equals(PurchaseOrderReceivingStatus.Purpose.REPLACEMENT)){
-                tfIMEI1.promptTextProperty().set("Press F3: Search");
-                tfIMEI2.promptTextProperty().set("Press F3: Search");
-            }
+//            if(poPurchaseReceivingController.Master().getPurpose().equals(PurchaseOrderReceivingStatus.Purpose.REPLACEMENT)){
+//                tfIMEI1.promptTextProperty().set("Press F3: Search");
+//                tfIMEI2.promptTextProperty().set("Press F3: Search");
+//            }
             
             tfIMEI1.setText(poPurchaseReceivingController.PurchaseOrderReceivingSerialList(pnDetail2).getSerial01());
             tfIMEI2.setText(poPurchaseReceivingController.PurchaseOrderReceivingSerialList(pnDetail2).getSerial02());
@@ -567,26 +567,26 @@ public class DeliveryAcceptance_SerialMPController implements Initializable {
                 event.consume();
                 break;
             case F3:
-                if(poPurchaseReceivingController.Master().getPurpose().equals(PurchaseOrderReceivingStatus.Purpose.REPLACEMENT)){
-                    switch (lsID) {
-                        case "tfIMEI1":
-                            poJSON = poPurchaseReceivingController.SearchSerial(lsValue, pnDetail2);
-                            if ("error".equals((String) poJSON.get("result"))) {
-                                ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-                                tfIMEI1.setText("");
-                            }
-                            loadTableDetail();
-                            break;
-                        case "tfIMEI2":
-                            poJSON = poPurchaseReceivingController.SearchSerial(lsValue, pnDetail2);
-                            if ("error".equals((String) poJSON.get("result"))) {
-                                ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-                                tfIMEI2.setText("");
-                            }
-                            loadTableDetail();
-                            break;
-                    }
-                }
+//                if(poPurchaseReceivingController.Master().getPurpose().equals(PurchaseOrderReceivingStatus.Purpose.REPLACEMENT)){
+//                    switch (lsID) {
+//                        case "tfIMEI1":
+//                            poJSON = poPurchaseReceivingController.SearchSerial(lsValue, pnDetail2);
+//                            if ("error".equals((String) poJSON.get("result"))) {
+//                                ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+//                                tfIMEI1.setText("");
+//                            }
+//                            loadTableDetail();
+//                            break;
+//                        case "tfIMEI2":
+//                            poJSON = poPurchaseReceivingController.SearchSerial(lsValue, pnDetail2);
+//                            if ("error".equals((String) poJSON.get("result"))) {
+//                                ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+//                                tfIMEI2.setText("");
+//                            }
+//                            loadTableDetail();
+//                            break;
+//                    }
+//                }
                 break;
             default:
                 break;

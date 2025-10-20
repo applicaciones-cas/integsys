@@ -200,19 +200,19 @@ public class DeliveryAcceptance_SerialCarController implements Initializable {
                 }
                 
                 if (lsButton.equals("btnOkay")) {
-                    if(poPurchaseReceivingController.Master().getPurpose().equals(PurchaseOrderReceivingStatus.Purpose.REPLACEMENT)){
-                        if (poPurchaseReceivingController.PurchaseOrderReceivingSerialList(lnCtr).getSerialId() == null || "".equals(poPurchaseReceivingController.PurchaseOrderReceivingSerialList(lnCtr).getSerialId())) {
-                            lsSerialId = poPurchaseReceivingController.getSerialId(lnCtr);
-                            if(!lsSerialId.isEmpty()){
-                                poPurchaseReceivingController.PurchaseOrderReceivingSerialList(lnCtr).setSerialId(lsSerialId);
-                            } else {
-                                poJSON.put("result", "error");
-                                lsMessage = "Please select serial that exists in Purchase Order Return transaction at row "+lnRow+".";
-                                inform = true;
-                            }
-                            break;
-                        }
-                    }
+//                    if(poPurchaseReceivingController.Master().getPurpose().equals(PurchaseOrderReceivingStatus.Purpose.REPLACEMENT)){
+//                        if (poPurchaseReceivingController.PurchaseOrderReceivingSerialList(lnCtr).getSerialId() == null || "".equals(poPurchaseReceivingController.PurchaseOrderReceivingSerialList(lnCtr).getSerialId())) {
+//                            lsSerialId = poPurchaseReceivingController.getSerialId(lnCtr);
+//                            if(!lsSerialId.isEmpty()){
+//                                poPurchaseReceivingController.PurchaseOrderReceivingSerialList(lnCtr).setSerialId(lsSerialId);
+//                            } else {
+//                                poJSON.put("result", "error");
+//                                lsMessage = "Please select serial that exists in Purchase Order Return transaction at row "+lnRow+".";
+//                                inform = true;
+//                            }
+//                            break;
+//                        }
+//                    }
                 }
                 lnRow++;
             }
@@ -427,46 +427,46 @@ public class DeliveryAcceptance_SerialCarController implements Initializable {
                             loadTableDetail();
                             loadRecordDetail();
                             break;
-                        case "tfEngineNo":
-                            if(poPurchaseReceivingController.Master().getPurpose().equals(PurchaseOrderReceivingStatus.Purpose.REPLACEMENT)){
-                                poJSON = poPurchaseReceivingController.SearchSerial(lsValue, pnDetail2);
-                                if ("error".equals((String) poJSON.get("result"))) {
-                                    ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-                                    tfEngineNo.setText("");
-                                }
-                                loadTableDetail();
-                            }
-                            break;
-                        case "tfFrameNo":
-                            if(poPurchaseReceivingController.Master().getPurpose().equals(PurchaseOrderReceivingStatus.Purpose.REPLACEMENT)){
-                                poJSON = poPurchaseReceivingController.SearchSerial(lsValue, pnDetail2);
-                                if ("error".equals((String) poJSON.get("result"))) {
-                                    ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-                                    tfFrameNo.setText("");
-                                }
-                                loadTableDetail();
-                            }
-                            break;
-                        case "tfCSNo":
-                            if(poPurchaseReceivingController.Master().getPurpose().equals(PurchaseOrderReceivingStatus.Purpose.REPLACEMENT)){
-                                poJSON = poPurchaseReceivingController.SearchSerial(lsValue, pnDetail2);
-                                if ("error".equals((String) poJSON.get("result"))) {
-                                    ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-                                    tfCSNo.setText("");
-                                }
-                                loadTableDetail();
-                            }
-                            break;
-                        case "tfPlateNo":
-                            if(poPurchaseReceivingController.Master().getPurpose().equals(PurchaseOrderReceivingStatus.Purpose.REPLACEMENT)){
-                                poJSON = poPurchaseReceivingController.SearchSerial(lsValue, pnDetail2);
-                                if ("error".equals((String) poJSON.get("result"))) {
-                                    ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-                                    tfPlateNo.setText("");
-                                }
-                                loadTableDetail();
-                            }
-                            break;
+//                        case "tfEngineNo":
+//                            if(poPurchaseReceivingController.Master().getPurpose().equals(PurchaseOrderReceivingStatus.Purpose.REPLACEMENT)){
+//                                poJSON = poPurchaseReceivingController.SearchSerial(lsValue, pnDetail2);
+//                                if ("error".equals((String) poJSON.get("result"))) {
+//                                    ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+//                                    tfEngineNo.setText("");
+//                                }
+//                                loadTableDetail();
+//                            }
+//                            break;
+//                        case "tfFrameNo":
+//                            if(poPurchaseReceivingController.Master().getPurpose().equals(PurchaseOrderReceivingStatus.Purpose.REPLACEMENT)){
+//                                poJSON = poPurchaseReceivingController.SearchSerial(lsValue, pnDetail2);
+//                                if ("error".equals((String) poJSON.get("result"))) {
+//                                    ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+//                                    tfFrameNo.setText("");
+//                                }
+//                                loadTableDetail();
+//                            }
+//                            break;
+//                        case "tfCSNo":
+//                            if(poPurchaseReceivingController.Master().getPurpose().equals(PurchaseOrderReceivingStatus.Purpose.REPLACEMENT)){
+//                                poJSON = poPurchaseReceivingController.SearchSerial(lsValue, pnDetail2);
+//                                if ("error".equals((String) poJSON.get("result"))) {
+//                                    ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+//                                    tfCSNo.setText("");
+//                                }
+//                                loadTableDetail();
+//                            }
+//                            break;
+//                        case "tfPlateNo":
+//                            if(poPurchaseReceivingController.Master().getPurpose().equals(PurchaseOrderReceivingStatus.Purpose.REPLACEMENT)){
+//                                poJSON = poPurchaseReceivingController.SearchSerial(lsValue, pnDetail2);
+//                                if ("error".equals((String) poJSON.get("result"))) {
+//                                    ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+//                                    tfPlateNo.setText("");
+//                                }
+//                                loadTableDetail();
+//                            }
+//                            break;
                     }
                     
                 default:
@@ -484,12 +484,12 @@ public class DeliveryAcceptance_SerialCarController implements Initializable {
                 ModelDeliveryAcceptance_Serial selectedItem = tblViewDetail.getItems().get(pnDetail);
                 int pnDetail2 = Integer.valueOf(selectedItem.getIndex07());
 
-                if(poPurchaseReceivingController.Master().getPurpose().equals(PurchaseOrderReceivingStatus.Purpose.REPLACEMENT)){
-                    tfEngineNo.promptTextProperty().set("Press F3: Search");
-                    tfFrameNo.promptTextProperty().set("Press F3: Search");
-                    tfCSNo.promptTextProperty().set("Press F3: Search");
-                    tfPlateNo.promptTextProperty().set("Press F3: Search");
-                }
+//                if(poPurchaseReceivingController.Master().getPurpose().equals(PurchaseOrderReceivingStatus.Purpose.REPLACEMENT)){
+//                    tfEngineNo.promptTextProperty().set("Press F3: Search");
+//                    tfFrameNo.promptTextProperty().set("Press F3: Search");
+//                    tfCSNo.promptTextProperty().set("Press F3: Search");
+//                    tfPlateNo.promptTextProperty().set("Press F3: Search");
+//                }
                 tfEngineNo.setText(poPurchaseReceivingController.PurchaseOrderReceivingSerialList(pnDetail2).getSerial01());
                 tfFrameNo.setText(poPurchaseReceivingController.PurchaseOrderReceivingSerialList(pnDetail2).getSerial02());
                 tfCSNo.setText(poPurchaseReceivingController.PurchaseOrderReceivingSerialList(pnDetail2).getConductionStickerNo());
