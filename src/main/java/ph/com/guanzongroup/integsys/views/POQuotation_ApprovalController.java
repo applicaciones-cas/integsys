@@ -429,7 +429,7 @@ public class POQuotation_ApprovalController implements Initializable, ScreenInte
 
     public void retrievePOQuotation() {
         poJSON = new JSONObject();
-        poController.POQuotation().setTransactionStatus(POQuotationStatus.CONFIRMED);
+        poController.POQuotation().setTransactionStatus(POQuotationStatus.APPROVED + POQuotationStatus.CONFIRMED);
         poJSON = poController.POQuotation().loadPOQuotationList(tfSearchBranch.getText(), tfSearchDepartment.getText(), tfSearchSupplier.getText(), tfSearchCategory.getText(),
                 tfSearchReferenceNo.getText());
         if (!"success".equals((String) poJSON.get("result"))) {
