@@ -244,7 +244,7 @@ public class POQuotationRequest_ConfirmationController implements Initializable,
                     case "btnSave":
                         //Validator
                         poJSON = new JSONObject();
-                        if (ShowMessageFX.YesNo(null, "Close Tab", "Are you sure you want to save the transaction?") == true) {
+                        if (ShowMessageFX.YesNo(null, pxeModuleName, "Are you sure you want to save the transaction?") == true) {
                             poJSON = poController.POQuotationRequest().SaveTransaction();
                             if (!"success".equals((String) poJSON.get("result"))) {
                                 ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
@@ -297,7 +297,7 @@ public class POQuotationRequest_ConfirmationController implements Initializable,
                         break;
                     case "btnVoid":
                         poJSON = new JSONObject();
-                        if (ShowMessageFX.YesNo(null, "Close Tab", "Are you sure you want to void transaction?") == true) {
+                        if (ShowMessageFX.YesNo(null, pxeModuleName, "Are you sure you want to void transaction?") == true) {
                             if (POQuotationRequestStatus.CONFIRMED.equals(poController.POQuotationRequest().Master().getTransactionStatus())) {
                                 poJSON = poController.POQuotationRequest().CancelTransaction("");
                             } else {
