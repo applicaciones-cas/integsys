@@ -897,7 +897,9 @@ public class DeliveryAcceptance_ConfirmationController implements Initializable,
                     if (poPurchaseReceivingController.PurchaseOrderReceiving().Detail(pnDetail).isSerialized()) {
                         if (!(Double.valueOf(lsValue) == Math.floor(Double.valueOf(lsValue)))) { // returns true if contains value in decimal point which is restricted; for serial quantity purpose
                             ShowMessageFX.Warning(null, pxeModuleName, "Input whole-number equivalent only for serialized item");
-                            break;
+                            loadRecordDetail();
+                            JFXUtil.textFieldMoveNext(tfReceiveQuantity);
+                            return;
                         }
                     }
 
