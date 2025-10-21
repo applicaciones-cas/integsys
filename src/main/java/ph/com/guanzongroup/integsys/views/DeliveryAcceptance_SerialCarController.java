@@ -64,7 +64,7 @@ public class DeliveryAcceptance_SerialCarController implements Initializable {
     private JSONObject poJSON;
     int pnEntryNo = 0;
     int pnDetail = -1;
-    private final String pxeModuleName = "Inventory Serial Car";
+    private final String pxeModuleName = "Delivery Acceptance Serial Car";
     static PurchaseOrderReceiving poPurchaseReceivingController;
     public int pnEditMode;
     public boolean pbIsFinancing = false;

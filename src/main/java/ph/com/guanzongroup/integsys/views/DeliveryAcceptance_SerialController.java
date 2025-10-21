@@ -64,7 +64,7 @@ public class DeliveryAcceptance_SerialController implements Initializable {
     private JSONObject poJSON;
     int pnEntryNo = 0;
     int pnDetail = 0;
-    private final String pxeModuleName = "Purchase Order Receiving Serial";
+    private final String pxeModuleName = "Delivery Acceptance Serial";
     static PurchaseOrderReceiving poPurchaseReceivingController;
     public int pnEditMode;
     public boolean pbIsFinancing = false;
