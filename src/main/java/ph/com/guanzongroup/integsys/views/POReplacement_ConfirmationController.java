@@ -707,7 +707,7 @@ public class POReplacement_ConfirmationController implements Initializable, Scre
                         if (poController.PurchaseOrderReceiving().Detail(pnDetail).isSerialized()) {
                             if (!(Double.valueOf(lsValue) == Math.floor(Double.valueOf(lsValue)))) { // returns true if contains value in decimal point which is restricted; for serial quantity purpose
                                 ShowMessageFX.Warning(null, pxeModuleName, "Input whole-number equivalent only for serialized item");
-                                return;
+                                break;
                             }
                         }
                         poJSON = poController.PurchaseOrderReceiving().checkPurchaseOrderReceivingSerial(pnDetail + 1, (int) Math.floor(Double.valueOf(lsValue)));
