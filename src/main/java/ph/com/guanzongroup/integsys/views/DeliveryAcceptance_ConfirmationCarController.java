@@ -314,6 +314,7 @@ public class DeliveryAcceptance_ConfirmationCarController implements Initializab
                     case "btnClose":
                         unloadForm appUnload = new unloadForm();
                         if (ShowMessageFX.OkayCancel(null, "Close Tab", "Are you sure you want to close this Tab?") == true) {
+                            closeSerialDialog();
                             appUnload.unloadForm(apMainAnchor, oApp, pxeModuleName);
                         } else {
                             return;
@@ -894,7 +895,7 @@ public class DeliveryAcceptance_ConfirmationCarController implements Initializab
                                             poJSON.put("message", "User is not an authorized approving officer.");
                                         }
                                     }
-                                    
+
                                     if ("error".equals((String) poJSON.get("result"))) {
                                         ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                         loadRecordDetail();
