@@ -718,7 +718,7 @@ public class DeliveryAcceptance_EntryController implements Initializable, Screen
                             }
                         }
                     }
-                    poJSON = poPurchaseReceivingController.PurchaseOrderReceiving().checkPurchaseOrderReceivingSerial(pnDetail + 1, (int) Math.round(Double.valueOf(lsValue)));
+                    poJSON = poPurchaseReceivingController.PurchaseOrderReceiving().checkPurchaseOrderReceivingSerial(pnDetail + 1, (int) Math.floor(Double.valueOf(lsValue)));
                     if ("error".equals((String) poJSON.get("result"))) {
                         System.err.println((String) poJSON.get("message"));
                         ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
