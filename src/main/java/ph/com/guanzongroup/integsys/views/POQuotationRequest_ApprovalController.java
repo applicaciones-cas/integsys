@@ -292,6 +292,7 @@ public class POQuotationRequest_ApprovalController implements Initializable, Scr
                         } else {
                             return;
                         }
+                        break;
                     case "btnReturn":
                         poJSON = new JSONObject();
                         if (ShowMessageFX.YesNo(null, pxeModuleName, "Are you sure you want to return transaction?") == true) {
@@ -1134,11 +1135,10 @@ public class POQuotationRequest_ApprovalController implements Initializable, Scr
         JFXUtil.setDisabled(true, apDetail);
         JFXUtil.setButtonsVisibility(lbShow4, btnClose);
         JFXUtil.setButtonsVisibility((poController.POQuotationRequest().getPOQuotationRequestSupplierCount() > 0 && lbShow3), btnExport);
-        JFXUtil.setButtonsVisibility(false, btnReturn);
+        JFXUtil.setButtonsVisibility(fnValue == EditMode.READY, btnReturn); //always show return for confirm / approve status
         switch (poController.POQuotationRequest().Master().getTransactionStatus()) {
             case POQuotationRequestStatus.APPROVED:
                 JFXUtil.setButtonsVisibility(false, btnApprove, btnDisapprove);
-                JFXUtil.setButtonsVisibility(true, btnReturn);
                 if (fnValue == EditMode.UPDATE) {
                     JFXUtil.setDisabled(true, apMaster, apDetail);
                     JFXUtil.setDisabled(false, taRemarks, apSupplier);
@@ -1146,6 +1146,7 @@ public class POQuotationRequest_ApprovalController implements Initializable, Scr
                 break;
             case POQuotationRequestStatus.CANCELLED:
                 JFXUtil.setButtonsVisibility(false, btnApprove, btnDisapprove, btnUpdate);
+                JFXUtil.setButtonsVisibility(false, btnReturn);
                 break;
         }
     }

@@ -1431,17 +1431,18 @@ public class POQuotation_ApprovalController implements Initializable, ScreenInte
         //Unkown || Ready
         JFXUtil.setDisabled(true, apMaster, apDetail, apAttachments);
         JFXUtil.setButtonsVisibility(lbShow4, btnClose);
-        JFXUtil.setButtonsVisibility(false, btnReturn);
+        JFXUtil.setButtonsVisibility(fnValue == EditMode.READY, btnReturn); //always show return for confirm / approve status
         switch (poController.POQuotation().Master().getTransactionStatus()) {
             case POQuotationStatus.CONFIRMED:
                 JFXUtil.setButtonsVisibility(true, btnApprove, btnDisapprove);
                 break;
             case POQuotationStatus.APPROVED:
-                JFXUtil.setButtonsVisibility(true, btnReturn);
+                JFXUtil.setButtonsVisibility(false, btnApprove, btnDisapprove);
                 break;
             case POQuotationStatus.VOID:
             case POQuotationStatus.CANCELLED:
                 JFXUtil.setButtonsVisibility(false, btnApprove, btnDisapprove);
+                JFXUtil.setButtonsVisibility(false, btnReturn);
                 break;
         }
     }
