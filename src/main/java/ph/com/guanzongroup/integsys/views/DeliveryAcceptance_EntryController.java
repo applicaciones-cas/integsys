@@ -2068,9 +2068,7 @@ public class DeliveryAcceptance_EntryController implements Initializable, Screen
                     }
                     goToPageBasedOnSelectedRow(String.valueOf(pnMain));
                 }
-                for (int lnCtr = 0; lnCtr <= poPurchaseReceivingController.PurchaseOrderReceiving().getDetailCount() - 1; lnCtr++) {
-                    poPurchaseReceivingController.PurchaseOrderReceiving().getPurchaseOrderReceivingSerial(poPurchaseReceivingController.PurchaseOrderReceiving().Detail(lnCtr).getEntryNo());
-                }
+        
                 loadTableDetail();
             } else {
                 ShowMessageFX.Warning(null, pxeModuleName, "Data can only be viewed when in ADD or UPDATE mode.");
