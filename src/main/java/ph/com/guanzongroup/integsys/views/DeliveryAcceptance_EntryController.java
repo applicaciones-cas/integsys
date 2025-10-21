@@ -718,6 +718,12 @@ public class DeliveryAcceptance_EntryController implements Initializable, Screen
                             }
                         }
                     }
+                    poJSON = poPurchaseReceivingController.PurchaseOrderReceiving().checkPurchaseOrderReceivingSerial(pnDetail + 1, Integer.valueOf(lsValue));
+                    if ("error".equals((String) poJSON.get("result"))) {
+                        System.err.println((String) poJSON.get("message"));
+                        ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                        return;
+                    }
                     double lnNewVal = Double.valueOf(lsValue);
                     double lnOldVal = poPurchaseReceivingController.PurchaseOrderReceiving().Detail(pnDetail).getQuantity().doubleValue();
                     poJSON = poPurchaseReceivingController.PurchaseOrderReceiving().Detail(pnDetail).setQuantity((Double.valueOf(lsValue)));
@@ -2068,7 +2074,7 @@ public class DeliveryAcceptance_EntryController implements Initializable, Screen
                     }
                     goToPageBasedOnSelectedRow(String.valueOf(pnMain));
                 }
-        
+
                 loadTableDetail();
             } else {
                 ShowMessageFX.Warning(null, pxeModuleName, "Data can only be viewed when in ADD or UPDATE mode.");
