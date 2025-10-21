@@ -89,10 +89,13 @@ import java.text.SimpleDateFormat;
 import java.time.format.DateTimeParseException;
 import javafx.scene.Node;
 import javafx.animation.PauseTransition;
+import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.ComboBox;
+import javafx.stage.Modality;
+import javafx.stage.StageStyle;
 import org.guanzon.appdriver.constant.DocumentType;
-import javafx.util.Pair;
 import org.guanzon.appdriver.agent.ShowDialogFX;
 import org.guanzon.appdriver.constant.UserRight;
 
@@ -117,6 +120,10 @@ public class DeliveryAcceptance_ConfirmationController implements Initializable,
     private String psCategoryId = "";
     private String psSupplierId = "";
     private boolean pbEntered = false;
+
+    private double xOffset = 0;
+    private double yOffset = 0;
+    private Stage dialogStage = null;
 
     private ObservableList<ModelDeliveryAcceptance_Main> main_data = FXCollections.observableArrayList();
     private ObservableList<ModelDeliveryAcceptance_Detail> details_data = FXCollections.observableArrayList();
@@ -158,7 +165,7 @@ public class DeliveryAcceptance_ConfirmationController implements Initializable,
     @FXML
     private Button btnUpdate, btnSearch, btnSave, btnCancel, btnConfirm, btnVoid, btnPrint,
             btnReturn, btnHistory, btnRetrieve, btnClose, btnAddAttachment,
-            btnRemoveAttachment, btnArrowLeft, btnArrowRight;
+            btnRemoveAttachment, btnArrowLeft, btnArrowRight, btnSerials;
 
     @FXML
     private TableView tblViewOrderDetails, tblViewPuchaseOrder, tblAttachments;
@@ -252,6 +259,88 @@ public class DeliveryAcceptance_ConfirmationController implements Initializable,
         psCategoryId = fsValue;
     }
 
+    public void closeSerialDialog() {
+        if (dialogStage != null && dialogStage.isShowing()) {
+            dialogStage.close();
+            dialogStage = null;
+        } else {
+        }
+    }
+
+    public void showSerialDialog() {
+        poJSON = new JSONObject();
+        try {
+            if (!poPurchaseReceivingController.PurchaseOrderReceiving().Detail(pnDetail).isSerialized()) {
+                return;
+            }
+            if (poPurchaseReceivingController.PurchaseOrderReceiving().Detail(pnDetail).getQuantity().doubleValue() == 0) {
+                ShowMessageFX.Warning(null, pxeModuleName, "Received quantity cannot be empty.");
+                return;
+            }
+            //Populate Purchase Order Receiving Detail
+            poJSON = poPurchaseReceivingController.PurchaseOrderReceiving().getPurchaseOrderReceivingSerial(pnDetail + 1);
+            if ("error".equals((String) poJSON.get("result"))) {
+                ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                return;
+            }
+
+//             Check if the dialog is already open
+            if (dialogStage != null) {
+                if (dialogStage.isShowing()) {
+                    dialogStage.toFront();
+                    return;
+                }
+            }
+
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/ph/com/guanzongroup/integsys/views/DeliveryAcceptance_SerialAppliances.fxml"));
+            DeliveryAcceptance_SerialController controller = new DeliveryAcceptance_SerialController();
+            loader.setController(controller);
+
+            if (controller != null) {
+                controller.setGRider(oApp);
+                controller.setObject(poPurchaseReceivingController.PurchaseOrderReceiving());
+                controller.setEntryNo(pnDetail + 1);
+            }
+
+            Parent root = loader.load();
+
+            // Handle drag events for the undecorated window
+            root.setOnMousePressed(event -> {
+                xOffset = event.getSceneX();
+                yOffset = event.getSceneY();
+            });
+
+            root.setOnMouseDragged(event -> {
+                Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+                stage.setX(event.getScreenX() - xOffset);
+                stage.setY(event.getScreenY() - yOffset);
+            });
+
+            dialogStage = new Stage();
+            dialogStage.initStyle(StageStyle.UNDECORATED);
+            dialogStage.initModality(Modality.APPLICATION_MODAL);
+            dialogStage.setTitle("Inventory Serial");
+            dialogStage.setScene(new Scene(root));
+
+            // Clear the reference when closed
+            dialogStage.setOnHidden(event -> {
+                dialogStage = null;
+                moveNext();
+                Platform.runLater(() -> {
+                    loadTableDetail();
+                });
+            });
+            dialogStage.show();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (SQLException ex) {
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+        } catch (GuanzonException ex) {
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+        }
+    }
+
     @FXML
     private void cmdButton_Click(ActionEvent event) {
         poJSON = new JSONObject();
@@ -307,11 +396,19 @@ public class DeliveryAcceptance_ConfirmationController implements Initializable,
                     case "btnClose":
                         unloadForm appUnload = new unloadForm();
                         if (ShowMessageFX.OkayCancel(null, "Close Tab", "Are you sure you want to close this Tab?") == true) {
+                            closeSerialDialog();
                             appUnload.unloadForm(apMainAnchor, oApp, pxeModuleName);
                         } else {
                             return;
                         }
                         break;
+                    case "btnSerials":
+                        if (!poPurchaseReceivingController.PurchaseOrderReceiving().Detail(pnDetail).isSerialized()) {
+                            ShowMessageFX.Warning(null, pxeModuleName, "Selected item is not serialized.");
+                            return;
+                        }
+                        showSerialDialog();
+                        return;
                     case "btnUpdate":
                         poJSON = poPurchaseReceivingController.PurchaseOrderReceiving().OpenTransaction(poPurchaseReceivingController.PurchaseOrderReceiving().Master().getTransactionNo());
                         poJSON = poPurchaseReceivingController.PurchaseOrderReceiving().UpdateTransaction();
@@ -782,7 +879,7 @@ public class DeliveryAcceptance_ConfirmationController implements Initializable,
                                             poJSON.put("message", "User is not an authorized approving officer.");
                                         }
                                     }
-                                    
+
                                     if ("error".equals((String) poJSON.get("result"))) {
                                         ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                         loadRecordDetail();
@@ -794,6 +891,7 @@ public class DeliveryAcceptance_ConfirmationController implements Initializable,
                             }
                         }
                     }
+                    double lnNewVal = Double.valueOf(lsValue);
                     double lnOldVal = poPurchaseReceivingController.PurchaseOrderReceiving().Detail(pnDetail).getQuantity().doubleValue();
                     poJSON = poPurchaseReceivingController.PurchaseOrderReceiving().Detail(pnDetail).setQuantity((Double.valueOf(lsValue)));
                     if ("error".equals((String) poJSON.get("result"))) {
@@ -815,7 +913,17 @@ public class DeliveryAcceptance_ConfirmationController implements Initializable,
                     }
 
                     if (pbEntered) {
-                        moveNext();
+                        if (lnNewVal != lnOldVal) {
+                            if ((Double.valueOf(lsValue) > 0
+                                    && poPurchaseReceivingController.PurchaseOrderReceiving().Detail(pnDetail).getStockId() != null
+                                    && !"".equals(poPurchaseReceivingController.PurchaseOrderReceiving().Detail(pnDetail).getStockId()))) {
+                                showSerialDialog();
+                            } else {
+                                moveNext();
+                            }
+                        } else {
+                            moveNext();
+                        }
                         pbEntered = false;
                     }
                     break;
@@ -2277,6 +2385,8 @@ public class DeliveryAcceptance_ConfirmationController implements Initializable,
         //Update 
         btnSearch.setVisible(lbShow1);
         btnSearch.setManaged(lbShow1);
+        btnSerials.setVisible(lbShow1);
+        btnSerials.setManaged(lbShow1);
         btnSave.setVisible(lbShow1);
         btnSave.setManaged(lbShow1);
         btnCancel.setVisible(lbShow1);
