@@ -416,8 +416,10 @@ public class DeliveryAcceptance_ConfirmationController implements Initializable,
                             ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                             return;
                         }
+                        for (int lnCtr = 0; lnCtr <= poPurchaseReceivingController.PurchaseOrderReceiving().getDetailCount() - 1; lnCtr++) {
+                            poPurchaseReceivingController.PurchaseOrderReceiving().getPurchaseOrderReceivingSerial(poPurchaseReceivingController.PurchaseOrderReceiving().Detail(lnCtr).getEntryNo());
+                        }
                         poPurchaseReceivingController.PurchaseOrderReceiving().loadAttachments();
-
                         pnEditMode = poPurchaseReceivingController.PurchaseOrderReceiving().getEditMode();
                         break;
                     case "btnSearch":
@@ -1969,6 +1971,9 @@ public class DeliveryAcceptance_ConfirmationController implements Initializable,
                     return;
                 }
                 goToPageBasedOnSelectedRow(String.valueOf(pnMain));
+            }
+            for (int lnCtr = 0; lnCtr <= poPurchaseReceivingController.PurchaseOrderReceiving().getDetailCount() - 1; lnCtr++) {
+                poPurchaseReceivingController.PurchaseOrderReceiving().getPurchaseOrderReceivingSerial(poPurchaseReceivingController.PurchaseOrderReceiving().Detail(lnCtr).getEntryNo());
             }
             poPurchaseReceivingController.PurchaseOrderReceiving().loadAttachments();
             Platform.runLater(() -> {

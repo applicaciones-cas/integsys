@@ -327,7 +327,7 @@ public class DeliveryAcceptance_HistoryController implements Initializable, Scre
                             tfTransactionNo.requestFocus();
                             return;
                         }
-
+                        closeSerialDialog();
                         pnEditMode = poPurchaseReceivingController.PurchaseOrderReceiving().getEditMode();
                         psCompanyId = poPurchaseReceivingController.PurchaseOrderReceiving().Master().getCompanyId();
                         psSupplierId = poPurchaseReceivingController.PurchaseOrderReceiving().Master().getSupplierId();

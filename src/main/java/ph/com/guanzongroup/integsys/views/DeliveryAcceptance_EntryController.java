@@ -324,6 +324,7 @@ public class DeliveryAcceptance_EntryController implements Initializable, Screen
                             tfTransactionNo.requestFocus();
                             return;
                         }
+                        closeSerialDialog();
                         showRetainedHighlight(false);
                         pnEditMode = poPurchaseReceivingController.PurchaseOrderReceiving().getEditMode();
 //                        psCompanyId = poPurchaseReceivingController.PurchaseOrderReceiving().Master().getCompanyId();
@@ -392,6 +393,9 @@ public class DeliveryAcceptance_EntryController implements Initializable, Screen
                         if ("error".equals((String) poJSON.get("result"))) {
                             ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                             return;
+                        }
+                        for (int lnCtr = 0; lnCtr <= poPurchaseReceivingController.PurchaseOrderReceiving().getDetailCount() - 1; lnCtr++) {
+                            poPurchaseReceivingController.PurchaseOrderReceiving().getPurchaseOrderReceivingSerial(poPurchaseReceivingController.PurchaseOrderReceiving().Detail(lnCtr).getEntryNo());
                         }
                         pnEditMode = poPurchaseReceivingController.PurchaseOrderReceiving().getEditMode();
                         break;
@@ -2064,6 +2068,9 @@ public class DeliveryAcceptance_EntryController implements Initializable, Screen
                     }
                     goToPageBasedOnSelectedRow(String.valueOf(pnMain));
                 }
+                for (int lnCtr = 0; lnCtr <= poPurchaseReceivingController.PurchaseOrderReceiving().getDetailCount() - 1; lnCtr++) {
+                    poPurchaseReceivingController.PurchaseOrderReceiving().getPurchaseOrderReceivingSerial(poPurchaseReceivingController.PurchaseOrderReceiving().Detail(lnCtr).getEntryNo());
+                }
                 loadTableDetail();
             } else {
                 ShowMessageFX.Warning(null, pxeModuleName, "Data can only be viewed when in ADD or UPDATE mode.");
@@ -2231,7 +2238,7 @@ public class DeliveryAcceptance_EntryController implements Initializable, Screen
         btnSave.setManaged(lbShow);
         btnCancel.setVisible(lbShow);
         btnCancel.setManaged(lbShow);
-        
+
         btnSerials.setVisible(lbShow);
         btnSerials.setManaged(lbShow);
 
