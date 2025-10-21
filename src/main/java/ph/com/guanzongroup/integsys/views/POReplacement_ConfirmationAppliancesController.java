@@ -569,7 +569,7 @@ public class POReplacement_ConfirmationAppliancesController implements Initializ
                         loadTableDetail.reload();
                     });
                 });
-                stageSerialDialog.showDialog((Stage) btnSave.getScene().getWindow(), getClass().getResource("/ph/com/guanzongroup/integsys/views/DeliveryAcceptance_SerialMC.fxml"),
+                stageSerialDialog.showDialog((Stage) btnSave.getScene().getWindow(), getClass().getResource("/ph/com/guanzongroup/integsys/views/DeliveryAcceptance_SerialAppliances.fxml"),
                         controller, "Inventory Serial", true, true, false);
             } catch (IOException ex) {
                 Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
