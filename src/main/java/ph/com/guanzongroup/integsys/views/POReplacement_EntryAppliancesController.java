@@ -210,7 +210,7 @@ public class POReplacement_EntryAppliancesController implements Initializable, S
                             tfTransactionNo.requestFocus();
                             return;
                         }
-                        showRetainedHighlight(false);
+                        JFXUtil.showRetainedHighlight(false, tblViewMainList, "#A7C7E7", plOrderNoPartial, plOrderNoFinal, highlightedRowsMain, true);
                         pnEditMode = poController.PurchaseOrderReceiving().getEditMode();
 //                        psCompanyId = poController.PurchaseOrderReceiving().Master().getCompanyId();
                         psSupplierId = poController.PurchaseOrderReceiving().Master().getSupplierId();
@@ -269,7 +269,7 @@ public class POReplacement_EntryAppliancesController implements Initializable, S
                             poController.PurchaseOrderReceiving().SearchSupplier(psSupplierId, true);
                         }
                         pnEditMode = poController.PurchaseOrderReceiving().getEditMode();
-                        showRetainedHighlight(false);
+                        JFXUtil.showRetainedHighlight(false, tblViewMainList, "#A7C7E7", plOrderNoPartial, plOrderNoFinal, highlightedRowsMain, true);
                         break;
                     case "btnUpdate":
                         poJSON = poController.PurchaseOrderReceiving().OpenTransaction(poController.PurchaseOrderReceiving().Master().getTransactionNo());
@@ -292,7 +292,7 @@ public class POReplacement_EntryAppliancesController implements Initializable, S
                     case "btnCancel":
                         if (ShowMessageFX.OkayCancel(null, pxeModuleName, "Do you want to disregard changes?") == true) {
                             //get last retrieved Company and Supplier
-//                            psCompanyId = poController.PurchaseOrderReceiving().Master().getCompanyId();
+                            JFXUtil.showRetainedHighlight(false, tblViewMainList, "#A7C7E7", plOrderNoPartial, plOrderNoFinal, highlightedRowsMain, true);
                             psSupplierId = poController.PurchaseOrderReceiving().Master().getSupplierId();
 
                             //Clear data
@@ -305,7 +305,6 @@ public class POReplacement_EntryAppliancesController implements Initializable, S
                             poController.PurchaseOrderReceiving().Master().setCompanyId(psCompanyId);
                             poController.PurchaseOrderReceiving().Master().setSupplierId(psSupplierId);
                             pnEditMode = EditMode.UNKNOWN;
-                            showRetainedHighlight(false);
                             break;
                         } else {
                             return;
@@ -325,7 +324,7 @@ public class POReplacement_EntryAppliancesController implements Initializable, S
                             }
                         }
                         if (pnEditMode != EditMode.ADDNEW && pnEditMode != EditMode.READY && pnEditMode != EditMode.UPDATE) {
-                            showRetainedHighlight(false);
+//                            showRetainedHighlight(false);
                         }
                         break;
                     case "btnSave":
@@ -360,7 +359,7 @@ public class POReplacement_EntryAppliancesController implements Initializable, S
                                     }
                                 }
 
-                                showRetainedHighlight(true);
+                                JFXUtil.showRetainedHighlight(true, tblViewMainList, "#A7C7E7", plOrderNoPartial, plOrderNoFinal, highlightedRowsMain, true);
                                 // Print Transaction Prompt
                                 lsIsSaved = false;
                                 loJSON = poController.PurchaseOrderReceiving().OpenTransaction(poController.PurchaseOrderReceiving().Master().getTransactionNo());
@@ -406,27 +405,6 @@ public class POReplacement_EntryAppliancesController implements Initializable, S
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
         } catch (ParseException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
-        }
-    }
-
-    public void showRetainedHighlight(boolean isRetained) {
-        if (isRetained) {
-            for (Pair<String, String> pair : plOrderNoPartial) {
-                if (!"0".equals(pair.getValue())) {
-
-                    plOrderNoFinal.add(new Pair<>(pair.getKey(), pair.getValue()));
-                }
-            }
-        }
-        JFXUtil.disableAllHighlight(tblViewMainList, highlightedRowsMain);
-
-        plOrderNoPartial.clear();
-        for (Pair<String, String> pair : plOrderNoFinal) {
-            if (!"0".equals(pair.getValue())) {
-
-                JFXUtil.highlightByKey(tblViewMainList, pair.getKey(), "#A7C7E7", highlightedRowsMain);
-
-            }
         }
     }
 
@@ -636,7 +614,7 @@ public class POReplacement_EntryAppliancesController implements Initializable, S
                                             if (ShowMessageFX.YesNo(null, pxeModuleName,
                                                     "Are you sure you want to change the supplier name?\nPlease note that doing so will delete all purchase order receiving details.\n\nDo you wish to proceed?") == true) {
                                                 poController.PurchaseOrderReceiving().removePORDetails();
-                                                showRetainedHighlight(false);
+//                                                showRetainedHighlight(false);
                                                 loadTableDetail.reload();
                                             } else {
                                                 loadRecordMaster();
@@ -1164,13 +1142,9 @@ public class POReplacement_EntryAppliancesController implements Initializable, S
                                         ));
                             }
 
-                            for (Pair<String, String> pair : plOrderNoPartial) {
-                                if (!"".equals(pair.getKey()) && pair.getKey() != null) {
-
-                                    JFXUtil.highlightByKey(tblViewMainList, pair.getKey(), "#A7C7E7", highlightedRowsMain);
-                                }
-                            }
-
+                            JFXUtil.showRetainedHighlight(false, tblViewMainList, "#A7C7E7", plOrderNoPartial, plOrderNoFinal, highlightedRowsMain, true);
+                            loadHighlightFromDetail();
+                            
                             if (pnDetail < 0 || pnDetail
                                     >= details_data.size()) {
                                 if (!details_data.isEmpty()) {
@@ -1542,7 +1516,7 @@ public class POReplacement_EntryAppliancesController implements Initializable, S
 
         // Manage visibility and managed state of other buttons
         JFXUtil.setButtonsVisibility(!lbShow, btnNew);
-        JFXUtil.setButtonsVisibility(lbShow, btnSerials,btnSearch, btnSave, btnCancel);
+        JFXUtil.setButtonsVisibility(lbShow, btnSerials, btnSearch, btnSave, btnCancel);
         JFXUtil.setButtonsVisibility(lbShow2, btnUpdate, btnPrint, btnHistory);
         JFXUtil.setButtonsVisibility(lbShow3, btnBrowse, btnClose);
 
