@@ -718,6 +718,13 @@ public class DeliveryAcceptance_EntryController implements Initializable, Screen
                             }
                         }
                     }
+                    //check first if serialized 
+                    if (poPurchaseReceivingController.PurchaseOrderReceiving().Detail(pnDetail).isSerialized()) {
+                        if (!(Double.valueOf(lsValue) == Math.floor(Double.valueOf(lsValue)))) { // returns true if contains value in decimal point which is restricted; for serial quantity purpose
+                            ShowMessageFX.Warning(null, pxeModuleName, "Input whole-number equivalent only for serialized item");
+                            return;
+                        }
+                    }
                     poJSON = poPurchaseReceivingController.PurchaseOrderReceiving().checkPurchaseOrderReceivingSerial(pnDetail + 1, (int) Math.floor(Double.valueOf(lsValue)));
                     if ("error".equals((String) poJSON.get("result"))) {
                         System.err.println((String) poJSON.get("message"));
