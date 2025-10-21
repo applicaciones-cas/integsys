@@ -739,7 +739,7 @@ public class POReplacement_ConfirmationController implements Initializable, Scre
 
                         if (pbEntered) {
                             if (lnNewVal != lnOldVal) {
-                                if ((Integer.valueOf(lsValue) > 0
+                                if ((Double.valueOf(lsValue) > 0
                                 && poController.PurchaseOrderReceiving().Detail(pnDetail).getStockId() != null
                                 && !"".equals(poController.PurchaseOrderReceiving().Detail(pnDetail).getStockId()))) {
                                     showSerialDialog();
