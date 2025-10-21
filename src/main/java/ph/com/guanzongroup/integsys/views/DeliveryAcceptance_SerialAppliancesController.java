@@ -64,7 +64,7 @@ public class DeliveryAcceptance_SerialAppliancesController implements Initializa
     private JSONObject poJSON;
     int pnEntryNo = 0;
     int pnDetail = 0;
-    private final String pxeModuleName = "Purchase Order Receiving Serial Appliances";
+    private final String pxeModuleName = "Delivery Acceptance Serial Appliances";
     static PurchaseOrderReceiving poPurchaseReceivingController;
     public int pnEditMode;
     public boolean isViewing = false;
