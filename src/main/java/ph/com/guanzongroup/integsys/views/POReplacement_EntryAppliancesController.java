@@ -108,6 +108,8 @@ public class POReplacement_EntryAppliancesController implements Initializable, S
 
     private ChangeListener<String> detailSearchListener;
     private ChangeListener<String> mainSearchListener;
+
+    JFXUtil.StageManager stageSerialDialog = new JFXUtil.StageManager();
     @FXML
     private AnchorPane apMainAnchor, apBrowse, apButton, apMaster, apDetail;
     @FXML
@@ -232,6 +234,7 @@ public class POReplacement_EntryAppliancesController implements Initializable, S
                     case "btnClose":
                         unloadForm appUnload = new unloadForm();
                         if (ShowMessageFX.OkayCancel(null, "Close Tab", "Are you sure you want to close this Tab?") == true) {
+                            stageSerialDialog.closeDialog();
                             appUnload.unloadForm(apMainAnchor, oApp, pxeModuleName);
                         } else {
                             return;
@@ -242,6 +245,7 @@ public class POReplacement_EntryAppliancesController implements Initializable, S
                             ShowMessageFX.Warning(null, pxeModuleName, "Selected item is not serialized.");
                             return;
                         }
+                        showSerialDialog();
                         return;
                     case "btnNew":
                         //Clear data
@@ -426,6 +430,51 @@ public class POReplacement_EntryAppliancesController implements Initializable, S
         }
     }
 
+    public void showSerialDialog() {
+        stageSerialDialog.closeDialog();
+        poJSON = new JSONObject();
+        try {
+            if (!poController.PurchaseOrderReceiving().Detail(pnDetail).isSerialized()) {
+                return;
+            }
+
+            if (poController.PurchaseOrderReceiving().Detail(pnDetail).getQuantity().intValue() == 0) {
+                ShowMessageFX.Warning(null, pxeModuleName, "Received quantity cannot be empty.");
+                return;
+            }
+
+            //Populate Purchase Order Receiving Detail
+            poJSON = poController.PurchaseOrderReceiving().getPurchaseOrderReceivingSerial(pnDetail + 1);
+            if ("error".equals((String) poJSON.get("result"))) {
+                ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                return;
+            }
+
+            DeliveryAcceptance_SerialAppliancesController controller = new DeliveryAcceptance_SerialAppliancesController();
+            if (controller != null) {
+                controller.setGRider(oApp);
+                controller.setObject(poController.PurchaseOrderReceiving());
+                controller.setEntryNo(pnDetail + 1);
+            }
+
+            try {
+                stageSerialDialog.setOnHidden(event -> {
+                    moveNext(false, true);
+                    Platform.runLater(() -> {
+                        loadTableDetail.reload();
+                    });
+                });
+                stageSerialDialog.showDialog((Stage) btnSave.getScene().getWindow(), getClass().getResource("/ph/com/guanzongroup/integsys/views/DeliveryAcceptance_SerialMC.fxml"),
+                        controller, "Inventory Serial", true, true, false);
+            } catch (IOException ex) {
+                Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+            }
+
+        } catch (SQLException | GuanzonException ex) {
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+        }
+    }
+
     public void loadHighlightFromDetail() {
         for (int lnCtr = 0; lnCtr < poController.PurchaseOrderReceiving().getDetailCount(); lnCtr++) {
             String lsHighlightbasis = poController.PurchaseOrderReceiving().Detail(lnCtr).getOrderNo();
@@ -533,7 +582,8 @@ public class POReplacement_EntryAppliancesController implements Initializable, S
                             JFXUtil.textFieldMoveNext(tfReceiveQuantity);
                             break;
                         }
-
+                        double lnNewVal = Double.valueOf(lsValue);
+                        double lnOldVal = poController.PurchaseOrderReceiving().Detail(pnDetail).getQuantity().intValue();
                         poJSON = poController.PurchaseOrderReceiving().Detail(pnDetail).setQuantity((Integer.valueOf(lsValue)));
                         if ("error".equals((String) poJSON.get("result"))) {
                             ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
@@ -552,7 +602,17 @@ public class POReplacement_EntryAppliancesController implements Initializable, S
                             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
                         }
                         if (pbEntered) {
-                            moveNext(false, true);
+                            if (lnNewVal != lnOldVal) {
+                                if ((Integer.valueOf(lsValue) > 0
+                                && poController.PurchaseOrderReceiving().Detail(pnDetail).getStockId() != null
+                                && !"".equals(poController.PurchaseOrderReceiving().Detail(pnDetail).getStockId()))) {
+                                    showSerialDialog();
+                                } else {
+                                    moveNext(false, true);
+                                }
+                            } else {
+                                moveNext(false, true);
+                            }
                             pbEntered = false;
                         }
                         break;
@@ -1382,6 +1442,7 @@ public class POReplacement_EntryAppliancesController implements Initializable, S
                 if (event.getClickCount() == 1) {  // Detect single click (or use another condition for double click)
                     ModelDeliveryAcceptance_Detail selected = (ModelDeliveryAcceptance_Detail) tblViewTransDetails.getSelectionModel().getSelectedItem();
                     if (selected != null) {
+                        stageSerialDialog.closeDialog();
                         pnDetail = Integer.parseInt(selected.getIndex01()) - 1;
                         loadRecordDetail();
                         if (poController.PurchaseOrderReceiving().Detail(pnDetail).getStockId() != null && !poController.PurchaseOrderReceiving().Detail(pnDetail).getStockId().equals("")) {
