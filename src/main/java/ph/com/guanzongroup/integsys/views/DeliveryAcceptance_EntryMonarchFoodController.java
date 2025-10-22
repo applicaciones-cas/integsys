@@ -272,13 +272,6 @@ public class DeliveryAcceptance_EntryMonarchFoodController implements Initializa
                         }
 
                         poPurchaseReceivingController.PurchaseOrderReceiving().initFields();
-
-                        if (!psCompanyId.isEmpty()) {
-                            poPurchaseReceivingController.PurchaseOrderReceiving().SearchCompany(psCompanyId, true);
-                        }
-                        if (!psSupplierId.isEmpty()) {
-                            poPurchaseReceivingController.PurchaseOrderReceiving().SearchSupplier(psSupplierId, true);
-                        }
                         pnEditMode = poPurchaseReceivingController.PurchaseOrderReceiving().getEditMode();
                         showRetainedHighlight(false);
                         break;
