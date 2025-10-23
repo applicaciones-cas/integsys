@@ -73,7 +73,7 @@ public class AccountsAccreditation_ConfirmationController implements Initializab
 
     @FXML
     private TextField tfTransactionNo, tfCategory, tfCompany,
-            tfContactPerson, tfAddress, tfSearchCompany;
+            tfContactPerson, tfAddress, tfSearchCompany, tfTIN;
 
     @FXML
     private DatePicker dpTransactionDate;
@@ -375,6 +375,7 @@ public class AccountsAccreditation_ConfirmationController implements Initializab
             poLogWrapper.severe(psFormName + " :" + ex.getMessage());
         }
     }
+    
     final ChangeListener<? super Boolean> dPicker_Focus = (o, ov, nv) -> {
         DatePicker loDatePicker = (DatePicker) ((ReadOnlyBooleanPropertyBase) o).getBean();
         String lsDatePickerID = loDatePicker.getId();
@@ -464,6 +465,7 @@ public class AccountsAccreditation_ConfirmationController implements Initializab
             tfCompany.setText(poAppController.getModel().Client().getCompanyName());
             tfContactPerson.setText(poAppController.getModel().ClientInstitutionContact().getContactPersonName());
             tfAddress.setText(poAppController.getModel().ClientAddress().getAddress());
+            tfTIN.setText(poAppController.getModel().Client().getTaxIdNumber());
             taRemarks.setText(poAppController.getModel().getRemarks());
             cmbAccountType.getSelectionModel().select(Integer.parseInt(poAppController.getModel().getAccountType()));
             cmbTransType.getSelectionModel().select(Integer.parseInt(poAppController.getModel().getTransactionType()));
