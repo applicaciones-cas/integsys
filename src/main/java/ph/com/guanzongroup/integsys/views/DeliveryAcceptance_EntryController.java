@@ -745,9 +745,9 @@ public class DeliveryAcceptance_EntryController implements Initializable, Screen
                         }
                     } catch (SQLException | GuanzonException ex) {
                         Logger.getLogger(DeliveryAcceptance_EntryController.class.getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
-                    }
+                    } 
                     if (pbEntered) {
-                        if (lnNewVal != lnOldVal) {
+                        if (lnNewVal != lnOldVal && poPurchaseReceivingController.PurchaseOrderReceiving().Detail(pnDetail).isSerialized()) {
                             if ((Double.valueOf(lsValue) > 0
                                     && poPurchaseReceivingController.PurchaseOrderReceiving().Detail(pnDetail).getStockId() != null
                                     && !"".equals(poPurchaseReceivingController.PurchaseOrderReceiving().Detail(pnDetail).getStockId()))) {

@@ -740,7 +740,7 @@ public class POReplacement_ConfirmationController implements Initializable, Scre
                         }
 
                         if (pbEntered) {
-                            if (lnNewVal != lnOldVal) {
+                            if (lnNewVal != lnOldVal && poController.PurchaseOrderReceiving().Detail(pnDetail).isSerialized()) {
                                 if ((Double.valueOf(lsValue) > 0
                                 && poController.PurchaseOrderReceiving().Detail(pnDetail).getStockId() != null
                                 && !"".equals(poController.PurchaseOrderReceiving().Detail(pnDetail).getStockId()))) {

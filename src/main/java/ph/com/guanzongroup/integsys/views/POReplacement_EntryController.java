@@ -571,7 +571,7 @@ public class POReplacement_EntryController implements Initializable, ScreenInter
                             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
                         }
                         if (pbEntered) {
-                            if (lnNewVal != lnOldVal) {
+                            if (lnNewVal != lnOldVal && poController.PurchaseOrderReceiving().Detail(pnDetail).isSerialized()) {
                                 if ((Double.valueOf(lsValue) > 0
                                 && poController.PurchaseOrderReceiving().Detail(pnDetail).getStockId() != null
                                 && !"".equals(poController.PurchaseOrderReceiving().Detail(pnDetail).getStockId()))) {

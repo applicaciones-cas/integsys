@@ -931,7 +931,7 @@ public class DeliveryAcceptance_ConfirmationController implements Initializable,
                     }
 
                     if (pbEntered) {
-                        if (lnNewVal != lnOldVal) {
+                        if (lnNewVal != lnOldVal && poPurchaseReceivingController.PurchaseOrderReceiving().Detail(pnDetail).isSerialized()) {
                             if ((Double.valueOf(lsValue) > 0
                                     && poPurchaseReceivingController.PurchaseOrderReceiving().Detail(pnDetail).getStockId() != null
                                     && !"".equals(poPurchaseReceivingController.PurchaseOrderReceiving().Detail(pnDetail).getStockId()))) {
