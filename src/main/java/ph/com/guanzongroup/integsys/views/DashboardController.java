@@ -35,7 +35,6 @@ import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.event.EventHandler;
-import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
@@ -50,8 +49,6 @@ import javafx.scene.control.TabPane;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.control.TreeCell;
-import javafx.scene.control.TreeItem;
-import javafx.scene.control.TreeView;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.Dragboard;
@@ -76,20 +73,18 @@ import org.guanzon.appdriver.base.MiscUtil;
 import org.guanzon.appdriver.base.SQLUtil;
 import org.json.simple.JSONObject;
 import ph.com.guanzongroup.integsys.utility.JFXUtil;
+import ph.com.guanzongroup.cas.sysmonitor.SystemMonitorMenu;
 import javafx.scene.Cursor;
 import javafx.scene.control.Tooltip;
-
 import javafx.fxml.FXML;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
-
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 import javafx.beans.value.ChangeListener;
+import org.json.simple.JSONArray;
 
 public class DashboardController implements Initializable {
 
@@ -101,9 +96,6 @@ public class DashboardController implements Initializable {
     private String psDefaultScreenFXML = "/ph/com/guanzongroup/integsys/views/Login.fxml";
     private String psDefaultScreenFXML2 = "/ph/com/guanzongroup/integsys/views/DefaultScreen.fxml";
     private String psUserManagementFXML = "/ph/com/guanzongroup/integsys/views/UserManagement.fxml";
-
-    private int notificationCount = 0;
-    private int cartCount = 0;
 
     private ToggleGroup toggleGroup;
     private static ToggleButton[] toggleBtnLeftUpperSideBar;
@@ -133,12 +125,16 @@ public class DashboardController implements Initializable {
     private String psCategoryID = "";
 
     List<String> tabName = new ArrayList<>();
-    String sformname = "";
+    String psFormName = "";
+    Object poController = null;
     boolean lbproceed = false;
 
     private final Map<String, Runnable> javaCommands = new HashMap<>();
     private Set<String> allowedMenuIds = new HashSet<>();
     List<Node> savedNodes = null;
+
+    // Keep a shared lookup map for your left sidebar nodes
+    private final Map<String, TreeNode> leftSidebarLookup = new HashMap<>();
 
     @FXML
     private AnchorPane MainAnchor;
@@ -219,7 +215,6 @@ public class DashboardController implements Initializable {
             setAppVersion("v1.00.01");
 
             initButtonClickActions();
-            notificationChecker();
             setTreeViewStyle(tvLeftSideBar);
             setTreeViewStyleMonitor(tvRightSideBar);
 
@@ -244,28 +239,28 @@ public class DashboardController implements Initializable {
             JFXUtil.applyHoverFadeToButtons("#FFFFFF", "#552B00", btnMinimize, btnClose);
             JFXUtil.placeClockInAnchorPane(apClock, 25);
 
-            switch (System.getProperty("user.selected.industry")) {
-                case "06":
-                    loadDummyMenu();
-                    setAnchorPaneVisibleManage(true, anchorRightSideBarMenu);
-                    break;
-                case "09":
-                    loadDummyMenux();
-                    setAnchorPaneVisibleManage(true, anchorRightSideBarMenu);
-                    break;
-                default:
-                    setAnchorPaneVisibleManage(false, anchorRightSideBarMenu);
-            }
+//            switch (System.getProperty("user.selected.industry")) {
+//                case "06":
+//                    loadDummyMenu();
+//                    setAnchorPaneVisibleManage(true, anchorRightSideBarMenu);
+//                    break;
+//                case "09":
+//                    loadDummyMenux();
+//                    setAnchorPaneVisibleManage(true, anchorRightSideBarMenu);
+//                    break;
+//                default:
+//                    setAnchorPaneVisibleManage(false, anchorRightSideBarMenu);
+//            }
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
     @FXML
-    private void showMenu(ActionEvent event) {
+    private void showMenu(ActionEvent event) throws SQLException {
         loadMenu();
         toggleLeftSideBarMenuButton("btnMenu", 0);
-        toggleSidebarWidth();
+
     }
 
     @FXML
@@ -278,7 +273,9 @@ public class DashboardController implements Initializable {
 
     @FXML
     private void switchSysMonitor(ActionEvent event) {
-        toggleRightSideBarMenuButton("switchSysMonitor", 0);
+        loadSystemMonitor();
+        toggleSidebarWidth();
+        toggleRightSideBarMenuButton("btnSysMonitor", 0);
     }
 
     public void setGRider(GRiderCAS foValue) {
@@ -386,7 +383,7 @@ public class DashboardController implements Initializable {
 
     private void initMenu() {
         setAnchorPaneVisibleManage(false, anchorLeftSideBarMenu);
-        //setAnchorPaneVisibleManage(false, anchorRightSideBarMenu);
+        setAnchorPaneVisibleManage(false, anchorRightSideBarMenu);
     }
     ChangeListener<Boolean> toggleSelectedListener = (obs, oldVal, newVal) -> {
         setAnchorPaneVisibleManage(false, anchorLeftSideBarMenu);
@@ -547,7 +544,7 @@ public class DashboardController implements Initializable {
         }
     }
 
-    private void notificationChecker() {
+    public void notificationChecker() {
         ScheduledService<Void> service = new ScheduledService<Void>() {
             @Override
             protected Task<Void> createTask() {
@@ -565,11 +562,22 @@ public class DashboardController implements Initializable {
     }
 
     private void checkNotifications() {
-        notificationCount += (int) (Math.random() * 5);
-        cartCount += (int) (Math.random() * 5);
-
+//        notificationCount += (int) (Math.random() * 5);
+//        cartCount += (int) (Math.random() * 5);
+//        if (btnSysMonitor.isDisabled()) {
+//            return;
+//        }
         Platform.runLater(() -> {
-            lblNotifCount.setText(String.valueOf(notificationCount));
+            if (tvRightSideBar.isShowRoot()) {
+                //refresh the tree monitor
+                loadSystemMonitor();
+            } else {
+                SystemMonitorMenu monitorMenu = new SystemMonitorMenu(oApp, "CAS");
+                JSONObject loSysMontrData = monitorMenu.processMonitoring();
+                lblNotifCount.setText(String.valueOf(monitorMenu.getMonitoringCount()));
+
+            }
+
         });
     }
 
@@ -690,22 +698,22 @@ public class DashboardController implements Initializable {
 
                     if (isContainer) {
                         // Container node styling
-                        setStyle("-fx-font-weight: bold; -fx-text-fill: #555555;");
+                        setStyle("-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #555555;");
                         setCursor(javafx.scene.Cursor.DEFAULT);
                     } else {
                         // Executable node styling
-                        setStyle("-fx-font-weight: normal; -fx-text-fill: black;");
+                        setStyle("-fx-font-size: 12px; -fx-font-weight: normal; -fx-text-fill: black;");
                         setCursor(javafx.scene.Cursor.HAND);
                     }
 
                     // Hover effect only for command/executable nodes
                     if (!isContainer) {
                         setOnMouseEntered(e -> {
-                            setStyle("-fx-background-color: #E6F2FF; -fx-font-weight: normal; -fx-text-fill: black;");
+                            setStyle("-fx-font-size: 12px; -fx-background-color: #E6F2FF; -fx-font-weight: normal; -fx-text-fill: black;");
                             setCursor(javafx.scene.Cursor.HAND);
                         });
                         setOnMouseExited(e -> {
-                            setStyle("-fx-font-weight: normal; -fx-text-fill: black;");
+                            setStyle("-fx-font-size: 12px;-fx-font-weight: normal; -fx-text-fill: black;");
                             setCursor(javafx.scene.Cursor.HAND);
                         });
                     } else {
@@ -773,8 +781,8 @@ public class DashboardController implements Initializable {
                         Tab currentTab = tabpane.getSelectionModel().getSelectedItem();
                         if (currentTab != null) {
                             try {
-                                if (!sformname.contains("PurchaseOrder")) {
-                                    if (!sformname.contains("DeliveryAcceptance_History")) {
+                                if (!psFormName.contains("PurchaseOrder")) {
+                                    if (!psFormName.contains("DeliveryAcceptance_History")) {
                                         return;
                                     }
                                 }
@@ -806,7 +814,7 @@ public class DashboardController implements Initializable {
             fxmlLoader.setController(loControl);
 
             //get industry of current opend form
-            SetTabTitle(sformname);
+            SetTabTitle(psFormName);
             String lsOldForm = getFormIndustry(psIndustryID, psCategoryID);
             String lsOldCompany = psCompanyID;
             //load the main interface
@@ -838,21 +846,21 @@ public class DashboardController implements Initializable {
                 //change form name base on selected industry
                 //  /com/rmj/guanzongroup/sidebarmenus/views/DeliveryAcceptance_ConfirmationCar.fxml
 
-                System.out.println("OLD : " + sformname);
-                String originalString = sformname;
+                System.out.println("OLD : " + psFormName);
+                String originalString = psFormName;
                 String updatedString = originalString.replace(lsOldForm + ".fxml", lsIndustry + ".fxml");
 
                 // Print the updated string
                 System.out.println(originalString);
                 System.out.println(updatedString);
-                sformname = updatedString;
+                psFormName = updatedString;
 
-                System.out.println("NEW : " + sformname);
+                System.out.println("NEW : " + psFormName);
                 if (oApp != null) {
-                    boolean isNewTab = (checktabs(SetTabTitle(sformname)) == 1);
+                    boolean isNewTab = (checktabs(SetTabTitle(psFormName)) == 1);
                     if (isNewTab || !lsOldCompany.equals(psCompanyID)) {
-                        if (!sformname.isEmpty() && sformname.contains(".fxml")) {
-                            setScene2(loadAnimateExchange(sformname));
+                        if (!psFormName.isEmpty() && psFormName.contains(".fxml")) {
+                            setScene2(loadAnimateExchange(psFormName));
                         } else {
                             ShowMessageFX.Warning("This form is currently unavailable.", "Computerized Accounting System", MODULE);
                         }
@@ -956,7 +964,7 @@ public class DashboardController implements Initializable {
                 toggleBtnRightSideBar[i].setSelected(false);
             }
             if (tabpane.getSelectionModel().getSelectedItem() != null) {
-                sformname = getFormName(tabpane.getSelectionModel().getSelectedItem().getText());
+                psFormName = getFormName(tabpane.getSelectionModel().getSelectedItem().getText());
             }
         });
 
@@ -1224,6 +1232,10 @@ public class DashboardController implements Initializable {
 
             Tab newTab = new Tab(node.getDescription());
             newTab.setContent(new javafx.scene.control.Label("Content of Tab " + node.getFxmlPath()));
+
+            // ✅ Store controller reference in the tab
+            newTab.setUserData(fxObj);
+
             newTab.setContextMenu(createContextMenu(tabpane, newTab, oApp));
             tabName.add(node.getDescription());
 
@@ -1442,6 +1454,21 @@ public class DashboardController implements Initializable {
         return (int) Math.min(calculatedWidth, parentWidth * 0.9);
     }
 
+    private int calculateTreeMonitorViewWidth(TreeItem<TreeMonitor> root) {
+        if (root == null) {
+            return 250;
+        }
+        int baseWidth = 250;
+        int textPadding = 10;
+
+        int longestTextWidth = getSysMonitorMaxTextWidth(root);
+
+        double parentWidth = anchorRightSideBarMenu.getParent().getLayoutBounds().getWidth();
+
+        int calculatedWidth = baseWidth + longestTextWidth + textPadding;
+        return (int) Math.min(calculatedWidth, parentWidth * 0.9);
+    }
+
     private int getMaxTextWidth(TreeItem<TreeNode> item) {
         if (item == null) {
             return 0;
@@ -1451,6 +1478,22 @@ public class DashboardController implements Initializable {
 
         for (TreeItem<TreeNode> child : item.getChildren()) {
             maxWidth = Math.max(maxWidth, getMaxTextWidth(child));
+        }
+
+        return maxWidth;
+    }
+
+    private int getSysMonitorMaxTextWidth(TreeItem<TreeMonitor> item) {
+        if (item == null) {
+            return 0;
+        }
+        if (item.getValue() == null) {
+            return 0;
+        }
+        int maxWidth = getTextWidth(item.getValue().getName() != null ? item.getValue().getName() : "");
+
+        for (TreeItem<TreeMonitor> child : item.getChildren()) {
+            maxWidth = Math.max(maxWidth, getSysMonitorMaxTextWidth(child));
         }
 
         return maxWidth;
@@ -1599,6 +1642,13 @@ public class DashboardController implements Initializable {
 
     }
 
+    // Utility for menu key
+    private String buildMenuKey(String menuCode, String industry, String category) {
+        return (menuCode + "-"
+                + (industry != null ? industry : "") + "-"
+                + (category != null ? category : "")).toUpperCase();
+    }
+
     private TreeItem<TreeNode> buildTree(TreeNode node, Set<String> allowedMenuIds) {
         // Node must have a non-empty commandType
         boolean hasValidCommand = node.getCommandType() != null && !node.getCommandType().isEmpty();
@@ -1651,6 +1701,13 @@ public class DashboardController implements Initializable {
 
             if (!command.isEmpty() && !commandType.isEmpty()) {
                 node.setAction(createAction(node));
+
+                // Register node in lookup map for later access
+                String key = buildMenuKey(node.getId(), node.getIndustry(), node.getCategory());
+                leftSidebarLookup.put(key, node);
+                if (node.getId().equals("2500000058")) {
+                    System.out.println(key);
+                }
             }
 
             map.put(id, node);
@@ -1675,6 +1732,14 @@ public class DashboardController implements Initializable {
 
             Platform.runLater(() -> {
                 anchorLeftSideBarMenu.setPrefWidth(calculatedWidth);
+            });
+        }
+
+        if (tvRightSideBar != null && tvRightSideBar.getRoot() != null) {
+            int calculatedWidth = calculateTreeMonitorViewWidth(tvRightSideBar.getRoot());
+
+            Platform.runLater(() -> {
+                anchorRightSideBarMenu.setPrefWidth(calculatedWidth);
             });
         }
     }
@@ -1733,9 +1798,11 @@ public class DashboardController implements Initializable {
             if (tabIndex == -1) {
                 if (!node.getFxmlPath().isEmpty() && node.getFxmlPath().contains(".fxml")) {
                     setScene2(loadAnimate(node));
+                    poController = tabpane.getUserData();
                 }
             } else {
                 tabpane.getSelectionModel().select(tabIndex);
+                poController = tabpane.getUserData();
             }
 
             setAnchorPaneVisibleManage(false, anchorLeftSideBarMenu);
@@ -1776,170 +1843,120 @@ public class DashboardController implements Initializable {
     }
     //end menu actions
 
-    private void loadDummyMenu() {
-        // Dummy parent modules
-        List<TreeMonitor> modules = Arrays.asList(
-                new TreeMonitor("PAY", "ROOT", "Payables", "Payment Requests", () -> System.out.println("Opening Payables module..."))
-        );
+// ======================= SYSTEM MONITOR =======================
+    private void loadSystemMonitor() {
+        try {
+            SystemMonitorMenu monitorMenu = new SystemMonitorMenu(oApp, "CAS");
 
-        // Dummy submodules
-        List<TreeMonitor> submodules = Arrays.asList(
-                new TreeMonitor("PY", "PAY", "Payment Vouchers", "List of payment vouchers", null),
-                new TreeMonitor("CH", "PAY", "Check Releases", "List of released checks", null)
-        );
+            monitorMenu.setIndustryCode(psIndustryID);
+            monitorMenu.setCategoryCode(oApp.getCategory());
+            JSONObject loSysMontrData = monitorMenu.processMonitoring();
 
-        // Dummy transactions for submodules
-        Map<String, List<TreeMonitor>> transactionsMap = new HashMap<>();
-        transactionsMap.put("PY", Arrays.asList(
-                new TreeMonitor("PY001", "PY", "PV #001", "For Processing", () -> System.out.println("Opening PV #001"))
-        ));
-        transactionsMap.put("CH", Arrays.asList(
-                new TreeMonitor("CH001", "CH", "Check #001", "Released", () -> System.out.println("Opening Check #001"))
-        ));
-
-        // Root node
-        TreeItem<TreeMonitor> rootItem = new TreeItem<>(new TreeMonitor("ROOT", null, "System Monitor", "Root menu", null));
-
-        // Build Module → Submodule → Transactions hierarchy
-        for (TreeMonitor module : modules) {
-            TreeItem<TreeMonitor> moduleItem = new TreeItem<>(module);
-            int subCount = 0;
-
-            for (TreeMonitor sub : submodules) {
-                if (!sub.getParentId().equals(module.getId())) {
-                    continue;
-                }
-
-                TreeItem<TreeMonitor> subItem = new TreeItem<>(sub);
-                int transCount = 0;
-
-                List<TreeMonitor> transList = transactionsMap.getOrDefault(sub.getId(), new ArrayList<TreeMonitor>());
-                for (TreeMonitor trans : transList) {
-                    subItem.getChildren().add(new TreeItem<>(trans));
-                    transCount++;
-                }
-
-                // Update submodule name with transaction count
-                subItem.setValue(new TreeMonitor(
-                        sub.getId(),
-                        sub.getParentId(),
-                        sub.getName() + " (" + transCount + ")",
-                        sub.getDescription(),
-                        sub.getAction()
-                ));
-
-                moduleItem.getChildren().add(subItem);
-                subCount++;
+            if (!"success".equals((String) loSysMontrData.get("result"))) {
+                tvRightSideBar.setRoot(null);
+                tvRightSideBar.setShowRoot(false);
+                return;
             }
 
-            // Update module name with submodule count
-            moduleItem.setValue(new TreeMonitor(
-                    module.getId(),
-                    module.getParentId(),
-                    module.getName() + " (" + subCount + ")",
-                    module.getDescription(),
-                    module.getAction()
-            ));
+            JSONArray loSysMontrRecord = (JSONArray) loSysMontrData.get("data");
 
-            rootItem.getChildren().add(moduleItem);
+            TreeItem<TreeMonitor> loTreeNode = loadSystemMonitoMenu(loSysMontrRecord);
+            tvRightSideBar.setRoot(loTreeNode);
+            tvRightSideBar.setShowRoot(false);
+
+            lblNotifCount.setText(String.valueOf(monitorMenu.getMonitoringCount()));
+
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-
-        rootItem.setExpanded(true);
-        tvRightSideBar.setRoot(rootItem);
-        tvRightSideBar.setShowRoot(false);
-
-        // Handle click actions
-        tvRightSideBar.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
-            if (newVal != null && newVal.getValue() != null) {
-                newVal.getValue().runAction();
-            }
-        });
     }
 
-    private void loadDummyMenux() {
-        // Dummy parent modules
-        List<TreeMonitor> modules = Arrays.asList(
-                new TreeMonitor("PUR", "ROOT", "Purchasing", "Purchase Transactions", () -> System.out.println("Opening Purchasing module..."))
-        );
+    private TreeItem<TreeMonitor> loadSystemMonitoMenu(JSONArray jsonArray) {
+        TreeItem<TreeMonitor> root = new TreeItem<>();
 
-        // Dummy submodules
-        List<TreeMonitor> submodules = Arrays.asList(
-                new TreeMonitor("PR", "PUR", "Purchase Requests", "List of purchase requests", null),
-                new TreeMonitor("PO", "PUR", "Open Purchase Orders", "List of purchase orders", null),
-                new TreeMonitor("DA", "PUR", "Unposted DA", "List of purchase orders", null)
-        );
+        for (Object obj : jsonArray) {
+            JSONObject json = (JSONObject) obj;
 
-        // Dummy transactions for submodules
-        Map<String, List<TreeMonitor>> transactionsMap = new HashMap<>();
-        transactionsMap.put("PO", Arrays.asList(
-                new TreeMonitor("PO001", "PO", "PO #001", "Pending Approval", () -> System.out.println("Opening PO #001")),
-                new TreeMonitor("PO002", "PO", "PO #002", "For Receiving", () -> System.out.println("Opening PO #002"))
-        ));
-        transactionsMap.put("DA", Arrays.asList(
-                new TreeMonitor("DO001", "DA", "DA #001", "Pending Confirmation", () -> System.out.println("Opening DA #001")),
-                new TreeMonitor("DO002", "DA", "DA #002", "Pending Confirmation", () -> System.out.println("Opening DA #002"))
-        ));
-        transactionsMap.put("PR", Arrays.asList(
-                new TreeMonitor("PR001", "PR", "PR #001", "Pending", () -> System.out.println("Opening PR #001")),
-                new TreeMonitor("PR002", "PR", "PR #002", "Approved", () -> System.out.println("Opening PR #002"))
-        ));
+            String id = (String) json.get("sSysMnuCd");
+            String group = (String) json.get("sMenuGrpx");
+            String name = (String) json.get("sMenuName");
+            String desc = (String) json.get("sDescript");
+            String menuCode = (String) json.get("sMenuCDxx");
+            String industry = (String) json.get("sIndstCdx");
+            String category = (String) json.get("sCategrCd");
 
-        // Root node
-        TreeItem<TreeMonitor> rootItem = new TreeItem<>(new TreeMonitor("ROOT", null, "System Monitor", "Root menu", null));
+            TreeMonitor monitorNode = new TreeMonitor(
+                    id, group, name, desc, menuCode, industry, category
+            );
 
-        // Build Module → Submodule → Transactions hierarchy
-        for (TreeMonitor module : modules) {
-            TreeItem<TreeMonitor> moduleItem = new TreeItem<>(module);
-            int subCount = 0;
+            TreeItem<TreeMonitor> treeNode = new TreeItem<>(monitorNode);
 
-            for (TreeMonitor sub : submodules) {
-                if (!sub.getParentId().equals(module.getId())) {
-                    continue;
-                }
-
-                TreeItem<TreeMonitor> subItem = new TreeItem<>(sub);
-                int transCount = 0;
-
-                List<TreeMonitor> transList = transactionsMap.getOrDefault(sub.getId(), new ArrayList<TreeMonitor>());
-                for (TreeMonitor trans : transList) {
-                    subItem.getChildren().add(new TreeItem<>(trans));
-                    transCount++;
-                }
-
-                // Update submodule name with transaction count
-                subItem.setValue(new TreeMonitor(
-                        sub.getId(),
-                        sub.getParentId(),
-                        sub.getName() + " (" + transCount + ")",
-                        sub.getDescription(),
-                        sub.getAction()
-                ));
-
-                moduleItem.getChildren().add(subItem);
-                subCount++;
+            // Build submodules
+            JSONArray subModules = (JSONArray) json.get("subModule");
+            if (subModules != null && !subModules.isEmpty()) {
+                TreeItem<TreeMonitor> subTree = loadSystemMonitoMenu(subModules);
+                treeNode.getChildren().addAll(subTree.getChildren());
             }
 
-            // Update module name with submodule count
-            moduleItem.setValue(new TreeMonitor(
-                    module.getId(),
-                    module.getParentId(),
-                    module.getName() + " (" + subCount + ")",
-                    module.getDescription(),
-                    module.getAction()
-            ));
+            // Add transactions
+            JSONArray transactions = (JSONArray) json.get("transaction");
+            if (transactions != null && !transactions.isEmpty()) {
+                for (Object t : transactions) {
+                    JSONObject tx = (JSONObject) t;
+                    String txId = (String) tx.get("sTransNox");
+                    String txDisplayName = (String) tx.get("sDisplayNme");
+                    String txDescToolTip = (String) tx.get("sToolTipx");
+                    String txIndustry = (String) tx.get("sIndstCdx");
+                    String txCategory = (String) tx.get("sCategrCd");
 
-            rootItem.getChildren().add(moduleItem);
+                    TreeMonitor txNode = new TreeMonitor(
+                            txId, id, txDisplayName != null ? txDisplayName : txId,
+                            txDescToolTip != null ? txDescToolTip : "Transaction", menuCode, txIndustry, txCategory != null ? txCategory : ""
+                    );
+
+                    if (!txId.isEmpty() && !menuCode.isEmpty()) {
+                        txNode.setAction(createSysMonitorAction(txNode));
+                    }
+
+                    TreeItem<TreeMonitor> txItem = new TreeItem<>(txNode);
+                    treeNode.getChildren().add(txItem);
+                }
+            }
+
+            root.getChildren().add(treeNode);
         }
 
-        rootItem.setExpanded(true);
-        tvRightSideBar.setRoot(rootItem);
-        tvRightSideBar.setShowRoot(false);
+        return root;
+    }
 
-        // Handle click actions
-        tvRightSideBar.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
-            if (newVal != null && newVal.getValue() != null) {
-                newVal.getValue().runAction();
+    public Runnable createSysMonitorAction(TreeMonitor node) {
+        return () -> {
+            try {
+                String menuCode = node.getMenuCode();
+                String industry = node.getIndustry();
+                String category = node.getCategory();
+
+                String key = buildMenuKey(menuCode, industry, category);
+
+                TreeNode sidebarNode = leftSidebarLookup.get(key);
+                if (sidebarNode != null) {
+                    System.out.println("Triggering left sidebar for: " + key);
+                    sidebarNode.runAction();
+
+                    System.out.println("Transaction no. " + node.getSystemId());
+                    if (poController != null) {
+                        Method retrieveMethod = poController.getClass().getMethod("retrieveBySystemMonitor", String.class);
+                        retrieveMethod.invoke(poController, node.getSystemId());
+                        System.out.println("Transaction no. " + node.getSystemId());
+                    } else {
+                        System.err.println("Controller not found for sidebar: " + key);
+                    }
+                } else {
+                    System.err.println("No sidebar entry found for: " + key);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-        });
+        };
     }
 }
