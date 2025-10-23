@@ -134,6 +134,8 @@ public class SIPosting_Controller implements Initializable, ScreenInterface {
     private Stage dialogStage = null;
     private final JFXUtil.ImageViewer imageviewerutil = new JFXUtil.ImageViewer();
     JFXUtil.StageManager stageAttachment = new JFXUtil.StageManager();
+    JFXUtil.StageManager stageSerial = new JFXUtil.StageManager();
+
     AnchorPane root = null;
     Scene scene = null;
 
@@ -146,7 +148,7 @@ public class SIPosting_Controller implements Initializable, ScreenInterface {
     @FXML
     private HBox hbButtons;
     @FXML
-    private Button btnUpdate, btnSearch, btnSave, btnCancel, btnPost, btnHistory, btnRetrieve, btnClose, btnArrowLeft, btnArrowRight;
+    private Button btnUpdate, btnSearch, btnSave, btnCancel, btnPost, btnHistory, btnRetrieve, btnClose, btnArrowLeft, btnArrowRight, btnSerials;
     @FXML
     private TabPane tabPaneForm;
     @FXML
@@ -251,6 +253,7 @@ public class SIPosting_Controller implements Initializable, ScreenInterface {
     public void RemoveWindowEvent() {
         root.sceneProperty().removeListener(WindowKeyEvent);
         scene.setOnKeyPressed(null);
+        stageSerial.closeDialog();
         stageAttachment.closeDialog();
     }
 
@@ -330,6 +333,64 @@ public class SIPosting_Controller implements Initializable, ScreenInterface {
 
     }
 
+    public void setKeyEventSerial(Scene scene) {
+        scene.setOnKeyPressed(event -> {
+            if (event.getCode() == KeyCode.F5) {
+                System.out.println("tested key press");
+
+                if (JFXUtil.isObjectEqualTo(poPurchaseReceivingController.PurchaseOrderReceiving().getEditMode(), EditMode.READY, EditMode.UPDATE)) {
+                    showAttachmentDialog();
+                }
+            }
+        });
+    }
+
+    public void showSerialDialog() {
+        try {
+            poJSON = new JSONObject();
+            stageSerial.closeDialog();
+            if (!poPurchaseReceivingController.PurchaseOrderReceiving().Detail(pnDetail).isSerialized()) {
+                return;
+            }
+
+            if (poPurchaseReceivingController.PurchaseOrderReceiving().Detail(pnDetail).getQuantity().intValue() == 0) {
+                return;
+            }
+            poJSON = poPurchaseReceivingController.PurchaseOrderReceiving().getPurchaseOrderReceivingSerial(pnDetail + 1);
+            if ("error".equals((String) poJSON.get("result"))) {
+                ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                return;
+            }
+            DeliveryAcceptance_SerialController controller = new DeliveryAcceptance_SerialController();
+            if (controller != null) {
+                controller.setGRider(oApp);
+                controller.setObject(poPurchaseReceivingController.PurchaseOrderReceiving());
+                controller.setEntryNo(pnDetail + 1);
+                controller.isFinancing(true);
+            }
+            stageSerial.setOnHidden(event -> {
+                moveNext();
+            });
+
+            stageSerial.showDialog((Stage) btnSave.getScene().getWindow(), getClass().getResource("/ph/com/guanzongroup/integsys/views/DeliveryAcceptance_Serial.fxml"), controller, "Inventory Serial", true, false, false);
+            if (stageSerial.getScene() != null) {
+                setKeyEventSerial(stageSerial.getScene());
+            } else {
+                stageSerial.getRoot().sceneProperty().addListener((obs, oldScene, newScene) -> {
+                    if (newScene != null) {
+                        setKeyEvent(newScene);
+                    }
+                });
+            }
+        } catch (IOException ex) {
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+        } catch (SQLException ex) {
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+        } catch (GuanzonException ex) {
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
     @FXML
     private void cmdCheckBox_Click(ActionEvent event) {
         poJSON = new JSONObject();
@@ -363,10 +424,17 @@ public class SIPosting_Controller implements Initializable, ScreenInterface {
                 Button clickedButton = (Button) source;
                 String lsButton = clickedButton.getId();
                 switch (lsButton) {
+                    case "btnSerials":
+                        if (!poPurchaseReceivingController.PurchaseOrderReceiving().Detail(pnDetail).isSerialized()) {
+                            ShowMessageFX.Warning(null, pxeModuleName, "Selected item is not serialized.");
+                            return;
+                        }
+                        showSerialDialog();
+                        return;
                     case "btnClose":
                         unloadForm appUnload = new unloadForm();
                         if (ShowMessageFX.OkayCancel(null, "Close Tab", "Are you sure you want to close this Tab?") == true) {
-                            stageAttachment.closeDialog();
+                            closeDialog();
                             appUnload.unloadForm(apMainAnchor, oApp, pxeModuleName);
                         } else {
                             return;
@@ -486,7 +554,7 @@ public class SIPosting_Controller implements Initializable, ScreenInterface {
                         break;
                 }
 
-                if (JFXUtil.isObjectEqualTo(lsButton, "btnSave", "btnCancel")) {
+                if (JFXUtil.isObjectEqualTo(lsButton, "btnSave", "btnCancel","btnPost")) {
                     poPurchaseReceivingController.PurchaseOrderReceiving().resetMaster();
                     poPurchaseReceivingController.PurchaseOrderReceiving().resetOthers();
                     poPurchaseReceivingController.PurchaseOrderReceiving().Detail().clear();
@@ -512,6 +580,15 @@ public class SIPosting_Controller implements Initializable, ScreenInterface {
             }
         } catch (CloneNotSupportedException | SQLException | GuanzonException | ParseException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+        }
+    }
+
+    private void closeDialog() {
+        if (stageAttachment != null) {
+            stageAttachment.closeDialog();
+        }
+        if (stageSerial != null) {
+            stageSerial.closeDialog();
         }
     }
 
@@ -1564,7 +1641,7 @@ public class SIPosting_Controller implements Initializable, ScreenInterface {
                 psSupplierId = poPurchaseReceivingController.PurchaseOrderReceiving().Master().getSupplierId();
                 psBranchId = poPurchaseReceivingController.PurchaseOrderReceiving().Master().getBranchCode();
             }
-
+            closeDialog();
             poPurchaseReceivingController.PurchaseOrderReceiving().loadAttachments();
             if (poPurchaseReceivingController.PurchaseOrderReceiving().getTransactionAttachmentCount() > 1) {
                 if (!openedAttachment.equals(poPurchaseReceivingController.PurchaseOrderReceiving().PurchaseOrderReceivingList(pnMain).getTransactionNo())) {
@@ -1952,6 +2029,7 @@ public class SIPosting_Controller implements Initializable, ScreenInterface {
                 if (event.getClickCount() == 1) {  // Detect single click (or use another condition for double click)
                     ModelDeliveryAcceptance_Detail selected = (ModelDeliveryAcceptance_Detail) tblViewTransDetailList.getSelectionModel().getSelectedItem();
                     if (selected != null) {
+                        stageSerial.closeDialog();
                         pnDetail = Integer.parseInt(selected.getIndex01()) - 1;
                         loadRecordDetail();
                         tfCost.requestFocus();
@@ -1985,7 +2063,7 @@ public class SIPosting_Controller implements Initializable, ScreenInterface {
         boolean lbShow4 = (fnValue == EditMode.UNKNOWN || fnValue == EditMode.READY);
         // Manage visibility and managed state of other buttons
         //Update 
-        JFXUtil.setButtonsVisibility(lbShow1, btnSearch, btnSave, btnCancel);
+        JFXUtil.setButtonsVisibility(lbShow1, btnSearch, btnSave, btnCancel, btnSerials);
         //Ready
         JFXUtil.setButtonsVisibility(lbShow3, btnUpdate, btnHistory);
         JFXUtil.setButtonsVisibility(false, btnPost);
@@ -2172,6 +2250,7 @@ public class SIPosting_Controller implements Initializable, ScreenInterface {
             JFXUtil.clearTextFields(apMaster, apDetail, apJEDetail, apJEMaster, apAttachments);
             cbVatInclusive.setSelected(false);
             cbVatable.setSelected(false);
+            closeDialog();
         });
     }
 

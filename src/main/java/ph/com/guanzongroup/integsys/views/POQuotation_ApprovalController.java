@@ -130,7 +130,7 @@ public class POQuotation_ApprovalController implements Initializable, ScreenInte
     @FXML
     private HBox hbButtons, hboxid;
     @FXML
-    private Button btnApprove, btnDisapprove, btnHistory, btnRetrieve, btnClose, btnArrowLeft, btnArrowRight;
+    private Button btnApprove, btnDisapprove, btnHistory, btnRetrieve, btnClose, btnArrowLeft, btnArrowRight, btnReturn;
     @FXML
     private TabPane tabPane;
     @FXML
@@ -169,7 +169,7 @@ public class POQuotation_ApprovalController implements Initializable, ScreenInte
         }
 
         JFXUtil.checkIfFolderExists(poJSON, System.getProperty("sys.default.path.temp") + "/Attachments//");
-        
+
         initTextFields();
         initDatePickers();
         initMainGrid();
@@ -342,6 +342,22 @@ public class POQuotation_ApprovalController implements Initializable, ScreenInte
                     case "btnRetrieve":
                         retrievePOQuotation();
                         break;
+                    case "btnReturn":
+                        poJSON = new JSONObject();
+                        if (ShowMessageFX.YesNo(null, pxeModuleName, "Are you sure you want to return transaction?") == true) {
+                            poJSON = poController.POQuotation().ReturnTransaction("");
+                            if ("error".equals((String) poJSON.get("result"))) {
+                                ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                                return;
+                            } else {
+                                ShowMessageFX.Information(null, pxeModuleName, (String) poJSON.get("message"));
+                                JFXUtil.disableAllHighlightByColor(tblViewMainList, "#A7C7E7", highlightedRowsMain);
+                                JFXUtil.highlightByKey(tblViewMainList, String.valueOf(pnMain + 1), "#FAC898", highlightedRowsMain);
+                            }
+                        } else {
+                            return;
+                        }
+                        break;
                     case "btnApprove":
                         poJSON = new JSONObject();
                         if (ShowMessageFX.YesNo(null, pxeModuleName, "Are you sure you want to approve transaction?") == true) {
@@ -413,9 +429,9 @@ public class POQuotation_ApprovalController implements Initializable, ScreenInte
 
     public void retrievePOQuotation() {
         poJSON = new JSONObject();
-        poController.POQuotation().setTransactionStatus(POQuotationStatus.CONFIRMED);
+        poController.POQuotation().setTransactionStatus(POQuotationStatus.APPROVED + POQuotationStatus.CONFIRMED);
         poJSON = poController.POQuotation().loadPOQuotationList(tfSearchBranch.getText(), tfSearchDepartment.getText(), tfSearchSupplier.getText(), tfSearchCategory.getText(),
-                tfSearchReferenceNo.getText());
+                tfSearchReferenceNo.getText(), true);
         if (!"success".equals((String) poJSON.get("result"))) {
             ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
         } else {
@@ -1415,15 +1431,18 @@ public class POQuotation_ApprovalController implements Initializable, ScreenInte
         //Unkown || Ready
         JFXUtil.setDisabled(true, apMaster, apDetail, apAttachments);
         JFXUtil.setButtonsVisibility(lbShow4, btnClose);
-
+        JFXUtil.setButtonsVisibility(fnValue == EditMode.READY, btnReturn); //always show return for confirm / approve status
         switch (poController.POQuotation().Master().getTransactionStatus()) {
             case POQuotationStatus.CONFIRMED:
                 JFXUtil.setButtonsVisibility(true, btnApprove, btnDisapprove);
                 break;
             case POQuotationStatus.APPROVED:
+                JFXUtil.setButtonsVisibility(false, btnApprove, btnDisapprove);
+                break;
             case POQuotationStatus.VOID:
             case POQuotationStatus.CANCELLED:
                 JFXUtil.setButtonsVisibility(false, btnApprove, btnDisapprove);
+                JFXUtil.setButtonsVisibility(false, btnReturn);
                 break;
         }
     }

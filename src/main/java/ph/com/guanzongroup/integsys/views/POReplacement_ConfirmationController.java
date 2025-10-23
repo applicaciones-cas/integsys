@@ -121,6 +121,7 @@ public class POReplacement_ConfirmationController implements Initializable, Scre
     AtomicReference<Object> previousSearchedTextField = new AtomicReference<>();
     JFXUtil.ReloadableTableTask loadTableDetail, loadTableMain, loadTableAttachment;
     private final JFXUtil.ImageViewer imageviewerutil = new JFXUtil.ImageViewer();
+    JFXUtil.StageManager stageSerialDialog = new JFXUtil.StageManager();
 
     private ChangeListener<String> detailSearchListener;
     private ChangeListener<String> mainSearchListener;
@@ -134,7 +135,7 @@ public class POReplacement_ConfirmationController implements Initializable, Scre
     @FXML
     private HBox hbButtons;
     @FXML
-    private Button btnUpdate, btnSearch, btnSave, btnCancel, btnConfirm, btnVoid, btnPrint, btnReturn, btnHistory, btnRetrieve, btnClose, btnAddAttachment, btnRemoveAttachment, btnArrowLeft, btnArrowRight;
+    private Button btnUpdate, btnSearch, btnSave, btnCancel, btnSerials, btnConfirm, btnVoid, btnPrint, btnReturn, btnHistory, btnRetrieve, btnClose, btnAddAttachment, btnRemoveAttachment, btnArrowLeft, btnArrowRight;
     @FXML
     private DatePicker dpTransactionDate, dpReferenceDate, dpExpiryDate;
     @FXML
@@ -264,11 +265,19 @@ public class POReplacement_ConfirmationController implements Initializable, Scre
                     case "btnClose":
                         unloadForm appUnload = new unloadForm();
                         if (ShowMessageFX.OkayCancel(null, "Close Tab", "Are you sure you want to close this Tab?") == true) {
+                            stageSerialDialog.closeDialog();
                             appUnload.unloadForm(apMainAnchor, oApp, pxeModuleName);
                         } else {
                             return;
                         }
                         break;
+                    case "btnSerials":
+                        if (!poController.PurchaseOrderReceiving().Detail(pnDetail).isSerialized()) {
+                            ShowMessageFX.Warning(null, pxeModuleName, "Selected item is not serialized.");
+                            return;
+                        }
+                        showSerialDialog();
+                        return;
                     case "btnUpdate":
                         poJSON = poController.PurchaseOrderReceiving().OpenTransaction(poController.PurchaseOrderReceiving().Master().getTransactionNo());
                         poJSON = poController.PurchaseOrderReceiving().UpdateTransaction();
@@ -276,8 +285,10 @@ public class POReplacement_ConfirmationController implements Initializable, Scre
                             ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                             return;
                         }
+                        for (int lnCtr = 0; lnCtr <= poController.PurchaseOrderReceiving().getDetailCount() - 1; lnCtr++) {
+                            poController.PurchaseOrderReceiving().getPurchaseOrderReceivingSerial(poController.PurchaseOrderReceiving().Detail(lnCtr).getEntryNo());
+                        }
                         poController.PurchaseOrderReceiving().loadAttachments();
-
                         pnEditMode = poController.PurchaseOrderReceiving().getEditMode();
                         break;
                     case "btnSearch":
@@ -512,6 +523,51 @@ public class POReplacement_ConfirmationController implements Initializable, Scre
             loadTableMain.reload();
         }
     }
+
+    public void showSerialDialog() {
+        stageSerialDialog.closeDialog();
+        poJSON = new JSONObject();
+        try {
+            if (!poController.PurchaseOrderReceiving().Detail(pnDetail).isSerialized()) {
+                return;
+            }
+
+            if (poController.PurchaseOrderReceiving().Detail(pnDetail).getQuantity().intValue() == 0) {
+                ShowMessageFX.Warning(null, pxeModuleName, "Received quantity cannot be empty.");
+                return;
+            }
+
+            //Populate Purchase Order Receiving Detail
+            poJSON = poController.PurchaseOrderReceiving().getPurchaseOrderReceivingSerial(pnDetail + 1);
+            if ("error".equals((String) poJSON.get("result"))) {
+                ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                return;
+            }
+
+            DeliveryAcceptance_SerialController controller = new DeliveryAcceptance_SerialController();
+            if (controller != null) {
+                controller.setGRider(oApp);
+                controller.setObject(poController.PurchaseOrderReceiving());
+                controller.setEntryNo(pnDetail + 1);
+            }
+
+            try {
+                stageSerialDialog.setOnHidden(event -> {
+                    moveNext(false, true);
+                    Platform.runLater(() -> {
+                        loadTableDetail.reload();
+                    });
+                });
+                stageSerialDialog.showDialog((Stage) btnSave.getScene().getWindow(), getClass().getResource("/ph/com/guanzongroup/integsys/views/DeliveryAcceptance_Serial.fxml"),
+                        controller, "Inventory Serial", true, true, false);
+            } catch (IOException ex) {
+                Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+            }
+
+        } catch (SQLException | GuanzonException ex) {
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+        }
+    }
     ChangeListener<Boolean> txtMaster_Focus = JFXUtil.FocusListener(TextField.class,
             (lsID, lsValue) -> {
                 /*Lost Focus*/
@@ -647,6 +703,24 @@ public class POReplacement_ConfirmationController implements Initializable, Scre
                                 break;
                             }
                         }
+                        //check first if serialized 
+                        if (poController.PurchaseOrderReceiving().Detail(pnDetail).isSerialized()) {
+                            if (!(Double.valueOf(lsValue) == Math.floor(Double.valueOf(lsValue)))) { // returns true if contains value in decimal point which is restricted; for serial quantity purpose
+                                ShowMessageFX.Warning(null, pxeModuleName, "Input whole-number equivalent only for serialized item");
+                                loadRecordDetail();
+                                JFXUtil.textFieldMoveNext(tfReceiveQuantity);
+                                return;
+                            }
+                        }
+                        poJSON = poController.PurchaseOrderReceiving().checkPurchaseOrderReceivingSerial(pnDetail + 1, (int) Math.floor(Double.valueOf(lsValue)));
+                        if ("error".equals((String) poJSON.get("result"))) {
+                            ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                            JFXUtil.textFieldMoveNext(tfReceiveQuantity);
+                            break;
+                        }
+                        double lnNewVal = Double.valueOf(lsValue);
+                        double lnOldVal = poController.PurchaseOrderReceiving().Detail(pnDetail).getQuantity().doubleValue();
+
                         poJSON = poController.PurchaseOrderReceiving().Detail(pnDetail).setQuantity((Double.valueOf(lsValue)));
                         if ("error".equals((String) poJSON.get("result"))) {
                             ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
@@ -666,7 +740,17 @@ public class POReplacement_ConfirmationController implements Initializable, Scre
                         }
 
                         if (pbEntered) {
-                            moveNext(false, true);
+                            if (lnNewVal != lnOldVal && poController.PurchaseOrderReceiving().Detail(pnDetail).isSerialized()) {
+                                if ((Double.valueOf(lsValue) > 0
+                                && poController.PurchaseOrderReceiving().Detail(pnDetail).getStockId() != null
+                                && !"".equals(poController.PurchaseOrderReceiving().Detail(pnDetail).getStockId()))) {
+                                    showSerialDialog();
+                                } else {
+                                    moveNext(false, true);
+                                }
+                            } else {
+                                moveNext(false, true);
+                            }
                             pbEntered = false;
                         }
                         break;
@@ -1204,6 +1288,9 @@ public class POReplacement_ConfirmationController implements Initializable, Scre
                 }
                 goToPageBasedOnSelectedRow(String.valueOf(pnMain));
             }
+            for (int lnCtr = 0; lnCtr <= poController.PurchaseOrderReceiving().getDetailCount() - 1; lnCtr++) {
+                poController.PurchaseOrderReceiving().getPurchaseOrderReceivingSerial(poController.PurchaseOrderReceiving().Detail(lnCtr).getEntryNo());
+            }
             poController.PurchaseOrderReceiving().loadAttachments();
             Platform.runLater(() -> {
                 loadTableDetail.reload();
@@ -1486,6 +1573,7 @@ public class POReplacement_ConfirmationController implements Initializable, Scre
                 if (event.getClickCount() == 1) {  // Detect single click (or use another condition for double click)
                     ModelDeliveryAcceptance_Detail selected = (ModelDeliveryAcceptance_Detail) tblViewTransDetails.getSelectionModel().getSelectedItem();
                     if (selected != null) {
+                        stageSerialDialog.closeDialog();
                         pnDetail = Integer.parseInt(selected.getIndex01()) - 1;
                         loadRecordDetail();
                         if (poController.PurchaseOrderReceiving().Detail(pnDetail).getStockId() != null && !poController.PurchaseOrderReceiving().Detail(pnDetail).getStockId().equals("")) {
@@ -1523,7 +1611,7 @@ public class POReplacement_ConfirmationController implements Initializable, Scre
         boolean lbShow4 = (fnValue == EditMode.UNKNOWN || fnValue == EditMode.READY);
         // Manage visibility and managed state of other buttons
         //Update 
-        JFXUtil.setButtonsVisibility(lbShow1, btnSearch, btnSave, btnCancel);
+        JFXUtil.setButtonsVisibility(lbShow1, btnSerials, btnSearch, btnSave, btnCancel);
         JFXUtil.setButtonsVisibility(lbShow3, btnPrint, btnUpdate, btnHistory, btnConfirm, btnVoid);
         JFXUtil.setButtonsVisibility(lbShow4, btnClose);
         JFXUtil.setDisabled(!lbShow1, btnAddAttachment, btnRemoveAttachment);

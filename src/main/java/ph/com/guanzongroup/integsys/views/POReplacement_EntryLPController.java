@@ -245,13 +245,6 @@ public class POReplacement_EntryLPController implements Initializable, ScreenInt
                         }
 
                         poController.PurchaseOrderReceiving().initFields();
-
-                        if (!psCompanyId.isEmpty()) {
-                            poController.PurchaseOrderReceiving().SearchCompany(psCompanyId, true);
-                        }
-                        if (!psSupplierId.isEmpty()) {
-                            poController.PurchaseOrderReceiving().SearchSupplier(psSupplierId, true);
-                        }
                         pnEditMode = poController.PurchaseOrderReceiving().getEditMode();
                         JFXUtil.showRetainedHighlight(false, tblViewMainList, "#A7C7E7", plOrderNoPartial, plOrderNoFinal, highlightedRowsMain, true);
                         break;

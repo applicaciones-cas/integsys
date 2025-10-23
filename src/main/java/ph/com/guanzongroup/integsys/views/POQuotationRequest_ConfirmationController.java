@@ -108,7 +108,7 @@ public class POQuotationRequest_ConfirmationController implements Initializable,
     @FXML
     private HBox hbButtons;
     @FXML
-    private Button btnUpdate, btnSearch, btnSave, btnCancel, btnConfirm, btnVoid, btnHistory, btnRetrieve, btnClose;
+    private Button btnUpdate, btnSearch, btnSave, btnCancel, btnConfirm, btnVoid, btnHistory, btnRetrieve, btnClose, btnReturn;
     @FXML
     private TextArea taRemarks;
     @FXML
@@ -244,7 +244,7 @@ public class POQuotationRequest_ConfirmationController implements Initializable,
                     case "btnSave":
                         //Validator
                         poJSON = new JSONObject();
-                        if (ShowMessageFX.YesNo(null, "Close Tab", "Are you sure you want to save the transaction?") == true) {
+                        if (ShowMessageFX.YesNo(null, pxeModuleName, "Are you sure you want to save the transaction?") == true) {
                             poJSON = poController.POQuotationRequest().SaveTransaction();
                             if (!"success".equals((String) poJSON.get("result"))) {
                                 ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
@@ -297,7 +297,7 @@ public class POQuotationRequest_ConfirmationController implements Initializable,
                         break;
                     case "btnVoid":
                         poJSON = new JSONObject();
-                        if (ShowMessageFX.YesNo(null, "Close Tab", "Are you sure you want to void transaction?") == true) {
+                        if (ShowMessageFX.YesNo(null, pxeModuleName, "Are you sure you want to void transaction?") == true) {
                             if (POQuotationRequestStatus.CONFIRMED.equals(poController.POQuotationRequest().Master().getTransactionStatus())) {
                                 poJSON = poController.POQuotationRequest().CancelTransaction("");
                             } else {
@@ -310,6 +310,22 @@ public class POQuotationRequest_ConfirmationController implements Initializable,
                                 ShowMessageFX.Information(null, pxeModuleName, (String) poJSON.get("message"));
                                 JFXUtil.disableAllHighlightByColor(tblViewMainList, "#A7C7E7", highlightedRowsMain);
                                 JFXUtil.highlightByKey(tblViewMainList, String.valueOf(pnMain + 1), "#FAA0A0", highlightedRowsMain);
+                            }
+                        } else {
+                            return;
+                        }
+                        break;
+                    case "btnReturn":
+                        poJSON = new JSONObject();
+                        if (ShowMessageFX.YesNo(null, pxeModuleName, "Are you sure you want to return transaction?") == true) {
+                            poJSON = poController.POQuotationRequest().ReturnTransaction("");
+                            if ("error".equals((String) poJSON.get("result"))) {
+                                ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                                return;
+                            } else {
+                                ShowMessageFX.Information(null, pxeModuleName, (String) poJSON.get("message"));
+                                JFXUtil.disableAllHighlightByColor(tblViewMainList, "#A7C7E7", highlightedRowsMain);
+                                JFXUtil.highlightByKey(tblViewMainList, String.valueOf(pnMain + 1), "#FAC898", highlightedRowsMain);
                             }
                         } else {
                             return;
@@ -352,13 +368,13 @@ public class POQuotationRequest_ConfirmationController implements Initializable,
 
     public void retrievePOQuotationRequest() {
         poJSON = new JSONObject();
-        poController.POQuotationRequest().setTransactionStatus(POQuotationRequestStatus.OPEN + POQuotationRequestStatus.CONFIRMED);
+        poController.POQuotationRequest().setTransactionStatus(POQuotationRequestStatus.OPEN + POQuotationRequestStatus.CONFIRMED + POQuotationRequestStatus.RETURNED);
 
         SimpleDateFormat sdfFormat = new SimpleDateFormat(SQLUtil.FORMAT_SHORT_DATE);
         String inputText = JFXUtil.isObjectEqualTo(dpSearchTransactionDate.getEditor().getText(), "") ? "01/01/1900" : dpSearchTransactionDate.getEditor().getText();
         String lsSelectedDate = sdfFormat.format(SQLUtil.toDate(JFXUtil.convertToIsoFormat(inputText), SQLUtil.FORMAT_SHORT_DATE));
         LocalDate selectedDate = LocalDate.parse(lsSelectedDate, DateTimeFormatter.ofPattern(SQLUtil.FORMAT_SHORT_DATE));
-        
+
         poJSON = poController.POQuotationRequest().loadPOQuotationRequestList(oApp.getBranchName(), tfSearchDepartment.getText(),
                 tfSearchCategory.getText(), java.sql.Date.valueOf(selectedDate),
                 tfSearchReferenceNo.getText(), false);
@@ -1139,6 +1155,17 @@ public class POQuotationRequest_ConfirmationController implements Initializable,
         JFXUtil.setDisabled(!lbShow1, apMaster, apDetail);
         JFXUtil.setButtonsVisibility(lbShow4, btnClose);
 
+        JFXUtil.setButtonsVisibility(false, btnReturn);
+        try {
+            if (JFXUtil.isObjectEqualTo(poController.POQuotationRequest().Master().getTransactionStatus(), POQuotationRequestStatus.OPEN,
+                    POQuotationRequestStatus.CONFIRMED)) {
+//                JFXUtil.setButtonsVisibility(true, btnReturn);
+            } else {
+                JFXUtil.setButtonsVisibility(false, btnReturn);
+            }
+        } catch (Exception e) {
+        }
+        
         switch (poController.POQuotationRequest().Master().getTransactionStatus()) {
             case POQuotationRequestStatus.CONFIRMED:
                 JFXUtil.setButtonsVisibility(false, btnConfirm);

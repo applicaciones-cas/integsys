@@ -490,7 +490,7 @@ public class SIPosting_LPController implements Initializable, ScreenInterface {
                         break;
                 }
 
-                if (JFXUtil.isObjectEqualTo(lsButton, "btnSave", "btnCancel")) {
+                if (JFXUtil.isObjectEqualTo(lsButton, "btnSave", "btnCancel","btnPost")) {
                     poPurchaseReceivingController.PurchaseOrderReceiving().resetMaster();
                     poPurchaseReceivingController.PurchaseOrderReceiving().resetOthers();
                     poPurchaseReceivingController.PurchaseOrderReceiving().Detail().clear();

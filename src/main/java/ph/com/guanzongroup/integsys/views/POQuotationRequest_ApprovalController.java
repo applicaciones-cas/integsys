@@ -109,7 +109,7 @@ public class POQuotationRequest_ApprovalController implements Initializable, Scr
     @FXML
     private HBox hbButtons, hboxid;
     @FXML
-    private Button btnUpdate, btnSearch, btnSave, btnCancel, btnApprove, btnDisapprove, btnExport, btnHistory, btnRetrieve, btnClose;
+    private Button btnUpdate, btnSearch, btnSave, btnCancel, btnApprove, btnDisapprove, btnExport, btnHistory, btnRetrieve, btnClose, btnReturn;
     @FXML
     private TabPane tabPane;
     @FXML
@@ -292,7 +292,22 @@ public class POQuotationRequest_ApprovalController implements Initializable, Scr
                         } else {
                             return;
                         }
-
+                        break;
+                    case "btnReturn":
+                        poJSON = new JSONObject();
+                        if (ShowMessageFX.YesNo(null, pxeModuleName, "Are you sure you want to return transaction?") == true) {
+                            poJSON = poController.POQuotationRequest().ReturnTransaction("");
+                            if ("error".equals((String) poJSON.get("result"))) {
+                                ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                                return;
+                            } else {
+                                ShowMessageFX.Information(null, pxeModuleName, (String) poJSON.get("message"));
+                                JFXUtil.disableAllHighlightByColor(tblViewMainList, "#A7C7E7", highlightedRowsMain);
+                                JFXUtil.highlightByKey(tblViewMainList, String.valueOf(pnMain + 1), "#FAC898", highlightedRowsMain);
+                            }
+                        } else {
+                            return;
+                        }
                         break;
                     case "btnApprove":
                         poJSON = new JSONObject();
@@ -360,10 +375,9 @@ public class POQuotationRequest_ApprovalController implements Initializable, Scr
                     loadTableDetail.reload();
                 }
                 initButton(pnEditMode);
+
                 if (lsButton.equals("btnUpdate")) {
-                    if (lsButton.equals("btnUpdate")) {
-                        moveNext(false, false);
-                    }
+                    moveNext(false, false);
                 }
             }
         } catch (CloneNotSupportedException | SQLException | GuanzonException | ParseException ex) {
@@ -1121,7 +1135,7 @@ public class POQuotationRequest_ApprovalController implements Initializable, Scr
         JFXUtil.setDisabled(true, apDetail);
         JFXUtil.setButtonsVisibility(lbShow4, btnClose);
         JFXUtil.setButtonsVisibility((poController.POQuotationRequest().getPOQuotationRequestSupplierCount() > 0 && lbShow3), btnExport);
-
+        JFXUtil.setButtonsVisibility(fnValue == EditMode.READY, btnReturn); //always show return for confirm / approve status
         switch (poController.POQuotationRequest().Master().getTransactionStatus()) {
             case POQuotationRequestStatus.APPROVED:
                 JFXUtil.setButtonsVisibility(false, btnApprove, btnDisapprove);
@@ -1132,6 +1146,7 @@ public class POQuotationRequest_ApprovalController implements Initializable, Scr
                 break;
             case POQuotationRequestStatus.CANCELLED:
                 JFXUtil.setButtonsVisibility(false, btnApprove, btnDisapprove, btnUpdate);
+                JFXUtil.setButtonsVisibility(false, btnReturn);
                 break;
         }
     }

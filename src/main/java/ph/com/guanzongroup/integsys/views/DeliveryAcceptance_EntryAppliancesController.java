@@ -383,13 +383,6 @@ public class DeliveryAcceptance_EntryAppliancesController implements Initializab
                         }
 
                         poPurchaseReceivingController.PurchaseOrderReceiving().initFields();
-
-                        if (!psCompanyId.isEmpty()) {
-                            poPurchaseReceivingController.PurchaseOrderReceiving().SearchCompany(psCompanyId, true);
-                        }
-                        if (!psSupplierId.isEmpty()) {
-                            poPurchaseReceivingController.PurchaseOrderReceiving().SearchSupplier(psSupplierId, true);
-                        }
                         pnEditMode = poPurchaseReceivingController.PurchaseOrderReceiving().getEditMode();
                         showRetainedHighlight(false);
                         break;

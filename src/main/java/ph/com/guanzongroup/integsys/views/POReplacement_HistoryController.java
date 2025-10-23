@@ -4,6 +4,7 @@
  */
 package ph.com.guanzongroup.integsys.views;
 
+import java.io.IOException;
 import ph.com.guanzongroup.integsys.model.ModelDeliveryAcceptance_Attachment;
 import ph.com.guanzongroup.integsys.model.ModelDeliveryAcceptance_Detail;
 import ph.com.guanzongroup.integsys.model.ModelDeliveryAcceptance_Main;
@@ -62,6 +63,7 @@ import javafx.scene.control.ComboBox;
 import org.guanzon.appdriver.constant.DocumentType;
 import ph.com.guanzongroup.integsys.utility.JFXUtil;
 import javafx.scene.input.KeyCode;
+import javafx.stage.Stage;
 
 /**
  * FXML Controller class
@@ -98,6 +100,7 @@ public class POReplacement_HistoryController implements Initializable, ScreenInt
     JFXUtil.ReloadableTableTask loadTableDetail, loadTableAttachment;
     private final JFXUtil.ImageViewer imageviewerutil = new JFXUtil.ImageViewer();
     private ChangeListener<String> detailSearchListener;
+    JFXUtil.StageManager stageSerialDialog = new JFXUtil.StageManager();
 
     @FXML
     private AnchorPane apMainAnchor, apBrowse, apButton, apMaster, apDetail, apAttachments;
@@ -108,7 +111,7 @@ public class POReplacement_HistoryController implements Initializable, ScreenInt
     @FXML
     private HBox hbButtons;
     @FXML
-    private Button btnBrowse, btnPrint, btnHistory, btnClose, btnArrowLeft, btnArrowRight;
+    private Button btnBrowse, btnPrint, btnHistory, btnClose, btnArrowLeft, btnArrowRight, btnSerials;
     @FXML
     private DatePicker dpTransactionDate, dpReferenceDate, dpExpiryDate;
     @FXML
@@ -215,11 +218,19 @@ public class POReplacement_HistoryController implements Initializable, ScreenInt
                     case "btnClose":
                         unloadForm appUnload = new unloadForm();
                         if (ShowMessageFX.OkayCancel(null, "Close Tab", "Are you sure you want to close this Tab?") == true) {
+                            stageSerialDialog.closeDialog();
                             appUnload.unloadForm(apMainAnchor, oApp, pxeModuleName);
                         } else {
                             return;
                         }
                         break;
+                    case "btnSerials":
+                        if (!poController.PurchaseOrderReceiving().Detail(pnDetail).isSerialized()) {
+                            ShowMessageFX.Warning(null, pxeModuleName, "Selected item is not serialized.");
+                            return;
+                        }
+                        showSerialDialog();
+                        return;
                     case "btnHistory":
                         break;
 
@@ -277,6 +288,50 @@ public class POReplacement_HistoryController implements Initializable, ScreenInt
             }
         }
     };
+
+    public void showSerialDialog() {
+        stageSerialDialog.closeDialog();
+        poJSON = new JSONObject();
+        try {
+            if (!poController.PurchaseOrderReceiving().Detail(pnDetail).isSerialized()) {
+                return;
+            }
+
+            if (poController.PurchaseOrderReceiving().Detail(pnDetail).getQuantity().intValue() == 0) {
+                ShowMessageFX.Warning(null, pxeModuleName, "Received quantity cannot be empty.");
+                return;
+            }
+
+            //Populate Purchase Order Receiving Detail
+            poJSON = poController.PurchaseOrderReceiving().getPurchaseOrderReceivingSerial(pnDetail + 1);
+            if ("error".equals((String) poJSON.get("result"))) {
+                ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                return;
+            }
+
+            DeliveryAcceptance_SerialController controller = new DeliveryAcceptance_SerialController();
+            if (controller != null) {
+                controller.setGRider(oApp);
+                controller.setObject(poController.PurchaseOrderReceiving());
+                controller.setEntryNo(pnDetail + 1);
+            }
+
+            try {
+                stageSerialDialog.setOnHidden(event -> {
+                    Platform.runLater(() -> {
+                        loadTableDetail.reload();
+                    });
+                });
+                stageSerialDialog.showDialog((Stage) apMainAnchor.getScene().getWindow(), getClass().getResource("/ph/com/guanzongroup/integsys/views/DeliveryAcceptance_Serial.fxml"),
+                        controller, "Inventory Serial", true, true, false);
+            } catch (IOException ex) {
+                Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+            }
+
+        } catch (SQLException | GuanzonException ex) {
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+        }
+    }
 
     private void txtField_KeyPressed(KeyEvent event) {
         try {
@@ -699,6 +754,7 @@ public class POReplacement_HistoryController implements Initializable, ScreenInt
         tblViewTransDetails.setOnMouseClicked(event -> {
             if (details_data.size() > 0) {
                 if (event.getClickCount() == 1) {  // Detect single click (or use another condition for double click)
+                    stageSerialDialog.closeDialog();
                     pnDetail = tblViewTransDetails.getSelectionModel().getSelectedIndex();
                     loadRecordDetail();
                 }
@@ -718,7 +774,7 @@ public class POReplacement_HistoryController implements Initializable, ScreenInt
         boolean lbShow4 = (fnValue == EditMode.UNKNOWN || fnValue == EditMode.READY);
         // Manage visibility and managed state of other buttons
         // Ready
-        JFXUtil.setButtonsVisibility(lbShow3, btnPrint, btnHistory);
+        JFXUtil.setButtonsVisibility(lbShow3, btnSerials, btnPrint, btnHistory);
         // Unknown || Ready
         JFXUtil.setButtonsVisibility(lbShow4, btnClose);
         JFXUtil.setDisabled(!lbShow1, apMaster, apDetail, apAttachments);
