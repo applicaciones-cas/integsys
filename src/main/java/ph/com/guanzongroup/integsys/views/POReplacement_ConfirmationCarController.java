@@ -1249,6 +1249,9 @@ public class POReplacement_ConfirmationCarController implements Initializable, S
                 }
                 goToPageBasedOnSelectedRow(String.valueOf(pnMain));
             }
+            for (int lnCtr = 0; lnCtr <= poController.PurchaseOrderReceiving().getDetailCount() - 1; lnCtr++) {
+                poController.PurchaseOrderReceiving().getPurchaseOrderReceivingSerial(poController.PurchaseOrderReceiving().Detail(lnCtr).getEntryNo());
+            }
             poController.PurchaseOrderReceiving().loadAttachments();
             Platform.runLater(() -> {
                 loadTableDetail.reload();

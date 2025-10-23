@@ -741,7 +741,7 @@ public class JFXUtil {
         }
     }
 
-    /* Auto link/set table values & auto disable column re-alignment */
+    /* Auto link & set table values & auto disable column re-alignment */
  /*Requires TableView*/
     public static void setColumnsIndexAndDisableReordering(final TableView<?> tableView) {
         int counter = 1;
@@ -1255,7 +1255,7 @@ public class JFXUtil {
         tableView.getFocusModel().focus(index);
     }
 
-    /*Sets any object to null*/
+    /*Sets particular objects to null*/
     public static void setValueToNull(Object... items) {
         for (Object item : items) {
             if (item instanceof Node) {

@@ -9,6 +9,7 @@ import ph.com.guanzongroup.integsys.model.ModelDeliveryAcceptance_Detail;
 import ph.com.guanzongroup.integsys.model.ModelDeliveryAcceptance_Main;
 import ph.com.guanzongroup.integsys.utility.CustomCommonUtil;
 import com.sun.javafx.scene.control.skin.TableHeaderRow;
+import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -34,9 +35,13 @@ import javafx.collections.transformation.SortedList;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.geometry.Bounds;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
@@ -74,6 +79,9 @@ import org.guanzon.cas.purchasing.services.PurchaseOrderReceivingControllers;
 import org.guanzon.cas.purchasing.status.PurchaseOrderReceivingStatus;
 import org.json.simple.JSONObject;
 import javafx.scene.control.ComboBox;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 import org.guanzon.appdriver.constant.DocumentType;
 import ph.com.guanzongroup.integsys.utility.JFXUtil;
 
@@ -120,6 +128,10 @@ public class DeliveryAcceptance_HistoryController implements Initializable, Scre
 
     private ChangeListener<String> detailSearchListener;
 
+    private double xOffset = 0;
+    private double yOffset = 0;
+    private Stage dialogStage = null;
+
     @FXML
     private AnchorPane apMainAnchor, apBrowse, apButton, apMaster, apDetail, apAttachments, apAttachmentButtons;
 
@@ -131,7 +143,7 @@ public class DeliveryAcceptance_HistoryController implements Initializable, Scre
             tfOrderQuantity, tfReceiveQuantity, tfOrderNo, tfSupersede, tfAttachmentNo;
 
     @FXML
-    private Button btnPrint, btnHistory, btnClose, btnArrowLeft, btnArrowRight;
+    private Button btnPrint, btnHistory, btnClose, btnArrowLeft, btnArrowRight, btnSerials;
 
     @FXML
     private TableView tblViewOrderDetails, tblAttachments;
@@ -219,6 +231,84 @@ public class DeliveryAcceptance_HistoryController implements Initializable, Scre
         psCategoryId = fsValue;
     }
 
+    public void closeSerialDialog() {
+        if (dialogStage != null && dialogStage.isShowing()) {
+            dialogStage.close();
+            dialogStage = null;
+        } else {
+        }
+    }
+
+    public void showSerialDialog() {
+        poJSON = new JSONObject();
+        try {
+            if (!poPurchaseReceivingController.PurchaseOrderReceiving().Detail(pnDetail).isSerialized()) {
+                return;
+            }
+
+            if (poPurchaseReceivingController.PurchaseOrderReceiving().Detail(pnDetail).getQuantity().doubleValue() == 0) {
+                return;
+            }
+
+            //Populate Purchase Order Receiving Detail
+            poJSON = poPurchaseReceivingController.PurchaseOrderReceiving().getPurchaseOrderReceivingSerial(pnDetail + 1);
+            if ("error".equals((String) poJSON.get("result"))) {
+                ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                return;
+            }
+
+//             Check if the dialog is already open
+            if (dialogStage != null) {
+                if (dialogStage.isShowing()) {
+                    dialogStage.toFront();
+                    return;
+                }
+            }
+
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/ph/com/guanzongroup/integsys/views/DeliveryAcceptance_Serial.fxml"));
+            DeliveryAcceptance_SerialController controller = new DeliveryAcceptance_SerialController();
+            loader.setController(controller);
+
+            if (controller != null) {
+                controller.setGRider(oApp);
+                controller.setObject(poPurchaseReceivingController.PurchaseOrderReceiving());
+                controller.setEntryNo(pnDetail + 1);
+                controller.isFinancing(true);
+            }
+
+            Parent root = loader.load();
+
+            // Handle drag events for the undecorated window
+            root.setOnMousePressed(event -> {
+                xOffset = event.getSceneX();
+                yOffset = event.getSceneY();
+            });
+
+            root.setOnMouseDragged(event -> {
+                Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+                stage.setX(event.getScreenX() - xOffset);
+                stage.setY(event.getScreenY() - yOffset);
+            });
+
+            dialogStage = new Stage();
+            dialogStage.initStyle(StageStyle.UNDECORATED);
+            dialogStage.initModality(Modality.APPLICATION_MODAL);
+            dialogStage.setTitle("Inventory Serial");
+            dialogStage.setScene(new Scene(root));
+
+            // Clear the reference when closed
+            dialogStage.setOnHidden(event -> dialogStage = null);
+            dialogStage.show();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (SQLException ex) {
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+        } catch (GuanzonException ex) {
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+        }
+    }
+
     @FXML
     private void cmdButton_Click(ActionEvent event) {
         poJSON = new JSONObject();
@@ -237,7 +327,7 @@ public class DeliveryAcceptance_HistoryController implements Initializable, Scre
                             tfTransactionNo.requestFocus();
                             return;
                         }
-
+                        closeSerialDialog();
                         pnEditMode = poPurchaseReceivingController.PurchaseOrderReceiving().getEditMode();
                         psCompanyId = poPurchaseReceivingController.PurchaseOrderReceiving().Master().getCompanyId();
                         psSupplierId = poPurchaseReceivingController.PurchaseOrderReceiving().Master().getSupplierId();
@@ -254,11 +344,19 @@ public class DeliveryAcceptance_HistoryController implements Initializable, Scre
                     case "btnClose":
                         unloadForm appUnload = new unloadForm();
                         if (ShowMessageFX.OkayCancel(null, "Close Tab", "Are you sure you want to close this Tab?") == true) {
+                            closeSerialDialog();
                             appUnload.unloadForm(apMainAnchor, oApp, pxeModuleName);
                         } else {
                             return;
                         }
                         break;
+                    case "btnSerials":
+                        if (!poPurchaseReceivingController.PurchaseOrderReceiving().Detail(pnDetail).isSerialized()) {
+                            ShowMessageFX.Warning(null, pxeModuleName, "Selected item is not serialized.");
+                            return;
+                        }
+                        showSerialDialog();
+                        return;
                     case "btnHistory":
                         break;
 
@@ -934,6 +1032,9 @@ public class DeliveryAcceptance_HistoryController implements Initializable, Scre
 
         btnHistory.setVisible(lbShow3);
         btnHistory.setManaged(lbShow3);
+
+        btnSerials.setVisible(lbShow3);
+        btnSerials.setManaged(lbShow3);
 
         //Unkown || Ready
         btnClose.setVisible(lbShow4);

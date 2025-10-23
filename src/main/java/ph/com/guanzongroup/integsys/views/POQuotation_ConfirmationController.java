@@ -127,11 +127,11 @@ public class POQuotation_ConfirmationController implements Initializable, Screen
     @FXML
     private Label lblSource, lblStatus;
     @FXML
-    private TextField tfSearchBranch, tfSearchSupplier, tfSearchCategory, tfSearchReferenceNo, tfSearchDepartment, tfTransactionNo, tfReferenceNo, tfBranch, tfDepartment, tfSupplier, tfAddress, tfSourceNo, tfCategory, tfTerm, tfContact, tfGrossAmount, tfDiscRate, tfAddlDiscAmt, tfFreight, tfVATAmount, tfTransactionTotal, tfCompany, tfDescription, tfReplaceId, tfReplaceDescription, tfUnitPrice, tfQuantity, tfDiscRateDetail, tfAddlDiscAmtDetail, tfCost, tfAttachmentNo;
+    private TextField tfSearchBranch, tfSearchSupplier, tfSearchCategory, tfSearchReferenceNo, tfSearchDepartment, tfTransactionNo, tfReferenceNo, tfCompany, tfBranch, tfDepartment, tfSupplier, tfAddress, tfSourceNo, tfCategory, tfTerm, tfContact, tfGrossAmount, tfDiscRate, tfAddlDiscAmt, tfFreight, tfVATAmount, tfTransactionTotal, tfDescription, tfReplaceId, tfReplaceDescription, tfUnitPrice, tfDiscRateDetail, tfAddlDiscAmtDetail, tfQuantity, tfCost, tfAttachmentNo;
     @FXML
     private HBox hbButtons, hboxid;
     @FXML
-    private Button btnUpdate, btnSearch, btnSave, btnCancel, btnConfirm, btnVoid, btnHistory, btnRetrieve, btnClose, btnAddAttachment, btnRemoveAttachment, btnArrowLeft, btnArrowRight;
+    private Button btnUpdate, btnSearch, btnSave, btnCancel, btnConfirm, btnVoid, btnReturn, btnHistory, btnRetrieve, btnClose, btnAddAttachment, btnRemoveAttachment, btnArrowLeft, btnArrowRight;
     @FXML
     private TabPane tabPane;
     @FXML
@@ -145,7 +145,7 @@ public class POQuotation_ConfirmationController implements Initializable, Screen
     @FXML
     private TableView tblViewTransDetails, tblAttachments, tblViewMainList;
     @FXML
-    private TableColumn tblRowNoDetail, tblReplacementDetail, tblDescriptionDetail, tblUnitPriceDetail, tblDiscountDetail, tblQuantityDetail, tblTotalDetail, tblRowNoAttachment, tblFileNameAttachment, tblRowNo, tblBranch, tblSupplier, tblDate, tblReferenceNo, tblTransactionTotal;
+    private TableColumn tblRowNoDetail, tblDescriptionDetail, tblReplacementDetail, tblUnitPriceDetail, tblDiscountDetail, tblQuantityDetail, tblTotalDetail, tblRowNoAttachment, tblFileNameAttachment, tblRowNo, tblBranch, tblSupplier, tblDate, tblReferenceNo, tblTransactionTotal;
     @FXML
     private ComboBox cmbAttachmentType;
     @FXML
@@ -364,7 +364,7 @@ public class POQuotation_ConfirmationController implements Initializable, Screen
                     case "btnSave":
                         //Validator
                         poJSON = new JSONObject();
-                        if (ShowMessageFX.YesNo(null, "Close Tab", "Are you sure you want to save the transaction?") == true) {
+                        if (ShowMessageFX.YesNo(null, pxeModuleName, "Are you sure you want to save the transaction?") == true) {
                             poJSON = poController.POQuotation().SaveTransaction();
                             if (!"success".equals((String) poJSON.get("result"))) {
                                 ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
@@ -414,7 +414,7 @@ public class POQuotation_ConfirmationController implements Initializable, Screen
                         break;
                     case "btnVoid":
                         poJSON = new JSONObject();
-                        if (ShowMessageFX.YesNo(null, "Close Tab", "Are you sure you want to void transaction?") == true) {
+                        if (ShowMessageFX.YesNo(null, pxeModuleName, "Are you sure you want to void transaction?") == true) {
                             if (POQuotationStatus.CONFIRMED.equals(poController.POQuotation().Master().getTransactionStatus())) {
                                 poJSON = poController.POQuotation().CancelTransaction("");
                             } else {
@@ -429,6 +429,22 @@ public class POQuotation_ConfirmationController implements Initializable, Screen
                                 JFXUtil.highlightByKey(tblViewMainList, String.valueOf(pnMain + 1), "#FAA0A0", highlightedRowsMain);
                             }
 
+                        } else {
+                            return;
+                        }
+                        break;
+                    case "btnReturn":
+                        poJSON = new JSONObject();
+                        if (ShowMessageFX.YesNo(null, pxeModuleName, "Are you sure you want to return transaction?") == true) {
+                            poJSON = poController.POQuotation().ReturnTransaction("");
+                            if ("error".equals((String) poJSON.get("result"))) {
+                                ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                                return;
+                            } else {
+                                ShowMessageFX.Information(null, pxeModuleName, (String) poJSON.get("message"));
+                                JFXUtil.disableAllHighlightByColor(tblViewMainList, "#A7C7E7", highlightedRowsMain);
+                                JFXUtil.highlightByKey(tblViewMainList, String.valueOf(pnMain + 1), "#FAC898", highlightedRowsMain);
+                            }
                         } else {
                             return;
                         }
@@ -529,9 +545,9 @@ public class POQuotation_ConfirmationController implements Initializable, Screen
 
     public void retrievePOQuotation() {
         poJSON = new JSONObject();
-        poController.POQuotation().setTransactionStatus(POQuotationStatus.OPEN + POQuotationStatus.CONFIRMED);
+        poController.POQuotation().setTransactionStatus(POQuotationStatus.OPEN + POQuotationStatus.CONFIRMED + POQuotationStatus.RETURNED);
         poJSON = poController.POQuotation().loadPOQuotationList(tfSearchBranch.getText(), tfSearchDepartment.getText(), tfSearchSupplier.getText(), tfSearchCategory.getText(),
-                tfSearchReferenceNo.getText());
+                tfSearchReferenceNo.getText(), false);
         if (!"success".equals((String) poJSON.get("result"))) {
             ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
         } else {
@@ -1207,6 +1223,7 @@ public class POQuotation_ConfirmationController implements Initializable, Screen
             JFXUtil.setDisabled(!lbShow, dpTransactionDate);
 
             JFXUtil.setStatusValue(lblStatus, POQuotationStatus.class, pnEditMode == EditMode.UNKNOWN ? "-1" : poController.POQuotation().Master().getTransactionStatus());
+
             poController.POQuotation().computeFields();
 
             tfTransactionNo.setText(poController.POQuotation().Master().getTransactionNo());
@@ -1536,6 +1553,16 @@ public class POQuotation_ConfirmationController implements Initializable, Screen
         JFXUtil.setDisabled(!lbShow1, apMaster, apDetail, apAttachments, apAttachmentButtons);
         JFXUtil.setButtonsVisibility(lbShow4, btnClose);
 
+        JFXUtil.setButtonsVisibility(false, btnReturn);
+        try {
+            if (JFXUtil.isObjectEqualTo(poController.POQuotationRequest().Master().getTransactionStatus(), POQuotationStatus.OPEN,
+                    POQuotationStatus.CONFIRMED)) {
+//                JFXUtil.setButtonsVisibility(true, btnReturn);
+            } else {
+                JFXUtil.setButtonsVisibility(false, btnReturn);
+            }
+        } catch (Exception e) {
+        }
         switch (poController.POQuotation().Master().getTransactionStatus()) {
             case POQuotationStatus.CONFIRMED:
                 JFXUtil.setButtonsVisibility(false, btnConfirm);

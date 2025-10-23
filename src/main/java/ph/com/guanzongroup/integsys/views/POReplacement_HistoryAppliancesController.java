@@ -101,6 +101,7 @@ public class POReplacement_HistoryAppliancesController implements Initializable,
     JFXUtil.ReloadableTableTask loadTableDetail, loadTableAttachment;
     private final JFXUtil.ImageViewer imageviewerutil = new JFXUtil.ImageViewer();
     private ChangeListener<String> detailSearchListener;
+    JFXUtil.StageManager stageSerialDialog = new JFXUtil.StageManager();
 
     @FXML
     private AnchorPane apMainAnchor, apBrowse, apButton, apMaster, apDetail, apAttachments;
@@ -217,6 +218,7 @@ public class POReplacement_HistoryAppliancesController implements Initializable,
                     case "btnClose":
                         unloadForm appUnload = new unloadForm();
                         if (ShowMessageFX.OkayCancel(null, "Close Tab", "Are you sure you want to close this Tab?") == true) {
+                            stageSerialDialog.closeDialog();
                             appUnload.unloadForm(apMainAnchor, oApp, pxeModuleName);
                         } else {
                             return;
@@ -227,6 +229,7 @@ public class POReplacement_HistoryAppliancesController implements Initializable,
                             ShowMessageFX.Warning(null, pxeModuleName, "Selected item is not serialized.");
                             return;
                         }
+                        showSerialDialog();
                         return;
                     case "btnHistory":
                         break;
@@ -285,6 +288,50 @@ public class POReplacement_HistoryAppliancesController implements Initializable,
             }
         }
     };
+
+    public void showSerialDialog() {
+        stageSerialDialog.closeDialog();
+        poJSON = new JSONObject();
+        try {
+            if (!poController.PurchaseOrderReceiving().Detail(pnDetail).isSerialized()) {
+                return;
+            }
+
+            if (poController.PurchaseOrderReceiving().Detail(pnDetail).getQuantity().intValue() == 0) {
+                ShowMessageFX.Warning(null, pxeModuleName, "Received quantity cannot be empty.");
+                return;
+            }
+
+            //Populate Purchase Order Receiving Detail
+            poJSON = poController.PurchaseOrderReceiving().getPurchaseOrderReceivingSerial(pnDetail + 1);
+            if ("error".equals((String) poJSON.get("result"))) {
+                ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                return;
+            }
+
+            DeliveryAcceptance_SerialAppliancesController controller = new DeliveryAcceptance_SerialAppliancesController();
+            if (controller != null) {
+                controller.setGRider(oApp);
+                controller.setObject(poController.PurchaseOrderReceiving());
+                controller.setEntryNo(pnDetail + 1);
+            }
+
+            try {
+                stageSerialDialog.setOnHidden(event -> {
+                    Platform.runLater(() -> {
+                        loadTableDetail.reload();
+                    });
+                });
+                stageSerialDialog.showDialog((Stage) apMainAnchor.getScene().getWindow(), getClass().getResource("/ph/com/guanzongroup/integsys/views/DeliveryAcceptance_SerialAppliances.fxml"),
+                        controller, "Inventory Serial", true, true, false);
+            } catch (IOException ex) {
+                Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+            }
+
+        } catch (SQLException | GuanzonException ex) {
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+        }
+    }
 
     private void txtField_KeyPressed(KeyEvent event) {
         try {
@@ -726,6 +773,7 @@ public class POReplacement_HistoryAppliancesController implements Initializable,
         tblViewTransDetails.setOnMouseClicked(event -> {
             if (details_data.size() > 0) {
                 if (event.getClickCount() == 1) {  // Detect single click (or use another condition for double click)
+                    stageSerialDialog.closeDialog();
                     pnDetail = tblViewTransDetails.getSelectionModel().getSelectedIndex();
                     loadRecordDetail();
                 }

@@ -163,7 +163,8 @@ public class PurchaseOrder_ApprovalSPMCController implements Initializable, Scre
     public void initialize(URL url, ResourceBundle rb) {
         try {
             poPurchasingController = new PurchaseOrderControllers(poApp, logWrapper);
-            poPurchasingController.PurchaseOrder().setTransactionStatus(PurchaseOrderStatus.CONFIRMED);
+            poPurchasingController.PurchaseOrder().setTransactionStatus(PurchaseOrderStatus.CONFIRMED + 
+                    PurchaseOrderStatus.RETURNED);
             poJSON = new JSONObject();
             poPurchasingController.PurchaseOrder().setWithUI(true);
             poJSON = poPurchasingController.PurchaseOrder().InitTransaction();
@@ -973,12 +974,16 @@ public class PurchaseOrder_ApprovalSPMCController implements Initializable, Scre
         if (fnEditMode == EditMode.READY) {
             switch (poPurchasingController.PurchaseOrder().Master().getTransactionStatus()) {
                 case PurchaseOrderStatus.CONFIRMED:
-                    CustomCommonUtil.setVisible(true, btnApprove,  btnVoid, btnUpdate, btnPrint);
-                    CustomCommonUtil.setManaged(true, btnApprove,  btnVoid, btnUpdate, btnPrint);
+                    CustomCommonUtil.setVisible(true, btnApprove, btnReturn, btnVoid, btnUpdate, btnPrint);
+                    CustomCommonUtil.setManaged(true, btnApprove, btnReturn, btnVoid, btnUpdate, btnPrint);
                     break;
                 case PurchaseOrderStatus.APPROVED:
                     btnPrint.setVisible(true);
                     btnPrint.setManaged(true);
+                    break;
+                case PurchaseOrderStatus.RETURNED:
+                    CustomCommonUtil.setVisible(true,  btnVoid, btnUpdate, btnPrint);
+                    CustomCommonUtil.setManaged(true,  btnVoid, btnUpdate, btnPrint);
                     break;
             }
         }

@@ -76,6 +76,7 @@ import javafx.stage.Stage;
 import org.guanzon.appdriver.constant.DocumentType;
 import javafx.util.Pair;
 import javax.script.ScriptException;
+import static ph.com.guanzongroup.integsys.views.SIPosting_HistoryAppliancesController.poPurchaseReceivingController;
 
 /**
  *
@@ -123,6 +124,7 @@ public class SIPosting_HistoryController implements Initializable, ScreenInterfa
     private Stage dialogStage = null;
     private final JFXUtil.ImageViewer imageviewerutil = new JFXUtil.ImageViewer();
     JFXUtil.StageManager stageAttachment = new JFXUtil.StageManager();
+    JFXUtil.StageManager stageSerial = new JFXUtil.StageManager();
     AnchorPane root = null;
     Scene scene = null;
 
@@ -133,7 +135,7 @@ public class SIPosting_HistoryController implements Initializable, ScreenInterfa
     @FXML
     private Label lblSource, lblStatus, lblJEStatus;
     @FXML
-    private Button btnBrowse, btnSave, btnHistory, btnClose, btnArrowLeft, btnArrowRight;
+    private Button btnBrowse, btnSave, btnHistory, btnClose, btnArrowLeft, btnArrowRight, btnSerials;
     @FXML
     private TextField tfSearchSupplier, tfSearchReferenceNo, tfSearchReceiveBranch, tfTransactionNo, tfSupplier, tfBranch, tfTrucking, tfReferenceNo,
             tfSINo, tfTerm, tfDiscountRate, tfDiscountAmount, tfFreightAmt, tfVatSales, tfVatAmount, tfZeroVatSales, tfVatExemptSales, tfNetTotal, tfVatRate,
@@ -141,7 +143,7 @@ public class SIPosting_HistoryController implements Initializable, ScreenInterfa
             tfAddlDiscAmtDetail, tfSRPAmount, tfJETransactionNo, tfJEAcctCode, tfJEAcctDescription, tfCreditAmt, tfDebitAmt, tfTotalCreditAmt,
             tfTotalDebitAmt, tfAttachmentNo, tfAdvancePayment;
     @FXML
-    private DatePicker dpTransactionDate, dpReferenceDate, dpSIDate,dpExpiryDate, dpJETransactionDate, dpReportMonthYear;
+    private DatePicker dpTransactionDate, dpReferenceDate, dpSIDate, dpExpiryDate, dpJETransactionDate, dpReportMonthYear;
     @FXML
     private CheckBox cbVatInclusive, cbVatable;
     @FXML
@@ -292,6 +294,15 @@ public class SIPosting_HistoryController implements Initializable, ScreenInterfa
         });
     }
 
+    private void closeDialog() {
+        if (stageAttachment != null) {
+            stageAttachment.closeDialog();
+        }
+        if (stageSerial != null) {
+            stageSerial.closeDialog();
+        }
+    }
+
     public void showAttachmentDialog() {
         poJSON = new JSONObject();
         stageAttachment.closeDialog();
@@ -320,6 +331,64 @@ public class SIPosting_HistoryController implements Initializable, ScreenInterfa
 
     }
 
+    public void setKeyEventSerial(Scene scene) {
+        scene.setOnKeyPressed(event -> {
+            if (event.getCode() == KeyCode.F5) {
+                System.out.println("tested key press");
+
+                if (JFXUtil.isObjectEqualTo(poPurchaseReceivingController.PurchaseOrderReceiving().getEditMode(), EditMode.READY, EditMode.UPDATE)) {
+                    showAttachmentDialog();
+                }
+            }
+        });
+    }
+
+    public void showSerialDialog() {
+        try {
+            poJSON = new JSONObject();
+            stageSerial.closeDialog();
+            if (!poPurchaseReceivingController.PurchaseOrderReceiving().Detail(pnDetail).isSerialized()) {
+                return;
+            }
+
+            if (poPurchaseReceivingController.PurchaseOrderReceiving().Detail(pnDetail).getQuantity().intValue() == 0) {
+                return;
+            }
+            poJSON = poPurchaseReceivingController.PurchaseOrderReceiving().getPurchaseOrderReceivingSerial(pnDetail + 1);
+            if ("error".equals((String) poJSON.get("result"))) {
+                ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                return;
+            }
+            DeliveryAcceptance_SerialAppliancesController controller = new DeliveryAcceptance_SerialAppliancesController();
+            if (controller != null) {
+                controller.setGRider(oApp);
+                controller.setObject(poPurchaseReceivingController.PurchaseOrderReceiving());
+                controller.setEntryNo(pnDetail + 1);
+                controller.isFinancing(true);
+            }
+//            stageSerial.setOnHidden(event -> {
+//                moveNext();
+//            });
+
+            stageSerial.showDialog((Stage) btnBrowse.getScene().getWindow(), getClass().getResource("/ph/com/guanzongroup/integsys/views/DeliveryAcceptance_Serial.fxml"), controller, "Inventory Serial", true, false, false);
+            if (stageSerial.getScene() != null) {
+                setKeyEventSerial(stageSerial.getScene());
+            } else {
+                stageSerial.getRoot().sceneProperty().addListener((obs, oldScene, newScene) -> {
+                    if (newScene != null) {
+                        setKeyEvent(newScene);
+                    }
+                });
+            }
+        } catch (IOException ex) {
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+        } catch (SQLException ex) {
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+        } catch (GuanzonException ex) {
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
     @FXML
     private void cmdCheckBox_Click(ActionEvent event) {
     }
@@ -334,15 +403,15 @@ public class SIPosting_HistoryController implements Initializable, ScreenInterfa
                 String lsButton = clickedButton.getId();
                 switch (lsButton) {
                     case "btnBrowse":
-                        poJSON = poPurchaseReceivingController.PurchaseOrderReceiving().searchTransaction(psIndustryId, psCompanyId, tfSearchSupplier.getText(), tfSearchReceiveBranch.getText(), tfSearchReferenceNo.getText());
+                        poJSON = poPurchaseReceivingController.PurchaseOrderReceiving().searchTransaction(tfSearchSupplier.getText(), tfSearchReceiveBranch.getText(), tfSearchReferenceNo.getText());
                         if ("error".equalsIgnoreCase((String) poJSON.get("result"))) {
                             ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                             tfTransactionNo.requestFocus();
                             return;
                         }
-                        stageAttachment.closeDialog();
+                        closeDialog();
                         pnEditMode = poPurchaseReceivingController.PurchaseOrderReceiving().getEditMode();
-                        psCompanyId = poPurchaseReceivingController.PurchaseOrderReceiving().Master().getCompanyId();
+                        //psCompanyId = poPurchaseReceivingController.PurchaseOrderReceiving().Master().getCompanyId();
                         psSupplierId = poPurchaseReceivingController.PurchaseOrderReceiving().Master().getSupplierId();
                         poPurchaseReceivingController.PurchaseOrderReceiving().populateJournal();
                         poPurchaseReceivingController.PurchaseOrderReceiving().loadAttachments();
@@ -350,12 +419,19 @@ public class SIPosting_HistoryController implements Initializable, ScreenInterfa
                     case "btnClose":
                         unloadForm appUnload = new unloadForm();
                         if (ShowMessageFX.OkayCancel(null, "Close Tab", "Are you sure you want to close this Tab?") == true) {
-                            stageAttachment.closeDialog();
+                            closeDialog();
                             appUnload.unloadForm(apMainAnchor, oApp, pxeModuleName);
                         } else {
                             return;
                         }
                         break;
+                    case "btnSerials":
+                        if (!poPurchaseReceivingController.PurchaseOrderReceiving().Detail(pnDetail).isSerialized()) {
+                            ShowMessageFX.Warning(null, pxeModuleName, "Selected item is not serialized.");
+                            return;
+                        }
+                        showSerialDialog();
+                        return;
                     case "btnHistory":
                         break;
                     case "btnArrowRight":
@@ -469,7 +545,7 @@ public class SIPosting_HistoryController implements Initializable, ScreenInterfa
                             return;
                         case "tfSearchReferenceNo":
                             stageAttachment.closeDialog();
-                            poJSON = poPurchaseReceivingController.PurchaseOrderReceiving().searchTransaction(psIndustryId, psCompanyId,
+                            poJSON = poPurchaseReceivingController.PurchaseOrderReceiving().searchTransaction(
                                     tfSearchSupplier.getText(), tfSearchReceiveBranch.getText(), tfSearchReferenceNo.getText());
 
                             if ("error".equals(poJSON.get("result"))) {
@@ -477,9 +553,9 @@ public class SIPosting_HistoryController implements Initializable, ScreenInterfa
                                 tfSearchReferenceNo.setText("");
                                 break;
                             } else {
-                                stageAttachment.closeDialog();
+                                closeDialog();
                                 pnEditMode = poPurchaseReceivingController.PurchaseOrderReceiving().getEditMode();
-                                psCompanyId = poPurchaseReceivingController.PurchaseOrderReceiving().Master().getCompanyId();
+                                //psCompanyId = poPurchaseReceivingController.PurchaseOrderReceiving().Master().getCompanyId();
                                 psSupplierId = poPurchaseReceivingController.PurchaseOrderReceiving().Master().getSupplierId();
                                 poPurchaseReceivingController.PurchaseOrderReceiving().populateJournal();
                                 poPurchaseReceivingController.PurchaseOrderReceiving().loadAttachments();
@@ -1049,7 +1125,7 @@ public class SIPosting_HistoryController implements Initializable, ScreenInterfa
 
     public void initDatePickers() {
         JFXUtil.setDatePickerFormat("MM/dd/yyyy",
-                dpTransactionDate, dpReferenceDate, dpSIDate,dpExpiryDate, dpJETransactionDate, dpReportMonthYear);
+                dpTransactionDate, dpReferenceDate, dpSIDate, dpExpiryDate, dpJETransactionDate, dpReportMonthYear);
     }
 
     public void initTextFields() {
@@ -1100,6 +1176,7 @@ public class SIPosting_HistoryController implements Initializable, ScreenInterfa
                 if (event.getClickCount() == 1) {  // Detect single click (or use another condition for double click)
                     ModelDeliveryAcceptance_Detail selected = (ModelDeliveryAcceptance_Detail) tblViewTransDetailList.getSelectionModel().getSelectedItem();
                     if (selected != null) {
+                        stageSerial.closeDialog();
                         pnDetail = Integer.parseInt(selected.getIndex01()) - 1;
                         loadRecordDetail();
                         tfCost.requestFocus();
@@ -1117,7 +1194,7 @@ public class SIPosting_HistoryController implements Initializable, ScreenInterfa
 
         JFXUtil.setDisabled(true, apMaster, apDetail, apJEMaster, apJEDetail);
         // Manage visibility and managed state of other buttons
-        JFXUtil.setButtonsVisibility(lbShow, btnHistory);
+        JFXUtil.setButtonsVisibility(lbShow, btnSerials, btnHistory);
 
     }
 
@@ -1263,14 +1340,14 @@ public class SIPosting_HistoryController implements Initializable, ScreenInterfa
 
     public void clearTextFields() {
         Platform.runLater(() -> {
-            stageAttachment.closeDialog();
             imageinfo_temp.clear();
-            JFXUtil.setValueToNull(previousSearchedTextField, lastFocusedTextField, dpTransactionDate, dpReferenceDate, dpSIDate,dpExpiryDate, dpReportMonthYear);
+            JFXUtil.setValueToNull(previousSearchedTextField, lastFocusedTextField, dpTransactionDate, dpReferenceDate, dpSIDate, dpExpiryDate, dpReportMonthYear);
             psSupplierId = "";
             psBranchId = "";
             JFXUtil.clearTextFields(apMaster, apDetail, apJEDetail, apJEMaster, apAttachments);
             cbVatInclusive.setSelected(false);
             cbVatable.setSelected(false);
+            closeDialog();
         });
     }
 
