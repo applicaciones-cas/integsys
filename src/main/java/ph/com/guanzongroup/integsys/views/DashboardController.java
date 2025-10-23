@@ -573,6 +573,9 @@ public class DashboardController implements Initializable {
                 loadSystemMonitor();
             } else {
                 SystemMonitorMenu monitorMenu = new SystemMonitorMenu(oApp, "CAS");
+
+                monitorMenu.setIndustryCode(psIndustryID);
+                monitorMenu.setCategoryCode(oApp.getCategory());
                 JSONObject loSysMontrData = monitorMenu.processMonitoring();
                 lblNotifCount.setText(String.valueOf(monitorMenu.getMonitoringCount()));
 
@@ -1916,6 +1919,9 @@ public class DashboardController implements Initializable {
 
                     if (!txId.isEmpty() && !menuCode.isEmpty()) {
                         txNode.setAction(createSysMonitorAction(txNode));
+                    } else if (!txId.isEmpty() && menuCode.isEmpty()) {//still add 
+                        txNode.setAction(createSysMonitorAction(txNode));
+
                     }
 
                     TreeItem<TreeMonitor> txItem = new TreeItem<>(txNode);
@@ -1936,8 +1942,14 @@ public class DashboardController implements Initializable {
                 String industry = node.getIndustry();
                 String category = node.getCategory();
 
+                if (menuCode.isEmpty()) {
+                    return;
+                }
                 String key = buildMenuKey(menuCode, industry, category);
-
+                //loadmenu if never clicked
+                if (leftSidebarLookup.size() <= 0) {
+                    loadMenu();
+                }
                 TreeNode sidebarNode = leftSidebarLookup.get(key);
                 if (sidebarNode != null) {
                     System.out.println("Triggering left sidebar for: " + key);
