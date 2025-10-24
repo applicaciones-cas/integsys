@@ -37,7 +37,8 @@
                                                 <ColumnConstraints halignment="RIGHT" hgrow="ALWAYS" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="200.0" />
                                                 <ColumnConstraints halignment="CENTER" hgrow="ALWAYS" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="150.0" />
                                                 <ColumnConstraints halignment="RIGHT" hgrow="ALWAYS" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="250.0" />
-                                                <ColumnConstraints halignment="RIGHT" hgrow="ALWAYS" maxWidth="1.7976931348623157E308" />
+                                                <ColumnConstraints halignment="RIGHT" hgrow="ALWAYS" maxWidth="729.0" minWidth="729.0" prefWidth="729.0" />
+                                    <ColumnConstraints halignment="RIGHT" hgrow="ALWAYS" maxWidth="1.7976931348623157E308" minWidth="10.0" prefWidth="302.0" />
                                             </columnConstraints>
                                             <rowConstraints>
                                                 <RowConstraints />
@@ -125,13 +126,13 @@
                         </AnchorPane>
                     </bottom>
                     <center>
-                        <AnchorPane BorderPane.alignment="CENTER">
+                        <AnchorPane maxWidth="900.0" BorderPane.alignment="CENTER_LEFT">
                             <children>
                                 <AnchorPane style="-fx-border-color: orange;" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="5.0">
                                     <children>
-                                        <GridPane maxWidth="1.7976931348623157E308" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                        <GridPane AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                             <columnConstraints>
-                                                <ColumnConstraints hgrow="ALWAYS" maxWidth="1.7976931348623157E308" minWidth="-Infinity" />
+                                                <ColumnConstraints hgrow="ALWAYS" maxWidth="1.7976931348623157E308" minWidth="1450.0" />
                                             </columnConstraints>
                                             <rowConstraints>
                                                 <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" vgrow="SOMETIMES" />
@@ -139,7 +140,7 @@
                                                 <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="40.0" vgrow="SOMETIMES" />
                                             </rowConstraints>
                                             <children>
-                                                <TableView fx:id="tblVwMain" minWidth="242.0" GridPane.rowIndex="1">
+                                                <TableView fx:id="tblVwMain" GridPane.rowIndex="1">
                                                     <columns>
                                                         <TableColumn fx:id="tblRowNo" maxWidth="30.0" minWidth="30.0" prefWidth="30.0" resizable="false" sortable="false" text="No." />
                                                         <TableColumn fx:id="tblCheckBox" maxWidth="30.0" minWidth="30.0" prefWidth="30.0" resizable="false" sortable="false">
@@ -149,12 +150,12 @@
                                                         </TableColumn>
                                                         <TableColumn fx:id="tblDVNo" maxWidth="150.0" minWidth="150.0" prefWidth="150.0" resizable="false" sortable="false" text="DV No" />
                                                         <TableColumn fx:id="tblDate" maxWidth="130.0" minWidth="130.0" prefWidth="130.0" resizable="false" sortable="false" text="DV Date" />
-                                                        <TableColumn fx:id="tblSupplier" maxWidth="250.0" minWidth="250.0" prefWidth="250.0" resizable="false" sortable="false" text="Supplier" />
+                                                        <TableColumn fx:id="tblSupplier" maxWidth="300.0" minWidth="300.0" prefWidth="300.0" resizable="false" sortable="false" text="Supplier" />
                                                         <TableColumn fx:id="tblPayeeName" maxWidth="250.0" minWidth="250.0" prefWidth="250.0" resizable="false" sortable="false" text="Payee Name" />
-                                                        <TableColumn fx:id="tblPaymentForm" maxWidth="250.0" minWidth="250.0" prefWidth="250.0" resizable="false" sortable="false" text="Payment Form" />
-                                                        <TableColumn fx:id="tblBankName" maxWidth="250.0" minWidth="250.0" prefWidth="250.0" resizable="false" sortable="false" text="Bank Name" />
-                                                        <TableColumn fx:id="tblBankAccount" maxWidth="180.0" minWidth="180.0" prefWidth="180.0" resizable="false" sortable="false" text="Bank Account" />
-                                                        <TableColumn fx:id="tblTransAmount" maxWidth="200.0" minWidth="200.0" prefWidth="200.0" resizable="false" sortable="false" text="Total Amount" />
+                                                        <TableColumn fx:id="tblPaymentForm" maxWidth="200.0" minWidth="200.0" prefWidth="200.0" resizable="false" sortable="false" text="Payment Form" />
+                                                        <TableColumn fx:id="tblBankName" maxWidth="200.0" minWidth="200.0" prefWidth="200.0" resizable="false" sortable="false" text="Bank Name" />
+                                                        <TableColumn fx:id="tblBankAccount" maxWidth="150.0" minWidth="150.0" prefWidth="150.0" resizable="false" sortable="false" text="Bank Account" />
+                                                        <TableColumn fx:id="tblTransAmount" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="100.0" resizable="false" sortable="false" text="Total Amount" />
                                                     </columns>
                                                     <GridPane.margin>
                                                         <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
