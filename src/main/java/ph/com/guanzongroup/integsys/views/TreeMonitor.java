@@ -9,50 +9,44 @@ package ph.com.guanzongroup.integsys.views;
  * @author GMC_SEG09
  */
 public class TreeMonitor {
-    private String id;
-    private String parentId;
-    private String name;
-    private String description;
-    private Runnable action; // what to do when clicked
-
-    public TreeMonitor(String id, String parentId, String name, String description, Runnable action) {
-        this.id = id;
-        this.parentId = parentId;
-        this.name = name;
-        this.description = description;
-        this.action = action;
+    private String sSysMnuCd;
+    private String psMenuGrpx;
+    private String psMenuName;
+    private String psDescription;
+    private String psMenuCode;
+    private String psIndustry;
+    private String psCategory;
+    private Runnable prAction;
+    
+     public TreeMonitor(String id, String groupId, String name, String description,
+                       String menuCode,String industry,String category) {
+        this.sSysMnuCd = id;
+        this.psMenuGrpx = groupId;
+        this.psMenuName = name;
+        this.psDescription = description;
+        this.psMenuCode = menuCode;
+        this.psIndustry = industry;
+        this.psCategory = category;
     }
 
-    public String getId() {
-        return id;
+    public String getSystemId() { return sSysMnuCd; }
+    public String getGroup() { return psMenuGrpx; }
+    public String getName() { return psMenuName; }
+    public String getDescription() { return psDescription; }
+    public String getMenuCode() { return psMenuCode; }
+    public String getIndustry() { return psIndustry; }
+    public String getCategory() { return psCategory; }
+    
+     public Runnable getAction() {
+        return prAction;
     }
-
-    public String getParentId() {
-        return parentId;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public Runnable getAction() {
-        return action;
-    }
-
-    public void runAction() {
-        if (action != null) {
-            action.run();
-        } else {
-            System.out.println("No action assigned for " + name);
-        }
+     public void setAction(Runnable action) {
+        prAction = action;
     }
 
     @Override
     public String toString() {
-        return name;
+        return psMenuName;
     }
+
 }
