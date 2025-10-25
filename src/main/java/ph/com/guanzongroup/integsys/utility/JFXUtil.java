@@ -473,8 +473,14 @@ public class JFXUtil {
 
     /* To put caret position of a textfield to last character index*/
  /* Requires AnchorPane ID containing textfields*/
-    public static void updateCaretPositions(AnchorPane anchorPane) {
-        List<TextField> textFields = getAllTextFields(anchorPane);
+    public static void updateCaretPositions(AnchorPane... anchorPanes) {
+        List<TextField> textFields = new ArrayList<>();
+
+        // Collect all TextFields from all provided AnchorPanes
+        for (AnchorPane anchorPane : anchorPanes) {
+            textFields.addAll(getAllTextFields(anchorPane));
+        }
+
         for (TextField textField : textFields) {
             String text = textField.getText();
             if (text != null && !"".equals(text)) {
@@ -2694,4 +2700,17 @@ public class JFXUtil {
         return withSpaces.trim();
     }
 
+    public static void setCmbValue(ComboBox<?> comboBox, int value) {
+        // Save original listener
+        EventHandler<ActionEvent> originalHandler = comboBox.getOnAction();
+        // Temporarily remove listener to prevent triggering events
+        comboBox.setOnAction(null);
+        // Safe cast for flexibility
+        if (value < 0) {
+            comboBox.getSelectionModel().select(value);
+        } else {
+            comboBox.getSelectionModel().select(value);
+        }
+        comboBox.setOnAction(originalHandler);
+    }
 }
