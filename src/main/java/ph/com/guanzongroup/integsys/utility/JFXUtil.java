@@ -121,8 +121,12 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.util.Callback;
 import java.io.File;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.regex.Pattern;
 import javafx.css.PseudoClass;
+import javafx.scene.control.ButtonBase;
+import javafx.scene.control.MenuItem;
 import ph.com.guanzongroup.integsys.views.ScreenInterface;
 
 /**
@@ -263,6 +267,49 @@ public class JFXUtil {
     public static void showRetainedHighlight(boolean isRetained, TableView<?> tblView, String color, List<Pair<String, String>> plPartial, List<Pair<String, String>> plFinal,
             Map<String, List<String>> highlightedRows, boolean resetpartial) {
 
+        //define if it contains - then trim()
+        //transactionNo-transNoBasis
+        //identifies if exists other same Main transactionNo in the MapList then delete before retaining
+        // --- Skip process if plPartial has no '-' in any key ---
+        boolean hasDash = false;
+        for (Pair<String, String> pair : plPartial) {
+            if (pair.getKey().contains("-")) {
+                hasDash = true;
+                break;
+            }
+        }
+
+        if (hasDash) {
+            Set<String> prefixesToRemove = new HashSet<>();
+
+            for (Pair<String, String> pair : plFinal) {
+                String key = pair.getKey();
+                int dashIndex = key.indexOf("-");
+                if (dashIndex > 0) {
+                    String prefix = key.substring(0, dashIndex); // e.g., "m001323"
+
+                    // Check if any key in plPartial starts with prefix + "-"
+                    for (Pair<String, String> partialPair : plPartial) {
+                        if (partialPair.getKey().startsWith(prefix + "-")) {
+                            prefixesToRemove.add(prefix);
+                            break;
+                        }
+                    }
+                }
+            }
+
+            // Remove from plFinal all pairs whose key starts with any prefix in prefixesToRemove
+            plFinal.removeIf(p -> {
+                for (String prefix : prefixesToRemove) {
+                    if (p.getKey().startsWith(prefix)) {
+                        return true;
+                    }
+                }
+                return false;
+            });
+        }
+        //===================================================================================
+
         //decide if to allow adding to final of rows highlighted 
         //if contains 1 value, indicates will proceed
         if (isRetained) {
@@ -272,6 +319,7 @@ public class JFXUtil {
                 }
             }
         }
+
         //decide if to reset the temporary highlights made
         if (resetpartial) {
             disableAllHighlightByColor(tblView, color, highlightedRows);
@@ -857,17 +905,36 @@ public class JFXUtil {
 
     /* Disables any node in UI*/
  /* Requires boolean & Nodes*/
-    public static void setDisabled(boolean disable, Node... nodes) {
-        for (Node node : nodes) {
-            node.setDisable(disable);
-            if (node instanceof TextField) {
-                if (!disable) {
-                    while (node.getStyleClass().contains("DisabledTextField")) {
+    public static void setDisabled(boolean disable, Object... elements) {
+        for (Object obj : elements) {
+            if (obj instanceof Node) {
+                Node node = (Node) obj;
+                node.setDisable(disable);
+
+                if (node instanceof TextField) {
+                    if (disable) {
+                        if (!node.getStyleClass().contains("DisabledTextField")) {
+                            node.getStyleClass().add("DisabledTextField");
+                        }
+                    } else {
                         node.getStyleClass().remove("DisabledTextField");
                     }
-                } else {
-                    node.getStyleClass().add("DisabledTextField");
                 }
+
+            } else if (obj instanceof Tab) {
+                ((Tab) obj).setDisable(disable);
+
+            } else if (obj instanceof MenuItem) {
+                ((MenuItem) obj).setDisable(disable);
+
+            } else if (obj instanceof ButtonBase) {
+                ((ButtonBase) obj).setDisable(disable);
+
+            } else if (obj instanceof Control) {
+                ((Control) obj).setDisable(disable);
+
+            } else {
+                System.out.println("Unsupported element type: " + obj.getClass().getSimpleName());
             }
         }
     }

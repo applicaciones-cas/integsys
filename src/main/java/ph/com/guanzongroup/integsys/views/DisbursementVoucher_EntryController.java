@@ -23,14 +23,12 @@ import java.util.ResourceBundle;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javafx.animation.PauseTransition;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
-import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -48,7 +46,6 @@ import javafx.scene.control.TablePosition;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
-import javafx.scene.input.KeyCode;
 import static javafx.scene.input.KeyCode.DOWN;
 import static javafx.scene.input.KeyCode.ENTER;
 import static javafx.scene.input.KeyCode.F3;
@@ -56,7 +53,6 @@ import static javafx.scene.input.KeyCode.TAB;
 import static javafx.scene.input.KeyCode.UP;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
-import javafx.util.Duration;
 import javafx.util.Pair;
 import javax.script.ScriptException;
 import org.guanzon.appdriver.agent.ShowMessageFX;
@@ -978,7 +974,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
         JFXUtil.setFocusListener(txtMasterOnlinePayment_Focus, tfBankNameOnlinePayment, tfBankAccountOnlinePayment);
         //apJournalDetails
         JFXUtil.setFocusListener(txtDetailJE_Focus, tfAccountCode, tfAccountDescription, tfDebitAmount, tfCreditAmount);
-        //Initialise  TextField KeyPressed
+
         JFXUtil.setKeyPressedListener(this::txtField_KeyPressed, apDVMaster1, apMasterDVCheck, apMasterDVBTransfer, apMasterDVOp, apDVDetail, apMainList, apJournalDetails);
         JFXUtil.inputDecimalOnly(tfVatZeroRatedSales, tfTaxRateDetail, tfVatZeroRatedSalesDetail, tfVatRateDetail);
         JFXUtil.setCommaFormatter(tfCheckAmount, tfPaymentAmountBTransfer, tfPaymentAmount, tfVatAmountMaster, tfTotalNetAmount, tfTotalAmount, tfPurchasedAmountDetail, tfTaxAmountDetail, tfNetAmountDetail, tfVatAmountDetail, tfTotalCreditAmount, tfTotalDebitAmount, tfDebitAmount, tfCreditAmount);
@@ -1753,20 +1749,8 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                 switch (cmbId) {
                     case "cmbTransactionType":
                         String selected = String.valueOf(cmbTransactionType.getValue());
-                        switch (selected) {
-                            case DisbursementStatic.SourceCode.PAYMENT_REQUEST: // "PRF"
-                                psTransactionType = DisbursementStatic.SourceCode.PAYMENT_REQUEST;
-                                break;
-                            case DisbursementStatic.SourceCode.CASH_PAYABLE: // "CP"
-                                psTransactionType = DisbursementStatic.SourceCode.CASH_PAYABLE;
-                                break;
-                            case DisbursementStatic.SourceCode.ACCOUNTS_PAYABLE: // "SOA"
-                                psTransactionType = DisbursementStatic.SourceCode.ACCOUNTS_PAYABLE;
-                                break;
-                            case DisbursementStatic.SourceCode.LOAD_ALL:
-                                psTransactionType = DisbursementStatic.SourceCode.LOAD_ALL;
-                                break;
-                        }
+                        psTransactionType = JFXUtil.setStatusValue(null, DisbursementStatic.SourceCode.class, selected);
+
                         loadTableMain.reload();
                         break;
                     case "cmbPaymentMode":
