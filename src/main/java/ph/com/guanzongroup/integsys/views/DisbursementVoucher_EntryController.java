@@ -85,11 +85,9 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
     private int pnMain = 0;
     private int pnDetail = 0;
     private int pnDetailJE = 0;
-    private boolean lsIsSaved = false;
     private boolean pbIsCheckedJournalTab = false;
     private boolean pbIsVerifier = false;
     private boolean isWithVAToriginal = false;
-//    private boolean pbIsFromBrowse = false;
     private final String pxeModuleName = "Disbursement Voucher";
     private DisbursementVoucher poController;
     public int pnEditMode;
@@ -98,7 +96,6 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
     private String psCompanyId = "";
     private String psCategoryId = "";
     private String psSupplierPayeeId = "";
-    private String psTransactionNo = "";
     private String psTransactionType = "";
     private Double netTotalperDetail = 0.00;
 
@@ -240,7 +237,6 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
         initButton(pnEditMode);
         pagination.setPageCount(0);
         JFXUtil.initKeyClickObject(AnchorMain, lastFocusedTextField, previousSearchedTextField); // for btnSearch Reference
-
     }
 
     public void initTabPane() {
@@ -250,6 +246,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                 switch (tabTitle) {
                     case "Disbursement Voucher":
                         if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
+                            pnDetailJE = 0;
                         }
                         break;
                     case "Journal":
@@ -299,7 +296,8 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
     }
 
     private void initButtonsClickActions() {
-        JFXUtil.setActionListener(this::cmdButton_Click, btnBrowse, btnNew, btnUpdate, btnSearch, btnSave, btnCancel, btnVoid, btnRetrieve, btnHistory, btnClose);
+        List<Button> buttons = Arrays.asList(btnBrowse, btnNew, btnUpdate, btnSearch, btnSave, btnCancel, btnVoid, btnRetrieve, btnHistory, btnClose);
+        buttons.forEach(button -> button.setOnAction(this::cmdButton_Click));
     }
 
     private void cmdButton_Click(ActionEvent event) {
