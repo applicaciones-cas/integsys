@@ -92,7 +92,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
     private final String pxeModuleName = "Disbursement Voucher";
     private Disbursement poController;
     public int pnEditMode;
-
+    boolean pbKeyPressed = false;
     private String psIndustryId = "";
     private String psCompanyId = "";
     private String psCategoryId = "";
@@ -236,7 +236,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
         initTabPane();
         clearFields();
         pnEditMode = EditMode.UNKNOWN;
-        initFields(pnEditMode);
+        initMasterDVTab(pnEditMode);
         initButton(pnEditMode);
         pagination.setPageCount(0);
         JFXUtil.initKeyClickObject(AnchorMain, lastFocusedTextField, previousSearchedTextField); // for btnSearch Reference
@@ -371,7 +371,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                     if ("success".equals(poJSON.get("result"))) {
                         pnEditMode = poController.getEditMode();
                         loadTableDetail.reload();
-                        initFields(pnEditMode);
+                        initMasterDVTab(pnEditMode);
                         initButton(pnEditMode);
                     }
                     if (pnEditMode == EditMode.READY) {
@@ -461,7 +461,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                 CustomCommonUtil.switchToTab(tabCheck, tabPanePaymentMode);
                 pnEditMode = EditMode.UNKNOWN;
             }
-            initFields(pnEditMode);
+            initMasterDVTab(pnEditMode);
             initButton(pnEditMode);
         } catch (CloneNotSupportedException | SQLException | GuanzonException | ParseException | ScriptException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
@@ -589,28 +589,24 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
     }
 
     public void loadHighlightFromDetail() {
-        try {
-            for (int lnCtr = 0; lnCtr < poController.getDetailCount(); lnCtr++) {
-                String lsTransNo = !JFXUtil.isObjectEqualTo(poController.Detail(lnCtr).getSourceNo(), null, "") ? poController.Detail(lnCtr).getSourceNo() : "";
-                String lsTransType = !JFXUtil.isObjectEqualTo(poController.Detail(lnCtr).Particular().getAccountCode(), null, "") ? poController.Detail(lnCtr).Particular().getAccountCode() : "";
-                String lsHighlightbasis = lsTransNo + lsTransType;
-                if (!JFXUtil.isObjectEqualTo(poController.Detail(lnCtr).getAmount(), null, "")) {
-                    if (poController.Detail(lnCtr).getAmount() > 0.0000) {
-                        plOrderNoPartial.add(new Pair<>(lsHighlightbasis, "1"));
-                    } else {
-                        plOrderNoPartial.add(new Pair<>(lsHighlightbasis, "0"));
-                    }
+        for (int lnCtr = 0; lnCtr < poController.getDetailCount(); lnCtr++) {
+            String lsTransNo = !JFXUtil.isObjectEqualTo(poController.Detail(lnCtr).getSourceNo(), null, "") ? poController.Detail(lnCtr).getSourceNo() : "";
+            String lsTransType = !JFXUtil.isObjectEqualTo(poController.Detail(lnCtr).getSourceCode(), null, "") ? poController.Detail(lnCtr).getSourceCode() : "";
+            String lsHighlightbasis = lsTransNo + lsTransType;
+            if (!JFXUtil.isObjectEqualTo(poController.Detail(lnCtr).getAmount(), null, "")) {
+                if (poController.Detail(lnCtr).getAmount() > 0.0000) {
+                    plOrderNoPartial.add(new Pair<>(lsHighlightbasis, "1"));
+                } else {
+                    plOrderNoPartial.add(new Pair<>(lsHighlightbasis, "0"));
                 }
             }
-            for (Pair<String, String> pair : plOrderNoPartial) {
-                if (!"".equals(pair.getKey()) && pair.getKey() != null) {
-                    JFXUtil.highlightByKey(tblViewMainList, pair.getKey(), "#A7C7E7", highlightedRowsMain);
-                }
-            }
-            JFXUtil.showRetainedHighlight(false, tblViewMainList, "#A7C7E7", plOrderNoPartial, plOrderNoFinal, highlightedRowsMain, false);
-        } catch (SQLException | GuanzonException ex) {
-            Logger.getLogger(DisbursementVoucher_EntryController.class.getName()).log(Level.SEVERE, null, ex);
         }
+        for (Pair<String, String> pair : plOrderNoPartial) {
+            if (!"".equals(pair.getKey()) && pair.getKey() != null) {
+                JFXUtil.highlightByKey(tblViewMainList, pair.getKey(), "#A7C7E7", highlightedRowsMain);
+            }
+        }
+        JFXUtil.showRetainedHighlight(false, tblViewMainList, "#A7C7E7", plOrderNoPartial, plOrderNoFinal, highlightedRowsMain, false);
     }
 
     private void loadTableDetailFromMain() {
@@ -625,6 +621,14 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                     String lsTransactionType = selected.getIndex02();
                     String lsTransactionNo = selected.getIndex07();
                     String lsHighLight = selected.getIndex01();
+                    String lsPayee = selected.getIndex08();
+
+                    if (!JFXUtil.isObjectEqualTo(poController.Master().Payee().Client().getCompanyName(), null, "")) {
+                        if (!poController.Master().Payee().Client().getCompanyName().equals(lsPayee)) {
+                            ShowMessageFX.Warning(null, pxeModuleName, "Invalid retrieval, ensure supplier is similar");
+                            return;
+                        }
+                    }
                     poJSON = poController.addUnifiedPaymentToDisbursement(lsTransactionNo, lsTransactionType);
                     if ("error".equals(poJSON.get("result"))) {
                         ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
@@ -658,6 +662,8 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                                     if (unifiedPayments != null && !unifiedPayments.isEmpty()) {
                                         for (Object requestObj : unifiedPayments) {
                                             JSONObject obj = (JSONObject) requestObj;
+                                            String lsTransBasis = (obj.get("sTransNox") != null ? obj.get("sTransNox").toString() : "")
+                                                    + (obj.get("TransactionType") != null ? obj.get("TransactionType").toString() : "");
                                             ModelDisbursementVoucher_Main loMain = new ModelDisbursementVoucher_Main(
                                                     String.valueOf(main_data.size() + 1),
                                                     obj.get("TransactionType") != null ? obj.get("TransactionType").toString() : "",
@@ -666,7 +672,8 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                                                     obj.get("Reference") != null ? obj.get("Reference").toString() : "",
                                                     obj.get("Balance") != null ? CustomCommonUtil.setIntegerValueToDecimalFormat(obj.get("Balance"), true) : "",
                                                     obj.get("sTransNox") != null ? obj.get("sTransNox").toString() : "",
-                                                    (obj.get("sTransNox") != null ? obj.get("sTransNox").toString() : "" + obj.get("TransactionType") != null ? obj.get("TransactionType").toString() : "")
+                                                    obj.get("Payee") != null ? obj.get("Payee").toString() : "",
+                                                    lsTransBasis
                                             );
 
                                             main_data.add(loMain);
@@ -908,7 +915,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
             }
         }
         );
-        JFXUtil.applyRowHighlighting(tblViewMainList, item -> ((ModelDisbursementVoucher_Main) item).getIndex08(), highlightedRowsMain);
+        JFXUtil.applyRowHighlighting(tblViewMainList, item -> ((ModelDisbursementVoucher_Main) item).getIndex09(), highlightedRowsMain);
         JFXUtil.setKeyEventFilter(this::tableKeyEvents, tblVwDetails, tblVwJournalDetails);
         JFXUtil.adjustColumnForScrollbar(tblViewMainList, tblVwDetails, tblVwJournalDetails);
     }
@@ -932,7 +939,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                                 break;
                         }
                         loadRecordDetail();
-                        initFields(pnEditMode);
+                        initMasterDVTab(pnEditMode);
                         event.consume();
                     }
                     break;
@@ -950,7 +957,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                                 break;
                         }
                         loadRecordDetailJE();
-                        initFields(pnEditMode);
+                        initMasterDVTab(pnEditMode);
                         event.consume();
                     }
                     break;
@@ -1032,31 +1039,39 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                 switch (lsID) {
                     case "tfSupplier":
                         if (lsValue.isEmpty()) {
-                            if (!tfPayeeName.getText().isEmpty()) {
-                                if (!isExchangingSupplier()) {
-                                    return;
-                                }
-                            } else {
-                                if (poController.getDetailCount() >= 1) {
-                                    if (poController.Detail(0).getSourceNo() != null) {
-                                        if (!poController.Detail(0).getSourceNo().isEmpty()) {
-                                            if (!isExchangingSupplier()) {
+                            if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
+
+                                if (!JFXUtil.isObjectEqualTo(poController.Master().getSupplierClientID(), null, "")
+                                && !JFXUtil.isObjectEqualTo(poController.Master().getPayeeID(), null, "")) {
+                                    if (poController.getDetailCount() > 1) {
+                                        if (!pbKeyPressed) {
+                                            if (ShowMessageFX.YesNo(null, pxeModuleName,
+                                                    "Are you sure you want to change the supplier name?\nPlease note that doing so will delete all purchase order receiving details.\n\nDo you wish to proceed?") == true) {
+//                                                if (!isExchangingSupplier()) {
+//                                                    break;
+//                                                }
+                                                removeDVDetails();
+                                                if (poController.Master().getDisbursementType().equals(DisbursementStatic.DisbursementType.CHECK)) {
+                                                    poController.CheckPayments().getModel().setPayeeID("");
+                                                    tfPayeeName.setText("");
+                                                }
+                                                poController.Master().setSupplierClientID("");
+                                                poController.Master().setPayeeID("");
+                                                tfSupplier.setText("");
+                                                psSupplierPayeeId = "";
+                                                loadTableDetail.reload();
+                                            } else {
+                                                loadRecordMaster();
                                                 return;
                                             }
+                                        } else {
+                                            loadRecordMaster();
+                                            return;
                                         }
                                     }
                                 }
                             }
-                            if (poController.Master().getDisbursementType().equals(DisbursementStatic.DisbursementType.CHECK)) {
-                                poController.CheckPayments().getModel().setPayeeID("");
-                                tfPayeeName.setText("");
-                            }
                             poController.Master().setSupplierClientID("");
-                            poController.Master().setPayeeID("");
-                            tfSupplier.setText("");
-                            psSupplierPayeeId = "";
-
-                            loadTableMain.reload();
                         }
                         break;
                 }
@@ -1131,8 +1146,9 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                         }
                         break;
                     case "tfAuthorizedPerson":
-                        if (lsValue.isEmpty()) {
-                            poController.CheckPayments().getModel().setAuthorize("");
+                        poJSON = poController.CheckPayments().getModel().setAuthorize(lsValue);
+                        if(!JFXUtil.isJSONSuccess(poJSON)){
+                            ShowMessageFX.Warning(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
                         }
                         break;
                 }
@@ -1314,22 +1330,52 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
 
                             //apMasterDV1
                             case "tfSupplier":
-                                if (!isExchangingSupplier()) {
-                                    return;
-                                }
-                                poJSON = poController.SearchSupplier(lsValue.replace(" ", ""), false);
-                                if ("error".equals((String) poJSON.get("result"))) {
-                                    ShowMessageFX.Warning((String) poJSON.get("message"), pxeModuleName, null);
-                                    if (!poController.Master().getPayeeID().isEmpty()) {
-                                        tfSupplier.setText(poController.Master().Payee().Client().getCompanyName() != null ? poController.Master().Payee().Client().getCompanyName() : "");
+                                if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
+                                    if (poController.getDetailCount() > 1) {
+                                        pbKeyPressed = true;
+                                        if (ShowMessageFX.YesNo(null, pxeModuleName,
+                                                "Are you sure you want to change the supplier name?\nPlease note that doing so will delete all purchase order receiving details.\n\nDo you wish to proceed?") == true) {
+                                            removeDVDetails();
+                                            loadTableDetail.reload();
+                                        } else {
+                                            return;
+                                        }
+                                        pbKeyPressed = false;
                                     }
-                                    return;
+                                }
+
+                                poJSON = poController.SearchSupplier(lsValue, false);
+                                if ("error".equals(poJSON.get("result"))) {
+                                    ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                                    tfSupplier.setText("");
+//                                    psSupplierId = "";
+                                    break;
                                 }
                                 psSupplierPayeeId = poController.Master().getSupplierClientID();
-                                tfSupplier.setText(poController.Master().Payee().Client().getCompanyName() != null ? poController.Master().Payee().Client().getCompanyName() : "");
-                                if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
-                                    tfPayeeName.setText(poController.Master().getDisbursementType().equals(DisbursementStatic.DisbursementType.CHECK) ? (poController.Master().Payee().getPayeeName() != null ? poController.Master().Payee().getPayeeName() : "") : "");
-                                }
+                                loadRecordMaster();
+
+                                JFXUtil.runWithDelay(0.50, () -> {
+                                    loadTableMain.reload();
+                                    if ("error".equals((String) poJSON.get("result"))) {
+                                        if (!(boolean) poJSON.get("continue")) {
+                                            ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                                        }
+                                    }
+                                });
+
+//                                poJSON = poController.SearchSupplier(lsValue.replace(" ", ""), false);
+//                                if ("error".equals((String) poJSON.get("result"))) {
+//                                    ShowMessageFX.Warning((String) poJSON.get("message"), pxeModuleName, null);
+//                                    if (!poController.Master().getPayeeID().isEmpty()) {
+//                                        tfSupplier.setText(poController.Master().Payee().Client().getCompanyName() != null ? poController.Master().Payee().Client().getCompanyName() : "");
+//                                    }
+//                                    return;
+//                                }
+//                                psSupplierPayeeId = poController.Master().getSupplierClientID();
+//                                tfSupplier.setText(poController.Master().Payee().Client().getCompanyName() != null ? poController.Master().Payee().Client().getCompanyName() : "");
+//                                if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
+//                                    tfPayeeName.setText(poController.Master().getDisbursementType().equals(DisbursementStatic.DisbursementType.CHECK) ? (poController.Master().Payee().getPayeeName() != null ? poController.Master().Payee().getPayeeName() : "") : "");
+//                                }
 //                                loadTableMain.reload();
                                 break;
 
@@ -1650,6 +1696,9 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
     private void loadRecordMasterCheck() {
         try {
             tfCheckNo.setText(poController.CheckPayments().getModel().getCheckNo());
+            if (JFXUtil.isObjectEqualTo(poController.CheckPayments().getModel().getCheckNo(), null, "")) {
+                poController.CheckPayments().getModel().setCheckDate(null);
+            }
             dpCheckDate.setValue(poController.CheckPayments().getModel().getCheckDate() != null
                     ? CustomCommonUtil.parseDateStringToLocalDate(SQLUtil.dateFormat(poController.CheckPayments().getModel().getCheckDate(), SQLUtil.FORMAT_SHORT_DATE))
                     : null);
@@ -1663,12 +1712,6 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                             ? (poController.CheckPayments().getModel().Bank_Account_Master().getAccountNo() != null
                             ? poController.CheckPayments().getModel().Bank_Account_Master().getAccountNo() : "") : "");
             chbkPrintByBank.setSelected(poController.Master().getBankPrint().equals(Logical.YES));
-            if (!chbkPrintByBank.isSelected()) {
-                JFXUtil.setDisabled(true, cmbPayeeType, cmbDisbursementMode, cmbClaimantType, tfAuthorizedPerson);
-                clearFilter();
-            } else {
-                JFXUtil.setDisabled(false, cmbPayeeType, cmbDisbursementMode, cmbClaimantType, tfAuthorizedPerson);
-            }
 
             tfPayeeName.setText(poController.Master().Payee().getPayeeName() != null ? poController.Master().Payee().getPayeeName() : "");
             cmbPayeeType.getSelectionModel().select(!poController.CheckPayments().getModel().getPayeeType().equals("") ? Integer.valueOf(poController.CheckPayments().getModel().getPayeeType()) : -1);
@@ -1676,6 +1719,27 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
             cmbClaimantType.getSelectionModel().select(!poController.CheckPayments().getModel().getClaimant().equals("") ? Integer.valueOf(poController.CheckPayments().getModel().getClaimant()) : -1);
             tfAuthorizedPerson.setText(poController.CheckPayments().getModel().getAuthorize() != null ? poController.CheckPayments().getModel().getAuthorize() : "");
             cmbCheckStatus.getSelectionModel().select(!poController.CheckPayments().getModel().getTransactionStatus().equals("") ? Integer.valueOf(poController.CheckPayments().getModel().getTransactionStatus()) : -1);
+
+            if (poController.Master().getBankPrint().equals(Logical.YES)) {
+                JFXUtil.setDisabled(false, cmbPayeeType, cmbDisbursementMode);
+            } else {
+                JFXUtil.setDisabled(true, cmbPayeeType, cmbDisbursementMode);
+            }
+
+            if (poController.Master().getBankPrint().equals(Logical.YES)
+                    && poController.CheckPayments().getModel().getDesbursementMode().equals("1")) {
+                JFXUtil.setDisabled(false, cmbClaimantType);
+            } else {
+                JFXUtil.setDisabled(true, cmbClaimantType);
+            }
+
+            if (poController.Master().getBankPrint().equals(Logical.YES)
+                    && poController.CheckPayments().getModel().getDesbursementMode().equals("1")
+                    && poController.CheckPayments().getModel().getClaimant().equals("0")) {
+                JFXUtil.setDisabled(false, tfAuthorizedPerson);
+            } else {
+                JFXUtil.setDisabled(true, tfAuthorizedPerson);
+            }
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
         }
@@ -1760,76 +1824,69 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                             ShowMessageFX.Warning(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
                         }
                         loadRecordMaster();
-                        initFields(pnEditMode);
+                        initMasterDVTab(pnEditMode);
                         break;
                     case "cmbPayeeType":
                         poJSON = poController.CheckPayments().getModel().setPayeeType(String.valueOf(selectedIndex));
                         if (!JFXUtil.isJSONSuccess(poJSON)) {
                             ShowMessageFX.Warning(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
                         }
-                        initFields(pnEditMode);
+                        initMasterDVTab(pnEditMode);
                         break;
                     case "cmbDisbursementMode":
                         if (poController.CheckPayments().getModel().getDesbursementMode().equals("1")
                         && poController.CheckPayments().getModel().getClaimant().equals("0")
                         && !tfAuthorizedPerson.getText().isEmpty()) {
-                            if (ShowMessageFX.YesNo("You have Claimant Type & Authorized Person are not empty, \n"
+                            if (ShowMessageFX.YesNo("Claimant Type & Authorized Person is not empty, \n"
                                     + "Are you sure you want to change Disbursement Type?", pxeModuleName, null)) {
                                 poController.CheckPayments().getModel().setClaimant("");
                                 poController.CheckPayments().getModel().setAuthorize("");
-                                cmbClaimantType.setValue(null);
+                                initMasterDVTab(pnEditMode);
+                                loadRecordMasterCheck();
+                                return;
                             } else {
-                                Platform.runLater(() -> {
-//                                    cmbDisbursementMode.getSelectionModel().select(!poController.CheckPayments().getModel().getDesbursementMode().equals("") ? Integer.valueOf(poController.CheckPayments().getModel().getDesbursementMode()) : -1);
-                                    cmbClaimantType.getSelectionModel().select(!poController.CheckPayments().getModel().getClaimant().equals("") ? Integer.valueOf(poController.CheckPayments().getModel().getClaimant()) : -1);
-//                                    tfAuthorizedPerson.setText(poController.CheckPayments().getModel().getAuthorize());
-                                    loadRecordMasterCheck();
-                                });
+                                initMasterDVTab(pnEditMode);
+                                loadRecordMasterCheck();
                                 return;
                             }
                         } else if (poController.CheckPayments().getModel().getDesbursementMode().equals("1")
                         && poController.CheckPayments().getModel().getClaimant().equals("0")) {
-                            if (ShowMessageFX.YesNo("You have Claimant Type is not empty, \n"
+                            if (ShowMessageFX.YesNo("Claimant Type is not empty, \n"
                                     + "Are you sure you want to change Disbursement Type?", pxeModuleName, null)) {
                                 poController.CheckPayments().getModel().setClaimant("");
-                                cmbClaimantType.setValue(null);
                             } else {
-                                Platform.runLater(() -> {
-                                    cmbDisbursementMode.getSelectionModel().select(!poController.CheckPayments().getModel().getDesbursementMode().equals("") ? Integer.valueOf(poController.CheckPayments().getModel().getDesbursementMode()) : -1);
-                                    cmbClaimantType.getSelectionModel().select(!poController.CheckPayments().getModel().getClaimant().equals("") ? Integer.valueOf(poController.CheckPayments().getModel().getClaimant()) : -1);
-                                });
+                                initMasterDVTab(pnEditMode);
+                                loadRecordMasterCheck();
                                 return;
                             }
-
                         }
                         poJSON = poController.CheckPayments().getModel().setDesbursementMode(String.valueOf(selectedIndex));
                         if (!JFXUtil.isJSONSuccess(poJSON)) {
                             ShowMessageFX.Warning(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
                         }
-                        initFields(pnEditMode);
+                        initMasterDVTab(pnEditMode);
                         loadRecordMasterCheck();
                         break;
                     case "cmbClaimantType":
                         if (poController.CheckPayments().getModel().getClaimant().equals("0") && !tfAuthorizedPerson.getText().isEmpty()) {
-                            if (ShowMessageFX.YesNo("You have Authorized Person is not Empty, \n"
+                            if (ShowMessageFX.YesNo("Authorized Person is not Empty, \n"
                                     + "Are you sure you want to change Claimant Type?", pxeModuleName, null)) {
-
                                 poController.CheckPayments().getModel().setAuthorize("");
-                                tfAuthorizedPerson.setText("");
+                                initMasterDVTab(pnEditMode);
+                                loadRecordMasterCheck();
+                                return;
                             } else {
-                                // Temporarily remove the listener
-                                cmbClaimantType.setOnAction(null);
-                                Platform.runLater(() -> {
-                                    cmbClaimantType.getSelectionModel().select(!poController.CheckPayments().getModel().getClaimant().equals("") ? Integer.valueOf(poController.CheckPayments().getModel().getClaimant()) : -1);
-                                    tfAuthorizedPerson.setText(poController.CheckPayments().getModel().getAuthorize());
-                                    cmbClaimantType.setOnAction(claimantTypeHandler);
-                                });
+                                initMasterDVTab(pnEditMode);
+                                loadRecordMasterCheck();
                                 return;
                             }
                         }
-
-                        poController.CheckPayments().getModel().setClaimant(String.valueOf(cmbClaimantType.getSelectionModel().getSelectedIndex()));
-                        initFields(pnEditMode);
+                        poJSON = poController.CheckPayments().getModel().setClaimant(String.valueOf(cmbClaimantType.getSelectionModel().getSelectedIndex()));
+                        if (!JFXUtil.isJSONSuccess(poJSON)) {
+                            ShowMessageFX.Warning(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
+                        }
+                        initMasterDVTab(pnEditMode);
+                        loadRecordMasterCheck();
                         break;
                     case "cmbOtherPayment":
                         if ((pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) && cmbOtherPayment.getSelectionModel().getSelectedIndex() >= 0) {
@@ -1978,11 +2035,34 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
             CheckBox checkedBox = (CheckBox) source;
             switch (checkedBox.getId()) {
                 case "chbkPrintByBank": // this is the id
+                    //get old and new value
+                    String oldValue = poController.Master().getBankPrint();
+                    if (oldValue.equals("1")) {
+                        if (poController.Master().getBankPrint().equals(Logical.YES)) {
+                            if (!JFXUtil.isObjectEqualTo(poController.CheckPayments().getModel().getPayeeType(), null, "")
+                                    || !JFXUtil.isObjectEqualTo(poController.CheckPayments().getModel().getDesbursementMode(), null, "")
+                                    || !JFXUtil.isObjectEqualTo(poController.CheckPayments().getModel().getClaimant(), null, "")
+                                    || !JFXUtil.isObjectEqualTo(poController.CheckPayments().getModel().getAuthorize(), null, "")) {
+                                //asks if should proceed
+                                if (ShowMessageFX.YesNo("Modes are not empty, changing will set to null value, proceed?", pxeModuleName, null)) {
+                                    poController.CheckPayments().getModel().setPayeeType("");
+                                    poController.CheckPayments().getModel().setDesbursementMode("");
+                                    poController.CheckPayments().getModel().setClaimant("");
+                                    poController.CheckPayments().getModel().setAuthorize(null);
+                                } else {
+                                    initMasterDVTab(pnEditMode);
+                                    loadRecordMasterCheck();
+                                    return;
+                                }
+                            }
+                        }
+                    }
+
                     poJSON = poController.Master().setBankPrint(checkedBox.isSelected() == true ? "1" : "0");
                     if (!JFXUtil.isJSONSuccess(poJSON)) {
                         ShowMessageFX.Warning(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
                     }
-                    initFields(pnEditMode);
+                    initMasterDVTab(pnEditMode);
                     loadRecordMasterCheck();
                     break;
                 case "chbkIsCrossCheck": // this is the id
@@ -2024,7 +2104,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
     }
 
     //disables enables tabs
-    private void initFields(int fnEditMode) {
+    private void initMasterDVTab(int fnEditMode) {
         boolean lbShow = (fnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE);
         JFXUtil.setDisabled(!lbShow, apDVMaster1, apDVMaster2, apDVMaster3, apJournalMaster);
         JFXUtil.setDisabled(true, apDVDetail, apJournalDetails, apMasterDVCheck, apMasterDVOp, apMasterDVBTransfer, tfAuthorizedPerson);
@@ -2035,13 +2115,6 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                 tabCheck.setDisable(!lbShow);
                 apMasterDVOp.setDisable(!lbShow);
                 CustomCommonUtil.switchToTab(tabCheck, tabPanePaymentMode);
-
-                boolean isDisbursementModeSelected = cmbDisbursementMode.getSelectionModel().getSelectedIndex() >= 0;
-                boolean isClaimantTypeSelected = cmbClaimantType.getSelectionModel().getSelectedIndex() == 0;
-
-                if (isDisbursementModeSelected && isClaimantTypeSelected) {
-                    tfAuthorizedPerson.setDisable(!lbShow);
-                }
                 break;
             case DisbursementStatic.DisbursementType.WIRED:
                 tabBankTransfer.setDisable(!lbShow);
@@ -2077,6 +2150,46 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
         if (fnEditMode != EditMode.UPDATE) {
             tfSupplier.setDisable(!lbShow);
         }
+    }
+
+    private boolean removeDVDetails() {
+        poJSON = new JSONObject();
+        if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
+            // Check if the first detail has a non-empty source number
+            boolean hasSourceNo = false;
+            if (poController.getDetailCount() >= 1) {
+                String sourceNo = poController.Detail(0).getSourceNo();
+                hasSourceNo = sourceNo != null && !sourceNo.isEmpty();
+            }
+
+            if (!hasSourceNo) {
+                return true;
+            }
+            try {
+                int detailCountDV = poController.getDetailCount();
+                for (int lnCtr = detailCountDV - 1; lnCtr >= 0; lnCtr--) {
+                    if (poController.Detail(lnCtr).getSourceNo().isEmpty() && poController.Detail(lnCtr).getAmount() == 0.0000) {
+                        continue; // Skip deleting this row
+                    }
+                    poController.Detail().remove(lnCtr);
+                }
+                chbkVatClassification.setSelected(false);
+                int detailCountJE = poController.Journal().getDetailCount();
+                if (poController.Journal().Master().getTransactionNo() != null) {
+                    for (int lnCtr = detailCountJE - 1; lnCtr >= 0; lnCtr--) {
+                        if (poController.Journal().Detail(lnCtr).getAccountCode() == null) {
+                            continue;
+                        }
+                        poController.Journal().Detail().remove(lnCtr);
+                    }
+                    loadTableDetailJE.reload();
+                }
+            } catch (SQLException | GuanzonException ex) {
+                Logger.getLogger(getClass()
+                        .getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        return true;
     }
 
     private boolean isExchangingSupplier() {
@@ -2245,15 +2358,9 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
         }
     }
 
-    private void clearFilter() {
-        poController.CheckPayments().getModel().setAuthorize(null);
-        tfAuthorizedPerson.clear();
-        JFXUtil.setValueToNull(null, cmbPayeeType, cmbDisbursementMode, cmbClaimantType);
-    }
-
     private void clearFields() {
         JFXUtil.setValueToNull(previousSearchedTextField, lastFocusedTextField);
         CustomCommonUtil.setText("", tfDVTransactionNo, tfVoucherNo);
-        JFXUtil.clearTextFields(apDVDetail, apDVMaster2, apDVMaster3, apMasterDVCheck, apMasterDVBTransfer, apMasterDVOp, apJournalMaster, apJournalDetails);
+        JFXUtil.clearTextFields(apDVMaster1, apDVDetail, apDVMaster2, apDVMaster3, apMasterDVCheck, apMasterDVBTransfer, apMasterDVOp, apJournalMaster, apJournalDetails);
     }
 }

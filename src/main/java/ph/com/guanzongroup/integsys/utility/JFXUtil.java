@@ -861,7 +861,7 @@ public class JFXUtil {
                 EventHandler<ActionEvent> savedHandler = combo.getOnAction(); // save
 
                 combo.setOnAction(null);
-                combo.getSelectionModel().select(0);
+                combo.getSelectionModel().select(null);
                 combo.setOnAction(savedHandler);
             } else if (node instanceof Parent) {
                 clearTextInputsRecursive((Parent) node);
