@@ -75,7 +75,7 @@ import ph.com.guanzongroup.cas.cashflow.status.DisbursementStatic;
 /**
  * FXML Controller class
  *
- * @author Team 1 & Team 2  
+ * @author Team 1 & Team 2
  */
 public class DisbursementVoucher_EntryController implements Initializable, ScreenInterface {
 
@@ -215,7 +215,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
             initButton(pnEditMode);
             pagination.setPageCount(1);
             JFXUtil.initKeyClickObject(AnchorMain, lastFocusedTextField, previousSearchedTextField); // for btnSearch Reference
-            
+
             Platform.runLater(() -> {
                 poController.Master().setIndustryID(psIndustryId);
                 poController.Master().setCompanyID(psCompanyId);
@@ -658,6 +658,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                         ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                         return;
                     }
+                    pnEditMode = poController.getEditMode();
                     loadTableDetail.reload();
                     moveNext(false, false);
 

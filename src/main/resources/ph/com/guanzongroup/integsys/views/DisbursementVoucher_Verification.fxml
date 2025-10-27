@@ -267,14 +267,14 @@
                                                                                                                                                         <TextField fx:id="tfCheckNo" disable="true" editable="false" maxWidth="150.0" GridPane.columnIndex="2" GridPane.rowIndex="3" />
                                                                                                                                                         <DatePicker fx:id="dpCheckDate" maxWidth="150.0" GridPane.columnIndex="2" GridPane.rowIndex="4" />
                                                                                                                                                         <TextField fx:id="tfCheckAmount" alignment="CENTER_RIGHT" disable="true" editable="false" maxWidth="150.0" promptText="0.00" GridPane.columnIndex="2" GridPane.rowIndex="5" />
-                                                                                                                                                        <CheckBox fx:id="chbkPrintByBank" mnemonicParsing="false" GridPane.columnIndex="2" GridPane.rowIndex="6" />
+                                                                                                                                                        <CheckBox fx:id="chbkPrintByBank" mnemonicParsing="false" onAction="#cmdCheckBox_Click" GridPane.columnIndex="2" GridPane.rowIndex="6" />
                                                                                                                                                         <Label text="Disburse. Mode" GridPane.columnIndex="4" GridPane.rowIndex="1" />
                                                                                                                                                         <Label text="Claimant Type" GridPane.columnIndex="4" GridPane.rowIndex="2" />
                                                                                                                                                         <Label text="Auth. Person Name" GridPane.columnIndex="4" GridPane.rowIndex="3" />
                                                                                                                                                         <Label text="Crosscheck" GridPane.columnIndex="4" GridPane.rowIndex="4" />
                                                                                                                                                         <Label text="Payees Acc. only" GridPane.columnIndex="4" GridPane.rowIndex="5" />
-                                                                                                                                                        <CheckBox fx:id="chbkIsCrossCheck" mnemonicParsing="false" GridPane.columnIndex="6" GridPane.rowIndex="4" />
-                                                                                                                                                        <CheckBox fx:id="chbkIsPersonOnly" mnemonicParsing="false" GridPane.columnIndex="6" GridPane.rowIndex="5" />
+                                                                                                                                                        <CheckBox fx:id="chbkIsCrossCheck" mnemonicParsing="false" onAction="#cmdCheckBox_Click" GridPane.columnIndex="6" GridPane.rowIndex="4" />
+                                                                                                                                                        <CheckBox fx:id="chbkIsPersonOnly" mnemonicParsing="false" onAction="#cmdCheckBox_Click" GridPane.columnIndex="6" GridPane.rowIndex="5" />
                                                                                                                                                         <Label text="Bank Name" />
                                                                                                                                                         <TextField fx:id="tfBankNameCheck" maxWidth="1.7976931348623157E308" promptText="Press F3: Search" GridPane.columnIndex="2" />
                                                                                                                                                         <TextField fx:id="tfBankAccountCheck" promptText="Press F3: Search" GridPane.columnIndex="2" GridPane.rowIndex="1" />
@@ -552,7 +552,7 @@
                                                                               <Font name="System Bold" size="14.0" />
                                                                            </font>
                                                                         </TextField>
-                                                                        <CheckBox fx:id="chbkVatClassification" disable="true" mnemonicParsing="false" GridPane.columnIndex="4" GridPane.rowIndex="2" />
+                                                                        <CheckBox fx:id="chbkVatClassification" disable="true" mnemonicParsing="false" onAction="#cmdCheckBox_Click" GridPane.columnIndex="4" GridPane.rowIndex="2" />
                                                                         <Label text="Less: Adv. Paym." visible="false" GridPane.columnIndex="6" GridPane.rowIndex="6">
                                                                            <GridPane.margin>
                                                                               <Insets right="5.0" />
@@ -776,7 +776,7 @@
                                                     <rowConstraints>
                                                         <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" vgrow="SOMETIMES" />
                                                         <RowConstraints maxHeight="1.7976931348623157E308" prefHeight="30.0" vgrow="ALWAYS" />
-                                                        <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="40.0" vgrow="SOMETIMES" />
+                                                        <RowConstraints vgrow="SOMETIMES" />
                                                     </rowConstraints>
                                                     <children>
                                                         <AnchorPane minHeight="-Infinity" prefHeight="28.0" prefWidth="402.0" style="-fx-background-color: FF8201;">
@@ -791,7 +791,7 @@
                                                                 <Insets left="5.0" right="5.0" top="5.0" />
                                                             </GridPane.margin>
                                                         </AnchorPane>
-                                                        <TableView fx:id="tblVwDisbursementVoucher" minWidth="242.0" GridPane.rowIndex="1">
+                                                        <TableView fx:id="tblViewMainList" minWidth="242.0" GridPane.rowIndex="1">
                                                             <columns>
                                                                 <TableColumn fx:id="tblRowNo" maxWidth="30.0" minWidth="30.0" prefWidth="30.0" resizable="false" sortable="false" text="No." />
                                                                 <TableColumn fx:id="tblSupplier" maxWidth="236.0" minWidth="236.0" prefWidth="236.0" resizable="false" sortable="false" text="Supplier" />
@@ -803,10 +803,13 @@
                                                                 <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                                                             </GridPane.margin>
                                                         </TableView>
-                                                        <Pagination fx:id="pagination" maxPageIndicatorCount="0" prefHeight="200.0" prefWidth="200.0" GridPane.rowIndex="2">
+                                                        <Pagination fx:id="pagination" maxPageIndicatorCount="0" GridPane.rowIndex="2">
                                                             <GridPane.margin>
                                                                 <Insets />
                                                             </GridPane.margin>
+                                             <padding>
+                                                <Insets bottom="5.0" />
+                                             </padding>
                                                         </Pagination>
                                                     </children>
                                                 </GridPane>

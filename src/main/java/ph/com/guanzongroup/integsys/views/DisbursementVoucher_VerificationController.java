@@ -353,8 +353,6 @@ public class DisbursementVoucher_VerificationController implements Initializable
                                 return;
                             } else {
                                 ShowMessageFX.Information((String) poJSON.get("message"), pxeModuleName, null);
-                                JFXUtil.disableAllHighlightByColor(tblViewMainList, "#A7C7E7", highlightedRowsMain);
-//                                showRetainedHighlight(true);
                             }
                         }
                     }
@@ -393,7 +391,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
                                     } else {
                                         ShowMessageFX.Information((String) poJSON.get("message"), pxeModuleName, null);
                                         JFXUtil.disableAllHighlightByColor(tblViewMainList, "#A7C7E7", highlightedRowsMain);
-//                                        showRetainedHighlight(true);
+                                        JFXUtil.highlightByKey(tblViewMainList, String.valueOf(pnMain + 1), "#C1E1C1", highlightedRowsMain);
                                     }
                                 }
                             } else {
@@ -415,8 +413,8 @@ public class DisbursementVoucher_VerificationController implements Initializable
                         } else {
                             ShowMessageFX.Information((String) poJSON.get("message"), pxeModuleName, null);
                             pnEditMode = poController.getEditMode();
-                            JFXUtil.disableAllHighlightByColor(tblViewMainList, "#C1E1C1", highlightedRowsMain);
-                            JFXUtil.highlightByKey(tblViewMainList, poController.Master().getTransactionNo(), "#FAA0A0", highlightedRowsMain);
+                            JFXUtil.disableAllHighlightByColor(tblViewMainList, "#A7C7E7", highlightedRowsMain);
+                            JFXUtil.highlightByKey(tblViewMainList, String.valueOf(pnMain + 1), "#FAA0A0", highlightedRowsMain);
                         }
                     } else {
                         return;
@@ -435,7 +433,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
                                     ShowMessageFX.Information((String) poJSON.get("message"), pxeModuleName, null);
                                     pnEditMode = poController.getEditMode();
                                     JFXUtil.disableAllHighlightByColor(tblViewMainList, "#A7C7E7", highlightedRowsMain);
-                                    JFXUtil.highlightByKey(tblViewMainList, poController.Master().getTransactionNo(), "#FAA0A0", highlightedRowsMain);
+                                    JFXUtil.highlightByKey(tblViewMainList, String.valueOf(pnMain + 1), "#FAA0A0", highlightedRowsMain);
                                 }
                             } else {
                                 ShowMessageFX.Warning("No journal entry exist, please add journal entry click edit and click tab journal then save before void.", pxeModuleName, null);
@@ -610,6 +608,9 @@ public class DisbursementVoucher_VerificationController implements Initializable
             try {
                 int pnRowMain = Integer.parseInt(selected.getIndex01()) - 1;
                 pnMain = pnRowMain;
+                JFXUtil.disableAllHighlightByColor(tblViewMainList, "#A7C7E7", highlightedRowsMain);
+                JFXUtil.highlightByKey(tblViewMainList, String.valueOf(pnRowMain + 1), "#A7C7E7", highlightedRowsMain);
+
                 String lsTransactionNo = selected.getIndex05();
                 clearTextFields();
                 poJSON = poController.OpenTransaction(lsTransactionNo);
@@ -617,6 +618,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
                     ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                     return;
                 }
+                pnEditMode = poController.getEditMode();
                 Platform.runLater(() -> {
                     loadTableDetail.reload();
                 });
@@ -653,6 +655,9 @@ public class DisbursementVoucher_VerificationController implements Initializable
                                                 CustomCommonUtil.formatDateToShortString(poController.getMaster(lnCtr).getTransactionDate()),
                                                 poController.getMaster(lnCtr).getTransactionNo()
                                         ));
+                                        if (poController.getMaster(lnCtr).getTransactionStatus().equals(DisbursementStatic.VERIFIED)) {
+                                            JFXUtil.highlightByKey(tblViewMainList, String.valueOf(lnCtr + 1), "#C1E1C1", highlightedRowsMain);
+                                        }
                                     }
                                 }
                                 if (pnMain < 0 || pnMain
