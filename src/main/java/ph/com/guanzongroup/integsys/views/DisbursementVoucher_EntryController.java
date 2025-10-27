@@ -213,7 +213,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
             pnEditMode = EditMode.UNKNOWN;
 
             initButton(pnEditMode);
-            pagination.setPageCount(0);
+            pagination.setPageCount(1);
             JFXUtil.initKeyClickObject(AnchorMain, lastFocusedTextField, previousSearchedTextField); // for btnSearch Reference
             
             Platform.runLater(() -> {

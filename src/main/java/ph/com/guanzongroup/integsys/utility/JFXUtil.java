@@ -2515,7 +2515,7 @@ public class JFXUtil {
 
     //private
     private static String getNameByValue(Class<?> clazz, String value) {
-        if ("-1".equals(value) || "".equals(value)) {
+        if ("-1".equals(value) || JFXUtil.isObjectEqualTo(value, null, "")) {
             return "UNKNOWN";
         }
         return buildValueToNameMap(clazz).getOrDefault(value, "UNKNOWN");
@@ -2536,6 +2536,12 @@ public class JFXUtil {
                         // Special handling: if field name is VOID, change to VOIDED
                         if ("VOID".equals(fieldName)) {
                             fieldName = "VOIDED";
+                        }
+                        if ("DIGITAL PAYMENT".equals(fieldName)) {
+                            fieldName = "ONLINE PAYMENT";
+                        }
+                        if ("WIRED".equals(fieldName)) {
+                            fieldName = "BANK TRANSFER";
                         }
                         valueToNameMap.put((String) value, fieldName);
                     }
