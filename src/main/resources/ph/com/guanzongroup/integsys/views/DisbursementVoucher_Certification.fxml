@@ -140,12 +140,12 @@
                                                 <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="40.0" vgrow="SOMETIMES" />
                                             </rowConstraints>
                                             <children>
-                                                <TableView fx:id="tblVwMain" GridPane.rowIndex="1">
+                                                <TableView fx:id="tblViewMainList" GridPane.rowIndex="1">
                                                     <columns>
                                                         <TableColumn fx:id="tblRowNo" maxWidth="30.0" minWidth="30.0" prefWidth="30.0" resizable="false" sortable="false" text="No." />
                                                         <TableColumn fx:id="tblCheckBox" maxWidth="30.0" minWidth="30.0" prefWidth="30.0" resizable="false" sortable="false">
                                                             <graphic>
-                                                                <CheckBox fx:id="chckSelectAll" mnemonicParsing="false" />
+                                                                <CheckBox fx:id="chckSelectAll" mnemonicParsing="false" onAction="#cmdCheckBox_Click" />
                                                             </graphic>
                                                         </TableColumn>
                                                         <TableColumn fx:id="tblDVNo" maxWidth="150.0" minWidth="150.0" prefWidth="150.0" resizable="false" sortable="false" text="DV No" />
