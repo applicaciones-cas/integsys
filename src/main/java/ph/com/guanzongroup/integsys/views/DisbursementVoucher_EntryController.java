@@ -204,9 +204,9 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
             initTextFields();
             initComboBoxes();
             initDatePicker();
-            initTableDetailDV();
-            initTableMain();
-            initTableDetailJE();
+            initDetailGrid();
+            initMainGrid();
+            initDetailJEGrid();
             initTableOnClick();
             initTabPane();
             clearTextFields();
@@ -911,7 +911,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                 });
     }
 
-    private void initTableMain() {
+    private void initMainGrid() {
         JFXUtil.setColumnCenter(tblRowNo, tblDueDate, tblRefNo);
         JFXUtil.setColumnLeft(tblTransactionType, tblBranchName);
         JFXUtil.setColumnRight(tblAmountMain);
@@ -921,7 +921,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
         tblViewMainList.setItems(filteredMain_Data);
     }
 
-    private void initTableDetailDV() {
+    private void initDetailGrid() {
         tblAccountCode.setVisible(false);
         JFXUtil.setColumnCenter(tblDVRowNo, tblReferenceNo);
         JFXUtil.setColumnLeft(tblAccountCode, tblTransactionTypeDetail, tblParticulars, tblVatableSales, tblVatAmt, tblVatRate, tblVatZeroRatedSales, tblVatExemptSales, tblTaxCode);
@@ -935,7 +935,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
         tblVwDetails.autosize();
     }
 
-    private void initTableDetailJE() {
+    private void initDetailJEGrid() {
         JFXUtil.setColumnCenter(tblJournalRowNo, tblJournalReportMonthYear);
         JFXUtil.setColumnLeft(tblJournalAccountCode, tblJournalAccountDescription);
         JFXUtil.setColumnRight(tblJournalDebitAmount, tblJournalCreditAmount);
@@ -2162,7 +2162,6 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
 
     private void clearTextFields() {
         JFXUtil.setValueToNull(previousSearchedTextField, lastFocusedTextField);
-        CustomCommonUtil.setText("", tfDVTransactionNo, tfVoucherNo);
         JFXUtil.clearTextFields(apDVMaster1, apDVDetail, apDVMaster2, apDVMaster3, apMasterDVCheck, apMasterDVBTransfer, apMasterDVOp, apJournalMaster, apJournalDetails);
     }
 }

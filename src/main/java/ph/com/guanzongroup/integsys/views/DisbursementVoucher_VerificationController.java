@@ -203,9 +203,9 @@ public class DisbursementVoucher_VerificationController implements Initializable
             initTextFields();
             initComboBoxes();
             initDatePicker();
-            initTableDetailDV();
-            initTableMain();
-            initTableDetailJE();
+            initDetailGrid();
+            initMainGrid();
+            initDetailJEGrid();
             initTableOnClick();
             initTabPane();
             clearTextFields();
@@ -628,7 +628,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
             } catch (CloneNotSupportedException | SQLException | ScriptException | GuanzonException ex) {
                 Logger.getLogger(getClass()
                         .getName()).log(Level.SEVERE, null, ex);
-            } 
+            }
         }
 
     }
@@ -643,21 +643,27 @@ public class DisbursementVoucher_VerificationController implements Initializable
                         Platform.runLater(() -> {
                             try {
                                 main_data.clear();
+                                JFXUtil.disableAllHighlight(tblViewMainList, highlightedRowsMain);
                                 poJSON = poController.loadTransactionList(psSearchSupplierID, psSearchTransactionNo, "", false);
+                                int lnRowNo = 0;
                                 if (poController.getMasterList().size() > 0) {
                                     for (int lnCtr = 0; lnCtr <= poController.getMasterList().size() - 1; lnCtr++) {
                                         String lsPaymentForm = "";
+                                        //Retrieve Open or Returned DV transactions only
+                                        if (!JFXUtil.isObjectEqualTo(poController.getMaster(lnCtr).getTransactionStatus(), DisbursementStatic.OPEN, DisbursementStatic.RETURNED)) {
+                                            continue;
+                                        }
                                         lsPaymentForm = JFXUtil.setStatusValue(null, DisbursementStatic.DisbursementType.class, poController.getMaster(lnCtr).getDisbursementType());
-
+                                        lnRowNo += 1;
                                         main_data.add(new ModelDisbursementVoucher_Main(
-                                                String.valueOf(lnCtr + 1),
+                                                String.valueOf(lnRowNo),
                                                 poController.getMaster(lnCtr).Payee().getPayeeName(),
                                                 lsPaymentForm,
                                                 CustomCommonUtil.formatDateToShortString(poController.getMaster(lnCtr).getTransactionDate()),
                                                 poController.getMaster(lnCtr).getTransactionNo()
                                         ));
-                                        if (poController.getMaster(lnCtr).getTransactionStatus().equals(DisbursementStatic.VERIFIED)) {
-                                            JFXUtil.highlightByKey(tblViewMainList, String.valueOf(lnCtr + 1), "#C1E1C1", highlightedRowsMain);
+                                        if (poController.getMaster(lnCtr).getTransactionStatus().equals(DisbursementStatic.RETURNED)) {
+                                            JFXUtil.highlightByKey(tblViewMainList, String.valueOf(lnRowNo), "#FAA0A0", highlightedRowsMain);
                                         }
                                     }
                                 }
@@ -862,7 +868,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
                 });
     }
 
-    private void initTableMain() {
+    private void initMainGrid() {
         JFXUtil.setColumnCenter(tblRowNo, tblTransDate, tblReferNo);
         JFXUtil.setColumnLeft(tblSupplier, tblPaymentForm);
         JFXUtil.setColumnsIndexAndDisableReordering(tblViewMainList);
@@ -871,11 +877,11 @@ public class DisbursementVoucher_VerificationController implements Initializable
         tblViewMainList.setItems(filteredMain_Data);
     }
 
-    private void initTableDetailDV() {
+    private void initDetailGrid() {
         tblAccountCode.setVisible(false);
         JFXUtil.setColumnCenter(tblDVRowNo, tblReferenceNo);
-        JFXUtil.setColumnLeft(tblAccountCode, tblTransactionTypeDetail, tblParticulars, tblVatableSales, tblVatAmt, tblVatRate, tblVatZeroRatedSales, tblVatExemptSales, tblTaxCode);
-        JFXUtil.setColumnRight(tblPurchasedAmount, tblTaxAmount, tblNetAmount);
+        JFXUtil.setColumnLeft(tblAccountCode, tblTransactionTypeDetail, tblParticulars,  tblTaxCode);
+        JFXUtil.setColumnRight(tblVatableSales,tblVatAmt, tblVatRate, tblVatZeroRatedSales, tblVatExemptSales, tblPurchasedAmount, tblTaxAmount, tblNetAmount);
         JFXUtil.setColumnsIndexAndDisableReordering(tblVwDetails);
         filteredDataDetailDV = new FilteredList<>(details_data, b -> true);
 
@@ -885,7 +891,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
         tblVwDetails.autosize();
     }
 
-    private void initTableDetailJE() {
+    private void initDetailJEGrid() {
         JFXUtil.setColumnCenter(tblJournalRowNo, tblJournalReportMonthYear);
         JFXUtil.setColumnLeft(tblJournalAccountCode, tblJournalAccountDescription);
         JFXUtil.setColumnRight(tblJournalDebitAmount, tblJournalCreditAmount);
@@ -2072,7 +2078,6 @@ public class DisbursementVoucher_VerificationController implements Initializable
 
         JFXUtil.setDisabled(!lbShow, apDVMaster1, apDVMaster2, apDVMaster3, apDVDetail,
                 apMasterDVCheck, apMasterDVBTransfer, apMasterDVOp, apJournalMaster, apJournalDetails);
-        //if not ready then invisible verify dvcancel
 
         if (fnEditMode == EditMode.READY) {
             switch (poController.Master().getTransactionStatus()) {
@@ -2081,6 +2086,9 @@ public class DisbursementVoucher_VerificationController implements Initializable
                     break;
                 case DisbursementStatic.VERIFIED:
                     JFXUtil.setButtonsVisibility(true, btnUpdate);
+                    break;
+                case DisbursementStatic.RETURNED:
+                    JFXUtil.setButtonsVisibility(false, btnVerify, btnDVCancel);
                     break;
             }
         }
