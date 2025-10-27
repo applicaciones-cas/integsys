@@ -75,7 +75,7 @@ import ph.com.guanzongroup.cas.cashflow.status.DisbursementStatic;
 /**
  * FXML Controller class
  *
- * @author User
+ * @author Team 1 & Team 2  
  */
 public class DisbursementVoucher_EntryController implements Initializable, ScreenInterface {
 
@@ -199,7 +199,23 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
             if (!"success".equals((String) poJSON.get("result"))) {
                 ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
             }
-            initAll();
+            initLoadTable();
+            initButtonsClickActions();
+            initTextFields();
+            initComboBoxes();
+            initDatePicker();
+            initTableDetailDV();
+            initTableMain();
+            initTableDetailJE();
+            initTableOnClick();
+            initTabPane();
+            clearTextFields();
+            pnEditMode = EditMode.UNKNOWN;
+
+            initButton(pnEditMode);
+            pagination.setPageCount(0);
+            JFXUtil.initKeyClickObject(AnchorMain, lastFocusedTextField, previousSearchedTextField); // for btnSearch Reference
+            
             Platform.runLater(() -> {
                 poController.Master().setIndustryID(psIndustryId);
                 poController.Master().setCompanyID(psCompanyId);
@@ -218,25 +234,6 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
         }
-    }
-
-    private void initAll() {
-        initLoadTable();
-        initButtonsClickActions();
-        initTextFields();
-        initComboBoxes();
-        initDatePicker();
-        initTableDetailDV();
-        initTableMain();
-        initTableDetailJE();
-        initTableOnClick();
-        initTabPane();
-        clearTextFields();
-        pnEditMode = EditMode.UNKNOWN;
-
-        initButton(pnEditMode);
-        pagination.setPageCount(0);
-        JFXUtil.initKeyClickObject(AnchorMain, lastFocusedTextField, previousSearchedTextField); // for btnSearch Reference
     }
 
     public void initTabPane() {
@@ -2072,26 +2069,21 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
         if (source instanceof CheckBox) {
             CheckBox checkedBox = (CheckBox) source;
             switch (checkedBox.getId()) {
-                case "chbkPrintByBank": // this is the id
-                    //get old and new value
-                    String oldValue = poController.Master().getBankPrint();
-                    if (oldValue.equals("1")) {
-                        if (poController.Master().getBankPrint().equals(Logical.YES)) {
-                            if (!JFXUtil.isObjectEqualTo(poController.CheckPayments().getModel().getPayeeType(), null, "")
-                                    || !JFXUtil.isObjectEqualTo(poController.CheckPayments().getModel().getDesbursementMode(), null, "")
-                                    || !JFXUtil.isObjectEqualTo(poController.CheckPayments().getModel().getClaimant(), null, "")
-                                    || !JFXUtil.isObjectEqualTo(poController.CheckPayments().getModel().getAuthorize(), null, "")) {
-                                //asks if should proceed
-                                if (ShowMessageFX.YesNo(null, pxeModuleName, "Modes are not empty, changing will reset other check information fields, proceed?")) {
-                                    poController.CheckPayments().getModel().setPayeeType("");
-                                    poController.CheckPayments().getModel().setDesbursementMode("");
-                                    poController.CheckPayments().getModel().setClaimant("");
-                                    poController.CheckPayments().getModel().setAuthorize(null);
-                                } else {
-
-                                    loadRecordMasterCheck();
-                                    return;
-                                }
+                case "chbkPrintByBank":
+                    if (poController.Master().getBankPrint().equals(Logical.YES)) {
+                        if (!JFXUtil.isObjectEqualTo(poController.CheckPayments().getModel().getPayeeType(), null, "")
+                                || !JFXUtil.isObjectEqualTo(poController.CheckPayments().getModel().getDesbursementMode(), null, "")
+                                || !JFXUtil.isObjectEqualTo(poController.CheckPayments().getModel().getClaimant(), null, "")
+                                || !JFXUtil.isObjectEqualTo(poController.CheckPayments().getModel().getAuthorize(), null, "")) {
+                            //asks if should proceed
+                            if (ShowMessageFX.YesNo(null, pxeModuleName, "Modes are not empty, changing will reset other check information fields, proceed?")) {
+                                poController.CheckPayments().getModel().setPayeeType("");
+                                poController.CheckPayments().getModel().setDesbursementMode("");
+                                poController.CheckPayments().getModel().setClaimant("");
+                                poController.CheckPayments().getModel().setAuthorize(null);
+                            } else {
+                                loadRecordMasterCheck();
+                                return;
                             }
                         }
                     }
@@ -2103,21 +2095,21 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
 
                     loadRecordMasterCheck();
                     break;
-                case "chbkIsCrossCheck": // this is the id
+                case "chbkIsCrossCheck":
                     poJSON = poController.CheckPayments().getModel().isCross(checkedBox.isSelected());
                     if (!JFXUtil.isJSONSuccess(poJSON)) {
                         ShowMessageFX.Warning(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
                     }
                     loadRecordMasterCheck();
                     break;
-                case "chbkIsPersonOnly": // this is the id
+                case "chbkIsPersonOnly":
                     poJSON = poController.CheckPayments().getModel().isPayee(checkedBox.isSelected());
                     if (!JFXUtil.isJSONSuccess(poJSON)) {
                         ShowMessageFX.Warning(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
                     }
                     loadRecordMasterCheck();
                     break;
-                case "chbkVatClassification": // this is the id
+                case "chbkVatClassification":
                     poJSON = poController.Detail(pnDetail).isWithVat(checkedBox.isSelected());
                     if (!JFXUtil.isJSONSuccess(poJSON)) {
                         ShowMessageFX.Warning(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
