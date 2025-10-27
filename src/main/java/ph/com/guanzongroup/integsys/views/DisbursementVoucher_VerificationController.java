@@ -625,10 +625,10 @@ public class DisbursementVoucher_VerificationController implements Initializable
                 });
                 moveNext(false, false);
 
-            } catch (CloneNotSupportedException | SQLException | GuanzonException ex) {
+            } catch (CloneNotSupportedException | SQLException | ScriptException | GuanzonException ex) {
                 Logger.getLogger(getClass()
                         .getName()).log(Level.SEVERE, null, ex);
-            }
+            } 
         }
 
     }
@@ -643,7 +643,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
                         Platform.runLater(() -> {
                             try {
                                 main_data.clear();
-                                poJSON = poController.loadTransactionList(psSearchSupplierID, psSearchTransactionNo);
+                                poJSON = poController.loadTransactionList(psSearchSupplierID, psSearchTransactionNo, "", false);
                                 if (poController.getMasterList().size() > 0) {
                                     for (int lnCtr = 0; lnCtr <= poController.getMasterList().size() - 1; lnCtr++) {
                                         String lsPaymentForm = "";
