@@ -621,6 +621,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
                 pnEditMode = poController.getEditMode();
                 Platform.runLater(() -> {
                     loadTableDetail.reload();
+                    loadTableDetailJE.reload();
                 });
                 moveNext(false, false);
 
@@ -981,7 +982,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
         //apJournalDetails
         JFXUtil.setFocusListener(txtDetailJE_Focus, tfAccountCode, tfAccountDescription, tfDebitAmount, tfCreditAmount);
 
-        JFXUtil.setKeyPressedListener(this::txtField_KeyPressed, apDVMaster1, apMasterDVCheck, apMasterDVBTransfer, apMasterDVOp, apDVDetail, apJournalDetails);
+        JFXUtil.setKeyPressedListener(this::txtField_KeyPressed, apBrowse, apDVMaster1, apMasterDVCheck, apMasterDVBTransfer, apMasterDVOp, apDVDetail, apJournalDetails);
         JFXUtil.inputDecimalOnly(tfVatZeroRatedSales, tfTaxRateDetail, tfVatZeroRatedSalesDetail, tfVatRateDetail);
         JFXUtil.setCommaFormatter(tfCheckAmount, tfPaymentAmountBTransfer, tfPaymentAmount, tfVatAmountMaster, tfTotalNetAmount, tfTotalAmount, tfPurchasedAmountDetail, tfTaxAmountDetail, tfNetAmountDetail, tfVatAmountDetail, tfTotalCreditAmount, tfTotalDebitAmount, tfDebitAmount, tfCreditAmount);
         JFXUtil.setCheckboxHoverCursor(chbkPrintByBank, chbkIsCrossCheck, chbkIsPersonOnly, chbkVatClassification);
@@ -1306,7 +1307,6 @@ public class DisbursementVoucher_VerificationController implements Initializable
                             //apBrowse?
                             case "tfSearchTransaction":
                                 psSearchTransactionNo = tfSearchTransaction.getText();
-                                loadRecordSearch();
                                 loadTableMain.reload();
                                 break;
                             case "tfSearchSupplier":
@@ -1314,39 +1314,12 @@ public class DisbursementVoucher_VerificationController implements Initializable
                                 if ("error".equals((String) poJSON.get("result"))) {
                                     ShowMessageFX.Warning((String) poJSON.get("message"), pxeModuleName, null);
                                     return;
+                                } else {
+                                    psSearchSupplierID = poController.Master().getPayeeID();
+                                    loadRecordSearch();
+                                    loadTableMain.reload();
                                 }
-                                psSearchSupplierID = poController.Master().getPayeeID();
-                                loadRecordSearch();
-                                loadTableMain.reload();
                                 break;
-                            case "tfSearchPayee":
-                                poJSON = poController.SearchPayee(lsValue, false, true);
-                                if ("error".equals((String) poJSON.get("result"))) {
-                                    ShowMessageFX.Warning((String) poJSON.get("message"), pxeModuleName, null);
-                                    return;
-                                }
-                                loadRecordSearch();
-                                loadTableMain.reload();
-                                break;
-                            case "tfSearchBranch":
-                                poJSON = poController.SearchBranch(lsValue, false, true);
-                                if ("error".equals((String) poJSON.get("result"))) {
-                                    ShowMessageFX.Warning((String) poJSON.get("message"), pxeModuleName, null);
-                                    return;
-                                }
-                                loadRecordSearch();
-                                loadTableMain.reload();
-                                break;
-                            case "tfSearchParticular":
-                                poJSON = poController.SearchParticular(lsValue, pnMain, false, true);
-                                if ("error".equals((String) poJSON.get("result"))) {
-                                    ShowMessageFX.Warning((String) poJSON.get("message"), pxeModuleName, null);
-                                    return;
-                                }
-                                loadRecordSearch();
-                                loadTableMain.reload();
-                                break;
-
                             //apMasterDV1
                             case "tfSupplier":
                                 //implement auto reload in similar supplier in tableMain

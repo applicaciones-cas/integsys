@@ -1367,27 +1367,30 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                                 if ("error".equals((String) poJSON.get("result"))) {
                                     ShowMessageFX.Warning((String) poJSON.get("message"), pxeModuleName, null);
                                     return;
+                                } else {
+                                    loadTableMain.reload();
                                 }
                                 loadRecordSearch();
-                                loadTableMain.reload();
                                 break;
                             case "tfSearchBranch":
                                 poJSON = poController.SearchBranch(lsValue, false, true);
                                 if ("error".equals((String) poJSON.get("result"))) {
                                     ShowMessageFX.Warning((String) poJSON.get("message"), pxeModuleName, null);
                                     return;
+                                } else {
+                                    loadTableMain.reload();
                                 }
                                 loadRecordSearch();
-                                loadTableMain.reload();
                                 break;
                             case "tfSearchParticular":
                                 poJSON = poController.SearchParticular(lsValue, pnMain, false, true);
                                 if ("error".equals((String) poJSON.get("result"))) {
                                     ShowMessageFX.Warning((String) poJSON.get("message"), pxeModuleName, null);
                                     return;
+                                } else {
+                                    loadTableMain.reload();
                                 }
                                 loadRecordSearch();
-                                loadTableMain.reload();
                                 break;
 
                             //apMasterDV1
