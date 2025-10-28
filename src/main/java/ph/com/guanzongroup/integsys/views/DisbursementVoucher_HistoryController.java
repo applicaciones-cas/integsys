@@ -84,7 +84,6 @@ public class DisbursementVoucher_HistoryController implements Initializable, Scr
     private String psCategoryId = "";
     private String psSupplierPayeeId = "";
     private String psTransactionType = "";
-    private Double netTotalperDetail = 0.00;
     private String psSearchTransactionNo = "";
 
     private unloadForm poUnload = new unloadForm();
@@ -400,25 +399,8 @@ public class DisbursementVoucher_HistoryController implements Initializable, Scr
                                 }
                             }
 
-                            double lnNetTotal = 0.0000;
                             for (lnCtr = 0; lnCtr < poController.getDetailCount(); lnCtr++) {
                                 try {
-                                    lnNetTotal = poController.Detail(lnCtr).getAmount() - poController.Detail(lnCtr).getTaxAmount();
-                                    String lsTransactionType;
-//                            switch (poController.Detail(lnCtr).getSourceCode()) {
-//                                case DisbursementStatic.SourceCode.PAYMENT_REQUEST:
-//                                    lsTransactionType = DisbursementStatic.SourceCode.PAYMENT_REQUEST;
-//                                    break;
-//                                case DisbursementStatic.SourceCode.ACCOUNTS_PAYABLE:
-//                                    lsTransactionType = DisbursementStatic.SourceCode.ACCOUNTS_PAYABLE;
-//                                    break;
-//                                case DisbursementStatic.SourceCode.CASH_PAYABLE:
-//                                    lsTransactionType = DisbursementStatic.SourceCode.CASH_PAYABLE;
-//                                    break;
-//                                default:
-//                                    lsTransactionType = "";
-//                                    break;
-//                            }
                                     details_data.add(
                                             new ModelDisbursementVoucher_Detail(String.valueOf(lnCtr + 1),
                                                     poController.Detail(lnCtr).getSourceNo(),
@@ -433,7 +415,7 @@ public class DisbursementVoucher_HistoryController implements Initializable, Scr
                                                     CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(lnCtr).getDetailVatExempt(), true),
                                                     poController.Detail(lnCtr).TaxCode().getTaxCode(),
                                                     CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(lnCtr).getTaxAmount(), true),
-                                                    CustomCommonUtil.setIntegerValueToDecimalFormat(lnNetTotal, true)
+                                                    ""
                                             ));
 
                                 } catch (SQLException | GuanzonException ex) {
@@ -775,7 +757,7 @@ public class DisbursementVoucher_HistoryController implements Initializable, Scr
             tfTaxRateDetail.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(pnDetail).getTaxRates(), false));
             tfTaxAmountDetail.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(pnDetail).getTaxAmount(), true));
             tfPurchasedAmountDetail.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(pnDetail).getAmountApplied(), true));
-            tfNetAmountDetail.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(netTotalperDetail, true));
+            tfNetAmountDetail.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.getDetailNetTotal(pnDetail), true));
 
             JFXUtil.updateCaretPositions(apDVDetail);
         } catch (SQLException | GuanzonException ex) {

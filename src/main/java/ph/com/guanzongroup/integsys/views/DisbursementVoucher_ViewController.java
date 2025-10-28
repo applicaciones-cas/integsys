@@ -80,7 +80,6 @@ public class DisbursementVoucher_ViewController implements Initializable, Screen
     private String psCategoryId = "";
     private String psSupplierPayeeId = "";
     private String psTransactionType = "";
-    private Double netTotalperDetail = 0.00;
     private String psSearchSupplierID = "";
     private String psSearchTransactionNo = "";
     private String psTransactionNo = "";
@@ -324,25 +323,8 @@ public class DisbursementVoucher_ViewController implements Initializable, Screen
                                 }
                             }
 
-                            double lnNetTotal = 0.0000;
                             for (lnCtr = 0; lnCtr < poController.getDetailCount(); lnCtr++) {
                                 try {
-                                    lnNetTotal = poController.Detail(lnCtr).getAmount() - poController.Detail(lnCtr).getTaxAmount();
-                                    String lsTransactionType;
-//                            switch (poController.Detail(lnCtr).getSourceCode()) {
-//                                case DisbursementStatic.SourceCode.PAYMENT_REQUEST:
-//                                    lsTransactionType = DisbursementStatic.SourceCode.PAYMENT_REQUEST;
-//                                    break;
-//                                case DisbursementStatic.SourceCode.ACCOUNTS_PAYABLE:
-//                                    lsTransactionType = DisbursementStatic.SourceCode.ACCOUNTS_PAYABLE;
-//                                    break;
-//                                case DisbursementStatic.SourceCode.CASH_PAYABLE:
-//                                    lsTransactionType = DisbursementStatic.SourceCode.CASH_PAYABLE;
-//                                    break;
-//                                default:
-//                                    lsTransactionType = "";
-//                                    break;
-//                            }
                                     details_data.add(
                                             new ModelDisbursementVoucher_Detail(String.valueOf(lnCtr + 1),
                                                     poController.Detail(lnCtr).getSourceNo(),
@@ -357,7 +339,7 @@ public class DisbursementVoucher_ViewController implements Initializable, Screen
                                                     CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(lnCtr).getDetailVatExempt(), true),
                                                     poController.Detail(lnCtr).TaxCode().getTaxCode(),
                                                     CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(lnCtr).getTaxAmount(), true),
-                                                    CustomCommonUtil.setIntegerValueToDecimalFormat(lnNetTotal, true)
+                                                    ""
                                             ));
 
                                 } catch (SQLException | GuanzonException ex) {
@@ -521,8 +503,7 @@ public class DisbursementVoucher_ViewController implements Initializable, Screen
             tfTaxRateDetail.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(pnDetail).getTaxRates(), false));
             tfTaxAmountDetail.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(pnDetail).getTaxAmount(), true));
             tfPurchasedAmountDetail.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(pnDetail).getAmountApplied(), true));
-            tfNetAmountDetail.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(netTotalperDetail, true));
-            
+            tfNetAmountDetail.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.getDetailNetTotal(pnDetail), true));
             JFXUtil.updateCaretPositions(apDVDetail);
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
@@ -633,7 +614,7 @@ public class DisbursementVoucher_ViewController implements Initializable, Screen
 
     private void initButton(int fnEditMode) {
         boolean lbShow = (fnEditMode == EditMode.ADDNEW || fnEditMode == EditMode.UPDATE);
-        JFXUtil.setDisabled(!lbShow, apDVMaster1, apDVMaster2, apDVMaster3, apDVDetail,   apMasterDVCheck, apMasterDVBTransfer, apMasterDVOp);
+        JFXUtil.setDisabled(!lbShow, apDVMaster1, apDVMaster2, apDVMaster3, apDVDetail, apMasterDVCheck, apMasterDVBTransfer, apMasterDVOp);
     }
 
     private void clearTextFields() {
@@ -641,4 +622,3 @@ public class DisbursementVoucher_ViewController implements Initializable, Screen
         JFXUtil.clearTextFields(apDVMaster1, apDVDetail, apDVMaster2, apDVMaster3, apMasterDVCheck, apMasterDVBTransfer, apMasterDVOp);
     }
 }
-
