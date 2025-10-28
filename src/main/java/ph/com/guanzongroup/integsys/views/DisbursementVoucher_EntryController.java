@@ -1120,7 +1120,6 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                                                 }
                                                 poController.Master().setSupplierClientID("");
                                                 poController.Master().setPayeeID("");
-                                                tfSupplier.setText("");
                                                 psSupplierPayeeId = "";
                                                 loadTableDetail.reload();
                                             } else {
@@ -1135,6 +1134,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                                 }
                             }
                             poController.Master().setSupplierClientID("");
+                            poController.Master().setPayeeID("");
                         }
                         break;
                 }
@@ -1189,7 +1189,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                         }
                         break;
                     case "tfPayeeName":
-                        //Similar as the Supplier Name, if deleted; then?
+                        //Similar as the Supplier Name
                         if (lsValue.isEmpty()) {
                             if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
                                 if (!JFXUtil.isObjectEqualTo(poController.Master().getSupplierClientID(), null, "")
@@ -1235,23 +1235,54 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
             (lsID, lsValue) -> {
                 /*Lost Focus*/
                 switch (lsID) {
-                    case "tfSupplierBank":
-                        if (lsValue.isEmpty()) {
-                        }
-                        break;
-                    case "tfSupplierAccountNoBTransfer":
-                        if (lsValue.isEmpty()) {
-
-                        }
-                        break;
                     case "tfBankNameBTransfer":
                         if (lsValue.isEmpty()) {
-
+                            poController.CheckPayments().getModel().setBankID("");
+                            poController.CheckPayments().getModel().setBankAcountID("");
                         }
                         break;
                     case "tfBankAccountBTransfer":
                         if (lsValue.isEmpty()) {
-
+                            poController.CheckPayments().getModel().setBankAcountID("");
+                        }
+                        break;
+                    case "tfSupplierBank":
+                        if (lsValue.isEmpty()) {
+//                            if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
+//                                if (!JFXUtil.isObjectEqualTo(poController.Master().getSupplierClientID(), null, "")
+//                                && !JFXUtil.isObjectEqualTo(poController.Master().getPayeeID(), null, "")) {
+//                                    if (poController.getDetailCount() > 1) {
+//                                        if (!pbKeyPressed) {
+//                                            if (ShowMessageFX.YesNo(null, pxeModuleName,
+//                                                    "Are you sure you want to change the supplier name?\nPlease note that this action will delete all Disbursement voucher details.\n\nDo you wish to proceed?") == true) {
+//                                                poController.removeDetails();
+//                                                if (poController.Master().getDisbursementType().equals(DisbursementStatic.DisbursementType.CHECK)) {
+//                                                    poController.CheckPayments().getModel().setPayeeID("");
+//                                                    loadRecordMasterCheck();
+//                                                }
+//                                                poController.Master().setSupplierClientID("");
+//                                                poController.Master().setPayeeID("");
+//                                                tfSupplier.setText("");
+//                                                psSupplierPayeeId = "";
+//                                                loadTableDetail.reload();
+//                                            } else {
+//                                                loadRecordMaster();
+//                                                return;
+//                                            }
+//                                        } else {
+//                                            loadRecordMaster();
+//                                            return;
+//                                        }
+//                                    }
+//                                }
+//                            }
+//                            poController.Master().setSupplierClientID("");
+                        }
+                        break;
+                    case "tfSupplierAccountNoBTransfer":
+                        poJSON = poController.CheckPayments().getModel().setAuthorize(lsValue);
+                        if (!JFXUtil.isJSONSuccess(poJSON)) {
+                            ShowMessageFX.Warning(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
                         }
                         break;
                 }
@@ -1472,13 +1503,36 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                                 break;
 
                             //apMasterDVBTransfer
-                            case "tfSupplierBank":
-                                break;
-                            case "tfSupplierAccountNoBTransfer":
-                                break;
                             case "tfBankNameBTransfer":
+                                poJSON = poController.SearchBanks(lsValue, false);
+                                if ("error".equals((String) poJSON.get("result"))) {
+                                    ShowMessageFX.Warning((String) poJSON.get("message"), pxeModuleName, null);
+                                }
+                                loadRecordMasterBankTransfer();
                                 break;
                             case "tfBankAccountBTransfer":
+                                poJSON = poController.SearchBankAccount(lsValue, poController.CheckPayments().getModel().getBankID(), false);
+                                if ("error".equals((String) poJSON.get("result"))) {
+                                    ShowMessageFX.Warning((String) poJSON.get("message"), pxeModuleName, null);
+                                }
+                                loadRecordMasterBankTransfer();
+                                break;
+                            case "tfSupplierBank":
+//                                poJSON = poController.SearchPayee(poController.Master().getSupplierClientID(), true, false);
+//                                if ("error".equals((String) poJSON.get("result"))) {
+//                                    ShowMessageFX.Warning((String) poJSON.get("message"), pxeModuleName, null);
+//                                    loadRecordMasterCheck();
+//                                    break;
+//                                }
+                                psSupplierPayeeId = poController.Master().getSupplierClientID();
+                                loadRecordMasterBankTransfer();
+                                break;
+                            case "tfSupplierAccountNoBTransfer":
+//                                poJSON = poController.CheckPayments().getModel().setAuthorize(lsValue);
+//                                if (!JFXUtil.isJSONSuccess(poJSON)) {
+//                                    ShowMessageFX.Warning(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
+//                                }
+                                loadRecordMasterBankTransfer();
                                 break;
 
                             //apMasterDVOp
@@ -1770,6 +1824,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
             tfCheckAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.CheckPayments().getModel().getAmount(), true));
             chbkIsCrossCheck.setSelected(poController.CheckPayments().getModel().isCross());
             chbkIsPersonOnly.setSelected(poController.CheckPayments().getModel().isPayee());
+
             tfBankNameCheck.setText(poController.CheckPayments().getModel().Banks().getBankName() != null ? poController.CheckPayments().getModel().Banks().getBankName() : "");
 //            tfBankAccountCheck.setText(poController.CheckPayments().getModel().Bank_Account_Master().getAccountNo() != null ? poController.CheckPayments().getModel().Bank_Account_Master().getAccountNo() : "");
             tfBankAccountCheck.setText(poController.Master().getDisbursementType().equals(
@@ -1815,16 +1870,15 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
 
     private void loadRecordMasterBankTransfer() {
         try {
-            if (true) {
-                return;
-            }
+            tfBankNameBTransfer.setText(poController.CheckPayments().getModel().Banks().getBankName() != null ? poController.CheckPayments().getModel().Banks().getBankName() : "");
+            tfBankAccountBTransfer.setText(poController.CheckPayments().getModel().Bank_Account_Master().getAccountNo() != null ? poController.CheckPayments().getModel().Bank_Account_Master().getAccountNo() : "");
             tfPaymentAmountBTransfer.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.OtherPayments().getModel().getTotalAmount(), true));
+            tfSupplierBank.setText(poController.CheckPayments().getModel().Supplier().getCompanyName() != null ? poController.CheckPayments().getModel().Supplier().getCompanyName() : "");
+            tfSupplierAccountNoBTransfer.setText(poController.CheckPayments().getModel().Bank_Account_Master().getAccountNo() != null ? poController.CheckPayments().getModel().Bank_Account_Master().getAccountNo() : "");
+
             tfBankTransReferNo.setText(poController.OtherPayments().getModel().getReferNox() != null ? poController.OtherPayments().getModel().getReferNox() : "");
             JFXUtil.setCmbValue(cmbOtherPaymentBTransfer, !poController.OtherPayments().getModel().getTransactionStatus().equals("") ? Integer.valueOf(poController.OtherPayments().getModel().getTransactionStatus()) : -1);
-            tfSupplierBank.setText(poController.OtherPayments().getModel().Banks().getBankName() != null ? poController.OtherPayments().getModel().Banks().getBankName() : "");
-            tfSupplierAccountNoBTransfer.setText(poController.OtherPayments().getModel().Bank_Account_Master().getAccountNo() != null ? poController.OtherPayments().getModel().Bank_Account_Master().getAccountNo() : "");
-            tfBankNameBTransfer.setText(poController.OtherPayments().getModel().Banks().getBankName() != null ? poController.OtherPayments().getModel().Banks().getBankName() : "");
-            tfBankAccountBTransfer.setText(poController.OtherPayments().getModel().Bank_Account_Master().getAccountNo() != null ? poController.OtherPayments().getModel().Bank_Account_Master().getAccountNo() : "");
+
             JFXUtil.updateCaretPositions(apMasterDVBTransfer);
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
@@ -1836,14 +1890,14 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
             if (true) {
                 return;
             }
-            tfPaymentAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.OtherPayments().getModel().getTotalAmount(), true));
-            tfPaymentReferenceNo.setText(poController.OtherPayments().getModel().getReferNox() != null ? poController.OtherPayments().getModel().getReferNox() : "");
-            JFXUtil.setCmbValue(cmbOtherPayment, !poController.OtherPayments().getModel().getTransactionStatus().equals("") ? Integer.valueOf(poController.OtherPayments().getModel().getTransactionStatus()) : -1);
-            tfSupplierServiceName.setText(poController.OtherPayments().getModel().Banks().getBankName() != null ? poController.OtherPayments().getModel().Banks().getBankName() : "");
-            tfSupplierAccountNo.setText(poController.OtherPayments().getModel().Bank_Account_Master().getAccountNo() != null ? poController.OtherPayments().getModel().Bank_Account_Master().getAccountNo() : "");
             tfBankNameOnlinePayment.setText(poController.OtherPayments().getModel().Banks().getBankName() != null ? poController.OtherPayments().getModel().Banks().getBankName() : "");
             tfBankAccountOnlinePayment.setText(poController.OtherPayments().getModel().Bank_Account_Master().getAccountNo() != null ? poController.OtherPayments().getModel().Bank_Account_Master().getAccountNo() : "");
+            tfPaymentAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.OtherPayments().getModel().getTotalAmount(), true));
+            tfSupplierServiceName.setText(poController.OtherPayments().getModel().Banks().getBankName() != null ? poController.OtherPayments().getModel().Banks().getBankName() : "");
+            tfSupplierAccountNo.setText(poController.OtherPayments().getModel().Bank_Account_Master().getAccountNo() != null ? poController.OtherPayments().getModel().Bank_Account_Master().getAccountNo() : "");
 
+            tfPaymentReferenceNo.setText(poController.OtherPayments().getModel().getReferNox() != null ? poController.OtherPayments().getModel().getReferNox() : "");
+            JFXUtil.setCmbValue(cmbOtherPayment, !poController.OtherPayments().getModel().getTransactionStatus().equals("") ? Integer.valueOf(poController.OtherPayments().getModel().getTransactionStatus()) : -1);
             JFXUtil.updateCaretPositions(apMasterDVOp);
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
