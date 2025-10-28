@@ -168,13 +168,13 @@
                                                                                                                                     </font>
                                                                                                                                 </Label>
                                                                                                                                 <Label text="Payment Form" GridPane.columnIndex="4" GridPane.rowIndex="3" />
+                                                                                                                                <Label text="Voucher No." GridPane.columnIndex="4" GridPane.rowIndex="2" />
+                                                                                                                                <Label text="Supplier Name" GridPane.rowIndex="3" />
                                                                                                                                 <TextField fx:id="tfDVTransactionNo" disable="true" editable="false" maxWidth="-Infinity" prefWidth="150.0" style="-fx-font-weight: bold;" GridPane.columnIndex="2" />
                                                                                                                                 <DatePicker fx:id="dpDVTransactionDate" disable="true" editable="false" maxWidth="150.0" GridPane.columnIndex="2" GridPane.rowIndex="2" />
-                                                                                                                                <ComboBox fx:id="cmbPaymentMode" maxWidth="150.0" GridPane.columnIndex="6" GridPane.rowIndex="3" />
-                                                                                                                                <Label text="Voucher No." GridPane.columnIndex="4" GridPane.rowIndex="2" />
+                                                                                                                                <TextField fx:id="tfSupplier" maxWidth="1.7976931348623157E308" GridPane.columnIndex="2" GridPane.rowIndex="3" />
                                                                                                                                 <TextField fx:id="tfVoucherNo" disable="true" editable="false" maxWidth="150.0" GridPane.columnIndex="6" GridPane.rowIndex="2" />
-                                                                                                                                <Label text="Supplier Name" GridPane.rowIndex="3" />
-                                                                                                                                <TextField fx:id="tfSupplier" maxWidth="1.7976931348623157E308" promptText="Press F3: Search" GridPane.columnIndex="2" GridPane.rowIndex="3" />
+                                                                                                                                <ComboBox fx:id="cmbPaymentMode" maxWidth="150.0" GridPane.columnIndex="6" GridPane.rowIndex="3" />
                                                                                                                             </children>
                                                                                                                         </GridPane>
                                                                                                                     </children>
@@ -215,27 +215,27 @@
                                                                                                                                                         <Label text="Check Amount" GridPane.rowIndex="5" />
                                                                                                                                                         <Label text="Chk Print by Bank" GridPane.rowIndex="6" />
                                                                                                                                                         <Label text="Payee Type" GridPane.columnIndex="4" />
-                                                                                                                                                        <TextField fx:id="tfCheckNo" disable="true" editable="false" maxWidth="150.0" GridPane.columnIndex="2" GridPane.rowIndex="3" />
-                                                                                                                                                        <DatePicker fx:id="dpCheckDate" maxWidth="150.0" GridPane.columnIndex="2" GridPane.rowIndex="4" />
-                                                                                                                                                        <TextField fx:id="tfCheckAmount" alignment="CENTER_RIGHT" disable="true" editable="false" maxWidth="150.0" promptText="0.00" GridPane.columnIndex="2" GridPane.rowIndex="5" />
-                                                                                                                                                        <CheckBox fx:id="chbkPrintByBank" mnemonicParsing="false" GridPane.columnIndex="2" GridPane.rowIndex="6" />
                                                                                                                                                         <Label text="Disburse. Mode" GridPane.columnIndex="4" GridPane.rowIndex="1" />
                                                                                                                                                         <Label text="Claimant Type" GridPane.columnIndex="4" GridPane.rowIndex="2" />
                                                                                                                                                         <Label text="Auth. Person Name" GridPane.columnIndex="4" GridPane.rowIndex="3" />
                                                                                                                                                         <Label text="Crosscheck" GridPane.columnIndex="4" GridPane.rowIndex="4" />
                                                                                                                                                         <Label text="Payees Acc. only" GridPane.columnIndex="4" GridPane.rowIndex="5" />
-                                                                                                                                                        <CheckBox fx:id="chbkIsCrossCheck" mnemonicParsing="false" GridPane.columnIndex="6" GridPane.rowIndex="4" />
-                                                                                                                                                        <CheckBox fx:id="chbkIsPersonOnly" mnemonicParsing="false" GridPane.columnIndex="6" GridPane.rowIndex="5" />
                                                                                                                                                         <Label text="Bank Name" />
-                                                                                                                                                        <TextField fx:id="tfBankNameCheck" maxWidth="1.7976931348623157E308" promptText="Press F3: Search" GridPane.columnIndex="2" />
-                                                                                                                                                        <TextField fx:id="tfBankAccountCheck" promptText="Press F3: Search" GridPane.columnIndex="2" GridPane.rowIndex="1" />
-                                                                                                                                                        <TextField fx:id="tfPayeeName" maxWidth="1.7976931348623157E308" promptText="Press F3: Search" GridPane.columnIndex="2" GridPane.rowIndex="2" />
+                                                                                                                                                        <Label text="Bank Account" GridPane.rowIndex="1" />
+                                                                                                                                                        <Label text="Check Status" GridPane.columnIndex="4" GridPane.rowIndex="6" />
+                                                                                                                                                        <TextField fx:id="tfBankNameCheck" maxWidth="1.7976931348623157E308" GridPane.columnIndex="2" />
+                                                                                                                                                        <TextField fx:id="tfBankAccountCheck" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+                                                                                                                                                        <TextField fx:id="tfPayeeName" maxWidth="1.7976931348623157E308" GridPane.columnIndex="2" GridPane.rowIndex="2" />
+                                                                                                                                                        <TextField fx:id="tfCheckNo" disable="true" editable="false" maxWidth="150.0" GridPane.columnIndex="2" GridPane.rowIndex="3" />
+                                                                                                                                                        <DatePicker fx:id="dpCheckDate" maxWidth="150.0" GridPane.columnIndex="2" GridPane.rowIndex="4" />
+                                                                                                                                                        <TextField fx:id="tfCheckAmount" alignment="CENTER_RIGHT" disable="true" editable="false" maxWidth="150.0" promptText="0.00" GridPane.columnIndex="2" GridPane.rowIndex="5" />
+                                                                                                                                                        <CheckBox fx:id="chbkPrintByBank" mnemonicParsing="false" onAction="#cmdCheckBox_Click" GridPane.columnIndex="2" GridPane.rowIndex="6" />
                                                                                                                                                         <ComboBox fx:id="cmbPayeeType" maxWidth="150.0" GridPane.columnIndex="6" />
                                                                                                                                                         <ComboBox fx:id="cmbDisbursementMode" maxWidth="1.7976931348623157E308" GridPane.columnIndex="6" GridPane.rowIndex="1" />
                                                                                                                                                         <ComboBox fx:id="cmbClaimantType" maxWidth="1.7976931348623157E308" GridPane.columnIndex="6" GridPane.rowIndex="2" />
                                                                                                                                                         <TextField fx:id="tfAuthorizedPerson" maxWidth="1.7976931348623157E308" GridPane.columnIndex="6" GridPane.rowIndex="3" />
-                                                                                                                                                        <Label text="Bank Account" GridPane.rowIndex="1" />
-                                                                                                                                                        <Label text="Check Status" GridPane.columnIndex="4" GridPane.rowIndex="6" />
+                                                                                                                                                        <CheckBox fx:id="chbkIsCrossCheck" mnemonicParsing="false" onAction="#cmdCheckBox_Click" GridPane.columnIndex="6" GridPane.rowIndex="4" />
+                                                                                                                                                        <CheckBox fx:id="chbkIsPersonOnly" mnemonicParsing="false" onAction="#cmdCheckBox_Click" GridPane.columnIndex="6" GridPane.rowIndex="5" />
                                                                                                                                                         <ComboBox fx:id="cmbCheckStatus" disable="true" maxWidth="1.7976931348623157E308" GridPane.columnIndex="6" GridPane.rowIndex="6" />
                                                                                                                                                     </children>
                                                                                                                                                 </GridPane>
@@ -267,17 +267,17 @@
                                                                                                                                                         <Label text="Payment Amount" GridPane.rowIndex="2" />
                                                                                                                                                         <Label text="Bank Trans Ref. No." GridPane.rowIndex="5" />
                                                                                                                                                         <Label text="Oth Pay Status" GridPane.rowIndex="6" />
-                                                                                                                                                        <TextField fx:id="tfPaymentAmountBTransfer" alignment="CENTER_RIGHT" disable="true" editable="false" maxWidth="150" promptText="0.00" GridPane.columnIndex="2" GridPane.rowIndex="2" />
-                                                                                                                                                        <TextField fx:id="tfBankTransReferNo" disable="true" editable="false" maxWidth="150.0" promptText="" GridPane.columnIndex="2" GridPane.rowIndex="5" />
-                                                                                                                                                        <ComboBox fx:id="cmbOtherPaymentBTransfer" maxWidth="1.7976931348623157E308" GridPane.columnIndex="2" GridPane.rowIndex="6" />
                                                                                                                                                         <Label text="Supplier Bank" GridPane.rowIndex="3" />
-                                                                                                                                                        <TextField fx:id="tfSupplierBank" disable="true" editable="false" maxWidth="1.7976931348623157E308" promptText="Press F3: Search" GridPane.columnIndex="2" GridPane.rowIndex="3" />
                                                                                                                                                         <Label text="Supplier Acc. No." GridPane.rowIndex="4" />
-                                                                                                                                                        <TextField fx:id="tfSupplierAccountNoBTransfer" disable="true" editable="false" maxWidth="150.0" prefWidth="150.0" promptText="Press F3: Search" GridPane.columnIndex="2" GridPane.rowIndex="4" />
-                                                                                                                                                        <TextField fx:id="tfBankNameBTransfer" maxWidth="1.7976931348623157E308" promptText="Press F3: Search" GridPane.columnIndex="2" />
-                                                                                                                                                        <TextField fx:id="tfBankAccountBTransfer" maxWidth="1.7976931348623157E308" promptText="Press F3: Search" GridPane.columnIndex="2" GridPane.rowIndex="1" />
                                                                                                                                                         <Label text="Bank Name" />
                                                                                                                                                         <Label text="Bank Account" GridPane.rowIndex="1" />
+                                                                                                                                                        <TextField fx:id="tfBankNameBTransfer" maxWidth="1.7976931348623157E308" GridPane.columnIndex="2" />
+                                                                                                                                                        <TextField fx:id="tfBankAccountBTransfer" maxWidth="1.7976931348623157E308" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+                                                                                                                                                        <TextField fx:id="tfPaymentAmountBTransfer" alignment="CENTER_RIGHT" disable="true" editable="false" maxWidth="150" promptText="0.00" GridPane.columnIndex="2" GridPane.rowIndex="2" />
+                                                                                                                                                        <TextField fx:id="tfSupplierBank" disable="true" editable="false" maxWidth="1.7976931348623157E308" GridPane.columnIndex="2" GridPane.rowIndex="3" />
+                                                                                                                                                        <TextField fx:id="tfSupplierAccountNoBTransfer" disable="true" editable="false" maxWidth="150.0" prefWidth="150.0" GridPane.columnIndex="2" GridPane.rowIndex="4" />
+                                                                                                                                                        <TextField fx:id="tfBankTransReferNo" disable="true" editable="false" maxWidth="150.0" promptText="" GridPane.columnIndex="2" GridPane.rowIndex="5" />
+                                                                                                                                                        <ComboBox fx:id="cmbOtherPaymentBTransfer" disable="true" maxWidth="1.7976931348623157E308" GridPane.columnIndex="2" GridPane.rowIndex="6" />
                                                                                                                                                     </children>
                                                                                                                                                 </GridPane>
                                                                                                                                             </children>
@@ -308,17 +308,17 @@
                                                                                                                                                         <Label text="Payment Amount" GridPane.rowIndex="2" />
                                                                                                                                                         <Label text="Payment Ref. No." GridPane.rowIndex="5" />
                                                                                                                                                         <Label text="Oth. Pay Status" GridPane.rowIndex="6" />
-                                                                                                                                                        <TextField fx:id="tfPaymentAmount" alignment="CENTER_RIGHT" disable="true" editable="false" maxWidth="150" promptText="0.00" GridPane.columnIndex="2" GridPane.rowIndex="2" />
-                                                                                                                                                        <TextField fx:id="tfPaymentReferenceNo" disable="true" editable="false" maxWidth="150.0" promptText="" GridPane.columnIndex="2" GridPane.rowIndex="5" />
-                                                                                                                                                        <ComboBox fx:id="cmbOtherPayment" maxWidth="1.7976931348623157E308" GridPane.columnIndex="2" GridPane.rowIndex="6" />
                                                                                                                                                         <Label text="Service Name" GridPane.rowIndex="3" />
-                                                                                                                                                        <TextField fx:id="tfSupplierServiceName" disable="true" editable="false" maxWidth="1.7976931348623157E308" promptText="Press F3: Search" GridPane.columnIndex="2" GridPane.rowIndex="3" />
                                                                                                                                                         <Label text="Supplier Acc. No." GridPane.rowIndex="4" />
-                                                                                                                                                        <TextField fx:id="tfSupplierAccountNo" disable="true" editable="false" maxWidth="150.0" prefWidth="150.0" promptText="Press F3: Search" GridPane.columnIndex="2" GridPane.rowIndex="4" />
-                                                                                                                                                        <TextField fx:id="tfBankNameOnlinePayment" maxWidth="1.7976931348623157E308" promptText="Press F3: Search" GridPane.columnIndex="2" />
-                                                                                                                                                        <TextField fx:id="tfBankAccountOnlinePayment" maxWidth="1.7976931348623157E308" promptText="Press F3: Search" GridPane.columnIndex="2" GridPane.rowIndex="1" />
                                                                                                                                                         <Label text="E-Wallet Name" />
                                                                                                                                                         <Label text="E-Wallet Account" GridPane.rowIndex="1" />
+                                                                                                                                                        <TextField fx:id="tfBankNameOnlinePayment" maxWidth="1.7976931348623157E308" GridPane.columnIndex="2" />
+                                                                                                                                                        <TextField fx:id="tfBankAccountOnlinePayment" maxWidth="1.7976931348623157E308" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+                                                                                                                                                        <TextField fx:id="tfPaymentAmount" alignment="CENTER_RIGHT" disable="true" editable="false" maxWidth="150" promptText="0.00" GridPane.columnIndex="2" GridPane.rowIndex="2" />
+                                                                                                                                                        <TextField fx:id="tfSupplierServiceName" disable="true" editable="false" maxWidth="1.7976931348623157E308" GridPane.columnIndex="2" GridPane.rowIndex="3" />
+                                                                                                                                                        <TextField fx:id="tfSupplierAccountNo" disable="true" editable="false" maxWidth="150.0" prefWidth="150.0" GridPane.columnIndex="2" GridPane.rowIndex="4" />
+                                                                                                                                                        <TextField fx:id="tfPaymentReferenceNo" disable="true" editable="false" maxWidth="150.0" promptText="" GridPane.columnIndex="2" GridPane.rowIndex="5" />
+                                                                                                                                                        <ComboBox fx:id="cmbOtherPayment" disable="true" maxWidth="1.7976931348623157E308" GridPane.columnIndex="2" GridPane.rowIndex="6" />
                                                                                                                                                     </children>
                                                                                                                                                 </GridPane>
                                                                                                                                             </children>
@@ -371,10 +371,7 @@
                                                                                                                         </AnchorPane>
                                                                                                                         <Label text="  Vatable Sales" GridPane.rowIndex="5" />
                                                                                                                         <Label text="Vat Amount" GridPane.rowIndex="6" />
-                                                                                                                        <TextField fx:id="tfVatAmountMaster" alignment="CENTER_RIGHT" disable="true" editable="false" promptText="0.00" GridPane.columnIndex="2" GridPane.rowIndex="6" />
                                                                                                                         <Label text="VAT-Zero Sales" GridPane.rowIndex="7" />
-                                                                                                                        <TextField fx:id="tfVatExemptSales" alignment="CENTER_RIGHT" disable="true" editable="false" promptText="0.00" GridPane.columnIndex="2" GridPane.rowIndex="8" />
-                                                                                                                        <TextField fx:id="tfLessWHTax" alignment="CENTER_RIGHT" disable="true" editable="false" promptText="0.00" GridPane.columnIndex="2" GridPane.rowIndex="9" />
                                                                                                                         <Label text="Vat-Exempt Sales" GridPane.rowIndex="8" />
                                                                                                                         <Label text="Total Amount" GridPane.rowIndex="4">
                                                                                                                             <font>
@@ -387,10 +384,13 @@
                                                                                                                                 <Font name="System Bold" size="14.0" />
                                                                                                                             </font>
                                                                                                                         </Label>
-                                                                                                                        <TextField fx:id="tfTotalNetAmount" alignment="CENTER_RIGHT" disable="true" editable="false" promptText="0.00" style="-fx-font-weight: bold;" GridPane.columnIndex="2" GridPane.rowIndex="10" />
                                                                                                                         <TextField fx:id="tfTotalAmount" alignment="CENTER_RIGHT" disable="true" editable="false" promptText="0.00" style="-fx-font-weight: bold;" GridPane.columnIndex="2" GridPane.rowIndex="4" />
-                                                                                                                        <TextField fx:id="tfVatZeroRatedSales" alignment="CENTER_RIGHT" disable="true" editable="false" promptText="0.00" GridPane.columnIndex="2" GridPane.rowIndex="7" />
                                                                                                                         <TextField fx:id="tfVatableSales" alignment="CENTER_RIGHT" disable="true" editable="false" promptText="0.00" GridPane.columnIndex="2" GridPane.rowIndex="5" />
+                                                                                                                        <TextField fx:id="tfVatAmountMaster" alignment="CENTER_RIGHT" disable="true" editable="false" promptText="0.00" GridPane.columnIndex="2" GridPane.rowIndex="6" />
+                                                                                                                        <TextField fx:id="tfVatZeroRatedSales" alignment="CENTER_RIGHT" disable="true" editable="false" promptText="0.00" GridPane.columnIndex="2" GridPane.rowIndex="7" />
+                                                                                                                        <TextField fx:id="tfVatExemptSales" alignment="CENTER_RIGHT" disable="true" editable="false" promptText="0.00" GridPane.columnIndex="2" GridPane.rowIndex="8" />
+                                                                                                                        <TextField fx:id="tfLessWHTax" alignment="CENTER_RIGHT" disable="true" editable="false" promptText="0.00" GridPane.columnIndex="2" GridPane.rowIndex="9" />
+                                                                                                                        <TextField fx:id="tfTotalNetAmount" alignment="CENTER_RIGHT" disable="true" editable="false" promptText="0.00" style="-fx-font-weight: bold;" GridPane.columnIndex="2" GridPane.rowIndex="10" />
                                                                                                                     </children>
                                                                                                                 </GridPane>
                                                                                                             </children>
@@ -446,13 +446,11 @@
                                                                         <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="28.0" vgrow="SOMETIMES" />
                                                                      </rowConstraints>
                                                                      <children>
-                                                                        <TextField fx:id="tfRefNoDetail" disable="true" editable="false" maxWidth="1.7976931348623157E308" GridPane.columnIndex="1" GridPane.rowIndex="2" />
                                                                         <Label text="Reference No" GridPane.rowIndex="2">
                                                                            <padding>
                                                                               <Insets right="5.0" />
                                                                            </padding>
                                                                         </Label>
-                                                                        <TextField fx:id="tfParticularsDetail" promptText="Press F3: Search" GridPane.columnIndex="1" GridPane.rowIndex="3" />
                                                                         <Label text="Particulars" GridPane.rowIndex="3">
                                                                            <padding>
                                                                               <Insets right="5.0" />
@@ -476,8 +474,6 @@
                                                                               <Insets right="5.0" />
                                                                            </padding>
                                                                         </Label>
-                                                                        <TextField fx:id="tfPurchasedAmountDetail" alignment="CENTER_RIGHT" promptText="0.00" GridPane.columnIndex="7" GridPane.rowIndex="5" />
-                                                                        <TextField fx:id="tfTaxCodeDetail" promptText="Press F3: Search" GridPane.columnIndex="7" GridPane.rowIndex="2" />
                                                                         <Label text="Tax Rate (%)" GridPane.columnIndex="6" GridPane.rowIndex="3">
                                                                            <padding>
                                                                               <Insets right="5.0" />
@@ -496,14 +492,6 @@
                                                                               <Font name="System Bold" size="14.0" />
                                                                            </font>
                                                                         </Label>
-                                                                        <TextField fx:id="tfTaxRateDetail" alignment="CENTER_RIGHT" disable="true" editable="false" promptText="0.00" GridPane.columnIndex="7" GridPane.rowIndex="3" />
-                                                                        <TextField fx:id="tfTaxAmountDetail" alignment="CENTER_RIGHT" disable="true" editable="false" promptText="0.00" GridPane.columnIndex="7" GridPane.rowIndex="4" />
-                                                                        <TextField fx:id="tfNetAmountDetail" alignment="CENTER_RIGHT" disable="true" editable="false" promptText="0.00" GridPane.columnIndex="7" GridPane.rowIndex="6">
-                                                                           <font>
-                                                                              <Font name="System Bold" size="14.0" />
-                                                                           </font>
-                                                                        </TextField>
-                                                                        <CheckBox fx:id="chbkVatClassification" disable="true" mnemonicParsing="false" GridPane.columnIndex="4" GridPane.rowIndex="2" />
                                                                         <Label text="Less: Adv. Paym." visible="false" GridPane.columnIndex="6" GridPane.rowIndex="6">
                                                                            <GridPane.margin>
                                                                               <Insets right="5.0" />
@@ -512,7 +500,6 @@
                                                                               <Insets right="5.0" />
                                                                            </padding>
                                                                         </Label>
-                                                                        <TextField fx:id="tfPartialPayment" alignment="CENTER_RIGHT" editable="false" promptText="0.00" visible="false" GridPane.columnIndex="7" GridPane.rowIndex="6" />
                                                                         <Label text="VAT Amount" GridPane.columnIndex="3" GridPane.rowIndex="6">
                                                                            <GridPane.margin>
                                                                               <Insets right="5.0" />
@@ -533,16 +520,29 @@
                                                                               <Insets right="5.0" />
                                                                            </GridPane.margin>
                                                                         </Label>
-                                                                        <TextField fx:id="tfVatableSalesDetail" alignment="CENTER_RIGHT" disable="true" promptText="0.00" GridPane.columnIndex="4" GridPane.rowIndex="3" />
-                                                                        <TextField fx:id="tfVatAmountDetail" alignment="CENTER_RIGHT" disable="true" promptText="0.00" GridPane.columnIndex="4" GridPane.rowIndex="6" />
-                                                                        <TextField fx:id="tfVatZeroRatedSalesDetail" alignment="CENTER_RIGHT" disable="true" promptText="0.00" GridPane.columnIndex="4" GridPane.rowIndex="5" />
-                                                                        <TextField fx:id="tfVatExemptDetail" alignment="CENTER_RIGHT" disable="true" promptText="0.00" GridPane.columnIndex="4" GridPane.rowIndex="4" />
                                                                         <Label text="VAT Rate (%)" visible="false" GridPane.columnIndex="3" GridPane.rowIndex="5">
                                                                            <GridPane.margin>
                                                                               <Insets right="5.0" />
                                                                            </GridPane.margin>
                                                                         </Label>
+                                                                        <TextField fx:id="tfRefNoDetail" disable="true" editable="false" maxWidth="1.7976931348623157E308" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                                                                        <TextField fx:id="tfParticularsDetail" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                                                                        <CheckBox fx:id="chbkVatClassification" disable="true" mnemonicParsing="false" onAction="#cmdCheckBox_Click" GridPane.columnIndex="4" GridPane.rowIndex="2" />
+                                                                        <TextField fx:id="tfVatableSalesDetail" alignment="CENTER_RIGHT" disable="true" promptText="0.00" styleClass="DisabledTextField" GridPane.columnIndex="4" GridPane.rowIndex="3" />
+                                                                        <TextField fx:id="tfVatExemptDetail" alignment="CENTER_RIGHT" disable="true" promptText="0.00" styleClass="DisabledTextField" GridPane.columnIndex="4" GridPane.rowIndex="4" />
+                                                                        <TextField fx:id="tfVatZeroRatedSalesDetail" alignment="CENTER_RIGHT" disable="true" promptText="0.00" styleClass="DisabledTextField" GridPane.columnIndex="4" GridPane.rowIndex="5" />
                                                                         <TextField fx:id="tfVatRateDetail" alignment="CENTER_RIGHT" disable="true" promptText="0.00" visible="false" GridPane.columnIndex="4" GridPane.rowIndex="5" />
+                                                                        <TextField fx:id="tfVatAmountDetail" alignment="CENTER_RIGHT" disable="true" promptText="0.00" styleClass="DisabledTextField" GridPane.columnIndex="4" GridPane.rowIndex="6" />
+                                                                        <TextField fx:id="tfTaxCodeDetail" GridPane.columnIndex="7" GridPane.rowIndex="2" />
+                                                                        <TextField fx:id="tfTaxRateDetail" alignment="CENTER_RIGHT" disable="true" editable="false" promptText="0.00" styleClass="DisabledTextField" GridPane.columnIndex="7" GridPane.rowIndex="3" />
+                                                                        <TextField fx:id="tfTaxAmountDetail" alignment="CENTER_RIGHT" disable="true" editable="false" promptText="0.00" styleClass="DisabledTextField" GridPane.columnIndex="7" GridPane.rowIndex="4" />
+                                                                        <TextField fx:id="tfPurchasedAmountDetail" alignment="CENTER_RIGHT" promptText="0.00" GridPane.columnIndex="7" GridPane.rowIndex="5" />
+                                                                        <TextField fx:id="tfNetAmountDetail" alignment="CENTER_RIGHT" disable="true" editable="false" promptText="0.00" styleClass="DisabledTextField" GridPane.columnIndex="7" GridPane.rowIndex="6">
+                                                                           <font>
+                                                                              <Font name="System Bold" size="12.0" />
+                                                                           </font>
+                                                                        </TextField>
+                                                                        <TextField fx:id="tfPartialPayment" alignment="CENTER_RIGHT" editable="false" promptText="0.00" visible="false" GridPane.columnIndex="7" GridPane.rowIndex="6" />
                                                                      </children>
                                                                   </GridPane>
                                                                </children>
@@ -582,7 +582,6 @@
                                                                         <Insets />
                                                                     </HBox.margin>
                                                                 </AnchorPane>
-
                                                             </children>
                                                         </HBox>
                                                     </children>
@@ -671,8 +670,8 @@
                                                                                 <Label text="Report Month/Year" GridPane.rowIndex="2" />
                                                                                 <Label text="Account Code" />
                                                                                 <Label text="Account Name" GridPane.rowIndex="1" />
-                                                                                <TextField fx:id="tfAccountCode" promptText="Press F3: Search" GridPane.columnIndex="2" />
-                                                                                <TextField fx:id="tfAccountDescription" maxWidth="1.7976931348623157E308" promptText="Press F3: Search" GridPane.columnIndex="2" GridPane.columnSpan="3" GridPane.rowIndex="1" />
+                                                                                <TextField fx:id="tfAccountCode" GridPane.columnIndex="2" />
+                                                                                <TextField fx:id="tfAccountDescription" maxWidth="1.7976931348623157E308" GridPane.columnIndex="2" GridPane.columnSpan="3" GridPane.rowIndex="1" />
                                                                                 <DatePicker fx:id="dpReportMonthYear" GridPane.columnIndex="2" GridPane.rowIndex="2" />
                                                                                 <TextField fx:id="tfDebitAmount" alignment="CENTER_RIGHT" maxWidth="1.7976931348623157E308" promptText="0.00" GridPane.columnIndex="8" GridPane.rowIndex="1" />
                                                                                 <TextField fx:id="tfCreditAmount" alignment="CENTER_RIGHT" maxWidth="1.7976931348623157E308" promptText="0.00" GridPane.columnIndex="8" GridPane.rowIndex="2" />
