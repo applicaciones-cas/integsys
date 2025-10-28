@@ -14,7 +14,6 @@ import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -53,8 +52,8 @@ import static javafx.scene.input.KeyCode.F3;
 import static javafx.scene.input.KeyCode.TAB;
 import static javafx.scene.input.KeyCode.UP;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
-import javafx.util.Pair;
 import javax.script.ScriptException;
 import org.guanzon.appdriver.agent.ShowMessageFX;
 import org.guanzon.appdriver.base.CommonUtils;
@@ -65,7 +64,6 @@ import org.guanzon.appdriver.base.SQLUtil;
 import org.guanzon.appdriver.constant.EditMode;
 import org.guanzon.appdriver.constant.Logical;
 import org.guanzon.appdriver.constant.UserRight;
-import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.ParseException;
 import ph.com.guanzongroup.cas.cashflow.DisbursementVoucher;
@@ -257,11 +255,25 @@ public class DisbursementVoucher_VerificationController implements Initializable
                 }
             }
         });
+
+        tabPanePaymentMode.addEventFilter(MouseEvent.MOUSE_PRESSED, event -> {
+            tabPanePaymentMode.lookupAll(".tab").forEach(node -> {
+                if (node.localToScene(node.getBoundsInLocal()).contains(event.getSceneX(), event.getSceneY())) {
+                    String tabName = ((javafx.scene.control.Label) node.lookup(".tab-label")).getText();
+                    for (Tab tab : tabPanePaymentMode.getTabs()) {
+                        if (tab.getText().equals(tabName) && tab.isDisable()) {
+                            ShowMessageFX.Warning(null, pxeModuleName, "This tab has been disabled as only one option applies based on the selected payment form.");
+                            event.consume();
+                        }
+                    }
+                }
+            });
+        });
     }
 
     //Disables/ Enables tabs
     private void initDVMasterTabs() {
-        boolean lbShow = (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE);
+        boolean lbShow = JFXUtil.isObjectEqualTo(pnEditMode, EditMode.READY, EditMode.ADDNEW, EditMode.UPDATE);
         JFXUtil.setDisabled(true, tabCheck, tabOnlinePayment, tabBankTransfer);
         switch (poController.Master().getDisbursementType()) {
             case DisbursementStatic.DisbursementType.CHECK:
@@ -650,7 +662,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
                                     for (int lnCtr = 0; lnCtr <= poController.getMasterList().size() - 1; lnCtr++) {
                                         String lsPaymentForm = "";
                                         //Retrieve Open or Returned DV transactions only
-                                        if (!JFXUtil.isObjectEqualTo(poController.getMaster(lnCtr).getTransactionStatus(), 
+                                        if (!JFXUtil.isObjectEqualTo(poController.getMaster(lnCtr).getTransactionStatus(),
                                                 DisbursementStatic.OPEN, DisbursementStatic.RETURNED, DisbursementStatic.VERIFIED)) {
                                             continue;
                                         }

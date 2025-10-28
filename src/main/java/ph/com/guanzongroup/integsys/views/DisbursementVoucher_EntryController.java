@@ -53,6 +53,7 @@ import static javafx.scene.input.KeyCode.F3;
 import static javafx.scene.input.KeyCode.TAB;
 import static javafx.scene.input.KeyCode.UP;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.util.Pair;
 import javax.script.ScriptException;
@@ -260,11 +261,25 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                 }
             }
         });
+
+        tabPanePaymentMode.addEventFilter(MouseEvent.MOUSE_PRESSED, event -> {
+            tabPanePaymentMode.lookupAll(".tab").forEach(node -> {
+                if (node.localToScene(node.getBoundsInLocal()).contains(event.getSceneX(), event.getSceneY())) {
+                    String tabName = ((javafx.scene.control.Label) node.lookup(".tab-label")).getText();
+                    for (Tab tab : tabPanePaymentMode.getTabs()) {
+                        if (tab.getText().equals(tabName) && tab.isDisable()) {
+                            ShowMessageFX.Warning(null, pxeModuleName, "This tab has been disabled as only one option applies based on the selected payment form.");
+                            event.consume();
+                        }
+                    }
+                }
+            });
+        });
     }
 
     //Disables/ Enables tabs
     private void initDVMasterTabs() {
-        boolean lbShow = (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE);
+        boolean lbShow = JFXUtil.isObjectEqualTo(pnEditMode, EditMode.READY, EditMode.ADDNEW, EditMode.UPDATE);
         JFXUtil.setDisabled(true, tabCheck, tabOnlinePayment, tabBankTransfer);
         switch (poController.Master().getDisbursementType()) {
             case DisbursementStatic.DisbursementType.CHECK:
