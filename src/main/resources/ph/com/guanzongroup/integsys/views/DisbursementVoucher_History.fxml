@@ -58,7 +58,7 @@
                                                         <Font name="System Bold" size="14.0" />
                                                     </font>
                                                 </Label>
-                                                <TextField fx:id="tfSearchTransaction" maxWidth="1.7976931348623157E308" GridPane.columnIndex="2" />
+                                                <TextField fx:id="tfSearchTransaction" maxWidth="1.7976931348623157E308" promptText="Press F3: Search" GridPane.columnIndex="2" />
                                                 <TextField fx:id="tfSearchSupplier" maxWidth="1.7976931348623157E308" promptText="Press F3: Search" GridPane.columnIndex="6" />
                                                 <Label text="Reference No.">
                                                     <font>
@@ -229,13 +229,13 @@
                                                                                                                                                         <TextField fx:id="tfCheckNo" disable="true" editable="false" maxWidth="150.0" GridPane.columnIndex="2" GridPane.rowIndex="3" />
                                                                                                                                                         <DatePicker fx:id="dpCheckDate" maxWidth="150.0" GridPane.columnIndex="2" GridPane.rowIndex="4" />
                                                                                                                                                         <TextField fx:id="tfCheckAmount" alignment="CENTER_RIGHT" disable="true" editable="false" maxWidth="150.0" promptText="0.00" GridPane.columnIndex="2" GridPane.rowIndex="5" />
-                                                                                                                                                        <CheckBox fx:id="chbkPrintByBank" mnemonicParsing="false" onAction="#cmdCheckBox_Click" GridPane.columnIndex="2" GridPane.rowIndex="6" />
+                                                                                                                                                        <CheckBox fx:id="chbkPrintByBank" mnemonicParsing="false" GridPane.columnIndex="2" GridPane.rowIndex="6" />
                                                                                                                                                         <ComboBox fx:id="cmbPayeeType" maxWidth="150.0" GridPane.columnIndex="6" />
                                                                                                                                                         <ComboBox fx:id="cmbDisbursementMode" maxWidth="1.7976931348623157E308" GridPane.columnIndex="6" GridPane.rowIndex="1" />
                                                                                                                                                         <ComboBox fx:id="cmbClaimantType" maxWidth="1.7976931348623157E308" GridPane.columnIndex="6" GridPane.rowIndex="2" />
                                                                                                                                                         <TextField fx:id="tfAuthorizedPerson" maxWidth="1.7976931348623157E308" GridPane.columnIndex="6" GridPane.rowIndex="3" />
-                                                                                                                                                        <CheckBox fx:id="chbkIsCrossCheck" mnemonicParsing="false" onAction="#cmdCheckBox_Click" GridPane.columnIndex="6" GridPane.rowIndex="4" />
-                                                                                                                                                        <CheckBox fx:id="chbkIsPersonOnly" mnemonicParsing="false" onAction="#cmdCheckBox_Click" GridPane.columnIndex="6" GridPane.rowIndex="5" />
+                                                                                                                                                        <CheckBox fx:id="chbkIsCrossCheck" mnemonicParsing="false" GridPane.columnIndex="6" GridPane.rowIndex="4" />
+                                                                                                                                                        <CheckBox fx:id="chbkIsPersonOnly" mnemonicParsing="false" GridPane.columnIndex="6" GridPane.rowIndex="5" />
                                                                                                                                                         <ComboBox fx:id="cmbCheckStatus" disable="true" maxWidth="1.7976931348623157E308" GridPane.columnIndex="6" GridPane.rowIndex="6" />
                                                                                                                                                     </children>
                                                                                                                                                 </GridPane>
@@ -527,7 +527,7 @@
                                                                         </Label>
                                                                         <TextField fx:id="tfRefNoDetail" disable="true" editable="false" maxWidth="1.7976931348623157E308" GridPane.columnIndex="1" GridPane.rowIndex="2" />
                                                                         <TextField fx:id="tfParticularsDetail" GridPane.columnIndex="1" GridPane.rowIndex="3" />
-                                                                        <CheckBox fx:id="chbkVatClassification" disable="true" mnemonicParsing="false" onAction="#cmdCheckBox_Click" GridPane.columnIndex="4" GridPane.rowIndex="2" />
+                                                                        <CheckBox fx:id="chbkVatClassification" disable="true" mnemonicParsing="false" GridPane.columnIndex="4" GridPane.rowIndex="2" />
                                                                         <TextField fx:id="tfVatableSalesDetail" alignment="CENTER_RIGHT" disable="true" promptText="0.00" styleClass="DisabledTextField" GridPane.columnIndex="4" GridPane.rowIndex="3" />
                                                                         <TextField fx:id="tfVatExemptDetail" alignment="CENTER_RIGHT" disable="true" promptText="0.00" styleClass="DisabledTextField" GridPane.columnIndex="4" GridPane.rowIndex="4" />
                                                                         <TextField fx:id="tfVatZeroRatedSalesDetail" alignment="CENTER_RIGHT" disable="true" promptText="0.00" styleClass="DisabledTextField" GridPane.columnIndex="4" GridPane.rowIndex="5" />

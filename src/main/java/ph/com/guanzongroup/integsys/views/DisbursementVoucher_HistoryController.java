@@ -73,7 +73,6 @@ public class DisbursementVoucher_HistoryController implements Initializable, Scr
     private int pnMain = 0;
     private int pnDetail = 0;
     private int pnDetailJE = 0;
-    private boolean pbIsCheckedJournalTab = false;
     private boolean pbIsVerifier = false;
     private boolean isWithVAToriginal = false;
     private final String pxeModuleName = "Disbursement Voucher History";
@@ -86,7 +85,6 @@ public class DisbursementVoucher_HistoryController implements Initializable, Scr
     private String psSupplierPayeeId = "";
     private String psTransactionType = "";
     private Double netTotalperDetail = 0.00;
-    private String psSearchSupplierID = "";
     private String psSearchTransactionNo = "";
 
     private unloadForm poUnload = new unloadForm();
@@ -224,7 +222,6 @@ public class DisbursementVoucher_HistoryController implements Initializable, Scr
                     case "Journal":
                         if (pnEditMode == EditMode.READY || pnEditMode == EditMode.UPDATE || pnEditMode == EditMode.ADDNEW) {
                             if (poController.Detail(0).getSourceNo() != null && !poController.Detail(0).getSourceNo().isEmpty()) {
-                                pbIsCheckedJournalTab = true;
                                 populateJE();
                             } else {
                                 CustomCommonUtil.switchToTab(tabDetails, tabPaneMain);
@@ -301,8 +298,6 @@ public class DisbursementVoucher_HistoryController implements Initializable, Scr
                         ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                         return;
                     }
-                    pnEditMode = poController.getEditMode();
-                    pbIsCheckedJournalTab = false;
                     JFXUtil.clickTabByTitleText(tabPaneMain, "Disbursement Voucher");
                     pnEditMode = poController.getEditMode();
                     psSupplierPayeeId = poController.Master().Payee().getClientID();
@@ -324,9 +319,7 @@ public class DisbursementVoucher_HistoryController implements Initializable, Scr
                     break;
             }
             if (JFXUtil.isObjectEqualTo(lsButton, "btnSave", "btnCancel", "btnVoid")) {
-                pbIsCheckedJournalTab = false;
                 poController.resetTransaction();
-                poController.Master().setSupplierClientID(psSupplierPayeeId);
                 clearTextFields();
                 JFXUtil.clickTabByTitleText(tabPaneMain, "Disbursement Voucher");
                 pnEditMode = EditMode.UNKNOWN;
@@ -632,7 +625,7 @@ public class DisbursementVoucher_HistoryController implements Initializable, Scr
                     case "tfSearchSupplier":
                         if (lsValue.isEmpty()) {
                             poController.Master().setPayeeID("");
-                            psSearchSupplierID = "";
+                            poController.Master().setSupplierClientID("");
                         }
                         break;
                     case "tfSearchTransaction":
@@ -660,15 +653,31 @@ public class DisbursementVoucher_HistoryController implements Initializable, Scr
                         switch (lsID) {
                             //apBrowse?
                             case "tfSearchTransaction":
-                                psSearchTransactionNo = tfSearchTransaction.getText();
-                                break;
-                            case "tfSearchSupplier":
-                                poJSON = poController.SearchSupplier(lsValue, false, true);
+                                poController.Master().setIndustryID(psIndustryId);
+                                poController.Master().setCompanyID(psCompanyId);
+                                poController.Master().setBranchCode(oApp.getBranchCode());
+                                poController.setTransactionStatus(DisbursementStatic.OPEN + DisbursementStatic.VERIFIED);
+                                poJSON = poController.SearchTransaction();
                                 if ("error".equals((String) poJSON.get("result"))) {
                                     ShowMessageFX.Warning((String) poJSON.get("message"), pxeModuleName, null);
                                     return;
                                 } else {
-                                    psSearchSupplierID = poController.Master().getPayeeID();
+                                    psSearchTransactionNo = poController.Master().getTransactionNo();
+                                    loadRecordSearch();
+                                    JFXUtil.clickTabByTitleText(tabPaneMain, "Disbursement Voucher");
+                                    pnEditMode = poController.getEditMode();
+                                    psSupplierPayeeId = poController.Master().Payee().getClientID();
+                                    poController.populateJournal();
+                                    loadTableDetail.reload();
+                                    initDVMasterTabs();
+                                }
+                                break;
+                            case "tfSearchSupplier":
+                                poJSON = poController.SearchPayee(lsValue, false, true);
+                                if ("error".equals((String) poJSON.get("result"))) {
+                                    ShowMessageFX.Warning((String) poJSON.get("message"), pxeModuleName, null);
+                                    return;
+                                } else {
                                     loadRecordSearch();
                                 }
                                 break;
@@ -679,7 +688,7 @@ public class DisbursementVoucher_HistoryController implements Initializable, Scr
                         break;
                 }
             }
-        } catch (SQLException | GuanzonException ex) {
+        } catch (SQLException | GuanzonException | CloneNotSupportedException | ScriptException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
         }
     }
@@ -687,8 +696,8 @@ public class DisbursementVoucher_HistoryController implements Initializable, Scr
     private void loadRecordSearch() {
         try {
             lblSource.setText(poController.Master().Company().getCompanyName() + " - " + poController.Master().Industry().getDescription());
-//            tfSearchSupplier.setText(poController.getSearchSupplier);
-//            tfSearchTransaction.setText(poController.getSearchTransaction());
+            tfSearchSupplier.setText(poController.getSearchPayee() != null ? poController.getSearchPayee() : "");
+            tfSearchTransaction.setText(psSearchTransactionNo);
             JFXUtil.updateCaretPositions(apBrowse);
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
