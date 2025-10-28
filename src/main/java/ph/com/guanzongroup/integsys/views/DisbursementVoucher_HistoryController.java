@@ -292,7 +292,7 @@ public class DisbursementVoucher_HistoryController implements Initializable, Scr
                     poController.Master().setCompanyID(psCompanyId);
                     poController.Master().setBranchCode(oApp.getBranchCode());
                     poController.setTransactionStatus(DisbursementStatic.OPEN + DisbursementStatic.VERIFIED);
-                    poJSON = poController.SearchTransaction();
+                    poJSON = poController.SearchTransaction(tfSearchTransaction.getText());
                     if ("error".equalsIgnoreCase((String) poJSON.get("result"))) {
                         ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                         return;
@@ -638,8 +638,7 @@ public class DisbursementVoucher_HistoryController implements Initializable, Scr
                                 poController.Master().setIndustryID(psIndustryId);
                                 poController.Master().setCompanyID(psCompanyId);
                                 poController.Master().setBranchCode(oApp.getBranchCode());
-                                poController.setTransactionStatus(DisbursementStatic.OPEN + DisbursementStatic.VERIFIED);
-                                poJSON = poController.SearchTransaction();
+                                poJSON = poController.SearchTransaction(lsValue);
                                 if ("error".equals((String) poJSON.get("result"))) {
                                     ShowMessageFX.Warning((String) poJSON.get("message"), pxeModuleName, null);
                                     return;
