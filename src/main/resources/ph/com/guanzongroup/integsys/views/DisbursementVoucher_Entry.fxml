@@ -613,7 +613,7 @@
                                                                               <Font name="System Bold" size="12.0" />
                                                                            </font>
                                                                         </TextField>
-                                                                        <TextField fx:id="tfPartialPayment" alignment="CENTER_RIGHT" editable="false" promptText="0.00" visible="false" GridPane.columnIndex="7" GridPane.rowIndex="6" />
+                                                                        
                                                                      </children>
                                                                   </GridPane>
                                                                </children>

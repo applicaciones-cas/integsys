@@ -453,7 +453,7 @@
                                                                               <Insets right="5.0" />
                                                                            </padding>
                                                                         </Label>
-                                                                        <TextField fx:id="tfPartialPayment" alignment="CENTER_RIGHT" editable="false" promptText="0.00" visible="false" GridPane.columnIndex="7" GridPane.rowIndex="6" />
+                                                                        
                                                                         <Label text="VAT Amount" GridPane.columnIndex="3" GridPane.rowIndex="6">
                                                                            <GridPane.margin>
                                                                               <Insets right="5.0" />
