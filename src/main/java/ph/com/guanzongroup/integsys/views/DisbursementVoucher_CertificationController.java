@@ -314,25 +314,26 @@ public class DisbursementVoucher_CertificationController implements Initializabl
     }
 
     private void retrieveDisbursement() {
-//        try {
-        poJSON = poDisbursementController.getDisbursementForCertification(psSearchBankID, psSearchBankAccountID);
-        if ("error".equals(poJSON.get("result"))) {
-            ShowMessageFX.Error(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
-        } else {
-            Platform.runLater(() -> {
-                chckSelectAll.setSelected(false);
-                checkedItem.clear();
-                if (poDisbursementController.getDetailCount() > 0) {
-                    for (int lnCntr = 0; lnCntr < poDisbursementController.getMasterList().size() - 1; lnCntr++) {
-                        checkedItem.add("0");
+        try {
+            poJSON = poDisbursementController.loadTransactionList(psSearchBankID, psSearchBankAccountID, "", true);
+
+            if ("error".equals(poJSON.get("result"))) {
+                ShowMessageFX.Error(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
+            } else {
+                Platform.runLater(() -> {
+                    chckSelectAll.setSelected(false);
+                    checkedItem.clear();
+                    if (poDisbursementController.getDetailCount() > 0) {
+                        for (int lnCntr = 0; lnCntr < poDisbursementController.getMasterList().size() - 1; lnCntr++) {
+                            checkedItem.add("0");
+                        }
                     }
-                }
-                loadTableMain.reload();
-            });
+                    loadTableMain.reload();
+                });
+            }
+        } catch (SQLException | GuanzonException ex) {
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
         }
-//        } catch (SQLException | GuanzonException ex) {
-//            Logger.getLogger(DisbursementVoucher_CertificationController.class.getName()).log(Level.SEVERE, null, ex);
-//        }
     }
 
     private void initLoadTable() {
