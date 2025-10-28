@@ -667,19 +667,35 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                             return;
                         }
                     }
+                    switch (lsTransactionType) {
+                        case "SOA":
+                            lsTransactionType = DisbursementStatic.SourceCode.ACCOUNTS_PAYABLE;
+                            break;
+                        case "PRF":
+                            lsTransactionType = DisbursementStatic.SourceCode.PAYMENT_REQUEST;
+                            break;
+                        case "AP Adjustment":
+                            lsTransactionType = DisbursementStatic.SourceCode.AP_ADJUSTMENT;
+                            break;
+                        case "PO Receiving":
+                            lsTransactionType = DisbursementStatic.SourceCode.PO_RECEIVING;
+                            break;
+                    }
 
                     poJSON = poController.populateDetail(lsTransactionNo, lsTransactionType);
                     if ("error".equals(poJSON.get("result"))) {
                         ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                         return;
                     }
+                    if (poController.getDetailCount() > 0) {
+                        ShowMessageFX.Warning(null, pxeModuleName, "No items retrieved");
+                    }
                     pnEditMode = poController.getEditMode();
                     loadTableDetail.reload();
                     moveNext(false, false);
 
                 } catch (CloneNotSupportedException | SQLException | GuanzonException ex) {
-                    Logger.getLogger(getClass()
-                            .getName()).log(Level.SEVERE, null, ex);
+                    Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
                 }
             }
         } else {
@@ -1802,7 +1818,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
             tfTaxRateDetail.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(pnDetail).getTaxRates(), false));
             tfTaxAmountDetail.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(pnDetail).getTaxAmount(), true));
             tfPurchasedAmountDetail.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(pnDetail).getAmountApplied(), true));
-            
+
             netTotalperDetail = 0.0;
             ModelDisbursementVoucher_Detail selected = (ModelDisbursementVoucher_Detail) tblVwDetails.getSelectionModel().getSelectedItem();
             netTotalperDetail = (JFXUtil.isObjectEqualTo(selected.getIndex14(), null, "")) ? Double.parseDouble(JFXUtil.removeComma(selected.getIndex14()))
