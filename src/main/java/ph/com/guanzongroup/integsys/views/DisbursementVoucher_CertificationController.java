@@ -249,14 +249,12 @@ public class DisbursementVoucher_CertificationController implements Initializabl
                             poDisbursementController.CheckPayments().getModel().setBankAcountID("");
                             psSearchBankID = "";
                             psSearchBankAccountID = "";
-                            retrieveDisbursement();
                         }
                         break;
                     case "tfSearchBankAccount":
                         if (lsValue.isEmpty()) {
                             poDisbursementController.CheckPayments().getModel().setBankAcountID("");
                             psSearchBankAccountID = "";
-                            retrieveDisbursement();
                         }
                         break;
                 }
@@ -316,7 +314,6 @@ public class DisbursementVoucher_CertificationController implements Initializabl
     private void retrieveDisbursement() {
         try {
             poJSON = poDisbursementController.loadTransactionList(psSearchBankID, psSearchBankAccountID, "", true);
-
             if ("error".equals(poJSON.get("result"))) {
                 ShowMessageFX.Error(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
             } else {
@@ -493,7 +490,7 @@ public class DisbursementVoucher_CertificationController implements Initializabl
                     checkedItem.clear();
                     break;
                 case "disapprove":
-//                    poJSON = poDisbursementController.DisapprovedTransaction("", checkedItems);
+                    poJSON = poDisbursementController.DisApproveTransaction("", checkedItems);
                     if (!"success".equals((String) poJSON.get("result"))) {
                         ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                         break;
