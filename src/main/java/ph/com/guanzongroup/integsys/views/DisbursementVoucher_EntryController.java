@@ -254,7 +254,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                                 populateJE();
                             } else {
                                 CustomCommonUtil.switchToTab(tabDetails, tabPaneMain);
-                                ShowMessageFX.Warning("Please provide at least one valid disbursement detail to proceed.", pxeModuleName, null);
+                                ShowMessageFX.Warning(null, pxeModuleName, "Please provide at least one valid disbursement detail to proceed.");
                             }
                         }
                         break;
@@ -1555,9 +1555,9 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                                     });
                                     return;
                                 }
-                                JFXUtil.textFieldMoveNext(tfTaxCodeDetail);
                                 JFXUtil.runWithDelay(0.50, () -> {
                                     loadTableDetail.reload();
+                                    JFXUtil.textFieldMoveNext(tfTaxCodeDetail);
                                 });
                                 break;
                             case "tfTaxCodeDetail":
@@ -1573,13 +1573,14 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                                 if (!poController.Detail(pnDetail).isWithVat()) {
                                     isWithVAToriginal = false;
                                     poController.Detail(pnDetail).isWithVat(true);
-                                    poController.Detail(pnDetail).setDetailVatRates((double) poJSONVAT.get("totalVatRa"));
+                                    double lnVatRate = JFXUtil.isObjectEqualTo(poJSONVAT.get("totalVatRa"), null, "") ? 0 : (double) poJSONVAT.get("totalVatRa");
+                                    poController.Detail(pnDetail).setDetailVatRates(lnVatRate);
 //                                  poController.computeVat(pnDetail, poController.Detail(pnDetail).getAmount(), poController.Detail(pnDetail).getDetailVatRates(),
 //                                  (double) poJSONVAT.get("totalApplied"), true);
                                 }
-                                JFXUtil.textFieldMoveNext(tfPurchasedAmountDetail);
                                 JFXUtil.runWithDelay(0.50, () -> {
                                     loadTableDetail.reload();
+                                    JFXUtil.textFieldMoveNext(tfPurchasedAmountDetail);
                                 });
                                 break;
 
@@ -1792,19 +1793,19 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
 
             tfRefNoDetail.setText(poController.Detail(pnDetail).getSourceNo());
             tfParticularsDetail.setText(poController.Detail(pnDetail).Particular().getDescription());
-            tfPurchasedAmountDetail.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(pnDetail).getAmountApplied(), true));
+            chbkVatClassification.setSelected(poController.Detail(pnDetail).isWithVat());
+            tfVatableSalesDetail.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(pnDetail).getDetailVatSales(), true));
+            tfVatExemptDetail.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(pnDetail).getDetailVatExempt(), true));
+            tfVatZeroRatedSalesDetail.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(pnDetail).getDetailZeroVat(), true));
+            tfVatRateDetail.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(pnDetail).getDetailVatRates(), false));
+            tfVatAmountDetail.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(pnDetail).getDetailVatAmount(), true));
             tfTaxCodeDetail.setText(poController.Detail(pnDetail).TaxCode().getTaxCode());
             tfTaxRateDetail.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(pnDetail).getTaxRates(), false));
             tfTaxAmountDetail.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(pnDetail).getTaxAmount(), true));
+            tfPurchasedAmountDetail.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(pnDetail).getAmountApplied(), true));
             tfNetAmountDetail.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(netTotalperDetail, true));
             tfPartialPayment.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(pnDetail).getAmountApplied(), true));
-            tfVatAmountDetail.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(pnDetail).getDetailVatAmount(), true));
-            tfVatableSalesDetail.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(pnDetail).getDetailVatSales(), true));
-            tfVatZeroRatedSalesDetail.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(pnDetail).getDetailZeroVat(), true));
-            tfVatExemptDetail.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(pnDetail).getDetailVatExempt(), true));
-            tfVatRateDetail.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(pnDetail).getDetailVatRates(), false));
 
-            chbkVatClassification.setSelected(poController.Detail(pnDetail).isWithVat());
             JFXUtil.updateCaretPositions(apDVDetail);
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
@@ -1895,9 +1896,9 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
             tfPaymentAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.OtherPayments().getModel().getTotalAmount(), true));
             tfSupplierServiceName.setText(poController.OtherPayments().getModel().Banks().getBankName() != null ? poController.OtherPayments().getModel().Banks().getBankName() : "");
             tfSupplierAccountNo.setText(poController.OtherPayments().getModel().Bank_Account_Master().getAccountNo() != null ? poController.OtherPayments().getModel().Bank_Account_Master().getAccountNo() : "");
-
             tfPaymentReferenceNo.setText(poController.OtherPayments().getModel().getReferNox() != null ? poController.OtherPayments().getModel().getReferNox() : "");
             JFXUtil.setCmbValue(cmbOtherPayment, !poController.OtherPayments().getModel().getTransactionStatus().equals("") ? Integer.valueOf(poController.OtherPayments().getModel().getTransactionStatus()) : -1);
+           
             JFXUtil.updateCaretPositions(apMasterDVOp);
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
