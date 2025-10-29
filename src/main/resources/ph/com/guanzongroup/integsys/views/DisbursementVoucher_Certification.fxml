@@ -35,17 +35,19 @@
                                                 <ColumnConstraints halignment="RIGHT" minWidth="-Infinity" prefWidth="100.0" />
                                                 <ColumnConstraints halignment="RIGHT" hgrow="ALWAYS" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="10.0" />
                                                 <ColumnConstraints halignment="RIGHT" hgrow="ALWAYS" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="200.0" />
-                                                <ColumnConstraints halignment="CENTER" hgrow="ALWAYS" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="150.0" />
-                                                <ColumnConstraints halignment="RIGHT" hgrow="ALWAYS" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="250.0" />
-                                                <ColumnConstraints halignment="RIGHT" hgrow="ALWAYS" maxWidth="729.0" minWidth="729.0" prefWidth="729.0" />
-                                    <ColumnConstraints halignment="RIGHT" hgrow="ALWAYS" maxWidth="1.7976931348623157E308" minWidth="10.0" prefWidth="302.0" />
+                                    <ColumnConstraints halignment="RIGHT" hgrow="ALWAYS" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="20.0" />
+                                                <ColumnConstraints halignment="RIGHT" hgrow="ALWAYS" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="100.0" />
+                                    <ColumnConstraints halignment="RIGHT" hgrow="ALWAYS" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="10.0" />
+                                                <ColumnConstraints halignment="RIGHT" hgrow="ALWAYS" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="200.0" />
+                                                <ColumnConstraints halignment="RIGHT" hgrow="ALWAYS" maxWidth="801.0" minWidth="801.0" prefWidth="801.0" />
+                                    <ColumnConstraints halignment="RIGHT" hgrow="ALWAYS" maxWidth="1.7976931348623157E308" minWidth="10.0" prefWidth="300.0" />
                                             </columnConstraints>
                                             <rowConstraints>
                                                 <RowConstraints />
                                                 <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="28.0" vgrow="SOMETIMES" />
                                             </rowConstraints>
                                             <children>
-                                                <Label fx:id="lblSource" text="Company - Industry" GridPane.columnIndex="5" GridPane.rowIndex="1">
+                                                <Label fx:id="lblSource" text="Company - Industry" GridPane.columnIndex="7" GridPane.rowIndex="1">
                                                     <font>
                                                         <Font name="System Bold" size="14.0" />
                                                     </font>
@@ -56,12 +58,12 @@
                                                     </font>
                                                 </Label>
                                                 <TextField fx:id="tfSearchBankName" maxWidth="1.7976931348623157E308" promptText="Press F3: Search" GridPane.columnIndex="2" GridPane.rowIndex="1" />
-                                                <Label text="Bank Account" GridPane.columnIndex="3" GridPane.rowIndex="1">
+                                                <Label text="Bank Account" GridPane.columnIndex="4" GridPane.rowIndex="1">
                                                     <font>
                                                         <Font name="System Bold" size="14.0" />
                                                     </font>
                                                 </Label>
-                                                <TextField fx:id="tfSearchBankAccount" maxWidth="1.7976931348623157E308" promptText="Press F3: Search" GridPane.columnIndex="4" GridPane.rowIndex="1" />
+                                                <TextField fx:id="tfSearchBankAccount" maxWidth="1.7976931348623157E308" promptText="Press F3: Search" GridPane.columnIndex="6" GridPane.rowIndex="1" />
                                             </children>
                                         </GridPane>
                                     </children>

@@ -439,8 +439,9 @@ public class CheckAuthorizationController implements Initializable, ScreenInterf
     }
 
     private void initButtons() {
-        JFXUtil.setButtonsVisibility(!main_data.isEmpty(),  btnAuthorize, btnReturn, btnDisapproved);
+        JFXUtil.setButtonsVisibility(!main_data.isEmpty(), btnAuthorize, btnReturn, btnDisapproved);
         disableRowCheckbox.set(main_data.isEmpty()); // set enable/disable in checkboxes in requirements
+        JFXUtil.setDisabled(main_data.isEmpty(), chckSelectAll);
     }
 
     private void handleDisbursementAction(String action) {

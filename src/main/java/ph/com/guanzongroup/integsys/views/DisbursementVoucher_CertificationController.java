@@ -443,6 +443,7 @@ public class DisbursementVoucher_CertificationController implements Initializabl
     private void initButtons() {
         JFXUtil.setButtonsVisibility(!main_data.isEmpty(), btnCertify, btnDisapproved, btnReturn);
         disableRowCheckbox.set(main_data.isEmpty()); // set enable/disable in checkboxes in requirements
+        JFXUtil.setDisabled(main_data.isEmpty(),chckSelectAll );
     }
 
     private void handleDisbursementAction(String action) {
