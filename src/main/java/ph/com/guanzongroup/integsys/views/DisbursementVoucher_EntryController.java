@@ -87,8 +87,6 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
     private int pnDetail = 0;
     private int pnDetailJE = 0;
     private boolean pbIsCheckedJournalTab = false;
-    private boolean pbIsVerifier = false;
-    private boolean isWithVAToriginal = false;
     private final String pxeModuleName = "Disbursement Voucher";
     private DisbursementVoucher poController;
     public int pnEditMode;
@@ -113,7 +111,6 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
     AtomicReference<Object> previousSearchedTextField = new AtomicReference<>();
     private boolean pbEnteredDV = false;
     private boolean pbEnteredJE = false;
-    private boolean isSearchActive = false;
 
     List<Pair<String, String>> plOrderNoPartial = new ArrayList<>();
     List<Pair<String, String>> plOrderNoFinal = new ArrayList<>();
@@ -137,7 +134,6 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
     ObservableList<String> cOtherPayment = FXCollections.observableArrayList("FLOATING");
     ObservableList<String> cOtherPaymentBTransfer = FXCollections.observableArrayList("FLOATING");
 
-    private EventHandler<ActionEvent> claimantTypeHandler;
     /* DV  & Journal */
     @FXML
     private AnchorPane AnchorMain, apButton, apMasterDetail, apDVMaster1, apMasterDVCheck, apMasterDVBTransfer, apMasterDVOp, apDVMaster2, apDVMaster3, apDVDetail, apMainList, apJournalMaster, apJournalDetails, apBrowse;
@@ -226,9 +222,6 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                 loadRecordSearch();
                 cmbTransactionType.getSelectionModel().select(DisbursementStatic.SourceCode.LOAD_ALL);
                 psTransactionType = DisbursementStatic.SourceCode.LOAD_ALL;
-                if (oApp.getUserLevel() > UserRight.ENCODER) {
-                    pbIsVerifier = true;
-                }
                 btnNew.fire();
             });
         } catch (SQLException | GuanzonException ex) {
@@ -340,7 +333,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                     poController.initFields();
                     poJSON = poController.NewTransaction();
                     if ("error".equals((String) poJSON.get("result"))) {
-                        ShowMessageFX.Warning((String) poJSON.get("message"), pxeModuleName, null);
+                        ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                         return;
                     }
 
@@ -354,7 +347,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                 case "btnUpdate":
                     poJSON = poController.UpdateTransaction();
                     if ("error".equals((String) poJSON.get("result"))) {
-                        ShowMessageFX.Warning((String) poJSON.get("message"), pxeModuleName, null);
+                        ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                         return;
                     }
                     pbIsCheckedJournalTab = false;
@@ -375,7 +368,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                     }
                     poJSON = poController.validateTAXandVat();
                     if ("error".equals((String) poJSON.get("result"))) {
-                        ShowMessageFX.Information((String) poJSON.get("message"), pxeModuleName, null);
+                        ShowMessageFX.Information(null, pxeModuleName, (String) poJSON.get("message"));
                         pnDetail = (int) poJSON.get("pnDetail");
                         JFXUtil.selectAndFocusRow(tblVwDetails, pnDetail);
 //                        loadRecordDetail();
@@ -386,7 +379,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                     if (pnEditMode == EditMode.UPDATE || pnEditMode == EditMode.ADDNEW) {
                         if (oApp.getUserLevel() > UserRight.ENCODER) {
                             if (!pbIsCheckedJournalTab) {
-                                ShowMessageFX.Warning(null, pxeModuleName, "Please review the Journal Entry before proceeding to save.");
+                                ShowMessageFX.Warning(null, pxeModuleName, "Please check the Journal Entry before saving.");
                                 return;
                             }
                         }
@@ -395,12 +388,12 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                     }
                     poJSON = poController.SaveTransaction();
                     if (!"success".equals((String) poJSON.get("result"))) {
-                        ShowMessageFX.Warning((String) poJSON.get("message"), pxeModuleName, null);
+                        ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                         return;
                     }
                     JFXUtil.showRetainedHighlight(true, tblViewMainList, "#A7C7E7", plOrderNoPartial, plOrderNoFinal, highlightedRowsMain, true);
 
-                    ShowMessageFX.Information((String) poJSON.get("message"), pxeModuleName, null);
+                    ShowMessageFX.Information(null, pxeModuleName, (String) poJSON.get("message"));
                     poJSON = poController.OpenTransaction(poController.Master().getTransactionNo());
                     if ("success".equals(poJSON.get("result"))) {
                         pnEditMode = poController.getEditMode();
@@ -413,15 +406,15 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                             if (oApp.getUserLevel() >= UserRight.ENCODER) {
                                 if (!poController.existJournal().equals("")) {
                                     if (!pbIsCheckedJournalTab) {
-                                        ShowMessageFX.Warning(null, pxeModuleName, "Please review the Journal Entry before proceeding to save.");
+                                        ShowMessageFX.Warning(null, pxeModuleName, "Please check the Journal Entry before saving.");
                                         return;
                                     } else {
                                         poJSON = poController.VerifyTransaction("");
                                         if ("error".equals((String) poJSON.get("result"))) {
-                                            ShowMessageFX.Warning((String) poJSON.get("message"), pxeModuleName, null);
+                                            ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                             return;
                                         } else {
-                                            ShowMessageFX.Information((String) poJSON.get("message"), pxeModuleName, null);
+                                            ShowMessageFX.Information(null, pxeModuleName, (String) poJSON.get("message"));
                                         }
                                     }
                                 } else {
@@ -447,28 +440,6 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                 case "btnRetrieve":
                     loadTableMain.reload();
                     break;
-//                case "btnVoid":
-//                    if (ShowMessageFX.YesNo(null, "Close Tab", "Are you sure you want to void transaction?")) {
-//                        pnEditMode = poController.getEditMode();
-//                        if (pnEditMode == EditMode.READY) {
-//                            if (!poController.existJournal().equals("")) {
-//                                poJSON = poController.VoidTransaction("");
-//                                if ("error".equals((String) poJSON.get("result"))) {
-//                                    ShowMessageFX.Warning((String) poJSON.get("message"), pxeModuleName, null);
-//                                    return;
-//                                } else {
-//                                    ShowMessageFX.Information((String) poJSON.get("message"), pxeModuleName, null);
-//                                    pnEditMode = poController.getEditMode();
-//                                }
-//                            } else {
-//                                ShowMessageFX.Warning("No journal entry exist, please add journal entry click edit and click tab journal then save before void.", pxeModuleName, null);
-//                                return;
-//                            }
-//                        }
-//                    } else {
-//                        return;
-//                    }
-//                    break;
                 case "btnClose":
                     if (ShowMessageFX.YesNo(null, "Close Tab", "Are you sure you want to close this Tab?")) {
                         poUnload.unloadForm(AnchorMain, oApp, pxeModuleName);
@@ -477,7 +448,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                     }
                     break;
                 default:
-                    ShowMessageFX.Warning(null, pxeModuleName, "Button is not registered");
+                    ShowMessageFX.Warning(null, pxeModuleName, "Button is not registered, Please contact admin to assist about the unregistered button");
                     break;
             }
             if (JFXUtil.isObjectEqualTo(lsButton, "btnSave", "btnCancel", "btnVoid")) {
@@ -1369,9 +1340,9 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                                 return;
                             }
                         }
-                        if (pbEnteredDV) {
+                        if (pbEnteredJE) {
                             moveNextJE(false, true);
-                            pbEnteredDV = false;
+                            pbEnteredJE = false;
                         }
                         break;
                 }
@@ -1408,7 +1379,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                             case "tfSearchPayee":
                                 poJSON = poController.SearchPayee(lsValue, false, true);
                                 if ("error".equals((String) poJSON.get("result"))) {
-                                    ShowMessageFX.Warning((String) poJSON.get("message"), pxeModuleName, null);
+                                    ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                     return;
                                 } else {
                                     loadTableMain.reload();
@@ -1418,7 +1389,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                             case "tfSearchBranch":
                                 poJSON = poController.SearchBranch(lsValue, false, true);
                                 if ("error".equals((String) poJSON.get("result"))) {
-                                    ShowMessageFX.Warning((String) poJSON.get("message"), pxeModuleName, null);
+                                    ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                     return;
                                 } else {
                                     loadTableMain.reload();
@@ -1428,7 +1399,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                             case "tfSearchParticular":
                                 poJSON = poController.SearchParticular(lsValue, pnMain, false, true);
                                 if ("error".equals((String) poJSON.get("result"))) {
-                                    ShowMessageFX.Warning((String) poJSON.get("message"), pxeModuleName, null);
+                                    ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                     return;
                                 } else {
                                     loadTableMain.reload();
@@ -1470,21 +1441,21 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                             case "tfBankNameCheck":
                                 poJSON = poController.SearchBanks(lsValue, false);
                                 if ("error".equals((String) poJSON.get("result"))) {
-                                    ShowMessageFX.Warning((String) poJSON.get("message"), pxeModuleName, null);
+                                    ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                 }
                                 loadRecordMasterCheck();
                                 break;
                             case "tfBankAccountCheck":
                                 poJSON = poController.SearchBankAccount(lsValue, poController.CheckPayments().getModel().getBankID(), false);
                                 if ("error".equals((String) poJSON.get("result"))) {
-                                    ShowMessageFX.Warning((String) poJSON.get("message"), pxeModuleName, null);
+                                    ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                 }
                                 loadRecordMasterCheck();
                                 break;
                             case "tfPayeeName":
                                 poJSON = poController.SearchPayee(poController.Master().getSupplierClientID(), true, false);
                                 if ("error".equals((String) poJSON.get("result"))) {
-                                    ShowMessageFX.Warning((String) poJSON.get("message"), pxeModuleName, null);
+                                    ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                     loadRecordMasterCheck();
                                     break;
                                 }
@@ -1503,21 +1474,21 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                             case "tfBankNameBTransfer":
                                 poJSON = poController.SearchBanks(lsValue, false);
                                 if ("error".equals((String) poJSON.get("result"))) {
-                                    ShowMessageFX.Warning((String) poJSON.get("message"), pxeModuleName, null);
+                                    ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                 }
                                 loadRecordMasterBankTransfer();
                                 break;
                             case "tfBankAccountBTransfer":
                                 poJSON = poController.SearchBankAccount(lsValue, poController.CheckPayments().getModel().getBankID(), false);
                                 if ("error".equals((String) poJSON.get("result"))) {
-                                    ShowMessageFX.Warning((String) poJSON.get("message"), pxeModuleName, null);
+                                    ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                 }
                                 loadRecordMasterBankTransfer();
                                 break;
                             case "tfSupplierBank":
 //                                poJSON = poController.SearchPayee(poController.Master().getSupplierClientID(), true, false);
 //                                if ("error".equals((String) poJSON.get("result"))) {
-//                                    ShowMessageFX.Warning((String) poJSON.get("message"), pxeModuleName, null);
+//                                    ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
 //                                    loadRecordMasterCheck();
 //                                    break;
 //                                }
@@ -1546,7 +1517,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                             case "tfParticularsDetail":
                                 poJSON = poController.SearchParticular(lsValue, pnDetail, false, false);
                                 if ("error".equals((String) poJSON.get("result"))) {
-                                    ShowMessageFX.Warning((String) poJSON.get("message"), pxeModuleName, null);
+                                    ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                     JFXUtil.runWithDelay(0.50, () -> {
                                         loadTableDetail.reload();
                                     });
@@ -1558,17 +1529,15 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                                 });
                                 break;
                             case "tfTaxCodeDetail":
-                                isSearchActive = true;
                                 poJSON = poController.SearchTaxCode(lsValue, pnDetail, false);
                                 if ("error".equals((String) poJSON.get("result"))) {
-                                    ShowMessageFX.Warning((String) poJSON.get("message"), pxeModuleName, null);
+                                    ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                     JFXUtil.runWithDelay(0.50, () -> {
                                         loadTableDetail.reload();
                                     });
                                     return;
                                 }
                                 if (!poController.Detail(pnDetail).isWithVat()) {
-                                    isWithVAToriginal = false;
                                     poController.Detail(pnDetail).isWithVat(true);
                                     double lnVatRate = JFXUtil.isObjectEqualTo(poJSONVAT.get("totalVatRa"), null, "") ? 0 : (double) poJSONVAT.get("totalVatRa");
                                     poController.Detail(pnDetail).setDetailVatRates(lnVatRate);
@@ -1741,12 +1710,12 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
 
             poJSON = poController.computeFields();
             if ("error".equals((String) poJSON.get("result"))) {
-                ShowMessageFX.Warning((String) poJSON.get("message"), pxeModuleName, null);
+                ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                 return;
             }
 //            poJSON = poController.modeOfPayment(poController.Master().getDisbursementType());
 //            if ("error".equals((String) poJSON.get("message"))) {
-//                ShowMessageFX.Warning((String) poJSON.get("message"), pxeModuleName, null);
+//                ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
 //            }
             switch (poController.Master().getDisbursementType()) {
                 case DisbursementStatic.DisbursementType.CHECK:
@@ -1782,7 +1751,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
         try {
             poJSON = poController.computeDetailFields();
             if ("error".equals((String) poJSON.get("result"))) {
-                ShowMessageFX.Warning((String) poJSON.get("message"), pxeModuleName, null);
+                ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                 return;
             }
             //according to business rule particular is non-editable

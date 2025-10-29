@@ -54,7 +54,6 @@ import org.guanzon.appdriver.base.MiscUtil;
 import org.guanzon.appdriver.base.SQLUtil;
 import org.guanzon.appdriver.constant.EditMode;
 import org.guanzon.appdriver.constant.Logical;
-import org.guanzon.appdriver.constant.UserRight;
 import org.json.simple.JSONObject;
 import ph.com.guanzongroup.cas.cashflow.DisbursementVoucher;
 import ph.com.guanzongroup.cas.cashflow.services.CashflowControllers;
@@ -68,28 +67,18 @@ import ph.com.guanzongroup.cas.cashflow.status.DisbursementStatic;
 public class DisbursementVoucher_HistoryController implements Initializable, ScreenInterface {
 
     private GRiderCAS oApp;
-    private JSONObject poJSON, poJSONVAT;
-    private static final int ROWS_PER_PAGE = 50;
-    private int pnMain = 0;
+    private JSONObject poJSON;
     private int pnDetail = 0;
     private int pnDetailJE = 0;
-    private boolean pbIsVerifier = false;
-    private boolean isWithVAToriginal = false;
     private final String pxeModuleName = "Disbursement Voucher History";
     private DisbursementVoucher poController;
     public int pnEditMode;
-    boolean pbKeyPressed = false;
     private String psIndustryId = "";
     private String psCompanyId = "";
     private String psCategoryId = "";
-    private String psSupplierPayeeId = "";
-    private String psTransactionType = "";
     private String psSearchTransactionNo = "";
 
     private unloadForm poUnload = new unloadForm();
-    private ObservableList<ModelDisbursementVoucher_Main> main_data = FXCollections.observableArrayList();
-    private FilteredList<ModelDisbursementVoucher_Main> filteredMain_Data;
-
     private ObservableList<ModelDisbursementVoucher_Detail> details_data = FXCollections.observableArrayList();
     private FilteredList<ModelDisbursementVoucher_Detail> filteredDataDetailDV;
 
@@ -99,12 +88,8 @@ public class DisbursementVoucher_HistoryController implements Initializable, Scr
     AtomicReference<Object> lastFocusedTextField = new AtomicReference<>();
     AtomicReference<Object> previousSearchedTextField = new AtomicReference<>();
 
-    JFXUtil.ReloadableTableTask loadTableMain, loadTableDetail, loadTableDetailJE;
+    JFXUtil.ReloadableTableTask loadTableDetail, loadTableDetailJE;
 
-    ObservableList<String> cTransactionType = FXCollections.observableArrayList(DisbursementStatic.SourceCode.ACCOUNTS_PAYABLE, // "SOA"
-            DisbursementStatic.SourceCode.PAYMENT_REQUEST, // "PRF"
-            DisbursementStatic.SourceCode.CASH_PAYABLE,
-            "ALL");
     ObservableList<String> cPaymentMode = FXCollections.observableArrayList(
             "CHECK", "WIRED", "DIGITAL PAYMENT");
     ObservableList<String> cDisbursementMode = FXCollections.observableArrayList("DELIVER", "PICK-UP");
@@ -198,10 +183,6 @@ public class DisbursementVoucher_HistoryController implements Initializable, Scr
                 poController.setCategoryID(psCategoryId);
                 poController.Master().setBranchCode(oApp.getBranchCode());
                 loadRecordSearch();
-                psTransactionType = DisbursementStatic.SourceCode.LOAD_ALL;
-                if (oApp.getUserLevel() > UserRight.ENCODER) {
-                    pbIsVerifier = true;
-                }
             });
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
@@ -224,7 +205,7 @@ public class DisbursementVoucher_HistoryController implements Initializable, Scr
                                 populateJE();
                             } else {
                                 CustomCommonUtil.switchToTab(tabDetails, tabPaneMain);
-                                ShowMessageFX.Warning("Please provide at least one valid disbursement detail to proceed.", pxeModuleName, null);
+                                ShowMessageFX.Warning(null, pxeModuleName, "Please provide at least one valid disbursement detail to proceed.");
                             }
                         }
                         break;
@@ -299,7 +280,6 @@ public class DisbursementVoucher_HistoryController implements Initializable, Scr
                     }
                     JFXUtil.clickTabByTitleText(tabPaneMain, "Disbursement Voucher");
                     pnEditMode = poController.getEditMode();
-                    psSupplierPayeeId = poController.Master().Payee().getClientID();
                     poController.populateJournal();
                     loadTableDetail.reload();
                     break;
@@ -314,7 +294,7 @@ public class DisbursementVoucher_HistoryController implements Initializable, Scr
                     }
                     break;
                 default:
-                    ShowMessageFX.Warning(null, pxeModuleName, "Button is not registered");
+                    ShowMessageFX.Warning(null, pxeModuleName, "Button is not registered, Please contact admin to assist about the unregistered button");
                     break;
             }
             if (JFXUtil.isObjectEqualTo(lsButton, "btnSave", "btnCancel", "btnVoid")) {
@@ -640,14 +620,13 @@ public class DisbursementVoucher_HistoryController implements Initializable, Scr
                                 poController.Master().setBranchCode(oApp.getBranchCode());
                                 poJSON = poController.SearchTransaction(lsValue);
                                 if ("error".equals((String) poJSON.get("result"))) {
-                                    ShowMessageFX.Warning((String) poJSON.get("message"), pxeModuleName, null);
+                                    ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                     return;
                                 } else {
                                     psSearchTransactionNo = poController.Master().getTransactionNo();
                                     loadRecordSearch();
                                     JFXUtil.clickTabByTitleText(tabPaneMain, "Disbursement Voucher");
                                     pnEditMode = poController.getEditMode();
-                                    psSupplierPayeeId = poController.Master().Payee().getClientID();
                                     poController.populateJournal();
                                     loadTableDetail.reload();
                                     initDVMasterTabs();
@@ -656,7 +635,7 @@ public class DisbursementVoucher_HistoryController implements Initializable, Scr
                             case "tfSearchSupplier":
                                 poJSON = poController.SearchPayee(lsValue, false, true);
                                 if ("error".equals((String) poJSON.get("result"))) {
-                                    ShowMessageFX.Warning((String) poJSON.get("message"), pxeModuleName, null);
+                                    ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                     return;
                                 } else {
                                     loadRecordSearch();
@@ -700,12 +679,12 @@ public class DisbursementVoucher_HistoryController implements Initializable, Scr
 
             poJSON = poController.computeFields();
             if ("error".equals((String) poJSON.get("result"))) {
-                ShowMessageFX.Warning((String) poJSON.get("message"), pxeModuleName, null);
+                ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                 return;
             }
 //            poJSON = poController.modeOfPayment(poController.Master().getDisbursementType());
 //            if ("error".equals((String) poJSON.get("message"))) {
-//                ShowMessageFX.Warning((String) poJSON.get("message"), pxeModuleName, null);
+//                ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
 //            }
             switch (poController.Master().getDisbursementType()) {
                 case DisbursementStatic.DisbursementType.CHECK:
@@ -741,7 +720,7 @@ public class DisbursementVoucher_HistoryController implements Initializable, Scr
         try {
             poJSON = poController.computeDetailFields();
             if ("error".equals((String) poJSON.get("result"))) {
-                ShowMessageFX.Warning((String) poJSON.get("message"), pxeModuleName, null);
+                ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                 return;
             }
             tfRefNoDetail.setText(poController.Detail(pnDetail).getSourceNo());

@@ -43,9 +43,7 @@ import org.json.simple.JSONObject;
 import javax.script.ScriptException;
 import org.guanzon.appdriver.base.CommonUtils;
 import org.json.simple.parser.ParseException;
-import ph.com.guanzongroup.cas.cashflow.Disbursement;
 import ph.com.guanzongroup.cas.cashflow.DisbursementVoucher;
-import ph.com.guanzongroup.cas.cashflow.model.SelectedITems;
 import ph.com.guanzongroup.cas.cashflow.services.CashflowControllers;
 import ph.com.guanzongroup.cas.cashflow.status.DisbursementStatic;
 
@@ -63,13 +61,11 @@ public class DisbursementVoucher_CertificationController implements Initializabl
     private DisbursementVoucher poDisbursementController;
 
     private String psIndustryId = "";
-    private String psCompanyId = "";
     private String psCategoryId = "";
+    private String psCompanyId = "";
     private String psSearchBankID = "";
     private String psSearchBankAccountID = "";
     public int pnEditMode;
-    private double xOffset = 0;
-    private double yOffset = 0;
     int pnMain = 0;
     private unloadForm poUnload = new unloadForm();
 
