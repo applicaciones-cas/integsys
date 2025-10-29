@@ -131,7 +131,7 @@
                         </AnchorPane>
                     </bottom>
                     <center>
-                        <AnchorPane BorderPane.alignment="CENTER">
+                        <AnchorPane maxWidth="900.0" BorderPane.alignment="CENTER">
                             <children>
                                 <AnchorPane style="-fx-border-color: orange;" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="5.0">
                                     <children>
@@ -142,15 +142,15 @@
                                             <rowConstraints>
                                                 <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" vgrow="SOMETIMES" />
                                                 <RowConstraints maxHeight="1.7976931348623157E308" prefHeight="30.0" vgrow="ALWAYS" />
-                                                <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="40.0" vgrow="SOMETIMES" />
+                                                <RowConstraints vgrow="SOMETIMES" />
                                             </rowConstraints>
                                             <children>
-                                                <TableView fx:id="tblVwMain" minWidth="242.0" GridPane.rowIndex="1">
+                                                <TableView fx:id="tblViewMainList" minWidth="242.0" GridPane.rowIndex="1">
                                                     <columns>
                                                         <TableColumn fx:id="tblRowNo" maxWidth="30.0" minWidth="30.0" prefWidth="30.0" resizable="false" sortable="false" text="No." />
                                                         <TableColumn fx:id="tblCheckBox" maxWidth="30.0" minWidth="30.0" prefWidth="30.0" resizable="false" sortable="false">
                                                             <graphic>
-                                                                <CheckBox fx:id="chckSelectAll" mnemonicParsing="false" />
+                                                                <CheckBox fx:id="chckSelectAll" mnemonicParsing="false" onAction="#cmdCheckBox_Click" />
                                                             </graphic>
                                                         </TableColumn>
                                                         <TableColumn fx:id="tblDVNo" maxWidth="150.0" minWidth="150.0" prefWidth="150.0" resizable="false" sortable="false" text="DV No" />
@@ -165,9 +165,9 @@
                                                         <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                                                     </GridPane.margin>
                                                 </TableView>
-                                                <Pagination fx:id="pagination" maxPageIndicatorCount="0" prefHeight="200.0" prefWidth="200.0" GridPane.rowIndex="2">
+                                                <Pagination fx:id="pagination" maxPageIndicatorCount="0" GridPane.rowIndex="2">
                                                     <GridPane.margin>
-                                                        <Insets />
+                                                        <Insets bottom="5.0" />
                                                     </GridPane.margin>
                                                 </Pagination>
                                             </children>
