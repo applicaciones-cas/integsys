@@ -612,11 +612,14 @@ public class DisbursementVoucher_VerificationController implements Initializable
                 String lsTransactionNo = selected.getIndex05();
                 clearTextFields();
                 poJSON = poController.OpenTransaction(lsTransactionNo);
+                pnEditMode = poController.getEditMode();
+                details_data.clear();
+                journal_data.clear();
+
                 if ("error".equals((String) poJSON.get("result"))) {
                     ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                     return;
                 }
-                pnEditMode = poController.getEditMode();
                 Platform.runLater(() -> {
                     loadTableDetail.reload();
                     loadTableDetailJE.reload();
