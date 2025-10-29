@@ -245,14 +245,12 @@ public class CheckAuthorizationController implements Initializable, ScreenInterf
                             poDisbursementController.CheckPayments().getModel().setBankAcountID("");
                             psSearchBankID = "";
                             psSearchBankAccountID = "";
-                            retrieveDisbursement();
                         }
                         break;
                     case "tfSearchBankAccount":
                         if (lsValue.isEmpty()) {
                             poDisbursementController.CheckPayments().getModel().setBankAcountID("");
                             psSearchBankAccountID = "";
-                            retrieveDisbursement();
                         }
                         break;
                 }
