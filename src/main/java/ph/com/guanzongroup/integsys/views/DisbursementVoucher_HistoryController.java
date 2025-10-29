@@ -125,7 +125,7 @@ public class DisbursementVoucher_HistoryController implements Initializable, Scr
     @FXML
     private TableView tblVwDetails, tblVwJournalDetails;
     @FXML
-    private TableColumn tblDVRowNo, tblReferenceNo, tblAccountCode, tblTransactionTypeDetail, tblParticulars, tblPurchasedAmount, tblVatableSales, tblVatAmt, tblVatRate, tblVatZeroRatedSales, tblVatExemptSales, tblTaxCode, tblTaxAmount, tblNetAmount, tblJournalRowNo, tblJournalAccountCode, tblJournalAccountDescription, tblJournalDebitAmount, tblJournalCreditAmount, tblJournalReportMonthYear;
+    private TableColumn tblDVRowNo, tblReferenceNo, tblTransactionTypeDetail, tblParticulars, tblPurchasedAmount, tblVatableSales, tblVatAmt, tblVatRate, tblVatZeroRatedSales, tblVatExemptSales, tblTaxCode, tblTaxAmount, tblNetAmount, tblJournalRowNo, tblJournalAccountCode, tblJournalAccountDescription, tblJournalDebitAmount, tblJournalCreditAmount, tblJournalReportMonthYear;
 
     @Override
     public void setGRider(GRiderCAS foValue) {
@@ -384,8 +384,7 @@ public class DisbursementVoucher_HistoryController implements Initializable, Scr
                                     details_data.add(
                                             new ModelDisbursementVoucher_Detail(String.valueOf(lnCtr + 1),
                                                     poController.Detail(lnCtr).getSourceNo(),
-                                                    poController.Detail(lnCtr).Particular().getAccountCode(),
-                                                    poController.Detail(lnCtr).getSourceCode(),
+                                                    JFXUtil.getSourceType(poController.Detail(lnCtr).getSourceCode(), true),
                                                     poController.Detail(lnCtr).Particular().getDescription(),
                                                     CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(lnCtr).getAmountApplied(), true),
                                                     CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(lnCtr).getDetailVatSales(), true),
@@ -415,11 +414,6 @@ public class DisbursementVoucher_HistoryController implements Initializable, Scr
 //                            try {
                                 /* FOCUS ON THE ROW THAT pnRowDetail POINTS TO */
                                 JFXUtil.selectAndFocusRow(tblVwDetails, pnDetail);
-//                            poJSONVAT = poController.validateDetailVATAndTAX(poController.Detail(pnDetail).getSourceCode(), poController.Detail(pnDetail).getSourceNo());
-//                            poController.computeVat(pnDetail, poController.Detail(pnDetail).getAmountApplied(),
-//                                    poController.Detail(pnDetail).getDetailVatRates(), Double.parseDouble(JFXUtil.removeComma(tfPartialPayment.getText())),
-//                                    true);
-
                                 loadRecordDetail();
 //                            } catch (SQLException ex) {
 //                                Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
@@ -494,9 +488,8 @@ public class DisbursementVoucher_HistoryController implements Initializable, Scr
     }
 
     private void initDetailGrid() {
-        tblAccountCode.setVisible(false);
         JFXUtil.setColumnCenter(tblDVRowNo, tblReferenceNo);
-        JFXUtil.setColumnLeft(tblAccountCode, tblTransactionTypeDetail, tblParticulars, tblVatableSales, tblVatAmt, tblVatRate, tblVatZeroRatedSales, tblVatExemptSales, tblTaxCode);
+        JFXUtil.setColumnLeft(tblTransactionTypeDetail, tblParticulars, tblVatableSales, tblVatAmt, tblVatRate, tblVatZeroRatedSales, tblVatExemptSales, tblTaxCode);
         JFXUtil.setColumnRight(tblPurchasedAmount, tblTaxAmount, tblNetAmount);
         JFXUtil.setColumnsIndexAndDisableReordering(tblVwDetails);
         filteredDataDetailDV = new FilteredList<>(details_data, b -> true);
@@ -667,6 +660,10 @@ public class DisbursementVoucher_HistoryController implements Initializable, Scr
     private void loadRecordMaster() {
         try {
             poJSON = new JSONObject();
+            if ("error".equals((String) poJSON.get("result"))) {
+                ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                return;
+            }
             JFXUtil.setStatusValue(lblDVTransactionStatus, DisbursementStatic.class, pnEditMode == EditMode.UNKNOWN ? "-1" : poController.Master().getTransactionStatus());
 
             tfDVTransactionNo.setText(poController.Master().getTransactionNo() != null ? poController.Master().getTransactionNo() : "");

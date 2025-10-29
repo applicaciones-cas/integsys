@@ -2719,4 +2719,35 @@ public class JFXUtil {
         }
         comboBox.setOnAction(originalHandler);
     }
+
+    public static String getSourceType(String lsValue, boolean isCode) {
+        if (lsValue == null || lsValue.trim().isEmpty()) {
+            return "";
+        }
+
+        String val = lsValue.trim().toLowerCase();
+
+        for (Map.Entry<String, String> entry : SOURCE_MAP.entrySet()) {
+            String code = entry.getKey();
+            String desc = entry.getValue();
+
+            if (val.equalsIgnoreCase(code)) {
+                return isCode ? desc : code;
+            } else if (val.equalsIgnoreCase(desc)) {
+                return isCode ? code : desc;
+            }
+        }
+
+        return "";
+    }
+    private static final Map<String, String> SOURCE_MAP = new HashMap<>();
+
+    static {
+        SOURCE_MAP.put("PRFx", "PRF");
+        SOURCE_MAP.put("SOAt", "SOA");
+        SOURCE_MAP.put("CcPy", "Cash Payable");
+        SOURCE_MAP.put("PORc", "PO Receiving");
+        SOURCE_MAP.put("APAd", "AP Adjustment");
+        SOURCE_MAP.put("PO", "Purchase Order");
+    }
 }
