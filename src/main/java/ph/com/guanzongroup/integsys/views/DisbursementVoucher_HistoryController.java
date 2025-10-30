@@ -5,7 +5,6 @@
 package ph.com.guanzongroup.integsys.views;
 
 import ph.com.guanzongroup.integsys.model.ModelDisbursementVoucher_Detail;
-import ph.com.guanzongroup.integsys.model.ModelDisbursementVoucher_Main;
 import ph.com.guanzongroup.integsys.model.ModelJournalEntry_Detail;
 import ph.com.guanzongroup.integsys.utility.CustomCommonUtil;
 import ph.com.guanzongroup.integsys.utility.JFXUtil;
@@ -22,7 +21,6 @@ import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
-import javafx.collections.transformation.SortedList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -80,10 +78,7 @@ public class DisbursementVoucher_HistoryController implements Initializable, Scr
 
     private unloadForm poUnload = new unloadForm();
     private ObservableList<ModelDisbursementVoucher_Detail> details_data = FXCollections.observableArrayList();
-    private FilteredList<ModelDisbursementVoucher_Detail> filteredDataDetailDV;
-
     private ObservableList<ModelJournalEntry_Detail> journal_data = FXCollections.observableArrayList();
-    private FilteredList<ModelJournalEntry_Detail> filteredJournal_Data;
 
     AtomicReference<Object> lastFocusedTextField = new AtomicReference<>();
     AtomicReference<Object> previousSearchedTextField = new AtomicReference<>();
@@ -485,12 +480,7 @@ public class DisbursementVoucher_HistoryController implements Initializable, Scr
         JFXUtil.setColumnLeft(tblTransactionTypeDetail, tblParticulars, tblTaxCode);
         JFXUtil.setColumnRight(tblPurchasedAmount, tblTaxAmount, tblNetAmount, tblVatableSales, tblVatAmt, tblVatRate, tblVatZeroRatedSales, tblVatExemptSales);
         JFXUtil.setColumnsIndexAndDisableReordering(tblVwDetails);
-        filteredDataDetailDV = new FilteredList<>(details_data, b -> true);
-
-        SortedList<ModelDisbursementVoucher_Detail> sortedData = new SortedList<>(filteredDataDetailDV);
-        sortedData.comparatorProperty().bind(tblVwDetails.comparatorProperty());
-        tblVwDetails.setItems(sortedData);
-        tblVwDetails.autosize();
+        tblVwDetails.setItems(details_data);
     }
 
     private void initDetailJEGrid() {
@@ -498,12 +488,7 @@ public class DisbursementVoucher_HistoryController implements Initializable, Scr
         JFXUtil.setColumnLeft(tblJournalAccountCode, tblJournalAccountDescription);
         JFXUtil.setColumnRight(tblJournalDebitAmount, tblJournalCreditAmount);
         JFXUtil.setColumnsIndexAndDisableReordering(tblVwJournalDetails);
-        filteredJournal_Data = new FilteredList<>(journal_data, b -> true);
-
-        SortedList<ModelJournalEntry_Detail> sortedData = new SortedList<>(filteredJournal_Data);
-        sortedData.comparatorProperty().bind(tblVwJournalDetails.comparatorProperty());
-        tblVwJournalDetails.setItems(sortedData);
-        tblVwJournalDetails.autosize();
+        tblVwJournalDetails.setItems(journal_data);
     }
 
     private void initTableOnClick() {

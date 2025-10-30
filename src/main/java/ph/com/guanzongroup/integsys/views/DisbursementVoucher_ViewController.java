@@ -378,12 +378,7 @@ public class DisbursementVoucher_ViewController implements Initializable, Screen
         JFXUtil.setColumnLeft(tblTransactionTypeDetail, tblParticulars, tblTaxCode);
         JFXUtil.setColumnRight(tblPurchasedAmount, tblTaxAmount, tblNetAmount, tblVatableSales, tblVatAmt, tblVatRate, tblVatZeroRatedSales, tblVatExemptSales);
         JFXUtil.setColumnsIndexAndDisableReordering(tblVwDetails);
-        filteredDataDetailDV = new FilteredList<>(details_data, b -> true);
-
-        SortedList<ModelDisbursementVoucher_Detail> sortedData = new SortedList<>(filteredDataDetailDV);
-        sortedData.comparatorProperty().bind(tblVwDetails.comparatorProperty());
-        tblVwDetails.setItems(sortedData);
-        tblVwDetails.autosize();
+        tblVwDetails.setItems(details_data);
     }
 
     private void initTableOnClick() {

@@ -29,7 +29,6 @@ import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
-import javafx.collections.transformation.SortedList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -103,10 +102,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
     private FilteredList<ModelDisbursementVoucher_Main> filteredMain_Data;
 
     private ObservableList<ModelDisbursementVoucher_Detail> details_data = FXCollections.observableArrayList();
-    private FilteredList<ModelDisbursementVoucher_Detail> filteredDataDetailDV;
-
     private ObservableList<ModelJournalEntry_Detail> journal_data = FXCollections.observableArrayList();
-    private FilteredList<ModelJournalEntry_Detail> filteredJournal_Data;
 
     AtomicReference<Object> lastFocusedTextField = new AtomicReference<>();
     AtomicReference<Object> previousSearchedTextField = new AtomicReference<>();
@@ -857,12 +853,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
         JFXUtil.setColumnLeft(tblTransactionTypeDetail, tblParticulars, tblTaxCode);
         JFXUtil.setColumnRight(tblPurchasedAmount, tblTaxAmount, tblNetAmount, tblVatableSales, tblVatAmt, tblVatRate, tblVatZeroRatedSales, tblVatExemptSales);
         JFXUtil.setColumnsIndexAndDisableReordering(tblVwDetails);
-        filteredDataDetailDV = new FilteredList<>(details_data, b -> true);
-
-        SortedList<ModelDisbursementVoucher_Detail> sortedData = new SortedList<>(filteredDataDetailDV);
-        sortedData.comparatorProperty().bind(tblVwDetails.comparatorProperty());
-        tblVwDetails.setItems(sortedData);
-        tblVwDetails.autosize();
+        tblVwDetails.setItems(details_data);
     }
 
     private void initDetailJEGrid() {
@@ -870,12 +861,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
         JFXUtil.setColumnLeft(tblJournalAccountCode, tblJournalAccountDescription);
         JFXUtil.setColumnRight(tblJournalDebitAmount, tblJournalCreditAmount);
         JFXUtil.setColumnsIndexAndDisableReordering(tblVwJournalDetails);
-        filteredJournal_Data = new FilteredList<>(journal_data, b -> true);
-
-        SortedList<ModelJournalEntry_Detail> sortedData = new SortedList<>(filteredJournal_Data);
-        sortedData.comparatorProperty().bind(tblVwJournalDetails.comparatorProperty());
-        tblVwJournalDetails.setItems(sortedData);
-        tblVwJournalDetails.autosize();
+        tblVwJournalDetails.setItems(journal_data);
     }
 
     private void initTableOnClick() {
@@ -1994,7 +1980,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
                     case "dpReportMonthYear":
                         if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
                             lsServerDate = sdfFormat.format(oApp.getServerDate());
-                            lsTransDate = sdfFormat.format(poController.Journal().Master().getTransactionDate());
+                            lsTransDate = sdfFormat.format(poController.CheckPayments().getModel().getTransactionDate());
                             lsSelectedDate = sdfFormat.format(SQLUtil.toDate(JFXUtil.convertToIsoFormat(inputText), SQLUtil.FORMAT_SHORT_DATE));
                             currentDate = LocalDate.parse(lsServerDate, DateTimeFormatter.ofPattern(SQLUtil.FORMAT_SHORT_DATE));
                             selectedDate = LocalDate.parse(lsSelectedDate, DateTimeFormatter.ofPattern(SQLUtil.FORMAT_SHORT_DATE));
