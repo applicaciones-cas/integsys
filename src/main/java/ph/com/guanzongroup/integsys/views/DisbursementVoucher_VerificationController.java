@@ -860,8 +860,8 @@ public class DisbursementVoucher_VerificationController implements Initializable
 
     private void initDetailGrid() {
         JFXUtil.setColumnCenter(tblDVRowNo, tblReferenceNo);
-        JFXUtil.setColumnLeft( tblTransactionTypeDetail, tblParticulars, tblTaxCode);
-        JFXUtil.setColumnRight(tblVatableSales, tblVatAmt, tblVatRate, tblVatZeroRatedSales, tblVatExemptSales, tblPurchasedAmount, tblTaxAmount, tblNetAmount);
+        JFXUtil.setColumnLeft(tblTransactionTypeDetail, tblParticulars, tblTaxCode);
+        JFXUtil.setColumnRight(tblPurchasedAmount, tblTaxAmount, tblNetAmount, tblVatableSales, tblVatAmt, tblVatRate, tblVatZeroRatedSales, tblVatExemptSales);
         JFXUtil.setColumnsIndexAndDisableReordering(tblVwDetails);
         filteredDataDetailDV = new FilteredList<>(details_data, b -> true);
 

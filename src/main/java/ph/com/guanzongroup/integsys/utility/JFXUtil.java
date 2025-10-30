@@ -267,52 +267,13 @@ public class JFXUtil {
     public static void showRetainedHighlight(boolean isRetained, TableView<?> tblView, String color, List<Pair<String, String>> plPartial, List<Pair<String, String>> plFinal,
             Map<String, List<String>> highlightedRows, boolean resetpartial) {
 
-        //define if it contains - then trim()
-        //transactionNo-transNoBasis
-        //identifies if exists other same Main transactionNo in the MapList then delete before retaining
-        // --- Skip process if plPartial has no '-' in any key ---
-        boolean hasDash = false;
-        for (Pair<String, String> pair : plPartial) {
-            if (pair.getKey().contains("-")) {
-                hasDash = true;
-                break;
-            }
-        }
-
-        if (hasDash) {
-            Set<String> prefixesToRemove = new HashSet<>();
-
-            for (Pair<String, String> pair : plFinal) {
-                String key = pair.getKey();
-                int dashIndex = key.indexOf("-");
-                if (dashIndex > 0) {
-                    String prefix = key.substring(0, dashIndex); // e.g., "m001323"
-
-                    // Check if any key in plPartial starts with prefix + "-"
-                    for (Pair<String, String> partialPair : plPartial) {
-                        if (partialPair.getKey().startsWith(prefix + "-")) {
-                            prefixesToRemove.add(prefix);
-                            break;
-                        }
-                    }
-                }
-            }
-
-            // Remove from plFinal all pairs whose key starts with any prefix in prefixesToRemove
-            plFinal.removeIf(p -> {
-                for (String prefix : prefixesToRemove) {
-                    if (p.getKey().startsWith(prefix)) {
-                        return true;
-                    }
-                }
-                return false;
-            });
-        }
-        //===================================================================================
-
         //decide if to allow adding to final of rows highlighted 
         //if contains 1 value, indicates will proceed
         if (isRetained) {
+            plFinal.removeIf(finalPair
+                    -> plPartial.stream()
+                            .anyMatch(partialPair -> partialPair.getKey().equals(finalPair.getKey()))
+            );
             for (Pair<String, String> pair : plPartial) {
                 if (!"0".equals(pair.getValue())) {
                     plFinal.add(new Pair<>(pair.getKey(), pair.getValue()));

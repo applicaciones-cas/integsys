@@ -908,8 +908,8 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
 
     private void initDetailGrid() {
         JFXUtil.setColumnCenter(tblDVRowNo, tblReferenceNo);
-        JFXUtil.setColumnLeft(tblTransactionTypeDetail, tblParticulars, tblVatableSales, tblVatAmt, tblVatRate, tblVatZeroRatedSales, tblVatExemptSales, tblTaxCode);
-        JFXUtil.setColumnRight(tblPurchasedAmount, tblTaxAmount, tblNetAmount);
+        JFXUtil.setColumnLeft(tblTransactionTypeDetail, tblParticulars, tblTaxCode);
+        JFXUtil.setColumnRight(tblPurchasedAmount, tblTaxAmount, tblNetAmount, tblVatableSales, tblVatAmt, tblVatRate, tblVatZeroRatedSales, tblVatExemptSales);
         JFXUtil.setColumnsIndexAndDisableReordering(tblVwDetails);
         filteredDataDetailDV = new FilteredList<>(details_data, b -> true);
 
@@ -945,12 +945,10 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
         });
 
         tblViewMainList.setOnMouseClicked(event -> {
-            if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
-                pnMain = tblViewMainList.getSelectionModel().getSelectedIndex();
-                if (pnMain >= 0 && event.getClickCount() == 2) {
-                    loadTableDetailFromMain();
-                    initButton(pnEditMode);
-                }
+            pnMain = tblViewMainList.getSelectionModel().getSelectedIndex();
+            if (pnMain >= 0 && event.getClickCount() == 2) {
+                loadTableDetailFromMain();
+                initButton(pnEditMode);
             }
         }
         );
