@@ -772,17 +772,11 @@ public class DisbursementVoucher_VerificationController implements Initializable
                                     loadRecordDetail();
                                 }
                             } else {
-//                            try {
                                 /* FOCUS ON THE ROW THAT pnRowDetail POINTS TO */
                                 JFXUtil.selectAndFocusRow(tblVwDetails, pnDetail);
                                 loadRecordDetail();
-//                            } catch (SQLException ex) {
-//                                Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
-//                            }
                             }
-
                             loadRecordMaster();
-
                         } catch (CloneNotSupportedException ex) {
                             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
                         }
@@ -1950,9 +1944,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
 
     private void datepicker_Action(ActionEvent event) {
         poJSON = new JSONObject();
-        poJSON.put("result", "success");
-        poJSON.put("message", "success");
-
+        JFXUtil.setJSONSuccess(poJSON, "success");
         try {
             Object source = event.getSource();
             if (source instanceof DatePicker) {
@@ -1962,38 +1954,27 @@ public class DisbursementVoucher_VerificationController implements Initializable
                 LocalDate currentDate = null, transactionDate = null, referenceDate = null, selectedDate = null;
                 String lsServerDate = "", lsTransDate = "", lsRefDate = "", lsSelectedDate = "";
 
-                JFXUtil.JFXUtilDateResult ldtResult = JFXUtil.processDate(inputText, datePicker);
-                poJSON = ldtResult.poJSON;
-                if ("error".equals(poJSON.get("result"))) {
-                    ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-                    loadRecordMaster();
-                    return;
-                }
                 if (inputText == null || "".equals(inputText) || "01/01/1900".equals(inputText)) {
                     return;
                 }
-                selectedDate = ldtResult.selectedDate;
                 switch (datePicker.getId()) {
                     case "dpCheckDate":
                         //back date not allowed
                         if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
                             lsServerDate = sdfFormat.format(oApp.getServerDate());
                             lsTransDate = sdfFormat.format(poController.CheckPayments().getModel().getTransactionDate());
-//                            lsRefDate = sdfFormat.format(poController.CheckPayments().getModel().getReferenceDate());
                             lsSelectedDate = sdfFormat.format(SQLUtil.toDate(JFXUtil.convertToIsoFormat(inputText), SQLUtil.FORMAT_SHORT_DATE));
                             currentDate = LocalDate.parse(lsServerDate, DateTimeFormatter.ofPattern(SQLUtil.FORMAT_SHORT_DATE));
                             selectedDate = LocalDate.parse(lsSelectedDate, DateTimeFormatter.ofPattern(SQLUtil.FORMAT_SHORT_DATE));
                             transactionDate = LocalDate.parse(lsTransDate, DateTimeFormatter.ofPattern(SQLUtil.FORMAT_SHORT_DATE));
 
                             if (selectedDate.isAfter(currentDate)) {
-                                poJSON.put("result", "error");
-                                poJSON.put("message", "Future dates are not allowed.");
+                                JFXUtil.setJSONError(poJSON, "Future dates are not allowed.");
                                 pbSuccess = false;
                             }
 
                             if (pbSuccess && (selectedDate.isAfter(transactionDate))) {
-                                poJSON.put("result", "error");
-                                poJSON.put("message", "Check date cannot be later than the transaction date.");
+                                JFXUtil.setJSONError(poJSON, "Check date cannot be later than the transaction date.");
                                 pbSuccess = false;
                             }
 
@@ -2013,22 +1994,19 @@ public class DisbursementVoucher_VerificationController implements Initializable
                     case "dpReportMonthYear":
                         if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
                             lsServerDate = sdfFormat.format(oApp.getServerDate());
-                            lsTransDate = sdfFormat.format(poController.CheckPayments().getModel().getTransactionDate());
-//                            lsRefDate = sdfFormat.format(poController.CheckPayments().getModel().getReferenceDate());
+                            lsTransDate = sdfFormat.format(poController.Journal().Master().getTransactionDate());
                             lsSelectedDate = sdfFormat.format(SQLUtil.toDate(JFXUtil.convertToIsoFormat(inputText), SQLUtil.FORMAT_SHORT_DATE));
                             currentDate = LocalDate.parse(lsServerDate, DateTimeFormatter.ofPattern(SQLUtil.FORMAT_SHORT_DATE));
                             selectedDate = LocalDate.parse(lsSelectedDate, DateTimeFormatter.ofPattern(SQLUtil.FORMAT_SHORT_DATE));
                             transactionDate = LocalDate.parse(lsTransDate, DateTimeFormatter.ofPattern(SQLUtil.FORMAT_SHORT_DATE));
 
                             if (selectedDate.isAfter(currentDate)) {
-                                poJSON.put("result", "error");
-                                poJSON.put("message", "Future dates are not allowed.");
+                                JFXUtil.setJSONError(poJSON, "Future dates are not allowed.");
                                 pbSuccess = false;
                             }
 
                             if (pbSuccess && (selectedDate.isAfter(transactionDate))) {
-                                poJSON.put("result", "error");
-                                poJSON.put("message", "Report date cannot be later than the transaction date.");
+                                JFXUtil.setJSONError(poJSON, "Report date cannot be later than the transaction date.");
                                 pbSuccess = false;
                             }
 
@@ -2039,7 +2017,6 @@ public class DisbursementVoucher_VerificationController implements Initializable
                                     ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                 }
                             }
-
                             pbSuccess = false; //Set to false to prevent multiple message box: Conflict with server date vs transaction date validation
                             loadTableDetailJE.reload();
                             pbSuccess = true; //Set to original value

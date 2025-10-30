@@ -398,8 +398,7 @@ public class DisbursementVoucher_HistoryController implements Initializable, Scr
                                             ));
 
                                 } catch (SQLException | GuanzonException ex) {
-                                    Logger.getLogger(getClass()
-                                            .getName()).log(Level.SEVERE, null, ex);
+                                    Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
                                 }
                             }
                             if (pnDetail < 0 || pnDetail
@@ -411,17 +410,11 @@ public class DisbursementVoucher_HistoryController implements Initializable, Scr
                                     loadRecordDetail();
                                 }
                             } else {
-//                            try {
                                 /* FOCUS ON THE ROW THAT pnRowDetail POINTS TO */
                                 JFXUtil.selectAndFocusRow(tblVwDetails, pnDetail);
                                 loadRecordDetail();
-//                            } catch (SQLException ex) {
-//                                Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
-//                            }
                             }
-
                             loadRecordMaster();
-
                         } catch (CloneNotSupportedException ex) {
                             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
                         }
