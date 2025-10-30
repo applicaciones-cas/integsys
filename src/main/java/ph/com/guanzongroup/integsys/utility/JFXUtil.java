@@ -130,7 +130,7 @@ import javafx.scene.control.MenuItem;
 import ph.com.guanzongroup.integsys.views.ScreenInterface;
 
 /**
- * Date : 4/28/2025 Recent update: 10/16/2025
+ * Date : 4/28/2025 Recent update: 10/30/2025
  *
  * @author Aldrich
  */
@@ -2702,7 +2702,6 @@ public class JFXUtil {
         return "";
     }
     private static final Map<String, String> SOURCE_MAP = new HashMap<>();
-
     static {
         SOURCE_MAP.put("PRFx", "PRF");
         SOURCE_MAP.put("SOAt", "SOA");

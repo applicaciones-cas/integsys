@@ -338,7 +338,7 @@ public class DisbursementVoucher_ViewController implements Initializable, Screen
                                                     CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(lnCtr).getDetailVatExempt(), true),
                                                     poController.Detail(lnCtr).TaxCode().getTaxCode(),
                                                     CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(lnCtr).getTaxAmount(), true),
-                                                    ""
+                                                    CustomCommonUtil.setIntegerValueToDecimalFormat(poController.getDetailNetTotal(lnCtr), true)
                                             ));
 
                                 } catch (SQLException | GuanzonException ex) {
@@ -375,8 +375,8 @@ public class DisbursementVoucher_ViewController implements Initializable, Screen
 
     private void initDetailGrid() {
         JFXUtil.setColumnCenter(tblDVRowNo, tblReferenceNo);
-        JFXUtil.setColumnLeft(tblTransactionTypeDetail, tblParticulars, tblVatableSales, tblVatAmt, tblVatRate, tblVatZeroRatedSales, tblVatExemptSales, tblTaxCode);
-        JFXUtil.setColumnRight(tblPurchasedAmount, tblTaxAmount, tblNetAmount);
+        JFXUtil.setColumnLeft(tblTransactionTypeDetail, tblParticulars, tblTaxCode);
+        JFXUtil.setColumnRight(tblPurchasedAmount, tblTaxAmount, tblNetAmount, tblVatableSales, tblVatAmt, tblVatRate, tblVatZeroRatedSales, tblVatExemptSales);
         JFXUtil.setColumnsIndexAndDisableReordering(tblVwDetails);
         filteredDataDetailDV = new FilteredList<>(details_data, b -> true);
 

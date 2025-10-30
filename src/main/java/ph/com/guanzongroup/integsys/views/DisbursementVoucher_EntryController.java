@@ -794,7 +794,8 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                                                     CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(lnCtr).getDetailVatExempt(), true),
                                                     poController.Detail(lnCtr).TaxCode().getTaxCode(),
                                                     CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(lnCtr).getTaxAmount(), true),
-                                                    ""
+                                                    CustomCommonUtil.setIntegerValueToDecimalFormat(poController.getDetailNetTotal(lnCtr), true)
+                                                    
                                             ));
 
                                 } catch (SQLException | GuanzonException ex) {
