@@ -72,7 +72,7 @@ import org.guanzon.appdriver.constant.DocumentType;
 import javafx.util.Pair;
 import org.guanzon.appdriver.agent.ShowDialogFX;
 import org.guanzon.appdriver.constant.UserRight;
-import ph.com.guanzongroup.cas.purchasing.t2.services.QuotationControllers;
+import org.guanzon.cas.purchasing.services.QuotationControllers;
 import ph.com.guanzongroup.cas.purchasing.t2.status.POQuotationStatus;
 
 /**
