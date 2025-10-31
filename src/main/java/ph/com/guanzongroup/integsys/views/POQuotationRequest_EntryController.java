@@ -50,7 +50,7 @@ import org.guanzon.appdriver.agent.ShowDialogFX;
 import org.guanzon.appdriver.base.GRiderCAS;
 import org.guanzon.appdriver.constant.UserRight;
 import org.json.simple.JSONObject;
-import ph.com.guanzongroup.cas.purchasing.t2.services.QuotationControllers;
+import org.guanzon.cas.purchasing.services.QuotationControllers;
 import ph.com.guanzongroup.cas.purchasing.t2.status.POQuotationRequestStatus;
 import ph.com.guanzongroup.integsys.model.ModelPOQuotationRequest_Detail;
 
