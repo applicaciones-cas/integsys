@@ -504,7 +504,7 @@ public class InventoryParamController implements Initializable, ScreenInterface 
                             poJson = oParameters.InventoryType().searchRecord(oParameters.CategoryLevel2().getModel().getInventoryTypeCode(), true);
                             if ("success".equals((String) poJson.get("result"))) {
                                 cmbField01.setValue(oParameters.InventoryType().getModel().getDescription());
-                                oTrans.getModel().setInventoryTypeId(oParameters.CategoryLevel2().getModel().getInventoryTypeCode());
+                                oTrans.  getModel().setInventoryTypeId(oParameters.CategoryLevel2().getModel().getInventoryTypeCode());
                             }
                             break;
                         case 8:
