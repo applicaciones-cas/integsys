@@ -61,6 +61,7 @@ import org.json.simple.JSONObject;
 import ph.com.guanzongroup.cas.cashflow.CheckPayments;
 import ph.com.guanzongroup.cas.cashflow.CheckPrinting;
 import ph.com.guanzongroup.cas.cashflow.Disbursement;
+import ph.com.guanzongroup.cas.cashflow.DisbursementVoucher;
 import ph.com.guanzongroup.cas.cashflow.model.SelectedITems;
 import ph.com.guanzongroup.cas.cashflow.services.CashflowControllers;
 import ph.com.guanzongroup.cas.cashflow.status.DisbursementStatic;
@@ -78,7 +79,7 @@ public class CheckPrintingController implements Initializable, ScreenInterface {
     private final String pxeModuleName = "Check Printing";
     private CheckPrinting poCheckPrintingController;
     private CheckPayments poCheckPayments;
-    private Disbursement poDisbursementController;
+    private DisbursementVoucher poDisbursementController;
     public int pnEditMode;
 
     private String psIndustryId = "";

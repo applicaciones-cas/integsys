@@ -51,6 +51,7 @@ import org.guanzon.appdriver.base.MiscUtil;
 import org.json.simple.JSONObject;
 import ph.com.guanzongroup.cas.cashflow.CheckStatusUpdate;
 import ph.com.guanzongroup.cas.cashflow.Disbursement;
+import ph.com.guanzongroup.cas.cashflow.DisbursementVoucher;
 import ph.com.guanzongroup.cas.cashflow.model.SelectedITems;
 import ph.com.guanzongroup.cas.cashflow.services.CashflowControllers;
 import ph.com.guanzongroup.cas.cashflow.status.CheckStatus;
@@ -70,7 +71,7 @@ public class CheckStatusUpdateByBatchController implements Initializable, Screen
     private static final int ROWS_PER_PAGE = 50;
     private final String pxeModuleName = "Check Clear Status";
     private CheckStatusUpdate poCheckStatusUpdateController;
-    private Disbursement poDisbursementController;
+    private DisbursementVoucher poDisbursementController;
     public int pnEditMode;
 
     private String psIndustryId = "";
