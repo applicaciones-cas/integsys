@@ -57,9 +57,8 @@ import javafx.scene.control.TabPane;
 import javafx.stage.Stage;
 import org.guanzon.appdriver.constant.DocumentType;
 import javafx.util.Pair;
-import ph.com.guanzongroup.cas.purchasing.t2.services.QuotationControllers;
-import ph.com.guanzongroup.cas.purchasing.t2.status.POQuotationStatus;
-
+import org.guanzon.cas.purchasing.services.QuotationControllers;
+import org.guanzon.cas.purchasing.status.POQuotationStatus;
 /**
  *
  * @author Team 2
