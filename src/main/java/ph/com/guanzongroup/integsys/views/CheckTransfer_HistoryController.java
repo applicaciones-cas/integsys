@@ -1,5 +1,6 @@
 package ph.com.guanzongroup.integsys.views;
 
+import ph.com.guanzongroup.cas.cashflow.CheckTransfer;
 import java.lang.reflect.Field;
 import java.net.URL;
 import java.sql.SQLException;
@@ -50,10 +51,9 @@ import org.guanzon.appdriver.base.LogWrapper;
 import org.guanzon.appdriver.constant.EditMode;
 import org.guanzon.appdriver.base.GuanzonException;
 import org.json.simple.JSONObject;
-import ph.com.guanzongroup.cas.check.module.mnv.CheckTransfer;
-import ph.com.guanzongroup.cas.check.module.mnv.constant.CheckTransferStatus;
-import ph.com.guanzongroup.cas.check.module.mnv.models.Model_Check_Transfer_Detail;
-import ph.com.guanzongroup.cas.check.module.mnv.services.CheckController;
+import ph.com.guanzongroup.cas.cashflow.status.CheckTransferStatus;
+import ph.com.guanzongroup.cas.cashflow.model.Model_Check_Transfer_Detail;
+import ph.com.guanzongroup.cas.cashflow.services.CheckController;
 
 /**
  * FXML Controller class

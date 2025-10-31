@@ -1,9 +1,6 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package ph.com.guanzongroup.integsys.views;
 
+import ph.com.guanzongroup.cas.cashflow.CheckRelease;
 import java.lang.reflect.Field;
 import java.net.URL;
 import java.sql.SQLException;
@@ -46,13 +43,11 @@ import org.guanzon.appdriver.agent.ShowMessageFX;
 import org.guanzon.appdriver.base.GRiderCAS;
 import org.guanzon.appdriver.base.GuanzonException;
 import org.guanzon.appdriver.base.LogWrapper;
-import org.guanzon.appdriver.constant.EditMode;
 import org.json.simple.JSONObject;
 import ph.com.guanzongroup.cas.cashflow.model.Model_Check_Payments;
-import ph.com.guanzongroup.cas.check.module.mnv.CheckRelease;
-import ph.com.guanzongroup.cas.check.module.mnv.constant.CheckReleaseStatus;
-import ph.com.guanzongroup.cas.check.module.mnv.models.Model_Check_Release_Detail;
-import ph.com.guanzongroup.cas.check.module.mnv.services.CheckController;
+import ph.com.guanzongroup.cas.cashflow.status.CheckReleaseStatus;
+import ph.com.guanzongroup.cas.cashflow.model.Model_Check_Release_Detail;
+import ph.com.guanzongroup.cas.cashflow.services.CheckController;
 
 /**
  *
