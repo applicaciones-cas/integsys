@@ -72,7 +72,7 @@ import javafx.util.Pair;
 import org.guanzon.appdriver.agent.ShowDialogFX;
 import org.guanzon.appdriver.constant.UserRight;
 import org.guanzon.cas.purchasing.services.QuotationControllers;
-import org.guanzon.cas.purchasing.status.POQuotationStatus;
+import ph.com.guanzongroup.cas.purchasing.t2.status.POQuotationStatus;
 import ph.com.guanzongroup.integsys.utility.CustomCommonUtil;
 import ph.com.guanzongroup.integsys.utility.JFXUtil;
 

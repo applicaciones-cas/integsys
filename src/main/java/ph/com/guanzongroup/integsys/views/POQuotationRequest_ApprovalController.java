@@ -61,7 +61,7 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.TabPane;
 import javafx.scene.input.KeyCode;
 import org.guanzon.cas.purchasing.services.QuotationControllers;
-import org.guanzon.cas.purchasing.status.POQuotationRequestStatus;
+import ph.com.guanzongroup.cas.purchasing.t2.status.POQuotationRequestStatus;
 
 /**
  * FXML Controller class
