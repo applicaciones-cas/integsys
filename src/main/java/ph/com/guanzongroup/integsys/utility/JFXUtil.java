@@ -263,7 +263,8 @@ public class JFXUtil {
         });
     }
 
-    /* To retain non-temporary highlights and remove temporary highlights; this is specifically used for ENTRY form*/
+    /*this is specifically used for ENTRY form*/
+ /* To retain non-temporary highlights and remove temporary highlights; */
     public static void showRetainedHighlight(boolean isRetained, TableView<?> tblView, String color, List<Pair<String, String>> plPartial, List<Pair<String, String>> plFinal,
             Map<String, List<String>> highlightedRows, boolean resetpartial) {
 
@@ -2702,6 +2703,7 @@ public class JFXUtil {
         return "";
     }
     private static final Map<String, String> SOURCE_MAP = new HashMap<>();
+
     static {
         SOURCE_MAP.put("PRFx", "PRF");
         SOURCE_MAP.put("SOAt", "SOA");

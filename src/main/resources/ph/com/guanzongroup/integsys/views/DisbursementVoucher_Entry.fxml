@@ -522,12 +522,7 @@
                                                                               <Insets right="5.0" />
                                                                            </padding>
                                                                         </Label>
-                                                                        <Label text="Particulars" GridPane.rowIndex="3">
-                                                                           <padding>
-                                                                              <Insets right="5.0" />
-                                                                           </padding>
-                                                                        </Label>
-                                                                        <Label text="Amount" GridPane.columnIndex="6" GridPane.rowIndex="5">
+                                                                        <Label text="Amount" GridPane.columnIndex="6" GridPane.rowIndex="4">
                                                                            <padding>
                                                                               <Insets right="5.0" />
                                                                            </padding>
@@ -540,17 +535,12 @@
                                                                               <Insets right="5.0" />
                                                                            </padding>
                                                                         </Label>
-                                                                        <Label text="Tax Code" GridPane.columnIndex="6" GridPane.rowIndex="2">
+                                                                        <Label text="Tax Rate (%)" GridPane.columnIndex="6" GridPane.rowIndex="2">
                                                                            <padding>
                                                                               <Insets right="5.0" />
                                                                            </padding>
                                                                         </Label>
-                                                                        <Label text="Tax Rate (%)" GridPane.columnIndex="6" GridPane.rowIndex="3">
-                                                                           <padding>
-                                                                              <Insets right="5.0" />
-                                                                           </padding>
-                                                                        </Label>
-                                                                        <Label text="Tax Amount" GridPane.columnIndex="6" GridPane.rowIndex="4">
+                                                                        <Label text="Tax Amount" GridPane.columnIndex="6" GridPane.rowIndex="3">
                                                                            <padding>
                                                                               <Insets right="5.0" />
                                                                            </padding>
@@ -597,17 +587,15 @@
                                                                            </GridPane.margin>
                                                                         </Label>
                                                                         <TextField fx:id="tfRefNoDetail" disable="true" editable="false" maxWidth="1.7976931348623157E308" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-                                                                        <TextField fx:id="tfParticularsDetail" promptText="Press F3: Search" GridPane.columnIndex="1" GridPane.rowIndex="3" />
                                                                         <CheckBox fx:id="chbkVatClassification" disable="true" mnemonicParsing="false" onAction="#cmdCheckBox_Click" GridPane.columnIndex="4" GridPane.rowIndex="2" />
                                                                         <TextField fx:id="tfVatableSalesDetail" alignment="CENTER_RIGHT" disable="true" promptText="0.00" styleClass="DisabledTextField" GridPane.columnIndex="4" GridPane.rowIndex="3" />
                                                                         <TextField fx:id="tfVatExemptDetail" alignment="CENTER_RIGHT" disable="true" promptText="0.00" styleClass="DisabledTextField" GridPane.columnIndex="4" GridPane.rowIndex="4" />
                                                                         <TextField fx:id="tfVatZeroRatedSalesDetail" alignment="CENTER_RIGHT" disable="true" promptText="0.00" styleClass="DisabledTextField" GridPane.columnIndex="4" GridPane.rowIndex="5" />
                                                                         <TextField fx:id="tfVatRateDetail" alignment="CENTER_RIGHT" disable="true" promptText="0.00" visible="false" GridPane.columnIndex="4" GridPane.rowIndex="5" />
                                                                         <TextField fx:id="tfVatAmountDetail" alignment="CENTER_RIGHT" disable="true" promptText="0.00" styleClass="DisabledTextField" GridPane.columnIndex="4" GridPane.rowIndex="6" />
-                                                                        <TextField fx:id="tfTaxCodeDetail" promptText="Press F3: Search" GridPane.columnIndex="7" GridPane.rowIndex="2" />
-                                                                        <TextField fx:id="tfTaxRateDetail" alignment="CENTER_RIGHT" disable="true" editable="false" promptText="0.00" styleClass="DisabledTextField" GridPane.columnIndex="7" GridPane.rowIndex="3" />
-                                                                        <TextField fx:id="tfTaxAmountDetail" alignment="CENTER_RIGHT" disable="true" editable="false" promptText="0.00" styleClass="DisabledTextField" GridPane.columnIndex="7" GridPane.rowIndex="4" />
-                                                                        <TextField fx:id="tfPurchasedAmountDetail" alignment="CENTER_RIGHT" promptText="0.00" GridPane.columnIndex="7" GridPane.rowIndex="5" />
+                                                                        <TextField fx:id="tfTaxRateDetail" alignment="CENTER_RIGHT" disable="true" editable="false" promptText="0.00" styleClass="DisabledTextField" GridPane.columnIndex="7" GridPane.rowIndex="2" />
+                                                                        <TextField fx:id="tfTaxAmountDetail" alignment="CENTER_RIGHT" disable="true" editable="false" promptText="0.00" styleClass="DisabledTextField" GridPane.columnIndex="7" GridPane.rowIndex="3" />
+                                                                        <TextField fx:id="tfPurchasedAmountDetail" alignment="CENTER_RIGHT" promptText="0.00" GridPane.columnIndex="7" GridPane.rowIndex="4" />
                                                                         <TextField fx:id="tfNetAmountDetail" alignment="CENTER_RIGHT" disable="true" editable="false" promptText="0.00" styleClass="DisabledTextField" GridPane.columnIndex="7" GridPane.rowIndex="6">
                                                                            <font>
                                                                               <Font name="System Bold" size="12.0" />
@@ -628,7 +616,6 @@
                                                                                                 <TableColumn fx:id="tblDVRowNo" editable="false" maxWidth="40.0" minWidth="40.0" prefWidth="40.0" resizable="false" sortable="false" text="No." />
                                                                                                 <TableColumn fx:id="tblReferenceNo" editable="false" maxWidth="150.0" minWidth="150.0" prefWidth="150.0" resizable="false" sortable="false" text="Reference No." />
                                                                                                 <TableColumn fx:id="tblTransactionTypeDetail" editable="false" maxWidth="200.0" minWidth="200.0" prefWidth="200.0" resizable="false" sortable="false" text="Transaction Type" />
-                                                                                                <TableColumn fx:id="tblParticulars" editable="false" maxWidth="300.0" minWidth="300.0" prefWidth="300.0" resizable="false" sortable="false" text="Particulars" />
                                                                                                 <TableColumn fx:id="tblPurchasedAmount" editable="false" maxWidth="120.0" minWidth="120.0" prefWidth="120.0" resizable="false" sortable="false" style="-fx-alignment: CENTER-RIGHT;" text="Amount" />
                                                                         <TableColumn fx:id="tblVatableSales" editable="false" maxWidth="120.0" minWidth="120.0" prefWidth="120.0" resizable="false" sortable="false" style="-fx-alignment: CENTER-RIGHT;" text="VATable Sales" />
                                                                         <TableColumn fx:id="tblVatAmt" editable="false" maxWidth="120.0" minWidth="120.0" prefWidth="120.0" resizable="false" sortable="false" style="-fx-alignment: CENTER-RIGHT;" text="VAT Amt" />

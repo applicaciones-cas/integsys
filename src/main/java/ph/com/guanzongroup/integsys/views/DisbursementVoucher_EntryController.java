@@ -136,7 +136,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
 
     /* DV  & Journal */
     @FXML
-    private AnchorPane AnchorMain, apButton, apMasterDetail, apDVMaster1, apMasterDVCheck, apMasterDVBTransfer, apMasterDVOp, apDVMaster2, apDVMaster3, apDVDetail, apMainList, apJournalMaster, apJournalDetails, apBrowse;
+    private AnchorPane AnchorMain, apButton, apMasterDetail, apDVMaster1, apMasterDVCheck, apMasterDVBTransfer, apMasterDVOp, apDVMaster2, apDVMaster3, apDVDetail, apMainList, apBrowse, apJournalMaster, apJournalDetails;
     @FXML
     private Label lblSource, lblDVTransactionStatus, lblJournalTransactionStatus;
     @FXML
@@ -146,7 +146,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
     @FXML
     private Tab tabDetails, tabCheck, tabBankTransfer, tabOnlinePayment, tabJournal;
     @FXML
-    private TextField tfDVTransactionNo, tfVoucherNo, tfSupplier, tfCheckNo, tfCheckAmount, tfBankNameCheck, tfBankAccountCheck, tfPayeeName, tfAuthorizedPerson, tfPaymentAmountBTransfer, tfBankTransReferNo, tfSupplierBank, tfSupplierAccountNoBTransfer, tfBankNameBTransfer, tfBankAccountBTransfer, tfPaymentAmount, tfPaymentReferenceNo, tfSupplierServiceName, tfSupplierAccountNo, tfBankNameOnlinePayment, tfBankAccountOnlinePayment, tfVatAmountMaster, tfVatExemptSales, tfLessWHTax, tfTotalNetAmount, tfTotalAmount, tfVatZeroRatedSales, tfVatableSales, tfRefNoDetail, tfParticularsDetail, tfPurchasedAmountDetail, tfTaxCodeDetail, tfTaxRateDetail, tfTaxAmountDetail, tfNetAmountDetail, tfVatableSalesDetail, tfVatAmountDetail, tfVatZeroRatedSalesDetail, tfVatExemptDetail, tfVatRateDetail, tfSearchPayee, tfSearchBranch, tfSearchParticular, tfTotalCreditAmount, tfJournalTransactionNo, tfTotalDebitAmount, tfAccountCode, tfAccountDescription, tfDebitAmount, tfCreditAmount;
+    private TextField tfDVTransactionNo, tfSupplier, tfVoucherNo, tfBankNameCheck, tfBankAccountCheck, tfPayeeName, tfCheckNo, tfCheckAmount, tfAuthorizedPerson, tfBankNameBTransfer, tfBankAccountBTransfer, tfPaymentAmountBTransfer, tfSupplierBank, tfSupplierAccountNoBTransfer, tfBankTransReferNo, tfBankNameOnlinePayment, tfBankAccountOnlinePayment, tfPaymentAmount, tfSupplierServiceName, tfSupplierAccountNo, tfPaymentReferenceNo, tfTotalAmount, tfVatableSales, tfVatAmountMaster, tfVatZeroRatedSales, tfVatExemptSales, tfLessWHTax, tfTotalNetAmount, tfRefNoDetail, tfVatableSalesDetail, tfVatExemptDetail, tfVatZeroRatedSalesDetail, tfVatRateDetail, tfVatAmountDetail, tfTaxRateDetail, tfTaxAmountDetail, tfPurchasedAmountDetail, tfNetAmountDetail, tfSearchPayee, tfSearchBranch, tfSearchParticular, tfJournalTransactionNo, tfTotalDebitAmount, tfTotalCreditAmount, tfAccountCode, tfAccountDescription, tfDebitAmount, tfCreditAmount;
     @FXML
     private DatePicker dpDVTransactionDate, dpCheckDate, dpJournalTransactionDate, dpReportMonthYear;
     @FXML
@@ -158,7 +158,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
     @FXML
     private TableView tblVwDetails, tblViewMainList, tblVwJournalDetails;
     @FXML
-    private TableColumn tblDVRowNo, tblReferenceNo, tblTransactionTypeDetail, tblParticulars, tblPurchasedAmount, tblVatableSales, tblVatAmt, tblVatRate, tblVatZeroRatedSales, tblVatExemptSales, tblTaxCode, tblTaxAmount, tblNetAmount, tblRowNo, tblTransactionType, tblBranchName, tblDueDate, tblRefNo, tblAmountMain, tblJournalRowNo, tblJournalAccountCode, tblJournalAccountDescription, tblJournalDebitAmount, tblJournalCreditAmount, tblJournalReportMonthYear;
+    private TableColumn tblDVRowNo, tblReferenceNo, tblTransactionTypeDetail, tblPurchasedAmount, tblVatableSales, tblVatAmt, tblVatRate, tblVatZeroRatedSales, tblVatExemptSales, tblTaxCode, tblTaxAmount, tblNetAmount, tblRowNo, tblTransactionType, tblBranchName, tblDueDate, tblRefNo, tblAmountMain, tblJournalRowNo, tblJournalAccountCode, tblJournalAccountDescription, tblJournalDebitAmount, tblJournalCreditAmount, tblJournalReportMonthYear;
     @FXML
     private Pagination pagination;
 
@@ -895,7 +895,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
 
     private void initDetailGrid() {
         JFXUtil.setColumnCenter(tblDVRowNo, tblReferenceNo);
-        JFXUtil.setColumnLeft(tblTransactionTypeDetail, tblParticulars, tblTaxCode);
+        JFXUtil.setColumnLeft(tblTransactionTypeDetail, tblTaxCode);
         JFXUtil.setColumnRight(tblPurchasedAmount, tblTaxAmount, tblNetAmount, tblVatableSales, tblVatAmt, tblVatRate, tblVatZeroRatedSales, tblVatExemptSales);
         JFXUtil.setColumnsIndexAndDisableReordering(tblVwDetails);
         tblVwDetails.setItems(details_data);
@@ -983,7 +983,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
         //apDVMaster1
         JFXUtil.setFocusListener(txtMaster_Focus, tfSupplier);
         //apDVDetail
-        JFXUtil.setFocusListener(txtDetail_Focus, tfParticularsDetail, tfPurchasedAmountDetail, tfTaxCodeDetail);
+        JFXUtil.setFocusListener(txtDetail_Focus, tfPurchasedAmountDetail);
         //apCheck
         JFXUtil.setFocusListener(txtMasterCheck_Focus, tfBankNameCheck, tfBankAccountCheck, tfPayeeName, tfAuthorizedPerson);
         // apMasterDVBTransfer
@@ -1088,11 +1088,6 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
             (lsID, lsValue) -> {
                 /*Lost Focus*/
                 switch (lsID) {
-                    case "tfParticularsDetail":
-                        if (lsValue.isEmpty()) {
-                            poController.Detail(pnDetail).setParticularID("");
-                        }
-                        break;
                     case "tfPurchasedAmountDetail":
                         lsValue = JFXUtil.removeComma(lsValue);
                         poJSON = poController.Detail(pnDetail).setAmountApplied(Double.valueOf(lsValue));
@@ -1102,13 +1097,6 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                         if (pbEnteredDV) {
                             moveNext(false, true);
                             pbEnteredDV = false;
-                        }
-                        break;
-                    case "tfTaxCodeDetail":
-                        if (lsValue.isEmpty()) {
-                            poController.Detail(pnDetail).setTaxCode("");
-                            poController.Detail(pnDetail).setTaxRates(0.00);
-                            poController.Detail(pnDetail).setTaxAmount(0.0000);
                         }
                         break;
                 }
@@ -1490,35 +1478,6 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                                 break;
 
                             //apDVDetail
-                            case "tfParticularsDetail":
-                                poJSON = poController.SearchParticular(lsValue, pnDetail, false, false);
-                                if ("error".equals((String) poJSON.get("result"))) {
-                                    ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-                                    JFXUtil.runWithDelay(0.50, () -> {
-                                        loadTableDetail.reload();
-                                    });
-                                    return;
-                                }
-                                JFXUtil.runWithDelay(0.50, () -> {
-                                    loadTableDetail.reload();
-                                    JFXUtil.textFieldMoveNext(tfTaxCodeDetail);
-                                });
-                                break;
-                            case "tfTaxCodeDetail":
-                                poJSON = poController.SearchTaxCode(lsValue, pnDetail, false);
-                                if ("error".equals((String) poJSON.get("result"))) {
-                                    ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-                                    JFXUtil.runWithDelay(0.50, () -> {
-                                        loadTableDetail.reload();
-                                    });
-                                    return;
-                                }
-                                JFXUtil.runWithDelay(0.50, () -> {
-                                    loadTableDetail.reload();
-                                    JFXUtil.textFieldMoveNext(tfPurchasedAmountDetail);
-                                });
-                                break;
-
                             //apJournalDetails
                             case "tfAccountCode":
                                 poJSON = poController.Journal().SearchAccountCode(pnDetailJE, lsValue, true, null, null);
@@ -1619,18 +1578,13 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
     }
 
     public void moveNext(boolean isUp, boolean continueNext) {
-        try {
-            if (continueNext) {
-                apDVDetail.requestFocus();
-                pnDetail = isUp ? JFXUtil.moveToPreviousRow(tblVwDetails) : JFXUtil.moveToNextRow(tblVwDetails);
-            }
-            loadRecordDetail();
-            JFXUtil.requestFocusNullField(new Object[][]{ // alternative to if , else if
-                {poController.Detail(pnDetail).TaxCode().getTaxCode(), tfTaxCodeDetail}, // if null or empty, then requesting focus to the txtfield
-                {poController.Detail(pnDetail).getAmountApplied(), tfPurchasedAmountDetail},}, tfPurchasedAmountDetail); // default
-        } catch (SQLException | GuanzonException ex) {
-            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+        if (continueNext) {
+            apDVDetail.requestFocus();
+            pnDetail = isUp ? JFXUtil.moveToPreviousRow(tblVwDetails) : JFXUtil.moveToNextRow(tblVwDetails);
         }
+        loadRecordDetail();
+        JFXUtil.requestFocusNullField(new Object[][]{ // alternative to if , else if
+            {poController.Detail(pnDetail).getAmountApplied(), tfPurchasedAmountDetail},}, tfPurchasedAmountDetail); // default
     }
 
     public void moveNextJE(boolean isUp, boolean continueNext) {
@@ -1721,34 +1675,23 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
         if (pnDetail < 0 || pnDetail > poController.getDetailCount() - 1) {
             return;
         }
-        try {
-            poJSON = poController.computeDetailFields();
-            if ("error".equals((String) poJSON.get("result"))) {
-                ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-                return;
-            }
-            //according to business rule particular is non-editable
-            JFXUtil.setDisabled(true, tfParticularsDetail);
-
-            tfRefNoDetail.setText(poController.Detail(pnDetail).getSourceNo());
-            tfParticularsDetail.setText(poController.Detail(pnDetail).Particular().getDescription());
-            chbkVatClassification.setSelected(poController.Detail(pnDetail).isWithVat());
-            tfVatableSalesDetail.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(pnDetail).getDetailVatSales(), true));
-            tfVatExemptDetail.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(pnDetail).getDetailVatExempt(), true));
-            tfVatZeroRatedSalesDetail.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(pnDetail).getDetailZeroVat(), true));
-            tfVatRateDetail.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(pnDetail).getDetailVatRates(), false));
-            tfVatAmountDetail.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(pnDetail).getDetailVatAmount(), true));
-            tfTaxCodeDetail.setText(poController.Detail(pnDetail).TaxCode().getTaxCode());
-            tfTaxRateDetail.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(pnDetail).getTaxRates(), false));
-            tfTaxAmountDetail.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(pnDetail).getTaxAmount(), true));
-            tfPurchasedAmountDetail.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(pnDetail).getAmountApplied(), true));
-
-            tfNetAmountDetail.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.getDetailNetTotal(pnDetail), true));
-
-            JFXUtil.updateCaretPositions(apDVDetail);
-        } catch (SQLException | GuanzonException ex) {
-            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+        poJSON = poController.computeDetailFields();
+        if ("error".equals((String) poJSON.get("result"))) {
+            ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+            return;
         }
+        tfRefNoDetail.setText(poController.Detail(pnDetail).getSourceNo());
+        chbkVatClassification.setSelected(poController.Detail(pnDetail).isWithVat());
+        tfVatableSalesDetail.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(pnDetail).getDetailVatSales(), true));
+        tfVatExemptDetail.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(pnDetail).getDetailVatExempt(), true));
+        tfVatZeroRatedSalesDetail.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(pnDetail).getDetailZeroVat(), true));
+        tfVatRateDetail.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(pnDetail).getDetailVatRates(), false));
+        tfVatAmountDetail.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(pnDetail).getDetailVatAmount(), true));
+        tfTaxRateDetail.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(pnDetail).getTaxRates(), false));
+        tfTaxAmountDetail.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(pnDetail).getTaxAmount(), true));
+        tfPurchasedAmountDetail.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(pnDetail).getAmountApplied(), true));
+        tfNetAmountDetail.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.getDetailNetTotal(pnDetail), true));
+        JFXUtil.updateCaretPositions(apDVDetail);
 
     }
 
