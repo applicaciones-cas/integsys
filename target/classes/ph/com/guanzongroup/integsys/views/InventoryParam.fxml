@@ -53,7 +53,7 @@
                                           <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                                        </rowConstraints>
                                        <children>
-                                          <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Barr Code" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.valignment="CENTER" GridPane.vgrow="NEVER">
+                                          <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Barcode" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.valignment="CENTER" GridPane.vgrow="NEVER">
                                              <font>
                                                 <Font name="System Bold" size="15.0" />
                                              </font>
@@ -203,23 +203,23 @@
                                              <children>
                                                 <Text strokeType="OUTSIDE" strokeWidth="0.0" text="STOCK ID" GridPane.halignment="RIGHT" GridPane.rowIndex="1" GridPane.valignment="CENTER">
                                                    <font>
-                                                      <Font name="System Bold" size="14.0" />
+                                                      <Font name="System Bold" size="12.0" />
                                                    </font>
                                                    <GridPane.margin>
                                                       <Insets right="10.0" />
                                                    </GridPane.margin>
                                                 </Text>
-                                                <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Barrcode" GridPane.halignment="RIGHT" GridPane.rowIndex="3" GridPane.valignment="CENTER">
+                                                <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Barcode" GridPane.halignment="RIGHT" GridPane.rowIndex="3" GridPane.valignment="CENTER">
                                                    <font>
-                                                      <Font size="14.0" />
+                                                      <Font name="System Bold" size="12.0" />
                                                    </font>
                                                    <GridPane.margin>
                                                       <Insets right="10.0" />
                                                    </GridPane.margin>
                                                 </Text>
-                                                <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Alt. Barrcode" GridPane.halignment="RIGHT" GridPane.rowIndex="4" GridPane.valignment="CENTER">
+                                                <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Alt. Barcode" GridPane.halignment="RIGHT" GridPane.rowIndex="4" GridPane.valignment="CENTER">
                                                    <font>
-                                                      <Font size="14.0" />
+                                                      <Font name="System Bold" size="12.0" />
                                                    </font>
                                                    <GridPane.margin>
                                                       <Insets right="10.0" />
@@ -227,7 +227,7 @@
                                                 </Text>
                                                 <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Brief Desc" GridPane.halignment="RIGHT" GridPane.rowIndex="5" GridPane.valignment="CENTER">
                                                    <font>
-                                                      <Font size="14.0" />
+                                                      <Font name="System Bold" size="12.0" />
                                                    </font>
                                                    <GridPane.margin>
                                                       <Insets right="10.0" />
@@ -235,7 +235,7 @@
                                                 </Text>
                                                 <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Description" GridPane.halignment="RIGHT" GridPane.rowIndex="6" GridPane.valignment="CENTER">
                                                    <font>
-                                                      <Font size="14.0" />
+                                                      <Font name="System Bold" size="12.0" />
                                                    </font>
                                                    <GridPane.margin>
                                                       <Insets right="10.0" />
@@ -243,7 +243,7 @@
                                                 </Text>
                                                 <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Inventory Type" GridPane.halignment="RIGHT" GridPane.rowIndex="8" GridPane.valignment="CENTER">
                                                    <font>
-                                                      <Font size="14.0" />
+                                                      <Font name="System Bold" size="12.0" />
                                                    </font>
                                                    <GridPane.margin>
                                                       <Insets right="10.0" />
@@ -251,7 +251,7 @@
                                                 </Text>
                                                 <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Catergory 1" GridPane.halignment="RIGHT" GridPane.rowIndex="9" GridPane.valignment="CENTER">
                                                    <font>
-                                                      <Font size="14.0" />
+                                                      <Font name="System Bold" size="12.0" />
                                                    </font>
                                                    <GridPane.margin>
                                                       <Insets right="10.0" />
@@ -259,7 +259,7 @@
                                                 </Text>
                                                 <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Catergory 2" GridPane.halignment="RIGHT" GridPane.rowIndex="10" GridPane.valignment="CENTER">
                                                    <font>
-                                                      <Font size="14.0" />
+                                                      <Font name="System Bold" size="12.0" />
                                                    </font>
                                                    <GridPane.margin>
                                                       <Insets right="10.0" />
@@ -267,7 +267,7 @@
                                                 </Text>
                                                 <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Catergory 3" GridPane.halignment="RIGHT" GridPane.rowIndex="11" GridPane.valignment="CENTER">
                                                    <font>
-                                                      <Font size="14.0" />
+                                                      <Font name="System Bold" size="12.0" />
                                                    </font>
                                                    <GridPane.margin>
                                                       <Insets right="10.0" />
@@ -275,7 +275,7 @@
                                                 </Text>
                                                 <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Catergory 4" GridPane.halignment="RIGHT" GridPane.rowIndex="12" GridPane.valignment="CENTER">
                                                    <font>
-                                                      <Font size="14.0" />
+                                                      <Font name="System Bold" size="12.0" />
                                                    </font>
                                                    <GridPane.margin>
                                                       <Insets right="10.0" />
@@ -283,7 +283,7 @@
                                                 </Text>
                                                 <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Brand" GridPane.columnIndex="4" GridPane.halignment="RIGHT" GridPane.rowIndex="9" GridPane.valignment="CENTER">
                                                    <font>
-                                                      <Font size="14.0" />
+                                                      <Font name="System Bold" size="12.0" />
                                                    </font>
                                                    <GridPane.margin>
                                                       <Insets right="10.0" />
@@ -291,7 +291,7 @@
                                                 </Text>
                                                 <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Model" GridPane.columnIndex="4" GridPane.halignment="RIGHT" GridPane.rowIndex="10" GridPane.valignment="CENTER">
                                                    <font>
-                                                      <Font size="14.0" />
+                                                      <Font name="System Bold" size="12.0" />
                                                    </font>
                                                    <GridPane.margin>
                                                       <Insets right="10.0" />
@@ -299,7 +299,7 @@
                                                 </Text>
                                                 <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Color" GridPane.columnIndex="4" GridPane.halignment="RIGHT" GridPane.rowIndex="11" GridPane.valignment="CENTER">
                                                    <font>
-                                                      <Font size="14.0" />
+                                                      <Font name="System Bold" size="12.0" />
                                                    </font>
                                                    <GridPane.margin>
                                                       <Insets right="10.0" />
@@ -307,7 +307,7 @@
                                                 </Text>
                                                 <Text fx:id="lblMeasure" strokeType="OUTSIDE" strokeWidth="0.0" text="Measure" GridPane.columnIndex="4" GridPane.halignment="RIGHT" GridPane.rowIndex="12" GridPane.valignment="CENTER">
                                                    <font>
-                                                      <Font size="14.0" />
+                                                      <Font name="System Bold" size="12.0" />
                                                    </font>
                                                    <GridPane.margin>
                                                       <Insets right="10.0" />
@@ -315,7 +315,7 @@
                                                 </Text>
                                                 <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Discount 1" GridPane.halignment="RIGHT" GridPane.rowIndex="14" GridPane.valignment="CENTER">
                                                    <font>
-                                                      <Font size="14.0" />
+                                                      <Font name="System Bold" size="12.0" />
                                                    </font>
                                                    <GridPane.margin>
                                                       <Insets right="10.0" />
@@ -323,7 +323,7 @@
                                                 </Text>
                                                 <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Discount 2" GridPane.halignment="RIGHT" GridPane.rowIndex="15" GridPane.valignment="CENTER">
                                                    <font>
-                                                      <Font size="14.0" />
+                                                      <Font name="System Bold" size="12.0" />
                                                    </font>
                                                    <GridPane.margin>
                                                       <Insets right="10.0" />
@@ -331,7 +331,7 @@
                                                 </Text>
                                                 <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Discount 3" GridPane.halignment="RIGHT" GridPane.rowIndex="16" GridPane.valignment="CENTER">
                                                    <font>
-                                                      <Font size="14.0" />
+                                                      <Font name="System Bold" size="12.0" />
                                                    </font>
                                                    <GridPane.margin>
                                                       <Insets right="10.0" />
@@ -339,7 +339,7 @@
                                                 </Text>
                                                 <Text strokeType="OUTSIDE" strokeWidth="0.0" text="COST" GridPane.columnIndex="4" GridPane.halignment="RIGHT" GridPane.rowIndex="16" GridPane.valignment="CENTER">
                                                    <font>
-                                                      <Font name="System Bold" size="15.0" />
+                                                      <Font name="System Bold" size="12.0" />
                                                    </font>
                                                    <GridPane.margin>
                                                       <Insets right="10.0" />
@@ -347,7 +347,7 @@
                                                 </Text>
                                                 <Text strokeType="OUTSIDE" strokeWidth="0.0" text="SRP" GridPane.columnIndex="4" GridPane.halignment="RIGHT" GridPane.rowIndex="17" GridPane.valignment="CENTER">
                                                    <font>
-                                                      <Font name="System Bold" size="15.0" />
+                                                      <Font name="System Bold" size="12.0" />
                                                    </font>
                                                    <GridPane.margin>
                                                       <Insets right="10.0" />
@@ -355,7 +355,7 @@
                                                 </Text>
                                                 <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Superseded" GridPane.columnIndex="4" GridPane.halignment="RIGHT" GridPane.rowIndex="19" GridPane.valignment="CENTER">
                                                    <font>
-                                                      <Font size="14.0" />
+                                                      <Font name="System Bold" size="12.0" />
                                                    </font>
                                                    <GridPane.margin>
                                                       <Insets right="10.0" />
@@ -363,7 +363,7 @@
                                                 </Text>
                                                 <Text fx:id="lblShelf" strokeType="OUTSIDE" strokeWidth="0.0" text="Shelf Life" GridPane.columnIndex="4" GridPane.halignment="RIGHT" GridPane.rowIndex="20">
                                                    <font>
-                                                      <Font size="14.0" />
+                                                      <Font name="System Bold" size="12.0" />
                                                    </font>
                                                    <GridPane.margin>
                                                       <Insets right="10.0" />
@@ -476,26 +476,17 @@
                                                             <Insets right="10.0" />
                                                          </GridPane.margin>
                                                       </Text>
-                                                      <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Barrcode" GridPane.halignment="RIGHT" GridPane.rowIndex="3" GridPane.valignment="CENTER">
-                                                         <font>
-                                                            <Font size="14.0" />
-                                                         </font>
+                                                      <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Barcode" GridPane.halignment="RIGHT" GridPane.rowIndex="3" GridPane.valignment="CENTER">
                                                          <GridPane.margin>
                                                             <Insets right="10.0" />
                                                          </GridPane.margin>
                                                       </Text>
                                                       <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Description" GridPane.halignment="RIGHT" GridPane.rowIndex="4" GridPane.valignment="CENTER">
-                                                         <font>
-                                                            <Font size="14.0" />
-                                                         </font>
                                                          <GridPane.margin>
                                                             <Insets right="10.0" />
                                                          </GridPane.margin>
                                                       </Text>
                                                       <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Measurement" GridPane.halignment="RIGHT" GridPane.rowIndex="5" GridPane.valignment="CENTER">
-                                                         <font>
-                                                            <Font size="14.0" />
-                                                         </font>
                                                          <GridPane.margin>
                                                             <Insets right="10.0" />
                                                          </GridPane.margin>
@@ -504,9 +495,6 @@
                                                       <TextField fx:id="txtField23" styleClass="text-field" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="4" />
                                                       <TextField fx:id="txtField24" disable="true" editable="false" styleClass="text-field" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="5" />
                                                       <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Quantity" GridPane.halignment="RIGHT" GridPane.rowIndex="6">
-                                                         <font>
-                                                            <Font size="14.0" />
-                                                         </font>
                                                          <GridPane.margin>
                                                             <Insets right="10.0" />
                                                          </GridPane.margin>
@@ -536,7 +524,7 @@
                                                 <TableView fx:id="tblSubItems" onMouseClicked="#tblSubUnit_Clicked" stylesheets="@../css/Tables.css" VBox.vgrow="ALWAYS">
                                                   <columns>
                                                     <TableColumn fx:id="index01" prefWidth="30.0" text="No." />
-                                                    <TableColumn fx:id="index02" prefWidth="150.0" text="Barrcode" />
+                                                    <TableColumn fx:id="index02" prefWidth="150.0" text="Barcode" />
                                                       <TableColumn fx:id="index03" prefWidth="250.0" text="Description" />
                                                       <TableColumn fx:id="index04" minWidth="40.0" prefWidth="40.0" text="Qty" />
                                                       <TableColumn fx:id="index05" prefWidth="150.0" text="Measurement" />

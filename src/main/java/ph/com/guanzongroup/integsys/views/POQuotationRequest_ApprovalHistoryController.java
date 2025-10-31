@@ -52,6 +52,7 @@ import javafx.scene.input.KeyCode;
 import org.guanzon.cas.purchasing.services.QuotationControllers;
 import ph.com.guanzongroup.cas.purchasing.t2.status.POQuotationRequestStatus;
 import java.time.format.DateTimeFormatter;
+import org.guanzon.cas.purchasing.status.POQuotationRequestStatus;
 
 /**
  * FXML Controller class
