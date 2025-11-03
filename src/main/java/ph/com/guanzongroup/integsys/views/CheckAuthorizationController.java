@@ -318,14 +318,12 @@ public class CheckAuthorizationController implements Initializable, ScreenInterf
                 Platform.runLater(() -> {
                     chckSelectAll.setSelected(false);
                     checkedItem.clear();
-                    if (poDisbursementController.getDetailCount() > 0) {
-                        for (int lnCntr = 0; lnCntr < poDisbursementController.getMasterList().size() - 1; lnCntr++) {
-                            checkedItem.add("0");
-                        }
+                    for (int lnCntr = 0; lnCntr < poDisbursementController.getMasterList().size() - 1; lnCntr++) {
+                        checkedItem.add("0");
                     }
-                    loadTableMain.reload();
                 });
             }
+            loadTableMain.reload();
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
         }
