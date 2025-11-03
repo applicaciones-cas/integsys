@@ -380,7 +380,6 @@ public class DisbursementVoucher_HistoryController implements Initializable, Scr
                                             new ModelDisbursementVoucher_Detail(String.valueOf(lnCtr + 1),
                                                     poController.Detail(lnCtr).getSourceNo(),
                                                     JFXUtil.getSourceType(poController.Detail(lnCtr).getSourceCode(), true),
-                                                    poController.Detail(lnCtr).Particular().getDescription(),
                                                     CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(lnCtr).getAmountApplied(), true),
                                                     CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(lnCtr).getDetailVatSales(), true),
                                                     String.valueOf(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(lnCtr).getDetailVatAmount(), true)),
