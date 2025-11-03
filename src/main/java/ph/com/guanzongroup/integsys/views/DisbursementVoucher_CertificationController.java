@@ -309,7 +309,7 @@ public class DisbursementVoucher_CertificationController implements Initializabl
 
     private void retrieveDisbursement() {
         try {
-            poJSON = poDisbursementController.loadTransactionList(psSearchBankID, psSearchBankAccountID, "", true);
+            poJSON = poDisbursementController.loadTransactionList(tfSearchBankName.getText(), tfSearchBankAccount.getText(), "", true);
             if ("error".equals(poJSON.get("result"))) {
                 ShowMessageFX.Error(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
             } else {
@@ -317,7 +317,7 @@ public class DisbursementVoucher_CertificationController implements Initializabl
                     chckSelectAll.setSelected(false);
                     checkedItem.clear();
                     if (poDisbursementController.getDetailCount() > 0) {
-                        for (int lnCntr = 0; lnCntr < poDisbursementController.getMasterList().size() - 1; lnCntr++) {
+                        for (int lnCntr = 0; lnCntr < poDisbursementController.getMasterList().size(); lnCntr++) {
                             checkedItem.add("0");
                         }
                     }
@@ -337,8 +337,8 @@ public class DisbursementVoucher_CertificationController implements Initializabl
                     Platform.runLater(() -> {
                         try {
                             main_data.clear();
-                            if (poDisbursementController.getMasterList().size() - 1 > 0) {
-                                for (int lnCntr = 0; lnCntr < poDisbursementController.getMasterList().size() - 1; lnCntr++) {
+                            if (poDisbursementController.getMasterList().size() > 0) {
+                                for (int lnCntr = 0; lnCntr < poDisbursementController.getMasterList().size(); lnCntr++) {
                                     String lsPaymentForm = "";
                                     String lsBankName = "";
                                     String lsBankAccount = "";
@@ -439,7 +439,7 @@ public class DisbursementVoucher_CertificationController implements Initializabl
     private void initButtons() {
         JFXUtil.setButtonsVisibility(!main_data.isEmpty(), btnCertify, btnDisapproved, btnReturn);
         disableRowCheckbox.set(main_data.isEmpty()); // set enable/disable in checkboxes in requirements
-        JFXUtil.setDisabled(main_data.isEmpty(),chckSelectAll );
+        JFXUtil.setDisabled(main_data.isEmpty(), chckSelectAll);
     }
 
     private void handleDisbursementAction(String action) {

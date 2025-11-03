@@ -146,7 +146,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
     @FXML
     private Tab tabDetails, tabCheck, tabBankTransfer, tabOnlinePayment, tabJournal;
     @FXML
-    private TextField tfDVTransactionNo, tfSupplier, tfVoucherNo, tfBankNameCheck, tfBankAccountCheck, tfPayeeName, tfCheckNo, tfCheckAmount, tfAuthorizedPerson, tfBankNameBTransfer, tfBankAccountBTransfer, tfPaymentAmountBTransfer, tfSupplierBank, tfSupplierAccountNoBTransfer, tfBankTransReferNo, tfBankNameOnlinePayment, tfBankAccountOnlinePayment, tfPaymentAmount, tfSupplierServiceName, tfSupplierAccountNo, tfPaymentReferenceNo, tfTotalAmount, tfVatableSales, tfVatAmountMaster, tfVatZeroRatedSales, tfVatExemptSales, tfLessWHTax, tfTotalNetAmount, tfRefNoDetail, tfVatableSalesDetail, tfVatExemptDetail, tfVatZeroRatedSalesDetail, tfVatRateDetail, tfVatAmountDetail, tfTaxRateDetail, tfTaxAmountDetail, tfPurchasedAmountDetail, tfNetAmountDetail, tfSearchPayee, tfSearchBranch, tfSearchParticular, tfJournalTransactionNo, tfTotalDebitAmount, tfTotalCreditAmount, tfAccountCode, tfAccountDescription, tfDebitAmount, tfCreditAmount;
+    private TextField tfDVTransactionNo, tfSupplier, tfVoucherNo, tfBankNameCheck, tfBankAccountCheck, tfPayeeName, tfCheckNo, tfCheckAmount, tfAuthorizedPerson, tfBankNameBTransfer, tfBankAccountBTransfer, tfPaymentAmountBTransfer, tfSupplierBank, tfSupplierAccountNoBTransfer, tfBankTransReferNo, tfBankNameOnlinePayment, tfBankAccountOnlinePayment, tfPaymentAmount, tfSupplierServiceName, tfSupplierAccountNo, tfPaymentReferenceNo, tfTotalAmount, tfVatableSales, tfVatAmountMaster, tfVatZeroRatedSales, tfVatExemptSales, tfLessWHTax, tfTotalNetAmount, tfRefNoDetail, tfVatableSalesDetail, tfVatExemptDetail, tfVatZeroRatedSalesDetail, tfVatRateDetail, tfVatAmountDetail, tfTaxRateDetail, tfTaxAmountDetail, tfPurchasedAmountDetail, tfNetAmountDetail, tfSearchPayee, tfSearchBranch, tfJournalTransactionNo, tfTotalDebitAmount, tfTotalCreditAmount, tfAccountCode, tfAccountDescription, tfDebitAmount, tfCreditAmount;
     @FXML
     private DatePicker dpDVTransactionDate, dpCheckDate, dpJournalTransactionDate, dpReportMonthYear;
     @FXML
@@ -971,7 +971,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
     private void initTextFields() {
         //Initialise  TextField Focus
 
-        JFXUtil.setFocusListener(txtSearch_Focus, tfSearchPayee, tfSearchBranch, tfSearchParticular);
+        JFXUtil.setFocusListener(txtSearch_Focus, tfSearchPayee, tfSearchBranch);
         JFXUtil.setFocusListener(txtArea_Focus, taDVRemarks, taJournalRemarks);
         //apDVMaster1
         JFXUtil.setFocusListener(txtMaster_Focus, tfSupplier);
@@ -1005,12 +1005,6 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                     case "tfSearchPayee":
                         if (lsValue.isEmpty()) {
                             poController.setSearchPayee("");
-                            loadTableMain.reload();
-                        }
-                        break;
-                    case "tfSearchParticular":
-                        if (lsValue.isEmpty()) {
-                            poController.setSearchParticular("");
                             loadTableMain.reload();
                         }
                         break;
@@ -1353,16 +1347,6 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                                 }
                                 loadRecordSearch();
                                 break;
-                            case "tfSearchParticular":
-                                poJSON = poController.SearchParticular(lsValue, pnMain, false, true);
-                                if ("error".equals((String) poJSON.get("result"))) {
-                                    ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-                                    return;
-                                } else {
-                                    loadTableMain.reload();
-                                }
-                                loadRecordSearch();
-                                break;
 
                             //apMasterDV1
                             case "tfSupplier":
@@ -1603,7 +1587,6 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
 //            cmbTransactionType.getSelectionModel().getSelection();
             tfSearchPayee.setText(poController.getSearchPayee());
             tfSearchBranch.setText(poController.getSearchBranch());
-            tfSearchParticular.setText(poController.getSearchParticular());
 
             JFXUtil.updateCaretPositions(apBrowse);
         } catch (SQLException | GuanzonException ex) {

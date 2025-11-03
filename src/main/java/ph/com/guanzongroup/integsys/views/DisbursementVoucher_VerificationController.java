@@ -453,7 +453,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
                     ShowMessageFX.Warning(null, pxeModuleName, "Button is not registered, Please contact admin to assist about the unregistered button");
                     break;
             }
-            if (JFXUtil.isObjectEqualTo(lsButton, "btnSave", "btnCancel", "btnVoid")) {
+            if (JFXUtil.isObjectEqualTo(lsButton, "btnSave", "btnCancel", "btnVoid", "btnVerify", "btnDVCancel")) {
                 pbIsCheckedJournalTab = false;
                 poController.resetTransaction();
                 poController.Master().setSupplierClientID(psSupplierPayeeId);
@@ -643,7 +643,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
                             try {
                                 main_data.clear();
                                 JFXUtil.disableAllHighlight(tblViewMainList, highlightedRowsMain);
-                                poJSON = poController.loadTransactionList(psSearchSupplierID, psSearchTransactionNo, "", false);
+                                poJSON = poController.loadTransactionList(tfSearchSupplier.getText(), tfSearchTransaction.getText(), "", false);
                                 int lnRowNo = 0;
                                 if (poController.getMasterList().size() > 0) {
                                     for (int lnCtr = 0; lnCtr <= poController.getMasterList().size() - 1; lnCtr++) {
@@ -1533,7 +1533,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
     private void loadRecordSearch() {
         try {
             lblSource.setText(poController.Master().Company().getCompanyName() + " - " + poController.Master().Industry().getDescription());
-//            tfSearchSupplier.setText(poController.getSearchSupplier);
+            tfSearchSupplier.setText(poController.getSearchPayee());
 //            tfSearchTransaction.setText(poController.getSearchTransaction());
             JFXUtil.updateCaretPositions(apBrowse);
         } catch (SQLException | GuanzonException ex) {
