@@ -310,7 +310,7 @@ public class CheckAuthorizationController implements Initializable, ScreenInterf
 
     private void retrieveDisbursement() {
         try {
-            poJSON = poDisbursementController.loadTransactionList(psSearchBankID, psSearchBankAccountID, "", true);
+            poJSON = poDisbursementController.loadTransactionList(tfSearchBankName.getText(), tfSearchBankAccount.getText(), "", true);
 
             if ("error".equals(poJSON.get("result"))) {
                 ShowMessageFX.Error(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
@@ -512,7 +512,7 @@ public class CheckAuthorizationController implements Initializable, ScreenInterf
         controller.setTransaction(fsTransactionNo);
         try {
             stageDV.showDialog((Stage) AnchorMain.getScene().getWindow(), getClass().getResource("/ph/com/guanzongroup/integsys/views/DisbursementVoucher_View.fxml"), controller,
-                    "Disbursement Dialog", true, true, false);
+                    "Disbursement Dialog", true, false, false);
         } catch (IOException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
         }

@@ -457,7 +457,7 @@
                                                                            </GridPane.margin>
                                                                         </Label>
                                                                         <TextField fx:id="tfRefNoDetail" disable="true" editable="false" maxWidth="1.7976931348623157E308" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-                                                                        <CheckBox fx:id="chbkVatClassification" disable="true" mnemonicParsing="false" onAction="#cmdCheckBox_Click" GridPane.columnIndex="4" GridPane.rowIndex="2" />
+                                                                        <CheckBox fx:id="chbkVatClassification" disable="true" mnemonicParsing="false" GridPane.columnIndex="4" GridPane.rowIndex="2" />
                                                                         <TextField fx:id="tfVatableSalesDetail" alignment="CENTER_RIGHT" disable="true" promptText="0.00" styleClass="DisabledTextField" GridPane.columnIndex="4" GridPane.rowIndex="3" />
                                                                         <TextField fx:id="tfVatExemptDetail" alignment="CENTER_RIGHT" disable="true" promptText="0.00" styleClass="DisabledTextField" GridPane.columnIndex="4" GridPane.rowIndex="4" />
                                                                         <TextField fx:id="tfVatZeroRatedSalesDetail" alignment="CENTER_RIGHT" disable="true" promptText="0.00" styleClass="DisabledTextField" GridPane.columnIndex="4" GridPane.rowIndex="5" />
@@ -466,11 +466,7 @@
                                                                         <TextField fx:id="tfTaxRateDetail" alignment="CENTER_RIGHT" disable="true" editable="false" promptText="0.00" styleClass="DisabledTextField" GridPane.columnIndex="7" GridPane.rowIndex="2" />
                                                                         <TextField fx:id="tfTaxAmountDetail" alignment="CENTER_RIGHT" disable="true" editable="false" promptText="0.00" styleClass="DisabledTextField" GridPane.columnIndex="7" GridPane.rowIndex="3" />
                                                                         <TextField fx:id="tfPurchasedAmountDetail" alignment="CENTER_RIGHT" promptText="0.00" GridPane.columnIndex="7" GridPane.rowIndex="4" />
-                                                                        <TextField fx:id="tfNetAmountDetail" alignment="CENTER_RIGHT" disable="true" editable="false" promptText="0.00" styleClass="DisabledTextField" GridPane.columnIndex="7" GridPane.rowIndex="6">
-                                                                           <font>
-                                                                              <Font name="System Bold" size="12.0" />
-                                                                           </font>
-                                                                        </TextField>
+                                                            <TextField fx:id="tfNetAmountDetail" alignment="CENTER_RIGHT" disable="true" promptText="0.00" style="-fx-font-weight: bold;" styleClass="DisabledTextField" GridPane.columnIndex="7" GridPane.rowIndex="6" />
                                                                         
                                                                      </children>
                                                                   </GridPane>

@@ -190,7 +190,8 @@ public class DisbursementVoucher_ViewController implements Initializable, Screen
                     initTabPane();
                     clearTextFields();
                     pnEditMode = EditMode.UNKNOWN;
-
+                    loadTableDetail.reload();
+                    initDVMasterTabs();
                     initButton(pnEditMode);
                 } else {
                     ShowMessageFX.Warning((String) poJSON.get("message"), pxeModuleName, null);
@@ -222,23 +223,22 @@ public class DisbursementVoucher_ViewController implements Initializable, Screen
 
     //Disables/ Enables tabs
     private void initDVMasterTabs() {
-        boolean lbShow = JFXUtil.isObjectEqualTo(pnEditMode, EditMode.READY, EditMode.ADDNEW, EditMode.UPDATE);
         JFXUtil.setDisabled(true, tabCheck, tabOnlinePayment, tabBankTransfer);
         switch (poController.Master().getDisbursementType()) {
             case DisbursementStatic.DisbursementType.CHECK:
-                JFXUtil.setDisabled(!lbShow, tabCheck);
+                JFXUtil.setDisabled(false, tabCheck);
                 JFXUtil.clickTabByTitleText(tabPanePaymentMode, "Check");
                 loadRecordMasterCheck();
                 //must reset data of check
                 break;
             case DisbursementStatic.DisbursementType.WIRED:
-                JFXUtil.setDisabled(!lbShow, tabBankTransfer);
+                JFXUtil.setDisabled(false, tabBankTransfer);
                 JFXUtil.clickTabByTitleText(tabPanePaymentMode, "Bank Transfer");
                 loadRecordMasterBankTransfer();
                 //must reset data of btransfer
                 break;
             case DisbursementStatic.DisbursementType.DIGITAL_PAYMENT:
-                JFXUtil.setDisabled(!lbShow, tabOnlinePayment);
+                JFXUtil.setDisabled(false, tabOnlinePayment);
                 JFXUtil.clickTabByTitleText(tabPanePaymentMode, "E-Wallet");
                 loadRecordMasterOnlinePayment();
                 //must reset data of online payment
