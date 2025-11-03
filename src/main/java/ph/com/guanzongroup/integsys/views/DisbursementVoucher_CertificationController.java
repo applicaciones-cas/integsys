@@ -316,10 +316,8 @@ public class DisbursementVoucher_CertificationController implements Initializabl
                 Platform.runLater(() -> {
                     chckSelectAll.setSelected(false);
                     checkedItem.clear();
-                    if (poDisbursementController.getMasterList().size() > 0) {
-                        for (int lnCntr = 0; lnCntr < poDisbursementController.getMasterList().size(); lnCntr++) {
-                            checkedItem.add("0");
-                        }
+                    for (int lnCntr = 0; lnCntr < poDisbursementController.getMasterList().size(); lnCntr++) {
+                        checkedItem.add("0");
                     }
 
                 });
@@ -402,6 +400,7 @@ public class DisbursementVoucher_CertificationController implements Initializabl
                         } catch (SQLException | GuanzonException ex) {
                             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
                         }
+                        initButtons();
                     });
                 });
     }
