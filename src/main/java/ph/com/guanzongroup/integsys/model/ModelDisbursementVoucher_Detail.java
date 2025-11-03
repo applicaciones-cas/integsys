@@ -37,8 +37,7 @@ public class ModelDisbursementVoucher_Detail {
             String index08,
             String index09,
             String index10,
-            String index11,
-            String index12) {
+            String index11) {
 
         this.index01 = new SimpleStringProperty(index01);
         this.index02 = new SimpleStringProperty(index02);
@@ -51,7 +50,6 @@ public class ModelDisbursementVoucher_Detail {
         this.index09 = new SimpleStringProperty(index09);
         this.index10 = new SimpleStringProperty(index10);        
         this.index11 = new SimpleStringProperty(index11);
-        this.index12 = new SimpleStringProperty(index12);
     }
 
     public ModelDisbursementVoucher_Detail(
