@@ -450,7 +450,7 @@ public class DisbursementVoucher_CertificationController implements Initializabl
                 return;
             }
 
-            if (!ShowMessageFX.OkayCancel(null, pxeModuleName, "Are you sure you want to " + action + " selected items?")) {
+            if (!ShowMessageFX.OkayCancel(null, pxeModuleName, "Are you sure you want to " + action + " selected item/s?")) {
                 return;
             }
 

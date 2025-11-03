@@ -665,6 +665,9 @@ public class DisbursementVoucher_VerificationController implements Initializable
                                         if (poController.getMaster(lnCtr).getTransactionStatus().equals(DisbursementStatic.RETURNED)) {
                                             JFXUtil.highlightByKey(tblViewMainList, String.valueOf(lnRowNo), "#FAA0A0", highlightedRowsMain);
                                         }
+                                        if (poController.getMaster(lnCtr).getTransactionStatus().equals(DisbursementStatic.VERIFIED)) {
+                                            JFXUtil.highlightByKey(tblViewMainList, String.valueOf(lnRowNo), "#C1E1C1", highlightedRowsMain);
+                                        }
                                     }
                                 }
                                 if (pnMain < 0 || pnMain
@@ -1509,17 +1512,24 @@ public class DisbursementVoucher_VerificationController implements Initializable
             pnDetail = isUp ? JFXUtil.moveToPreviousRow(tblVwDetails) : JFXUtil.moveToNextRow(tblVwDetails);
         }
         loadRecordDetail();
+        if (pnDetail < 0 || pnDetail > poController.getDetailCount() - 1) {
+            return;
+        }
         JFXUtil.requestFocusNullField(new Object[][]{ // alternative to if , else if
             {poController.Detail(pnDetail).getAmountApplied(), tfPurchasedAmountDetail},}, tfPurchasedAmountDetail); // default
     }
 
     public void moveNextJE(boolean isUp, boolean continueNext) {
         try {
+
             if (continueNext) {
                 apJournalDetails.requestFocus();
                 pnDetailJE = isUp ? JFXUtil.moveToPreviousRow(tblVwJournalDetails) : JFXUtil.moveToNextRow(tblVwJournalDetails);
             }
             loadRecordDetailJE();
+            if (pnDetailJE < 0 || pnDetailJE > poController.Journal().getDetailCount() - 1) {
+                return;
+            }
             JFXUtil.requestFocusNullField(new Object[][]{ // alternative to if , else if
                 {poController.Journal().Detail(pnDetailJE).getAccountCode(), tfAccountCode},
                 {poController.Journal().Detail(pnDetailJE).Account_Chart().getDescription(), tfAccountDescription}, // if null or empty, then requesting focus to the txtfield
@@ -2023,20 +2033,19 @@ public class DisbursementVoucher_VerificationController implements Initializable
         boolean lbShow2 = (fnEditMode == EditMode.READY);
         JFXUtil.setButtonsVisibility(!lbShow, btnClose);
         JFXUtil.setButtonsVisibility(lbShow, btnSave, btnCancel);
-        JFXUtil.setButtonsVisibility(false, btnUpdate, btnVoid);
+        JFXUtil.setButtonsVisibility(false, btnUpdate, btnVoid, btnDVCancel);
         JFXUtil.setButtonsVisibility(lbShow2, btnVerify, btnDVCancel);
         JFXUtil.setButtonsVisibility(fnEditMode != EditMode.ADDNEW && fnEditMode != EditMode.UNKNOWN, btnHistory);
 
         JFXUtil.setDisabled(!lbShow, apDVMaster1, apDVMaster2, apDVMaster3, apDVDetail,
                 apMasterDVCheck, apMasterDVBTransfer, apMasterDVOp, apJournalMaster, apJournalDetails);
-
         if (fnEditMode == EditMode.READY) {
             switch (poController.Master().getTransactionStatus()) {
                 case DisbursementStatic.OPEN:
                     JFXUtil.setButtonsVisibility(true, btnUpdate, btnVoid);
                     break;
                 case DisbursementStatic.VERIFIED:
-                    JFXUtil.setButtonsVisibility(true, btnUpdate);
+                    JFXUtil.setButtonsVisibility(true, btnUpdate, btnDVCancel);
                     break;
                 case DisbursementStatic.RETURNED:
                     JFXUtil.setButtonsVisibility(false, btnVerify, btnDVCancel);

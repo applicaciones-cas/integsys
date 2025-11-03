@@ -1560,6 +1560,9 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
             pnDetail = isUp ? JFXUtil.moveToPreviousRow(tblVwDetails) : JFXUtil.moveToNextRow(tblVwDetails);
         }
         loadRecordDetail();
+        if (pnDetail < 0 || pnDetail > poController.getDetailCount() - 1) {
+            return;
+        }
         JFXUtil.requestFocusNullField(new Object[][]{ // alternative to if , else if
             {poController.Detail(pnDetail).getAmountApplied(), tfPurchasedAmountDetail},}, tfPurchasedAmountDetail); // default
     }
@@ -1571,6 +1574,9 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                 pnDetailJE = isUp ? JFXUtil.moveToPreviousRow(tblVwJournalDetails) : JFXUtil.moveToNextRow(tblVwJournalDetails);
             }
             loadRecordDetailJE();
+            if (pnDetailJE < 0 || pnDetailJE > poController.Journal().getDetailCount() - 1) {
+                return;
+            }
             JFXUtil.requestFocusNullField(new Object[][]{ // alternative to if , else if
                 {poController.Journal().Detail(pnDetailJE).getAccountCode(), tfAccountCode},
                 {poController.Journal().Detail(pnDetailJE).Account_Chart().getDescription(), tfAccountDescription}, // if null or empty, then requesting focus to the txtfield
