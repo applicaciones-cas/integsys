@@ -2046,6 +2046,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
                     break;
                 case DisbursementStatic.VERIFIED:
                     JFXUtil.setButtonsVisibility(true, btnUpdate, btnDVCancel);
+                    JFXUtil.setButtonsVisibility(false, btnVerify);
                     break;
                 case DisbursementStatic.RETURNED:
                     JFXUtil.setButtonsVisibility(false, btnVerify, btnDVCancel);
