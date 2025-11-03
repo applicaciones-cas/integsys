@@ -130,7 +130,7 @@ import javafx.scene.control.MenuItem;
 import ph.com.guanzongroup.integsys.views.ScreenInterface;
 
 /**
- * Date : 4/28/2025 Recent update: 10/30/2025
+ * Date : 4/28/2025 Recent update: 11/03/2025
  *
  * @author Aldrich
  */
@@ -2652,7 +2652,7 @@ public class JFXUtil {
             textField.textProperty().removeListener(searchListener);
         }
     }
-
+    /*Gets Node id and returns string English format of the id*/
     public static String IDToWord(String id) {
         if (id == null || id.isEmpty()) {
             return "";
@@ -2668,6 +2668,8 @@ public class JFXUtil {
         return withSpaces.trim();
     }
 
+    /*ComboBox value setter; Prevents listener to trigger while setting value*/
+ /*requires combobox id and index value to be selected*/
     public static void setCmbValue(ComboBox<?> comboBox, int value) {
         // Save original listener
         EventHandler<ActionEvent> originalHandler = comboBox.getOnAction();
@@ -2682,6 +2684,8 @@ public class JFXUtil {
         comboBox.setOnAction(originalHandler);
     }
 
+    /*Returns description or code of the source type*/
+ /*Requires string value(for comparison) and boolean if the string value is code(to return description); alternatively*/
     public static String getSourceType(String lsValue, boolean isCode) {
         if (lsValue == null || lsValue.trim().isEmpty()) {
             return "";
@@ -2702,6 +2706,7 @@ public class JFXUtil {
 
         return "";
     }
+    //private static source
     private static final Map<String, String> SOURCE_MAP = new HashMap<>();
 
     static {
