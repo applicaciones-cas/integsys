@@ -715,8 +715,8 @@ public class DisbursementVoucher_HistoryController implements Initializable, Scr
                     : null);
             JFXUtil.setDisabled(JFXUtil.isObjectEqualTo(poController.CheckPayments().getModel().getCheckNo(), null, ""), dpCheckDate);
             tfCheckAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.CheckPayments().getModel().getAmount(), true));
-            chbkIsCrossCheck.setSelected(poController.CheckPayments().getModel().isCross());
-            chbkIsPersonOnly.setSelected(poController.CheckPayments().getModel().isPayee());
+            chbkIsCrossCheck.setSelected(JFXUtil.isObjectEqualTo(poController.CheckPayments().getModel().isCross(), null, "") ? false : poController.CheckPayments().getModel().isCross());
+            chbkIsPersonOnly.setSelected(JFXUtil.isObjectEqualTo(poController.CheckPayments().getModel().isPayee(), null, "") ? false : poController.CheckPayments().getModel().isPayee());
             tfBankNameCheck.setText(poController.CheckPayments().getModel().Banks().getBankName() != null ? poController.CheckPayments().getModel().Banks().getBankName() : "");
 //            tfBankAccountCheck.setText(poController.CheckPayments().getModel().Bank_Account_Master().getAccountNo() != null ? poController.CheckPayments().getModel().Bank_Account_Master().getAccountNo() : "");
             tfBankAccountCheck.setText(poController.Master().getDisbursementType().equals(
