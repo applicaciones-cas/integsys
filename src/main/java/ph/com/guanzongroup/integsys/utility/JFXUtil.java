@@ -121,12 +121,16 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.util.Callback;
 import java.io.File;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.regex.Pattern;
 import javafx.css.PseudoClass;
+import javafx.scene.control.ButtonBase;
+import javafx.scene.control.MenuItem;
 import ph.com.guanzongroup.integsys.views.ScreenInterface;
 
 /**
- * Date : 4/28/2025 Recent update: 10/16/2025
+ * Date : 4/28/2025 Recent update: 10/30/2025
  *
  * @author Aldrich
  */
@@ -259,19 +263,25 @@ public class JFXUtil {
         });
     }
 
-    /* To retain non-temporary highlights and remove temporary highlights; this is specifically used for ENTRY form*/
+    /*this is specifically used for ENTRY form*/
+ /* To retain non-temporary highlights and remove temporary highlights; */
     public static void showRetainedHighlight(boolean isRetained, TableView<?> tblView, String color, List<Pair<String, String>> plPartial, List<Pair<String, String>> plFinal,
             Map<String, List<String>> highlightedRows, boolean resetpartial) {
 
         //decide if to allow adding to final of rows highlighted 
         //if contains 1 value, indicates will proceed
         if (isRetained) {
+            plFinal.removeIf(finalPair
+                    -> plPartial.stream()
+                            .anyMatch(partialPair -> partialPair.getKey().equals(finalPair.getKey()))
+            );
             for (Pair<String, String> pair : plPartial) {
                 if (!"0".equals(pair.getValue())) {
                     plFinal.add(new Pair<>(pair.getKey(), pair.getValue()));
                 }
             }
         }
+
         //decide if to reset the temporary highlights made
         if (resetpartial) {
             disableAllHighlightByColor(tblView, color, highlightedRows);
@@ -425,8 +435,14 @@ public class JFXUtil {
 
     /* To put caret position of a textfield to last character index*/
  /* Requires AnchorPane ID containing textfields*/
-    public static void updateCaretPositions(AnchorPane anchorPane) {
-        List<TextField> textFields = getAllTextFields(anchorPane);
+    public static void updateCaretPositions(AnchorPane... anchorPanes) {
+        List<TextField> textFields = new ArrayList<>();
+
+        // Collect all TextFields from all provided AnchorPanes
+        for (AnchorPane anchorPane : anchorPanes) {
+            textFields.addAll(getAllTextFields(anchorPane));
+        }
+
         for (TextField textField : textFields) {
             String text = textField.getText();
             if (text != null && !"".equals(text)) {
@@ -813,7 +829,7 @@ public class JFXUtil {
                 EventHandler<ActionEvent> savedHandler = combo.getOnAction(); // save
 
                 combo.setOnAction(null);
-                combo.getSelectionModel().select(0);
+                combo.getSelectionModel().select(null);
                 combo.setOnAction(savedHandler);
             } else if (node instanceof Parent) {
                 clearTextInputsRecursive((Parent) node);
@@ -857,17 +873,36 @@ public class JFXUtil {
 
     /* Disables any node in UI*/
  /* Requires boolean & Nodes*/
-    public static void setDisabled(boolean disable, Node... nodes) {
-        for (Node node : nodes) {
-            node.setDisable(disable);
-            if (node instanceof TextField) {
-                if (!disable) {
-                    while (node.getStyleClass().contains("DisabledTextField")) {
+    public static void setDisabled(boolean disable, Object... elements) {
+        for (Object obj : elements) {
+            if (obj instanceof Node) {
+                Node node = (Node) obj;
+                node.setDisable(disable);
+
+                if (node instanceof TextField) {
+                    if (disable) {
+                        if (!node.getStyleClass().contains("DisabledTextField")) {
+                            node.getStyleClass().add("DisabledTextField");
+                        }
+                    } else {
                         node.getStyleClass().remove("DisabledTextField");
                     }
-                } else {
-                    node.getStyleClass().add("DisabledTextField");
                 }
+
+            } else if (obj instanceof Tab) {
+                ((Tab) obj).setDisable(disable);
+
+            } else if (obj instanceof MenuItem) {
+                ((MenuItem) obj).setDisable(disable);
+
+            } else if (obj instanceof ButtonBase) {
+                ((ButtonBase) obj).setDisable(disable);
+
+            } else if (obj instanceof Control) {
+                ((Control) obj).setDisable(disable);
+
+            } else {
+                System.out.println("Unsupported element type: " + obj.getClass().getSimpleName());
             }
         }
     }
@@ -2442,7 +2477,7 @@ public class JFXUtil {
 
     //private
     private static String getNameByValue(Class<?> clazz, String value) {
-        if ("-1".equals(value) || "".equals(value)) {
+        if ("-1".equals(value) || JFXUtil.isObjectEqualTo(value, null, "")) {
             return "UNKNOWN";
         }
         return buildValueToNameMap(clazz).getOrDefault(value, "UNKNOWN");
@@ -2463,6 +2498,12 @@ public class JFXUtil {
                         // Special handling: if field name is VOID, change to VOIDED
                         if ("VOID".equals(fieldName)) {
                             fieldName = "VOIDED";
+                        }
+                        if ("DIGITAL PAYMENT".equals(fieldName)) {
+                            fieldName = "ONLINE PAYMENT";
+                        }
+                        if ("WIRED".equals(fieldName)) {
+                            fieldName = "BANK TRANSFER";
                         }
                         valueToNameMap.put((String) value, fieldName);
                     }
@@ -2627,4 +2668,48 @@ public class JFXUtil {
         return withSpaces.trim();
     }
 
+    public static void setCmbValue(ComboBox<?> comboBox, int value) {
+        // Save original listener
+        EventHandler<ActionEvent> originalHandler = comboBox.getOnAction();
+        // Temporarily remove listener to prevent triggering events
+        comboBox.setOnAction(null);
+        // Safe cast for flexibility
+        if (value < 0) {
+            comboBox.getSelectionModel().select(value);
+        } else {
+            comboBox.getSelectionModel().select(value);
+        }
+        comboBox.setOnAction(originalHandler);
+    }
+
+    public static String getSourceType(String lsValue, boolean isCode) {
+        if (lsValue == null || lsValue.trim().isEmpty()) {
+            return "";
+        }
+
+        String val = lsValue.trim().toLowerCase();
+
+        for (Map.Entry<String, String> entry : SOURCE_MAP.entrySet()) {
+            String code = entry.getKey();
+            String desc = entry.getValue();
+
+            if (val.equalsIgnoreCase(code)) {
+                return isCode ? desc : code;
+            } else if (val.equalsIgnoreCase(desc)) {
+                return isCode ? code : desc;
+            }
+        }
+
+        return "";
+    }
+    private static final Map<String, String> SOURCE_MAP = new HashMap<>();
+
+    static {
+        SOURCE_MAP.put("PRFx", "PRF");
+        SOURCE_MAP.put("SOAt", "SOA");
+        SOURCE_MAP.put("CcPy", "Cash Payable");
+        SOURCE_MAP.put("PORc", "PO Receiving");
+        SOURCE_MAP.put("APAd", "AP Adjustment");
+        SOURCE_MAP.put("PO", "Purchase Order");
+    }
 }
