@@ -6,6 +6,10 @@
     -fx-focus-color: -fx-secondary-color;
     -c-fg: #222222;       /* For Custom checkbox */
     -c-border: #cccccc;   /* For Custom checkbox */
+    -material-design-color: #77797A;
+    -material-design-color-transparent-12: #3f51b51f;
+    -material-design-color-transparent-24: #3f51b53e;
+    -material-design-color-transparent-40: #3f51b566;
 }
 /* HEADER CSS */
 .toolbar{
@@ -762,25 +766,64 @@
 }
 
 .combo-box-base:disabled,
-.list-cell:disabled,
-.check-box:disabled{
+.list-cell:disabled{
     -fx-opacity: 1;
 }
-.check-box .box {
-    -fx-background-color: white;
-    -fx-border-color:black;
-    -fx-border-width:.5px;
-    -fx-background-radius:2px;
-    -fx-border-radius:3px;
-}
-.check-box .box:selected {
-    -fx-background-color: white;
-    -fx-border-color:black;
-    -fx-border-width:1px;
-    -fx-background-radius:2px;
-    -fx-border-radius:3px;
+
+.check-box > .box > .mark {
+    -fx-background-color: null;
+    -fx-padding: 0.416667em 0.416667em 0.5em 0.5em; /* 5 5 6 6 */
+    -fx-shape: "M-0.25,6.083c0.843-0.758,4.583,4.833,5.75,4.833S14.5-1.5,15.917-0.917c1.292,0.532-8.75,17.083-10.5,17.083C3,16.167-1.083,6.833-0.25,6.083z";
 }
 
+.check-box > .box > .mark {
+    -fx-background-color: null;
+    -fx-padding: 0.45em;
+    -fx-scale-x: 1.1;
+    -fx-scale-y: 0.8;
+    -fx-shape: "M9.998,13.946L22.473,1.457L26.035,5.016L10.012,21.055L0.618,11.688L4.178,8.127L9.998,13.946Z";
+ -fx-fill: white;
+}
+.check-box:selected > .box > .mark {
+    -fx-background-color: white;
+}
+.check-box > .box {
+    -fx-background-color: #F4F4F4;
+    -fx-background-insets: 0;
+    -fx-border-color: #0000008a;
+    -fx-border-width: 1px;
+    -fx-border-radius: 2px;
+    -fx-padding: 0.083333em; /* 1px */
+    -fx-alignment: CENTER;
+    -fx-content-display: LEFT;
+}
+
+.check-box:selected > .box {
+    -fx-background-color: -material-design-color;
+    -fx-background-radius: 2px;
+    -fx-background-insets: 0;
+    -fx-border-color: transparent;
+}
+
+
+.check-box:hover  {
+    -fx-cursor: hand;
+}
+
+/* Default cursor when checkbox is disabled (even if hovered) */
+.check-box:disabled:hover {
+    -fx-cursor: default;
+}
+
+.check-box:disabled {
+    -fx-cursor: default;
+}
+.check-box:selected:focused > .box {
+    -fx-background-color: -material-design-color-transparent-24, -material-design-color;
+    -fx-background-insets: -5, 0;
+    -fx-background-radius: 1024, 2px;
+    -fx-border-color: transparent;
+}
 
 .button_process2 {
     -fx-background-color: #FF8201;

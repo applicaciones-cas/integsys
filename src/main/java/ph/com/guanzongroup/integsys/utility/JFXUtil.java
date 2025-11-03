@@ -2324,7 +2324,7 @@ public class JFXUtil {
                         {
                             // Center checkbox
                             setStyle("-fx-alignment: CENTER;");
-                            setCheckboxStyle("#7B8182", checkBox);
+//                            setCheckboxStyle("#7B8182", checkBox);
                             // Cursor binding
                             checkBox.cursorProperty().bind(
                                     Bindings.when(disableAll)
