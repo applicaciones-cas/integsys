@@ -316,14 +316,15 @@ public class DisbursementVoucher_CertificationController implements Initializabl
                 Platform.runLater(() -> {
                     chckSelectAll.setSelected(false);
                     checkedItem.clear();
-                    if (poDisbursementController.getDetailCount() > 0) {
+                    if (poDisbursementController.getMasterList().size() > 0) {
                         for (int lnCntr = 0; lnCntr < poDisbursementController.getMasterList().size(); lnCntr++) {
                             checkedItem.add("0");
                         }
                     }
-                    loadTableMain.reload();
+
                 });
             }
+            loadTableMain.reload();
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
         }
