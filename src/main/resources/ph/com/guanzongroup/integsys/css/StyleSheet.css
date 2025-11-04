@@ -7,9 +7,8 @@
     -c-fg: #222222;       /* For Custom checkbox */
     -c-border: #cccccc;   /* For Custom checkbox */
     -material-design-color: #77797A;
-    -material-design-color-transparent-12: #3f51b51f;
     -material-design-color-transparent-24: #3f51b53e;
-    -material-design-color-transparent-40: #3f51b566;
+
 }
 /* HEADER CSS */
 .toolbar{
