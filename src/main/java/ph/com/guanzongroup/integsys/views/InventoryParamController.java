@@ -167,6 +167,7 @@ public class InventoryParamController implements Initializable, ScreenInterface 
                 poAppController.setIndustryID(psIndustryID);
                 poAppController.setCategory(psCategoryID);
                 System.err.println("Initialize value : Industry >" + psIndustryID);
+                System.err.println("Initialize value : Category >" + psCategoryID);
 
                 unloadForm appUnload = new unloadForm();
                 appUnload.unloadForm(apMainAnchor, poApp, psFormName);
@@ -388,7 +389,10 @@ public class InventoryParamController implements Initializable, ScreenInterface 
                         return;
                     }
                     clearAllInputs();
+
+                    poAppController.getModel().setCategoryFirstLevelId(psCategoryID);
                     getLoadedRecord();
+
                     break;
 
                 case "btnUpdate":
@@ -431,6 +435,7 @@ public class InventoryParamController implements Initializable, ScreenInterface 
                             poAppController.setIndustryID(psIndustryID);
                             poAppController.setCategory(psCategoryID);
                             System.err.println("Initialize value : Industry >" + psIndustryID);
+                            System.err.println("Initialize value : Category >" + psCategoryID);
 
                             clearAllInputs();
                         });
