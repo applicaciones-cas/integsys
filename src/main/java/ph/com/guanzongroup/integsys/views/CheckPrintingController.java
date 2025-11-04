@@ -10,9 +10,7 @@ import ph.com.guanzongroup.integsys.utility.JFXUtil;
 import java.io.IOException;
 import java.net.URL;
 import java.sql.SQLException;
-import java.text.SimpleDateFormat;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -47,7 +45,6 @@ import org.guanzon.appdriver.base.CommonUtils;
 import org.guanzon.appdriver.base.GRiderCAS;
 import org.guanzon.appdriver.base.GuanzonException;
 import org.guanzon.appdriver.base.MiscUtil;
-import org.guanzon.appdriver.base.SQLUtil;
 import org.json.simple.JSONObject;
 import ph.com.guanzongroup.cas.cashflow.CheckPayments;
 import ph.com.guanzongroup.cas.cashflow.CheckPrinting;
@@ -66,9 +63,8 @@ public class CheckPrintingController implements Initializable, ScreenInterface {
     private JSONObject poJSON;
     private static final int ROWS_PER_PAGE = 50;
     private final String pxeModuleName = "Check Printing";
-    private CheckPrinting poController;
+    private DisbursementVoucher poController;
     private CheckPayments poCheckPayments;
-    private DisbursementVoucher poDVController;
     public int pnEditMode;
 
     private String psIndustryId = "";
@@ -143,7 +139,7 @@ public class CheckPrintingController implements Initializable, ScreenInterface {
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         try {
-            poController = new CashflowControllers(oApp, null).CheckPrinting();
+            poController = new CashflowControllers(oApp, null).DisbursementVoucher();
             poController.setTransactionStatus(DisbursementStatic.VERIFIED);
             poJSON = new JSONObject();
             poController.setWithUI(true);
@@ -266,23 +262,32 @@ public class CheckPrintingController implements Initializable, ScreenInterface {
                 return;
             }
 
+            String firstBank = null;
+            boolean allSameBank = true;
             checkedItems.clear();
             for (Object item : tblViewMainList.getItems()) {
                 ModelCheckPrinting item1 = (ModelCheckPrinting) item;
                 String lschecked = item1.getIndex02();
                 String lsDVNO = item1.getIndex03();
-                String Remarks = action;
+                String banks = item1.getIndex07();
+
                 if (lschecked.equals("1")) {
+                    if (firstBank == null) {
+                        firstBank = banks;
+                    } else if (!firstBank.equals(banks)) {
+                        allSameBank = false;
+                        break;
+                    }
                     checkedItems.add(lsDVNO);
                 }
             }
+            if (!allSameBank) {
+                ShowMessageFX.Warning(null, pxeModuleName, "Selected items must belong to the same bank.");
+                return;
+            }
+
             switch (action) {
                 case "assign":
-//                    poJSON = validateSelectedItem();
-//                    if ("error".equals(poJSON.get("result"))) {
-//                        ShowMessageFX.Warning((String) poJSON.get("message"), pxeModuleName, null);
-//                        break;
-//                    }
                     if (!checkedItem.isEmpty()) {
                         showAssignWindow(checkedItem);
                         chckSelectAll.setSelected(false);
@@ -290,32 +295,21 @@ public class CheckPrintingController implements Initializable, ScreenInterface {
                     }
                     break;
                 case "print check":
-//                    poJSON = validateSelectedItem();
-//                    if ("error".equals(poJSON.get("result"))) {
-//                        ShowMessageFX.Warning((String) poJSON.get("message"), pxeModuleName, null);
-//                        break;
-//                    }
                     if (!checkedItem.isEmpty()) {
-                        poJSON = poController.PrintCheck(checkedItem);
+//                        poJSON = poController.PrintCheck(checkedItem);
                         if ("error".equals((String) poJSON.get("result"))) {
-                            ShowMessageFX.Warning((String) poJSON.get("message"), pxeModuleName, null);
+                            ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                             break;
                         }
                         chckSelectAll.setSelected(false);
                         checkedItem.clear();
                     }
-                    ShowMessageFX.Warning((String) poJSON.get("message"), pxeModuleName, null);
                     break;
                 case "print dv":
-//                    poJSON = validateSelectedItem();
-//                    if ("error".equals(poJSON.get("result"))) {
-//                        ShowMessageFX.Warning((String) poJSON.get("message"), pxeModuleName, null);
-//                        break;
-//                    }
                     if (!checkedItem.isEmpty()) {
-                        poJSON = poController.printTransaction(checkedItem);
+//                        poJSON = poController.printTransaction(checkedItem);
                         if (!"success".equals((String) poJSON.get("result"))) {
-                            ShowMessageFX.Warning((String) poJSON.get("message"), pxeModuleName, null);
+                            ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                         }
 
                         chckSelectAll.setSelected(false);
@@ -325,8 +319,9 @@ public class CheckPrintingController implements Initializable, ScreenInterface {
                 default:
                     throw new AssertionError();
             }
+            retrieveDisbursement();
             loadTableMain.reload();
-        } catch (SQLException | GuanzonException | CloneNotSupportedException ex) {
+        } catch (SQLException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
         }
     }
@@ -363,41 +358,46 @@ public class CheckPrintingController implements Initializable, ScreenInterface {
                 loadRecordSearch();
             });
 
-    boolean pbSuccess = true;
-
     private void datepicker_Action(ActionEvent event) {
         poJSON = new JSONObject();
         JFXUtil.setJSONSuccess(poJSON, "success");
-//        try {
         Object source = event.getSource();
         if (source instanceof DatePicker) {
+            LocalDate dateNow = LocalDate.now();
             DatePicker datePicker = (DatePicker) source;
             String inputText = datePicker.getEditor().getText();
-            SimpleDateFormat sdfFormat = new SimpleDateFormat(SQLUtil.FORMAT_SHORT_DATE);
-            String lsServerDate = "", lsTransDate = "", lsRefDate = "", lsSelectedDate = "";
-            LocalDate currentDate = null, transactionDate = null, referenceDate = null, selectedDate = null;
-
-            lsSelectedDate = sdfFormat.format(SQLUtil.toDate(JFXUtil.convertToIsoFormat(inputText), SQLUtil.FORMAT_SHORT_DATE));
-            selectedDate = LocalDate.parse(lsSelectedDate, DateTimeFormatter.ofPattern(SQLUtil.FORMAT_SHORT_DATE));
             if (inputText == null || "".equals(inputText) || "01/01/1900".equals(inputText)) {
                 return;
             }
             switch (datePicker.getId()) {
                 case "dpDVDateFrom":
-                    poController.CheckPayments().getModel().setCheckDate((SQLUtil.toDate(lsSelectedDate, SQLUtil.FORMAT_SHORT_DATE)));
+                    LocalDate selectedFromDate = dpDVDateFrom.getValue();
+                    LocalDate toDate = dpDVDateTo.getValue();
+                    if (toDate != null && selectedFromDate.isAfter(toDate)) {
+                        ShowMessageFX.Warning("Invalid Date, The 'From' date cannot be after the 'To' date.", pxeModuleName, null);
+                        dpDVDateFrom.setValue(CustomCommonUtil.parseDateStringToLocalDate(dateNow.toString()));
+                        psSearchDVDateFrom = CustomCommonUtil.formatLocalDateToShortString(dateNow);
+                        return;
+                    }
+                    psSearchDVDateFrom = CustomCommonUtil.formatLocalDateToShortString(selectedFromDate);
                     retrieveDisbursement();
                     break;
                 case "dpDVDateTo":
-                    poController.CheckPayments().getModel().setCheckDate((SQLUtil.toDate(lsSelectedDate, SQLUtil.FORMAT_SHORT_DATE)));
+                    LocalDate selectedToDate = dpDVDateTo.getValue();
+                    LocalDate fromDate = dpDVDateFrom.getValue();
+                    if (fromDate != null && selectedToDate.isBefore(fromDate)) {
+                        ShowMessageFX.Warning("Invalid Date, The 'To' date cannot be before the 'From' date.", pxeModuleName, null);
+                        dpDVDateTo.setValue(CustomCommonUtil.parseDateStringToLocalDate(dateNow.toString()));
+                        psSearchDVDateTo = CustomCommonUtil.formatLocalDateToShortString(dateNow);
+                        return;
+                    }
+                    psSearchDVDateTo = CustomCommonUtil.formatLocalDateToShortString(selectedToDate);
                     retrieveDisbursement();
                     break;
                 default:
                     break;
             }
         }
-//        } catch (SQLException ex) {
-//            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
-//        }
     }
 
     private void txtField_KeyPressed(KeyEvent event) {
@@ -428,7 +428,7 @@ public class CheckPrintingController implements Initializable, ScreenInterface {
                                 psSearchBankID = poController.CheckPayments().getModel().getBankID();
                                 break;
                             case "tfSearchBankAccount":
-                                poJSON = poController.SearhBankAccountForCheckPrinting(lsValue, poController.CheckPayments().getModel().getBankID(), false);
+                                poJSON = poController.SearchBankAccount(lsValue, poController.CheckPayments().getModel().getBankID(), false);
                                 if ("error".equals((String) poJSON.get("result"))) {
                                     ShowMessageFX.Warning((String) poJSON.get("message"), pxeModuleName, null);
                                     return;
@@ -452,16 +452,17 @@ public class CheckPrintingController implements Initializable, ScreenInterface {
 
     private void retrieveDisbursement() {
         try {
-            poJSON = poController.getDisbursementForCheckPrinting(tfSearchBankName.getText(), tfSearchBankAccount.getText(), "datefrom", "dateto");
+            poJSON = poController.loadTransactionList(tfSearchBankName.getText(), tfSearchBankAccount.getText(), "", true);
             if ("error".equals(poJSON.get("result"))) {
                 ShowMessageFX.Error(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
             } else {
                 Platform.runLater(() -> {
                     chckSelectAll.setSelected(false);
                     checkedItem.clear();
-                    for (int lnCntr = 0; lnCntr < poController.getDisbursementMasterCount() - 1; lnCntr++) {
+                    for (int lnCntr = 0; lnCntr < poController.getMasterList().size(); lnCntr++) {
                         checkedItem.add("0");
                     }
+
                 });
             }
             loadTableMain.reload();
@@ -478,21 +479,21 @@ public class CheckPrintingController implements Initializable, ScreenInterface {
                     Platform.runLater(() -> {
                         try {
                             main_data.clear();
-                            if (poController.getDisbursementMasterCount() - 1 > 0) {
-                                for (int lnCntr = 0; lnCntr < poController.getDisbursementMasterCount(); lnCntr++) {
+                            if (poController.getMasterList().size() > 0) {
+                                for (int lnCntr = 0; lnCntr <  poController.getMasterList().size(); lnCntr++) {
 
                                     main_data.add(new ModelCheckPrinting(
                                             String.valueOf(lnCntr + 1),
-                                            "",
-                                            poController.poDisbursementMaster(lnCntr).getTransactionNo(),
-                                            CustomCommonUtil.formatDateToShortString(poController.poDisbursementMaster(lnCntr).getTransactionDate()),
-                                            poController.poDisbursementMaster(lnCntr).Payee().getPayeeName(),
-                                            poController.poDisbursementMaster(lnCntr).Payee().getPayeeName(),
-                                            poController.poDisbursementMaster(lnCntr).CheckPayments().Banks().getBankName(),
-                                            poController.poDisbursementMaster(lnCntr).CheckPayments().Bank_Account_Master().getAccountNo(),
-                                            poController.poDisbursementMaster(lnCntr).CheckPayments().getCheckNo(),
-                                            CustomCommonUtil.formatDateToShortString(poController.poDisbursementMaster(lnCntr).getTransactionDate()),
-                                            CustomCommonUtil.setIntegerValueToDecimalFormat(poController.poDisbursementMaster(lnCntr).getNetTotal(), true)
+                                            checkedItem.get(lnCntr),
+                                            poController.getMaster(lnCntr).getTransactionNo(),
+                                            CustomCommonUtil.formatDateToShortString(poController.getMaster(lnCntr).getTransactionDate()),
+                                            poController.getMaster(lnCntr).Payee().getPayeeName(),
+                                            poController.getMaster(lnCntr).Payee().getPayeeName(),
+                                            poController.getMaster(lnCntr).CheckPayments().Banks().getBankName(),
+                                            poController.getMaster(lnCntr).CheckPayments().Bank_Account_Master().getAccountNo(),
+                                            poController.getMaster(lnCntr).CheckPayments().getCheckNo(),
+                                            CustomCommonUtil.formatDateToShortString(poController.getMaster(lnCntr).getTransactionDate()),
+                                            CustomCommonUtil.setIntegerValueToDecimalFormat(poController.getMaster(lnCntr).getNetTotal(), true)
                                     ));
                                 }
                             } else {
@@ -562,7 +563,7 @@ public class CheckPrintingController implements Initializable, ScreenInterface {
 
         DisbursementVoucher_ViewController controller = new DisbursementVoucher_ViewController();
         controller.setGRider(oApp);
-        controller.setDisbursement(poDVController);
+        controller.setDisbursement(poController);
         controller.setTransaction(fsTransactionNo);
         try {
             stageDV.showDialog((Stage) AnchorMain.getScene().getWindow(), getClass().getResource("/ph/com/guanzongroup/integsys/views/DisbursementVoucher_View.fxml"), controller,
@@ -578,7 +579,7 @@ public class CheckPrintingController implements Initializable, ScreenInterface {
 
         CheckAssignmentController controller = new CheckAssignmentController();
         controller.setGRider(oApp);
-        controller.setCheckPrinting(poController);
+//        controller.setCheckPrinting(poController);
         controller.setTransaction(fsTransactionNos);
         try {
             stageAssignment.showDialog((Stage) AnchorMain.getScene().getWindow(), getClass().getResource("/ph/com/guanzongroup/integsys/views/CheckAssignment.fxml"), controller,
@@ -587,4 +588,5 @@ public class CheckPrintingController implements Initializable, ScreenInterface {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
         }
     }
+
 }
