@@ -472,8 +472,9 @@ public class DisbursementVoucher_CertificationController implements Initializabl
                     if (!"success".equals((String) poJSON.get("result"))) {
                         ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                         break;
+                    } else {
+                        ShowMessageFX.Information(null, pxeModuleName, (String) poJSON.get("message"));
                     }
-                    ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                     chckSelectAll.setSelected(false);
                     checkedItem.clear();
                     break;
@@ -482,8 +483,9 @@ public class DisbursementVoucher_CertificationController implements Initializabl
                     if (!"success".equals((String) poJSON.get("result"))) {
                         ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                         break;
+                    } else {
+                        ShowMessageFX.Information(null, pxeModuleName, (String) poJSON.get("message"));
                     }
-                    ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                     chckSelectAll.setSelected(false);
                     checkedItem.clear();
                     break;
@@ -492,15 +494,19 @@ public class DisbursementVoucher_CertificationController implements Initializabl
                     if (!"success".equals((String) poJSON.get("result"))) {
                         ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                         break;
+                    } else {
+                        ShowMessageFX.Information(null, pxeModuleName, (String) poJSON.get("message"));
                     }
-                    ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                     chckSelectAll.setSelected(false);
                     checkedItem.clear();
                     break;
                 default:
                     throw new AssertionError();
             }
-            loadTableMain.reload();
+            Platform.runLater(() -> {
+                retrieveDisbursement();
+                loadTableMain.reload();
+            });
         } catch (ParseException | SQLException | GuanzonException | CloneNotSupportedException | ScriptException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
         }
