@@ -266,7 +266,6 @@ public class DisbursementVoucher_HistoryController implements Initializable, Scr
                     poController.Master().setIndustryID(psIndustryId);
                     poController.Master().setCompanyID(psCompanyId);
                     poController.Master().setBranchCode(oApp.getBranchCode());
-                    poController.setTransactionStatus(DisbursementStatic.OPEN + DisbursementStatic.VERIFIED);
                     poJSON = poController.SearchTransaction(tfSearchTransaction.getText());
                     if ("error".equalsIgnoreCase((String) poJSON.get("result"))) {
                         ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
