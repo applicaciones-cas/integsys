@@ -1085,6 +1085,10 @@ public class InventoryParamController implements Initializable, ScreenInterface 
         chkRecordStatus.setOnAction(e -> {
             poAppController.getModel().isRecordActive(chkRecordStatus.isSelected());
         });
+
+        cmbUnitType.setOnAction(e -> {
+            poAppController.getModel().setUnitType(String.valueOf(cmbUnitType.getSelectionModel().getSelectedIndex()));
+        });
         clearAllInputs();
     }
 
