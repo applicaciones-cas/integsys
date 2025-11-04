@@ -63,18 +63,11 @@ import ph.com.guanzongroup.cas.cashflow.status.DisbursementStatic;
 public class DisbursementVoucher_ViewController implements Initializable, ScreenInterface {
 
     private GRiderCAS oApp;
-    private JSONObject poJSON, poJSONVAT;
-    private static final int ROWS_PER_PAGE = 50;
-    private int pnMain = 0;
+    private JSONObject poJSON;
     private int pnDetail = 0;
-    private int pnDetailJE = 0;
-    private boolean pbIsCheckedJournalTab = false;
-    private boolean pbIsVerifier = false;
-    private boolean isWithVAToriginal = false;
     private final String pxeModuleName = "Disbursement Voucher View";
     private DisbursementVoucher poController;
     public int pnEditMode;
-    boolean pbKeyPressed = false;
     private String psIndustryId = "";
     private String psCompanyId = "";
     private String psCategoryId = "";
@@ -94,7 +87,7 @@ public class DisbursementVoucher_ViewController implements Initializable, Screen
     AtomicReference<Object> lastFocusedTextField = new AtomicReference<>();
     AtomicReference<Object> previousSearchedTextField = new AtomicReference<>();
 
-    JFXUtil.ReloadableTableTask loadTableDetail, loadTableDetailJE;
+    JFXUtil.ReloadableTableTask loadTableDetail;
 
     ObservableList<String> cPaymentMode = FXCollections.observableArrayList(
             "CHECK", "WIRED", "DIGITAL PAYMENT");
@@ -273,7 +266,6 @@ public class DisbursementVoucher_ViewController implements Initializable, Screen
 
         loadRecordMaster();
         loadTableDetail.reload();
-        loadTableDetailJE.reload();
         initDVMasterTabs();
         initButton(pnEditMode);
     }
