@@ -48,14 +48,14 @@
                                                 <ColumnConstraints halignment="RIGHT" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="25.0" />
                                     <ColumnConstraints halignment="RIGHT" maxWidth="10.0" minWidth="10.0" prefWidth="10.0" />
                                                 <ColumnConstraints halignment="RIGHT" maxWidth="150.0" minWidth="150.0" prefWidth="150.0" />
-                                                <ColumnConstraints halignment="RIGHT" hgrow="ALWAYS" maxWidth="465.0" minWidth="465.0" prefWidth="465.0" />
-                                                <ColumnConstraints halignment="RIGHT" hgrow="ALWAYS" maxWidth="1.7976931348623157E308" />
+                                                <ColumnConstraints halignment="RIGHT" hgrow="ALWAYS" maxWidth="474.0" minWidth="474.0" prefWidth="474.0" />
+                                                <ColumnConstraints halignment="RIGHT" hgrow="ALWAYS" maxWidth="1.7976931348623157E308" prefWidth="426.0" />
                                             </columnConstraints>
                                             <rowConstraints>
                                                 <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="28.0" vgrow="SOMETIMES" />
                                             </rowConstraints>
                                             <children>
-                                                <Label fx:id="lblSource" alignment="CENTER_RIGHT" layoutX="367.0" layoutY="14.0" maxWidth="1.7976931348623157E308" prefHeight="20.0" prefWidth="412.0" text="Company - Industry" GridPane.columnIndex="15">
+                                                <Label fx:id="lblSource" alignment="CENTER_RIGHT" layoutX="367.0" layoutY="14.0" maxWidth="1.7976931348623157E308" prefHeight="20.0" prefWidth="457.0" text="Company - Industry" GridPane.columnIndex="15">
                                                     <font>
                                                         <Font name="System Bold" size="14.0" />
                                                     </font>
@@ -142,7 +142,7 @@
                         </AnchorPane>
                     </bottom>
                     <center>
-                        <AnchorPane maxWidth="1550.0" BorderPane.alignment="CENTER_LEFT">
+                        <AnchorPane maxWidth="1560.0" BorderPane.alignment="CENTER_LEFT">
                             <children>
                                 <HBox spacing="5.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="5.0">
                                     <children>
