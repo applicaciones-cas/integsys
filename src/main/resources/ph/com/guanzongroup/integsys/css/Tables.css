@@ -88,3 +88,48 @@
     -fx-border-color: #000000;
     -fx-border-width: 1px 1px 1px 1px;
 }
+
+
+
+/* The main scrollbar track */
+.table-view .virtual-flow .scroll-bar:horizontal .track,
+.table-view .virtual-flow .scroll-bar:vertical .track {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-background-radius: 0em;
+    -fx-border-radius: 2em;
+}
+
+/* The increment and decrement buttons */
+.table-view .virtual-flow .scroll-bar:horizontal .increment-button,
+.table-view .virtual-flow .scroll-bar:horizontal .decrement-button {
+    -fx-background-color: transparent;
+    -fx-background-radius: 0em;
+    -fx-padding: 0 0 10 0;
+
+}
+
+.table-view .virtual-flow .scroll-bar:vertical .increment-button,
+.table-view .virtual-flow .scroll-bar:vertical .decrement-button {
+    -fx-background-color: transparent;
+    -fx-background-radius: 0em;
+    -fx-padding: 0 10 0 0;
+  
+}
+
+/* Hide the arrows */
+.table-view .virtual-flow .scroll-bar .increment-arrow,
+.table-view .virtual-flow .scroll-bar .decrement-arrow {
+    -fx-shape: " ";
+    -fx-padding: 0;
+}
+
+/* The scrollbar thumb (the draggable part) */
+.table-view .virtual-flow .scroll-bar:horizontal .thumb,
+.table-view .virtual-flow .scroll-bar:vertical .thumb {
+    -fx-background-color: #C2C4C4;
+    -fx-background-insets: 2, 0, 0;
+    -fx-background-radius: 2em;
+}
+
+
