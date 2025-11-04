@@ -121,7 +121,7 @@ public class CheckAuthorizationController implements Initializable, ScreenInterf
     public void initialize(URL url, ResourceBundle rb) {
         try {
             poDisbursementController = new CashflowControllers(oApp, null).DisbursementVoucher();
-            poDisbursementController.setTransactionStatus(DisbursementStatic.VERIFIED);
+            poDisbursementController.setTransactionStatus(DisbursementStatic.CERTIFIED);
             poJSON = new JSONObject();
             poDisbursementController.setWithUI(true);
             poJSON = poDisbursementController.InitTransaction();
@@ -318,7 +318,7 @@ public class CheckAuthorizationController implements Initializable, ScreenInterf
                 Platform.runLater(() -> {
                     chckSelectAll.setSelected(false);
                     checkedItem.clear();
-                    for (int lnCntr = 0; lnCntr < poDisbursementController.getMasterList().size() - 1; lnCntr++) {
+                    for (int lnCntr = 0; lnCntr < poDisbursementController.getMasterList().size(); lnCntr++) {
                         checkedItem.add("0");
                     }
                 });
@@ -337,8 +337,8 @@ public class CheckAuthorizationController implements Initializable, ScreenInterf
                     Platform.runLater(() -> {
                         try {
                             main_data.clear();
-                            if (poDisbursementController.getMasterList().size() - 1 > 0) {
-                                for (int lnCntr = 0; lnCntr < poDisbursementController.getMasterList().size() - 1; lnCntr++) {
+                            if (poDisbursementController.getMasterList().size() > 0) {
+                                for (int lnCntr = 0; lnCntr < poDisbursementController.getMasterList().size(); lnCntr++) {
                                     String lsPaymentForm = "";
                                     String lsBankName = "";
                                     String lsBankAccount = "";
@@ -470,8 +470,9 @@ public class CheckAuthorizationController implements Initializable, ScreenInterf
                     poJSON = poDisbursementController.AuthorizeTransaction("Authorized", checkedItems);
                     if (!"success".equals((String) poJSON.get("result"))) {
                         ShowMessageFX.Warning((String) poJSON.get("message"), pxeModuleName, null);
+                    } else {
+                        ShowMessageFX.Information(null, pxeModuleName, (String) poJSON.get("message"));
                     }
-                    ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                     chckSelectAll.setSelected(false);
                     checkedItem.clear();
                     break;
@@ -479,8 +480,9 @@ public class CheckAuthorizationController implements Initializable, ScreenInterf
                     poJSON = poDisbursementController.ReturnTransaction("Returned", checkedItems);
                     if (!"success".equals((String) poJSON.get("result"))) {
                         ShowMessageFX.Warning((String) poJSON.get("message"), pxeModuleName, null);
+                    } else {
+                        ShowMessageFX.Information(null, pxeModuleName, (String) poJSON.get("message"));
                     }
-                    ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                     chckSelectAll.setSelected(false);
                     checkedItem.clear();
                     break;
@@ -488,15 +490,20 @@ public class CheckAuthorizationController implements Initializable, ScreenInterf
                     poJSON = poDisbursementController.DisApproveTransaction("Disapproved", checkedItems);
                     if (!"success".equals((String) poJSON.get("result"))) {
                         ShowMessageFX.Warning((String) poJSON.get("message"), pxeModuleName, null);
+                    } else {
+                        ShowMessageFX.Information(null, pxeModuleName, (String) poJSON.get("message"));
                     }
-                    ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                     chckSelectAll.setSelected(false);
                     checkedItem.clear();
                     break;
                 default:
                     throw new AssertionError();
             }
-            loadTableMain.reload();
+            Platform.runLater(() -> {
+                retrieveDisbursement();
+                loadTableMain.reload();
+
+            });
         } catch (ParseException | SQLException | GuanzonException | CloneNotSupportedException | ScriptException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
         }
