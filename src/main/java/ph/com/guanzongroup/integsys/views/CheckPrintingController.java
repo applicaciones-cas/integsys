@@ -46,8 +46,6 @@ import org.guanzon.appdriver.base.GRiderCAS;
 import org.guanzon.appdriver.base.GuanzonException;
 import org.guanzon.appdriver.base.MiscUtil;
 import org.json.simple.JSONObject;
-import ph.com.guanzongroup.cas.cashflow.CheckPayments;
-import ph.com.guanzongroup.cas.cashflow.CheckPrinting;
 import ph.com.guanzongroup.cas.cashflow.DisbursementVoucher;
 import ph.com.guanzongroup.cas.cashflow.services.CashflowControllers;
 import ph.com.guanzongroup.cas.cashflow.status.DisbursementStatic;
@@ -64,7 +62,6 @@ public class CheckPrintingController implements Initializable, ScreenInterface {
     private static final int ROWS_PER_PAGE = 50;
     private final String pxeModuleName = "Check Printing";
     private DisbursementVoucher poController;
-    private CheckPayments poCheckPayments;
     public int pnEditMode;
 
     private String psIndustryId = "";
@@ -74,9 +71,6 @@ public class CheckPrintingController implements Initializable, ScreenInterface {
     private String psSearchBankAccountID = "";
     private String psSearchDVDateFrom = "";
     private String psSearchDVDateTo = "";
-    private int pnRow = -1;
-    private double xOffset = 0;
-    private double yOffset = 0;
 
     private unloadForm poUnload = new unloadForm();
 
@@ -140,7 +134,7 @@ public class CheckPrintingController implements Initializable, ScreenInterface {
     public void initialize(URL url, ResourceBundle rb) {
         try {
             poController = new CashflowControllers(oApp, null).DisbursementVoucher();
-            poController.setTransactionStatus(DisbursementStatic.VERIFIED);
+            poController.setTransactionStatus(DisbursementStatic.AUTHORIZED);
             poJSON = new JSONObject();
             poController.setWithUI(true);
             poJSON = poController.InitTransaction();
@@ -419,7 +413,7 @@ public class CheckPrintingController implements Initializable, ScreenInterface {
                             case "tfSearchBankName":
                                 poJSON = poController.SearchBanks(lsValue, false);
                                 if ("error".equals((String) poJSON.get("result"))) {
-                                    ShowMessageFX.Warning((String) poJSON.get("message"), pxeModuleName, null);
+                                    ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                     return;
                                 } else {
                                     loadRecordSearch();
@@ -430,7 +424,7 @@ public class CheckPrintingController implements Initializable, ScreenInterface {
                             case "tfSearchBankAccount":
                                 poJSON = poController.SearchBankAccount(lsValue, poController.CheckPayments().getModel().getBankID(), false);
                                 if ("error".equals((String) poJSON.get("result"))) {
-                                    ShowMessageFX.Warning((String) poJSON.get("message"), pxeModuleName, null);
+                                    ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                     return;
                                 } else {
                                     loadRecordSearch();
@@ -480,7 +474,7 @@ public class CheckPrintingController implements Initializable, ScreenInterface {
                         try {
                             main_data.clear();
                             if (poController.getMasterList().size() > 0) {
-                                for (int lnCntr = 0; lnCntr <  poController.getMasterList().size(); lnCntr++) {
+                                for (int lnCntr = 0; lnCntr < poController.getMasterList().size(); lnCntr++) {
 
                                     main_data.add(new ModelCheckPrinting(
                                             String.valueOf(lnCntr + 1),
