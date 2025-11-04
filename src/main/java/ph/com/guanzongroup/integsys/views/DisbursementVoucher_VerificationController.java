@@ -481,7 +481,6 @@ public class DisbursementVoucher_VerificationController implements Initializable
     private void populateJE() {
         try {
             poJSON = new JSONObject();
-            JFXUtil.setValueToNull(dpJournalTransactionDate, dpReportMonthYear);
             JFXUtil.clearTextFields(apJournalMaster, apJournalDetails);
             poController.getEditMode();
             poJSON = poController.populateJournal();
@@ -902,12 +901,12 @@ public class DisbursementVoucher_VerificationController implements Initializable
         int newIndex = 0;
 
         if (moveDown || moveUp) {
+            newIndex = moveDown ? JFXUtil.moveToNextRow(currentTable) : JFXUtil.moveToPreviousRow(currentTable);
             switch (currentTable.getId()) {
                 case "tblVwDetails":
                     if (details_data.isEmpty()) {
                         return;
                     }
-                    newIndex = moveDown ? JFXUtil.moveToNextRow(currentTable) : JFXUtil.moveToPreviousRow(currentTable);
                     pnDetail = newIndex;
                     loadRecordDetail();
                     break;
@@ -915,7 +914,6 @@ public class DisbursementVoucher_VerificationController implements Initializable
                     if (journal_data.isEmpty()) {
                         return;
                     }
-                    newIndex = moveDown ? JFXUtil.moveToNextRow(currentTable) : JFXUtil.moveToPreviousRow(currentTable);
                     pnDetailJE = newIndex;
                     loadRecordDetailJE();
                     break;
@@ -1890,15 +1888,16 @@ public class DisbursementVoucher_VerificationController implements Initializable
                 if (inputText == null || "".equals(inputText) || "01/01/1900".equals(inputText)) {
                     return;
                 }
+
+                lsServerDate = sdfFormat.format(oApp.getServerDate());
+                currentDate = LocalDate.parse(lsServerDate, DateTimeFormatter.ofPattern(SQLUtil.FORMAT_SHORT_DATE));
+                lsSelectedDate = sdfFormat.format(SQLUtil.toDate(JFXUtil.convertToIsoFormat(inputText), SQLUtil.FORMAT_SHORT_DATE));
+                selectedDate = LocalDate.parse(lsSelectedDate, DateTimeFormatter.ofPattern(SQLUtil.FORMAT_SHORT_DATE));
                 switch (datePicker.getId()) {
                     case "dpCheckDate":
                         //back date not allowed
                         if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
-                            lsServerDate = sdfFormat.format(oApp.getServerDate());
                             lsTransDate = sdfFormat.format(poController.CheckPayments().getModel().getTransactionDate());
-                            lsSelectedDate = sdfFormat.format(SQLUtil.toDate(JFXUtil.convertToIsoFormat(inputText), SQLUtil.FORMAT_SHORT_DATE));
-                            currentDate = LocalDate.parse(lsServerDate, DateTimeFormatter.ofPattern(SQLUtil.FORMAT_SHORT_DATE));
-                            selectedDate = LocalDate.parse(lsSelectedDate, DateTimeFormatter.ofPattern(SQLUtil.FORMAT_SHORT_DATE));
                             transactionDate = LocalDate.parse(lsTransDate, DateTimeFormatter.ofPattern(SQLUtil.FORMAT_SHORT_DATE));
 
                             if (selectedDate.isAfter(currentDate)) {
@@ -1926,11 +1925,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
                         break;
                     case "dpReportMonthYear":
                         if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
-                            lsServerDate = sdfFormat.format(oApp.getServerDate());
                             lsTransDate = sdfFormat.format(poController.CheckPayments().getModel().getTransactionDate());
-                            lsSelectedDate = sdfFormat.format(SQLUtil.toDate(JFXUtil.convertToIsoFormat(inputText), SQLUtil.FORMAT_SHORT_DATE));
-                            currentDate = LocalDate.parse(lsServerDate, DateTimeFormatter.ofPattern(SQLUtil.FORMAT_SHORT_DATE));
-                            selectedDate = LocalDate.parse(lsSelectedDate, DateTimeFormatter.ofPattern(SQLUtil.FORMAT_SHORT_DATE));
                             transactionDate = LocalDate.parse(lsTransDate, DateTimeFormatter.ofPattern(SQLUtil.FORMAT_SHORT_DATE));
 
                             if (selectedDate.isAfter(currentDate)) {
