@@ -114,7 +114,7 @@
     -fx-background-color: transparent;
     -fx-background-radius: 0em;
     -fx-padding: 0 10 0 0;
-  
+
 }
 
 /* Hide the arrows */
@@ -139,5 +139,9 @@
 }
 .table-view .virtual-flow .scroll-bar:horizontal .thumb:hover,
 .table-view .virtual-flow .scroll-bar:vertical .thumb:hover {
-     -fx-background-color: #979797;
+    -fx-background-color: #B9B9B9;
+}
+.table-view .virtual-flow .scroll-bar .thumb:pressed,
+.table-view .virtual-flow .scroll-bar .thumb:pressed:hover {
+    -fx-background-color: #979797;
 }
