@@ -2406,50 +2406,6 @@ public class JFXUtil {
         });
     }
 
-    /*Experimental; Modern checkbox UI*/
- /*Requires hex color, and checkbox id*/
-    public static void setCheckboxStyle(String hexColor, CheckBox... checkBoxes) {
-        for (CheckBox cb : checkBoxes) {
-            if (!cb.getStyleClass().contains("modern")) {
-                cb.getStyleClass().add("modern");
-            }
-            cb.setStyle("-c-accent: " + hexColor + ";");
-
-            cb.skinProperty().addListener((obs, oldSkin, newSkin) -> {
-                if (newSkin != null) {
-                    setupCheckAnimation(cb);
-                }
-            });
-            Platform.runLater(() -> setupCheckAnimation(cb));
-        }
-    }
-
-    //private
-    private static void setupCheckAnimation(CheckBox cb) {
-        Node mark = cb.lookup(".mark");
-        if (mark == null) {
-            return;
-        }
-
-        ScaleTransition popIn = new ScaleTransition(Duration.millis(140), mark);
-        popIn.setFromX(0.6);
-        popIn.setFromY(0.6);
-        popIn.setToX(1.0);
-        popIn.setToY(1.0);
-
-        cb.selectedProperty().addListener((o, was, isNow) -> {
-            if (isNow) {
-                mark.setScaleX(0.6);
-                mark.setScaleY(0.6);
-                popIn.stop();
-                popIn.playFromStart();
-            } else {
-                mark.setScaleX(0.0);
-                mark.setScaleY(0.0);
-            }
-        });
-    }
-
     private static final Map<Class<?>, Map<String, String>> cache = new HashMap<>();
 
     /*Sets value to a label, textField, textArea, or button from class various variable name w/ value*/
