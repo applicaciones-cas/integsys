@@ -89,7 +89,7 @@
                         <Insets bottom="5.0" left="10.0" right="5.0" top="5.0" />
                      </padding>
                      <children>
-                        <Button fx:id="btnBrowse" contentDisplay="TOP" ellipsisString="" maxHeight="70.0" mnemonicParsing="false" prefHeight="50.0" prefWidth="70.0" styleClass="button_process" stylesheets="@../css/StyleSheet.css" text="Browse">
+                        <Button fx:id="btnBrowse" contentDisplay="TOP" ellipsisString="" maxHeight="70.0" mnemonicParsing="false" onAction="#cmdButton_Click" prefHeight="50.0" prefWidth="70.0" styleClass="button_process" stylesheets="@../css/StyleSheet.css" text="Browse">
                            <graphic>
                               <FontAwesomeIconView glyphName="FOLDER_OPEN" size="20" />
                            </graphic>
@@ -97,7 +97,7 @@
                               <Blend />
                            </effect>
                         </Button>
-                        <Button fx:id="btnSave" contentDisplay="TOP" ellipsisString="" maxHeight="70.0" mnemonicParsing="false" prefHeight="50.0" prefWidth="70.0" styleClass="button_process" stylesheets="@../css/StyleSheet.css" text="Save">
+                        <Button fx:id="btnSave" contentDisplay="TOP" ellipsisString="" maxHeight="70.0" mnemonicParsing="false" onAction="#cmdButton_Click" prefHeight="50.0" prefWidth="70.0" styleClass="button_process" stylesheets="@../css/StyleSheet.css" text="Save">
                            <graphic>
                               <FontAwesomeIconView glyphName="SAVE" size="20" />
                            </graphic>
@@ -105,7 +105,7 @@
                               <Blend />
                            </effect>
                         </Button>
-                        <Button fx:id="btnUpdate" contentDisplay="TOP" ellipsisString="" maxHeight="70.0" mnemonicParsing="false" prefHeight="50.0" prefWidth="70.0" styleClass="button_process" stylesheets="@../css/StyleSheet.css" text="Update">
+                        <Button fx:id="btnUpdate" contentDisplay="TOP" ellipsisString="" maxHeight="70.0" mnemonicParsing="false" onAction="#cmdButton_Click" prefHeight="50.0" prefWidth="70.0" styleClass="button_process" stylesheets="@../css/StyleSheet.css" text="Update">
                            <graphic>
                               <FontAwesomeIconView glyphName="EDIT" size="20" />
                            </graphic>
@@ -113,7 +113,7 @@
                               <Blend />
                            </effect>
                         </Button>
-                        <Button fx:id="btnSearch" contentDisplay="TOP" ellipsisString="" maxHeight="70.0" mnemonicParsing="false" prefHeight="50.0" prefWidth="70.0" styleClass="button_process" stylesheets="@../css/StyleSheet.css" text="Search">
+                        <Button fx:id="btnSearch" contentDisplay="TOP" ellipsisString="" maxHeight="70.0" mnemonicParsing="false" onAction="#cmdButton_Click" prefHeight="50.0" prefWidth="70.0" styleClass="button_process" stylesheets="@../css/StyleSheet.css" text="Search">
                            <graphic>
                               <FontAwesomeIconView glyphName="SEARCH" size="20" />
                            </graphic>
@@ -121,7 +121,7 @@
                               <Blend />
                            </effect>
                         </Button>
-                        <Button fx:id="btnCancel" contentDisplay="TOP" ellipsisString="" maxHeight="70.0" mnemonicParsing="false" prefHeight="50.0" prefWidth="70.0" styleClass="button_process" stylesheets="@../css/StyleSheet.css" text="Cancel">
+                        <Button fx:id="btnCancel" contentDisplay="TOP" ellipsisString="" maxHeight="70.0" mnemonicParsing="false" onAction="#cmdButton_Click" prefHeight="50.0" prefWidth="70.0" styleClass="button_process" stylesheets="@../css/StyleSheet.css" text="Cancel">
                            <graphic>
                               <FontAwesomeIconView glyphName="CLOSE" size="20" />
                            </graphic>
@@ -129,7 +129,7 @@
                               <Blend />
                            </effect>
                         </Button>
-                        <Button fx:id="btnLedger" contentDisplay="TOP" ellipsisString="" maxHeight="70.0" maxWidth="104.0" minHeight="50.0" minWidth="70.0" mnemonicParsing="false" prefHeight="47.0" prefWidth="70.0" styleClass="button_process" stylesheets="@../css/StyleSheet.css" text="Ledger">
+                        <Button fx:id="btnLedger" contentDisplay="TOP" ellipsisString="" maxHeight="70.0" maxWidth="104.0" minHeight="50.0" minWidth="70.0" mnemonicParsing="false" onAction="#cmdButton_Click" prefHeight="47.0" prefWidth="70.0" styleClass="button_process" stylesheets="@../css/StyleSheet.css" text="Ledger">
                            <graphic>
                               <FontAwesomeIconView glyphName="LIST" size="20" />
                            </graphic>
@@ -137,7 +137,7 @@
                               <Blend />
                            </effect>
                         </Button>
-                        <Button fx:id="btnSerial" contentDisplay="TOP" ellipsisString="" maxHeight="70.0" maxWidth="104.0" minHeight="50.0" minWidth="70.0" mnemonicParsing="false" prefHeight="47.0" prefWidth="70.0" styleClass="button_process" stylesheets="@../css/StyleSheet.css" text="Serial">
+                        <Button fx:id="btnSerial" contentDisplay="TOP" ellipsisString="" maxHeight="70.0" maxWidth="104.0" minHeight="50.0" minWidth="70.0" mnemonicParsing="false" onAction="#cmdButton_Click" prefHeight="47.0" prefWidth="70.0" styleClass="button_process" stylesheets="@../css/StyleSheet.css" text="Serial">
                            <graphic>
                               <FontAwesomeIconView glyphName="KEY" size="20" />
                            </graphic>
@@ -145,7 +145,7 @@
                               <Blend />
                            </effect>
                         </Button>
-                        <Button fx:id="btnClose" contentDisplay="TOP" ellipsisString="" maxHeight="70.0" maxWidth="104.0" minHeight="50.0" minWidth="70.0" mnemonicParsing="false" prefHeight="47.0" prefWidth="70.0" styleClass="button_process" stylesheets="@../css/StyleSheet.css" text="Close">
+                        <Button fx:id="btnClose" contentDisplay="TOP" ellipsisString="" maxHeight="70.0" maxWidth="104.0" minHeight="50.0" minWidth="70.0" mnemonicParsing="false" onAction="#cmdButton_Click" prefHeight="47.0" prefWidth="70.0" styleClass="button_process" stylesheets="@../css/StyleSheet.css" text="Close">
                            <graphic>
                               <FontAwesomeIconView glyphName="POWER_OFF" size="20" />
                            </graphic>
@@ -333,8 +333,8 @@
                                     <TextField fx:id="tfDiscount4" alignment="CENTER_RIGHT" editable="false" promptText="0.00" styleClass="text-field" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="18" />
                                     <TextField fx:id="tfMinLevel" alignment="CENTER_RIGHT" editable="false" prefHeight="46.0" promptText="0" styleClass="text-field" GridPane.columnIndex="5" GridPane.columnSpan="2" GridPane.rowIndex="15" />
                                     <TextField fx:id="tfMaxLevel" alignment="CENTER_RIGHT" editable="false" prefHeight="46.0" promptText="0" styleClass="text-field" GridPane.columnIndex="5" GridPane.columnSpan="2" GridPane.rowIndex="16" />
-                                    <TextField fx:id="tfCost" alignment="CENTER_RIGHT" editable="false" prefHeight="46.0" promptText="0.00" styleClass="text-field" GridPane.columnIndex="5" GridPane.columnSpan="2" GridPane.rowIndex="17" />
-                                    <TextField fx:id="tfSRP" alignment="CENTER_RIGHT" editable="false" prefHeight="43.0" prefWidth="203.0" promptText="0.00" styleClass="text-field" GridPane.columnIndex="5" GridPane.columnSpan="2" GridPane.rowIndex="18" />
+                                    <TextField fx:id="tfCost" alignment="CENTER_RIGHT" editable="false" prefHeight="46.0" promptText="0.0000" styleClass="text-field" GridPane.columnIndex="5" GridPane.columnSpan="2" GridPane.rowIndex="17" />
+                                    <TextField fx:id="tfSRP" alignment="CENTER_RIGHT" editable="false" prefHeight="43.0" prefWidth="203.0" promptText="0.0000" styleClass="text-field" GridPane.columnIndex="5" GridPane.columnSpan="2" GridPane.rowIndex="18" />
                                     <CheckBox fx:id="chkSerialized" disable="true" mnemonicParsing="false" text="Serialize" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.halignment="LEFT" GridPane.rowIndex="20" />
                                     <CheckBox fx:id="chkCombo" disable="true" mnemonicParsing="false" text="Combo" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.halignment="LEFT" GridPane.rowIndex="21" />
                                     <CheckBox fx:id="chkPromo" disable="true" mnemonicParsing="false" text="with Promo" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.halignment="LEFT" GridPane.rowIndex="20" />
@@ -386,7 +386,7 @@
                               <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                            </padding>
                         </AnchorPane>
-                        <AnchorPane fx:id="apDetailOther" style="-fx-border-color: FF8201;">
+                        <AnchorPane fx:id="apDetail" style="-fx-border-color: FF8201;">
                            <children>
                               <GridPane hgap="3.0" vgap="3.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                 <columnConstraints>
@@ -505,14 +505,14 @@
                                           <Insets right="10.0" />
                                        </GridPane.margin>
                                     </Text>
-                                    <DatePicker fx:id="dpField01" disable="true" prefWidth="203.0" GridPane.columnIndex="1" GridPane.rowIndex="4" />
-                                    <TextField fx:id="tfQOH" alignment="CENTER_RIGHT" disable="true" editable="false" promptText="0.0000" styleClass="text-field" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+                                    <DatePicker fx:id="dpBegDate" disable="true" prefWidth="203.0" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+                                    <TextField fx:id="tfQOH" alignment="CENTER_RIGHT" disable="true" editable="false" promptText="0.00" styleClass="text-field" GridPane.columnIndex="1" GridPane.rowIndex="5" />
                                     <TextField fx:id="tfMinLevelMaster" alignment="CENTER_RIGHT" prefHeight="46.0" promptText="0" styleClass="text-field" GridPane.columnIndex="1" GridPane.rowIndex="6" />
                                     <TextField fx:id="tfMaxLevelMaster" alignment="CENTER_RIGHT" prefHeight="46.0" promptText="0" styleClass="text-field" GridPane.columnIndex="1" GridPane.rowIndex="7" />
-                                    <TextField fx:id="tfOnHand" alignment="CENTER_RIGHT" disable="true" editable="false" promptText="0.0000" styleClass="text-field" GridPane.columnIndex="4" GridPane.rowIndex="7" />
-                                    <TextField fx:id="tfAveMonthlySales" alignment="CENTER_RIGHT" disable="true" editable="false" promptText="0.0000" styleClass="text-field" GridPane.columnIndex="4" GridPane.rowIndex="5" />
-                                    <TextField fx:id="tfCXOrder" alignment="CENTER_RIGHT" disable="true" editable="false" promptText="0.0000" styleClass="text-field" GridPane.columnIndex="4" GridPane.rowIndex="6" />
-                                    <TextField fx:id="tfClass" disable="true" editable="false" styleClass="text-field" GridPane.columnIndex="4" GridPane.rowIndex="4" />
+                                    <TextField fx:id="tfOnHand" alignment="CENTER_RIGHT" disable="true" editable="false" promptText="0.00" styleClass="text-field" GridPane.columnIndex="4" GridPane.rowIndex="7" />
+                                    <TextField fx:id="tfAveMonthlySales" alignment="CENTER_RIGHT" disable="true" editable="false" promptText="0.00" styleClass="text-field" GridPane.columnIndex="4" GridPane.rowIndex="5" />
+                                    <TextField fx:id="tfCXOrder" alignment="CENTER_RIGHT" disable="true" editable="false" promptText="0.00" styleClass="text-field" GridPane.columnIndex="4" GridPane.rowIndex="6" />
+                                    <TextField fx:id="tfClass" disable="true" editable="false" promptText="F" styleClass="text-field" GridPane.columnIndex="4" GridPane.rowIndex="4" />
                                     <TextField fx:id="tfLocation" promptText="PRESS F3 : Search" styleClass="text-field" GridPane.columnIndex="1" GridPane.rowIndex="1" />
                                     <TextField fx:id="tfWarehouse" promptText="PRESS F3 : Search" styleClass="text-field" GridPane.columnIndex="1" GridPane.rowIndex="2" />
                                     <TextField fx:id="tfSection" promptText="PRESS F3 : Search" styleClass="text-field" GridPane.columnIndex="4" GridPane.rowIndex="1" />
