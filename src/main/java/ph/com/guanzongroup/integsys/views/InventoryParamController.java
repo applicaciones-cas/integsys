@@ -20,7 +20,6 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -45,9 +44,7 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
-import javafx.scene.text.Text;
 import org.guanzon.appdriver.agent.ShowMessageFX;
 import org.guanzon.appdriver.base.CommonUtils;
 import org.guanzon.appdriver.base.GRiderCAS;
@@ -58,13 +55,12 @@ import org.guanzon.appdriver.constant.RecordStatus;
 import org.guanzon.cas.inv.Inventory;
 import org.guanzon.cas.inv.model.Model_Inventory;
 import org.guanzon.cas.inv.services.InvControllers;
-import org.guanzon.cas.parameter.services.ParamControllers;
 import org.json.simple.JSONObject;
 
 /**
  * FXML Controller class
  *
- * @author User
+ * @author mnv
  */
 public class InventoryParamController implements Initializable, ScreenInterface {
 
@@ -481,17 +477,25 @@ public class InventoryParamController implements Initializable, ScreenInterface 
 
                 case "tfBarcode":
                     poAppController.getModel().setBarCode(lsValue);
+
+                    loadRecord();
 //                        loadSelectedRecordDetail(pnRecordDetail);
 
                     break;
                 case "tfAltBarcode":
                     poAppController.getModel().setAlternateBarCode(lsValue);
+
+                    loadRecord();
                     break;
                 case "tfBriefDescription":
                     poAppController.getModel().setBriefDescription(lsValue);
+
+                    loadRecord();
                     break;
                 case "tfDescription":
                     poAppController.getModel().setDescription(lsValue);
+
+                    loadRecord();
                     break;
                 case "tfDiscount1":
                     if (poAppController.getModel().getStockId() == null
@@ -1008,6 +1012,7 @@ public class InventoryParamController implements Initializable, ScreenInterface 
             tfBarcode.setText(poAppController.getModel().getBarCode());
             tfAltBarcode.setText(poAppController.getModel().getAlternateBarCode());
             tfBriefDescription.setText(poAppController.getModel().getBriefDescription());
+            tfDescription.setText(poAppController.getModel().getDescription());
             cmbUnitType.getSelectionModel().select(Integer.parseInt(poAppController.getModel().getUnitType()));
             tfInvType.setText(poAppController.getModel().InventoryType().getDescription());
             tfCategory1.setText(poAppController.getModel().Category().getDescription());
