@@ -713,11 +713,8 @@ public class DisbursementVoucher_HistoryController implements Initializable, Scr
                     : null);
             JFXUtil.setDisabled(JFXUtil.isObjectEqualTo(poController.CheckPayments().getModel().getCheckNo(), null, ""), dpCheckDate);
             tfCheckAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.CheckPayments().getModel().getAmount(), true));
-            try {
-                chbkIsCrossCheck.setSelected(JFXUtil.isObjectEqualTo(poController.CheckPayments().getModel().isCross(), null, "") ? false : poController.CheckPayments().getModel().isCross());
-                chbkIsPersonOnly.setSelected(JFXUtil.isObjectEqualTo(poController.CheckPayments().getModel().isPayee(), null, "") ? false : poController.CheckPayments().getModel().isPayee());
-            } catch (Exception e) {
-            }
+            chbkIsCrossCheck.setSelected(JFXUtil.isObjectEqualTo(poController.CheckPayments().getModel().isCross(), null, "") ? false : poController.CheckPayments().getModel().isCross());
+            chbkIsPersonOnly.setSelected(JFXUtil.isObjectEqualTo(poController.CheckPayments().getModel().isPayee(), null, "") ? false : poController.CheckPayments().getModel().isPayee());
 
             tfBankNameCheck.setText(poController.CheckPayments().getModel().Banks().getBankName() != null ? poController.CheckPayments().getModel().Banks().getBankName() : "");
 //            tfBankAccountCheck.setText(poController.CheckPayments().getModel().Bank_Account_Master().getAccountNo() != null ? poController.CheckPayments().getModel().Bank_Account_Master().getAccountNo() : "");
@@ -725,10 +722,8 @@ public class DisbursementVoucher_HistoryController implements Initializable, Scr
                     DisbursementStatic.DisbursementType.CHECK)
                             ? (poController.CheckPayments().getModel().Bank_Account_Master().getAccountNo() != null
                             ? poController.CheckPayments().getModel().Bank_Account_Master().getAccountNo() : "") : "");
-            try {
-                chbkPrintByBank.setSelected(poController.Master().getBankPrint().equals(Logical.YES));
-            } catch (Exception e) {
-            }
+            chbkPrintByBank.setSelected(poController.Master().getBankPrint().equals(Logical.YES));
+
             tfPayeeName.setText(poController.Master().Payee().getPayeeName() != null ? poController.Master().Payee().getPayeeName() : "");
             JFXUtil.setCmbValue(cmbPayeeType, !poController.CheckPayments().getModel().getPayeeType().equals("") ? Integer.valueOf(poController.CheckPayments().getModel().getPayeeType()) : -1);
             JFXUtil.setCmbValue(cmbDisbursementMode, !JFXUtil.isObjectEqualTo(poController.CheckPayments().getModel().getDesbursementMode(), null, "") ? Integer.valueOf(poController.CheckPayments().getModel().getDesbursementMode()) : -1);

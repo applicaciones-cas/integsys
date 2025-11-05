@@ -5,7 +5,6 @@
 package ph.com.guanzongroup.integsys.views;
 
 import ph.com.guanzongroup.integsys.model.ModelDisbursementVoucher_Detail;
-import ph.com.guanzongroup.integsys.model.ModelDisbursementVoucher_Main;
 import ph.com.guanzongroup.integsys.model.ModelJournalEntry_Detail;
 import ph.com.guanzongroup.integsys.utility.CustomCommonUtil;
 import ph.com.guanzongroup.integsys.utility.JFXUtil;
@@ -21,7 +20,6 @@ import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
-import javafx.collections.transformation.SortedList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -339,13 +337,9 @@ public class DisbursementVoucher_ViewController implements Initializable, Screen
                                     loadRecordDetail();
                                 }
                             } else {
-//                            try {
                                 /* FOCUS ON THE ROW THAT pnRowDetail POINTS TO */
                                 JFXUtil.selectAndFocusRow(tblVwDetails, pnDetail);
                                 loadRecordDetail();
-//                            } catch (SQLException ex) {
-//                                Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
-//                            }
                             }
 
                             loadRecordMaster();

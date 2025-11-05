@@ -134,7 +134,7 @@ public class CheckPrintingController implements Initializable, ScreenInterface {
     public void initialize(URL url, ResourceBundle rb) {
         try {
             poController = new CashflowControllers(oApp, null).DisbursementVoucher();
-            poController.setTransactionStatus(DisbursementStatic.AUTHORIZED);
+            poController.setTransactionStatus(DisbursementStatic.AUTHORIZED + DisbursementStatic.CERTIFIED);
             poJSON = new JSONObject();
             poController.setWithUI(true);
             poJSON = poController.InitTransaction();
