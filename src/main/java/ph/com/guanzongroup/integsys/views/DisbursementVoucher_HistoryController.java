@@ -302,7 +302,7 @@ public class DisbursementVoucher_HistoryController implements Initializable, Scr
                 loadRecordMaster();
                 loadTableDetail.reload();
                 loadTableDetailJE.reload();
-            }          
+            }
             initButton(pnEditMode);
         } catch (CloneNotSupportedException | SQLException | GuanzonException | ScriptException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
@@ -445,7 +445,8 @@ public class DisbursementVoucher_HistoryController implements Initializable, Scr
                                 ));
 
                             }
-                            if (pnDetailJE <= 0) {
+                            if (pnDetailJE < 0 || pnDetailJE
+                                    >= journal_data.size()) {
                                 if (!journal_data.isEmpty()) {
                                     /* FOCUS ON FIRST ROW */
                                     JFXUtil.selectAndFocusRow(tblVwJournalDetails, 0);

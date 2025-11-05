@@ -812,7 +812,8 @@ public class DisbursementVoucher_VerificationController implements Initializable
                                 ));
 
                             }
-                            if (pnDetailJE <= 0) {
+                            if (pnDetailJE < 0 || pnDetailJE
+                                    >= journal_data.size()) {
                                 if (!journal_data.isEmpty()) {
                                     /* FOCUS ON FIRST ROW */
                                     JFXUtil.selectAndFocusRow(tblVwJournalDetails, 0);
