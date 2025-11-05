@@ -2668,7 +2668,7 @@ public class JFXUtil {
     static {
         SOURCE_MAP.put("PRFx", "PRF");
         SOURCE_MAP.put("SOAt", "SOA");
-        SOURCE_MAP.put("CcPy", "Cash Payable");
+        SOURCE_MAP.put("CcPy", "Cache Payable");
         SOURCE_MAP.put("PORc", "PO Receiving");
         SOURCE_MAP.put("APAd", "AP Adjustment");
         SOURCE_MAP.put("PO", "Purchase Order");
