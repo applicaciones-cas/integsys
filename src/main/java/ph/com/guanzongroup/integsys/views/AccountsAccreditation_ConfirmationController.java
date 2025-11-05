@@ -159,14 +159,15 @@ public class AccountsAccreditation_ConfirmationController implements Initializab
                             getLoadedClient();
                             initButtonDisplay(poAppController.getEditMode());
                             break;
-                        case "tfContactPerson":
-                            if (!isJSONSuccess(poAppController.searchClientContact(tfContactPerson.getText(), false),
-                                    "Initialize Search Client Contact! ")) {
-                                return;
-                            }
-                            getLoadedClient();
-                            initButtonDisplay(poAppController.getEditMode());
-                            break;
+ //disabled as its value should be autoset from attached supplier entry
+//                        case "tfContactPerson":
+//                            if (!isJSONSuccess(poAppController.searchClientContact(tfContactPerson.getText(), false),
+//                                    "Initialize Search Client Contact! ")) {
+//                                return;
+//                            }
+//                            getLoadedClient();
+//                            initButtonDisplay(poAppController.getEditMode());
+//                            break;
 
                     }
                     break;
@@ -191,7 +192,7 @@ public class AccountsAccreditation_ConfirmationController implements Initializab
                         ShowMessageFX.Information("Please load record before proceeding..", psFormName, "");
                         return;
                     }
-                    poAppController.openRecord(poAppController.getModel().getClientId());
+                    //poAppController.openRecord(poAppController.getModel().getClientId());
                     if (!isJSONSuccess(poAppController.updateRecord(), "Initialize Update Record")) {
                         return;
                     }
@@ -358,14 +359,15 @@ public class AccountsAccreditation_ConfirmationController implements Initializab
                                 initButtonDisplay(poAppController.getEditMode());
                                 break;
 
-                            case "tfContactPerson":
-                                if (!isJSONSuccess(poAppController.searchClientContact(tfContactPerson.getText(), false),
-                                        "Initialize Search Client Contact! ")) {
-                                    return;
-                                }
-                                getLoadedClient();
-                                initButtonDisplay(poAppController.getEditMode());
-                                break;
+//disabled as its value should be autoset from attached supplier entry
+//                            case "tfContactPerson":
+//                                if (!isJSONSuccess(poAppController.searchClientContact(tfContactPerson.getText(), false),
+//                                        "Initialize Search Client Contact! ")) {
+//                                    return;
+//                                }
+//                                getLoadedClient();
+//                                initButtonDisplay(poAppController.getEditMode());
+//                                break;
 
                         }
                         break;
@@ -598,7 +600,6 @@ public class AccountsAccreditation_ConfirmationController implements Initializab
     }
 
     private void getLoadedClient() throws SQLException, GuanzonException, CloneNotSupportedException {
-//        clearAllInputs();
         loadClientMaster();
     }
 
