@@ -550,6 +550,7 @@ public class DisbursementVoucher_HistoryController implements Initializable, Scr
                             poController.Master().setPayeeID("");
                             poController.Master().setSupplierClientID("");
                         }
+                        loadRecordSearch();
                         break;
                     case "tfSearchTransaction":
                         if (lsValue.isEmpty()) {

@@ -956,6 +956,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
                             psSearchSupplierID = "";
                             loadTableMain.reload();
                         }
+                        loadRecordSearch();
                         break;
                     case "tfSearchTransaction":
                         if (lsValue.isEmpty()) {
