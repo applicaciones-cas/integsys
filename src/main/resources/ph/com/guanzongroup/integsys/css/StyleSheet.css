@@ -7,7 +7,7 @@
     -c-fg: #222222;       /* For Custom checkbox */
     -c-border: #cccccc;   /* For Custom checkbox */
     -material-design-color: #77797A;
-    -material-design-color-transparent-24: #3f51b53e;
+    -material-design-color-transparent-24: transparent;
 
 }
 /* HEADER CSS */
@@ -781,7 +781,7 @@
     -fx-scale-x: 1.1;
     -fx-scale-y: 0.8;
     -fx-shape: "M9.998,13.946L22.473,1.457L26.035,5.016L10.012,21.055L0.618,11.688L4.178,8.127L9.998,13.946Z";
- -fx-fill: white;
+    -fx-fill: white;
 }
 .check-box:selected > .box > .mark {
     -fx-background-color: white;
@@ -815,6 +815,7 @@
 }
 
 .check-box:disabled {
+    -fx-opacity: 1.0;
     -fx-cursor: default;
 }
 .check-box:selected:focused > .box {
@@ -839,10 +840,6 @@
     -fx-border-radius: 3;
     -fx-background-color: #f7f7f7;
     -fx-padding: 0 7 0 7;
-}
-
-.check-box:disabled {
-    -fx-text-fill: gray;
 }
 
 .custom-text-area {
