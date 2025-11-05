@@ -383,6 +383,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                                 return;
                             }
                         }
+
                         poController.Master().setModifiedDate(oApp.getServerDate());
                         poController.Master().setModifyingId(oApp.getUserID());
                     }
@@ -398,7 +399,6 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                     if ("success".equals(poJSON.get("result"))) {
                         pnEditMode = poController.getEditMode();
                         loadTableDetail.reload();
-                        initDVMasterTabs();
                         initButton(pnEditMode);
                     }
                     if (pnEditMode == EditMode.READY) {
@@ -466,7 +466,6 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                 loadTableDetail.reload();
                 loadTableDetailJE.reload();
             }
-            initDVMasterTabs();
             initButton(pnEditMode);
             if (lsButton.equals("btnUpdate")) {
                 moveNext(false, false);
@@ -497,7 +496,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
         boolean hasValidItem = false; // True if at least one valid item exists
 
         if (detailCount == 0) {
-            ShowMessageFX.Warning("Your order is empty. Please add at least one item.", pxeModuleName, null);
+            ShowMessageFX.Warning(null, pxeModuleName, "Your order is empty. Please add at least one item.");
             return false;
         }
         for (int lnCntr = 0; lnCntr <= detailCount - 1; lnCntr++) {
@@ -518,34 +517,34 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
         switch (poController.Master().getDisbursementType()) {
             case DisbursementStatic.DisbursementType.CHECK:
                 if (tfBankNameCheck.getText().isEmpty()) {
-                    ShowMessageFX.Warning("Please enter Bank Name.", pxeModuleName, null);
+                    ShowMessageFX.Warning(null, pxeModuleName, "Please enter Bank Name.");
                     return false;
                 }
                 if (tfBankAccountCheck.getText().isEmpty()) {
-                    ShowMessageFX.Warning("Please enter Bank Account.", pxeModuleName, null);
+                    ShowMessageFX.Warning(null, pxeModuleName, "Please enter Bank Account.");
                     return false;
                 }
                 if (tfPayeeName.getText().isEmpty()) {
-                    ShowMessageFX.Warning("Please enter Payee Name.", pxeModuleName, null);
+                    ShowMessageFX.Warning(null, pxeModuleName, "Please enter Payee Name.");
                     return false;
                 }
                 if (chbkPrintByBank.isSelected()) {
                     if (cmbPayeeType.getSelectionModel().getSelectedIndex() < 0) {
-                        ShowMessageFX.Warning("Please select Payee Type.", pxeModuleName, null);
+                        ShowMessageFX.Warning(null, pxeModuleName, "Please select Payee Type.");
                         return false;
                     }
                     if (cmbDisbursementMode.getSelectionModel().getSelectedIndex() < 0) {
-                        ShowMessageFX.Warning("Please select Disbursement Mode.", pxeModuleName, null);
+                        ShowMessageFX.Warning(null, pxeModuleName, "Please select Disbursement Mode.");
                         return false;
                     }
                     if (cmbDisbursementMode.getSelectionModel().getSelectedIndex() == 1) {
                         if (cmbClaimantType.getSelectionModel().getSelectedIndex() < 0) {
-                            ShowMessageFX.Warning("Please select Claimant Type.", pxeModuleName, null);
+                            ShowMessageFX.Warning(null, pxeModuleName, "Please select Claimant Type.");
                             return false;
                         }
                         if (cmbClaimantType.getSelectionModel().getSelectedIndex() == 0) {
                             if (tfAuthorizedPerson.getText().trim().isEmpty()) {
-                                ShowMessageFX.Warning("Please enter Authorized Person.", pxeModuleName, null);
+                                ShowMessageFX.Warning(null, pxeModuleName, "Please enter Authorized Person.");
                                 return false;
                             }
                         }
@@ -1600,6 +1599,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
 
     private void loadRecordMaster() {
         try {
+            initDVMasterTabs();
             poJSON = new JSONObject();
             poJSON = poController.computeFields();
             if ("error".equals((String) poJSON.get("result"))) {
@@ -1624,17 +1624,6 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
 //            if ("error".equals((String) poJSON.get("message"))) {
 //                ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
 //            }
-            switch (poController.Master().getDisbursementType()) {
-                case DisbursementStatic.DisbursementType.CHECK:
-                    loadRecordMasterCheck();
-                    break;
-                case DisbursementStatic.DisbursementType.WIRED:
-                    loadRecordMasterBankTransfer();
-                    break;
-                case DisbursementStatic.DisbursementType.DIGITAL_PAYMENT:
-                    loadRecordMasterOnlinePayment();
-                    break;
-            }
 
             tfVatAmountMaster.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Master().getVATAmount(), true));
             tfVatExemptSales.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Master().getVATExmpt(), true));
@@ -1820,7 +1809,6 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                             ShowMessageFX.Warning(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
                         }
                         loadRecordMaster();
-                        initDVMasterTabs();
                         break;
                     case "cmbPayeeType":
                         poJSON = poController.CheckPayments().getModel().setPayeeType(String.valueOf(selectedIndex));
@@ -1927,6 +1915,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
 
     }
     boolean pbSuccess = true;
+
     private void datepicker_Action(ActionEvent event) {
         poJSON = new JSONObject();
         JFXUtil.setJSONSuccess(poJSON, "success");
@@ -1942,7 +1931,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                 if (inputText == null || "".equals(inputText) || "01/01/1900".equals(inputText)) {
                     return;
                 }
-                
+
                 lsServerDate = sdfFormat.format(oApp.getServerDate());
                 currentDate = LocalDate.parse(lsServerDate, DateTimeFormatter.ofPattern(SQLUtil.FORMAT_SHORT_DATE));
                 lsSelectedDate = sdfFormat.format(SQLUtil.toDate(JFXUtil.convertToIsoFormat(inputText), SQLUtil.FORMAT_SHORT_DATE));

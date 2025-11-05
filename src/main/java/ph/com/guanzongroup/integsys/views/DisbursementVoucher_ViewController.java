@@ -182,7 +182,6 @@ public class DisbursementVoucher_ViewController implements Initializable, Screen
                     clearTextFields();
                     pnEditMode = EditMode.UNKNOWN;
                     loadTableDetail.reload();
-                    initDVMasterTabs();
                     initButton(pnEditMode);
                 } else {
                     ShowMessageFX.Warning((String) poJSON.get("message"), pxeModuleName, null);
@@ -264,7 +263,6 @@ public class DisbursementVoucher_ViewController implements Initializable, Screen
 
         loadRecordMaster();
         loadTableDetail.reload();
-        initDVMasterTabs();
         initButton(pnEditMode);
     }
 
@@ -400,6 +398,7 @@ public class DisbursementVoucher_ViewController implements Initializable, Screen
 
     private void loadRecordMaster() {
         try {
+            initDVMasterTabs();
             poJSON = new JSONObject();
             if ("error".equals((String) poJSON.get("result"))) {
                 ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
@@ -424,17 +423,6 @@ public class DisbursementVoucher_ViewController implements Initializable, Screen
 //            if ("error".equals((String) poJSON.get("message"))) {
 //                ShowMessageFX.Warning((String) poJSON.get("message"), pxeModuleName, null);
 //            }
-            switch (poController.Master().getDisbursementType()) {
-                case DisbursementStatic.DisbursementType.CHECK:
-                    loadRecordMasterCheck();
-                    break;
-                case DisbursementStatic.DisbursementType.WIRED:
-                    loadRecordMasterBankTransfer();
-                    break;
-                case DisbursementStatic.DisbursementType.DIGITAL_PAYMENT:
-                    loadRecordMasterOnlinePayment();
-                    break;
-            }
 
             tfVatAmountMaster.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Master().getVATAmount(), true));
             tfVatExemptSales.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Master().getVATExmpt(), true));

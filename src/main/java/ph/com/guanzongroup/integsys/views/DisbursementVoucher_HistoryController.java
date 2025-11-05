@@ -302,8 +302,7 @@ public class DisbursementVoucher_HistoryController implements Initializable, Scr
                 loadRecordMaster();
                 loadTableDetail.reload();
                 loadTableDetailJE.reload();
-            }
-            initDVMasterTabs();
+            }          
             initButton(pnEditMode);
         } catch (CloneNotSupportedException | SQLException | GuanzonException | ScriptException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
@@ -591,7 +590,6 @@ public class DisbursementVoucher_HistoryController implements Initializable, Scr
                                     pnEditMode = poController.getEditMode();
                                     poController.populateJournal();
                                     loadTableDetail.reload();
-                                    initDVMasterTabs();
                                 }
                                 break;
                             case "tfSearchSupplier":
@@ -628,6 +626,7 @@ public class DisbursementVoucher_HistoryController implements Initializable, Scr
 
     private void loadRecordMaster() {
         try {
+            initDVMasterTabs();
             poJSON = new JSONObject();
             if ("error".equals((String) poJSON.get("result"))) {
                 ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
@@ -652,17 +651,6 @@ public class DisbursementVoucher_HistoryController implements Initializable, Scr
 //            if ("error".equals((String) poJSON.get("message"))) {
 //                ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
 //            }
-            switch (poController.Master().getDisbursementType()) {
-                case DisbursementStatic.DisbursementType.CHECK:
-                    loadRecordMasterCheck();
-                    break;
-                case DisbursementStatic.DisbursementType.WIRED:
-                    loadRecordMasterBankTransfer();
-                    break;
-                case DisbursementStatic.DisbursementType.DIGITAL_PAYMENT:
-                    loadRecordMasterOnlinePayment();
-                    break;
-            }
 
             tfVatAmountMaster.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Master().getVATAmount(), true));
             tfVatExemptSales.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Master().getVATExmpt(), true));
