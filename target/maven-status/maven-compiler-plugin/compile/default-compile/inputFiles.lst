@@ -81,6 +81,7 @@ D:\Guanzon\GMC SEG Folder - Maven\integsys\src\main\java\ph\com\guanzongroup\int
 D:\Guanzon\GMC SEG Folder - Maven\integsys\src\main\java\ph\com\guanzongroup\integsys\views\PurchaseOrder_ConfirmationAppliancesController.java
 D:\Guanzon\GMC SEG Folder - Maven\integsys\src\main\java\ph\com\guanzongroup\integsys\views\APPaymentAdjustment_HistoryCarController.java
 D:\Guanzon\GMC SEG Folder - Maven\integsys\src\main\java\ph\com\guanzongroup\integsys\views\DeliveryAcceptance_ConfirmationSPMCController.java
+D:\Guanzon\GMC SEG Folder - Maven\integsys\src\main\java\ph\com\guanzongroup\integsys\views\DeliveryAcceptance_SerialController.java
 D:\Guanzon\GMC SEG Folder - Maven\integsys\src\main\java\ph\com\guanzongroup\integsys\views\SOATagging_ConfirmationMPController.java
 D:\Guanzon\GMC SEG Folder - Maven\integsys\src\main\java\ph\com\guanzongroup\integsys\views\PurchaseOrder_HistoryController.java
 D:\Guanzon\GMC SEG Folder - Maven\integsys\src\main\java\ph\com\guanzongroup\integsys\views\POQuotationRequest_ApprovalHistoryController.java
@@ -149,6 +150,7 @@ D:\Guanzon\GMC SEG Folder - Maven\integsys\src\main\java\ph\com\guanzongroup\int
 D:\Guanzon\GMC SEG Folder - Maven\integsys\src\main\java\ph\com\guanzongroup\integsys\model\ModelSalesInquiry_Detail.java
 D:\Guanzon\GMC SEG Folder - Maven\integsys\src\main\java\ph\com\guanzongroup\integsys\views\CheckTransfer_HistoryController.java
 D:\Guanzon\GMC SEG Folder - Maven\integsys\src\main\java\ph\com\guanzongroup\integsys\views\DeliveryAcceptance_HistorySPCarController.java
+D:\Guanzon\GMC SEG Folder - Maven\integsys\src\main\java\ph\com\guanzongroup\integsys\views\UserManagement_Controller.java
 D:\Guanzon\GMC SEG Folder - Maven\integsys\src\main\java\ph\com\guanzongroup\integsys\views\SOATagging_EntryMonarchController.java
 D:\Guanzon\GMC SEG Folder - Maven\integsys\src\main\java\ph\com\guanzongroup\integsys\views\PurchaseOrder_ConfirmationSPMCController.java
 D:\Guanzon\GMC SEG Folder - Maven\integsys\src\main\java\ph\com\guanzongroup\integsys\views\AccountsAccreditation_EntryController.java
@@ -344,3 +346,4 @@ D:\Guanzon\GMC SEG Folder - Maven\integsys\src\main\java\ph\com\guanzongroup\int
 D:\Guanzon\GMC SEG Folder - Maven\integsys\src\main\java\ph\com\guanzongroup\integsys\views\LoginControllerHolder.java
 D:\Guanzon\GMC SEG Folder - Maven\integsys\src\main\java\ph\com\guanzongroup\integsys\views\DeliveryAcceptance_ConfirmationMPController.java
 D:\Guanzon\GMC SEG Folder - Maven\integsys\src\main\java\ph\com\guanzongroup\integsys\views\PurchaseOrderReturn_ConfirmationMCController.java
+D:\Guanzon\GMC SEG Folder - Maven\integsys\src\main\java\ph\com\guanzongroup\integsys\model\ModelUserManagement.java
