@@ -198,7 +198,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
             initTabPane();
             clearTextFields();
             pnEditMode = EditMode.UNKNOWN;
-
+            initDVMasterTabs();
             initButton(pnEditMode);
             pagination.setPageCount(1);
             JFXUtil.initKeyClickObject(AnchorMain, lastFocusedTextField, previousSearchedTextField); // for btnSearch Reference

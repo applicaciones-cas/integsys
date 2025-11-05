@@ -132,4 +132,8 @@
     -fx-background-radius: 2em;
 }
 
-
+/* When pressed (clicked) */
+.table-view .virtual-flow .scroll-bar:horizontal .thumb:pressed,
+.table-view .virtual-flow .scroll-bar:vertical .thumb:pressed {
+    -fx-background-color: #979797;
+}
