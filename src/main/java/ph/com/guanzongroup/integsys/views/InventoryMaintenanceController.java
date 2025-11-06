@@ -4,6 +4,7 @@
  */
 package ph.com.guanzongroup.integsys.views;
 
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.net.URL;
 import java.sql.SQLException;
@@ -23,10 +24,15 @@ import javafx.beans.property.ReadOnlyBooleanPropertyBase;
 import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
@@ -43,8 +49,12 @@ import static javafx.scene.input.KeyCode.F3;
 import static javafx.scene.input.KeyCode.TAB;
 import static javafx.scene.input.KeyCode.UP;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.StackPane;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 import org.guanzon.appdriver.agent.ShowMessageFX;
 import org.guanzon.appdriver.base.CommonUtils;
 import org.guanzon.appdriver.base.GRiderCAS;
@@ -53,6 +63,7 @@ import org.guanzon.appdriver.base.LogWrapper;
 import org.guanzon.appdriver.constant.EditMode;
 import org.guanzon.appdriver.constant.RecordStatus;
 import org.guanzon.cas.inv.InvMaster;
+import org.guanzon.cas.inv.model.Model_Inv_Ledger;
 import org.guanzon.cas.inv.services.InvControllers;
 import org.json.simple.JSONObject;
 
@@ -71,6 +82,8 @@ public class InventoryMaintenanceController implements Initializable, ScreenInte
     private Control lastFocusedControl;
     private String psIndustryID;
     private String psCategoryID;
+    private double xOffset;
+    private double yOffset;
 
     private boolean pbLoaded = false;
 
@@ -338,6 +351,10 @@ public class InventoryMaintenanceController implements Initializable, ScreenInte
                     break;
 
                 case "btnLedger":
+                    if (!isJSONSuccess(showLedger(), "Initialize show Ledger Record")) {
+                        return;
+                    }
+                    break;
                 case "btnSerial":
                     ShowMessageFX.Information(null, psFormName,
                             "This feature is under development and will be available soon.\nThank you for your patience!");
@@ -698,7 +715,7 @@ public class InventoryMaintenanceController implements Initializable, ScreenInte
         boolean lbShow = (fnEditMode == EditMode.ADDNEW || fnEditMode == EditMode.UPDATE);
 
         // Always show these buttons
-        initButtonControls(true, "btnRetrieve", "btnHistory", "btnClose");
+        initButtonControls(true, "btnClose");
 
         // Show-only based on mode
         initButtonControls(lbShow, "btnSearch", "btnSave", "btnCancel");
@@ -736,6 +753,106 @@ public class InventoryMaintenanceController implements Initializable, ScreenInte
     private void getLoadedRecord() throws SQLException, GuanzonException, CloneNotSupportedException {
 //        clearAllInputs();
         loadRecord();
+    }
+
+    private JSONObject showLedger() {
+        JSONObject loJSON = new JSONObject();
+        if (tfStockID.getText().isEmpty()) {
+            loJSON.put("result", "error");
+            loJSON.put("message", "Please select a record first.");
+            return loJSON;
+        }
+
+        StackPane overlay = getOverlayProgress(apMainAnchor);
+        ProgressIndicator pi = (ProgressIndicator) overlay.getChildren().get(0);
+        overlay.setVisible(true);
+        pi.setVisible(true);
+
+        Task<ObservableList<Model_Inv_Ledger>> loadLedger = new Task<ObservableList<Model_Inv_Ledger>>() {
+            @Override
+            protected ObservableList<Model_Inv_Ledger> call() throws Exception {
+                if (!isJSONSuccess(poAppController.loadLedgerList("", ""),
+                        "Initialize : Load of Record List")) {
+                    return null;
+                }
+
+                List<Model_Inv_Ledger> rawList = poAppController.getLedgerList();
+                System.out.print("The size of list is " + rawList.size());
+                return FXCollections.observableArrayList(new ArrayList<>(rawList));
+            }
+
+            @Override
+            protected void succeeded() {
+
+                InventoryLedgerController inventoryLedger = new InventoryLedgerController();
+                inventoryLedger.setInventoryMaster(poAppController);
+                inventoryLedger.setGRider(poApp);
+                FXMLLoader fxmlLoader = new FXMLLoader();
+                fxmlLoader.setLocation(getClass().getResource("/ph/com/guanzongroup/integsys/views/InventoryLedger.fxml"));
+                fxmlLoader.setController(inventoryLedger);
+
+                Parent parent;
+                try {
+                    parent = fxmlLoader.load();
+                    Stage stage = new Stage();
+
+                    Stage parentStage = (Stage) apMainAnchor.getScene().getWindow();
+                    stage.initOwner(parentStage);
+                    stage.initModality(Modality.WINDOW_MODAL);
+                    stage.initStyle(StageStyle.UNDECORATED);
+
+                    parent.setOnMousePressed(new EventHandler<MouseEvent>() {
+                        @Override
+                        public void handle(MouseEvent event) {
+                            xOffset = event.getSceneX();
+                            yOffset = event.getSceneY();
+                        }
+                    });
+                    parent.setOnMouseDragged(new EventHandler<MouseEvent>() {
+                        @Override
+                        public void handle(MouseEvent event) {
+                            stage.setX(event.getScreenX() - xOffset);
+                            stage.setY(event.getScreenY() - yOffset);
+
+                        }
+                    });
+
+                    Scene scene = new Scene(parent);
+                    stage.setScene(scene);
+                    stage.showAndWait();
+
+                    loJSON.put("result", "success");
+                } catch (IOException ex) {
+
+                    loJSON.put("result", "error");
+                    loJSON.put("message", ex.getMessage());
+                }
+
+                overlay.setVisible(false);
+                pi.setVisible(false);
+            }
+
+            @Override
+            protected void failed() {
+                overlay.setVisible(false);
+                pi.setVisible(false);
+                Throwable ex = getException();
+                ex.printStackTrace();
+                poLogWrapper.severe(psFormName + " : " + ex.getMessage());
+            }
+
+            @Override
+            protected void cancelled() {
+                overlay.setVisible(false);
+                pi.setVisible(false);
+            }
+        };
+        Thread thread = new Thread(loadLedger);
+        thread.setDaemon(true);
+        thread.start();
+
+        loJSON.put("result", "success");
+        return loJSON;
     }
 
     private boolean isJSONSuccess(JSONObject loJSON, String fsModule) {
