@@ -635,20 +635,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                             return;
                         }
                     }
-                    switch (lsPayableType) {
-                        case "SOA":
-                            lsPayableType = DisbursementStatic.SourceCode.ACCOUNTS_PAYABLE;
-                            break;
-                        case "PRF":
-                            lsPayableType = DisbursementStatic.SourceCode.PAYMENT_REQUEST;
-                            break;
-                        case "AP Adjustment":
-                            lsPayableType = DisbursementStatic.SourceCode.AP_ADJUSTMENT;
-                            break;
-                        case "PO Receiving":
-                            lsPayableType = DisbursementStatic.SourceCode.PO_RECEIVING;
-                            break;
-                    }
+                    lsPayableType = JFXUtil.getSourceType(lsPayableType, false);
 
                     poJSON = poController.populateDetail(lsTransactionNo, lsPayableType);
                     if ("error".equals(poJSON.get("result"))) {
@@ -786,7 +773,6 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                             }
                             JFXUtil.showRetainedHighlight(false, tblViewMainList, "#A7C7E7", plOrderNoPartial, plOrderNoFinal, highlightedRowsMain, true);
                             loadHighlightFromDetail();
-
                             if (pnDetail < 0 || pnDetail
                                     >= details_data.size()) {
                                 if (!details_data.isEmpty()) {

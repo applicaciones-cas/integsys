@@ -139,7 +139,7 @@
 }
 .table-view .virtual-flow .scroll-bar:horizontal .thumb:hover,
 .table-view .virtual-flow .scroll-bar:vertical .thumb:hover {
-    -fx-background-color: #B9B9B9;
+    -fx-background-color: #ababab;
 }
 .table-view .virtual-flow .scroll-bar .thumb:pressed,
 .table-view .virtual-flow .scroll-bar .thumb:pressed:hover {
