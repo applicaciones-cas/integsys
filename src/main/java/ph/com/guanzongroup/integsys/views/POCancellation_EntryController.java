@@ -72,7 +72,6 @@ import org.guanzon.cas.purchasing.services.POController;
  * @author User
  */
 public class POCancellation_EntryController implements Initializable, ScreenInterface {
-
     private GRiderCAS poApp;
     private LogWrapper poLogWrapper;
     private String psFormName = "PO Cancellation Entry";
