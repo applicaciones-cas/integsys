@@ -142,6 +142,21 @@ public class AccountsAccreditation_ConfirmationController implements Initializab
                     }
 
                     switch (lastFocusedControl.getId()) {
+                        
+                        case "tfSearchCompany":
+                            if (!(tfTransactionNo.getText() == null ? "" : tfTransactionNo.getText()).isEmpty()) {
+                                if (ShowMessageFX.OkayCancel(null, "Search Client! by ID", "Are you sure you want replace loaded Record?") == false) {
+                                        return;
+                                    }
+                            }
+                            if (!isJSONSuccess(poAppController.searchRecord(tfSearchCompany.getText(), false),
+                                    "")) {
+                                return;
+                            }
+
+                            getLoadedClient();
+                            initButtonDisplay(poAppController.getEditMode());
+                            return;
 
                         case "tfCategory":
                             if (!isJSONSuccess(poAppController.searchCategory(tfCategory.getText() == null ? "" : tfCategory.getText(), false),
@@ -173,7 +188,7 @@ public class AccountsAccreditation_ConfirmationController implements Initializab
                     break;
 
                 case "btnBrowse":
-                    if (!tfTransactionNo.getText().isEmpty()) {
+                    if (!(tfTransactionNo.getText() == null ? "" : tfTransactionNo.getText()).isEmpty()) {
                         if (ShowMessageFX.OkayCancel(null, "Search Client! by ID", "Are you sure you want replace loaded Record?") == false) {
                             return;
                         }
@@ -290,6 +305,7 @@ public class AccountsAccreditation_ConfirmationController implements Initializab
             initButtonDisplay(poAppController.getEditMode());
 
         } catch (Exception e) {
+            e.printStackTrace();
             poLogWrapper.severe(psFormName + " :" + e.getMessage());
         }
     }
@@ -330,7 +346,7 @@ public class AccountsAccreditation_ConfirmationController implements Initializab
                     case F3:
                         switch (txtFieldID) {
                             case "tfSearchCompany":
-                                if (!tfTransactionNo.getText().isEmpty()) {
+                                if (!(tfTransactionNo.getText() == null ? "" : tfTransactionNo.getText()).isEmpty()) {
                                     if (ShowMessageFX.OkayCancel(null, "Search Client! by Name", "Are you sure you want replace loaded Record?") == false) {
                                         return;
                                     }
@@ -569,7 +585,7 @@ public class AccountsAccreditation_ConfirmationController implements Initializab
 
         // Show-only based on mode
         initButtonControls(lbShow, "btnSearch", "btnSave", "btnCancel");
-        initButtonControls(!lbShow, "btnBrowse", "btnHistory", "btnNew", "btnUpdate");
+        initButtonControls(!lbShow, "btnBrowse", "btnHistory", "btnNew", "btnUpdate", "btnConfirm", "btnVoid");
 
         apMaster.setDisable(!lbShow);
     }
@@ -622,13 +638,13 @@ public class AccountsAccreditation_ConfirmationController implements Initializab
         }
 
         if ("success".equalsIgnoreCase(result)) {
-            if (message != null && !message.trim().isEmpty()) {
-                if (Platform.isFxApplicationThread()) {
-                    ShowMessageFX.Information(null, psFormName, fsModule + ": " + message);
-                } else {
-                    Platform.runLater(() -> ShowMessageFX.Information(null, psFormName, fsModule + ": " + message));
-                }
-            }
+//            if (message != null && !message.trim().isEmpty()) {
+//                if (Platform.isFxApplicationThread()) {
+//                    ShowMessageFX.Information(null, psFormName, fsModule + ": " + message);
+//                } else {
+//                    Platform.runLater(() -> ShowMessageFX.Information(null, psFormName, fsModule + ": " + message));
+//                }
+//            }
             poLogWrapper.info(psFormName + " : Success on " + fsModule);
             return true;
         }
