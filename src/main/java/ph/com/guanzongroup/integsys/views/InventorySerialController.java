@@ -6,14 +6,9 @@ import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
 import java.util.ResourceBundle;
-import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyBooleanPropertyBase;
 import javafx.beans.property.SimpleStringProperty;
@@ -47,35 +42,44 @@ import org.guanzon.appdriver.base.GRiderCAS;
 import org.guanzon.appdriver.base.GuanzonException;
 import org.guanzon.appdriver.base.LogWrapper;
 import org.guanzon.cas.inv.InvMaster;
-import org.guanzon.cas.inv.model.Model_Inv_Ledger;
+import org.guanzon.cas.inv.model.Model_Inv_Serial;
 import org.json.simple.JSONObject;
 
-public class InventoryLedgerController implements Initializable, ScreenInterface {
+public class InventorySerialController implements Initializable, ScreenInterface {
 
     private GRiderCAS poApp;
     private LogWrapper poLogWrapper;
-    private String psFormName = "Inventory Ledger";
+    private String psFormName = "Inventory Serial";
     private InvMaster poAppController;
     private String psIndustryID;
-    private ObservableList<Model_Inv_Ledger> laRecordLedger;
+    private ObservableList<Model_Inv_Serial> laRecordSerial;
+
+    ObservableList<String> unitType = FXCollections.observableArrayList(
+            "LDU",
+            "Regular",
+            "Free",
+            "Live",
+            "Service",
+            "RDU",
+            "Others"
+    );
 
     @FXML
     private AnchorPane apMainAnchor;
 
     @FXML
-    private Button btnRetrieve, btnCancel, btnClose, btnRecalculate;
-
-    @FXML
-    private DatePicker dpDateThru, dpDateFrom;
-
+    private Button btnRetrieve, btnOkay, btnClose;
     @FXML
     private TextField tfBarcode, tfDescription, tfModel, tfBrand, tfColor, tfMeasurement;
     @FXML
-    private TableView<Model_Inv_Ledger> tblInventoryLedger;
+    private TableView<Model_Inv_Serial> tblSerialLedger;
 
     @FXML
-    private TableColumn<Model_Inv_Ledger, String> index01, index02, index03, index04,
-            index05, index06, index07, index08, index09;
+    private TableColumn<Model_Inv_Serial, String> index01, index02, index03, index04,
+            index05, index06, index07;
+
+    @FXML
+    private ComboBox cmbUnitType;
 
     @Override
     public void setGRider(GRiderCAS foValue) {
@@ -110,14 +114,7 @@ public class InventoryLedgerController implements Initializable, ScreenInterface
         initializeTableDetail();
         initControlEvents();
         getLoadedTransaction();
-        LocalDate today = LocalDate.now();
-
-        dpDateFrom.setValue(today.minusMonths(1));
-        try {
-            dpDateThru.setValue(ParseDate((Date) poApp.getServerDate()));
-        } catch (SQLException ex) {
-            Logger.getLogger(InventoryLedgerController.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        
     }
 
     @FXML
@@ -126,8 +123,8 @@ public class InventoryLedgerController implements Initializable, ScreenInterface
             //get button id
             String btnID = ((Button) event.getSource()).getId();
             switch (btnID) {
-                case "btnCancel":  //Close
-                    CommonUtils.closeStage(btnCancel);
+                case "btnOkay":  //Close
+                    CommonUtils.closeStage(btnOkay);
                     break;
 
                 case "btnClose": //OK
@@ -135,16 +132,11 @@ public class InventoryLedgerController implements Initializable, ScreenInterface
                     break;
 
                 case "btnRetrieve": //OK 
-                    if (!isJSONSuccess(poAppController.loadLedgerList(String.valueOf(dpDateFrom.getValue()), String.valueOf(dpDateThru.getValue())),
-                            "Initialize : Load of Ledger List")) {
+                    if (!isJSONSuccess(poAppController.loadSerialList(String.valueOf(cmbUnitType.getSelectionModel().getSelectedIndex())),
+                            "Initialize : Load of Serial List")) {
                         return;
                     }
                     reloadTableDetail();
-                    break;
-
-                case "btnRecalculate":
-                    ShowMessageFX.Information(null, psFormName,
-                            "This feature is under development and will be available soon.\nThank you for your patience!");
                     break;
                 default:
                     ShowMessageFX.Warning(null, psFormName, "Button with name " + btnID + " not registered.");
@@ -248,21 +240,21 @@ public class InventoryLedgerController implements Initializable, ScreenInterface
         }
     }
 
-    private void loadRecordList(String dateFrom, String dateThru) {
+    private void loadRecordList() {
         StackPane overlay = getOverlayProgress(apMainAnchor);
         ProgressIndicator pi = (ProgressIndicator) overlay.getChildren().get(0);
         overlay.setVisible(true);
         pi.setVisible(true);
 
-        Task<ObservableList<Model_Inv_Ledger>> loadInvLedger = new Task<ObservableList<Model_Inv_Ledger>>() {
+        Task<ObservableList<Model_Inv_Serial>> loadInvSerial = new Task<ObservableList<Model_Inv_Serial>>() {
             @Override
-            protected ObservableList<Model_Inv_Ledger> call() throws Exception {
-                if (!isJSONSuccess(poAppController.loadLedgerList(dateFrom, dateThru),
-                        "Initialize : Load of Ledger List")) {
+            protected ObservableList<Model_Inv_Serial> call() throws Exception {
+                if (!isJSONSuccess(poAppController.loadSerialList(String.valueOf(cmbUnitType.getSelectionModel().getSelectedIndex())),
+                        "Initialize : Load of Serial List")) {
                     return null;
                 }
 
-                List<Model_Inv_Ledger> rawList = poAppController.getLedgerList();
+                List<Model_Inv_Serial> rawList = poAppController.getSerialList();
                 System.out.print("The size of list is " + rawList.size());
                 return FXCollections.observableArrayList(new ArrayList<>(rawList));
             }
@@ -290,7 +282,7 @@ public class InventoryLedgerController implements Initializable, ScreenInterface
                 pi.setVisible(false);
             }
         };
-        Thread thread = new Thread(loadInvLedger);
+        Thread thread = new Thread(loadInvSerial);
         thread.setDaemon(true);
         thread.start();
     }
@@ -354,75 +346,84 @@ public class InventoryLedgerController implements Initializable, ScreenInterface
             }
         }
 
+        cmbUnitType.setItems(unitType);
     }
 
     private void initializeTableDetail() {
-        if (laRecordLedger == null) {
-            laRecordLedger = FXCollections.observableArrayList();
+        if (laRecordSerial == null) {
+            laRecordSerial = FXCollections.observableArrayList();
 
-            tblInventoryLedger.setItems(laRecordLedger);
+            tblSerialLedger.setItems(laRecordSerial);
 
             index06.setStyle("-fx-alignment: CENTER-RIGHT; -fx-padding: 0 5 0 0;");
             index07.setStyle("-fx-alignment: CENTER-RIGHT; -fx-padding: 0 5 0 0;");
             index01.setCellValueFactory((loModel) -> {
-                int index = tblInventoryLedger.getItems().indexOf(loModel.getValue()) + 1;
+                int index = tblSerialLedger.getItems().indexOf(loModel.getValue()) + 1;
                 return new SimpleStringProperty(String.valueOf(index));
             });
 
             index02.setCellValueFactory((loModel) -> {
-                return new SimpleStringProperty(String.valueOf(loModel.getValue().getTransactionDate()));
+                return new SimpleStringProperty(String.valueOf(loModel.getValue().getSerialId()));
             });
 
             index03.setCellValueFactory((loModel) -> {
-                try {
-                    return new SimpleStringProperty(String.valueOf(loModel.getValue().Branch().getBranchName()));
-                } catch (SQLException | GuanzonException e) {
-                    poLogWrapper.severe(psFormName, e.getMessage());
-                    return new SimpleStringProperty("");
-                }
+                return new SimpleStringProperty(String.valueOf(loModel.getValue().getSerial01()));
             });
 
             index04.setCellValueFactory((loModel) -> {
-                try {
-                    return new SimpleStringProperty(String.valueOf(loModel.getValue().TransactionSource().getSourceName()));
-                } catch (SQLException | GuanzonException e) {
-                    poLogWrapper.severe(psFormName, e.getMessage());
-                    return new SimpleStringProperty("");
-                }
+                return new SimpleStringProperty(String.valueOf(loModel.getValue().getSerial02()));
             });
 
             index05.setCellValueFactory((loModel) -> {
-                return new SimpleStringProperty(String.valueOf(loModel.getValue().getSourceNo()));
+                String lsValue = "";
+                switch (loModel.getValue().getLocation()) {
+                    case "0":
+                        lsValue = "WAREHOUSE";
+                        break;
+                    case "1":
+                        lsValue = "BRANCH";
+                        break;
+                    case "2":
+                        lsValue = "SUPPLIER";
+                        break;
+                    case "3":
+                        lsValue = "CUSTOMER";
+                        break;
+                    case "4":
+                        lsValue = "ON-TRANSIT";
+                        break;
+                    case "5":
+                        lsValue = "SERVICE";
+                        break;
+                    default:
+                        lsValue = "UNKNOWN";
+                        break;
+
+                }
+                return new SimpleStringProperty(lsValue);
             });
 
             index06.setCellValueFactory((loModel) -> {
-                return new SimpleStringProperty(CommonUtils.NumberFormat(loModel.getValue().getQuantityIn(), "###,##0.00"));
+                return new SimpleStringProperty(loModel.getValue().isSold() ? "YES" : "NO");
             });
 
             index07.setCellValueFactory((loModel) -> {
-                return new SimpleStringProperty(CommonUtils.NumberFormat(loModel.getValue().getQuantityOut(), "###,##0.00"));
-            });
-
-            index08.setCellValueFactory((loModel) -> {
-                return new SimpleStringProperty(CommonUtils.NumberFormat(loModel.getValue().getQuantityOrder(), "###,##0.00"));
-            });
-
-            index09.setCellValueFactory((loModel) -> {
-                return new SimpleStringProperty(CommonUtils.NumberFormat(loModel.getValue().getQuantityIssued(), "###,##0.00"));
+                String lsValue = unitType.get(Integer.parseInt(loModel.getValue().getUnitType()));
+                return new SimpleStringProperty(lsValue);
             });
 
         }
     }
 
     private void reloadTableDetail() {
-        List<Model_Inv_Ledger> rawDetail = poAppController.getLedgerList();
-        laRecordLedger.setAll(rawDetail);
+        List<Model_Inv_Serial> rawDetail = poAppController.getSerialList();
+        laRecordSerial.setAll(rawDetail);
 
         // Restore or select last row
-        int indexToSelect = laRecordLedger.size() - 1;
+        int indexToSelect = laRecordSerial.size() - 1;
 
-        tblInventoryLedger.getSelectionModel().select(indexToSelect);
-        tblInventoryLedger.refresh();
+        tblSerialLedger.getSelectionModel().select(indexToSelect);
+        tblSerialLedger.refresh();
     }
 
     private void getLoadedTransaction() {
