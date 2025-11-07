@@ -162,7 +162,7 @@ public class AccountsAccreditation_ConfirmationController implements Initializab
                             if (!isJSONSuccess(poAppController.searchCategory(tfCategory.getText() == null ? "" : tfCategory.getText(), false),
                                     "Initialize Search Category! ")) {
                                 return;
-                            }
+                            } 
                             loadClientMaster();
                             break;
 
@@ -482,8 +482,16 @@ public class AccountsAccreditation_ConfirmationController implements Initializab
             tfCategory.setText(poAppController.getModel().Category().getDescription());
             tfCompany.setText(poAppController.getModel().Client().getCompanyName());
             tfContactPerson.setText(poAppController.getModel().ClientInstitutionContact().getContactPersonName());
-            tfAddress.setText(poAppController.getModel().ClientAddress().getAddress());
-            tfTIN.setText(poAppController.getModel().Client().getTaxIdNumber());
+            
+            String lshouseno = poAppController.getModel().ClientAddress().getHouseNo() == null || poAppController.getModel().ClientAddress().getHouseNo().isEmpty() ? " " : poAppController.getModel().ClientAddress().getHouseNo();
+            String lsaddress = poAppController.getModel().ClientAddress().getAddress() == null || poAppController.getModel().ClientAddress().getAddress().isEmpty() ? " " : poAppController.getModel().ClientAddress().getAddress();
+            String lsbrgy = poAppController.getModel().ClientAddress().Barangay().getBarangayName() == null || poAppController.getModel().ClientAddress().Barangay().getBarangayName().isEmpty() ? " " : poAppController.getModel().ClientAddress().Barangay().getBarangayName();
+            String lscity = poAppController.getModel().ClientAddress().Town().getDescription() == null || poAppController.getModel().ClientAddress().Town().getDescription().isEmpty() ? " " : poAppController.getModel().ClientAddress().Town().getDescription();
+            String lsprovince = poAppController.getModel().ClientAddress().Town().Province().getDescription() == null || poAppController.getModel().ClientAddress().Town().Province().getDescription().isEmpty() ? " " : poAppController.getModel().ClientAddress().Town().Province().getDescription();
+            
+            tfAddress.setText( lshouseno + "" + lsaddress + " " + lsbrgy +", "+ lscity + ", " + lsprovince);
+            
+            tfTIN.setText(poAppController.getModel().Client().getTaxIdNumber() == null ? "" : poAppController.getModel().Client().getTaxIdNumber());
             taRemarks.setText(poAppController.getModel().getRemarks());
             cmbAccountType.getSelectionModel().select(Integer.parseInt(poAppController.getModel().getAccountType()));
             cmbTransType.getSelectionModel().select(Integer.parseInt(poAppController.getModel().getTransactionType()));
