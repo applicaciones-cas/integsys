@@ -64,6 +64,7 @@ import org.guanzon.appdriver.constant.EditMode;
 import org.guanzon.appdriver.constant.RecordStatus;
 import org.guanzon.cas.inv.InvMaster;
 import org.guanzon.cas.inv.model.Model_Inv_Ledger;
+import org.guanzon.cas.inv.model.Model_Inv_Serial;
 import org.guanzon.cas.inv.services.InvControllers;
 import org.json.simple.JSONObject;
 
@@ -356,10 +357,10 @@ public class InventoryMaintenanceController implements Initializable, ScreenInte
                     }
                     break;
                 case "btnSerial":
-                    ShowMessageFX.Information(null, psFormName,
-                            "This feature is under development and will be available soon.\nThank you for your patience!");
+                    if (!isJSONSuccess(showSerial(), "Initialize show Serial Record")) {
+                        return;
+                    }
                     break;
-
                 case "btnClose":
                     if (ShowMessageFX.YesNo("Are you sure you want to close this form?", psFormName, null)) {
                         if (poUnload != null) {
@@ -848,6 +849,113 @@ public class InventoryMaintenanceController implements Initializable, ScreenInte
             }
         };
         Thread thread = new Thread(loadLedger);
+        thread.setDaemon(true);
+        thread.start();
+
+        loJSON.put("result", "success");
+        return loJSON;
+    }
+
+    private JSONObject showSerial() throws SQLException, GuanzonException {
+        JSONObject loJSON = new JSONObject();
+        if (tfStockID.getText().isEmpty()) {
+            loJSON.put("result", "error");
+            loJSON.put("message", "Please select a record first.");
+            return loJSON;
+        }
+
+        if (!poAppController.getModel().Inventory().isSerialized()) {
+            loJSON.put("result", "error");
+            loJSON.put("message", "Non-serialize inventory detected.");
+            return loJSON;
+        }
+
+        StackPane overlay = getOverlayProgress(apMainAnchor);
+        ProgressIndicator pi = (ProgressIndicator) overlay.getChildren().get(0);
+        overlay.setVisible(true);
+        pi.setVisible(true);
+
+        Task<ObservableList<Model_Inv_Serial>> loadSerial = new Task<ObservableList<Model_Inv_Serial>>() {
+            @Override
+            protected ObservableList<Model_Inv_Serial> call() throws Exception {
+                if (!isJSONSuccess(poAppController.loadSerialList(""),
+                        "Initialize : Load of Record List")) {
+                    return null;
+                }
+
+                List<Model_Inv_Serial> rawList = poAppController.getSerialList();
+                System.out.print("The size of list is " + rawList.size());
+                return FXCollections.observableArrayList(new ArrayList<>(rawList));
+            }
+
+            @Override
+            protected void succeeded() {
+
+                InventorySerialController inventorySerial = new InventorySerialController();
+                inventorySerial.setInventoryMaster(poAppController);
+                inventorySerial.setGRider(poApp);
+                FXMLLoader fxmlLoader = new FXMLLoader();
+                fxmlLoader.setLocation(getClass().getResource("/ph/com/guanzongroup/integsys/views/InventorySerial.fxml"));
+                fxmlLoader.setController(inventorySerial);
+
+                Parent parent;
+                try {
+                    parent = fxmlLoader.load();
+                    Stage stage = new Stage();
+
+                    Stage parentStage = (Stage) apMainAnchor.getScene().getWindow();
+                    stage.initOwner(parentStage);
+                    stage.initModality(Modality.WINDOW_MODAL);
+                    stage.initStyle(StageStyle.UNDECORATED);
+
+                    parent.setOnMousePressed(new EventHandler<MouseEvent>() {
+                        @Override
+                        public void handle(MouseEvent event) {
+                            xOffset = event.getSceneX();
+                            yOffset = event.getSceneY();
+                        }
+                    });
+                    parent.setOnMouseDragged(new EventHandler<MouseEvent>() {
+                        @Override
+                        public void handle(MouseEvent event) {
+                            stage.setX(event.getScreenX() - xOffset);
+                            stage.setY(event.getScreenY() - yOffset);
+
+                        }
+                    });
+
+                    Scene scene = new Scene(parent);
+                    stage.setScene(scene);
+                    stage.showAndWait();
+
+                    loJSON.put("result", "success");
+                } catch (IOException ex) {
+
+                    ex.printStackTrace(); // prints full trace
+                    loJSON.put("result", "error");
+                    loJSON.put("message", ex.getMessage());
+                }
+
+                overlay.setVisible(false);
+                pi.setVisible(false);
+            }
+
+            @Override
+            protected void failed() {
+                overlay.setVisible(false);
+                pi.setVisible(false);
+                Throwable ex = getException();
+                ex.printStackTrace();
+                poLogWrapper.severe(psFormName + " : " + ex.getMessage());
+            }
+
+            @Override
+            protected void cancelled() {
+                overlay.setVisible(false);
+                pi.setVisible(false);
+            }
+        };
+        Thread thread = new Thread(loadSerial);
         thread.setDaemon(true);
         thread.start();
 
