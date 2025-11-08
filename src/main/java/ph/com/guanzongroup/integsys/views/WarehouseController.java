@@ -1,6 +1,5 @@
 package ph.com.guanzongroup.integsys.views;
 
-import com.rmj.guanzongroup.sidebarmenus.table.model.ModelResultSet;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import java.net.URL;
 import java.sql.SQLException;
@@ -34,6 +33,7 @@ import org.guanzon.appdriver.base.LogWrapper;
 import org.guanzon.appdriver.constant.EditMode;
 import org.guanzon.cas.parameter.services.ParamControllers;
 import org.json.simple.JSONObject;
+import ph.com.guanzongroup.integsys.model.ModelResultSet;
 
 public class WarehouseController implements Initializable, ScreenInterface {
 
