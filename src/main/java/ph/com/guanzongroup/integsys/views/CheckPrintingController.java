@@ -40,6 +40,7 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import javafx.util.Pair;
+import javax.script.ScriptException;
 import org.guanzon.appdriver.agent.ShowMessageFX;
 import org.guanzon.appdriver.base.CommonUtils;
 import org.guanzon.appdriver.base.GRiderCAS;
@@ -273,6 +274,7 @@ public class CheckPrintingController implements Initializable, ScreenInterface {
                         break;
                     }
                     checkedItems.add(lsDVNO);
+                    System.out.println("check items : " + checkedItems.get(checkedItems.size()-1));
                 }
             }
             if (!allSameBank) {
@@ -282,18 +284,20 @@ public class CheckPrintingController implements Initializable, ScreenInterface {
 
             switch (action) {
                 case "assign":
-                    if (!checkedItem.isEmpty()) {
-                        showAssignWindow(checkedItem);
+                    if (!checkedItems.isEmpty()) {
+                        showAssignWindow(checkedItems);
                         chckSelectAll.setSelected(false);
                         checkedItem.clear();
                     }
                     break;
                 case "print check":
                     if (!checkedItem.isEmpty()) {
-//                        poJSON = poController.PrintCheck(checkedItem);
+                        poJSON = poController.PrintCheck(checkedItems);
                         if ("error".equals((String) poJSON.get("result"))) {
                             ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                             break;
+                        } else {
+                            ShowMessageFX.Information(null, pxeModuleName, (String) poJSON.get("message"));
                         }
                         chckSelectAll.setSelected(false);
                         checkedItem.clear();
@@ -301,9 +305,11 @@ public class CheckPrintingController implements Initializable, ScreenInterface {
                     break;
                 case "print dv":
                     if (!checkedItem.isEmpty()) {
-//                        poJSON = poController.printTransaction(checkedItem);
+                        poJSON = poController.printTransaction(checkedItems);
                         if (!"success".equals((String) poJSON.get("result"))) {
                             ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                        } else {
+                            ShowMessageFX.Information(null, pxeModuleName, (String) poJSON.get("message"));
                         }
 
                         chckSelectAll.setSelected(false);
@@ -315,7 +321,7 @@ public class CheckPrintingController implements Initializable, ScreenInterface {
             }
             retrieveDisbursement();
             loadTableMain.reload();
-        } catch (SQLException ex) {
+        } catch (SQLException | GuanzonException | CloneNotSupportedException | ScriptException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
         }
     }
@@ -446,7 +452,8 @@ public class CheckPrintingController implements Initializable, ScreenInterface {
 
     private void retrieveDisbursement() {
         try {
-            poJSON = poController.loadTransactionList(tfSearchBankName.getText(), tfSearchBankAccount.getText(), "", true);
+            //TODO ayusin nalang yung pag pass ng date
+            poJSON = poController.loadCheckPrintTransactionList(tfSearchBankName.getText(), tfSearchBankAccount.getText(), "2025-11-01", "2025-11-31"); 
             if ("error".equals(poJSON.get("result"))) {
                 ShowMessageFX.Error(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
             } else {
@@ -573,7 +580,7 @@ public class CheckPrintingController implements Initializable, ScreenInterface {
 
         CheckAssignmentController controller = new CheckAssignmentController();
         controller.setGRider(oApp);
-//        controller.setCheckPrinting(poController);
+        controller.setCheckPrinting(poController);
         controller.setTransaction(fsTransactionNos);
         try {
             stageAssignment.showDialog((Stage) AnchorMain.getScene().getWindow(), getClass().getResource("/ph/com/guanzongroup/integsys/views/CheckAssignment.fxml"), controller,

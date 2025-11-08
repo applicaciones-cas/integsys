@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -21,6 +22,7 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
+import javax.script.ScriptException;
 import org.guanzon.appdriver.agent.ShowMessageFX;
 import org.guanzon.appdriver.base.CommonUtils;
 import org.guanzon.appdriver.base.GRiderCAS;
@@ -29,6 +31,7 @@ import org.guanzon.appdriver.base.SQLUtil;
 import org.guanzon.appdriver.constant.EditMode;
 import org.json.simple.JSONObject;
 import ph.com.guanzongroup.cas.cashflow.CheckPrinting;
+import ph.com.guanzongroup.cas.cashflow.DisbursementVoucher;
 import ph.com.guanzongroup.cas.cashflow.services.CashflowControllers;
 import ph.com.guanzongroup.cas.cashflow.status.CheckStatus;
 import ph.com.guanzongroup.cas.cashflow.status.DisbursementStatic;
@@ -38,7 +41,7 @@ public class CheckAssignmentController implements Initializable {
     private GRiderCAS oApp;
     private JSONObject poJSON;
     private final String pxeModuleName = "Check Assignment";
-    private CheckPrinting poController;
+    private DisbursementVoucher poController;
 
     public int pnEditMode;
     private String psTransactionNo = "";
@@ -75,25 +78,20 @@ public class CheckAssignmentController implements Initializable {
         oApp = foValue;
     }
 
-    public void setCheckPrinting(CheckPrinting foValue) {
+    public void setCheckPrinting(DisbursementVoucher foValue) {
         poController = foValue;
     }
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         try {
+            poJSON = new JSONObject();
             initButtonsClickActions();
             initTextFields();
             initDatePicker();
             initFields(pnEditMode);
             initButton(pnEditMode);
             if (transactionNos != null && !transactionNos.isEmpty()) {
-                poController = new CashflowControllers(oApp, null).CheckPrinting();
-                poJSON = poController.InitTransaction();
-                if (!"success".equals((String) poJSON.get("result"))) {
-                    ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-                    return;
-                }
                 loadTransaction(currentTransactionIndex);
                 initFields(pnEditMode);
                 initButton(pnEditMode);
@@ -103,46 +101,45 @@ public class CheckAssignmentController implements Initializable {
         }
     }
 
-    private void loadRecordMaster() throws SQLException, GuanzonException {
+    private void loadRecordMaster(){
         String initialCheckNo = "";
         boolean fromBankAccount = false;
-
         tfDVNo.setText(poController.Master().getTransactionNo());
         if (transactionNos.size() > 1) {
             chbkApplyToAll.setSelected(true);
         }
-        if (poController.Master().CheckPayments().getCheckNo().isEmpty()) {
-            initialCheckNo = poController.BankAccountMaster().getModel().getCheckNo();
-            fromBankAccount = true;
-        } else {
-            initialCheckNo = poController.Master().CheckPayments().getCheckNo();
-        }
-
-        if (fromBankAccount && initialCheckNo.matches("\\d+")) {
-            long incremented = Long.parseLong(initialCheckNo) + 1;
-            initialCheckNo = String.format("%0" + initialCheckNo.length() + "d", incremented);
-        }
-        originalCheckNo = initialCheckNo;
-        tfCheckNo.setText(initialCheckNo);
-        String checkNoValue = tfCheckNo.getText();
-        if (currentTransactionIndex == 0 && startingCheckNo == -1 && checkNoValue != null && checkNoValue.matches("\\d+")) {
-            startingCheckNo = Long.parseLong(checkNoValue);
-            checkNoLength = checkNoValue.length();
-            poController.CheckPayments().getModel().setCheckNo(checkNoValue);
-            poController.BankAccountMaster().getModel().setCheckNo(checkNoValue);
-//             poController.BankAccountLedger().getModel().setSourceNo(checkNoValue);
-            poController.CheckPayments().getModel().setTransactionStatus(CheckStatus.OPEN);
-        } else if (startingCheckNo != -1) {
-            long currentCheckNo = startingCheckNo + currentTransactionIndex;
-            String formatted = String.format("%0" + checkNoLength + "d", currentCheckNo);
-            tfCheckNo.setText(formatted);
-            poController.CheckPayments().getModel().setCheckNo(formatted);
-            poController.CheckPayments().getModel().setTransactionStatus(CheckStatus.OPEN);
-            poController.BankAccountMaster().getModel().setCheckNo(formatted);
-//            poController.BankAccountLedger().getModel().setSourceNo(formatted);
-
-        }
-
+        //        if (poController.Master().CheckPayments().getCheckNo().isEmpty()) {
+//            initialCheckNo = poController.CheckPayments().getModel().Bank_Account_Master().getCheckNo();
+//            fromBankAccount = true;
+//        } else {
+//            initialCheckNo = poController.Master().CheckPayments().getCheckNo();
+//        }
+//
+//        if (fromBankAccount && initialCheckNo.matches("\\d+")) {
+//            long incremented = Long.parseLong(initialCheckNo) + 1;
+//            initialCheckNo = String.format("%0" + initialCheckNo.length() + "d", incremented);
+//        }
+//        originalCheckNo = initialCheckNo;
+//        tfCheckNo.setText(initialCheckNo);
+//        String checkNoValue = tfCheckNo.getText();
+//        if (currentTransactionIndex == 0 && startingCheckNo == -1 && checkNoValue != null && checkNoValue.matches("\\d+")) {
+//            startingCheckNo = Long.parseLong(checkNoValue);
+//            checkNoLength = checkNoValue.length();
+//            poController.CheckPayments().getModel().setCheckNo(checkNoValue);
+//            poController.BankAccountMaster().getModel().setCheckNo(checkNoValue);
+////             poController.BankAccountLedger().getModel().setSourceNo(checkNoValue);
+//            poController.CheckPayments().getModel().setTransactionStatus(CheckStatus.OPEN);
+//        } else if (startingCheckNo != -1) {
+//            long currentCheckNo = startingCheckNo + currentTransactionIndex;
+//            String formatted = String.format("%0" + checkNoLength + "d", currentCheckNo);
+//            tfCheckNo.setText(formatted);
+//            poController.CheckPayments().getModel().setCheckNo(formatted);
+//            poController.CheckPayments().getModel().setTransactionStatus(CheckStatus.OPEN);
+//            poController.BankAccountMaster().getModel().setCheckNo(formatted);
+////            poController.BankAccountLedger().getModel().setSourceNo(formatted);
+//
+//        }
+        tfCheckNo.setText(poController.CheckPayments().getModel().getCheckNo());
         dpCheckDate.setValue(CustomCommonUtil.parseDateStringToLocalDate(SQLUtil.dateFormat(poController.Master().getTransactionDate(), SQLUtil.FORMAT_SHORT_DATE)));
         tfCheckAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Master().getTransactionTotal(), true));
         taRemarks.setText(poController.Master().getRemarks());
@@ -254,27 +251,16 @@ public class CheckAssignmentController implements Initializable {
                                 /* 1. Check duplicates ­-- but skip if it’s the same number that was already stored on this very transaction      */
                                 // Only bother calling the DB if the user actually changed the value
                                 if (!lsValue.equals(originalCheckNo)) {
-                                    poJSON = poController.checkNoExists(lsValue);
+                                    poJSON = poController.existCheckNo(lsValue);
                                     if ("error".equals((String) poJSON.get("result"))) {
                                         ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                         return;
                                     }
                                 }
-
-                                /* 2. Parse and apply values (unchanged) */
-                                long inputCheckNo = Long.parseLong(lsValue);
-                                String masterVal = poController.BankAccountMaster().getModel().getCheckNo();
-                                long masterCheckNo = (masterVal != null && masterVal.matches("\\d+")) ? Long.parseLong(masterVal) : 0;
-
-                                startingCheckNo = inputCheckNo - currentTransactionIndex;
-                                checkNoLength = lsValue.length();
-                                poController.CheckPayments().getModel().setCheckNo(lsValue);
-
-                                /* 3. Update master only if higher or equal (unchanged) */
-                                if (inputCheckNo >= masterCheckNo) {
-                                    poController.BankAccountMaster().getModel().setCheckNo(lsValue);
-                                }
-                                poController.CheckPayments().getModel().setTransactionStatus(CheckStatus.OPEN);
+                                
+                                Platform.runLater(() -> {
+                                    loadRecordMaster();
+                                });
                             } else {
                                 ShowMessageFX.Warning(null, pxeModuleName, "Invalid check number format.");
                                 tfCheckNo.requestFocus();
@@ -339,25 +325,18 @@ public class CheckAssignmentController implements Initializable {
         try {
             String checkNoToCheck = tfCheckNo.getText();
             String currentAssignedCheckNo = poController.Master().CheckPayments().getCheckNo();
+//
+//            // Only check for duplicates if the check no has changed (doesn't match the current assigned)
+//            if (!checkNoToCheck.equals(currentAssignedCheckNo)) {
+//                poJSON = poController.checkNoExists(checkNoToCheck);
+//                if ("error".equals((String) poJSON.get("result"))) {
+//                    ShowMessageFX.Warning(null, pxeModuleName,
+//                            (String) poJSON.get("message"));
+//                    return;
+//                }
+//            }
 
-            // Only check for duplicates if the check no has changed (doesn't match the current assigned)
-            if (!checkNoToCheck.equals(currentAssignedCheckNo)) {
-                poJSON = poController.checkNoExists(checkNoToCheck);
-                if ("error".equals((String) poJSON.get("result"))) {
-                    ShowMessageFX.Warning(null, pxeModuleName,
-                            (String) poJSON.get("message"));
-                    return;
-                }
-            }
-
-            poController.Master().CheckPayments().setModifiedDate(oApp.getServerDate());
-            poController.Master().setModifiedDate(oApp.getServerDate());
-            /* ---------- 1. Save the CURRENT record ---------- */
-            poController.Master().setModifiedDate(oApp.getServerDate());
-            poController.BankAccountMaster().getModel().setCheckNo(checkNoToCheck);
-//            poJSON = poController.saveBankAccountMaster();
             poJSON = poController.SaveTransaction();
-
             if (!"success".equals(poJSON.get("result"))) {
                 ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                 isAutoProcessing = false;
@@ -386,35 +365,38 @@ public class CheckAssignmentController implements Initializable {
         }
     }
 
-    private void loadTransaction(int index) throws SQLException, GuanzonException, CloneNotSupportedException {
-        if (index >= transactionNos.size()) {
-            ShowMessageFX.Information(null, pxeModuleName, "All transactions have been processed.");
-            CommonUtils.closeStage(btnClose);
-            return;
-        }
-
-        psTransactionNo = transactionNos.get(index);
-        poJSON = poController.OpenTransaction(psTransactionNo);
-
-        if (!"success".equals((String) poJSON.get("result"))) {
-            ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-            loadTransaction(++currentTransactionIndex);
-            return;
-        }
-        poJSON = poController.UpdateTransaction();
-
-        if (!"error".equals((String) poJSON.get("result"))) {
-            if (poController.Master().getDisbursementType().equals(DisbursementStatic.DisbursementType.CHECK)) {
-                poController.setCheckpayment();
-//                poController.setBankAccountLedger();
-                poController.setBankAccountCheckNo();
-
+    private void loadTransaction(int index){
+        try {
+            if (index >= transactionNos.size()) {
+                ShowMessageFX.Information(null, pxeModuleName, "All transactions have been processed.");
+                CommonUtils.closeStage(btnClose);
+                return;
             }
-            clearTextFields();
-            loadRecordMaster();
-        } else {
-            ShowMessageFX.Warning((String) poJSON.get("message"), pxeModuleName, null);
-            CommonUtils.closeStage(btnClose);
+            
+            psTransactionNo = transactionNos.get(index);
+            poJSON = poController.OpenTransaction(psTransactionNo);
+            if (!"success".equals((String) poJSON.get("result"))) {
+                ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                loadTransaction(++currentTransactionIndex);
+                return;
+            }
+            poJSON = poController.UpdateTransaction();
+            if (!"error".equals((String) poJSON.get("result"))) {
+                poJSON = poController.populateCheckNo();
+                if ("error".equals((String) poJSON.get("result"))){
+                    ShowMessageFX.Warning((String) poJSON.get("message"), pxeModuleName, null);
+                    return;
+                }
+                loadRecordMaster();
+                initTextFields();
+                pnEditMode = poController.getEditMode();
+                initButton(pnEditMode);
+            } else {
+                ShowMessageFX.Warning((String) poJSON.get("message"), pxeModuleName, null);
+                CommonUtils.closeStage(btnClose);
+            }
+        } catch (SQLException | GuanzonException | CloneNotSupportedException | ScriptException ex) {
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
         }
     }
 
