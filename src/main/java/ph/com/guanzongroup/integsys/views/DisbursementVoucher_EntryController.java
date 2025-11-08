@@ -119,10 +119,10 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
 
     JFXUtil.ReloadableTableTask loadTableMain, loadTableDetail, loadTableDetailJE;
 
-    ObservableList<String> cTransactionType = FXCollections.observableArrayList(DisbursementStatic.SourceCode.ACCOUNTS_PAYABLE, // "SOA"
+    ObservableList<String> cTransactionType = FXCollections.observableArrayList("ALL",DisbursementStatic.SourceCode.ACCOUNTS_PAYABLE, // "SOA"
             DisbursementStatic.SourceCode.PAYMENT_REQUEST, // "PRF"
-            DisbursementStatic.SourceCode.CASH_PAYABLE,
-            "ALL");
+            DisbursementStatic.SourceCode.CASH_PAYABLE
+            );
     ObservableList<String> cPaymentMode = FXCollections.observableArrayList(
             "CHECK", "WIRED", "DIGITAL PAYMENT");
     ObservableList<String> cDisbursementMode = FXCollections.observableArrayList("DELIVER", "PICK-UP");

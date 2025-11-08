@@ -12,13 +12,11 @@ import java.util.List;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
-import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
@@ -260,7 +258,6 @@ public class CheckAssignmentController implements Initializable {
 //            poController.CheckPayments().getModel().setTransactionStatus(CheckStatus.OPEN);
 //            poController.BankAccountMaster().getModel().setCheckNo(formatted);
 ////            poController.BankAccountLedger().getModel().setSourceNo(formatted);
-//
 //        }
         JFXUtil.setDisabled(false, dpCheckDate);
         tfDVNo.setText(poController.Master().getTransactionNo());
@@ -277,41 +274,6 @@ public class CheckAssignmentController implements Initializable {
     private void initButtonsClickActions() {
         List<Button> buttons = Arrays.asList(btnAssign, btnPrintCheck, btnClose);
         buttons.forEach(button -> button.setOnAction(this::cmdButton_Click));
-    }
-
-    private void loadTransaction(int index) {
-        try {
-            if (index >= transactionNos.size()) {
-                ShowMessageFX.Information(null, pxeModuleName, "All transactions have been processed.");
-                CommonUtils.closeStage(btnClose);
-                return;
-            }
-
-            psTransactionNo = transactionNos.get(index);
-            poJSON = poController.OpenTransaction(psTransactionNo);
-            if (!"success".equals((String) poJSON.get("result"))) {
-                ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-                loadTransaction(++currentTransactionIndex);
-                return;
-            }
-            poJSON = poController.UpdateTransaction();
-            if (!"error".equals((String) poJSON.get("result"))) {
-                poJSON = poController.populateCheckNo();
-                if ("error".equals((String) poJSON.get("result"))) {
-                    ShowMessageFX.Warning((String) poJSON.get("message"), pxeModuleName, null);
-                    return;
-                }
-                loadRecordMaster();
-                initTextFields();
-                pnEditMode = poController.getEditMode();
-                initButton(pnEditMode);
-            } else {
-                ShowMessageFX.Warning((String) poJSON.get("message"), pxeModuleName, null);
-                CommonUtils.closeStage(btnClose);
-            }
-        } catch (SQLException | GuanzonException | CloneNotSupportedException | ScriptException ex) {
-            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
-        }
     }
 
     private void initTextFields() {
@@ -375,8 +337,43 @@ public class CheckAssignmentController implements Initializable {
 
         } catch (Exception ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
-            ShowMessageFX.Warning("Unexpected error during assignment.", pxeModuleName, null);
+            ShowMessageFX.Warning(null, pxeModuleName, "Unexpected error during assignment.");
             isAutoProcessing = false;
+        }
+    }
+
+    private void loadTransaction(int index) {
+        try {
+            if (index >= transactionNos.size()) {
+                ShowMessageFX.Information(null, pxeModuleName, "All transactions have been processed.");
+                CommonUtils.closeStage(btnClose);
+                return;
+            }
+
+            psTransactionNo = transactionNos.get(index);
+            poJSON = poController.OpenTransaction(psTransactionNo);
+            if (!"success".equals((String) poJSON.get("result"))) {
+                ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                loadTransaction(++currentTransactionIndex);
+                return;
+            }
+            poJSON = poController.UpdateTransaction();
+            if (!"error".equals((String) poJSON.get("result"))) {
+                poJSON = poController.populateCheckNo();
+                if ("error".equals((String) poJSON.get("result"))) {
+                    ShowMessageFX.Warning((String) poJSON.get("message"), pxeModuleName, null);
+                    return;
+                }
+                loadRecordMaster();
+                initTextFields();
+                pnEditMode = poController.getEditMode();
+                initButton(pnEditMode);
+            } else {
+                ShowMessageFX.Warning((String) poJSON.get("message"), pxeModuleName, null);
+                CommonUtils.closeStage(btnClose);
+            }
+        } catch (SQLException | GuanzonException | CloneNotSupportedException | ScriptException ex) {
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
         }
     }
 

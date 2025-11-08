@@ -325,13 +325,8 @@ public class CheckPrintingController implements Initializable, ScreenInterface {
                     break;
                 case "print check":
                     if (!checkedItems.isEmpty()) {
-                        poJSON = poController.PrintCheck(checkedItems);
-                        if ("error".equals((String) poJSON.get("result"))) {
-                            ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-                            break;
-                        } else {
-                            ShowMessageFX.Information(null, pxeModuleName, (String) poJSON.get("message"));
-                        }
+                        poController.PrintCheck(checkedItems);
+
                         chckSelectAll.setSelected(false);
                         checkedItem.clear();
                     }
@@ -530,7 +525,6 @@ public class CheckPrintingController implements Initializable, ScreenInterface {
                             main_data.clear();
                             if (poController.getMasterList().size() > 0) {
                                 for (int lnCntr = 0; lnCntr < poController.getMasterList().size(); lnCntr++) {
-
                                     main_data.add(new ModelCheckPrinting(
                                             String.valueOf(lnCntr + 1),
                                             checkedItem.get(lnCntr),
