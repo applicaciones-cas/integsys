@@ -46,8 +46,9 @@ public class UserManagement_Controller implements Initializable, ScreenInterface
     private JSONObject poJSON;
     public int pnEditMode;
     private LogWrapper poLogWrapper;
-
-    private String pxeModuleName = "User Management";
+    private unloadForm poUnload = new unloadForm();
+    
+    private String pxeModuleName = "System User Manager";
     private boolean isGeneral = false;
     private String psIndustryId = "";
     private String psCompanyId = "";
@@ -76,7 +77,7 @@ public class UserManagement_Controller implements Initializable, ScreenInterface
     ObservableList<String> UserType = FXCollections.observableArrayList("Local", "Global");
 
     @FXML
-    private AnchorPane apMainAnchor, apBrowse, apButton, apMaster;
+    private AnchorPane AnchorMain, apBrowse, apButton, apMaster;
     @FXML
     private TextField tfSearchEmployeeName, tfSearchLogInName, tfUserID, tfLogInName, tfPassword, tfEmployeeName, tfProduct;
     @FXML
@@ -301,20 +302,13 @@ public class UserManagement_Controller implements Initializable, ScreenInterface
                         
                         break;
                     case "btnClose":
-                        unloadForm appUnload = new unloadForm();
-                        if (ShowMessageFX.OkayCancel(null, "Close Tab", "Are you sure you want to close this Tab?") == true) {
-//                        appUnload.unloadForm(apMainAnchor, oApp, pxeModuleName);
-//
-                            LoginControllerHolder.getMainController().toggleBtnLeftLowerSideBar[0].selectedProperty().set(false);
-                            //should go back to log in or in xml form
-                            if (LoginControllerHolder.getLogInStatus()) {
-                                LoginControllerHolder.getMainController().TabUserManagement1();
-                            } else {
-                                LoginControllerHolder.getMainController().TabUserManagement2();
-                            }
+                        if (ShowMessageFX.YesNo("Are you sure you want to close this form?", pxeModuleName, null)) {
+                        if (poUnload != null) {
+                            poUnload.unloadForm(AnchorMain, oApp, pxeModuleName);
                         } else {
-                            return;
+                            ShowMessageFX.Warning("Please notify the system administrator to configure the null value at the close button.", "Warning", null);
                         }
+                    }
                         break;
                         
                     case "btnStatus":

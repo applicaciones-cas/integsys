@@ -432,25 +432,32 @@ public class AccountsAccreditation_EntryController implements Initializable, Scr
     private void loadClientMaster() {
         try {
             
-            System.out.print(poAppController.getModel().ClientInstitutionContact().getContactPersonName());
-            
             lblStatus.setText(poAppController.getModel().getRecordStatus().equals("0") == true ? "OPEN"
                     : poAppController.getModel().getRecordStatus().equals("1") == true ? "CONFIRMED"
                     : poAppController.getModel().getRecordStatus().equals("3") == true ? "CANCELLED" : "VOID");
             lblSource.setText("");
-
+            
             tfTransactionNo.setText(poAppController.getModel().getTransactionNo());
             dpTransactionDate.setValue(ParseDate(poAppController.getModel().getDateTransact()));
             tfCategory.setText(poAppController.getModel().Category().getDescription());
             tfCompany.setText(poAppController.getModel().Client().getCompanyName());
             tfContactPerson.setText(poAppController.getModel().ClientInstitutionContact().getContactPersonName());
-            tfAddress.setText(poAppController.getModel().ClientAddress().getAddress());
-            tfTIN.setText(poAppController.getModel().Client().getTaxIdNumber());
+            
+            String lshouseno = poAppController.getModel().ClientAddress().getHouseNo() == null || poAppController.getModel().ClientAddress().getHouseNo().isEmpty() ? "" : poAppController.getModel().ClientAddress().getHouseNo() + " ";
+            String lsaddress = poAppController.getModel().ClientAddress().getAddress() == null || poAppController.getModel().ClientAddress().getAddress().isEmpty() ? "" : poAppController.getModel().ClientAddress().getAddress();
+            String lsbrgy = poAppController.getModel().ClientAddress().Barangay().getBarangayName() == null || poAppController.getModel().ClientAddress().Barangay().getBarangayName().isEmpty() ? "" : ", " + poAppController.getModel().ClientAddress().Barangay().getBarangayName();
+            String lscity = poAppController.getModel().ClientAddress().Town().getDescription() == null || poAppController.getModel().ClientAddress().Town().getDescription().isEmpty() ? " " : ", " + poAppController.getModel().ClientAddress().Town().getDescription();
+            String lsprovince = poAppController.getModel().ClientAddress().Town().Province().getDescription() == null || poAppController.getModel().ClientAddress().Town().Province().getDescription().isEmpty() ? " " : " " + poAppController.getModel().ClientAddress().Town().Province().getDescription();
+            
+            tfAddress.setText( lshouseno + lsaddress + lsbrgy + lscity + lsprovince);
+            
+            tfTIN.setText(poAppController.getModel().Client().getTaxIdNumber() == null ? " " : poAppController.getModel().Client().getTaxIdNumber());
             taRemarks.setText(poAppController.getModel().getRemarks());
             cmbAccountType.getSelectionModel().select(Integer.parseInt(poAppController.getModel().getAccountType()));
             cmbTransType.getSelectionModel().select(Integer.parseInt(poAppController.getModel().getTransactionType()));
 
         } catch (SQLException | GuanzonException e) {
+            e.printStackTrace();
             poLogWrapper.severe(psFormName, e.getMessage());
         }
     }
