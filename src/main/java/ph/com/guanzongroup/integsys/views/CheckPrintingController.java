@@ -321,12 +321,10 @@ public class CheckPrintingController implements Initializable, ScreenInterface {
                 case "assign":
                     if (!checkedItems.isEmpty()) {
                         showAssignWindow(checkedItems);
-                        chckSelectAll.setSelected(false);
-                        checkedItem.clear();
                     }
                     break;
                 case "print check":
-                    if (!checkedItem.isEmpty()) {
+                    if (!checkedItems.isEmpty()) {
                         poJSON = poController.PrintCheck(checkedItems);
                         if ("error".equals((String) poJSON.get("result"))) {
                             ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
@@ -337,9 +335,11 @@ public class CheckPrintingController implements Initializable, ScreenInterface {
                         chckSelectAll.setSelected(false);
                         checkedItem.clear();
                     }
+                    retrieveDisbursement();
+                    loadTableMain.reload();
                     break;
                 case "print dv":
-                    if (!checkedItem.isEmpty()) {
+                    if (!checkedItems.isEmpty()) {
                         poJSON = poController.printTransaction(checkedItems);
                         if (!"success".equals((String) poJSON.get("result"))) {
                             ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
@@ -350,12 +350,13 @@ public class CheckPrintingController implements Initializable, ScreenInterface {
                         chckSelectAll.setSelected(false);
                         checkedItem.clear();
                     }
+                    retrieveDisbursement();
+                    loadTableMain.reload();
                     break;
                 default:
                     throw new AssertionError();
             }
-            retrieveDisbursement();
-            loadTableMain.reload();
+
         } catch (SQLException | GuanzonException | CloneNotSupportedException | ScriptException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
         }
@@ -631,10 +632,12 @@ public class CheckPrintingController implements Initializable, ScreenInterface {
         controller.setTransaction(fsTransactionNos);
         try {
             stageAssignment.showDialog((Stage) AnchorMain.getScene().getWindow(), getClass().getResource("/ph/com/guanzongroup/integsys/views/CheckAssignment.fxml"), controller,
-                    "Check Assignment Dialog", true, false, false);
+                    "Check Assignment Dialog", true, true, false);
             stageAssignment.setOnHidden(event -> {
+                chckSelectAll.setSelected(false);
                 retrieveDisbursement();
                 loadTableMain.reload();
+                checkedItem.clear();
             });
 
         } catch (IOException ex) {
