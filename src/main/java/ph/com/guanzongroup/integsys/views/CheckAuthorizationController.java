@@ -446,7 +446,7 @@ public class CheckAuthorizationController implements Initializable, ScreenInterf
         try {
             if (checkedItem.stream().anyMatch("1"::equals)) {
             } else {
-                ShowMessageFX.Information(null, pxeModuleName, "No items were selected to " + action + ".");
+                ShowMessageFX.Warning(null, pxeModuleName, "No items were selected to " + action + ".");
                 return;
             }
 

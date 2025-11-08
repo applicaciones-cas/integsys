@@ -126,7 +126,7 @@ public class DisbursementVoucher_CertificationController implements Initializabl
             poDisbursementController.setWithUI(true);
             poJSON = poDisbursementController.InitTransaction();
             if (!"success".equals((String) poJSON.get("result"))) {
-                ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                ShowMessageFX.Error(null, pxeModuleName, (String) poJSON.get("message"));
             }
             initLoadTable();
             initButtonsClickActions();
@@ -277,7 +277,7 @@ public class DisbursementVoucher_CertificationController implements Initializabl
                             case "tfSearchBankName":
                                 poJSON = poDisbursementController.SearchBanks(lsValue, false);
                                 if ("error".equals((String) poJSON.get("result"))) {
-                                    ShowMessageFX.Warning((String) poJSON.get("message"), pxeModuleName, null);
+                                    ShowMessageFX.Information(null, pxeModuleName, (String) poJSON.get("message"));
                                     return;
                                 } else {
                                     loadRecordSearch();
@@ -288,7 +288,7 @@ public class DisbursementVoucher_CertificationController implements Initializabl
                             case "tfSearchBankAccount":
                                 poJSON = poDisbursementController.SearchBankAccount(lsValue, poDisbursementController.CheckPayments().getModel().getBankID(), false);
                                 if ("error".equals((String) poJSON.get("result"))) {
-                                    ShowMessageFX.Warning((String) poJSON.get("message"), pxeModuleName, null);
+                                    ShowMessageFX.Information(null, pxeModuleName, (String) poJSON.get("message"));
                                     return;
                                 } else {
                                     loadRecordSearch();
@@ -424,7 +424,7 @@ public class DisbursementVoucher_CertificationController implements Initializabl
                         pnMain = tblViewMainList.getSelectionModel().getSelectedIndex();
                     }
                     if (JFXUtil.isObjectEqualTo(selected.getIndex03(), null, "")) {
-                        ShowMessageFX.Warning("Unable to view transaction.", pxeModuleName, null);
+                        ShowMessageFX.Warning(null, pxeModuleName, "Unable to view transaction.");
                         return;
                     } else {
                         showDVWindow(selected.getIndex03());
@@ -447,7 +447,7 @@ public class DisbursementVoucher_CertificationController implements Initializabl
         try {
             if (checkedItem.stream().anyMatch("1"::equals)) {
             } else {
-                ShowMessageFX.Information(null, pxeModuleName, "No items were selected to " + action + ".");
+                ShowMessageFX.Warning(null, pxeModuleName, "No items were selected to " + action + ".");
                 return;
             }
 
