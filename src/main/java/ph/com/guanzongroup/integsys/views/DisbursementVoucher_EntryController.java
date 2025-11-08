@@ -362,16 +362,13 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                     if (!ShowMessageFX.YesNo(null, pxeModuleName, "Are you sure you want to save the transaction?")) {
                         return;
                     }
-                    if (!isSavingValid()) {
-                        JFXUtil.clickTabByTitleText(tabPaneMain, "Disbursement Voucher");
-                        return;
-                    }
+                  
                     poJSON = poController.validateTAXandVat();
                     if ("error".equals((String) poJSON.get("result"))) {
                         ShowMessageFX.Information(null, pxeModuleName, (String) poJSON.get("message"));
                         pnDetail = (int) poJSON.get("pnDetail");
                         JFXUtil.selectAndFocusRow(tblVwDetails, pnDetail);
-//                        loadRecordDetail();
+                        loadRecordDetail();
                         return;
 
                     }
@@ -489,109 +486,6 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
         } catch (SQLException | GuanzonException | CloneNotSupportedException | ScriptException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
         }
-    }
-
-    private boolean isSavingValid() {
-        int detailCount = poController.getDetailCount();
-        boolean hasValidItem = false; // True if at least one valid item exists
-
-        if (detailCount == 0) {
-            ShowMessageFX.Warning(null, pxeModuleName, "Your order is empty. Please add at least one item.");
-            return false;
-        }
-        for (int lnCntr = 0; lnCntr <= detailCount - 1; lnCntr++) {
-            String lsSourceNo = (String) poController.Detail(lnCntr).getSourceNo();
-            if (detailCount == 1) {
-                if (lsSourceNo == null || lsSourceNo.trim().isEmpty()) {
-                    ShowMessageFX.Warning(null, pxeModuleName, "Your disbursement detail must have at least one valid item with a Reference No.");
-                    return false;
-                }
-            }
-            hasValidItem = true;
-        }
-        if (!hasValidItem) {
-            ShowMessageFX.Warning(null, pxeModuleName, "Invalid item in disbursement detail. Ensure all items have a valid Reference No and an Amount greater than 0.0000");
-            return false;
-        }
-
-        switch (poController.Master().getDisbursementType()) {
-            case DisbursementStatic.DisbursementType.CHECK:
-                if (tfBankNameCheck.getText().isEmpty()) {
-                    ShowMessageFX.Warning(null, pxeModuleName, "Please enter Bank Name.");
-                    return false;
-                }
-                if (tfBankAccountCheck.getText().isEmpty()) {
-                    ShowMessageFX.Warning(null, pxeModuleName, "Please enter Bank Account.");
-                    return false;
-                }
-                if (tfPayeeName.getText().isEmpty()) {
-                    ShowMessageFX.Warning(null, pxeModuleName, "Please enter Payee Name.");
-                    return false;
-                }
-                if (chbkPrintByBank.isSelected()) {
-                    if (cmbPayeeType.getSelectionModel().getSelectedIndex() < 0) {
-                        ShowMessageFX.Warning(null, pxeModuleName, "Please select Payee Type.");
-                        return false;
-                    }
-                    if (cmbDisbursementMode.getSelectionModel().getSelectedIndex() < 0) {
-                        ShowMessageFX.Warning(null, pxeModuleName, "Please select Disbursement Mode.");
-                        return false;
-                    }
-                    if (cmbDisbursementMode.getSelectionModel().getSelectedIndex() == 1) {
-                        if (cmbClaimantType.getSelectionModel().getSelectedIndex() < 0) {
-                            ShowMessageFX.Warning(null, pxeModuleName, "Please select Claimant Type.");
-                            return false;
-                        }
-                        if (cmbClaimantType.getSelectionModel().getSelectedIndex() == 0) {
-                            if (tfAuthorizedPerson.getText().trim().isEmpty()) {
-                                ShowMessageFX.Warning(null, pxeModuleName, "Please enter Authorized Person.");
-                                return false;
-                            }
-                        }
-
-                    }
-
-                }
-
-                break;
-            case DisbursementStatic.DisbursementType.WIRED:
-//                if (tfBankNameBTransfer.getText().isEmpty()) {
-//                    ShowMessageFX.Warning("Please enter Bank Name.", pxeModuleName, null);
-//                    return false;
-//                }
-//                if (tfBankAccountBTransfer.getText().isEmpty()) {
-//                    ShowMessageFX.Warning("Please enter Bank Account.", pxeModuleName, null);
-//                    return false;
-//                }
-//                if (tfSupplierBank.getText().isEmpty()) {
-//                    ShowMessageFX.Warning("Please enter Supplier Bank.", pxeModuleName, null);
-//                    return false;
-//                }
-//                if (tfSupplierAccountNoBTransfer.getText().isEmpty()) {
-//                    ShowMessageFX.Warning("Please enter Supplier Account No.", pxeModuleName, null);
-//                    return false;
-//                }
-                break;
-            case DisbursementStatic.DisbursementType.DIGITAL_PAYMENT:
-//                if (tfBankNameOnlinePayment.getText().isEmpty()) {
-//                    ShowMessageFX.Warning("Please enter Bank Name.", pxeModuleName, null);
-//                    return false;
-//                }
-//                if (tfBankAccountOnlinePayment.getText().isEmpty()) {
-//                    ShowMessageFX.Warning("Please enter Bank Account.", pxeModuleName, null);
-//                    return false;
-//                }
-//                    if (tfSupplierServiceName.getText().isEmpty()) {
-//                        ShowMessageFX.Warning("Please enter Supplier Service Name.", pxeModuleName, null);
-//                        return false;
-//                    }
-//                    if (tfSupplierAccountNo.getText().isEmpty()) {
-//                        ShowMessageFX.Warning("Please enter Supplier Account No.", pxeModuleName, null);
-//                        return false;
-//                    }
-                break;
-        }
-        return true;
     }
 
     public void loadHighlightFromDetail() {
