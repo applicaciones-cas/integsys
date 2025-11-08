@@ -130,7 +130,7 @@ public class CheckAssignmentController implements Initializable {
         JFXUtil.setDisabled(false, dpCheckDate);
         tfDVNo.setText(poController.Master().getTransactionNo());
         tfCheckNo.setText(poController.CheckPayments().getModel().getCheckNo());
-        dpCheckDate.setValue(CustomCommonUtil.parseDateStringToLocalDate(SQLUtil.dateFormat(poController.Master().getTransactionDate(), SQLUtil.FORMAT_SHORT_DATE)));
+        dpCheckDate.setValue(CustomCommonUtil.parseDateStringToLocalDate(SQLUtil.dateFormat(poController.CheckPayments().getModel().getCheckDate(), SQLUtil.FORMAT_SHORT_DATE)));
         tfCheckAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Master().getTransactionTotal(), true));
         taRemarks.setText(poController.Master().getRemarks());
         if (transactionNos.size() > 1) {
@@ -221,23 +221,23 @@ public class CheckAssignmentController implements Initializable {
                         case "tfDVNo":
                             break;
                         case "tfCheckNo":
-//                            if (lsValue != null && lsValue.matches("\\d+")) { 
-                            /* 1. Check duplicates ­-- but skip if it’s the same number that was already stored on this very transaction      */
-                            // Only bother calling the DB if the user actually changed the value                               
-
-                            //Allow editing
-                            if (!lsValue.equals(originalCheckNo)) {
-                                poJSON = poController.existCheckNo(lsValue);
-                                if ("error".equals((String) poJSON.get("result"))) {
-                                    ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-                                    break;
+                            if (lsValue != null && lsValue.matches("\\d+")) {
+                                /* 1. Check duplicates ­-- but skip if it’s the same number that was already stored on this very transaction      */
+                                // Only bother calling the DB if the user actually changed the value                               
+                                //Allow editing
+                                if (!lsValue.equals(originalCheckNo)) {
+                                    poJSON = poController.existCheckNo(lsValue);
+                                    if ("error".equals((String) poJSON.get("result"))) {
+                                        ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                                        break;
+                                    }
                                 }
+                                poController.CheckPayments().getModel().setCheckNo(lsValue);
+                                loadRecordMaster();
+                            } else {
+                                ShowMessageFX.Warning(null, pxeModuleName, "Invalid check number format.");
+                                tfCheckNo.requestFocus();
                             }
-                            loadRecordMaster();
-//                            } else {
-//                                ShowMessageFX.Warning(null, pxeModuleName, "Invalid check number format.");
-//                                tfCheckNo.requestFocus();
-//                            }
                             break;
                     }
                 } catch (Exception ex) {
@@ -249,7 +249,11 @@ public class CheckAssignmentController implements Initializable {
             (lsID, lsValue) -> {
                 switch (lsID) {
                     case "taRemarks":
-                        poController.Master().setRemarks(lsValue);
+                        poJSON = poController.Master().setRemarks(lsValue);
+                        if(!JFXUtil.isJSONSuccess(poJSON)){
+                            ShowMessageFX.Information(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
+                        }
+                        loadRecordMaster();
                         break;
                 }
             });
@@ -271,8 +275,12 @@ public class CheckAssignmentController implements Initializable {
                 return;
             }
             switch (datePicker.getId()) {
-                case "dpDVDateFrom":
-//                    poController.CheckPayments().getModel().setCheckDate((SQLUtil.toDate(lsSelectedDate, SQLUtil.FORMAT_SHORT_DATE)));
+                case "dpCheckDate":
+                   poJSON = poController.CheckPayments().getModel().setCheckDate((SQLUtil.toDate(lsSelectedDate, SQLUtil.FORMAT_SHORT_DATE)));
+                   if(!JFXUtil.isJSONSuccess(poJSON)){
+                       ShowMessageFX.Information(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
+                   }
+                   loadRecordMaster();
                     break;
                 default:
                     break;
