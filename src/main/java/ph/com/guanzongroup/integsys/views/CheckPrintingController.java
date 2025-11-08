@@ -632,6 +632,11 @@ public class CheckPrintingController implements Initializable, ScreenInterface {
         try {
             stageAssignment.showDialog((Stage) AnchorMain.getScene().getWindow(), getClass().getResource("/ph/com/guanzongroup/integsys/views/CheckAssignment.fxml"), controller,
                     "Check Assignment Dialog", true, false, false);
+            stageAssignment.setOnHidden(event -> {
+                retrieveDisbursement();
+                loadTableMain.reload();
+            });
+
         } catch (IOException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
         }
