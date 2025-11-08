@@ -463,13 +463,13 @@ public class AccountsAccreditation_HistoryController implements Initializable, S
         }
 
         if ("success".equalsIgnoreCase(result)) {
-            if (message != null && !message.trim().isEmpty()) {
-                if (Platform.isFxApplicationThread()) {
-                    ShowMessageFX.Information(null, psFormName, fsModule + ": " + message);
-                } else {
-                    Platform.runLater(() -> ShowMessageFX.Information(null, psFormName, fsModule + ": " + message));
-                }
-            }
+//            if (message != null && !message.trim().isEmpty()) {
+//                if (Platform.isFxApplicationThread()) {
+//                    ShowMessageFX.Information(null, psFormName, fsModule + ": " + message);
+//                } else {
+//                    Platform.runLater(() -> ShowMessageFX.Information(null, psFormName, fsModule + ": " + message));
+//                }
+//            }
             poLogWrapper.info(psFormName + " : Success on " + fsModule);
             return true;
         }
