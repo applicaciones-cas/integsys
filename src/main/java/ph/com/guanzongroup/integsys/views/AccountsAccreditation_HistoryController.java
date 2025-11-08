@@ -311,8 +311,15 @@ public class AccountsAccreditation_HistoryController implements Initializable, S
             tfCategory.setText(poAppController.getModel().Category().getDescription());
             tfCompany.setText(poAppController.getModel().Client().getCompanyName());
             tfContactPerson.setText(poAppController.getModel().ClientInstitutionContact().getContactPersonName());
-            tfAddress.setText(poAppController.getModel().ClientAddress().getAddress());
-            tfTIN.setText(poAppController.getModel().Client().getTaxIdNumber());
+            
+            String lshouseno = poAppController.getModel().ClientAddress().getHouseNo() == null || poAppController.getModel().ClientAddress().getHouseNo().isEmpty() ? "" : poAppController.getModel().ClientAddress().getHouseNo() + " ";
+            String lsaddress = poAppController.getModel().ClientAddress().getAddress() == null || poAppController.getModel().ClientAddress().getAddress().isEmpty() ? "" : poAppController.getModel().ClientAddress().getAddress();
+            String lsbrgy = poAppController.getModel().ClientAddress().Barangay().getBarangayName() == null || poAppController.getModel().ClientAddress().Barangay().getBarangayName().isEmpty() ? "" : ", " + poAppController.getModel().ClientAddress().Barangay().getBarangayName();
+            String lscity = poAppController.getModel().ClientAddress().Town().getDescription() == null || poAppController.getModel().ClientAddress().Town().getDescription().isEmpty() ? " " : ", " + poAppController.getModel().ClientAddress().Town().getDescription();
+            String lsprovince = poAppController.getModel().ClientAddress().Town().Province().getDescription() == null || poAppController.getModel().ClientAddress().Town().Province().getDescription().isEmpty() ? " " : " " + poAppController.getModel().ClientAddress().Town().Province().getDescription();
+            
+            tfAddress.setText( lshouseno + lsaddress + lsbrgy + lscity + lsprovince);
+            
             taRemarks.setText(poAppController.getModel().getRemarks());
             cmbAccountType.getSelectionModel().select(Integer.parseInt(poAppController.getModel().getAccountType()));
             cmbTransType.getSelectionModel().select(Integer.parseInt(poAppController.getModel().getTransactionType()));
@@ -456,13 +463,13 @@ public class AccountsAccreditation_HistoryController implements Initializable, S
         }
 
         if ("success".equalsIgnoreCase(result)) {
-            if (message != null && !message.trim().isEmpty()) {
-                if (Platform.isFxApplicationThread()) {
-                    ShowMessageFX.Information(null, psFormName, fsModule + ": " + message);
-                } else {
-                    Platform.runLater(() -> ShowMessageFX.Information(null, psFormName, fsModule + ": " + message));
-                }
-            }
+//            if (message != null && !message.trim().isEmpty()) {
+//                if (Platform.isFxApplicationThread()) {
+//                    ShowMessageFX.Information(null, psFormName, fsModule + ": " + message);
+//                } else {
+//                    Platform.runLater(() -> ShowMessageFX.Information(null, psFormName, fsModule + ": " + message));
+//                }
+//            }
             poLogWrapper.info(psFormName + " : Success on " + fsModule);
             return true;
         }
