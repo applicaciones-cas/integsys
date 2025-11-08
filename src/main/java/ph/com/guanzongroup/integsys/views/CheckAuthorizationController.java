@@ -519,7 +519,7 @@ public class CheckAuthorizationController implements Initializable, ScreenInterf
         controller.setTransaction(fsTransactionNo);
         try {
             stageDV.showDialog((Stage) AnchorMain.getScene().getWindow(), getClass().getResource("/ph/com/guanzongroup/integsys/views/DisbursementVoucher_View.fxml"), controller,
-                    "Disbursement Dialog", true, false, false);
+                    "Disbursement Dialog", true, true, false);
         } catch (IOException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
         }
