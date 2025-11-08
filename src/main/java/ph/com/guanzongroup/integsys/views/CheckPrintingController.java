@@ -13,6 +13,8 @@ import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
@@ -200,11 +202,44 @@ public class CheckPrintingController implements Initializable, ScreenInterface {
                 }, 1);//starts 0,1,2 
     }
 
+    public static Date getFirstDayOfMonth(Date date) {
+        if (date == null) {
+            return null;
+        }
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
+
+        // Set to first day of the same month and year
+        calendar.set(Calendar.DAY_OF_MONTH, 1);
+
+        // Optional: Reset time to start of the day
+        calendar.set(Calendar.HOUR_OF_DAY, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        calendar.set(Calendar.MILLISECOND, 0);
+
+        return calendar.getTime();
+    }
+
     private void loadRecordSearch() {
         try {
             lblSource.setText(poController.Master().Company().getCompanyName() + " - " + poController.Master().Industry().getDescription());
             tfSearchBankName.setText(poController.CheckPayments().getModel().Banks().getBankName() != null ? poController.CheckPayments().getModel().Banks().getBankName() : "");
             tfSearchBankAccount.setText(poController.CheckPayments().getModel().Bank_Account_Master().getAccountNo() != null ? poController.CheckPayments().getModel().Bank_Account_Master().getAccountNo() : "");
+
+            //define if both are empty
+            if (dpDVDateFrom.getEditor().getText().equals("")) {
+                String lsDateFrom = CustomCommonUtil.formatDateToShortString(getFirstDayOfMonth(oApp.getServerDate()));
+                JFXUtil.setDateValue(dpDVDateFrom, CustomCommonUtil.parseDateStringToLocalDate(lsDateFrom, "yyyy-MM-dd"));
+                psSearchDVDateFrom = CustomCommonUtil.formatLocalDateToShortString(CustomCommonUtil.parseDateStringToLocalDate(lsDateFrom, "yyyy-MM-dd"));
+            }
+            if (dpDVDateTo.getEditor().getText().equals("")) {
+                String lsDateTo = CustomCommonUtil.formatDateToShortString(oApp.getServerDate());
+                JFXUtil.setDateValue(dpDVDateTo, CustomCommonUtil.parseDateStringToLocalDate(lsDateTo, "yyyy-MM-dd"));
+                psSearchDVDateTo = CustomCommonUtil.formatLocalDateToShortString(CustomCommonUtil.parseDateStringToLocalDate(lsDateTo, "yyyy-MM-dd"));
+            }
+
             JFXUtil.updateCaretPositions(apBrowse);
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
@@ -274,7 +309,7 @@ public class CheckPrintingController implements Initializable, ScreenInterface {
                         break;
                     }
                     checkedItems.add(lsDVNO);
-                    System.out.println("check items : " + checkedItems.get(checkedItems.size()-1));
+                    System.out.println("check items : " + checkedItems.get(checkedItems.size() - 1));
                 }
             }
             if (!allSameBank) {
@@ -359,44 +394,50 @@ public class CheckPrintingController implements Initializable, ScreenInterface {
             });
 
     private void datepicker_Action(ActionEvent event) {
-        poJSON = new JSONObject();
-        JFXUtil.setJSONSuccess(poJSON, "success");
-        Object source = event.getSource();
-        if (source instanceof DatePicker) {
-            LocalDate dateNow = LocalDate.now();
-            DatePicker datePicker = (DatePicker) source;
-            String inputText = datePicker.getEditor().getText();
-            if (inputText == null || "".equals(inputText) || "01/01/1900".equals(inputText)) {
-                return;
+        try {
+
+            poJSON = new JSONObject();
+            JFXUtil.setJSONSuccess(poJSON, "success");
+            Object source = event.getSource();
+            if (source instanceof DatePicker) {
+                LocalDate dateNow = LocalDate.now();
+                DatePicker datePicker = (DatePicker) source;
+                String inputText = datePicker.getEditor().getText();
+                if (inputText == null || "".equals(inputText) || "01/01/1900".equals(inputText)) {
+                    return;
+                }
+                switch (datePicker.getId()) {
+                    case "dpDVDateFrom":
+                        LocalDate selectedFromDate = dpDVDateFrom.getValue();
+                        LocalDate toDate = dpDVDateTo.getValue();
+                        if (toDate != null && selectedFromDate.isAfter(toDate)) {
+                            ShowMessageFX.Warning(null, pxeModuleName, "Invalid Date, The 'From' date cannot be after the 'To' date.");
+                            String lsDateFrom = CustomCommonUtil.formatDateToShortString(getFirstDayOfMonth(oApp.getServerDate()));
+                            dpDVDateFrom.setValue(CustomCommonUtil.parseDateStringToLocalDate(lsDateFrom, "yyyy-MM-dd"));
+                            psSearchDVDateFrom = CustomCommonUtil.formatDateToShortString(getFirstDayOfMonth(oApp.getServerDate()));
+                            return;
+                        }
+                        psSearchDVDateFrom = CustomCommonUtil.formatLocalDateToShortString(selectedFromDate);
+                        retrieveDisbursement();
+                        break;
+                    case "dpDVDateTo":
+                        LocalDate selectedToDate = dpDVDateTo.getValue();
+                        LocalDate fromDate = dpDVDateFrom.getValue();
+                        if (fromDate != null && selectedToDate.isBefore(fromDate)) {
+                            ShowMessageFX.Warning(null, pxeModuleName, "Invalid Date, The 'To' date cannot be before the 'From' date.");
+                            dpDVDateTo.setValue(CustomCommonUtil.parseDateStringToLocalDate(dateNow.toString()));
+                            psSearchDVDateTo = CustomCommonUtil.formatLocalDateToShortString(dateNow);
+                            return;
+                        }
+                        psSearchDVDateTo = CustomCommonUtil.formatLocalDateToShortString(selectedToDate);
+                        retrieveDisbursement();
+                        break;
+                    default:
+                        break;
+                }
             }
-            switch (datePicker.getId()) {
-                case "dpDVDateFrom":
-                    LocalDate selectedFromDate = dpDVDateFrom.getValue();
-                    LocalDate toDate = dpDVDateTo.getValue();
-                    if (toDate != null && selectedFromDate.isAfter(toDate)) {
-                        ShowMessageFX.Warning("Invalid Date, The 'From' date cannot be after the 'To' date.", pxeModuleName, null);
-                        dpDVDateFrom.setValue(CustomCommonUtil.parseDateStringToLocalDate(dateNow.toString()));
-                        psSearchDVDateFrom = CustomCommonUtil.formatLocalDateToShortString(dateNow);
-                        return;
-                    }
-                    psSearchDVDateFrom = CustomCommonUtil.formatLocalDateToShortString(selectedFromDate);
-                    retrieveDisbursement();
-                    break;
-                case "dpDVDateTo":
-                    LocalDate selectedToDate = dpDVDateTo.getValue();
-                    LocalDate fromDate = dpDVDateFrom.getValue();
-                    if (fromDate != null && selectedToDate.isBefore(fromDate)) {
-                        ShowMessageFX.Warning("Invalid Date, The 'To' date cannot be before the 'From' date.", pxeModuleName, null);
-                        dpDVDateTo.setValue(CustomCommonUtil.parseDateStringToLocalDate(dateNow.toString()));
-                        psSearchDVDateTo = CustomCommonUtil.formatLocalDateToShortString(dateNow);
-                        return;
-                    }
-                    psSearchDVDateTo = CustomCommonUtil.formatLocalDateToShortString(selectedToDate);
-                    retrieveDisbursement();
-                    break;
-                default:
-                    break;
-            }
+        } catch (SQLException ex) {
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
         }
     }
 
@@ -452,8 +493,14 @@ public class CheckPrintingController implements Initializable, ScreenInterface {
 
     private void retrieveDisbursement() {
         try {
-            //TODO ayusin nalang yung pag pass ng date
-            poJSON = poController.loadCheckPrintTransactionList(tfSearchBankName.getText(), tfSearchBankAccount.getText(), "2025-11-01", "2025-11-31"); 
+//            dpDVDateFrom.getse, dpDVDateTo
+            if (dpDVDateFrom.getEditor().getText().equals("") || dpDVDateTo.getEditor().getText().equals("")) {
+                ShowMessageFX.Warning(null, pxeModuleName, "Please select both the From and To dates to retrieve/reload the disbursement records.");
+                loadRecordSearch();
+                return;
+            }
+
+            poJSON = poController.loadCheckPrintTransactionList(tfSearchBankName.getText(), tfSearchBankAccount.getText(), psSearchDVDateFrom, psSearchDVDateTo);
             if ("error".equals(poJSON.get("result"))) {
                 ShowMessageFX.Error(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
             } else {

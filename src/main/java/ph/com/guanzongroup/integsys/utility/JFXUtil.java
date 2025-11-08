@@ -2608,6 +2608,7 @@ public class JFXUtil {
             textField.textProperty().removeListener(searchListener);
         }
     }
+
     /*Gets Node id and returns string English format of the id*/
     public static String IDToWord(String id) {
         if (id == null || id.isEmpty()) {
@@ -2672,5 +2673,18 @@ public class JFXUtil {
         SOURCE_MAP.put("PORc", "PO Receiving");
         SOURCE_MAP.put("APAd", "AP Adjustment");
         SOURCE_MAP.put("PO", "Purchase Order");
+    }
+
+    public static void setDateValue(DatePicker datePicker, LocalDate value) {
+        if (datePicker == null) {
+            return;
+        }
+        EventHandler<ActionEvent> originalHandler = datePicker.getOnAction();
+        try {
+            datePicker.setOnAction(null);
+            datePicker.setValue(value);
+        } finally {
+            datePicker.setOnAction(originalHandler);
+        }
     }
 }
