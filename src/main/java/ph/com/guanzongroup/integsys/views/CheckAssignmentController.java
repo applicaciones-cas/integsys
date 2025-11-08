@@ -30,11 +30,7 @@ import org.guanzon.appdriver.base.GuanzonException;
 import org.guanzon.appdriver.base.SQLUtil;
 import org.guanzon.appdriver.constant.EditMode;
 import org.json.simple.JSONObject;
-import ph.com.guanzongroup.cas.cashflow.CheckPrinting;
 import ph.com.guanzongroup.cas.cashflow.DisbursementVoucher;
-import ph.com.guanzongroup.cas.cashflow.services.CashflowControllers;
-import ph.com.guanzongroup.cas.cashflow.status.CheckStatus;
-import ph.com.guanzongroup.cas.cashflow.status.DisbursementStatic;
 
 public class CheckAssignmentController implements Initializable {
 
@@ -89,11 +85,9 @@ public class CheckAssignmentController implements Initializable {
             initButtonsClickActions();
             initTextFields();
             initDatePicker();
-            initFields(pnEditMode);
             initButton(pnEditMode);
             if (transactionNos != null && !transactionNos.isEmpty()) {
                 loadTransaction(currentTransactionIndex);
-                initFields(pnEditMode);
                 initButton(pnEditMode);
             }
         } catch (Exception ex) {
@@ -101,13 +95,7 @@ public class CheckAssignmentController implements Initializable {
         }
     }
 
-    private void loadRecordMaster(){
-        String initialCheckNo = "";
-        boolean fromBankAccount = false;
-        tfDVNo.setText(poController.Master().getTransactionNo());
-        if (transactionNos.size() > 1) {
-            chbkApplyToAll.setSelected(true);
-        }
+    private void loadRecordMaster() {
         //        if (poController.Master().CheckPayments().getCheckNo().isEmpty()) {
 //            initialCheckNo = poController.CheckPayments().getModel().Bank_Account_Master().getCheckNo();
 //            fromBankAccount = true;
@@ -139,10 +127,15 @@ public class CheckAssignmentController implements Initializable {
 ////            poController.BankAccountLedger().getModel().setSourceNo(formatted);
 //
 //        }
+        JFXUtil.setDisabled(false, dpCheckDate);
+        tfDVNo.setText(poController.Master().getTransactionNo());
         tfCheckNo.setText(poController.CheckPayments().getModel().getCheckNo());
         dpCheckDate.setValue(CustomCommonUtil.parseDateStringToLocalDate(SQLUtil.dateFormat(poController.Master().getTransactionDate(), SQLUtil.FORMAT_SHORT_DATE)));
         tfCheckAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Master().getTransactionTotal(), true));
         taRemarks.setText(poController.Master().getRemarks());
+        if (transactionNos.size() > 1) {
+            chbkApplyToAll.setSelected(true);
+        }
     }
 
     private void initButtonsClickActions() {
@@ -187,28 +180,9 @@ public class CheckAssignmentController implements Initializable {
                     ShowMessageFX.Warning("Unknown button action.", pxeModuleName, null);
                     break;
             }
-            initFields(pnEditMode);
             initButton(pnEditMode);
         } catch (Exception ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
-        }
-    }
-
-    private void txtField_KeyPressed(KeyEvent event) {
-        TextArea txtArea = (TextArea) event.getSource();
-        switch (event.getCode()) {
-            case TAB:
-            case ENTER:
-            case DOWN:
-                CommonUtils.SetNextFocus(txtArea);
-                event.consume();
-                break;
-            case UP:
-                CommonUtils.SetPreviousFocus(txtArea);
-                event.consume();
-                break;
-            default:
-                break;
         }
     }
 
@@ -218,10 +192,10 @@ public class CheckAssignmentController implements Initializable {
         if (source instanceof CheckBox) {
             CheckBox checkedBox = (CheckBox) source;
             switch (checkedBox.getId()) {
-                case "chbkApplyToAll": // this is the id
-                    //            if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
-//                poController.Master().setBankPrint(chbkApplyToAll.isSelected() ? "1" : "0");
-//            }
+                case "chbkApplyToAll":
+                    if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
+                        poController.Master().setBankPrint(chbkApplyToAll.isSelected() ? "1" : "0");
+                    }
                     break;
             }
         }
@@ -231,8 +205,8 @@ public class CheckAssignmentController implements Initializable {
         JFXUtil.setFocusListener(txtArea_Focus, taRemarks);
         JFXUtil.setFocusListener(txtMaster_Focus, tfDVNo, tfCheckNo);
 
-        JFXUtil.setKeyPressedListener(this::txtField_KeyPressed, apMaster);
         JFXUtil.setCommaFormatter(tfCheckAmount);
+        JFXUtil.inputIntegersOnly(tfCheckNo);
     }
 
     private void initDatePicker() {
@@ -247,24 +221,23 @@ public class CheckAssignmentController implements Initializable {
                         case "tfDVNo":
                             break;
                         case "tfCheckNo":
-                            if (lsValue != null && lsValue.matches("\\d+")) {
-                                /* 1. Check duplicates ­-- but skip if it’s the same number that was already stored on this very transaction      */
-                                // Only bother calling the DB if the user actually changed the value
-                                if (!lsValue.equals(originalCheckNo)) {
-                                    poJSON = poController.existCheckNo(lsValue);
-                                    if ("error".equals((String) poJSON.get("result"))) {
-                                        ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-                                        return;
-                                    }
+//                            if (lsValue != null && lsValue.matches("\\d+")) { 
+                            /* 1. Check duplicates ­-- but skip if it’s the same number that was already stored on this very transaction      */
+                            // Only bother calling the DB if the user actually changed the value                               
+
+                            //Allow editing
+                            if (!lsValue.equals(originalCheckNo)) {
+                                poJSON = poController.existCheckNo(lsValue);
+                                if ("error".equals((String) poJSON.get("result"))) {
+                                    ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                                    break;
                                 }
-                                
-                                Platform.runLater(() -> {
-                                    loadRecordMaster();
-                                });
-                            } else {
-                                ShowMessageFX.Warning(null, pxeModuleName, "Invalid check number format.");
-                                tfCheckNo.requestFocus();
                             }
+                            loadRecordMaster();
+//                            } else {
+//                                ShowMessageFX.Warning(null, pxeModuleName, "Invalid check number format.");
+//                                tfCheckNo.requestFocus();
+//                            }
                             break;
                     }
                 } catch (Exception ex) {
@@ -311,13 +284,9 @@ public class CheckAssignmentController implements Initializable {
         JFXUtil.clearTextFields(apMaster);
     }
 
-    private void initFields(int fnEditMode) {
-        boolean lbShow = (fnEditMode == EditMode.UPDATE);
-        JFXUtil.setDisabled(!lbShow, apMaster);
-    }
-
     private void initButton(int fnEditMode) {
         boolean lbShow = (fnEditMode == EditMode.UPDATE);
+        JFXUtil.setDisabled(!lbShow, apMaster);
         JFXUtil.setButtonsVisibility(lbShow, btnAssign);
     }
 
@@ -365,14 +334,14 @@ public class CheckAssignmentController implements Initializable {
         }
     }
 
-    private void loadTransaction(int index){
+    private void loadTransaction(int index) {
         try {
             if (index >= transactionNos.size()) {
                 ShowMessageFX.Information(null, pxeModuleName, "All transactions have been processed.");
                 CommonUtils.closeStage(btnClose);
                 return;
             }
-            
+
             psTransactionNo = transactionNos.get(index);
             poJSON = poController.OpenTransaction(psTransactionNo);
             if (!"success".equals((String) poJSON.get("result"))) {
@@ -383,7 +352,7 @@ public class CheckAssignmentController implements Initializable {
             poJSON = poController.UpdateTransaction();
             if (!"error".equals((String) poJSON.get("result"))) {
                 poJSON = poController.populateCheckNo();
-                if ("error".equals((String) poJSON.get("result"))){
+                if ("error".equals((String) poJSON.get("result"))) {
                     ShowMessageFX.Warning((String) poJSON.get("message"), pxeModuleName, null);
                     return;
                 }

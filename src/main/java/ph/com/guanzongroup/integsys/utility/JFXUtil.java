@@ -1427,7 +1427,15 @@ public class JFXUtil {
             });
         }
     }
-
+     /*Alternative version of inputDecimalOnly; commas not allowed*/
+    public static void inputIntegersOnly(TextField... foTxtFields) {
+        Pattern pattern = Pattern.compile("[0-9]*");
+        for (TextField txtField : foTxtFields) {
+            if (txtField != null) {
+                txtField.setTextFormatter(new TextFormaterUtil(pattern));
+            }
+        }
+    }
     /*Alternative version of inputDecimalOnly; restricts to 1 dot, commas not allowed*/
     public static void inputDecimalOnly(TextField... foTxtFields) {
         Pattern pattern = Pattern.compile("\\d*(\\.\\d*)?");
