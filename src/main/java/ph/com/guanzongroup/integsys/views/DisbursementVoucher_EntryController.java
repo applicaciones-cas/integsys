@@ -396,8 +396,6 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                     poJSON = poController.OpenTransaction(poController.Master().getTransactionNo());
                     if ("success".equals(poJSON.get("result"))) {
                         pnEditMode = poController.getEditMode();
-                        loadTableDetail.reload();
-                        initButton(pnEditMode);
                     }
                     if (pnEditMode == EditMode.READY) {
                         if (ShowMessageFX.YesNo(null, pxeModuleName, "Do you want to verify this transaction?")) {

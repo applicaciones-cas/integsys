@@ -353,10 +353,6 @@ public class DisbursementVoucher_VerificationController implements Initializable
                         }
                     }
                     pnEditMode = poController.getEditMode();
-                    loadTableDetail.reload();
-                    loadRecordDetail();
-                    loadTableMain.reload();
-                    pagination.toBack();
                     break;
                 case "btnCancel":
                     if (ShowMessageFX.OkayCancel(null, pxeModuleName, "Do you want to disregard changes?")) {
