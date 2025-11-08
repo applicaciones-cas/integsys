@@ -297,6 +297,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                 JFXUtil.clickTabByTitleText(tabPanePaymentMode, "Check");
                 break;
         }
+        initButton(pnEditMode);
     }
 
     private void initButtonsClickActions() {
@@ -362,7 +363,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                     if (!ShowMessageFX.YesNo(null, pxeModuleName, "Are you sure you want to save the transaction?")) {
                         return;
                     }
-                  
+
                     poJSON = poController.validateTAXandVat();
                     if ("error".equals((String) poJSON.get("result"))) {
                         ShowMessageFX.Information(null, pxeModuleName, (String) poJSON.get("message"));

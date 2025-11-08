@@ -250,6 +250,7 @@ public class DisbursementVoucher_HistoryController implements Initializable, Scr
                 JFXUtil.clickTabByTitleText(tabPanePaymentMode, "Check");
                 break;
         }
+        initButton(pnEditMode);
     }
 
     private void initButtonsClickActions() {
@@ -701,7 +702,6 @@ public class DisbursementVoucher_HistoryController implements Initializable, Scr
             dpCheckDate.setValue(poController.CheckPayments().getModel().getCheckDate() != null
                     ? CustomCommonUtil.parseDateStringToLocalDate(SQLUtil.dateFormat(poController.CheckPayments().getModel().getCheckDate(), SQLUtil.FORMAT_SHORT_DATE))
                     : null);
-            JFXUtil.setDisabled(JFXUtil.isObjectEqualTo(poController.CheckPayments().getModel().getCheckNo(), null, ""), dpCheckDate);
             tfCheckAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.CheckPayments().getModel().getAmount(), true));
             chbkIsCrossCheck.setSelected(JFXUtil.isObjectEqualTo(poController.CheckPayments().getModel().isCross(), null, "") ? false : poController.CheckPayments().getModel().isCross());
             chbkIsPersonOnly.setSelected(JFXUtil.isObjectEqualTo(poController.CheckPayments().getModel().isPayee(), null, "") ? false : poController.CheckPayments().getModel().isPayee());
@@ -721,27 +721,6 @@ public class DisbursementVoucher_HistoryController implements Initializable, Scr
 
             tfAuthorizedPerson.setText(poController.CheckPayments().getModel().getAuthorize() != null ? poController.CheckPayments().getModel().getAuthorize() : "");
             JFXUtil.setCmbValue(cmbCheckStatus, !poController.CheckPayments().getModel().getTransactionStatus().equals("") ? Integer.valueOf(poController.CheckPayments().getModel().getTransactionStatus()) : -1);
-
-            if (poController.Master().getBankPrint().equals(Logical.YES)) {
-                JFXUtil.setDisabled(false, cmbPayeeType, cmbDisbursementMode);
-            } else {
-                JFXUtil.setDisabled(true, cmbPayeeType, cmbDisbursementMode);
-            }
-
-            if (poController.Master().getBankPrint().equals(Logical.YES)
-                    && poController.CheckPayments().getModel().getDesbursementMode().equals("1")) {
-                JFXUtil.setDisabled(false, cmbClaimantType);
-            } else {
-                JFXUtil.setDisabled(true, cmbClaimantType);
-            }
-
-            if (poController.Master().getBankPrint().equals(Logical.YES)
-                    && poController.CheckPayments().getModel().getDesbursementMode().equals("1")
-                    && poController.CheckPayments().getModel().getClaimant().equals("0")) {
-                JFXUtil.setDisabled(false, tfAuthorizedPerson);
-            } else {
-                JFXUtil.setDisabled(true, tfAuthorizedPerson);
-            }
 
             JFXUtil.updateCaretPositions(apMasterDVCheck);
         } catch (SQLException | GuanzonException ex) {

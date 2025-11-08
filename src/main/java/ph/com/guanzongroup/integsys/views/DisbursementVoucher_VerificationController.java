@@ -285,6 +285,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
                 JFXUtil.clickTabByTitleText(tabPanePaymentMode, "Check");
                 break;
         }
+        initButton(pnEditMode);
     }
 
     private void initButtonsClickActions() {
@@ -1454,8 +1455,8 @@ public class DisbursementVoucher_VerificationController implements Initializable
             }
             JFXUtil.setStatusValue(lblDVTransactionStatus, DisbursementStatic.class, pnEditMode == EditMode.UNKNOWN ? "-1" : poController.Master().getTransactionStatus());
             JFXUtil.setDisabled(true, tfSupplier);
-            JFXUtil.setDisabled( poController.Master().getTransactionStatus() != DisbursementStatic.OPEN, btnVoid);
-            JFXUtil.setDisabled( poController.Master().getTransactionStatus() != DisbursementStatic.VERIFIED, btnDVCancel);
+            JFXUtil.setDisabled(poController.Master().getTransactionStatus() != DisbursementStatic.OPEN, btnVoid);
+            JFXUtil.setDisabled(poController.Master().getTransactionStatus() != DisbursementStatic.VERIFIED, btnDVCancel);
 
             tfDVTransactionNo.setText(poController.Master().getTransactionNo() != null ? poController.Master().getTransactionNo() : "");
             dpDVTransactionDate.setValue(CustomCommonUtil.parseDateStringToLocalDate(SQLUtil.dateFormat(poController.Master().getTransactionDate(), SQLUtil.FORMAT_SHORT_DATE)));
