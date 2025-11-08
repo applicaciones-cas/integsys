@@ -22,8 +22,10 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
+import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
@@ -1144,7 +1146,7 @@ public class InventoryParamController implements Initializable, ScreenInterface 
         boolean lbShow = (fnEditMode == EditMode.ADDNEW || fnEditMode == EditMode.UPDATE);
 
         // Always show these buttons
-        initButtonControls(true, "btnRetrieve", "btnHistory", "btnClose");
+        initButtonControls(true, "btnClose");
 
         // Show-only based on mode
         initButtonControls(lbShow, "btnSearch", "btnSave", "btnCancel");
@@ -1351,4 +1353,5 @@ public class InventoryParamController implements Initializable, ScreenInterface 
         }
         return controls;
     }
+
 }
