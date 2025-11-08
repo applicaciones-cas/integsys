@@ -144,9 +144,9 @@
                     <center>
                         <AnchorPane maxWidth="1560.0" BorderPane.alignment="CENTER_LEFT">
                             <children>
-                                <HBox spacing="5.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="5.0">
+                                <HBox spacing="5.0" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="5.0">
                                     <children>
-                                        <AnchorPane style="-fx-border-color: orange;">
+                                        <AnchorPane style="-fx-border-color: #FF8201;">
                                             <children>
                                                 <GridPane AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                                     <columnConstraints>
