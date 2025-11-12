@@ -142,6 +142,21 @@ public class AccountsAccreditation_EntryController implements Initializable, Scr
                     }
 
                     switch (lastFocusedControl.getId()) {
+                        
+                        case "tfSearchCompany":
+                            if (!(tfTransactionNo.getText() == null ? "" : tfTransactionNo.getText()).isEmpty()) {
+                                if (ShowMessageFX.OkayCancel(null, "Search Client! by ID", "Are you sure you want replace loaded Record?") == false) {
+                                        return;
+                                    }
+                            }
+                            if (!isJSONSuccess(poAppController.searchRecord(tfSearchCompany.getText(), false),
+                                    "")) {
+                                return;
+                            }
+
+                            getLoadedClient();
+                            initButtonDisplay(poAppController.getEditMode());
+                            return;
 
                         case "tfCategory":
                             if (!isJSONSuccess(poAppController.searchCategory(tfCategory.getText() == null ? "" : tfCategory.getText(), false),
@@ -159,20 +174,12 @@ public class AccountsAccreditation_EntryController implements Initializable, Scr
                             getLoadedClient();
                             initButtonDisplay(poAppController.getEditMode());
                             break;
-                        case "tfContactPerson":
-                            if (!isJSONSuccess(poAppController.searchClientContact(tfContactPerson.getText(), false),
-                                    "Initialize Search Client Contact! ")) {
-                                return;
-                            }
-                            getLoadedClient();
-                            initButtonDisplay(poAppController.getEditMode());
-                            break;
 
                     }
                     break;
 
                 case "btnBrowse":
-                    if (!tfTransactionNo.getText().isEmpty()) {
+                    if (!(tfTransactionNo.getText() == null ? "" : tfTransactionNo.getText()).isEmpty()) {
                         if (ShowMessageFX.OkayCancel(null, "Search Client! by ID", "Are you sure you want replace loaded Record?") == false) {
                             return;
                         }
@@ -191,7 +198,7 @@ public class AccountsAccreditation_EntryController implements Initializable, Scr
                         ShowMessageFX.Information("Please load record before proceeding..", psFormName, "");
                         return;
                     }
-                    poAppController.openRecord(poAppController.getModel().getClientId());
+                    //poAppController.openRecord(poAppController.getModel().getClientId());
                     if (!isJSONSuccess(poAppController.updateRecord(), "Initialize Update Record")) {
                         return;
                     }
@@ -264,6 +271,7 @@ public class AccountsAccreditation_EntryController implements Initializable, Scr
             initButtonDisplay(poAppController.getEditMode());
 
         } catch (Exception e) {
+            e.printStackTrace();
             poLogWrapper.severe(psFormName + " :" + e.getMessage());
         }
     }
@@ -304,7 +312,7 @@ public class AccountsAccreditation_EntryController implements Initializable, Scr
                     case F3:
                         switch (txtFieldID) {
                             case "tfSearchCompany":
-                                if (!tfTransactionNo.getText().isEmpty()) {
+                                if (!(tfTransactionNo.getText() == null ? "" : tfTransactionNo.getText()).isEmpty()) {
                                     if (ShowMessageFX.OkayCancel(null, "Search Client! by Name", "Are you sure you want replace loaded Record?") == false) {
                                         return;
                                     }
@@ -325,28 +333,20 @@ public class AccountsAccreditation_EntryController implements Initializable, Scr
                                 loadClientMaster();
                                 break;
                             case "tfCompany":
-                                if (!isJSONSuccess(poAppController.searchClient(tfCompany.getText(), false),
+                                JSONObject loJSONObject = poAppController.searchClient(tfCompany.getText() , false);
+                                if (!isJSONSuccess(loJSONObject,
                                         "Initialize Search Client! ")) {
                                     return;
                                 }
                                 getLoadedClient();
                                 initButtonDisplay(poAppController.getEditMode());
                                 break;
-
-                            case "tfContactPerson":
-                                if (!isJSONSuccess(poAppController.searchClientContact(tfContactPerson.getText(), false),
-                                        "Initialize Search Client Contact! ")) {
-                                    return;
-                                }
-                                getLoadedClient();
-                                initButtonDisplay(poAppController.getEditMode());
-                                break;
-
                         }
                         break;
                 }
             }
         } catch (Exception ex) {
+            ex.printStackTrace();
             poLogWrapper.severe(psFormName + " :" + ex.getMessage());
         }
     }
@@ -431,23 +431,33 @@ public class AccountsAccreditation_EntryController implements Initializable, Scr
 
     private void loadClientMaster() {
         try {
+            
             lblStatus.setText(poAppController.getModel().getRecordStatus().equals("0") == true ? "OPEN"
                     : poAppController.getModel().getRecordStatus().equals("1") == true ? "CONFIRMED"
                     : poAppController.getModel().getRecordStatus().equals("3") == true ? "CANCELLED" : "VOID");
             lblSource.setText("");
-
+            
             tfTransactionNo.setText(poAppController.getModel().getTransactionNo());
             dpTransactionDate.setValue(ParseDate(poAppController.getModel().getDateTransact()));
             tfCategory.setText(poAppController.getModel().Category().getDescription());
             tfCompany.setText(poAppController.getModel().Client().getCompanyName());
             tfContactPerson.setText(poAppController.getModel().ClientInstitutionContact().getContactPersonName());
-            tfAddress.setText(poAppController.getModel().ClientAddress().getAddress());
-            tfTIN.setText(poAppController.getModel().Client().getTaxIdNumber());
+            
+            String lshouseno = poAppController.getModel().ClientAddress().getHouseNo() == null || poAppController.getModel().ClientAddress().getHouseNo().isEmpty() ? "" : poAppController.getModel().ClientAddress().getHouseNo() + " ";
+            String lsaddress = poAppController.getModel().ClientAddress().getAddress() == null || poAppController.getModel().ClientAddress().getAddress().isEmpty() ? "" : poAppController.getModel().ClientAddress().getAddress();
+            String lsbrgy = poAppController.getModel().ClientAddress().Barangay().getBarangayName() == null || poAppController.getModel().ClientAddress().Barangay().getBarangayName().isEmpty() ? "" : ", " + poAppController.getModel().ClientAddress().Barangay().getBarangayName();
+            String lscity = poAppController.getModel().ClientAddress().Town().getDescription() == null || poAppController.getModel().ClientAddress().Town().getDescription().isEmpty() ? " " : ", " + poAppController.getModel().ClientAddress().Town().getDescription();
+            String lsprovince = poAppController.getModel().ClientAddress().Town().Province().getDescription() == null || poAppController.getModel().ClientAddress().Town().Province().getDescription().isEmpty() ? " " : " " + poAppController.getModel().ClientAddress().Town().Province().getDescription();
+            
+            tfAddress.setText( lshouseno + lsaddress + lsbrgy + lscity + lsprovince);
+            
+            tfTIN.setText(poAppController.getModel().Client().getTaxIdNumber() == null ? " " : poAppController.getModel().Client().getTaxIdNumber());
             taRemarks.setText(poAppController.getModel().getRemarks());
             cmbAccountType.getSelectionModel().select(Integer.parseInt(poAppController.getModel().getAccountType()));
             cmbTransType.getSelectionModel().select(Integer.parseInt(poAppController.getModel().getTransactionType()));
 
         } catch (SQLException | GuanzonException e) {
+            e.printStackTrace();
             poLogWrapper.severe(psFormName, e.getMessage());
         }
     }
@@ -575,7 +585,6 @@ public class AccountsAccreditation_EntryController implements Initializable, Scr
     }
 
     private void getLoadedClient() throws SQLException, GuanzonException, CloneNotSupportedException {
-//        clearAllInputs();
         loadClientMaster();
     }
 
@@ -598,13 +607,13 @@ public class AccountsAccreditation_EntryController implements Initializable, Scr
         }
 
         if ("success".equalsIgnoreCase(result)) {
-            if (message != null && !message.trim().isEmpty()) {
-                if (Platform.isFxApplicationThread()) {
-                    ShowMessageFX.Information(null, psFormName, fsModule + ": " + message);
-                } else {
-                    Platform.runLater(() -> ShowMessageFX.Information(null, psFormName, fsModule + ": " + message));
-                }
-            }
+//            if (message != null && !message.trim().isEmpty()) {
+//                if (Platform.isFxApplicationThread()) {
+//                    ShowMessageFX.Information(null, psFormName, fsModule + ": " + message);
+//                } else {
+//                    Platform.runLater(() -> ShowMessageFX.Information(null, psFormName, fsModule + ": " + message));
+//                }
+//            }
             poLogWrapper.info(psFormName + " : Success on " + fsModule);
             return true;
         }

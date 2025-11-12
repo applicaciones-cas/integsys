@@ -142,12 +142,27 @@ public class AccountsAccreditation_ConfirmationController implements Initializab
                     }
 
                     switch (lastFocusedControl.getId()) {
+                        
+                        case "tfSearchCompany":
+                            if (!(tfTransactionNo.getText() == null ? "" : tfTransactionNo.getText()).isEmpty()) {
+                                if (ShowMessageFX.OkayCancel(null, "Search Client! by ID", "Are you sure you want replace loaded Record?") == false) {
+                                        return;
+                                    }
+                            }
+                            if (!isJSONSuccess(poAppController.searchRecord(tfSearchCompany.getText(), false),
+                                    "")) {
+                                return;
+                            }
+
+                            getLoadedClient();
+                            initButtonDisplay(poAppController.getEditMode());
+                            return;
 
                         case "tfCategory":
                             if (!isJSONSuccess(poAppController.searchCategory(tfCategory.getText() == null ? "" : tfCategory.getText(), false),
                                     "Initialize Search Category! ")) {
                                 return;
-                            }
+                            } 
                             loadClientMaster();
                             break;
 
@@ -159,20 +174,21 @@ public class AccountsAccreditation_ConfirmationController implements Initializab
                             getLoadedClient();
                             initButtonDisplay(poAppController.getEditMode());
                             break;
-                        case "tfContactPerson":
-                            if (!isJSONSuccess(poAppController.searchClientContact(tfContactPerson.getText(), false),
-                                    "Initialize Search Client Contact! ")) {
-                                return;
-                            }
-                            getLoadedClient();
-                            initButtonDisplay(poAppController.getEditMode());
-                            break;
+ //disabled as its value should be autoset from attached supplier entry
+//                        case "tfContactPerson":
+//                            if (!isJSONSuccess(poAppController.searchClientContact(tfContactPerson.getText(), false),
+//                                    "Initialize Search Client Contact! ")) {
+//                                return;
+//                            }
+//                            getLoadedClient();
+//                            initButtonDisplay(poAppController.getEditMode());
+//                            break;
 
                     }
                     break;
 
                 case "btnBrowse":
-                    if (!tfTransactionNo.getText().isEmpty()) {
+                    if (!(tfTransactionNo.getText() == null ? "" : tfTransactionNo.getText()).isEmpty()) {
                         if (ShowMessageFX.OkayCancel(null, "Search Client! by ID", "Are you sure you want replace loaded Record?") == false) {
                             return;
                         }
@@ -191,7 +207,7 @@ public class AccountsAccreditation_ConfirmationController implements Initializab
                         ShowMessageFX.Information("Please load record before proceeding..", psFormName, "");
                         return;
                     }
-                    poAppController.openRecord(poAppController.getModel().getClientId());
+                    //poAppController.openRecord(poAppController.getModel().getClientId());
                     if (!isJSONSuccess(poAppController.updateRecord(), "Initialize Update Record")) {
                         return;
                     }
@@ -289,6 +305,7 @@ public class AccountsAccreditation_ConfirmationController implements Initializab
             initButtonDisplay(poAppController.getEditMode());
 
         } catch (Exception e) {
+            e.printStackTrace();
             poLogWrapper.severe(psFormName + " :" + e.getMessage());
         }
     }
@@ -329,7 +346,7 @@ public class AccountsAccreditation_ConfirmationController implements Initializab
                     case F3:
                         switch (txtFieldID) {
                             case "tfSearchCompany":
-                                if (!tfTransactionNo.getText().isEmpty()) {
+                                if (!(tfTransactionNo.getText() == null ? "" : tfTransactionNo.getText()).isEmpty()) {
                                     if (ShowMessageFX.OkayCancel(null, "Search Client! by Name", "Are you sure you want replace loaded Record?") == false) {
                                         return;
                                     }
@@ -358,14 +375,15 @@ public class AccountsAccreditation_ConfirmationController implements Initializab
                                 initButtonDisplay(poAppController.getEditMode());
                                 break;
 
-                            case "tfContactPerson":
-                                if (!isJSONSuccess(poAppController.searchClientContact(tfContactPerson.getText(), false),
-                                        "Initialize Search Client Contact! ")) {
-                                    return;
-                                }
-                                getLoadedClient();
-                                initButtonDisplay(poAppController.getEditMode());
-                                break;
+//disabled as its value should be autoset from attached supplier entry
+//                            case "tfContactPerson":
+//                                if (!isJSONSuccess(poAppController.searchClientContact(tfContactPerson.getText(), false),
+//                                        "Initialize Search Client Contact! ")) {
+//                                    return;
+//                                }
+//                                getLoadedClient();
+//                                initButtonDisplay(poAppController.getEditMode());
+//                                break;
 
                         }
                         break;
@@ -464,8 +482,16 @@ public class AccountsAccreditation_ConfirmationController implements Initializab
             tfCategory.setText(poAppController.getModel().Category().getDescription());
             tfCompany.setText(poAppController.getModel().Client().getCompanyName());
             tfContactPerson.setText(poAppController.getModel().ClientInstitutionContact().getContactPersonName());
-            tfAddress.setText(poAppController.getModel().ClientAddress().getAddress());
-            tfTIN.setText(poAppController.getModel().Client().getTaxIdNumber());
+            
+            String lshouseno = poAppController.getModel().ClientAddress().getHouseNo() == null || poAppController.getModel().ClientAddress().getHouseNo().isEmpty() ? "" : poAppController.getModel().ClientAddress().getHouseNo() + " ";
+            String lsaddress = poAppController.getModel().ClientAddress().getAddress() == null || poAppController.getModel().ClientAddress().getAddress().isEmpty() ? "" : poAppController.getModel().ClientAddress().getAddress();
+            String lsbrgy = poAppController.getModel().ClientAddress().Barangay().getBarangayName() == null || poAppController.getModel().ClientAddress().Barangay().getBarangayName().isEmpty() ? "" : ", " + poAppController.getModel().ClientAddress().Barangay().getBarangayName();
+            String lscity = poAppController.getModel().ClientAddress().Town().getDescription() == null || poAppController.getModel().ClientAddress().Town().getDescription().isEmpty() ? " " : ", " + poAppController.getModel().ClientAddress().Town().getDescription();
+            String lsprovince = poAppController.getModel().ClientAddress().Town().Province().getDescription() == null || poAppController.getModel().ClientAddress().Town().Province().getDescription().isEmpty() ? " " : " " + poAppController.getModel().ClientAddress().Town().Province().getDescription();
+            
+            tfAddress.setText( lshouseno + lsaddress + lsbrgy + lscity + lsprovince);
+            
+            tfTIN.setText(poAppController.getModel().Client().getTaxIdNumber() == null ? "" : poAppController.getModel().Client().getTaxIdNumber());
             taRemarks.setText(poAppController.getModel().getRemarks());
             cmbAccountType.getSelectionModel().select(Integer.parseInt(poAppController.getModel().getAccountType()));
             cmbTransType.getSelectionModel().select(Integer.parseInt(poAppController.getModel().getTransactionType()));
@@ -567,7 +593,7 @@ public class AccountsAccreditation_ConfirmationController implements Initializab
 
         // Show-only based on mode
         initButtonControls(lbShow, "btnSearch", "btnSave", "btnCancel");
-        initButtonControls(!lbShow, "btnBrowse", "btnHistory", "btnNew", "btnUpdate");
+        initButtonControls(!lbShow, "btnBrowse", "btnHistory", "btnNew", "btnUpdate", "btnConfirm", "btnVoid");
 
         apMaster.setDisable(!lbShow);
     }
@@ -598,7 +624,6 @@ public class AccountsAccreditation_ConfirmationController implements Initializab
     }
 
     private void getLoadedClient() throws SQLException, GuanzonException, CloneNotSupportedException {
-//        clearAllInputs();
         loadClientMaster();
     }
 
@@ -621,13 +646,13 @@ public class AccountsAccreditation_ConfirmationController implements Initializab
         }
 
         if ("success".equalsIgnoreCase(result)) {
-            if (message != null && !message.trim().isEmpty()) {
-                if (Platform.isFxApplicationThread()) {
-                    ShowMessageFX.Information(null, psFormName, fsModule + ": " + message);
-                } else {
-                    Platform.runLater(() -> ShowMessageFX.Information(null, psFormName, fsModule + ": " + message));
-                }
-            }
+//            if (message != null && !message.trim().isEmpty()) {
+//                if (Platform.isFxApplicationThread()) {
+//                    ShowMessageFX.Information(null, psFormName, fsModule + ": " + message);
+//                } else {
+//                    Platform.runLater(() -> ShowMessageFX.Information(null, psFormName, fsModule + ": " + message));
+//                }
+//            }
             poLogWrapper.info(psFormName + " : Success on " + fsModule);
             return true;
         }

@@ -1,15 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
+<?import java.net.URL?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.DatePicker?>
 <?import javafx.scene.control.Label?>
-<?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.Separator?>
-<?import javafx.scene.control.SplitPane?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.effect.Blend?>
 <?import javafx.scene.layout.AnchorPane?>
@@ -18,169 +17,167 @@
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.RowConstraints?>
-<?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<AnchorPane fx:id="AnchorMain" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1">
-   <children>
-      <BorderPane AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-         <top>
-            <AnchorPane BorderPane.alignment="CENTER">
-               <children>
-                  <AnchorPane prefHeight="55.0" style="-fx-background-color: black;" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-                     <children>
-                        <AnchorPane style="-fx-background-color: FF8201;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-                           <children>
-                              <AnchorPane style="-fx-background-color: A0A0A0;" AnchorPane.bottomAnchor="2.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
-                              <GridPane prefHeight="55.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0">
-                                 <columnConstraints>
-                                    <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" minWidth="25.0" prefWidth="25.0" />
-                                    <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" minWidth="100.0" />
-                                    <ColumnConstraints hgrow="SOMETIMES" minWidth="180.0" prefWidth="150.0" />
-                                    <ColumnConstraints hgrow="SOMETIMES" minWidth="25.0" prefWidth="25.0" />
-                                    <ColumnConstraints hgrow="SOMETIMES" minWidth="25.0" prefWidth="25.0" />
-                                    <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="250.0" />
-                                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="50.0" />
-                                    <ColumnConstraints hgrow="SOMETIMES" minWidth="5.0" />
-                                    <ColumnConstraints hgrow="SOMETIMES" minWidth="30.0" />
-                                 </columnConstraints>
-                                 <rowConstraints>
-                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                 </rowConstraints>
-                                 <children>
-                                    <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Barcode" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.valignment="CENTER" GridPane.vgrow="NEVER">
-                                       <font>
-                                          <Font name="System Bold" size="15.0" />
-                                       </font>
-                                       <GridPane.margin>
-                                          <Insets right="5.0" />
-                                       </GridPane.margin>
-                                    </Text>
-                                    <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Description" GridPane.columnIndex="5" GridPane.halignment="RIGHT" GridPane.hgrow="NEVER" GridPane.valignment="CENTER" GridPane.vgrow="NEVER">
-                                       <font>
-                                          <Font name="System Bold" size="15.0" />
-                                       </font>
-                                       <GridPane.margin>
-                                          <Insets right="10.0" />
-                                       </GridPane.margin>
-                                    </Text>
-                                    <TextField fx:id="txtSeeks02" promptText="Press F3: Search" styleClass="text-field" GridPane.columnIndex="6" />
-                                    <TextField fx:id="txtSeeks01" promptText="Press F3: Search" styleClass="text-field" GridPane.columnIndex="2" />
-                                 </children>
-                                 <padding>
-                                    <Insets left="10.0" right="10.0" />
-                                 </padding>
-                              </GridPane>
-                           </children>
+<AnchorPane fx:id="apMainAnchor" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1">
+    <children>
+        <BorderPane AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+            <top>
+                <AnchorPane BorderPane.alignment="CENTER">
+                    <children>
+                        <AnchorPane prefHeight="55.0" style="-fx-background-color: black;" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                            <children>
+                                <AnchorPane style="-fx-background-color: FF8201;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                    <children>
+                                        <AnchorPane style="-fx-background-color: A0A0A0;" AnchorPane.bottomAnchor="2.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                            <children>
+                                                <GridPane prefHeight="55.0">
+                                                    <columnConstraints>
+                                                        <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" minWidth="100.0" prefWidth="100.0" />
+                                                        <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" minWidth="100.0" />
+                                                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="150.0" />
+                                                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="150.0" />
+                                                        <ColumnConstraints hgrow="SOMETIMES" minWidth="200.0" />
+                                                        <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="300.0" />
+                                                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="50.0" />
+                                                        <ColumnConstraints hgrow="SOMETIMES" minWidth="5.0" />
+                                                        <ColumnConstraints hgrow="SOMETIMES" minWidth="30.0" />
+                                                    </columnConstraints>
+                                                    <rowConstraints>
+                                                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                    </rowConstraints>
+                                                    <children>
+                                                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Barcode" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.valignment="CENTER" GridPane.vgrow="NEVER">
+                                                            <font>
+                                                                <Font name="System Bold" size="15.0" />
+                                                            </font>
+                                                            <GridPane.margin>
+                                                                <Insets right="5.0" />
+                                                            </GridPane.margin>
+                                                        </Text>
+                                                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Description" GridPane.columnIndex="5" GridPane.halignment="RIGHT" GridPane.hgrow="NEVER" GridPane.valignment="CENTER" GridPane.vgrow="NEVER">
+                                                            <font>
+                                                                <Font name="System Bold" size="15.0" />
+                                                            </font>
+                                                            <GridPane.margin>
+                                                                <Insets right="10.0" />
+                                                            </GridPane.margin>
+                                                        </Text>
+                                                        <TextField fx:id="tfSearchDescription" promptText="Press F3: Search" styleClass="text-field" GridPane.columnIndex="6" GridPane.columnSpan="2147483647" />
+                                                        <TextField fx:id="tfSearchBarcode" promptText="Press F3: Search" styleClass="text-field" GridPane.columnIndex="2" GridPane.columnSpan="2" />
+                                                    </children>
+                                                    <padding>
+                                                        <Insets left="10.0" right="10.0" />
+                                                    </padding>
+                                                </GridPane>
+                                            </children>
+                                        </AnchorPane>
+                                    </children>
+                                </AnchorPane>
+                            </children>
                         </AnchorPane>
-                     </children>
-                  </AnchorPane>
-               </children>
-            </AnchorPane>
-         </top>
-         <bottom>
-            <AnchorPane maxHeight="80.0" minHeight="100.0" style="-fx-background-color: E9E9E9;" BorderPane.alignment="CENTER">
-               <children>
-                  <HBox fx:id="hbButtons" alignment="CENTER_LEFT" spacing="5.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="5.0">
-                     <children>
-                        <Button fx:id="btnBrowse" contentDisplay="TOP" ellipsisString="" maxHeight="70.0" mnemonicParsing="false" prefHeight="50.0" prefWidth="70.0" styleClass="button_process" stylesheets="@../css/StyleSheet.css" text="Browse">
-                           <graphic>
-                              <FontAwesomeIconView glyphName="FOLDER_OPEN" size="20" />
-                           </graphic>
-                           <effect>
-                              <Blend />
-                           </effect>
-                        </Button>
-                        <Button fx:id="btnSave" contentDisplay="TOP" ellipsisString="" maxHeight="70.0" mnemonicParsing="false" prefHeight="50.0" prefWidth="70.0" styleClass="button_process" stylesheets="@../css/StyleSheet.css" text="Save">
-                           <graphic>
-                              <FontAwesomeIconView glyphName="SAVE" size="20" />
-                           </graphic>
-                           <effect>
-                              <Blend />
-                           </effect>
-                        </Button>
-                        <Button fx:id="btnUpdate" contentDisplay="TOP" ellipsisString="" maxHeight="70.0" mnemonicParsing="false" prefHeight="50.0" prefWidth="70.0" styleClass="button_process" stylesheets="@../css/StyleSheet.css" text="Update">
-                           <graphic>
-                              <FontAwesomeIconView glyphName="EDIT" size="20" />
-                           </graphic>
-                           <effect>
-                              <Blend />
-                           </effect>
-                        </Button>
-                        <Button fx:id="btnSearch" contentDisplay="TOP" ellipsisString="" maxHeight="70.0" mnemonicParsing="false" prefHeight="50.0" prefWidth="70.0" styleClass="button_process" stylesheets="@../css/StyleSheet.css" text="Search">
-                           <graphic>
-                              <FontAwesomeIconView glyphName="SEARCH" size="20" />
-                           </graphic>
-                           <effect>
-                              <Blend />
-                           </effect>
-                        </Button>
-                        <Button fx:id="btnCancel" contentDisplay="TOP" ellipsisString="" maxHeight="70.0" mnemonicParsing="false" prefHeight="50.0" prefWidth="70.0" styleClass="button_process" stylesheets="@../css/StyleSheet.css" text="Cancel">
-                           <graphic>
-                              <FontAwesomeIconView glyphName="CLOSE" size="20" />
-                           </graphic>
-                           <effect>
-                              <Blend />
-                           </effect>
-                        </Button>
-                        <Button fx:id="btnLedger" contentDisplay="TOP" ellipsisString="" maxHeight="70.0" maxWidth="104.0" minHeight="50.0" minWidth="70.0" mnemonicParsing="false" prefHeight="47.0" prefWidth="70.0" styleClass="button_process" stylesheets="@../css/StyleSheet.css" text="Ledger">
-                           <graphic>
-                              <FontAwesomeIconView glyphName="LIST" size="20" />
-                           </graphic>
-                           <effect>
-                              <Blend />
-                           </effect>
-                        </Button>
-                        <Button fx:id="btnSerial" contentDisplay="TOP" ellipsisString="" maxHeight="70.0" maxWidth="104.0" minHeight="50.0" minWidth="70.0" mnemonicParsing="false" prefHeight="47.0" prefWidth="70.0" styleClass="button_process" stylesheets="@../css/StyleSheet.css" text="Serial">
-                           <graphic>
-                              <FontAwesomeIconView glyphName="KEY" size="20" />
-                           </graphic>
-                           <effect>
-                              <Blend />
-                           </effect>
-                        </Button>
-                        <Button fx:id="btnClose" contentDisplay="TOP" ellipsisString="" maxHeight="70.0" maxWidth="104.0" minHeight="50.0" minWidth="70.0" mnemonicParsing="false" prefHeight="47.0" prefWidth="70.0" styleClass="button_process" stylesheets="@../css/StyleSheet.css" text="Close">
-                           <graphic>
-                              <FontAwesomeIconView glyphName="POWER_OFF" size="20" />
-                           </graphic>
-                           <effect>
-                              <Blend />
-                           </effect>
-                        </Button>
-                     </children>
-                     <padding>
-                        <Insets bottom="5.0" left="10.0" right="5.0" top="5.0" />
-                     </padding>
-                  </HBox>
-               </children>
-            </AnchorPane>
-         </bottom>
-         <center>
-            <AnchorPane BorderPane.alignment="CENTER">
-               <children>
-                  <ScrollPane fitToHeight="true" fitToWidth="true" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-                     <content>
-                        <AnchorPane>
-                           <children>
-                              <SplitPane dividerPositions="0.3" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-                                 <items>
-                                    <AnchorPane fx:id="AnchorInput" maxWidth="-Infinity" minHeight="0.0" minWidth="-Infinity" style="-fx-border-color: FF8201;" SplitPane.resizableWithParent="false">
-                                       <children>
-                                          <GridPane hgap="3.0" vgap="3.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="5.0">
-                                             <columnConstraints>
+                    </children>
+                </AnchorPane>
+            </top>
+            <bottom>
+                <AnchorPane maxHeight="80.0" minHeight="100.0" style="-fx-background-color: E9E9E9;" BorderPane.alignment="CENTER">
+                    <children>
+                        <HBox alignment="CENTER_LEFT" spacing="5.0" style="-fx-background-color: E9E9E9;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="5.0">
+                            <padding>
+                                <Insets bottom="5.0" left="10.0" right="5.0" top="5.0" />
+                            </padding>
+                            <children>
+                                <Button fx:id="btnBrowse" contentDisplay="TOP" ellipsisString="" maxHeight="70.0" mnemonicParsing="false" onAction="#cmdButton_Click" prefHeight="50.0" prefWidth="70.0" styleClass="button_process" stylesheets="@../css/StyleSheet.css" text="Browse">
+                                    <graphic>
+                                        <FontAwesomeIconView glyphName="FOLDER_OPEN" size="20" />
+                                    </graphic>
+                                    <effect>
+                                        <Blend />
+                                    </effect>
+                                </Button>
+                                <Button fx:id="btnSearch" contentDisplay="TOP" ellipsisString="" maxHeight="70.0" mnemonicParsing="false" onAction="#cmdButton_Click" prefHeight="50.0" prefWidth="70.0" styleClass="button_process" stylesheets="@../css/StyleSheet.css" text="Search">
+                                    <graphic>
+                                        <FontAwesomeIconView glyphName="SEARCH" size="20" />
+                                    </graphic>
+                                    <effect>
+                                        <Blend />
+                                    </effect>
+                                </Button>
+                                <Button fx:id="btnSave" contentDisplay="TOP" ellipsisString="" maxHeight="70.0" mnemonicParsing="false" onAction="#cmdButton_Click" prefHeight="50.0" prefWidth="70.0" styleClass="button_process" stylesheets="@../css/StyleSheet.css" text="Save">
+                                    <graphic>
+                                        <FontAwesomeIconView glyphName="SAVE" size="20" />
+                                    </graphic>
+                                    <effect>
+                                        <Blend />
+                                    </effect>
+                                </Button>
+                                <Button fx:id="btnUpdate" contentDisplay="TOP" ellipsisString="" maxHeight="70.0" mnemonicParsing="false" onAction="#cmdButton_Click" prefHeight="50.0" prefWidth="70.0" styleClass="button_process" stylesheets="@../css/StyleSheet.css" text="Update">
+                                    <graphic>
+                                        <FontAwesomeIconView glyphName="EDIT" size="20" />
+                                    </graphic>
+                                    <effect>
+                                        <Blend />
+                                    </effect>
+                                </Button>
+                                <Button fx:id="btnCancel" contentDisplay="TOP" ellipsisString="" maxHeight="70.0" mnemonicParsing="false" onAction="#cmdButton_Click" prefHeight="50.0" prefWidth="70.0" styleClass="button_process" stylesheets="@../css/StyleSheet.css" text="Cancel">
+                                    <graphic>
+                                        <FontAwesomeIconView glyphName="CLOSE" size="20" />
+                                    </graphic>
+                                    <effect>
+                                        <Blend />
+                                    </effect>
+                                </Button>
+                                <Button fx:id="btnLedger" contentDisplay="TOP" ellipsisString="" maxHeight="70.0" maxWidth="104.0" minHeight="50.0" minWidth="70.0" mnemonicParsing="false" onAction="#cmdButton_Click" prefHeight="47.0" prefWidth="70.0" styleClass="button_process" stylesheets="@../css/StyleSheet.css" text="Ledger">
+                                    <graphic>
+                                        <FontAwesomeIconView glyphName="LIST" size="20" />
+                                    </graphic>
+                                    <effect>
+                                        <Blend />
+                                    </effect>
+                                </Button>
+                                <Button fx:id="btnSerial" contentDisplay="TOP" ellipsisString="" maxHeight="70.0" maxWidth="104.0" minHeight="50.0" minWidth="70.0" mnemonicParsing="false" onAction="#cmdButton_Click" prefHeight="47.0" prefWidth="70.0" styleClass="button_process" stylesheets="@../css/StyleSheet.css" text="Serial">
+                                    <graphic>
+                                        <FontAwesomeIconView glyphName="KEY" size="20" />
+                                    </graphic>
+                                    <effect>
+                                        <Blend />
+                                    </effect>
+                                </Button>
+                                <Button fx:id="btnClose" contentDisplay="TOP" ellipsisString="" maxHeight="70.0" maxWidth="104.0" minHeight="50.0" minWidth="70.0" mnemonicParsing="false" onAction="#cmdButton_Click" prefHeight="47.0" prefWidth="70.0" styleClass="button_process" stylesheets="@../css/StyleSheet.css" text="Close">
+                                    <graphic>
+                                        <FontAwesomeIconView glyphName="POWER_OFF" size="20" />
+                                    </graphic>
+                                    <effect>
+                                        <Blend />
+                                    </effect>
+                                </Button>
+                            </children>
+                        </HBox>
+                    </children>
+                </AnchorPane>
+            </bottom>
+            <center>
+                <AnchorPane BorderPane.alignment="CENTER">
+                    <children>
+                        <VBox fillWidth="false" spacing="5.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                            <children>
+                                <AnchorPane fx:id="apMaster" style="-fx-border-color: FF8201;">
+                                    <children>
+                                        <GridPane hgap="3.0" vgap="3.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                            <columnConstraints>
                                                 <ColumnConstraints hgrow="SOMETIMES" minWidth="110.0" prefWidth="110.0" />
                                                 <ColumnConstraints hgrow="SOMETIMES" minWidth="85.0" prefWidth="85.0" />
                                                 <ColumnConstraints hgrow="SOMETIMES" minWidth="85.0" prefWidth="85.0" />
-                                                <ColumnConstraints hgrow="SOMETIMES" minWidth="30.0" prefWidth="30.0" />
-                                                <ColumnConstraints hgrow="SOMETIMES" minWidth="0.0" prefWidth="120.0" />
+                                                <ColumnConstraints hgrow="SOMETIMES" minWidth="20.0" prefWidth="20.0" />
+                                                <ColumnConstraints hgrow="SOMETIMES" minWidth="0.0" prefWidth="90.0" />
                                                 <ColumnConstraints hgrow="SOMETIMES" minWidth="85.0" prefWidth="85.0" />
                                                 <ColumnConstraints hgrow="SOMETIMES" minWidth="85.0" prefWidth="85.0" />
                                                 <ColumnConstraints />
-                                             </columnConstraints>
-                                             <rowConstraints>
+                                            </columnConstraints>
+                                            <rowConstraints>
                                                 <RowConstraints minHeight="10.0" prefHeight="10.0" vgrow="SOMETIMES" />
                                                 <RowConstraints minHeight="10.0" prefHeight="25.0" vgrow="SOMETIMES" />
                                                 <RowConstraints minHeight="10.0" prefHeight="10.0" vgrow="SOMETIMES" />
@@ -189,6 +186,7 @@
                                                 <RowConstraints minHeight="10.0" prefHeight="25.0" vgrow="SOMETIMES" />
                                                 <RowConstraints minHeight="10.0" prefHeight="25.0" vgrow="SOMETIMES" />
                                                 <RowConstraints minHeight="10.0" prefHeight="10.0" vgrow="SOMETIMES" />
+                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                                                 <RowConstraints minHeight="10.0" prefHeight="25.0" vgrow="SOMETIMES" />
                                                 <RowConstraints minHeight="10.0" prefHeight="25.0" vgrow="SOMETIMES" />
                                                 <RowConstraints minHeight="10.0" prefHeight="25.0" vgrow="SOMETIMES" />
@@ -203,424 +201,342 @@
                                                 <RowConstraints minHeight="10.0" prefHeight="25.0" vgrow="SOMETIMES" />
                                                 <RowConstraints minHeight="10.0" prefHeight="25.0" vgrow="SOMETIMES" />
                                                 <RowConstraints minHeight="10.0" prefHeight="10.0" vgrow="SOMETIMES" />
-                                                <RowConstraints minHeight="10.0" prefHeight="25.0" vgrow="SOMETIMES" />
-                                                <RowConstraints minHeight="10.0" prefHeight="25.0" vgrow="SOMETIMES" />
-                                                <RowConstraints minHeight="10.0" prefHeight="10.0" vgrow="SOMETIMES" />
-                                                <RowConstraints minHeight="10.0" prefHeight="25.0" vgrow="SOMETIMES" />
-                                                <RowConstraints minHeight="10.0" prefHeight="25.0" vgrow="SOMETIMES" />
-                                                <RowConstraints minHeight="10.0" prefHeight="25.0" vgrow="SOMETIMES" />
-                                                <RowConstraints minHeight="10.0" prefHeight="25.0" vgrow="SOMETIMES" />
-                                                <RowConstraints minHeight="10.0" prefHeight="10.0" vgrow="SOMETIMES" />
-                                             </rowConstraints>
-                                             <children>
+                                            </rowConstraints>
+                                            <children>
                                                 <Text strokeType="OUTSIDE" strokeWidth="0.0" text="STOCK ID" GridPane.halignment="RIGHT" GridPane.rowIndex="1" GridPane.valignment="CENTER">
-                                                   <font>
-                                                      <Font name="System Bold" size="14.0" />
-                                                   </font>
-                                                   <GridPane.margin>
-                                                      <Insets right="10.0" />
-                                                   </GridPane.margin>
+                                                    <font>
+                                                        <Font name="System Bold" size="14.0" />
+                                                    </font>
+                                                    <GridPane.margin>
+                                                        <Insets right="10.0" />
+                                                    </GridPane.margin>
                                                 </Text>
                                                 <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Barcode" GridPane.halignment="RIGHT" GridPane.rowIndex="3" GridPane.valignment="CENTER">
-                                                   <font>
-                                                      <Font name="System Bold" size="12.0" />
-                                                   </font>
-                                                   <GridPane.margin>
-                                                      <Insets right="10.0" />
-                                                   </GridPane.margin>
+                                                    <GridPane.margin>
+                                                        <Insets right="10.0" />
+                                                    </GridPane.margin>
                                                 </Text>
                                                 <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Alt. Barcode" GridPane.halignment="RIGHT" GridPane.rowIndex="4" GridPane.valignment="CENTER">
-                                                   <font>
-                                                      <Font name="System Bold" size="12.0" />
-                                                   </font>
-                                                   <GridPane.margin>
-                                                      <Insets right="10.0" />
-                                                   </GridPane.margin>
+                                                    <GridPane.margin>
+                                                        <Insets right="10.0" />
+                                                    </GridPane.margin>
                                                 </Text>
                                                 <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Brief Desc" GridPane.halignment="RIGHT" GridPane.rowIndex="5" GridPane.valignment="CENTER">
-                                                   <font>
-                                                      <Font name="System Bold" size="12.0" />
-                                                   </font>
-                                                   <GridPane.margin>
-                                                      <Insets right="10.0" />
-                                                   </GridPane.margin>
+                                                    <GridPane.margin>
+                                                        <Insets right="10.0" />
+                                                    </GridPane.margin>
                                                 </Text>
                                                 <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Description" GridPane.halignment="RIGHT" GridPane.rowIndex="6" GridPane.valignment="CENTER">
-                                                   <font>
-                                                      <Font name="System Bold" size="12.0" />
-                                                   </font>
-                                                   <GridPane.margin>
-                                                      <Insets right="10.0" />
-                                                   </GridPane.margin>
+                                                    <GridPane.margin>
+                                                        <Insets right="10.0" />
+                                                    </GridPane.margin>
                                                 </Text>
-                                                <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Inventory Type" GridPane.halignment="RIGHT" GridPane.rowIndex="8" GridPane.valignment="CENTER">
-                                                   <font>
-                                                      <Font name="System Bold" size="12.0" />
-                                                   </font>
-                                                   <GridPane.margin>
-                                                      <Insets right="10.0" />
-                                                   </GridPane.margin>
+                                                <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Unit Type" GridPane.halignment="RIGHT" GridPane.rowIndex="9" GridPane.valignment="CENTER">
+                                                    <GridPane.margin>
+                                                        <Insets right="10.0" />
+                                                    </GridPane.margin>
                                                 </Text>
-                                                <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Catergory 1" GridPane.halignment="RIGHT" GridPane.rowIndex="9" GridPane.valignment="CENTER">
-                                                   <font>
-                                                      <Font name="System Bold" size="12.0" />
-                                                   </font>
-                                                   <GridPane.margin>
-                                                      <Insets right="10.0" />
-                                                   </GridPane.margin>
+                                                <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Catergory 1" GridPane.halignment="RIGHT" GridPane.rowIndex="10" GridPane.valignment="CENTER">
+                                                    <GridPane.margin>
+                                                        <Insets right="10.0" />
+                                                    </GridPane.margin>
                                                 </Text>
-                                                <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Catergory 2" GridPane.halignment="RIGHT" GridPane.rowIndex="10" GridPane.valignment="CENTER">
-                                                   <font>
-                                                      <Font name="System Bold" size="12.0" />
-                                                   </font>
-                                                   <GridPane.margin>
-                                                      <Insets right="10.0" />
-                                                   </GridPane.margin>
+                                                <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Catergory 2" GridPane.halignment="RIGHT" GridPane.rowIndex="11" GridPane.valignment="CENTER">
+                                                    <GridPane.margin>
+                                                        <Insets right="10.0" />
+                                                    </GridPane.margin>
                                                 </Text>
-                                                <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Catergory 3" GridPane.halignment="RIGHT" GridPane.rowIndex="11" GridPane.valignment="CENTER">
-                                                   <font>
-                                                      <Font name="System Bold" size="12.0" />
-                                                   </font>
-                                                   <GridPane.margin>
-                                                      <Insets right="10.0" />
-                                                   </GridPane.margin>
+                                                <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Catergory 3" GridPane.halignment="RIGHT" GridPane.rowIndex="12" GridPane.valignment="CENTER">
+                                                    <GridPane.margin>
+                                                        <Insets right="10.0" />
+                                                    </GridPane.margin>
                                                 </Text>
-                                                <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Catergory 4" GridPane.halignment="RIGHT" GridPane.rowIndex="12" GridPane.valignment="CENTER">
-                                                   <font>
-                                                      <Font name="System Bold" size="12.0" />
-                                                   </font>
-                                                   <GridPane.margin>
-                                                      <Insets right="10.0" />
-                                                   </GridPane.margin>
+                                                <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Catergory 4" GridPane.halignment="RIGHT" GridPane.rowIndex="13" GridPane.valignment="CENTER">
+                                                    <GridPane.margin>
+                                                        <Insets right="10.0" />
+                                                    </GridPane.margin>
                                                 </Text>
-                                                <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Brand" GridPane.columnIndex="4" GridPane.halignment="RIGHT" GridPane.rowIndex="9" GridPane.valignment="CENTER">
-                                                   <font>
-                                                      <Font name="System Bold" size="12.0" />
-                                                   </font>
-                                                   <GridPane.margin>
-                                                      <Insets right="10.0" />
-                                                   </GridPane.margin>
+                                                <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Brand" GridPane.columnIndex="4" GridPane.halignment="RIGHT" GridPane.rowIndex="8" GridPane.valignment="CENTER">
+                                                    <GridPane.margin>
+                                                        <Insets right="10.0" />
+                                                    </GridPane.margin>
                                                 </Text>
-                                                <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Model" GridPane.columnIndex="4" GridPane.halignment="RIGHT" GridPane.rowIndex="10" GridPane.valignment="CENTER">
-                                                   <font>
-                                                      <Font name="System Bold" size="12.0" />
-                                                   </font>
-                                                   <GridPane.margin>
-                                                      <Insets right="10.0" />
-                                                   </GridPane.margin>
+                                                <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Model" GridPane.columnIndex="4" GridPane.halignment="RIGHT" GridPane.rowIndex="9" GridPane.valignment="CENTER">
+                                                    <GridPane.margin>
+                                                        <Insets right="10.0" />
+                                                    </GridPane.margin>
                                                 </Text>
-                                                <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Color" GridPane.columnIndex="4" GridPane.halignment="RIGHT" GridPane.rowIndex="11" GridPane.valignment="CENTER">
-                                                   <font>
-                                                      <Font name="System Bold" size="12.0" />
-                                                   </font>
-                                                   <GridPane.margin>
-                                                      <Insets right="10.0" />
-                                                   </GridPane.margin>
+                                                <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Color" GridPane.columnIndex="4" GridPane.halignment="RIGHT" GridPane.rowIndex="10" GridPane.valignment="CENTER">
+                                                    <GridPane.margin>
+                                                        <Insets right="10.0" />
+                                                    </GridPane.margin>
                                                 </Text>
-                                                <Text fx:id="lblMeasure" strokeType="OUTSIDE" strokeWidth="0.0" text="Measure" GridPane.columnIndex="4" GridPane.halignment="RIGHT" GridPane.rowIndex="12" GridPane.valignment="CENTER">
-                                                   <font>
-                                                      <Font name="System Bold" size="12.0" />
-                                                   </font>
-                                                   <GridPane.margin>
-                                                      <Insets right="10.0" />
-                                                   </GridPane.margin>
+                                                <Text fx:id="lblMeasure" strokeType="OUTSIDE" strokeWidth="0.0" text="Measure" GridPane.columnIndex="4" GridPane.halignment="RIGHT" GridPane.rowIndex="11" GridPane.valignment="CENTER">
+                                                    <GridPane.margin>
+                                                        <Insets right="10.0" />
+                                                    </GridPane.margin>
                                                 </Text>
-                                                <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Discount 1" GridPane.halignment="RIGHT" GridPane.rowIndex="14" GridPane.valignment="CENTER">
-                                                   <font>
-                                                      <Font name="System Bold" size="12.0" />
-                                                   </font>
-                                                   <GridPane.margin>
-                                                      <Insets right="10.0" />
-                                                   </GridPane.margin>
+                                                <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Discount 1" GridPane.halignment="RIGHT" GridPane.rowIndex="15" GridPane.valignment="CENTER">
+                                                    <GridPane.margin>
+                                                        <Insets right="10.0" />
+                                                    </GridPane.margin>
                                                 </Text>
-                                                <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Discount 2" GridPane.halignment="RIGHT" GridPane.rowIndex="15" GridPane.valignment="CENTER">
-                                                   <font>
-                                                      <Font name="System Bold" size="12.0" />
-                                                   </font>
-                                                   <GridPane.margin>
-                                                      <Insets right="10.0" />
-                                                   </GridPane.margin>
+                                                <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Discount 2" GridPane.halignment="RIGHT" GridPane.rowIndex="16" GridPane.valignment="CENTER">
+                                                    <GridPane.margin>
+                                                        <Insets right="10.0" />
+                                                    </GridPane.margin>
                                                 </Text>
-                                                <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Discount 3" GridPane.halignment="RIGHT" GridPane.rowIndex="16" GridPane.valignment="CENTER">
-                                                   <font>
-                                                      <Font name="System Bold" size="12.0" />
-                                                   </font>
-                                                   <GridPane.margin>
-                                                      <Insets right="10.0" />
-                                                   </GridPane.margin>
+                                                <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Discount 3" GridPane.halignment="RIGHT" GridPane.rowIndex="17" GridPane.valignment="CENTER">
+                                                    <GridPane.margin>
+                                                        <Insets right="10.0" />
+                                                    </GridPane.margin>
                                                 </Text>
-                                                <Text strokeType="OUTSIDE" strokeWidth="0.0" text="COST" GridPane.columnIndex="4" GridPane.halignment="RIGHT" GridPane.rowIndex="16" GridPane.valignment="CENTER">
-                                                   <font>
-                                                      <Font name="System Bold" size="12.0" />
-                                                   </font>
-                                                   <GridPane.margin>
-                                                      <Insets right="10.0" />
-                                                   </GridPane.margin>
+                                                <Text strokeType="OUTSIDE" strokeWidth="0.0" text="COST" GridPane.columnIndex="4" GridPane.halignment="RIGHT" GridPane.rowIndex="17" GridPane.valignment="CENTER">
+                                                    <GridPane.margin>
+                                                        <Insets right="10.0" />
+                                                    </GridPane.margin>
                                                 </Text>
-                                                <Text strokeType="OUTSIDE" strokeWidth="0.0" text="SRP" GridPane.columnIndex="4" GridPane.halignment="RIGHT" GridPane.rowIndex="17" GridPane.valignment="CENTER">
-                                                   <font>
-                                                      <Font name="System Bold" size="12.0" />
-                                                   </font>
-                                                   <GridPane.margin>
-                                                      <Insets right="10.0" />
-                                                   </GridPane.margin>
+                                                <Text fill="RED" strokeType="OUTSIDE" strokeWidth="0.0" text="SRP" GridPane.columnIndex="4" GridPane.halignment="RIGHT" GridPane.rowIndex="18" GridPane.valignment="CENTER">
+                                                    <GridPane.margin>
+                                                        <Insets right="10.0" />
+                                                    </GridPane.margin>
+                                                    <font>
+                                                        <Font name="System Bold" size="14.0" />
+                                                    </font>
                                                 </Text>
-                                                <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Superseded" GridPane.columnIndex="4" GridPane.halignment="RIGHT" GridPane.rowIndex="19" GridPane.valignment="CENTER">
-                                                   <font>
-                                                      <Font name="System Bold" size="12.0" />
-                                                   </font>
-                                                   <GridPane.margin>
-                                                      <Insets right="10.0" />
-                                                   </GridPane.margin>
+                                                <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Superseded" GridPane.columnIndex="4" GridPane.halignment="RIGHT" GridPane.rowIndex="20" GridPane.valignment="CENTER">
+                                                    <GridPane.margin>
+                                                        <Insets right="10.0" />
+                                                    </GridPane.margin>
                                                 </Text>
-                                                <Text fx:id="lblShelf" strokeType="OUTSIDE" strokeWidth="0.0" text="Shelf Life" GridPane.columnIndex="4" GridPane.halignment="RIGHT" GridPane.rowIndex="20">
-                                                   <font>
-                                                      <Font name="System Bold" size="12.0" />
-                                                   </font>
-                                                   <GridPane.margin>
-                                                      <Insets right="10.0" />
-                                                   </GridPane.margin>
+                                                <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Shelf Life" GridPane.columnIndex="4" GridPane.halignment="RIGHT" GridPane.rowIndex="21">
+                                                    <GridPane.margin>
+                                                        <Insets right="10.0" />
+                                                    </GridPane.margin>
                                                 </Text>
-                                                <TextField fx:id="txtField01" editable="false" styleClass="text-field" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="1" />
-                                                <TextField fx:id="txtField02" styleClass="text-field" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="3" />
-                                                <TextField fx:id="txtField03" styleClass="text-field" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="4" />
-                                                <TextField fx:id="txtField04" styleClass="text-field" GridPane.columnIndex="1" GridPane.columnSpan="6" GridPane.rowIndex="5" />
-                                                <TextField fx:id="txtField05" styleClass="text-field" GridPane.columnIndex="1" GridPane.columnSpan="6" GridPane.rowIndex="6" />
-                                                <ComboBox fx:id="cmbField01" disable="true" prefWidth="203.0" visibleRowCount="0" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="8" />
-                                                <TextField fx:id="txtField06" promptText="PRESS F3 : Search" styleClass="text-field" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="9" />
-                                                <TextField fx:id="txtField07" promptText="PRESS F3 : Search" styleClass="text-field" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="10" />
-                                                <TextField fx:id="txtField08" promptText="PRESS F3 : Search" styleClass="text-field" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="11" />
-                                                <TextField fx:id="txtField09" promptText="PRESS F3 : Search" styleClass="text-field" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="12" />
-                                                <TextField fx:id="txtField10" promptText="PRESS F3 : Search" styleClass="text-field" GridPane.columnIndex="5" GridPane.columnSpan="2" GridPane.rowIndex="9" />
-                                                <TextField fx:id="txtField11" promptText="PRESS F3 : Search" styleClass="text-field" GridPane.columnIndex="5" GridPane.columnSpan="2" GridPane.rowIndex="10" />
-                                                <TextField fx:id="txtField12" promptText="PRESS F3 : Search" styleClass="text-field" GridPane.columnIndex="5" GridPane.columnSpan="2" GridPane.rowIndex="11" />
-                                                <TextField fx:id="txtField13" promptText="PRESS F3 : Search" styleClass="text-field" GridPane.columnIndex="5" GridPane.columnSpan="2" GridPane.rowIndex="12" />
-                                                <TextField fx:id="txtField14" styleClass="text-field" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="14" />
-                                                <TextField fx:id="txtField15" styleClass="text-field" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="15" />
-                                                <TextField fx:id="txtField16" styleClass="text-field" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="16" />
-                                                <TextField fx:id="txtField17" styleClass="text-field" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="17" />
-                                                <TextField fx:id="txtField26" prefHeight="46.0" prefWidth="203.0" styleClass="text-field" GridPane.columnIndex="5" GridPane.columnSpan="2" GridPane.rowIndex="14" />
-                                                <TextField fx:id="txtField27" prefHeight="46.0" prefWidth="203.0" styleClass="text-field" GridPane.columnIndex="5" GridPane.columnSpan="2" GridPane.rowIndex="15" />
-                                                <TextField fx:id="txtField18" prefHeight="46.0" prefWidth="203.0" styleClass="text-field" GridPane.columnIndex="5" GridPane.columnSpan="2" GridPane.rowIndex="16" />
-                                                <TextField fx:id="txtField19" prefHeight="43.0" prefWidth="203.0" styleClass="text-field" GridPane.columnIndex="5" GridPane.columnSpan="2" GridPane.rowIndex="17" />
-                                                <CheckBox fx:id="chkField01" mnemonicParsing="false" onMouseClicked="#chkFiled01_Clicked" text="Serialize" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.halignment="LEFT" GridPane.rowIndex="19" />
-                                                <CheckBox fx:id="chkField02" mnemonicParsing="false" onMouseClicked="#chkFiled02_Clicked" text="Combo" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.halignment="LEFT" GridPane.rowIndex="19" />
-                                                <CheckBox fx:id="chkField03" mnemonicParsing="false" onMouseClicked="#chkFiled03_Clicked" text="with Promo" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.halignment="LEFT" GridPane.rowIndex="20" />
-                                                <TextField fx:id="txtField20" styleClass="text-field" GridPane.columnIndex="5" GridPane.columnSpan="2" GridPane.rowIndex="19" />
-                                                <TextField fx:id="txtField21" styleClass="text-field" GridPane.columnIndex="5" GridPane.columnSpan="2" GridPane.rowIndex="20" />
-                                                <Label fx:id="lblStatus" alignment="CENTER" contentDisplay="CENTER" maxWidth="264.0" minWidth="150.0" prefHeight="37.0" prefWidth="264.0" style="-fx-background-color: FF8201;" stylesheets="@../css/StyleSheet.css" text="ACTIVE" textAlignment="CENTER" textFill="#111111" GridPane.columnIndex="5" GridPane.columnSpan="2" GridPane.halignment="RIGHT" GridPane.rowIndex="1">
-                                                   <font>
-                                                      <Font name="System Bold" size="18.0" />
-                                                   </font>
-                                                   <padding>
-                                                      <Insets bottom="5.0" left="10.0" right="10.0" top="5.0" />
-                                                   </padding>
+                                                <TextField fx:id="tfStockID" editable="false" styleClass="text-field" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="1" />
+                                                <TextField fx:id="tfBarcode" editable="false" styleClass="text-field" GridPane.columnIndex="1" GridPane.columnSpan="4" GridPane.rowIndex="3" />
+                                                <TextField fx:id="tfAltBarcode" editable="false" styleClass="text-field" GridPane.columnIndex="1" GridPane.columnSpan="4" GridPane.rowIndex="4" />
+                                                <TextField fx:id="tfBriefDescription" editable="false" styleClass="text-field" GridPane.columnIndex="1" GridPane.columnSpan="6" GridPane.rowIndex="5" />
+                                                <TextField fx:id="tfDescription" editable="false" styleClass="text-field" GridPane.columnIndex="1" GridPane.columnSpan="6" GridPane.rowIndex="6" />
+                                                <ComboBox fx:id="cmbUnitType" disable="true" prefWidth="203.0" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="9" />
+                                                <TextField fx:id="tfCategory1" editable="false" styleClass="text-field" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="10" />
+                                                <TextField fx:id="tfCategory2" editable="false" styleClass="text-field" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="11" />
+                                                <TextField fx:id="tfCategory3" editable="false" styleClass="text-field" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="12" />
+                                                <TextField fx:id="tfCategory4" editable="false" styleClass="text-field" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="13" />
+                                                <TextField fx:id="tfBrand" editable="false" styleClass="text-field" GridPane.columnIndex="5" GridPane.columnSpan="2" GridPane.rowIndex="8" />
+                                                <TextField fx:id="tfModel" editable="false" styleClass="text-field" GridPane.columnIndex="5" GridPane.columnSpan="2" GridPane.rowIndex="9" />
+                                                <TextField fx:id="tfColor" editable="false" styleClass="text-field" GridPane.columnIndex="5" GridPane.columnSpan="2" GridPane.rowIndex="10" />
+                                                <TextField fx:id="tfMeasure" editable="false" styleClass="text-field" GridPane.columnIndex="5" GridPane.columnSpan="2" GridPane.rowIndex="11" />
+                                                <TextField fx:id="tfDiscount1" alignment="CENTER_RIGHT" editable="false" promptText="0.00" styleClass="text-field" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="15" />
+                                                <TextField fx:id="tfDiscount2" alignment="CENTER_RIGHT" editable="false" promptText="0.00" styleClass="text-field" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="16" />
+                                                <TextField fx:id="tfDiscount3" alignment="CENTER_RIGHT" editable="false" promptText="0.00" styleClass="text-field" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="17" />
+                                                <TextField fx:id="tfDiscount4" alignment="CENTER_RIGHT" editable="false" promptText="0.00" styleClass="text-field" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="18" />
+                                                <TextField fx:id="tfMinLevel" alignment="CENTER_RIGHT" editable="false" prefHeight="46.0" promptText="0" styleClass="text-field" GridPane.columnIndex="5" GridPane.columnSpan="2" GridPane.rowIndex="15" />
+                                                <TextField fx:id="tfMaxLevel" alignment="CENTER_RIGHT" editable="false" prefHeight="46.0" promptText="0" styleClass="text-field" GridPane.columnIndex="5" GridPane.columnSpan="2" GridPane.rowIndex="16" />
+                                                <TextField fx:id="tfCost" alignment="CENTER_RIGHT" editable="false" prefHeight="46.0" promptText="0.0000" styleClass="text-field" GridPane.columnIndex="5" GridPane.columnSpan="2" GridPane.rowIndex="17" />
+                                                <TextField fx:id="tfSRP" alignment="CENTER_RIGHT" editable="false" prefHeight="43.0" prefWidth="203.0" promptText="0.0000" styleClass="text-field" GridPane.columnIndex="5" GridPane.columnSpan="2" GridPane.rowIndex="18" />
+                                                <CheckBox fx:id="chkSerialized" disable="true" mnemonicParsing="false" text="Serialize" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.halignment="LEFT" GridPane.rowIndex="20" />
+                                                <CheckBox fx:id="chkCombo" disable="true" mnemonicParsing="false" text="Combo" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.halignment="LEFT" GridPane.rowIndex="21" />
+                                                <CheckBox fx:id="chkPromo" disable="true" mnemonicParsing="false" text="with Promo" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.halignment="LEFT" GridPane.rowIndex="20" />
+                                                <TextField fx:id="tfSuperseded" editable="false" styleClass="text-field" GridPane.columnIndex="5" GridPane.columnSpan="2" GridPane.rowIndex="20" />
+                                                <TextField fx:id="tfShelfLife" editable="false" promptText="0" styleClass="text-field" GridPane.columnIndex="5" GridPane.columnSpan="2" GridPane.rowIndex="21" />
+                                                <Label fx:id="lblStatus" alignment="CENTER" contentDisplay="CENTER" maxWidth="264.0" minWidth="150.0" prefHeight="37.0" prefWidth="264.0" style="-fx-background-color: FF8201;" text="ACTIVE" textAlignment="CENTER" textFill="#111111" GridPane.columnIndex="5" GridPane.columnSpan="2" GridPane.halignment="RIGHT" GridPane.rowIndex="1">
+                                                    <font>
+                                                        <Font name="System Bold" size="18.0" />
+                                                    </font>
+                                                    <padding>
+                                                        <Insets bottom="5.0" left="10.0" right="10.0" top="5.0" />
+                                                    </padding>
                                                 </Label>
-                                                <CheckBox fx:id="chkField04" mnemonicParsing="false" onMouseClicked="#chkFiled04_Clicked" text="Active" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.rowIndex="20" />
-                                                <Separator prefWidth="200.0" GridPane.columnSpan="7" GridPane.rowIndex="21" />
+                                                <CheckBox fx:id="chkRecordStatus" disable="true" mnemonicParsing="false" text="Active" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.rowIndex="21" />
                                                 <Separator prefWidth="200.0" GridPane.columnSpan="8" GridPane.rowIndex="7" />
-                                                <Separator prefWidth="200.0" GridPane.columnSpan="8" GridPane.rowIndex="13" />
-                                                <Separator prefWidth="200.0" GridPane.columnSpan="8" GridPane.rowIndex="18" />
-                                                <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Discount 4" GridPane.halignment="RIGHT" GridPane.rowIndex="17">
-                                                   <font>
-                                                      <Font size="14.0" />
-                                                   </font>
-                                                   <GridPane.margin>
-                                                      <Insets right="10.0" />
-                                                   </GridPane.margin>
+                                                <Separator prefWidth="200.0" GridPane.columnSpan="8" GridPane.rowIndex="14" />
+                                                <Separator prefWidth="200.0" GridPane.columnSpan="8" GridPane.rowIndex="19" />
+                                                <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Dealer Disc." GridPane.halignment="RIGHT" GridPane.rowIndex="18">
+                                                    <GridPane.margin>
+                                                        <Insets right="10.0" />
+                                                    </GridPane.margin>
                                                 </Text>
-                                                <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Min Level" GridPane.columnIndex="4" GridPane.halignment="RIGHT" GridPane.rowIndex="14">
-                                                   <font>
-                                                      <Font size="14.0" />
-                                                   </font>
-                                                   <GridPane.margin>
-                                                      <Insets right="10.0" />
-                                                   </GridPane.margin>
+                                                <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Min Level" GridPane.columnIndex="4" GridPane.halignment="RIGHT" GridPane.rowIndex="15">
+                                                    <GridPane.margin>
+                                                        <Insets right="10.0" />
+                                                    </GridPane.margin>
                                                 </Text>
-                                                <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Max Level" GridPane.columnIndex="4" GridPane.halignment="RIGHT" GridPane.rowIndex="15">
-                                                   <font>
-                                                      <Font size="14.0" />
-                                                   </font>
-                                                   <GridPane.margin>
-                                                      <Insets right="10.0" />
-                                                   </GridPane.margin>
+                                                <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Max Level" GridPane.columnIndex="4" GridPane.halignment="RIGHT" GridPane.rowIndex="16">
+                                                    <GridPane.margin>
+                                                        <Insets right="10.0" />
+                                                    </GridPane.margin>
                                                 </Text>
-                                                <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Location" GridPane.halignment="RIGHT" GridPane.rowIndex="22">
-                                                   <font>
-                                                      <Font size="14.0" />
-                                                   </font>
-                                                   <GridPane.margin>
-                                                      <Insets right="10.0" />
-                                                   </GridPane.margin>
+                                                <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Inventory Type" GridPane.halignment="RIGHT" GridPane.rowIndex="8">
+                                                    <GridPane.margin>
+                                                        <Insets right="10.0" />
+                                                    </GridPane.margin>
                                                 </Text>
-                                                <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Warehouse" GridPane.halignment="RIGHT" GridPane.rowIndex="23" GridPane.valignment="CENTER">
-                                                   <font>
-                                                      <Font size="14.0" />
-                                                   </font>
-                                                   <GridPane.margin>
-                                                      <Insets right="10.0" />
-                                                   </GridPane.margin>
+                                                <TextField fx:id="tfInvType" editable="false" styleClass="text-field" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="8" />
+                                                <Text fx:id="lblMeasure1" strokeType="OUTSIDE" strokeWidth="0.0" text="Variant" GridPane.columnIndex="4" GridPane.halignment="RIGHT" GridPane.rowIndex="12">
+                                                    <GridPane.margin>
+                                                        <Insets right="10.0" />
+                                                    </GridPane.margin>
                                                 </Text>
-                                                <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Level" GridPane.columnIndex="4" GridPane.halignment="RIGHT" GridPane.rowIndex="23" GridPane.valignment="CENTER">
-                                                   <font>
-                                                      <Font size="14.0" />
-                                                   </font>
-                                                   <GridPane.margin>
-                                                      <Insets right="10.0" />
-                                                   </GridPane.margin>
+                                                <TextField fx:id="tfVariant" editable="false" styleClass="text-field" GridPane.columnIndex="5" GridPane.columnSpan="2" GridPane.rowIndex="12" />
+                                            </children>
+                                        </GridPane>
+                                    </children>
+                                    <padding>
+                                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                    </padding>
+                                </AnchorPane>
+                                <AnchorPane fx:id="apDetail" style="-fx-border-color: FF8201;">
+                                    <children>
+                                        <GridPane hgap="3.0" vgap="3.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                            <columnConstraints>
+                                                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="110.0" />
+                                                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="170.0" />
+                                                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="20.0" />
+                                                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="170.0" />
+                                            </columnConstraints>
+                                            <rowConstraints>
+                                                <RowConstraints minHeight="10.0" prefHeight="10.0" vgrow="SOMETIMES" />
+                                                <RowConstraints minHeight="10.0" prefHeight="25.0" vgrow="SOMETIMES" />
+                                                <RowConstraints minHeight="10.0" prefHeight="25.0" vgrow="SOMETIMES" />
+                                                <RowConstraints minHeight="10.0" prefHeight="10.0" vgrow="SOMETIMES" />
+                                                <RowConstraints minHeight="10.0" prefHeight="25.0" vgrow="SOMETIMES" />
+                                                <RowConstraints minHeight="10.0" prefHeight="25.0" vgrow="SOMETIMES" />
+                                                <RowConstraints minHeight="10.0" prefHeight="25.0" vgrow="SOMETIMES" />
+                                                <RowConstraints minHeight="10.0" prefHeight="25.0" vgrow="SOMETIMES" />
+                                                <RowConstraints minHeight="10.0" prefHeight="10.0" vgrow="SOMETIMES" />
+                                            </rowConstraints>
+                                            <children>
+                                                <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Location" GridPane.halignment="RIGHT" GridPane.rowIndex="1">
+                                                    <font>
+                                                        <Font name="System Bold" size="12.0" />
+                                                    </font>
+                                                    <GridPane.margin>
+                                                        <Insets right="10.0" />
+                                                    </GridPane.margin>
                                                 </Text>
-                                                <TextField fx:id="txtField22" styleClass="text-field" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="22" />
-                                                <TextField fx:id="txtField23" disable="true" editable="false" styleClass="text-field" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="23" />
-                                                <TextField fx:id="txtField25" styleClass="text-field" GridPane.columnIndex="5" GridPane.columnSpan="2" GridPane.rowIndex="23" />
-                                                <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Section" GridPane.columnIndex="4" GridPane.halignment="RIGHT" GridPane.rowIndex="22">
-                                                   <font>
-                                                      <Font size="14.0" />
-                                                   </font>
-                                                   <GridPane.margin>
-                                                      <Insets right="10.0" />
-                                                   </GridPane.margin>
+                                                <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Warehouse" GridPane.halignment="RIGHT" GridPane.rowIndex="2">
+                                                    <font>
+                                                        <Font name="System Bold" size="12.0" />
+                                                    </font>
+                                                    <GridPane.margin>
+                                                        <Insets right="10.0" />
+                                                    </GridPane.margin>
                                                 </Text>
-                                                <TextField fx:id="txtField24" disable="true" editable="false" styleClass="text-field" GridPane.columnIndex="5" GridPane.columnSpan="2" GridPane.rowIndex="22" />
-                                                <Separator prefWidth="200.0" GridPane.columnSpan="7" GridPane.rowIndex="24">
-                                                   <GridPane.margin>
-                                                      <Insets left="5.0" right="5.0" />
-                                                   </GridPane.margin>
-                                                </Separator>
-                                                <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Beg. Date" GridPane.halignment="RIGHT" GridPane.rowIndex="25" GridPane.valignment="CENTER">
-                                                   <font>
-                                                      <Font size="14.0" />
-                                                   </font>
-                                                   <GridPane.margin>
-                                                      <Insets right="10.0" />
-                                                   </GridPane.margin>
+                                                <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Level" GridPane.columnIndex="3" GridPane.halignment="RIGHT" GridPane.rowIndex="2">
+                                                    <font>
+                                                        <Font name="System Bold" size="12.0" />
+                                                    </font>
+                                                    <GridPane.margin>
+                                                        <Insets right="10.0" />
+                                                    </GridPane.margin>
                                                 </Text>
-                                                <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Beg QOH" GridPane.halignment="RIGHT" GridPane.rowIndex="26" GridPane.valignment="CENTER">
-                                                   <font>
-                                                      <Font size="14.0" />
-                                                   </font>
-                                                   <GridPane.margin>
-                                                      <Insets right="10.0" />
-                                                   </GridPane.margin>
+                                                <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Section" GridPane.columnIndex="3" GridPane.halignment="RIGHT" GridPane.rowIndex="1">
+                                                    <font>
+                                                        <Font name="System Bold" size="12.0" />
+                                                    </font>
+                                                    <GridPane.margin>
+                                                        <Insets right="10.0" />
+                                                    </GridPane.margin>
                                                 </Text>
-                                                <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Min Level" GridPane.halignment="RIGHT" GridPane.rowIndex="27" GridPane.valignment="CENTER">
-                                                   <font>
-                                                      <Font size="14.0" />
-                                                   </font>
-                                                   <GridPane.margin>
-                                                      <Insets right="10.0" />
-                                                   </GridPane.margin>
+                                                <Separator prefWidth="200.0" GridPane.columnSpan="2147483647" GridPane.rowIndex="3" />
+                                                <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Beg. Date" GridPane.halignment="RIGHT" GridPane.rowIndex="4">
+                                                    <font>
+                                                        <Font name="System Bold" size="12.0" />
+                                                    </font>
+                                                    <GridPane.margin>
+                                                        <Insets right="10.0" />
+                                                    </GridPane.margin>
                                                 </Text>
-                                                <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Max Level" GridPane.halignment="RIGHT" GridPane.rowIndex="28" GridPane.valignment="CENTER">
-                                                   <font>
-                                                      <Font size="14.0" />
-                                                   </font>
-                                                   <GridPane.margin>
-                                                      <Insets right="10.0" />
-                                                   </GridPane.margin>
+                                                <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Beg QOH" GridPane.halignment="RIGHT" GridPane.rowIndex="5">
+                                                    <font>
+                                                        <Font name="System Bold" size="12.0" />
+                                                    </font>
+                                                    <GridPane.margin>
+                                                        <Insets right="10.0" />
+                                                    </GridPane.margin>
                                                 </Text>
-                                                <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Class" GridPane.columnIndex="4" GridPane.halignment="RIGHT" GridPane.rowIndex="25" GridPane.valignment="CENTER">
-                                                   <font>
-                                                      <Font size="14.0" />
-                                                   </font>
-                                                   <GridPane.margin>
-                                                      <Insets right="10.0" />
-                                                   </GridPane.margin>
+                                                <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Min Level" GridPane.halignment="RIGHT" GridPane.rowIndex="6">
+                                                    <font>
+                                                        <Font name="System Bold" size="12.0" />
+                                                    </font>
+                                                    <GridPane.margin>
+                                                        <Insets right="10.0" />
+                                                    </GridPane.margin>
                                                 </Text>
-                                                <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Ave. Mo. Sales" GridPane.columnIndex="4" GridPane.halignment="RIGHT" GridPane.rowIndex="26" GridPane.valignment="CENTER">
-                                                   <GridPane.margin>
-                                                      <Insets right="10.0" />
-                                                   </GridPane.margin>
-                                                   <font>
-                                                      <Font size="14.0" />
-                                                   </font>
+                                                <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Max Level" GridPane.halignment="RIGHT" GridPane.rowIndex="7">
+                                                    <font>
+                                                        <Font name="System Bold" size="12.0" />
+                                                    </font>
+                                                    <GridPane.margin>
+                                                        <Insets right="10.0" />
+                                                    </GridPane.margin>
                                                 </Text>
-                                                <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Customer Order" GridPane.columnIndex="4" GridPane.halignment="RIGHT" GridPane.rowIndex="27" GridPane.valignment="CENTER">
-                                                   <font>
-                                                      <Font size="14.0" />
-                                                   </font>
-                                                   <GridPane.margin>
-                                                      <Insets right="10.0" />
-                                                   </GridPane.margin>
+                                                <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Class" GridPane.columnIndex="3" GridPane.halignment="RIGHT" GridPane.rowIndex="4">
+                                                    <font>
+                                                        <Font name="System Bold" size="12.0" />
+                                                    </font>
+                                                    <GridPane.margin>
+                                                        <Insets right="10.0" />
+                                                    </GridPane.margin>
                                                 </Text>
-                                                <Text strokeType="OUTSIDE" strokeWidth="0.0" text="ON HAND" GridPane.columnIndex="4" GridPane.halignment="RIGHT" GridPane.rowIndex="28" GridPane.valignment="CENTER">
-                                                   <font>
-                                                      <Font name="System Bold" size="14.0" />
-                                                   </font>
-                                                   <GridPane.margin>
-                                                      <Insets right="10.0" />
-                                                   </GridPane.margin>
+                                                <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Ave. Mo. Sales" GridPane.columnIndex="3" GridPane.halignment="RIGHT" GridPane.rowIndex="5">
+                                                    <font>
+                                                        <Font name="System Bold" size="12.0" />
+                                                    </font>
+                                                    <GridPane.margin>
+                                                        <Insets right="10.0" />
+                                                    </GridPane.margin>
                                                 </Text>
-                                                <DatePicker fx:id="dpField01" prefWidth="203.0" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="25" />
-                                                <TextField fx:id="txtField28" styleClass="text-field" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="26" />
-                                                <TextField fx:id="txtField29" styleClass="text-field" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="27" />
-                                                <TextField fx:id="txtField30" styleClass="text-field" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="28" />
-                                                <TextField fx:id="txtField31" styleClass="text-field" GridPane.columnIndex="5" GridPane.columnSpan="2" GridPane.rowIndex="25" />
-                                                <TextField fx:id="txtField32" styleClass="text-field" GridPane.columnIndex="5" GridPane.columnSpan="2" GridPane.rowIndex="26" />
-                                                <TextField fx:id="txtField33" styleClass="text-field" GridPane.columnIndex="5" GridPane.columnSpan="2" GridPane.rowIndex="27" />
-                                                <TextField fx:id="txtField34" styleClass="text-field" GridPane.columnIndex="5" GridPane.columnSpan="2" GridPane.rowIndex="28" />
-                                             </children>
-                                          </GridPane>
-                                       </children>
-                                    </AnchorPane>
-                                    <AnchorPane fx:id="AnchorTable" maxWidth="-Infinity" minHeight="0.0" minWidth="-Infinity" style="-fx-border-color: FF8201;" visible="false" SplitPane.resizableWithParent="false">
-                                       <padding>
-                                          <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-                                       </padding>
-                                       <children>
-                                          <VBox layoutY="6.0">
-                                             <children>
-                                                <GridPane fx:id="gridEditable" hgap="3.0" vgap="3.0">
-                                                   <columnConstraints>
-                                                      <ColumnConstraints hgrow="SOMETIMES" minWidth="110.0" prefWidth="130.0" />
-                                                      <ColumnConstraints hgrow="SOMETIMES" minWidth="100.0" prefWidth="100.0" />
-                                                      <ColumnConstraints hgrow="SOMETIMES" minWidth="100.0" prefWidth="100.0" />
-                                                      <ColumnConstraints hgrow="SOMETIMES" minWidth="30.0" prefWidth="30.0" />
-                                                      <ColumnConstraints hgrow="SOMETIMES" minWidth="0.0" prefWidth="120.0" />
-                                                      <ColumnConstraints hgrow="SOMETIMES" minWidth="100.0" prefWidth="100.0" />
-                                                      <ColumnConstraints hgrow="SOMETIMES" minWidth="100.0" prefWidth="100.0" />
-                                                      <ColumnConstraints />
-                                                   </columnConstraints>
-                                                   <rowConstraints>
-                                                      <RowConstraints minHeight="10.0" prefHeight="25.0" vgrow="SOMETIMES" />
-                                                      <RowConstraints minHeight="10.0" prefHeight="25.0" vgrow="SOMETIMES" />
-                                                   </rowConstraints>
-                                                </GridPane>
-                                                <GridPane fx:id="gridFix" hgap="3.0" vgap="3.0">
-                                                   <columnConstraints>
-                                                      <ColumnConstraints hgrow="SOMETIMES" minWidth="110.0" prefWidth="130.0" />
-                                                      <ColumnConstraints hgrow="SOMETIMES" minWidth="100.0" prefWidth="100.0" />
-                                                      <ColumnConstraints hgrow="SOMETIMES" minWidth="100.0" prefWidth="100.0" />
-                                                      <ColumnConstraints hgrow="SOMETIMES" minWidth="30.0" prefWidth="30.0" />
-                                                      <ColumnConstraints hgrow="SOMETIMES" minWidth="0.0" prefWidth="120.0" />
-                                                      <ColumnConstraints hgrow="SOMETIMES" minWidth="100.0" prefWidth="100.0" />
-                                                      <ColumnConstraints hgrow="SOMETIMES" minWidth="100.0" prefWidth="100.0" />
-                                                      <ColumnConstraints />
-                                                   </columnConstraints>
-                                                   <rowConstraints>
-                                                      <RowConstraints minHeight="10.0" prefHeight="10.0" vgrow="SOMETIMES" />
-                                                      <RowConstraints minHeight="10.0" prefHeight="25.0" vgrow="SOMETIMES" />
-                                                      <RowConstraints minHeight="10.0" prefHeight="25.0" vgrow="SOMETIMES" />
-                                                      <RowConstraints minHeight="10.0" prefHeight="25.0" vgrow="SOMETIMES" />
-                                                      <RowConstraints minHeight="10.0" prefHeight="25.0" vgrow="SOMETIMES" />
-                                                   </rowConstraints>
-                                                </GridPane>
-                                             </children>
-                                          </VBox>
-                                       </children>
-                                    </AnchorPane>
-                                 </items>
-                                 <padding>
-                                    <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-                                 </padding>
-                              </SplitPane>
-                           </children>
-                        </AnchorPane>
-                     </content>
-                  </ScrollPane>
-               </children>
-            </AnchorPane>
-         </center>
-      </BorderPane>
-      <StackPane fx:id="overlay" prefHeight="150.0" prefWidth="200.0" style="-fx-background-color: rgb(0, 0, 0,0.5);" visible="false" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
-   </children>
+                                                <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Customer Order" GridPane.columnIndex="3" GridPane.halignment="RIGHT" GridPane.rowIndex="6">
+                                                    <font>
+                                                        <Font name="System Bold" size="12.0" />
+                                                    </font>
+                                                    <GridPane.margin>
+                                                        <Insets right="10.0" />
+                                                    </GridPane.margin>
+                                                </Text>
+                                                <Text fill="RED" strokeType="OUTSIDE" strokeWidth="0.0" text="ON-HAND" GridPane.columnIndex="3" GridPane.halignment="RIGHT" GridPane.rowIndex="7">
+                                                    <font>
+                                                        <Font name="System Bold" size="14.0" />
+                                                    </font>
+                                                    <GridPane.margin>
+                                                        <Insets right="10.0" />
+                                                    </GridPane.margin>
+                                                </Text>
+                                                <DatePicker fx:id="dpBegDate" disable="true" prefWidth="203.0" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+                                                <TextField fx:id="tfQOH" alignment="CENTER_RIGHT" disable="true" editable="false" promptText="0.00" styleClass="text-field" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+                                                <TextField fx:id="tfMinLevelMaster" alignment="CENTER_RIGHT" prefHeight="46.0" promptText="0" styleClass="text-field" GridPane.columnIndex="1" GridPane.rowIndex="6" />
+                                                <TextField fx:id="tfMaxLevelMaster" alignment="CENTER_RIGHT" prefHeight="46.0" promptText="0" styleClass="text-field" GridPane.columnIndex="1" GridPane.rowIndex="7" />
+                                                <TextField fx:id="tfOnHand" alignment="CENTER_RIGHT" disable="true" editable="false" promptText="0.00" styleClass="text-field" GridPane.columnIndex="4" GridPane.rowIndex="7" />
+                                                <TextField fx:id="tfAveMonthlySales" alignment="CENTER_RIGHT" disable="true" editable="false" promptText="0.00" styleClass="text-field" GridPane.columnIndex="4" GridPane.rowIndex="5" />
+                                                <TextField fx:id="tfCXOrder" alignment="CENTER_RIGHT" disable="true" editable="false" promptText="0.00" styleClass="text-field" GridPane.columnIndex="4" GridPane.rowIndex="6" />
+                                                <TextField fx:id="tfClass" disable="true" editable="false" promptText="F" styleClass="text-field" GridPane.columnIndex="4" GridPane.rowIndex="4" />
+                                                <TextField fx:id="tfLocation" promptText="PRESS F3 : Search" styleClass="text-field" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                                                <TextField fx:id="tfWarehouse" promptText="PRESS F3 : Search" styleClass="text-field" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                                                <TextField fx:id="tfSection" promptText="PRESS F3 : Search" styleClass="text-field" GridPane.columnIndex="4" GridPane.rowIndex="1" />
+                                                <TextField fx:id="tfLevel" promptText="PRESS F3 : Search" styleClass="text-field" GridPane.columnIndex="4" GridPane.rowIndex="2" />
+                                            </children>
+                                            <padding>
+                                                <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                            </padding>
+                                        </GridPane>
+                                    </children>
+                                </AnchorPane>
+                            </children>
+                            <padding>
+                                <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                            </padding>
+                        </VBox>
+                    </children>
+                </AnchorPane>
+            </center>
+        </BorderPane>
+    </children>
+    <stylesheets>
+        <URL value="@../css/StyleSheet.css" />
+        <URL value="@../css/Tables.css" />
+    </stylesheets>
 </AnchorPane>
