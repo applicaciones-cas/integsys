@@ -212,7 +212,12 @@ public class PurchaseOrder_ApprovalAppliancesController implements Initializable
         try {
             tfTransactionNo.setText(poPurchasingController.PurchaseOrder().Master().getTransactionNo());
             String lsStatus = "";
-            switch (poPurchasingController.PurchaseOrder().Master().getTransactionStatus()) {
+            if("ABCDEFGHIJ".contains(poPurchasingController.PurchaseOrder().Master().getTransactionStatus())){
+                lsStatus = String.valueOf(poPurchasingController.PurchaseOrder().Master().getTransactionStatus().getBytes()[0] - 64);
+            } else {
+                lsStatus = poPurchasingController.PurchaseOrder().Master().getTransactionStatus();
+            }
+            switch (lsStatus) {
                 case PurchaseOrderStatus.OPEN:
                     lsStatus = "OPEN";
                     break;
@@ -321,35 +326,38 @@ public class PurchaseOrder_ApprovalAppliancesController implements Initializable
                     pagination.toFront();
                     break;
                 case "btnApprove":
-                    if (ShowMessageFX.YesNo(null, psFormName, "Are you sure you want to approve transaction?")) {
-                        poJSON = poPurchasingController.PurchaseOrder().ApproveTransaction("");
-                        if (!"success".equals((String) poJSON.get("result"))) {
-                            ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
-                            break;
-                        }
-                        ShowMessageFX.Information((String) poJSON.get("message"), psFormName, null);
-                        if (!"success".equals((poJSON = poPurchasingController.PurchaseOrder().OpenTransaction(poPurchasingController.PurchaseOrder().Master().getTransactionNo())).get("result"))) {
-                            ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
-                            return;
-                        }
-                        if (ShowMessageFX.YesNo(null, psFormName, "Do you want to print this transaction?")) {
-                            poJSON = poPurchasingController.PurchaseOrder().printTransaction(PurchaseOrderStaticData.Printing_CAR_MC_MPUnit_Appliance);
-                            if (!"success".equals((String) poJSON.get("result"))) {
-                                ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
-                            }
-                        }
-                        clearMasterFields();
-                        clearDetailFields();
-                        detail_data.clear();
-                        pnEditMode = EditMode.UNKNOWN;
-                        pnTblDetailRow = -1;
-                        //this code below use to highlight tblpurchase
-                        tblVwPurchaseOrder.refresh();
-                        main_data.get(pnTblMainRow).setIndex05(PurchaseOrderStatus.APPROVED);
-                        pagination.toBack();
-                    } else {
-                        return;
-                    }
+                    ShowMessageFX.Warning("We already sent a SMS to the approving officer.", psFormName, null);
+                    //Commented below script requested by ma'am Sheryl, Replaced by message box above.
+                    //-Arsiela 11-12-2025 01:22:01 PM
+//                    if (ShowMessageFX.YesNo(null, psFormName, "Are you sure you want to approve transaction?")) {
+//                        poJSON = poPurchasingController.PurchaseOrder().ApproveTransaction("");
+//                        if (!"success".equals((String) poJSON.get("result"))) {
+//                            ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
+//                            break;
+//                        }
+//                        ShowMessageFX.Information((String) poJSON.get("message"), psFormName, null);
+//                        if (!"success".equals((poJSON = poPurchasingController.PurchaseOrder().OpenTransaction(poPurchasingController.PurchaseOrder().Master().getTransactionNo())).get("result"))) {
+//                            ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
+//                            return;
+//                        }
+//                        if (ShowMessageFX.YesNo(null, psFormName, "Do you want to print this transaction?")) {
+//                            poJSON = poPurchasingController.PurchaseOrder().printTransaction(PurchaseOrderStaticData.Printing_CAR_MC_MPUnit_Appliance);
+//                            if (!"success".equals((String) poJSON.get("result"))) {
+//                                ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
+//                            }
+//                        }
+//                        clearMasterFields();
+//                        clearDetailFields();
+//                        detail_data.clear();
+//                        pnEditMode = EditMode.UNKNOWN;
+//                        pnTblDetailRow = -1;
+//                        //this code below use to highlight tblpurchase
+//                        tblVwPurchaseOrder.refresh();
+//                        main_data.get(pnTblMainRow).setIndex05(PurchaseOrderStatus.APPROVED);
+//                        pagination.toBack();
+//                    } else {
+//                        return;
+//                    }
                     break;
                 case "btnSave":
                     if (!ShowMessageFX.YesNo(null, psFormName, "Are you sure you want to save?")) {
