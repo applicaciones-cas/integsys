@@ -146,7 +146,7 @@ public class POReplacement_HistoryController implements Initializable, ScreenInt
         initTableOnClick();
         clearTextFields();
         Platform.runLater(() -> {
-            psIndustryId = "";
+//            psIndustryId = "";
             poController.PurchaseOrderReceiving().Master().setIndustryId(psIndustryId);
             poController.PurchaseOrderReceiving().Master().setCompanyId(psCompanyId);
             poController.PurchaseOrderReceiving().setIndustryId(psIndustryId);

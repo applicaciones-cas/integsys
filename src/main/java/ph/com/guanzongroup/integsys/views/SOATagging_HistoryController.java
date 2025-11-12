@@ -99,7 +99,7 @@ public class SOATagging_HistoryController implements Initializable, ScreenInterf
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        psIndustryId = ""; // general
+//        psIndustryId = ""; // general
 
         poSOATaggingController = new CashflowControllers(oApp, null);
         poJSON = poSOATaggingController.SOATagging().InitTransaction(); // Initialize transaction
