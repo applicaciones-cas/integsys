@@ -265,7 +265,12 @@ public class PurchaseOrder_EntryAppliancesController implements Initializable, S
         try {
             tfTransactionNo.setText(poPurchasingController.PurchaseOrder().Master().getTransactionNo());
             String lsStatus = "";
-            switch (poPurchasingController.PurchaseOrder().Master().getTransactionStatus()) {
+            if("ABCDEFGHIJ".contains(poPurchasingController.PurchaseOrder().Master().getTransactionStatus())){
+                lsStatus = String.valueOf(poPurchasingController.PurchaseOrder().Master().getTransactionStatus().getBytes()[0] - 64);
+            } else {
+                lsStatus = poPurchasingController.PurchaseOrder().Master().getTransactionStatus();
+            }
+            switch (lsStatus) {
                 case PurchaseOrderStatus.OPEN:
                     lsStatus = "OPEN";
                     break;

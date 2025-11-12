@@ -267,7 +267,12 @@ public class PurchaseOrder_EntryController implements Initializable, ScreenInter
         try {
             tfTransactionNo.setText(poPurchasingController.PurchaseOrder().Master().getTransactionNo());
             String lsStatus = "";
-            switch (poPurchasingController.PurchaseOrder().Master().getTransactionStatus()) {
+            if("ABCDEFGHIJ".contains(poPurchasingController.PurchaseOrder().Master().getTransactionStatus())){
+                lsStatus = String.valueOf(poPurchasingController.PurchaseOrder().Master().getTransactionStatus().getBytes()[0] - 64);
+            } else {
+                lsStatus = poPurchasingController.PurchaseOrder().Master().getTransactionStatus();
+            }
+            switch (lsStatus) {
                 case PurchaseOrderStatus.OPEN:
                     lsStatus = "OPEN";
                     break;
@@ -395,7 +400,7 @@ public class PurchaseOrder_EntryController implements Initializable, ScreenInter
                     poJSON = poPurchasingController.PurchaseOrder().NewTransaction();
                     if ("success".equals((String) poJSON.get("result"))) {
                         poPurchasingController.PurchaseOrder().Master().setSupplierID(prevSupplier);
-                        poPurchasingController.PurchaseOrder().Master().setIndustryID("");
+                        poPurchasingController.PurchaseOrder().Master().setIndustryID(psIndustryID);
                         poPurchasingController.PurchaseOrder().Master().setCompanyID(psCompanyID);
                         poPurchasingController.PurchaseOrder().Master().setCategoryCode(psCategoryID);
                         poPurchasingController.PurchaseOrder().Master().setDestinationID(poApp.getBranchCode());
