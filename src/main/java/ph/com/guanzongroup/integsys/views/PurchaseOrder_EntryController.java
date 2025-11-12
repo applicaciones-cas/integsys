@@ -177,7 +177,7 @@ public class PurchaseOrder_EntryController implements Initializable, ScreenInter
 
             tblVwOrderDetails.addEventFilter(KeyEvent.KEY_PRESSED, this::tableKeyEvents);
             Platform.runLater((() -> {
-                psIndustryID = "";
+//                psIndustryID = "";
                 poPurchasingController.PurchaseOrder().Master().setIndustryID(psIndustryID);
                 poPurchasingController.PurchaseOrder().Master().setCompanyID(psCompanyID);
                 poPurchasingController.PurchaseOrder().Master().setCategoryCode(psCategoryID);
@@ -1067,7 +1067,12 @@ public class PurchaseOrder_EntryController implements Initializable, ScreenInter
         }
         double lnRequestQuantity = 0;
         try {
-            lnRequestQuantity = poPurchasingController.PurchaseOrder().Detail(pnTblDetailRow).InvStockRequestDetail().getApproved();
+            System.out.println("SOURCE CODE: " + poPurchasingController.PurchaseOrder().Detail(pnTblDetailRow).getSouceCode());
+            if(PurchaseOrderStatus.SourceCode.POQUOTATION.equals(poPurchasingController.PurchaseOrder().Detail(pnTblDetailRow).getSouceCode())){
+                lnRequestQuantity = poPurchasingController.PurchaseOrder().Detail(pnTblDetailRow).POQuotationDetail().getQuantity();
+            } else {
+                lnRequestQuantity = poPurchasingController.PurchaseOrder().Detail(pnTblDetailRow).InvStockRequestDetail().getApproved();
+            }
             if (!poPurchasingController.PurchaseOrder().Detail(pnTblDetailRow).getSouceNo().isEmpty()) {
                 if (Integer.parseInt(fsValue) > lnRequestQuantity) {
                     ShowMessageFX.Warning("Invalid order quantity entered. The item is from a stock request, and the order quantity must not be greater than the requested quantity.", psFormName, null);
@@ -1331,7 +1336,7 @@ public class PurchaseOrder_EntryController implements Initializable, ScreenInter
         }
         if (pnTblDetailRow >= 0 && pnTblDetailRow < poPurchasingController.PurchaseOrder().Detail().size()) {
             try {
-                if (!poPurchasingController.PurchaseOrder().Detail(pnTblDetailRow).Inventory().getInventoryTypeId().equals("0007")) {
+                if (!"0007".equals(poPurchasingController.PurchaseOrder().Detail(pnTblDetailRow).Inventory().getInventoryTypeId())) {
                     if (pnTblDetailRow != -1) {
                         CustomCommonUtil.setDisable(!lbShow, tfBarcode, tfDescription);
                     }
@@ -1898,7 +1903,7 @@ public class PurchaseOrder_EntryController implements Initializable, ScreenInter
                     tfBarcode.setDisable(isSourceNotEmpty);
                     tfDescription.setDisable(isSourceNotEmpty);
 
-                    if (poPurchasingController.PurchaseOrder().Detail(pnTblDetailRow).Inventory().getInventoryTypeId().equals("0007")) {
+                    if ("0007".equals(poPurchasingController.PurchaseOrder().Detail(pnTblDetailRow).Inventory().getInventoryTypeId())) {
                         CustomCommonUtil.setDisable(false, tfBarcode, tfDescription);
                         tfOrderQuantity.requestFocus();
                     }
