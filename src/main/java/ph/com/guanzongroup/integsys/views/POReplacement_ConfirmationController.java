@@ -173,7 +173,7 @@ public class POReplacement_ConfirmationController implements Initializable, Scre
         clearTextFields();
 
         Platform.runLater(() -> {
-            psIndustryId = "";
+//            psIndustryId = "";
             poController.PurchaseOrderReceiving().Master().setIndustryId(psIndustryId);
             poController.PurchaseOrderReceiving().Master().setCompanyId(psCompanyId);
             poController.PurchaseOrderReceiving().setIndustryId(psIndustryId);

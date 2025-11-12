@@ -135,7 +135,7 @@ public class SOATagging_EntryController implements Initializable, ScreenInterfac
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        psIndustryId = ""; // general
+//        psIndustryId = ""; // general
 
         poSOATaggingController = new CashflowControllers(oApp, null);
         poJSON = new JSONObject();
