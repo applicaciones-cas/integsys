@@ -75,7 +75,7 @@ public class APPaymentAdjustment_EntryController implements Initializable, Scree
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        psIndustryId = ""; // general
+//        psIndustryId = ""; // general
 
         poJSON = new JSONObject();
         poAPPaymentAdjustmentController = new CashflowControllers(oApp, null);
