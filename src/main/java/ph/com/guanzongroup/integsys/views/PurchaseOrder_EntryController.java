@@ -395,7 +395,7 @@ public class PurchaseOrder_EntryController implements Initializable, ScreenInter
                     poJSON = poPurchasingController.PurchaseOrder().NewTransaction();
                     if ("success".equals((String) poJSON.get("result"))) {
                         poPurchasingController.PurchaseOrder().Master().setSupplierID(prevSupplier);
-                        poPurchasingController.PurchaseOrder().Master().setIndustryID("");
+                        poPurchasingController.PurchaseOrder().Master().setIndustryID(psIndustryID);
                         poPurchasingController.PurchaseOrder().Master().setCompanyID(psCompanyID);
                         poPurchasingController.PurchaseOrder().Master().setCategoryCode(psCategoryID);
                         poPurchasingController.PurchaseOrder().Master().setDestinationID(poApp.getBranchCode());
