@@ -100,7 +100,7 @@ public class APPaymentAdjustment_ConfirmationController implements Initializable
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        psIndustryId = ""; // general
+//        psIndustryId = ""; // general
 
         poJSON = new JSONObject();
         poAPPaymentAdjustmentController = new CashflowControllers(oApp, null);

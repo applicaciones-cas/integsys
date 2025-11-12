@@ -784,7 +784,12 @@ public class PurchaseOrder_ApprovalMCController implements Initializable, Screen
         }
         double lnRequestQuantity = 0;
         try {
-            lnRequestQuantity = poPurchasingController.PurchaseOrder().Detail(pnTblDetailRow).InvStockRequestDetail().getApproved();
+            System.out.println("SOURCE CODE: " + poPurchasingController.PurchaseOrder().Detail(pnTblDetailRow).getSouceCode());
+            if(PurchaseOrderStatus.SourceCode.POQUOTATION.equals(poPurchasingController.PurchaseOrder().Detail(pnTblDetailRow).getSouceCode())){
+                lnRequestQuantity = poPurchasingController.PurchaseOrder().Detail(pnTblDetailRow).POQuotationDetail().getQuantity();
+            } else {
+                lnRequestQuantity = poPurchasingController.PurchaseOrder().Detail(pnTblDetailRow).InvStockRequestDetail().getApproved();
+            }
             if (!poPurchasingController.PurchaseOrder().Detail(pnTblDetailRow).getSouceNo().isEmpty()) {
                 if (Integer.parseInt(fsValue) > lnRequestQuantity) {
                     ShowMessageFX.Warning("Invalid order quantity entered. The item is from a stock request, and the order quantity must not be greater than the requested quantity.", psFormName, null);

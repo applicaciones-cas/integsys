@@ -220,19 +220,24 @@ public class AccountsAccreditation_ConfirmationController implements Initializab
                         return;
                     }
 
-                    if (!isJSONSuccess(poAppController.saveRecord(), "Initialize Save Record")) {
-                        return;
-                    }
-                    if (poAppController.getModel().getRecordStatus().equals("0")) {
-                        if (ShowMessageFX.OkayCancel(null, psFormName, "Do you want to Confirm transaction?") == true) {
-                            if (!isJSONSuccess(poAppController.CloseTransaction(), "Initialize Close Transaction")) {
-                                return;
+                    if (ShowMessageFX.OkayCancel(null, psFormName, "Are you sure you want to save client??") == true) {
+                        if (!isJSONSuccess(poAppController.saveRecord(), "Initialize Save Record")) {
+                            return;
+                        }
+                        ShowMessageFX.Information("Client saved successfully!", "Initialize Save Record", null);
+                        
+                        if (poAppController.getModel().getRecordStatus().equals("0")) {
+                            if (ShowMessageFX.OkayCancel(null, psFormName, "Do you want to Confirm transaction?") == true) {
+                                
+                                if (!isJSONSuccess(poAppController.CloseTransaction(), "Initialize Close Transaction")) {
+                                    return;
+                                }
                             }
                         }
-                    }
 
-                    getLoadedClient();
-                    initButtonDisplay(poAppController.getEditMode());
+                        getLoadedClient();
+                        initButtonDisplay(poAppController.getEditMode());
+                    }
                     break;
                 case "btnConfirm":
                     if (tfTransactionNo.getText().isEmpty()) {

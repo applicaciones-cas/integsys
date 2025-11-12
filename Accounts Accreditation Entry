@@ -2220,3 +2220,123 @@ Nov 08, 2025 10:57:04 AM org.guanzon.appdriver.base.LogWrapper info
 INFO: Accounts Accreditation Entry : Success on 
 Nov 08, 2025 10:57:14 AM org.guanzon.appdriver.base.LogWrapper info
 INFO: Accounts Accreditation Entry : Success on 
+Nov 08, 2025 1:46:03 PM org.guanzon.appdriver.base.LogWrapper info
+INFO: Accounts Accreditation Entry : Success on Initialize New Transaction
+Nov 08, 2025 1:46:09 PM org.guanzon.appdriver.base.LogWrapper severe
+SEVERE: Accounts Accreditation Entry : No record selected.
+Nov 08, 2025 1:46:48 PM org.guanzon.appdriver.base.LogWrapper info
+INFO: Accounts Accreditation Entry : Success on Initialize Search Client! 
+Nov 08, 2025 1:47:03 PM org.guanzon.appdriver.base.LogWrapper severe
+SEVERE: Accounts Accreditation Entry : No record selected.
+Nov 08, 2025 1:47:05 PM org.guanzon.appdriver.base.LogWrapper severe
+SEVERE: Accounts Accreditation Entry : Category not be empty.
+Nov 08, 2025 3:21:38 PM org.guanzon.appdriver.base.LogWrapper info
+INFO: Accounts Accreditation Entry : Success on Initialize New Transaction
+Nov 08, 2025 3:21:46 PM org.guanzon.appdriver.base.LogWrapper severe
+SEVERE: Accounts Accreditation Entry : No record selected.
+Nov 08, 2025 3:22:17 PM org.guanzon.appdriver.base.LogWrapper info
+INFO: Accounts Accreditation Entry : Success on Initialize Search Client! 
+Nov 08, 2025 3:22:29 PM org.guanzon.appdriver.base.LogWrapper info
+INFO: Accounts Accreditation Entry : Success on Initialize Search Client! 
+Nov 08, 2025 3:22:48 PM org.guanzon.appdriver.base.LogWrapper info
+INFO: Accounts Accreditation Entry : Success on Initialize Search Client! 
+Nov 08, 2025 3:24:09 PM org.guanzon.appdriver.base.LogWrapper info
+INFO: Accounts Accreditation Entry : Success on Initialize Search Client! 
+Nov 08, 2025 3:24:34 PM org.guanzon.appdriver.base.LogWrapper info
+INFO: Accounts Accreditation Entry : Success on Initialize Search Client! 
+Nov 08, 2025 3:24:45 PM org.guanzon.appdriver.base.LogWrapper info
+INFO: Accounts Accreditation Entry : Success on Initialize Search Client! 
+Nov 08, 2025 3:25:06 PM org.guanzon.appdriver.base.LogWrapper info
+INFO: Accounts Accreditation Entry : Success on Initialize Search Client! 
+Nov 08, 2025 3:25:12 PM org.guanzon.appdriver.base.LogWrapper info
+INFO: Accounts Accreditation Entry : Success on Initialize Search Client! 
+Nov 08, 2025 3:25:31 PM org.guanzon.appdriver.base.LogWrapper info
+INFO: Accounts Accreditation Entry : Success on Initialize Search Client! 
+Nov 08, 2025 3:29:37 PM org.guanzon.appdriver.base.LogWrapper info
+INFO: Accounts Accreditation Entry : Success on Initialize New Transaction
+Nov 08, 2025 3:29:45 PM org.guanzon.appdriver.base.LogWrapper info
+INFO: Accounts Accreditation Entry : Success on 
+Nov 08, 2025 3:29:48 PM org.guanzon.appdriver.base.LogWrapper info
+INFO: Accounts Accreditation Entry : Success on Initialize Update Record
+Nov 08, 2025 3:29:53 PM org.guanzon.appdriver.base.LogWrapper info
+INFO: Accounts Accreditation Entry : Success on Initialize Save Record
+Nov 08, 2025 3:29:54 PM org.guanzon.appdriver.base.LogWrapper info
+INFO: Accounts Accreditation Entry : Success on Initialize Open Transaction
+Nov 08, 2025 3:29:58 PM org.guanzon.appdriver.base.LogWrapper info
+INFO: Accounts Accreditation Entry : Success on Initialize Close Transaction
+Nov 08, 2025 3:30:08 PM org.guanzon.appdriver.base.LogWrapper info
+INFO: Accounts Accreditation Entry : Success on 
+Nov 08, 2025 3:30:11 PM org.guanzon.appdriver.base.LogWrapper info
+INFO: Accounts Accreditation Entry : Success on Initialize Update Record
+Nov 08, 2025 3:30:22 PM org.guanzon.appdriver.base.LogWrapper severe
+SEVERE: Accounts Accreditation Entry :null
+Nov 08, 2025 3:30:43 PM org.guanzon.appdriver.base.LogWrapper info
+INFO: Accounts Accreditation Entry : Success on Initialize Search Client! 
+Nov 08, 2025 3:30:48 PM org.guanzon.appdriver.base.LogWrapper info
+INFO: Accounts Accreditation Entry : Success on Initialize Save Record
+Nov 08, 2025 3:30:49 PM org.guanzon.appdriver.base.LogWrapper info
+INFO: Accounts Accreditation Entry : Success on Initialize Open Transaction
+Nov 08, 2025 3:30:52 PM org.guanzon.appdriver.base.LogWrapper info
+INFO: Accounts Accreditation Entry : Success on Initialize Close Transaction
+Nov 12, 2025 9:12:08 AM org.guanzon.appdriver.base.LogWrapper info
+INFO: Accounts Accreditation Entry : Success on Initialize New Transaction
+Nov 12, 2025 9:12:17 AM org.guanzon.appdriver.base.LogWrapper severe
+SEVERE: Accounts Accreditation Entry :null
+Nov 12, 2025 9:14:34 AM org.guanzon.appdriver.base.LogWrapper info
+INFO: Accounts Accreditation Entry : Success on 
+Nov 12, 2025 9:15:04 AM org.guanzon.appdriver.base.LogWrapper info
+INFO: Accounts Accreditation Entry : Success on Initialize Update Record
+Nov 12, 2025 9:15:12 AM org.guanzon.appdriver.base.LogWrapper info
+INFO: Accounts Accreditation Entry : Success on Initialize Save Record
+Nov 12, 2025 9:15:15 AM org.guanzon.appdriver.base.LogWrapper info
+INFO: Accounts Accreditation Entry : Success on Initialize Open Transaction
+Nov 12, 2025 9:15:18 AM org.guanzon.appdriver.base.LogWrapper info
+INFO: Accounts Accreditation Entry : Success on Initialize Close Transaction
+Nov 12, 2025 9:16:50 AM org.guanzon.appdriver.base.LogWrapper info
+INFO: Accounts Accreditation Entry : Success on Initialize New Transaction
+Nov 12, 2025 9:16:58 AM org.guanzon.appdriver.base.LogWrapper info
+INFO: Accounts Accreditation Entry : Success on Initialize Search Category! 
+Nov 12, 2025 9:17:02 AM org.guanzon.appdriver.base.LogWrapper severe
+SEVERE: Accounts Accreditation Entry : No record selected.
+Nov 12, 2025 9:17:15 AM org.guanzon.appdriver.base.LogWrapper info
+INFO: Accounts Accreditation Entry : Success on Initialize Search Client! 
+Nov 12, 2025 9:21:00 AM org.guanzon.appdriver.base.LogWrapper info
+INFO: Accounts Accreditation Entry : Success on Initialize New Transaction
+Nov 12, 2025 9:21:04 AM org.guanzon.appdriver.base.LogWrapper info
+INFO: Accounts Accreditation Entry : Success on Initialize Search Category! 
+Nov 12, 2025 9:21:07 AM org.guanzon.appdriver.base.LogWrapper severe
+SEVERE: Accounts Accreditation Entry : No record selected.
+Nov 12, 2025 9:21:14 AM org.guanzon.appdriver.base.LogWrapper info
+INFO: Accounts Accreditation Entry : Success on Initialize Search Client! 
+Nov 12, 2025 9:23:33 AM org.guanzon.appdriver.base.LogWrapper info
+INFO: Accounts Accreditation Entry : Success on Initialize New Transaction
+Nov 12, 2025 9:23:41 AM org.guanzon.appdriver.base.LogWrapper info
+INFO: Accounts Accreditation Entry : Success on Initialize Search Category! 
+Nov 12, 2025 9:23:44 AM org.guanzon.appdriver.base.LogWrapper severe
+SEVERE: Accounts Accreditation Entry : No record selected.
+Nov 12, 2025 9:23:54 AM org.guanzon.appdriver.base.LogWrapper info
+INFO: Accounts Accreditation Entry : Success on Initialize Search Client! 
+Nov 12, 2025 9:24:16 AM org.guanzon.appdriver.base.LogWrapper info
+INFO: Accounts Accreditation Entry : Success on Initialize Save Record
+Nov 12, 2025 9:24:21 AM org.guanzon.appdriver.base.LogWrapper info
+INFO: Accounts Accreditation Entry : Success on Initialize Open Transaction
+Nov 12, 2025 9:24:21 AM org.guanzon.appdriver.base.LogWrapper info
+INFO: Accounts Accreditation Entry : Success on Initialize Close Transaction
+Nov 12, 2025 9:24:47 AM org.guanzon.appdriver.base.LogWrapper info
+INFO: Accounts Accreditation Entry : Success on Initialize New Transaction
+Nov 12, 2025 9:24:52 AM org.guanzon.appdriver.base.LogWrapper info
+INFO: Accounts Accreditation Entry : Success on Initialize Search Category! 
+Nov 12, 2025 9:25:20 AM org.guanzon.appdriver.base.LogWrapper severe
+SEVERE: Accounts Accreditation Entry : No record selected.
+Nov 12, 2025 9:43:25 AM org.guanzon.appdriver.base.LogWrapper info
+INFO: Accounts Accreditation Entry : Success on Initialize New Transaction
+Nov 12, 2025 9:43:30 AM org.guanzon.appdriver.base.LogWrapper info
+INFO: Accounts Accreditation Entry : Success on Initialize Search Category! 
+Nov 12, 2025 9:45:33 AM org.guanzon.appdriver.base.LogWrapper info
+INFO: Accounts Accreditation Entry : Success on Initialize Search Client! 
+Nov 12, 2025 9:45:44 AM org.guanzon.appdriver.base.LogWrapper info
+INFO: Accounts Accreditation Entry : Success on Initialize Save Record
+Nov 12, 2025 9:45:47 AM org.guanzon.appdriver.base.LogWrapper info
+INFO: Accounts Accreditation Entry : Success on Initialize Open Transaction
+Nov 12, 2025 9:45:47 AM org.guanzon.appdriver.base.LogWrapper info
+INFO: Accounts Accreditation Entry : Success on Initialize Close Transaction

@@ -193,7 +193,7 @@ public class SIPosting_Controller implements Initializable, ScreenInterface {
         clearTextFields();
 
         Platform.runLater(() -> {
-            psIndustryId = "";
+//            psIndustryId = "";
             poPurchaseReceivingController.PurchaseOrderReceiving().Master().setIndustryId(psIndustryId);
             poPurchaseReceivingController.PurchaseOrderReceiving().Master().setCompanyId(psCompanyId);
             poPurchaseReceivingController.PurchaseOrderReceiving().setIndustryId(psIndustryId);
