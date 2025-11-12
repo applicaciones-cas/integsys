@@ -307,12 +307,9 @@ public class DeliveryAcceptance_HistoryMCController implements Initializable, Sc
                     loadTableDetail();
                     loadTableAttachment();
                 }
-            } catch (CloneNotSupportedException ex) {
-                Logger.getLogger(DeliveryAcceptance_HistoryMCController.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (SQLException ex) {
-                Logger.getLogger(DeliveryAcceptance_HistoryMCController.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (GuanzonException ex) {
-                Logger.getLogger(DeliveryAcceptance_HistoryMCController.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (CloneNotSupportedException | SQLException | GuanzonException ex) {
+                Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+                ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
             }
 
         }
@@ -380,10 +377,9 @@ public class DeliveryAcceptance_HistoryMCController implements Initializable, Sc
 
         } catch (IOException e) {
             e.printStackTrace();
-        } catch (SQLException ex) {
-            Logger.getLogger(DeliveryAcceptance_EntryCarController.class.getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
-        } catch (GuanzonException ex) {
-            Logger.getLogger(DeliveryAcceptance_EntryCarController.class.getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+        } catch (SQLException | GuanzonException ex) {
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -651,12 +647,9 @@ public class DeliveryAcceptance_HistoryMCController implements Initializable, Sc
                 case UP:
                     CommonUtils.SetPreviousFocus(txtField);
             }
-        } catch (GuanzonException ex) {
-            Logger.getLogger(DeliveryAcceptance_HistoryMCController.class.getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
-        } catch (SQLException ex) {
-            Logger.getLogger(DeliveryAcceptance_HistoryMCController.class.getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
-        } catch (CloneNotSupportedException ex) {
-            Logger.getLogger(DeliveryAcceptance_HistoryMCController.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (GuanzonException | SQLException | CloneNotSupportedException ex) {
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -679,7 +672,8 @@ public class DeliveryAcceptance_HistoryMCController implements Initializable, Sc
                 tfSearchReferenceNo.setText("");
             }
         } catch (SQLException | GuanzonException ex) {
-            Logger.getLogger(DeliveryAcceptance_HistoryMCController.class.getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -763,10 +757,9 @@ public class DeliveryAcceptance_HistoryMCController implements Initializable, Sc
             tfOrderQuantity.setText(String.valueOf(poPurchaseReceivingController.PurchaseOrderReceiving().Detail(pnDetail).getOrderQty().intValue()));
             tfReceiveQuantity.setText(String.valueOf(poPurchaseReceivingController.PurchaseOrderReceiving().Detail(pnDetail).getQuantity().intValue()));
 
-        } catch (SQLException ex) {
-            Logger.getLogger(DeliveryAcceptance_HistoryMCController.class.getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
-        } catch (GuanzonException ex) {
-            Logger.getLogger(DeliveryAcceptance_HistoryMCController.class.getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+        } catch (SQLException | GuanzonException ex) {
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
 
     }
@@ -859,10 +852,9 @@ public class DeliveryAcceptance_HistoryMCController implements Initializable, Sc
             tfDiscountAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poPurchaseReceivingController.PurchaseOrderReceiving().Master().getDiscount(), true));
             tfTotal.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poPurchaseReceivingController.PurchaseOrderReceiving().Master().getTransactionTotal(), true));
 
-        } catch (SQLException ex) {
-            Logger.getLogger(DeliveryAcceptance_HistoryMCController.class.getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
-        } catch (GuanzonException ex) {
-            Logger.getLogger(DeliveryAcceptance_HistoryMCController.class.getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+        } catch (SQLException | GuanzonException ex) {
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
 
     }
@@ -893,7 +885,8 @@ public class DeliveryAcceptance_HistoryMCController implements Initializable, Sc
             }
 
         } catch (CloneNotSupportedException | SQLException | GuanzonException ex) {
-            Logger.getLogger(DeliveryAcceptance_HistoryMCController.class.getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -985,12 +978,9 @@ public class DeliveryAcceptance_HistoryMCController implements Initializable, Sc
                             tblViewOrderDetails.getFocusModel().focus(pnDetail);
                             loadRecordDetail();
                         }
-                    } catch (SQLException ex) {
-                        Logger.getLogger(DeliveryAcceptance_HistoryMCController.class.getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
-                    } catch (GuanzonException ex) {
-                        Logger.getLogger(DeliveryAcceptance_HistoryMCController.class.getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
-                    } catch (CloneNotSupportedException ex) {
-                        Logger.getLogger(DeliveryAcceptance_HistoryMCController.class.getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+                    } catch (SQLException | GuanzonException | CloneNotSupportedException ex) {
+                        Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+                        ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
                     }
                 });
 

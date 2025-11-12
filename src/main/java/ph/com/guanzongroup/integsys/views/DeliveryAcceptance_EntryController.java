@@ -299,10 +299,9 @@ public class DeliveryAcceptance_EntryController implements Initializable, Screen
 
         } catch (IOException e) {
             e.printStackTrace();
-        } catch (SQLException ex) {
+        } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
-        } catch (GuanzonException ex) {
-            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -532,10 +531,9 @@ public class DeliveryAcceptance_EntryController implements Initializable, Screen
                 initButton(pnEditMode);
 
             }
-        } catch (CloneNotSupportedException | SQLException | GuanzonException ex) {
-            Logger.getLogger(DeliveryAcceptance_EntryController.class.getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
-        } catch (ParseException ex) {
-            Logger.getLogger(DeliveryAcceptance_EntryController.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (CloneNotSupportedException | SQLException | GuanzonException | ParseException ex) {
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -681,7 +679,8 @@ public class DeliveryAcceptance_EntryController implements Initializable, Screen
                             return;
                         }
                     } catch (SQLException | GuanzonException ex) {
-                        Logger.getLogger(DeliveryAcceptance_EntryController.class.getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+                        Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+                        ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
                     }
 
                     break;
@@ -744,8 +743,9 @@ public class DeliveryAcceptance_EntryController implements Initializable, Screen
                             return;
                         }
                     } catch (SQLException | GuanzonException ex) {
-                        Logger.getLogger(DeliveryAcceptance_EntryController.class.getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
-                    } 
+                        Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+                        ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
+                    }
                     if (pbEntered) {
                         if (lnNewVal != lnOldVal && poPurchaseReceivingController.PurchaseOrderReceiving().Detail(pnDetail).isSerialized()) {
                             if ((Double.valueOf(lsValue) > 0
@@ -1195,7 +1195,8 @@ public class DeliveryAcceptance_EntryController implements Initializable, Screen
                     break;
             }
         } catch (GuanzonException | SQLException ex) {
-            Logger.getLogger(DeliveryAcceptance_EntryController.class.getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -1393,7 +1394,8 @@ public class DeliveryAcceptance_EntryController implements Initializable, Screen
                 }
             }
         } catch (SQLException ex) {
-            Logger.getLogger(DeliveryAcceptance_EntryController.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -1604,7 +1606,8 @@ public class DeliveryAcceptance_EntryController implements Initializable, Screen
             lblSource.setText(poPurchaseReceivingController.PurchaseOrderReceiving().Master().Company().getCompanyName());
 
         } catch (SQLException | GuanzonException ex) {
-            Logger.getLogger(DeliveryAcceptance_EntryController.class.getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -1656,7 +1659,8 @@ public class DeliveryAcceptance_EntryController implements Initializable, Screen
 
             updateCaretPositions(apDetail);
         } catch (SQLException | GuanzonException ex) {
-            Logger.getLogger(DeliveryAcceptance_EntryController.class.getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
 
     }
@@ -1761,7 +1765,8 @@ public class DeliveryAcceptance_EntryController implements Initializable, Screen
 
             updateCaretPositions(apMaster);
         } catch (SQLException | GuanzonException ex) {
-            Logger.getLogger(DeliveryAcceptance_EntryController.class.getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
 
     }
@@ -2083,7 +2088,8 @@ public class DeliveryAcceptance_EntryController implements Initializable, Screen
             }
 
         } catch (CloneNotSupportedException | SQLException | GuanzonException ex) {
-            Logger.getLogger(DeliveryAcceptance_EntryController.class.getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -2199,7 +2205,8 @@ public class DeliveryAcceptance_EntryController implements Initializable, Screen
                         }
                         loadRecordMaster();
                     } catch (SQLException | GuanzonException | CloneNotSupportedException ex) {
-                        Logger.getLogger(DeliveryAcceptance_EntryController.class.getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+                        Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+                        ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
                     }
 
                 });
