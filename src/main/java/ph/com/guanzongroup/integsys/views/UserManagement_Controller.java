@@ -123,10 +123,9 @@ public class UserManagement_Controller implements Initializable, ScreenInterface
             poSysUser.setApplicationDriver(oApp);
             poSysUser.setWithParentClass(false);
             poSysUser.setLogWrapper(poLogWrapper);
-            poSysUser.setRecordStatus("1");
             poSysUser.initialize();
             poJSON = poSysUser.newRecord();
-
+            
 //            Platform.runLater(() -> btnNew.fire());
 
         } catch (SQLException | GuanzonException ex) {
@@ -233,6 +232,7 @@ public class UserManagement_Controller implements Initializable, ScreenInterface
                 switch (lsButton) {
                     case "btnBrowse":
                         String loValue = "";
+                        poSysUser.setRecordStatus("1" + "0");
                         switch (psActiveField) {
                             case "tfSearchEmployeeName":
                                 if (!poSysUser.getModel().getUserName().isEmpty() && !tfSearchEmployeeName.getText().isEmpty()){
@@ -312,21 +312,31 @@ public class UserManagement_Controller implements Initializable, ScreenInterface
                         break;
                         
                     case "btnStatus":
-                        switch (poSysUser.getModel().getUserStatus()) {
-                            case "0":
-                                poJSON = poSysUser.activateRecord();
-                                break;
-                            case "1":
-                                poJSON = poSysUser.deactivateRecord();
-                                break;
-                            default:
-                                throw new AssertionError();
-                        }   
+                        String userID = poSysUser.getModel().getUserId();
+                        String userStatus = poSysUser.getModel().getUserStatus();
+                        
+                        JSONObject poJSON = "0".equals(userStatus)
+                                ? poSysUser.activateRecord()
+                                : poSysUser.deactivateRecord();
+
+                        if (!"success".equals(poJSON.get("result"))) {
+                            ShowMessageFX.Warning((String) poJSON.get("message"), pxeModuleName, null);
+                            return;
+                        }
+                        
+                        String msg = "0".equals(userStatus) ? "User activated successfully." : "User deactivated successfully.";
+                        ShowMessageFX.Information(msg, pxeModuleName, null);
+                        
+                        poJSON = poSysUser.openRecord(userID);
                         if (!"success".equals((String) poJSON.get("result"))) {
                             ShowMessageFX.Warning((String) poJSON.get("message"), pxeModuleName, null);
                             return;
                         }
-                        ShowMessageFX.Warning((String) poJSON.get("message"), pxeModuleName, null);
+                        loadRecordMaster();
+                        pnEditMode = poSysUser.getEditMode();
+                        initButton(pnEditMode);
+                        tfSearchLogInName.clear();
+                        tfSearchEmployeeName.clear();
                         break;
                         
                     case "btnSave":
