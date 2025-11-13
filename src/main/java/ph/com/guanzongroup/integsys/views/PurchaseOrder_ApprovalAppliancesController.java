@@ -218,9 +218,6 @@ public class PurchaseOrder_ApprovalAppliancesController implements Initializable
                 lsStatus = poPurchasingController.PurchaseOrder().Master().getTransactionStatus();
             }
             switch (lsStatus) {
-                case PurchaseOrderStatus.OPEN:
-                    lsStatus = "OPEN";
-                    break;
                 case PurchaseOrderStatus.CONFIRMED:
                     lsStatus = "CONFIRMED";
                     break;
@@ -234,7 +231,19 @@ public class PurchaseOrder_ApprovalAppliancesController implements Initializable
                     lsStatus = "CANCELLED";
                     break;
                 case PurchaseOrderStatus.VOID:
-                    lsStatus = "VOID";
+                    lsStatus = "VOIDED";
+                    break;
+                case PurchaseOrderStatus.PROCESSED:
+                    lsStatus = "PROCESSED";
+                    break;
+                case PurchaseOrderStatus.POSTED:
+                    lsStatus = "POSTED";
+                    break;
+                case PurchaseOrderStatus.OPEN:
+                    lsStatus = "OPEN";
+                    break;
+                default:
+                    lsStatus = "UNKNOWN";
                     break;
             }
             lblTransactionStatus.setText(lsStatus);
