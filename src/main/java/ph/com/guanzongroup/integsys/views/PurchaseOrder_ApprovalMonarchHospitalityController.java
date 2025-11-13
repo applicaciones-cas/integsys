@@ -339,7 +339,7 @@ public class PurchaseOrder_ApprovalMonarchHospitalityController implements Initi
                     pagination.toFront();
                     break;
                 case "btnApprove":
-                    ShowMessageFX.Warning("An SMS has been sent to the approving officer for the transaction’s approval.\nKindly check the transaction again after a few minutes.", psFormName, null);
+                    ShowMessageFX.Warning("An SMS has been sent to the approving officer for transaction approval.\nThis PO will be automatically approved once the approving officer grants their approval.", psFormName, null);
                     //Commented below script requested by ma'am Sheryl, Replaced by message box above.
                     //-Arsiela 11-12-2025 01:22:01 PM
 //                    if (ShowMessageFX.YesNo(null, psFormName, "Are you sure you want to approve transaction?")) {
