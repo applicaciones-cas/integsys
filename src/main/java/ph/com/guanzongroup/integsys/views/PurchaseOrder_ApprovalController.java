@@ -222,9 +222,6 @@ public class PurchaseOrder_ApprovalController implements Initializable, ScreenIn
                 lsStatus = poPurchasingController.PurchaseOrder().Master().getTransactionStatus();
             }
             switch (lsStatus) {
-                case PurchaseOrderStatus.OPEN:
-                    lsStatus = "OPEN";
-                    break;
                 case PurchaseOrderStatus.CONFIRMED:
                     lsStatus = "CONFIRMED";
                     break;
@@ -238,7 +235,19 @@ public class PurchaseOrder_ApprovalController implements Initializable, ScreenIn
                     lsStatus = "CANCELLED";
                     break;
                 case PurchaseOrderStatus.VOID:
-                    lsStatus = "VOID";
+                    lsStatus = "VOIDED";
+                    break;
+                case PurchaseOrderStatus.PROCESSED:
+                    lsStatus = "PROCESSED";
+                    break;
+                case PurchaseOrderStatus.POSTED:
+                    lsStatus = "POSTED";
+                    break;
+                case PurchaseOrderStatus.OPEN:
+                    lsStatus = "OPEN";
+                    break;
+                default:
+                    lsStatus = "UNKNOWN";
                     break;
             }
             lblTransactionStatus.setText(lsStatus);
@@ -331,7 +340,7 @@ public class PurchaseOrder_ApprovalController implements Initializable, ScreenIn
                     pagination.toFront();
                     break;
                 case "btnApprove":
-                    ShowMessageFX.Warning("We already sent a SMS to the approving officer.", psFormName, null);
+                    ShowMessageFX.Warning("An SMS has been sent to the approving officer for the transaction’s approval.\nKindly check the transaction again after a few minutes.", psFormName, null);
                     //Commented below script requested by ma'am Sheryl, Replaced by message box above.
                     //-Arsiela 11-12-2025 01:22:01 PM
 //                    if (ShowMessageFX.YesNo(null, psFormName, "Are you sure you want to approve transaction?")) {
