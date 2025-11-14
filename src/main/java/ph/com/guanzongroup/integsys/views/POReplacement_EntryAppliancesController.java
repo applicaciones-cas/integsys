@@ -394,11 +394,10 @@ public class POReplacement_EntryAppliancesController implements Initializable, S
                 }
 
             }
-        } catch (CloneNotSupportedException | SQLException | GuanzonException ex) {
+        } catch (CloneNotSupportedException | SQLException | GuanzonException | ParseException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
-        } catch (ParseException ex) {
-            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
-        }
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
+        } 
     }
 
     public void showSerialDialog() {
@@ -438,11 +437,13 @@ public class POReplacement_EntryAppliancesController implements Initializable, S
                 stageSerialDialog.showDialog((Stage) btnSave.getScene().getWindow(), getClass().getResource("/ph/com/guanzongroup/integsys/views/DeliveryAcceptance_SerialAppliances.fxml"),
                         controller, "Inventory Serial", true, true, false);
             } catch (IOException ex) {
-                Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
             }
 
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -534,6 +535,7 @@ public class POReplacement_EntryAppliancesController implements Initializable, S
                             }
                         } catch (SQLException | GuanzonException ex) {
                             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
                         }
 
                         break;
@@ -571,6 +573,7 @@ public class POReplacement_EntryAppliancesController implements Initializable, S
                             }
                         } catch (SQLException | GuanzonException ex) {
                             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
                         }
                         if (pbEntered) {
                             if (lnNewVal != lnOldVal) {
@@ -885,6 +888,7 @@ public class POReplacement_EntryAppliancesController implements Initializable, S
             }
         } catch (GuanzonException | SQLException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -1035,7 +1039,8 @@ public class POReplacement_EntryAppliancesController implements Initializable, S
                 }
             }
         } catch (SQLException ex) {
-            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -1154,12 +1159,9 @@ public class POReplacement_EntryAppliancesController implements Initializable, S
                                 loadRecordDetail();
                             }
                             loadRecordMaster();
-                        } catch (SQLException ex) {
+                        } catch (SQLException | GuanzonException | CloneNotSupportedException ex) {
                             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
-                        } catch (GuanzonException ex) {
-                            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
-                        } catch (CloneNotSupportedException ex) {
-                            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
                         }
                     });
                 });
@@ -1194,7 +1196,8 @@ public class POReplacement_EntryAppliancesController implements Initializable, S
                                 } else {
                                 }
                             }
-                        } catch (Exception e) {
+                        } catch (Exception ex) {
+                            
 
                         }
                         if (poController.PurchaseOrderReceiving().getPurchaseOrderReturnCount() > 0) {
@@ -1206,8 +1209,8 @@ public class POReplacement_EntryAppliancesController implements Initializable, S
                                             String.valueOf(poController.PurchaseOrderReceiving().PurchaseOrderReturnList(lnCtr).getTransactionDate()),
                                             String.valueOf(poController.PurchaseOrderReceiving().PurchaseOrderReturnList(lnCtr).getTransactionNo())
                                     ));
-                                } catch (Exception e) {
-
+                                } catch (Exception ex) {
+                                    
                                 }
 
                             }
@@ -1277,6 +1280,7 @@ public class POReplacement_EntryAppliancesController implements Initializable, S
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass()
                     .getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -1316,6 +1320,7 @@ public class POReplacement_EntryAppliancesController implements Initializable, S
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass()
                     .getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
 
     }
@@ -1369,13 +1374,11 @@ public class POReplacement_EntryAppliancesController implements Initializable, S
 
             JFXUtil.updateCaretPositions(apMaster);
 
-        } catch (SQLException ex) {
+        } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass()
                     .getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
 
-        } catch (GuanzonException ex) {
-            Logger.getLogger(getClass()
-                    .getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
         }
 
     }
@@ -1498,6 +1501,7 @@ public class POReplacement_EntryAppliancesController implements Initializable, S
         } catch (CloneNotSupportedException | SQLException | GuanzonException ex) {
             Logger.getLogger(getClass()
                     .getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 

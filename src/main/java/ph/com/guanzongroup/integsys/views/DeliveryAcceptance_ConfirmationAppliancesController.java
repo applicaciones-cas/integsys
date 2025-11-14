@@ -294,12 +294,9 @@ public class DeliveryAcceptance_ConfirmationAppliancesController implements Init
                                     loadRecordMaster();
                                     loadTableDetail();
                                     loadTableAttachment();
-                                } catch (CloneNotSupportedException ex) {
-                                    Logger.getLogger(DeliveryAcceptance_ConfirmationAppliancesController.class.getName()).log(Level.SEVERE, null, ex);
-                                } catch (SQLException ex) {
-                                    Logger.getLogger(DeliveryAcceptance_ConfirmationAppliancesController.class.getName()).log(Level.SEVERE, null, ex);
-                                } catch (GuanzonException ex) {
-                                    Logger.getLogger(DeliveryAcceptance_ConfirmationAppliancesController.class.getName()).log(Level.SEVERE, null, ex);
+                                } catch (CloneNotSupportedException | SQLException | GuanzonException ex) {
+                                    Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+                                    ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
                                 }
                                 isPrinted = false;
                             });
@@ -599,7 +596,8 @@ public class DeliveryAcceptance_ConfirmationAppliancesController implements Init
 
             }
         } catch (CloneNotSupportedException | SQLException | GuanzonException | ParseException | IOException ex) {
-            Logger.getLogger(DeliveryAcceptance_ConfirmationAppliancesController.class.getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -680,10 +678,9 @@ public class DeliveryAcceptance_ConfirmationAppliancesController implements Init
 
         } catch (IOException e) {
             e.printStackTrace();
-        } catch (SQLException ex) {
-            Logger.getLogger(DeliveryAcceptance_ConfirmationAppliancesController.class.getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
-        } catch (GuanzonException ex) {
-            Logger.getLogger(DeliveryAcceptance_ConfirmationAppliancesController.class.getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+        } catch (SQLException | GuanzonException ex) {
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -877,7 +874,8 @@ public class DeliveryAcceptance_ConfirmationAppliancesController implements Init
                             return;
                         }
                     } catch (SQLException | GuanzonException ex) {
-                        Logger.getLogger(DeliveryAcceptance_ConfirmationAppliancesController.class.getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+                        Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+                        ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
                     }
 
                     break;
@@ -895,7 +893,7 @@ public class DeliveryAcceptance_ConfirmationAppliancesController implements Init
                                             poJSON.put("message", "User is not an authorized approving officer.");
                                         }
                                     }
-                                    
+
                                     if ("error".equals((String) poJSON.get("result"))) {
                                         ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                         loadRecordDetail();
@@ -934,7 +932,8 @@ public class DeliveryAcceptance_ConfirmationAppliancesController implements Init
                             return;
                         }
                     } catch (SQLException | GuanzonException ex) {
-                        Logger.getLogger(DeliveryAcceptance_ConfirmationAppliancesController.class.getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+                        Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+                        ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
                     }
 
                     if (pbEntered) {
@@ -1293,10 +1292,9 @@ public class DeliveryAcceptance_ConfirmationAppliancesController implements Init
                     break;
             }
 
-        } catch (GuanzonException ex) {
-            Logger.getLogger(DeliveryAcceptance_ConfirmationAppliancesController.class.getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
-        } catch (SQLException ex) {
-            Logger.getLogger(DeliveryAcceptance_ConfirmationAppliancesController.class.getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+        } catch (GuanzonException | SQLException ex) {
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -1439,7 +1437,8 @@ public class DeliveryAcceptance_ConfirmationAppliancesController implements Init
                 }
             }
         } catch (SQLException ex) {
-            Logger.getLogger(DeliveryAcceptance_ConfirmationAppliancesController.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -1615,10 +1614,9 @@ public class DeliveryAcceptance_ConfirmationAppliancesController implements Init
                                         String.valueOf(poPurchaseReceivingController.PurchaseOrderReceiving().PurchaseOrderReceivingList(lnCtr).getTransactionNo())
                                 ));
                                 numm = (lnCtr);
-                            } catch (SQLException ex) {
-                                Logger.getLogger(DeliveryAcceptance_ConfirmationAppliancesController.class.getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
-                            } catch (GuanzonException ex) {
-                                Logger.getLogger(DeliveryAcceptance_ConfirmationAppliancesController.class.getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+                            } catch (SQLException | GuanzonException ex) {
+                                Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+                                ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
                             }
                             if (poPurchaseReceivingController.PurchaseOrderReceiving().PurchaseOrderReceivingList(lnCtr).getTransactionStatus().equals(PurchaseOrderReceivingStatus.CONFIRMED)) {
                                 highlight(tblViewPuchaseOrder, lnCtr + 1, "#C1E1C1", highlightedRowsMain);
@@ -1691,7 +1689,8 @@ public class DeliveryAcceptance_ConfirmationAppliancesController implements Init
             }
 
         } catch (SQLException | GuanzonException ex) {
-            Logger.getLogger(DeliveryAcceptance_ConfirmationAppliancesController.class.getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -1804,7 +1803,8 @@ public class DeliveryAcceptance_ConfirmationAppliancesController implements Init
 
             updateCaretPositions(apDetail);
         } catch (SQLException | GuanzonException ex) {
-            Logger.getLogger(DeliveryAcceptance_ConfirmationAppliancesController.class.getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
 
     }
@@ -1908,10 +1908,9 @@ public class DeliveryAcceptance_ConfirmationAppliancesController implements Init
             tfTotal.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poPurchaseReceivingController.PurchaseOrderReceiving().Master().getTransactionTotal(), true));
 
             updateCaretPositions(apMaster);
-        } catch (SQLException ex) {
-            Logger.getLogger(DeliveryAcceptance_ConfirmationAppliancesController.class.getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
-        } catch (GuanzonException ex) {
-            Logger.getLogger(DeliveryAcceptance_ConfirmationAppliancesController.class.getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+        } catch (SQLException | GuanzonException ex) {
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
 
     }
@@ -2028,7 +2027,8 @@ public class DeliveryAcceptance_ConfirmationAppliancesController implements Init
             });
 
         } catch (CloneNotSupportedException | SQLException | GuanzonException ex) {
-            Logger.getLogger(DeliveryAcceptance_ConfirmationAppliancesController.class.getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -2153,12 +2153,9 @@ public class DeliveryAcceptance_ConfirmationAppliancesController implements Init
                         }
                         loadRecordMaster();
 
-                    } catch (SQLException ex) {
-                        Logger.getLogger(DeliveryAcceptance_ConfirmationAppliancesController.class.getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
-                    } catch (GuanzonException ex) {
-                        Logger.getLogger(DeliveryAcceptance_ConfirmationAppliancesController.class.getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
-                    } catch (CloneNotSupportedException ex) {
-                        Logger.getLogger(DeliveryAcceptance_ConfirmationAppliancesController.class.getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+                    } catch (SQLException | GuanzonException | CloneNotSupportedException ex) {
+                        Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+                        ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
                     }
                 });
 

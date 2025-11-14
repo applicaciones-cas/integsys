@@ -1368,7 +1368,7 @@ public class SOATagging_EntryController implements Initializable, ScreenInterfac
 
     public void clearTextFields() {
         JFXUtil.setValueToNull(previousSearchedTextField, lastFocusedTextField, dpTransactionDate);
-        JFXUtil.clearTextFields(apMaster, apDetail, apBrowse);
+        JFXUtil.clearTextFields(apMaster, apDetail);
     }
 
 }

@@ -215,10 +215,12 @@ public class PurchaseOrder_ApprovalLPController implements Initializable, Screen
         try {
             tfTransactionNo.setText(poPurchasingController.PurchaseOrder().Master().getTransactionNo());
             String lsStatus = "";
-            switch (poPurchasingController.PurchaseOrder().Master().getTransactionStatus()) {
-                case PurchaseOrderStatus.OPEN:
-                    lsStatus = "OPEN";
-                    break;
+            if("ABCDEFGHIJ".contains(poPurchasingController.PurchaseOrder().Master().getTransactionStatus())){
+                lsStatus = String.valueOf(poPurchasingController.PurchaseOrder().Master().getTransactionStatus().getBytes()[0] - 64);
+            } else {
+                lsStatus = poPurchasingController.PurchaseOrder().Master().getTransactionStatus();
+            }
+            switch (lsStatus) {
                 case PurchaseOrderStatus.CONFIRMED:
                     lsStatus = "CONFIRMED";
                     break;
@@ -232,7 +234,19 @@ public class PurchaseOrder_ApprovalLPController implements Initializable, Screen
                     lsStatus = "CANCELLED";
                     break;
                 case PurchaseOrderStatus.VOID:
-                    lsStatus = "VOID";
+                    lsStatus = "VOIDED";
+                    break;
+                case PurchaseOrderStatus.PROCESSED:
+                    lsStatus = "PROCESSED";
+                    break;
+                case PurchaseOrderStatus.POSTED:
+                    lsStatus = "POSTED";
+                    break;
+                case PurchaseOrderStatus.OPEN:
+                    lsStatus = "OPEN";
+                    break;
+                default:
+                    lsStatus = "UNKNOWN";
                     break;
             }
             lblTransactionStatus.setText(lsStatus);
@@ -325,34 +339,37 @@ public class PurchaseOrder_ApprovalLPController implements Initializable, Screen
                     pagination.toFront();
                     break;
                 case "btnApprove":
-                    if (ShowMessageFX.YesNo(null, psFormName, "Are you sure you want to approve transaction?")) {
-                        poJSON = poPurchasingController.PurchaseOrder().ApproveTransaction("");
-                        if (!"success".equals((String) poJSON.get("result"))) {
-                            ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
-                            break;
-                        }
-                        if (!"success".equals((poJSON = poPurchasingController.PurchaseOrder().OpenTransaction(poPurchasingController.PurchaseOrder().Master().getTransactionNo())).get("result"))) {
-                            ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
-                            return;
-                        }
-                        if (ShowMessageFX.YesNo(null, psFormName, "Do you want to print this transaction?")) {
-                            poJSON = poPurchasingController.PurchaseOrder().printTransaction(PurchaseOrderStaticData.Printing_Pedritos);
-                            if (!"success".equals((String) poJSON.get("result"))) {
-                                ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
-                            }
-                        }
-                        clearMasterFields();
-                        clearDetailFields();
-                        detail_data.clear();
-                        pnEditMode = EditMode.UNKNOWN;
-                        pnTblDetailRow = -1;
-                        //this code below use to highlight tblpurchase
-                        tblVwPurchaseOrder.refresh();
-                        main_data.get(pnTblMainRow).setIndex05(PurchaseOrderStatus.APPROVED);
-                        pagination.toBack();
-                    } else {
-                        return;
-                    }
+                    ShowMessageFX.Warning("An SMS has been sent to the approving officer for transaction approval.\nThis PO will be automatically approved once the approving officer grants their approval.", psFormName, null);
+                    //Commented below script requested by ma'am Sheryl, Replaced by message box above.
+                    //-Arsiela 11-12-2025 01:22:01 PM
+//                    if (ShowMessageFX.YesNo(null, psFormName, "Are you sure you want to approve transaction?")) {
+//                        poJSON = poPurchasingController.PurchaseOrder().ApproveTransaction("");
+//                        if (!"success".equals((String) poJSON.get("result"))) {
+//                            ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
+//                            break;
+//                        }
+//                        if (!"success".equals((poJSON = poPurchasingController.PurchaseOrder().OpenTransaction(poPurchasingController.PurchaseOrder().Master().getTransactionNo())).get("result"))) {
+//                            ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
+//                            return;
+//                        }
+//                        if (ShowMessageFX.YesNo(null, psFormName, "Do you want to print this transaction?")) {
+//                            poJSON = poPurchasingController.PurchaseOrder().printTransaction(PurchaseOrderStaticData.Printing_Pedritos);
+//                            if (!"success".equals((String) poJSON.get("result"))) {
+//                                ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
+//                            }
+//                        }
+//                        clearMasterFields();
+//                        clearDetailFields();
+//                        detail_data.clear();
+//                        pnEditMode = EditMode.UNKNOWN;
+//                        pnTblDetailRow = -1;
+//                        //this code below use to highlight tblpurchase
+//                        tblVwPurchaseOrder.refresh();
+//                        main_data.get(pnTblMainRow).setIndex05(PurchaseOrderStatus.APPROVED);
+//                        pagination.toBack();
+//                    } else {
+//                        return;
+//                    }
                     break;
                 case "btnSave":
                     if (!ShowMessageFX.YesNo(null, psFormName, "Are you sure you want to save?")) {

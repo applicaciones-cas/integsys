@@ -267,10 +267,12 @@ public class PurchaseOrder_EntryController implements Initializable, ScreenInter
         try {
             tfTransactionNo.setText(poPurchasingController.PurchaseOrder().Master().getTransactionNo());
             String lsStatus = "";
-            switch (poPurchasingController.PurchaseOrder().Master().getTransactionStatus()) {
-                case PurchaseOrderStatus.OPEN:
-                    lsStatus = "OPEN";
-                    break;
+            if("ABCDEFGHIJ".contains(poPurchasingController.PurchaseOrder().Master().getTransactionStatus())){
+                lsStatus = String.valueOf(poPurchasingController.PurchaseOrder().Master().getTransactionStatus().getBytes()[0] - 64);
+            } else {
+                lsStatus = poPurchasingController.PurchaseOrder().Master().getTransactionStatus();
+            }
+            switch (lsStatus) {
                 case PurchaseOrderStatus.CONFIRMED:
                     lsStatus = "CONFIRMED";
                     break;
@@ -284,7 +286,19 @@ public class PurchaseOrder_EntryController implements Initializable, ScreenInter
                     lsStatus = "CANCELLED";
                     break;
                 case PurchaseOrderStatus.VOID:
-                    lsStatus = "VOID";
+                    lsStatus = "VOIDED";
+                    break;
+                case PurchaseOrderStatus.PROCESSED:
+                    lsStatus = "PROCESSED";
+                    break;
+                case PurchaseOrderStatus.POSTED:
+                    lsStatus = "POSTED";
+                    break;
+                case PurchaseOrderStatus.OPEN:
+                    lsStatus = "OPEN";
+                    break;
+                default:
+                    lsStatus = "UNKNOWN";
                     break;
             }
             lblTransactionStatus.setText(lsStatus);
@@ -395,7 +409,7 @@ public class PurchaseOrder_EntryController implements Initializable, ScreenInter
                     poJSON = poPurchasingController.PurchaseOrder().NewTransaction();
                     if ("success".equals((String) poJSON.get("result"))) {
                         poPurchasingController.PurchaseOrder().Master().setSupplierID(prevSupplier);
-                        poPurchasingController.PurchaseOrder().Master().setIndustryID("");
+                        poPurchasingController.PurchaseOrder().Master().setIndustryID(psIndustryID);
                         poPurchasingController.PurchaseOrder().Master().setCompanyID(psCompanyID);
                         poPurchasingController.PurchaseOrder().Master().setCategoryCode(psCategoryID);
                         poPurchasingController.PurchaseOrder().Master().setDestinationID(poApp.getBranchCode());

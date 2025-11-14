@@ -266,10 +266,12 @@ public class PurchaseOrder_EntrySPCarController implements Initializable, Screen
         try {
             tfTransactionNo.setText(poPurchasingController.PurchaseOrder().Master().getTransactionNo());
             String lsStatus = "";
-            switch (poPurchasingController.PurchaseOrder().Master().getTransactionStatus()) {
-                case PurchaseOrderStatus.OPEN:
-                    lsStatus = "OPEN";
-                    break;
+            if("ABCDEFGHIJ".contains(poPurchasingController.PurchaseOrder().Master().getTransactionStatus())){
+                lsStatus = String.valueOf(poPurchasingController.PurchaseOrder().Master().getTransactionStatus().getBytes()[0] - 64);
+            } else {
+                lsStatus = poPurchasingController.PurchaseOrder().Master().getTransactionStatus();
+            }
+            switch (lsStatus) {
                 case PurchaseOrderStatus.CONFIRMED:
                     lsStatus = "CONFIRMED";
                     break;
@@ -283,7 +285,19 @@ public class PurchaseOrder_EntrySPCarController implements Initializable, Screen
                     lsStatus = "CANCELLED";
                     break;
                 case PurchaseOrderStatus.VOID:
-                    lsStatus = "VOID";
+                    lsStatus = "VOIDED";
+                    break;
+                case PurchaseOrderStatus.PROCESSED:
+                    lsStatus = "PROCESSED";
+                    break;
+                case PurchaseOrderStatus.POSTED:
+                    lsStatus = "POSTED";
+                    break;
+                case PurchaseOrderStatus.OPEN:
+                    lsStatus = "OPEN";
+                    break;
+                default:
+                    lsStatus = "UNKNOWN";
                     break;
             }
             lblTransactionStatus.setText(lsStatus);
