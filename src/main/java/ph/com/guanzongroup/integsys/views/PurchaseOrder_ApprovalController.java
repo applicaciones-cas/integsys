@@ -340,37 +340,40 @@ public class PurchaseOrder_ApprovalController implements Initializable, ScreenIn
                     pagination.toFront();
                     break;
                 case "btnApprove":
-                    ShowMessageFX.Warning("An SMS has been sent to the approving officer for transaction approval.\nThis PO will be automatically approved once the approving officer grants their approval.", psFormName, null);
                     //Commented below script requested by ma'am Sheryl, Replaced by message box above.
                     //-Arsiela 11-12-2025 01:22:01 PM
-//                    if (ShowMessageFX.YesNo(null, psFormName, "Are you sure you want to approve transaction?")) {
-//                        poJSON = poPurchasingController.PurchaseOrder().ApproveTransaction("");
-//                        if (!"success".equals((String) poJSON.get("result"))) {
-//                            ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
-//                            break;
-//                        }
-//                        if (!"success".equals((poJSON = poPurchasingController.PurchaseOrder().OpenTransaction(poPurchasingController.PurchaseOrder().Master().getTransactionNo())).get("result"))) {
-//                            ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
-//                            return;
-//                        }
-//                        if (ShowMessageFX.YesNo(null, psFormName, "Do you want to print this transaction?")) {
-//                            poJSON = poPurchasingController.PurchaseOrder().printTransaction(PurchaseOrderStaticData.Printing_CARSp_MCSp_General);
-//                            if (!"success".equals((String) poJSON.get("result"))) {
-//                                ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
-//                            }
-//                        }
-//                        clearMasterFields();
-//                        clearDetailFields();
-//                        detail_data.clear();
-//                        pnEditMode = EditMode.UNKNOWN;
-//                        pnTblDetailRow = -1;
-//                        //this code below use to highlight tblpurchase
-//                        tblVwPurchaseOrder.refresh();
-//                        main_data.get(pnTblMainRow).setIndex05(PurchaseOrderStatus.APPROVED);
-//                        pagination.toBack();
-//                    } else {
-//                        return;
-//                    }
+                    if (ShowMessageFX.YesNo(null, psFormName, "Are you sure you want to approve transaction?")) {
+                        poJSON = poPurchasingController.PurchaseOrder().ApproveTransaction("");
+                        if (!"success".equals((String) poJSON.get("result"))) {
+                            ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
+                            break;
+                        }
+                        
+                        ShowMessageFX.Warning("An SMS has been sent to the approving officer for transaction approval.\nThis PO will be automatically approved once the approving officer grants their approval.", psFormName, null);
+                        
+                        if (!"success".equals((poJSON = poPurchasingController.PurchaseOrder().OpenTransaction(poPurchasingController.PurchaseOrder().Master().getTransactionNo())).get("result"))) {
+                            ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
+                            return;
+                        }
+                        
+                        if (ShowMessageFX.YesNo(null, psFormName, "Do you want to print this transaction?")) {
+                            poJSON = poPurchasingController.PurchaseOrder().printTransaction(PurchaseOrderStaticData.Printing_CARSp_MCSp_General);
+                            if (!"success".equals((String) poJSON.get("result"))) {
+                                ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
+                            }
+                        }
+                        clearMasterFields();
+                        clearDetailFields();
+                        detail_data.clear();
+                        pnEditMode = EditMode.UNKNOWN;
+                        pnTblDetailRow = -1;
+                        //this code below use to highlight tblpurchase
+                        tblVwPurchaseOrder.refresh();
+                        main_data.get(pnTblMainRow).setIndex05(PurchaseOrderStatus.APPROVED);
+                        pagination.toBack();
+                    } else {
+                        return;
+                    }
                     break;
                 case "btnSave":
                     if (!ShowMessageFX.YesNo(null, psFormName, "Are you sure you want to save?")) {
