@@ -211,12 +211,7 @@ public class PurchaseOrder_ConfirmationCarController implements Initializable, S
     private void loadRecordMaster() {
         try {
             tfTransactionNo.setText(poPurchasingController.PurchaseOrder().Master().getTransactionNo());
-            String lsStatus = "";
-            if("ABCDEFGHIJ".contains(poPurchasingController.PurchaseOrder().Master().getTransactionStatus())){
-                lsStatus = String.valueOf(poPurchasingController.PurchaseOrder().Master().getTransactionStatus().getBytes()[0] - 64);
-            } else {
-                lsStatus = poPurchasingController.PurchaseOrder().Master().getTransactionStatus();
-            }
+            String lsStatus = poPurchasingController.PurchaseOrder().Master().getConvertedTransactionStatus();
             switch (lsStatus) {
                 case PurchaseOrderStatus.CONFIRMED:
                     lsStatus = "CONFIRMED";
@@ -415,7 +410,7 @@ public class PurchaseOrder_ConfirmationCarController implements Initializable, S
                         ShowMessageFX.Information((String) poJSON.get("message"), psFormName, null);
                         return;
                     } else {
-                        if (poPurchasingController.PurchaseOrder().Master().getTransactionStatus().equals(PurchaseOrderStatus.OPEN)) {
+                        if (poPurchasingController.PurchaseOrder().Master().getConvertedTransactionStatus().equals(PurchaseOrderStatus.OPEN)) {
                             if (ShowMessageFX.YesNo(null, psFormName, "Do you want to confirm this transaction?")) {
                                 if ("success".equals((poJSON = poPurchasingController.PurchaseOrder().ConfirmTransaction("")).get("result"))) {
                                     ShowMessageFX.Information((String) poJSON.get("message"), psFormName, null);
@@ -985,7 +980,7 @@ public class PurchaseOrder_ConfirmationCarController implements Initializable, S
             btnPrint.setText("Print");
         }
         if (fnEditMode == EditMode.READY) {
-            switch (poPurchasingController.PurchaseOrder().Master().getTransactionStatus()) {
+            switch (poPurchasingController.PurchaseOrder().Master().getConvertedTransactionStatus()) {
                 case PurchaseOrderStatus.OPEN:
                     CustomCommonUtil.setVisible(true, btnConfirm, btnVoid, btnUpdate, btnPrint);
                     CustomCommonUtil.setManaged(true, btnConfirm, btnVoid, btnUpdate, btnPrint);
@@ -1006,7 +1001,7 @@ public class PurchaseOrder_ConfirmationCarController implements Initializable, S
         boolean lbShow = (fnEditMode == EditMode.UPDATE);
 
         /* Master Fields*/
-        if (poPurchasingController.PurchaseOrder().Master().getTransactionStatus().equals(PurchaseOrderStatus.OPEN)) {
+        if (poPurchasingController.PurchaseOrder().Master().getConvertedTransactionStatus().equals(PurchaseOrderStatus.OPEN)) {
             CustomCommonUtil.setDisable(!lbShow, AnchorMaster, AnchorDetails);
             CustomCommonUtil.setDisable(!lbShow,
                     dpTransactionDate, tfDestination, taRemarks,
