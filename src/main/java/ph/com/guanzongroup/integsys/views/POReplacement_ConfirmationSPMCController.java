@@ -247,12 +247,9 @@ public class POReplacement_ConfirmationSPMCController implements Initializable, 
                                     loadRecordMaster();
                                     loadTableDetail.reload();
                                     loadTableAttachment.reload();
-                                } catch (CloneNotSupportedException ex) {
-                                    Logger.getLogger(POReplacement_ConfirmationSPMCController.class.getName()).log(Level.SEVERE, null, ex);
-                                } catch (SQLException ex) {
-                                    Logger.getLogger(POReplacement_ConfirmationSPMCController.class.getName()).log(Level.SEVERE, null, ex);
-                                } catch (GuanzonException ex) {
-                                    Logger.getLogger(POReplacement_ConfirmationSPMCController.class.getName()).log(Level.SEVERE, null, ex);
+                                } catch (CloneNotSupportedException | SQLException | GuanzonException ex) {
+                                    Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+                                    ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
                                 }
                                 isPrinted = false;
                             });
@@ -499,7 +496,8 @@ public class POReplacement_ConfirmationSPMCController implements Initializable, 
 
             }
         } catch (CloneNotSupportedException | SQLException | GuanzonException | ParseException | IOException ex) {
-            Logger.getLogger(POReplacement_ConfirmationSPMCController.class.getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -631,7 +629,8 @@ public class POReplacement_ConfirmationSPMCController implements Initializable, 
                                 return;
                             }
                         } catch (SQLException | GuanzonException ex) {
-                            Logger.getLogger(POReplacement_ConfirmationSPMCController.class.getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+                            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+                            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
                         }
 
                         break;
@@ -661,7 +660,8 @@ public class POReplacement_ConfirmationSPMCController implements Initializable, 
                                 break;
                             }
                         } catch (SQLException | GuanzonException ex) {
-                            Logger.getLogger(POReplacement_ConfirmationSPMCController.class.getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+                            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+                            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
                         }
                         if (pbEntered) {
                             moveNext(false, true);
@@ -814,7 +814,8 @@ public class POReplacement_ConfirmationSPMCController implements Initializable, 
                     break;
             }
         } catch (GuanzonException | SQLException ex) {
-            Logger.getLogger(POReplacement_ConfirmationSPMCController.class.getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -954,7 +955,8 @@ public class POReplacement_ConfirmationSPMCController implements Initializable, 
                 }
             }
         } catch (SQLException ex) {
-            Logger.getLogger(POReplacement_ConfirmationSPMCController.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -973,12 +975,13 @@ public class POReplacement_ConfirmationSPMCController implements Initializable, 
                 } else {
 
                 }
-            } catch (Exception e) {
+            } catch (Exception ex) {
                 tfSearchReferenceNo.setText("");
             }
 
         } catch (SQLException | GuanzonException ex) {
-            Logger.getLogger(POReplacement_ConfirmationSPMCController.class.getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -1020,7 +1023,7 @@ public class POReplacement_ConfirmationSPMCController implements Initializable, 
                             imageView.setImage(null);
                         }
 
-                    } catch (Exception e) {
+                    } catch (Exception ex) {
                         imageView.setImage(null);
                     }
                 }
@@ -1031,7 +1034,7 @@ public class POReplacement_ConfirmationSPMCController implements Initializable, 
                     pnAttachment = 0;
                 }
             }
-        } catch (Exception e) {
+        } catch (Exception ex) {
         }
     }
 
@@ -1056,7 +1059,8 @@ public class POReplacement_ConfirmationSPMCController implements Initializable, 
 
             JFXUtil.updateCaretPositions(apDetail);
         } catch (SQLException | GuanzonException ex) {
-            Logger.getLogger(POReplacement_ConfirmationSPMCController.class.getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
 
     }
@@ -1116,10 +1120,9 @@ public class POReplacement_ConfirmationSPMCController implements Initializable, 
             tfTotal.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.PurchaseOrderReceiving().Master().getTransactionTotal(), true));
 
             JFXUtil.updateCaretPositions(apMaster);
-        } catch (SQLException ex) {
-            Logger.getLogger(POReplacement_ConfirmationSPMCController.class.getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
-        } catch (GuanzonException ex) {
-            Logger.getLogger(POReplacement_ConfirmationSPMCController.class.getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+        } catch (SQLException | GuanzonException ex) {
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
 
     }
@@ -1191,7 +1194,8 @@ public class POReplacement_ConfirmationSPMCController implements Initializable, 
             });
 
         } catch (CloneNotSupportedException | SQLException | GuanzonException ex) {
-            Logger.getLogger(POReplacement_ConfirmationSPMCController.class.getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -1229,8 +1233,7 @@ public class POReplacement_ConfirmationSPMCController implements Initializable, 
                                 tblAttachments.getFocusModel().focus(pnAttachment);
                                 loadRecordAttachment(true);
                             }
-                        } catch (Exception e) {
-
+                        } catch (Exception ex) {
                         }
 
                     });
@@ -1292,8 +1295,7 @@ public class POReplacement_ConfirmationSPMCController implements Initializable, 
                                 }
                                 try {
                                     lnTotal = poController.PurchaseOrderReceiving().Detail(lnCtr).getUnitPrce().doubleValue() * poController.PurchaseOrderReceiving().Detail(lnCtr).getQuantity().intValue();
-                                } catch (Exception e) {
-
+                                } catch (Exception ex) {
                                 }
 
                                 if ((!poController.PurchaseOrderReceiving().Detail(lnCtr).getOrderNo().equals("") && poController.PurchaseOrderReceiving().Detail(lnCtr).getOrderNo() != null)
@@ -1332,7 +1334,8 @@ public class POReplacement_ConfirmationSPMCController implements Initializable, 
                             loadRecordMaster();
 
                         } catch (SQLException | GuanzonException | CloneNotSupportedException ex) {
-                            Logger.getLogger(POReplacement_ConfirmationSPMCController.class.getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+                            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+                            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
                         }
                     });
                 });
@@ -1367,8 +1370,7 @@ public class POReplacement_ConfirmationSPMCController implements Initializable, 
                                 } else {
                                 }
                             }
-                        } catch (Exception e) {
-
+                        } catch (Exception ex) {
                         }
 
                         if (poController.PurchaseOrderReceiving().getPurchaseOrderReceivingCount() > 0) {
@@ -1381,10 +1383,9 @@ public class POReplacement_ConfirmationSPMCController implements Initializable, 
                                             String.valueOf(poController.PurchaseOrderReceiving().PurchaseOrderReceivingList(lnCtr).getTransactionDate()),
                                             String.valueOf(poController.PurchaseOrderReceiving().PurchaseOrderReceivingList(lnCtr).getTransactionNo())
                                     ));
-                                } catch (SQLException ex) {
-                                    Logger.getLogger(POReplacement_ConfirmationSPMCController.class.getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
-                                } catch (GuanzonException ex) {
-                                    Logger.getLogger(POReplacement_ConfirmationSPMCController.class.getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+                                } catch (SQLException | GuanzonException ex) {
+                                    Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+                                    ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
                                 }
 
                                 if (poController.PurchaseOrderReceiving().PurchaseOrderReceivingList(lnCtr).getTransactionStatus().equals(PurchaseOrderReceivingStatus.CONFIRMED)) {
@@ -1439,7 +1440,7 @@ public class POReplacement_ConfirmationSPMCController implements Initializable, 
                     int selectedIndex = cmbAttachmentType.getSelectionModel().getSelectedIndex();
                     poController.PurchaseOrderReceiving().TransactionAttachmentList(pnAttachment).getModel().setDocumentType("000" + String.valueOf(selectedIndex));
                     cmbAttachmentType.getSelectionModel().select(selectedIndex);
-                } catch (Exception e) {
+                } catch (Exception ex) {
                 }
             }
         });

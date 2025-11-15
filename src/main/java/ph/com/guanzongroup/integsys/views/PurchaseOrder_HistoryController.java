@@ -157,7 +157,7 @@ public class PurchaseOrder_HistoryController implements Initializable, ScreenInt
 
             tblVwOrderDetails.addEventFilter(KeyEvent.KEY_PRESSED, this::tableKeyEvents);
             Platform.runLater((() -> {
-                psIndustryID = "";
+//                psIndustryID = "";
                 poPurchasingController.PurchaseOrder().Master().setIndustryID(psIndustryID);
                 poPurchasingController.PurchaseOrder().Master().setCompanyID(psCompanyID);
                 poPurchasingController.PurchaseOrder().Master().setCategoryCode(psCategoryID);
@@ -191,11 +191,8 @@ public class PurchaseOrder_HistoryController implements Initializable, ScreenInt
     private void loadRecordMaster() {
         try {
             tfTransactionNo.setText(poPurchasingController.PurchaseOrder().Master().getTransactionNo());
-            String lsStatus = "";
-            switch (poPurchasingController.PurchaseOrder().Master().getTransactionStatus()) {
-                case PurchaseOrderStatus.OPEN:
-                    lsStatus = "OPEN";
-                    break;
+            String lsStatus = poPurchasingController.PurchaseOrder().Master().getConvertedTransactionStatus();
+            switch (lsStatus) {
                 case PurchaseOrderStatus.CONFIRMED:
                     lsStatus = "CONFIRMED";
                     break;
@@ -209,7 +206,19 @@ public class PurchaseOrder_HistoryController implements Initializable, ScreenInt
                     lsStatus = "CANCELLED";
                     break;
                 case PurchaseOrderStatus.VOID:
-                    lsStatus = "VOID";
+                    lsStatus = "VOIDED";
+                    break;
+                case PurchaseOrderStatus.PROCESSED:
+                    lsStatus = "PROCESSED";
+                    break;
+                case PurchaseOrderStatus.POSTED:
+                    lsStatus = "POSTED";
+                    break;
+                case PurchaseOrderStatus.OPEN:
+                    lsStatus = "OPEN";
+                    break;
+                default:
+                    lsStatus = "UNKNOWN";
                     break;
             }
             lblTransactionStatus.setText(lsStatus);
@@ -419,7 +428,7 @@ public class PurchaseOrder_HistoryController implements Initializable, ScreenInt
             btnPrint.setText("Print");
         }
         if (fnEditMode == EditMode.READY) {
-            switch (poPurchasingController.PurchaseOrder().Master().getTransactionStatus()) {
+            switch (poPurchasingController.PurchaseOrder().Master().getConvertedTransactionStatus()) {
                 case PurchaseOrderStatus.OPEN:
                 case PurchaseOrderStatus.APPROVED:
                 case PurchaseOrderStatus.CONFIRMED:

@@ -177,7 +177,7 @@ public class PurchaseOrder_EntryController implements Initializable, ScreenInter
 
             tblVwOrderDetails.addEventFilter(KeyEvent.KEY_PRESSED, this::tableKeyEvents);
             Platform.runLater((() -> {
-                psIndustryID = "";
+//                psIndustryID = "";
                 poPurchasingController.PurchaseOrder().Master().setIndustryID(psIndustryID);
                 poPurchasingController.PurchaseOrder().Master().setCompanyID(psCompanyID);
                 poPurchasingController.PurchaseOrder().Master().setCategoryCode(psCategoryID);
@@ -266,11 +266,8 @@ public class PurchaseOrder_EntryController implements Initializable, ScreenInter
     private void loadRecordMaster() {
         try {
             tfTransactionNo.setText(poPurchasingController.PurchaseOrder().Master().getTransactionNo());
-            String lsStatus = "";
-            switch (poPurchasingController.PurchaseOrder().Master().getTransactionStatus()) {
-                case PurchaseOrderStatus.OPEN:
-                    lsStatus = "OPEN";
-                    break;
+            String lsStatus = poPurchasingController.PurchaseOrder().Master().getConvertedTransactionStatus();
+            switch (lsStatus) {
                 case PurchaseOrderStatus.CONFIRMED:
                     lsStatus = "CONFIRMED";
                     break;
@@ -284,7 +281,19 @@ public class PurchaseOrder_EntryController implements Initializable, ScreenInter
                     lsStatus = "CANCELLED";
                     break;
                 case PurchaseOrderStatus.VOID:
-                    lsStatus = "VOID";
+                    lsStatus = "VOIDED";
+                    break;
+                case PurchaseOrderStatus.PROCESSED:
+                    lsStatus = "PROCESSED";
+                    break;
+                case PurchaseOrderStatus.POSTED:
+                    lsStatus = "POSTED";
+                    break;
+                case PurchaseOrderStatus.OPEN:
+                    lsStatus = "OPEN";
+                    break;
+                default:
+                    lsStatus = "UNKNOWN";
                     break;
             }
             lblTransactionStatus.setText(lsStatus);
@@ -395,7 +404,7 @@ public class PurchaseOrder_EntryController implements Initializable, ScreenInter
                     poJSON = poPurchasingController.PurchaseOrder().NewTransaction();
                     if ("success".equals((String) poJSON.get("result"))) {
                         poPurchasingController.PurchaseOrder().Master().setSupplierID(prevSupplier);
-                        poPurchasingController.PurchaseOrder().Master().setIndustryID("");
+                        poPurchasingController.PurchaseOrder().Master().setIndustryID(psIndustryID);
                         poPurchasingController.PurchaseOrder().Master().setCompanyID(psCompanyID);
                         poPurchasingController.PurchaseOrder().Master().setCategoryCode(psCategoryID);
                         poPurchasingController.PurchaseOrder().Master().setDestinationID(poApp.getBranchCode());
@@ -611,7 +620,7 @@ public class PurchaseOrder_EntryController implements Initializable, ScreenInter
                     ShowMessageFX.Information((String) poJSON.get("message"), psFormName, null);
                     poJSON = poPurchasingController.PurchaseOrder().OpenTransaction(poPurchasingController.PurchaseOrder().Master().getTransactionNo());
                     if ("success".equals(poJSON.get("result"))) {
-                        if (poPurchasingController.PurchaseOrder().Master().getTransactionStatus().equals(PurchaseOrderStatus.OPEN)) {
+                        if (poPurchasingController.PurchaseOrder().Master().getConvertedTransactionStatus().equals(PurchaseOrderStatus.OPEN)) {
                             if (ShowMessageFX.YesNo(null, psFormName, "Do you want to confirm this transaction?")) {
                                 poPurchasingController.PurchaseOrder().setWithUI(true);
                                 if ("success".equals((poJSON = poPurchasingController.PurchaseOrder().ConfirmTransaction("")).get("result"))) {
@@ -1067,7 +1076,12 @@ public class PurchaseOrder_EntryController implements Initializable, ScreenInter
         }
         double lnRequestQuantity = 0;
         try {
-            lnRequestQuantity = poPurchasingController.PurchaseOrder().Detail(pnTblDetailRow).InvStockRequestDetail().getApproved();
+            System.out.println("SOURCE CODE: " + poPurchasingController.PurchaseOrder().Detail(pnTblDetailRow).getSouceCode());
+            if(PurchaseOrderStatus.SourceCode.POQUOTATION.equals(poPurchasingController.PurchaseOrder().Detail(pnTblDetailRow).getSouceCode())){
+                lnRequestQuantity = poPurchasingController.PurchaseOrder().Detail(pnTblDetailRow).POQuotationDetail().getQuantity();
+            } else {
+                lnRequestQuantity = poPurchasingController.PurchaseOrder().Detail(pnTblDetailRow).InvStockRequestDetail().getApproved();
+            }
             if (!poPurchasingController.PurchaseOrder().Detail(pnTblDetailRow).getSouceNo().isEmpty()) {
                 if (Integer.parseInt(fsValue) > lnRequestQuantity) {
                     ShowMessageFX.Warning("Invalid order quantity entered. The item is from a stock request, and the order quantity must not be greater than the requested quantity.", psFormName, null);
@@ -1299,7 +1313,7 @@ public class PurchaseOrder_EntryController implements Initializable, ScreenInter
             btnPrint.setText("Print");
         }
         if (fnEditMode == EditMode.READY) {
-            switch (poPurchasingController.PurchaseOrder().Master().getTransactionStatus()) {
+            switch (poPurchasingController.PurchaseOrder().Master().getConvertedTransactionStatus()) {
                 case PurchaseOrderStatus.OPEN:
                 case PurchaseOrderStatus.CONFIRMED:
                 case PurchaseOrderStatus.RETURNED:
@@ -1331,7 +1345,7 @@ public class PurchaseOrder_EntryController implements Initializable, ScreenInter
         }
         if (pnTblDetailRow >= 0 && pnTblDetailRow < poPurchasingController.PurchaseOrder().Detail().size()) {
             try {
-                if (!poPurchasingController.PurchaseOrder().Detail(pnTblDetailRow).Inventory().getInventoryTypeId().equals("0007")) {
+                if (!"0007".equals(poPurchasingController.PurchaseOrder().Detail(pnTblDetailRow).Inventory().getInventoryTypeId())) {
                     if (pnTblDetailRow != -1) {
                         CustomCommonUtil.setDisable(!lbShow, tfBarcode, tfDescription);
                     }
@@ -1898,7 +1912,7 @@ public class PurchaseOrder_EntryController implements Initializable, ScreenInter
                     tfBarcode.setDisable(isSourceNotEmpty);
                     tfDescription.setDisable(isSourceNotEmpty);
 
-                    if (poPurchasingController.PurchaseOrder().Detail(pnTblDetailRow).Inventory().getInventoryTypeId().equals("0007")) {
+                    if ("0007".equals(poPurchasingController.PurchaseOrder().Detail(pnTblDetailRow).Inventory().getInventoryTypeId())) {
                         CustomCommonUtil.setDisable(false, tfBarcode, tfDescription);
                         tfOrderQuantity.requestFocus();
                     }

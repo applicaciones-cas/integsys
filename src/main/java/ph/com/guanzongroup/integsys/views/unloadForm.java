@@ -41,7 +41,7 @@ public class unloadForm {
                     if (tabPaneParent instanceof StackPane) {
                         StackPane myBox = (StackPane) tabPaneParent;
                         myBox.getChildren().clear();
-                        myBox.getChildren().add(getScene("/com/rmj/guanzongroup/sidebarmenus/views/DefaultScreen.fxml", oApp));
+                        myBox.getChildren().add(getScene("/ph/com/guanzongroup/integsys/views/DefaultScreen.fxml", oApp));
                     }
                 }
 

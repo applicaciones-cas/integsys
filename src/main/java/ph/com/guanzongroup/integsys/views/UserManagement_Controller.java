@@ -46,8 +46,9 @@ public class UserManagement_Controller implements Initializable, ScreenInterface
     private JSONObject poJSON;
     public int pnEditMode;
     private LogWrapper poLogWrapper;
-
-    private String pxeModuleName = "User Management";
+    private unloadForm poUnload = new unloadForm();
+    
+    private String pxeModuleName = "System User Manager";
     private boolean isGeneral = false;
     private String psIndustryId = "";
     private String psCompanyId = "";
@@ -76,7 +77,7 @@ public class UserManagement_Controller implements Initializable, ScreenInterface
     ObservableList<String> UserType = FXCollections.observableArrayList("Local", "Global");
 
     @FXML
-    private AnchorPane apMainAnchor, apBrowse, apButton, apMaster;
+    private AnchorPane AnchorMain, apBrowse, apButton, apMaster;
     @FXML
     private TextField tfSearchEmployeeName, tfSearchLogInName, tfUserID, tfLogInName, tfPassword, tfEmployeeName, tfProduct;
     @FXML
@@ -234,11 +235,20 @@ public class UserManagement_Controller implements Initializable, ScreenInterface
                         String loValue = "";
                         switch (psActiveField) {
                             case "tfSearchEmployeeName":
-                                loValue = tfSearchEmployeeName.getText();
-                                poJSON = poSysUser.searchRecord(loValue,false);
+                                if (!poSysUser.getModel().getUserName().isEmpty() && !tfSearchEmployeeName.getText().isEmpty()){
+                                    poJSON = poSysUser.searchRecord(poSysUser.getModel().getUserId(),true);
+                                }else{
+                                    loValue = tfSearchEmployeeName.getText();
+                                    poJSON = poSysUser.searchRecord(loValue, false);
+                                }
                                 break;
                             case "tfSearchLogInName":
-                                poJSON = poSysUser.searchRecord(loValue,false);
+                                if (!poSysUser.getModel().getLogName().isEmpty() && !tfSearchLogInName.getText().isEmpty()){
+                                    poJSON = poSysUser.searchRecord(poSysUser.getModel().getUserId(),true);
+                                }else{
+                                    loValue = tfSearchLogInName.getText();
+                                    poJSON = poSysUser.searchRecord(loValue, false);
+                                }
                                 break;
                             default:
                                 loValue = "";
@@ -292,20 +302,13 @@ public class UserManagement_Controller implements Initializable, ScreenInterface
                         
                         break;
                     case "btnClose":
-                        unloadForm appUnload = new unloadForm();
-                        if (ShowMessageFX.OkayCancel(null, "Close Tab", "Are you sure you want to close this Tab?") == true) {
-//                        appUnload.unloadForm(apMainAnchor, oApp, pxeModuleName);
-//
-                            LoginControllerHolder.getMainController().toggleBtnLeftLowerSideBar[0].selectedProperty().set(false);
-                            //should go back to log in or in xml form
-                            if (LoginControllerHolder.getLogInStatus()) {
-                                LoginControllerHolder.getMainController().TabUserManagement1();
-                            } else {
-                                LoginControllerHolder.getMainController().TabUserManagement2();
-                            }
+                        if (ShowMessageFX.YesNo("Are you sure you want to close this form?", pxeModuleName, null)) {
+                        if (poUnload != null) {
+                            poUnload.unloadForm(AnchorMain, oApp, pxeModuleName);
                         } else {
-                            return;
+                            ShowMessageFX.Warning("Please notify the system administrator to configure the null value at the close button.", "Warning", null);
                         }
+                    }
                         break;
                         
                     case "btnStatus":
@@ -314,7 +317,6 @@ public class UserManagement_Controller implements Initializable, ScreenInterface
                                 poJSON = poSysUser.activateRecord();
                                 break;
                             case "1":
-                                System.out.println("EDITMODE BEFORE DEACTIVATE : " + poSysUser.getEditMode());
                                 poJSON = poSysUser.deactivateRecord();
                                 break;
                             default:
@@ -324,6 +326,7 @@ public class UserManagement_Controller implements Initializable, ScreenInterface
                             ShowMessageFX.Warning((String) poJSON.get("message"), pxeModuleName, null);
                             return;
                         }
+                        ShowMessageFX.Warning((String) poJSON.get("message"), pxeModuleName, null);
                         break;
                         
                     case "btnSave":
@@ -335,6 +338,7 @@ public class UserManagement_Controller implements Initializable, ScreenInterface
                             ShowMessageFX.Warning((String) poJSON.get("message"), pxeModuleName, null);
                             return;
                         }
+                        ShowMessageFX.Warning((String) poJSON.get("message"), pxeModuleName, null);
                         clearTextFields();
                         Platform.runLater(() -> btnNew.fire());
                         break;
@@ -366,7 +370,7 @@ public class UserManagement_Controller implements Initializable, ScreenInterface
                     switch (lsID) {
                         case "tfSearchEmployeeName":
                             psActiveField = lsID;
-                            poJSON = poSysUser.searchEmployee(lsValue, false); //replace this line with  >> searchRecordByEmployee("employee name"); <<
+                            poJSON = poSysUser.searchRecord(lsValue, false);
                             if("error".equals(poJSON.get("result"))){
                                 ShowMessageFX.Warning((String)poJSON.get("message"), lsValue, lsValue);
                             }

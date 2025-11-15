@@ -158,7 +158,7 @@ public class PurchaseOrderReturn_ConfirmationController implements Initializable
         clearTextFields();
 
         Platform.runLater(() -> {
-            psIndustryId = "";
+//            psIndustryId = "";
             poPurchaseReturnController.PurchaseOrderReturn().Master().setIndustryId(psIndustryId);
             poPurchaseReturnController.PurchaseOrderReturn().Master().setCompanyId(psCompanyId);
             poPurchaseReturnController.PurchaseOrderReturn().setIndustryId(psIndustryId);

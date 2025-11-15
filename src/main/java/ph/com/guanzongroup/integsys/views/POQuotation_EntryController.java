@@ -1109,14 +1109,14 @@ public class POQuotation_EntryController implements Initializable, ScreenInterfa
                 String inputText = datePicker.getEditor().getText();
                 SimpleDateFormat sdfFormat = new SimpleDateFormat(SQLUtil.FORMAT_SHORT_DATE);
 
-                if (JFXUtil.isObjectEqualTo(inputText, null, "", "01/01/1900")) {
-                    switch (datePicker.getId()) {
-                        case "dpValidityDate":
-                            poJSON = poController.POQuotation().Master().setValidityDate(null);
-                            break;
-                    }
-                    return;
-                }
+//                if (JFXUtil.isObjectEqualTo(inputText, null, "", "01/01/1900")) {
+//                    switch (datePicker.getId()) {
+//                        case "dpValidityDate":
+//                            poJSON = poController.POQuotation().Master().setValidityDate(null);
+//                            break;
+//                    }
+//                    return;
+//                }
                 if (!datePicker.isShowing() && !datePicker.getEditor().isFocused()) {
                     return;
                 }
