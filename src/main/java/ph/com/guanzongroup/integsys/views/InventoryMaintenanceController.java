@@ -167,9 +167,6 @@ public class InventoryMaintenanceController implements Initializable, ScreenInte
                 System.err.println("Initialize value : Industry >" + psIndustryID);
                 System.err.println("Initialize value : Category >" + psCategoryID);
 
-                unloadForm appUnload = new unloadForm();
-                appUnload.unloadForm(apMainAnchor, poApp, psFormName);
-
             });
             initControlEvents();
         } catch (SQLException | GuanzonException e) {
