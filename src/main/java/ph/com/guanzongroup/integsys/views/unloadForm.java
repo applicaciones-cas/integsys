@@ -20,38 +20,33 @@ public class unloadForm {
 
     //test
     public void unloadForm(AnchorPane AnchorMain, GRiderCAS oApp, String sTabTitle) {
-        // Get the parent of the TabContent node
+        // Get the parent of the AnchorMain node (assumes it's the content of a Tab)
         Node tabContent = AnchorMain.getParent();
         Parent tabContentParent = tabContent.getParent();
 
-        // If the parent is a TabPane, you can work with it directly
+        // Ensure the parent is a TabPane
         if (tabContentParent instanceof TabPane) {
             TabPane tabpane = (TabPane) tabContentParent;
-            // Get the list of tabs in the TabPane
-            ObservableList<Tab> tabs = tabpane.getTabs();
-            int tabsize = tabpane.getTabs().size();
-            List<String> tabName = new ArrayList<>();
-            // tabName = TabsStateManager.loadCurrentTab();
 
-            // Use an iterator to loop through the tabs and find the one you want to remove
-            Iterator<Tab> iterator = tabs.iterator();
-            while (iterator.hasNext()) {
-                Tab tab = iterator.next();
-                if (tab.getText().equals(sTabTitle)) {
-                    // Remove the tab using the iterator
-                    iterator.remove();
+            // Get the currently selected tab
+            Tab selectedTab = tabpane.getSelectionModel().getSelectedItem();
 
-                    if (tabsize == 1) {
-                        StackPane myBox = (StackPane) tabpane.getParent();
+            if (selectedTab != null) {
+                // Remove the selected tab
+                tabpane.getTabs().remove(selectedTab);
+
+                // If it was the last tab, show default screen
+                if (tabpane.getTabs().isEmpty()) {
+                    Parent tabPaneParent = tabpane.getParent();
+                    if (tabPaneParent instanceof StackPane) {
+                        StackPane myBox = (StackPane) tabPaneParent;
                         myBox.getChildren().clear();
                         myBox.getChildren().add(getScene("/com/rmj/guanzongroup/sidebarmenus/views/DefaultScreen.fxml", oApp));
                     }
-
-                    if (tabName.size() > 0) {
-                        tabName.remove(sTabTitle);
-                    }
-                    break;
                 }
+
+                // Optional: if you have a tabName tracking list
+                // tabName.remove(selectedTab.getText());
             }
         }
     }
