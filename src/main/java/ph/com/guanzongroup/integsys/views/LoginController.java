@@ -11,6 +11,9 @@ import java.util.List;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javafx.animation.FadeTransition;
+import javafx.animation.PauseTransition;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -22,9 +25,12 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
+import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.AnchorPane;
+import javafx.util.Duration;
 import org.guanzon.appdriver.agent.ShowMessageFX;
 import org.guanzon.appdriver.agent.systables.SystemUser;
 import org.guanzon.appdriver.base.GRiderCAS;
@@ -39,22 +45,23 @@ import ph.com.guanzongroup.integsys.model.ModelLog_In_User;
 import ph.com.guanzongroup.integsys.utility.JFXUtil;
 
 public class LoginController implements Initializable, ScreenInterface {
+
     private final String MODULE = "Login";
-    
+
     private GRiderCAS oApp;
     private String psIndustryID = "";
     private String psCompanyID = "";
-    
+
     private boolean isMainOffice = false;
     private boolean isWarehouse = false;
-    
+
     private LogWrapper poLogWrapper;
     private DashboardController dashboardController;
-    
+
     ObservableList<ModelLog_In_Industry> industryOptions = FXCollections.observableArrayList();
     ObservableList<ModelLog_In_Company> companyOptions = FXCollections.observableArrayList();
     ObservableList<ModelLog_In_User> users = FXCollections.observableArrayList();
-    
+
     @FXML
     private TextField tfUsername;
     @FXML
@@ -69,6 +76,8 @@ public class LoginController implements Initializable, ScreenInterface {
     private Button btnEyeIcon;
     @FXML
     private ComboBox cmbIndustry, cmbCompany;
+    @FXML
+    private AnchorPane rootPane, loadingPane, spinnerPane;
 
     @Override
     public void setGRider(GRiderCAS foValue) {
@@ -93,18 +102,18 @@ public class LoginController implements Initializable, ScreenInterface {
     public void initialize(URL url, ResourceBundle rb) {
         DashboardController mainController = LoginControllerHolder.getMainController();
         mainController.triggervbox();
-               
+
         tfPassword.textProperty().bindBidirectional(pfPassword.textProperty());
-        
+
         String year = String.valueOf(Year.now().getValue());
-        
+
         lblCopyright.setStyle("-fx-font-size: 13px;");
         lblCopyright.setText("© " + year + " Guanzon Group of Companies. All Rights Reserved.");
 
         initComboBox();
         initTextFields();
     }
-    
+
     EventHandler<KeyEvent> tabKeyHandler = event -> {
         if (event.getCode() != KeyCode.TAB) {
             return;
@@ -145,67 +154,123 @@ public class LoginController implements Initializable, ScreenInterface {
         this.dashboardController = controller;
     }
 
-    @FXML
-    private void cmdButton_Click(ActionEvent event) {
-        try {
-            String lsButton = ((Button) event.getSource()).getId();
-            switch (lsButton) {
-                case "btnSignIn":
-                    JSONObject poJSON = ValidateLogin();
-                    
-                    if (!"success".equals((String) poJSON.get("result"))) {
-                        ShowMessageFX.Warning((String) poJSON.get("message"), MODULE, null);
-                    } else {
+    private void handleLoadingScreen(AnchorPane pane, JSONObject poJSON) {
+        spinnerPane = new AnchorPane();
+        spinnerPane.setPrefSize(400, 300);
+        spinnerPane.setStyle("-fx-background-color: #F4F4F4;");
+        spinnerPane.setOpacity(0);
+
+        ProgressIndicator spinner = new ProgressIndicator();
+        spinner.setStyle("-fx-progress-color: #F37C01;");
+        spinner.setPrefSize(25, 25);
+        spinner.setMinSize(25, 25);
+        spinner.setMaxSize(25, 25);
+        AnchorPane.setTopAnchor(spinner, 120.0);
+        AnchorPane.setBottomAnchor(spinner, 120.0);
+        AnchorPane.setLeftAnchor(spinner, 120.0);
+        AnchorPane.setRightAnchor(spinner, 120.0);
+
+        spinnerPane.getChildren().add(spinner);
+
+        rootPane.getChildren().add(spinnerPane);
+        AnchorPane.setTopAnchor(spinnerPane, 0.0);
+        AnchorPane.setLeftAnchor(spinnerPane, 0.0);
+        AnchorPane.setRightAnchor(spinnerPane, 0.0);
+        AnchorPane.setBottomAnchor(spinnerPane, 0.0);
+
+        // Fade out the given pane (login form)
+        FadeTransition fadeOutLogin = new FadeTransition(Duration.millis(600), pane);
+        fadeOutLogin.setFromValue(1.0);
+        fadeOutLogin.setToValue(0.0);
+        fadeOutLogin.setOnFinished(e -> {
+
+            FadeTransition fadeInLoad = new FadeTransition(Duration.millis(600), spinnerPane);
+            fadeInLoad.setFromValue(0.0);
+            fadeInLoad.setToValue(1.0);
+            fadeInLoad.play();
+            double lnDuration = 0.8;
+            if ("success".equals((String) poJSON.get("result"))) {
+                lnDuration = 1.5;
+            }
+            PauseTransition wait = new PauseTransition(Duration.seconds(lnDuration));
+            wait.setOnFinished(done -> {
+                if (!"success".equals((String) poJSON.get("result"))) {
+                    FadeTransition fadeOutLoad = new FadeTransition(Duration.millis(600), spinnerPane);
+                    fadeOutLoad.setFromValue(1.0);
+                    fadeOutLoad.setToValue(0.0);
+                    fadeOutLoad.setOnFinished(ea -> {
+                        rootPane.getChildren().remove(spinnerPane);
+                        Platform.runLater(() -> {
+                            ShowMessageFX.Warning(null, MODULE, (String) poJSON.get("message"));
+                        });
+                    });
+                    fadeOutLoad.play();
+                } else {
+                    try {
                         if (!oApp.logUser("gRider", (String) poJSON.get("userId"))) {
-                            ShowMessageFX.Warning(oApp.getMessage(), "Warning", null);
+                            ShowMessageFX.Warning(null, "Warning", oApp.getMessage());
                             return;
                         }
-                        
-                        DashboardController dashboardController = LoginControllerHolder.getMainController();
-                        dashboardController.triggervbox2();
-                        
-                        dashboardController.setUserIndustry(psIndustryID);
-                        dashboardController.setUserCompany(psCompanyID);
-                        dashboardController.changeUserInfo();
-                        dashboardController.notificationChecker();
-                        //set the orignal industry and company
-                        System.setProperty("sys.industry", psIndustryID);
-                        System.setProperty("sys.company", psCompanyID);
-                        
-                        LoginControllerHolder.setLogInStatus(true);
+                    } catch (SQLException | GuanzonException ex) {
+                        Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
                     }
-                    break;
-                case "btnEyeIcon":
-                    FontAwesomeIconView eyeIcon = new FontAwesomeIconView(FontAwesomeIcon.EYE);
-                    if (pfPassword.isVisible()) {
-                        tfPassword.setText(pfPassword.getText());
-                        pfPassword.setVisible(false);
-                        tfPassword.setVisible(true);
-                        eyeIcon.setIcon(FontAwesomeIcon.EYE);
-                        eyeIcon.setStyle("-fx-fill: gray; -glyph-size: 20; ");
-                        btnEyeIcon.setGraphic(eyeIcon);
-                    } else {
-                        pfPassword.setText(tfPassword.getText());
-                        tfPassword.setVisible(false);
-                        pfPassword.setVisible(true);
-                        eyeIcon.setIcon(FontAwesomeIcon.EYE_SLASH);
-                        eyeIcon.setStyle("-fx-fill: gray; -glyph-size: 20; ");
-                        btnEyeIcon.setGraphic(eyeIcon);
-                    }
-                    break;
-                default:
-                    break;
-            }
-        } catch (SQLException | GuanzonException ex) {
-            Logger.getLogger(LoginController.class.getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+
+                    DashboardController dashboardController = LoginControllerHolder.getMainController();
+                    dashboardController.triggervbox2();
+                    dashboardController.setUserIndustry(psIndustryID);
+                    dashboardController.setUserCompany(psCompanyID);
+                    dashboardController.changeUserInfo();
+                    dashboardController.notificationChecker();
+                    //set the orignal industry and company
+                    System.setProperty("sys.industry", psIndustryID);
+                    System.setProperty("sys.company", psCompanyID);
+
+                    LoginControllerHolder.setLogInStatus(true);
+                }
+
+            });
+            wait.play();
+        });
+        fadeOutLogin.play();
+
+    }
+
+    @FXML
+    private void cmdButton_Click(ActionEvent event) {
+        String lsButton = ((Button) event.getSource()).getId();
+        switch (lsButton) {
+            case "btnSignIn":
+                JSONObject poJSON = ValidateLogin();
+                handleLoadingScreen(loadingPane, poJSON);
+                break;
+            case "btnEyeIcon":
+                FontAwesomeIconView eyeIcon = new FontAwesomeIconView(FontAwesomeIcon.EYE);
+                if (pfPassword.isVisible()) {
+                    tfPassword.setText(pfPassword.getText());
+                    pfPassword.setVisible(false);
+                    tfPassword.setVisible(true);
+                    eyeIcon.setIcon(FontAwesomeIcon.EYE);
+                    eyeIcon.setStyle("-fx-fill: gray; -glyph-size: 20; ");
+                    btnEyeIcon.setGraphic(eyeIcon);
+                } else {
+                    pfPassword.setText(tfPassword.getText());
+                    tfPassword.setVisible(false);
+                    pfPassword.setVisible(true);
+                    eyeIcon.setIcon(FontAwesomeIcon.EYE_SLASH);
+                    eyeIcon.setStyle("-fx-fill: gray; -glyph-size: 20; ");
+                    btnEyeIcon.setGraphic(eyeIcon);
+                }
+                break;
+            default:
+                break;
         }
     }
 
-    public void reloadCompnanyItems() throws SQLException{
+    public void reloadCompnanyItems() throws SQLException {
         companyOptions = FXCollections.observableArrayList(getAllCompanies((ModelLog_In_Industry) cmbIndustry.getSelectionModel().getSelectedItem()));
         cmbCompany.setItems(companyOptions);
-        
-        if (!companyOptions.isEmpty()){
+
+        if (!companyOptions.isEmpty()) {
             cmbCompany.getSelectionModel().select(companyOptions.get(0));
         } else {
             cmbCompany.getSelectionModel().select(companyOptions.get(-1));
@@ -218,56 +283,56 @@ public class LoginController implements Initializable, ScreenInterface {
         switch (id) {
             case "cmbCompany":
                 try {
-                    ModelLog_In_Company selectedCompany = (ModelLog_In_Company) cmbCompany.getSelectionModel().getSelectedItem();
-                    if (selectedCompany != null) {
-                        psCompanyID = selectedCompany.getCompanyId();
-                    }
-                } catch (Exception ex) {
-                    Logger.getLogger(LoginController.class.getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+                ModelLog_In_Company selectedCompany = (ModelLog_In_Company) cmbCompany.getSelectionModel().getSelectedItem();
+                if (selectedCompany != null) {
+                    psCompanyID = selectedCompany.getCompanyId();
                 }
-                break;
+            } catch (Exception ex) {
+                Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            }
+            break;
             case "cmbIndustry":
                 try {
-                    ModelLog_In_Industry selectedIndustry = (ModelLog_In_Industry) cmbIndustry.getSelectionModel().getSelectedItem();
-                    if (selectedIndustry != null) {
-                        psIndustryID = selectedIndustry.getIndustryID();
-                        
-                        reloadCompnanyItems();
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
+                ModelLog_In_Industry selectedIndustry = (ModelLog_In_Industry) cmbIndustry.getSelectionModel().getSelectedItem();
+                if (selectedIndustry != null) {
+                    psIndustryID = selectedIndustry.getIndustryID();
+
+                    reloadCompnanyItems();
                 }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
             break;
         }
     };
 
     private void initComboBox() {
         JFXUtil.initComboBoxCellDesignColor("#FF8201", cmbCompany, cmbIndustry);
-        
+
         loadComboBoxItems();
-        
+
         JFXUtil.setActionListener(comboBoxHandler, cmbIndustry, cmbCompany);
     }
 
     private void loadComboBoxItems() {
         try {
-            boolean lbShow = oApp.getIndustry().equals(System.getProperty("sys.main.industry")) ||
-                                oApp.getIndustry().equals(System.getProperty("sys.general.industry"));
-            
-            if (lbShow){
+            boolean lbShow = oApp.getIndustry().equals(System.getProperty("sys.main.industry"))
+                    || oApp.getIndustry().equals(System.getProperty("sys.general.industry"));
+
+            if (lbShow) {
                 psIndustryID = oApp.getIndustry();
-                        
+
                 industryOptions = FXCollections.observableArrayList(getAllIndustries());
                 companyOptions = FXCollections.observableArrayList(getAllCompanies(industryOptions.get(0)));
 
                 cmbIndustry.setItems(industryOptions);
-                if (!cmbIndustry.getItems().isEmpty()){
+                if (!cmbIndustry.getItems().isEmpty()) {
                     cmbIndustry.getSelectionModel().select(0);
                     psIndustryID = industryOptions.get(0).getIndustryID();
                 }
 
                 cmbCompany.setItems(companyOptions);
-                if (!cmbCompany.getItems().isEmpty()){
+                if (!cmbCompany.getItems().isEmpty()) {
                     cmbCompany.getSelectionModel().select(0);
                     psCompanyID = companyOptions.get(0).getCompanyId();
                 }
@@ -275,7 +340,7 @@ public class LoginController implements Initializable, ScreenInterface {
                 psIndustryID = oApp.getIndustry();
                 psCompanyID = oApp.getCompnyId();
             }
-            
+
             cmbIndustry.setVisible(lbShow);
             cmbCompany.setVisible(lbShow);
         } catch (SQLException ex) {
@@ -305,10 +370,12 @@ public class LoginController implements Initializable, ScreenInterface {
 
                     JSONObject loJSON = sysuser.isValidUser(tfUsername.getText().trim(), tfPassword.getText().trim(), oApp.getProductID());
 
-                    if ("success".equals((String) loJSON.get("result"))) return loJSON;
+                    if ("success".equals((String) loJSON.get("result"))) {
+                        return loJSON;
+                    }
                 } catch (SQLException e) {
                     JFXUtil.setJSONError(poJSON, e.getMessage());
-                } catch (GuanzonException ex){
+                } catch (GuanzonException ex) {
                     JFXUtil.setJSONError(poJSON, "Unable to log user. Please verify your entry.");
                 }
             }
@@ -321,20 +388,20 @@ public class LoginController implements Initializable, ScreenInterface {
 
     private List<ModelLog_In_Company> getAllCompanies(ModelLog_In_Industry industry) throws SQLException {
         List<ModelLog_In_Company> companies = new ArrayList<>();
-        
-        String lsSQL = "SELECT * FROM Company" +
-                        " WHERE cRecdStat = '1'" +
-                        " ORDER BY sCompnyNm";
-        
+
+        String lsSQL = "SELECT * FROM Company"
+                + " WHERE cRecdStat = '1'"
+                + " ORDER BY sCompnyNm";
+
         String lsCompany = industry.getCompanyID();
-        String [] laCompany  = lsCompany.split(";");
-        
+        String[] laCompany = lsCompany.split(";");
+
         lsCompany = "";
         for (int lnCtr = 0; lnCtr <= laCompany.length - 1; lnCtr++) {
             lsCompany += ", " + SQLUtil.toSQL(laCompany[lnCtr]);
         }
-        
-        if (!lsCompany.isEmpty()){
+
+        if (!lsCompany.isEmpty()) {
             lsCompany = "(" + lsCompany.substring(2) + ")";
             lsSQL = MiscUtil.addCondition(lsSQL, "sCompnyID IN " + lsCompany);
         }
@@ -345,19 +412,19 @@ public class LoginController implements Initializable, ScreenInterface {
             String name = rs.getString("sCompnyNm");
             companies.add(new ModelLog_In_Company(id, name));
         }
-        
+
         MiscUtil.close(rs);
-        
+
         return companies;
     }
 
     private List<ModelLog_In_Industry> getAllIndustries() throws SQLException {
         List<ModelLog_In_Industry> industries = new ArrayList<>();
-        
-        String lsSQL = "SELECT * FROM Industry" +
-                        " WHERE cRecdStat = '1'" +
-                        " ORDER BY sDescript";
-        
+
+        String lsSQL = "SELECT * FROM Industry"
+                + " WHERE cRecdStat = '1'"
+                + " ORDER BY sDescript";
+
         if (!psIndustryID.isEmpty()) {
             lsSQL = MiscUtil.addCondition(lsSQL, "sIndstCdx = " + SQLUtil.toSQL(psIndustryID));
         }
@@ -366,12 +433,12 @@ public class LoginController implements Initializable, ScreenInterface {
 
         while (loRS.next()) {
             industries.add(new ModelLog_In_Industry(
-                    loRS.getString("sIndstCdx"), 
-                    loRS.getString("sDescript"), 
+                    loRS.getString("sIndstCdx"),
+                    loRS.getString("sDescript"),
                     loRS.getString("sCompnyID")));
         }
         MiscUtil.close(loRS);
-        
+
         return industries;
     }
 }
