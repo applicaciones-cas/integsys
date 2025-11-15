@@ -190,12 +190,7 @@ public class PurchaseOrder_HistorySPCarController implements Initializable, Scre
     private void loadRecordMaster() {
         try {
             tfTransactionNo.setText(poPurchasingController.PurchaseOrder().Master().getTransactionNo());
-            String lsStatus = "";
-            if("ABCDEFGHIJ".contains(poPurchasingController.PurchaseOrder().Master().getTransactionStatus())){
-                lsStatus = String.valueOf(poPurchasingController.PurchaseOrder().Master().getTransactionStatus().getBytes()[0] - 64);
-            } else {
-                lsStatus = poPurchasingController.PurchaseOrder().Master().getTransactionStatus();
-            }
+            String lsStatus = poPurchasingController.PurchaseOrder().Master().getConvertedTransactionStatus();
             switch (lsStatus) {
                 case PurchaseOrderStatus.CONFIRMED:
                     lsStatus = "CONFIRMED";
@@ -432,7 +427,7 @@ public class PurchaseOrder_HistorySPCarController implements Initializable, Scre
             btnPrint.setText("Print");
         }
         if (fnEditMode == EditMode.READY) {
-            switch (poPurchasingController.PurchaseOrder().Master().getTransactionStatus()) {
+            switch (poPurchasingController.PurchaseOrder().Master().getConvertedTransactionStatus()) {
                 case PurchaseOrderStatus.OPEN:
                 case PurchaseOrderStatus.APPROVED:
                 case PurchaseOrderStatus.CONFIRMED:
