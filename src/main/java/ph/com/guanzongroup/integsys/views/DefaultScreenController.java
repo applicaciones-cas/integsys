@@ -15,7 +15,7 @@ public class DefaultScreenController implements Initializable, ScreenInterface {
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         AnimationPreviewManager manager = new AnimationPreviewManager();
-        manager.setAnimationFilePath(System.getProperty("sys.default.path.config") + "/Images/Animation/anim_config.txt");
+        manager.setAnimationFilePath(System.getProperty("sys.default.path.config") + "/Images/Assets/anim_config.txt");
         manager.createAnimationPane(550, 550);
         manager.setContainer(PreviewPane);
         manager.attachToContainer();

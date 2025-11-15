@@ -31,7 +31,7 @@ public class AnimationPreviewManager {
     private final List<ParallelTransition> transitions = new ArrayList<>();
     private final List<ImageView> animatedImages = new ArrayList<>();
     private final List<FrameDataPair> framePairs = new ArrayList<>();
-    String GLOBAL_PATH =System.getProperty("sys.default.path.config") + "/Images/Animation/";
+    String GLOBAL_PATH =System.getProperty("sys.default.path.config") + "/Images/Assets/";
     private String displayAlternativePath;
 
     // ----------------------  Set file path ----------------------
