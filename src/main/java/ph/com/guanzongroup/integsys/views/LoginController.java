@@ -201,7 +201,7 @@ public class LoginController implements Initializable, ScreenInterface {
                     fadeOutLoad.setOnFinished(ea -> {
                         rootPane.getChildren().remove(spinnerPane);
                         Platform.runLater(() -> {
-                            ShowMessageFX.Warning(null, MODULE, (String) poJSON.get("message"));
+                            ShowMessageFX.Warning((String) poJSON.get("message"), MODULE, null);
                         });
                     });
                     fadeOutLoad.play();
@@ -210,25 +210,25 @@ public class LoginController implements Initializable, ScreenInterface {
                         if (!oApp.logUser("gRider", (String) poJSON.get("userId"))) {
                             Platform.runLater(() -> {
                                 rootPane.getChildren().remove(spinnerPane);
-                                ShowMessageFX.Warning(null, "Warning", (String) poJSON.get("message"));
+                                ShowMessageFX.Warning(oApp.getMessage(), MODULE, null);
                             });
-                            return;
+                        } else {
+                            DashboardController dashboardController = LoginControllerHolder.getMainController();
+                            dashboardController.triggervbox2();
+                            dashboardController.setUserIndustry(psIndustryID);
+                            dashboardController.setUserCompany(psCompanyID);
+                            dashboardController.changeUserInfo();
+                            dashboardController.notificationChecker();
+                            //set the orignal industry and company
+                            System.setProperty("sys.industry", psIndustryID);
+                            System.setProperty("sys.company", psCompanyID);
+
+                            LoginControllerHolder.setLogInStatus(true);
                         }
                     } catch (SQLException | GuanzonException ex) {
+                        rootPane.getChildren().remove(spinnerPane);
                         Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
                     }
-
-                    DashboardController dashboardController = LoginControllerHolder.getMainController();
-                    dashboardController.triggervbox2();
-                    dashboardController.setUserIndustry(psIndustryID);
-                    dashboardController.setUserCompany(psCompanyID);
-                    dashboardController.changeUserInfo();
-                    dashboardController.notificationChecker();
-                    //set the orignal industry and company
-                    System.setProperty("sys.industry", psIndustryID);
-                    System.setProperty("sys.company", psCompanyID);
-
-                    LoginControllerHolder.setLogInStatus(true);
                 }
 
             });
@@ -371,10 +371,10 @@ public class LoginController implements Initializable, ScreenInterface {
                     sysuser.setApplicationDriver(oApp);
                     sysuser.setLogWrapper(null);
 
-                    JSONObject loJSON = sysuser.isValidUser(tfUsername.getText().trim(), tfPassword.getText().trim(), oApp.getProductID());
+                    poJSON = sysuser.isValidUser(tfUsername.getText().trim(), tfPassword.getText().trim(), oApp.getProductID());
 
-                    if ("success".equals((String) loJSON.get("result"))) {
-                        return loJSON;
+                    if ("success".equals((String) poJSON.get("result"))) {
+                        return poJSON;
                     }
                 } catch (SQLException e) {
                     JFXUtil.setJSONError(poJSON, e.getMessage());
