@@ -212,7 +212,6 @@ public class LoginController implements Initializable, ScreenInterface {
                                 rootPane.getChildren().remove(spinnerPane);
                                 ShowMessageFX.Warning(oApp.getMessage(), MODULE, null);
                             });
-                            return;
                         } else {
                             DashboardController dashboardController = LoginControllerHolder.getMainController();
                             dashboardController.triggervbox2();
