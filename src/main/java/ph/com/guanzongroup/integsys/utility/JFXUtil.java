@@ -2550,7 +2550,13 @@ public class JFXUtil {
     /*Requests focus on a textfield, only if its object condition is null or blank*/
     public static void requestFocusNullField(Object[][] checks, TextField fallback) {
         Stream.of(checks)
-                .filter(c -> isObjectEqualTo(c[0], null, ""))
+                .filter(c -> {
+                    try {
+                        return isObjectEqualTo(c[0], null, "");
+                    } catch (Exception e) {
+                        return false; // skip and continue to next object
+                    }
+                })
                 .map(c -> (TextField) c[1])
                 .findFirst()
                 .orElse(fallback)
