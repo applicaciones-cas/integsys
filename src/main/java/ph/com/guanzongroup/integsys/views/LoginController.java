@@ -208,7 +208,10 @@ public class LoginController implements Initializable, ScreenInterface {
                 } else {
                     try {
                         if (!oApp.logUser("gRider", (String) poJSON.get("userId"))) {
-                            ShowMessageFX.Warning(null, "Warning", oApp.getMessage());
+                            Platform.runLater(() -> {
+                                rootPane.getChildren().remove(spinnerPane);
+                                ShowMessageFX.Warning(null, "Warning", (String) poJSON.get("message"));
+                            });
                             return;
                         }
                     } catch (SQLException | GuanzonException ex) {
