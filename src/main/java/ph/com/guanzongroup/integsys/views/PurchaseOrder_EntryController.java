@@ -1736,7 +1736,7 @@ public class PurchaseOrder_EntryController implements Initializable, ScreenInter
                             }
                             poPurchasingController.PurchaseOrder().Detail().remove(lnCtr);
                         }
-                        pnTblDetailRow = -1;
+                        pnTblDetailRow = 0;
                         pnTblMainRow = -1;
                         tblVwStockRequest.getSelectionModel().clearSelection();
                         poPurchasingController.PurchaseOrder().Master().setTermCode("0000004");
