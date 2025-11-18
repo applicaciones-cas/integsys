@@ -183,12 +183,12 @@ public class DeliveryAcceptance_SerialController implements Initializable {
                     break;
 
                 }
-                if (poPurchaseReceivingController.PurchaseOrderReceivingSerialList(lnCtr).getSerial02() == null || poPurchaseReceivingController.PurchaseOrderReceivingSerialList(lnCtr).getSerial02().equals("")) {
-                    poJSON.put("result", "error");
-                    lsMessage = "IMEI 2 at row " + lnRow + " cannot be empty.";
-                    inform = true;
-                    break;
-                }
+//                if (poPurchaseReceivingController.PurchaseOrderReceivingSerialList(lnCtr).getSerial02() == null || poPurchaseReceivingController.PurchaseOrderReceivingSerialList(lnCtr).getSerial02().equals("")) {
+//                    poJSON.put("result", "error");
+//                    lsMessage = "IMEI 2 at row " + lnRow + " cannot be empty.";
+//                    inform = true;
+//                    break;
+//                }
                 
                 if (lsButton.equals("btnOkay")) {
 //                    if(poPurchaseReceivingController.Master().getPurpose().equals(PurchaseOrderReceivingStatus.Purpose.REPLACEMENT)){
