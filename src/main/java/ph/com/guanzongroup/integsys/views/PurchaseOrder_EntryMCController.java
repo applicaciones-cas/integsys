@@ -319,7 +319,8 @@ public class PurchaseOrder_EntryMCController implements Initializable, ScreenInt
             if (pnTblDetailRow < 0 || pnTblDetailRow > poPurchasingController.PurchaseOrder().getDetailCount() - 1) {
                 return;
             }
-            boolean lbShow = JFXUtil.isObjectEqualTo(poPurchasingController.PurchaseOrder().Detail(pnTblDetailRow).getSouceCode(), null, "");
+            boolean lbShow = JFXUtil.isObjectEqualTo(pnEditMode, EditMode.UPDATE, EditMode.ADDNEW)
+                    && JFXUtil.isObjectEqualTo(poPurchasingController.PurchaseOrder().Detail(pnTblDetailRow).getSouceCode(), null, "");
             JFXUtil.setDisabled(!lbShow, tfCost);
             if (pnTblDetailRow >= 0) {
                 tfBrand.setText(poPurchasingController.PurchaseOrder().Detail(pnTblDetailRow).Inventory().Brand().getDescription() != null ? poPurchasingController.PurchaseOrder().Detail(pnTblDetailRow).Inventory().Brand().getDescription() : "");

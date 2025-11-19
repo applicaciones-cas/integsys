@@ -267,7 +267,7 @@ public class PurchaseOrder_ConfirmationSPMCController implements Initializable, 
             if (pnTblDetailRow < 0 || pnTblDetailRow > poPurchasingController.PurchaseOrder().getDetailCount() - 1) {
                 return;
             }
-            boolean lbShow = JFXUtil.isObjectEqualTo(poPurchasingController.PurchaseOrder().Detail(pnTblDetailRow).getSouceCode(), null, "");
+            boolean lbShow = pnEditMode == EditMode.UPDATE && JFXUtil.isObjectEqualTo(poPurchasingController.PurchaseOrder().Detail(pnTblDetailRow).getSouceCode(), null, "");
             JFXUtil.setDisabled(!lbShow, tfCost);
             if (pnTblDetailRow >= 0) {
                 tfBarcode.setText(poPurchasingController.PurchaseOrder().Detail(pnTblDetailRow).Inventory().getBarCode() != null ? poPurchasingController.PurchaseOrder().Detail(pnTblDetailRow).Inventory().getBarCode() : "");

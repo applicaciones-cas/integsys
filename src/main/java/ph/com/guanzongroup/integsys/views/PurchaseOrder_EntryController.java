@@ -322,7 +322,8 @@ public class PurchaseOrder_EntryController implements Initializable, ScreenInter
             if (pnTblDetailRow < 0 || pnTblDetailRow > poPurchasingController.PurchaseOrder().getDetailCount() - 1) {
                 return;
             }
-            boolean lbShow = JFXUtil.isObjectEqualTo(poPurchasingController.PurchaseOrder().Detail(pnTblDetailRow).getSouceCode(), null, "");
+            boolean lbShow = JFXUtil.isObjectEqualTo(pnEditMode, EditMode.UPDATE, EditMode.ADDNEW)
+                    && JFXUtil.isObjectEqualTo(poPurchasingController.PurchaseOrder().Detail(pnTblDetailRow).getSouceCode(), null, "");
             JFXUtil.setDisabled(!lbShow, tfCost);
             if (pnTblDetailRow >= 0) {
                 CustomCommonUtil.setDisable(poPurchasingController.PurchaseOrder().Detail(pnTblDetailRow).getSouceCode() == PurchaseOrderStatus.SourceCode.POQUOTATION,

@@ -322,7 +322,8 @@ public class PurchaseOrder_EntryMonarchFoodController implements Initializable, 
             if (pnTblDetailRow < 0 || pnTblDetailRow > poPurchasingController.PurchaseOrder().getDetailCount() - 1) {
                 return;
             }
-            boolean lbShow = JFXUtil.isObjectEqualTo(poPurchasingController.PurchaseOrder().Detail(pnTblDetailRow).getSouceCode(), null, "");
+            boolean lbShow = JFXUtil.isObjectEqualTo(pnEditMode, EditMode.UPDATE, EditMode.ADDNEW)
+                    && JFXUtil.isObjectEqualTo(poPurchasingController.PurchaseOrder().Detail(pnTblDetailRow).getSouceCode(), null, "");
             JFXUtil.setDisabled(!lbShow, tfCost);
             if (pnTblDetailRow >= 0) {
                 tfBarcode.setText(poPurchasingController.PurchaseOrder().Detail(pnTblDetailRow).Inventory().getBarCode() != null ? poPurchasingController.PurchaseOrder().Detail(pnTblDetailRow).Inventory().getBarCode() : "");

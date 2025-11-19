@@ -162,8 +162,8 @@ public class PurchaseOrder_ApprovalCarController implements Initializable, Scree
     public void initialize(URL url, ResourceBundle rb) {
         try {
             poPurchasingController = new PurchaseOrderControllers(poApp, logWrapper);
-            poPurchasingController.PurchaseOrder().setTransactionStatus(PurchaseOrderStatus.CONFIRMED + 
-                    PurchaseOrderStatus.RETURNED);
+            poPurchasingController.PurchaseOrder().setTransactionStatus(PurchaseOrderStatus.CONFIRMED
+                    + PurchaseOrderStatus.RETURNED);
             poPurchasingController.PurchaseOrder().setWithUI(true);
             poJSON = poPurchasingController.PurchaseOrder().InitTransaction();
             if (!"success".equals(poJSON.get("result"))) {
@@ -270,6 +270,9 @@ public class PurchaseOrder_ApprovalCarController implements Initializable, Scree
             if (pnTblDetailRow < 0 || pnTblDetailRow > poPurchasingController.PurchaseOrder().getDetailCount() - 1) {
                 return;
             }
+            boolean lbShow = JFXUtil.isObjectEqualTo(pnEditMode, EditMode.UPDATE, EditMode.ADDNEW)
+                    && JFXUtil.isObjectEqualTo(poPurchasingController.PurchaseOrder().Detail(pnTblDetailRow).getSouceCode(), null, "");
+            JFXUtil.setDisabled(!lbShow, tfCost);
             if (pnTblDetailRow >= 0) {
                 tfBrand.setText(poPurchasingController.PurchaseOrder().Detail(pnTblDetailRow).Inventory().Brand().getDescription() != null ? poPurchasingController.PurchaseOrder().Detail(pnTblDetailRow).Inventory().Brand().getDescription() : "");
                 tfModel.setText(poPurchasingController.PurchaseOrder().Detail(pnTblDetailRow).Inventory().Model().getDescription() != null ? poPurchasingController.PurchaseOrder().Detail(pnTblDetailRow).Inventory().Model().getDescription() : "");
@@ -596,6 +599,11 @@ public class PurchaseOrder_ApprovalCarController implements Initializable, Scree
                     psReferID = tfSearchReferenceNo.getText();
                     loadTableMain();
                     break;
+                case "tfCost":
+                    lsValue = JFXUtil.removeComma(lsValue);
+                    setOrderCost(lsValue);
+                    loadTableDetailAndSelectedRow();
+                    break;
             }
         } else {
             loTextField.selectAll();
@@ -798,7 +806,7 @@ public class PurchaseOrder_ApprovalCarController implements Initializable, Scree
         double lnRequestQuantity = 0;
         try {
             System.out.println("SOURCE CODE: " + poPurchasingController.PurchaseOrder().Detail(pnTblDetailRow).getSouceCode());
-            if(PurchaseOrderStatus.SourceCode.POQUOTATION.equals(poPurchasingController.PurchaseOrder().Detail(pnTblDetailRow).getSouceCode())){
+            if (PurchaseOrderStatus.SourceCode.POQUOTATION.equals(poPurchasingController.PurchaseOrder().Detail(pnTblDetailRow).getSouceCode())) {
                 lnRequestQuantity = poPurchasingController.PurchaseOrder().Detail(pnTblDetailRow).POQuotationDetail().getQuantity();
             } else {
                 lnRequestQuantity = poPurchasingController.PurchaseOrder().Detail(pnTblDetailRow).InvStockRequestDetail().getApproved();
@@ -989,16 +997,16 @@ public class PurchaseOrder_ApprovalCarController implements Initializable, Scree
         if (fnEditMode == EditMode.READY) {
             switch (poPurchasingController.PurchaseOrder().Master().getConvertedTransactionStatus()) {
                 case PurchaseOrderStatus.CONFIRMED:
-                    CustomCommonUtil.setVisible(true, btnApprove,  btnReturn,btnVoid, btnUpdate, btnPrint);
-                    CustomCommonUtil.setManaged(true, btnApprove, btnReturn,btnVoid, btnUpdate, btnPrint);
+                    CustomCommonUtil.setVisible(true, btnApprove, btnReturn, btnVoid, btnUpdate, btnPrint);
+                    CustomCommonUtil.setManaged(true, btnApprove, btnReturn, btnVoid, btnUpdate, btnPrint);
                     break;
                 case PurchaseOrderStatus.APPROVED:
-                    CustomCommonUtil.setVisible(true,  btnPrint);
-                    CustomCommonUtil.setManaged(true,  btnPrint);
+                    CustomCommonUtil.setVisible(true, btnPrint);
+                    CustomCommonUtil.setManaged(true, btnPrint);
                     break;
                 case PurchaseOrderStatus.RETURNED:
-                    CustomCommonUtil.setVisible(true,  btnVoid, btnUpdate, btnPrint);
-                    CustomCommonUtil.setManaged(true,  btnVoid, btnUpdate, btnPrint);
+                    CustomCommonUtil.setVisible(true, btnVoid, btnUpdate, btnPrint);
+                    CustomCommonUtil.setManaged(true, btnVoid, btnUpdate, btnPrint);
                     break;
             }
         }
