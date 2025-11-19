@@ -178,14 +178,14 @@ public class DeliveryAcceptance_SerialController implements Initializable {
             if (poPurchaseReceivingController.PurchaseOrderReceivingSerialList(lnCtr).getEntryNo() == pnEntryNo) {
                 if (poPurchaseReceivingController.PurchaseOrderReceivingSerialList(lnCtr).getSerial01() == null || poPurchaseReceivingController.PurchaseOrderReceivingSerialList(lnCtr).getSerial01().equals("")) {
                     poJSON.put("result", "error");
-                    lsMessage = "IMEI 1 at row " + lnRow + " cannot be empty.";
+                    lsMessage = "Serial 1 at row " + lnRow + " cannot be empty.";
                     inform = true;
                     break;
 
                 }
 //                if (poPurchaseReceivingController.PurchaseOrderReceivingSerialList(lnCtr).getSerial02() == null || poPurchaseReceivingController.PurchaseOrderReceivingSerialList(lnCtr).getSerial02().equals("")) {
 //                    poJSON.put("result", "error");
-//                    lsMessage = "IMEI 2 at row " + lnRow + " cannot be empty.";
+//                    lsMessage = "Serial 2 at row " + lnRow + " cannot be empty.";
 //                    inform = true;
 //                    break;
 //                }
