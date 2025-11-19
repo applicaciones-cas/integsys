@@ -933,6 +933,7 @@ public class PurchaseOrder_EntryMonarchHospitalityController implements Initiali
                             case "tfAdvancePRate":
                             case "tfDiscountRate":
                             case "tfDiscountAmount":
+                            case "tfCost":
                                 CommonUtils.SetNextFocus((TextField) event.getSource());
                                 break;
                             case "tfOrderQuantity":

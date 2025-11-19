@@ -936,6 +936,7 @@ public class PurchaseOrder_EntryCarController implements Initializable, ScreenIn
                             case "tfAdvancePRate":
                             case "tfDiscountRate":
                             case "tfDiscountAmount":
+                            case "tfCost":
                                 CommonUtils.SetNextFocus((TextField) event.getSource());
                                 break;
                             case "tfOrderQuantity":

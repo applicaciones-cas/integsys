@@ -880,12 +880,14 @@ public class JFXUtil {
                 node.setDisable(disable);
 
                 if (node instanceof TextField) {
+                    ((TextField) node).setEditable(!disable);
                     if (disable) {
                         if (!node.getStyleClass().contains("DisabledTextField")) {
                             node.getStyleClass().add("DisabledTextField");
                         }
                     } else {
                         node.getStyleClass().remove("DisabledTextField");
+
                     }
                 }
 

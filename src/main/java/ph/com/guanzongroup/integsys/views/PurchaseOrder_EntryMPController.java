@@ -1030,6 +1030,7 @@ public class PurchaseOrder_EntryMPController implements Initializable, ScreenInt
                             case "tfAdvancePRate":
                             case "tfDiscountRate":
                             case "tfDiscountAmount":
+                            case "tfCost":
                                 CommonUtils.SetNextFocus((TextField) event.getSource());
                                 break;
                             case "tfOrderQuantity":

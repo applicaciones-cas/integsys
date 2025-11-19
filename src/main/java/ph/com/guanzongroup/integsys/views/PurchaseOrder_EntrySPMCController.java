@@ -932,6 +932,7 @@ public class PurchaseOrder_EntrySPMCController implements Initializable, ScreenI
                             case "tfAdvancePRate":
                             case "tfDiscountRate":
                             case "tfDiscountAmount":
+                            case "tfCost":
                                 CommonUtils.SetNextFocus((TextField) event.getSource());
                                 break;
                             case "tfOrderQuantity":
