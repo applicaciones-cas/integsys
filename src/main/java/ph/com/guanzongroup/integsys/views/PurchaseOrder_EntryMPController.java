@@ -319,6 +319,9 @@ public class PurchaseOrder_EntryMPController implements Initializable, ScreenInt
             if (pnTblDetailRow < 0 || pnTblDetailRow > poPurchasingController.PurchaseOrder().getDetailCount() - 1) {
                 return;
             }
+            boolean lbShow = JFXUtil.isObjectEqualTo(pnEditMode, EditMode.UPDATE, EditMode.ADDNEW)
+                    && JFXUtil.isObjectEqualTo(poPurchasingController.PurchaseOrder().Detail(pnTblDetailRow).getSouceCode(), null, "");
+            JFXUtil.setDisabled(!lbShow, tfCost);
             if (pnTblDetailRow >= 0) {
                 tfBrand.setText(poPurchasingController.PurchaseOrder().Detail(pnTblDetailRow).Inventory().Brand().getDescription() != null ? poPurchasingController.PurchaseOrder().Detail(pnTblDetailRow).Inventory().Brand().getDescription() : "");
                 tfModel.setText(poPurchasingController.PurchaseOrder().Detail(pnTblDetailRow).Inventory().Model().getDescription() != null ? poPurchasingController.PurchaseOrder().Detail(pnTblDetailRow).Inventory().Model().getDescription() : "");
@@ -832,6 +835,14 @@ public class PurchaseOrder_EntryMPController implements Initializable, ScreenInt
                     break;
                 case "tfOrderQuantity":
                     break;
+                case "tfCost":
+                    lsValue = JFXUtil.removeComma(lsValue);
+                    poJSON = poPurchasingController.PurchaseOrder().Detail(pnTblDetailRow).setUnitPrice(Double.valueOf(lsValue));
+                    if (!"success".equals((String) poJSON.get("result"))) {
+                        ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
+                    }
+                    loadTableDetailAndSelectedRow();
+                    break;
             }
         } else {
             loTextField.selectAll();
@@ -1020,6 +1031,7 @@ public class PurchaseOrder_EntryMPController implements Initializable, ScreenInt
                             case "tfAdvancePRate":
                             case "tfDiscountRate":
                             case "tfDiscountAmount":
+                            case "tfCost":
                                 CommonUtils.SetNextFocus((TextField) event.getSource());
                                 break;
                             case "tfOrderQuantity":
@@ -1219,7 +1231,7 @@ public class PurchaseOrder_EntryMPController implements Initializable, ScreenInt
             double lnRequestQuantity = 0;
             try {
                 System.out.println("SOURCE CODE: " + poPurchasingController.PurchaseOrder().Detail(pnTblDetailRow).getSouceCode());
-                if(PurchaseOrderStatus.SourceCode.POQUOTATION.equals(poPurchasingController.PurchaseOrder().Detail(pnTblDetailRow).getSouceCode())){
+                if (PurchaseOrderStatus.SourceCode.POQUOTATION.equals(poPurchasingController.PurchaseOrder().Detail(pnTblDetailRow).getSouceCode())) {
                     lnRequestQuantity = poPurchasingController.PurchaseOrder().Detail(pnTblDetailRow).POQuotationDetail().getQuantity();
                 } else {
                     lnRequestQuantity = poPurchasingController.PurchaseOrder().Detail(pnTblDetailRow).InvStockRequestDetail().getApproved();
