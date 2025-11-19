@@ -376,10 +376,8 @@ public class LoginController implements Initializable, ScreenInterface {
                     if ("success".equals((String) poJSON.get("result"))) {
                         return poJSON;
                     }
-                } catch (SQLException e) {
-                    JFXUtil.setJSONError(poJSON, e.getMessage());
-                } catch (GuanzonException ex) {
-                    JFXUtil.setJSONError(poJSON, "Unable to log user. Please verify your entry.");
+                } catch (SQLException | GuanzonException ex) {
+                    JFXUtil.setJSONError(poJSON, MiscUtil.getException(ex));
                 }
             }
         } else {
