@@ -225,7 +225,7 @@ public class CheckPrintingController implements Initializable, ScreenInterface {
     private void loadRecordSearch() {
         try {
             lblSource.setText(poController.Master().Company().getCompanyName() + " - " + poController.Master().Industry().getDescription());
-            tfSearchIndustry.setText(poController.CheckPayments().getModel().Industry().getDescription());
+            tfSearchIndustry.setText(poController.getSearchIndustry());
             tfSearchBankName.setText(poController.CheckPayments().getModel().Banks().getBankName() != null ? poController.CheckPayments().getModel().Banks().getBankName() : "");
             tfSearchBankAccount.setText(poController.CheckPayments().getModel().Bank_Account_Master().getAccountNo() != null ? poController.CheckPayments().getModel().Bank_Account_Master().getAccountNo() : "");
 
@@ -374,7 +374,7 @@ public class CheckPrintingController implements Initializable, ScreenInterface {
                 switch (lsID) {
                     case "tfSearchIndustry":
                         if (lsValue.isEmpty()) {
-                            poController.CheckPayments().getModel().setIndustryID("");
+                            poController.setIndustryID("");
                         }
                         break;
                     case "tfSearchBankName":

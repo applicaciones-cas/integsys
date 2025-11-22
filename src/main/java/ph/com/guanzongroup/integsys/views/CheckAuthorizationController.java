@@ -188,7 +188,7 @@ public class CheckAuthorizationController implements Initializable, ScreenInterf
     private void loadRecordSearch() {
         try {
             lblSource.setText(poDisbursementController.Master().Company().getCompanyName() + " - " + poDisbursementController.Master().Industry().getDescription());
-            tfSearchIndustry.setText(poDisbursementController.CheckPayments().getModel().Industry().getDescription());
+            tfSearchIndustry.setText(poDisbursementController.getSearchIndustry());
             tfSearchBankName.setText(poDisbursementController.CheckPayments().getModel().Banks().getBankName() != null ? poDisbursementController.CheckPayments().getModel().Banks().getBankName() : "");
             tfSearchBankAccount.setText(poDisbursementController.CheckPayments().getModel().Bank_Account_Master().getAccountNo() != null ? poDisbursementController.CheckPayments().getModel().Bank_Account_Master().getAccountNo() : "");
             JFXUtil.updateCaretPositions(apBrowse);
@@ -243,7 +243,7 @@ public class CheckAuthorizationController implements Initializable, ScreenInterf
                 switch (lsID) {
                     case "tfSearchIndustry":
                         if (lsValue.isEmpty()) {
-                            poDisbursementController.CheckPayments().getModel().setIndustryID("");
+                            poDisbursementController.setIndustryID("");
                         }
                         break;
 

@@ -844,7 +844,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
                 switch (lsID) {
                     case "tfSearchIndustry":
                         if (lsValue.isEmpty()) {
-                            poController.CheckPayments().getModel().setIndustryID("");
+                            poController.setIndustryID("");
                         }
                         break;
                     case "tfSearchSupplier":
@@ -853,7 +853,6 @@ public class DisbursementVoucher_VerificationController implements Initializable
                             psSearchSupplierID = "";
                             loadTableMain.reload();
                         }
-                        loadRecordSearch();
                         break;
                     case "tfSearchTransaction":
                         if (lsValue.isEmpty()) {
@@ -883,7 +882,6 @@ public class DisbursementVoucher_VerificationController implements Initializable
                         loadRecordMasterJE();
                         break;
                 }
-
             });
     ChangeListener<Boolean> txtMaster_Focus = JFXUtil.FocusListener(TextField.class,
             (lsID, lsValue) -> {
@@ -1448,7 +1446,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
     private void loadRecordSearch() {
         try {
             lblSource.setText(poController.Master().Company().getCompanyName() + " - " + poController.Master().Industry().getDescription());
-            tfSearchIndustry.setText(poController.CheckPayments().getModel().Industry().getDescription());
+            tfSearchIndustry.setText(poController.getSearchIndustry());
             tfSearchSupplier.setText(poController.getSearchPayee());
 //            tfSearchTransaction.setText(poController.getSearchTransaction());
             JFXUtil.updateCaretPositions(apBrowse);
