@@ -80,7 +80,7 @@ public class CheckAuthorizationController implements Initializable, ScreenInterf
     @FXML
     private AnchorPane AnchorMain, apBrowse, apButton;
     @FXML
-    private TextField tfSearchBankName, tfSearchBankAccount;
+    private TextField tfSearchIndustry, tfSearchBankName, tfSearchBankAccount;
     @FXML
     private Label lblSource;
     @FXML
@@ -188,6 +188,7 @@ public class CheckAuthorizationController implements Initializable, ScreenInterf
     private void loadRecordSearch() {
         try {
             lblSource.setText(poDisbursementController.Master().Company().getCompanyName() + " - " + poDisbursementController.Master().Industry().getDescription());
+            tfSearchIndustry.setText(poDisbursementController.CheckPayments().getModel().Industry().getDescription());
             tfSearchBankName.setText(poDisbursementController.CheckPayments().getModel().Banks().getBankName() != null ? poDisbursementController.CheckPayments().getModel().Banks().getBankName() : "");
             tfSearchBankAccount.setText(poDisbursementController.CheckPayments().getModel().Bank_Account_Master().getAccountNo() != null ? poDisbursementController.CheckPayments().getModel().Bank_Account_Master().getAccountNo() : "");
             JFXUtil.updateCaretPositions(apBrowse);
@@ -232,7 +233,7 @@ public class CheckAuthorizationController implements Initializable, ScreenInterf
     }
 
     private void initTextFields() {
-        JFXUtil.setFocusListener(txtSearch_Focus, tfSearchBankName, tfSearchBankAccount);
+        JFXUtil.setFocusListener(txtSearch_Focus, tfSearchIndustry, tfSearchBankName, tfSearchBankAccount);
         JFXUtil.setKeyPressedListener(this::txtField_KeyPressed, apBrowse);
         JFXUtil.adjustColumnForScrollbar(tblViewMainList);
     }
@@ -240,6 +241,12 @@ public class CheckAuthorizationController implements Initializable, ScreenInterf
     ChangeListener<Boolean> txtSearch_Focus = JFXUtil.FocusListener(TextField.class,
             (lsID, lsValue) -> {
                 switch (lsID) {
+                    case "tfSearchIndustry":
+                        if (lsValue.isEmpty()) {
+                            poDisbursementController.CheckPayments().getModel().setIndustryID("");
+                        }
+                        break;
+
                     case "tfSearchBankName":
                         if (lsValue.isEmpty()) {
                             poDisbursementController.CheckPayments().getModel().setBankID("");
@@ -256,6 +263,7 @@ public class CheckAuthorizationController implements Initializable, ScreenInterf
                         break;
                 }
                 loadRecordSearch();
+
             });
 
     private void txtField_KeyPressed(KeyEvent event) {
@@ -274,6 +282,16 @@ public class CheckAuthorizationController implements Initializable, ScreenInterf
                         break;
                     case F3:
                         switch (lsID) {
+                            case "tfSearchIndustry":
+                                poJSON = poDisbursementController.SearchIndustry(lsValue, false);
+                                if ("error".equals((String) poJSON.get("result"))) {
+                                    ShowMessageFX.Information(null, pxeModuleName, (String) poJSON.get("message"));
+                                    return;
+                                } else {
+                                    loadRecordSearch();
+                                    retrieveDisbursement();
+                                }
+                                break;
                             case "tfSearchBankName":
                                 poJSON = poDisbursementController.SearchBanks(lsValue, false);
                                 if ("error".equals((String) poJSON.get("result"))) {
@@ -310,7 +328,7 @@ public class CheckAuthorizationController implements Initializable, ScreenInterf
 
     private void retrieveDisbursement() {
         try {
-            poJSON = poDisbursementController.loadTransactionList(tfSearchBankName.getText(), tfSearchBankAccount.getText(), "", true);
+            poJSON = poDisbursementController.loadTransactionList(tfSearchIndustry.getText(), tfSearchBankName.getText(), tfSearchBankAccount.getText(), "", true);
 
             if ("error".equals(poJSON.get("result"))) {
                 ShowMessageFX.Error(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));

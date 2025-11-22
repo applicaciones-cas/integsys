@@ -131,7 +131,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
     @FXML
     private Label lblSource, lblDVTransactionStatus, lblJournalTransactionStatus;
     @FXML
-    private TextField tfSearchTransaction, tfSearchSupplier, tfDVTransactionNo, tfSupplier, tfVoucherNo, tfBankNameCheck, tfBankAccountCheck, tfPayeeName, tfCheckNo, tfCheckAmount, tfAuthorizedPerson, tfBankNameBTransfer, tfBankAccountBTransfer, tfPaymentAmountBTransfer, tfSupplierBank, tfSupplierAccountNoBTransfer, tfBankTransReferNo, tfBankNameOnlinePayment, tfBankAccountOnlinePayment, tfPaymentAmount, tfSupplierServiceName, tfSupplierAccountNo, tfPaymentReferenceNo, tfTotalAmount, tfVatableSales, tfVatAmountMaster, tfVatZeroRatedSales, tfVatExemptSales, tfLessWHTax, tfTotalNetAmount, tfRefNoDetail, tfVatableSalesDetail, tfVatExemptDetail, tfVatZeroRatedSalesDetail, tfVatRateDetail, tfVatAmountDetail, tfTaxRateDetail, tfTaxAmountDetail, tfPurchasedAmountDetail, tfNetAmountDetail, tfTotalCreditAmount, tfJournalTransactionNo, tfTotalDebitAmount, tfAccountCode, tfAccountDescription, tfDebitAmount, tfCreditAmount;
+    private TextField tfSearchIndustry, tfSearchTransaction, tfSearchSupplier, tfDVTransactionNo, tfSupplier, tfVoucherNo, tfBankNameCheck, tfBankAccountCheck, tfPayeeName, tfCheckNo, tfCheckAmount, tfAuthorizedPerson, tfBankNameBTransfer, tfBankAccountBTransfer, tfPaymentAmountBTransfer, tfSupplierBank, tfSupplierAccountNoBTransfer, tfBankTransReferNo, tfBankNameOnlinePayment, tfBankAccountOnlinePayment, tfPaymentAmount, tfSupplierServiceName, tfSupplierAccountNo, tfPaymentReferenceNo, tfTotalAmount, tfVatableSales, tfVatAmountMaster, tfVatZeroRatedSales, tfVatExemptSales, tfLessWHTax, tfTotalNetAmount, tfRefNoDetail, tfVatableSalesDetail, tfVatExemptDetail, tfVatZeroRatedSalesDetail, tfVatRateDetail, tfVatAmountDetail, tfTaxRateDetail, tfTaxAmountDetail, tfPurchasedAmountDetail, tfNetAmountDetail, tfTotalCreditAmount, tfJournalTransactionNo, tfTotalDebitAmount, tfAccountCode, tfAccountDescription, tfDebitAmount, tfCreditAmount;
     @FXML
     private Button btnUpdate, btnSave, btnCancel, btnVerify, btnVoid, btnDVCancel, btnRetrieve, btnHistory, btnClose;
     @FXML
@@ -532,7 +532,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
                             try {
                                 main_data.clear();
                                 JFXUtil.disableAllHighlight(tblViewMainList, highlightedRowsMain);
-                                poJSON = poController.loadTransactionList(tfSearchSupplier.getText(), tfSearchTransaction.getText(), "", false);
+                                poJSON = poController.loadTransactionList(tfSearchIndustry.getText(), tfSearchSupplier.getText(), tfSearchTransaction.getText(), "", false);
                                 int lnRowNo = 0;
                                 if (poController.getMasterList().size() > 0) {
                                     for (int lnCtr = 0; lnCtr <= poController.getMasterList().size() - 1; lnCtr++) {
@@ -817,7 +817,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
     private void initTextFields() {
         //Initialise  TextField Focus
 
-        JFXUtil.setFocusListener(txtSearch_Focus, tfSearchSupplier, tfSearchTransaction);
+        JFXUtil.setFocusListener(txtSearch_Focus, tfSearchIndustry, tfSearchSupplier, tfSearchTransaction);
         JFXUtil.setFocusListener(txtArea_Focus, taDVRemarks, taJournalRemarks);
         //apDVMaster1
         JFXUtil.setFocusListener(txtMaster_Focus, tfSupplier);
@@ -842,6 +842,11 @@ public class DisbursementVoucher_VerificationController implements Initializable
             (lsID, lsValue) -> {
                 /*Lost Focus*/
                 switch (lsID) {
+                    case "tfSearchIndustry":
+                        if (lsValue.isEmpty()) {
+                            poController.CheckPayments().getModel().setIndustryID("");
+                        }
+                        break;
                     case "tfSearchSupplier":
                         if (lsValue.isEmpty()) {
                             poController.Master().setPayeeID("");
@@ -857,6 +862,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
                         }
                         break;
                 }
+                loadRecordSearch();
             });
 
     ChangeListener<Boolean> txtArea_Focus = JFXUtil.FocusListener(TextArea.class,
@@ -1175,6 +1181,16 @@ public class DisbursementVoucher_VerificationController implements Initializable
                     case F3:
                         switch (lsID) {
                             //apBrowse?
+                            case "tfSearchIndustry":
+                                poJSON = poController.SearchIndustry(lsValue, false);
+                                if ("error".equals((String) poJSON.get("result"))) {
+                                    ShowMessageFX.Information(null, pxeModuleName, (String) poJSON.get("message"));
+                                    return;
+                                } else {
+                                    loadRecordSearch();
+                                    loadTableMain.reload();
+                                }
+                                break;
                             case "tfSearchTransaction":
                                 psSearchTransactionNo = tfSearchTransaction.getText();
                                 loadTableMain.reload();
@@ -1432,6 +1448,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
     private void loadRecordSearch() {
         try {
             lblSource.setText(poController.Master().Company().getCompanyName() + " - " + poController.Master().Industry().getDescription());
+            tfSearchIndustry.setText(poController.CheckPayments().getModel().Industry().getDescription());
             tfSearchSupplier.setText(poController.getSearchPayee());
 //            tfSearchTransaction.setText(poController.getSearchTransaction());
             JFXUtil.updateCaretPositions(apBrowse);

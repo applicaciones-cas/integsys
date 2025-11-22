@@ -95,7 +95,7 @@ public class CheckPrintingController implements Initializable, ScreenInterface {
     @FXML
     private Label lblSource;
     @FXML
-    private TextField tfSearchBankName, tfSearchBankAccount;
+    private TextField tfSearchIndustry, tfSearchBankName, tfSearchBankAccount;
     @FXML
     private DatePicker dpDVDateFrom, dpDVDateTo;
     @FXML
@@ -225,6 +225,7 @@ public class CheckPrintingController implements Initializable, ScreenInterface {
     private void loadRecordSearch() {
         try {
             lblSource.setText(poController.Master().Company().getCompanyName() + " - " + poController.Master().Industry().getDescription());
+            tfSearchIndustry.setText(poController.CheckPayments().getModel().Industry().getDescription());
             tfSearchBankName.setText(poController.CheckPayments().getModel().Banks().getBankName() != null ? poController.CheckPayments().getModel().Banks().getBankName() : "");
             tfSearchBankAccount.setText(poController.CheckPayments().getModel().Bank_Account_Master().getAccountNo() != null ? poController.CheckPayments().getModel().Bank_Account_Master().getAccountNo() : "");
 
@@ -363,7 +364,7 @@ public class CheckPrintingController implements Initializable, ScreenInterface {
     }
 
     private void initTextFields() {
-        JFXUtil.setFocusListener(txtSearch_Focus, tfSearchBankName, tfSearchBankAccount);
+        JFXUtil.setFocusListener(txtSearch_Focus, tfSearchIndustry, tfSearchBankName, tfSearchBankAccount);
         JFXUtil.setKeyPressedListener(this::txtField_KeyPressed, apBrowse);
         JFXUtil.adjustColumnForScrollbar(tblViewMainList);
     }
@@ -371,6 +372,11 @@ public class CheckPrintingController implements Initializable, ScreenInterface {
     ChangeListener<Boolean> txtSearch_Focus = JFXUtil.FocusListener(TextField.class,
             (lsID, lsValue) -> {
                 switch (lsID) {
+                    case "tfSearchIndustry":
+                        if (lsValue.isEmpty()) {
+                            poController.CheckPayments().getModel().setIndustryID("");
+                        }
+                        break;
                     case "tfSearchBankName":
                         if (lsValue.isEmpty()) {
                             poController.CheckPayments().getModel().setBankID("");
@@ -453,6 +459,16 @@ public class CheckPrintingController implements Initializable, ScreenInterface {
                         break;
                     case F3:
                         switch (lsID) {
+                            case "tfSearchIndustry":
+                                poJSON = poController.SearchIndustry(lsValue, false);
+                                if ("error".equals((String) poJSON.get("result"))) {
+                                    ShowMessageFX.Information(null, pxeModuleName, (String) poJSON.get("message"));
+                                    return;
+                                } else {
+                                    loadRecordSearch();
+                                    retrieveDisbursement();
+                                }
+                                break;
                             case "tfSearchBankName":
                                 poJSON = poController.SearchBanks(lsValue, false);
                                 if ("error".equals((String) poJSON.get("result"))) {
@@ -496,7 +512,7 @@ public class CheckPrintingController implements Initializable, ScreenInterface {
                 return;
             }
 
-            poJSON = poController.loadCheckPrintTransactionList(tfSearchBankName.getText(), tfSearchBankAccount.getText(), psSearchDVDateFrom, psSearchDVDateTo);
+            poJSON = poController.loadCheckPrintTransactionList(tfSearchIndustry.getText(), tfSearchBankName.getText(), tfSearchBankAccount.getText(), psSearchDVDateFrom, psSearchDVDateTo);
             if ("error".equals(poJSON.get("result"))) {
                 ShowMessageFX.Error(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
             } else {
