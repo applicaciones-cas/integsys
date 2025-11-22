@@ -212,12 +212,7 @@ public class PurchaseOrder_ConfirmationMonarchFoodController implements Initiali
     private void loadRecordMaster() {
         try {
             tfTransactionNo.setText(poPurchasingController.PurchaseOrder().Master().getTransactionNo());
-            String lsStatus = "";
-            if("ABCDEFGHIJ".contains(poPurchasingController.PurchaseOrder().Master().getTransactionStatus())){
-                lsStatus = String.valueOf(poPurchasingController.PurchaseOrder().Master().getTransactionStatus().getBytes()[0] - 64);
-            } else {
-                lsStatus = poPurchasingController.PurchaseOrder().Master().getTransactionStatus();
-            }
+            String lsStatus = poPurchasingController.PurchaseOrder().Master().getConvertedTransactionStatus();
             switch (lsStatus) {
                 case PurchaseOrderStatus.CONFIRMED:
                     lsStatus = "CONFIRMED";
@@ -273,6 +268,8 @@ public class PurchaseOrder_ConfirmationMonarchFoodController implements Initiali
             if (pnTblDetailRow < 0 || pnTblDetailRow > poPurchasingController.PurchaseOrder().getDetailCount() - 1) {
                 return;
             }
+            boolean lbShow = pnEditMode == EditMode.UPDATE && JFXUtil.isObjectEqualTo(poPurchasingController.PurchaseOrder().Detail(pnTblDetailRow).getSouceCode(), null, "");
+            JFXUtil.setDisabled(!lbShow, tfCost);
             if (pnTblDetailRow >= 0) {
                 tfBarcode.setText(poPurchasingController.PurchaseOrder().Detail(pnTblDetailRow).Inventory().getBarCode() != null ? poPurchasingController.PurchaseOrder().Detail(pnTblDetailRow).Inventory().getBarCode() : "");
                 tfDescription.setText(poPurchasingController.PurchaseOrder().Detail(pnTblDetailRow).Inventory().getDescription() != null ? poPurchasingController.PurchaseOrder().Detail(pnTblDetailRow).Inventory().getDescription() : "");
@@ -418,7 +415,7 @@ public class PurchaseOrder_ConfirmationMonarchFoodController implements Initiali
                         ShowMessageFX.Information((String) poJSON.get("message"), psFormName, null);
                         return;
                     } else {
-                        if (poPurchasingController.PurchaseOrder().Master().getTransactionStatus().equals(PurchaseOrderStatus.OPEN)) {
+                        if (poPurchasingController.PurchaseOrder().Master().getConvertedTransactionStatus().equals(PurchaseOrderStatus.OPEN)) {
                             if (ShowMessageFX.YesNo(null, psFormName, "Do you want to confirm this transaction?")) {
                                 if ("success".equals((poJSON = poPurchasingController.PurchaseOrder().ConfirmTransaction("")).get("result"))) {
                                     ShowMessageFX.Information((String) poJSON.get("message"), psFormName, null);
@@ -595,6 +592,11 @@ public class PurchaseOrder_ConfirmationMonarchFoodController implements Initiali
                 case "tfSearchReferenceNo":
                     psReferID = tfSearchReferenceNo.getText();
                     loadTableMain();
+                    break;
+                case "tfCost":
+                    lsValue = JFXUtil.removeComma(lsValue);
+                    setOrderCost(lsValue);
+                    loadTableDetailAndSelectedRow();
                     break;
             }
         } else {
@@ -798,7 +800,7 @@ public class PurchaseOrder_ConfirmationMonarchFoodController implements Initiali
         double lnRequestQuantity = 0.00;
         try {
             System.out.println("SOURCE CODE: " + poPurchasingController.PurchaseOrder().Detail(pnTblDetailRow).getSouceCode());
-            if(PurchaseOrderStatus.SourceCode.POQUOTATION.equals(poPurchasingController.PurchaseOrder().Detail(pnTblDetailRow).getSouceCode())){
+            if (PurchaseOrderStatus.SourceCode.POQUOTATION.equals(poPurchasingController.PurchaseOrder().Detail(pnTblDetailRow).getSouceCode())) {
                 lnRequestQuantity = poPurchasingController.PurchaseOrder().Detail(pnTblDetailRow).POQuotationDetail().getQuantity();
             } else {
                 lnRequestQuantity = poPurchasingController.PurchaseOrder().Detail(pnTblDetailRow).InvStockRequestDetail().getApproved();
@@ -989,7 +991,7 @@ public class PurchaseOrder_ConfirmationMonarchFoodController implements Initiali
             btnPrint.setText("Print");
         }
         if (fnEditMode == EditMode.READY) {
-            switch (poPurchasingController.PurchaseOrder().Master().getTransactionStatus()) {
+            switch (poPurchasingController.PurchaseOrder().Master().getConvertedTransactionStatus()) {
                 case PurchaseOrderStatus.OPEN:
                     CustomCommonUtil.setVisible(true, btnConfirm, btnVoid, btnUpdate, btnPrint);
                     CustomCommonUtil.setManaged(true, btnConfirm, btnVoid, btnUpdate, btnPrint);
@@ -1008,7 +1010,7 @@ public class PurchaseOrder_ConfirmationMonarchFoodController implements Initiali
 
     private void initFields(int fnEditMode) {
         boolean lbShow = (fnEditMode == EditMode.UPDATE);
-        if (poPurchasingController.PurchaseOrder().Master().getTransactionStatus().equals(PurchaseOrderStatus.OPEN)) {
+        if (poPurchasingController.PurchaseOrder().Master().getConvertedTransactionStatus().equals(PurchaseOrderStatus.OPEN)) {
             CustomCommonUtil.setDisable(!lbShow, AnchorMaster, AnchorDetails);
             CustomCommonUtil.setDisable(!lbShow,
                     dpTransactionDate, tfDestination, taRemarks,

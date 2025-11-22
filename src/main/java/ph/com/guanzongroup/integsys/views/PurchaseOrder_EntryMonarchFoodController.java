@@ -266,12 +266,7 @@ public class PurchaseOrder_EntryMonarchFoodController implements Initializable, 
     private void loadRecordMaster() {
         try {
             tfTransactionNo.setText(poPurchasingController.PurchaseOrder().Master().getTransactionNo());
-            String lsStatus = "";
-            if("ABCDEFGHIJ".contains(poPurchasingController.PurchaseOrder().Master().getTransactionStatus())){
-                lsStatus = String.valueOf(poPurchasingController.PurchaseOrder().Master().getTransactionStatus().getBytes()[0] - 64);
-            } else {
-                lsStatus = poPurchasingController.PurchaseOrder().Master().getTransactionStatus();
-            }
+            String lsStatus = poPurchasingController.PurchaseOrder().Master().getConvertedTransactionStatus();
             switch (lsStatus) {
                 case PurchaseOrderStatus.CONFIRMED:
                     lsStatus = "CONFIRMED";
@@ -327,6 +322,9 @@ public class PurchaseOrder_EntryMonarchFoodController implements Initializable, 
             if (pnTblDetailRow < 0 || pnTblDetailRow > poPurchasingController.PurchaseOrder().getDetailCount() - 1) {
                 return;
             }
+            boolean lbShow = JFXUtil.isObjectEqualTo(pnEditMode, EditMode.UPDATE, EditMode.ADDNEW)
+                    && JFXUtil.isObjectEqualTo(poPurchasingController.PurchaseOrder().Detail(pnTblDetailRow).getSouceCode(), null, "");
+            JFXUtil.setDisabled(!lbShow, tfCost);
             if (pnTblDetailRow >= 0) {
                 tfBarcode.setText(poPurchasingController.PurchaseOrder().Detail(pnTblDetailRow).Inventory().getBarCode() != null ? poPurchasingController.PurchaseOrder().Detail(pnTblDetailRow).Inventory().getBarCode() : "");
                 tfDescription.setText(poPurchasingController.PurchaseOrder().Detail(pnTblDetailRow).Inventory().getDescription() != null ? poPurchasingController.PurchaseOrder().Detail(pnTblDetailRow).Inventory().getDescription() : "");
@@ -620,7 +618,7 @@ public class PurchaseOrder_EntryMonarchFoodController implements Initializable, 
                     ShowMessageFX.Information((String) poJSON.get("message"), psFormName, null);
                     poJSON = poPurchasingController.PurchaseOrder().OpenTransaction(poPurchasingController.PurchaseOrder().Master().getTransactionNo());
                     if ("success".equals(poJSON.get("result"))) {
-                        if (poPurchasingController.PurchaseOrder().Master().getTransactionStatus().equals(PurchaseOrderStatus.OPEN)) {
+                        if (poPurchasingController.PurchaseOrder().Master().getConvertedTransactionStatus().equals(PurchaseOrderStatus.OPEN)) {
                             if (ShowMessageFX.YesNo(null, psFormName, "Do you want to confirm this transaction?")) {
                                 poPurchasingController.PurchaseOrder().setWithUI(true);
                                 if ("success".equals((poJSON = poPurchasingController.PurchaseOrder().ConfirmTransaction("")).get("result"))) {
@@ -787,6 +785,14 @@ public class PurchaseOrder_EntryMonarchFoodController implements Initializable, 
                     break;
                 case "tfOrderQuantity":
                     break;
+                case "tfCost":
+                    lsValue = JFXUtil.removeComma(lsValue);
+                    poJSON = poPurchasingController.PurchaseOrder().Detail(pnTblDetailRow).setUnitPrice(Double.valueOf(lsValue));
+                    if (!"success".equals((String) poJSON.get("result"))) {
+                        ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
+                    }
+                    loadTableDetailAndSelectedRow();
+                    break;
             }
         } else {
             loTextField.selectAll();
@@ -928,6 +934,7 @@ public class PurchaseOrder_EntryMonarchFoodController implements Initializable, 
                             case "tfAdvancePRate":
                             case "tfDiscountRate":
                             case "tfDiscountAmount":
+                            case "tfCost":
                                 CommonUtils.SetNextFocus((TextField) event.getSource());
                                 break;
                             case "tfOrderQuantity":
@@ -1076,7 +1083,7 @@ public class PurchaseOrder_EntryMonarchFoodController implements Initializable, 
         double lnRequestQuantity = 0.00;
         try {
             System.out.println("SOURCE CODE: " + poPurchasingController.PurchaseOrder().Detail(pnTblDetailRow).getSouceCode());
-            if(PurchaseOrderStatus.SourceCode.POQUOTATION.equals(poPurchasingController.PurchaseOrder().Detail(pnTblDetailRow).getSouceCode())){
+            if (PurchaseOrderStatus.SourceCode.POQUOTATION.equals(poPurchasingController.PurchaseOrder().Detail(pnTblDetailRow).getSouceCode())) {
                 lnRequestQuantity = poPurchasingController.PurchaseOrder().Detail(pnTblDetailRow).POQuotationDetail().getQuantity();
             } else {
                 lnRequestQuantity = poPurchasingController.PurchaseOrder().Detail(pnTblDetailRow).InvStockRequestDetail().getApproved();
@@ -1311,7 +1318,7 @@ public class PurchaseOrder_EntryMonarchFoodController implements Initializable, 
             btnPrint.setText("Print");
         }
         if (fnEditMode == EditMode.READY) {
-            switch (poPurchasingController.PurchaseOrder().Master().getTransactionStatus()) {
+            switch (poPurchasingController.PurchaseOrder().Master().getConvertedTransactionStatus()) {
                 case PurchaseOrderStatus.OPEN:
                 case PurchaseOrderStatus.CONFIRMED:
                 case PurchaseOrderStatus.RETURNED:
@@ -1607,7 +1614,7 @@ public class PurchaseOrder_EntryMonarchFoodController implements Initializable, 
                                 orderDetail.Inventory().getBarCode(),
                                 orderDetail.Inventory().getDescription(),
                                 CustomCommonUtil.setIntegerValueToDecimalFormat(orderDetail.getUnitPrice(), true),
-                             "0",
+                                "0",
                                 CustomCommonUtil.setIntegerValueToDecimalFormat(lnRequestQuantity),
                                 CustomCommonUtil.setIntegerValueToDecimalFormat(orderDetail.getQuantity()),
                                 CustomCommonUtil.setIntegerValueToDecimalFormat(lnTotalAmount, true),

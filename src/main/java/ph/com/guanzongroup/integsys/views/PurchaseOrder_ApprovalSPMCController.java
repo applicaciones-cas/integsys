@@ -163,8 +163,8 @@ public class PurchaseOrder_ApprovalSPMCController implements Initializable, Scre
     public void initialize(URL url, ResourceBundle rb) {
         try {
             poPurchasingController = new PurchaseOrderControllers(poApp, logWrapper);
-            poPurchasingController.PurchaseOrder().setTransactionStatus(PurchaseOrderStatus.CONFIRMED + 
-                    PurchaseOrderStatus.RETURNED);
+            poPurchasingController.PurchaseOrder().setTransactionStatus(PurchaseOrderStatus.CONFIRMED
+                    + PurchaseOrderStatus.RETURNED);
             poJSON = new JSONObject();
             poPurchasingController.PurchaseOrder().setWithUI(true);
             poJSON = poPurchasingController.PurchaseOrder().InitTransaction();
@@ -214,12 +214,7 @@ public class PurchaseOrder_ApprovalSPMCController implements Initializable, Scre
     private void loadRecordMaster() {
         try {
             tfTransactionNo.setText(poPurchasingController.PurchaseOrder().Master().getTransactionNo());
-            String lsStatus = "";
-            if("ABCDEFGHIJ".contains(poPurchasingController.PurchaseOrder().Master().getTransactionStatus())){
-                lsStatus = String.valueOf(poPurchasingController.PurchaseOrder().Master().getTransactionStatus().getBytes()[0] - 64);
-            } else {
-                lsStatus = poPurchasingController.PurchaseOrder().Master().getTransactionStatus();
-            }
+            String lsStatus = poPurchasingController.PurchaseOrder().Master().getConvertedTransactionStatus();
             switch (lsStatus) {
                 case PurchaseOrderStatus.CONFIRMED:
                     lsStatus = "CONFIRMED";
@@ -275,6 +270,9 @@ public class PurchaseOrder_ApprovalSPMCController implements Initializable, Scre
             if (pnTblDetailRow < 0 || pnTblDetailRow > poPurchasingController.PurchaseOrder().getDetailCount() - 1) {
                 return;
             }
+            boolean lbShow = JFXUtil.isObjectEqualTo(pnEditMode, EditMode.UPDATE, EditMode.ADDNEW)
+                    && JFXUtil.isObjectEqualTo(poPurchasingController.PurchaseOrder().Detail(pnTblDetailRow).getSouceCode(), null, "");
+            JFXUtil.setDisabled(!lbShow, tfCost);
             if (pnTblDetailRow >= 0) {
                 tfBarcode.setText(poPurchasingController.PurchaseOrder().Detail(pnTblDetailRow).Inventory().getBarCode() != null ? poPurchasingController.PurchaseOrder().Detail(pnTblDetailRow).Inventory().getBarCode() : "");
                 tfDescription.setText(poPurchasingController.PurchaseOrder().Detail(pnTblDetailRow).Inventory().getDescription() != null ? poPurchasingController.PurchaseOrder().Detail(pnTblDetailRow).Inventory().getDescription() : "");
@@ -423,7 +421,7 @@ public class PurchaseOrder_ApprovalSPMCController implements Initializable, Scre
                         ShowMessageFX.Information((String) poJSON.get("message"), psFormName, null);
                         return;
                     } else {
-                        if (poPurchasingController.PurchaseOrder().Master().getTransactionStatus().equals(PurchaseOrderStatus.CONFIRMED)) {
+                        if (poPurchasingController.PurchaseOrder().Master().getConvertedTransactionStatus().equals(PurchaseOrderStatus.CONFIRMED)) {
                             if (ShowMessageFX.YesNo(null, psFormName, "Do you want to approve this transaction?")) {
                                 if ("success".equals((poJSON = poPurchasingController.PurchaseOrder().ApproveTransaction("")).get("result"))) {
                                     ShowMessageFX.Information((String) poJSON.get("message"), psFormName, null);
@@ -601,6 +599,11 @@ public class PurchaseOrder_ApprovalSPMCController implements Initializable, Scre
                 case "tfSearchReferenceNo":
                     psReferID = tfSearchReferenceNo.getText();
                     loadTableMain();
+                    break;
+                case "tfCost":
+                    lsValue = JFXUtil.removeComma(lsValue);
+                    setOrderCost(lsValue);
+                    loadTableDetailAndSelectedRow();
                     break;
             }
         } else {
@@ -803,7 +806,7 @@ public class PurchaseOrder_ApprovalSPMCController implements Initializable, Scre
         double lnRequestQuantity = 0;
         try {
             System.out.println("SOURCE CODE: " + poPurchasingController.PurchaseOrder().Detail(pnTblDetailRow).getSouceCode());
-            if(PurchaseOrderStatus.SourceCode.POQUOTATION.equals(poPurchasingController.PurchaseOrder().Detail(pnTblDetailRow).getSouceCode())){
+            if (PurchaseOrderStatus.SourceCode.POQUOTATION.equals(poPurchasingController.PurchaseOrder().Detail(pnTblDetailRow).getSouceCode())) {
                 lnRequestQuantity = poPurchasingController.PurchaseOrder().Detail(pnTblDetailRow).POQuotationDetail().getQuantity();
             } else {
                 lnRequestQuantity = poPurchasingController.PurchaseOrder().Detail(pnTblDetailRow).InvStockRequestDetail().getApproved();
@@ -994,7 +997,7 @@ public class PurchaseOrder_ApprovalSPMCController implements Initializable, Scre
             btnPrint.setText("Print");
         }
         if (fnEditMode == EditMode.READY) {
-            switch (poPurchasingController.PurchaseOrder().Master().getTransactionStatus()) {
+            switch (poPurchasingController.PurchaseOrder().Master().getConvertedTransactionStatus()) {
                 case PurchaseOrderStatus.CONFIRMED:
                     CustomCommonUtil.setVisible(true, btnApprove, btnReturn, btnVoid, btnUpdate, btnPrint);
                     CustomCommonUtil.setManaged(true, btnApprove, btnReturn, btnVoid, btnUpdate, btnPrint);
@@ -1004,8 +1007,8 @@ public class PurchaseOrder_ApprovalSPMCController implements Initializable, Scre
                     btnPrint.setManaged(true);
                     break;
                 case PurchaseOrderStatus.RETURNED:
-                    CustomCommonUtil.setVisible(true,  btnVoid, btnUpdate, btnPrint);
-                    CustomCommonUtil.setManaged(true,  btnVoid, btnUpdate, btnPrint);
+                    CustomCommonUtil.setVisible(true, btnVoid, btnUpdate, btnPrint);
+                    CustomCommonUtil.setManaged(true, btnVoid, btnUpdate, btnPrint);
                     break;
             }
         }
@@ -1013,7 +1016,7 @@ public class PurchaseOrder_ApprovalSPMCController implements Initializable, Scre
 
     private void initFields(int fnEditMode) {
         boolean lbShow = (fnEditMode == EditMode.UPDATE);
-        if (poPurchasingController.PurchaseOrder().Master().getTransactionStatus().equals(PurchaseOrderStatus.CONFIRMED)) {
+        if (poPurchasingController.PurchaseOrder().Master().getConvertedTransactionStatus().equals(PurchaseOrderStatus.CONFIRMED)) {
             CustomCommonUtil.setDisable(!lbShow, AnchorMaster, AnchorDetails);
             CustomCommonUtil.setDisable(!lbShow,
                     dpTransactionDate, tfDestination, taRemarks,

@@ -266,12 +266,7 @@ public class PurchaseOrder_EntryController implements Initializable, ScreenInter
     private void loadRecordMaster() {
         try {
             tfTransactionNo.setText(poPurchasingController.PurchaseOrder().Master().getTransactionNo());
-            String lsStatus = "";
-            if("ABCDEFGHIJ".contains(poPurchasingController.PurchaseOrder().Master().getTransactionStatus())){
-                lsStatus = String.valueOf(poPurchasingController.PurchaseOrder().Master().getTransactionStatus().getBytes()[0] - 64);
-            } else {
-                lsStatus = poPurchasingController.PurchaseOrder().Master().getTransactionStatus();
-            }
+            String lsStatus = poPurchasingController.PurchaseOrder().Master().getConvertedTransactionStatus();
             switch (lsStatus) {
                 case PurchaseOrderStatus.CONFIRMED:
                     lsStatus = "CONFIRMED";
@@ -327,6 +322,9 @@ public class PurchaseOrder_EntryController implements Initializable, ScreenInter
             if (pnTblDetailRow < 0 || pnTblDetailRow > poPurchasingController.PurchaseOrder().getDetailCount() - 1) {
                 return;
             }
+            boolean lbShow = JFXUtil.isObjectEqualTo(pnEditMode, EditMode.UPDATE, EditMode.ADDNEW)
+                    && JFXUtil.isObjectEqualTo(poPurchasingController.PurchaseOrder().Detail(pnTblDetailRow).getSouceCode(), null, "");
+            JFXUtil.setDisabled(!lbShow, tfCost);
             if (pnTblDetailRow >= 0) {
                 CustomCommonUtil.setDisable(poPurchasingController.PurchaseOrder().Detail(pnTblDetailRow).getSouceCode() == PurchaseOrderStatus.SourceCode.POQUOTATION,
                         tfRequestQuantity);
@@ -625,7 +623,7 @@ public class PurchaseOrder_EntryController implements Initializable, ScreenInter
                     ShowMessageFX.Information((String) poJSON.get("message"), psFormName, null);
                     poJSON = poPurchasingController.PurchaseOrder().OpenTransaction(poPurchasingController.PurchaseOrder().Master().getTransactionNo());
                     if ("success".equals(poJSON.get("result"))) {
-                        if (poPurchasingController.PurchaseOrder().Master().getTransactionStatus().equals(PurchaseOrderStatus.OPEN)) {
+                        if (poPurchasingController.PurchaseOrder().Master().getConvertedTransactionStatus().equals(PurchaseOrderStatus.OPEN)) {
                             if (ShowMessageFX.YesNo(null, psFormName, "Do you want to confirm this transaction?")) {
                                 poPurchasingController.PurchaseOrder().setWithUI(true);
                                 if ("success".equals((poJSON = poPurchasingController.PurchaseOrder().ConfirmTransaction("")).get("result"))) {
@@ -793,6 +791,14 @@ public class PurchaseOrder_EntryController implements Initializable, ScreenInter
                     break;
                 case "tfOrderQuantity":
                     break;
+                case "tfCost":
+                    lsValue = JFXUtil.removeComma(lsValue);
+                    poJSON = poPurchasingController.PurchaseOrder().Detail(pnTblDetailRow).setUnitPrice(Double.valueOf(lsValue));
+                    if (!"success".equals((String) poJSON.get("result"))) {
+                        ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
+                    }
+                    loadTableDetailAndSelectedRow();
+                    break;
             }
         } else {
             loTextField.selectAll();
@@ -934,6 +940,7 @@ public class PurchaseOrder_EntryController implements Initializable, ScreenInter
                             case "tfAdvancePRate":
                             case "tfDiscountRate":
                             case "tfDiscountAmount":
+                            case "tfCost":
                                 CommonUtils.SetNextFocus((TextField) event.getSource());
                                 break;
                             case "tfOrderQuantity":
@@ -1082,7 +1089,7 @@ public class PurchaseOrder_EntryController implements Initializable, ScreenInter
         double lnRequestQuantity = 0;
         try {
             System.out.println("SOURCE CODE: " + poPurchasingController.PurchaseOrder().Detail(pnTblDetailRow).getSouceCode());
-            if(PurchaseOrderStatus.SourceCode.POQUOTATION.equals(poPurchasingController.PurchaseOrder().Detail(pnTblDetailRow).getSouceCode())){
+            if (PurchaseOrderStatus.SourceCode.POQUOTATION.equals(poPurchasingController.PurchaseOrder().Detail(pnTblDetailRow).getSouceCode())) {
                 lnRequestQuantity = poPurchasingController.PurchaseOrder().Detail(pnTblDetailRow).POQuotationDetail().getQuantity();
             } else {
                 lnRequestQuantity = poPurchasingController.PurchaseOrder().Detail(pnTblDetailRow).InvStockRequestDetail().getApproved();
@@ -1318,7 +1325,7 @@ public class PurchaseOrder_EntryController implements Initializable, ScreenInter
             btnPrint.setText("Print");
         }
         if (fnEditMode == EditMode.READY) {
-            switch (poPurchasingController.PurchaseOrder().Master().getTransactionStatus()) {
+            switch (poPurchasingController.PurchaseOrder().Master().getConvertedTransactionStatus()) {
                 case PurchaseOrderStatus.OPEN:
                 case PurchaseOrderStatus.CONFIRMED:
                 case PurchaseOrderStatus.RETURNED:
@@ -1741,7 +1748,7 @@ public class PurchaseOrder_EntryController implements Initializable, ScreenInter
                             }
                             poPurchasingController.PurchaseOrder().Detail().remove(lnCtr);
                         }
-                        pnTblDetailRow = -1;
+                        pnTblDetailRow = 0;
                         pnTblMainRow = -1;
                         tblVwStockRequest.getSelectionModel().clearSelection();
                         poPurchasingController.PurchaseOrder().Master().setTermCode("0000004");
