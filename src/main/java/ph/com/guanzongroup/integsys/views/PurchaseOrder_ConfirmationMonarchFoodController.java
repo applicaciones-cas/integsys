@@ -268,6 +268,8 @@ public class PurchaseOrder_ConfirmationMonarchFoodController implements Initiali
             if (pnTblDetailRow < 0 || pnTblDetailRow > poPurchasingController.PurchaseOrder().getDetailCount() - 1) {
                 return;
             }
+            boolean lbShow = pnEditMode == EditMode.UPDATE && JFXUtil.isObjectEqualTo(poPurchasingController.PurchaseOrder().Detail(pnTblDetailRow).getSouceCode(), null, "");
+            JFXUtil.setDisabled(!lbShow, tfCost);
             if (pnTblDetailRow >= 0) {
                 tfBarcode.setText(poPurchasingController.PurchaseOrder().Detail(pnTblDetailRow).Inventory().getBarCode() != null ? poPurchasingController.PurchaseOrder().Detail(pnTblDetailRow).Inventory().getBarCode() : "");
                 tfDescription.setText(poPurchasingController.PurchaseOrder().Detail(pnTblDetailRow).Inventory().getDescription() != null ? poPurchasingController.PurchaseOrder().Detail(pnTblDetailRow).Inventory().getDescription() : "");
@@ -591,6 +593,11 @@ public class PurchaseOrder_ConfirmationMonarchFoodController implements Initiali
                     psReferID = tfSearchReferenceNo.getText();
                     loadTableMain();
                     break;
+                case "tfCost":
+                    lsValue = JFXUtil.removeComma(lsValue);
+                    setOrderCost(lsValue);
+                    loadTableDetailAndSelectedRow();
+                    break;
             }
         } else {
             loTextField.selectAll();
@@ -793,7 +800,7 @@ public class PurchaseOrder_ConfirmationMonarchFoodController implements Initiali
         double lnRequestQuantity = 0.00;
         try {
             System.out.println("SOURCE CODE: " + poPurchasingController.PurchaseOrder().Detail(pnTblDetailRow).getSouceCode());
-            if(PurchaseOrderStatus.SourceCode.POQUOTATION.equals(poPurchasingController.PurchaseOrder().Detail(pnTblDetailRow).getSouceCode())){
+            if (PurchaseOrderStatus.SourceCode.POQUOTATION.equals(poPurchasingController.PurchaseOrder().Detail(pnTblDetailRow).getSouceCode())) {
                 lnRequestQuantity = poPurchasingController.PurchaseOrder().Detail(pnTblDetailRow).POQuotationDetail().getQuantity();
             } else {
                 lnRequestQuantity = poPurchasingController.PurchaseOrder().Detail(pnTblDetailRow).InvStockRequestDetail().getApproved();
