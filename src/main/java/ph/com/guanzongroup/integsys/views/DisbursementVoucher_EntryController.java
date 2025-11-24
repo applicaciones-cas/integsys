@@ -2083,13 +2083,8 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                             lsPeriodToDate = sdfFormat.format(poController.WTaxDeduction(pnDetailBIR).getModel().getPeriodTo());
                             periodToDate = LocalDate.parse(lsPeriodToDate, DateTimeFormatter.ofPattern(SQLUtil.FORMAT_SHORT_DATE));
 
-                            if (selectedDate.isAfter(currentDate)) {
-                                JFXUtil.setJSONError(poJSON, "Future dates are not allowed.");
-                                pbSuccess = false;
-                            }
-
                             if (pbSuccess && (selectedDate.isAfter(periodToDate))) {
-                                JFXUtil.setJSONError(poJSON, "Period From cannot be later than the period to date.");
+                                JFXUtil.setJSONError(poJSON, "Period From cannot be later than the \"Period To\" date.");
                                 pbSuccess = false;
                             }
 
@@ -2110,13 +2105,8 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                             lsPeriodFromDate = sdfFormat.format(poController.WTaxDeduction(pnDetailBIR).getModel().getPeriodFrom());
                             periodFromDate = LocalDate.parse(lsPeriodFromDate, DateTimeFormatter.ofPattern(SQLUtil.FORMAT_SHORT_DATE));
 
-                            if (selectedDate.isAfter(currentDate)) {
-                                JFXUtil.setJSONError(poJSON, "Future dates are not allowed.");
-                                pbSuccess = false;
-                            }
-
-                            if (pbSuccess && (selectedDate.isAfter(transactionDate))) {
-                                JFXUtil.setJSONError(poJSON, "Period To cannot be later than the period from date.");
+                            if (pbSuccess && (selectedDate.isBefore(transactionDate))) {
+                                JFXUtil.setJSONError(poJSON, "Period To cannot be before than the \"Period From\" date.");
                                 pbSuccess = false;
                             }
 

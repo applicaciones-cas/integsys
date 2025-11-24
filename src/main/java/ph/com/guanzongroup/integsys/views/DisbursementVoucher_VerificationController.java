@@ -1978,7 +1978,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
                 DatePicker datePicker = (DatePicker) source;
                 String inputText = datePicker.getEditor().getText();
                 SimpleDateFormat sdfFormat = new SimpleDateFormat(SQLUtil.FORMAT_SHORT_DATE);
-                LocalDate currentDate = null, transactionDate = null, referenceDate = null, selectedDate = null, periodToDate= null, periodFromDate = null;
+                LocalDate currentDate = null, transactionDate = null, referenceDate = null, selectedDate = null, periodToDate = null, periodFromDate = null;
                 String lsServerDate = "", lsTransDate = "", lsRefDate = "", lsSelectedDate = "", lsPeriodToDate = "", lsPeriodFromDate = "";
 
                 if (inputText == null || "".equals(inputText) || "01/01/1900".equals(inputText)) {
@@ -2051,13 +2051,8 @@ public class DisbursementVoucher_VerificationController implements Initializable
                             lsPeriodToDate = sdfFormat.format(poController.WTaxDeduction(pnDetailBIR).getModel().getPeriodTo());
                             periodToDate = LocalDate.parse(lsPeriodToDate, DateTimeFormatter.ofPattern(SQLUtil.FORMAT_SHORT_DATE));
 
-                            if (selectedDate.isAfter(currentDate)) {
-                                JFXUtil.setJSONError(poJSON, "Future dates are not allowed.");
-                                pbSuccess = false;
-                            }
-
                             if (pbSuccess && (selectedDate.isAfter(periodToDate))) {
-                                JFXUtil.setJSONError(poJSON, "Period From cannot be later than the period to date.");
+                                JFXUtil.setJSONError(poJSON, "Period From cannot be later than the \"Period To\" date.");
                                 pbSuccess = false;
                             }
 
@@ -2078,13 +2073,8 @@ public class DisbursementVoucher_VerificationController implements Initializable
                             lsPeriodFromDate = sdfFormat.format(poController.WTaxDeduction(pnDetailBIR).getModel().getPeriodFrom());
                             periodFromDate = LocalDate.parse(lsPeriodFromDate, DateTimeFormatter.ofPattern(SQLUtil.FORMAT_SHORT_DATE));
 
-                            if (selectedDate.isAfter(currentDate)) {
-                                JFXUtil.setJSONError(poJSON, "Future dates are not allowed.");
-                                pbSuccess = false;
-                            }
-
-                            if (pbSuccess && (selectedDate.isAfter(transactionDate))) {
-                                JFXUtil.setJSONError(poJSON, "Period To cannot be later than the period from date.");
+                            if (pbSuccess && (selectedDate.isBefore(transactionDate))) {
+                                JFXUtil.setJSONError(poJSON, "Period To cannot be before than the \"Period From\" date.");
                                 pbSuccess = false;
                             }
 
