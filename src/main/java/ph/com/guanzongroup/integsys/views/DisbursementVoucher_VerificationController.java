@@ -1628,8 +1628,8 @@ public class DisbursementVoucher_VerificationController implements Initializable
                 apBIRDetail.requestFocus();
                 pnDetailBIR = isUp ? JFXUtil.moveToPreviousRow(tblVwBIRDetails) : JFXUtil.moveToNextRow(tblVwBIRDetails);
             }
-            loadRecordDetailJE();
-            if (pnDetailBIR < 0 || pnDetailBIR > poController.Journal().getDetailCount() - 1) {
+            loadRecordDetailBIR();
+            if (pnDetailBIR < 0 || pnDetailBIR > poController.getWTaxDeductionsCount() - 1) {
                 return;
             }
             JFXUtil.requestFocusNullField(new Object[][]{ // alternative to if , else if

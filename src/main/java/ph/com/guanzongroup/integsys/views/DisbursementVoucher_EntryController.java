@@ -1646,15 +1646,15 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
         }
     }
-
+    
     public void moveNextBIR(boolean isUp, boolean continueNext) {
         try {
             if (continueNext) {
                 apBIRDetail.requestFocus();
                 pnDetailBIR = isUp ? JFXUtil.moveToPreviousRow(tblVwBIRDetails) : JFXUtil.moveToNextRow(tblVwBIRDetails);
             }
-            loadRecordDetailJE();
-            if (pnDetailBIR < 0 || pnDetailBIR > poController.Journal().getDetailCount() - 1) {
+            loadRecordDetailBIR();
+            if (pnDetailBIR < 0 || pnDetailBIR > poController.getWTaxDeductionsCount() - 1) {
                 return;
             }
             JFXUtil.requestFocusNullField(new Object[][]{ // alternative to if , else if
