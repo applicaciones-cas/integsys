@@ -114,6 +114,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
     AtomicReference<Object> previousSearchedTextField = new AtomicReference<>();
     private boolean pbEnteredDV = false;
     private boolean pbEnteredJE = false;
+    private boolean pbEnteredBIR = false;
 
     List<Pair<String, String>> plOrderNoPartial = new ArrayList<>();
     List<Pair<String, String>> plOrderNoFinal = new ArrayList<>();
@@ -782,29 +783,30 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                 BIR_data,
                 () -> {
                     Platform.runLater(() -> {
-//                        pbEnteredJE = false;
+                        pbEnteredBIR = false;
                         BIR_data.clear();
                         int lnCtr;
                         try {
+
                             if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
                                 lnCtr = poController.getWTaxDeductionsCount() - 1;
                                 while (lnCtr >= 0) {
-
-                                    if (JFXUtil.isObjectEqualTo(poController.Journal().Detail(lnCtr).getAccountCode(), null, "")) {
-                                        poController.Journal().Detail().remove(lnCtr);
+                                    if (poController.WTaxDeduction(pnDetailBIR).getModel().getTaxCode() == null
+                                            || poController.WTaxDeduction(pnDetailBIR).getModel().getTaxCode().equals("")) {
+                                        poController.Detail().remove(lnCtr);
                                     }
                                     lnCtr--;
                                 }
-                                if ((poController.Journal().getDetailCount() - 1) >= 0) {
-                                    if (poController.Journal().Detail(poController.Journal().getDetailCount() - 1).getAccountCode() != null
-                                            && !poController.Journal().Detail(poController.Journal().getDetailCount() - 1).getAccountCode().equals("")) {
-                                        poController.Journal().AddDetail();
-                                        poController.Journal().Detail(poController.Journal().getDetailCount() - 1).setForMonthOf(oApp.getServerDate());
+
+                                if ((poController.getWTaxDeductionsCount() - 1) >= 0) {
+                                    if (poController.WTaxDeduction(poController.getWTaxDeductionsCount() - 1).getModel().getTaxCode() != null
+                                            && !poController.WTaxDeduction(poController.getWTaxDeductionsCount() - 1).getModel().getTaxCode().equals("")) {
+                                        poController.AddDetail();
                                     }
                                 }
-                                if ((poController.Journal().getDetailCount() - 1) < 0) {
-                                    poController.Journal().AddDetail();
-                                    poController.Journal().Detail(poController.Journal().getDetailCount() - 1).setForMonthOf(oApp.getServerDate());
+
+                                if ((poController.getDetailCount() - 1) < 0) {
+                                    poController.AddDetail();
                                 }
                             }
                             for (lnCtr = 0; lnCtr < poController.getWTaxDeductionsCount(); lnCtr++) {
@@ -1295,7 +1297,18 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                     switch (lsID) {
                         case "tfBaseAmount":
                             lsValue = JFXUtil.removeComma(lsValue);
-                            poController.WTaxDeduction(pnDetailBIR).getModel().setBaseAmount(Double.valueOf(lsValue));
+                            poJSON = poController.WTaxDeduction(pnDetailBIR).getModel().setBaseAmount(Double.valueOf(lsValue));
+                            if ("error".equals((String) poJSON.get("result"))) {
+                                ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                                JFXUtil.runWithDelay(0.50, () -> {
+                                    loadTableDetailJE.reload();
+                                });
+                                return;
+                            }
+                            if (pbEnteredJE) {
+                                moveNextJE(false, true);
+                                pbEnteredJE = false;
+                            }
                             break;
                         case "tfTaxCode":
                             if (lsValue.isEmpty()) {
@@ -1331,6 +1344,9 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                         }
                         if (tfCreditAmount.isFocused()) {
                             pbEnteredJE = true;
+                        }
+                        if (tfBaseAmount.isFocused()) {
+                            pbEnteredBIR = true;
                         }
                         CommonUtils.SetNextFocus(txtField);
                         event.consume();
@@ -1525,6 +1541,8 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                                 poJSON = poController.SearchTaxCode(lsValue, pnMain, false);
                                 if ("error".equals(poJSON.get("result"))) {
                                     ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                                } else {
+                                    JFXUtil.textFieldMoveNext(tfParticular);
                                 }
                                 JFXUtil.runWithDelay(0.50, () -> {
                                     loadTableDetailBIR.reload();
@@ -2011,7 +2029,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                 String inputText = datePicker.getEditor().getText();
                 SimpleDateFormat sdfFormat = new SimpleDateFormat(SQLUtil.FORMAT_SHORT_DATE);
                 LocalDate currentDate = null, transactionDate = null, referenceDate = null, selectedDate = null, periodToDate = null, periodFromDate = null;
-                String lsServerDate = "", lsTransDate = "", lsPeriodToDate = "", lsSelectedDate = "", lsPeriodFromDate="";
+                String lsServerDate = "", lsTransDate = "", lsPeriodToDate = "", lsSelectedDate = "", lsPeriodFromDate = "";
 
                 if (inputText == null || "".equals(inputText) || "01/01/1900".equals(inputText)) {
                     return;
