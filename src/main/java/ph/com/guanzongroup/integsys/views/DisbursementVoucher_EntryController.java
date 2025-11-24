@@ -75,6 +75,7 @@ import org.json.simple.parser.ParseException;
 import ph.com.guanzongroup.cas.cashflow.DisbursementVoucher;
 import ph.com.guanzongroup.cas.cashflow.services.CashflowControllers;
 import ph.com.guanzongroup.cas.cashflow.status.DisbursementStatic;
+import ph.com.guanzongroup.integsys.model.ModelBIR_Detail;
 
 /**
  * FXML Controller class
@@ -89,6 +90,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
     private int pnMain = 0;
     private int pnDetail = 0;
     private int pnDetailJE = 0;
+    private int pnDetailBIR = 0;
     private boolean pbIsCheckedJournalTab = false;
     private final String pxeModuleName = "Disbursement Voucher";
     private DisbursementVoucher poController;
@@ -106,6 +108,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
 
     private ObservableList<ModelDisbursementVoucher_Detail> details_data = FXCollections.observableArrayList();
     private ObservableList<ModelJournalEntry_Detail> journal_data = FXCollections.observableArrayList();
+    private ObservableList<ModelBIR_Detail> BIR_data = FXCollections.observableArrayList();
 
     AtomicReference<Object> lastFocusedTextField = new AtomicReference<>();
     AtomicReference<Object> previousSearchedTextField = new AtomicReference<>();
@@ -117,7 +120,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
 
     private final Map<String, List<String>> highlightedRowsMain = new HashMap<>();
 
-    JFXUtil.ReloadableTableTask loadTableMain, loadTableDetail, loadTableDetailJE;
+    JFXUtil.ReloadableTableTask loadTableMain, loadTableDetail, loadTableDetailJE, loadTableDetailBIR;
 
     ObservableList<String> cTransactionType = FXCollections.observableArrayList("ALL", DisbursementStatic.SourceCode.ACCOUNTS_PAYABLE, // "SOA"
             DisbursementStatic.SourceCode.PAYMENT_REQUEST, // "PRF"
@@ -136,19 +139,19 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
 
     /* DV  & Journal */
     @FXML
-    private AnchorPane AnchorMain, apButton, apMasterDetail, apDVMaster1, apMasterDVCheck, apMasterDVBTransfer, apMasterDVOp, apDVMaster2, apDVMaster3, apDVDetail, apMainList, apBrowse, apJournalMaster, apJournalDetails;
+    private AnchorPane AnchorMain, apButton, apMasterDetail, apDVMaster1, apMasterDVCheck, apMasterDVBTransfer, apMasterDVOp, apDVMaster2, apDVMaster3, apDVDetail, apMainList, apBrowse, apJournalMaster, apJournalDetails, apBIRDetail;
     @FXML
-    private Label lblSource, lblDVTransactionStatus, lblJournalTransactionStatus;
+    private Label lblSource, lblDVTransactionStatus, lblJournalTransactionStatus, lblBIRTransactionStatus;
     @FXML
     private Button btnBrowse, btnNew, btnUpdate, btnSearch, btnSave, btnCancel, btnVoid, btnHistory, btnRetrieve, btnClose;
     @FXML
     private TabPane tabPaneMain, tabPanePaymentMode;
     @FXML
-    private Tab tabDetails, tabCheck, tabBankTransfer, tabOnlinePayment, tabJournal;
+    private Tab tabDetails, tabCheck, tabBankTransfer, tabOnlinePayment, tabJournal, tabBIR;
     @FXML
-    private TextField tfDVTransactionNo, tfSupplier, tfVoucherNo, tfBankNameCheck, tfBankAccountCheck, tfPayeeName, tfCheckNo, tfCheckAmount, tfAuthorizedPerson, tfBankNameBTransfer, tfBankAccountBTransfer, tfPaymentAmountBTransfer, tfSupplierBank, tfSupplierAccountNoBTransfer, tfBankTransReferNo, tfBankNameOnlinePayment, tfBankAccountOnlinePayment, tfPaymentAmount, tfSupplierServiceName, tfSupplierAccountNo, tfPaymentReferenceNo, tfTotalAmount, tfVatableSales, tfVatAmountMaster, tfVatZeroRatedSales, tfVatExemptSales, tfLessWHTax, tfTotalNetAmount, tfRefNoDetail, tfVatableSalesDetail, tfVatExemptDetail, tfVatZeroRatedSalesDetail, tfVatRateDetail, tfVatAmountDetail, tfPurchasedAmountDetail, tfNetAmountDetail, tfSearchPayee, tfSearchBranch, tfJournalTransactionNo, tfTotalDebitAmount, tfTotalCreditAmount, tfAccountCode, tfAccountDescription, tfDebitAmount, tfCreditAmount;
+    private TextField tfDVTransactionNo, tfSupplier, tfVoucherNo, tfBankNameCheck, tfBankAccountCheck, tfPayeeName, tfCheckNo, tfCheckAmount, tfAuthorizedPerson, tfBankNameBTransfer, tfBankAccountBTransfer, tfPaymentAmountBTransfer, tfSupplierBank, tfSupplierAccountNoBTransfer, tfBankTransReferNo, tfBankNameOnlinePayment, tfBankAccountOnlinePayment, tfPaymentAmount, tfSupplierServiceName, tfSupplierAccountNo, tfPaymentReferenceNo, tfTotalAmount, tfVatableSales, tfVatAmountMaster, tfVatZeroRatedSales, tfVatExemptSales, tfLessWHTax, tfTotalNetAmount, tfRefNoDetail, tfVatableSalesDetail, tfVatExemptDetail, tfVatZeroRatedSalesDetail, tfVatRateDetail, tfVatAmountDetail, tfPurchasedAmountDetail, tfNetAmountDetail, tfSearchPayee, tfSearchBranch, tfJournalTransactionNo, tfTotalDebitAmount, tfTotalCreditAmount, tfAccountCode, tfAccountDescription, tfDebitAmount, tfCreditAmount, tfBIRTransactionNo, tfTotalTaxAmount, tfBaseAmount, tfTaxRate, tfTaxCode, tfParticular;
     @FXML
-    private DatePicker dpDVTransactionDate, dpCheckDate, dpJournalTransactionDate, dpReportMonthYear;
+    private DatePicker dpDVTransactionDate, dpCheckDate, dpJournalTransactionDate, dpReportMonthYear, dpPeriodFrom, dpPeriodTo;
     @FXML
     private ComboBox cmbPaymentMode, cmbPayeeType, cmbDisbursementMode, cmbClaimantType, cmbCheckStatus, cmbOtherPaymentBTransfer, cmbOtherPayment, cmbTransactionType;
     @FXML
@@ -156,9 +159,9 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
     @FXML
     private TextArea taDVRemarks, taJournalRemarks;
     @FXML
-    private TableView tblVwDetails, tblViewMainList, tblVwJournalDetails;
+    private TableView tblVwDetails, tblViewMainList, tblVwJournalDetails, tblVwBIRDetails;
     @FXML
-    private TableColumn tblDVRowNo, tblReferenceNo, tblTransactionTypeDetail, tblPurchasedAmount, tblVatableSales, tblVatAmt, tblVatRate, tblVatZeroRatedSales, tblVatExemptSales, tblNetAmount, tblRowNo, tblTransactionType, tblBranchName, tblDueDate, tblRefNo, tblAmountMain, tblJournalRowNo, tblJournalAccountCode, tblJournalAccountDescription, tblJournalDebitAmount, tblJournalCreditAmount, tblJournalReportMonthYear;
+    private TableColumn tblDVRowNo, tblReferenceNo, tblTransactionTypeDetail, tblPurchasedAmount, tblVatableSales, tblVatAmt, tblVatRate, tblVatZeroRatedSales, tblVatExemptSales, tblNetAmount, tblRowNo, tblTransactionType, tblBranchName, tblDueDate, tblRefNo, tblAmountMain, tblJournalRowNo, tblJournalAccountCode, tblJournalAccountDescription, tblJournalDebitAmount, tblJournalCreditAmount, tblJournalReportMonthYear, tblBIRRowNo, tblBIRParticular, tblTaxCode, tblTaxRate, tblTaxAmount;
     @FXML
     private Pagination pagination;
 
@@ -203,6 +206,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
             initDetailGrid();
             initMainGrid();
             initDetailJEGrid();
+            initDetailBIRGrid();
             initTableOnClick();
             initTabPane();
             clearTextFields();
@@ -237,6 +241,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                     case "Disbursement Voucher":
                         if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
                             pnDetailJE = 0;
+                            pnDetailBIR = 0;
                         }
                         break;
                     case "Journal":
@@ -248,6 +253,11 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                                 CustomCommonUtil.switchToTab(tabDetails, tabPaneMain);
                                 ShowMessageFX.Warning(null, pxeModuleName, "Please provide at least one valid disbursement detail to proceed.");
                             }
+                        }
+                        break;
+                    case "BIR 2307":
+                        if (pnEditMode == EditMode.READY || pnEditMode == EditMode.UPDATE || pnEditMode == EditMode.ADDNEW) {
+                            populateBIR();
                         }
                         break;
                 }
@@ -357,7 +367,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                     loadTableDetail.reload();
                     break;
                 case "btnSearch":
-                    JFXUtil.initiateBtnSearch(pxeModuleName, lastFocusedTextField, previousSearchedTextField, apBrowse, apDVMaster1, apMasterDVCheck, apMasterDVBTransfer, apMasterDVOp, apDVDetail, apJournalDetails);
+                    JFXUtil.initiateBtnSearch(pxeModuleName, lastFocusedTextField, previousSearchedTextField, apBrowse, apDVMaster1, apMasterDVCheck, apMasterDVBTransfer, apMasterDVOp, apDVDetail, apJournalDetails, apBIRDetail);
                     break;
                 case "btnSave":
                     if (!ShowMessageFX.YesNo(null, pxeModuleName, "Are you sure you want to save the transaction?")) {
@@ -461,12 +471,28 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                 loadRecordMaster();
                 loadTableDetail.reload();
                 loadTableDetailJE.reload();
+                loadTableDetailBIR.reload();
             }
             initButton(pnEditMode);
             if (lsButton.equals("btnUpdate")) {
                 moveNext(false, false);
             }
         } catch (CloneNotSupportedException | SQLException | GuanzonException | ParseException | ScriptException ex) {
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    private void populateBIR() {
+        try {
+            poJSON = new JSONObject();
+            JFXUtil.clearTextFields(apBIRDetail);
+            poJSON = poController.populateWithholdingTaxDeductions();
+            if (JFXUtil.isJSONSuccess(poJSON)) {
+                loadTableDetailBIR.reload();
+            } else {
+                BIR_data.clear();
+            }
+        } catch (SQLException | GuanzonException | CloneNotSupportedException | ScriptException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
         }
     }
@@ -751,6 +777,63 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                         }
                     });
                 });
+        loadTableDetailBIR = new JFXUtil.ReloadableTableTask(
+                tblVwBIRDetails,
+                BIR_data,
+                () -> {
+                    Platform.runLater(() -> {
+//                        pbEnteredJE = false;
+                        BIR_data.clear();
+                        int lnCtr;
+                        try {
+                            if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
+                                lnCtr = poController.getWTaxDeductionsCount() - 1;
+                                while (lnCtr >= 0) {
+
+                                    if (JFXUtil.isObjectEqualTo(poController.Journal().Detail(lnCtr).getAccountCode(), null, "")) {
+                                        poController.Journal().Detail().remove(lnCtr);
+                                    }
+                                    lnCtr--;
+                                }
+                                if ((poController.Journal().getDetailCount() - 1) >= 0) {
+                                    if (poController.Journal().Detail(poController.Journal().getDetailCount() - 1).getAccountCode() != null
+                                            && !poController.Journal().Detail(poController.Journal().getDetailCount() - 1).getAccountCode().equals("")) {
+                                        poController.Journal().AddDetail();
+                                        poController.Journal().Detail(poController.Journal().getDetailCount() - 1).setForMonthOf(oApp.getServerDate());
+                                    }
+                                }
+                                if ((poController.Journal().getDetailCount() - 1) < 0) {
+                                    poController.Journal().AddDetail();
+                                    poController.Journal().Detail(poController.Journal().getDetailCount() - 1).setForMonthOf(oApp.getServerDate());
+                                }
+                            }
+                            for (lnCtr = 0; lnCtr < poController.getWTaxDeductionsCount(); lnCtr++) {
+                                BIR_data.add(new ModelBIR_Detail(String.valueOf(lnCtr + 1),
+                                        poController.WTaxDeduction(pnDetailBIR).getModel().WithholdingTax().AccountChart().getDescription(),
+                                        poController.WTaxDeduction(pnDetailBIR).getModel().getTaxCode(),
+                                        CustomCommonUtil.setIntegerValueToDecimalFormat(poController.WTaxDeduction(pnDetailBIR).getModel().WithholdingTax().getTaxRate(), false),
+                                        CustomCommonUtil.setIntegerValueToDecimalFormat(poController.WTaxDeduction(pnDetailBIR).getModel().getTaxAmount(), false))
+                                );
+
+                            }
+                            if (pnDetailBIR < 0 || pnDetailBIR
+                                    >= BIR_data.size()) {
+                                if (!BIR_data.isEmpty()) {
+                                    /* FOCUS ON FIRST ROW */
+                                    JFXUtil.selectAndFocusRow(tblVwBIRDetails, 0);
+                                    pnDetailBIR = tblVwBIRDetails.getSelectionModel().getSelectedIndex();
+                                    loadRecordDetailBIR();
+                                }
+                            } else {
+                                /* FOCUS ON THE ROW THAT pnRowDetail POINTS TO */
+                                JFXUtil.selectAndFocusRow(tblVwBIRDetails, pnDetailBIR);
+                                loadRecordDetailBIR();
+                            }
+                        } catch (SQLException | GuanzonException | CloneNotSupportedException ex) {
+                            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+                        }
+                    });
+                });
     }
 
     private void initMainGrid() {
@@ -777,6 +860,14 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
         JFXUtil.setColumnRight(tblJournalDebitAmount, tblJournalCreditAmount);
         JFXUtil.setColumnsIndexAndDisableReordering(tblVwJournalDetails);
         tblVwJournalDetails.setItems(journal_data);
+    }
+
+    private void initDetailBIRGrid() {
+        JFXUtil.setColumnCenter(tblBIRRowNo);
+        JFXUtil.setColumnLeft(tblBIRParticular, tblTaxCode);
+        JFXUtil.setColumnRight(tblTaxRate, tblTaxAmount);
+        JFXUtil.setColumnsIndexAndDisableReordering(tblVwBIRDetails);
+        tblVwBIRDetails.setItems(BIR_data);
     }
 
     private void initTableOnClick() {
@@ -806,9 +897,17 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
             }
         }
         );
+
+        tblVwBIRDetails.setOnMouseClicked(event -> {
+            if (!BIR_data.isEmpty() && event.getClickCount() == 1) {
+                pnDetailBIR = tblVwBIRDetails.getSelectionModel().getSelectedIndex();
+                moveNextBIR(false, false);
+            }
+        }
+        );
         JFXUtil.applyRowHighlighting(tblViewMainList, item -> ((ModelDisbursementVoucher_Main) item).getIndex09(), highlightedRowsMain);
-        JFXUtil.setKeyEventFilter(this::tableKeyEvents, tblVwDetails, tblVwJournalDetails);
-        JFXUtil.adjustColumnForScrollbar(tblViewMainList, tblVwDetails, tblVwJournalDetails);
+        JFXUtil.setKeyEventFilter(this::tableKeyEvents, tblVwDetails, tblVwJournalDetails, tblVwBIRDetails);
+        JFXUtil.adjustColumnForScrollbar(tblViewMainList, tblVwDetails, tblVwJournalDetails, tblVwBIRDetails);
     }
 
     private void tableKeyEvents(KeyEvent event) {
@@ -838,6 +937,13 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                     pnDetailJE = newIndex;
                     loadRecordDetailJE();
                     break;
+                case "tblVwBIRDetails":
+                    if (BIR_data.isEmpty()) {
+                        return;
+                    }
+                    pnDetailBIR = newIndex;
+                    loadRecordDetailBIR();
+                    break;
 
             }
             event.consume();
@@ -862,9 +968,11 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
         //apJournalDetails
         JFXUtil.setFocusListener(txtDetailJE_Focus, tfAccountCode, tfAccountDescription, tfDebitAmount, tfCreditAmount);
 
-        JFXUtil.setKeyPressedListener(this::txtField_KeyPressed, apDVMaster1, apMasterDVCheck, apMasterDVBTransfer, apMasterDVOp, apDVDetail, apMainList, apJournalDetails);
-        JFXUtil.inputDecimalOnly(tfVatZeroRatedSales, tfVatZeroRatedSalesDetail, tfVatRateDetail);
-        JFXUtil.setCommaFormatter(tfCheckAmount, tfPaymentAmountBTransfer, tfPaymentAmount, tfVatAmountMaster, tfTotalNetAmount, tfTotalAmount, tfPurchasedAmountDetail, tfNetAmountDetail, tfVatAmountDetail, tfTotalCreditAmount, tfTotalDebitAmount, tfDebitAmount, tfCreditAmount);
+        JFXUtil.setFocusListener(txtBIRDetail_Focus, tfBaseAmount, tfTaxCode, tfParticular, tfTaxCode);
+
+        JFXUtil.setKeyPressedListener(this::txtField_KeyPressed, apDVMaster1, apMasterDVCheck, apMasterDVBTransfer, apMasterDVOp, apDVDetail, apMainList, apJournalDetails, apBIRDetail);
+        JFXUtil.inputDecimalOnly(tfVatZeroRatedSales, tfVatZeroRatedSalesDetail, tfVatRateDetail, tfTaxRate);
+        JFXUtil.setCommaFormatter(tfCheckAmount, tfPaymentAmountBTransfer, tfPaymentAmount, tfTotalAmount, tfVatAmountMaster, tfTotalNetAmount, tfVatAmountDetail, tfPurchasedAmountDetail, tfNetAmountDetail, tfTotalDebitAmount, tfTotalCreditAmount, tfDebitAmount, tfCreditAmount, tfTotalTaxAmount, tfBaseAmount);
         JFXUtil.setCheckboxHoverCursor(chbkPrintByBank, chbkIsCrossCheck, chbkIsPersonOnly, chbkVatClassification);
 
     }
@@ -1181,6 +1289,33 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
 //                }
             });
 
+    ChangeListener<Boolean> txtBIRDetail_Focus = JFXUtil.FocusListener(TextField.class,
+            (lsID, lsValue) -> {
+                try {
+                    switch (lsID) {
+                        case "tfBaseAmount":
+                            lsValue = JFXUtil.removeComma(lsValue);
+                            poController.WTaxDeduction(pnDetailBIR).getModel().setBaseAmount(Double.valueOf(lsValue));
+                            break;
+                        case "tfTaxCode":
+                            if (lsValue.isEmpty()) {
+                                poController.WTaxDeduction(pnDetailBIR).getModel().setTaxCode("");
+                            }
+                            break;
+                        case "tfParticular":
+                            if (lsValue.isEmpty()) {
+                                poController.WTaxDeduction(pnDetailBIR).getModel().WithholdingTax().AccountChart().setDescription("");
+                            }
+                            break;
+                    }
+                    JFXUtil.runWithDelay(0.50, () -> {
+                        loadTableDetailBIR.reload();
+                    });
+                } catch (SQLException | GuanzonException ex) {
+                    Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+                }
+            });
+
     private void txtField_KeyPressed(KeyEvent event) {
         TextField txtField = (TextField) event.getSource();
         String lsID = (((TextField) event.getSource()).getId());
@@ -1386,9 +1521,28 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                                 }
                                 moveNextJE(false, true);
                                 break;
+                            case "tfTaxCode":
+                                poJSON = poController.SearchTaxCode(lsValue, pnMain, false);
+                                if ("error".equals(poJSON.get("result"))) {
+                                    ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                                }
+                                JFXUtil.runWithDelay(0.50, () -> {
+                                    loadTableDetailBIR.reload();
+                                });
+                                break;
+                            case "tfParticular":
+                                poJSON = poController.SearchParticular(lsValue, pnMain, false);
+                                if ("error".equals(poJSON.get("result"))) {
+                                    ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                                }
+                                JFXUtil.runWithDelay(0.50, () -> {
+                                    loadTableDetailBIR.reload();
+                                });
+                                break;
                         }
                         event.consume();
                         break;
+
                     case UP:
                         switch (lsID) {
                             case "tfPurchasedAmountDetail":
@@ -1401,6 +1555,12 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                             case "tfDebitAmount":
                             case "tfCreditAmount":
                                 moveNextJE(true, true);
+                                break;
+                            case "tfTaxCode":
+                            case "tfParticular":
+                            case "tfBaseAmount":
+                            case "tfTaxRate":
+                                moveNextBIR(true, true);
                                 break;
                         }
                         event.consume();
@@ -1417,6 +1577,12 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                             case "tfDebitAmount":
                             case "tfCreditAmount":
                                 moveNextJE(false, true);
+                                break;
+                            case "tfTaxCode":
+                            case "tfParticular":
+                            case "tfBaseAmount":
+                            case "tfTaxRate":
+                                moveNextBIR(false, true);
                                 break;
                         }
                         event.consume();
@@ -1458,6 +1624,26 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                 {poController.Journal().Detail(pnDetailJE).Account_Chart().getDescription(), tfAccountDescription}, // if null or empty, then requesting focus to the txtfield
                 {poController.Journal().Detail(pnDetailJE).getDebitAmount(), tfDebitAmount},
                 {poController.Journal().Detail(pnDetailJE).getCreditAmount(), tfCreditAmount},}, tfCreditAmount); // default
+        } catch (SQLException | GuanzonException ex) {
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    public void moveNextBIR(boolean isUp, boolean continueNext) {
+        try {
+            if (continueNext) {
+                apBIRDetail.requestFocus();
+                pnDetailBIR = isUp ? JFXUtil.moveToPreviousRow(tblVwBIRDetails) : JFXUtil.moveToNextRow(tblVwBIRDetails);
+            }
+            loadRecordDetailJE();
+            if (pnDetailBIR < 0 || pnDetailBIR > poController.Journal().getDetailCount() - 1) {
+                return;
+            }
+            JFXUtil.requestFocusNullField(new Object[][]{ // alternative to if , else if
+                {poController.WTaxDeduction(pnDetailBIR).getModel().getTaxCode(), tfTaxCode},
+                {poController.WTaxDeduction(pnDetailBIR).getModel().WithholdingTax().AccountChart().getDescription(), tfParticular}, // if null or empty, then requesting focus to the txtfield
+                {poController.WTaxDeduction(pnDetailBIR).getModel().getBaseAmount(), tfBaseAmount},
+                {poController.WTaxDeduction(pnDetailBIR).getModel().WithholdingTax().getTaxRate(), tfTaxRate},}, tfTaxRate); // default
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
         }
@@ -1671,6 +1857,28 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
         }
     }
 
+    public void loadRecordDetailBIR() {
+        try {
+            if (pnDetailBIR < 0 || pnDetailBIR > poController.getWTaxDeductionsCount() - 1) {
+                return;
+            }
+            tfBIRTransactionNo.setText(poController.WTaxDeduction(pnDetailBIR).getModel().getTransactionNo());
+            tfTotalTaxAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.WTaxDeduction(pnDetailBIR).getModel().getTaxAmount(), false));
+            tfBaseAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.WTaxDeduction(pnDetailBIR).getModel().getBaseAmount(), false));
+            tfTaxRate.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.WTaxDeduction(pnDetailBIR).getModel().WithholdingTax().getTaxRate()));
+
+            tfTaxCode.setText(poController.WTaxDeduction(pnDetailBIR).getModel().getTaxCode());
+            String lsPeriodFromDate = CustomCommonUtil.formatDateToShortString(poController.WTaxDeduction(pnDetailBIR).getModel().getPeriodFrom());
+            dpPeriodFrom.setValue(CustomCommonUtil.parseDateStringToLocalDate(lsPeriodFromDate, "yyyy-MM-dd"));
+
+            String lsPeriodToDate = CustomCommonUtil.formatDateToShortString(poController.WTaxDeduction(pnDetailBIR).getModel().getPeriodFrom());
+            dpPeriodTo.setValue(CustomCommonUtil.parseDateStringToLocalDate(lsPeriodToDate, "yyyy-MM-dd"));
+            tfParticular.setText(poController.WTaxDeduction(pnDetailBIR).getModel().WithholdingTax().AccountChart().getDescription());
+        } catch (SQLException | GuanzonException ex) {
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
     EventHandler<ActionEvent> comboBoxActionListener = JFXUtil.CmbActionListener(
             (cmbId, selectedIndex, selectedValue) -> {
                 switch (cmbId) {
@@ -1870,6 +2078,61 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                             pbSuccess = true; //Set to original value
                         }
                         break;
+                    case "dpPeriodFrom":
+                        if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
+                            lsTransDate = sdfFormat.format(poController.CheckPayments().getModel().getTransactionDate());
+                            transactionDate = LocalDate.parse(lsTransDate, DateTimeFormatter.ofPattern(SQLUtil.FORMAT_SHORT_DATE));
+
+                            if (selectedDate.isAfter(currentDate)) {
+                                JFXUtil.setJSONError(poJSON, "Future dates are not allowed.");
+                                pbSuccess = false;
+                            }
+
+                            if (pbSuccess && (selectedDate.isAfter(transactionDate))) {
+                                JFXUtil.setJSONError(poJSON, "Period From cannot be later than the period to date.");
+                                pbSuccess = false;
+                            }
+
+                            if (pbSuccess) {
+                                poController.WTaxDeduction(pnDetailBIR).getModel().setPeriodFrom(SQLUtil.toDate(lsSelectedDate, SQLUtil.FORMAT_SHORT_DATE));
+                            } else {
+                                if ("error".equals((String) poJSON.get("result"))) {
+                                    ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                                }
+                            }
+                            pbSuccess = false; //Set to false to prevent multiple message box: Conflict with server date vs transaction date validation
+                            loadRecordDetailBIR();
+                            pbSuccess = true; //Set to original value
+                        }
+                        break;
+                    case "dpPeriodTo":
+                        if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
+                            lsTransDate = sdfFormat.format(poController.CheckPayments().getModel().getTransactionDate());
+                            transactionDate = LocalDate.parse(lsTransDate, DateTimeFormatter.ofPattern(SQLUtil.FORMAT_SHORT_DATE));
+
+                            if (selectedDate.isAfter(currentDate)) {
+                                JFXUtil.setJSONError(poJSON, "Future dates are not allowed.");
+                                pbSuccess = false;
+                            }
+
+                            if (pbSuccess && (selectedDate.isAfter(transactionDate))) {
+                                JFXUtil.setJSONError(poJSON, "Period To cannot be later than the period from date.");
+                                pbSuccess = false;
+                            }
+
+                            if (pbSuccess) {
+                                poController.WTaxDeduction(pnDetailBIR).getModel().setPeriodTo(SQLUtil.toDate(lsSelectedDate, SQLUtil.FORMAT_SHORT_DATE));
+                            } else {
+                                if ("error".equals((String) poJSON.get("result"))) {
+                                    ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                                }
+                            }
+                            pbSuccess = false; //Set to false to prevent multiple message box: Conflict with server date vs transaction date validation
+                            loadRecordDetailBIR();
+                            pbSuccess = true; //Set to original value
+                        }
+                        break;
+
                     default:
                         break;
                 }
@@ -1880,8 +2143,8 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
     }
 
     private void initDatePicker() {
-        JFXUtil.setDatePickerFormat("MM/dd/yyyy", dpDVTransactionDate, dpCheckDate, dpJournalTransactionDate, dpReportMonthYear);
-        JFXUtil.setActionListener(this::datepicker_Action, dpDVTransactionDate, dpCheckDate, dpJournalTransactionDate, dpReportMonthYear);
+        JFXUtil.setDatePickerFormat("MM/dd/yyyy", dpDVTransactionDate, dpCheckDate, dpJournalTransactionDate, dpReportMonthYear, dpPeriodFrom, dpPeriodTo);
+        JFXUtil.setActionListener(this::datepicker_Action, dpDVTransactionDate, dpCheckDate, dpJournalTransactionDate, dpReportMonthYear, dpPeriodFrom, dpPeriodTo);
     }
 
     @FXML
@@ -1950,7 +2213,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
         JFXUtil.setButtonsVisibility(fnEditMode != EditMode.ADDNEW && fnEditMode != EditMode.UNKNOWN, btnHistory);
 
         JFXUtil.setDisabled(!lbShow, apDVMaster1, apDVMaster2, apDVMaster3, apDVDetail,
-                apMasterDVCheck, apMasterDVBTransfer, apMasterDVOp, apJournalMaster, apJournalDetails);
+                apMasterDVCheck, apMasterDVBTransfer, apMasterDVOp, apJournalMaster, apJournalDetails, apBIRDetail);
 
         if (fnEditMode == EditMode.READY) {
             switch (poController.Master().getTransactionStatus()) {
@@ -1967,6 +2230,6 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
 
     private void clearTextFields() {
         JFXUtil.setValueToNull(previousSearchedTextField, lastFocusedTextField);
-        JFXUtil.clearTextFields(apDVMaster1, apDVDetail, apDVMaster2, apDVMaster3, apMasterDVCheck, apMasterDVBTransfer, apMasterDVOp, apJournalMaster, apJournalDetails);
+        JFXUtil.clearTextFields(apDVMaster1, apDVDetail, apDVMaster2, apDVMaster3, apMasterDVCheck, apMasterDVBTransfer, apMasterDVOp, apJournalMaster, apJournalDetails, apBIRDetail);
     }
 }
