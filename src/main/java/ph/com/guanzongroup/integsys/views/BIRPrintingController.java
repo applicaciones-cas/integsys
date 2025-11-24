@@ -427,6 +427,7 @@ public class BIRPrintingController implements Initializable, ScreenInterface {
                             main_data.clear();
                             if (poController.getMasterList().size() > 0) {
                                 for (int lnCntr = 0; lnCntr < poController.getMasterList().size(); lnCntr++) {
+                                    String lsPayeeType = poController.CheckPayments().getModel().getPayeeType().equals("0") ? "INDIVIDUAL" : "CORPORATION";
                                     main_data.add(new ModelBIRPrinting(
                                             String.valueOf(lnCntr + 1),
                                             checkedItem.get(lnCntr),
@@ -434,7 +435,7 @@ public class BIRPrintingController implements Initializable, ScreenInterface {
                                             CustomCommonUtil.formatDateToShortString(poController.getMaster(lnCntr).getTransactionDate()),
                                             poController.getMaster(lnCntr).Payee().getPayeeName(),
                                             poController.getMaster(lnCntr).Payee().getPayeeName(),
-                                            poController.getMaster(lnCntr).CheckPayments().Banks().getBankName(),
+                                            lsPayeeType,
                                             CustomCommonUtil.setIntegerValueToDecimalFormat(poController.getMaster(lnCntr).CheckPayments().Banks().getBankName(), false)
                                     ));
                                 }
