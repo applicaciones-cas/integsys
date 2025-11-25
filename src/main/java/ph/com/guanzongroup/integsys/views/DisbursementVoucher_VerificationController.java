@@ -922,7 +922,6 @@ public class DisbursementVoucher_VerificationController implements Initializable
 
     private void initTextFields() {
         //Initialise  TextField Focus
-
         JFXUtil.setFocusListener(txtSearch_Focus, tfSearchIndustry, tfSearchSupplier, tfSearchTransaction);
         JFXUtil.setFocusListener(txtArea_Focus, taDVRemarks, taJournalRemarks);
         //apDVMaster1
@@ -1751,26 +1750,16 @@ public class DisbursementVoucher_VerificationController implements Initializable
             tfAuthorizedPerson.setText(poController.CheckPayments().getModel().getAuthorize() != null ? poController.CheckPayments().getModel().getAuthorize() : "");
             JFXUtil.setCmbValue(cmbCheckStatus, !poController.CheckPayments().getModel().getTransactionStatus().equals("") ? Integer.valueOf(poController.CheckPayments().getModel().getTransactionStatus()) : -1);
 
-            if (poController.Master().getBankPrint().equals(Logical.YES)) {
-                JFXUtil.setDisabled(false, cmbPayeeType, cmbDisbursementMode);
-            } else {
-                JFXUtil.setDisabled(true, cmbPayeeType, cmbDisbursementMode);
-            }
+            boolean lbValidation01 = poController.Master().getBankPrint().equals(Logical.YES);
+            JFXUtil.setDisabled(!lbValidation01, cmbPayeeType, cmbDisbursementMode);
 
-            if (poController.Master().getBankPrint().equals(Logical.YES)
-                    && poController.CheckPayments().getModel().getDesbursementMode().equals("1")) {
-                JFXUtil.setDisabled(false, cmbClaimantType);
-            } else {
-                JFXUtil.setDisabled(true, cmbClaimantType);
-            }
+            boolean lbValidation02 = poController.Master().getBankPrint().equals(Logical.YES) && poController.CheckPayments().getModel().getDesbursementMode().equals("1");
+            JFXUtil.setDisabled(!lbValidation02, cmbClaimantType);
 
-            if (poController.Master().getBankPrint().equals(Logical.YES)
+            boolean lbValidation03 = poController.Master().getBankPrint().equals(Logical.YES)
                     && poController.CheckPayments().getModel().getDesbursementMode().equals("1")
-                    && poController.CheckPayments().getModel().getClaimant().equals("0")) {
-                JFXUtil.setDisabled(false, tfAuthorizedPerson);
-            } else {
-                JFXUtil.setDisabled(true, tfAuthorizedPerson);
-            }
+                    && poController.CheckPayments().getModel().getClaimant().equals("0");
+            JFXUtil.setDisabled(!lbValidation03, tfAuthorizedPerson);
 
             JFXUtil.updateCaretPositions(apMasterDVCheck);
         } catch (SQLException | GuanzonException ex) {
