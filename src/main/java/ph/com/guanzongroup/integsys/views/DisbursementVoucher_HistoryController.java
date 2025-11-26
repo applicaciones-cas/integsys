@@ -341,7 +341,7 @@ public class DisbursementVoucher_HistoryController implements Initializable, Scr
         try {
             poJSON = new JSONObject();
             JFXUtil.clearTextFields(apBIRDetail);
-            poJSON = poController.populateWithholdingTaxDeductions();
+            poJSON = poController.populateWithholdingTaxDeduction();
             if (JFXUtil.isJSONSuccess(poJSON)) {
                 loadTableDetailBIR.reload();
             } else {
@@ -494,29 +494,29 @@ public class DisbursementVoucher_HistoryController implements Initializable, Scr
                 BIR_data,
                 () -> {
                     Platform.runLater(() -> {
-//                        pbEnteredJE = false;
                         BIR_data.clear();
                         int lnCtr;
                         try {
+
                             if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
                                 lnCtr = poController.getWTaxDeductionsCount() - 1;
                                 while (lnCtr >= 0) {
-
-                                    if (JFXUtil.isObjectEqualTo(poController.Journal().Detail(lnCtr).getAccountCode(), null, "")) {
-                                        poController.Journal().Detail().remove(lnCtr);
+                                    if (poController.WTaxDeduction(pnDetailBIR).getModel().getTaxCode() == null
+                                            || poController.WTaxDeduction(pnDetailBIR).getModel().getTaxCode().equals("")) {
+                                        poController.WTaxDeduction().remove(lnCtr);
                                     }
                                     lnCtr--;
                                 }
-                                if ((poController.Journal().getDetailCount() - 1) >= 0) {
-                                    if (poController.Journal().Detail(poController.Journal().getDetailCount() - 1).getAccountCode() != null
-                                            && !poController.Journal().Detail(poController.Journal().getDetailCount() - 1).getAccountCode().equals("")) {
-                                        poController.Journal().AddDetail();
-                                        poController.Journal().Detail(poController.Journal().getDetailCount() - 1).setForMonthOf(oApp.getServerDate());
+
+                                if ((poController.getWTaxDeductionsCount() - 1) >= 0) {
+                                    if (poController.WTaxDeduction(poController.getWTaxDeductionsCount() - 1).getModel().getTaxCode() != null
+                                            && !poController.WTaxDeduction(poController.getWTaxDeductionsCount() - 1).getModel().getTaxCode().equals("")) {
+                                        poController.AddWTaxDeduction();
                                     }
                                 }
-                                if ((poController.Journal().getDetailCount() - 1) < 0) {
-                                    poController.Journal().AddDetail();
-                                    poController.Journal().Detail(poController.Journal().getDetailCount() - 1).setForMonthOf(oApp.getServerDate());
+
+                                if ((poController.getDetailCount() - 1) < 0) {
+                                    poController.AddWTaxDeduction();
                                 }
                             }
                             for (lnCtr = 0; lnCtr < poController.getWTaxDeductionsCount(); lnCtr++) {

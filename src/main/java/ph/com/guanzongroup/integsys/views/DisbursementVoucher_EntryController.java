@@ -477,7 +477,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
         try {
             poJSON = new JSONObject();
             JFXUtil.clearTextFields(apBIRDetail);
-            poJSON = poController.populateWithholdingTaxDeductions();
+            poJSON = poController.populateWithholdingTaxDeduction();
             if (JFXUtil.isJSONSuccess(poJSON)) {
                 loadTableDetailBIR.reload();
             } else {
@@ -782,7 +782,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                                 while (lnCtr >= 0) {
                                     if (poController.WTaxDeduction(pnDetailBIR).getModel().getTaxCode() == null
                                             || poController.WTaxDeduction(pnDetailBIR).getModel().getTaxCode().equals("")) {
-                                        poController.Detail().remove(lnCtr);
+                                        poController.WTaxDeduction().remove(lnCtr);
                                     }
                                     lnCtr--;
                                 }
@@ -790,12 +790,12 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                                 if ((poController.getWTaxDeductionsCount() - 1) >= 0) {
                                     if (poController.WTaxDeduction(poController.getWTaxDeductionsCount() - 1).getModel().getTaxCode() != null
                                             && !poController.WTaxDeduction(poController.getWTaxDeductionsCount() - 1).getModel().getTaxCode().equals("")) {
-                                        poController.AddDetail();
+                                        poController.AddWTaxDeduction();
                                     }
                                 }
 
                                 if ((poController.getDetailCount() - 1) < 0) {
-                                    poController.AddDetail();
+                                    poController.AddWTaxDeduction();
                                 }
                             }
                             for (lnCtr = 0; lnCtr < poController.getWTaxDeductionsCount(); lnCtr++) {
