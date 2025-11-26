@@ -1383,6 +1383,8 @@ public class DisbursementVoucher_VerificationController implements Initializable
                                 poJSON = poController.SearchBanks(lsValue, false);
                                 if ("error".equals((String) poJSON.get("result"))) {
                                     ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                                } else {
+                                    JFXUtil.textFieldMoveNext(tfBankAccountCheck);
                                 }
                                 loadRecordMasterCheck();
                                 break;
@@ -1390,6 +1392,8 @@ public class DisbursementVoucher_VerificationController implements Initializable
                                 poJSON = poController.SearchBankAccount(lsValue, poController.CheckPayments().getModel().getBankID(), false);
                                 if ("error".equals((String) poJSON.get("result"))) {
                                     ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                                } else {
+                                    JFXUtil.textFieldMoveNext(tfPayeeName);
                                 }
                                 loadRecordMasterCheck();
                                 break;
@@ -1416,6 +1420,8 @@ public class DisbursementVoucher_VerificationController implements Initializable
                                 poJSON = poController.SearchBanks(lsValue, false);
                                 if ("error".equals((String) poJSON.get("result"))) {
                                     ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                                } else {
+                                    JFXUtil.textFieldMoveNext(tfBankAccountBTransfer);
                                 }
                                 loadRecordMasterBankTransfer();
                                 break;
@@ -1423,6 +1429,8 @@ public class DisbursementVoucher_VerificationController implements Initializable
                                 poJSON = poController.SearchBankAccount(lsValue, poController.CheckPayments().getModel().getBankID(), false);
                                 if ("error".equals((String) poJSON.get("result"))) {
                                     ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                                } else {
+                                    JFXUtil.textFieldMoveNext(tfSupplierBank);
                                 }
                                 loadRecordMasterBankTransfer();
                                 break;
@@ -1432,6 +1440,8 @@ public class DisbursementVoucher_VerificationController implements Initializable
 //                                    ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
 //                                    loadRecordMasterCheck();
 //                                    break;
+//                                } else {
+//                                    JFXUtil.textFieldMoveNext(tfSupplierAccountNoBTransfer);
 //                                }
                                 psSupplierPayeeId = poController.Master().getSupplierClientID();
                                 loadRecordMasterBankTransfer();
@@ -1440,18 +1450,24 @@ public class DisbursementVoucher_VerificationController implements Initializable
 //                                poJSON = poController.CheckPayments().getModel().setAuthorize(lsValue);
 //                                if (!JFXUtil.isJSONSuccess(poJSON)) {
 //                                    ShowMessageFX.Warning(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
+//                                } else {
+//                                    JFXUtil.textFieldMoveNext(tfSupplierAccountNoBTransfer);
 //                                }
                                 loadRecordMasterBankTransfer();
                                 break;
 
                             //apMasterDVOp
                             case "tfSupplierServiceName":
+                                loadRecordMasterOnlinePayment();
                                 break;
                             case "tfSupplierAccountNo":
+                                loadRecordMasterOnlinePayment();
                                 break;
                             case "tfBankNameOnlinePayment":
+                                loadRecordMasterOnlinePayment();
                                 break;
                             case "tfBankAccountOnlinePayment":
+                                loadRecordMasterOnlinePayment();
                                 break;
 
                             //apDVDetail
@@ -1510,6 +1526,8 @@ public class DisbursementVoucher_VerificationController implements Initializable
                                 }
                                 moveNextJE(false, true);
                                 break;
+
+                            //apBIRDetail
                             case "tfTaxCode":
                                 poJSON = poController.SearchTaxCode(lsValue, pnMain, false);
                                 if ("error".equals(poJSON.get("result"))) {

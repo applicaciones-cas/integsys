@@ -1407,6 +1407,8 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                                 poJSON = poController.SearchBanks(lsValue, false);
                                 if ("error".equals((String) poJSON.get("result"))) {
                                     ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                                } else {
+                                    JFXUtil.textFieldMoveNext(tfBankAccountCheck);
                                 }
                                 loadRecordMasterCheck();
                                 break;
@@ -1414,6 +1416,8 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                                 poJSON = poController.SearchBankAccount(lsValue, poController.CheckPayments().getModel().getBankID(), false);
                                 if ("error".equals((String) poJSON.get("result"))) {
                                     ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                                } else {
+                                    JFXUtil.textFieldMoveNext(tfPayeeName);
                                 }
                                 loadRecordMasterCheck();
                                 break;
@@ -1440,6 +1444,8 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                                 poJSON = poController.SearchBanks(lsValue, false);
                                 if ("error".equals((String) poJSON.get("result"))) {
                                     ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                                } else {
+                                    JFXUtil.textFieldMoveNext(tfBankAccountBTransfer);
                                 }
                                 loadRecordMasterBankTransfer();
                                 break;
@@ -1447,6 +1453,8 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                                 poJSON = poController.SearchBankAccount(lsValue, poController.CheckPayments().getModel().getBankID(), false);
                                 if ("error".equals((String) poJSON.get("result"))) {
                                     ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                                } else {
+                                    JFXUtil.textFieldMoveNext(tfSupplierBank);
                                 }
                                 loadRecordMasterBankTransfer();
                                 break;
@@ -1470,12 +1478,16 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
 
                             //apMasterDVOp
                             case "tfSupplierServiceName":
+                                loadRecordMasterOnlinePayment();
                                 break;
                             case "tfSupplierAccountNo":
+                                loadRecordMasterOnlinePayment();
                                 break;
                             case "tfBankNameOnlinePayment":
+                                loadRecordMasterOnlinePayment();
                                 break;
                             case "tfBankAccountOnlinePayment":
+                                loadRecordMasterOnlinePayment();
                                 break;
 
                             //apDVDetail
@@ -1534,6 +1546,8 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                                 }
                                 moveNextJE(false, true);
                                 break;
+                                
+                            //apBIRDetail
                             case "tfTaxCode":
                                 poJSON = poController.SearchTaxCode(lsValue, pnMain, false);
                                 if ("error".equals(poJSON.get("result"))) {
@@ -1772,7 +1786,6 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
             tfAuthorizedPerson.setText(poController.CheckPayments().getModel().getAuthorize() != null ? poController.CheckPayments().getModel().getAuthorize() : "");
             JFXUtil.setCmbValue(cmbCheckStatus, !poController.CheckPayments().getModel().getTransactionStatus().equals("") ? Integer.valueOf(poController.CheckPayments().getModel().getTransactionStatus()) : -1);
 
-            
             boolean lbValidation01 = poController.Master().getBankPrint().equals(Logical.YES);
             JFXUtil.setDisabled(!lbValidation01, cmbPayeeType, cmbDisbursementMode);
 
