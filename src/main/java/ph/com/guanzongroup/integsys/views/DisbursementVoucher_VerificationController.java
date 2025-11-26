@@ -327,15 +327,6 @@ public class DisbursementVoucher_VerificationController implements Initializable
                     if (!ShowMessageFX.YesNo(null, pxeModuleName, "Are you sure you want to save the transaction?")) {
                         return;
                     }
-                    poJSON = poController.validateTAXandVat();
-                    if ("error".equals((String) poJSON.get("result"))) {
-                        ShowMessageFX.Information(null, pxeModuleName, (String) poJSON.get("message"));
-                        pnDetail = (int) poJSON.get("pnDetailDV");
-                        JFXUtil.selectAndFocusRow(tblVwDetails, pnDetail);
-                        loadRecordDetail();
-                        return;
-
-                    }
 
                     if (pnEditMode == EditMode.UPDATE) {
                         if (!pbIsCheckedJournalTab) {
@@ -1275,6 +1266,12 @@ public class DisbursementVoucher_VerificationController implements Initializable
                                 loadRecordDetailBIR();
                                 return;
                             }
+                            poJSON = poController.computeTaxAmount();
+                            if ("error".equals((String) poJSON.get("result"))) {
+                                ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                                loadRecordDetailBIR();
+                                return;
+                            }
                             if (pbEnteredJE) {
                                 moveNextJE(false, true);
                                 pbEnteredJE = false;
@@ -1530,7 +1527,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
 
                             //apBIRDetail
                             case "tfTaxCode":
-                                poJSON = poController.SearchTaxCode(lsValue, pnMain, false);
+                                poJSON = poController.SearchTaxCode(lsValue, pnDetailBIR, false);
                                 if ("error".equals(poJSON.get("result"))) {
                                     ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                 } else {
@@ -1541,7 +1538,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
                                 });
                                 break;
                             case "tfParticular":
-                                poJSON = poController.SearchParticular(lsValue, pnMain, false);
+                                poJSON = poController.SearchParticular(lsValue, pnDetailBIR, false);
                                 if ("error".equals(poJSON.get("result"))) {
                                     ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                 }
@@ -2082,7 +2079,12 @@ public class DisbursementVoucher_VerificationController implements Initializable
                             }
 
                             if (pbSuccess) {
-                                poController.WTaxDeduction(pnDetailBIR).getModel().setPeriodFrom(SQLUtil.toDate(lsSelectedDate, SQLUtil.FORMAT_SHORT_DATE));
+                                poJSON = poController.checkPeriodDate(pnDetailBIR, selectedDate);
+                                if ("error".equals((String) poJSON.get("result"))) {
+                                    ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                                } else {
+                                    poController.WTaxDeduction(pnDetailBIR).getModel().setPeriodFrom(SQLUtil.toDate(lsSelectedDate, SQLUtil.FORMAT_SHORT_DATE));
+                                }
                             } else {
                                 if ("error".equals((String) poJSON.get("result"))) {
                                     ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
@@ -2104,7 +2106,12 @@ public class DisbursementVoucher_VerificationController implements Initializable
                             }
 
                             if (pbSuccess) {
-                                poController.WTaxDeduction(pnDetailBIR).getModel().setPeriodTo(SQLUtil.toDate(lsSelectedDate, SQLUtil.FORMAT_SHORT_DATE));
+                                poJSON = poController.checkPeriodDate(pnDetailBIR, selectedDate);
+                                if ("error".equals((String) poJSON.get("result"))) {
+                                    ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                                } else {
+                                    poController.WTaxDeduction(pnDetailBIR).getModel().setPeriodTo(SQLUtil.toDate(lsSelectedDate, SQLUtil.FORMAT_SHORT_DATE));
+                                }
                             } else {
                                 if ("error".equals((String) poJSON.get("result"))) {
                                     ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));

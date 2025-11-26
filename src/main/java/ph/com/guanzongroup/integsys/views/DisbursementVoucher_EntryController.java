@@ -375,16 +375,6 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                         return;
                     }
 
-                    poJSON = poController.validateTAXandVat();
-                    if ("error".equals((String) poJSON.get("result"))) {
-                        ShowMessageFX.Information(null, pxeModuleName, (String) poJSON.get("message"));
-                        pnDetail = (int) poJSON.get("pnDetail");
-                        JFXUtil.selectAndFocusRow(tblVwDetails, pnDetail);
-                        loadRecordDetail();
-                        return;
-
-                    }
-
                     if (pnEditMode == EditMode.UPDATE || pnEditMode == EditMode.ADDNEW) {
                         if (oApp.getUserLevel() > UserRight.ENCODER) {
                             if (!pbIsCheckedJournalTab) {
@@ -1302,6 +1292,12 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                                 loadRecordDetailBIR();
                                 return;
                             }
+                            poJSON = poController.computeTaxAmount();
+                            if ("error".equals((String) poJSON.get("result"))) {
+                                ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                                loadRecordDetailBIR();
+                                return;
+                            }
                             if (pbEnteredJE) {
                                 moveNextJE(false, true);
                                 pbEnteredJE = false;
@@ -1546,10 +1542,10 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                                 }
                                 moveNextJE(false, true);
                                 break;
-                                
+
                             //apBIRDetail
                             case "tfTaxCode":
-                                poJSON = poController.SearchTaxCode(lsValue, pnMain, false);
+                                poJSON = poController.SearchTaxCode(lsValue, pnDetailBIR, false);
                                 if ("error".equals(poJSON.get("result"))) {
                                     ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                 } else {
@@ -1560,7 +1556,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                                 });
                                 break;
                             case "tfParticular":
-                                poJSON = poController.SearchParticular(lsValue, pnMain, false);
+                                poJSON = poController.SearchParticular(lsValue, pnDetailBIR, false);
                                 if ("error".equals(poJSON.get("result"))) {
                                     ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                 }
@@ -2109,7 +2105,12 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                             }
 
                             if (pbSuccess) {
-                                poController.WTaxDeduction(pnDetailBIR).getModel().setPeriodFrom(SQLUtil.toDate(lsSelectedDate, SQLUtil.FORMAT_SHORT_DATE));
+                                poJSON = poController.checkPeriodDate(pnDetailBIR, selectedDate);
+                                if ("error".equals((String) poJSON.get("result"))) {
+                                    ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                                } else {
+                                    poController.WTaxDeduction(pnDetailBIR).getModel().setPeriodFrom(SQLUtil.toDate(lsSelectedDate, SQLUtil.FORMAT_SHORT_DATE));
+                                }
                             } else {
                                 if ("error".equals((String) poJSON.get("result"))) {
                                     ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
@@ -2131,7 +2132,12 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                             }
 
                             if (pbSuccess) {
-                                poController.WTaxDeduction(pnDetailBIR).getModel().setPeriodTo(SQLUtil.toDate(lsSelectedDate, SQLUtil.FORMAT_SHORT_DATE));
+                                poJSON = poController.checkPeriodDate(pnDetailBIR, selectedDate);
+                                if ("error".equals((String) poJSON.get("result"))) {
+                                    ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                                } else {
+                                    poController.WTaxDeduction(pnDetailBIR).getModel().setPeriodTo(SQLUtil.toDate(lsSelectedDate, SQLUtil.FORMAT_SHORT_DATE));
+                                }
                             } else {
                                 if ("error".equals((String) poJSON.get("result"))) {
                                     ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
