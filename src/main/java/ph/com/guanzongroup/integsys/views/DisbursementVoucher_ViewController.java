@@ -405,7 +405,7 @@ public class DisbursementVoucher_ViewController implements Initializable, Screen
                                     }
                                 }
 
-                                if ((poController.getDetailCount() - 1) < 0) {
+                                if ((poController.getWTaxDeductionsCount() - 1) < 0) {
                                     poController.AddWTaxDeduction();
                                 }
                             }

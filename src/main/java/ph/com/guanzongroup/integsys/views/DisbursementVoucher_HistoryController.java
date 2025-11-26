@@ -515,7 +515,7 @@ public class DisbursementVoucher_HistoryController implements Initializable, Scr
                                     }
                                 }
 
-                                if ((poController.getDetailCount() - 1) < 0) {
+                                if ((poController.getWTaxDeductionsCount() - 1) < 0) {
                                     poController.AddWTaxDeduction();
                                 }
                             }

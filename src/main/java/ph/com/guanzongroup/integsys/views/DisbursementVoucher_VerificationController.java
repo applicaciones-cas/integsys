@@ -767,7 +767,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
                                     }
                                 }
 
-                                if ((poController.getDetailCount() - 1) < 0) {
+                                if ((poController.getWTaxDeductionsCount() - 1) < 0) {
                                     poController.AddWTaxDeduction();
                                 }
                             }
@@ -1842,6 +1842,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
             if (pnDetailJE < 0 || pnDetailJE > poController.Journal().getDetailCount() - 1) {
                 return;
             }
+
             tfAccountCode.setText(poController.Journal().Detail(pnDetailJE).getAccountCode());
             tfAccountDescription.setText(poController.Journal().Detail(pnDetailJE).Account_Chart().getDescription());
             dpReportMonthYear.setValue(CustomCommonUtil.parseDateStringToLocalDate(SQLUtil.dateFormat(poController.Journal().Detail(pnDetailJE).getForMonthOf(), SQLUtil.FORMAT_SHORT_DATE)));

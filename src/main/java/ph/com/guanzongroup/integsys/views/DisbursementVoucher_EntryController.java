@@ -794,7 +794,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                                     }
                                 }
 
-                                if ((poController.getDetailCount() - 1) < 0) {
+                                if ((poController.getWTaxDeductionsCount() - 1) < 0) {
                                     poController.AddWTaxDeduction();
                                 }
                             }
