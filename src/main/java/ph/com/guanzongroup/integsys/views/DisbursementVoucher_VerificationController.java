@@ -539,6 +539,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
                 Platform.runLater(() -> {
                     loadTableDetail.reload();
                     loadTableDetailJE.reload();
+                    loadTableDetailBIR.reload();
                 });
                 moveNext(false, false);
             } catch (CloneNotSupportedException | SQLException | ScriptException | GuanzonException ex) {
