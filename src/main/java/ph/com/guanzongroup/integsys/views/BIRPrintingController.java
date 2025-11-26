@@ -40,7 +40,6 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import javafx.util.Pair;
-import javax.script.ScriptException;
 import org.guanzon.appdriver.agent.ShowMessageFX;
 import org.guanzon.appdriver.base.CommonUtils;
 import org.guanzon.appdriver.base.GRiderCAS;
@@ -69,10 +68,6 @@ public class BIRPrintingController implements Initializable, ScreenInterface {
     private String psIndustryId = "";
     private String psCompanyId = "";
     private String psCategoryId = "";
-    private String psSearchBankID = "";
-    private String psSearchBankAccountID = "";
-    private String psSearchDVDateFrom = "";
-    private String psSearchDVDateTo = "";
 
     private unloadForm poUnload = new unloadForm();
 
@@ -129,7 +124,6 @@ public class BIRPrintingController implements Initializable, ScreenInterface {
     /**
      * Initializes the controller class.
      */
-    //Check Printing In-house
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         try {
@@ -222,7 +216,7 @@ public class BIRPrintingController implements Initializable, ScreenInterface {
         try {
             lblSource.setText(poController.Master().Company().getCompanyName() + " - " + poController.Master().Industry().getDescription());
             tfSearchIndustry.setText(poController.getSearchIndustry());
-            tfSearchSupplier.setText(poController.Master().Payee().getPayeeName());
+            tfSearchSupplier.setText(poController.getSearchPayee());
 
             JFXUtil.updateCaretPositions(apBrowse);
         } catch (SQLException | GuanzonException ex) {
@@ -259,65 +253,65 @@ public class BIRPrintingController implements Initializable, ScreenInterface {
     }
 
     private void handleDisbursementAction(String action) {
-        try {
-            if (checkedItem.stream().anyMatch("1"::equals)) {
-            } else {
-                ShowMessageFX.Warning(null, pxeModuleName, "No items were selected to " + action + ".");
-                return;
-            }
-
-            if (!ShowMessageFX.OkayCancel(null, pxeModuleName, "Are you sure you want to " + action + " selected item/s?")) {
-                return;
-            }
-
-            String firstBank = null;
-            boolean allSameBank = true;
-            checkedItems.clear();
-            for (Object item : tblViewMainList.getItems()) {
-                ModelCheckPrinting item1 = (ModelCheckPrinting) item;
-                String lschecked = item1.getIndex02();
-                String lsDVNO = item1.getIndex03();
-                String banks = item1.getIndex07();
-
-                if (lschecked.equals("1")) {
-                    if (firstBank == null) {
-                        firstBank = banks;
-                    } else if (!firstBank.equals(banks)) {
-                        allSameBank = false;
-                        break;
-                    }
-                    checkedItems.add(lsDVNO);
-                    System.out.println("check items : " + checkedItems.get(checkedItems.size() - 1));
-                }
-            }
-            if (!allSameBank) {
-                ShowMessageFX.Warning(null, pxeModuleName, "Selected items must belong to the same bank.");
-                return;
-            }
-
-            switch (action) {
-                case "print br":
-                    if (!checkedItems.isEmpty()) {
-                        poJSON = poController.printTransaction(checkedItems);
-                        if (!"success".equals((String) poJSON.get("result"))) {
-                            ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-                        } else {
-                            ShowMessageFX.Information(null, pxeModuleName, (String) poJSON.get("message"));
-                        }
-
-                        chckSelectAll.setSelected(false);
-                        checkedItem.clear();
-                    }
-                    retrieveDisbursement();
-                    loadTableMain.reload();
-                    break;
-                default:
-                    throw new AssertionError();
-            }
-
-        } catch (SQLException | GuanzonException | CloneNotSupportedException ex) {
-            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+//        try {
+        if (checkedItem.stream().anyMatch("1"::equals)) {
+        } else {
+            ShowMessageFX.Warning(null, pxeModuleName, "No items were selected to " + action + ".");
+            return;
         }
+
+        if (!ShowMessageFX.OkayCancel(null, pxeModuleName, "Are you sure you want to " + action + " selected item/s?")) {
+            return;
+        }
+
+        String firstPayee = null;
+        boolean allSamePayee = true;
+        checkedItems.clear();
+        for (Object item : tblViewMainList.getItems()) {
+            ModelCheckPrinting item1 = (ModelCheckPrinting) item;
+            String lschecked = item1.getIndex02();
+            String lsDVNO = item1.getIndex03();
+            String payeetype = item1.getIndex07();
+
+            if (lschecked.equals("1")) {
+                if (firstPayee == null) {
+                    firstPayee = payeetype;
+                } else if (!firstPayee.equals(payeetype)) {
+                    allSamePayee = false;
+                    break;
+                }
+                checkedItems.add(lsDVNO);
+                System.out.println("check items : " + checkedItems.get(checkedItems.size() - 1));
+            }
+        }
+        if (!allSamePayee) {
+            ShowMessageFX.Warning(null, pxeModuleName, "Selected items must belong to the same bank.");
+            return;
+        }
+
+        switch (action) {
+            case "print br":
+                if (!checkedItems.isEmpty()) {
+                    poJSON = poController.PrintBIR(checkedItems);
+                    if (!"success".equals((String) poJSON.get("result"))) {
+                        ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                    } else {
+                        ShowMessageFX.Information(null, pxeModuleName, (String) poJSON.get("message"));
+                    }
+
+                    chckSelectAll.setSelected(false);
+                    checkedItem.clear();
+                }
+                retrieveDisbursement();
+                loadTableMain.reload();
+                break;
+            default:
+                throw new AssertionError();
+        }
+
+//        } catch (CloneNotSupportedException ex) {
+//            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+//        }
     }
 
     private void initTextFields() {
@@ -339,8 +333,6 @@ public class BIRPrintingController implements Initializable, ScreenInterface {
                         if (lsValue.isEmpty()) {
                             poController.CheckPayments().getModel().setBankID("");
                             poController.CheckPayments().getModel().setBankAcountID("");
-                            psSearchBankID = "";
-                            psSearchBankAccountID = "";
                         }
                         break;
                 }
@@ -382,7 +374,6 @@ public class BIRPrintingController implements Initializable, ScreenInterface {
                                     loadRecordSearch();
                                     retrieveDisbursement();
                                 }
-                                psSearchBankID = poController.CheckPayments().getModel().getBankID();
                                 break;
                         }
                         event.consume();
@@ -433,7 +424,7 @@ public class BIRPrintingController implements Initializable, ScreenInterface {
                                             checkedItem.get(lnCntr),
                                             poController.getMaster(lnCntr).getTransactionNo(),
                                             CustomCommonUtil.formatDateToShortString(poController.getMaster(lnCntr).getTransactionDate()),
-                                            poController.getMaster(lnCntr).Payee().getPayeeName(),
+                                            poController.getMaster(lnCntr).Company().getCompanyName(),
                                             poController.getMaster(lnCntr).Payee().getPayeeName(),
                                             lsPayeeType,
                                             CustomCommonUtil.setIntegerValueToDecimalFormat(poController.getMaster(lnCntr).CheckPayments().Banks().getBankName(), false)
@@ -448,7 +439,6 @@ public class BIRPrintingController implements Initializable, ScreenInterface {
                                     /* FOCUS ON FIRST ROW */
                                     JFXUtil.selectAndFocusRow(tblViewMainList, 0);
                                     pnMain = tblViewMainList.getSelectionModel().getSelectedIndex();
-
                                 }
                             } else {
                                 /* FOCUS ON THE ROW THAT pnRowDetail POINTS TO */
