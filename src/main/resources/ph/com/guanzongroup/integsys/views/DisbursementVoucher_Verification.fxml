@@ -723,7 +723,7 @@
                                                                                     <columns>
                                                                                         <TableColumn fx:id="tblJournalRowNo" maxWidth="40.0" minWidth="40.0" prefWidth="40.0" resizable="false" sortable="false" text="No." />
                                                                                         <TableColumn fx:id="tblJournalAccountCode" maxWidth="130.0" minWidth="130.0" prefWidth="130.0" resizable="false" sortable="false" text="Account Code" />
-                                                                                        <TableColumn fx:id="tblJournalAccountDescription" maxWidth="340.0" minWidth="340.0" prefWidth="340.0" resizable="false" sortable="false" text="Account Name" />
+                                                                                        <TableColumn fx:id="tblJournalAccountDescription" maxWidth="350.0" minWidth="-1.0" prefWidth="350.0" resizable="false" sortable="false" text="Account Name" />
                                                                                         <TableColumn fx:id="tblJournalDebitAmount" maxWidth="130.0" minWidth="130.0" prefWidth="130.0" resizable="false" sortable="false" style="-fx-alignment: CENTER-RIGHT;" text="Debit Amount" />
                                                                                         <TableColumn fx:id="tblJournalCreditAmount" maxWidth="150.0" minWidth="150.0" prefWidth="150.0" resizable="false" sortable="false" style="-fx-alignment: CENTER-RIGHT;" text="Credit Amount" />
                                                                                         <TableColumn fx:id="tblJournalReportMonthYear" maxWidth="120.0" minWidth="120.0" prefWidth="120.0" resizable="false" sortable="false" text="Report Month/Year" />
@@ -820,7 +820,7 @@
                                                                                 <TableView fx:id="tblVwBIRDetails" prefHeight="200.0" prefWidth="200.0">
                                                                                     <columns>
                                                                                         <TableColumn fx:id="tblBIRRowNo" maxWidth="40.0" minWidth="40.0" prefWidth="40.0" resizable="false" sortable="false" text="No." />
-                                                                                        <TableColumn fx:id="tblBIRParticular" maxWidth="340.0" minWidth="340.0" prefWidth="340.0" resizable="false" sortable="false" text="Particular" />
+                                                                                        <TableColumn fx:id="tblBIRParticular" maxWidth="480.0" minWidth="-1.0" prefWidth="480.0" resizable="false" sortable="false" text="Particular" />
                                                                                         <TableColumn fx:id="tblTaxCode" maxWidth="130.0" minWidth="130.0" prefWidth="130.0" resizable="false" sortable="false" style="-fx-alignment: CENTER-RIGHT;" text="Tax Code" />
                                                                   <TableColumn fx:id="tblTaxRate" maxWidth="130.0" minWidth="130.0" prefWidth="130.0" resizable="false" sortable="false" style="-fx-alignment: CENTER-RIGHT;" text="Tax Rate" />
                                                                                         <TableColumn fx:id="tblTaxAmount" maxWidth="150.0" minWidth="150.0" prefWidth="150.0" resizable="false" sortable="false" style="-fx-alignment: CENTER-RIGHT;" text="Tax Amount" />
@@ -868,7 +868,7 @@
                                                         <TableView fx:id="tblViewMainList" minWidth="242.0" GridPane.rowIndex="1">
                                                             <columns>
                                                                 <TableColumn fx:id="tblRowNo" maxWidth="30.0" minWidth="30.0" prefWidth="30.0" resizable="false" sortable="false" text="No." />
-                                                                <TableColumn fx:id="tblSupplier" maxWidth="236.0" minWidth="236.0" prefWidth="236.0" resizable="false" sortable="false" text="Supplier" />
+                                                                <TableColumn fx:id="tblSupplier" maxWidth="236.0" minWidth="-1.0" prefWidth="236.0" resizable="false" sortable="false" text="Supplier" />
                                                                 <TableColumn fx:id="tblPaymentForm" maxWidth="120.0" minWidth="120.0" prefWidth="120.0" resizable="false" sortable="false" text="Payment Form" />
                                                                 <TableColumn fx:id="tblTransDate" maxWidth="120.0" minWidth="120.0" prefWidth="120.0" resizable="false" sortable="false" text="Date" />
                                                                 <TableColumn fx:id="tblReferNo" maxWidth="90.0" minWidth="90.0" prefWidth="90.0" resizable="false" sortable="false" text="Refer No." />
