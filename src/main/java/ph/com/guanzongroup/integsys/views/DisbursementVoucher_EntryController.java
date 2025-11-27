@@ -1314,7 +1314,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                             }
                             break;
                     }
-                    JFXUtil.runWithDelay(0.50, () -> {
+                    JFXUtil.runWithDelay(0.80, () -> {
                         loadTableDetailBIR.reload();
                     });
                 } catch (SQLException | GuanzonException ex) {
@@ -1551,7 +1551,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                                 } else {
                                     JFXUtil.textFieldMoveNext(tfParticular);
                                 }
-                                JFXUtil.runWithDelay(0.50, () -> {
+                                JFXUtil.runWithDelay(0.80, () -> {
                                     loadTableDetailBIR.reload();
                                 });
                                 break;
@@ -1560,7 +1560,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                                 if ("error".equals(poJSON.get("result"))) {
                                     ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                 }
-                                JFXUtil.runWithDelay(0.50, () -> {
+                                JFXUtil.runWithDelay(0.80, () -> {
                                     loadTableDetailBIR.reload();
                                 });
                                 break;

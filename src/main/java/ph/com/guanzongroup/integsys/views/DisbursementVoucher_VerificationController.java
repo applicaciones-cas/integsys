@@ -1288,7 +1288,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
                             }
                             break;
                     }
-                    JFXUtil.runWithDelay(0.50, () -> {
+                    JFXUtil.runWithDelay(0.80, () -> {
                         loadTableDetailBIR.reload();
                     });
                 } catch (SQLException | GuanzonException ex) {
@@ -1533,7 +1533,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
                                 } else {
                                     JFXUtil.textFieldMoveNext(tfParticular);
                                 }
-                                JFXUtil.runWithDelay(0.50, () -> {
+                                JFXUtil.runWithDelay(0.80, () -> {
                                     loadTableDetailBIR.reload();
                                 });
                                 break;
@@ -1542,7 +1542,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
                                 if ("error".equals(poJSON.get("result"))) {
                                     ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                 }
-                                JFXUtil.runWithDelay(0.50, () -> {
+                                JFXUtil.runWithDelay(0.80, () -> {
                                     loadTableDetailBIR.reload();
                                 });
                                 break;
