@@ -15,6 +15,7 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -634,22 +635,20 @@ public class DisbursementVoucher_VerificationController implements Initializable
                                 if ((poController.getDetailCount() - 1) < 0) {
                                     poController.AddDetail();
                                 }
-                            }
 
-                            if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
-                                lnCtr = poController.getDetailCount() - 1;
-                                if (lnCtr >= 0) {
-                                    String lsSourceNo = poController.Detail(lnCtr).getSourceNo();
-                                    if (!lsSourceNo.isEmpty() || poController.Detail(lnCtr).getSourceNo() == null) {
-                                        try {
-                                            poController.AddDetail();
-
-                                        } catch (CloneNotSupportedException ex) {
-                                            Logger.getLogger(getClass()
-                                                    .getName()).log(Level.SEVERE, null, ex);
-                                        }
-                                    }
-                                }
+//                                lnCtr = poController.getDetailCount() - 1;
+//                                if (lnCtr >= 0) {
+//                                    String lsSourceNo = poController.Detail(lnCtr).getSourceNo();
+//                                    if (!lsSourceNo.isEmpty() || poController.Detail(lnCtr).getSourceNo() == null) {
+//                                        try {
+//                                            poController.AddDetail();
+//
+//                                        } catch (CloneNotSupportedException ex) {
+//                                            Logger.getLogger(getClass()
+//                                                    .getName()).log(Level.SEVERE, null, ex);
+//                                        }
+//                                    }
+//                                }
                             }
 
                             for (lnCtr = 0; lnCtr < poController.getDetailCount(); lnCtr++) {
@@ -755,12 +754,17 @@ public class DisbursementVoucher_VerificationController implements Initializable
                         BIR_data.clear();
                         int lnCtr;
                         try {
-
                             if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
                                 lnCtr = poController.getWTaxDeductionsCount() - 1;
+                                Date fromdate = null, todate = null;
+
                                 while (lnCtr >= 0) {
+                                    fromdate = null;
+                                    todate = null;
                                     if (poController.WTaxDeduction(lnCtr).getModel().getTaxCode() == null
-                                            || poController.WTaxDeduction(lnCtr).getModel().getTaxCode().equals("")) {
+                                            || "".equals(poController.WTaxDeduction(lnCtr).getModel().getTaxCode())) {
+                                        fromdate = poController.WTaxDeduction(poController.getWTaxDeductionsCount() - 1).getModel().getPeriodFrom();
+                                        todate = poController.WTaxDeduction(poController.getWTaxDeductionsCount() - 1).getModel().getPeriodTo();
                                         poController.WTaxDeduction().remove(lnCtr);
                                     }
                                     lnCtr--;
@@ -768,15 +772,21 @@ public class DisbursementVoucher_VerificationController implements Initializable
 
                                 if ((poController.getWTaxDeductionsCount() - 1) >= 0) {
                                     if (poController.WTaxDeduction(poController.getWTaxDeductionsCount() - 1).getModel().getTaxCode() != null
-                                            && !poController.WTaxDeduction(poController.getWTaxDeductionsCount() - 1).getModel().getTaxCode().equals("")) {
+                                            && !"".equals(poController.WTaxDeduction(poController.getWTaxDeductionsCount() - 1).getModel().getTaxCode())) {
                                         poController.AddWTaxDeduction();
+
                                     }
                                 }
 
                                 if ((poController.getWTaxDeductionsCount() - 1) < 0) {
                                     poController.AddWTaxDeduction();
                                 }
+                                if (fromdate != null && todate != null) {
+                                    poController.WTaxDeduction(poController.getWTaxDeductionsCount() - 1).getModel().setPeriodFrom(fromdate);
+                                    poController.WTaxDeduction(poController.getWTaxDeductionsCount() - 1).getModel().setPeriodTo(todate);
+                                }
                             }
+
                             for (lnCtr = 0; lnCtr < poController.getWTaxDeductionsCount(); lnCtr++) {
                                 BIR_data.add(new ModelBIR_Detail(String.valueOf(lnCtr + 1),
                                         poController.WTaxDeduction(lnCtr).getModel().WithholdingTax().AccountChart().getDescription(),
@@ -1294,7 +1304,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
                             }
                             break;
                     }
-                    JFXUtil.runWithDelay(0.80, () -> {
+                    JFXUtil.runWithDelay(0.50, () -> {
                         loadTableDetailBIR.reload();
                     });
                 } catch (SQLException | GuanzonException ex) {

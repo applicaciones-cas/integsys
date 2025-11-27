@@ -16,6 +16,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -653,19 +654,19 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                                     poController.AddDetail();
                                 }
 
-                                lnCtr = poController.getDetailCount() - 1;
-                                if (lnCtr >= 0) {
-                                    String lsSourceNo = poController.Detail(lnCtr).getSourceNo();
-                                    if (!lsSourceNo.isEmpty() || poController.Detail(lnCtr).getSourceNo() == null) {
-                                        try {
-                                            poController.AddDetail();
-
-                                        } catch (CloneNotSupportedException ex) {
-                                            Logger.getLogger(getClass()
-                                                    .getName()).log(Level.SEVERE, null, ex);
-                                        }
-                                    }
-                                }
+//                                lnCtr = poController.getDetailCount() - 1;
+//                                if (lnCtr >= 0) {
+//                                    String lsSourceNo = poController.Detail(lnCtr).getSourceNo();
+//                                    if (!lsSourceNo.isEmpty() || poController.Detail(lnCtr).getSourceNo() == null) {
+//                                        try {
+//                                            poController.AddDetail();
+//
+//                                        } catch (CloneNotSupportedException ex) {
+//                                            Logger.getLogger(getClass()
+//                                                    .getName()).log(Level.SEVERE, null, ex);
+//                                        }
+//                                    }
+//                                }
                             }
 
                             for (lnCtr = 0; lnCtr < poController.getDetailCount(); lnCtr++) {
@@ -724,7 +725,6 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                             if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
                                 lnCtr = poController.Journal().getDetailCount() - 1;
                                 while (lnCtr >= 0) {
-
                                     if (JFXUtil.isObjectEqualTo(poController.Journal().Detail(lnCtr).getAccountCode(), null, "")) {
                                         poController.Journal().Detail().remove(lnCtr);
                                     }
@@ -741,7 +741,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                                     poController.Journal().AddDetail();
                                     poController.Journal().Detail(poController.Journal().getDetailCount() - 1).setForMonthOf(oApp.getServerDate());
                                 }
-                            
+
                             }
 
                             for (lnCtr = 0; lnCtr < poController.Journal().getDetailCount(); lnCtr++) {
@@ -782,12 +782,17 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                         BIR_data.clear();
                         int lnCtr;
                         try {
-
                             if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
                                 lnCtr = poController.getWTaxDeductionsCount() - 1;
+                                Date fromdate = null, todate = null;
+
                                 while (lnCtr >= 0) {
+                                    fromdate = null;
+                                    todate = null;
                                     if (poController.WTaxDeduction(lnCtr).getModel().getTaxCode() == null
-                                            || poController.WTaxDeduction(lnCtr).getModel().getTaxCode().equals("")) {
+                                            || "".equals(poController.WTaxDeduction(lnCtr).getModel().getTaxCode())) {
+                                        fromdate = poController.WTaxDeduction(poController.getWTaxDeductionsCount() - 1).getModel().getPeriodFrom();
+                                        todate = poController.WTaxDeduction(poController.getWTaxDeductionsCount() - 1).getModel().getPeriodTo();
                                         poController.WTaxDeduction().remove(lnCtr);
                                     }
                                     lnCtr--;
@@ -795,13 +800,18 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
 
                                 if ((poController.getWTaxDeductionsCount() - 1) >= 0) {
                                     if (poController.WTaxDeduction(poController.getWTaxDeductionsCount() - 1).getModel().getTaxCode() != null
-                                            && !poController.WTaxDeduction(poController.getWTaxDeductionsCount() - 1).getModel().getTaxCode().equals("")) {
+                                            && !"".equals(poController.WTaxDeduction(poController.getWTaxDeductionsCount() - 1).getModel().getTaxCode())) {
                                         poController.AddWTaxDeduction();
+
                                     }
                                 }
 
                                 if ((poController.getWTaxDeductionsCount() - 1) < 0) {
                                     poController.AddWTaxDeduction();
+                                }
+                                if (fromdate != null && todate != null) {
+                                    poController.WTaxDeduction(poController.getWTaxDeductionsCount() - 1).getModel().setPeriodFrom(fromdate);
+                                    poController.WTaxDeduction(poController.getWTaxDeductionsCount() - 1).getModel().setPeriodTo(todate);
                                 }
                             }
 
@@ -1321,7 +1331,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                             }
                             break;
                     }
-                    JFXUtil.runWithDelay(0.80, () -> {
+                    JFXUtil.runWithDelay(0.50, () -> {
                         loadTableDetailBIR.reload();
                     });
                 } catch (SQLException | GuanzonException ex) {
