@@ -147,6 +147,9 @@ public class BIRPrintingController implements Initializable, ScreenInterface {
             Platform.runLater(() -> {
                 poController.Master().setIndustryID(psIndustryId);
                 poController.Master().setCompanyID(psCompanyId);
+                poController.setIndustryID(psIndustryId);
+                poController.setCompanyID(psCompanyId);
+                poController.setCategoryID(psCategoryId);
                 loadRecordSearch();
             });
         } catch (SQLException | GuanzonException ex) {
@@ -177,7 +180,7 @@ public class BIRPrintingController implements Initializable, ScreenInterface {
     }
 
     private void initCheckboxes() {
-        JFXUtil.addCheckboxColumns(ModelCheckPrinting.class, tblViewMainList, disableRowCheckbox,
+        JFXUtil.addCheckboxColumns(ModelBIRPrinting.class, tblViewMainList, disableRowCheckbox,
                 (row, rowIndex, colIndex, newVal) -> {
                     boolean lbisTrue = newVal;
                     switch (colIndex) {
@@ -306,13 +309,12 @@ public class BIRPrintingController implements Initializable, ScreenInterface {
 
                     case "tfSearchIndustry":
                         if (lsValue.isEmpty()) {
-                            poController.setIndustryID("");
+                            poController.setSearchIndustry("");
                         }
                         break;
                     case "tfSearchSupplier":
                         if (lsValue.isEmpty()) {
-                            poController.CheckPayments().getModel().setBankID("");
-                            poController.CheckPayments().getModel().setBankAcountID("");
+                            poController.setSearchPayee("");
                         }
                         break;
                 }
@@ -404,10 +406,10 @@ public class BIRPrintingController implements Initializable, ScreenInterface {
                                             checkedItem.get(lnCntr),
                                             poController.getMaster(lnCntr).getTransactionNo(),
                                             CustomCommonUtil.formatDateToShortString(poController.getMaster(lnCntr).getTransactionDate()),
-                                            poController.getMaster(lnCntr).Company().getCompanyName(),
+                                            poController.getMaster(lnCntr).Payee().APClient().getCompanyName(),
                                             poController.getMaster(lnCntr).Payee().getPayeeName(),
                                             lsPayeeType,
-                                            CustomCommonUtil.setIntegerValueToDecimalFormat(poController.getMaster(lnCntr).CheckPayments().Banks().getBankName(), false)
+                                            CustomCommonUtil.setIntegerValueToDecimalFormat(poController.getMaster(lnCntr).getWithTaxTotal(), false)
                                     ));
                                 }
                             } else {

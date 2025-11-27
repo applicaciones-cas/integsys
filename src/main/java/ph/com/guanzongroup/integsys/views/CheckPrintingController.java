@@ -157,6 +157,9 @@ public class CheckPrintingController implements Initializable, ScreenInterface {
             Platform.runLater(() -> {
                 poController.Master().setIndustryID(psIndustryId);
                 poController.Master().setCompanyID(psCompanyId);
+                poController.setIndustryID(psIndustryId);
+                poController.setCompanyID(psCompanyId);
+                poController.setCategoryID(psCategoryId);
                 loadRecordSearch();
             });
         } catch (SQLException | GuanzonException ex) {
