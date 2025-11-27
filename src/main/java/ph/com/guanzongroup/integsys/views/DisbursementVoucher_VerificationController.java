@@ -239,14 +239,20 @@ public class DisbursementVoucher_VerificationController implements Initializable
                                 pbIsCheckedJournalTab = true;
                                 populateJE();
                             } else {
-                                CustomCommonUtil.switchToTab(tabDetails, tabPaneMain);
+                                JFXUtil.clickTabByTitleText(tabPaneMain, "Disbursement Voucher");
                                 ShowMessageFX.Warning(null, pxeModuleName, "Please provide at least one valid disbursement detail to proceed.");
                             }
                         }
                         break;
                     case "BIR 2307":
                         if (pnEditMode == EditMode.READY || pnEditMode == EditMode.UPDATE || pnEditMode == EditMode.ADDNEW) {
-                            populateBIR();
+                            if (poController.Detail(0).getSourceNo() != null && !poController.Detail(0).getSourceNo().isEmpty()) {
+                                populateBIR();
+                            } else {
+                                JFXUtil.clickTabByTitleText(tabPaneMain, "Disbursement Voucher");
+                                ShowMessageFX.Warning(null, pxeModuleName, "Please provide at least one valid disbursement detail to proceed.");
+                            }
+
                         }
                         break;
                 }
