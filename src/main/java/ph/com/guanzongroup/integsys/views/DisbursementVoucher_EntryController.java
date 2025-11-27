@@ -652,9 +652,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                                 if ((poController.getDetailCount() - 1) < 0) {
                                     poController.AddDetail();
                                 }
-                            }
 
-                            if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
                                 lnCtr = poController.getDetailCount() - 1;
                                 if (lnCtr >= 0) {
                                     String lsSourceNo = poController.Detail(lnCtr).getSourceNo();
@@ -743,7 +741,9 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                                     poController.Journal().AddDetail();
                                     poController.Journal().Detail(poController.Journal().getDetailCount() - 1).setForMonthOf(oApp.getServerDate());
                                 }
+                            
                             }
+
                             for (lnCtr = 0; lnCtr < poController.Journal().getDetailCount(); lnCtr++) {
                                 journal_data.add(new ModelJournalEntry_Detail(String.valueOf(lnCtr + 1),
                                         poController.Journal().Detail(lnCtr).getAccountCode() != null ? poController.Journal().Detail(lnCtr).getAccountCode() : "",
@@ -805,19 +805,6 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                                 }
                             }
 
-                            if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
-                                lnCtr = poController.getWTaxDeductionsCount() - 1;
-                                if (lnCtr >= 0) {
-                                    String lsSourceNo = poController.WTaxDeduction(lnCtr).getModel().getTaxCode();
-                                    if (!lsSourceNo.isEmpty() || poController.WTaxDeduction(lnCtr).getModel().getTaxCode() == null) {
-                                        try {
-                                            poController.AddWTaxDeduction();
-                                        } catch (CloneNotSupportedException ex) {
-                                            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
-                                        }
-                                    }
-                                }
-                            }
                             for (lnCtr = 0; lnCtr < poController.getWTaxDeductionsCount(); lnCtr++) {
                                 BIR_data.add(new ModelBIR_Detail(String.valueOf(lnCtr + 1),
                                         poController.WTaxDeduction(lnCtr).getModel().WithholdingTax().AccountChart().getDescription(),

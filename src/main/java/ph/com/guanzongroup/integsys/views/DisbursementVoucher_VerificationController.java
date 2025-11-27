@@ -777,20 +777,6 @@ public class DisbursementVoucher_VerificationController implements Initializable
                                     poController.AddWTaxDeduction();
                                 }
                             }
-
-                            if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
-                                lnCtr = poController.getWTaxDeductionsCount() - 1;
-                                if (lnCtr >= 0) {
-                                    String lsSourceNo = poController.WTaxDeduction(lnCtr).getModel().getTaxCode();
-                                    if (!lsSourceNo.isEmpty() || poController.WTaxDeduction(lnCtr).getModel().getTaxCode() == null) {
-                                        try {
-                                            poController.AddWTaxDeduction();
-                                        } catch (CloneNotSupportedException ex) {
-                                            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
-                                        }
-                                    }
-                                }
-                            }
                             for (lnCtr = 0; lnCtr < poController.getWTaxDeductionsCount(); lnCtr++) {
                                 BIR_data.add(new ModelBIR_Detail(String.valueOf(lnCtr + 1),
                                         poController.WTaxDeduction(lnCtr).getModel().WithholdingTax().AccountChart().getDescription(),
