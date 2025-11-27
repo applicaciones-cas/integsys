@@ -342,20 +342,18 @@ public class BIRPrintingController implements Initializable, ScreenInterface {
                                 if ("error".equals((String) poJSON.get("result"))) {
                                     ShowMessageFX.Information(null, pxeModuleName, (String) poJSON.get("message"));
                                     return;
-                                } else {
-                                    loadRecordSearch();
-                                    retrieveDisbursement();
                                 }
+                                loadRecordSearch();
+                                retrieveDisbursement();
                                 break;
                             case "tfSearchSupplier":
-                                poJSON = poController.SearchSupplier(lsValue, true, true);
+                                poJSON = poController.SearchSupplier(lsValue, false, true);
                                 if ("error".equals((String) poJSON.get("result"))) {
                                     ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                     return;
-                                } else {
-                                    loadRecordSearch();
-                                    retrieveDisbursement();
                                 }
+                                loadRecordSearch();
+                                retrieveDisbursement();
                                 break;
                         }
                         event.consume();
