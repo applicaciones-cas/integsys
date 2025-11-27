@@ -1553,7 +1553,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
                                 } else {
                                     JFXUtil.textFieldMoveNext(tfParticular);
                                 }
-                                JFXUtil.runWithDelay(0.50, () -> {
+                                JFXUtil.runWithDelay(0.40, () -> {
                                     loadTableDetailBIR.reload();
                                 });
                                 break;
@@ -1564,7 +1564,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
                                 } else {
                                     JFXUtil.textFieldMoveNext(tfBaseAmount);
                                 }
-                                JFXUtil.runWithDelay(0.50, () -> {
+                                JFXUtil.runWithDelay(0.40, () -> {
                                     loadTableDetailBIR.reload();
                                 });
                                 break;

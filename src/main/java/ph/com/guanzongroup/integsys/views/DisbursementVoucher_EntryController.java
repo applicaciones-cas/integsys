@@ -1571,7 +1571,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                                 } else {
                                     JFXUtil.textFieldMoveNext(tfParticular);
                                 }
-                                JFXUtil.runWithDelay(0.50, () -> {
+                                JFXUtil.runWithDelay(0.40, () -> {
                                     loadTableDetailBIR.reload();
                                 });
                                 break;
@@ -1582,7 +1582,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                                 } else {
                                     JFXUtil.textFieldMoveNext(tfBaseAmount);
                                 }
-                                JFXUtil.runWithDelay(0.50, () -> {
+                                JFXUtil.runWithDelay(0.40, () -> {
                                     loadTableDetailBIR.reload();
                                 });
                                 break;
