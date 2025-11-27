@@ -332,7 +332,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                     poController.Master().setIndustryID(psIndustryId);
                     poController.Master().setCompanyID(psCompanyId);
                     poController.Master().setBranchCode(oApp.getBranchCode());
-                    poController.setTransactionStatus(DisbursementStatic.OPEN + DisbursementStatic.VERIFIED);
+                    poController.setTransactionStatus(DisbursementStatic.OPEN);
                     poJSON = poController.SearchTransaction();
                     if ("error".equalsIgnoreCase((String) poJSON.get("result"))) {
                         ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
