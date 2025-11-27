@@ -1308,6 +1308,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                             lsValue = JFXUtil.removeComma(lsValue);
                             poJSON = poController.WTaxDeduction(pnDetailBIR).getModel().setBaseAmount(Double.valueOf(lsValue));
                             if ("error".equals((String) poJSON.get("result"))) {
+                                poController.WTaxDeduction(pnDetailBIR).getModel().setBaseAmount(0.0);
                                 ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                 loadRecordDetailBIR();
                                 return;
@@ -1712,6 +1713,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
         try {
             initDVMasterTabs();
             poJSON = new JSONObject();
+            poController.computeTaxAmount();
             poJSON = poController.computeFields();
             if ("error".equals((String) poJSON.get("result"))) {
                 ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));

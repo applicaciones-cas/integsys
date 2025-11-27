@@ -727,6 +727,8 @@ public class DisbursementVoucher_HistoryController implements Initializable, Scr
         try {
             initDVMasterTabs();
             poJSON = new JSONObject();
+            poController.computeTaxAmount();
+            poJSON = poController.computeFields();
             if ("error".equals((String) poJSON.get("result"))) {
                 ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                 return;

@@ -510,6 +510,8 @@ public class DisbursementVoucher_ViewController implements Initializable, Screen
         try {
             initDVMasterTabs();
             poJSON = new JSONObject();
+            poController.computeTaxAmount();
+            poJSON = poController.computeFields();
             if ("error".equals((String) poJSON.get("result"))) {
                 ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                 return;
