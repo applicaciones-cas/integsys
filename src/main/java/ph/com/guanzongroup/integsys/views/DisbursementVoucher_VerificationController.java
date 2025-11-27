@@ -759,8 +759,8 @@ public class DisbursementVoucher_VerificationController implements Initializable
                             if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
                                 lnCtr = poController.getWTaxDeductionsCount() - 1;
                                 while (lnCtr >= 0) {
-                                    if (poController.WTaxDeduction(pnDetailBIR).getModel().getTaxCode() == null
-                                            || poController.WTaxDeduction(pnDetailBIR).getModel().getTaxCode().equals("")) {
+                                    if (poController.WTaxDeduction(lnCtr).getModel().getTaxCode() == null
+                                            || poController.WTaxDeduction(lnCtr).getModel().getTaxCode().equals("")) {
                                         poController.WTaxDeduction().remove(lnCtr);
                                     }
                                     lnCtr--;
@@ -775,6 +775,20 @@ public class DisbursementVoucher_VerificationController implements Initializable
 
                                 if ((poController.getWTaxDeductionsCount() - 1) < 0) {
                                     poController.AddWTaxDeduction();
+                                }
+                            }
+
+                            if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
+                                lnCtr = poController.getWTaxDeductionsCount() - 1;
+                                if (lnCtr >= 0) {
+                                    String lsSourceNo = poController.WTaxDeduction(lnCtr).getModel().getTaxCode();
+                                    if (!lsSourceNo.isEmpty() || poController.WTaxDeduction(lnCtr).getModel().getTaxCode() == null) {
+                                        try {
+                                            poController.AddWTaxDeduction();
+                                        } catch (CloneNotSupportedException ex) {
+                                            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+                                        }
+                                    }
                                 }
                             }
                             for (lnCtr = 0; lnCtr < poController.getWTaxDeductionsCount(); lnCtr++) {
@@ -1278,9 +1292,9 @@ public class DisbursementVoucher_VerificationController implements Initializable
                                 loadRecordDetailBIR();
                                 return;
                             }
-                            if (pbEnteredJE) {
-                                moveNextJE(false, true);
-                                pbEnteredJE = false;
+                            if (pbEnteredBIR) {
+                                moveNextBIR(false, true);
+                                pbEnteredBIR = false;
                             }
                             break;
                         case "tfTaxCode":
@@ -1539,7 +1553,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
                                 } else {
                                     JFXUtil.textFieldMoveNext(tfParticular);
                                 }
-                                JFXUtil.runWithDelay(0.80, () -> {
+                                JFXUtil.runWithDelay(0.50, () -> {
                                     loadTableDetailBIR.reload();
                                 });
                                 break;
@@ -1547,8 +1561,10 @@ public class DisbursementVoucher_VerificationController implements Initializable
                                 poJSON = poController.SearchParticular(lsValue, pnDetailBIR, false);
                                 if ("error".equals(poJSON.get("result"))) {
                                     ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                                } else {
+                                    JFXUtil.textFieldMoveNext(tfBaseAmount);
                                 }
-                                JFXUtil.runWithDelay(0.80, () -> {
+                                JFXUtil.runWithDelay(0.50, () -> {
                                     loadTableDetailBIR.reload();
                                 });
                                 break;
@@ -1654,8 +1670,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
             JFXUtil.requestFocusNullField(new Object[][]{ // alternative to if , else if
                 {poController.WTaxDeduction(pnDetailBIR).getModel().getTaxCode(), tfTaxCode},
                 {poController.WTaxDeduction(pnDetailBIR).getModel().WithholdingTax().AccountChart().getDescription(), tfParticular}, // if null or empty, then requesting focus to the txtfield
-                {poController.WTaxDeduction(pnDetailBIR).getModel().getBaseAmount(), tfBaseAmount},
-                {poController.WTaxDeduction(pnDetailBIR).getModel().WithholdingTax().getTaxRate(), tfTaxRate},}, tfTaxRate); // default
+                {poController.WTaxDeduction(pnDetailBIR).getModel().getBaseAmount(), tfBaseAmount},}, tfBaseAmount); // default
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
         }
@@ -1870,7 +1885,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
             String lsPeriodFromDate = CustomCommonUtil.formatDateToShortString(poController.WTaxDeduction(pnDetailBIR).getModel().getPeriodFrom());
             dpPeriodFrom.setValue(CustomCommonUtil.parseDateStringToLocalDate(lsPeriodFromDate, "yyyy-MM-dd"));
 
-            String lsPeriodToDate = CustomCommonUtil.formatDateToShortString(poController.WTaxDeduction(pnDetailBIR).getModel().getPeriodFrom());
+            String lsPeriodToDate = CustomCommonUtil.formatDateToShortString(poController.WTaxDeduction(pnDetailBIR).getModel().getPeriodTo());
             dpPeriodTo.setValue(CustomCommonUtil.parseDateStringToLocalDate(lsPeriodToDate, "yyyy-MM-dd"));
 
             tfTaxCode.setText(poController.WTaxDeduction(pnDetailBIR).getModel().getTaxCode());
