@@ -757,15 +757,18 @@ public class DisbursementVoucher_VerificationController implements Initializable
                             if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
                                 lnCtr = poController.getWTaxDeductionsCount() - 1;
                                 Date fromdate = null, todate = null;
-
+                                boolean lbProceed = false;
                                 while (lnCtr >= 0) {
-                                    fromdate = null;
-                                    todate = null;
+                                    if (!lbProceed) {
+                                        fromdate = null;
+                                        todate = null;
+                                    }
                                     if (poController.WTaxDeduction(lnCtr).getModel().getTaxCode() == null
                                             || "".equals(poController.WTaxDeduction(lnCtr).getModel().getTaxCode())) {
                                         fromdate = poController.WTaxDeduction(poController.getWTaxDeductionsCount() - 1).getModel().getPeriodFrom();
                                         todate = poController.WTaxDeduction(poController.getWTaxDeductionsCount() - 1).getModel().getPeriodTo();
                                         poController.WTaxDeduction().remove(lnCtr);
+                                        lbProceed = true;
                                     }
                                     lnCtr--;
                                 }
@@ -781,7 +784,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
                                 if ((poController.getWTaxDeductionsCount() - 1) < 0) {
                                     poController.AddWTaxDeduction();
                                 }
-                                if (fromdate != null && todate != null) {
+                                if (lbProceed) {
                                     poController.WTaxDeduction(poController.getWTaxDeductionsCount() - 1).getModel().setPeriodFrom(fromdate);
                                     poController.WTaxDeduction(poController.getWTaxDeductionsCount() - 1).getModel().setPeriodTo(todate);
                                 }
