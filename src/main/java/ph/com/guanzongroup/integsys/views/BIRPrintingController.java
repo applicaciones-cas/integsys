@@ -192,26 +192,6 @@ public class BIRPrintingController implements Initializable, ScreenInterface {
                 }, 1);//starts 0,1,2 
     }
 
-    public static Date getFirstDayOfMonth(Date date) {
-        if (date == null) {
-            return null;
-        }
-
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(date);
-
-        // Set to first day of the same month and year
-        calendar.set(Calendar.DAY_OF_MONTH, 1);
-
-        // Optional: Reset time to start of the day
-        calendar.set(Calendar.HOUR_OF_DAY, 0);
-        calendar.set(Calendar.MINUTE, 0);
-        calendar.set(Calendar.SECOND, 0);
-        calendar.set(Calendar.MILLISECOND, 0);
-
-        return calendar.getTime();
-    }
-
     private void loadRecordSearch() {
         try {
             lblSource.setText(poController.Master().Company().getCompanyName() + " - " + poController.Master().Industry().getDescription());
