@@ -80,9 +80,9 @@ public class DisbursementVoucher_CertificationController implements Initializabl
     @FXML
     private AnchorPane AnchorMain, apBrowse, apButton;
     @FXML
-    private Label lblSource;
+    private Label lblSource, tfSearchIndustry;
     @FXML
-    private TextField tfSearchIndustry, tfSearchBankName, tfSearchBankAccount;
+    private TextField tfSearchBankName, tfSearchBankAccount, tfSearchBankName1;
     @FXML
     private Button btnCertify, btnReturn, btnDisapproved, btnRetrieve, btnClose;
     @FXML
