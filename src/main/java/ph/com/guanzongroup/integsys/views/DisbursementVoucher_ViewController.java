@@ -115,7 +115,7 @@ public class DisbursementVoucher_ViewController implements Initializable, Screen
     @FXML
     private ComboBox cmbPaymentMode, cmbPayeeType, cmbDisbursementMode, cmbClaimantType, cmbCheckStatus, cmbOtherPaymentBTransfer, cmbOtherPayment;
     @FXML
-    private CheckBox chbkPrintByBank, chbkIsCrossCheck, chbkIsPersonOnly, chbkVatClassification;
+    private CheckBox chbkPrintByBank, chbkIsCrossCheck, chbkIsPersonOnly, chbkVatClassification, cbReverse;
     @FXML
     private Label lblDVTransactionStatus, lblBIRTransactionStatus;
     @FXML
@@ -591,6 +591,8 @@ public class DisbursementVoucher_ViewController implements Initializable, Screen
             tfBaseAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.WTaxDeduction(pnDetailBIR).getModel().getBaseAmount(), false));
             tfTaxRate.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.WTaxDeduction(pnDetailBIR).getModel().WithholdingTax().getTaxRate()));
             tfTotalTaxAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.WTaxDeduction(pnDetailBIR).getModel().getTaxAmount(), false));
+
+            cbReverse.setSelected(poController.WTaxDeduction(pnDetailBIR).getModel().isReverse());
             JFXUtil.updateCaretPositions(apBIRDetail);
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
