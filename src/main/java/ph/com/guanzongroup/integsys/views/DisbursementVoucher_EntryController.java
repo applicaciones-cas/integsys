@@ -151,7 +151,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
     @FXML
     private Tab tabDetails, tabCheck, tabBankTransfer, tabOnlinePayment, tabJournal, tabBIR;
     @FXML
-    private TextField tfDVTransactionNo, tfSupplier, tfVoucherNo, tfBankNameCheck, tfBankAccountCheck, tfPayeeName, tfCheckNo, tfCheckAmount, tfAuthorizedPerson, tfBankNameBTransfer, tfBankAccountBTransfer, tfPaymentAmountBTransfer, tfSupplierBank, tfSupplierAccountNoBTransfer, tfBankTransReferNo, tfBankNameOnlinePayment, tfBankAccountOnlinePayment, tfPaymentAmount, tfSupplierServiceName, tfSupplierAccountNo, tfPaymentReferenceNo, tfTotalAmount, tfVatableSales, tfVatAmountMaster, tfVatZeroRatedSales, tfVatExemptSales, tfLessWHTax, tfTotalNetAmount, tfRefNoDetail, tfVatableSalesDetail, tfVatExemptDetail, tfVatZeroRatedSalesDetail, tfVatRateDetail, tfVatAmountDetail, tfPurchasedAmountDetail, tfNetAmountDetail, tfSearchPayee, tfSearchBranch, tfJournalTransactionNo, tfTotalDebitAmount, tfTotalCreditAmount, tfAccountCode, tfAccountDescription, tfDebitAmount, tfCreditAmount, tfBIRTransactionNo, tfTotalTaxAmount, tfBaseAmount, tfTaxRate, tfTaxCode, tfParticular;
+    private TextField tfDVTransactionNo, tfSupplier, tfVoucherNo, tfBankNameCheck, tfBankAccountCheck, tfPayeeName, tfCheckNo, tfCheckAmount, tfAuthorizedPerson, tfBankNameBTransfer, tfBankAccountBTransfer, tfPaymentAmountBTransfer, tfSupplierBank, tfSupplierAccountNoBTransfer, tfBankTransReferNo, tfBankNameOnlinePayment, tfBankAccountOnlinePayment, tfPaymentAmount, tfSupplierServiceName, tfSupplierAccountNo, tfPaymentReferenceNo, tfTotalAmount, tfVatableSales, tfVatAmountMaster, tfVatZeroRatedSales, tfVatExemptSales, tfLessWHTax, tfTotalNetAmount, tfRefNoDetail, tfVatableSalesDetail, tfVatExemptDetail, tfVatZeroRatedSalesDetail, tfVatRateDetail, tfVatAmountDetail, tfPurchasedAmountDetail, tfNetAmountDetail, tfSearchBranch, tfSearchPayee, tfJournalTransactionNo, tfTotalDebitAmount, tfTotalCreditAmount, tfAccountCode, tfAccountDescription, tfDebitAmount, tfCreditAmount, tfBIRTransactionNo, tfTaxCode, tfParticular, tfBaseAmount, tfTaxRate, tfTotalTaxAmount;
     @FXML
     private DatePicker dpDVTransactionDate, dpCheckDate, dpJournalTransactionDate, dpReportMonthYear, dpPeriodFrom, dpPeriodTo;
     @FXML
@@ -163,7 +163,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
     @FXML
     private TableView tblVwDetails, tblViewMainList, tblVwJournalDetails, tblVwBIRDetails;
     @FXML
-    private TableColumn tblDVRowNo, tblReferenceNo, tblTransactionTypeDetail, tblPurchasedAmount, tblVatableSales, tblVatAmt, tblVatRate, tblVatZeroRatedSales, tblVatExemptSales, tblNetAmount, tblRowNo, tblTransactionType, tblBranchName, tblDueDate, tblRefNo, tblAmountMain, tblJournalRowNo, tblJournalAccountCode, tblJournalAccountDescription, tblJournalDebitAmount, tblJournalCreditAmount, tblJournalReportMonthYear, tblBIRRowNo, tblBIRParticular, tblTaxCode, tblTaxRate, tblTaxAmount;
+    private TableColumn tblDVRowNo, tblReferenceNo, tblTransactionTypeDetail, tblPurchasedAmount, tblVatableSales, tblVatAmt, tblVatRate, tblVatZeroRatedSales, tblVatExemptSales, tblNetAmount, tblRowNo, tblTransactionType, tblBranchName, tblDueDate, tblRefNo, tblAmountMain, tblJournalRowNo, tblJournalAccountCode, tblJournalAccountDescription, tblJournalDebitAmount, tblJournalCreditAmount, tblJournalReportMonthYear, tblBIRRowNo, tblBIRParticular, tblTaxCode, tblTaxRate, tblBaseAmount, tblTaxAmount;
     @FXML
     private Pagination pagination;
 
@@ -821,6 +821,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                                 BIR_data.add(new ModelBIR_Detail(String.valueOf(lnCtr + 1),
                                         poController.WTaxDeduction(lnCtr).getModel().WithholdingTax().AccountChart().getDescription(),
                                         poController.WTaxDeduction(lnCtr).getModel().getTaxCode(),
+                                        CustomCommonUtil.setIntegerValueToDecimalFormat(poController.WTaxDeduction(lnCtr).getModel().getBaseAmount(), false),
                                         CustomCommonUtil.setIntegerValueToDecimalFormat(poController.WTaxDeduction(lnCtr).getModel().WithholdingTax().getTaxRate(), false),
                                         CustomCommonUtil.setIntegerValueToDecimalFormat(poController.WTaxDeduction(lnCtr).getModel().getTaxAmount(), false))
                                 );
@@ -875,7 +876,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
     private void initDetailBIRGrid() {
         JFXUtil.setColumnCenter(tblBIRRowNo);
         JFXUtil.setColumnLeft(tblBIRParticular, tblTaxCode);
-        JFXUtil.setColumnRight(tblTaxRate, tblTaxAmount);
+        JFXUtil.setColumnRight(tblBaseAmount, tblTaxRate, tblTaxAmount);
         JFXUtil.setColumnsIndexAndDisableReordering(tblVwBIRDetails);
         tblVwBIRDetails.setItems(BIR_data);
     }

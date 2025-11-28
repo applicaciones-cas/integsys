@@ -491,7 +491,7 @@
                                         </Tab>
                                         <Tab fx:id="tabBIR" text="BIR 2307">
                                             <content>
-                                                <AnchorPane maxWidth="800.0" minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="800.0">
+                                                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0">
                                                     <children>
                                                         <VBox prefHeight="339.0" spacing="5.0" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="5.0">
                                                             <children>
@@ -567,8 +567,9 @@
                                                                                 <TableView fx:id="tblVwBIRDetails" prefHeight="200.0" prefWidth="200.0">
                                                                                     <columns>
                                                                                         <TableColumn fx:id="tblBIRRowNo" maxWidth="40.0" minWidth="40.0" prefWidth="40.0" resizable="false" sortable="false" text="No." />
-                                                                                        <TableColumn fx:id="tblBIRParticular" maxWidth="340.0" minWidth="-1.0" prefWidth="340.0" resizable="false" sortable="false" text="Particular" />
+                                                                                        <TableColumn fx:id="tblBIRParticular" maxWidth="350.0" minWidth="-1.0" prefWidth="350.0" resizable="false" sortable="false" text="Particular" />
                                                                                         <TableColumn fx:id="tblTaxCode" maxWidth="130.0" minWidth="130.0" prefWidth="130.0" resizable="false" sortable="false" style="-fx-alignment: CENTER-RIGHT;" text="Tax Code" />
+                                                                  <TableColumn fx:id="tblBaseAmount" maxWidth="130.0" minWidth="130.0" prefWidth="130.0" resizable="false" sortable="false" style="-fx-alignment: CENTER-RIGHT;" text="Base Amount" />
                                                                   <TableColumn fx:id="tblTaxRate" maxWidth="130.0" minWidth="130.0" prefWidth="130.0" resizable="false" sortable="false" style="-fx-alignment: CENTER-RIGHT;" text="Tax Rate" />
                                                                                         <TableColumn fx:id="tblTaxAmount" maxWidth="150.0" minWidth="150.0" prefWidth="150.0" resizable="false" sortable="false" style="-fx-alignment: CENTER-RIGHT;" text="Tax Amount" />
                                                                                     </columns>

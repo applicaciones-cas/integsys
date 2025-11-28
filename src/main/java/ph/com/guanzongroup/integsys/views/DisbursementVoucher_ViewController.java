@@ -109,7 +109,7 @@ public class DisbursementVoucher_ViewController implements Initializable, Screen
     @FXML
     private Tab tabDisbursement, tabCheck, tabBankTransfer, tabOnlinePayment, tabBIR;
     @FXML
-    private TextField tfDVTransactionNo, tfVoucherNo, tfSupplier, tfCheckNo, tfCheckAmount, tfBankNameCheck, tfBankAccountCheck, tfPayeeName, tfAuthorizedPerson, tfPaymentAmountBTransfer, tfBankTransReferNo, tfSupplierBank, tfSupplierAccountNoBTransfer, tfBankNameBTransfer, tfBankAccountBTransfer, tfPaymentAmount, tfPaymentReferenceNo, tfSupplierServiceName, tfSupplierAccountNo, tfBankNameOnlinePayment, tfBankAccountOnlinePayment, tfVatAmountMaster, tfVatExemptSales, tfLessWHTax, tfTotalNetAmount, tfTotalAmount, tfVatZeroRatedSales, tfVatableSales, tfRefNoDetail, tfVatableSalesDetail, tfVatExemptDetail, tfVatZeroRatedSalesDetail, tfVatRateDetail, tfVatAmountDetail, tfPurchasedAmountDetail, tfNetAmountDetail, tfBIRTransactionNo, tfTotalTaxAmount, tfBaseAmount, tfTaxRate, tfTaxCode, tfParticular;
+    private TextField tfDVTransactionNo, tfSupplier, tfVoucherNo, tfBankNameCheck, tfBankAccountCheck, tfPayeeName, tfCheckNo, tfCheckAmount, tfAuthorizedPerson, tfBankNameBTransfer, tfBankAccountBTransfer, tfPaymentAmountBTransfer, tfSupplierBank, tfSupplierAccountNoBTransfer, tfBankTransReferNo, tfBankNameOnlinePayment, tfBankAccountOnlinePayment, tfPaymentAmount, tfSupplierServiceName, tfSupplierAccountNo, tfPaymentReferenceNo, tfTotalAmount, tfVatableSales, tfVatAmountMaster, tfVatZeroRatedSales, tfVatExemptSales, tfLessWHTax, tfTotalNetAmount, tfRefNoDetail, tfVatableSalesDetail, tfVatExemptDetail, tfVatZeroRatedSalesDetail, tfVatRateDetail, tfVatAmountDetail, tfPurchasedAmountDetail, tfNetAmountDetail, tfBIRTransactionNo, tfTaxCode, tfParticular, tfBaseAmount, tfTaxRate, tfTotalTaxAmount;
     @FXML
     private DatePicker dpDVTransactionDate, dpCheckDate, dpPeriodFrom, dpPeriodTo;
     @FXML
@@ -123,7 +123,7 @@ public class DisbursementVoucher_ViewController implements Initializable, Screen
     @FXML
     private TableView tblVwDetails, tblVwBIRDetails;
     @FXML
-    private TableColumn tblDVRowNo, tblReferenceNo, tblTransactionTypeDetail, tblPurchasedAmount, tblVatableSales, tblVatAmt, tblVatRate, tblVatZeroRatedSales, tblVatExemptSales, tblNetAmount, tblBIRRowNo, tblBIRParticular, tblTaxCode, tblTaxRate, tblTaxAmount;
+    private TableColumn tblDVRowNo, tblReferenceNo, tblTransactionTypeDetail, tblPurchasedAmount, tblVatableSales, tblVatAmt, tblVatRate, tblVatZeroRatedSales, tblVatExemptSales, tblNetAmount, tblBIRRowNo, tblBIRParticular, tblTaxCode, tblBaseAmount, tblTaxRate, tblTaxAmount;
 
     @Override
     public void setGRider(GRiderCAS foValue) {
@@ -411,10 +411,11 @@ public class DisbursementVoucher_ViewController implements Initializable, Screen
                             }
                             for (lnCtr = 0; lnCtr < poController.getWTaxDeductionsCount(); lnCtr++) {
                                 BIR_data.add(new ModelBIR_Detail(String.valueOf(lnCtr + 1),
-                                        poController.WTaxDeduction(pnDetailBIR).getModel().WithholdingTax().AccountChart().getDescription(),
-                                        poController.WTaxDeduction(pnDetailBIR).getModel().getTaxCode(),
-                                        CustomCommonUtil.setIntegerValueToDecimalFormat(poController.WTaxDeduction(pnDetailBIR).getModel().WithholdingTax().getTaxRate(), false),
-                                        CustomCommonUtil.setIntegerValueToDecimalFormat(poController.WTaxDeduction(pnDetailBIR).getModel().getTaxAmount(), false))
+                                        poController.WTaxDeduction(lnCtr).getModel().WithholdingTax().AccountChart().getDescription(),
+                                        poController.WTaxDeduction(lnCtr).getModel().getTaxCode(),
+                                        CustomCommonUtil.setIntegerValueToDecimalFormat(poController.WTaxDeduction(lnCtr).getModel().getBaseAmount(), false),
+                                        CustomCommonUtil.setIntegerValueToDecimalFormat(poController.WTaxDeduction(lnCtr).getModel().WithholdingTax().getTaxRate(), false),
+                                        CustomCommonUtil.setIntegerValueToDecimalFormat(poController.WTaxDeduction(lnCtr).getModel().getTaxAmount(), false))
                                 );
                             }
                             if (pnDetailBIR < 0 || pnDetailBIR
@@ -449,7 +450,7 @@ public class DisbursementVoucher_ViewController implements Initializable, Screen
     private void initDetailBIRGrid() {
         JFXUtil.setColumnCenter(tblBIRRowNo);
         JFXUtil.setColumnLeft(tblBIRParticular, tblTaxCode);
-        JFXUtil.setColumnRight(tblTaxRate, tblTaxAmount);
+        JFXUtil.setColumnRight(tblBaseAmount, tblTaxRate, tblTaxAmount);
         JFXUtil.setColumnsIndexAndDisableReordering(tblVwBIRDetails);
         tblVwBIRDetails.setItems(BIR_data);
     }

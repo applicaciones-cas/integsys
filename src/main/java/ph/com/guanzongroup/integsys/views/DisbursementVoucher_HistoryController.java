@@ -103,9 +103,9 @@ public class DisbursementVoucher_HistoryController implements Initializable, Scr
     @FXML
     private AnchorPane AnchorMain, apBrowse, apButton, apMasterDetail, apDVMaster1, apMasterDVCheck, apMasterDVBTransfer, apMasterDVOp, apDVMaster2, apDVMaster3, apDVDetail, apJournalMaster, apJournalDetails, apBIRDetail;
     @FXML
-    private TextField tfSearchTransaction, tfSearchSupplier, tfDVTransactionNo, tfSupplier, tfVoucherNo, tfBankNameCheck, tfBankAccountCheck, tfPayeeName, tfCheckNo, tfCheckAmount, tfAuthorizedPerson, tfBankNameBTransfer, tfBankAccountBTransfer, tfPaymentAmountBTransfer, tfSupplierBank, tfSupplierAccountNoBTransfer, tfBankTransReferNo, tfBankNameOnlinePayment, tfBankAccountOnlinePayment, tfPaymentAmount, tfSupplierServiceName, tfSupplierAccountNo, tfPaymentReferenceNo, tfTotalAmount, tfVatableSales, tfVatAmountMaster, tfVatZeroRatedSales, tfVatExemptSales, tfLessWHTax, tfTotalNetAmount, tfRefNoDetail, tfVatableSalesDetail, tfVatExemptDetail, tfVatZeroRatedSalesDetail, tfVatRateDetail, tfVatAmountDetail, tfPurchasedAmountDetail, tfNetAmountDetail, tfTotalCreditAmount, tfJournalTransactionNo, tfTotalDebitAmount, tfAccountCode, tfAccountDescription, tfDebitAmount, tfCreditAmount, tfBIRTransactionNo, tfTotalTaxAmount, tfBaseAmount, tfTaxRate, tfTaxCode, tfParticular;
-    @FXML
     private Label lblSource, lblDVTransactionStatus, lblJournalTransactionStatus, lblBIRTransactionStatus;
+    @FXML
+    private TextField tfSearchTransaction, tfSearchSupplier, tfDVTransactionNo, tfSupplier, tfVoucherNo, tfBankNameCheck, tfBankAccountCheck, tfPayeeName, tfCheckNo, tfCheckAmount, tfAuthorizedPerson, tfBankNameBTransfer, tfBankAccountBTransfer, tfPaymentAmountBTransfer, tfSupplierBank, tfSupplierAccountNoBTransfer, tfBankTransReferNo, tfBankNameOnlinePayment, tfBankAccountOnlinePayment, tfPaymentAmount, tfSupplierServiceName, tfSupplierAccountNo, tfPaymentReferenceNo, tfTotalAmount, tfVatableSales, tfVatAmountMaster, tfVatZeroRatedSales, tfVatExemptSales, tfLessWHTax, tfTotalNetAmount, tfRefNoDetail, tfVatableSalesDetail, tfVatExemptDetail, tfVatZeroRatedSalesDetail, tfVatRateDetail, tfVatAmountDetail, tfPurchasedAmountDetail, tfNetAmountDetail, tfJournalTransactionNo, tfTotalDebitAmount, tfTotalCreditAmount, tfAccountCode, tfAccountDescription, tfDebitAmount, tfCreditAmount, tfBIRTransactionNo, tfTaxCode, tfParticular, tfBaseAmount, tfTaxRate, tfTotalTaxAmount;
     @FXML
     private Button btnBrowse, btnHistory, btnClose;
     @FXML
@@ -123,7 +123,7 @@ public class DisbursementVoucher_HistoryController implements Initializable, Scr
     @FXML
     private TableView tblVwDetails, tblVwJournalDetails, tblVwBIRDetails;
     @FXML
-    private TableColumn tblDVRowNo, tblReferenceNo, tblTransactionTypeDetail, tblPurchasedAmount, tblVatableSales, tblVatAmt, tblVatRate, tblVatZeroRatedSales, tblVatExemptSales, tblNetAmount, tblJournalRowNo, tblJournalAccountCode, tblJournalAccountDescription, tblJournalDebitAmount, tblJournalCreditAmount, tblJournalReportMonthYear, tblBIRRowNo, tblBIRParticular, tblTaxCode, tblTaxRate, tblTaxAmount;
+    private TableColumn tblDVRowNo, tblReferenceNo, tblTransactionTypeDetail, tblPurchasedAmount, tblVatableSales, tblVatAmt, tblVatRate, tblVatZeroRatedSales, tblVatExemptSales, tblNetAmount, tblJournalRowNo, tblJournalAccountCode, tblJournalAccountDescription, tblJournalDebitAmount, tblJournalCreditAmount, tblJournalReportMonthYear, tblBIRRowNo, tblBIRParticular, tblTaxCode, tblTaxRate, tblBaseAmount, tblTaxAmount;
 
     @Override
     public void setGRider(GRiderCAS foValue) {
@@ -523,10 +523,11 @@ public class DisbursementVoucher_HistoryController implements Initializable, Scr
                             }
                             for (lnCtr = 0; lnCtr < poController.getWTaxDeductionsCount(); lnCtr++) {
                                 BIR_data.add(new ModelBIR_Detail(String.valueOf(lnCtr + 1),
-                                        poController.WTaxDeduction(pnDetailBIR).getModel().WithholdingTax().AccountChart().getDescription(),
-                                        poController.WTaxDeduction(pnDetailBIR).getModel().getTaxCode(),
-                                        CustomCommonUtil.setIntegerValueToDecimalFormat(poController.WTaxDeduction(pnDetailBIR).getModel().WithholdingTax().getTaxRate(), false),
-                                        CustomCommonUtil.setIntegerValueToDecimalFormat(poController.WTaxDeduction(pnDetailBIR).getModel().getTaxAmount(), false))
+                                        poController.WTaxDeduction(lnCtr).getModel().WithholdingTax().AccountChart().getDescription(),
+                                        poController.WTaxDeduction(lnCtr).getModel().getTaxCode(),
+                                        CustomCommonUtil.setIntegerValueToDecimalFormat(poController.WTaxDeduction(lnCtr).getModel().getBaseAmount(), false),
+                                        CustomCommonUtil.setIntegerValueToDecimalFormat(poController.WTaxDeduction(lnCtr).getModel().WithholdingTax().getTaxRate(), false),
+                                        CustomCommonUtil.setIntegerValueToDecimalFormat(poController.WTaxDeduction(lnCtr).getModel().getTaxAmount(), false))
                                 );
                             }
                             if (pnDetailBIR < 0 || pnDetailBIR
@@ -569,7 +570,7 @@ public class DisbursementVoucher_HistoryController implements Initializable, Scr
     private void initDetailBIRGrid() {
         JFXUtil.setColumnCenter(tblBIRRowNo);
         JFXUtil.setColumnLeft(tblBIRParticular, tblTaxCode);
-        JFXUtil.setColumnRight(tblTaxRate, tblTaxAmount);
+        JFXUtil.setColumnRight(tblBaseAmount, tblTaxRate, tblTaxAmount);
         JFXUtil.setColumnsIndexAndDisableReordering(tblVwBIRDetails);
         tblVwBIRDetails.setItems(BIR_data);
     }
