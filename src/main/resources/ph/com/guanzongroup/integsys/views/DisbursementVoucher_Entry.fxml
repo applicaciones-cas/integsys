@@ -931,7 +931,7 @@
                                                                                 <TextField fx:id="tfBaseAmount" alignment="CENTER_RIGHT" maxWidth="1.7976931348623157E308" promptText="0.00" GridPane.columnIndex="7" GridPane.rowIndex="5" />
                                                                                 <TextField fx:id="tfTaxRate" alignment="CENTER_RIGHT" disable="true" editable="false" maxWidth="1.7976931348623157E308" promptText="0.00" GridPane.columnIndex="7" GridPane.rowIndex="6" />
                                                                                 <TextField fx:id="tfTotalTaxAmount" alignment="CENTER_RIGHT" disable="true" editable="false" maxWidth="1.7976931348623157E308" promptText="0.00" GridPane.columnIndex="7" GridPane.rowIndex="7" />
-                                                            <CheckBox fx:id="cbReverse" mnemonicParsing="false" GridPane.columnIndex="7" GridPane.rowIndex="4" />
+                                                            <CheckBox fx:id="cbReverse" mnemonicParsing="false" onAction="#cmdCheckBox_Click" GridPane.columnIndex="7" GridPane.rowIndex="4" />
                                                             <Label text="Reverse" GridPane.columnIndex="5" GridPane.rowIndex="4" />
                                                                             </children>
                                                                         </GridPane>
