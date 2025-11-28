@@ -93,6 +93,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
     private int pnDetailJE = 0;
     private int pnDetailBIR = 0;
     private boolean pbIsCheckedJournalTab = false;
+    private boolean pbIsCheckedBIRTab = false;
     private final String pxeModuleName = "Disbursement Voucher";
     private DisbursementVoucher poController;
     public int pnEditMode;
@@ -261,6 +262,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                     case "BIR 2307":
                         if (pnEditMode == EditMode.READY || pnEditMode == EditMode.UPDATE || pnEditMode == EditMode.ADDNEW) {
                             if (poController.Detail(0).getSourceNo() != null && !poController.Detail(0).getSourceNo().isEmpty()) {
+                                pbIsCheckedBIRTab = true;
                                 populateBIR();
                             } else {
                                 JFXUtil.clickTabByTitleText(tabPaneMain, "Disbursement Voucher");
@@ -341,6 +343,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                     pnEditMode = poController.getEditMode();
                     JFXUtil.showRetainedHighlight(false, tblViewMainList, "#A7C7E7", plOrderNoPartial, plOrderNoFinal, highlightedRowsMain, true);
                     pbIsCheckedJournalTab = false;
+                    pbIsCheckedBIRTab = false;
                     JFXUtil.clickTabByTitleText(tabPaneMain, "Disbursement Voucher");
                     pnEditMode = poController.getEditMode();
                     psSupplierPayeeId = poController.Master().Payee().getClientID();
@@ -370,6 +373,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                         return;
                     }
                     pbIsCheckedJournalTab = false;
+                    pbIsCheckedBIRTab = false;
                     pnEditMode = poController.getEditMode();
                     JFXUtil.clickTabByTitleText(tabPaneMain, "Disbursement Voucher");
                     loadTableDetail.reload();
@@ -386,6 +390,10 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                         if (oApp.getUserLevel() > UserRight.ENCODER) {
                             if (!pbIsCheckedJournalTab) {
                                 ShowMessageFX.Warning(null, pxeModuleName, "Please check the Journal Entry before saving.");
+                                return;
+                            }
+                            if (!pbIsCheckedBIRTab) {
+                                ShowMessageFX.Warning(null, pxeModuleName, "Please check the BIR 2307 before saving.");
                                 return;
                             }
                         }
@@ -457,6 +465,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
             }
             if (JFXUtil.isObjectEqualTo(lsButton, "btnSave", "btnCancel", "btnVoid")) {
                 pbIsCheckedJournalTab = false;
+                pbIsCheckedBIRTab = false;
                 poController.resetTransaction();
                 poController.Master().setSupplierClientID(psSupplierPayeeId);
                 clearTextFields();

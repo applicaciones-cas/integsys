@@ -89,6 +89,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
     private int pnDetailJE = 0;
     private int pnDetailBIR = 0;
     private boolean pbIsCheckedJournalTab = false;
+    private boolean pbIsCheckedBIRTab = false;
     private final String pxeModuleName = "Disbursement Voucher Verification";
     private DisbursementVoucher poController;
     public int pnEditMode;
@@ -249,6 +250,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
                     case "BIR 2307":
                         if (pnEditMode == EditMode.READY || pnEditMode == EditMode.UPDATE || pnEditMode == EditMode.ADDNEW) {
                             if (poController.Detail(0).getSourceNo() != null && !poController.Detail(0).getSourceNo().isEmpty()) {
+                                pbIsCheckedBIRTab = true;
                                 populateBIR();
                             } else {
                                 JFXUtil.clickTabByTitleText(tabPaneMain, "Disbursement Voucher");
@@ -323,6 +325,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
                         return;
                     }
                     pbIsCheckedJournalTab = false;
+                    pbIsCheckedBIRTab = false;
                     pnEditMode = poController.getEditMode();
                     CustomCommonUtil.switchToTab(tabDetails, tabPaneMain);
                     loadTableDetail.reload();
@@ -338,6 +341,10 @@ public class DisbursementVoucher_VerificationController implements Initializable
                     if (pnEditMode == EditMode.UPDATE) {
                         if (!pbIsCheckedJournalTab) {
                             ShowMessageFX.Warning(null, pxeModuleName, "Please check the Journal Entry before saving.");
+                            return;
+                        }
+                        if (!pbIsCheckedBIRTab) {
+                            ShowMessageFX.Warning(null, pxeModuleName, "Please check the BIR 2307 before saving.");
                             return;
                         }
                         poController.Master().setModifiedDate(oApp.getServerDate());
@@ -458,6 +465,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
             }
             if (JFXUtil.isObjectEqualTo(lsButton, "btnSave", "btnCancel", "btnVoid", "btnVerify", "btnDVCancel")) {
                 pbIsCheckedJournalTab = false;
+                pbIsCheckedBIRTab = false;
                 poController.resetTransaction();
                 poController.Master().setSupplierClientID(psSupplierPayeeId);
                 clearTextFields();
@@ -1902,7 +1910,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
             tfBaseAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.WTaxDeduction(pnDetailBIR).getModel().getBaseAmount(), false));
             tfTaxRate.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.WTaxDeduction(pnDetailBIR).getModel().WithholdingTax().getTaxRate()));
             tfTotalTaxAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.WTaxDeduction(pnDetailBIR).getModel().getTaxAmount(), false));
-            
+
             cbReverse.setSelected(poController.WTaxDeduction(pnDetailBIR).getModel().isReverse());
             JFXUtil.updateCaretPositions(apBIRDetail);
         } catch (SQLException | GuanzonException ex) {
