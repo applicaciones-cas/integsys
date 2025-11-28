@@ -391,6 +391,9 @@ public class DisbursementVoucher_VerificationController implements Initializable
                                 if (!pbIsCheckedJournalTab) {
                                     ShowMessageFX.Warning(null, pxeModuleName, "Please check the Journal Entry before saving.");
                                     return;
+                                } else if (!pbIsCheckedBIRTab) {
+                                    ShowMessageFX.Warning(null, pxeModuleName, "Please check the BIR 2307 before saving.");
+                                    return;
                                 } else {
                                     poJSON = poController.VerifyTransaction("Verified");
                                     if ("error".equals((String) poJSON.get("result"))) {

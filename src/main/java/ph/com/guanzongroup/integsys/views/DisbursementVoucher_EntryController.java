@@ -420,6 +420,9 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                                     if (!pbIsCheckedJournalTab) {
                                         ShowMessageFX.Warning(null, pxeModuleName, "Please check the Journal Entry before saving.");
                                         return;
+                                    } else if (!pbIsCheckedBIRTab) {
+                                        ShowMessageFX.Warning(null, pxeModuleName, "Please check the BIR 2307 before saving.");
+                                        return;
                                     } else {
                                         poJSON = poController.VerifyTransaction("");
                                         if ("error".equals((String) poJSON.get("result"))) {
