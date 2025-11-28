@@ -330,8 +330,12 @@ public class CheckPrintingController implements Initializable, ScreenInterface {
                     break;
                 case "print check":
                     if (!checkedItems.isEmpty()) {
-                        poController.PrintCheck(checkedItems);
-
+                        poJSON = poController.PrintCheck(checkedItems);
+                        if (!"success".equals((String) poJSON.get("result"))) {
+                            ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                        } else {
+                            ShowMessageFX.Information(null, pxeModuleName, (String) poJSON.get("message"));
+                        }
                         chckSelectAll.setSelected(false);
                         checkedItem.clear();
                     }
@@ -346,7 +350,6 @@ public class CheckPrintingController implements Initializable, ScreenInterface {
                         } else {
                             ShowMessageFX.Information(null, pxeModuleName, (String) poJSON.get("message"));
                         }
-
                         chckSelectAll.setSelected(false);
                         checkedItem.clear();
                     }
