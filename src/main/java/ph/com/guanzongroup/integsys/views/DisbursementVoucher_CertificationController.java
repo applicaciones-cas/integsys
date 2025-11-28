@@ -330,7 +330,7 @@ public class DisbursementVoucher_CertificationController implements Initializabl
         try {
             poJSON = poDisbursementController.loadTransactionList(tfSearchIndustry.getText(), tfSearchBankName.getText(), tfSearchBankAccount.getText(), "", true);
             if ("error".equals(poJSON.get("result"))) {
-                ShowMessageFX.Error(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
+//                ShowMessageFX.Error(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
             } else {
                 Platform.runLater(() -> {
                     chckSelectAll.setSelected(false);

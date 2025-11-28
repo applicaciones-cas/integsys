@@ -373,7 +373,7 @@ public class BIRPrintingController implements Initializable, ScreenInterface {
         try {
             poJSON = poController.loadBIRPrintTransactionList(tfSearchIndustry.getText(), tfSearchSupplier.getText());
             if ("error".equals(poJSON.get("result"))) {
-                ShowMessageFX.Error(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
+//                ShowMessageFX.Error(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
             } else {
                 Platform.runLater(() -> {
                     chckSelectAll.setSelected(false);

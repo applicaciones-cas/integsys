@@ -518,7 +518,7 @@ public class CheckPrintingController implements Initializable, ScreenInterface {
 
             poJSON = poController.loadCheckPrintTransactionList(tfSearchIndustry.getText(), tfSearchBankName.getText(), tfSearchBankAccount.getText(), psSearchDVDateFrom, psSearchDVDateTo);
             if ("error".equals(poJSON.get("result"))) {
-                ShowMessageFX.Error(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
+//                ShowMessageFX.Error(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
             } else {
                 Platform.runLater(() -> {
                     chckSelectAll.setSelected(false);
