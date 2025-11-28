@@ -1564,9 +1564,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
                                 } else {
                                     JFXUtil.textFieldMoveNext(tfParticular);
                                 }
-                                JFXUtil.runWithDelay(0.40, () -> {
-                                    loadTableDetailBIR.reload();
-                                });
+                                loadTableDetailBIR.reload();
                                 break;
                             case "tfParticular":
                                 poJSON = poController.SearchParticular(lsValue, pnDetailBIR, false);
@@ -1575,9 +1573,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
                                 } else {
                                     JFXUtil.textFieldMoveNext(tfBaseAmount);
                                 }
-                                JFXUtil.runWithDelay(0.40, () -> {
-                                    loadTableDetailBIR.reload();
-                                });
+                                loadTableDetailBIR.reload();
                                 break;
                         }
                         event.consume();
