@@ -232,6 +232,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
             });
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -265,7 +266,6 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                                 JFXUtil.clickTabByTitleText(tabPaneMain, "Disbursement Voucher");
                                 ShowMessageFX.Warning(null, pxeModuleName, "Please provide at least one valid disbursement detail to proceed.");
                             }
-
                         }
                         break;
                 }
@@ -477,6 +477,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
             }
         } catch (CloneNotSupportedException | SQLException | GuanzonException | ParseException | ScriptException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -492,6 +493,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
             }
         } catch (SQLException | GuanzonException | CloneNotSupportedException | ScriptException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -508,6 +510,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
             }
         } catch (SQLException | GuanzonException | CloneNotSupportedException | ScriptException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -561,9 +564,9 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                     pnEditMode = poController.getEditMode();
                     loadTableDetail.reload();
                     moveNext(false, false);
-
                 } catch (CloneNotSupportedException | SQLException | GuanzonException ex) {
                     Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+                    ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
                 }
             }
         } else {
@@ -613,7 +616,6 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                                     /* FOCUS ON FIRST ROW */
                                     JFXUtil.selectAndFocusRow(tblViewMainList, 0);
                                     pnMain = tblViewMainList.getSelectionModel().getSelectedIndex();
-
                                 }
                             } else {
                                 /* FOCUS ON THE ROW THAT pnRowDetail POINTS TO */
@@ -623,6 +625,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                         });
                     } catch (InterruptedException ex) {
                         Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+                        ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
                     }
                 });
 
@@ -662,8 +665,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
 //                                            poController.AddDetail();
 //
 //                                        } catch (CloneNotSupportedException ex) {
-//                                            Logger.getLogger(getClass()
-//                                                    .getName()).log(Level.SEVERE, null, ex);
+//                                            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
 //                                        }
 //                                    }
 //                                }
@@ -682,7 +684,6 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                                                 CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(lnCtr).getDetailVatExempt(), true),
                                                 CustomCommonUtil.setIntegerValueToDecimalFormat(poController.getDetailNetTotal(lnCtr), true)
                                         ));
-
                             }
                             JFXUtil.showRetainedHighlight(false, tblViewMainList, "#A7C7E7", plOrderNoPartial, plOrderNoFinal, highlightedRowsMain, true);
                             loadHighlightFromDetail();
@@ -706,9 +707,9 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                             }
 
                             loadRecordMaster();
-
                         } catch (CloneNotSupportedException ex) {
                             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+                            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
                         }
                     });
                 });
@@ -741,7 +742,6 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                                     poController.Journal().AddDetail();
                                     poController.Journal().Detail(poController.Journal().getDetailCount() - 1).setForMonthOf(oApp.getServerDate());
                                 }
-
                             }
 
                             for (lnCtr = 0; lnCtr < poController.Journal().getDetailCount(); lnCtr++) {
@@ -752,7 +752,6 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                                         CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Journal().Detail(lnCtr).getCreditAmount(), true),
                                         CustomCommonUtil.formatDateToShortString(poController.Journal().Detail(lnCtr).getForMonthOf())
                                 ));
-
                             }
                             if (pnDetailJE < 0 || pnDetailJE
                                     >= journal_data.size()) {
@@ -770,6 +769,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                             loadRecordMasterJE();
                         } catch (SQLException | GuanzonException | CloneNotSupportedException ex) {
                             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+                            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
                         }
                     });
                 });
@@ -805,7 +805,6 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                                     if (poController.WTaxDeduction(poController.getWTaxDeductionsCount() - 1).getModel().getTaxCode() != null
                                             && !"".equals(poController.WTaxDeduction(poController.getWTaxDeductionsCount() - 1).getModel().getTaxCode())) {
                                         poController.AddWTaxDeduction();
-
                                     }
                                 }
 
@@ -825,7 +824,6 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                                         CustomCommonUtil.setIntegerValueToDecimalFormat(poController.WTaxDeduction(lnCtr).getModel().WithholdingTax().getTaxRate(), false),
                                         CustomCommonUtil.setIntegerValueToDecimalFormat(poController.WTaxDeduction(lnCtr).getModel().getTaxAmount(), false))
                                 );
-
                             }
                             if (pnDetailBIR < 0 || pnDetailBIR
                                     >= BIR_data.size()) {
@@ -842,6 +840,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                             }
                         } catch (SQLException | GuanzonException | CloneNotSupportedException ex) {
                             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+                            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
                         }
                     });
                 });
@@ -955,7 +954,6 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                     pnDetailBIR = newIndex;
                     loadRecordDetailBIR();
                     break;
-
             }
             event.consume();
         }
@@ -985,7 +983,6 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
         JFXUtil.inputDecimalOnly(tfVatZeroRatedSales, tfVatZeroRatedSalesDetail, tfVatRateDetail, tfTaxRate);
         JFXUtil.setCommaFormatter(tfCheckAmount, tfPaymentAmountBTransfer, tfPaymentAmount, tfTotalAmount, tfVatAmountMaster, tfTotalNetAmount, tfVatAmountDetail, tfPurchasedAmountDetail, tfNetAmountDetail, tfTotalDebitAmount, tfTotalCreditAmount, tfDebitAmount, tfCreditAmount, tfTotalTaxAmount, tfBaseAmount);
         JFXUtil.setCheckboxHoverCursor(chbkPrintByBank, chbkIsCrossCheck, chbkIsPersonOnly, chbkVatClassification);
-
     }
     ChangeListener<Boolean> txtSearch_Focus = JFXUtil.FocusListener(TextField.class,
             (lsID, lsValue) -> {
@@ -1024,7 +1021,6 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                         loadRecordMasterJE();
                         break;
                 }
-
             });
     ChangeListener<Boolean> txtMaster_Focus = JFXUtil.FocusListener(TextField.class,
             (lsID, lsValue) -> {
@@ -1231,6 +1227,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                     loadRecordMasterOnlinePayment();
                 } catch (SQLException | GuanzonException ex) {
                     Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+                    ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
                 }
             });
     ChangeListener<Boolean> txtDetailJE_Focus = JFXUtil.FocusListener(TextField.class,
@@ -1340,6 +1337,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                     });
                 } catch (SQLException | GuanzonException ex) {
                     Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+                    ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
                 }
             });
 
@@ -1641,6 +1639,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
             }
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -1674,6 +1673,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                 {poController.Journal().Detail(pnDetailJE).getCreditAmount(), tfCreditAmount},}, tfCreditAmount); // default
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -1693,6 +1693,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                 {poController.WTaxDeduction(pnDetailBIR).getModel().getBaseAmount(), tfBaseAmount},}, tfBaseAmount); // default
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -1706,6 +1707,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
             JFXUtil.updateCaretPositions(apBrowse);
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -1750,6 +1752,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
             JFXUtil.updateCaretPositions(apDVMaster1, apDVMaster2, apDVMaster3);
         } catch (GuanzonException | SQLException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -1772,7 +1775,6 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
         tfPurchasedAmountDetail.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(pnDetail).getAmountApplied(), true));
         tfNetAmountDetail.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.getDetailNetTotal(pnDetail), true));
         JFXUtil.updateCaretPositions(apDVDetail);
-
     }
 
     private void loadRecordMasterCheck() {
@@ -1819,6 +1821,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
             JFXUtil.updateCaretPositions(apMasterDVCheck);
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -1839,6 +1842,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
             JFXUtil.updateCaretPositions(apMasterDVBTransfer);
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -1858,6 +1862,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
             JFXUtil.updateCaretPositions(apMasterDVOp);
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -1892,6 +1897,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
             JFXUtil.updateCaretPositions(apJournalDetails);
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -1915,6 +1921,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
             JFXUtil.updateCaretPositions(apBIRDetail);
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -2019,7 +2026,6 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                                 ShowMessageFX.Warning(null, pxeModuleName, "Authorized Person field is only available when the \"Claimant Type\" is Authorized Representative.");
                                 break;
                         }
-
                     } else if (node instanceof ComboBox<?>) {
                         switch (node.getId()) {
                             case "cmbPayeeType":
@@ -2036,7 +2042,6 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                 }
             }
         });
-
     }
     boolean pbSuccess = true;
 
@@ -2167,6 +2172,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
             }
         } catch (SQLException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -2253,7 +2259,6 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                     break;
             }
         }
-
     }
 
     private void clearTextFields() {

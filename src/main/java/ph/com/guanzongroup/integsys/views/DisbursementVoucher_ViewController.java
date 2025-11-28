@@ -61,7 +61,6 @@ import ph.com.guanzongroup.integsys.model.ModelBIR_Detail;
  * @author Team 1 & Team 2
  */
 public class DisbursementVoucher_ViewController implements Initializable, ScreenInterface {
-
     private GRiderCAS oApp;
     private JSONObject poJSON;
     private int pnDetail = 0;
@@ -189,6 +188,7 @@ public class DisbursementVoucher_ViewController implements Initializable, Screen
                 }
             } catch (SQLException | GuanzonException | CloneNotSupportedException | ScriptException ex) {
                 Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+                    ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
             }
         }
         initTableOnClick();
@@ -240,6 +240,7 @@ public class DisbursementVoucher_ViewController implements Initializable, Screen
             }
         } catch (SQLException | GuanzonException | CloneNotSupportedException | ScriptException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+                ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -335,10 +336,9 @@ public class DisbursementVoucher_ViewController implements Initializable, Screen
                                     if (!lsSourceNo.isEmpty() || poController.Detail(lnCtr).getSourceNo() == null) {
                                         try {
                                             poController.AddDetail();
-
-                                        } catch (CloneNotSupportedException ex) {
-                                            Logger.getLogger(getClass()
-                                                    .getName()).log(Level.SEVERE, null, ex);
+} catch (CloneNotSupportedException ex) {
+                                            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+                                                ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
                                         }
                                     }
                                 }
@@ -373,9 +373,9 @@ public class DisbursementVoucher_ViewController implements Initializable, Screen
                             }
 
                             loadRecordMaster();
-
-                        } catch (CloneNotSupportedException ex) {
+} catch (CloneNotSupportedException ex) {
                             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+                                ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
                         }
                     });
                 });
@@ -387,7 +387,6 @@ public class DisbursementVoucher_ViewController implements Initializable, Screen
                         BIR_data.clear();
                         int lnCtr;
                         try {
-
                             if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
                                 lnCtr = poController.getWTaxDeductionsCount() - 1;
                                 while (lnCtr >= 0) {
@@ -416,8 +415,7 @@ public class DisbursementVoucher_ViewController implements Initializable, Screen
                                         CustomCommonUtil.setIntegerValueToDecimalFormat(poController.WTaxDeduction(pnDetailBIR).getModel().WithholdingTax().getTaxRate(), false),
                                         CustomCommonUtil.setIntegerValueToDecimalFormat(poController.WTaxDeduction(pnDetailBIR).getModel().getTaxAmount(), false))
                                 );
-
-                            }
+}
                             if (pnDetailBIR < 0 || pnDetailBIR
                                     >= BIR_data.size()) {
                                 if (!BIR_data.isEmpty()) {
@@ -433,6 +431,7 @@ public class DisbursementVoucher_ViewController implements Initializable, Screen
                             }
                         } catch (SQLException | GuanzonException | CloneNotSupportedException ex) {
                             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+                                ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
                         }
                     });
                 });
@@ -548,6 +547,7 @@ public class DisbursementVoucher_ViewController implements Initializable, Screen
             JFXUtil.updateCaretPositions(apDVMaster1, apDVMaster2, apDVMaster3);
         } catch (GuanzonException | SQLException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+                ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -570,8 +570,7 @@ public class DisbursementVoucher_ViewController implements Initializable, Screen
         tfPurchasedAmountDetail.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(pnDetail).getAmountApplied(), true));
         tfNetAmountDetail.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.getDetailNetTotal(pnDetail), true));
         JFXUtil.updateCaretPositions(apDVDetail);
-
-    }
+}
 
     public void loadRecordDetailBIR() {
         try {
@@ -593,6 +592,7 @@ public class DisbursementVoucher_ViewController implements Initializable, Screen
             JFXUtil.updateCaretPositions(apBIRDetail);
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+                ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -627,6 +627,7 @@ public class DisbursementVoucher_ViewController implements Initializable, Screen
             JFXUtil.updateCaretPositions(apMasterDVCheck);
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+                ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -644,6 +645,7 @@ public class DisbursementVoucher_ViewController implements Initializable, Screen
             JFXUtil.updateCaretPositions(apMasterDVBTransfer);
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+                ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -663,6 +665,7 @@ public class DisbursementVoucher_ViewController implements Initializable, Screen
             JFXUtil.updateCaretPositions(apMasterDVOp);
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+                ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 

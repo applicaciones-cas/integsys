@@ -144,6 +144,7 @@ public class CheckAuthorizationController implements Initializable, ScreenInterf
             });
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -194,6 +195,7 @@ public class CheckAuthorizationController implements Initializable, ScreenInterf
             JFXUtil.updateCaretPositions(apBrowse);
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -229,7 +231,6 @@ public class CheckAuthorizationController implements Initializable, ScreenInterf
                 break;
         }
         initButtons();
-
     }
 
     private void initTextFields() {
@@ -263,7 +264,6 @@ public class CheckAuthorizationController implements Initializable, ScreenInterf
                         break;
                 }
                 loadRecordSearch();
-
             });
 
     private void txtField_KeyPressed(KeyEvent event) {
@@ -321,8 +321,8 @@ public class CheckAuthorizationController implements Initializable, ScreenInterf
                 }
             } catch (GuanzonException | SQLException ex) {
                 Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+                ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
             }
-
         }
     }
 
@@ -344,6 +344,7 @@ public class CheckAuthorizationController implements Initializable, ScreenInterf
             loadTableMain.reload();
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -408,7 +409,6 @@ public class CheckAuthorizationController implements Initializable, ScreenInterf
                                     /* FOCUS ON FIRST ROW */
                                     JFXUtil.selectAndFocusRow(tblViewMainList, 0);
                                     pnMain = tblViewMainList.getSelectionModel().getSelectedIndex();
-
                                 }
                             } else {
                                 /* FOCUS ON THE ROW THAT pnRowDetail POINTS TO */
@@ -417,6 +417,7 @@ public class CheckAuthorizationController implements Initializable, ScreenInterf
                             JFXUtil.loadTab(pagination, main_data.size(), ROWS_PER_PAGE, tblViewMainList, filteredMain_Data);
                         } catch (SQLException | GuanzonException ex) {
                             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+                            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
                         }
                         initButtons();
                     });
@@ -448,10 +449,10 @@ public class CheckAuthorizationController implements Initializable, ScreenInterf
                     }
                 } catch (SQLException ex) {
                     Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+                    ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
                 }
             }
         });
-
     }
 
     private void initButtons() {
@@ -520,10 +521,10 @@ public class CheckAuthorizationController implements Initializable, ScreenInterf
             Platform.runLater(() -> {
                 retrieveDisbursement();
                 loadTableMain.reload();
-
             });
         } catch (ParseException | SQLException | GuanzonException | CloneNotSupportedException | ScriptException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -540,6 +541,7 @@ public class CheckAuthorizationController implements Initializable, ScreenInterf
                     "Disbursement Dialog", true, true, false);
         } catch (IOException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 }

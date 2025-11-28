@@ -154,6 +154,7 @@ public class BIRPrintingController implements Initializable, ScreenInterface {
             });
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -204,6 +205,7 @@ public class BIRPrintingController implements Initializable, ScreenInterface {
             JFXUtil.updateCaretPositions(apBrowse);
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -232,7 +234,6 @@ public class BIRPrintingController implements Initializable, ScreenInterface {
                 break;
         }
         initButtons();
-
     }
 
     private void handleDisbursementAction(String action) {
@@ -306,7 +307,6 @@ public class BIRPrintingController implements Initializable, ScreenInterface {
     ChangeListener<Boolean> txtSearch_Focus = JFXUtil.FocusListener(TextField.class,
             (lsID, lsValue) -> {
                 switch (lsID) {
-
                     case "tfSearchIndustry":
                         if (lsValue.isEmpty()) {
                             poController.setSearchIndustry("");
@@ -364,8 +364,8 @@ public class BIRPrintingController implements Initializable, ScreenInterface {
                 }
             } catch (GuanzonException | SQLException ex) {
                 Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+                ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
             }
-
         }
     }
 
@@ -381,12 +381,12 @@ public class BIRPrintingController implements Initializable, ScreenInterface {
                     for (int lnCntr = 0; lnCntr < poController.getMasterList().size(); lnCntr++) {
                         checkedItem.add("0");
                     }
-
                 });
             }
             loadTableMain.reload();
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -429,6 +429,7 @@ public class BIRPrintingController implements Initializable, ScreenInterface {
                             JFXUtil.loadTab(pagination, main_data.size(), ROWS_PER_PAGE, tblViewMainList, filteredMain_Data);
                         } catch (SQLException | GuanzonException ex) {
                             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+                            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
                         }
                         initButtons();
                     });
@@ -460,10 +461,10 @@ public class BIRPrintingController implements Initializable, ScreenInterface {
                     }
                 } catch (SQLException ex) {
                     Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+                    ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
                 }
             }
         });
-
     }
 
     private void initButtons() {
@@ -485,6 +486,7 @@ public class BIRPrintingController implements Initializable, ScreenInterface {
                     "Disbursement Dialog", true, true, false);
         } catch (IOException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -505,10 +507,9 @@ public class BIRPrintingController implements Initializable, ScreenInterface {
                 loadTableMain.reload();
                 checkedItem.clear();
             });
-
         } catch (IOException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
-
 }

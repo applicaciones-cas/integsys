@@ -144,6 +144,7 @@ public class DisbursementVoucher_CertificationController implements Initializabl
             });
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -194,6 +195,7 @@ public class DisbursementVoucher_CertificationController implements Initializabl
             JFXUtil.updateCaretPositions(apBrowse);
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -229,7 +231,6 @@ public class DisbursementVoucher_CertificationController implements Initializabl
                 break;
         }
         initButtons();
-
     }
 
     private void initTextFields() {
@@ -319,8 +320,8 @@ public class DisbursementVoucher_CertificationController implements Initializabl
                 }
             } catch (GuanzonException | SQLException ex) {
                 Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+                ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
             }
-
         }
     }
 
@@ -336,12 +337,12 @@ public class DisbursementVoucher_CertificationController implements Initializabl
                     for (int lnCntr = 0; lnCntr < poDisbursementController.getMasterList().size(); lnCntr++) {
                         checkedItem.add("0");
                     }
-
                 });
             }
             loadTableMain.reload();
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -407,7 +408,6 @@ public class DisbursementVoucher_CertificationController implements Initializabl
                                     /* FOCUS ON FIRST ROW */
                                     JFXUtil.selectAndFocusRow(tblViewMainList, 0);
                                     pnMain = tblViewMainList.getSelectionModel().getSelectedIndex();
-
                                 }
                             } else {
                                 /* FOCUS ON THE ROW THAT pnRowDetail POINTS TO */
@@ -416,6 +416,7 @@ public class DisbursementVoucher_CertificationController implements Initializabl
                             JFXUtil.loadTab(pagination, main_data.size(), ROWS_PER_PAGE, tblViewMainList, filteredMain_Data);
                         } catch (SQLException | GuanzonException ex) {
                             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+                            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
                         }
                         initButtons();
                     });
@@ -447,10 +448,10 @@ public class DisbursementVoucher_CertificationController implements Initializabl
                     }
                 } catch (SQLException ex) {
                     Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+                    ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
                 }
             }
         });
-
     }
 
     private void initButtons() {
@@ -525,6 +526,7 @@ public class DisbursementVoucher_CertificationController implements Initializabl
             });
         } catch (ParseException | SQLException | GuanzonException | CloneNotSupportedException | ScriptException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -541,6 +543,7 @@ public class DisbursementVoucher_CertificationController implements Initializabl
                     "Disbursement Dialog", true, true, false);
         } catch (IOException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 }
