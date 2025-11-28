@@ -80,9 +80,9 @@ public class DisbursementVoucher_CertificationController implements Initializabl
     @FXML
     private AnchorPane AnchorMain, apBrowse, apButton;
     @FXML
-    private Label lblSource, tfSearchIndustry;
+    private Label lblSource;
     @FXML
-    private TextField tfSearchBankName, tfSearchBankAccount, tfSearchBankName1;
+    private TextField tfSearchBankName, tfSearchBankAccount, tfSearchIndustry;
     @FXML
     private Button btnCertify, btnReturn, btnDisapproved, btnRetrieve, btnClose;
     @FXML
@@ -93,6 +93,7 @@ public class DisbursementVoucher_CertificationController implements Initializabl
     private CheckBox chckSelectAll;
     @FXML
     private Pagination pagination;
+
 
     @Override
     public void setGRider(GRiderCAS foValue) {
