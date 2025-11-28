@@ -4,7 +4,7 @@
  */
 package ph.com.guanzongroup.integsys.views;
 
-import ph.com.guanzongroup.integsys.model.ModelCheckPrinting;
+import ph.com.guanzongroup.integsys.model.ModelBIRPrinting;
 import ph.com.guanzongroup.integsys.utility.CustomCommonUtil;
 import ph.com.guanzongroup.integsys.utility.JFXUtil;
 import java.io.IOException;
@@ -251,7 +251,7 @@ public class BIRPrintingController implements Initializable, ScreenInterface {
         boolean allSamePayee = true;
         checkedItems.clear();
         for (Object item : tblViewMainList.getItems()) {
-            ModelCheckPrinting item1 = (ModelCheckPrinting) item;
+            ModelBIRPrinting item1 = (ModelBIRPrinting) item;
             String lschecked = item1.getIndex02();
             String lsDVNO = item1.getIndex03();
             String payeetype = item1.getIndex07();
@@ -448,7 +448,7 @@ public class BIRPrintingController implements Initializable, ScreenInterface {
         tblViewMainList.setOnMouseClicked(event -> {
             if (tblViewMainList.getSelectionModel().getSelectedIndex() >= 0 && event.getClickCount() == 2) {
                 try {
-                    ModelCheckPrinting selected = (ModelCheckPrinting) tblViewMainList.getSelectionModel().getSelectedItem();
+                    ModelBIRPrinting selected = (ModelBIRPrinting) tblViewMainList.getSelectionModel().getSelectedItem();
                     if (selected != null) {
                         pnMain = tblViewMainList.getSelectionModel().getSelectedIndex();
                     }
