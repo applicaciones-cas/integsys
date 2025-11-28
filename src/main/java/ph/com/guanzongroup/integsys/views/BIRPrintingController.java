@@ -489,27 +489,4 @@ public class BIRPrintingController implements Initializable, ScreenInterface {
             ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
-
-    public void showAssignWindow(List<String> fsTransactionNos) throws SQLException {
-        poJSON = new JSONObject();
-        stageAssignment.closeDialog();
-
-        CheckAssignmentController controller = new CheckAssignmentController();
-        controller.setGRider(oApp);
-        controller.setCheckPrinting(poController);
-        controller.setTransaction(fsTransactionNos);
-        try {
-            stageAssignment.showDialog((Stage) AnchorMain.getScene().getWindow(), getClass().getResource("/ph/com/guanzongroup/integsys/views/CheckAssignment.fxml"), controller,
-                    "Check Assignment Dialog", true, true, false);
-            stageAssignment.setOnHidden(event -> {
-                chckSelectAll.setSelected(false);
-                retrieveDisbursement();
-                loadTableMain.reload();
-                checkedItem.clear();
-            });
-        } catch (IOException ex) {
-            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
-            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
-        }
-    }
 }

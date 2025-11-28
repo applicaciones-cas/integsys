@@ -180,7 +180,7 @@ public class DisbursementVoucher_ViewController implements Initializable, Screen
                     initTableOnClick();
                     initTabPane();
                     clearTextFields();
-                    pnEditMode = EditMode.UNKNOWN;
+                    pnEditMode = poController.getEditMode();
                     loadTableDetail.reload();
                     initButton(pnEditMode);
                 } else {
