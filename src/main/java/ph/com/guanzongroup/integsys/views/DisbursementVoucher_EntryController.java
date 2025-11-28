@@ -447,7 +447,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                         return;
                     }
                 case "btnHistory":
-                    ShowMessageFX.Warning(null, pxeModuleName, "Button History is Underdevelopment.");
+                    ShowMessageFX.Warning(null, pxeModuleName, "Button History is under development.");
                     break;
                 case "btnRetrieve":
                     loadTableMain.reload();

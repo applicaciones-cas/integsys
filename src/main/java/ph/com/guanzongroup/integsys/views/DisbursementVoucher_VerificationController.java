@@ -378,7 +378,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
                         return;
                     }
                 case "btnHistory":
-                    ShowMessageFX.Warning(null, pxeModuleName, "Button History is Underdevelopment.");
+                    ShowMessageFX.Warning(null, pxeModuleName, "Button History is under development.");
                     break;
                 case "btnRetrieve":
                     loadTableMain.reload();
