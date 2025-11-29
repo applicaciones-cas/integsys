@@ -399,20 +399,20 @@ public class DisbursementVoucher_HistoryController implements Initializable, Scr
                                     }
                                 }
                             }
-
-                             for (lnCtr = 0; lnCtr < poController.getDetailCount(); lnCtr++) {
-                                 details_data.add(
-                                         new ModelDisbursementVoucher_Detail(String.valueOf(lnCtr + 1),
-                                                 poController.Detail(lnCtr).getSourceNo(),
-                                                 poController.getSourceCodeDescription(poController.Detail(lnCtr).getSourceCode()),
-                                                 CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(lnCtr).getAmountApplied(), true),
-                                                 CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(lnCtr).getDetailVatSales(), true),
-                                                 String.valueOf(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(lnCtr).getDetailVatAmount(), true)),
-                                                 CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(lnCtr).getDetailVatRates(), false),
-                                                 CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(lnCtr).getDetailZeroVat(), true),
-                                                 CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(lnCtr).getDetailVatExempt(), true),
-                                                 CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(lnCtr).getAmount(), true)
-                                         ));
+                            int lnRowCount = 0;
+                            for (lnCtr = 0; lnCtr < poController.getDetailCount(); lnCtr++) {
+                                details_data.add(
+                                        new ModelDisbursementVoucher_Detail(String.valueOf(lnCtr + 1),
+                                                poController.Detail(lnCtr).getSourceNo(),
+                                                poController.getSourceCodeDescription(poController.Detail(lnCtr).getSourceCode()),
+                                                CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(lnCtr).getAmountApplied(), true),
+                                                CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(lnCtr).getDetailVatSales(), true),
+                                                String.valueOf(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(lnCtr).getDetailVatAmount(), true)),
+                                                CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(lnCtr).getDetailVatRates(), false),
+                                                CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(lnCtr).getDetailZeroVat(), true),
+                                                CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(lnCtr).getDetailVatExempt(), true),
+                                                CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(lnCtr).getAmount(), true)
+                                        ));
                             }
                             if (pnDetail < 0 || pnDetail
                                     >= details_data.size()) {
@@ -521,9 +521,11 @@ public class DisbursementVoucher_HistoryController implements Initializable, Scr
                                     poController.AddWTaxDeduction();
                                 }
                             }
+                            int lnRowCount = 0;
                             for (lnCtr = 0; lnCtr < poController.getWTaxDeductionsCount(); lnCtr++) {
                                 if (poController.WTaxDeduction(lnCtr).getModel().isReverse()) {
-                                    BIR_data.add(new ModelBIR_Detail(String.valueOf(lnCtr + 1),
+                                    lnRowCount += 1;
+                                    BIR_data.add(new ModelBIR_Detail(String.valueOf(lnRowCount),
                                             poController.WTaxDeduction(lnCtr).getModel().WithholdingTax().AccountChart().getDescription(),
                                             poController.WTaxDeduction(lnCtr).getModel().getTaxCode(),
                                             CustomCommonUtil.setIntegerValueToDecimalFormat(poController.WTaxDeduction(lnCtr).getModel().getBaseAmount(), false),

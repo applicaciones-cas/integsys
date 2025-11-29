@@ -827,10 +827,11 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                                     poController.WTaxDeduction(poController.getWTaxDeductionsCount() - 1).getModel().setPeriodTo(todate);
                                 }
                             }
-
+                            int lnRowCount = 0;
                             for (lnCtr = 0; lnCtr < poController.getWTaxDeductionsCount(); lnCtr++) {
                                 if (poController.WTaxDeduction(lnCtr).getModel().isReverse()) {
-                                    BIR_data.add(new ModelBIR_Detail(String.valueOf(lnCtr + 1),
+                                    lnRowCount += 1;
+                                    BIR_data.add(new ModelBIR_Detail(String.valueOf(lnRowCount),
                                             poController.WTaxDeduction(lnCtr).getModel().WithholdingTax().AccountChart().getDescription(),
                                             poController.WTaxDeduction(lnCtr).getModel().getTaxCode(),
                                             CustomCommonUtil.setIntegerValueToDecimalFormat(poController.WTaxDeduction(lnCtr).getModel().getBaseAmount(), false),

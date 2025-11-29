@@ -795,10 +795,11 @@ public class DisbursementVoucher_VerificationController implements Initializable
                                     poController.WTaxDeduction(poController.getWTaxDeductionsCount() - 1).getModel().setPeriodTo(todate);
                                 }
                             }
-
+                            int lnRowCount = 0;
                             for (lnCtr = 0; lnCtr < poController.getWTaxDeductionsCount(); lnCtr++) {
                                 if (poController.WTaxDeduction(lnCtr).getModel().isReverse()) {
-                                    BIR_data.add(new ModelBIR_Detail(String.valueOf(lnCtr + 1),
+                                    lnRowCount += 1;
+                                    BIR_data.add(new ModelBIR_Detail(String.valueOf(lnRowCount),
                                             poController.WTaxDeduction(lnCtr).getModel().WithholdingTax().AccountChart().getDescription(),
                                             poController.WTaxDeduction(lnCtr).getModel().getTaxCode(),
                                             CustomCommonUtil.setIntegerValueToDecimalFormat(poController.WTaxDeduction(lnCtr).getModel().getBaseAmount(), false),
@@ -1605,7 +1606,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
                             case "tfParticular":
                                 poJSON = poController.SearchParticular(lsValue, pnDetailBIR, false);
                                 if ("error".equals(poJSON.get("result"))) {
-                                    if(poJSON.get("row") == null){
+                                    if (poJSON.get("row") == null) {
                                         return;
                                     }
                                     int lnReturned = Integer.parseInt(String.valueOf(poJSON.get("row"))) + 1;
