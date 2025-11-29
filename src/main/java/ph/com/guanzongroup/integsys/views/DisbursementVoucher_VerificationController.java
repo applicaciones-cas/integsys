@@ -416,9 +416,9 @@ public class DisbursementVoucher_VerificationController implements Initializable
                     break;
                 case "btnVoid":
                     String lsTransaction = "";
-                    if (poController.Master().getTransactionStatus() == DisbursementStatic.OPEN) {
+                    if (DisbursementStatic.OPEN.equals(poController.Master().getTransactionStatus())) {
                         lsTransaction = "void";
-                    } else if (poController.Master().getTransactionStatus() == DisbursementStatic.VERIFIED) {
+                    } else if (DisbursementStatic.VERIFIED.equals(poController.Master().getTransactionStatus())) {
                         lsTransaction = "cancel";
                     } else {
                     }
@@ -426,9 +426,9 @@ public class DisbursementVoucher_VerificationController implements Initializable
                         pnEditMode = poController.getEditMode();
                         if (pnEditMode == EditMode.READY) {
                             if (!poController.existJournal().equals("")) {
-                                if (poController.Master().getTransactionStatus() == DisbursementStatic.OPEN) {
+                                if (DisbursementStatic.OPEN.equals(poController.Master().getTransactionStatus())) {
                                     poJSON = poController.VoidTransaction("");
-                                } else if (poController.Master().getTransactionStatus() == DisbursementStatic.VERIFIED) {
+                                } else if (DisbursementStatic.VERIFIED.equals(poController.Master().getTransactionStatus())) {
                                     poJSON = poController.CancelTransaction("");
                                 } else {
                                 }
@@ -1759,12 +1759,11 @@ public class DisbursementVoucher_VerificationController implements Initializable
                 ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                 return;
             }
-            if (poController.Master().getTransactionStatus() == DisbursementStatic.OPEN) {
+            if (DisbursementStatic.OPEN.equals(poController.Master().getTransactionStatus())) {
                 btnVoid.setText("Void");
-            } else if (poController.Master().getTransactionStatus() == DisbursementStatic.VERIFIED) {
+            } else if (DisbursementStatic.VERIFIED.equals(poController.Master().getTransactionStatus())) {
                 btnVoid.setText("Cancel");
             } else {
-                btnVoid.setText("Void");
             }
             JFXUtil.setStatusValue(lblDVTransactionStatus, DisbursementStatic.class, pnEditMode == EditMode.UNKNOWN ? "-1" : poController.Master().getTransactionStatus());
             JFXUtil.setDisabled(true, tfSupplier);
