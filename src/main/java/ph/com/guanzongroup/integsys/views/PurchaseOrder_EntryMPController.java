@@ -263,28 +263,7 @@ public class PurchaseOrder_EntryMPController implements Initializable, ScreenInt
     private void loadRecordMaster() {
         try {
             tfTransactionNo.setText(poPurchasingController.PurchaseOrder().Master().getTransactionNo());
-            String lsStatus = "";
-            switch (poPurchasingController.PurchaseOrder().Master().getTransactionStatus()) {
-                case PurchaseOrderStatus.OPEN:
-                    lsStatus = "OPEN";
-                    break;
-                case PurchaseOrderStatus.CONFIRMED:
-                    lsStatus = "CONFIRMED";
-                    break;
-                case PurchaseOrderStatus.APPROVED:
-                    lsStatus = "APPROVED";
-                    break;
-                case PurchaseOrderStatus.RETURNED:
-                    lsStatus = "RETURNED";
-                    break;
-                case PurchaseOrderStatus.CANCELLED:
-                    lsStatus = "CANCELLED";
-                    break;
-                case PurchaseOrderStatus.VOID:
-                    lsStatus = "VOID";
-                    break;
-            }
-            lblTransactionStatus.setText(lsStatus);
+            lblTransactionStatus.setText(poPurchasingController.PurchaseOrder().getStatusValue());
             dpTransactionDate.setValue(CustomCommonUtil.parseDateStringToLocalDate(SQLUtil.dateFormat(poPurchasingController.PurchaseOrder().Master().getTransactionDate(), SQLUtil.FORMAT_SHORT_DATE)));
             tfSupplier.setText(poPurchasingController.PurchaseOrder().Master().Supplier().getCompanyName() != null ? poPurchasingController.PurchaseOrder().Master().Supplier().getCompanyName() : "");
             tfDestination.setText(poPurchasingController.PurchaseOrder().Master().Branch().getBranchName() != null ? poPurchasingController.PurchaseOrder().Master().Branch().getBranchName() : "");
@@ -310,6 +289,9 @@ public class PurchaseOrder_EntryMPController implements Initializable, ScreenInt
             if (pnTblDetailRow < 0 || pnTblDetailRow > poPurchasingController.PurchaseOrder().getDetailCount() - 1) {
                 return;
             }
+            boolean lbShow = JFXUtil.isObjectEqualTo(pnEditMode, EditMode.UPDATE, EditMode.ADDNEW)
+                    && JFXUtil.isObjectEqualTo(poPurchasingController.PurchaseOrder().Detail(pnTblDetailRow).getSouceCode(), null, "");
+            JFXUtil.setDisabled(!lbShow, tfCost);
             if (pnTblDetailRow >= 0) {
                 tfBrand.setText(poPurchasingController.PurchaseOrder().Detail(pnTblDetailRow).Inventory().Brand().getDescription() != null ? poPurchasingController.PurchaseOrder().Detail(pnTblDetailRow).Inventory().Brand().getDescription() : "");
                 tfModel.setText(poPurchasingController.PurchaseOrder().Detail(pnTblDetailRow).Inventory().Model().getDescription() != null ? poPurchasingController.PurchaseOrder().Detail(pnTblDetailRow).Inventory().Model().getDescription() : "");
@@ -644,7 +626,7 @@ public class PurchaseOrder_EntryMPController implements Initializable, ScreenInt
                     ShowMessageFX.Information((String) poJSON.get("message"), psFormName, null);
                     poJSON = poPurchasingController.PurchaseOrder().OpenTransaction(poPurchasingController.PurchaseOrder().Master().getTransactionNo());
                     if ("success".equals(poJSON.get("result"))) {
-                        if (poPurchasingController.PurchaseOrder().Master().getTransactionStatus().equals(PurchaseOrderStatus.OPEN)) {
+                        if (poPurchasingController.PurchaseOrder().Master().getConvertedTransactionStatus().equals(PurchaseOrderStatus.OPEN)) {
                             if (ShowMessageFX.YesNo(null, psFormName, "Do you want to confirm this transaction?")) {
                                 poPurchasingController.PurchaseOrder().setWithUI(true);
                                 if ("success".equals((poJSON = poPurchasingController.PurchaseOrder().ConfirmTransaction("")).get("result"))) {
@@ -822,6 +804,14 @@ public class PurchaseOrder_EntryMPController implements Initializable, ScreenInt
                     ));
                     break;
                 case "tfOrderQuantity":
+                    break;
+                case "tfCost":
+                    lsValue = JFXUtil.removeComma(lsValue);
+                    poJSON = poPurchasingController.PurchaseOrder().Detail(pnTblDetailRow).setUnitPrice(Double.valueOf(lsValue));
+                    if (!"success".equals((String) poJSON.get("result"))) {
+                        ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
+                    }
+                    loadTableDetailAndSelectedRow();
                     break;
             }
         } else {
@@ -1011,6 +1001,7 @@ public class PurchaseOrder_EntryMPController implements Initializable, ScreenInt
                             case "tfAdvancePRate":
                             case "tfDiscountRate":
                             case "tfDiscountAmount":
+                            case "tfCost":
                                 CommonUtils.SetNextFocus((TextField) event.getSource());
                                 break;
                             case "tfOrderQuantity":
@@ -1209,7 +1200,12 @@ public class PurchaseOrder_EntryMPController implements Initializable, ScreenInt
             }
             double lnRequestQuantity = 0;
             try {
-                lnRequestQuantity = poPurchasingController.PurchaseOrder().Detail(pnTblDetailRow).InvStockRequestDetail().getApproved();
+                System.out.println("SOURCE CODE: " + poPurchasingController.PurchaseOrder().Detail(pnTblDetailRow).getSouceCode());
+                if (PurchaseOrderStatus.SourceCode.POQUOTATION.equals(poPurchasingController.PurchaseOrder().Detail(pnTblDetailRow).getSouceCode())) {
+                    lnRequestQuantity = poPurchasingController.PurchaseOrder().Detail(pnTblDetailRow).POQuotationDetail().getQuantity();
+                } else {
+                    lnRequestQuantity = poPurchasingController.PurchaseOrder().Detail(pnTblDetailRow).InvStockRequestDetail().getApproved();
+                }
                 if (!poPurchasingController.PurchaseOrder().Detail(pnTblDetailRow).getSouceNo().isEmpty()) {
                     if (Integer.parseInt(fsValue) > lnRequestQuantity) {
                         ShowMessageFX.Warning("Invalid order quantity entered. The item is from a stock request, and the order quantity must not be greater than the requested quantity.", psFormName, null);
@@ -1447,7 +1443,7 @@ public class PurchaseOrder_EntryMPController implements Initializable, ScreenInt
             btnPrint.setText("Print");
         }
         if (fnEditMode == EditMode.READY) {
-            switch (poPurchasingController.PurchaseOrder().Master().getTransactionStatus()) {
+            switch (poPurchasingController.PurchaseOrder().Master().getConvertedTransactionStatus()) {
                 case PurchaseOrderStatus.OPEN:
                 case PurchaseOrderStatus.CONFIRMED:
                 case PurchaseOrderStatus.RETURNED:

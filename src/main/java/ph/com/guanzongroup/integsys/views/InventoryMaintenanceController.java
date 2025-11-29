@@ -167,9 +167,6 @@ public class InventoryMaintenanceController implements Initializable, ScreenInte
                 System.err.println("Initialize value : Industry >" + psIndustryID);
                 System.err.println("Initialize value : Category >" + psCategoryID);
 
-                unloadForm appUnload = new unloadForm();
-                appUnload.unloadForm(apMainAnchor, poApp, psFormName);
-
             });
             initControlEvents();
         } catch (SQLException | GuanzonException e) {
@@ -764,6 +761,12 @@ public class InventoryMaintenanceController implements Initializable, ScreenInte
             return loJSON;
         }
 
+        if (poAppController.getModel().getEditMode() == EditMode.ADDNEW) {
+            loJSON.put("result", "error");
+            loJSON.put("message", "Inventory is not yet saved.");
+            return loJSON;
+        }
+
         StackPane overlay = getOverlayProgress(apMainAnchor);
         ProgressIndicator pi = (ProgressIndicator) overlay.getChildren().get(0);
         overlay.setVisible(true);
@@ -785,6 +788,9 @@ public class InventoryMaintenanceController implements Initializable, ScreenInte
             @Override
             protected void succeeded() {
 
+                if (poAppController.getLedgerList().size() <= 0) {
+                    return;
+                }
                 InventoryLedgerController inventoryLedger = new InventoryLedgerController();
                 inventoryLedger.setInventoryMaster(poAppController);
                 inventoryLedger.setGRider(poApp);
@@ -870,6 +876,12 @@ public class InventoryMaintenanceController implements Initializable, ScreenInte
             return loJSON;
         }
 
+        if (poAppController.getModel().getEditMode() == EditMode.ADDNEW) {
+            loJSON.put("result", "error");
+            loJSON.put("message", "Inventory is not yet saved.");
+            return loJSON;
+        }
+
         StackPane overlay = getOverlayProgress(apMainAnchor);
         ProgressIndicator pi = (ProgressIndicator) overlay.getChildren().get(0);
         overlay.setVisible(true);
@@ -890,7 +902,9 @@ public class InventoryMaintenanceController implements Initializable, ScreenInte
 
             @Override
             protected void succeeded() {
-
+                if (poAppController.getSerialList().size() <= 0) {
+                    return;
+                }
                 InventorySerialController inventorySerial = new InventorySerialController();
                 inventorySerial.setInventoryMaster(poAppController);
                 inventorySerial.setGRider(poApp);

@@ -167,9 +167,6 @@ public class InventoryParamController implements Initializable, ScreenInterface 
                 System.err.println("Initialize value : Industry >" + psIndustryID);
                 System.err.println("Initialize value : Category >" + psCategoryID);
 
-                unloadForm appUnload = new unloadForm();
-                appUnload.unloadForm(apMainAnchor, poApp, psFormName);
-
                 //hide temporary
                 apDetail.setVisible(false);
                 btnNew.fire();

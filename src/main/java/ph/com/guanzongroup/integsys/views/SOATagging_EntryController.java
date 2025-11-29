@@ -135,7 +135,7 @@ public class SOATagging_EntryController implements Initializable, ScreenInterfac
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        psIndustryId = ""; // general
+//        psIndustryId = ""; // general
 
         poSOATaggingController = new CashflowControllers(oApp, null);
         poJSON = new JSONObject();
@@ -1368,7 +1368,7 @@ public class SOATagging_EntryController implements Initializable, ScreenInterfac
 
     public void clearTextFields() {
         JFXUtil.setValueToNull(previousSearchedTextField, lastFocusedTextField, dpTransactionDate);
-        JFXUtil.clearTextFields(apMaster, apDetail, apBrowse);
+        JFXUtil.clearTextFields(apMaster, apDetail);
     }
 
 }

@@ -143,7 +143,7 @@ public class PurchaseOrderReturn_EntryController implements Initializable, Scree
         initButton(pnEditMode);
 
         Platform.runLater(() -> {
-            psIndustryId = "";
+//            psIndustryId = "";
             poPurchaseReturnController.PurchaseOrderReturn().Master().setIndustryId(psIndustryId);
             poPurchaseReturnController.PurchaseOrderReturn().Master().setCompanyId(psCompanyId);
             poPurchaseReturnController.PurchaseOrderReturn().setIndustryId(psIndustryId);
