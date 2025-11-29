@@ -1299,6 +1299,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
                             }
                             poJSON = poController.computeTaxAmount();
                             if ("error".equals((String) poJSON.get("result"))) {
+                                poController.WTaxDeduction(pnDetailBIR).getModel().setBaseAmount(0.0);
                                 ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                 break;
                             }

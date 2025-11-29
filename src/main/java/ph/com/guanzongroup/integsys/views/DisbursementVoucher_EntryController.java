@@ -1323,6 +1323,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                             }
                             poJSON = poController.computeTaxAmount();
                             if ("error".equals((String) poJSON.get("result"))) {
+                                poController.WTaxDeduction(pnDetailBIR).getModel().setBaseAmount(0.0);
                                 ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                 break;
                             }

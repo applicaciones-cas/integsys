@@ -345,11 +345,6 @@ public class CheckPrintingController implements Initializable, ScreenInterface {
                 case "print dv":
                     if (!checkedItems.isEmpty()) {
                         poJSON = poController.printTransaction(checkedItems);
-                        if (!"success".equals((String) poJSON.get("result"))) {
-                            ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-                        } else {
-                            ShowMessageFX.Information(null, pxeModuleName, (String) poJSON.get("message"));
-                        }
                         chckSelectAll.setSelected(false);
                         checkedItem.clear();
                     }
