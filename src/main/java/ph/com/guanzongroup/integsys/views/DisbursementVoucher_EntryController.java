@@ -1316,6 +1316,28 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
 //                }
             });
 
+//    private void baseAmountError() {
+//        if ("error".equals(poJSON.get("result"))) {
+//            pbEnteredBIR = false;
+//            int lnReturned = Integer.parseInt(String.valueOf(poJSON.get("row"))) + 1;
+//            JFXUtil.runWithDelay(0.70, () -> {
+//                int lnTempRow = JFXUtil.getDetailTempRow(BIR_data, lnReturned, 7);
+//                pnDetailBIR = lnTempRow;
+//                poController.WTaxDeduction(pnDetailBIR).getModel().setBaseAmount(0.0);
+//                loadTableDetailBIR.reload();
+//            });
+//            ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+//            throw new JFXUtil.BreakLoopException();
+//        } else {
+//            int lnReturned = Integer.parseInt(String.valueOf(poJSON.get("row")));
+//            JFXUtil.runWithDelay(0.80, () -> {
+////          int lnTempRow = JFXUtil.getDetailTempRow(BIR_data, lnReturned, 7); // comment intentional
+//                pnDetailBIR = lnReturned;
+//                loadTableDetailBIR.reload();
+//            });
+//            loadTableDetail.reload();
+//        }
+//    }
     ChangeListener<Boolean> txtBIRDetail_Focus = JFXUtil.FocusListener(TextField.class,
             (lsID, lsValue) -> {
                 try {
@@ -1328,6 +1350,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                                 ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                 break;
                             }
+
                             poJSON = poController.computeTaxAmount();
                             if ("error".equals((String) poJSON.get("result"))) {
                                 poController.WTaxDeduction(pnDetailBIR).getModel().setBaseAmount(0.0);
