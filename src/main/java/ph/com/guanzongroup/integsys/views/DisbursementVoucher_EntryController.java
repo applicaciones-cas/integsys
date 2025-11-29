@@ -1607,7 +1607,6 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                             case "tfTaxCode":
                                 poJSON = poController.SearchTaxCode(lsValue, pnDetailBIR, false);
                                 if ("error".equals(poJSON.get("result"))) {
-                                    txtField.setText("");
                                     int lnReturned = Integer.parseInt(String.valueOf(poJSON.get("row"))) + 1;
                                     JFXUtil.runWithDelay(0.70, () -> {
                                         int lnTempRow = JFXUtil.getDetailTempRow(BIR_data, lnReturned, 7);
@@ -1618,19 +1617,18 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                                     break;
                                 } else {
                                     int lnReturned = Integer.parseInt(String.valueOf(poJSON.get("row")));
-                                    JFXUtil.runWithDelay(0.80, () -> {
 //                                    int lnTempRow = JFXUtil.getDetailTempRow(BIR_data, lnReturned, 7); // comment intentional
-                                        pnDetailBIR = lnReturned;
-                                        loadTableDetailBIR.reload();
-                                    });
-                                    loadTableDetail.reload();
+                                    pnDetailBIR = lnReturned;
+                                    loadTableDetailBIR.reload();
                                     JFXUtil.textFieldMoveNext(tfParticular);
                                 }
                                 break;
                             case "tfParticular":
                                 poJSON = poController.SearchParticular(lsValue, pnDetailBIR, false);
                                 if ("error".equals(poJSON.get("result"))) {
-                                    txtField.setText("");
+                                    if(poJSON.get("row") == null){
+                                        return;
+                                    }
                                     int lnReturned = Integer.parseInt(String.valueOf(poJSON.get("row"))) + 1;
                                     JFXUtil.runWithDelay(0.70, () -> {
                                         int lnTempRow = JFXUtil.getDetailTempRow(BIR_data, lnReturned, 7);
@@ -1641,12 +1639,9 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                                     break;
                                 } else {
                                     int lnReturned = Integer.parseInt(String.valueOf(poJSON.get("row")));
-                                    JFXUtil.runWithDelay(0.80, () -> {
 //                                    int lnTempRow = JFXUtil.getDetailTempRow(BIR_data, lnReturned, 7); // comment intentional
-                                        pnDetailBIR = lnReturned;
-                                        loadTableDetailBIR.reload();
-                                    });
-                                    loadTableDetail.reload();
+                                    pnDetailBIR = lnReturned;
+                                    loadTableDetailBIR.reload();
                                     JFXUtil.textFieldMoveNext(tfBaseAmount);
                                 }
                                 break;
