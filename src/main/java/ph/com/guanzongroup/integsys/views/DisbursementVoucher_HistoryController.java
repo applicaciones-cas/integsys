@@ -400,18 +400,18 @@ public class DisbursementVoucher_HistoryController implements Initializable, Scr
                                 }
                             }
 
-                            for (lnCtr = 0; lnCtr < poController.getDetailCount(); lnCtr++) {
+                             for (lnCtr = 0; lnCtr < poController.getDetailCount(); lnCtr++) {
                                 details_data.add(
                                         new ModelDisbursementVoucher_Detail(String.valueOf(lnCtr + 1),
                                                 poController.Detail(lnCtr).getSourceNo(),
-                                                JFXUtil.getSourceType(poController.Detail(lnCtr).getSourceCode(), true),
+                                                poController.particular(poController.Detail(lnCtr).getSourceCode()),
                                                 CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(lnCtr).getAmountApplied(), true),
                                                 CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(lnCtr).getDetailVatSales(), true),
                                                 String.valueOf(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(lnCtr).getDetailVatAmount(), true)),
                                                 CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(lnCtr).getDetailVatRates(), false),
                                                 CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(lnCtr).getDetailZeroVat(), true),
                                                 CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(lnCtr).getDetailVatExempt(), true),
-                                                CustomCommonUtil.setIntegerValueToDecimalFormat(poController.getDetailNetTotal(lnCtr), true)
+                                                CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(lnCtr).getAmount(), true)
                                         ));
                             }
                             if (pnDetail < 0 || pnDetail
