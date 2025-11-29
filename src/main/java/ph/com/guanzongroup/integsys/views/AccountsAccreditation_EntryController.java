@@ -237,6 +237,7 @@ public class AccountsAccreditation_EntryController implements Initializable, Scr
                                 }
                             }
                         }
+                        ShowMessageFX.Information("Transaction saved successfully", null, psFormName);
 
                         getLoadedClient();
                         initButtonDisplay(poAppController.getEditMode());
@@ -441,6 +442,9 @@ public class AccountsAccreditation_EntryController implements Initializable, Scr
             
             tfTransactionNo.setText(poAppController.getModel().getTransactionNo());
             dpTransactionDate.setValue(ParseDate(poAppController.getModel().getDateTransact()));
+            
+            System.out.print(poAppController.getModel().Category().getDescription());
+            
             tfCategory.setText(poAppController.getModel().Category().getDescription());
             tfCompany.setText(poAppController.getModel().Client().getCompanyName());
             tfContactPerson.setText(poAppController.getModel().ClientInstitutionContact().getContactPersonName());
