@@ -687,14 +687,14 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                                 details_data.add(
                                         new ModelDisbursementVoucher_Detail(String.valueOf(lnCtr + 1),
                                                 poController.Detail(lnCtr).getSourceNo(),
-                                                JFXUtil.getSourceType(poController.Detail(lnCtr).getSourceCode(), true),
+                                                poController.particular(poController.Detail(lnCtr).getSourceCode()),
                                                 CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(lnCtr).getAmountApplied(), true),
                                                 CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(lnCtr).getDetailVatSales(), true),
                                                 String.valueOf(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(lnCtr).getDetailVatAmount(), true)),
                                                 CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(lnCtr).getDetailVatRates(), false),
                                                 CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(lnCtr).getDetailZeroVat(), true),
                                                 CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(lnCtr).getDetailVatExempt(), true),
-                                                CustomCommonUtil.setIntegerValueToDecimalFormat(poController.getDetailNetTotal(lnCtr), true)
+                                                CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(lnCtr).getAmount(), true)
                                         ));
                             }
                             JFXUtil.showRetainedHighlight(false, tblViewMainList, "#A7C7E7", plOrderNoPartial, plOrderNoFinal, highlightedRowsMain, true);
@@ -829,25 +829,32 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                             }
 
                             for (lnCtr = 0; lnCtr < poController.getWTaxDeductionsCount(); lnCtr++) {
-                                BIR_data.add(new ModelBIR_Detail(String.valueOf(lnCtr + 1),
-                                        poController.WTaxDeduction(lnCtr).getModel().WithholdingTax().AccountChart().getDescription(),
-                                        poController.WTaxDeduction(lnCtr).getModel().getTaxCode(),
-                                        CustomCommonUtil.setIntegerValueToDecimalFormat(poController.WTaxDeduction(lnCtr).getModel().getBaseAmount(), false),
-                                        CustomCommonUtil.setIntegerValueToDecimalFormat(poController.WTaxDeduction(lnCtr).getModel().WithholdingTax().getTaxRate(), false),
-                                        CustomCommonUtil.setIntegerValueToDecimalFormat(poController.WTaxDeduction(lnCtr).getModel().getTaxAmount(), false))
-                                );
+                                if (poController.WTaxDeduction(lnCtr).getModel().isReverse()) {
+                                    BIR_data.add(new ModelBIR_Detail(String.valueOf(lnCtr + 1),
+                                            poController.WTaxDeduction(lnCtr).getModel().WithholdingTax().AccountChart().getDescription(),
+                                            poController.WTaxDeduction(lnCtr).getModel().getTaxCode(),
+                                            CustomCommonUtil.setIntegerValueToDecimalFormat(poController.WTaxDeduction(lnCtr).getModel().getBaseAmount(), false),
+                                            CustomCommonUtil.setIntegerValueToDecimalFormat(poController.WTaxDeduction(lnCtr).getModel().WithholdingTax().getTaxRate(), false),
+                                            CustomCommonUtil.setIntegerValueToDecimalFormat(poController.WTaxDeduction(lnCtr).getModel().getTaxAmount(), false),
+                                            String.valueOf(lnCtr))
+                                    );
+                                }
                             }
-                            if (pnDetailBIR < 0 || pnDetailBIR
+                            int lnTempRow = JFXUtil.getDetailRow(BIR_data, pnDetailBIR, 7); //this method is used only when Reverse is applied
+                            if (lnTempRow < 0 || lnTempRow
                                     >= BIR_data.size()) {
                                 if (!BIR_data.isEmpty()) {
                                     /* FOCUS ON FIRST ROW */
                                     JFXUtil.selectAndFocusRow(tblVwBIRDetails, 0);
-                                    pnDetailBIR = tblVwBIRDetails.getSelectionModel().getSelectedIndex();
+                                    int lnRow = Integer.parseInt(BIR_data.get(0).getIndex07());
+                                    pnDetailBIR = lnRow;
                                     loadRecordDetailBIR();
                                 }
                             } else {
                                 /* FOCUS ON THE ROW THAT pnRowDetail POINTS TO */
-                                JFXUtil.selectAndFocusRow(tblVwBIRDetails, pnDetailBIR);
+                                JFXUtil.selectAndFocusRow(tblVwBIRDetails, lnTempRow);
+                                int lnRow = Integer.parseInt(BIR_data.get(tblVwBIRDetails.getSelectionModel().getSelectedIndex()).getIndex07());
+                                pnDetailBIR = lnRow;
                                 loadRecordDetailBIR();
                             }
                         } catch (SQLException | GuanzonException | CloneNotSupportedException ex) {
@@ -1577,20 +1584,48 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                             case "tfTaxCode":
                                 poJSON = poController.SearchTaxCode(lsValue, pnDetailBIR, false);
                                 if ("error".equals(poJSON.get("result"))) {
+                                    txtField.setText("");
+                                    int lnReturned = Integer.parseInt(String.valueOf(poJSON.get("row"))) + 1;
+                                    JFXUtil.runWithDelay(0.70, () -> {
+                                        int lnTempRow = JFXUtil.getDetailTempRow(BIR_data, lnReturned, 7);
+                                        pnDetailBIR = lnTempRow;
+                                        loadTableDetailBIR.reload();
+                                    });
                                     ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                                    break;
                                 } else {
+                                    int lnReturned = Integer.parseInt(String.valueOf(poJSON.get("row")));
+                                    JFXUtil.runWithDelay(0.80, () -> {
+//                                    int lnTempRow = JFXUtil.getDetailTempRow(BIR_data, lnReturned, 7); // comment intentional
+                                        pnDetailBIR = lnReturned;
+                                        loadTableDetailBIR.reload();
+                                    });
+                                    loadTableDetail.reload();
                                     JFXUtil.textFieldMoveNext(tfParticular);
                                 }
-                                loadTableDetailBIR.reload();
                                 break;
                             case "tfParticular":
                                 poJSON = poController.SearchParticular(lsValue, pnDetailBIR, false);
                                 if ("error".equals(poJSON.get("result"))) {
+                                    txtField.setText("");
+                                    int lnReturned = Integer.parseInt(String.valueOf(poJSON.get("row"))) + 1;
+                                    JFXUtil.runWithDelay(0.70, () -> {
+                                        int lnTempRow = JFXUtil.getDetailTempRow(BIR_data, lnReturned, 7);
+                                        pnDetailBIR = lnTempRow;
+                                        loadTableDetailBIR.reload();
+                                    });
                                     ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                                    break;
                                 } else {
+                                    int lnReturned = Integer.parseInt(String.valueOf(poJSON.get("row")));
+                                    JFXUtil.runWithDelay(0.80, () -> {
+//                                    int lnTempRow = JFXUtil.getDetailTempRow(BIR_data, lnReturned, 7); // comment intentional
+                                        pnDetailBIR = lnReturned;
+                                        loadTableDetailBIR.reload();
+                                    });
+                                    loadTableDetail.reload();
                                     JFXUtil.textFieldMoveNext(tfBaseAmount);
                                 }
-                                loadTableDetailBIR.reload();
                                 break;
                         }
                         event.consume();
@@ -1780,7 +1815,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
         tfVatRateDetail.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(pnDetail).getDetailVatRates(), false));
         tfVatAmountDetail.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(pnDetail).getDetailVatAmount(), true));
         tfPurchasedAmountDetail.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(pnDetail).getAmountApplied(), true));
-        tfNetAmountDetail.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.getDetailNetTotal(pnDetail), true));
+        tfNetAmountDetail.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(pnDetail).getAmount(), true));
         JFXUtil.updateCaretPositions(apDVDetail);
     }
 

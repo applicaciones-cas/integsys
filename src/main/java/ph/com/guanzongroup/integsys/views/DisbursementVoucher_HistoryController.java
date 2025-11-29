@@ -522,25 +522,32 @@ public class DisbursementVoucher_HistoryController implements Initializable, Scr
                                 }
                             }
                             for (lnCtr = 0; lnCtr < poController.getWTaxDeductionsCount(); lnCtr++) {
-                                BIR_data.add(new ModelBIR_Detail(String.valueOf(lnCtr + 1),
-                                        poController.WTaxDeduction(lnCtr).getModel().WithholdingTax().AccountChart().getDescription(),
-                                        poController.WTaxDeduction(lnCtr).getModel().getTaxCode(),
-                                        CustomCommonUtil.setIntegerValueToDecimalFormat(poController.WTaxDeduction(lnCtr).getModel().getBaseAmount(), false),
-                                        CustomCommonUtil.setIntegerValueToDecimalFormat(poController.WTaxDeduction(lnCtr).getModel().WithholdingTax().getTaxRate(), false),
-                                        CustomCommonUtil.setIntegerValueToDecimalFormat(poController.WTaxDeduction(lnCtr).getModel().getTaxAmount(), false))
-                                );
+                                if (poController.WTaxDeduction(lnCtr).getModel().isReverse()) {
+                                    BIR_data.add(new ModelBIR_Detail(String.valueOf(lnCtr + 1),
+                                            poController.WTaxDeduction(lnCtr).getModel().WithholdingTax().AccountChart().getDescription(),
+                                            poController.WTaxDeduction(lnCtr).getModel().getTaxCode(),
+                                            CustomCommonUtil.setIntegerValueToDecimalFormat(poController.WTaxDeduction(lnCtr).getModel().getBaseAmount(), false),
+                                            CustomCommonUtil.setIntegerValueToDecimalFormat(poController.WTaxDeduction(lnCtr).getModel().WithholdingTax().getTaxRate(), false),
+                                            CustomCommonUtil.setIntegerValueToDecimalFormat(poController.WTaxDeduction(lnCtr).getModel().getTaxAmount(), false),
+                                            String.valueOf(lnCtr))
+                                    );
+                                }
                             }
-                            if (pnDetailBIR < 0 || pnDetailBIR
+                            int lnTempRow = JFXUtil.getDetailRow(BIR_data, pnDetailBIR, 7); //this method is used only when Reverse is applied
+                            if (lnTempRow < 0 || lnTempRow
                                     >= BIR_data.size()) {
                                 if (!BIR_data.isEmpty()) {
                                     /* FOCUS ON FIRST ROW */
                                     JFXUtil.selectAndFocusRow(tblVwBIRDetails, 0);
-                                    pnDetailBIR = tblVwBIRDetails.getSelectionModel().getSelectedIndex();
+                                    int lnRow = Integer.parseInt(BIR_data.get(0).getIndex07());
+                                    pnDetailBIR = lnRow;
                                     loadRecordDetailBIR();
                                 }
                             } else {
                                 /* FOCUS ON THE ROW THAT pnRowDetail POINTS TO */
-                                JFXUtil.selectAndFocusRow(tblVwBIRDetails, pnDetailBIR);
+                                JFXUtil.selectAndFocusRow(tblVwBIRDetails, lnTempRow);
+                                int lnRow = Integer.parseInt(BIR_data.get(tblVwBIRDetails.getSelectionModel().getSelectedIndex()).getIndex07());
+                                pnDetailBIR = lnRow;
                                 loadRecordDetailBIR();
                             }
                         } catch (SQLException | GuanzonException | CloneNotSupportedException ex) {
