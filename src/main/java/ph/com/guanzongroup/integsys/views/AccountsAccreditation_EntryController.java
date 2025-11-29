@@ -235,9 +235,9 @@ public class AccountsAccreditation_EntryController implements Initializable, Scr
                                 if (!isJSONSuccess(poAppController.CloseTransaction(), "Initialize Close Transaction")) {
                                     return;
                                 }
+                                ShowMessageFX.Information("Transaction confirmed successfully", null, psFormName);
                             }
                         }
-                        ShowMessageFX.Information("Transaction saved successfully", null, psFormName);
 
                         getLoadedClient();
                         initButtonDisplay(poAppController.getEditMode());
