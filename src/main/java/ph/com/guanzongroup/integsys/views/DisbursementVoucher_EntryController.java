@@ -687,7 +687,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                                 details_data.add(
                                         new ModelDisbursementVoucher_Detail(String.valueOf(lnCtr + 1),
                                                 poController.Detail(lnCtr).getSourceNo(),
-                                                poController.particular(poController.Detail(lnCtr).getSourceCode()),
+                                                poController.getSourceCodeDescription(poController.Detail(lnCtr).getSourceCode()),
                                                 CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(lnCtr).getAmountApplied(), true),
                                                 CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(lnCtr).getDetailVatSales(), true),
                                                 String.valueOf(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(lnCtr).getDetailVatAmount(), true)),
@@ -1626,7 +1626,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                             case "tfParticular":
                                 poJSON = poController.SearchParticular(lsValue, pnDetailBIR, false);
                                 if ("error".equals(poJSON.get("result"))) {
-                                    if(poJSON.get("row") == null){
+                                    if (poJSON.get("row") == null) {
                                         return;
                                     }
                                     int lnReturned = Integer.parseInt(String.valueOf(poJSON.get("row"))) + 1;

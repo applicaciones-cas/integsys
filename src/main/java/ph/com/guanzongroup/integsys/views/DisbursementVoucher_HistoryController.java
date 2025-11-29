@@ -401,18 +401,18 @@ public class DisbursementVoucher_HistoryController implements Initializable, Scr
                             }
 
                              for (lnCtr = 0; lnCtr < poController.getDetailCount(); lnCtr++) {
-                                details_data.add(
-                                        new ModelDisbursementVoucher_Detail(String.valueOf(lnCtr + 1),
-                                                poController.Detail(lnCtr).getSourceNo(),
-                                                poController.particular(poController.Detail(lnCtr).getSourceCode()),
-                                                CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(lnCtr).getAmountApplied(), true),
-                                                CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(lnCtr).getDetailVatSales(), true),
-                                                String.valueOf(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(lnCtr).getDetailVatAmount(), true)),
-                                                CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(lnCtr).getDetailVatRates(), false),
-                                                CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(lnCtr).getDetailZeroVat(), true),
-                                                CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(lnCtr).getDetailVatExempt(), true),
-                                                CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(lnCtr).getAmount(), true)
-                                        ));
+                                 details_data.add(
+                                         new ModelDisbursementVoucher_Detail(String.valueOf(lnCtr + 1),
+                                                 poController.Detail(lnCtr).getSourceNo(),
+                                                 poController.getSourceCodeDescription(poController.Detail(lnCtr).getSourceCode()),
+                                                 CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(lnCtr).getAmountApplied(), true),
+                                                 CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(lnCtr).getDetailVatSales(), true),
+                                                 String.valueOf(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(lnCtr).getDetailVatAmount(), true)),
+                                                 CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(lnCtr).getDetailVatRates(), false),
+                                                 CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(lnCtr).getDetailZeroVat(), true),
+                                                 CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(lnCtr).getDetailVatExempt(), true),
+                                                 CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(lnCtr).getAmount(), true)
+                                         ));
                             }
                             if (pnDetail < 0 || pnDetail
                                     >= details_data.size()) {

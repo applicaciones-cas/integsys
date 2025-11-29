@@ -663,7 +663,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
                                 details_data.add(
                                         new ModelDisbursementVoucher_Detail(String.valueOf(lnCtr + 1),
                                                 poController.Detail(lnCtr).getSourceNo(),
-                                                poController.particular(poController.Detail(lnCtr).getSourceCode()),
+                                                poController.getSourceCodeDescription(poController.Detail(lnCtr).getSourceCode()),
                                                 CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(lnCtr).getAmountApplied(), true),
                                                 CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(lnCtr).getDetailVatSales(), true),
                                                 String.valueOf(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(lnCtr).getDetailVatAmount(), true)),
