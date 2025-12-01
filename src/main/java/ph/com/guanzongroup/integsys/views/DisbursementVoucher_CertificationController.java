@@ -94,7 +94,6 @@ public class DisbursementVoucher_CertificationController implements Initializabl
     @FXML
     private Pagination pagination;
 
-
     @Override
     public void setGRider(GRiderCAS foValue) {
         oApp = foValue;
@@ -390,7 +389,7 @@ public class DisbursementVoucher_CertificationController implements Initializabl
                                     main_data.add(new ModelDisbursementVoucher_Main(
                                             String.valueOf(lnCntr + 1),
                                             checkedItem.get(lnCntr),// 0 as unchecked, 1 as checked
-                                            poDisbursementController.getMaster(lnCntr).getTransactionNo(),
+                                            poDisbursementController.getMaster(lnCntr).getVoucherNo(),
                                             CustomCommonUtil.formatDateToShortString(poDisbursementController.getMaster(lnCntr).getTransactionDate()),
                                             poDisbursementController.getMaster(lnCntr).Payee().getPayeeName(),
                                             poDisbursementController.getMaster(lnCntr).Payee().getPayeeName(),

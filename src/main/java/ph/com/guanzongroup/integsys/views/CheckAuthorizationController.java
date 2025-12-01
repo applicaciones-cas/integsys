@@ -331,7 +331,7 @@ public class CheckAuthorizationController implements Initializable, ScreenInterf
             poJSON = poDisbursementController.loadTransactionList(tfSearchIndustry.getText(), tfSearchBankName.getText(), tfSearchBankAccount.getText(), "", true);
 
             if ("error".equals(poJSON.get("result"))) {
-                ShowMessageFX.Error(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
+//                ShowMessageFX.Error(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
             } else {
                 Platform.runLater(() -> {
                     chckSelectAll.setSelected(false);
@@ -391,7 +391,7 @@ public class CheckAuthorizationController implements Initializable, ScreenInterf
                                     main_data.add(new ModelDisbursementVoucher_Main(
                                             String.valueOf(lnCntr + 1),
                                             checkedItem.get(lnCntr),// 0 as unchecked, 1 as checked
-                                            poDisbursementController.getMaster(lnCntr).getTransactionNo(),
+                                            poDisbursementController.getMaster(lnCntr).getVoucherNo(),
                                             CustomCommonUtil.formatDateToShortString(poDisbursementController.getMaster(lnCntr).getTransactionDate()),
                                             poDisbursementController.getMaster(lnCntr).Payee().getPayeeName(),
                                             poDisbursementController.getMaster(lnCntr).Payee().getPayeeName(),
