@@ -303,10 +303,14 @@ public class POQuotation_EntryController implements Initializable, ScreenInterfa
                     break;
                 case "cbReverse":
                     if (poController.POQuotation().Detail(pnDetail).getEditMode() == EditMode.ADDNEW) {
-                        if (!checkedBox.isSelected()) {
-                            poController.POQuotation().ReverseItem(pnDetail);
+                        if (null != poController.POQuotation().Master().getSourceNo() && !"".equals(poController.POQuotation().Master().getSourceNo())) {
+                            if (!checkedBox.isSelected()) {
+                                poController.POQuotation().ReverseItem(pnDetail);
+                            } else {
+                                poController.POQuotation().Detail(pnDetail).isReverse(checkedBox.isSelected());
+                            }
                         } else {
-                            poController.POQuotation().Detail(pnDetail).isReverse(checkedBox.isSelected());
+                            poController.POQuotation().ReverseItem(pnDetail);
                         }
                     } else {
                         poController.POQuotation().Detail(pnDetail).isReverse(checkedBox.isSelected());
