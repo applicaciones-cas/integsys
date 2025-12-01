@@ -376,7 +376,7 @@ public class CheckPrintingController implements Initializable, ScreenInterface {
                 switch (lsID) {
                     case "tfSearchIndustry":
                         if (lsValue.isEmpty()) {
-                            poController.setIndustryID("");
+                            poController.setSearchIndustry("");
                         }
                         break;
                     case "tfSearchBankName":

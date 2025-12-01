@@ -244,7 +244,7 @@ public class CheckAuthorizationController implements Initializable, ScreenInterf
                 switch (lsID) {
                     case "tfSearchIndustry":
                         if (lsValue.isEmpty()) {
-                            poDisbursementController.setIndustryID("");
+                            poDisbursementController.setSearchIndustry("");
                         }
                         break;
 

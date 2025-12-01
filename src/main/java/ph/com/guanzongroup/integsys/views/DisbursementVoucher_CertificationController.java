@@ -244,7 +244,7 @@ public class DisbursementVoucher_CertificationController implements Initializabl
                 switch (lsID) {
                     case "tfSearchIndustry":
                         if (lsValue.isEmpty()) {
-                            poDisbursementController.setIndustryID("");
+                            poDisbursementController.setSearchIndustry("");
                         }
                         break;
                     case "tfSearchBankName":
