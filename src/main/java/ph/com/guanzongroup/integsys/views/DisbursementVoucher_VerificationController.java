@@ -992,7 +992,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
                         poJSON = poController.computeFields();
                         if ("error".equals((String) poJSON.get("result"))) {
                             ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-                            poController.Detail(pnDetail).setAmountApplied(ldblOrigAmt);
+                            poController.Detail(pnDetail).setAmountApplied(0.0);
                             tfPurchasedAmountDetail.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(pnDetail).getAmountApplied(), true));
                             return;
                         }
@@ -1252,6 +1252,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
                             poJSON = poController.WTaxDeduction(pnDetailBIR).getModel().setBaseAmount(Double.valueOf(lsValue));
                             if ("error".equals((String) poJSON.get("result"))) {
                                 poController.WTaxDeduction(pnDetailBIR).getModel().setBaseAmount(0.0);
+                                poController.WTaxDeduction(pnDetailBIR).getModel().setTaxAmount(0.0);
                                 ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                 break;
                             }
@@ -1259,6 +1260,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
                             poJSON = poController.computeTaxAmount();
                             if ("error".equals((String) poJSON.get("result"))) {
                                 poController.WTaxDeduction(pnDetailBIR).getModel().setBaseAmount(0.0);
+                                poController.WTaxDeduction(pnDetailBIR).getModel().setTaxAmount(0.0);
                                 ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                 break;
                             }
@@ -1686,15 +1688,15 @@ public class DisbursementVoucher_VerificationController implements Initializable
         try {
             initDVMasterTabs();
             poController.computeFields();
-            switch(poController.Master().getTransactionStatus()){
+            switch (poController.Master().getTransactionStatus()) {
                 case DisbursementStatic.VERIFIED:
                     btnVoid.setText("Cancel");
-                break;
+                    break;
                 case DisbursementStatic.OPEN:
                 default:
                     btnVoid.setText("Void");
-                break;
-                    
+                    break;
+
             }
             JFXUtil.setStatusValue(lblDVTransactionStatus, DisbursementStatic.class, pnEditMode == EditMode.UNKNOWN ? "-1" : poController.Master().getTransactionStatus());
             JFXUtil.setDisabled(true, tfSupplier);
@@ -1880,7 +1882,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
             tfTaxRate.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.WTaxDeduction(pnDetailBIR).getModel().WithholdingTax().getTaxRate()));
             tfTotalTaxAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.WTaxDeduction(pnDetailBIR).getModel().getTaxAmount(), false));
             cbReverse.setSelected(poController.WTaxDeduction(pnDetailBIR).getModel().isReverse());
-            
+
             JFXUtil.updateCaretPositions(apBIRDetail);
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);

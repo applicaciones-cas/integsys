@@ -1018,7 +1018,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                         poJSON = poController.computeFields();
                         if ("error".equals((String) poJSON.get("result"))) {
                             ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-                            poController.Detail(pnDetail).setAmountApplied(ldblOrigAmt);
+                            poController.Detail(pnDetail).setAmountApplied(0.00);
                             tfPurchasedAmountDetail.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(pnDetail).getAmountApplied(), true));
                             return;
                         }
@@ -1278,6 +1278,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                             poJSON = poController.WTaxDeduction(pnDetailBIR).getModel().setBaseAmount(Double.valueOf(lsValue));
                             if ("error".equals((String) poJSON.get("result"))) {
                                 poController.WTaxDeduction(pnDetailBIR).getModel().setBaseAmount(0.0);
+                                poController.WTaxDeduction(pnDetailBIR).getModel().setTaxAmount(0.0);
                                 ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                 break;
                             }
@@ -1285,6 +1286,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                             poJSON = poController.computeTaxAmount();
                             if ("error".equals((String) poJSON.get("result"))) {
                                 poController.WTaxDeduction(pnDetailBIR).getModel().setBaseAmount(0.0);
+                                poController.WTaxDeduction(pnDetailBIR).getModel().setTaxAmount(0.0);
                                 ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                 break;
                             }
@@ -1701,7 +1703,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
             ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
-    
+
     private void loadRecordMaster() {
         try {
             initDVMasterTabs();
@@ -1889,7 +1891,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
             tfTaxRate.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.WTaxDeduction(pnDetailBIR).getModel().WithholdingTax().getTaxRate()));
             tfTotalTaxAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.WTaxDeduction(pnDetailBIR).getModel().getTaxAmount(), false));
             cbReverse.setSelected(poController.WTaxDeduction(pnDetailBIR).getModel().isReverse());
-            
+
             JFXUtil.updateCaretPositions(apBIRDetail);
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
