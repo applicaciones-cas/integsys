@@ -396,7 +396,8 @@ public class DisbursementVoucher_CertificationController implements Initializabl
                                             lsPaymentForm,
                                             lsBankName,
                                             lsBankAccount,
-                                            CustomCommonUtil.setIntegerValueToDecimalFormat(poDisbursementController.getMaster(lnCntr).getNetTotal(), true)
+                                            CustomCommonUtil.setIntegerValueToDecimalFormat(poDisbursementController.getMaster(lnCntr).getNetTotal(), true),
+                                            poDisbursementController.getMaster(lnCntr).getTransactionNo()
                                     ));
                                 }
                             } else {
@@ -440,11 +441,11 @@ public class DisbursementVoucher_CertificationController implements Initializabl
                     if (selected != null) {
                         pnMain = tblViewMainList.getSelectionModel().getSelectedIndex();
                     }
-                    if (JFXUtil.isObjectEqualTo(selected.getIndex03(), null, "")) {
+                    if (JFXUtil.isObjectEqualTo(selected.getIndex11(), null, "")) {
                         ShowMessageFX.Warning(null, pxeModuleName, "Unable to view transaction.");
                         return;
                     } else {
-                        showDVWindow(selected.getIndex03());
+                        showDVWindow(selected.getIndex11());
                     }
                 } catch (SQLException ex) {
                     Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
@@ -476,7 +477,7 @@ public class DisbursementVoucher_CertificationController implements Initializabl
             for (Object item : tblViewMainList.getItems()) {
                 ModelDisbursementVoucher_Main item1 = (ModelDisbursementVoucher_Main) item;
                 String lschecked = item1.getIndex02();
-                String lsDVNO = item1.getIndex03();
+                String lsDVNO = item1.getIndex11();
                 String Remarks = action;
                 if (lschecked.equals("1")) {
                     checkedItems.add(lsDVNO);

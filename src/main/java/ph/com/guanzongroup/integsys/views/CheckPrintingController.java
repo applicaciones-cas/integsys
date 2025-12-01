@@ -303,7 +303,7 @@ public class CheckPrintingController implements Initializable, ScreenInterface {
             for (Object item : tblViewMainList.getItems()) {
                 ModelCheckPrinting item1 = (ModelCheckPrinting) item;
                 String lschecked = item1.getIndex02();
-                String lsDVNO = item1.getIndex03();
+                String lsDVNO = item1.getIndex12();
                 String banks = item1.getIndex07();
 
                 if (lschecked.equals("1")) {
@@ -554,7 +554,8 @@ public class CheckPrintingController implements Initializable, ScreenInterface {
                                             poController.getMaster(lnCntr).CheckPayments().Bank_Account_Master().getAccountNo(),
                                             poController.getMaster(lnCntr).CheckPayments().getCheckNo(),
                                             CustomCommonUtil.formatDateToShortString(poController.getMaster(lnCntr).getTransactionDate()),
-                                            CustomCommonUtil.setIntegerValueToDecimalFormat(poController.getMaster(lnCntr).getNetTotal(), true)
+                                            CustomCommonUtil.setIntegerValueToDecimalFormat(poController.getMaster(lnCntr).getNetTotal(), true),
+                                            poController.getMaster(lnCntr).getTransactionNo()
                                     ));
                                 }
                             } else {
@@ -598,11 +599,11 @@ public class CheckPrintingController implements Initializable, ScreenInterface {
                     if (selected != null) {
                         pnMain = tblViewMainList.getSelectionModel().getSelectedIndex();
                     }
-                    if (JFXUtil.isObjectEqualTo(selected.getIndex03(), null, "")) {
+                    if (JFXUtil.isObjectEqualTo(selected.getIndex12(), null, "")) {
                         ShowMessageFX.Warning("Unable to view transaction.", pxeModuleName, null);
                         return;
                     } else {
-                        showDVWindow(selected.getIndex03());
+                        showDVWindow(selected.getIndex12());
                     }
                 } catch (SQLException ex) {
                     Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
