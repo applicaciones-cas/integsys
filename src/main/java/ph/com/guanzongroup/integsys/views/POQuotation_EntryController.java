@@ -1019,13 +1019,16 @@ public class POQuotation_EntryController implements Initializable, ScreenInterfa
                             poJSON = poController.POQuotation().SearchRequestItem(lsValue, false, pnDetail);
                             if ("error".equals(poJSON.get("result"))) {
                                 txtField.setText("");
+                                ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                                if (poJSON.get("row") == null) {
+                                    return;
+                                }
                                 int lnReturned = Integer.parseInt(String.valueOf(poJSON.get("row"))) + 1;
                                 JFXUtil.runWithDelay(0.70, () -> {
                                     int lnTempRow = JFXUtil.getDetailTempRow(details_data, lnReturned, 8);
                                     pnDetail = lnTempRow;
                                     loadTableDetail.reload();
                                 });
-                                ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                 break;
                             } else {
                                 int lnReturned = Integer.parseInt(String.valueOf(poJSON.get("row")));
@@ -1048,13 +1051,16 @@ public class POQuotation_EntryController implements Initializable, ScreenInterfa
                             poJSON = poController.POQuotation().SearchInventory(lsValue, false, pnDetail);
                             if ("error".equals(poJSON.get("result"))) {
                                 txtField.setText("");
+                                ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                                if (poJSON.get("row") == null) {
+                                    return;
+                                }
                                 int lnReturned = Integer.parseInt(String.valueOf(poJSON.get("row"))) + 1;
                                 JFXUtil.runWithDelay(0.70, () -> {
                                     int lnTempRow = JFXUtil.getDetailTempRow(details_data, lnReturned, 8);
                                     pnDetail = lnTempRow;
                                     loadTableDetail.reload();
                                 });
-                                ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                 break;
                             } else {
                                 int lnReturned = Integer.parseInt(String.valueOf(poJSON.get("row")));
@@ -1073,13 +1079,16 @@ public class POQuotation_EntryController implements Initializable, ScreenInterfa
                             poJSON = poController.POQuotation().SearchInventory(lsValue, false, pnDetail);
                             if ("error".equals(poJSON.get("result"))) {
                                 txtField.setText("");
+                                ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                                if (poJSON.get("row") == null) {
+                                    return;
+                                }
                                 int lnReturned = Integer.parseInt(String.valueOf(poJSON.get("row"))) + 1;
                                 JFXUtil.runWithDelay(0.70, () -> {
                                     int lnTempRow = JFXUtil.getDetailTempRow(details_data, lnReturned, 8);
                                     pnDetail = lnTempRow;
                                     loadTableDetail.reload();
                                 });
-                                ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                 break;
                             } else {
                                 int lnReturned = Integer.parseInt(String.valueOf(poJSON.get("row")));
