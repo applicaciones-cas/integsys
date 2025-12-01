@@ -591,7 +591,8 @@ public class POQuotation_EntryController implements Initializable, ScreenInterfa
 
     private boolean resetTransaction() {
         try {
-            if (poController.POQuotation().Master().getSourceNo() != null && !"".equals(poController.POQuotation().Master().getSourceNo())) {
+            if ((poController.POQuotation().getDetailCount() - 1 >= 1 && !JFXUtil.isObjectEqualTo(poController.POQuotation().Detail(0).getDescription(), null, ""))
+                    || (poController.POQuotation().Master().getSourceNo() != null && !"".equals(poController.POQuotation().Master().getSourceNo()))) {
                 if (ShowMessageFX.YesNo(null, "Close Tab", "Are you sure you want to select another transaction?\nTransaction details will be deleted") == false) {
                     return false;
                 } else {
@@ -614,7 +615,6 @@ public class POQuotation_EntryController implements Initializable, ScreenInterfa
                     });
                 }
             }
-
         } catch (CloneNotSupportedException | SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
         }
