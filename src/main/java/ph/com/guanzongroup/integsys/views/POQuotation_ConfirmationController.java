@@ -883,7 +883,11 @@ public class POQuotation_ConfirmationController implements Initializable, Screen
                                 });
                                 loadTableDetail.reload();
                                 if (!JFXUtil.isObjectEqualTo(poController.POQuotation().Detail(pnDetail).getDescription(), null, "")) {
-                                    JFXUtil.textFieldMoveNext(tfReplaceId);
+                                    if (!JFXUtil.isObjectEqualTo(poController.POQuotation().Master().getSourceNo(), null, "")) {
+                                        JFXUtil.textFieldMoveNext(tfReplaceId);
+                                    } else {
+                                        JFXUtil.textFieldMoveNext(tfUnitPrice);
+                                    }
                                 }
                             }
                             return;
@@ -1184,20 +1188,21 @@ public class POQuotation_ConfirmationController implements Initializable, Screen
 //                boolean lbShow = (lbIsUpdate && (lbReqItem && lbRepItem));
 //                JFXUtil.setDisabled(lbShow, tfReplaceId, tfReplaceDescription);
 
-//                if(lbIsUpdate){
+                if (null != poController.POQuotation().Master().getSourceNo() && !"".equals(poController.POQuotation().Master().getSourceNo())) {
+                    // if(lbIsUpdate){
 //                    JFXUtil.setDisabled(true, tfDescription);
 //                } else {
-                if (lbRepItem) {
-                    JFXUtil.setDisabled(true, tfDescription);
-                } else {
-                    if ((!lbIsReqMoreThanOne && lbReqItem)) {
+                    if (lbRepItem) {
                         JFXUtil.setDisabled(true, tfDescription);
                     } else {
-                        JFXUtil.setDisabled(false, tfDescription);
+                        if ((!lbIsReqMoreThanOne && lbReqItem)) {
+                            JFXUtil.setDisabled(true, tfDescription);
+                        } else {
+                            JFXUtil.setDisabled(false, tfDescription);
+                        }
                     }
-                }
 //                }
-
+                }
                 JFXUtil.setDisabled(false, tfReplaceId, tfReplaceDescription, tfUnitPrice, tfQuantity, tfDiscRateDetail, tfAddlDiscAmtDetail);
             }
             boolean lbShow2 = JFXUtil.isObjectEqualTo(poController.POQuotation().Master().getSourceNo(), null, "");
