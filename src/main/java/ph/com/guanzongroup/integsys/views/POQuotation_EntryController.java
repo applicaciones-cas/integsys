@@ -1366,6 +1366,7 @@ public class POQuotation_EntryController implements Initializable, ScreenInterfa
                     Platform.runLater(() -> {
                         JFXUtil.setDisabled(false, tfDescription, tfUnitPrice, tfQuantity, tfDiscRateDetail, tfAddlDiscAmtDetail);
                         JFXUtil.setDisabled(true, tfReplaceId, tfReplaceDescription);
+                        JFXUtil.setDisabled(lbIsUpdate, tfDescription);
                     });
                 }
 

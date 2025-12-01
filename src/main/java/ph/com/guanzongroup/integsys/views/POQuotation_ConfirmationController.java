@@ -1222,6 +1222,7 @@ public class POQuotation_ConfirmationController implements Initializable, Screen
                     Platform.runLater(() -> {
                         JFXUtil.setDisabled(false, tfDescription, tfUnitPrice, tfQuantity, tfDiscRateDetail, tfAddlDiscAmtDetail);
                         JFXUtil.setDisabled(true, tfReplaceId, tfReplaceDescription);
+                        JFXUtil.setDisabled(lbIsUpdate, tfDescription);
                     });
                 }
 
