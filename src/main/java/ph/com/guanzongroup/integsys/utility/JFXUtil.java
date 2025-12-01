@@ -989,25 +989,6 @@ public class JFXUtil {
         }
     }
 
-    /*Compares an object to any object if equal*/
-    public static boolean isObjectEqualTo(Object source, Object... others) {
-        if (source == null && others != null) {
-            for (Object other : others) {
-                if (other == null) {
-                    return true;
-                }
-            }
-            return false;
-        }
-
-        for (Object other : others) {
-            if (source != null && source.equals(other)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
     /*Sets a keypress listener to textfields in any anchorPane*/
     public static void setKeyPressedListener(EventHandler<KeyEvent> listener, AnchorPane... anchorPanes) {
         for (AnchorPane pane : anchorPanes) {
@@ -2515,18 +2496,44 @@ public class JFXUtil {
 
     /*Requests focus on a textfield, only if its object condition is null or blank*/
     public static void requestFocusNullField(Object[][] checks, TextField fallback) {
-        Stream.of(checks)
+        TextField target = Stream.of(checks)
                 .filter(c -> {
                     try {
                         return isObjectEqualTo(c[0], null, "");
                     } catch (Exception e) {
-                        return false; // skip and continue to next object
+                        return false;
                     }
                 })
                 .map(c -> (TextField) c[1])
+                .filter(tf -> tf != null && !tf.isDisabled())
                 .findFirst()
-                .orElse(fallback)
-                .requestFocus();
+                .orElse(null);
+
+        // focus result
+        if (target != null) {
+            target.requestFocus();
+        } else if (fallback != null && !fallback.isDisabled()) {
+            fallback.requestFocus();
+        }
+    }
+
+    /*Compares an object to any object if equal*/
+    public static boolean isObjectEqualTo(Object source, Object... others) {
+        if (source == null && others != null) {
+            for (Object other : others) {
+                if (other == null) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        for (Object other : others) {
+            if (source != null && source.equals(other)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /*Returns title from class*/

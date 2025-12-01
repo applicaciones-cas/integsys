@@ -303,10 +303,14 @@ public class POQuotation_EntryController implements Initializable, ScreenInterfa
                     break;
                 case "cbReverse":
                     if (poController.POQuotation().Detail(pnDetail).getEditMode() == EditMode.ADDNEW) {
-                        if (!checkedBox.isSelected()) {
-                            poController.POQuotation().ReverseItem(pnDetail);
+                        if (poController.POQuotation().Master().getSourceNo() != null && !"".equals(poController.POQuotation().Master().getSourceNo())) {
+                            if (!checkedBox.isSelected()) {
+                                poController.POQuotation().ReverseItem(pnDetail);
+                            } else {
+                                poController.POQuotation().Detail(pnDetail).isReverse(checkedBox.isSelected());
+                            }
                         } else {
-                            poController.POQuotation().Detail(pnDetail).isReverse(checkedBox.isSelected());
+                            poController.POQuotation().Detail().remove(pnDetail);
                         }
                     } else {
                         poController.POQuotation().Detail(pnDetail).isReverse(checkedBox.isSelected());
@@ -591,7 +595,8 @@ public class POQuotation_EntryController implements Initializable, ScreenInterfa
 
     private boolean resetTransaction() {
         try {
-            if (poController.POQuotation().Master().getSourceNo() != null && !"".equals(poController.POQuotation().Master().getSourceNo())) {
+            if ((poController.POQuotation().getDetailCount() - 1 >= 1 && !JFXUtil.isObjectEqualTo(poController.POQuotation().Detail(0).getDescription(), null, ""))
+                    || (poController.POQuotation().Master().getSourceNo() != null && !"".equals(poController.POQuotation().Master().getSourceNo()))) {
                 if (ShowMessageFX.YesNo(null, "Close Tab", "Are you sure you want to select another transaction?\nTransaction details will be deleted") == false) {
                     return false;
                 } else {
@@ -614,7 +619,6 @@ public class POQuotation_EntryController implements Initializable, ScreenInterfa
                     });
                 }
             }
-
         } catch (CloneNotSupportedException | SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
         }
@@ -1015,13 +1019,16 @@ public class POQuotation_EntryController implements Initializable, ScreenInterfa
                             poJSON = poController.POQuotation().SearchRequestItem(lsValue, false, pnDetail);
                             if ("error".equals(poJSON.get("result"))) {
                                 txtField.setText("");
+                                ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                                if (poJSON.get("row") == null) {
+                                    return;
+                                }
                                 int lnReturned = Integer.parseInt(String.valueOf(poJSON.get("row"))) + 1;
                                 JFXUtil.runWithDelay(0.70, () -> {
                                     int lnTempRow = JFXUtil.getDetailTempRow(details_data, lnReturned, 8);
                                     pnDetail = lnTempRow;
                                     loadTableDetail.reload();
                                 });
-                                ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                 break;
                             } else {
                                 int lnReturned = Integer.parseInt(String.valueOf(poJSON.get("row")));
@@ -1032,7 +1039,11 @@ public class POQuotation_EntryController implements Initializable, ScreenInterfa
                                 });
                                 loadTableDetail.reload();
                                 if (!JFXUtil.isObjectEqualTo(poController.POQuotation().Detail(pnDetail).getDescription(), null, "")) {
-                                    JFXUtil.textFieldMoveNext(tfReplaceId);
+                                    if (!JFXUtil.isObjectEqualTo(poController.POQuotation().Master().getSourceNo(), null, "")) {
+                                        JFXUtil.textFieldMoveNext(tfReplaceId);
+                                    } else {
+                                        JFXUtil.textFieldMoveNext(tfUnitPrice);
+                                    }
                                 }
                             }
                             return;
@@ -1040,13 +1051,16 @@ public class POQuotation_EntryController implements Initializable, ScreenInterfa
                             poJSON = poController.POQuotation().SearchInventory(lsValue, false, pnDetail);
                             if ("error".equals(poJSON.get("result"))) {
                                 txtField.setText("");
+                                ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                                if (poJSON.get("row") == null) {
+                                    return;
+                                }
                                 int lnReturned = Integer.parseInt(String.valueOf(poJSON.get("row"))) + 1;
                                 JFXUtil.runWithDelay(0.70, () -> {
                                     int lnTempRow = JFXUtil.getDetailTempRow(details_data, lnReturned, 8);
                                     pnDetail = lnTempRow;
                                     loadTableDetail.reload();
                                 });
-                                ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                 break;
                             } else {
                                 int lnReturned = Integer.parseInt(String.valueOf(poJSON.get("row")));
@@ -1065,13 +1079,16 @@ public class POQuotation_EntryController implements Initializable, ScreenInterfa
                             poJSON = poController.POQuotation().SearchInventory(lsValue, false, pnDetail);
                             if ("error".equals(poJSON.get("result"))) {
                                 txtField.setText("");
+                                ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                                if (poJSON.get("row") == null) {
+                                    return;
+                                }
                                 int lnReturned = Integer.parseInt(String.valueOf(poJSON.get("row"))) + 1;
                                 JFXUtil.runWithDelay(0.70, () -> {
                                     int lnTempRow = JFXUtil.getDetailTempRow(details_data, lnReturned, 8);
                                     pnDetail = lnTempRow;
                                     loadTableDetail.reload();
                                 });
-                                ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                 break;
                             } else {
                                 int lnReturned = Integer.parseInt(String.valueOf(poJSON.get("row")));
@@ -1328,21 +1345,30 @@ public class POQuotation_EntryController implements Initializable, ScreenInterfa
 //                boolean lbShow = (lbIsUpdate && (lbReqItem && lbRepItem));
 //                JFXUtil.setDisabled(lbShow, tfReplaceId, tfReplaceDescription);
 
-//                if(lbIsUpdate){
+                if (null != poController.POQuotation().Master().getSourceNo() && !"".equals(poController.POQuotation().Master().getSourceNo())) {
+                    // if(lbIsUpdate){
 //                    JFXUtil.setDisabled(true, tfDescription);
 //                } else {
-                if (lbRepItem) {
-                    JFXUtil.setDisabled(true, tfDescription);
-                } else {
-                    if ((!lbIsReqMoreThanOne && lbReqItem)) {
+                    if (lbRepItem) {
                         JFXUtil.setDisabled(true, tfDescription);
                     } else {
-                        JFXUtil.setDisabled(false, tfDescription);
+                        if ((!lbIsReqMoreThanOne && lbReqItem)) {
+                            JFXUtil.setDisabled(true, tfDescription);
+                        } else {
+                            JFXUtil.setDisabled(false, tfDescription);
+                        }
                     }
-                }
 //                }
+                    Platform.runLater(() -> {
+                        JFXUtil.setDisabled(false, tfReplaceId, tfReplaceDescription, tfUnitPrice, tfQuantity, tfDiscRateDetail, tfAddlDiscAmtDetail);
+                    });
+                } else {
+                    Platform.runLater(() -> {
+                        JFXUtil.setDisabled(false, tfDescription, tfUnitPrice, tfQuantity, tfDiscRateDetail, tfAddlDiscAmtDetail);
+                        JFXUtil.setDisabled(true, tfReplaceId, tfReplaceDescription);
+                    });
+                }
 
-                JFXUtil.setDisabled(false, tfReplaceId, tfReplaceDescription, tfUnitPrice, tfQuantity, tfDiscRateDetail, tfAddlDiscAmtDetail);
             }
 
             tfDescription.setText(poController.POQuotation().Detail(pnDetail).getDescription());

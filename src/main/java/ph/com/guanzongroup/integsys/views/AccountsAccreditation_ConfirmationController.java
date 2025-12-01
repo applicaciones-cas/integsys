@@ -234,6 +234,7 @@ public class AccountsAccreditation_ConfirmationController implements Initializab
                                 }
                             }
                         }
+                        ShowMessageFX.Information("Transaction saved successfully", null, psFormName);
 
                         getLoadedClient();
                         initButtonDisplay(poAppController.getEditMode());
@@ -254,6 +255,8 @@ public class AccountsAccreditation_ConfirmationController implements Initializab
                         if (!isJSONSuccess(poAppController.CloseTransaction(), "Initialize Close Transaction")) {
                             return;
                         }
+                        ShowMessageFX.Information("Transaction ocnfirmed successfully", null, psFormName);
+                        
                         getLoadedClient();
                         initButtonDisplay(poAppController.getEditMode());
                         break;
@@ -275,6 +278,7 @@ public class AccountsAccreditation_ConfirmationController implements Initializab
                         if (!isJSONSuccess(poAppController.VoidTransaction(), "Initialize Void Transaction")) {
                             return;
                         }
+                        ShowMessageFX.Information("Transaction voided successfully", null, psFormName);
 
                         getLoadedClient();
                         break;
@@ -379,17 +383,6 @@ public class AccountsAccreditation_ConfirmationController implements Initializab
                                 getLoadedClient();
                                 initButtonDisplay(poAppController.getEditMode());
                                 break;
-
-//disabled as its value should be autoset from attached supplier entry
-//                            case "tfContactPerson":
-//                                if (!isJSONSuccess(poAppController.searchClientContact(tfContactPerson.getText(), false),
-//                                        "Initialize Search Client Contact! ")) {
-//                                    return;
-//                                }
-//                                getLoadedClient();
-//                                initButtonDisplay(poAppController.getEditMode());
-//                                break;
-
                         }
                         break;
                 }
