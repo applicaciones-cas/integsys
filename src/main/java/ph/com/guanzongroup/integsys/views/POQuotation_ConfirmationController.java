@@ -301,15 +301,15 @@ public class POQuotation_ConfirmationController implements Initializable, Screen
                     break;
                 case "cbReverse":
                     if (poController.POQuotation().Detail(pnDetail).getEditMode() == EditMode.ADDNEW) {
-                        if (null != poController.POQuotation().Master().getSourceNo() && !"".equals(poController.POQuotation().Master().getSourceNo())) {
-                            if (!checkedBox.isSelected()) {
-                                poController.POQuotation().ReverseItem(pnDetail);
-                            } else {
-                                poController.POQuotation().Detail(pnDetail).isReverse(checkedBox.isSelected());
-                            }
-                        } else {
+//                        if (null != poController.POQuotation().Master().getSourceNo() && !"".equals(poController.POQuotation().Master().getSourceNo())) {
+                        if (!checkedBox.isSelected()) {
                             poController.POQuotation().ReverseItem(pnDetail);
+                        } else {
+                            poController.POQuotation().Detail(pnDetail).isReverse(checkedBox.isSelected());
                         }
+//                        } else {
+//                            poController.POQuotation().ReverseItem(pnDetail);
+//                        }
                     } else {
                         poController.POQuotation().Detail(pnDetail).isReverse(checkedBox.isSelected());
                     }
@@ -1215,11 +1215,18 @@ public class POQuotation_ConfirmationController implements Initializable, Screen
                         }
                     }
 //                }
+                    Platform.runLater(() -> {
+                        JFXUtil.setDisabled(false, tfReplaceId, tfReplaceDescription, tfUnitPrice, tfQuantity, tfDiscRateDetail, tfAddlDiscAmtDetail);
+                    });
+                } else {
+                    Platform.runLater(() -> {
+                        JFXUtil.setDisabled(false, tfDescription, tfUnitPrice, tfQuantity, tfDiscRateDetail, tfAddlDiscAmtDetail);
+                        JFXUtil.setDisabled(true, tfReplaceId, tfReplaceDescription);
+                    });
                 }
-                JFXUtil.setDisabled(false, tfReplaceId, tfReplaceDescription, tfUnitPrice, tfQuantity, tfDiscRateDetail, tfAddlDiscAmtDetail);
+
             }
-            boolean lbShow2 = JFXUtil.isObjectEqualTo(poController.POQuotation().Master().getSourceNo(), null, "");
-            JFXUtil.setDisabled(lbShow2, tfReplaceId, tfReplaceDescription);
+
             tfDescription.setText(poController.POQuotation().Detail(pnDetail).getDescription());
             tfReplaceId.setText(poController.POQuotation().Detail(pnDetail).ReplacedInventory().getBarCode());
             tfReplaceDescription.setText(poController.POQuotation().Detail(pnDetail).getReplaceDescription());
