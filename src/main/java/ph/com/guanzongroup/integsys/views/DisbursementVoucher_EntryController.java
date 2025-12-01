@@ -854,7 +854,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                 int lnRow = Integer.parseInt(BIR_data.get(tblVwBIRDetails.getSelectionModel().getSelectedIndex()).getIndex07());
                 pnDetailBIR = lnRow;
                 loadRecordDetailBIR();
-                moveNext(false, false);
+                moveNextBIR(false, false);
             }
         });
         JFXUtil.applyRowHighlighting(tblViewMainList, item -> ((ModelDisbursementVoucher_Main) item).getIndex09(), highlightedRowsMain);
@@ -1540,15 +1540,15 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                                 if ("error".equals(poJSON.get("result"))) {
                                     int lnReturned = Integer.parseInt(String.valueOf(poJSON.get("row"))) + 1;
                                     JFXUtil.runWithDelay(0.70, () -> {
-                                        int lnTempRow = JFXUtil.getDetailTempRow(BIR_data, lnReturned, 7);
-                                        pnDetailBIR = lnTempRow;
+//                                        int lnTempRow = JFXUtil.getDetailTempRow(BIR_data, lnReturned, 7); commented out intentionally
+                                        pnDetailBIR = lnReturned;
                                         loadTableDetailBIR.reload();
                                     });
                                     ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                     break;
                                 } else {
                                     int lnReturned = Integer.parseInt(String.valueOf(poJSON.get("row")));
-//                                    int lnTempRow = JFXUtil.getDetailTempRow(BIR_data, lnReturned, 7); // comment intentional
+//                                    int lnTempRow = JFXUtil.getDetailTempRow(BIR_data, lnReturned, 7); // commented out intentionally
                                     pnDetailBIR = lnReturned;
                                     loadTableDetailBIR.reload();
                                     JFXUtil.textFieldMoveNext(tfParticular);
@@ -1562,15 +1562,15 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                                     }
                                     int lnReturned = Integer.parseInt(String.valueOf(poJSON.get("row"))) + 1;
                                     JFXUtil.runWithDelay(0.70, () -> {
-                                        int lnTempRow = JFXUtil.getDetailTempRow(BIR_data, lnReturned, 7);
-                                        pnDetailBIR = lnTempRow;
+//                                        int lnTempRow = JFXUtil.getDetailTempRow(BIR_data, lnReturned, 7); commented out intentionally
+                                        pnDetailBIR = lnReturned;
                                         loadTableDetailBIR.reload();
                                     });
                                     ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                     break;
                                 } else {
                                     int lnReturned = Integer.parseInt(String.valueOf(poJSON.get("row")));
-//                                    int lnTempRow = JFXUtil.getDetailTempRow(BIR_data, lnReturned, 7); // comment intentional
+//                                    int lnTempRow = JFXUtil.getDetailTempRow(BIR_data, lnReturned, 7); // commented out intentionally
                                     pnDetailBIR = lnReturned;
                                     loadTableDetailBIR.reload();
                                     JFXUtil.textFieldMoveNext(tfBaseAmount);
