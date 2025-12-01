@@ -849,16 +849,6 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
             }
         }
         );
-
-//        tblVwBIRDetails.setOnMouseClicked(event -> {
-//            if (!BIR_data.isEmpty() && event.getClickCount() == 1) {
-//                pnDetailBIR = tblVwBIRDetails.getSelectionModel().getSelectedIndex();
-//                moveNextBIR(false, false);
-//            }
-//        }
-//        );
-
-
         tblVwBIRDetails.setOnMouseClicked(event -> {
             if (!BIR_data.isEmpty() && event.getClickCount() == 1) { // Detect single click (or use another condition for double click)
                 int lnRow = Integer.parseInt(BIR_data.get(tblVwBIRDetails.getSelectionModel().getSelectedIndex()).getIndex07());

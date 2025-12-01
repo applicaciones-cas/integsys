@@ -376,7 +376,7 @@ public class DisbursementVoucher_ViewController implements Initializable, Screen
                                 pnDetailBIR = lnRow;
                                 loadRecordDetailBIR();
                             }
-                        } catch (SQLException | GuanzonException  ex) {
+                        } catch (SQLException | GuanzonException ex) {
                             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
                             ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
                         }
@@ -411,12 +411,12 @@ public class DisbursementVoucher_ViewController implements Initializable, Screen
             }
         });
         tblVwBIRDetails.setOnMouseClicked(event -> {
-            if (!BIR_data.isEmpty() && event.getClickCount() == 1) {
-                pnDetailBIR = tblVwBIRDetails.getSelectionModel().getSelectedIndex();
+            if (!BIR_data.isEmpty() && event.getClickCount() == 1) { // Detect single click (or use another condition for double click)
+                int lnRow = Integer.parseInt(BIR_data.get(tblVwBIRDetails.getSelectionModel().getSelectedIndex()).getIndex07());
+                pnDetailBIR = lnRow;
                 loadRecordDetailBIR();
             }
-        }
-        );
+        });
         JFXUtil.setKeyEventFilter(this::tableKeyEvents, tblVwDetails, tblVwBIRDetails);
         JFXUtil.adjustColumnForScrollbar(tblVwDetails, tblVwBIRDetails);
     }
@@ -517,7 +517,7 @@ public class DisbursementVoucher_ViewController implements Initializable, Screen
             tfTaxRate.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.WTaxDeduction(pnDetailBIR).getModel().WithholdingTax().getTaxRate()));
             tfTotalTaxAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.WTaxDeduction(pnDetailBIR).getModel().getTaxAmount(), false));
             cbReverse.setSelected(poController.WTaxDeduction(pnDetailBIR).getModel().isReverse());
-            
+
             JFXUtil.updateCaretPositions(apBIRDetail);
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);

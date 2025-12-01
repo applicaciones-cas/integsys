@@ -594,13 +594,20 @@ public class DisbursementVoucher_HistoryController implements Initializable, Scr
                 }
             }
         });
-
         tblVwJournalDetails.setOnMouseClicked(event -> {
             if (!journal_data.isEmpty() && event.getClickCount() == 1) {
                 pnDetailJE = tblVwJournalDetails.getSelectionModel().getSelectedIndex();
+                loadRecordDetailJE();
             }
         }
         );
+        tblVwBIRDetails.setOnMouseClicked(event -> {
+            if (!BIR_data.isEmpty() && event.getClickCount() == 1) { // Detect single click (or use another condition for double click)
+                int lnRow = Integer.parseInt(BIR_data.get(tblVwBIRDetails.getSelectionModel().getSelectedIndex()).getIndex07());
+                pnDetailBIR = lnRow;
+                loadRecordDetailBIR();
+            }
+        });
         JFXUtil.setKeyEventFilter(this::tableKeyEvents, tblVwDetails, tblVwJournalDetails);
         JFXUtil.adjustColumnForScrollbar(tblVwDetails, tblVwJournalDetails);
     }
