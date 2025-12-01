@@ -1344,7 +1344,8 @@ public class POQuotation_EntryController implements Initializable, ScreenInterfa
 
                 JFXUtil.setDisabled(false, tfReplaceId, tfReplaceDescription, tfUnitPrice, tfQuantity, tfDiscRateDetail, tfAddlDiscAmtDetail);
             }
-
+            boolean lbShow2 = JFXUtil.isObjectEqualTo(poController.POQuotation().Master().getSourceNo(), null, "");
+            JFXUtil.setDisabled(lbShow2, tfReplaceId, tfReplaceDescription);
             tfDescription.setText(poController.POQuotation().Detail(pnDetail).getDescription());
             tfReplaceId.setText(poController.POQuotation().Detail(pnDetail).ReplacedInventory().getBarCode());
             tfReplaceDescription.setText(poController.POQuotation().Detail(pnDetail).getReplaceDescription());
