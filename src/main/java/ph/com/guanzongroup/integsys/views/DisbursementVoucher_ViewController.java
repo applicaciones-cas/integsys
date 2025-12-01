@@ -158,19 +158,11 @@ public class DisbursementVoucher_ViewController implements Initializable, Screen
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        if (!psTransactionNo.isEmpty()) {
-            try {
-                poController = new CashflowControllers(oApp, null).DisbursementVoucher();
-                poJSON = new JSONObject();
-                poJSON = poController.InitTransaction(); // Initialize transaction
-                if (!"success".equals((String) poJSON.get("result"))) {
-                    ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-                }
-                poJSON = poController.OpenTransaction(psTransactionNo);
-                if (!"error".equals((String) poJSON.get("result"))) {
-                    if (poController.Master().getDisbursementType().equals(DisbursementStatic.DisbursementType.CHECK)) {
-//                        poController.setCheckpayment();
-                    }
+        Platform.runLater(() -> {
+            if (!psTransactionNo.isEmpty()) {
+                try {
+                    poController = new CashflowControllers(oApp, null).DisbursementVoucher();
+                    poJSON = new JSONObject();
                     initLoadTable();
                     initButtonsClickActions();
                     initComboBoxes();
@@ -180,20 +172,31 @@ public class DisbursementVoucher_ViewController implements Initializable, Screen
                     initTableOnClick();
                     initTabPane();
                     clearTextFields();
-                    pnEditMode = poController.getEditMode();
-                    loadTableDetail.reload();
-                    initButton(pnEditMode);
-                } else {
-                    ShowMessageFX.Warning((String) poJSON.get("message"), pxeModuleName, null);
-                    CommonUtils.closeStage(btnClose);
+                    btnClose.setOnAction(this::cmdButton_Click);
+                    poJSON = poController.InitTransaction(); // Initialize transaction
+                    if (!"success".equals((String) poJSON.get("result"))) {
+                        ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                        CommonUtils.closeStage(btnClose);
+                    }
+                    poJSON = poController.OpenTransaction(psTransactionNo);
+                    if (!"error".equals((String) poJSON.get("result"))) {
+                        if (poController.Master().getDisbursementType().equals(DisbursementStatic.DisbursementType.CHECK)) {
+//                        poController.setCheckpayment();
+                        }
+
+                        pnEditMode = poController.getEditMode();
+                        loadTableDetail.reload();
+                        initButton(pnEditMode);
+                    } else {
+                        ShowMessageFX.Warning((String) poJSON.get("message"), pxeModuleName, null);
+                        CommonUtils.closeStage(btnClose);
+                    }
+                } catch (SQLException | GuanzonException | CloneNotSupportedException | ScriptException ex) {
+                    Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+                    ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
                 }
-            } catch (SQLException | GuanzonException | CloneNotSupportedException | ScriptException ex) {
-                Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
-                ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
             }
-        }
-        initTableOnClick();
-        btnClose.setOnAction(this::cmdButton_Click);
+        });
     }
 
     public void initTabPane() {
@@ -295,10 +298,12 @@ public class DisbursementVoucher_ViewController implements Initializable, Screen
                 ShowMessageFX.Warning(null, pxeModuleName, "Button is not registered");
                 break;
         }
-
-        loadRecordMaster();
-        loadTableDetail.reload();
-        initButton(pnEditMode);
+        try {
+            loadRecordMaster();
+            loadTableDetail.reload();
+            initButton(pnEditMode);
+        } catch (Exception e) {
+        }
     }
 
     public void initLoadTable() {
