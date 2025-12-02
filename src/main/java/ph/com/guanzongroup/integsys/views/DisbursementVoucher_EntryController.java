@@ -575,7 +575,6 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                             return;
                         }
                     }
-                    lsPayableType = JFXUtil.getSourceType(lsPayableType, false);
 
                     poJSON = poController.populateDetail(lsTransactionNo, lsPayableType);
                     if ("error".equals(poJSON.get("result"))) {
