@@ -2221,7 +2221,6 @@ public class DisbursementVoucher_VerificationController implements Initializable
                     JFXUtil.setButtonsVisibility(false, btnVerify);
                     break;
                 case DisbursementStatic.RETURNED:
-                    JFXUtil.setButtonsVisibility(false, btnVerify);
                     JFXUtil.setButtonsVisibility(true, btnUpdate);
                     break;
                 case DisbursementStatic.VOID:
@@ -2230,7 +2229,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
                     break;
             }
             if (JFXUtil.isObjectEqualTo(poController.Master().getTransactionStatus(),
-                    DisbursementStatic.OPEN, DisbursementStatic.VERIFIED, DisbursementStatic.RETURNED)) {
+                    DisbursementStatic.OPEN, DisbursementStatic.VERIFIED)) {
                 JFXUtil.setButtonsVisibility(true, btnVoid);
             }
         }
