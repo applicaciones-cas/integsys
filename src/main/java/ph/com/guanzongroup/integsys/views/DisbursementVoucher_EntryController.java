@@ -243,7 +243,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                 String tabTitle = newTab.getText();
                 switch (tabTitle) {
                     case "Disbursement Voucher":
-                        if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
+                        if (pnEditMode == EditMode.UNKNOWN) {
                             pnDetailJE = 0;
                             pnDetailBIR = 0;
                         }
@@ -530,7 +530,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
         for (int lnCtr = 0; lnCtr < poController.getDetailCount(); lnCtr++) {
             String lsTransNo = !JFXUtil.isObjectEqualTo(poController.Detail(lnCtr).getSourceNo(), null, "") ? poController.Detail(lnCtr).getSourceNo() : "";
             String lsTransType = !JFXUtil.isObjectEqualTo(poController.Detail(lnCtr).getSourceCode(), null, "") ? poController.Detail(lnCtr).getSourceCode() : "";
-            String lsHighlightbasis = lsTransNo + JFXUtil.getSourceType(lsTransType, true);
+            String lsHighlightbasis = lsTransNo + poController.getSourceCodeDescription(poController.Detail(lnCtr).getSourceCode());
             if (!JFXUtil.isObjectEqualTo(poController.Detail(lnCtr).getAmount(), null, "")) {
                 if (poController.Detail(lnCtr).getAmount() > 0.0000) {
                     plOrderNoPartial.add(new Pair<>(lsHighlightbasis, "1"));

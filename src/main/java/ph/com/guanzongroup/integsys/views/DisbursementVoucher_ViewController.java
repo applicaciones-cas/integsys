@@ -158,45 +158,45 @@ public class DisbursementVoucher_ViewController implements Initializable, Screen
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        Platform.runLater(() -> {
-            if (!psTransactionNo.isEmpty()) {
-                try {
-                    poController = new CashflowControllers(oApp, null).DisbursementVoucher();
-                    poJSON = new JSONObject();
-                    initLoadTable();
-                    initButtonsClickActions();
-                    initComboBoxes();
-                    initDatePicker();
-                    initDetailGrid();
-                    initDetailBIRGrid();
-                    initTableOnClick();
-                    initTabPane();
-                    clearTextFields();
-                    btnClose.setOnAction(this::cmdButton_Click);
-                    poJSON = poController.InitTransaction(); // Initialize transaction
-                    if (!"success".equals((String) poJSON.get("result"))) {
-                        ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-                        CommonUtils.closeStage(btnClose);
-                    }
-                    poJSON = poController.OpenTransaction(psTransactionNo);
-                    if (!"error".equals((String) poJSON.get("result"))) {
-                        if (poController.Master().getDisbursementType().equals(DisbursementStatic.DisbursementType.CHECK)) {
+        if (!psTransactionNo.isEmpty()) {
+            try {
+                poController = new CashflowControllers(oApp, null).DisbursementVoucher();
+                poJSON = new JSONObject();
+                initLoadTable();
+                initButtonsClickActions();
+                initComboBoxes();
+                initDatePicker();
+                initDetailGrid();
+                initDetailBIRGrid();
+                initTableOnClick();
+                initTabPane();
+                clearTextFields();
+                btnClose.setOnAction(this::cmdButton_Click);
+                poJSON = poController.InitTransaction(); // Initialize transaction
+                if (!"success".equals((String) poJSON.get("result"))) {
+                    ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                    CommonUtils.closeStage(btnClose);
+                }
+                poJSON = poController.OpenTransaction(psTransactionNo);
+                if (!"error".equals((String) poJSON.get("result"))) {
+                    if (poController.Master().getDisbursementType().equals(DisbursementStatic.DisbursementType.CHECK)) {
 //                        poController.setCheckpayment();
-                        }
+                    }
 
-                        pnEditMode = poController.getEditMode();
-                        loadTableDetail.reload();
-                        initButton(pnEditMode);
-                    } else {
+                    pnEditMode = poController.getEditMode();
+                    loadTableDetail.reload();
+                    initButton(pnEditMode);
+                } else {
+                    Platform.runLater(() -> {
                         ShowMessageFX.Warning((String) poJSON.get("message"), pxeModuleName, null);
                         CommonUtils.closeStage(btnClose);
-                    }
-                } catch (SQLException | GuanzonException | CloneNotSupportedException | ScriptException ex) {
-                    Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
-                    ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
+                    });
                 }
+            } catch (SQLException | GuanzonException | CloneNotSupportedException | ScriptException ex) {
+                Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+                ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
             }
-        });
+        }
     }
 
     public void initTabPane() {

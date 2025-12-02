@@ -231,7 +231,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
                 String tabTitle = newTab.getText();
                 switch (tabTitle) {
                     case "Disbursement Voucher":
-                        if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
+                        if (pnEditMode == EditMode.UNKNOWN) {
                             pnDetailJE = 0;
                             pnDetailBIR = 0;
                         }
