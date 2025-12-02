@@ -904,7 +904,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
                         break;
                     case "tfSearchSupplier":
                         if (lsValue.isEmpty()) {
-                            poController.Master().setPayeeID("");
+                            poController.setSearchPayee("");
                             psSearchSupplierID = "";
                             loadTableMain.reload();
                         }
