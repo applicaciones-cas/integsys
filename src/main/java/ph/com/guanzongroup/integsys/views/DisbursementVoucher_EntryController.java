@@ -567,7 +567,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                     pnMain = pnRowMain;
                     String lsPayableType = selected.getIndex11();
                     String lsTransactionNo = selected.getIndex08();
-                    String lsPayee = selected.getIndex08();
+                    String lsPayee = selected.getIndex09();
 
                     if (!JFXUtil.isObjectEqualTo(poController.Master().Payee().Client().getCompanyName(), null, "")) {
                         if (!poController.Master().Payee().Client().getCompanyName().equals(lsPayee)) {
