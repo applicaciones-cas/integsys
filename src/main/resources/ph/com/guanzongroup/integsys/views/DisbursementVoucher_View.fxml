@@ -537,15 +537,6 @@
                                                                                 <DatePicker fx:id="dpPeriodTo" GridPane.columnIndex="2" GridPane.rowIndex="5" />
                                                                                 <TextField fx:id="tfTaxCode" maxWidth="-Infinity" minWidth="-Infinity" prefHeight="25.0" prefWidth="150.0" GridPane.columnIndex="2" GridPane.rowIndex="6" />
                                                                                 <TextField fx:id="tfParticular" maxWidth="-Infinity" minWidth="-Infinity" prefHeight="25.0" prefWidth="249.0" GridPane.columnIndex="2" GridPane.rowIndex="7" />
-                                                                                <AnchorPane maxWidth="1.7976931348623157E308" minWidth="-Infinity" style="-fx-background-color: FF8201;" GridPane.columnIndex="7" GridPane.rowIndex="2">
-                                                               <children>
-                                                                                      <Label fx:id="lblBIRTransactionStatus" alignment="CENTER" contentDisplay="CENTER" maxWidth="1.7976931348623157E308" text="STATUS" textAlignment="CENTER" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-                                                                                          <font>
-                                                                                              <Font name="System Bold" size="14.0" />
-                                                                                          </font>
-                                                                                      </Label>
-                                                               </children>
-                                                                                </AnchorPane>
                                                                                 <TextField fx:id="tfBaseAmount" alignment="CENTER_RIGHT" editable="false" maxWidth="1.7976931348623157E308" promptText="0.00" GridPane.columnIndex="7" GridPane.rowIndex="5" />
                                                                                 <TextField fx:id="tfTaxRate" alignment="CENTER_RIGHT" disable="true" editable="false" maxWidth="1.7976931348623157E308" promptText="0.00" GridPane.columnIndex="7" GridPane.rowIndex="6" />
                                                                                 <TextField fx:id="tfTotalTaxAmount" alignment="CENTER_RIGHT" disable="true" editable="false" maxWidth="1.7976931348623157E308" promptText="0.00" GridPane.columnIndex="7" GridPane.rowIndex="7" />

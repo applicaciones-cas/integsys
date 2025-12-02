@@ -117,7 +117,7 @@ public class DisbursementVoucher_ViewController implements Initializable, Screen
     @FXML
     private CheckBox chbkPrintByBank, chbkIsCrossCheck, chbkIsPersonOnly, chbkVatClassification, cbReverse;
     @FXML
-    private Label lblDVTransactionStatus, lblBIRTransactionStatus;
+    private Label lblDVTransactionStatus;
     @FXML
     private TextArea taDVRemarks;
     @FXML

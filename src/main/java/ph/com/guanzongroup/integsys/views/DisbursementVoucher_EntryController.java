@@ -144,7 +144,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
     @FXML
     private AnchorPane AnchorMain, apButton, apMasterDetail, apDVMaster1, apMasterDVCheck, apMasterDVBTransfer, apMasterDVOp, apDVMaster2, apDVMaster3, apDVDetail, apMainList, apBrowse, apJournalMaster, apJournalDetails, apBIRDetail;
     @FXML
-    private Label lblSource, lblDVTransactionStatus, lblJournalTransactionStatus, lblBIRTransactionStatus;
+    private Label lblSource, lblDVTransactionStatus, lblJournalTransactionStatus;
     @FXML
     private Button btnBrowse, btnNew, btnUpdate, btnSearch, btnSave, btnCancel, btnVoid, btnHistory, btnRetrieve, btnClose;
     @FXML
@@ -584,6 +584,9 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                     pnEditMode = poController.getEditMode();
                     loadTableDetail.reload();
                     moveNext(false, false);
+                    JFXUtil.runWithDelay(0.50, () -> {
+                        loadTableMain.reload();
+                    });
                 } catch (CloneNotSupportedException | SQLException | GuanzonException ex) {
                     Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
                     ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
