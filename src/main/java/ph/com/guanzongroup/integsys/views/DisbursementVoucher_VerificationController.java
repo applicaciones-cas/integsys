@@ -1688,16 +1688,6 @@ public class DisbursementVoucher_VerificationController implements Initializable
         try {
             initDVMasterTabs();
             poController.computeFields();
-            switch (poController.Master().getTransactionStatus()) {
-                case DisbursementStatic.VERIFIED:
-                    btnVoid.setText("Cancel");
-                    break;
-                case DisbursementStatic.OPEN:
-                default:
-                    btnVoid.setText("Void");
-                    break;
-
-            }
             JFXUtil.setStatusValue(lblDVTransactionStatus, DisbursementStatic.class, pnEditMode == EditMode.UNKNOWN ? "-1" : poController.Master().getTransactionStatus());
             JFXUtil.setDisabled(true, tfSupplier);
             tfDVTransactionNo.setText(poController.Master().getTransactionNo() != null ? poController.Master().getTransactionNo() : "");
