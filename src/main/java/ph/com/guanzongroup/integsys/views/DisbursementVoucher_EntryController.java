@@ -164,7 +164,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
     @FXML
     private TableView tblVwDetails, tblViewMainList, tblVwJournalDetails, tblVwBIRDetails;
     @FXML
-    private TableColumn tblDVRowNo, tblReferenceNo, tblTransactionTypeDetail, tblPurchasedAmount, tblVatableSales, tblVatAmt, tblVatRate, tblVatZeroRatedSales, tblVatExemptSales, tblNetAmount, tblRowNo, tblTransactionType, tblBranchName, tblDueDate, tblRefNo, tblAmountMain, tblJournalRowNo, tblJournalAccountCode, tblJournalAccountDescription, tblJournalDebitAmount, tblJournalCreditAmount, tblJournalReportMonthYear, tblBIRRowNo, tblBIRParticular, tblTaxCode, tblTaxRate, tblBaseAmount, tblTaxAmount;
+    private TableColumn tblDVRowNo, tblReferenceNo, tblTransactionTypeDetail, tblPurchasedAmount, tblVatableSales, tblVatAmt, tblVatRate, tblVatZeroRatedSales, tblVatExemptSales, tblNetAmount, tblRowNo, tblTransactionType, tblBranchName, tblPayee, tblDueDate, tblRefNo, tblAmountMain, tblJournalRowNo, tblJournalAccountCode, tblJournalAccountDescription, tblJournalDebitAmount, tblJournalCreditAmount, tblJournalReportMonthYear, tblBIRRowNo, tblBIRParticular, tblTaxCode, tblTaxRate, tblBaseAmount, tblTaxAmount;
     @FXML
     private Pagination pagination;
 
@@ -527,24 +527,33 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
     }
 
     public void loadHighlightFromDetail() {
-        for (int lnCtr = 0; lnCtr < poController.getDetailCount(); lnCtr++) {
-            String lsTransNo = !JFXUtil.isObjectEqualTo(poController.Detail(lnCtr).getSourceNo(), null, "") ? poController.Detail(lnCtr).getSourceNo() : "";
-            String lsTransType = !JFXUtil.isObjectEqualTo(poController.Detail(lnCtr).getSourceCode(), null, "") ? poController.Detail(lnCtr).getSourceCode() : "";
-            String lsHighlightbasis = lsTransNo + poController.getSourceCodeDescription(poController.Detail(lnCtr).getSourceCode());
-            if (!JFXUtil.isObjectEqualTo(poController.Detail(lnCtr).getAmount(), null, "")) {
-                if (poController.Detail(lnCtr).getAmount() > 0.0000) {
-                    plOrderNoPartial.add(new Pair<>(lsHighlightbasis, "1"));
-                } else {
-                    plOrderNoPartial.add(new Pair<>(lsHighlightbasis, "0"));
+        try {
+            for (int lnCtr = 0; lnCtr < poController.getDetailCount(); lnCtr++) {
+                String lsTransNo = !JFXUtil.isObjectEqualTo(poController.Detail(lnCtr).getSourceNo(), null, "") ? poController.Detail(lnCtr).getSourceNo() : "";
+                String lsTransType = !JFXUtil.isObjectEqualTo(poController.Detail(lnCtr).getSourceCode(), null, "") ? poController.Detail(lnCtr).getSourceCode() : "";
+                String lsHighlightbasis;
+
+                lsHighlightbasis = lsTransNo + poController.getSourceCodeDescription(poController.Detail(lnCtr).getSourceCode())
+                        + poController.Master().Payee().getPayeeName();
+
+                if (!JFXUtil.isObjectEqualTo(poController.Detail(lnCtr).getAmount(), null, "")) {
+                    if (poController.Detail(lnCtr).getAmount() > 0.0000) {
+                        plOrderNoPartial.add(new Pair<>(lsHighlightbasis, "1"));
+                    } else {
+                        plOrderNoPartial.add(new Pair<>(lsHighlightbasis, "0"));
+                    }
                 }
             }
-        }
-        for (Pair<String, String> pair : plOrderNoPartial) {
-            if (!"".equals(pair.getKey()) && pair.getKey() != null) {
-                JFXUtil.highlightByKey(tblViewMainList, pair.getKey(), "#A7C7E7", highlightedRowsMain);
+            for (Pair<String, String> pair : plOrderNoPartial) {
+                if (!"".equals(pair.getKey()) && pair.getKey() != null) {
+                    JFXUtil.highlightByKey(tblViewMainList, pair.getKey(), "#A7C7E7", highlightedRowsMain);
+                }
             }
+            JFXUtil.showRetainedHighlight(false, tblViewMainList, "#A7C7E7", plOrderNoPartial, plOrderNoFinal, highlightedRowsMain, false);
+        } catch (GuanzonException | SQLException ex) {
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
-        JFXUtil.showRetainedHighlight(false, tblViewMainList, "#A7C7E7", plOrderNoPartial, plOrderNoFinal, highlightedRowsMain, false);
     }
 
     private void loadTableDetailFromMain() {
@@ -556,8 +565,8 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                 try {
                     int pnRowMain = Integer.parseInt(selected.getIndex01()) - 1;
                     pnMain = pnRowMain;
-                    String lsPayableType = selected.getIndex10();
-                    String lsTransactionNo = selected.getIndex07();
+                    String lsPayableType = selected.getIndex11();
+                    String lsTransactionNo = selected.getIndex08();
                     String lsPayee = selected.getIndex08();
 
                     if (!JFXUtil.isObjectEqualTo(poController.Master().Payee().Client().getCompanyName(), null, "")) {
@@ -601,12 +610,14 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                                 if (unifiedPayments != null && !unifiedPayments.isEmpty()) {
                                     for (Object requestObj : unifiedPayments) {
                                         JSONObject obj = (JSONObject) requestObj;
-                                        String lsTransBasis = (obj.get("sTransNox") != null ? obj.get("sTransNox").toString() : "")
-                                                + (obj.get("TransactionType") != null ? obj.get("TransactionType").toString() : "");
+                                        String lsTransBasis = (obj.get("SourceNo") != null ? obj.get("SourceNo").toString() : "")
+                                                + (obj.get("TransactionType") != null ? obj.get("TransactionType").toString() : "")
+                                                + (obj.get("Payee") != null ? obj.get("Payee").toString() : "");
                                         ModelDisbursementVoucher_Main loMain = new ModelDisbursementVoucher_Main(
                                                 String.valueOf(main_data.size() + 1),
                                                 obj.get("TransactionType") != null ? obj.get("TransactionType").toString() : "",
                                                 obj.get("sBranchNme") != null ? obj.get("sBranchNme").toString() : "",
+                                                obj.get("Payee") != null ? obj.get("Payee").toString() : "",
                                                 obj.get("dTransact") != null ? obj.get("dTransact").toString() : "",
                                                 obj.get("Reference") != null ? obj.get("Reference").toString() : "",
                                                 obj.get("Balance") != null ? CustomCommonUtil.setIntegerValueToDecimalFormat(obj.get("Balance"), true) : "",
@@ -789,7 +800,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
 
     private void initMainGrid() {
         JFXUtil.setColumnCenter(tblRowNo, tblDueDate, tblRefNo);
-        JFXUtil.setColumnLeft(tblTransactionType, tblBranchName);
+        JFXUtil.setColumnLeft(tblTransactionType, tblBranchName, tblPayee);
         JFXUtil.setColumnRight(tblAmountMain);
         JFXUtil.setColumnsIndexAndDisableReordering(tblViewMainList);
 
@@ -857,7 +868,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                 moveNextBIR(false, false);
             }
         });
-        JFXUtil.applyRowHighlighting(tblViewMainList, item -> ((ModelDisbursementVoucher_Main) item).getIndex09(), highlightedRowsMain);
+        JFXUtil.applyRowHighlighting(tblViewMainList, item -> ((ModelDisbursementVoucher_Main) item).getIndex10(), highlightedRowsMain);
         JFXUtil.setKeyEventFilter(this::tableKeyEvents, tblVwDetails, tblVwJournalDetails, tblVwBIRDetails);
         JFXUtil.adjustColumnForScrollbar(tblViewMainList, tblVwDetails, tblVwJournalDetails, tblVwBIRDetails);
     }
