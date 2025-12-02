@@ -216,7 +216,7 @@ public class DisbursementVoucher_CertificationController implements Initializabl
                 handleDisbursementAction("return");
                 break;
             case "btnDisapproved":
-                handleDisbursementAction("dissapprove");
+                handleDisbursementAction("disapprove");
                 break;
             case "btnRetrieve":
                 retrieveDisbursement();
