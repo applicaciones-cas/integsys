@@ -442,11 +442,11 @@ public class CheckAuthorizationController implements Initializable, ScreenInterf
                     if (selected != null) {
                         pnMain = tblViewMainList.getSelectionModel().getSelectedIndex();
                     }
-                    if (JFXUtil.isObjectEqualTo(selected.getIndex11(), null, "")) {
+                    if (JFXUtil.isObjectEqualTo(selected.getIndex10(), null, "")) {
                         ShowMessageFX.Warning("Unable to view transaction.", pxeModuleName, null);
                         return;
                     } else {
-                        showDVWindow(selected.getIndex11());
+                        showDVWindow(selected.getIndex10());
                     }
                 } catch (SQLException ex) {
                     Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
@@ -478,7 +478,7 @@ public class CheckAuthorizationController implements Initializable, ScreenInterf
             for (Object item : tblViewMainList.getItems()) {
                 ModelDisbursementVoucher_Main item1 = (ModelDisbursementVoucher_Main) item;
                 String lschecked = item1.getIndex02();
-                String lsDVNO = item1.getIndex11();
+                String lsDVNO = item1.getIndex10();
                 String Remarks = action;
                 if (lschecked.equals("1")) {
                     checkedItems.add(lsDVNO);
