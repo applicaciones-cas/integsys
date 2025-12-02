@@ -899,7 +899,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
                 switch (lsID) {
                     case "tfSearchIndustry":
                         if (lsValue.isEmpty()) {
-                            poController.setIndustryID("");
+                            poController.setSearchIndustry("");
                         }
                         break;
                     case "tfSearchSupplier":
