@@ -1078,7 +1078,6 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                                                 }
                                                 poController.Master().setSupplierClientID("");
                                                 poController.Master().setPayeeID("");
-                                                tfSupplier.setText("");
                                                 psSupplierPayeeId = "";
                                                 loadTableDetail.reload();
                                             } else {
@@ -1093,6 +1092,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                                 }
                             }
                             poController.Master().setSupplierClientID("");
+                            poController.Master().setPayeeID("");
                         }
                         break;
                     case "tfAuthorizedPerson":
