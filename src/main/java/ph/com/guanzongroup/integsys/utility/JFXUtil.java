@@ -130,7 +130,7 @@ import javafx.scene.control.MenuItem;
 import ph.com.guanzongroup.integsys.views.ScreenInterface;
 
 /**
- * Date : 4/28/2025 Recent update: 10/30/2025
+ * Date : 4/28/2025 Recent update: 11/03/2025
  *
  * @author Aldrich
  */
@@ -989,25 +989,6 @@ public class JFXUtil {
         }
     }
 
-    /*Compares an object to any object if equal*/
-    public static boolean isObjectEqualTo(Object source, Object... others) {
-        if (source == null && others != null) {
-            for (Object other : others) {
-                if (other == null) {
-                    return true;
-                }
-            }
-            return false;
-        }
-
-        for (Object other : others) {
-            if (source != null && source.equals(other)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
     /*Sets a keypress listener to textfields in any anchorPane*/
     public static void setKeyPressedListener(EventHandler<KeyEvent> listener, AnchorPane... anchorPanes) {
         for (AnchorPane pane : anchorPanes) {
@@ -1429,7 +1410,15 @@ public class JFXUtil {
             });
         }
     }
-
+     /*Alternative version of inputDecimalOnly; commas not allowed*/
+    public static void inputIntegersOnly(TextField... foTxtFields) {
+        Pattern pattern = Pattern.compile("[0-9]*");
+        for (TextField txtField : foTxtFields) {
+            if (txtField != null) {
+                txtField.setTextFormatter(new TextFormaterUtil(pattern));
+            }
+        }
+    }
     /*Alternative version of inputDecimalOnly; restricts to 1 dot, commas not allowed*/
     public static void inputDecimalOnly(TextField... foTxtFields) {
         Pattern pattern = Pattern.compile("\\d*(\\.\\d*)?");
@@ -2326,7 +2315,7 @@ public class JFXUtil {
                         {
                             // Center checkbox
                             setStyle("-fx-alignment: CENTER;");
-                            setCheckboxStyle("#7B8182", checkBox);
+//                            setCheckboxStyle("#7B8182", checkBox);
                             // Cursor binding
                             checkBox.cursorProperty().bind(
                                     Bindings.when(disableAll)
@@ -2405,50 +2394,6 @@ public class JFXUtil {
             PauseTransition delay = new PauseTransition(Duration.seconds(seconds));
             delay.setOnFinished(e -> action.run());
             delay.play();
-        });
-    }
-
-    /*Experimental; Modern checkbox UI*/
- /*Requires hex color, and checkbox id*/
-    public static void setCheckboxStyle(String hexColor, CheckBox... checkBoxes) {
-        for (CheckBox cb : checkBoxes) {
-            if (!cb.getStyleClass().contains("modern")) {
-                cb.getStyleClass().add("modern");
-            }
-            cb.setStyle("-c-accent: " + hexColor + ";");
-
-            cb.skinProperty().addListener((obs, oldSkin, newSkin) -> {
-                if (newSkin != null) {
-                    setupCheckAnimation(cb);
-                }
-            });
-            Platform.runLater(() -> setupCheckAnimation(cb));
-        }
-    }
-
-    //private
-    private static void setupCheckAnimation(CheckBox cb) {
-        Node mark = cb.lookup(".mark");
-        if (mark == null) {
-            return;
-        }
-
-        ScaleTransition popIn = new ScaleTransition(Duration.millis(140), mark);
-        popIn.setFromX(0.6);
-        popIn.setFromY(0.6);
-        popIn.setToX(1.0);
-        popIn.setToY(1.0);
-
-        cb.selectedProperty().addListener((o, was, isNow) -> {
-            if (isNow) {
-                mark.setScaleX(0.6);
-                mark.setScaleY(0.6);
-                popIn.stop();
-                popIn.playFromStart();
-            } else {
-                mark.setScaleX(0.0);
-                mark.setScaleY(0.0);
-            }
         });
     }
 
@@ -2551,18 +2496,44 @@ public class JFXUtil {
 
     /*Requests focus on a textfield, only if its object condition is null or blank*/
     public static void requestFocusNullField(Object[][] checks, TextField fallback) {
-        Stream.of(checks)
+        TextField target = Stream.of(checks)
                 .filter(c -> {
                     try {
                         return isObjectEqualTo(c[0], null, "");
                     } catch (Exception e) {
-                        return false; // skip and continue to next object
+                        return false;
                     }
                 })
                 .map(c -> (TextField) c[1])
+                .filter(tf -> tf != null && !tf.isDisabled())
                 .findFirst()
-                .orElse(fallback)
-                .requestFocus();
+                .orElse(null);
+
+        // focus result
+        if (target != null) {
+            target.requestFocus();
+        } else if (fallback != null && !fallback.isDisabled()) {
+            fallback.requestFocus();
+        }
+    }
+
+    /*Compares an object to any object if equal*/
+    public static boolean isObjectEqualTo(Object source, Object... others) {
+        if (source == null && others != null) {
+            for (Object other : others) {
+                if (other == null) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        for (Object other : others) {
+            if (source != null && source.equals(other)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /*Returns title from class*/
@@ -2661,6 +2632,7 @@ public class JFXUtil {
         }
     }
 
+    /*Gets Node id and returns string English format of the id*/
     public static String IDToWord(String id) {
         if (id == null || id.isEmpty()) {
             return "";
@@ -2676,6 +2648,8 @@ public class JFXUtil {
         return withSpaces.trim();
     }
 
+    /*ComboBox value setter; Prevents listener to trigger while setting value*/
+ /*requires combobox id and index value to be selected*/
     public static void setCmbValue(ComboBox<?> comboBox, int value) {
         // Save original listener
         EventHandler<ActionEvent> originalHandler = comboBox.getOnAction();
@@ -2690,6 +2664,8 @@ public class JFXUtil {
         comboBox.setOnAction(originalHandler);
     }
 
+    /*Returns description or code of the source type*/
+ /*Requires string value(for comparison) and boolean if the string value is code(to return description); alternatively*/
     public static String getSourceType(String lsValue, boolean isCode) {
         if (lsValue == null || lsValue.trim().isEmpty()) {
             return "";
@@ -2710,14 +2686,28 @@ public class JFXUtil {
 
         return "";
     }
+    //private static source
     private static final Map<String, String> SOURCE_MAP = new HashMap<>();
 
     static {
         SOURCE_MAP.put("PRFx", "PRF");
         SOURCE_MAP.put("SOAt", "SOA");
-        SOURCE_MAP.put("CcPy", "Cash Payable");
+        SOURCE_MAP.put("CcPy", "Cache Payable");
         SOURCE_MAP.put("PORc", "PO Receiving");
         SOURCE_MAP.put("APAd", "AP Adjustment");
         SOURCE_MAP.put("PO", "Purchase Order");
+    }
+
+    public static void setDateValue(DatePicker datePicker, LocalDate value) {
+        if (datePicker == null) {
+            return;
+        }
+        EventHandler<ActionEvent> originalHandler = datePicker.getOnAction();
+        try {
+            datePicker.setOnAction(null);
+            datePicker.setValue(value);
+        } finally {
+            datePicker.setOnAction(originalHandler);
+        }
     }
 }

@@ -5,7 +5,6 @@
 package ph.com.guanzongroup.integsys.views;
 
 import ph.com.guanzongroup.integsys.model.ModelDisbursementVoucher_Detail;
-import ph.com.guanzongroup.integsys.model.ModelDisbursementVoucher_Main;
 import ph.com.guanzongroup.integsys.model.ModelJournalEntry_Detail;
 import ph.com.guanzongroup.integsys.utility.CustomCommonUtil;
 import ph.com.guanzongroup.integsys.utility.JFXUtil;
@@ -21,7 +20,6 @@ import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
-import javafx.collections.transformation.SortedList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -47,6 +45,7 @@ import org.guanzon.appdriver.agent.ShowMessageFX;
 import org.guanzon.appdriver.base.CommonUtils;
 import org.guanzon.appdriver.base.GRiderCAS;
 import org.guanzon.appdriver.base.GuanzonException;
+import org.guanzon.appdriver.base.MiscUtil;
 import org.guanzon.appdriver.base.SQLUtil;
 import org.guanzon.appdriver.constant.EditMode;
 import org.guanzon.appdriver.constant.Logical;
@@ -54,6 +53,7 @@ import org.json.simple.JSONObject;
 import ph.com.guanzongroup.cas.cashflow.DisbursementVoucher;
 import ph.com.guanzongroup.cas.cashflow.services.CashflowControllers;
 import ph.com.guanzongroup.cas.cashflow.status.DisbursementStatic;
+import ph.com.guanzongroup.integsys.model.ModelBIR_Detail;
 
 /**
  * FXML Controller class
@@ -63,38 +63,28 @@ import ph.com.guanzongroup.cas.cashflow.status.DisbursementStatic;
 public class DisbursementVoucher_ViewController implements Initializable, ScreenInterface {
 
     private GRiderCAS oApp;
-    private JSONObject poJSON, poJSONVAT;
-    private static final int ROWS_PER_PAGE = 50;
-    private int pnMain = 0;
+    private JSONObject poJSON;
     private int pnDetail = 0;
-    private int pnDetailJE = 0;
-    private boolean pbIsCheckedJournalTab = false;
-    private boolean pbIsVerifier = false;
-    private boolean isWithVAToriginal = false;
+    private int pnDetailBIR = 0;
     private final String pxeModuleName = "Disbursement Voucher View";
     private DisbursementVoucher poController;
     public int pnEditMode;
-    boolean pbKeyPressed = false;
     private String psIndustryId = "";
     private String psCompanyId = "";
     private String psCategoryId = "";
-    private String psSupplierPayeeId = "";
-    private String psTransactionType = "";
-    private String psSearchSupplierID = "";
-    private String psSearchTransactionNo = "";
     private String psTransactionNo = "";
 
     private unloadForm poUnload = new unloadForm();
     private ObservableList<ModelDisbursementVoucher_Detail> details_data = FXCollections.observableArrayList();
     private FilteredList<ModelDisbursementVoucher_Detail> filteredDataDetailDV;
 
-    private ObservableList<ModelJournalEntry_Detail> journal_data = FXCollections.observableArrayList();
+    private ObservableList<ModelBIR_Detail> BIR_data = FXCollections.observableArrayList();
     private FilteredList<ModelJournalEntry_Detail> filteredJournal_Data;
 
     AtomicReference<Object> lastFocusedTextField = new AtomicReference<>();
     AtomicReference<Object> previousSearchedTextField = new AtomicReference<>();
 
-    JFXUtil.ReloadableTableTask loadTableDetail, loadTableDetailJE;
+    JFXUtil.ReloadableTableTask loadTableDetail, loadTableDetailBIR;
 
     ObservableList<String> cPaymentMode = FXCollections.observableArrayList(
             "CHECK", "WIRED", "DIGITAL PAYMENT");
@@ -109,31 +99,31 @@ public class DisbursementVoucher_ViewController implements Initializable, Screen
 
     /* DV  & Journal */
     @FXML
-    private AnchorPane AnchorMain, apButton, apMasterDetail, apDVMaster1, apMasterDVCheck, apMasterDVBTransfer, apMasterDVOp, apDVMaster2, apDVMaster3, apDVDetail;
+    private AnchorPane AnchorMain, apButton, apMasterDetail, apDVMaster1, apMasterDVCheck, apMasterDVBTransfer, apMasterDVOp, apDVMaster2, apDVMaster3, apDVDetail, apBIRDetail;
     @FXML
     private StackPane StackPane;
     @FXML
     private Button btnClose;
     @FXML
-    private TextField tfDVTransactionNo, tfVoucherNo, tfSupplier, tfCheckNo, tfCheckAmount, tfBankNameCheck, tfBankAccountCheck, tfPayeeName, tfAuthorizedPerson, tfPaymentAmountBTransfer, tfBankTransReferNo, tfSupplierBank, tfSupplierAccountNoBTransfer, tfBankNameBTransfer, tfBankAccountBTransfer, tfPaymentAmount, tfPaymentReferenceNo, tfSupplierServiceName, tfSupplierAccountNo, tfBankNameOnlinePayment, tfBankAccountOnlinePayment, tfVatAmountMaster, tfVatExemptSales, tfLessWHTax, tfTotalNetAmount, tfTotalAmount, tfVatZeroRatedSales, tfVatableSales, tfRefNoDetail, tfVatableSalesDetail, tfVatExemptDetail, tfVatZeroRatedSalesDetail, tfVatRateDetail, tfVatAmountDetail, tfTaxRateDetail, tfTaxAmountDetail, tfPurchasedAmountDetail, tfNetAmountDetail;
+    private TabPane tabPaneMain, tabPanePaymentMode;
     @FXML
-    private DatePicker dpDVTransactionDate, dpCheckDate;
+    private Tab tabDisbursement, tabCheck, tabBankTransfer, tabOnlinePayment, tabBIR;
+    @FXML
+    private TextField tfDVTransactionNo, tfSupplier, tfVoucherNo, tfBankNameCheck, tfBankAccountCheck, tfPayeeName, tfCheckNo, tfCheckAmount, tfAuthorizedPerson, tfBankNameBTransfer, tfBankAccountBTransfer, tfPaymentAmountBTransfer, tfSupplierBank, tfSupplierAccountNoBTransfer, tfBankTransReferNo, tfBankNameOnlinePayment, tfBankAccountOnlinePayment, tfPaymentAmount, tfSupplierServiceName, tfSupplierAccountNo, tfPaymentReferenceNo, tfTotalAmount, tfVatableSales, tfVatAmountMaster, tfVatZeroRatedSales, tfVatExemptSales, tfLessWHTax, tfTotalNetAmount, tfRefNoDetail, tfVatableSalesDetail, tfVatExemptDetail, tfVatZeroRatedSalesDetail, tfVatRateDetail, tfVatAmountDetail, tfPurchasedAmountDetail, tfNetAmountDetail, tfBIRTransactionNo, tfTaxCode, tfParticular, tfBaseAmount, tfTaxRate, tfTotalTaxAmount;
+    @FXML
+    private DatePicker dpDVTransactionDate, dpCheckDate, dpPeriodFrom, dpPeriodTo;
     @FXML
     private ComboBox cmbPaymentMode, cmbPayeeType, cmbDisbursementMode, cmbClaimantType, cmbCheckStatus, cmbOtherPaymentBTransfer, cmbOtherPayment;
     @FXML
-    private TabPane tabPanePaymentMode;
-    @FXML
-    private Tab tabCheck, tabBankTransfer, tabOnlinePayment;
-    @FXML
-    private CheckBox chbkPrintByBank, chbkIsCrossCheck, chbkIsPersonOnly, chbkVatClassification;
+    private CheckBox chbkPrintByBank, chbkIsCrossCheck, chbkIsPersonOnly, chbkVatClassification, cbReverse;
     @FXML
     private Label lblDVTransactionStatus;
     @FXML
     private TextArea taDVRemarks;
     @FXML
-    private TableView tblVwDetails;
+    private TableView tblVwDetails, tblVwBIRDetails;
     @FXML
-    private TableColumn tblDVRowNo, tblReferenceNo, tblTransactionTypeDetail, tblPurchasedAmount, tblVatableSales, tblVatAmt, tblVatRate, tblVatZeroRatedSales, tblVatExemptSales, tblTaxCode, tblTaxAmount, tblNetAmount;
+    private TableColumn tblDVRowNo, tblReferenceNo, tblTransactionTypeDetail, tblPurchasedAmount, tblVatableSales, tblVatAmt, tblVatRate, tblVatZeroRatedSales, tblVatExemptSales, tblNetAmount, tblBIRRowNo, tblBIRParticular, tblTaxCode, tblBaseAmount, tblTaxRate, tblTaxAmount;
 
     @Override
     public void setGRider(GRiderCAS foValue) {
@@ -172,36 +162,41 @@ public class DisbursementVoucher_ViewController implements Initializable, Screen
             try {
                 poController = new CashflowControllers(oApp, null).DisbursementVoucher();
                 poJSON = new JSONObject();
+                initLoadTable();
+                initButtonsClickActions();
+                initComboBoxes();
+                initDatePicker();
+                initDetailGrid();
+                initDetailBIRGrid();
+                initTableOnClick();
+                initTabPane();
+                clearTextFields();
+                btnClose.setOnAction(this::cmdButton_Click);
                 poJSON = poController.InitTransaction(); // Initialize transaction
                 if (!"success".equals((String) poJSON.get("result"))) {
                     ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                    CommonUtils.closeStage(btnClose);
                 }
                 poJSON = poController.OpenTransaction(psTransactionNo);
                 if (!"error".equals((String) poJSON.get("result"))) {
                     if (poController.Master().getDisbursementType().equals(DisbursementStatic.DisbursementType.CHECK)) {
 //                        poController.setCheckpayment();
                     }
-                    initLoadTable();
-                    initButtonsClickActions();
-                    initComboBoxes();
-                    initDatePicker();
-                    initDetailGrid();
-                    initTableOnClick();
-                    initTabPane();
-                    clearTextFields();
-                    pnEditMode = EditMode.UNKNOWN;
 
+                    pnEditMode = poController.getEditMode();
+                    loadTableDetail.reload();
                     initButton(pnEditMode);
                 } else {
-                    ShowMessageFX.Warning((String) poJSON.get("message"), pxeModuleName, null);
-                    CommonUtils.closeStage(btnClose);
+                    Platform.runLater(() -> {
+                        ShowMessageFX.Warning((String) poJSON.get("message"), pxeModuleName, null);
+                        CommonUtils.closeStage(btnClose);
+                    });
                 }
             } catch (SQLException | GuanzonException | CloneNotSupportedException | ScriptException ex) {
                 Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+                ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
             }
         }
-        initTableOnClick();
-        btnClose.setOnAction(this::cmdButton_Click);
     }
 
     public void initTabPane() {
@@ -218,27 +213,59 @@ public class DisbursementVoucher_ViewController implements Initializable, Screen
                 }
             });
         });
+        tabPaneMain.getSelectionModel().selectedItemProperty().addListener((obs, oldTab, newTab) -> {
+            if (newTab != null) {
+                String tabTitle = newTab.getText();
+                switch (tabTitle) {
+                    case "Disbursement Voucher":
+                        if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
+                            pnDetailBIR = 0;
+                        }
+                        break;
+                    case "BIR 2307":
+                        if (pnEditMode == EditMode.READY || pnEditMode == EditMode.UPDATE || pnEditMode == EditMode.ADDNEW) {
+                            populateBIR();
+                        }
+                        break;
+                }
+            }
+        });
+    }
+
+    private void populateBIR() {
+        try {
+            poJSON = new JSONObject();
+            JFXUtil.clearTextFields(apBIRDetail);
+            poJSON = poController.populateWithholdingTaxDeduction();
+            if (JFXUtil.isJSONSuccess(poJSON)) {
+                loadTableDetailBIR.reload();
+            } else {
+                BIR_data.clear();
+            }
+        } catch (SQLException | GuanzonException | CloneNotSupportedException | ScriptException ex) {
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
+        }
     }
 
     //Disables/ Enables tabs
     private void initDVMasterTabs() {
-        boolean lbShow = JFXUtil.isObjectEqualTo(pnEditMode, EditMode.READY, EditMode.ADDNEW, EditMode.UPDATE);
         JFXUtil.setDisabled(true, tabCheck, tabOnlinePayment, tabBankTransfer);
         switch (poController.Master().getDisbursementType()) {
             case DisbursementStatic.DisbursementType.CHECK:
-                JFXUtil.setDisabled(!lbShow, tabCheck);
+                JFXUtil.setDisabled(false, tabCheck);
                 JFXUtil.clickTabByTitleText(tabPanePaymentMode, "Check");
                 loadRecordMasterCheck();
                 //must reset data of check
                 break;
             case DisbursementStatic.DisbursementType.WIRED:
-                JFXUtil.setDisabled(!lbShow, tabBankTransfer);
+                JFXUtil.setDisabled(false, tabBankTransfer);
                 JFXUtil.clickTabByTitleText(tabPanePaymentMode, "Bank Transfer");
                 loadRecordMasterBankTransfer();
                 //must reset data of btransfer
                 break;
             case DisbursementStatic.DisbursementType.DIGITAL_PAYMENT:
-                JFXUtil.setDisabled(!lbShow, tabOnlinePayment);
+                JFXUtil.setDisabled(false, tabOnlinePayment);
                 JFXUtil.clickTabByTitleText(tabPanePaymentMode, "E-Wallet");
                 loadRecordMasterOnlinePayment();
                 //must reset data of online payment
@@ -248,6 +275,7 @@ public class DisbursementVoucher_ViewController implements Initializable, Screen
                 JFXUtil.clickTabByTitleText(tabPanePaymentMode, "Check");
                 break;
         }
+        initButton(pnEditMode);
     }
 
     private void initButtonsClickActions() {
@@ -270,12 +298,12 @@ public class DisbursementVoucher_ViewController implements Initializable, Screen
                 ShowMessageFX.Warning(null, pxeModuleName, "Button is not registered");
                 break;
         }
-
-        loadRecordMaster();
-        loadTableDetail.reload();
-        loadTableDetailJE.reload();
-        initDVMasterTabs();
-        initButton(pnEditMode);
+        try {
+            loadRecordMaster();
+            loadTableDetail.reload();
+            initButton(pnEditMode);
+        } catch (Exception e) {
+        }
     }
 
     public void initLoadTable() {
@@ -284,90 +312,78 @@ public class DisbursementVoucher_ViewController implements Initializable, Screen
                 details_data,
                 () -> {
                     Platform.runLater(() -> {
+                        details_data.clear();
+                        for (int lnCtr = 0; lnCtr < poController.getDetailCount(); lnCtr++) {
+                            details_data.add(
+                                    new ModelDisbursementVoucher_Detail(String.valueOf(lnCtr + 1),
+                                            poController.Detail(lnCtr).getSourceNo(),
+                                            poController.getSourceCodeDescription(poController.Detail(lnCtr).getSourceCode()),
+                                            CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(lnCtr).getAmountApplied(), true),
+                                            CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(lnCtr).getDetailVatSales(), true),
+                                            String.valueOf(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(lnCtr).getDetailVatAmount(), true)),
+                                            CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(lnCtr).getDetailVatRates(), false),
+                                            CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(lnCtr).getDetailZeroVat(), true),
+                                            CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(lnCtr).getDetailVatExempt(), true),
+                                            CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(lnCtr).getAmount(), true)
+                                    ));
+                        }
+                        if (pnDetail < 0 || pnDetail
+                                >= details_data.size()) {
+                            if (!details_data.isEmpty()) {
+                                /* FOCUS ON FIRST ROW */
+                                JFXUtil.selectAndFocusRow(tblVwDetails, 0);
+                                pnDetail = tblVwDetails.getSelectionModel().getSelectedIndex();
+                                loadRecordDetail();
+                            }
+                        } else {
+                            /* FOCUS ON THE ROW THAT pnRowDetail POINTS TO */
+                            JFXUtil.selectAndFocusRow(tblVwDetails, pnDetail);
+                            loadRecordDetail();
+                        }
+                        loadRecordMaster();
+                    });
+                });
+        loadTableDetailBIR = new JFXUtil.ReloadableTableTask(
+                tblVwBIRDetails,
+                BIR_data,
+                () -> {
+                    Platform.runLater(() -> {
+                        BIR_data.clear();
                         try {
-                            details_data.clear();
-                            int lnCtr;
-                            if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
-                                lnCtr = poController.getDetailCount() - 1;
-                                while (lnCtr >= 0) {
-                                    if (poController.Detail(lnCtr).getSourceNo() == null || poController.Detail(lnCtr).getSourceNo().equals("")) {
-                                        poController.Detail().remove(lnCtr);
-                                    }
-                                    lnCtr--;
-                                }
-
-                                if ((poController.getDetailCount() - 1) >= 0) {
-                                    if (poController.Detail(poController.getDetailCount() - 1).getSourceNo() != null && !poController.Detail(poController.getDetailCount() - 1).getSourceNo().equals("")) {
-                                        poController.AddDetail();
-                                    }
-                                }
-
-                                if ((poController.getDetailCount() - 1) < 0) {
-                                    poController.AddDetail();
+                            int lnRowCount = 0;
+                            for (int lnCtr = 0; lnCtr < poController.getWTaxDeductionsCount(); lnCtr++) {
+                                if (poController.WTaxDeduction(lnCtr).getModel().isReverse()) {
+                                    lnRowCount += 1;
+                                    BIR_data.add(new ModelBIR_Detail(String.valueOf(lnRowCount),
+                                            poController.WTaxDeduction(lnCtr).getModel().WithholdingTax().AccountChart().getDescription(),
+                                            poController.WTaxDeduction(lnCtr).getModel().getTaxCode(),
+                                            CustomCommonUtil.setIntegerValueToDecimalFormat(poController.WTaxDeduction(lnCtr).getModel().getBaseAmount(), false),
+                                            CustomCommonUtil.setIntegerValueToDecimalFormat(poController.WTaxDeduction(lnCtr).getModel().WithholdingTax().getTaxRate(), false),
+                                            CustomCommonUtil.setIntegerValueToDecimalFormat(poController.WTaxDeduction(lnCtr).getModel().getTaxAmount(), false),
+                                            String.valueOf(lnCtr))
+                                    );
                                 }
                             }
-
-                            if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
-                                lnCtr = poController.getDetailCount() - 1;
-                                if (lnCtr >= 0) {
-                                    String lsSourceNo = poController.Detail(lnCtr).getSourceNo();
-                                    if (!lsSourceNo.isEmpty() || poController.Detail(lnCtr).getSourceNo() == null) {
-                                        try {
-                                            poController.AddDetail();
-
-                                        } catch (CloneNotSupportedException ex) {
-                                            Logger.getLogger(getClass()
-                                                    .getName()).log(Level.SEVERE, null, ex);
-                                        }
-                                    }
-                                }
-                            }
-
-                            for (lnCtr = 0; lnCtr < poController.getDetailCount(); lnCtr++) {
-                                try {
-                                    details_data.add(
-                                            new ModelDisbursementVoucher_Detail(String.valueOf(lnCtr + 1),
-                                                    poController.Detail(lnCtr).getSourceNo(),
-                                                    JFXUtil.getSourceType(poController.Detail(lnCtr).getSourceCode(), true),
-                                                    poController.Detail(lnCtr).Particular().getDescription(),
-                                                    CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(lnCtr).getAmountApplied(), true),
-                                                    CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(lnCtr).getDetailVatSales(), true),
-                                                    String.valueOf(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(lnCtr).getDetailVatAmount(), true)),
-                                                    CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(lnCtr).getDetailVatRates(), false),
-                                                    CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(lnCtr).getDetailZeroVat(), true),
-                                                    CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(lnCtr).getDetailVatExempt(), true),
-                                                    poController.Detail(lnCtr).TaxCode().getTaxCode(),
-                                                    CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(lnCtr).getTaxAmount(), true),
-                                                    CustomCommonUtil.setIntegerValueToDecimalFormat(poController.getDetailNetTotal(lnCtr), true)
-                                            ));
-
-                                } catch (SQLException | GuanzonException ex) {
-                                    Logger.getLogger(getClass()
-                                            .getName()).log(Level.SEVERE, null, ex);
-                                }
-                            }
-                            if (pnDetail < 0 || pnDetail
-                                    >= details_data.size()) {
-                                if (!details_data.isEmpty()) {
+                            int lnTempRow = JFXUtil.getDetailRow(BIR_data, pnDetailBIR, 7); //this method is used only when Reverse is applied
+                            if (lnTempRow < 0 || lnTempRow
+                                    >= BIR_data.size()) {
+                                if (!BIR_data.isEmpty()) {
                                     /* FOCUS ON FIRST ROW */
-                                    JFXUtil.selectAndFocusRow(tblVwDetails, 0);
-                                    pnDetail = tblVwDetails.getSelectionModel().getSelectedIndex();
-                                    loadRecordDetail();
+                                    JFXUtil.selectAndFocusRow(tblVwBIRDetails, 0);
+                                    int lnRow = Integer.parseInt(BIR_data.get(0).getIndex07());
+                                    pnDetailBIR = lnRow;
+                                    loadRecordDetailBIR();
                                 }
                             } else {
-//                            try {
-                                /* FOCUS ON THE ROW THAT pnRowDetail POINTS TO */
-                                JFXUtil.selectAndFocusRow(tblVwDetails, pnDetail);
-                                loadRecordDetail();
-//                            } catch (SQLException ex) {
-//                                Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
-//                            }
+                                /* FOCUS ON THE ROW THAT pnDetailBIR POINTS TO */
+                                JFXUtil.selectAndFocusRow(tblVwBIRDetails, lnTempRow);
+                                int lnRow = Integer.parseInt(BIR_data.get(tblVwBIRDetails.getSelectionModel().getSelectedIndex()).getIndex07());
+                                pnDetailBIR = lnRow;
+                                loadRecordDetailBIR();
                             }
-
-                            loadRecordMaster();
-
-                        } catch (CloneNotSupportedException ex) {
-                            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+                        } catch (SQLException | GuanzonException ex) {
+                            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+                            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
                         }
                     });
                 });
@@ -375,10 +391,18 @@ public class DisbursementVoucher_ViewController implements Initializable, Screen
 
     private void initDetailGrid() {
         JFXUtil.setColumnCenter(tblDVRowNo, tblReferenceNo);
-        JFXUtil.setColumnLeft(tblTransactionTypeDetail, tblTaxCode);
-        JFXUtil.setColumnRight(tblPurchasedAmount, tblTaxAmount, tblNetAmount, tblVatableSales, tblVatAmt, tblVatRate, tblVatZeroRatedSales, tblVatExemptSales);
+        JFXUtil.setColumnLeft(tblTransactionTypeDetail);
+        JFXUtil.setColumnRight(tblPurchasedAmount, tblNetAmount, tblVatableSales, tblVatAmt, tblVatRate, tblVatZeroRatedSales, tblVatExemptSales);
         JFXUtil.setColumnsIndexAndDisableReordering(tblVwDetails);
         tblVwDetails.setItems(details_data);
+    }
+
+    private void initDetailBIRGrid() {
+        JFXUtil.setColumnCenter(tblBIRRowNo);
+        JFXUtil.setColumnLeft(tblBIRParticular, tblTaxCode);
+        JFXUtil.setColumnRight(tblBaseAmount, tblTaxRate, tblTaxAmount);
+        JFXUtil.setColumnsIndexAndDisableReordering(tblVwBIRDetails);
+        tblVwBIRDetails.setItems(BIR_data);
     }
 
     private void initTableOnClick() {
@@ -391,8 +415,15 @@ public class DisbursementVoucher_ViewController implements Initializable, Screen
                 }
             }
         });
-        JFXUtil.setKeyEventFilter(this::tableKeyEvents, tblVwDetails);
-        JFXUtil.adjustColumnForScrollbar(tblVwDetails);
+        tblVwBIRDetails.setOnMouseClicked(event -> {
+            if (!BIR_data.isEmpty() && event.getClickCount() == 1) { // Detect single click (or use another condition for double click)
+                int lnRow = Integer.parseInt(BIR_data.get(tblVwBIRDetails.getSelectionModel().getSelectedIndex()).getIndex07());
+                pnDetailBIR = lnRow;
+                loadRecordDetailBIR();
+            }
+        });
+        JFXUtil.setKeyEventFilter(this::tableKeyEvents, tblVwDetails, tblVwBIRDetails);
+        JFXUtil.adjustColumnForScrollbar(tblVwDetails, tblVwBIRDetails);
     }
 
     private void tableKeyEvents(KeyEvent event) {
@@ -415,6 +446,13 @@ public class DisbursementVoucher_ViewController implements Initializable, Screen
                     pnDetail = newIndex;
                     loadRecordDetail();
                     break;
+                case "tblVwBIRDetails":
+                    if (BIR_data.isEmpty()) {
+                        return;
+                    }
+                    pnDetailBIR = newIndex;
+                    loadRecordDetailBIR();
+                    break;
             }
             event.consume();
         }
@@ -422,42 +460,15 @@ public class DisbursementVoucher_ViewController implements Initializable, Screen
 
     private void loadRecordMaster() {
         try {
+            initDVMasterTabs();
             poJSON = new JSONObject();
-            if ("error".equals((String) poJSON.get("result"))) {
-                ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-                return;
-            }
-            JFXUtil.setStatusValue(lblDVTransactionStatus, DisbursementStatic.class, pnEditMode == EditMode.UNKNOWN ? "-1" : poController.Master().getTransactionStatus());
-
+            poController.computeFields();
+            JFXUtil.setStatusValue(lblDVTransactionStatus, DisbursementStatic.class, poController.Master().getTransactionStatus());
             tfDVTransactionNo.setText(poController.Master().getTransactionNo() != null ? poController.Master().getTransactionNo() : "");
             dpDVTransactionDate.setValue(CustomCommonUtil.parseDateStringToLocalDate(SQLUtil.dateFormat(poController.Master().getTransactionDate(), SQLUtil.FORMAT_SHORT_DATE)));
-
             JFXUtil.setCmbValue(cmbPaymentMode, !poController.Master().getDisbursementType().equals("") ? Integer.valueOf(poController.Master().getDisbursementType()) : -1);
-
             tfVoucherNo.setText(poController.Master().getVoucherNo());
             tfSupplier.setText(poController.Master().Payee().Client().getCompanyName() != null ? poController.Master().Payee().Client().getCompanyName() : "");
-
-            poJSON = poController.computeFields();
-            if ("error".equals((String) poJSON.get("result"))) {
-                ShowMessageFX.Warning((String) poJSON.get("message"), pxeModuleName, null);
-                return;
-            }
-//            poJSON = poController.modeOfPayment(poController.Master().getDisbursementType());
-//            if ("error".equals((String) poJSON.get("message"))) {
-//                ShowMessageFX.Warning((String) poJSON.get("message"), pxeModuleName, null);
-//            }
-            switch (poController.Master().getDisbursementType()) {
-                case DisbursementStatic.DisbursementType.CHECK:
-                    loadRecordMasterCheck();
-                    break;
-                case DisbursementStatic.DisbursementType.WIRED:
-                    loadRecordMasterBankTransfer();
-                    break;
-                case DisbursementStatic.DisbursementType.DIGITAL_PAYMENT:
-                    loadRecordMasterOnlinePayment();
-                    break;
-            }
-
             tfVatAmountMaster.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Master().getVATAmount(), true));
             tfVatExemptSales.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Master().getVATExmpt(), true));
             tfLessWHTax.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Master().getWithTaxTotal(), true));
@@ -470,6 +481,7 @@ public class DisbursementVoucher_ViewController implements Initializable, Screen
             JFXUtil.updateCaretPositions(apDVMaster1, apDVMaster2, apDVMaster3);
         } catch (GuanzonException | SQLException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -489,12 +501,33 @@ public class DisbursementVoucher_ViewController implements Initializable, Screen
         tfVatZeroRatedSalesDetail.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(pnDetail).getDetailZeroVat(), true));
         tfVatRateDetail.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(pnDetail).getDetailVatRates(), false));
         tfVatAmountDetail.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(pnDetail).getDetailVatAmount(), true));
-        tfTaxRateDetail.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(pnDetail).getTaxRates(), false));
-        tfTaxAmountDetail.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(pnDetail).getTaxAmount(), true));
         tfPurchasedAmountDetail.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(pnDetail).getAmountApplied(), true));
-        tfNetAmountDetail.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.getDetailNetTotal(pnDetail), true));
+        tfNetAmountDetail.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(pnDetail).getAmount(), true));
         JFXUtil.updateCaretPositions(apDVDetail);
+    }
 
+    public void loadRecordDetailBIR() {
+        try {
+            if (pnDetailBIR < 0 || pnDetailBIR > poController.getWTaxDeductionsCount() - 1) {
+                return;
+            }
+            tfBIRTransactionNo.setText(poController.WTaxDeduction(pnDetailBIR).getModel().getTransactionNo());
+            String lsPeriodFromDate = CustomCommonUtil.formatDateToShortString(poController.WTaxDeduction(pnDetailBIR).getModel().getPeriodFrom());
+            dpPeriodFrom.setValue(CustomCommonUtil.parseDateStringToLocalDate(lsPeriodFromDate, "yyyy-MM-dd"));
+            String lsPeriodToDate = CustomCommonUtil.formatDateToShortString(poController.WTaxDeduction(pnDetailBIR).getModel().getPeriodFrom());
+            dpPeriodTo.setValue(CustomCommonUtil.parseDateStringToLocalDate(lsPeriodToDate, "yyyy-MM-dd"));
+            tfTaxCode.setText(poController.WTaxDeduction(pnDetailBIR).getModel().getTaxCode());
+            tfParticular.setText(poController.WTaxDeduction(pnDetailBIR).getModel().WithholdingTax().AccountChart().getDescription());
+            tfBaseAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.WTaxDeduction(pnDetailBIR).getModel().getBaseAmount(), false));
+            tfTaxRate.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.WTaxDeduction(pnDetailBIR).getModel().WithholdingTax().getTaxRate()));
+            tfTotalTaxAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.WTaxDeduction(pnDetailBIR).getModel().getTaxAmount(), false));
+            cbReverse.setSelected(poController.WTaxDeduction(pnDetailBIR).getModel().isReverse());
+
+            JFXUtil.updateCaretPositions(apBIRDetail);
+        } catch (SQLException | GuanzonException ex) {
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
+        }
     }
 
     private void loadRecordMasterCheck() {
@@ -525,30 +558,10 @@ public class DisbursementVoucher_ViewController implements Initializable, Screen
             tfAuthorizedPerson.setText(poController.CheckPayments().getModel().getAuthorize() != null ? poController.CheckPayments().getModel().getAuthorize() : "");
             JFXUtil.setCmbValue(cmbCheckStatus, !poController.CheckPayments().getModel().getTransactionStatus().equals("") ? Integer.valueOf(poController.CheckPayments().getModel().getTransactionStatus()) : -1);
 
-            if (poController.Master().getBankPrint().equals(Logical.YES)) {
-                JFXUtil.setDisabled(false, cmbPayeeType, cmbDisbursementMode);
-            } else {
-                JFXUtil.setDisabled(true, cmbPayeeType, cmbDisbursementMode);
-            }
-
-            if (poController.Master().getBankPrint().equals(Logical.YES)
-                    && poController.CheckPayments().getModel().getDesbursementMode().equals("1")) {
-                JFXUtil.setDisabled(false, cmbClaimantType);
-            } else {
-                JFXUtil.setDisabled(true, cmbClaimantType);
-            }
-
-            if (poController.Master().getBankPrint().equals(Logical.YES)
-                    && poController.CheckPayments().getModel().getDesbursementMode().equals("1")
-                    && poController.CheckPayments().getModel().getClaimant().equals("0")) {
-                JFXUtil.setDisabled(false, tfAuthorizedPerson);
-            } else {
-                JFXUtil.setDisabled(true, tfAuthorizedPerson);
-            }
-
             JFXUtil.updateCaretPositions(apMasterDVCheck);
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -566,6 +579,7 @@ public class DisbursementVoucher_ViewController implements Initializable, Screen
             JFXUtil.updateCaretPositions(apMasterDVBTransfer);
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -585,6 +599,7 @@ public class DisbursementVoucher_ViewController implements Initializable, Screen
             JFXUtil.updateCaretPositions(apMasterDVOp);
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -596,16 +611,15 @@ public class DisbursementVoucher_ViewController implements Initializable, Screen
     }
 
     private void initDatePicker() {
-        JFXUtil.setDatePickerFormat("MM/dd/yyyy", dpDVTransactionDate, dpCheckDate);
+        JFXUtil.setDatePickerFormat("MM/dd/yyyy", dpDVTransactionDate, dpCheckDate, dpPeriodFrom, dpPeriodTo);
     }
 
     private void initButton(int fnEditMode) {
-        boolean lbShow = (fnEditMode == EditMode.ADDNEW || fnEditMode == EditMode.UPDATE);
-        JFXUtil.setDisabled(!lbShow, apDVMaster1, apDVMaster2, apDVMaster3, apDVDetail, apMasterDVCheck, apMasterDVBTransfer, apMasterDVOp);
+        JFXUtil.setDisabled(true, apDVMaster1, apDVMaster2, apDVMaster3, apDVDetail, apMasterDVCheck, apMasterDVBTransfer, apMasterDVOp, apBIRDetail);
     }
 
     private void clearTextFields() {
         JFXUtil.setValueToNull(previousSearchedTextField, lastFocusedTextField);
-        JFXUtil.clearTextFields(apDVMaster1, apDVDetail, apDVMaster2, apDVMaster3, apMasterDVCheck, apMasterDVBTransfer, apMasterDVOp);
+        JFXUtil.clearTextFields(apDVMaster1, apDVDetail, apDVMaster2, apDVMaster3, apMasterDVCheck, apMasterDVBTransfer, apMasterDVOp, apBIRDetail);
     }
 }

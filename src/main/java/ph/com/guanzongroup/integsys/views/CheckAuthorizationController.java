@@ -80,7 +80,7 @@ public class CheckAuthorizationController implements Initializable, ScreenInterf
     @FXML
     private AnchorPane AnchorMain, apBrowse, apButton;
     @FXML
-    private TextField tfSearchBankName, tfSearchBankAccount;
+    private TextField tfSearchIndustry, tfSearchBankName, tfSearchBankAccount;
     @FXML
     private Label lblSource;
     @FXML
@@ -121,7 +121,7 @@ public class CheckAuthorizationController implements Initializable, ScreenInterf
     public void initialize(URL url, ResourceBundle rb) {
         try {
             poDisbursementController = new CashflowControllers(oApp, null).DisbursementVoucher();
-            poDisbursementController.setTransactionStatus(DisbursementStatic.VERIFIED);
+            poDisbursementController.setTransactionStatus(DisbursementStatic.CERTIFIED);
             poJSON = new JSONObject();
             poDisbursementController.setWithUI(true);
             poJSON = poDisbursementController.InitTransaction();
@@ -144,6 +144,7 @@ public class CheckAuthorizationController implements Initializable, ScreenInterf
             });
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -188,10 +189,13 @@ public class CheckAuthorizationController implements Initializable, ScreenInterf
     private void loadRecordSearch() {
         try {
             lblSource.setText(poDisbursementController.Master().Company().getCompanyName() + " - " + poDisbursementController.Master().Industry().getDescription());
+            tfSearchIndustry.setText(poDisbursementController.getSearchIndustry());
             tfSearchBankName.setText(poDisbursementController.CheckPayments().getModel().Banks().getBankName() != null ? poDisbursementController.CheckPayments().getModel().Banks().getBankName() : "");
             tfSearchBankAccount.setText(poDisbursementController.CheckPayments().getModel().Bank_Account_Master().getAccountNo() != null ? poDisbursementController.CheckPayments().getModel().Bank_Account_Master().getAccountNo() : "");
+            JFXUtil.updateCaretPositions(apBrowse);
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -227,11 +231,10 @@ public class CheckAuthorizationController implements Initializable, ScreenInterf
                 break;
         }
         initButtons();
-
     }
 
     private void initTextFields() {
-        JFXUtil.setFocusListener(txtSearch_Focus, tfSearchBankName, tfSearchBankAccount);
+        JFXUtil.setFocusListener(txtSearch_Focus, tfSearchIndustry, tfSearchBankName, tfSearchBankAccount);
         JFXUtil.setKeyPressedListener(this::txtField_KeyPressed, apBrowse);
         JFXUtil.adjustColumnForScrollbar(tblViewMainList);
     }
@@ -239,6 +242,12 @@ public class CheckAuthorizationController implements Initializable, ScreenInterf
     ChangeListener<Boolean> txtSearch_Focus = JFXUtil.FocusListener(TextField.class,
             (lsID, lsValue) -> {
                 switch (lsID) {
+                    case "tfSearchIndustry":
+                        if (lsValue.isEmpty()) {
+                            poDisbursementController.setSearchIndustry("");
+                        }
+                        break;
+
                     case "tfSearchBankName":
                         if (lsValue.isEmpty()) {
                             poDisbursementController.CheckPayments().getModel().setBankID("");
@@ -273,6 +282,16 @@ public class CheckAuthorizationController implements Initializable, ScreenInterf
                         break;
                     case F3:
                         switch (lsID) {
+                            case "tfSearchIndustry":
+                                poJSON = poDisbursementController.SearchIndustry(lsValue, false);
+                                if ("error".equals((String) poJSON.get("result"))) {
+                                    ShowMessageFX.Information(null, pxeModuleName, (String) poJSON.get("message"));
+                                    return;
+                                } else {
+                                    loadRecordSearch();
+                                    retrieveDisbursement();
+                                }
+                                break;
                             case "tfSearchBankName":
                                 poJSON = poDisbursementController.SearchBanks(lsValue, false);
                                 if ("error".equals((String) poJSON.get("result"))) {
@@ -302,31 +321,30 @@ public class CheckAuthorizationController implements Initializable, ScreenInterf
                 }
             } catch (GuanzonException | SQLException ex) {
                 Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+                ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
             }
-
         }
     }
 
     private void retrieveDisbursement() {
         try {
-            poJSON = poDisbursementController.loadTransactionList(psSearchBankID, psSearchBankAccountID, "", true);
+            poJSON = poDisbursementController.loadTransactionList(tfSearchIndustry.getText(), tfSearchBankName.getText(), tfSearchBankAccount.getText(), "", true);
 
             if ("error".equals(poJSON.get("result"))) {
-                ShowMessageFX.Error(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
+//                ShowMessageFX.Error(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
             } else {
                 Platform.runLater(() -> {
                     chckSelectAll.setSelected(false);
                     checkedItem.clear();
-                    if (poDisbursementController.getDetailCount() > 0) {
-                        for (int lnCntr = 0; lnCntr < poDisbursementController.getMasterList().size() - 1; lnCntr++) {
-                            checkedItem.add("0");
-                        }
+                    for (int lnCntr = 0; lnCntr < poDisbursementController.getMasterList().size(); lnCntr++) {
+                        checkedItem.add("0");
                     }
-                    loadTableMain.reload();
                 });
             }
+            loadTableMain.reload();
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -338,8 +356,8 @@ public class CheckAuthorizationController implements Initializable, ScreenInterf
                     Platform.runLater(() -> {
                         try {
                             main_data.clear();
-                            if (poDisbursementController.getMasterList().size() - 1 > 0) {
-                                for (int lnCntr = 0; lnCntr < poDisbursementController.getMasterList().size() - 1; lnCntr++) {
+                            if (poDisbursementController.getMasterList().size() > 0) {
+                                for (int lnCntr = 0; lnCntr < poDisbursementController.getMasterList().size(); lnCntr++) {
                                     String lsPaymentForm = "";
                                     String lsBankName = "";
                                     String lsBankAccount = "";
@@ -373,13 +391,14 @@ public class CheckAuthorizationController implements Initializable, ScreenInterf
                                     main_data.add(new ModelDisbursementVoucher_Main(
                                             String.valueOf(lnCntr + 1),
                                             checkedItem.get(lnCntr),// 0 as unchecked, 1 as checked
-                                            poDisbursementController.getMaster(lnCntr).getTransactionNo(),
+                                            poDisbursementController.getMaster(lnCntr).getVoucherNo(),
                                             CustomCommonUtil.formatDateToShortString(poDisbursementController.getMaster(lnCntr).getTransactionDate()),
                                             poDisbursementController.getMaster(lnCntr).Payee().getPayeeName(),
                                             poDisbursementController.getMaster(lnCntr).Payee().getPayeeName(),
                                             lsBankName,
                                             lsBankAccount,
-                                            CustomCommonUtil.setIntegerValueToDecimalFormat(poDisbursementController.getMaster(lnCntr).getNetTotal(), true)
+                                            CustomCommonUtil.setIntegerValueToDecimalFormat(poDisbursementController.getMaster(lnCntr).getNetTotal(), true),
+                                            poDisbursementController.getMaster(lnCntr).getTransactionNo()
                                     ));
                                 }
                             } else {
@@ -391,7 +410,6 @@ public class CheckAuthorizationController implements Initializable, ScreenInterf
                                     /* FOCUS ON FIRST ROW */
                                     JFXUtil.selectAndFocusRow(tblViewMainList, 0);
                                     pnMain = tblViewMainList.getSelectionModel().getSelectedIndex();
-
                                 }
                             } else {
                                 /* FOCUS ON THE ROW THAT pnRowDetail POINTS TO */
@@ -400,7 +418,9 @@ public class CheckAuthorizationController implements Initializable, ScreenInterf
                             JFXUtil.loadTab(pagination, main_data.size(), ROWS_PER_PAGE, tblViewMainList, filteredMain_Data);
                         } catch (SQLException | GuanzonException ex) {
                             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+                            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
                         }
+                        initButtons();
                     });
                 });
     }
@@ -422,18 +442,18 @@ public class CheckAuthorizationController implements Initializable, ScreenInterf
                     if (selected != null) {
                         pnMain = tblViewMainList.getSelectionModel().getSelectedIndex();
                     }
-                    if (JFXUtil.isObjectEqualTo(selected.getIndex03(), null, "")) {
+                    if (JFXUtil.isObjectEqualTo(selected.getIndex10(), null, "")) {
                         ShowMessageFX.Warning("Unable to view transaction.", pxeModuleName, null);
                         return;
                     } else {
-                        showDVWindow(selected.getIndex03());
+                        showDVWindow(selected.getIndex10());
                     }
                 } catch (SQLException ex) {
                     Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+                    ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
                 }
             }
         });
-
     }
 
     private void initButtons() {
@@ -446,11 +466,11 @@ public class CheckAuthorizationController implements Initializable, ScreenInterf
         try {
             if (checkedItem.stream().anyMatch("1"::equals)) {
             } else {
-                ShowMessageFX.Information(null, pxeModuleName, "No items were selected to " + action + ".");
+                ShowMessageFX.Warning(null, pxeModuleName, "No items were selected to " + action + ".");
                 return;
             }
 
-            if (!ShowMessageFX.OkayCancel(null, pxeModuleName, "Are you sure you want to " + action + " selected items?")) {
+            if (!ShowMessageFX.OkayCancel(null, pxeModuleName, "Are you sure you want to " + action + " selected item/s?")) {
                 return;
             }
 
@@ -458,7 +478,7 @@ public class CheckAuthorizationController implements Initializable, ScreenInterf
             for (Object item : tblViewMainList.getItems()) {
                 ModelDisbursementVoucher_Main item1 = (ModelDisbursementVoucher_Main) item;
                 String lschecked = item1.getIndex02();
-                String lsDVNO = item1.getIndex03();
+                String lsDVNO = item1.getIndex10();
                 String Remarks = action;
                 if (lschecked.equals("1")) {
                     checkedItems.add(lsDVNO);
@@ -470,8 +490,9 @@ public class CheckAuthorizationController implements Initializable, ScreenInterf
                     poJSON = poDisbursementController.AuthorizeTransaction("Authorized", checkedItems);
                     if (!"success".equals((String) poJSON.get("result"))) {
                         ShowMessageFX.Warning((String) poJSON.get("message"), pxeModuleName, null);
+                    } else {
+                        ShowMessageFX.Information(null, pxeModuleName, (String) poJSON.get("message"));
                     }
-                    ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                     chckSelectAll.setSelected(false);
                     checkedItem.clear();
                     break;
@@ -479,8 +500,9 @@ public class CheckAuthorizationController implements Initializable, ScreenInterf
                     poJSON = poDisbursementController.ReturnTransaction("Returned", checkedItems);
                     if (!"success".equals((String) poJSON.get("result"))) {
                         ShowMessageFX.Warning((String) poJSON.get("message"), pxeModuleName, null);
+                    } else {
+                        ShowMessageFX.Information(null, pxeModuleName, (String) poJSON.get("message"));
                     }
-                    ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                     chckSelectAll.setSelected(false);
                     checkedItem.clear();
                     break;
@@ -488,17 +510,22 @@ public class CheckAuthorizationController implements Initializable, ScreenInterf
                     poJSON = poDisbursementController.DisApproveTransaction("Disapproved", checkedItems);
                     if (!"success".equals((String) poJSON.get("result"))) {
                         ShowMessageFX.Warning((String) poJSON.get("message"), pxeModuleName, null);
+                    } else {
+                        ShowMessageFX.Information(null, pxeModuleName, (String) poJSON.get("message"));
                     }
-                    ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                     chckSelectAll.setSelected(false);
                     checkedItem.clear();
                     break;
                 default:
                     throw new AssertionError();
             }
-            loadTableMain.reload();
+            Platform.runLater(() -> {
+                retrieveDisbursement();
+                loadTableMain.reload();
+            });
         } catch (ParseException | SQLException | GuanzonException | CloneNotSupportedException | ScriptException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -515,6 +542,7 @@ public class CheckAuthorizationController implements Initializable, ScreenInterf
                     "Disbursement Dialog", true, true, false);
         } catch (IOException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 }
