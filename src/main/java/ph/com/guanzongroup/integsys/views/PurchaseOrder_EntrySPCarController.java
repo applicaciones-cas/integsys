@@ -374,7 +374,6 @@ public class PurchaseOrder_EntrySPCarController implements Initializable, Screen
                         poPurchasingController.PurchaseOrder().Master().setIndustryID(psIndustryID);
                         poPurchasingController.PurchaseOrder().Master().setCompanyID(psCompanyID);
                         poPurchasingController.PurchaseOrder().Master().setCategoryCode(psCategoryID);
-                        poPurchasingController.PurchaseOrder().Master().setDestinationID(poApp.getBranchCode());
                         poPurchasingController.PurchaseOrder().Master().setInventoryTypeCode(poPurchasingController.PurchaseOrder().getInventoryTypeCode());
                         loadRecordMaster();
                         pnTblDetailRow = 0;
@@ -761,6 +760,11 @@ public class PurchaseOrder_EntrySPCarController implements Initializable, Screen
                         ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
                     }
                     loadTableDetailAndSelectedRow();
+                    break;
+                case "tfDestination":
+                    if (lsValue == null || lsValue.isEmpty()) {
+                        tfDestination.setText(poApp.getBranchCode());
+                    }
                     break;
             }
         } else {
