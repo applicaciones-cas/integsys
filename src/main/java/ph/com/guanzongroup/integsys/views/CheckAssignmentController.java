@@ -201,7 +201,7 @@ public class CheckAssignmentController implements Initializable {
                     transactionDate = LocalDate.parse(lsTransDate, DateTimeFormatter.ofPattern(SQLUtil.FORMAT_SHORT_DATE));
 
                     if (selectedDate.isBefore(transactionDate)) {
-                        JFXUtil.setJSONError(poJSON, "Check date cannot be later than the transaction date.");
+                        JFXUtil.setJSONError(poJSON, "Check date cannot be before the transaction date.");
                         pbSuccess = false;
                     }
 
