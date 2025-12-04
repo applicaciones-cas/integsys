@@ -83,7 +83,14 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import javafx.animation.Interpolator;
+import javafx.animation.KeyValue;
+import javafx.animation.PauseTransition;
+import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.value.ChangeListener;
+import javafx.geometry.Bounds;
+import javafx.scene.shape.Rectangle;
 import org.json.simple.JSONArray;
 
 public class DashboardController implements Initializable {
@@ -135,7 +142,7 @@ public class DashboardController implements Initializable {
 
     // Keep a shared lookup map for your left sidebar nodes
     private final Map<String, TreeNode> leftSidebarLookup = new HashMap<>();
-
+    private final Map<AnchorPane, ToggleButton> lastOpenedButtonMap = new HashMap<>();
     @FXML
     private AnchorPane MainAnchor;
     @FXML
@@ -155,7 +162,7 @@ public class DashboardController implements Initializable {
     @FXML
     private ToggleButton btnMenu;
     @FXML
-    private AnchorPane anchorIconMenu1;
+    private AnchorPane anchorIconMenu1, aprootleft;
     @FXML
     private VBox nav_bar1;
     @FXML
@@ -198,6 +205,8 @@ public class DashboardController implements Initializable {
     private AnchorPane badgeNotification;
     @FXML
     private Label lblNotifCount;
+    boolean menu1 = false;
+    boolean menu2 = false;
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -218,9 +227,8 @@ public class DashboardController implements Initializable {
             setTreeViewStyle(tvLeftSideBar);
             setTreeViewStyleMonitor(tvRightSideBar);
 
-            setDropShadowEffectsLeftSideBar(anchorLeftSideBarMenu);
-            setDropShadowEffectsRightSideBar(anchorRightSideBarMenu);
-
+//            setDropShadowEffectsLeftSideBar(anchorLeftSideBarMenu);
+//            setDropShadowEffectsRightSideBar(anchorRightSideBarMenu);
             Platform.runLater(() -> {
                 AnchorPane root = (AnchorPane) MainAnchor;
                 Scene scene = root.getScene();
@@ -288,6 +296,180 @@ public class DashboardController implements Initializable {
 
     public void setUserCompany(String lsCompanyId) {
         psCompanyID = lsCompanyId;
+    }
+
+    private void animateMenu(AnchorPane pane, TreeView<?> tree,
+            double targetWidth, double targetHeight, ToggleButton toggleButton,
+            AnchorPane buttonParent, boolean isOpened) {
+
+        ToggleButton lastBtn = lastOpenedButtonMap.get(pane);
+
+        if (isOpened) {
+            if (lastBtn == toggleButton) {
+                // Collapse current menu
+                animateDiagonalMenu(pane, tree, targetWidth, targetHeight, toggleButton, buttonParent, isOpened);
+                lastOpenedButtonMap.put(pane, null);
+            } else {
+                // Collapse previous (opened by different button) first
+                if (lastBtn != null) {
+                    animateDiagonalMenu(pane, tree, targetWidth, targetHeight, lastBtn, buttonParent, isOpened);
+                } else {
+                    animateDiagonalMenu(pane, tree, targetWidth, targetHeight, toggleButton, buttonParent, isOpened);
+                }
+
+                PauseTransition pt = new PauseTransition(Duration.millis(220));
+                pt.setOnFinished(ev -> {
+                    animateDiagonalMenu(pane, tree, targetWidth, targetHeight, toggleButton, buttonParent, isOpened);
+                });
+                pt.play();
+
+                lastOpenedButtonMap.put(pane, toggleButton);
+            }
+        } else {
+            animateDiagonalMenu(pane, tree, targetWidth, targetHeight, toggleButton, buttonParent, isOpened);
+            lastOpenedButtonMap.put(pane, toggleButton);
+        }
+    }
+
+    private void animateDiagonalMenu(
+            AnchorPane pane,
+            TreeView<?> tree,
+            double targetWidth,
+            double targetHeight,
+            ToggleButton toggleButton,
+            AnchorPane buttonParent, boolean isOpened
+    ) {
+
+        Rectangle clip = new Rectangle(0, 0);
+        tree.setClip(clip);
+
+        tree.layoutBoundsProperty().addListener((o, oldB, newB) -> {
+            clip.setWidth(newB.getWidth());
+            clip.setHeight(newB.getHeight());
+        });
+
+        try {
+            toggleButton.localToScene(toggleButton.getBoundsInLocal());
+        } catch (Exception e) {
+            return;
+        }
+        // Coordinates
+        Bounds btnScene = toggleButton.localToScene(toggleButton.getBoundsInLocal());
+        Bounds parentScene = pane.getParent().localToScene(buttonParent.getBoundsInLocal());
+        buttonParent.getHeight();
+
+        double parentHeight = buttonParent.getHeight();
+        double startX;
+        double startY = btnScene.getMinY() - parentScene.getMinY() + toggleButton.getHeight() / 2;
+        Double leftAnchor = AnchorPane.getLeftAnchor(pane);
+        Double rightAnchor = AnchorPane.getRightAnchor(pane);
+        boolean isRightMenu = (rightAnchor != null && leftAnchor == null);
+//            double startX;
+        if (!isRightMenu) {
+            // LEFT menu: expand from button center rightwards
+            startX = parentScene.getMinX() - 50;
+            AnchorPane.setRightAnchor(pane, null);   // remove conflicts
+        } else {
+            // RIGHT menu: expand from button center leftwards
+            startX = parentScene.getWidth() - buttonParent.getPrefWidth() - 1;
+            AnchorPane.setLeftAnchor(pane, null);    // remove conflicts
+        }
+
+        // Set initial left/right anchor
+        if (!isRightMenu) {
+            AnchorPane.setLeftAnchor(pane, startX);
+        } else {
+            AnchorPane.setRightAnchor(pane, startX - 40);
+        }
+
+        // FINAL top position (must align with buttonParent top)
+        double finalTopAnchor = 0; // since anchor relative to parent container
+        double finalHeight = parentHeight;
+
+        // Set starting anchor
+        AnchorPane.setTopAnchor(pane, startY);
+
+        if (!isOpened) {
+
+            pane.setVisible(true);
+            tree.setVisible(true);
+
+            // Start collapsed
+            pane.setPrefWidth(0);
+            pane.setPrefHeight(0);
+            tree.setPrefWidth(0);
+            tree.setPrefHeight(0);
+
+            // Animated properties
+            DoubleProperty animatedHeight = new SimpleDoubleProperty(0);
+            DoubleProperty animatedTop = new SimpleDoubleProperty(startY);
+
+            // Keep updating the pane in realtime
+            animatedHeight.addListener((obs, oldVal, newVal) -> {
+                pane.setPrefHeight(newVal.doubleValue());
+                tree.setPrefHeight(newVal.doubleValue());
+            });
+
+            animatedTop.addListener((obs, oldVal, newVal) -> {
+                AnchorPane.setTopAnchor(pane, newVal.doubleValue());
+            });
+
+            Timeline expand = new Timeline(
+                    new KeyFrame(Duration.ZERO,
+                            new KeyValue(pane.prefWidthProperty(), 0),
+                            new KeyValue(animatedHeight, 0),
+                            new KeyValue(animatedTop, startY),
+                            new KeyValue(tree.prefWidthProperty(), 0)
+                    ),
+                    new KeyFrame(Duration.millis(200),
+                            new KeyValue(pane.prefWidthProperty(), targetWidth, Interpolator.EASE_BOTH),
+                            new KeyValue(tree.prefWidthProperty(), targetWidth, Interpolator.EASE_BOTH),
+                            // Height becomes parent full height
+                            new KeyValue(animatedHeight, finalHeight, Interpolator.EASE_BOTH),
+                            // Top anchor moves to buttonParent's top
+                            new KeyValue(animatedTop, finalTopAnchor, Interpolator.EASE_BOTH)
+                    )
+            );
+
+            expand.setOnFinished(e -> tree.setClip(null));
+            expand.play();
+
+        } else {
+            if (pane.isVisible()) {
+                double currentWidth = pane.getPrefWidth();
+                if (pane.getPrefWidth() != targetWidth) {
+                    currentWidth = targetWidth;
+                }
+                double currentHeight = pane.getPrefHeight() - 30;
+
+                DoubleProperty animatedTop = new SimpleDoubleProperty(0);
+                animatedTop.addListener((obs, oldVal, newVal) -> AnchorPane.setTopAnchor(pane, newVal.doubleValue()));
+
+                Timeline collapse = new Timeline(
+                        new KeyFrame(Duration.ZERO,
+                                new KeyValue(pane.prefWidthProperty(), currentWidth),
+                                new KeyValue(tree.prefWidthProperty(), currentWidth),
+                                new KeyValue(pane.prefHeightProperty(), currentHeight),
+                                new KeyValue(tree.prefHeightProperty(), currentHeight),
+                                new KeyValue(animatedTop, 0)
+                        ),
+                        new KeyFrame(Duration.millis(200),
+                                new KeyValue(pane.prefWidthProperty(), 0, Interpolator.EASE_BOTH),
+                                new KeyValue(tree.prefWidthProperty(), 0, Interpolator.EASE_BOTH),
+                                new KeyValue(pane.prefHeightProperty(), 0, Interpolator.EASE_BOTH),
+                                new KeyValue(tree.prefHeightProperty(), 0, Interpolator.EASE_BOTH),
+                                new KeyValue(animatedTop, startY, Interpolator.EASE_BOTH)
+                        )
+                );
+
+                collapse.setOnFinished(e -> {
+                    pane.setVisible(false);
+                    AnchorPane.setTopAnchor(pane, startY); // ready for next expand
+                });
+
+                collapse.play();
+            }
+        }
     }
 
     private Pane loadAnimateAnchor(String fxml) {
@@ -958,7 +1140,17 @@ public class DashboardController implements Initializable {
 
     public void setTabPane() {
         tabpane.setOnMouseClicked(event -> {
-            setAnchorPaneVisibleManage(false, anchorLeftSideBarMenu);
+//            setAnchorPaneVisibleManage(false, anchorLeftSideBarMenu);
+
+            animateMenu(
+                    anchorLeftSideBarMenu, // AnchorPane pane
+                    tvLeftSideBar, // TreeView<?> tree
+                    300, // targetWidth,
+                    aprootleft.getHeight(),
+                    btnMenu,
+                    aprootleft, true
+            );
+
             for (int i = 0; i < toggleBtnLeftUpperSideBar.length; i++) {
                 toggleBtnLeftUpperSideBar[i].setSelected(false);
             }
@@ -1388,12 +1580,23 @@ public class DashboardController implements Initializable {
     }
 
     private void toggleLeftSideBarMenuButton(String buttonId, Integer btnIndex) {
+
         boolean isNoMenu = false;
         boolean isSameButton = anchorLeftSideBarMenu.isVisible() && lastClickedBtnLeftSideBar.equals(buttonId);
 
         if (tvLeftSideBar.getRoot() != null) {
             if (!tvLeftSideBar.getRoot().getChildren().isEmpty()) {
-                setAnchorPaneVisibleManage(!isSameButton, anchorLeftSideBarMenu);
+                if (!isSameButton) {
+                    setAnchorPaneVisibleManage(!isSameButton, anchorLeftSideBarMenu);
+                }
+                animateMenu(
+                        anchorLeftSideBarMenu, // AnchorPane pane
+                        tvLeftSideBar, // TreeView<?> tree
+                        300, // targetWidth,
+                        aprootleft.getHeight(),
+                        btnMenu,
+                        aprootleft, isSameButton
+                );
             } else {
                 setAnchorPaneVisibleManage(false, anchorLeftSideBarMenu);
                 ShowMessageFX.Warning(null, "Computerized Accounting System", "No menus available");
@@ -1412,16 +1615,26 @@ public class DashboardController implements Initializable {
             toggleBtnLeftUpperSideBar[btnIndex].setSelected(!isSameButton);
             lastClickedBtnLeftSideBar = isSameButton ? "" : buttonId;
         }
+
     }
 
     private void toggleRightSideBarMenuButton(String buttonId, Integer btnIndex) {
         boolean isNoMenu = false;
         boolean isSameButton = anchorRightSideBarMenu.isVisible() && lastClickedBtnRightSideBar.equals(buttonId);
-        setAnchorPaneVisibleManage(!isSameButton, anchorRightSideBarMenu);
 
         if (tvRightSideBar.getRoot() != null) {
             if (!tvRightSideBar.getRoot().getChildren().isEmpty()) {
-                setAnchorPaneVisibleManage(!isSameButton, anchorRightSideBarMenu);
+                if (!isSameButton) {
+                    setAnchorPaneVisibleManage(!isSameButton, anchorRightSideBarMenu);
+                }
+                animateMenu(
+                        anchorRightSideBarMenu, // AnchorPane pane
+                        tvRightSideBar, // TreeView<?> tree
+                        300, // targetWidth,
+                        anchorIconMenu11.getHeight(),
+                        btnSysMonitor,
+                        anchorIconMenu11, isSameButton
+                );
             } else {
                 setAnchorPaneVisibleManage(false, anchorRightSideBarMenu);
                 ShowMessageFX.Warning(null, "Computerized Accounting System", "No notifications available");
