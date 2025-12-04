@@ -30,7 +30,11 @@ import org.guanzon.appdriver.base.SQLUtil;
 import org.guanzon.appdriver.constant.EditMode;
 import org.json.simple.JSONObject;
 import ph.com.guanzongroup.cas.cashflow.DisbursementVoucher;
-
+/**
+ * FXML Controller class
+ *
+ * @author Team 1 & Team 2
+ */
 public class CheckAssignmentController implements Initializable {
 
     private GRiderCAS oApp;
@@ -86,28 +90,12 @@ public class CheckAssignmentController implements Initializable {
             if (transactionNos != null && !transactionNos.isEmpty()) {
                 loadTransaction(currentTransactionIndex);
                 initButton(pnEditMode);
+                if (transactionNos.size() > 1) {
+                    chbkApplyToAll.selectedProperty().set(true);
+                }
             }
         } catch (Exception ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
-        }
-    }
-
-    @FXML
-    private void cmdCheckBox_Click(ActionEvent event) {
-        Object source = event.getSource();
-        if (source instanceof CheckBox) {
-            CheckBox checkedBox = (CheckBox) source;
-            switch (checkedBox.getId()) {
-                case "chbkApplyToAll":
-                    if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
-                        poJSON = poController.Master().setBankPrint(chbkApplyToAll.isSelected() ? "1" : "0");
-                        if (!JFXUtil.isJSONSuccess(poJSON)) {
-                            ShowMessageFX.Information(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
-                        }
-                        loadRecordMaster();
-                    }
-                    break;
-            }
         }
     }
 
@@ -188,6 +176,7 @@ public class CheckAssignmentController implements Initializable {
                         break;
                 }
             });
+
     private void datepicker_Action(ActionEvent event) {
         poJSON = new JSONObject();
         JFXUtil.setJSONSuccess(poJSON, "success");
@@ -225,7 +214,6 @@ public class CheckAssignmentController implements Initializable {
         dpCheckDate.setValue(CustomCommonUtil.parseDateStringToLocalDate(SQLUtil.dateFormat(poController.CheckPayments().getModel().getCheckDate(), SQLUtil.FORMAT_SHORT_DATE)));
         tfCheckAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Master().getTransactionTotal(), true));
         taRemarks.setText(poController.Master().getRemarks());
-        chbkApplyToAll.setSelected(poController.Master().getBankPrint().equals("1") ? true : false);
     }
 
     private void initButtonsClickActions() {
