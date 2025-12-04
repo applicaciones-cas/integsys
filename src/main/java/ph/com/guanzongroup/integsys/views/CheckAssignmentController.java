@@ -148,7 +148,6 @@ public class CheckAssignmentController implements Initializable {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
         }
     }
-
     ChangeListener<Boolean> txtMaster_Focus = JFXUtil.FocusListener(TextField.class,
             (lsID, lsValue) -> {
                 try {
@@ -163,10 +162,12 @@ public class CheckAssignmentController implements Initializable {
                                 poJSON = poController.existCheckNo(lsValue);
                                 if ("error".equals((String) poJSON.get("result"))) {
                                     ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                                    tfCheckNo.setText(poController.CheckPayments().getModel().getCheckNo());
                                     break;
+                                } else {
+                                    poController.CheckPayments().getModel().setCheckNo(lsValue);
                                 }
                             }
-                            poController.CheckPayments().getModel().setCheckNo(lsValue);
                             loadRecordMaster();
                             break;
                     }
@@ -187,7 +188,6 @@ public class CheckAssignmentController implements Initializable {
                         break;
                 }
             });
-
     private void datepicker_Action(ActionEvent event) {
         poJSON = new JSONObject();
         JFXUtil.setJSONSuccess(poJSON, "success");
