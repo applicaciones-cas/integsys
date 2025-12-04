@@ -2018,7 +2018,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
                     case "dpCheckDate":
                         //back date not allowed
                         if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
-                            lsTransDate = sdfFormat.format(poController.CheckPayments().getModel().getTransactionDate());
+                            lsTransDate = sdfFormat.format(poController.Master().getTransactionDate());
                             transactionDate = LocalDate.parse(lsTransDate, DateTimeFormatter.ofPattern(SQLUtil.FORMAT_SHORT_DATE));
 
                             if (selectedDate.isAfter(currentDate)) {
@@ -2046,7 +2046,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
                         break;
                     case "dpReportMonthYear":
                         if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
-                            lsTransDate = sdfFormat.format(poController.CheckPayments().getModel().getTransactionDate());
+                            lsTransDate = sdfFormat.format(poController.Master().getTransactionDate());
                             transactionDate = LocalDate.parse(lsTransDate, DateTimeFormatter.ofPattern(SQLUtil.FORMAT_SHORT_DATE));
 
                             if (selectedDate.isAfter(currentDate)) {

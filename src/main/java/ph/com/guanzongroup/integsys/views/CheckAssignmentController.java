@@ -30,6 +30,7 @@ import org.guanzon.appdriver.base.SQLUtil;
 import org.guanzon.appdriver.constant.EditMode;
 import org.json.simple.JSONObject;
 import ph.com.guanzongroup.cas.cashflow.DisbursementVoucher;
+
 /**
  * FXML Controller class
  *
@@ -176,6 +177,7 @@ public class CheckAssignmentController implements Initializable {
                         break;
                 }
             });
+    boolean pbSuccess = true;
 
     private void datepicker_Action(ActionEvent event) {
         poJSON = new JSONObject();
@@ -185,8 +187,8 @@ public class CheckAssignmentController implements Initializable {
             DatePicker datePicker = (DatePicker) source;
             String inputText = datePicker.getEditor().getText();
             SimpleDateFormat sdfFormat = new SimpleDateFormat(SQLUtil.FORMAT_SHORT_DATE);
-            String lsSelectedDate = "";
-            LocalDate selectedDate = null;
+            LocalDate currentDate = null, transactionDate = null, referenceDate = null, selectedDate = null, periodToDate = null, periodFromDate = null;
+            String lsServerDate = "", lsTransDate = "", lsRefDate = "", lsSelectedDate = "", lsPeriodToDate = "", lsPeriodFromDate = "";
 
             lsSelectedDate = sdfFormat.format(SQLUtil.toDate(JFXUtil.convertToIsoFormat(inputText), SQLUtil.FORMAT_SHORT_DATE));
             selectedDate = LocalDate.parse(lsSelectedDate, DateTimeFormatter.ofPattern(SQLUtil.FORMAT_SHORT_DATE));
@@ -195,11 +197,25 @@ public class CheckAssignmentController implements Initializable {
             }
             switch (datePicker.getId()) {
                 case "dpCheckDate":
-                    poJSON = poController.CheckPayments().getModel().setCheckDate((SQLUtil.toDate(lsSelectedDate, SQLUtil.FORMAT_SHORT_DATE)));
-                    if (!JFXUtil.isJSONSuccess(poJSON)) {
-                        ShowMessageFX.Information(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
+                    lsTransDate = sdfFormat.format(poController.Master().getTransactionDate());// get transaction date of dv
+                    transactionDate = LocalDate.parse(lsTransDate, DateTimeFormatter.ofPattern(SQLUtil.FORMAT_SHORT_DATE));
+
+                    if (selectedDate.isBefore(currentDate)) {
+                        JFXUtil.setJSONError(poJSON, "Check date cannot be later than the transaction date.");
+                        pbSuccess = false;
                     }
+
+                    if (pbSuccess) {
+                        poJSON = poController.CheckPayments().getModel().setCheckDate((SQLUtil.toDate(lsSelectedDate, SQLUtil.FORMAT_SHORT_DATE)));
+
+                    } else {
+                        if ("error".equals((String) poJSON.get("result"))) {
+                            ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                        }
+                    }
+                    pbSuccess = false;
                     loadRecordMaster();
+                    pbSuccess = true;
                     break;
                 default:
                     break;

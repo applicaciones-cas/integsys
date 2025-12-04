@@ -2056,7 +2056,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                     case "dpCheckDate":
                         //back date not allowed
                         if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
-                            lsTransDate = sdfFormat.format(poController.CheckPayments().getModel().getTransactionDate());
+                            lsTransDate = sdfFormat.format(poController.Master().getTransactionDate());
                             transactionDate = LocalDate.parse(lsTransDate, DateTimeFormatter.ofPattern(SQLUtil.FORMAT_SHORT_DATE));
 
                             if (selectedDate.isAfter(currentDate)) {
@@ -2084,7 +2084,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                         break;
                     case "dpReportMonthYear":
                         if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
-                            lsTransDate = sdfFormat.format(poController.CheckPayments().getModel().getTransactionDate());
+                            lsTransDate = sdfFormat.format(poController.Master().getTransactionDate());
                             transactionDate = LocalDate.parse(lsTransDate, DateTimeFormatter.ofPattern(SQLUtil.FORMAT_SHORT_DATE));
 
                             if (selectedDate.isAfter(currentDate)) {
