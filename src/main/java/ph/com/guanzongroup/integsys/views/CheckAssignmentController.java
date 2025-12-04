@@ -26,6 +26,7 @@ import org.guanzon.appdriver.agent.ShowMessageFX;
 import org.guanzon.appdriver.base.CommonUtils;
 import org.guanzon.appdriver.base.GRiderCAS;
 import org.guanzon.appdriver.base.GuanzonException;
+import org.guanzon.appdriver.base.MiscUtil;
 import org.guanzon.appdriver.base.SQLUtil;
 import org.guanzon.appdriver.constant.EditMode;
 import org.json.simple.JSONObject;
@@ -97,6 +98,7 @@ public class CheckAssignmentController implements Initializable {
             }
         } catch (Exception ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -135,6 +137,7 @@ public class CheckAssignmentController implements Initializable {
             initButton(pnEditMode);
         } catch (Exception ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
     ChangeListener<Boolean> txtMaster_Focus = JFXUtil.FocusListener(TextField.class,
@@ -162,6 +165,7 @@ public class CheckAssignmentController implements Initializable {
                     }
                 } catch (Exception ex) {
                     Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+                    ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
                 }
             });
 
@@ -187,8 +191,8 @@ public class CheckAssignmentController implements Initializable {
             DatePicker datePicker = (DatePicker) source;
             String inputText = datePicker.getEditor().getText();
             SimpleDateFormat sdfFormat = new SimpleDateFormat(SQLUtil.FORMAT_SHORT_DATE);
-            LocalDate currentDate = null, transactionDate = null, referenceDate = null, selectedDate = null, periodToDate = null, periodFromDate = null;
-            String lsServerDate = "", lsTransDate = "", lsRefDate = "", lsSelectedDate = "", lsPeriodToDate = "", lsPeriodFromDate = "";
+            LocalDate transactionDate = null, selectedDate = null;
+            String lsTransDate = "", lsSelectedDate = "";
 
             lsSelectedDate = sdfFormat.format(SQLUtil.toDate(JFXUtil.convertToIsoFormat(inputText), SQLUtil.FORMAT_SHORT_DATE));
             selectedDate = LocalDate.parse(lsSelectedDate, DateTimeFormatter.ofPattern(SQLUtil.FORMAT_SHORT_DATE));
@@ -207,7 +211,6 @@ public class CheckAssignmentController implements Initializable {
 
                     if (pbSuccess) {
                         poJSON = poController.CheckPayments().getModel().setCheckDate((SQLUtil.toDate(lsSelectedDate, SQLUtil.FORMAT_SHORT_DATE)));
-
                     } else {
                         if ("error".equals((String) poJSON.get("result"))) {
                             ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
@@ -285,10 +288,9 @@ public class CheckAssignmentController implements Initializable {
                     CommonUtils.closeStage(btnClose);
                 });
             }
-
         } catch (Exception ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
-            ShowMessageFX.Warning(null, pxeModuleName, "Unexpected error during assignment.");
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
             isAutoProcessing = false;
         }
     }
@@ -325,7 +327,7 @@ public class CheckAssignmentController implements Initializable {
             }
         } catch (SQLException | GuanzonException | CloneNotSupportedException | ScriptException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
-
 }
