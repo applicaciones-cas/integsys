@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -41,8 +42,6 @@ public class CheckAssignmentController implements Initializable {
     private String psTransactionNo = "";
     private int currentTransactionIndex = 0;
     private boolean isAutoProcessing = false;
-    private long startingCheckNo = -1;
-    private int checkNoLength = 6;
     private String originalCheckNo = "";
     @FXML
     private AnchorPane AnchorMain, AnchorInputs, apMaster;
@@ -124,10 +123,6 @@ public class CheckAssignmentController implements Initializable {
                     }
                     break;
                 case "btnPrintCheck":
-//                    System.out.println("EDIT MODE SA BTN PRINT : " + poController.Master().CheckPayments().getEditMode());
-//                    poController.Master().CheckPayments().setPrint("1");
-//                    poController.Master().CheckPayments().setDatePrint(oApp.getServerDate());
-
                     poJSON = poController.PrintCheck(transactionNos);
                     if (!JFXUtil.isJSONSuccess(poJSON)) {
                         ShowMessageFX.Information(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
@@ -138,11 +133,6 @@ public class CheckAssignmentController implements Initializable {
                         assignAndProceed();
                     }
                     CommonUtils.closeStage(btnClose);
-//                    poJSON = poController.SaveTransaction();
-//                    if("error".equals(poJSON.get("result"))) {
-//                        System.out.println("Message : " + poJSON.get("message"));
-//                        break;
-//                    }
                     break;
                 case "btnClose":
                     if (ShowMessageFX.YesNo(null, pxeModuleName, "Are you sure want to close this form?")) {
@@ -229,36 +219,6 @@ public class CheckAssignmentController implements Initializable {
     }
 
     private void loadRecordMaster() {
-        //        if (poController.Master().CheckPayments().getCheckNo().isEmpty()) {
-//            initialCheckNo = poController.CheckPayments().getModel().Bank_Account_Master().getCheckNo();
-//            fromBankAccount = true;
-//        } else {
-//            initialCheckNo = poController.Master().CheckPayments().getCheckNo();
-//        }
-//
-//        if (fromBankAccount && initialCheckNo.matches("\\d+")) {
-//            long incremented = Long.parseLong(initialCheckNo) + 1;
-//            initialCheckNo = String.format("%0" + initialCheckNo.length() + "d", incremented);
-//        }
-//        originalCheckNo = initialCheckNo;
-//        tfCheckNo.setText(initialCheckNo);
-//        String checkNoValue = tfCheckNo.getText();
-//        if (currentTransactionIndex == 0 && startingCheckNo == -1 && checkNoValue != null && checkNoValue.matches("\\d+")) {
-//            startingCheckNo = Long.parseLong(checkNoValue);
-//            checkNoLength = checkNoValue.length();
-//            poController.CheckPayments().getModel().setCheckNo(checkNoValue);
-//            poController.BankAccountMaster().getModel().setCheckNo(checkNoValue);
-////             poController.BankAccountLedger().getModel().setSourceNo(checkNoValue);
-//            poController.CheckPayments().getModel().setTransactionStatus(CheckStatus.OPEN);
-//        } else if (startingCheckNo != -1) {
-//            long currentCheckNo = startingCheckNo + currentTransactionIndex;
-//            String formatted = String.format("%0" + checkNoLength + "d", currentCheckNo);
-//            tfCheckNo.setText(formatted);
-//            poController.CheckPayments().getModel().setCheckNo(formatted);
-//            poController.CheckPayments().getModel().setTransactionStatus(CheckStatus.OPEN);
-//            poController.BankAccountMaster().getModel().setCheckNo(formatted);
-////            poController.BankAccountLedger().getModel().setSourceNo(formatted);
-//        }
         JFXUtil.setDisabled(false, dpCheckDate);
         tfDVNo.setText(poController.Master().getTransactionNo());
         tfCheckNo.setText(poController.CheckPayments().getModel().getCheckNo());
@@ -266,9 +226,6 @@ public class CheckAssignmentController implements Initializable {
         tfCheckAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Master().getTransactionTotal(), true));
         taRemarks.setText(poController.Master().getRemarks());
         chbkApplyToAll.setSelected(poController.Master().getBankPrint().equals("1") ? true : false);
-//        if (transactionNos.size() > 1) {
-//            chbkApplyToAll.setSelected(true);
-//        }
     }
 
     private void initButtonsClickActions() {
@@ -301,18 +258,6 @@ public class CheckAssignmentController implements Initializable {
 
     private void assignAndProceed() {
         try {
-            String checkNoToCheck = tfCheckNo.getText();
-            String currentAssignedCheckNo = poController.Master().CheckPayments().getCheckNo();
-//
-//            // Only check for duplicates if the check no has changed (doesn't match the current assigned)
-//            if (!checkNoToCheck.equals(currentAssignedCheckNo)) {
-//                poJSON = poController.checkNoExists(checkNoToCheck);
-//                if ("error".equals((String) poJSON.get("result"))) {
-//                    ShowMessageFX.Warning(null, pxeModuleName,
-//                            (String) poJSON.get("message"));
-//                    return;
-//                }
-//            }
             poJSON = poController.SaveTransaction();
             if (!"success".equals(poJSON.get("result"))) {
                 ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
@@ -332,7 +277,9 @@ public class CheckAssignmentController implements Initializable {
                 }
             } else {                                       // ONLY THIS ONE
                 ShowMessageFX.Information(null, pxeModuleName, "Transaction has been assigned.");
-                CommonUtils.closeStage(btnClose);
+                Platform.runLater(() -> {
+                    CommonUtils.closeStage(btnClose);
+                });
             }
 
         } catch (Exception ex) {
