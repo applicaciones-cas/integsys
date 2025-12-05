@@ -23,6 +23,7 @@ public class ModelDisbursementVoucher_Main {
     public SimpleStringProperty index08;
     public SimpleStringProperty index09;
     public SimpleStringProperty index10;
+    public SimpleStringProperty index11;
     private CheckBox select;
 
     public ModelDisbursementVoucher_Main(
@@ -48,6 +49,33 @@ public class ModelDisbursementVoucher_Main {
         this.index08 = new SimpleStringProperty(index08);
         this.index09 = new SimpleStringProperty(index09);
         this.index10 = new SimpleStringProperty(index10);
+    }
+
+    public ModelDisbursementVoucher_Main(
+            String index01,
+            String index02,
+            String index03,
+            String index04,
+            String index05,
+            String index06,
+            String index07,
+            String index08,
+            String index09,
+            String index10,
+            String index11) {
+
+        this.index01 = new SimpleStringProperty(index01);
+        this.select = new CheckBox();
+        this.index02 = new SimpleStringProperty(index02);
+        this.index03 = new SimpleStringProperty(index03);
+        this.index04 = new SimpleStringProperty(index04);
+        this.index05 = new SimpleStringProperty(index05);
+        this.index06 = new SimpleStringProperty(index06);
+        this.index07 = new SimpleStringProperty(index07);
+        this.index08 = new SimpleStringProperty(index08);
+        this.index09 = new SimpleStringProperty(index09);
+        this.index10 = new SimpleStringProperty(index10);
+        this.index11 = new SimpleStringProperty(index11);
     }
 
     public ModelDisbursementVoucher_Main(String index01,
@@ -213,6 +241,14 @@ public class ModelDisbursementVoucher_Main {
 
     public void setIndex10(String index10) {
         this.index10.set(index10);
+    }
+
+    public String getIndex11() {
+        return index11.get();
+    }
+
+    public void setIndex11(String index11) {
+        this.index11.set(index11);
     }
 
 }

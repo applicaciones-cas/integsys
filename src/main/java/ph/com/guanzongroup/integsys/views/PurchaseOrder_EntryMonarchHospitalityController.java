@@ -265,37 +265,7 @@ public class PurchaseOrder_EntryMonarchHospitalityController implements Initiali
     private void loadRecordMaster() {
         try {
             tfTransactionNo.setText(poPurchasingController.PurchaseOrder().Master().getTransactionNo());
-            String lsStatus = poPurchasingController.PurchaseOrder().Master().getConvertedTransactionStatus();
-            switch (lsStatus) {
-                case PurchaseOrderStatus.CONFIRMED:
-                    lsStatus = "CONFIRMED";
-                    break;
-                case PurchaseOrderStatus.APPROVED:
-                    lsStatus = "APPROVED";
-                    break;
-                case PurchaseOrderStatus.RETURNED:
-                    lsStatus = "RETURNED";
-                    break;
-                case PurchaseOrderStatus.CANCELLED:
-                    lsStatus = "CANCELLED";
-                    break;
-                case PurchaseOrderStatus.VOID:
-                    lsStatus = "VOIDED";
-                    break;
-                case PurchaseOrderStatus.PROCESSED:
-                    lsStatus = "PROCESSED";
-                    break;
-                case PurchaseOrderStatus.POSTED:
-                    lsStatus = "POSTED";
-                    break;
-                case PurchaseOrderStatus.OPEN:
-                    lsStatus = "OPEN";
-                    break;
-                default:
-                    lsStatus = "UNKNOWN";
-                    break;
-            }
-            lblTransactionStatus.setText(lsStatus);
+            lblTransactionStatus.setText(poPurchasingController.PurchaseOrder().getStatusValue());
             dpTransactionDate.setValue(CustomCommonUtil.parseDateStringToLocalDate(SQLUtil.dateFormat(poPurchasingController.PurchaseOrder().Master().getTransactionDate(), SQLUtil.FORMAT_SHORT_DATE)));
             tfSupplier.setText(poPurchasingController.PurchaseOrder().Master().Supplier().getCompanyName() != null ? poPurchasingController.PurchaseOrder().Master().Supplier().getCompanyName() : "");
             tfDestination.setText(poPurchasingController.PurchaseOrder().Master().Branch().getBranchName() != null ? poPurchasingController.PurchaseOrder().Master().Branch().getBranchName() : "");
@@ -404,7 +374,6 @@ public class PurchaseOrder_EntryMonarchHospitalityController implements Initiali
                         poPurchasingController.PurchaseOrder().Master().setIndustryID(psIndustryID);
                         poPurchasingController.PurchaseOrder().Master().setCompanyID(psCompanyID);
                         poPurchasingController.PurchaseOrder().Master().setCategoryCode(psCategoryID);
-                        poPurchasingController.PurchaseOrder().Master().setDestinationID(poApp.getBranchCode());
                         poPurchasingController.PurchaseOrder().Master().setInventoryTypeCode(poPurchasingController.PurchaseOrder().getInventoryTypeCode());
                         loadRecordMaster();
                         pnTblDetailRow = 0;
@@ -792,6 +761,11 @@ public class PurchaseOrder_EntryMonarchHospitalityController implements Initiali
                         ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
                     }
                     loadTableDetailAndSelectedRow();
+                    break;
+                case "tfDestination":
+                    if (lsValue == null || lsValue.isEmpty()) {
+                        tfDestination.setText(poApp.getBranchCode());
+                    }
                     break;
             }
         } else {
