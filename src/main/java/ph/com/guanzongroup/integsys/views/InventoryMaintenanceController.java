@@ -172,6 +172,11 @@ public class InventoryMaintenanceController implements Initializable, ScreenInte
         } catch (SQLException | GuanzonException e) {
             Logger.getLogger(CheckDeposit_EntryController.class.getName()).log(Level.SEVERE, null, e);
             poLogWrapper.severe(psFormName + " :" + e.getMessage());
+            if (Platform.isFxApplicationThread()) {
+                ShowMessageFX.Warning(null, psFormName, e.getMessage());
+            } else {
+                Platform.runLater(() -> ShowMessageFX.Warning(null, psFormName, e.getMessage()));
+            }
         }
     }
 
@@ -373,6 +378,11 @@ public class InventoryMaintenanceController implements Initializable, ScreenInte
         } catch (CloneNotSupportedException | SQLException | GuanzonException e) {
             e.printStackTrace();
             poLogWrapper.severe(psFormName + " :" + e.getMessage());
+            if (Platform.isFxApplicationThread()) {
+                ShowMessageFX.Warning(null, psFormName, e.getMessage());
+            } else {
+                Platform.runLater(() -> ShowMessageFX.Warning(null, psFormName, e.getMessage()));
+            }
         }
     }
 
@@ -407,6 +417,11 @@ public class InventoryMaintenanceController implements Initializable, ScreenInte
                         poAppController.getModel().setMinimumLevel(lnMinLevel);
                         loadRecord();
                         loTextField.requestFocus();
+                        if (Platform.isFxApplicationThread()) {
+                            ShowMessageFX.Warning(null, psFormName, e.getMessage());
+                        } else {
+                            Platform.runLater(() -> ShowMessageFX.Warning(null, psFormName, e.getMessage()));
+                        }
                     }
 
                     poAppController.getModel().setMinimumLevel(lnMinLevel);
@@ -432,6 +447,11 @@ public class InventoryMaintenanceController implements Initializable, ScreenInte
                         poAppController.getModel().setMaximumLevel(lnMaxLevel);
                         loadRecord();
                         loTextField.requestFocus();
+                        if (Platform.isFxApplicationThread()) {
+                            ShowMessageFX.Warning(null, psFormName, e.getMessage());
+                        } else {
+                            Platform.runLater(() -> ShowMessageFX.Warning(null, psFormName, e.getMessage()));
+                        }
                     }
 
                     poAppController.getModel().setMaximumLevel(lnMaxLevel);
@@ -537,6 +557,11 @@ public class InventoryMaintenanceController implements Initializable, ScreenInte
         } catch (CloneNotSupportedException | SQLException | GuanzonException ex) {
             ex.printStackTrace();
             poLogWrapper.severe(psFormName + " :" + ex.getMessage());
+            if (Platform.isFxApplicationThread()) {
+                ShowMessageFX.Warning(null, psFormName, ex.getMessage());
+            } else {
+                Platform.runLater(() -> ShowMessageFX.Warning(null, psFormName, ex.getMessage()));
+            }
         }
     }
     private final ChangeListener<? super Boolean> txtArea_Focus = (o, ov, nv) -> {
@@ -584,6 +609,11 @@ public class InventoryMaintenanceController implements Initializable, ScreenInte
         } catch (Exception ex) {
             ex.printStackTrace();
             poLogWrapper.severe(psFormName + " :" + ex.getMessage());
+            if (Platform.isFxApplicationThread()) {
+                ShowMessageFX.Warning(null, psFormName, ex.getMessage());
+            } else {
+                Platform.runLater(() -> ShowMessageFX.Warning(null, psFormName, ex.getMessage()));
+            }
         }
     }
 
@@ -641,6 +671,11 @@ public class InventoryMaintenanceController implements Initializable, ScreenInte
 
         } catch (SQLException | GuanzonException e) {
             poLogWrapper.severe(psFormName, e.getMessage());
+            if (Platform.isFxApplicationThread()) {
+                ShowMessageFX.Warning(null, psFormName, e.getMessage());
+            } else {
+                Platform.runLater(() -> ShowMessageFX.Warning(null, psFormName, e.getMessage()));
+            }
         }
     }
 
@@ -744,6 +779,11 @@ public class InventoryMaintenanceController implements Initializable, ScreenInte
             } catch (IllegalAccessException e) {
                 e.printStackTrace();
                 poLogWrapper.severe(psFormName + " :" + e.getMessage());
+                if (Platform.isFxApplicationThread()) {
+                    ShowMessageFX.Warning(null, psFormName, e.getMessage());
+                } else {
+                    Platform.runLater(() -> ShowMessageFX.Warning(null, psFormName, e.getMessage()));
+                }
             }
         }
     }
@@ -1079,6 +1119,11 @@ public class InventoryMaintenanceController implements Initializable, ScreenInte
             } catch (IllegalAccessException e) {
                 e.printStackTrace();
                 poLogWrapper.severe(psFormName + " :" + e.getMessage());
+                if (Platform.isFxApplicationThread()) {
+                    ShowMessageFX.Warning(null, psFormName, e.getMessage());
+                } else {
+                    Platform.runLater(() -> ShowMessageFX.Warning(null, psFormName, e.getMessage()));
+                }
             }
         }
         return controls;
