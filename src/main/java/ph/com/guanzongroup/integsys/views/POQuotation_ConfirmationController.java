@@ -1348,6 +1348,10 @@ public class POQuotation_ConfirmationController implements Initializable, Screen
         }
     }
 
+    private String safeGet(Object value) {
+        return value == null ? "" : String.valueOf(value);
+    }
+
     public void initLoadTable() {
         loadTableAttachment = new JFXUtil.ReloadableTableTask(
                 tblAttachments,
@@ -1455,14 +1459,13 @@ public class POQuotation_ConfirmationController implements Initializable, Screen
                             //pending
                             //retreiving using column index
                             for (int lnCtr = 0; lnCtr <= poController.POQuotation().getPOQuotationCount() - 1; lnCtr++) {
-                                try {
-
+                                try {                           
                                     main_data.add(new ModelPOQuotation_Main(String.valueOf(lnCtr + 1),
                                             //                                            String.valueOf(poController.POQuotation().POQuotationList(lnCtr).Company().getCompanyName()),
                                             String.valueOf(poController.POQuotation().POQuotationList(lnCtr).Branch().getBranchName()),
                                             String.valueOf(poController.POQuotation().POQuotationList(lnCtr).Supplier().getCompanyName()),
                                             String.valueOf(CustomCommonUtil.formatDateToShortString(poController.POQuotation().POQuotationList(lnCtr).getTransactionDate())),
-                                            String.valueOf(poController.POQuotation().POQuotationList(lnCtr).POQuotationRequest().getTransactionNo()),
+                                            safeGet(poController.POQuotation().POQuotationList(lnCtr).POQuotationRequest().getTransactionNo()),
                                             String.valueOf(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.POQuotation().POQuotationList(lnCtr).getTransactionTotal(), true))
                                     ));
                                 } catch (GuanzonException | SQLException ex) {

@@ -1204,6 +1204,10 @@ public class POQuotation_ApprovalController implements Initializable, ScreenInte
         }
     }
 
+    private String safeGet(Object value) {
+        return value == null ? "" : String.valueOf(value);
+    }
+
     public void initLoadTable() {
         loadTableAttachment = new JFXUtil.ReloadableTableTask(
                 tblAttachments,
@@ -1318,7 +1322,7 @@ public class POQuotation_ApprovalController implements Initializable, ScreenInte
                                             String.valueOf(poController.POQuotation().POQuotationList(lnCtr).Branch().getBranchName()),
                                             String.valueOf(poController.POQuotation().POQuotationList(lnCtr).Supplier().getCompanyName()),
                                             String.valueOf(CustomCommonUtil.formatDateToShortString(poController.POQuotation().POQuotationList(lnCtr).getTransactionDate())),
-                                            String.valueOf(poController.POQuotation().POQuotationList(lnCtr).POQuotationRequest().getTransactionNo()),
+                                            safeGet(poController.POQuotation().POQuotationList(lnCtr).POQuotationRequest().getTransactionNo()),
                                             String.valueOf(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.POQuotation().POQuotationList(lnCtr).getTransactionTotal(), true))
                                     ));
                                 } catch (GuanzonException | SQLException ex) {

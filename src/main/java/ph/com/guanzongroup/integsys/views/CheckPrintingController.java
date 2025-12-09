@@ -645,14 +645,15 @@ public class CheckPrintingController implements Initializable, ScreenInterface {
         controller.setCheckPrinting(poController);
         controller.setTransaction(fsTransactionNos);
         try {
-            stageAssignment.showDialog((Stage) AnchorMain.getScene().getWindow(), getClass().getResource("/ph/com/guanzongroup/integsys/views/CheckAssignment.fxml"), controller,
-                    "Check Assignment Dialog", true, true, false);
             stageAssignment.setOnHidden(event -> {
                 chckSelectAll.setSelected(false);
                 retrieveDisbursement();
                 loadTableMain.reload();
                 checkedItem.clear();
             });
+            stageAssignment.showDialog((Stage) AnchorMain.getScene().getWindow(), getClass().getResource("/ph/com/guanzongroup/integsys/views/CheckAssignment.fxml"), controller,
+                    "Check Assignment Dialog", true, true, false);
+
         } catch (IOException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
             ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
