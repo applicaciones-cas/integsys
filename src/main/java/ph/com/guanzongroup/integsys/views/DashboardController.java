@@ -2015,6 +2015,13 @@ public class DashboardController implements Initializable {
                 if (!node.getFxmlPath().isEmpty() && node.getFxmlPath().contains(".fxml")) {
                     setScene2(loadAnimate(node));
                     poController = tabpane.getUserData();
+                } else {
+                    if (Platform.isFxApplicationThread()) {
+                        ShowMessageFX.Warning(null, psFormName, "Invalid FXML PATH");
+                    } else {
+                        Platform.runLater(() -> ShowMessageFX.Warning(null, psFormName, "Invalid FXML PATH"));
+                    }
+
                 }
             } else {
                 tabpane.getSelectionModel().select(tabIndex);
