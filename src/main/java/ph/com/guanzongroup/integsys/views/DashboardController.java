@@ -2017,9 +2017,9 @@ public class DashboardController implements Initializable {
                     poController = tabpane.getUserData();
                 } else {
                     if (Platform.isFxApplicationThread()) {
-                        ShowMessageFX.Warning(null, psFormName, "Invalid FXML PATH");
+                        ShowMessageFX.Warning(null, psFormName, "Invalid FXML path detected. Please inform MIS to configure the correct path.");
                     } else {
-                        Platform.runLater(() -> ShowMessageFX.Warning(null, psFormName, "Invalid FXML PATH"));
+                        Platform.runLater(() -> ShowMessageFX.Warning(null, psFormName, "Invalid FXML path detected. Please inform MIS to configure the correct path."));
                     }
 
                 }
