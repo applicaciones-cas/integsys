@@ -174,13 +174,17 @@ public class InventoryParamController implements Initializable, ScreenInterface 
             initializeTableDetail();
             initControlEvents();
         } catch (SQLException | GuanzonException e) {
-            Logger.getLogger(CheckDeposit_EntryController.class.getName()).log(Level.SEVERE, null, e);
             poLogWrapper.severe(psFormName + " :" + e.getMessage());
+            if (Platform.isFxApplicationThread()) {
+                ShowMessageFX.Warning(null, psFormName, e.getMessage());
+            } else {
+                Platform.runLater(() -> ShowMessageFX.Warning(null, psFormName, e.getMessage()));
+            }
         }
     }
 
     @FXML
-    void ontblDetailClicked(MouseEvent e) {
+    void ontblDetailClicked(MouseEvent ex) {
         try {
             pnRecordDetail = tblSubItems.getSelectionModel().getSelectedIndex() + 1;
             if (pnRecordDetail <= 0) {
@@ -188,9 +192,14 @@ public class InventoryParamController implements Initializable, ScreenInterface 
             }
 
             loadSelectedRecordDetail(pnRecordDetail);
-        } catch (SQLException | GuanzonException | CloneNotSupportedException ex) {
-            ex.printStackTrace();
-            poLogWrapper.severe(psFormName + " :" + ex.getMessage());
+        } catch (SQLException | GuanzonException | CloneNotSupportedException e) {
+            e.printStackTrace();
+            poLogWrapper.severe(psFormName + " :" + e.getMessage());
+            if (Platform.isFxApplicationThread()) {
+                ShowMessageFX.Warning(null, psFormName, e.getMessage());
+            } else {
+                Platform.runLater(() -> ShowMessageFX.Warning(null, psFormName, e.getMessage()));
+            }
         }
     }
 
@@ -420,8 +429,8 @@ public class InventoryParamController implements Initializable, ScreenInterface 
                         poAppController = new InvControllers(poApp, poLogWrapper).Inventory();
                         poAppController.initialize();
                         //initlalize and validate record objects from class controller
-                        unloadForm appUnload = new unloadForm();
-                        appUnload.unloadForm(apMainAnchor, poApp, psFormName);
+//                        unloadForm appUnload = new unloadForm();
+//                        appUnload.unloadForm(apMainAnchor, poApp, psFormName);
 
                         //background thread
                         Platform.runLater(() -> {
@@ -458,6 +467,11 @@ public class InventoryParamController implements Initializable, ScreenInterface 
         } catch (CloneNotSupportedException | SQLException | GuanzonException e) {
             e.printStackTrace();
             poLogWrapper.severe(psFormName + " :" + e.getMessage());
+            if (Platform.isFxApplicationThread()) {
+                ShowMessageFX.Warning(null, psFormName, e.getMessage());
+            } else {
+                Platform.runLater(() -> ShowMessageFX.Warning(null, psFormName, e.getMessage()));
+            }
         }
     }
 
@@ -950,9 +964,15 @@ public class InventoryParamController implements Initializable, ScreenInterface 
                         break;
                 }
             }
-        } catch (CloneNotSupportedException | SQLException | GuanzonException ex) {
-            ex.printStackTrace();
-            poLogWrapper.severe(psFormName + " :" + ex.getMessage());
+        } catch (CloneNotSupportedException | SQLException | GuanzonException e) {
+
+            e.printStackTrace();
+            poLogWrapper.severe(psFormName + " :" + e.getMessage());
+            if (Platform.isFxApplicationThread()) {
+                ShowMessageFX.Warning(null, psFormName, e.getMessage());
+            } else {
+                Platform.runLater(() -> ShowMessageFX.Warning(null, psFormName, e.getMessage()));
+            }
         }
     }
     private final ChangeListener<? super Boolean> txtArea_Focus = (o, ov, nv) -> {
@@ -997,9 +1017,14 @@ public class InventoryParamController implements Initializable, ScreenInterface 
 
                 }
             }
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            poLogWrapper.severe(psFormName + " :" + ex.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            poLogWrapper.severe(psFormName + " :" + e.getMessage());
+            if (Platform.isFxApplicationThread()) {
+                ShowMessageFX.Warning(null, psFormName, e.getMessage());
+            } else {
+                Platform.runLater(() -> ShowMessageFX.Warning(null, psFormName, e.getMessage()));
+            }
         }
     }
 
@@ -1042,6 +1067,11 @@ public class InventoryParamController implements Initializable, ScreenInterface 
             chkRecordStatus.setSelected(poAppController.getModel().isRecordActive());
         } catch (SQLException | GuanzonException e) {
             poLogWrapper.severe(psFormName, e.getMessage());
+            if (Platform.isFxApplicationThread()) {
+                ShowMessageFX.Warning(null, psFormName, e.getMessage());
+            } else {
+                Platform.runLater(() -> ShowMessageFX.Warning(null, psFormName, e.getMessage()));
+            }
         }
     }
 
@@ -1175,6 +1205,11 @@ public class InventoryParamController implements Initializable, ScreenInterface 
             } catch (IllegalAccessException e) {
                 e.printStackTrace();
                 poLogWrapper.severe(psFormName + " :" + e.getMessage());
+                if (Platform.isFxApplicationThread()) {
+                    ShowMessageFX.Warning(null, psFormName, e.getMessage());
+                } else {
+                    Platform.runLater(() -> ShowMessageFX.Warning(null, psFormName, e.getMessage()));
+                }
             }
         }
     }
@@ -1205,6 +1240,11 @@ public class InventoryParamController implements Initializable, ScreenInterface 
                     return new SimpleStringProperty(loModel.getValue().Measure().getDescription());
                 } catch (SQLException | GuanzonException e) {
                     poLogWrapper.severe(psFormName, e.getMessage());
+                    if (Platform.isFxApplicationThread()) {
+                        ShowMessageFX.Warning(null, psFormName, e.getMessage());
+                    } else {
+                        Platform.runLater(() -> ShowMessageFX.Warning(null, psFormName, e.getMessage()));
+                    }
                     return new SimpleStringProperty("");
                 }
             });
@@ -1346,6 +1386,11 @@ public class InventoryParamController implements Initializable, ScreenInterface 
             } catch (IllegalAccessException e) {
                 e.printStackTrace();
                 poLogWrapper.severe(psFormName + " :" + e.getMessage());
+                if (Platform.isFxApplicationThread()) {
+                    ShowMessageFX.Warning(null, psFormName, e.getMessage());
+                } else {
+                    Platform.runLater(() -> ShowMessageFX.Warning(null, psFormName, e.getMessage()));
+                }
             }
         }
         return controls;
