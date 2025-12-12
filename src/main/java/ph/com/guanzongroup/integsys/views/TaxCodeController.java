@@ -94,6 +94,12 @@ public class TaxCodeController implements Initializable, ScreenInterface {
             InitTextFields();
             ClickButton();
             pbLoaded = true;
+            
+            
+            if (oParameters.TaxCode().getEditMode() == EditMode.ADDNEW) {
+                initButton(pnEditMode);
+                loadRecord();
+            }
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(TaxCodeController.class.getName()).log(Level.SEVERE, null, ex);
         }

@@ -99,6 +99,11 @@ public class SectionController implements Initializable, ScreenInterface {
             ClickButton();
             initTabAnchor();
             pbLoaded = true;
+
+            if (oParameters.Section().getEditMode() == EditMode.ADDNEW) {
+                initButton(pnEditMode);
+                loadRecord();
+            }
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(SectionController.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -200,7 +205,7 @@ public class SectionController implements Initializable, ScreenInterface {
                         String Status = oParameters.Section().getModel().getRecordStatus();
                         String id = oParameters.Section().getModel().getSectionId();
                         JSONObject poJsON;
-                        
+
                         switch (Status) {
                             case "0":
                                 if (ShowMessageFX.YesNo(null, pxeModuleName, "Do you want to Activate this Parameter?") == true) {
@@ -222,7 +227,7 @@ public class SectionController implements Initializable, ScreenInterface {
                                 break;
                             case "1":
                                 if (ShowMessageFX.YesNo(null, pxeModuleName, "Do you want to Deactivate this Parameter?") == true) {
-                                  
+
                                     poJsON = oParameters.Section().deactivateRecord();
                                     if ("error".equals(poJsON.get("result"))) {
                                         ShowMessageFX.Information((String) poJsON.get("message"), "Computerized Accounting System", pxeModuleName);
@@ -239,7 +244,7 @@ public class SectionController implements Initializable, ScreenInterface {
                                 }
                                 break;
                         }
-                    break;
+                        break;
                 }
             } catch (SQLException | GuanzonException | CloneNotSupportedException ex) {
                 Logger.getLogger(SectionController.class.getName()).log(Level.SEVERE, null, ex);

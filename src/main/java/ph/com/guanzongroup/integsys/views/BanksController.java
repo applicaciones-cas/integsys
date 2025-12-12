@@ -99,6 +99,12 @@ public class BanksController implements Initializable, ScreenInterface {
             InitTextFields();
             ClickButton();
             initTabAnchor();
+
+            if (oParameters.Banks().getEditMode() == EditMode.ADDNEW) {
+                initButton(pnEditMode);
+                initTabAnchor();
+                loadRecord();
+            }
             pbLoaded = true;
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(BanksController.class.getName()).log(Level.SEVERE, null, ex);

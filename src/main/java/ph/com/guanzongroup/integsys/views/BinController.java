@@ -93,6 +93,12 @@ public class BinController implements Initializable, ScreenInterface {
             InitTextFields();
             ClickButton();
             pbLoaded = true;
+            
+            
+            if (oParameters.Bin().getEditMode() == EditMode.ADDNEW) {
+                initButton(pnEditMode);
+                loadRecord();
+            }
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
         }
