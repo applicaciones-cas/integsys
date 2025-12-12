@@ -30,6 +30,7 @@ import org.guanzon.appdriver.base.MiscUtil;
 import org.guanzon.appdriver.constant.EditMode;
 import org.guanzon.cas.parameter.services.ParamControllers;
 import org.json.simple.JSONObject;
+import org.json.simple.parser.ParseException;
 import ph.com.guanzongroup.integsys.utility.CustomCommonUtil;
 import ph.com.guanzongroup.integsys.utility.JFXUtil;
 
@@ -243,7 +244,7 @@ public class ModelVariantController implements Initializable, ScreenInterface {
                             if ("error".equalsIgnoreCase(poJSON.get("result").toString())) {
                                 ShowMessageFX.Information((String) poJSON.get("message"), "Computerized Acounting System", pxeModuleName);
                             }
-                            oParameters.ModelVariant().getModel().setColorId(oParameters.ModelVariant().getModel().Color().getColorId());
+                            oParameters.ModelVariant().getModel().setColorId(oParameters.Color().getModel().getColorId());
                             break;
                     }
                     loadRecord();
@@ -277,9 +278,17 @@ public class ModelVariantController implements Initializable, ScreenInterface {
                         case "tfDescription":
                             oParameters.ModelVariant().getModel().setDescription(lsValue);
                             break;
-//                        case "tfYearModel":
-//                            oParameters.ModelVariant().getModelVariant().setYearModel(lsValue);
-//                            break;
+                        case "tfYearModel":
+                            int value = 0;
+                            try {
+                                value = Integer.parseInt(lsValue);
+
+                            } catch (NumberFormatException e) {
+                                value = 0;
+
+                            }
+                            oParameters.ModelVariant().getModel().setYearModel(value);
+                            break;
                         case "tfSellPrice":
                             lsValue = JFXUtil.removeComma(lsValue);
                             oParameters.ModelVariant().getModel().setSellingPrice(Double.parseDouble(lsValue));
