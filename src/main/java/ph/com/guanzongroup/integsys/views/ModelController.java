@@ -97,11 +97,17 @@ public class ModelController implements Initializable, ScreenInterface {
     public void initialize(URL url, ResourceBundle rb) {
         try {
             initializeObject();
-            pnEditMode = oParameters.Barangay().getEditMode();
+            pnEditMode = oParameters.Model().getEditMode();
             initButton(pnEditMode);
             InitTextFields();
             ClickButton();
             initTabAnchor();
+            
+            if (oParameters.Model().getEditMode() == EditMode.ADDNEW) {
+                initButton(pnEditMode);
+                initTabAnchor();
+                loadRecord();
+            }
             pbLoaded = true;
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(ModelController.class.getName()).log(Level.SEVERE, null, ex);

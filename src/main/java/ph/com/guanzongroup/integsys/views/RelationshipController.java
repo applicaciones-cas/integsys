@@ -99,6 +99,12 @@ public class RelationshipController implements Initializable, ScreenInterface {
             ClickButton();
             initTabAnchor();
             pbLoaded = true;
+
+            if (oParameters.Relationship().getEditMode() == EditMode.ADDNEW) {
+                initButton(pnEditMode);
+                initTabAnchor();
+                loadRecord();
+            }
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(RelationshipController.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -200,7 +206,7 @@ public class RelationshipController implements Initializable, ScreenInterface {
                         String Status = oParameters.Relationship().getModel().getRecordStatus();
                         String id = oParameters.Relationship().getModel().getRelationId();
                         JSONObject poJsON;
-                        
+
                         switch (Status) {
                             case "0":
                                 if (ShowMessageFX.YesNo(null, pxeModuleName, "Do you want to Activate this Parameter?") == true) {
@@ -222,7 +228,7 @@ public class RelationshipController implements Initializable, ScreenInterface {
                                 break;
                             case "1":
                                 if (ShowMessageFX.YesNo(null, pxeModuleName, "Do you want to Deactivate this Parameter?") == true) {
-                                  
+
                                     poJsON = oParameters.Relationship().deactivateRecord();
                                     if ("error".equals(poJsON.get("result"))) {
                                         ShowMessageFX.Information((String) poJsON.get("message"), "Computerized Accounting System", pxeModuleName);
@@ -239,7 +245,7 @@ public class RelationshipController implements Initializable, ScreenInterface {
                                 }
                                 break;
                         }
-                    break;
+                        break;
                 }
             } catch (SQLException | GuanzonException | CloneNotSupportedException ex) {
                 Logger.getLogger(RelationshipController.class.getName()).log(Level.SEVERE, null, ex);

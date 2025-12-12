@@ -234,14 +234,14 @@ public class InventoryParamController implements Initializable, ScreenInterface 
                             break;
                         case "tfCategory3":
                             if (!isJSONSuccess(poAppController.searchCategory3(tfCategory3.getText() != null ? tfCategory3.getText() : "", false),
-                                    "Initialize Search Category 2! ")) {
+                                    "Initialize Search Category 3! ")) {
                                 return;
                             }
                             loadRecord();
                             break;
                         case "tfCategory4":
                             if (!isJSONSuccess(poAppController.searchCategory4(tfCategory4.getText() != null ? tfCategory4.getText() : "", false),
-                                    "Initialize Search Category 2! ")) {
+                                    "Initialize Search Category 4! ")) {
                                 return;
                             }
                             loadRecord();
@@ -873,14 +873,14 @@ public class InventoryParamController implements Initializable, ScreenInterface 
                                 break;
                             case "tfCategory3":
                                 if (!isJSONSuccess(poAppController.searchCategory3(tfCategory3.getText() != null ? tfCategory3.getText() : "", false),
-                                        "Initialize Search Category 2! ")) {
+                                        "Initialize Search Category 3! ")) {
                                     return;
                                 }
                                 loadRecord();
                                 break;
                             case "tfCategory4":
                                 if (!isJSONSuccess(poAppController.searchCategory4(tfCategory4.getText() != null ? tfCategory4.getText() : "", false),
-                                        "Initialize Search Category 2! ")) {
+                                        "Initialize Search Category 4! ")) {
                                     return;
                                 }
                                 loadRecord();

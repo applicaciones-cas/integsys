@@ -100,6 +100,12 @@ public class ProvinceController implements Initializable, ScreenInterface {
             ClickButton();
             initTabAnchor();
             pbLoaded = true;
+
+            if (oParameters.Region().getEditMode() == EditMode.ADDNEW) {
+                initButton(pnEditMode);
+                initTabAnchor();
+                loadRecord();
+            }
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(ProvinceController.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -197,7 +203,7 @@ public class ProvinceController implements Initializable, ScreenInterface {
                             ShowMessageFX.Information((String) saveResult.get("message"), "Computerized Acounting System", pxeModuleName);
                         }
                         break;
-                     case "btnActivate":
+                    case "btnActivate":
                         String Status = oParameters.Province().getModel().getRecordStatus();
                         String id = oParameters.Province().getModel().getProvinceId();
                         JSONObject poJsON;

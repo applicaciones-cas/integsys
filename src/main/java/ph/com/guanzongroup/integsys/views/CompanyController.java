@@ -101,6 +101,12 @@ public class CompanyController implements Initializable, ScreenInterface {
             ClickButton();
             initTabAnchor();
             pbLoaded = true;
+
+            if (oParameters.Company().getEditMode() == EditMode.ADDNEW) {
+                initButton(pnEditMode);
+                initTabAnchor();
+                loadRecord();
+            }
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(CompanyController.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -202,7 +208,7 @@ public class CompanyController implements Initializable, ScreenInterface {
                         String Status = oParameters.Company().getModel().getRecordStatus();
                         String id = oParameters.Company().getModel().getCompanyCode();
                         JSONObject poJsON;
-                        
+
                         switch (Status) {
                             case "0":
                                 if (ShowMessageFX.YesNo(null, pxeModuleName, "Do you want to Activate this Parameter?") == true) {
@@ -224,7 +230,7 @@ public class CompanyController implements Initializable, ScreenInterface {
                                 break;
                             case "1":
                                 if (ShowMessageFX.YesNo(null, pxeModuleName, "Do you want to Deactivate this Parameter?") == true) {
-                                  
+
                                     poJsON = oParameters.Company().deactivateRecord();
                                     if ("error".equals(poJsON.get("result"))) {
                                         ShowMessageFX.Information((String) poJsON.get("message"), "Computerized Accounting System", pxeModuleName);
@@ -241,7 +247,7 @@ public class CompanyController implements Initializable, ScreenInterface {
                                 }
                                 break;
                         }
-                    break;
+                        break;
                 }
             } catch (SQLException | GuanzonException | CloneNotSupportedException ex) {
                 Logger.getLogger(CompanyController.class.getName()).log(Level.SEVERE, null, ex);

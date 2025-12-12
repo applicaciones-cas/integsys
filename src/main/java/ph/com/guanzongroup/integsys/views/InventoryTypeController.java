@@ -93,6 +93,11 @@ public class InventoryTypeController implements Initializable, ScreenInterface {
             InitTextFields();
             ClickButton();
             pbLoaded = true;
+
+            if (oParameters.InventoryType().getEditMode() == EditMode.ADDNEW) {
+                initButton(pnEditMode);
+                loadRecord();
+            }
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
         }
@@ -187,11 +192,11 @@ public class InventoryTypeController implements Initializable, ScreenInterface {
                             ShowMessageFX.Information((String) saveResult.get("message"), "Computerized Acounting System", pxeModuleName);
                         }
                         break;
-                   case "btnActivate":
+                    case "btnActivate":
                         String Status = oParameters.InventoryType().getModel().getRecordStatus();
                         String id = oParameters.InventoryType().getModel().getInventoryTypeId();
                         JSONObject poJsON;
-                        
+
                         switch (Status) {
                             case "0":
                                 if (ShowMessageFX.YesNo(null, pxeModuleName, "Do you want to Activate this Parameter?") == true) {
@@ -214,11 +219,10 @@ public class InventoryTypeController implements Initializable, ScreenInterface {
                                 break;
                             case "1":
                                 if (ShowMessageFX.YesNo(null, pxeModuleName, "Do you want to Deactivate this Parameter?") == true) {
-                                   
-                                    
+
                                     System.out.println("EDIT MODE : " + oParameters.InventoryType().getEditMode());
                                     ShowMessageFX.Information(String.valueOf(oParameters.Category().getEditMode()), "Computerized Accounting System", pxeModuleName);
-                                    
+
                                     poJsON = oParameters.InventoryType().deactivateRecord();
                                     if ("error".equals(poJsON.get("result"))) {
                                         ShowMessageFX.Information((String) poJsON.get("message"), "Computerized Accounting System", pxeModuleName);

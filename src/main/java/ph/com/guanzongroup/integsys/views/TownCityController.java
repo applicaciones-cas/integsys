@@ -94,6 +94,12 @@ public class TownCityController implements Initializable, ScreenInterface {
             InitTextFields();
             ClickButton();
             pbLoaded = true;
+            
+            
+            if (oParameters.TownCity().getEditMode() == EditMode.ADDNEW) {
+                initButton(pnEditMode);
+                loadRecord();
+            }
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(TownCityController.class.getName()).log(Level.SEVERE, null, ex);
         }

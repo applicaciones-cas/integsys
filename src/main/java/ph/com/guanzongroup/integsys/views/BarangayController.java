@@ -99,6 +99,13 @@ public class BarangayController implements Initializable, ScreenInterface {
             InitTextFields();
             ClickButton();
             initTabAnchor();
+            
+            
+            if (oParameters.Barangay().getEditMode() == EditMode.ADDNEW) {
+                initButton(pnEditMode);
+                initTabAnchor();
+                loadRecord();
+            }
             pbLoaded = true;
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(BarangayController.class.getName()).log(Level.SEVERE, null, ex);

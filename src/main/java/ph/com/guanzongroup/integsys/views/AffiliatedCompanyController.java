@@ -99,11 +99,17 @@ public class AffiliatedCompanyController implements Initializable, ScreenInterfa
             clearAllFields();
             pnEditMode = oParameters.AffiliatedCompany().getEditMode();
             initButton(pnEditMode);
-            
+
             InitTextFields();
             initDatePicker();
             ClickButton();
             initTabAnchor();
+
+            if (oParameters.AffiliatedCompany().getEditMode() == EditMode.ADDNEW) {
+                initButton(pnEditMode);
+                initTabAnchor();
+                loadRecord();
+            }
             pbLoaded = true;
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(AffiliatedCompanyController.class.getName()).log(Level.SEVERE, null, ex);
@@ -204,7 +210,7 @@ public class AffiliatedCompanyController implements Initializable, ScreenInterfa
                             ShowMessageFX.Information((String) saveResult.get("message"), "Computerized Acounting System", pxeModuleName);
                         }
                         break;
-                     case "btnActivate":
+                    case "btnActivate":
                         String Status = oParameters.AffiliatedCompany().getModel().getRecordStatus();
                         String id = oParameters.AffiliatedCompany().getModel().getCompanyId();
                         JSONObject poJsON;
@@ -230,10 +236,9 @@ public class AffiliatedCompanyController implements Initializable, ScreenInterfa
                                 break;
                             case "1":
                                 if (ShowMessageFX.YesNo(null, pxeModuleName, "Do you want to Deactivate this Parameter?") == true) {
-                                   
-                                    
+
                                     System.out.println("EDIT MODE : " + oParameters.AffiliatedCompany().getEditMode());
-                                    
+
                                     poJsON = oParameters.AffiliatedCompany().deactivateRecord();
                                     if ("error".equals(poJsON.get("result"))) {
                                         ShowMessageFX.Information((String) poJsON.get("message"), "Computerized Accounting System", pxeModuleName);

@@ -100,6 +100,12 @@ public class CountryController implements Initializable, ScreenInterface {
             ClickButton();
             initTabAnchor();
             pbLoaded = true;
+
+            if (oParameters.Country().getEditMode() == EditMode.ADDNEW) {
+                initButton(pnEditMode);
+                initTabAnchor();
+                loadRecord();
+            }
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(CountryController.class.getName()).log(Level.SEVERE, null, ex);
         }

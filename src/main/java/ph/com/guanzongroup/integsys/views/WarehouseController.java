@@ -100,6 +100,12 @@ public class WarehouseController implements Initializable, ScreenInterface {
             ClickButton();
             initTabAnchor();
             pbLoaded = true;
+            
+            if (oParameters.Warehouse().getEditMode() == EditMode.ADDNEW) {
+                initButton(pnEditMode);
+                initTabAnchor();
+                loadRecord();
+            }
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(WarehouseController.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -201,7 +207,7 @@ public class WarehouseController implements Initializable, ScreenInterface {
                         String Status = oParameters.Warehouse().getModel().getRecordStatus();
                         String id = oParameters.Warehouse().getModel().getWarehouseId();
                         JSONObject poJsON;
-                        
+
                         switch (Status) {
                             case "0":
                                 if (ShowMessageFX.YesNo(null, pxeModuleName, "Do you want to Activate this Parameter?") == true) {
@@ -223,7 +229,7 @@ public class WarehouseController implements Initializable, ScreenInterface {
                                 break;
                             case "1":
                                 if (ShowMessageFX.YesNo(null, pxeModuleName, "Do you want to Deactivate this Parameter?") == true) {
-                                  
+
                                     poJsON = oParameters.Warehouse().deactivateRecord();
                                     if ("error".equals(poJsON.get("result"))) {
                                         ShowMessageFX.Information((String) poJsON.get("message"), "Computerized Accounting System", pxeModuleName);
@@ -240,7 +246,7 @@ public class WarehouseController implements Initializable, ScreenInterface {
                                 }
                                 break;
                         }
-                    break;
+                        break;
                 }
             } catch (SQLException | GuanzonException | CloneNotSupportedException ex) {
                 Logger.getLogger(WarehouseController.class.getName()).log(Level.SEVERE, null, ex);

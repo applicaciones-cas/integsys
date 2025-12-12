@@ -100,6 +100,12 @@ public class CategoryController implements Initializable, ScreenInterface {
             ClickButton();
             initTabAnchor();
             pbLoaded = true;
+
+            if (oParameters.Category().getEditMode() == EditMode.ADDNEW) {
+                initButton(pnEditMode);
+                initTabAnchor();
+                loadRecord();
+            }
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(BarangayController.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -201,7 +207,7 @@ public class CategoryController implements Initializable, ScreenInterface {
                         String Status = oParameters.Category().getModel().getRecordStatus();
                         String id = oParameters.Category().getModel().getCategoryId();
                         JSONObject poJsON;
-                        
+
                         switch (Status) {
                             case "0":
                                 if (ShowMessageFX.YesNo(null, pxeModuleName, "Do you want to Activate this Parameter?") == true) {
@@ -224,11 +230,10 @@ public class CategoryController implements Initializable, ScreenInterface {
                                 break;
                             case "1":
                                 if (ShowMessageFX.YesNo(null, pxeModuleName, "Do you want to Deactivate this Parameter?") == true) {
-                                   
-                                    
+
                                     System.out.println("EDIT MODE : " + oParameters.Category().getEditMode());
                                     ShowMessageFX.Information(String.valueOf(oParameters.Category().getEditMode()), "Computerized Accounting System", pxeModuleName);
-                                    
+
                                     poJsON = oParameters.Category().deactivateRecord();
                                     if ("error".equals(poJsON.get("result"))) {
                                         ShowMessageFX.Information((String) poJsON.get("message"), "Computerized Accounting System", pxeModuleName);

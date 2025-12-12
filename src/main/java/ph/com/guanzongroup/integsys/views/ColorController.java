@@ -93,6 +93,12 @@ public class ColorController implements Initializable, ScreenInterface {
             InitTextFields();
             ClickButton();
             pbLoaded = true;
+            
+            
+            if (oParameters.Color().getEditMode() == EditMode.ADDNEW) {
+                initButton(pnEditMode);
+                loadRecord();
+            }
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(ColorController.class.getName()).log(Level.SEVERE, null, ex);
         }

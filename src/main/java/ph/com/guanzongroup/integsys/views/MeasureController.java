@@ -98,6 +98,12 @@ public class MeasureController implements Initializable, ScreenInterface {
             InitTextFields();
             ClickButton();
             initTabAnchor();
+
+            if (oParameters.Measurement().getEditMode() == EditMode.ADDNEW) {
+                initButton(pnEditMode);
+                initTabAnchor();
+                loadRecord();
+            }
             pbLoaded = true;
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(MeasureController.class.getName()).log(Level.SEVERE, null, ex);
@@ -200,7 +206,7 @@ public class MeasureController implements Initializable, ScreenInterface {
                         String Status = oParameters.Measurement().getModel().getRecordStatus();
                         String id = oParameters.Measurement().getModel().getMeasureId();
                         JSONObject poJsON;
-                        
+
                         switch (Status) {
                             case "0":
                                 if (ShowMessageFX.YesNo(null, pxeModuleName, "Do you want to Activate this Parameter?") == true) {
@@ -222,7 +228,7 @@ public class MeasureController implements Initializable, ScreenInterface {
                                 break;
                             case "1":
                                 if (ShowMessageFX.YesNo(null, pxeModuleName, "Do you want to Deactivate this Parameter?") == true) {
-                                   
+
                                     poJsON = oParameters.Measurement().deactivateRecord();
                                     if ("error".equals(poJsON.get("result"))) {
                                         ShowMessageFX.Information((String) poJsON.get("message"), "Computerized Accounting System", pxeModuleName);

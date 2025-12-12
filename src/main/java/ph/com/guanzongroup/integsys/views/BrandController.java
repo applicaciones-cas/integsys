@@ -1,4 +1,5 @@
 package ph.com.guanzongroup.integsys.views;
+
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import java.net.URL;
 import java.sql.SQLException;
@@ -98,6 +99,12 @@ public class BrandController implements Initializable, ScreenInterface {
             InitTextFields();
             ClickButton();
             initTabAnchor();
+
+            if (oParameters.Brand().getEditMode() == EditMode.ADDNEW) {
+                initButton(pnEditMode);
+                initTabAnchor();
+                loadRecord();
+            }
             pbLoaded = true;
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(BrandController.class.getName()).log(Level.SEVERE, null, ex);
@@ -200,7 +207,7 @@ public class BrandController implements Initializable, ScreenInterface {
                         String Status = oParameters.Brand().getModel().getRecordStatus();
                         String id = oParameters.Brand().getModel().getBrandId();
                         JSONObject poJsON;
-                        
+
                         switch (Status) {
                             case "0":
                                 if (ShowMessageFX.YesNo(null, pxeModuleName, "Do you want to Activate this Parameter?") == true) {
@@ -223,11 +230,10 @@ public class BrandController implements Initializable, ScreenInterface {
                                 break;
                             case "1":
                                 if (ShowMessageFX.YesNo(null, pxeModuleName, "Do you want to Deactivate this Parameter?") == true) {
-                                   
-                                    
+
                                     System.out.println("EDIT MODE : " + oParameters.Brand().getEditMode());
                                     ShowMessageFX.Information(String.valueOf(oParameters.Brand().getEditMode()), "Computerized Accounting System", pxeModuleName);
-                                    
+
                                     poJsON = oParameters.Brand().deactivateRecord();
                                     if ("error".equals(poJsON.get("result"))) {
                                         ShowMessageFX.Information((String) poJsON.get("message"), "Computerized Accounting System", pxeModuleName);

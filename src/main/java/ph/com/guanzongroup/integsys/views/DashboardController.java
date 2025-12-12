@@ -102,7 +102,7 @@ public class DashboardController implements Initializable {
 
     private String psDefaultScreenFXML = "/ph/com/guanzongroup/integsys/views/Login.fxml";
     private String psDefaultScreenFXML2 = "/ph/com/guanzongroup/integsys/views/DefaultScreen.fxml";
-    private String psUserManagementFXML = "/ph/com/guanzongroup/integsys/views/UserManagement.fxml";
+//    private String psUserManagementFXML = "/ph/com/guanzongroup/integsys/views/UserManagement.fxml";
 
     private ToggleGroup toggleGroup;
     private static ToggleButton[] toggleBtnLeftUpperSideBar;
@@ -574,7 +574,7 @@ public class DashboardController implements Initializable {
                 savedNodes.clear();
             }
             savedNodes = new ArrayList<>(workingSpace.getChildren());
-            setScene(loadAnimateAnchor(psUserManagementFXML));
+//            setScene(loadAnimateAnchor(psUserManagementFXML));
         } else { //toggle off
             //define also if logged in or not, if logged in
             if (LoginControllerHolder.getLogInStatus()) {
@@ -1376,18 +1376,18 @@ public class DashboardController implements Initializable {
         }
     }
 
-    public void TabUserManagement1() { // if logged in
-        setAnchorPaneVisibleManage(false, anchorLeftSideBarMenu);
-        tabpane.setVisible(true);
-        tabpane.setManaged(true);
-        workingSpace.getChildren().clear();
-        workingSpace.getChildren().setAll(savedNodes);
-    }
-
-    public void TabUserManagement2() { //if not logged in
-        setAnchorPaneVisibleManage(false, anchorLeftSideBarMenu);
-        setScene(loadAnimateAnchor(psUserManagementFXML));
-    }
+//    public void TabUserManagement1() { // if logged in
+//        setAnchorPaneVisibleManage(false, anchorLeftSideBarMenu);
+//        tabpane.setVisible(true);
+//        tabpane.setManaged(true);
+//        workingSpace.getChildren().clear();
+//        workingSpace.getChildren().setAll(savedNodes);
+//    }
+//
+//    public void TabUserManagement2() { //if not logged in
+//        setAnchorPaneVisibleManage(false, anchorLeftSideBarMenu);
+//        setScene(loadAnimateAnchor(psUserManagementFXML));
+//    }
 
     public void Tabclose() {
         int tabsize = tabpane.getTabs().size();

@@ -100,6 +100,12 @@ public class TermController implements Initializable, ScreenInterface {
             ClickButton();
             initTabAnchor();
             pbLoaded = true;
+            
+            if (oParameters.Term().getEditMode() == EditMode.ADDNEW) {
+                initButton(pnEditMode);
+                initTabAnchor();
+                loadRecord();
+            }
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(TermController.class.getName()).log(Level.SEVERE, null, ex);
         }

@@ -105,6 +105,12 @@ public class BanksBranchesController implements Initializable, ScreenInterface {
             InitTextFields();
             ClickButton();
             initTabAnchor();
+
+            if (oParameters.BanksBranch().getEditMode() == EditMode.ADDNEW) {
+                initButton(pnEditMode);
+                initTabAnchor();
+                loadRecord();
+            }
             pbLoaded = true;
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(BanksBranchesController.class.getName()).log(Level.SEVERE, null, ex);
