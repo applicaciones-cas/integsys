@@ -236,7 +236,7 @@ public class ModelVariantController implements Initializable, ScreenInterface {
                             if ("error".equalsIgnoreCase(poJSON.get("result").toString())) {
                                 ShowMessageFX.Information((String) poJSON.get("message"), "Computerized Acounting System", pxeModuleName);
                             }
-//                            oParameters.ModelVariant().getModel().setModelId(oParameters.Model().getModel().getModelId());
+                            oParameters.ModelVariant().getModel().setModelId(oParameters.Model().getModel().getModelId());
                             break;
                         case "tfColor":
                             poJSON = oParameters.Color().searchRecord(lsValue, false);
@@ -306,12 +306,13 @@ public class ModelVariantController implements Initializable, ScreenInterface {
 
     private void loadRecord() {
         try {
-            tfModelVariantID.setText(oParameters.ModelVariant().getModel().getModelId());
-            cbActive.setSelected(oParameters.ModelVariant().getModel().getRecordStatus().equals("1") ? true : false);
+            tfModelVariantID.setText(oParameters.ModelVariant().getModel().getVariantId());
             tfDescription.setText(oParameters.ModelVariant().getModel().getDescription());
+            tfModel.setText(oParameters.ModelVariant().getModel().Model().getDescription());
+            tfColor.setText(oParameters.ModelVariant().getModel().Color().getDescription());
             tfYearModel.setText(String.valueOf(oParameters.ModelVariant().getModel().getYearModel()));
             tfSellPrice.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(oParameters.ModelVariant().getModel().getSellingPrice()));
-            tfColor.setText(oParameters.Color().getModel().getDescription());
+            cbActive.setSelected(oParameters.ModelVariant().getModel().getRecordStatus().equals("1") ? true : false);
 
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
