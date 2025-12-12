@@ -204,7 +204,7 @@ public class BanksBranchesController implements Initializable, ScreenInterface {
                             ShowMessageFX.Information((String) saveResult.get("message"), "Computerized Acounting System", pxeModuleName);
                             pnEditMode = EditMode.UNKNOWN;
                             initButton(pnEditMode);
-                            clearAllFields();
+                            loadRecord();
                         } else {
                             ShowMessageFX.Information((String) saveResult.get("message"), "Computerized Acounting System", pxeModuleName);
                         }
@@ -301,6 +301,7 @@ public class BanksBranchesController implements Initializable, ScreenInterface {
 
         txtField03.setOnKeyPressed(this::txtField_KeyPressed);
         txtField04.setOnKeyPressed(this::txtField_KeyPressed);
+        txtField07.setOnKeyPressed(this::txtField_KeyPressed);
         txtSeeks01.setOnKeyPressed(this::txtSeeks_KeyPressed);
     }
 
@@ -360,7 +361,8 @@ public class BanksBranchesController implements Initializable, ScreenInterface {
                                 ShowMessageFX.Information((String) poJson.get("message"), "Computerized Acounting System", pxeModuleName);
                             }
                             oParameters.BanksBranch().getModel().setBankID(oParameters.Banks().getModel().getBankID());
-                            txtField03.setText((String) oParameters.InventoryType().getModel().getDescription());
+
+                            txtField04.setText(oParameters.BanksBranch().getModel().Banks().getBankName());
                             break;
                         case 07:
                             poJson = oParameters.TownCity().searchRecord(lsValue, false);
@@ -368,7 +370,8 @@ public class BanksBranchesController implements Initializable, ScreenInterface {
                                 ShowMessageFX.Information((String) poJson.get("message"), "Computerized Acounting System", pxeModuleName);
                             }
                             oParameters.BanksBranch().getModel().setTownID(oParameters.TownCity().getModel().getTownId());
-                            txtField04.setText((String) oParameters.Category().getModel().getDescription());
+
+                            txtField07.setText(oParameters.BanksBranch().getModel().TownCity().getDescription());
                             break;
                     }
                 case ENTER:
@@ -448,8 +451,8 @@ public class BanksBranchesController implements Initializable, ScreenInterface {
         try {
             boolean lbActive = oParameters.BanksBranch().getModel().getRecordStatus() == "1";
 
-            txtField01.setText(oParameters.BanksBranch().getModel().getBankID());
-            txtField02.setText(oParameters.BanksBranch().getModel().getBranchBankName());
+            txtField01.setText(oParameters.BanksBranch().getModel().getBranchBankID());
+            txtField02.setText(oParameters.BanksBranch().getModel().getBranchBankCode());
             txtField03.setText(oParameters.BanksBranch().getModel().getBranchBankName());
             txtField04.setText(oParameters.BanksBranch().getModel().Banks().getBankName());
             txtField05.setText(oParameters.BanksBranch().getModel().getContactPerson());
