@@ -246,6 +246,8 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                         if (pnEditMode == EditMode.UNKNOWN) {
                             pnDetailJE = 0;
                             pnDetailBIR = 0;
+                        }else{
+                            loadRecordMaster();
                         }
                         break;
                     case "Journal":
@@ -1495,7 +1497,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                             //apDVDetail
                             //apJournalDetails
                             case "tfAccountCode":
-                                poJSON = poController.Journal().SearchAccountCode(pnDetailJE, lsValue, true, null, null);
+                                poJSON = poController.Journal().SearchAccountCode(pnDetailJE, lsValue, true, poController.Master().getIndustryID(), null);
                                 if ("error".equals(poJSON.get("result"))) {
                                     ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                     JFXUtil.runWithDelay(0.50, () -> {
@@ -1522,7 +1524,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                                 moveNextJE(false, true);
                                 break;
                             case "tfAccountDescription":
-                                poJSON = poController.Journal().SearchAccountCode(pnDetailJE, lsValue, false, null, null);
+                                poJSON = poController.Journal().SearchAccountCode(pnDetailJE, lsValue, false, poController.Master().getIndustryID(), null);
                                 if ("error".equals(poJSON.get("result"))) {
                                     ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                     JFXUtil.runWithDelay(0.50, () -> {
@@ -2047,7 +2049,6 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                 if (inputText == null || "".equals(inputText) || "01/01/1900".equals(inputText)) {
                     return;
                 }
-
                 lsServerDate = sdfFormat.format(oApp.getServerDate());
                 currentDate = LocalDate.parse(lsServerDate, DateTimeFormatter.ofPattern(SQLUtil.FORMAT_SHORT_DATE));
                 lsSelectedDate = sdfFormat.format(SQLUtil.toDate(JFXUtil.convertToIsoFormat(inputText), SQLUtil.FORMAT_SHORT_DATE));
