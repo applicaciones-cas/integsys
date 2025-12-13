@@ -495,6 +495,9 @@ public class POQuotation_EntryController implements Initializable, ScreenInterfa
                             if ("error".equals((String) poJSON.get("result"))) {
                                 ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                             }
+                            //Copy file to Attachment path
+                            poController.POQuotation().copyFile(selectedFile.toString());
+
                             pnAttachment = poController.POQuotation().getTransactionAttachmentCount() - 1;
                             poController.POQuotation().TransactionAttachmentList(pnAttachment).getModel().setFileName(imgPath2);
                             poController.POQuotation().TransactionAttachmentList(pnAttachment).getModel().setSourceNo(poController.POQuotation().Master().getTransactionNo());

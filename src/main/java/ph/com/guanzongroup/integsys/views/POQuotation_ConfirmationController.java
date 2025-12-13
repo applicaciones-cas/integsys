@@ -487,6 +487,9 @@ public class POQuotation_ConfirmationController implements Initializable, Screen
                             if ("error".equals((String) poJSON.get("result"))) {
                                 ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                             }
+                            //Copy file to Attachment path
+                            poController.POQuotation().copyFile(selectedFile.toString());
+                            
                             pnAttachment = poController.POQuotation().getTransactionAttachmentCount() - 1;
                             poController.POQuotation().TransactionAttachmentList(pnAttachment).getModel().setFileName(imgPath2);
                             poController.POQuotation().TransactionAttachmentList(pnAttachment).getModel().setSourceNo(poController.POQuotation().Master().getTransactionNo());
@@ -1459,7 +1462,7 @@ public class POQuotation_ConfirmationController implements Initializable, Screen
                             //pending
                             //retreiving using column index
                             for (int lnCtr = 0; lnCtr <= poController.POQuotation().getPOQuotationCount() - 1; lnCtr++) {
-                                try {                           
+                                try {
                                     main_data.add(new ModelPOQuotation_Main(String.valueOf(lnCtr + 1),
                                             //                                            String.valueOf(poController.POQuotation().POQuotationList(lnCtr).Company().getCompanyName()),
                                             String.valueOf(poController.POQuotation().POQuotationList(lnCtr).Branch().getBranchName()),
