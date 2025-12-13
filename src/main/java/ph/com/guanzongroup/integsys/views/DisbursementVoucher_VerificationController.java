@@ -1466,7 +1466,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
                             //apDVDetail
                             //apJournalDetails
                             case "tfAccountCode":
-                                poJSON = poController.Journal().SearchAccountCode(pnDetailJE, lsValue, true, null, null);
+                                poJSON = poController.Journal().SearchAccountCode(pnDetailJE, lsValue, true, poController.Master().getIndustryID(), null);
                                 if ("error".equals(poJSON.get("result"))) {
                                     ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                     JFXUtil.runWithDelay(0.50, () -> {
@@ -1493,7 +1493,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
                                 moveNextJE(false, true);
                                 break;
                             case "tfAccountDescription":
-                                poJSON = poController.Journal().SearchAccountCode(pnDetailJE, lsValue, false, null, null);
+                                poJSON = poController.Journal().SearchAccountCode(pnDetailJE, lsValue, false, poController.Master().getIndustryID(), null);
                                 if ("error".equals(poJSON.get("result"))) {
                                     ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                     JFXUtil.runWithDelay(0.50, () -> {
