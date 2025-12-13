@@ -121,8 +121,6 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.util.Callback;
 import java.io.File;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.regex.Pattern;
 import javafx.css.PseudoClass;
 import javafx.scene.control.ButtonBase;
@@ -130,7 +128,7 @@ import javafx.scene.control.MenuItem;
 import ph.com.guanzongroup.integsys.views.ScreenInterface;
 
 /**
- * Date : 4/28/2025 Recent update: 11/03/2025
+ * Date : 4/28/2025 Recent update: 12/13/2025
  *
  * @author Aldrich
  */
@@ -542,6 +540,7 @@ public class JFXUtil {
     }
 
     /* used to display pop-up dialog form*/
+    /*NOTE: setOnHidden must be called first before showDialog, to be initialized*/
     public static class StageManager {
 
         private Stage dialog;
@@ -1410,7 +1409,8 @@ public class JFXUtil {
             });
         }
     }
-     /*Alternative version of inputDecimalOnly; commas not allowed*/
+
+    /*Alternative version of inputDecimalOnly; commas not allowed*/
     public static void inputIntegersOnly(TextField... foTxtFields) {
         Pattern pattern = Pattern.compile("[0-9]*");
         for (TextField txtField : foTxtFields) {
@@ -1419,6 +1419,7 @@ public class JFXUtil {
             }
         }
     }
+
     /*Alternative version of inputDecimalOnly; restricts to 1 dot, commas not allowed*/
     public static void inputDecimalOnly(TextField... foTxtFields) {
         Pattern pattern = Pattern.compile("\\d*(\\.\\d*)?");
@@ -2462,7 +2463,7 @@ public class JFXUtil {
         cache.put(clazz, valueToNameMap);
         return valueToNameMap;
     }
-
+    
     /*Alternative ComboboxListener*/
 //    sample usage
 //    EventHandler<ActionEvent> comboBoxActionListener = JFXUtil.CmbActionListener(
@@ -2666,37 +2667,37 @@ public class JFXUtil {
 
     /*Returns description or code of the source type*/
  /*Requires string value(for comparison) and boolean if the string value is code(to return description); alternatively*/
-    public static String getSourceType(String lsValue, boolean isCode) {
-        if (lsValue == null || lsValue.trim().isEmpty()) {
-            return "";
-        }
-
-        String val = lsValue.trim().toLowerCase();
-
-        for (Map.Entry<String, String> entry : SOURCE_MAP.entrySet()) {
-            String code = entry.getKey();
-            String desc = entry.getValue();
-
-            if (val.equalsIgnoreCase(code)) {
-                return isCode ? desc : code;
-            } else if (val.equalsIgnoreCase(desc)) {
-                return isCode ? code : desc;
-            }
-        }
-
-        return "";
-    }
-    //private static source
-    private static final Map<String, String> SOURCE_MAP = new HashMap<>();
-
-    static {
-        SOURCE_MAP.put("PRFx", "PRF");
-        SOURCE_MAP.put("SOAt", "SOA");
-        SOURCE_MAP.put("CcPy", "Cache Payable");
-        SOURCE_MAP.put("PORc", "PO Receiving");
-        SOURCE_MAP.put("APAd", "AP Adjustment");
-        SOURCE_MAP.put("PO", "Purchase Order");
-    }
+//    public static String getSourceType(String lsValue, boolean isCode) {
+//        if (lsValue == null || lsValue.trim().isEmpty()) {
+//            return "";
+//        }
+//
+//        String val = lsValue.trim().toLowerCase();
+//
+//        for (Map.Entry<String, String> entry : SOURCE_MAP.entrySet()) {
+//            String code = entry.getKey();
+//            String desc = entry.getValue();
+//
+//            if (val.equalsIgnoreCase(code)) {
+//                return isCode ? desc : code;
+//            } else if (val.equalsIgnoreCase(desc)) {
+//                return isCode ? code : desc;
+//            }
+//        }
+//
+//        return "";
+//    }
+//    //private static source
+//    private static final Map<String, String> SOURCE_MAP = new HashMap<>();
+//
+//    static {
+//        SOURCE_MAP.put("PRFx", "PRF");
+//        SOURCE_MAP.put("SOAt", "SOA");
+//        SOURCE_MAP.put("CcPy", "Cache Payable");
+//        SOURCE_MAP.put("PORc", "PO Receiving");
+//        SOURCE_MAP.put("APAd", "AP Adjustment");
+//        SOURCE_MAP.put("PO", "Purchase Order");
+//    }
 
     public static void setDateValue(DatePicker datePicker, LocalDate value) {
         if (datePicker == null) {
@@ -2709,5 +2710,27 @@ public class JFXUtil {
         } finally {
             datePicker.setOnAction(originalHandler);
         }
+    }
+
+    public abstract static class TableKeyEvent implements EventHandler<KeyEvent> {
+
+        @Override
+        public void handle(KeyEvent event) {
+            TableView<?> currentTable = (TableView<?>) event.getSource();
+            TablePosition<?, ?> focusedCell = currentTable.getFocusModel().getFocusedCell();
+            if (focusedCell == null) {
+                return;
+            }
+
+            boolean moveDown = event.getCode() == KeyCode.TAB || event.getCode() == KeyCode.DOWN;
+            boolean moveUp = event.getCode() == KeyCode.UP;
+
+            if (moveDown || moveUp) {
+                onRowMove(currentTable, currentTable.getId(), moveDown);
+                event.consume();
+            }
+        }
+
+        protected abstract void onRowMove(TableView<?> currentTable, String currentTableID, boolean moveDown);
     }
 }
