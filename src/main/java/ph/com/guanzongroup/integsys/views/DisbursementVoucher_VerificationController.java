@@ -234,6 +234,8 @@ public class DisbursementVoucher_VerificationController implements Initializable
                         if (pnEditMode == EditMode.UNKNOWN) {
                             pnDetailJE = 0;
                             pnDetailBIR = 0;
+                        } else {
+                            loadRecordMaster();
                         }
                         break;
                     case "Journal":

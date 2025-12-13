@@ -246,6 +246,8 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                         if (pnEditMode == EditMode.UNKNOWN) {
                             pnDetailJE = 0;
                             pnDetailBIR = 0;
+                        }else{
+                            loadRecordMaster();
                         }
                         break;
                     case "Journal":
@@ -2047,7 +2049,6 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                 if (inputText == null || "".equals(inputText) || "01/01/1900".equals(inputText)) {
                     return;
                 }
-
                 lsServerDate = sdfFormat.format(oApp.getServerDate());
                 currentDate = LocalDate.parse(lsServerDate, DateTimeFormatter.ofPattern(SQLUtil.FORMAT_SHORT_DATE));
                 lsSelectedDate = sdfFormat.format(SQLUtil.toDate(JFXUtil.convertToIsoFormat(inputText), SQLUtil.FORMAT_SHORT_DATE));
