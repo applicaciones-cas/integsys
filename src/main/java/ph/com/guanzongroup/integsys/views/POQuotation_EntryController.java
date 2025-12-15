@@ -1853,7 +1853,7 @@ public class POQuotation_EntryController implements Initializable, ScreenInterfa
                     if (attachment_data.isEmpty()) {
                         return;
                     }
-                    newIndex = newIndex = moveDown ? Integer.parseInt(attachment_data.get(JFXUtil.moveToNextRow(currentTable)).getIndex03())
+                    newIndex = moveDown ? Integer.parseInt(attachment_data.get(JFXUtil.moveToNextRow(currentTable)).getIndex03())
                             : Integer.parseInt(attachment_data.get(JFXUtil.moveToPreviousRow(currentTable)).getIndex03());
                     pnAttachment = newIndex;
                     loadRecordAttachment(true);
