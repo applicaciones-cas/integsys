@@ -466,7 +466,7 @@ public class POQuotation_EntryController implements Initializable, ScreenInterfa
                         fileChooser = new FileChooser();
                         fileChooser.setTitle("Choose Image");
                         fileChooser.getExtensionFilters().addAll(
-                                new FileChooser.ExtensionFilter("Image Files", ".png", ".jpg", "*.gif")
+                                new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg", "*.gif")
                         );
                         java.io.File selectedFile = fileChooser.showOpenDialog((Stage) btnAddAttachment.getScene().getWindow());
 
@@ -502,12 +502,16 @@ public class POQuotation_EntryController implements Initializable, ScreenInterfa
                         }
                         break;
                     case "btnRemoveAttachment":
+                        if (poController.POQuotation().getTransactionAttachmentCount() <= 0) {
+                            return;
+                        }
                         poController.POQuotation().removeAttachment(pnAttachment);
                         attachment_data.remove(pnAttachment);
                         if (pnAttachment != 0) {
                             pnAttachment -= 1;
                         }
                         imageinfo_temp.clear();
+                        loadRecordAttachment(false);
                         loadTableAttachment.reload();
                         initAttachmentsGrid();
                         break;
