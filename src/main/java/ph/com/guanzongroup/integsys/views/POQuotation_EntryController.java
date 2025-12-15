@@ -70,6 +70,7 @@ import javafx.stage.Stage;
 import org.guanzon.appdriver.constant.DocumentType;
 import javafx.util.Pair;
 import org.guanzon.appdriver.agent.ShowDialogFX;
+import org.guanzon.appdriver.constant.RecordStatus;
 import org.guanzon.appdriver.constant.UserRight;
 import org.guanzon.cas.purchasing.services.QuotationControllers;
 import org.guanzon.cas.purchasing.status.POQuotationStatus;
@@ -465,7 +466,7 @@ public class POQuotation_EntryController implements Initializable, ScreenInterfa
                         fileChooser = new FileChooser();
                         fileChooser.setTitle("Choose Image");
                         fileChooser.getExtensionFilters().addAll(
-                                new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg", "*.gif")
+                                new FileChooser.ExtensionFilter("Image Files", ".png", ".jpg", "*.gif")
                         );
                         java.io.File selectedFile = fileChooser.showOpenDialog((Stage) btnAddAttachment.getScene().getWindow());
 
@@ -477,7 +478,8 @@ public class POQuotation_EntryController implements Initializable, ScreenInterfa
 
                             String imgPath2 = selectedFile.getName().toString();
                             for (int lnCtr = 0; lnCtr <= poController.POQuotation().getTransactionAttachmentCount() - 1; lnCtr++) {
-                                if (imgPath2.equals(poController.POQuotation().TransactionAttachmentList(lnCtr).getModel().getFileName())) {
+                                if (imgPath2.equals(poController.POQuotation().TransactionAttachmentList(lnCtr).getModel().getFileName())
+                                        && RecordStatus.ACTIVE.equals(poController.POQuotation().TransactionAttachmentList(lnCtr).getModel().getRecordStatus())) {
                                     ShowMessageFX.Warning(null, pxeModuleName, "File name already exists.");
                                     pnAttachment = lnCtr;
                                     loadRecordAttachment(true);
@@ -491,29 +493,23 @@ public class POQuotation_EntryController implements Initializable, ScreenInterfa
                             } else {
                                 imageinfo_temp.put(selectedFile.getName().toString(), imgPath.toString());
                             }
-                            poJSON = poController.POQuotation().addAttachment();
-                            if ("error".equals((String) poJSON.get("result"))) {
-                                ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-                            }
+                            pnAttachment = poController.POQuotation().addAttachment(imgPath2);
                             //Copy file to Attachment path
                             poController.POQuotation().copyFile(selectedFile.toString());
-
-                            pnAttachment = poController.POQuotation().getTransactionAttachmentCount() - 1;
-                            poController.POQuotation().TransactionAttachmentList(pnAttachment).getModel().setFileName(imgPath2);
-                            poController.POQuotation().TransactionAttachmentList(pnAttachment).getModel().setSourceNo(poController.POQuotation().Master().getTransactionNo());
-                            poController.POQuotation().getTransactionAttachmentCount();
                             loadTableAttachment.reload();
                             tblAttachments.getFocusModel().focus(pnAttachment);
                             tblAttachments.getSelectionModel().select(pnAttachment);
                         }
                         break;
                     case "btnRemoveAttachment":
-//                        attachment_data.remove(pnAttachment);
-//                        if (pnAttachment != 0) {
-//                            pnAttachment -= 1;
-//                        }
-//                        loadTableAttachment.reload();
-//                        initAttachmentsGrid();
+                        poController.POQuotation().removeAttachment(pnAttachment);
+                        attachment_data.remove(pnAttachment);
+                        if (pnAttachment != 0) {
+                            pnAttachment -= 1;
+                        }
+                        imageinfo_temp.clear();
+                        loadTableAttachment.reload();
+                        initAttachmentsGrid();
                         break;
                     case "btnArrowRight":
                         slideImage(1);
@@ -1495,27 +1491,33 @@ public class POQuotation_EntryController implements Initializable, ScreenInterfa
                         try {
                             attachment_data.clear();
                             int lnCtr;
+                            int lnCount = 0;
                             for (lnCtr = 0; lnCtr < poController.POQuotation().getTransactionAttachmentCount(); lnCtr++) {
+                                if (RecordStatus.INACTIVE.equals(poController.POQuotation().TransactionAttachmentList(lnCtr).getModel().getRecordStatus())) {
+                                    return;
+                                }
+                                lnCount += 1;
                                 attachment_data.add(
-                                        new ModelDeliveryAcceptance_Attachment(String.valueOf(lnCtr + 1),
-                                                String.valueOf(poController.POQuotation().TransactionAttachmentList(lnCtr).getModel().getFileName())
+                                        new ModelDeliveryAcceptance_Attachment(String.valueOf(lnCount),
+                                                String.valueOf(poController.POQuotation().TransactionAttachmentList(lnCtr).getModel().getFileName()),
+                                                String.valueOf(lnCtr)
                                         ));
                             }
+                            int lnTempRow = JFXUtil.getDetailRow(attachment_data, pnAttachment, 3); //this method is used only when Reverse is applied
                             if (pnAttachment < 0 || pnAttachment
                                     >= attachment_data.size()) {
                                 if (!attachment_data.isEmpty()) {
                                     /* FOCUS ON FIRST ROW */
                                     JFXUtil.selectAndFocusRow(tblAttachments, 0);
-                                    pnAttachment = 0;
+                                    int lnRow = Integer.parseInt(attachment_data.get(0).getIndex03());
+                                    pnAttachment = lnRow;
                                     loadRecordAttachment(true);
-                                } else {
-                                    tfAttachmentNo.setText("");
-                                    cmbAttachmentType.getSelectionModel().select(0);
-                                    loadRecordAttachment(false);
                                 }
                             } else {
                                 /* FOCUS ON THE ROW THAT pnRowDetail POINTS TO */
-                                JFXUtil.selectAndFocusRow(tblAttachments, pnAttachment);
+                                JFXUtil.selectAndFocusRow(tblAttachments, lnTempRow);
+                                int lnRow = Integer.parseInt(attachment_data.get(tblAttachments.getSelectionModel().getSelectedIndex()).getIndex03());
+                                pnAttachment = lnRow;
                                 loadRecordAttachment(true);
                             }
                         } catch (Exception e) {
@@ -1672,6 +1674,8 @@ public class POQuotation_EntryController implements Initializable, ScreenInterfa
             pnAttachment = tblAttachments.getSelectionModel().getSelectedIndex();
             if (pnAttachment >= 0) {
                 imageviewerutil.scaleFactor = 1.0;
+                int lnRow = Integer.parseInt(attachment_data.get(tblAttachments.getSelectionModel().getSelectedIndex()).getIndex03());
+                pnAttachment = lnRow;
                 loadRecordAttachment(true);
                 JFXUtil.resetImageBounds(imageView, stackPane1);
             }
