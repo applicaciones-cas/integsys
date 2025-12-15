@@ -524,6 +524,9 @@ public class DeliveryAcceptance_ConfirmationMPController implements Initializabl
                             if ("error".equals((String) poJSON.get("result"))) {
                                 ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                             }
+                            //Copy file to Attachment path
+                            poPurchaseReceivingController.PurchaseOrderReceiving().copyFile(selectedFile.toString());
+
                             pnAttachment = poPurchaseReceivingController.PurchaseOrderReceiving().getTransactionAttachmentCount() - 1;
                             poPurchaseReceivingController.PurchaseOrderReceiving().TransactionAttachmentList(pnAttachment).getModel().setFileName(imgPath2);
                             poPurchaseReceivingController.PurchaseOrderReceiving().TransactionAttachmentList(pnAttachment).getModel().setSourceNo(poPurchaseReceivingController.PurchaseOrderReceiving().Master().getTransactionNo());

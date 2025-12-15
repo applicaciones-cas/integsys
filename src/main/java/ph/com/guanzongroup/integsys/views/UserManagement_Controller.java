@@ -1,5 +1,6 @@
 package ph.com.guanzongroup.integsys.views;
 
+import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import java.net.URL;
 import java.sql.SQLException;
@@ -19,6 +20,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.PasswordField;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
@@ -81,7 +83,7 @@ public class UserManagement_Controller implements Initializable, ScreenInterface
     @FXML
     private TextField tfSearchEmployeeName, tfSearchLogInName, tfUserID, tfLogInName, tfPassword, tfEmployeeName, tfProduct;
     @FXML
-    private Button btnBrowse, btnNew, btnUpdate, btnSave, btnCancel, btnClose,btnStatus;
+    private Button btnBrowse, btnNew, btnUpdate, btnSave, btnCancel, btnClose,btnStatus,btnEyeIcon;
     @FXML
     private FontAwesomeIconView btnStatusGlyph;
     @FXML
@@ -94,6 +96,8 @@ public class UserManagement_Controller implements Initializable, ScreenInterface
     private Label lblStatus;
     @FXML
     private CheckBox chbAllowLock,chbAllowView, chbLockStatus;
+    @FXML
+    private PasswordField pfPassword;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -112,6 +116,7 @@ public class UserManagement_Controller implements Initializable, ScreenInterface
         pnEditMode = poSysUser.getEditMode();
         initButton(pnEditMode);
         poSysUser.setRecordStatus("1" + "0");
+        tfPassword.textProperty().bindBidirectional(pfPassword.textProperty());
 
     }
     private void initObject() {
@@ -310,6 +315,27 @@ public class UserManagement_Controller implements Initializable, ScreenInterface
                         }
                     }
                         break;
+                    case "btnEyeIcon":
+                        if(pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE){
+                            btnEyeIcon.setDisable(false);
+                            FontAwesomeIconView eyeIcon = new FontAwesomeIconView(FontAwesomeIcon.EYE);
+                            if (pfPassword.isVisible()) {
+                                tfPassword.setText(pfPassword.getText());
+                                pfPassword.setVisible(false);
+                                tfPassword.setVisible(true);
+                                eyeIcon.setIcon(FontAwesomeIcon.EYE);
+                                eyeIcon.setStyle("-fx-fill: gray; -glyph-size: 20; ");
+                                btnEyeIcon.setGraphic(eyeIcon);
+                            } else {
+                                pfPassword.setText(tfPassword.getText());
+                                tfPassword.setVisible(false);
+                                pfPassword.setVisible(true);
+                                eyeIcon.setIcon(FontAwesomeIcon.EYE_SLASH);
+                                eyeIcon.setStyle("-fx-fill: gray; -glyph-size: 20; ");
+                                btnEyeIcon.setGraphic(eyeIcon);
+                            }
+                        }
+                break;
                         
                     case "btnStatus":
                         String userID = poSysUser.getModel().getUserId();
@@ -393,7 +419,6 @@ public class UserManagement_Controller implements Initializable, ScreenInterface
                                 ShowMessageFX.Warning((String)poJSON.get("message"), lsValue, lsValue);
                             }
                             tfSearchLogInName.setText(poSysUser.getModel().getLogName());
-                            
                             return;
                         case "tfEmployeeName":
                             poJSON = poSysUser.searchEmployee(lsValue, false);
@@ -444,17 +469,17 @@ public class UserManagement_Controller implements Initializable, ScreenInterface
             });
 
     public void initTextFields() {
-        JFXUtil.setFocusListener(txtMaster_Focus, tfLogInName, tfPassword, tfEmployeeName, tfProduct);
+        JFXUtil.setFocusListener(txtMaster_Focus, tfLogInName, tfPassword,pfPassword, tfEmployeeName, tfProduct);
         JFXUtil.setFocusListener(txtField_Focus, tfSearchEmployeeName, tfSearchLogInName);
         JFXUtil.setKeyPressedListener(this::txtField_KeyPressed, apBrowse, apMaster);
         if(pnEditMode == EditMode.READY || pnEditMode == EditMode.UNKNOWN){
-             JFXUtil.setDisabled(true, tfLogInName,tfPassword,tfEmployeeName,tfProduct,
+             JFXUtil.setDisabled(true, tfLogInName,tfPassword,pfPassword,tfEmployeeName,tfProduct,
                      cmbUserLevel,cmbUserType,chbAllowLock,chbAllowView,chbLockStatus);
              tfEmployeeName.setPromptText("");
         }
         if(pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE){
-             JFXUtil.setDisabled(false, tfLogInName,tfPassword,tfEmployeeName,tfProduct,
-                     cmbUserLevel,cmbUserType,chbAllowLock,chbAllowView,chbLockStatus);
+             JFXUtil.setDisabled(false, tfLogInName,tfPassword,pfPassword,tfEmployeeName,tfProduct,
+                     cmbUserLevel,cmbUserType,chbAllowLock,chbAllowView,chbLockStatus );
              tfEmployeeName.setPromptText("Press F3: Search");
         }
         
@@ -590,7 +615,7 @@ public class UserManagement_Controller implements Initializable, ScreenInterface
         JFXUtil.setButtonsVisibility(lbShow, btnSave, btnCancel);
         JFXUtil.setButtonsVisibility(lbShow2, btnUpdate);
         JFXUtil.setButtonsVisibility(lbShow3, btnBrowse, btnClose);
-        
+        if(!lbShow) btnEyeIcon.setDisable(true);
         if((pnEditMode == EditMode.READY ) && !poSysUser.getModel().getUserId().isEmpty()){
             btnStatus.setVisible(true);
             btnStatus.setManaged(true);
