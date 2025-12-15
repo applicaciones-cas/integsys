@@ -505,7 +505,6 @@ public class POQuotation_EntryController implements Initializable, ScreenInterfa
                         break;
                     case "btnRemoveAttachment":
                         if (poController.POQuotation().getTransactionAttachmentCount() <= 0) {
-                            JFXUtil.clearTextFields(apAttachments);
                             return;
                         } else {
                             for (int lnCtr = 0; lnCtr < poController.POQuotation().getTransactionAttachmentCount(); lnCtr++) {
@@ -528,6 +527,9 @@ public class POQuotation_EntryController implements Initializable, ScreenInterfa
                         imageinfo_temp.clear();
                         loadRecordAttachment(false);
                         loadTableAttachment.reload();
+                        if (attachment_data.size() <= 0) {
+                            JFXUtil.clearTextFields(apAttachments);
+                        }
                         initAttachmentsGrid();
                         break;
                     case "btnArrowRight":
