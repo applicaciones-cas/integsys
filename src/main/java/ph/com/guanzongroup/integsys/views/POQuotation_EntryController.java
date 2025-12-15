@@ -506,9 +506,17 @@ public class POQuotation_EntryController implements Initializable, ScreenInterfa
                     case "btnRemoveAttachment":
                         if (poController.POQuotation().getTransactionAttachmentCount() <= 0) {
                             return;
+                        } else {
+                            for (int lnCtr = 0; lnCtr < poController.POQuotation().getTransactionAttachmentCount(); lnCtr++) {
+                                if (RecordStatus.INACTIVE.equals(poController.POQuotation().TransactionAttachmentList(lnCtr).getModel().getRecordStatus())) {
+                                    if (pnAttachment == lnCtr) {
+                                        return;
+                                    }
+                                }
+                            }
                         }
                         poController.POQuotation().removeAttachment(pnAttachment);
-                        attachment_data.remove(pnAttachment);
+                        attachment_data.remove(tblAttachments.getSelectionModel().getSelectedIndex());
                         if (pnAttachment != 0) {
                             pnAttachment -= 1;
                         }
@@ -1285,7 +1293,10 @@ public class POQuotation_EntryController implements Initializable, ScreenInterfa
     public void loadRecordAttachment(boolean lbloadImage) {
         try {
             if (attachment_data.size() > 0) {
-                tfAttachmentNo.setText(String.valueOf(pnAttachment + 1));
+                String sAttachNo = "".equals(attachment_data.get(tblAttachments.getSelectionModel().getSelectedIndex()).getIndex01()) ? "1"
+                        : attachment_data.get(tblAttachments.getSelectionModel().getSelectedIndex()).getIndex01();
+
+                tfAttachmentNo.setText(sAttachNo);
                 String lsAttachmentType = poController.POQuotation().TransactionAttachmentList(pnAttachment).getModel().getDocumentType();
                 if (lsAttachmentType.equals("")) {
                     poController.POQuotation().TransactionAttachmentList(pnAttachment).getModel().setDocumentType(DocumentType.OTHER);
@@ -1297,13 +1308,13 @@ public class POQuotation_EntryController implements Initializable, ScreenInterfa
 
                 if (lbloadImage) {
                     try {
-                        String filePath = (String) attachment_data.get(pnAttachment).getIndex02();
+                        String filePath = (String) attachment_data.get(tblAttachments.getSelectionModel().getSelectedIndex()).getIndex02();
                         String filePath2 = "";
-                        if (imageinfo_temp.containsKey((String) attachment_data.get(pnAttachment).getIndex02())) {
-                            filePath2 = imageinfo_temp.get((String) attachment_data.get(pnAttachment).getIndex02());
+                        if (imageinfo_temp.containsKey((String) attachment_data.get(tblAttachments.getSelectionModel().getSelectedIndex()).getIndex02())) {
+                            filePath2 = imageinfo_temp.get((String) attachment_data.get(tblAttachments.getSelectionModel().getSelectedIndex()).getIndex02());
                         } else {
                             // in server
-                            filePath2 = System.getProperty("sys.default.path.temp") + "/Attachments//" + (String) attachment_data.get(pnAttachment).getIndex02();
+                            filePath2 = System.getProperty("sys.default.path.temp") + "/Attachments//" + (String) attachment_data.get(tblAttachments.getSelectionModel().getSelectedIndex()).getIndex02();
 
                         }
                         if (filePath != null && !filePath.isEmpty()) {
@@ -1510,7 +1521,7 @@ public class POQuotation_EntryController implements Initializable, ScreenInterfa
                                         ));
                             }
                             int lnTempRow = JFXUtil.getDetailRow(attachment_data, pnAttachment, 3); //this method is used only when Reverse is applied
-                            if (pnAttachment < 0 || pnAttachment
+                            if (lnTempRow < 0 || lnTempRow
                                     >= attachment_data.size()) {
                                 if (!attachment_data.isEmpty()) {
                                     /* FOCUS ON FIRST ROW */
@@ -1751,7 +1762,8 @@ public class POQuotation_EntryController implements Initializable, ScreenInterfa
         if (attachment_data.size() <= 0) {
             return;
         }
-        currentIndex = pnAttachment;
+        int lnRow = Integer.valueOf(attachment_data.get(tblAttachments.getSelectionModel().getSelectedIndex()).getIndex01());
+        currentIndex = lnRow - 1;
         int newIndex = currentIndex + direction;
 
         if (newIndex != -1 && (newIndex <= attachment_data.size() - 1)) {
@@ -1759,7 +1771,9 @@ public class POQuotation_EntryController implements Initializable, ScreenInterfa
             slideOut.setByX(direction * -400); // Move left or right
 
             JFXUtil.selectAndFocusRow(tblAttachments, newIndex);
-            pnAttachment = newIndex;
+            int lnIndex = Integer.valueOf(attachment_data.get(tblAttachments.getSelectionModel().getSelectedIndex()).getIndex01());
+            int lnTempRow = JFXUtil.getDetailRow(attachment_data, lnIndex, 3);
+            pnAttachment = lnTempRow;
             loadRecordAttachment(false);
 
             // Create a transition animation
@@ -1832,8 +1846,8 @@ public class POQuotation_EntryController implements Initializable, ScreenInterfa
                     if (attachment_data.isEmpty()) {
                         return;
                     }
-                    newIndex = moveDown ? JFXUtil.moveToNextRow(currentTable)
-                            : JFXUtil.moveToPreviousRow(currentTable);
+                    newIndex = newIndex = moveDown ? Integer.parseInt(attachment_data.get(JFXUtil.moveToNextRow(currentTable)).getIndex03())
+                            : Integer.parseInt(attachment_data.get(JFXUtil.moveToPreviousRow(currentTable)).getIndex03());
                     pnAttachment = newIndex;
                     loadRecordAttachment(true);
                     break;
