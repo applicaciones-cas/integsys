@@ -493,6 +493,8 @@ public class POQuotation_EntryController implements Initializable, ScreenInterfa
                             } else {
                                 imageinfo_temp.put(selectedFile.getName().toString(), imgPath.toString());
                             }
+//                            int lnTempRow = JFXUtil.getDetailTempRow(attachment_data, poController.POQuotation().addAttachment(imgPath2), 3);
+//                            pnAttachment = lnTempRow;
                             pnAttachment = poController.POQuotation().addAttachment(imgPath2);
                             //Copy file to Attachment path
                             poController.POQuotation().copyFile(selectedFile.toString());
@@ -1498,7 +1500,7 @@ public class POQuotation_EntryController implements Initializable, ScreenInterfa
                             int lnCount = 0;
                             for (lnCtr = 0; lnCtr < poController.POQuotation().getTransactionAttachmentCount(); lnCtr++) {
                                 if (RecordStatus.INACTIVE.equals(poController.POQuotation().TransactionAttachmentList(lnCtr).getModel().getRecordStatus())) {
-                                    return;
+                                    continue;
                                 }
                                 lnCount += 1;
                                 attachment_data.add(
