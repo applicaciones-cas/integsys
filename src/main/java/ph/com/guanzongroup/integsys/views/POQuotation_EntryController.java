@@ -505,6 +505,7 @@ public class POQuotation_EntryController implements Initializable, ScreenInterfa
                         break;
                     case "btnRemoveAttachment":
                         if (poController.POQuotation().getTransactionAttachmentCount() <= 0) {
+                            JFXUtil.clearTextFields(apAttachments);
                             return;
                         } else {
                             for (int lnCtr = 0; lnCtr < poController.POQuotation().getTransactionAttachmentCount(); lnCtr++) {
@@ -515,7 +516,11 @@ public class POQuotation_EntryController implements Initializable, ScreenInterfa
                                 }
                             }
                         }
-                        poController.POQuotation().removeAttachment(pnAttachment);
+                        poJSON = poController.POQuotation().removeAttachment(pnAttachment);
+                        if ("error".equals((String) poJSON.get("result"))) {
+                            ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                            return;
+                        }
                         attachment_data.remove(tblAttachments.getSelectionModel().getSelectedIndex());
                         if (pnAttachment != 0) {
                             pnAttachment -= 1;
@@ -1771,8 +1776,8 @@ public class POQuotation_EntryController implements Initializable, ScreenInterfa
             slideOut.setByX(direction * -400); // Move left or right
 
             JFXUtil.selectAndFocusRow(tblAttachments, newIndex);
-            int lnIndex = Integer.valueOf(attachment_data.get(tblAttachments.getSelectionModel().getSelectedIndex()).getIndex01());
-            int lnTempRow = JFXUtil.getDetailRow(attachment_data, lnIndex, 3);
+            int lnIndex = Integer.valueOf(attachment_data.get(newIndex).getIndex01());
+            int lnTempRow = JFXUtil.getDetailTempRow(attachment_data, lnIndex, 3);
             pnAttachment = lnTempRow;
             loadRecordAttachment(false);
 
