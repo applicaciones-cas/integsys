@@ -1979,6 +1979,9 @@ public class DeliveryAcceptance_ConfirmationLPController implements Initializabl
                             pnAttachment = lnRow;
                             loadRecordAttachment(true);
                         }
+                        if (attachment_data.size() <= 0) {
+                            loadRecordAttachment(false);
+                        }
                     } catch (Exception e) {
 
                     }

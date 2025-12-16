@@ -2205,6 +2205,9 @@ public class DeliveryAcceptance_ConfirmationController implements Initializable,
                             pnAttachment = lnRow;
                             loadRecordAttachment(true);
                         }
+                        if (attachment_data.size() <= 0) {
+                            loadRecordAttachment(false);
+                        }
                     } catch (Exception e) {
 
                     }

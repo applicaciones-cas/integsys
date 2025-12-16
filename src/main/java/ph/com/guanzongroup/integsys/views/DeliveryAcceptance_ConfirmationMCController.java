@@ -2049,6 +2049,9 @@ public class DeliveryAcceptance_ConfirmationMCController implements Initializabl
                             pnAttachment = lnRow;
                             loadRecordAttachment(true);
                         }
+                        if (attachment_data.size() <= 0) {
+                            loadRecordAttachment(false);
+                        }
                     } catch (Exception e) {
 
                     }

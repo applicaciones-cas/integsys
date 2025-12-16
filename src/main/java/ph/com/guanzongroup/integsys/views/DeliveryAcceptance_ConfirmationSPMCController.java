@@ -1941,6 +1941,9 @@ public class DeliveryAcceptance_ConfirmationSPMCController implements Initializa
                             pnAttachment = lnRow;
                             loadRecordAttachment(true);
                         }
+                        if (attachment_data.size() <= 0) {
+                            loadRecordAttachment(false);
+                        }
                     } catch (Exception e) {
 
                     }
@@ -1973,6 +1976,7 @@ public class DeliveryAcceptance_ConfirmationSPMCController implements Initializa
         new Thread(task).start(); // Run task in background
 
     }
+
     public void initDatePickers() {
         JFXUtil.setDatePickerFormat("MM/dd/yyyy", dpTransactionDate, dpReferenceDate);
         JFXUtil.setActionListener(this::datepicker_Action, dpTransactionDate, dpReferenceDate);

@@ -1994,6 +1994,9 @@ public class DeliveryAcceptance_ConfirmationMonarchFoodController implements Ini
                             pnAttachment = lnRow;
                             loadRecordAttachment(true);
                         }
+                        if (attachment_data.size() <= 0) {
+                            loadRecordAttachment(false);
+                        }
                     } catch (Exception e) {
 
                     }

@@ -2165,6 +2165,9 @@ public class DeliveryAcceptance_ConfirmationAppliancesController implements Init
                             pnAttachment = lnRow;
                             loadRecordAttachment(true);
                         }
+                        if (attachment_data.size() <= 0) {
+                            loadRecordAttachment(false);
+                        }
                     } catch (Exception e) {
 
                     }

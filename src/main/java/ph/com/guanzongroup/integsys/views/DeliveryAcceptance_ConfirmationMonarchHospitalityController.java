@@ -1943,6 +1943,9 @@ public class DeliveryAcceptance_ConfirmationMonarchHospitalityController impleme
                             pnAttachment = lnRow;
                             loadRecordAttachment(true);
                         }
+                        if (attachment_data.size() <= 0) {
+                            loadRecordAttachment(false);
+                        }
                     } catch (Exception e) {
 
                     }
