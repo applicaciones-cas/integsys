@@ -291,8 +291,12 @@ public class POQuotation_EntryController implements Initializable, ScreenInterfa
         openedAttachment = poController.POQuotation().TransactionAttachmentList(pnAttachment).getModel().getTransactionNo();
         Map<String, Pair<String, String>> data = new HashMap<>();
         data.clear();
+        int lnCount = 0;
         for (int lnCtr = 0; lnCtr < poController.POQuotation().getTransactionAttachmentCount(); lnCtr++) {
-            data.put(String.valueOf(lnCtr + 1), new Pair<>(String.valueOf(poController.POQuotation().TransactionAttachmentList(lnCtr).getModel().getFileName()),
+            if (RecordStatus.INACTIVE.equals(poController.POQuotation().TransactionAttachmentList(lnCtr).getModel().getRecordStatus())) {
+                continue;
+            }
+            data.put(String.valueOf(lnCount + 1), new Pair<>(String.valueOf(poController.POQuotation().TransactionAttachmentList(lnCtr).getModel().getFileName()),
                     poController.POQuotation().TransactionAttachmentList(lnCtr).getModel().getDocumentType()));
         }
         AttachmentDialogController controller = new AttachmentDialogController();
@@ -509,19 +513,19 @@ public class POQuotation_EntryController implements Initializable, ScreenInterfa
                             } else {
                                 imageinfo_temp.put(selectedFile.getName().toString(), imgPath.toString());
                             }
-                            
+
                             //Limit maximum pages of pdf to add
-                            if(imgPath2.toLowerCase().endsWith(".pdf")){
+                            if (imgPath2.toLowerCase().endsWith(".pdf")) {
                                 try (PDDocument document = PDDocument.load(selectedFile)) {
                                     PDFRenderer pdfRenderer = new PDFRenderer(document);
                                     int pageCount = document.getNumberOfPages();
-                                    if(pageCount > 5){
+                                    if (pageCount > 5) {
                                         ShowMessageFX.Warning(null, pxeModuleName, "PDF exceeds maximum allowed pages.");
                                         return;
                                     }
                                 }
                             }
-                            
+
 //                            int lnTempRow = JFXUtil.getDetailTempRow(attachment_data, poController.POQuotation().addAttachment(imgPath2), 3);
 //                            pnAttachment = lnTempRow;
                             pnAttachment = poController.POQuotation().addAttachment(imgPath2);
@@ -1338,7 +1342,7 @@ public class POQuotation_EntryController implements Initializable, ScreenInterfa
                 int lnAttachmentType = 0;
                 lnAttachmentType = Integer.parseInt(lsAttachmentType);
                 cmbAttachmentType.getSelectionModel().select(lnAttachmentType);
-                
+
                 if (lbloadImage) {
                     try {
                         String filePath = (String) attachment_data.get(tblAttachments.getSelectionModel().getSelectedIndex()).getIndex02();
@@ -1349,15 +1353,14 @@ public class POQuotation_EntryController implements Initializable, ScreenInterfa
                             // in server
                             filePath2 = System.getProperty("sys.default.path.temp") + "/Attachments//" + (String) attachment_data.get(tblAttachments.getSelectionModel().getSelectedIndex()).getIndex02();
                         }
-                        
+
                         if (filePath != null && !filePath.isEmpty()) {
                             Path imgPath = Paths.get(filePath2);
                             String convertedPath = imgPath.toUri().toString();
                             boolean isPdf = filePath.toLowerCase().endsWith(".pdf");
-                            
+
                             // Clear previous content
                             stackPane1.getChildren().clear();
-                            
                             if (!isPdf) {
                                 // ----- IMAGE VIEW -----
                                 Image loimage = new Image(convertedPath);
@@ -1381,7 +1384,7 @@ public class POQuotation_EntryController implements Initializable, ScreenInterfa
                                 StackPane.setMargin(btnArrowRight, new Insets(0, 10, 0, 0));
 
                             } else {
-                               // ----- PDF VIEW -----
+                                // ----- PDF VIEW -----
                                 PDDocument document = PDDocument.load(new File(filePath2));
                                 PDFRenderer renderer = new PDFRenderer(document);
                                 int pageCount = document.getNumberOfPages();
