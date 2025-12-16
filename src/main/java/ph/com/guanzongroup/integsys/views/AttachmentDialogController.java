@@ -4,6 +4,8 @@
  */
 package ph.com.guanzongroup.integsys.views;
 
+import java.awt.image.BufferedImage;
+import java.io.File;
 import java.net.URL;
 import java.util.ResourceBundle;
 import javafx.animation.TranslateTransition;
@@ -30,9 +32,23 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleDoubleProperty;
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.embed.swing.SwingFXUtils;
+import javafx.geometry.Bounds;
+import javafx.geometry.Insets;
+import javafx.geometry.Point2D;
+import javafx.geometry.Pos;
+import javafx.scene.Group;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.util.Pair;
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.rendering.PDFRenderer;
 import org.guanzon.appdriver.constant.DocumentType;
 import org.guanzon.cas.purchasing.controller.PurchaseOrderReceiving;
 import ph.com.guanzongroup.integsys.model.ModelDeliveryAcceptance_Attachment;
@@ -190,12 +206,175 @@ public class AttachmentDialogController implements Initializable, ScreenInterfac
                         if (filePath != null && !filePath.isEmpty()) {
                             Path imgPath = Paths.get(filePath2);
                             String convertedPath = imgPath.toUri().toString();
-                            Image loimage = new Image(convertedPath);
-                            imageView.setImage(loimage);
-                            JFXUtil.adjustImageSize(loimage, imageView, imageviewerutil.ldstackPaneWidth, imageviewerutil.ldstackPaneHeight);
-                            Platform.runLater(() -> {
-                                JFXUtil.stackPaneClip(stackPane1);
-                            });
+                            boolean isPdf = filePath.toLowerCase().endsWith(".pdf");
+
+                            // Clear previous content
+                            stackPane1.getChildren().clear();
+
+                            if (!isPdf) {
+                                // ----- IMAGE VIEW -----
+                                Image loimage = new Image(convertedPath);
+                                imageView.setImage(loimage);
+                                JFXUtil.adjustImageSize(loimage, imageView, imageviewerutil.ldstackPaneWidth, imageviewerutil.ldstackPaneHeight);
+
+                                Platform.runLater(() -> {
+                                    JFXUtil.stackPaneClip(stackPane1);
+                                });
+
+                                // Add ImageView directly to stackPane
+                                stackPane1.getChildren().add(imageView);
+                                stackPane1.getChildren().addAll(btnArrowLeft, btnArrowRight);
+
+                                // Align buttons on top
+                                StackPane.setAlignment(btnArrowLeft, Pos.CENTER_LEFT);
+                                StackPane.setAlignment(btnArrowRight, Pos.CENTER_RIGHT);
+
+                                // Optional: add some margin
+                                StackPane.setMargin(btnArrowLeft, new Insets(0, 0, 0, 10));
+                                StackPane.setMargin(btnArrowRight, new Insets(0, 10, 0, 0));
+
+                            } else {
+                                
+                               // ----- PDF VIEW -----
+                                PDDocument document = PDDocument.load(new File(filePath2));
+                                PDFRenderer renderer = new PDFRenderer(document);
+                                int pageCount = document.getNumberOfPages();
+
+                                // 🔑 FORCE stackPane size (CRITICAL for popup & 1-page PDFs)
+                                stackPane1.setMinWidth(imageviewerutil.ldstackPaneWidth);
+                                stackPane1.setMinHeight(imageviewerutil.ldstackPaneHeight);
+                                stackPane1.setPrefSize(
+                                        imageviewerutil.ldstackPaneWidth,
+                                        imageviewerutil.ldstackPaneHeight
+                                );
+
+                                // Container for PDF pages
+                                VBox pdfContainer = new VBox(10);
+                                pdfContainer.setAlignment(Pos.CENTER);
+                                pdfContainer.setPrefWidth(imageviewerutil.ldstackPaneWidth);
+
+                                for (int i = 0; i < pageCount; i++) {
+                                    BufferedImage pageImage = renderer.renderImageWithDPI(i, 150);
+                                    Image fxImage = SwingFXUtils.toFXImage(pageImage, null);
+                                    ImageView pageView = new ImageView(fxImage);
+
+                                    pageView.setPreserveRatio(true);
+                                    pageView.setFitWidth(imageviewerutil.ldstackPaneWidth);
+
+                                    pdfContainer.getChildren().add(pageView);
+                                }
+
+                                // Wrap VBox in a Group for scaling
+                                Group pdfGroup = new Group(pdfContainer);
+
+                                // Wrap Group in a StackPane to center content
+                                StackPane centerPane = new StackPane(pdfGroup);
+                                centerPane.setAlignment(Pos.CENTER);
+
+                                // ScrollPane wraps the centerPane
+                                ScrollPane scrollPane = new ScrollPane(centerPane);
+                                scrollPane.setPannable(true);
+                                scrollPane.setFitToWidth(true);
+                                scrollPane.setFitToHeight(true);
+
+                                // 🔑 FIX #1 — FORCE CONTENT ≥ VIEWPORT (1-page PDF FIX)
+                                scrollPane.viewportBoundsProperty().addListener((obs, oldBounds, newBounds) -> {
+                                    if (newBounds != null) {
+                                        pdfContainer.setMinWidth(newBounds.getWidth());
+                                        pdfContainer.setMinHeight(newBounds.getHeight());
+                                    }
+                                });
+
+                                // Stack PDF and buttons
+                                stackPane1.getChildren().setAll(scrollPane, btnArrowLeft, btnArrowRight);
+                                StackPane.setAlignment(btnArrowLeft, Pos.CENTER_LEFT);
+                                StackPane.setAlignment(btnArrowRight, Pos.CENTER_RIGHT);
+                                StackPane.setMargin(btnArrowLeft, new Insets(0, 0, 0, 10));
+                                StackPane.setMargin(btnArrowRight, new Insets(0, 10, 0, 0));
+
+                                // 🔑 CENTER content initially (important for 1 page)
+                                Platform.runLater(() -> {
+                                    JFXUtil.stackPaneClip(stackPane1);
+                                    scrollPane.setHvalue(0.5);
+                                    scrollPane.setVvalue(0.5);
+                                });
+
+                                document.close();
+
+                                // ----- ZOOM & PAN -----
+                                final DoubleProperty zoomFactor = new SimpleDoubleProperty(1.0);
+
+                                // Zoom centered on mouse
+                                scrollPane.setOnScroll(event -> {
+                                    if (event.isControlDown()) {
+
+                                        double oldZoom = zoomFactor.get();
+                                        double delta = event.getDeltaY() > 0 ? 0.1 : -0.1;
+                                        double newZoom = Math.max(0.1, oldZoom + delta);
+                                        zoomFactor.set(newZoom);
+
+                                        Bounds viewportBounds = scrollPane.getViewportBounds();
+                                        Bounds contentBounds = pdfGroup.getLayoutBounds();
+
+                                        double mouseX = event.getX();
+                                        double mouseY = event.getY();
+
+                                        // 🔑 SAFE ratio calculation (prevents NaN on 1 page)
+                                        double maxX = Math.max(1, contentBounds.getWidth() - viewportBounds.getWidth());
+                                        double maxY = Math.max(1, contentBounds.getHeight() - viewportBounds.getHeight());
+
+                                        double hRatio = (scrollPane.getHvalue() * maxX + mouseX) / contentBounds.getWidth();
+                                        double vRatio = (scrollPane.getVvalue() * maxY + mouseY) / contentBounds.getHeight();
+
+                                        pdfContainer.setScaleX(newZoom);
+                                        pdfContainer.setScaleY(newZoom);
+
+                                        Platform.runLater(() -> {
+                                            Bounds newBounds = pdfGroup.getLayoutBounds();
+
+                                            double newMaxX = Math.max(1, newBounds.getWidth() - viewportBounds.getWidth());
+                                            double newMaxY = Math.max(1, newBounds.getHeight() - viewportBounds.getHeight());
+
+                                            double newH = (hRatio * newBounds.getWidth() - mouseX) / newMaxX;
+                                            double newV = (vRatio * newBounds.getHeight() - mouseY) / newMaxY;
+
+                                            scrollPane.setHvalue(Math.min(Math.max(0, newH), 1));
+                                            scrollPane.setVvalue(Math.min(Math.max(0, newV), 1));
+                                        });
+
+                                        event.consume();
+                                    }
+                                });
+
+                                // Pan with mouse drag
+                                final ObjectProperty<Point2D> lastMouse = new SimpleObjectProperty<>();
+
+                                pdfGroup.setOnMousePressed(e ->
+                                        lastMouse.set(new Point2D(e.getSceneX(), e.getSceneY()))
+                                );
+
+                                pdfGroup.setOnMouseDragged(e -> {
+                                    if (lastMouse.get() != null) {
+
+                                        double dx = lastMouse.get().getX() - e.getSceneX();
+                                        double dy = lastMouse.get().getY() - e.getSceneY();
+
+                                        double w = Math.max(1, pdfGroup.getLayoutBounds().getWidth());
+                                        double h = Math.max(1, pdfGroup.getLayoutBounds().getHeight());
+
+                                        scrollPane.setHvalue(
+                                                Math.min(Math.max(0, scrollPane.getHvalue() + dx / w), 1)
+                                        );
+                                        scrollPane.setVvalue(
+                                                Math.min(Math.max(0, scrollPane.getVvalue() + dy / h), 1)
+                                        );
+
+                                        lastMouse.set(new Point2D(e.getSceneX(), e.getSceneY()));
+                                    }
+                                });
+
+                                pdfGroup.setOnMouseReleased(e -> lastMouse.set(null));
+                            }
 
                         } else {
                             imageView.setImage(null);
