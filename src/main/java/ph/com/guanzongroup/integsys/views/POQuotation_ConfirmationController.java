@@ -72,6 +72,7 @@ import javafx.stage.Stage;
 import org.guanzon.appdriver.constant.DocumentType;
 import javafx.util.Pair;
 import org.guanzon.appdriver.agent.ShowDialogFX;
+import org.guanzon.appdriver.constant.RecordStatus;
 import org.guanzon.appdriver.constant.UserRight;
 import org.guanzon.cas.purchasing.services.QuotationControllers;
 import org.guanzon.cas.purchasing.status.POQuotationStatus;
@@ -469,7 +470,8 @@ public class POQuotation_ConfirmationController implements Initializable, Screen
 
                             String imgPath2 = selectedFile.getName().toString();
                             for (int lnCtr = 0; lnCtr <= poController.POQuotation().getTransactionAttachmentCount() - 1; lnCtr++) {
-                                if (imgPath2.equals(poController.POQuotation().TransactionAttachmentList(lnCtr).getModel().getFileName())) {
+                                if (imgPath2.equals(poController.POQuotation().TransactionAttachmentList(lnCtr).getModel().getFileName())
+                                        && RecordStatus.ACTIVE.equals(poController.POQuotation().TransactionAttachmentList(lnCtr).getModel().getRecordStatus())) {
                                     ShowMessageFX.Warning(null, pxeModuleName, "File name already exists.");
                                     pnAttachment = lnCtr;
                                     loadRecordAttachment(true);
@@ -483,29 +485,44 @@ public class POQuotation_ConfirmationController implements Initializable, Screen
                             } else {
                                 imageinfo_temp.put(selectedFile.getName().toString(), imgPath.toString());
                             }
-                            poJSON = poController.POQuotation().addAttachment();
-                            if ("error".equals((String) poJSON.get("result"))) {
-                                ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-                            }
+//                            int lnTempRow = JFXUtil.getDetailTempRow(attachment_data, poController.POQuotation().addAttachment(imgPath2), 3);
+//                            pnAttachment = lnTempRow;
+                            pnAttachment = poController.POQuotation().addAttachment(imgPath2);
                             //Copy file to Attachment path
                             poController.POQuotation().copyFile(selectedFile.toString());
-                            
-                            pnAttachment = poController.POQuotation().getTransactionAttachmentCount() - 1;
-                            poController.POQuotation().TransactionAttachmentList(pnAttachment).getModel().setFileName(imgPath2);
-                            poController.POQuotation().TransactionAttachmentList(pnAttachment).getModel().setSourceNo(poController.POQuotation().Master().getTransactionNo());
-                            poController.POQuotation().getTransactionAttachmentCount();
                             loadTableAttachment.reload();
                             tblAttachments.getFocusModel().focus(pnAttachment);
                             tblAttachments.getSelectionModel().select(pnAttachment);
                         }
                         break;
                     case "btnRemoveAttachment":
-//                        attachment_data.remove(pnAttachment);
-//                        if (pnAttachment != 0) {
-//                            pnAttachment -= 1;
-//                        }
-//                        loadTableAttachment.reload();
-//                        initAttachmentsGrid();
+                        if (poController.POQuotation().getTransactionAttachmentCount() <= 0) {
+                            return;
+                        } else {
+                            for (int lnCtr = 0; lnCtr < poController.POQuotation().getTransactionAttachmentCount(); lnCtr++) {
+                                if (RecordStatus.INACTIVE.equals(poController.POQuotation().TransactionAttachmentList(lnCtr).getModel().getRecordStatus())) {
+                                    if (pnAttachment == lnCtr) {
+                                        return;
+                                    }
+                                }
+                            }
+                        }
+                        poJSON = poController.POQuotation().removeAttachment(pnAttachment);
+                        if ("error".equals((String) poJSON.get("result"))) {
+                            ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                            return;
+                        }
+                        attachment_data.remove(tblAttachments.getSelectionModel().getSelectedIndex());
+                        if (pnAttachment != 0) {
+                            pnAttachment -= 1;
+                        }
+                        imageinfo_temp.clear();
+                        loadRecordAttachment(false);
+                        loadTableAttachment.reload();
+                        if (attachment_data.size() <= 0) {
+                            JFXUtil.clearTextFields(apAttachments);
+                        }
+                        initAttachmentsGrid();
                         break;
                     case "btnArrowRight":
                         slideImage(1);
@@ -1366,28 +1383,37 @@ public class POQuotation_ConfirmationController implements Initializable, Screen
                         try {
                             attachment_data.clear();
                             int lnCtr;
+                            int lnCount = 0;
                             for (lnCtr = 0; lnCtr < poController.POQuotation().getTransactionAttachmentCount(); lnCtr++) {
+                                if (RecordStatus.INACTIVE.equals(poController.POQuotation().TransactionAttachmentList(lnCtr).getModel().getRecordStatus())) {
+                                    continue;
+                                }
+                                lnCount += 1;
                                 attachment_data.add(
-                                        new ModelDeliveryAcceptance_Attachment(String.valueOf(lnCtr + 1),
-                                                String.valueOf(poController.POQuotation().TransactionAttachmentList(lnCtr).getModel().getFileName())
+                                        new ModelDeliveryAcceptance_Attachment(String.valueOf(lnCount),
+                                                String.valueOf(poController.POQuotation().TransactionAttachmentList(lnCtr).getModel().getFileName()),
+                                                String.valueOf(lnCtr)
                                         ));
                             }
-                            if (pnAttachment < 0 || pnAttachment
+                            int lnTempRow = JFXUtil.getDetailRow(attachment_data, pnAttachment, 3); //this method is used only when Reverse is applied
+                            if (lnTempRow < 0 || lnTempRow
                                     >= attachment_data.size()) {
                                 if (!attachment_data.isEmpty()) {
                                     /* FOCUS ON FIRST ROW */
                                     JFXUtil.selectAndFocusRow(tblAttachments, 0);
-                                    pnAttachment = 0;
+                                    int lnRow = Integer.parseInt(attachment_data.get(0).getIndex03());
+                                    pnAttachment = lnRow;
                                     loadRecordAttachment(true);
-                                } else {
-                                    tfAttachmentNo.setText("");
-                                    cmbAttachmentType.getSelectionModel().select(0);
-                                    loadRecordAttachment(false);
                                 }
                             } else {
                                 /* FOCUS ON THE ROW THAT pnRowDetail POINTS TO */
-                                JFXUtil.selectAndFocusRow(tblAttachments, pnAttachment);
+                                JFXUtil.selectAndFocusRow(tblAttachments, lnTempRow);
+                                int lnRow = Integer.parseInt(attachment_data.get(tblAttachments.getSelectionModel().getSelectedIndex()).getIndex03());
+                                pnAttachment = lnRow;
                                 loadRecordAttachment(true);
+                            }
+                            if (attachment_data.size() <= 0) {
+                                loadRecordAttachment(false);
                             }
                         } catch (Exception e) {
                         }
@@ -1539,6 +1565,8 @@ public class POQuotation_ConfirmationController implements Initializable, Screen
             pnAttachment = tblAttachments.getSelectionModel().getSelectedIndex();
             if (pnAttachment >= 0) {
                 imageviewerutil.scaleFactor = 1.0;
+                int lnRow = Integer.parseInt(attachment_data.get(tblAttachments.getSelectionModel().getSelectedIndex()).getIndex03());
+                pnAttachment = lnRow;
                 loadRecordAttachment(true);
                 JFXUtil.resetImageBounds(imageView, stackPane1);
             }
@@ -1623,7 +1651,8 @@ public class POQuotation_ConfirmationController implements Initializable, Screen
         if (attachment_data.size() <= 0) {
             return;
         }
-        currentIndex = pnAttachment;
+        int lnRow = Integer.valueOf(attachment_data.get(tblAttachments.getSelectionModel().getSelectedIndex()).getIndex01());
+        currentIndex = lnRow - 1;
         int newIndex = currentIndex + direction;
 
         if (newIndex != -1 && (newIndex <= attachment_data.size() - 1)) {
@@ -1631,7 +1660,9 @@ public class POQuotation_ConfirmationController implements Initializable, Screen
             slideOut.setByX(direction * -400); // Move left or right
 
             JFXUtil.selectAndFocusRow(tblAttachments, newIndex);
-            pnAttachment = newIndex;
+            int lnIndex = Integer.valueOf(attachment_data.get(newIndex).getIndex01());
+            int lnTempRow = JFXUtil.getDetailTempRow(attachment_data, lnIndex, 3);
+            pnAttachment = lnTempRow;
             loadRecordAttachment(false);
 
             // Create a transition animation
@@ -1704,8 +1735,8 @@ public class POQuotation_ConfirmationController implements Initializable, Screen
                     if (attachment_data.isEmpty()) {
                         return;
                     }
-                    newIndex = moveDown ? JFXUtil.moveToNextRow(currentTable)
-                            : JFXUtil.moveToPreviousRow(currentTable);
+                    newIndex = moveDown ? Integer.parseInt(attachment_data.get(JFXUtil.moveToNextRow(currentTable)).getIndex03())
+                            : Integer.parseInt(attachment_data.get(JFXUtil.moveToPreviousRow(currentTable)).getIndex03());
                     pnAttachment = newIndex;
                     loadRecordAttachment(true);
                     break;

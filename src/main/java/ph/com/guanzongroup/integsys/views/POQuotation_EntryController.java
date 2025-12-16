@@ -1300,10 +1300,7 @@ public class POQuotation_EntryController implements Initializable, ScreenInterfa
     public void loadRecordAttachment(boolean lbloadImage) {
         try {
             if (attachment_data.size() > 0) {
-                String sAttachNo = "".equals(attachment_data.get(tblAttachments.getSelectionModel().getSelectedIndex()).getIndex01()) ? "1"
-                        : attachment_data.get(tblAttachments.getSelectionModel().getSelectedIndex()).getIndex01();
-
-                tfAttachmentNo.setText(sAttachNo);
+                tfAttachmentNo.setText(attachment_data.get(tblAttachments.getSelectionModel().getSelectedIndex()).getIndex01());
                 String lsAttachmentType = poController.POQuotation().TransactionAttachmentList(pnAttachment).getModel().getDocumentType();
                 if (lsAttachmentType.equals("")) {
                     poController.POQuotation().TransactionAttachmentList(pnAttachment).getModel().setDocumentType(DocumentType.OTHER);
@@ -1544,8 +1541,8 @@ public class POQuotation_EntryController implements Initializable, ScreenInterfa
                                 pnAttachment = lnRow;
                                 loadRecordAttachment(true);
                             }
-                            if(attachment_data.size() <= 0){
-                                 loadRecordAttachment(false);
+                            if (attachment_data.size() <= 0) {
+                                loadRecordAttachment(false);
                             }
                         } catch (Exception e) {
                         }
@@ -1723,8 +1720,8 @@ public class POQuotation_EntryController implements Initializable, ScreenInterfa
             if (pnMain >= 0) {
                 if (event.getClickCount() == 2) {
                     loadTableDetailFromMain();
-//                    pnEditMode = poController.POQuotation().getEditMode();
-//                    initButton(pnEditMode);
+//                  pnEditMode = poController.POQuotation().getEditMode();
+//                  initButton(pnEditMode);
                 }
             }
         });
