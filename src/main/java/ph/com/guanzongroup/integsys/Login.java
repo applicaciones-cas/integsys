@@ -60,15 +60,23 @@ public class Login extends Application {
             Properties po_props = new Properties();
             po_props.load(new FileInputStream(System.getProperty("sys.default.path.config") + "/config/cas.properties"));
             
+            //industry ids
             System.setProperty("sys.main.industry", po_props.getProperty("sys.main.industry"));
             System.setProperty("sys.general.industry", po_props.getProperty("sys.general.industry"));
             
+            //department ids
             System.setProperty("sys.dept.finance", po_props.getProperty("sys.dept.finance"));
             System.setProperty("sys.dept.procurement", po_props.getProperty("sys.dept.procurement"));
             
+            //property for selected industry/company/category
             System.setProperty("user.selected.industry", po_props.getProperty("user.selected.industry"));
             System.setProperty("user.selected.category", po_props.getProperty("user.selected.category"));
             System.setProperty("user.selected.company", po_props.getProperty("user.selected.company"));
+            
+            //properties for client token and attachments
+            System.setProperty("sys.default.client.token", "client.token");
+            System.setProperty("sys.default.access.token", "access.token");
+            System.setProperty("sys.default.path.temp.attachments", po_props.getProperty("sys.default.path.temp.attachments"));
             
             return true;
         } catch (FileNotFoundException ex) {

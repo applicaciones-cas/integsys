@@ -211,7 +211,6 @@ ph\com\guanzongroup\integsys\views\PurchaseOrderReturn_EntryCarController.class
 ph\com\guanzongroup\integsys\views\DeliveryAcceptance_EntryLPController$4.class
 ph\com\guanzongroup\integsys\views\APPaymentAdjustment_EntryController.class
 ph\com\guanzongroup\integsys\views\PurchaseOrder_EntryMonarchFoodController.class
-ph\com\guanzongroup\integsys\views\SelectIndustryCompany$Company.class
 ph\com\guanzongroup\integsys\views\SIPosting_HistorySPCarController$2.class
 ph\com\guanzongroup\integsys\views\PurchaseOrderReturn_HistoryMonarchHospitalityController$2.class
 ph\com\guanzongroup\integsys\views\PurchaseOrder_ApprovalLPController$4.class
@@ -683,6 +682,7 @@ ph\com\guanzongroup\integsys\views\SOATagging_ConfirmationMCController.class
 ph\com\guanzongroup\integsys\views\AccountsAccreditation_ConfirmationController.class
 ph\com\guanzongroup\integsys\views\DeliveryAcceptance_ConfirmationMPController$4.class
 ph\com\guanzongroup\integsys\views\DeliverySchedule_EntryControllerAppliance$2.class
+ph\com\guanzongroup\integsys\utility\JFXUtil$TableKeyEvent.class
 ph\com\guanzongroup\integsys\views\PurchaseOrder_ApprovalMonarchHospitalityController$3.class
 ph\com\guanzongroup\integsys\views\DepartmentController.class
 ph\com\guanzongroup\integsys\views\SIPosting_MonarchFoodController$1.class
@@ -977,7 +977,6 @@ ph\com\guanzongroup\integsys\views\DeliverySchedule_EntryControllerMC$3.class
 ph\com\guanzongroup\integsys\views\PurchaseOrderReturn_ConfirmationMPController$1.class
 ph\com\guanzongroup\integsys\views\CheckRelease_HistoryController$1.class
 ph\com\guanzongroup\integsys\views\DeliveryAcceptance_EntrySPMCController$5.class
-ph\com\guanzongroup\integsys\views\SelectIndustryCompany$Category.class
 ph\com\guanzongroup\integsys\views\POCancellation_ConfirmationControllerMP$2.class
 ph\com\guanzongroup\integsys\views\PurchaseOrder_ConfirmationCarController$2.class
 ph\com\guanzongroup\integsys\views\PurchaseOrder_HistoryController$3.class
@@ -1094,7 +1093,6 @@ ph\com\guanzongroup\integsys\views\DeliveryAcceptance_ConfirmationMonarchHospita
 ph\com\guanzongroup\integsys\views\POReplacement_ConfirmationLPController$1.class
 ph\com\guanzongroup\integsys\views\DashboardController$3.class
 ph\com\guanzongroup\integsys\views\DisbursementVoucher_VerificationController.class
-ph\com\guanzongroup\integsys\views\SelectIndustryCompany$Industry.class
 ph\com\guanzongroup\integsys\views\PurchaseOrderReturn_EntrySPCarController.class
 ph\com\guanzongroup\integsys\views\PurchaseOrder_ApprovalMonarchFoodController$5.class
 ph\com\guanzongroup\integsys\views\SOATagging_HistoryController.class
@@ -1111,6 +1109,7 @@ ph\com\guanzongroup\integsys\views\PurchaseOrder_HistorySPMCController$3.class
 ph\com\guanzongroup\integsys\views\DeliveryAcceptance_SerialAppliancesController$2.class
 ph\com\guanzongroup\integsys\views\DisbursementVoucher_HistoryController$1.class
 ph\com\guanzongroup\integsys\views\PurchaseOrder_ConfirmationCarController$1.class
+ph\com\guanzongroup\integsys\model\ModelLog_In_Category.class
 ph\com\guanzongroup\integsys\views\PurchaseOrder_EntryLPController$4.class
 ph\com\guanzongroup\integsys\views\CheckDeposit_EntryController$1.class
 ph\com\guanzongroup\integsys\views\DeliveryAcceptance_ConfirmationMPController$3.class
