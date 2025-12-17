@@ -219,9 +219,14 @@ public class LoginController implements Initializable, ScreenInterface {
                             dashboardController.setUserCompany(psCompanyID);
                             dashboardController.changeUserInfo();
                             dashboardController.notificationChecker();
+                            
                             //set the orignal industry and company
                             System.setProperty("sys.industry", psIndustryID);
                             System.setProperty("sys.company", psCompanyID);
+                            
+                            //set the original to selected industry and company
+                            System.setProperty("user.selected.industry", psIndustryID);
+                            System.setProperty("user.selected.company", psCompanyID);
 
                             LoginControllerHolder.setLogInStatus(true);
                         }

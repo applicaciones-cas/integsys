@@ -143,7 +143,7 @@
                             <children>
                                 <BorderPane prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                     <left>
-                                        <AnchorPane BorderPane.alignment="CENTER">
+                                        <AnchorPane fx:id="aprootleft" BorderPane.alignment="CENTER">
                                             <children>
                                                 <BorderPane style="-fx-background-color: #B6B6B6;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0">
                                                     <top>
@@ -229,14 +229,14 @@
                                         </StackPane>
                                     </children>
                                 </AnchorPane>
-                                <AnchorPane fx:id="anchorRightSideBarMenu" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                <AnchorPane fx:id="anchorRightSideBarMenu" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                     <children>
-                                        <TreeView fx:id="tvRightSideBar" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                                        <TreeView fx:id="tvRightSideBar" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
                                     </children>
                                 </AnchorPane>
-                                <AnchorPane fx:id="anchorLeftSideBarMenu" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                <AnchorPane fx:id="anchorLeftSideBarMenu" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0">
                                     <children>
-                                        <TreeView fx:id="tvLeftSideBar" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                                        <TreeView fx:id="tvLeftSideBar" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0" />
                                     </children>
                                 </AnchorPane>
                             </children>

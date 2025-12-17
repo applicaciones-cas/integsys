@@ -17,7 +17,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane id="AnchorPane" fx:id="AnchorMain" prefHeight="138.0" prefWidth="364.0" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane id="AnchorPane" fx:id="AnchorMain" prefHeight="138.0" prefWidth="364.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1">
     <children>
         <StackPane fx:id="StackPane" prefHeight="150.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
             <children>
@@ -96,24 +96,24 @@
                                                         <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="30.0" vgrow="SOMETIMES" />
                                                     </rowConstraints>
                                                     <children>
-                                                        <Label text="Industry" GridPane.rowIndex="3">
+                                                        <Label text="Industry" GridPane.rowIndex="2">
                                                             <font>
                                                                 <Font size="12.0" />
                                                             </font>
                                                         </Label>
-                                                        <Label text="Company" GridPane.rowIndex="2">
+                                                        <Label text="Company" GridPane.rowIndex="3">
                                                             <font>
                                                                 <Font size="12.0" />
                                                             </font>
                                                         </Label>
-                                                        <ComboBox fx:id="cmbIndustry" maxWidth="1.7976931348623157E308" GridPane.columnIndex="2" GridPane.rowIndex="3" />
-                                                        <ComboBox fx:id="cmbCompany" maxWidth="1.7976931348623157E308" GridPane.columnIndex="2" GridPane.rowIndex="2" />
-                                                        <Label text="Category" GridPane.rowIndex="4">
+                                                        <ComboBox fx:id="cmbIndustry" maxWidth="1.7976931348623157E308" GridPane.columnIndex="2" GridPane.rowIndex="2" />
+                                                        <ComboBox fx:id="cmbCompany" maxWidth="1.7976931348623157E308" GridPane.columnIndex="2" GridPane.rowIndex="3" />
+                                                        <Label text="Category" visible="false" GridPane.rowIndex="4">
                                                             <font>
                                                                 <Font size="12.0" />
                                                             </font>
                                                         </Label>
-                                                        <ComboBox fx:id="cmbCategory" maxWidth="1.7976931348623157E308" GridPane.columnIndex="2" GridPane.rowIndex="4" />
+                                                        <ComboBox fx:id="cmbCategory" maxWidth="1.7976931348623157E308" visible="false" GridPane.columnIndex="2" GridPane.rowIndex="4" />
                                                     </children>
                                                 </GridPane>
                                             </children>
