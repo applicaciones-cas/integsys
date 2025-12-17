@@ -1,0 +1,281 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
+<?import java.net.URL?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?><AnchorPane xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1" fx:id="AnchorMain">
+    <children>
+        <StackPane AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" layoutX="107.0" layoutY="129.0">
+            <children>
+                <BorderPane>
+                    <bottom>
+                        <AnchorPane BorderPane.alignment="CENTER" maxHeight="80.0" minHeight="100.0" styleClass="AnchorPane3">
+                            <BorderPane.margin>
+                                <Insets/>
+                            </BorderPane.margin>
+                     <children>
+                        <HBox AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="5.0" alignment="CENTER_LEFT" fx:id="hbButtons" spacing="5.0" style="-fx-background-color: E9E9E9;" styleClass="button_process">
+                           <children>
+                              <Button contentDisplay="TOP" fx:id="btnBrowse" graphicTextGap="3.0" layoutX="10.0" layoutY="10.0" maxHeight="70.0" mnemonicParsing="false" prefHeight="50.0" prefWidth="70.0" styleClass="button_process" stylesheets="@../css/StyleSheet.css" text="Browse">
+                                 <graphic>
+                                    <FontAwesomeIconView glyphName="FOLDER_OPEN" size="20" styleClass="FontIcon"/>
+                                 </graphic>
+                              </Button>
+                              <Button contentDisplay="TOP" fx:id="btnNew" graphicTextGap="3.0" maxHeight="70.0" mnemonicParsing="false" prefHeight="50.0" prefWidth="70.0" styleClass="button_process" stylesheets="@../css/StyleSheet.css" text="New">
+                                 <graphic>
+                                    <FontAwesomeIconView glyphName="PLUS" size="20" styleClass="FontIcon"/>
+                                 </graphic>
+                              </Button>
+                              <Button contentDisplay="TOP" fx:id="btnSave" graphicTextGap="3.0" maxHeight="70.0" mnemonicParsing="false" prefHeight="50.0" prefWidth="70.0" styleClass="button_process" stylesheets="@../css/StyleSheet.css" text="Save">
+                                 <graphic>
+                                    <FontAwesomeIconView glyphName="SAVE" size="20" styleClass="FontIcon"/>
+                                 </graphic>
+                              </Button>
+                              <Button contentDisplay="TOP" fx:id="btnUpdate" graphicTextGap="3.0" maxHeight="70.0" mnemonicParsing="false" prefHeight="50.0" prefWidth="70.0" styleClass="button_process" stylesheets="@../css/StyleSheet.css" text="Update">
+                                 <graphic>
+                                    <FontAwesomeIconView glyphName="EDIT" size="20" styleClass="FontIcon"/>
+                                 </graphic>
+                              </Button>
+                              <Button contentDisplay="TOP" fx:id="btnCancel" graphicTextGap="3.0" maxHeight="70.0" mnemonicParsing="false" prefHeight="50.0" prefWidth="70.0" styleClass="button_process" stylesheets="@../css/StyleSheet.css" text="Cancel">
+                                 <graphic>
+                                    <FontAwesomeIconView glyphName="CLOSE" size="20" styleClass="FontIcon"/>
+                                 </graphic>
+                              </Button>
+                              <Button contentDisplay="TOP" fx:id="btnClose" graphicTextGap="3.0" maxHeight="70.0" mnemonicParsing="false" prefHeight="50.0" prefWidth="70.0" styleClass="button_process" stylesheets="@../css/StyleSheet.css" text="Close">
+                                 <graphic>
+                                    <FontAwesomeIconView glyphName="POWER_OFF" size="20" styleClass="FontIcon"/>
+                                 </graphic>
+                              </Button>
+                           </children>
+                           <padding>
+                              <Insets bottom="5.0" left="10.0" right="5.0" top="5.0"/>
+                           </padding>
+                        </HBox>
+                     </children>
+                        </AnchorPane>
+                    </bottom>
+                    <center>
+                        <AnchorPane BorderPane.alignment="CENTER_LEFT" fx:id="AnchorInputs" maxWidth="550.0" prefWidth="550.0">
+                            <opaqueInsets>
+                                <Insets/>
+                            </opaqueInsets>
+                            <BorderPane.margin>
+                                <Insets left="5.0" right="5.0"/>
+                            </BorderPane.margin>
+                            <children>
+                                <VBox AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="5.0" alignment="TOP_CENTER" spacing="15.0" style="-fx-border-color: FF8201; -fx-border-radius: 5;">
+                                    <children>
+                                        <AnchorPane fx:id="apMaster">
+                                            <children>
+                                                <GridPane AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                                    <columnConstraints>
+                                                        <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="130.0" minWidth="130.0" prefWidth="130.0"/>
+                                          <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="10.0" minWidth="10.0" prefWidth="10.0"/>
+                                                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="150.0"/>
+                                                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0"/>
+                                                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="150.0"/>
+                                                    </columnConstraints>
+                                                    <rowConstraints>
+                                                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+                                          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+                                          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+                                          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+                                          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+                                          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+                                          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+                                                    </rowConstraints>
+                                                    <children>
+                                                    <Label GridPane.rowIndex="1" contentDisplay="RIGHT" layoutX="20.0" layoutY="45.0" text="Description">
+                                             <graphic>
+                                                <Text fill="RED" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="Text2" text="*">
+                                                   <font>
+                                                      <Font name="Rockwell" size="14.0"/>
+                                                   </font>
+                                                </Text>
+                                             </graphic>
+                                             <GridPane.margin>
+                                                <Insets left="10.0"/>
+                                             </GridPane.margin>
+                                          </Label>
+                                                        <Label GridPane.rowIndex="2" contentDisplay="RIGHT" text="Model">
+                                             <graphic>
+                                                <Text fill="RED" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="Text2" text="*">
+                                                   <font>
+                                                      <Font name="Rockwell" size="14.0"/>
+                                                   </font>
+                                                </Text>
+                                             </graphic>
+                                          </Label>
+                                                        <Label GridPane.rowIndex="3" contentDisplay="RIGHT" text="Color">
+                                             <graphic>
+                                                <Text fill="RED" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="Text2" text="*">
+                                                   <font>
+                                                      <Font name="Rockwell" size="14.0"/>
+                                                   </font>
+                                                </Text>
+                                             </graphic>
+                                          </Label>
+                                                        <Label GridPane.rowIndex="4" contentDisplay="RIGHT" layoutX="10.0" layoutY="105.0" text="Year Model">
+                                             <graphic>
+                                                <Text fill="RED" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="Text2" text="*">
+                                                   <font>
+                                                      <Font name="Rockwell" size="14.0"/>
+                                                   </font>
+                                                </Text>
+                                             </graphic>
+                                             <GridPane.margin>
+                                                <Insets left="10.0"/>
+                                             </GridPane.margin>
+                                          </Label>
+                                                        <Label GridPane.rowIndex="5" contentDisplay="RIGHT" text="Sell Price">
+                                             <graphic>
+                                                <Text fill="RED" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="Text2" text="*">
+                                                   <font>
+                                                      <Font name="Rockwell" size="14.0"/>
+                                                   </font>
+                                                </Text>
+                                             </graphic>
+                                             <GridPane.margin>
+                                                <Insets left="10.0"/>
+                                             </GridPane.margin>
+                                          </Label>
+                                                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Model Variant ID">
+                                                            <GridPane.margin>
+                                                                <Insets left="10.0"/>
+                                                            </GridPane.margin>
+                                             <font>
+                                                <Font name="System Bold" size="12.0"/>
+                                             </font>
+                                                        </Text>
+                                                        <TextField GridPane.columnIndex="2" editable="false" fx:id="tfModelVariantID">
+                                                            <GridPane.margin>
+                                                                <Insets/>
+                                                            </GridPane.margin>
+                                                            <font>
+                                                                <Font size="14.0"/>
+                                                            </font>
+                                                            <padding>
+                                                                <Insets left="5.0"/>
+                                                            </padding>
+                                                        </TextField>
+                                                        <TextField GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.rowIndex="1" fx:id="tfDescription" layoutX="152.0" layoutY="72.0">
+                                             <font>
+                                                <Font size="14.0"/>
+                                             </font>
+                                             <padding>
+                                                <Insets left="5.0"/>
+                                             </padding>
+                                             <GridPane.margin>
+                                                <Insets/>
+                                             </GridPane.margin>
+                                          </TextField>
+                                                        <TextField GridPane.columnIndex="2" GridPane.rowIndex="2" fx:id="tfModel" promptText="Press F3: Search"/>
+                                                        <TextField GridPane.columnIndex="2" GridPane.rowIndex="3" fx:id="tfColor" promptText="Press F3: Search"/>
+                                                        <TextField GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.rowIndex="4" fx:id="tfYearModel" layoutX="152.0" layoutY="102.0">
+                                             <font>
+                                                <Font size="14.0"/>
+                                             </font>
+                                             <padding>
+                                                <Insets left="5.0"/>
+                                             </padding>
+                                             <GridPane.margin>
+                                                <Insets/>
+                                             </GridPane.margin>
+                                          </TextField>
+                                                        <TextField GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.rowIndex="5" alignment="CENTER_RIGHT" fx:id="tfSellPrice" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="141.0" promptText="0.00">
+                                             <font>
+                                                <Font size="14.0"/>
+                                             </font>
+                                             <padding>
+                                                <Insets left="5.0" right="5.0"/>
+                                             </padding>
+                                          </TextField>
+                                                        <CheckBox GridPane.columnIndex="2" GridPane.rowIndex="6" fx:id="cbActive" mnemonicParsing="false" onAction="#cmdCheckBox_Click" selected="true" text="Active">
+                                                            <font>
+                                                                <Font size="14.0"/>
+                                                            </font>
+                                                            <GridPane.margin>
+                                                                <Insets/>
+                                                            </GridPane.margin>
+                                                        </CheckBox>
+                                                    </children>
+                                                </GridPane>
+                                            </children>
+                                        </AnchorPane>
+                                    </children>
+                                    <padding>
+                                        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
+                                    </padding>
+                                </VBox>
+                            </children>
+                        </AnchorPane>
+                    </center>
+                    <top>
+                        <AnchorPane BorderPane.alignment="CENTER">
+                            <children>
+                                <VBox AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                    <children>
+                                        <AnchorPane fx:id="apBrowse" style="-fx-background-color: A0A0A0;">
+                                            <children>
+                                                <GridPane AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" prefHeight="45.0">
+                                                    <columnConstraints>
+                                                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="175.0" minWidth="10.0" prefWidth="165.0"/>
+                                                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="250.0" minWidth="10.0" prefWidth="250.0"/>
+                                                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0"/>
+                                                    </columnConstraints>
+                                                    <rowConstraints>
+                                                        <RowConstraints minHeight="10.0" prefHeight="26.0" vgrow="SOMETIMES"/>
+                                                    </rowConstraints>
+                                                    <children>
+                                                        <Text GridPane.halignment="LEFT" strokeType="OUTSIDE" strokeWidth="0.0" text="Model Variant Name">
+                                                            <font>
+                                                                <Font name="System Bold" size="14.0"/>
+                                                            </font>
+                                                            <GridPane.margin>
+                                                                <Insets left="30.0"/>
+                                                            </GridPane.margin>
+                                                        </Text>
+                                                        <TextField GridPane.columnIndex="1" fx:id="tfSearchModelVariantName" promptText="Press F3: Search">
+                                                            <font>
+                                                                <Font size="14.0"/>
+                                                            </font>
+                                                            <GridPane.margin>
+                                                                <Insets/>
+                                                            </GridPane.margin>
+                                                            <padding>
+                                                                <Insets left="5.0"/>
+                                                            </padding>
+                                                        </TextField>
+                                                    </children>
+                                                </GridPane>
+                                                <Separator AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" minHeight="5.0" style="-fx-background-color: FF8201;"/>
+                                            </children>
+                                        </AnchorPane>
+                                    </children>
+                                </VBox>
+                            </children>
+                        </AnchorPane>
+                    </top>
+                </BorderPane>
+            </children>
+        </StackPane>
+    </children>
+    <stylesheets>
+        <URL value="@../css/StyleSheet.css"/>
+        <URL value="@../css/MainPanelStyle.css"/>
+        <URL value="@../css/Tables.css"/>
+    </stylesheets>
+</AnchorPane>
