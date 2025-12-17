@@ -6,8 +6,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -24,7 +22,9 @@ import org.guanzon.appdriver.base.GRiderCAS;
 import org.guanzon.appdriver.base.LogWrapper;
 import org.guanzon.appdriver.base.MiscUtil;
 import org.guanzon.appdriver.base.SQLUtil;
-import org.guanzon.appdriver.constant.Logical;
+import ph.com.guanzongroup.integsys.model.ModelLog_In_Category;
+import ph.com.guanzongroup.integsys.model.ModelLog_In_Company;
+import ph.com.guanzongroup.integsys.model.ModelLog_In_Industry;
 import ph.com.guanzongroup.integsys.utility.CustomCommonUtil;
 
 /**
@@ -37,13 +37,12 @@ public class SelectIndustryCompany implements Initializable, ScreenInterface {
     private GRiderCAS poApp;
     private String psFormName = "Filter Industry & Company";
     private String psIndustryID = "";
-    private String psOldIndustryID;
     private String psCompanyID = "";
     private String psCategoryID = "";
-    private String psOldCategoryID = "";
-    private String psOldCompanyID;
+    
     private boolean pbIsFromFilter;
     private LogWrapper poLogWrapper;
+    
     @FXML
     private AnchorPane apButton;
     @FXML
@@ -56,6 +55,9 @@ public class SelectIndustryCompany implements Initializable, ScreenInterface {
     private Button btnOkay, btnClose;
     @FXML
     private ComboBox cmbIndustry, cmbCompany, cmbCategory;
+    
+    ObservableList<ModelLog_In_Industry> industryOptions = FXCollections.observableArrayList();
+    ObservableList<ModelLog_In_Company> companyOptions = FXCollections.observableArrayList();
 
     @Override
     public void setGRider(GRiderCAS foValue) {
@@ -74,18 +76,6 @@ public class SelectIndustryCompany implements Initializable, ScreenInterface {
 
     public void setCategoryID(String fsCategoryID) {
         psCategoryID = fsCategoryID;
-    }
-
-    public void setOldIndsutryID(String fsOldIndustryID) {
-        psOldIndustryID = fsOldIndustryID;
-    }
-
-    public void setOldCompanyID(String fsOldCompanyID) {
-        psOldCompanyID = fsOldCompanyID;
-    }
-
-    public void setOldCategoryID(String fsCategoryID) {
-        psOldCategoryID = fsCategoryID;
     }
 
     public void isFromFilter(boolean fsIsFromFilter) {
@@ -128,19 +118,20 @@ public class SelectIndustryCompany implements Initializable, ScreenInterface {
         String lsButton = ((Button) event.getSource()).getId();
         switch (lsButton) {
             case "btnOkay":
-                // Check if category is required and not selected
-                if ((psIndustryID.equals("02") || psIndustryID.equals("03") || psIndustryID.equals("04"))
-                        && (cmbCategory.getSelectionModel().isEmpty())) {
-                    ShowMessageFX.Warning("Please select a category.", psFormName, null);
-                    return; // Stop further processing
-                }
-                // No changes?
-                if (ShowMessageFX.YesNo("Are you sure you want to change industry or company?", psFormName, null)) {
+//                // Check if category is required and not selected
+//                if (psIndustryID.equals(System.getProperty("sys.general.industry")) && cmbCategory.getSelectionModel().isEmpty()) {
+//                    ShowMessageFX.Warning("Please select a category.", psFormName, null);
+//                    return; // Stop further processing
+//                }
+//                // No changes?
+                if (ShowMessageFX.YesNo("Are you sure you want to change connection?", psFormName, null)) {
+                    System.setProperty("user.selected.industry", psIndustryID);
+                    System.setProperty("user.selected.company", psCompanyID);
+                    
                     pbIsFromFilter = true;
                     CommonUtils.closeStage(btnOkay);
                 }
                 break;
-
             case "btnClose":
                 CommonUtils.closeStage(btnClose);
                 break;
@@ -153,205 +144,124 @@ public class SelectIndustryCompany implements Initializable, ScreenInterface {
 
     private void initComboBoxActions() {
         try {
-            ObservableList<Industry> industryOptions = FXCollections.observableArrayList(getAllIndustries());
-            ObservableList<Company> companyOptions = FXCollections.observableArrayList(getAllCompanies());
-            ObservableList<Category> categoryOptions = FXCollections.observableArrayList(getAllCategoryFromIndustry());
-            cmbIndustry.setItems(industryOptions);
-            cmbCompany.setItems(companyOptions);
-            cmbCategory.setItems(categoryOptions);
+            boolean lbShow = (System.getProperty("user.selected.industry")).equals(System.getProperty("sys.main.industry")) ||
+                                (System.getProperty("user.selected.industry")).equals(System.getProperty("sys.general.industry"));
 
-            for (Industry industry : industryOptions) {
-                if (industry.getIndustryID().equals(psOldIndustryID)) {
-                    cmbIndustry.getSelectionModel().select(industry);
-                    psIndustryID = psOldIndustryID;
-                    break;
-                }
-            }
+            if (lbShow) {
+                psIndustryID = poApp.getIndustry();
 
-            // Select old company
-            for (Company company : companyOptions) {
-                if (company.getCompanyId().equals(psOldCompanyID)) {
-                    cmbCompany.getSelectionModel().select(company);
-                    psCompanyID = psOldCompanyID;
-                    break;
-                }
-            }
-            cmbIndustry.setOnAction(event -> {
-                Industry selectedIndustry = (Industry) cmbIndustry.getSelectionModel().getSelectedItem();
-                if (selectedIndustry != null) {
-                    setIndustryID(selectedIndustry.getIndustryID());
-                    System.out.println("Selected industry id: " + selectedIndustry.getIndustryID());
+                industryOptions = FXCollections.observableArrayList(getAllIndustries());
 
-                    try {
-                        List<Category> newCategories = getAllCategoryFromIndustry();
-                        ObservableList<Category> updatedCategoryOptions = FXCollections.observableArrayList(newCategories);
-                        cmbCategory.setItems(updatedCategoryOptions);
-                        cmbCategory.getSelectionModel().clearSelection(); // optional
-                    } catch (SQLException ex) {
-                        Logger.getLogger(SelectIndustryCompany.class.getName()).log(Level.SEVERE, null, ex);
+                cmbIndustry.setItems(industryOptions);
+                if (!cmbIndustry.getItems().isEmpty()) {
+                    for (int lnCtr = 0; lnCtr <= industryOptions.size() - 1; lnCtr++){
+                        if (industryOptions.get(0).getIndustryID().equals(System.getProperty("user.selected.industry"))){
+                            cmbIndustry.getSelectionModel().select(lnCtr);
+                            psIndustryID = industryOptions.get(lnCtr).getIndustryID();
+                            
+                            companyOptions = FXCollections.observableArrayList(getAllCompanies(industryOptions.get(lnCtr)));
+                        }
                     }
                 }
-            });
+                
 
-            cmbCompany.setOnAction(event -> {
-                Company selectedCompany = (Company) cmbCompany.getSelectionModel().getSelectedItem();
-                if (selectedCompany != null) {
-                    setCompanyID(selectedCompany.getCompanyId());
-                    System.out.println("test company id: " + selectedCompany.getCompanyId());
+                cmbCompany.setItems(companyOptions);
+                if (!cmbCompany.getItems().isEmpty()) {
+                    for (int lnCtr = 0; lnCtr <= companyOptions.size() - 1; lnCtr++){
+                        if (companyOptions.get(lnCtr).getCompanyId().equals(System.getProperty("user.selected.company"))){
+                            cmbCompany.getSelectionModel().select(lnCtr);
+                            psCompanyID = companyOptions.get(lnCtr).getCompanyId();
+                        }
+                    }
                 }
-            });
-            cmbCategory.setOnAction(event -> {
-                Category selectedCategory = (Category) cmbCategory.getSelectionModel().getSelectedItem();
-                if (selectedCategory != null) {
-                    setCategoryID(selectedCategory.getCategoryId());
-                    System.out.println("test company id: " + selectedCategory.getCategoryId());
-                }
-            });
+            } else {
+                psIndustryID = System.getProperty("user.selected.industry");
+                psCompanyID = System.getProperty("user.selected.company");
+            }
+
+            cmbIndustry.setVisible(lbShow);
+            cmbCompany.setVisible(lbShow);
         } catch (SQLException ex) {
-            Logger.getLogger(SelectIndustryCompany.class.getName()).log(Level.SEVERE, null, ex);
+            ex.printStackTrace();
         }
     }
 
-    private List<Company> getAllCompanies() throws SQLException {
-        List<Company> companies = new ArrayList<>();
-        String lsSQL = "SELECT * FROM company";
-        lsSQL = MiscUtil.addCondition(lsSQL, "cRecdStat = " + SQLUtil.toSQL(Logical.YES));
-        ResultSet rs = poApp.executeQuery(lsSQL);
+    private List<ModelLog_In_Company> getAllCompanies(ModelLog_In_Industry industry) throws SQLException {
+        List<ModelLog_In_Company> companies = new ArrayList<>();
 
+        String lsSQL = "SELECT * FROM Company"
+                + " WHERE cRecdStat = '1'"
+                + " ORDER BY sCompnyNm";
+
+        String lsCompany = industry.getCompanyID();
+        String[] laCompany = lsCompany.split(";");
+
+        lsCompany = "";
+        for (int lnCtr = 0; lnCtr <= laCompany.length - 1; lnCtr++) {
+            lsCompany += ", " + SQLUtil.toSQL(laCompany[lnCtr]);
+        }
+
+        if (!lsCompany.isEmpty()) {
+            lsCompany = "(" + lsCompany.substring(2) + ")";
+            lsSQL = MiscUtil.addCondition(lsSQL, "sCompnyID IN " + lsCompany);
+        }
+
+        ResultSet rs = poApp.executeQuery(lsSQL);
         while (rs.next()) {
             String id = rs.getString("sCompnyID");
             String name = rs.getString("sCompnyNm");
-            companies.add(new Company(id, name));
+            companies.add(new ModelLog_In_Company(id, name));
         }
 
         MiscUtil.close(rs);
+
         return companies;
     }
 
-    private List<Industry> getAllIndustries() throws SQLException {
-        List<Industry> industries = new ArrayList<>();
-        String lsSQL = "SELECT * FROM industry";
-        lsSQL = MiscUtil.addCondition(lsSQL, "cRecdStat = " + SQLUtil.toSQL(Logical.YES));
+    private List<ModelLog_In_Industry> getAllIndustries() throws SQLException {
+        List<ModelLog_In_Industry> industries = new ArrayList<>();
+
+        String lsSQL = "SELECT * FROM Industry"
+                        + " WHERE cRecdStat = '1'"
+                        + " ORDER BY sDescript";
+
+        if (!psIndustryID.isEmpty()) {
+            lsSQL = MiscUtil.addCondition(lsSQL, "sIndstCdx = " + SQLUtil.toSQL(psIndustryID));
+        }
+
         ResultSet loRS = poApp.executeQuery(lsSQL);
 
         while (loRS.next()) {
-            String id = loRS.getString("sIndstCdx");
-            String description = loRS.getString("sDescript");
-            industries.add(new Industry(id, description));
+            industries.add(new ModelLog_In_Industry(
+                    loRS.getString("sIndstCdx"),
+                    loRS.getString("sDescript"),
+                    loRS.getString("sCompnyID")));
         }
-
         MiscUtil.close(loRS);
+
         return industries;
-
     }
 
-    private List<Category> getAllCategoryFromIndustry() throws SQLException {
-        List<Category> category = new ArrayList<>();
-        String lsSQL = null;
-        lsSQL = "SELECT * FROM category";
-        switch (psIndustryID) {
-            case "03": // Vehicle
-                lsSQL = MiscUtil.addCondition(lsSQL, " sIndstCdx = " + SQLUtil.toSQL(psIndustryID)
-                        + " AND cRecdStat = " + SQLUtil.toSQL(Logical.YES)
-                        + " AND (sDescript IN ('Vehicle', 'Spare Parts'))");
-                System.out.println("sql:" + lsSQL);
-                break;
-            case "02": // Motorcycle
-                lsSQL = MiscUtil.addCondition(lsSQL, " sIndstCdx = " + SQLUtil.toSQL(psIndustryID)
-                        + " AND cRecdStat = " + SQLUtil.toSQL(Logical.YES)
-                        + " AND (sDescript IN ('Motorcycle', 'Spare Parts'))");
-                break;
-            case "04": // Hospitality
-                lsSQL = MiscUtil.addCondition(lsSQL, " sIndstCdx = " + SQLUtil.toSQL(psIndustryID)
-                        + " AND cRecdStat = " + SQLUtil.toSQL(Logical.YES)
-                        + " AND (sDescript IN ('Food Service', 'Hospitality'))");
-                break;
-            default:
-                lsSQL = "";
-                return category;
+    private List<ModelLog_In_Category> getAllCategoryFromIndustry() throws SQLException {
+        List<ModelLog_In_Category> categories = new ArrayList<>();
+
+        String lsSQL = "SELECT * FROM Category" +
+                        " WHERE cRecdStat = '1'" +
+                        " ORDER BY sDescript";
+
+        if (!psIndustryID.isEmpty()) {
+            lsSQL = MiscUtil.addCondition(lsSQL, "sIndstCdx = " + SQLUtil.toSQL(psIndustryID));
         }
 
-        ResultSet rs = poApp.executeQuery(lsSQL);
+        ResultSet loRS = poApp.executeQuery(lsSQL);
 
-        while (rs.next()) {
-            String id = rs.getString("sCategrCd");
-            String name = rs.getString("sDescript");
-            category.add(new Category(id, name));
+        while (loRS.next()) {
+            categories.add(new ModelLog_In_Category(
+                                loRS.getString("sCategrCd"),
+                                loRS.getString("sDescript")));
         }
+        MiscUtil.close(loRS);
 
-        MiscUtil.close(rs);
-        return category;
-    }
-
-    class Industry {
-
-        private String industryID;
-        private String industryName;
-
-        public Industry(String industryID, String industryName) {
-            this.industryID = industryID;
-            this.industryName = industryName;
-        }
-
-        public String getIndustryID() {
-            return industryID;
-        }
-
-        public String getIndustryName() {
-            return industryName;
-        }
-
-        @Override
-        public String toString() {
-            return industryName;
-        }
-    }
-
-    class Company {
-
-        private String companyID;
-        private String companyName;
-
-        public Company(String companyID, String companyName) {
-            this.companyID = companyID;
-            this.companyName = companyName;
-        }
-
-        public String getCompanyId() {
-            return companyID;
-        }
-
-        public String getCompanyName() {
-            return companyName;
-        }
-
-        @Override
-        public String toString() {
-            return companyName;
-        }
-    }
-
-    class Category {
-
-        private String categoryID;
-        private String categoryName;
-
-        public Category(String categoryID, String categoryName) {
-            this.categoryID = categoryID;
-            this.categoryName = categoryName;
-        }
-
-        public String getCategoryId() {
-            return categoryID;
-        }
-
-        public String getCategoryName() {
-            return categoryName;
-        }
-
-        @Override
-        public String toString() {
-            return categoryName;
-        }
+        return categories;
     }
 }

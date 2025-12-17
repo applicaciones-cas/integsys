@@ -11,16 +11,12 @@ import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.AbstractMap;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
-import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.animation.Animation;
@@ -966,12 +962,8 @@ public class DashboardController implements Initializable {
                         Tab currentTab = tabpane.getSelectionModel().getSelectedItem();
                         if (currentTab != null) {
                             try {
-                                if (!psFormName.contains("PurchaseOrder")) {
-                                    if (!psFormName.contains("DeliveryAcceptance_History")) {
-                                        return;
-                                    }
-                                }
-                                if (oApp.isMainOffice()) {
+                                if (oApp.getIndustry().equals(System.getProperty("sys.main.industry")) ||
+                                    oApp.getIndustry().equals(System.getProperty("sys.general.industry"))) {
                                     loadSelectIndustryAndCompany();
                                 }
                             } catch (IOException e) {
@@ -981,7 +973,6 @@ public class DashboardController implements Initializable {
                     }
                 }
             }
-
         }
         );
     }
@@ -990,12 +981,9 @@ public class DashboardController implements Initializable {
         try {
             Stage stage = new Stage();
             FXMLLoader fxmlLoader = new FXMLLoader();
-            fxmlLoader.setLocation(getClass().getResource("/com/rmj/guanzongroup/sidebarmenus/views/SelectIndustryCompany.fxml"));
+            fxmlLoader.setLocation(getClass().getResource("/ph/com/guanzongroup/integsys/views/SelectIndustryCompany.fxml"));
             SelectIndustryCompany loControl = new SelectIndustryCompany();
             loControl.setGRider(oApp);
-            loControl.setOldIndsutryID(psIndustryID);
-            loControl.setOldCompanyID(psCompanyID);
-            loControl.setOldCategoryID(psCategoryID);
             fxmlLoader.setController(loControl);
 
             //get industry of current opend form
@@ -1159,7 +1147,8 @@ public class DashboardController implements Initializable {
                 toggleBtnRightSideBar[i].setSelected(false);
             }
             if (tabpane.getSelectionModel().getSelectedItem() != null) {
-                psFormName = getFormName(tabpane.getSelectionModel().getSelectedItem().getText());
+                //psFormName = getFormName(tabpane.getSelectionModel().getSelectedItem().getText());
+                psFormName = tabpane.getSelectionModel().getSelectedItem().getText();
             }
         });
 
