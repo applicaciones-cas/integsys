@@ -296,15 +296,17 @@ public class POQuotation_EntryController implements Initializable, ScreenInterfa
             if (RecordStatus.INACTIVE.equals(poController.POQuotation().TransactionAttachmentList(lnCtr).getModel().getRecordStatus())) {
                 continue;
             }
-            data.put(String.valueOf(lnCount + 1), new Pair<>(String.valueOf(poController.POQuotation().TransactionAttachmentList(lnCtr).getModel().getFileName()),
+            lnCount += 1;
+            data.put(String.valueOf(lnCount), new Pair<>(String.valueOf(poController.POQuotation().TransactionAttachmentList(lnCtr).getModel().getFileName()),
                     poController.POQuotation().TransactionAttachmentList(lnCtr).getModel().getDocumentType()));
+
         }
         AttachmentDialogController controller = new AttachmentDialogController();
         controller.setOpenedImage(pnAttachment);
         controller.addData(data);
 
         try {
-            stageAttachment.showDialog((Stage) btnSave.getScene().getWindow(), getClass().getResource("/ph/com/guanzongroup/integsys/views/AttachmentDialog.fxml"), controller, "Attachment Dialog", false, false, true);
+            stageAttachment.showDialog((Stage) btnClose.getScene().getWindow(), getClass().getResource("/ph/com/guanzongroup/integsys/views/AttachmentDialog.fxml"), controller, "Attachment Dialog", false, false, true);
         } catch (IOException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
         }

@@ -296,8 +296,10 @@ public class POQuotation_ApprovalController implements Initializable, ScreenInte
             if (RecordStatus.INACTIVE.equals(poController.POQuotation().TransactionAttachmentList(lnCtr).getModel().getRecordStatus())) {
                 continue;
             }
-            data.put(String.valueOf(lnCount + 1), new Pair<>(String.valueOf(poController.POQuotation().TransactionAttachmentList(lnCtr).getModel().getFileName()),
+            lnCount += 1;
+            data.put(String.valueOf(lnCount), new Pair<>(String.valueOf(poController.POQuotation().TransactionAttachmentList(lnCtr).getModel().getFileName()),
                     poController.POQuotation().TransactionAttachmentList(lnCtr).getModel().getDocumentType()));
+
         }
         AttachmentDialogController controller = new AttachmentDialogController();
         controller.setOpenedImage(pnAttachment);
