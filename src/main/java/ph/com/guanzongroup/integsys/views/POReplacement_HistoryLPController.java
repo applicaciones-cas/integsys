@@ -402,7 +402,11 @@ public class POReplacement_HistoryLPController implements Initializable, ScreenI
                             filePath2 = imageinfo_temp.get((String) attachment_data.get(tblAttachments.getSelectionModel().getSelectedIndex()).getIndex02());
                         } else {
                             // in server
-                            filePath2 = System.getProperty("sys.default.path.temp") + "/Attachments//" + (String) attachment_data.get(tblAttachments.getSelectionModel().getSelectedIndex()).getIndex02();
+                            if(poController.PurchaseOrderReceiving().TransactionAttachmentList(pnAttachment).getModel().getImagePath() != null && !"".equals(poController.PurchaseOrderReceiving().TransactionAttachmentList(pnAttachment).getModel().getImagePath())){
+                                filePath2 = poController.PurchaseOrderReceiving().TransactionAttachmentList(pnAttachment).getModel().getImagePath() + "/" + (String) attachment_data.get(tblAttachments.getSelectionModel().getSelectedIndex()).getIndex02();
+                            } else {
+                                filePath2 = System.getProperty("sys.default.path.temp.attachments") + "/" + (String) attachment_data.get(tblAttachments.getSelectionModel().getSelectedIndex()).getIndex02();
+                            }
                         }
 
                         if (filePath != null && !filePath.isEmpty()) {
