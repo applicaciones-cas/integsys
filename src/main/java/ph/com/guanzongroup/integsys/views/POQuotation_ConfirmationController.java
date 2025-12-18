@@ -93,7 +93,6 @@ import org.guanzon.appdriver.constant.RecordStatus;
 import org.guanzon.appdriver.constant.UserRight;
 import org.guanzon.cas.purchasing.services.QuotationControllers;
 import org.guanzon.cas.purchasing.status.POQuotationStatus;
-import static ph.com.guanzongroup.integsys.views.POQuotation_EntryController.poController;
 
 /**
  *

@@ -70,8 +70,6 @@ import org.guanzon.cas.purchasing.status.PurchaseOrderReceivingStatus;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.format.DateTimeParseException;
-import javafx.animation.PauseTransition;
 import javafx.scene.control.ComboBox;
 import org.guanzon.appdriver.constant.DocumentType;
 import org.guanzon.appdriver.agent.ShowDialogFX;
@@ -79,6 +77,24 @@ import org.guanzon.appdriver.constant.UserRight;
 import java.util.concurrent.atomic.AtomicReference;
 import javafx.scene.input.KeyCode;
 
+import java.awt.image.BufferedImage;
+import java.io.File;
+import javafx.animation.PauseTransition;
+import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleDoubleProperty;
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.embed.swing.SwingFXUtils;
+import javafx.geometry.Bounds;
+import javafx.geometry.Insets;
+import javafx.geometry.Point2D;
+import javafx.geometry.Pos;
+import javafx.scene.Group;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.layout.VBox;
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.rendering.PDFRenderer;
+import org.guanzon.appdriver.constant.RecordStatus;
 /**
  * FXML Controller class
  *
@@ -147,7 +163,7 @@ public class POReplacement_ConfirmationLPController implements Initializable, Sc
     private Pagination pgPagination;
     @FXML
     private ComboBox cmbAttachmentType;
-    @FXML
+        @FXML
     private StackPane stackPane1;
     @FXML
     private ImageView imageView;
@@ -406,7 +422,7 @@ public class POReplacement_ConfirmationLPController implements Initializable, Sc
                         fileChooser = new FileChooser();
                         fileChooser.setTitle("Choose Image");
                         fileChooser.getExtensionFilters().addAll(
-                                new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg", "*.gif")
+                                new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg", "*.gif", "*.pdf")
                         );
                         java.io.File selectedFile = fileChooser.showOpenDialog((Stage) btnAddAttachment.getScene().getWindow());
 
@@ -418,7 +434,8 @@ public class POReplacement_ConfirmationLPController implements Initializable, Sc
 
                             String imgPath2 = selectedFile.getName().toString();
                             for (int lnCtr = 0; lnCtr <= poController.PurchaseOrderReceiving().getTransactionAttachmentCount() - 1; lnCtr++) {
-                                if (imgPath2.equals(poController.PurchaseOrderReceiving().TransactionAttachmentList(lnCtr).getModel().getFileName())) {
+                                if (imgPath2.equals(poController.PurchaseOrderReceiving().TransactionAttachmentList(lnCtr).getModel().getFileName())
+                                        && RecordStatus.ACTIVE.equals(poController.PurchaseOrderReceiving().TransactionAttachmentList(lnCtr).getModel().getRecordStatus())) {
                                     ShowMessageFX.Warning(null, pxeModuleName, "File name already exists.");
                                     pnAttachment = lnCtr;
                                     loadRecordAttachment(true);
@@ -433,26 +450,56 @@ public class POReplacement_ConfirmationLPController implements Initializable, Sc
                                 imageinfo_temp.put(selectedFile.getName().toString(), imgPath.toString());
                             }
 
-                            poJSON = poController.PurchaseOrderReceiving().addAttachment();
-                            if ("error".equals((String) poJSON.get("result"))) {
-                                ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                            //Limit maximum pages of pdf to add
+                            if (imgPath2.toLowerCase().endsWith(".pdf")) {
+                                try (PDDocument document = PDDocument.load(selectedFile)) {
+                                    PDFRenderer pdfRenderer = new PDFRenderer(document);
+                                    int pageCount = document.getNumberOfPages();
+                                    if (pageCount > 5) {
+                                        ShowMessageFX.Warning(null, pxeModuleName, "PDF exceeds maximum allowed pages.");
+                                        return;
+                                    }
+                                }
                             }
-                            pnAttachment = poController.PurchaseOrderReceiving().getTransactionAttachmentCount() - 1;
-                            poController.PurchaseOrderReceiving().TransactionAttachmentList(pnAttachment).getModel().setFileName(imgPath2);
-                            poController.PurchaseOrderReceiving().TransactionAttachmentList(pnAttachment).getModel().setSourceNo(poController.PurchaseOrderReceiving().Master().getTransactionNo());
-                            poController.PurchaseOrderReceiving().TransactionAttachmentList(pnAttachment).getModel().getTransactionNo();
+
+//                            int lnTempRow = JFXUtil.getDetailTempRow(attachment_data, poController.POQuotation().addAttachment(imgPath2), 3);
+//                            pnAttachment = lnTempRow;
+                            pnAttachment = poController.PurchaseOrderReceiving().addAttachment(imgPath2);
+                            //Copy file to Attachment path
+                            poController.PurchaseOrderReceiving().copyFile(selectedFile.toString());
                             loadTableAttachment.reload();
                             tblAttachments.getFocusModel().focus(pnAttachment);
                             tblAttachments.getSelectionModel().select(pnAttachment);
                         }
                         break;
                     case "btnRemoveAttachment":
-//                        attachment_data.remove(pnAttachment);
-//                        if (pnAttachment != 0) {
-//                            pnAttachment -= 1;
-//                        }
-//                        loadTableAttachment.reload();
-//                        initAttachmentsGrid();
+                        if (poController.PurchaseOrderReceiving().getTransactionAttachmentCount() <= 0) {
+                            return;
+                        } else {
+                            for (int lnCtr = 0; lnCtr < poController.PurchaseOrderReceiving().getTransactionAttachmentCount(); lnCtr++) {
+                                if (RecordStatus.INACTIVE.equals(poController.PurchaseOrderReceiving().TransactionAttachmentList(lnCtr).getModel().getRecordStatus())) {
+                                    if (pnAttachment == lnCtr) {
+                                        return;
+                                    }
+                                }
+                            }
+                        }
+                        poJSON = poController.PurchaseOrderReceiving().removeAttachment(pnAttachment);
+                        if ("error".equals((String) poJSON.get("result"))) {
+                            ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                            return;
+                        }
+                        attachment_data.remove(tblAttachments.getSelectionModel().getSelectedIndex());
+                        if (pnAttachment != 0) {
+                            pnAttachment -= 1;
+                        }
+                        imageinfo_temp.clear();
+                        loadRecordAttachment(false);
+                        loadTableAttachment.reload();
+                        if (attachment_data.size() <= 0) {
+                            JFXUtil.clearTextFields(apAttachments);
+                        }
+                        initAttachmentsGrid();
                         break;
                     case "btnArrowRight":
                         slideImage(1);
@@ -1016,7 +1063,7 @@ public class POReplacement_ConfirmationLPController implements Initializable, Sc
     public void loadRecordAttachment(boolean lbloadImage) {
         try {
             if (attachment_data.size() > 0) {
-                tfAttachmentNo.setText(String.valueOf(pnAttachment + 1));
+                tfAttachmentNo.setText(attachment_data.get(tblAttachments.getSelectionModel().getSelectedIndex()).getIndex01());
                 String lsAttachmentType = poController.PurchaseOrderReceiving().TransactionAttachmentList(pnAttachment).getModel().getDocumentType();
                 if (lsAttachmentType.equals("")) {
                     poController.PurchaseOrderReceiving().TransactionAttachmentList(pnAttachment).getModel().setDocumentType(DocumentType.OTHER);
@@ -1028,37 +1075,166 @@ public class POReplacement_ConfirmationLPController implements Initializable, Sc
 
                 if (lbloadImage) {
                     try {
-                        String filePath = (String) attachment_data.get(pnAttachment).getIndex02();
+                        String filePath = (String) attachment_data.get(tblAttachments.getSelectionModel().getSelectedIndex()).getIndex02();
                         String filePath2 = "";
-                        if (imageinfo_temp.containsKey((String) attachment_data.get(pnAttachment).getIndex02())) {
-                            filePath2 = imageinfo_temp.get((String) attachment_data.get(pnAttachment).getIndex02());
+                        if (imageinfo_temp.containsKey((String) attachment_data.get(tblAttachments.getSelectionModel().getSelectedIndex()).getIndex02())) {
+                            filePath2 = imageinfo_temp.get((String) attachment_data.get(tblAttachments.getSelectionModel().getSelectedIndex()).getIndex02());
                         } else {
                             // in server
-                            filePath2 = System.getProperty("sys.default.path.temp") + "/Attachments//" + (String) attachment_data.get(pnAttachment).getIndex02();
-
+                            filePath2 = System.getProperty("sys.default.path.temp") + "/Attachments//" + (String) attachment_data.get(tblAttachments.getSelectionModel().getSelectedIndex()).getIndex02();
                         }
+
                         if (filePath != null && !filePath.isEmpty()) {
                             Path imgPath = Paths.get(filePath2);
                             String convertedPath = imgPath.toUri().toString();
-                            Image loimage = new Image(convertedPath);
-                            imageView.setImage(loimage);
-                            JFXUtil.adjustImageSize(loimage, imageView, imageviewerutil.ldstackPaneWidth, imageviewerutil.ldstackPaneHeight);
-                            Platform.runLater(() -> {
-                                JFXUtil.stackPaneClip(stackPane1);
-                            });
+                            boolean isPdf = filePath.toLowerCase().endsWith(".pdf");
 
+                            // Clear previous content
+                            stackPane1.getChildren().clear();
+                            if (!isPdf) {
+                                // ----- IMAGE VIEW -----
+                                Image loimage = new Image(convertedPath);
+                                imageView.setImage(loimage);
+                                JFXUtil.adjustImageSize(loimage, imageView, imageviewerutil.ldstackPaneWidth, imageviewerutil.ldstackPaneHeight);
+
+                                PauseTransition delay = new PauseTransition(Duration.seconds(2)); // 2-second delay
+                                delay.setOnFinished(event -> {
+                                    Platform.runLater(() -> {
+                                        JFXUtil.stackPaneClip(stackPane1);
+                                    });
+                                });
+                                delay.play();
+
+                                // Add ImageView directly to stackPane
+                                stackPane1.getChildren().add(imageView);
+                                stackPane1.getChildren().addAll(btnArrowLeft, btnArrowRight);
+
+                                // Align buttons on top
+                                StackPane.setAlignment(btnArrowLeft, Pos.CENTER_LEFT);
+                                StackPane.setAlignment(btnArrowRight, Pos.CENTER_RIGHT);
+
+                                // Optional: add some margin
+                                StackPane.setMargin(btnArrowLeft, new Insets(0, 0, 0, 10));
+                                StackPane.setMargin(btnArrowRight, new Insets(0, 10, 0, 0));
+
+                            } else {
+                                // ----- PDF VIEW -----
+                                PDDocument document = PDDocument.load(new File(filePath2));
+                                PDFRenderer renderer = new PDFRenderer(document);
+                                int pageCount = document.getNumberOfPages();
+
+                                // Container for PDF pages
+                                VBox pdfContainer = new VBox(10);
+                                pdfContainer.setAlignment(Pos.CENTER); // center pages
+                                pdfContainer.setPrefWidth(imageviewerutil.ldstackPaneWidth);
+
+                                for (int i = 0; i < pageCount; i++) {
+                                    BufferedImage pageImage = renderer.renderImageWithDPI(i, 150);
+                                    Image fxImage = SwingFXUtils.toFXImage(pageImage, null);
+                                    ImageView pageView = new ImageView(fxImage);
+
+                                    pageView.setPreserveRatio(true);
+                                    pageView.setFitWidth(imageviewerutil.ldstackPaneWidth);
+                                    JFXUtil.adjustImageSize(fxImage, pageView, imageviewerutil.ldstackPaneWidth, imageviewerutil.ldstackPaneHeight);
+
+                                    pdfContainer.getChildren().add(pageView);
+                                }
+
+                                // Wrap VBox in a Group for scaling
+                                Group pdfGroup = new Group(pdfContainer);
+
+                                // Wrap Group in a StackPane to center content
+                                StackPane centerPane = new StackPane(pdfGroup);
+                                centerPane.setAlignment(Pos.CENTER);
+
+                                // ScrollPane wraps the centerPane
+                                ScrollPane scrollPane = new ScrollPane(centerPane);
+                                scrollPane.setPannable(true);
+                                scrollPane.setFitToWidth(true);
+                                scrollPane.setFitToHeight(true);
+
+                                // Stack PDF and buttons
+                                stackPane1.getChildren().setAll(scrollPane, btnArrowLeft, btnArrowRight);
+                                StackPane.setAlignment(btnArrowLeft, Pos.CENTER_LEFT);
+                                StackPane.setAlignment(btnArrowRight, Pos.CENTER_RIGHT);
+                                StackPane.setMargin(btnArrowLeft, new Insets(0, 0, 0, 10));
+                                StackPane.setMargin(btnArrowRight, new Insets(0, 10, 0, 0));
+
+                                PauseTransition delay = new PauseTransition(Duration.seconds(2)); // 2-second delay
+                                delay.setOnFinished(event -> {
+                                    Platform.runLater(() -> {
+                                        JFXUtil.stackPaneClip(stackPane1);
+                                    });
+                                });
+                                delay.play();
+                                document.close();
+
+                                // ----- ZOOM & PAN -----
+                                final DoubleProperty zoomFactor = new SimpleDoubleProperty(1.0);
+
+                                // Zoom centered on mouse
+                                scrollPane.setOnScroll(event -> {
+                                    if (event.isControlDown()) {
+                                        double oldZoom = zoomFactor.get();
+                                        double delta = event.getDeltaY() > 0 ? 0.1 : -0.1;
+                                        zoomFactor.set(Math.max(0.1, oldZoom + delta));
+
+                                        Bounds viewportBounds = scrollPane.getViewportBounds();
+                                        Bounds contentBounds = pdfGroup.getLayoutBounds();
+                                        double mouseX = event.getX();
+                                        double mouseY = event.getY();
+
+                                        double hRatio = (scrollPane.getHvalue() * (contentBounds.getWidth() - viewportBounds.getWidth()) + mouseX) / contentBounds.getWidth();
+                                        double vRatio = (scrollPane.getVvalue() * (contentBounds.getHeight() - viewportBounds.getHeight()) + mouseY) / contentBounds.getHeight();
+
+                                        pdfContainer.setScaleX(zoomFactor.get());
+                                        pdfContainer.setScaleY(zoomFactor.get());
+
+                                        Platform.runLater(() -> {
+                                            Bounds newBounds = pdfGroup.getLayoutBounds();
+                                            double newH = (hRatio * newBounds.getWidth() - mouseX) / (newBounds.getWidth() - viewportBounds.getWidth());
+                                            double newV = (vRatio * newBounds.getHeight() - mouseY) / (newBounds.getHeight() - viewportBounds.getHeight());
+                                            scrollPane.setHvalue(Double.isNaN(newH) ? 0.5 : Math.min(Math.max(0, newH), 1.0));
+                                            scrollPane.setVvalue(Double.isNaN(newV) ? 0.5 : Math.min(Math.max(0, newV), 1.0));
+                                        });
+
+                                        event.consume();
+                                    }
+                                });
+
+                                // Pan with mouse drag
+                                final ObjectProperty<Point2D> lastMouse = new SimpleObjectProperty<>();
+                                pdfGroup.setOnMousePressed(e -> lastMouse.set(new Point2D(e.getSceneX(), e.getSceneY())));
+                                pdfGroup.setOnMouseDragged(e -> {
+                                    if (lastMouse.get() != null) {
+                                        double deltaX = lastMouse.get().getX() - e.getSceneX();
+                                        double deltaY = lastMouse.get().getY() - e.getSceneY();
+
+                                        scrollPane.setHvalue(Math.min(Math.max(0, scrollPane.getHvalue() + deltaX / pdfGroup.getLayoutBounds().getWidth()), 1.0));
+                                        scrollPane.setVvalue(Math.min(Math.max(0, scrollPane.getVvalue() + deltaY / pdfGroup.getLayoutBounds().getHeight()), 1.0));
+
+                                        lastMouse.set(new Point2D(e.getSceneX(), e.getSceneY()));
+                                    }
+                                });
+                                pdfGroup.setOnMouseReleased(e -> lastMouse.set(null));
+                            }
                         } else {
                             imageView.setImage(null);
                         }
 
-                    } catch (Exception ex) {
+                    } catch (Exception e) {
                         imageView.setImage(null);
                     }
                 }
             } else {
                 if (!lbloadImage) {
                     imageView.setImage(null);
-                    JFXUtil.stackPaneClip(stackPane1);
+                    // Clear previous content
+                    stackPane1.getChildren().clear();
+                    // Add ImageView directly to stackPane
+                    stackPane1.getChildren().add(imageView);
+                    stackPane1.getChildren().addAll(btnArrowLeft, btnArrowRight);
+                    Platform.runLater(() -> JFXUtil.stackPaneClip(stackPane1));
                     pnAttachment = 0;
                 }
             }
@@ -1236,40 +1412,47 @@ public class POReplacement_ConfirmationLPController implements Initializable, Sc
                 tblAttachments,
                 attachment_data,
                 () -> {
+                    imageviewerutil.scaleFactor = 1.0;
+                    JFXUtil.resetImageBounds(imageView, stackPane1);
                     Platform.runLater(() -> {
                         try {
                             attachment_data.clear();
                             int lnCtr;
+                            int lnCount = 0;
                             for (lnCtr = 0; lnCtr < poController.PurchaseOrderReceiving().getTransactionAttachmentCount(); lnCtr++) {
+                                if (RecordStatus.INACTIVE.equals(poController.PurchaseOrderReceiving().TransactionAttachmentList(lnCtr).getModel().getRecordStatus())) {
+                                    continue;
+                                }
+                                lnCount += 1;
                                 attachment_data.add(
-                                        new ModelDeliveryAcceptance_Attachment(String.valueOf(lnCtr + 1),
-                                                String.valueOf(poController.PurchaseOrderReceiving().TransactionAttachmentList(lnCtr).getModel().getFileName())
+                                        new ModelDeliveryAcceptance_Attachment(String.valueOf(lnCount),
+                                                String.valueOf(poController.PurchaseOrderReceiving().TransactionAttachmentList(lnCtr).getModel().getFileName()),
+                                                String.valueOf(lnCtr)
                                         ));
                             }
-                            if (pnAttachment < 0 || pnAttachment
+                            int lnTempRow = JFXUtil.getDetailRow(attachment_data, pnAttachment, 3); //this method is used only when Reverse is applied
+                            if (lnTempRow < 0 || lnTempRow
                                     >= attachment_data.size()) {
                                 if (!attachment_data.isEmpty()) {
                                     /* FOCUS ON FIRST ROW */
-                                    tblAttachments.getSelectionModel().select(0);
-                                    tblAttachments.getFocusModel().focus(0);
-                                    pnAttachment = 0;
+                                    JFXUtil.selectAndFocusRow(tblAttachments, 0);
+                                    int lnRow = Integer.parseInt(attachment_data.get(0).getIndex03());
+                                    pnAttachment = lnRow;
                                     loadRecordAttachment(true);
-                                } else {
-                                    tfAttachmentNo.setText("");
-                                    cmbAttachmentType.getSelectionModel().select(0);
-                                    loadRecordAttachment(false);
                                 }
                             } else {
                                 /* FOCUS ON THE ROW THAT pnRowDetail POINTS TO */
-                                tblAttachments.getSelectionModel().select(pnAttachment);
-                                tblAttachments.getFocusModel().focus(pnAttachment);
+                                JFXUtil.selectAndFocusRow(tblAttachments, lnTempRow);
+                                int lnRow = Integer.parseInt(attachment_data.get(tblAttachments.getSelectionModel().getSelectedIndex()).getIndex03());
+                                pnAttachment = lnRow;
                                 loadRecordAttachment(true);
                             }
-                        } catch (Exception ex) {
+                            if (attachment_data.size() <= 0) {
+                                loadRecordAttachment(false);
+                            }
+                        } catch (Exception e) {
                         }
-
                     });
-
                 }
         );
 
@@ -1485,6 +1668,8 @@ public class POReplacement_ConfirmationLPController implements Initializable, Sc
             pnAttachment = tblAttachments.getSelectionModel().getSelectedIndex();
             if (pnAttachment >= 0) {
                 imageviewerutil.scaleFactor = 1.0;
+                int lnRow = Integer.parseInt(attachment_data.get(tblAttachments.getSelectionModel().getSelectedIndex()).getIndex03());
+                pnAttachment = lnRow;
                 loadRecordAttachment(true);
                 JFXUtil.resetImageBounds(imageView, stackPane1);
             }
@@ -1582,7 +1767,8 @@ public class POReplacement_ConfirmationLPController implements Initializable, Sc
         if (attachment_data.size() <= 0) {
             return;
         }
-        currentIndex = pnAttachment;
+        int lnRow = Integer.valueOf(attachment_data.get(tblAttachments.getSelectionModel().getSelectedIndex()).getIndex01());
+        currentIndex = lnRow - 1;
         int newIndex = currentIndex + direction;
 
         if (newIndex != -1 && (newIndex <= attachment_data.size() - 1)) {
@@ -1590,7 +1776,9 @@ public class POReplacement_ConfirmationLPController implements Initializable, Sc
             slideOut.setByX(direction * -400); // Move left or right
 
             JFXUtil.selectAndFocusRow(tblAttachments, newIndex);
-            pnAttachment = newIndex;
+            int lnIndex = Integer.valueOf(attachment_data.get(newIndex).getIndex01());
+            int lnTempRow = JFXUtil.getDetailTempRow(attachment_data, lnIndex, 3);
+            pnAttachment = lnTempRow;
             loadRecordAttachment(false);
 
             // Create a transition animation
@@ -1659,8 +1847,8 @@ public class POReplacement_ConfirmationLPController implements Initializable, Sc
                     if (attachment_data.isEmpty()) {
                         return;
                     }
-                    newIndex = moveDown ? JFXUtil.moveToNextRow(currentTable)
-                            : JFXUtil.moveToPreviousRow(currentTable);
+                    newIndex = moveDown ? Integer.parseInt(attachment_data.get(JFXUtil.moveToNextRow(currentTable)).getIndex03())
+                            : Integer.parseInt(attachment_data.get(JFXUtil.moveToPreviousRow(currentTable)).getIndex03());
                     pnAttachment = newIndex;
                     loadRecordAttachment(true);
                     break;
