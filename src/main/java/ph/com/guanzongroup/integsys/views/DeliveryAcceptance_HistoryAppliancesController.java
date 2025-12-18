@@ -26,6 +26,7 @@ import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javafx.animation.PauseTransition;
 import javafx.animation.TranslateTransition;
 import javafx.application.Platform;
 import javafx.beans.property.DoubleProperty;
@@ -724,9 +725,13 @@ public class DeliveryAcceptance_HistoryAppliancesController implements Initializ
                                 imageView.setImage(loimage);
                                 JFXUtil.adjustImageSize(loimage, imageView, ldstackPaneWidth, ldstackPaneHeight);
 
-                                Platform.runLater(() -> {
-                                    JFXUtil.stackPaneClip(stackPane1);
+                                PauseTransition delay = new PauseTransition(Duration.seconds(2)); // 2-second delay
+                                delay.setOnFinished(event -> {
+                                    Platform.runLater(() -> {
+                                        JFXUtil.stackPaneClip(stackPane1);
+                                    });
                                 });
+                                delay.play();
 
                                 // Add ImageView directly to stackPane
                                 stackPane1.getChildren().add(imageView);
@@ -783,7 +788,13 @@ public class DeliveryAcceptance_HistoryAppliancesController implements Initializ
                                 StackPane.setMargin(btnArrowLeft, new Insets(0, 0, 0, 10));
                                 StackPane.setMargin(btnArrowRight, new Insets(0, 10, 0, 0));
 
-                                Platform.runLater(() -> JFXUtil.stackPaneClip(stackPane1));
+                                PauseTransition delay = new PauseTransition(Duration.seconds(2)); // 2-second delay
+                                delay.setOnFinished(event -> {
+                                    Platform.runLater(() -> {
+                                        JFXUtil.stackPaneClip(stackPane1);
+                                    });
+                                });
+                                delay.play();
                                 document.close();
 
                                 // ----- ZOOM & PAN -----

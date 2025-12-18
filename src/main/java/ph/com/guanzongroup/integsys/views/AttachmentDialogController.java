@@ -32,6 +32,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import javafx.animation.PauseTransition;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleDoubleProperty;
@@ -217,9 +218,13 @@ public class AttachmentDialogController implements Initializable, ScreenInterfac
                                 imageView.setImage(loimage);
                                 JFXUtil.adjustImageSize(loimage, imageView, imageviewerutil.ldstackPaneWidth, imageviewerutil.ldstackPaneHeight);
 
-                                Platform.runLater(() -> {
-                                    JFXUtil.stackPaneClip(stackPane1);
+                                PauseTransition delay = new PauseTransition(Duration.seconds(2)); // 2-second delay
+                                delay.setOnFinished(event -> {
+                                    Platform.runLater(() -> {
+                                        JFXUtil.stackPaneClip(stackPane1);
+                                    });
                                 });
+                                delay.play();
 
                                 // Add ImageView directly to stackPane
                                 stackPane1.getChildren().add(imageView);
@@ -293,11 +298,15 @@ public class AttachmentDialogController implements Initializable, ScreenInterfac
                                 StackPane.setMargin(btnArrowRight, new Insets(0, 10, 0, 0));
 
                                 // 🔑 CENTER content initially (important for 1 page)
-                                Platform.runLater(() -> {
+                                PauseTransition delay = new PauseTransition(Duration.seconds(2)); // 2-second delay
+                                delay.setOnFinished(event -> {
+                                    Platform.runLater(() -> {
                                     JFXUtil.stackPaneClip(stackPane1);
                                     scrollPane.setHvalue(0.5);
                                     scrollPane.setVvalue(0.5);
+                                    });
                                 });
+                                delay.play();
 
                                 document.close();
 

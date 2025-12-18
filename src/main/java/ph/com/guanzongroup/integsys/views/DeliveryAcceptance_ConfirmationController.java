@@ -1760,9 +1760,13 @@ public class DeliveryAcceptance_ConfirmationController implements Initializable,
                                 imageView.setImage(loimage);
                                 JFXUtil.adjustImageSize(loimage, imageView, ldstackPaneWidth, ldstackPaneHeight);
 
-                                Platform.runLater(() -> {
-                                    JFXUtil.stackPaneClip(stackPane1);
+                                PauseTransition delay = new PauseTransition(Duration.seconds(2)); // 2-second delay
+                                delay.setOnFinished(event -> {
+                                    Platform.runLater(() -> {
+                                        JFXUtil.stackPaneClip(stackPane1);
+                                    });
                                 });
+                                delay.play();
 
                                 // Add ImageView directly to stackPane
                                 stackPane1.getChildren().add(imageView);
@@ -1819,7 +1823,13 @@ public class DeliveryAcceptance_ConfirmationController implements Initializable,
                                 StackPane.setMargin(btnArrowLeft, new Insets(0, 0, 0, 10));
                                 StackPane.setMargin(btnArrowRight, new Insets(0, 10, 0, 0));
 
-                                Platform.runLater(() -> JFXUtil.stackPaneClip(stackPane1));
+                                PauseTransition delay = new PauseTransition(Duration.seconds(2)); // 2-second delay
+                                delay.setOnFinished(event -> {
+                                    Platform.runLater(() -> {
+                                        JFXUtil.stackPaneClip(stackPane1);
+                                    });
+                                });
+                                delay.play();
                                 document.close();
 
                                 // ----- ZOOM & PAN -----

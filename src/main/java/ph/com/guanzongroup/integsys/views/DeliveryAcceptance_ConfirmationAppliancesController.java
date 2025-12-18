@@ -108,6 +108,7 @@ import org.guanzon.appdriver.agent.ShowDialogFX;
 import org.guanzon.appdriver.constant.DocumentType;
 import org.guanzon.appdriver.constant.RecordStatus;
 import org.guanzon.appdriver.constant.UserRight;
+import static ph.com.guanzongroup.integsys.views.DeliveryAcceptance_ConfirmationCarController.poPurchaseReceivingController;
 
 /**
  * FXML Controller class
@@ -484,6 +485,22 @@ public class DeliveryAcceptance_ConfirmationAppliancesController implements Init
                         }
                         break;
                     case "btnReturn":
+                        poJSON = new JSONObject();
+                        if (ShowMessageFX.YesNo(null, "Close Tab", "Are you sure you want to return transaction?") == true) {
+                            poJSON = poPurchaseReceivingController.PurchaseOrderReceiving().ReturnTransaction("");
+                            if ("error".equals((String) poJSON.get("result"))) {
+                                ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                                return;
+                            } else {
+                                ShowMessageFX.Information(null, pxeModuleName, (String) poJSON.get("message"));
+                                disableAllHighlightByColor(tblViewPuchaseOrder, "#A7C7E7", highlightedRowsMain);
+                                highlight(tblViewPuchaseOrder, pnMain + 1, "#FAC898", highlightedRowsMain);
+                            }
+                        } else {
+                            return;
+                        }
+                        break;
+                    case "btnAddAttachment":
                         fileChooser = new FileChooser();
                         fileChooser.setTitle("Choose Image");
                         fileChooser.getExtensionFilters().addAll(
@@ -1673,9 +1690,13 @@ public class DeliveryAcceptance_ConfirmationAppliancesController implements Init
                                 imageView.setImage(loimage);
                                 JFXUtil.adjustImageSize(loimage, imageView, ldstackPaneWidth, ldstackPaneHeight);
 
-                                Platform.runLater(() -> {
-                                    JFXUtil.stackPaneClip(stackPane1);
+                                PauseTransition delay = new PauseTransition(Duration.seconds(2)); // 2-second delay
+                                delay.setOnFinished(event -> {
+                                    Platform.runLater(() -> {
+                                        JFXUtil.stackPaneClip(stackPane1);
+                                    });
                                 });
+                                delay.play();
 
                                 // Add ImageView directly to stackPane
                                 stackPane1.getChildren().add(imageView);
@@ -1732,7 +1753,13 @@ public class DeliveryAcceptance_ConfirmationAppliancesController implements Init
                                 StackPane.setMargin(btnArrowLeft, new Insets(0, 0, 0, 10));
                                 StackPane.setMargin(btnArrowRight, new Insets(0, 10, 0, 0));
 
-                                Platform.runLater(() -> JFXUtil.stackPaneClip(stackPane1));
+                                PauseTransition delay = new PauseTransition(Duration.seconds(2)); // 2-second delay
+                                delay.setOnFinished(event -> {
+                                    Platform.runLater(() -> {
+                                        JFXUtil.stackPaneClip(stackPane1);
+                                    });
+                                });
+                                delay.play();
                                 document.close();
 
                                 // ----- ZOOM & PAN -----

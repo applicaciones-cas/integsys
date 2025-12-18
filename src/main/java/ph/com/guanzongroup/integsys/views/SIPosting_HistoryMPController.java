@@ -67,6 +67,7 @@ import org.guanzon.cas.purchasing.services.PurchaseOrderReceivingControllers;
 import org.guanzon.cas.purchasing.status.PurchaseOrderReceivingStatus;
 import org.json.simple.JSONObject;
 import java.util.concurrent.atomic.AtomicReference;
+import javafx.animation.PauseTransition;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleDoubleProperty;
@@ -677,9 +678,13 @@ public class SIPosting_HistoryMPController implements Initializable, ScreenInter
                                 imageView.setImage(loimage);
                                 JFXUtil.adjustImageSize(loimage, imageView, imageviewerutil.ldstackPaneWidth, imageviewerutil.ldstackPaneHeight);
 
-                                Platform.runLater(() -> {
-                                    JFXUtil.stackPaneClip(stackPane1);
+                                PauseTransition delay = new PauseTransition(Duration.seconds(2)); // 2-second delay
+                                delay.setOnFinished(event -> {
+                                    Platform.runLater(() -> {
+                                        JFXUtil.stackPaneClip(stackPane1);
+                                    });
                                 });
+                                delay.play();
 
                                 // Add ImageView directly to stackPane
                                 stackPane1.getChildren().add(imageView);
@@ -736,7 +741,13 @@ public class SIPosting_HistoryMPController implements Initializable, ScreenInter
                                 StackPane.setMargin(btnArrowLeft, new Insets(0, 0, 0, 10));
                                 StackPane.setMargin(btnArrowRight, new Insets(0, 10, 0, 0));
 
-                                Platform.runLater(() -> JFXUtil.stackPaneClip(stackPane1));
+                                PauseTransition delay = new PauseTransition(Duration.seconds(2)); // 2-second delay
+                                delay.setOnFinished(event -> {
+                                    Platform.runLater(() -> {
+                                        JFXUtil.stackPaneClip(stackPane1);
+                                    });
+                                });
+                                delay.play();
                                 document.close();
 
                                 // ----- ZOOM & PAN -----
