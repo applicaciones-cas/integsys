@@ -4,12 +4,13 @@
  */
 package ph.com.guanzongroup.integsys.views;
 
+import java.awt.image.BufferedImage;
+import java.io.File;
 import ph.com.guanzongroup.integsys.model.ModelDeliveryAcceptance_Attachment;
 import ph.com.guanzongroup.integsys.model.ModelDeliveryAcceptance_Detail;
 import ph.com.guanzongroup.integsys.model.ModelDeliveryAcceptance_Main;
 import ph.com.guanzongroup.integsys.utility.CustomCommonUtil;
 import ph.com.guanzongroup.integsys.utility.JFXUtil;
-import com.sun.javafx.scene.control.skin.TableHeaderRow;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Files;
@@ -31,7 +32,6 @@ import javafx.animation.TranslateTransition;
 import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyBooleanPropertyBase;
 import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
@@ -40,7 +40,6 @@ import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.geometry.Bounds;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.DatePicker;
@@ -53,7 +52,6 @@ import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
-import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
@@ -72,7 +70,6 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import java.util.Arrays;
-import javafx.util.StringConverter;
 import org.guanzon.appdriver.agent.ShowMessageFX;
 import org.guanzon.appdriver.base.CommonUtils;
 import org.guanzon.appdriver.base.GRiderCAS;
@@ -80,7 +77,6 @@ import org.guanzon.appdriver.base.GuanzonException;
 import org.guanzon.appdriver.base.MiscUtil;
 import org.guanzon.appdriver.base.SQLUtil;
 import org.guanzon.appdriver.constant.EditMode;
-import org.guanzon.cas.purchasing.controller.PurchaseOrderReceiving;
 import org.guanzon.cas.purchasing.services.PurchaseOrderReceivingControllers;
 import org.guanzon.cas.purchasing.status.PurchaseOrderReceivingStatus;
 import org.json.simple.JSONObject;
@@ -89,14 +85,28 @@ import java.text.SimpleDateFormat;
 import java.time.format.DateTimeParseException;
 import javafx.scene.Node;
 import javafx.animation.PauseTransition;
+import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleDoubleProperty;
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.embed.swing.SwingFXUtils;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Bounds;
+import javafx.geometry.Insets;
+import javafx.geometry.Point2D;
+import javafx.scene.Group;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.StageStyle;
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.rendering.PDFRenderer;
 import org.guanzon.appdriver.constant.DocumentType;
 import org.guanzon.appdriver.agent.ShowDialogFX;
+import org.guanzon.appdriver.constant.RecordStatus;
 import org.guanzon.appdriver.constant.UserRight;
 
 /**
@@ -573,7 +583,7 @@ public class DeliveryAcceptance_ConfirmationController implements Initializable,
                         fileChooser = new FileChooser();
                         fileChooser.setTitle("Choose Image");
                         fileChooser.getExtensionFilters().addAll(
-                                new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg", "*.gif")
+                                new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg", "*.gif", "*.pdf")
                         );
                         java.io.File selectedFile = fileChooser.showOpenDialog((Stage) btnAddAttachment.getScene().getWindow());
 
@@ -585,7 +595,8 @@ public class DeliveryAcceptance_ConfirmationController implements Initializable,
 
                             String imgPath2 = selectedFile.getName().toString();
                             for (int lnCtr = 0; lnCtr <= poPurchaseReceivingController.PurchaseOrderReceiving().getTransactionAttachmentCount() - 1; lnCtr++) {
-                                if (imgPath2.equals(poPurchaseReceivingController.PurchaseOrderReceiving().TransactionAttachmentList(lnCtr).getModel().getFileName())) {
+                                if (imgPath2.equals(poPurchaseReceivingController.PurchaseOrderReceiving().TransactionAttachmentList(lnCtr).getModel().getFileName())
+                                        && RecordStatus.ACTIVE.equals(poPurchaseReceivingController.PurchaseOrderReceiving().TransactionAttachmentList(lnCtr).getModel().getRecordStatus())) {
                                     ShowMessageFX.Warning(null, pxeModuleName, "File name already exists.");
                                     pnAttachment = lnCtr;
                                     loadRecordAttachment(true);
@@ -600,29 +611,56 @@ public class DeliveryAcceptance_ConfirmationController implements Initializable,
                                 imageinfo_temp.put(selectedFile.getName().toString(), imgPath.toString());
                             }
 
-                            poJSON = poPurchaseReceivingController.PurchaseOrderReceiving().addAttachment();
-                            if ("error".equals((String) poJSON.get("result"))) {
-                                ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                            //Limit maximum pages of pdf to add
+                            if (imgPath2.toLowerCase().endsWith(".pdf")) {
+                                try (PDDocument document = PDDocument.load(selectedFile)) {
+                                    PDFRenderer pdfRenderer = new PDFRenderer(document);
+                                    int pageCount = document.getNumberOfPages();
+                                    if (pageCount > 5) {
+                                        ShowMessageFX.Warning(null, pxeModuleName, "PDF exceeds maximum allowed pages.");
+                                        return;
+                                    }
+                                }
                             }
+
+//                            int lnTempRow = JFXUtil.getDetailTempRow(attachment_data, poPurchaseReceivingController.PurchaseOrderReceiving().addAttachment(imgPath2), 3);
+//                            pnAttachment = lnTempRow;
+                            pnAttachment = poPurchaseReceivingController.PurchaseOrderReceiving().addAttachment(imgPath2);
                             //Copy file to Attachment path
                             poPurchaseReceivingController.PurchaseOrderReceiving().copyFile(selectedFile.toString());
-
-                            pnAttachment = poPurchaseReceivingController.PurchaseOrderReceiving().getTransactionAttachmentCount() - 1;
-                            poPurchaseReceivingController.PurchaseOrderReceiving().TransactionAttachmentList(pnAttachment).getModel().setFileName(imgPath2);
-                            poPurchaseReceivingController.PurchaseOrderReceiving().TransactionAttachmentList(pnAttachment).getModel().setSourceNo(poPurchaseReceivingController.PurchaseOrderReceiving().Master().getTransactionNo());
-                            poPurchaseReceivingController.PurchaseOrderReceiving().TransactionAttachmentList(pnAttachment).getModel().getTransactionNo();
                             loadTableAttachment();
                             tblAttachments.getFocusModel().focus(pnAttachment);
                             tblAttachments.getSelectionModel().select(pnAttachment);
                         }
                         break;
                     case "btnRemoveAttachment":
-//                        attachment_data.remove(pnAttachment);
-//                        if (pnAttachment != 0) {
-//                            pnAttachment -= 1;
-//                        }
-//                        loadTableAttachment();
-//                        initAttachmentsGrid();
+                        if (poPurchaseReceivingController.PurchaseOrderReceiving().getTransactionAttachmentCount() <= 0) {
+                            return;
+                        } else {
+                            for (int lnCtr = 0; lnCtr < poPurchaseReceivingController.PurchaseOrderReceiving().getTransactionAttachmentCount(); lnCtr++) {
+                                if (RecordStatus.INACTIVE.equals(poPurchaseReceivingController.PurchaseOrderReceiving().TransactionAttachmentList(lnCtr).getModel().getRecordStatus())) {
+                                    if (pnAttachment == lnCtr) {
+                                        return;
+                                    }
+                                }
+                            }
+                        }
+                        poJSON = poPurchaseReceivingController.PurchaseOrderReceiving().removeAttachment(pnAttachment);
+                        if ("error".equals((String) poJSON.get("result"))) {
+                            ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                            return;
+                        }
+                        attachment_data.remove(tblAttachments.getSelectionModel().getSelectedIndex());
+                        if (pnAttachment != 0) {
+                            pnAttachment -= 1;
+                        }
+                        imageinfo_temp.clear();
+                        loadRecordAttachment(false);
+                        loadTableAttachment();
+                        if (attachment_data.size() <= 0) {
+                            JFXUtil.clearTextFields(apAttachments);
+                        }
+                        initAttachmentsGrid();
                         break;
                     case "btnArrowRight":
                         slideImage(1);
@@ -1687,7 +1725,7 @@ public class DeliveryAcceptance_ConfirmationController implements Initializable,
     public void loadRecordAttachment(boolean lbloadImage) {
         try {
             if (attachment_data.size() > 0) {
-                tfAttachmentNo.setText(String.valueOf(pnAttachment + 1));
+                tfAttachmentNo.setText(attachment_data.get(tblAttachments.getSelectionModel().getSelectedIndex()).getIndex01());
                 String lsAttachmentType = poPurchaseReceivingController.PurchaseOrderReceiving().TransactionAttachmentList(pnAttachment).getModel().getDocumentType();
                 if (lsAttachmentType.equals("")) {
                     poPurchaseReceivingController.PurchaseOrderReceiving().TransactionAttachmentList(pnAttachment).getModel().setDocumentType(DocumentType.OTHER);
@@ -1699,23 +1737,154 @@ public class DeliveryAcceptance_ConfirmationController implements Initializable,
 
                 if (lbloadImage) {
                     try {
-                        String filePath = (String) attachment_data.get(pnAttachment).getIndex02();
+                        String filePath = (String) attachment_data.get(tblAttachments.getSelectionModel().getSelectedIndex()).getIndex02();
                         String filePath2 = "";
-                        if (imageinfo_temp.containsKey((String) attachment_data.get(pnAttachment).getIndex02())) {
-                            filePath2 = imageinfo_temp.get((String) attachment_data.get(pnAttachment).getIndex02());
+                        if (imageinfo_temp.containsKey((String) attachment_data.get(tblAttachments.getSelectionModel().getSelectedIndex()).getIndex02())) {
+                            filePath2 = imageinfo_temp.get((String) attachment_data.get(tblAttachments.getSelectionModel().getSelectedIndex()).getIndex02());
                         } else {
                             // in server
-                            filePath2 = System.getProperty("sys.default.path.temp") + "/Attachments//" + (String) attachment_data.get(pnAttachment).getIndex02();
+                            if(poPurchaseReceivingController.PurchaseOrderReceiving().TransactionAttachmentList(pnAttachment).getModel().getImagePath() != null && !"".equals(poPurchaseReceivingController.PurchaseOrderReceiving().TransactionAttachmentList(pnAttachment).getModel().getImagePath())){
+                                filePath2 = poPurchaseReceivingController.PurchaseOrderReceiving().TransactionAttachmentList(pnAttachment).getModel().getImagePath() + "/" + (String) attachment_data.get(tblAttachments.getSelectionModel().getSelectedIndex()).getIndex02();
+                            } else {
+                                filePath2 = System.getProperty("sys.default.path.temp.attachments") + "/" + (String) attachment_data.get(tblAttachments.getSelectionModel().getSelectedIndex()).getIndex02();
+                            }
                         }
+
                         if (filePath != null && !filePath.isEmpty()) {
                             Path imgPath = Paths.get(filePath2);
                             String convertedPath = imgPath.toUri().toString();
-                            Image loimage = new Image(convertedPath);
-                            imageView.setImage(loimage);
-                            adjustImageSize(loimage);
-                            stackPaneClip();
-                            stackPaneClip(); // dont remove duplicate
+                            boolean isPdf = filePath.toLowerCase().endsWith(".pdf");
 
+                            // Clear previous content
+                            stackPane1.getChildren().clear();
+
+                            if (!isPdf) {
+                                // ----- IMAGE VIEW -----
+                                Image loimage = new Image(convertedPath);
+                                imageView.setImage(loimage);
+                                JFXUtil.adjustImageSize(loimage, imageView, ldstackPaneWidth, ldstackPaneHeight);
+
+                                PauseTransition delay = new PauseTransition(Duration.seconds(2)); // 2-second delay
+                                delay.setOnFinished(event -> {
+                                    Platform.runLater(() -> {
+                                        JFXUtil.stackPaneClip(stackPane1);
+                                    });
+                                });
+                                delay.play();
+
+                                // Add ImageView directly to stackPane
+                                stackPane1.getChildren().add(imageView);
+                                stackPane1.getChildren().addAll(btnArrowLeft, btnArrowRight);
+
+                                // Align buttons on top
+                                StackPane.setAlignment(btnArrowLeft, Pos.CENTER_LEFT);
+                                StackPane.setAlignment(btnArrowRight, Pos.CENTER_RIGHT);
+
+                                // Optional: add some margin
+                                StackPane.setMargin(btnArrowLeft, new Insets(0, 0, 0, 10));
+                                StackPane.setMargin(btnArrowRight, new Insets(0, 10, 0, 0));
+
+                            } else {
+                                // ----- PDF VIEW -----
+                                PDDocument document = PDDocument.load(new File(filePath2));
+                                PDFRenderer renderer = new PDFRenderer(document);
+                                int pageCount = document.getNumberOfPages();
+
+                                // Container for PDF pages
+                                VBox pdfContainer = new VBox(10);
+                                pdfContainer.setAlignment(Pos.CENTER); // center pages
+                                pdfContainer.setPrefWidth(ldstackPaneWidth);
+
+                                for (int i = 0; i < pageCount; i++) {
+                                    BufferedImage pageImage = renderer.renderImageWithDPI(i, 150);
+                                    Image fxImage = SwingFXUtils.toFXImage(pageImage, null);
+                                    ImageView pageView = new ImageView(fxImage);
+
+                                    pageView.setPreserveRatio(true);
+                                    pageView.setFitWidth(ldstackPaneWidth);
+                                    JFXUtil.adjustImageSize(fxImage, pageView, ldstackPaneWidth, ldstackPaneHeight);
+
+                                    pdfContainer.getChildren().add(pageView);
+                                }
+
+                                // Wrap VBox in a Group for scaling
+                                Group pdfGroup = new Group(pdfContainer);
+
+                                // Wrap Group in a StackPane to center content
+                                StackPane centerPane = new StackPane(pdfGroup);
+                                centerPane.setAlignment(Pos.CENTER);
+
+                                // ScrollPane wraps the centerPane
+                                ScrollPane scrollPane = new ScrollPane(centerPane);
+                                scrollPane.setPannable(true);
+                                scrollPane.setFitToWidth(true);
+                                scrollPane.setFitToHeight(true);
+
+                                // Stack PDF and buttons
+                                stackPane1.getChildren().setAll(scrollPane, btnArrowLeft, btnArrowRight);
+                                StackPane.setAlignment(btnArrowLeft, Pos.CENTER_LEFT);
+                                StackPane.setAlignment(btnArrowRight, Pos.CENTER_RIGHT);
+                                StackPane.setMargin(btnArrowLeft, new Insets(0, 0, 0, 10));
+                                StackPane.setMargin(btnArrowRight, new Insets(0, 10, 0, 0));
+
+                                PauseTransition delay = new PauseTransition(Duration.seconds(2)); // 2-second delay
+                                delay.setOnFinished(event -> {
+                                    Platform.runLater(() -> {
+                                        JFXUtil.stackPaneClip(stackPane1);
+                                    });
+                                });
+                                delay.play();
+                                document.close();
+
+                                // ----- ZOOM & PAN -----
+                                final DoubleProperty zoomFactor = new SimpleDoubleProperty(1.0);
+
+                                // Zoom centered on mouse
+                                scrollPane.setOnScroll(event -> {
+                                    if (event.isControlDown()) {
+                                        double oldZoom = zoomFactor.get();
+                                        double delta = event.getDeltaY() > 0 ? 0.1 : -0.1;
+                                        zoomFactor.set(Math.max(0.1, oldZoom + delta));
+
+                                        Bounds viewportBounds = scrollPane.getViewportBounds();
+                                        Bounds contentBounds = pdfGroup.getLayoutBounds();
+                                        double mouseX = event.getX();
+                                        double mouseY = event.getY();
+
+                                        double hRatio = (scrollPane.getHvalue() * (contentBounds.getWidth() - viewportBounds.getWidth()) + mouseX) / contentBounds.getWidth();
+                                        double vRatio = (scrollPane.getVvalue() * (contentBounds.getHeight() - viewportBounds.getHeight()) + mouseY) / contentBounds.getHeight();
+
+                                        pdfContainer.setScaleX(zoomFactor.get());
+                                        pdfContainer.setScaleY(zoomFactor.get());
+
+                                        Platform.runLater(() -> {
+                                            Bounds newBounds = pdfGroup.getLayoutBounds();
+                                            double newH = (hRatio * newBounds.getWidth() - mouseX) / (newBounds.getWidth() - viewportBounds.getWidth());
+                                            double newV = (vRatio * newBounds.getHeight() - mouseY) / (newBounds.getHeight() - viewportBounds.getHeight());
+                                            scrollPane.setHvalue(Double.isNaN(newH) ? 0.5 : Math.min(Math.max(0, newH), 1.0));
+                                            scrollPane.setVvalue(Double.isNaN(newV) ? 0.5 : Math.min(Math.max(0, newV), 1.0));
+                                        });
+
+                                        event.consume();
+                                    }
+                                });
+
+                                // Pan with mouse drag
+                                final ObjectProperty<Point2D> lastMouse = new SimpleObjectProperty<>();
+                                pdfGroup.setOnMousePressed(e -> lastMouse.set(new Point2D(e.getSceneX(), e.getSceneY())));
+                                pdfGroup.setOnMouseDragged(e -> {
+                                    if (lastMouse.get() != null) {
+                                        double deltaX = lastMouse.get().getX() - e.getSceneX();
+                                        double deltaY = lastMouse.get().getY() - e.getSceneY();
+
+                                        scrollPane.setHvalue(Math.min(Math.max(0, scrollPane.getHvalue() + deltaX / pdfGroup.getLayoutBounds().getWidth()), 1.0));
+                                        scrollPane.setVvalue(Math.min(Math.max(0, scrollPane.getVvalue() + deltaY / pdfGroup.getLayoutBounds().getHeight()), 1.0));
+
+                                        lastMouse.set(new Point2D(e.getSceneX(), e.getSceneY()));
+                                    }
+                                });
+                                pdfGroup.setOnMouseReleased(e -> lastMouse.set(null));
+                            }
                         } else {
                             imageView.setImage(null);
                         }
@@ -1727,7 +1896,12 @@ public class DeliveryAcceptance_ConfirmationController implements Initializable,
             } else {
                 if (!lbloadImage) {
                     imageView.setImage(null);
-                    stackPaneClip();
+                    // Clear previous content
+                    stackPane1.getChildren().clear();
+                    // Add ImageView directly to stackPane
+                    stackPane1.getChildren().add(imageView);
+                    stackPane1.getChildren().addAll(btnArrowLeft, btnArrowRight);
+                    Platform.runLater(() -> JFXUtil.stackPaneClip(stackPane1));
                     pnAttachment = 0;
                 }
             }
@@ -2146,7 +2320,6 @@ public class DeliveryAcceptance_ConfirmationController implements Initializable,
     }
 
     private void loadTableAttachment() {
-
         // Setting data to table detail
         ProgressIndicator progressIndicator = new ProgressIndicator();
         progressIndicator.setMaxHeight(50);
@@ -2167,30 +2340,37 @@ public class DeliveryAcceptance_ConfirmationController implements Initializable,
                     try {
                         attachment_data.clear();
                         int lnCtr;
+                        int lnCount = 0;
                         for (lnCtr = 0; lnCtr < poPurchaseReceivingController.PurchaseOrderReceiving().getTransactionAttachmentCount(); lnCtr++) {
+                            if (RecordStatus.INACTIVE.equals(poPurchaseReceivingController.PurchaseOrderReceiving().TransactionAttachmentList(lnCtr).getModel().getRecordStatus())) {
+                                continue;
+                            }
+                            lnCount += 1;
                             attachment_data.add(
-                                    new ModelDeliveryAcceptance_Attachment(String.valueOf(lnCtr + 1),
-                                            String.valueOf(poPurchaseReceivingController.PurchaseOrderReceiving().TransactionAttachmentList(lnCtr).getModel().getFileName())
+                                    new ModelDeliveryAcceptance_Attachment(String.valueOf(lnCount),
+                                            String.valueOf(poPurchaseReceivingController.PurchaseOrderReceiving().TransactionAttachmentList(lnCtr).getModel().getFileName()),
+                                            String.valueOf(lnCtr)
                                     ));
                         }
-                        if (pnAttachment < 0 || pnAttachment
+                        int lnTempRow = JFXUtil.getDetailRow(attachment_data, pnAttachment, 3); //this method is used only when Reverse is applied
+                        if (lnTempRow < 0 || lnTempRow
                                 >= attachment_data.size()) {
                             if (!attachment_data.isEmpty()) {
                                 /* FOCUS ON FIRST ROW */
-                                tblAttachments.getSelectionModel().select(0);
-                                tblAttachments.getFocusModel().focus(0);
-                                pnAttachment = 0;
+                                JFXUtil.selectAndFocusRow(tblAttachments, 0);
+                                int lnRow = Integer.parseInt(attachment_data.get(0).getIndex03());
+                                pnAttachment = lnRow;
                                 loadRecordAttachment(true);
-                            } else {
-                                tfAttachmentNo.setText("");
-                                cmbAttachmentType.getSelectionModel().select(0);
-                                loadRecordAttachment(false);
                             }
                         } else {
                             /* FOCUS ON THE ROW THAT pnRowDetail POINTS TO */
-                            tblAttachments.getSelectionModel().select(pnAttachment);
-                            tblAttachments.getFocusModel().focus(pnAttachment);
+                            JFXUtil.selectAndFocusRow(tblAttachments, lnTempRow);
+                            int lnRow = Integer.parseInt(attachment_data.get(tblAttachments.getSelectionModel().getSelectedIndex()).getIndex03());
+                            pnAttachment = lnRow;
                             loadRecordAttachment(true);
+                        }
+                        if (attachment_data.size() <= 0) {
+                            loadRecordAttachment(false);
                         }
                     } catch (Exception e) {
 
@@ -2223,40 +2403,6 @@ public class DeliveryAcceptance_ConfirmationController implements Initializable,
         };
         new Thread(task).start(); // Run task in background
 
-    }
-
-    private void setDatePickerFormat(DatePicker datePicker) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        datePicker.setConverter(new StringConverter<LocalDate>() {
-            @Override
-            public String toString(LocalDate date) {
-                return (date != null) ? date.format(formatter) : "";
-            }
-
-            @Override
-            public LocalDate fromString(String string) {
-                return (string != null && !string.isEmpty()) ? LocalDate.parse(string, formatter) : null;
-            }
-        });
-    }
-
-    private void addKeyEventFilter(DatePicker datePicker) {
-        datePicker.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
-            if (event.getCode() == KeyCode.ENTER) {
-                Node source = (Node) event.getSource();
-                source.fireEvent(new KeyEvent(
-                        KeyEvent.KEY_PRESSED,
-                        "",
-                        "",
-                        KeyCode.TAB,
-                        false,
-                        false,
-                        false,
-                        false
-                ));
-                event.consume();
-            }
-        });
     }
 
     public void initDatePickers() {
@@ -2316,6 +2462,8 @@ public class DeliveryAcceptance_ConfirmationController implements Initializable,
             pnAttachment = tblAttachments.getSelectionModel().getSelectedIndex();
             if (pnAttachment >= 0) {
                 scaleFactor = 1.0;
+                int lnRow = Integer.parseInt(attachment_data.get(tblAttachments.getSelectionModel().getSelectedIndex()).getIndex03());
+                pnAttachment = lnRow;
                 loadRecordAttachment(true);
                 resetImageBounds();
             }
@@ -2468,58 +2616,6 @@ public class DeliveryAcceptance_ConfirmationController implements Initializable,
         }
     }
 
-//    private void initButton(int fnValue) {
-//
-//        boolean lbShow1 = (fnValue == EditMode.UPDATE);
-//        boolean lbShow2 = (fnValue == EditMode.READY || fnValue == EditMode.UPDATE);
-//        boolean lbShow3 = (fnValue == EditMode.READY);
-//        boolean lbShow4 = (fnValue == EditMode.UNKNOWN || fnValue == EditMode.READY);
-//        
-//        // Manage visibility and managed state of other buttons
-//        btnReturn.setVisible(lbShow2);
-//        btnReturn.setManaged(lbShow2);
-//
-//        btnClose.setVisible(lbShow4);
-//        btnClose.setManaged(lbShow4);
-//
-//        btnSearch.setVisible(lbShow1);
-//        btnSearch.setManaged(lbShow1);
-//        btnSave.setVisible(lbShow1);
-//        btnSave.setManaged(lbShow1);
-//        btnCancel.setVisible(lbShow1);
-//        btnCancel.setManaged(lbShow1);
-//
-//        btnUpdate.setVisible(lbShow3);
-//        btnUpdate.setManaged(lbShow3);
-//        
-//        btnPrint.setVisible(lbShow3);
-//        btnPrint.setManaged(lbShow3);
-//        btnHistory.setVisible(lbShow3);
-//        btnHistory.setManaged(lbShow3);
-//
-//        btnConfirm.setVisible(lbShow3);
-//        btnConfirm.setManaged(lbShow3);
-//        btnVoid.setVisible(lbShow3);
-//        btnVoid.setManaged(lbShow3);
-//
-//        apMaster.setDisable(!lbShow1);
-//        apDetail.setDisable(!lbShow1);
-//        apAttachments.setDisable(!lbShow1);
-//
-//        btnAddAttachment.setDisable(!lbShow1);
-//        btnRemoveAttachment.setDisable(!lbShow1);
-//        
-//        switch (poPurchaseReceivingController.PurchaseOrderReceiving().Master().getTransactionStatus()) {
-//            case PurchaseOrderReceivingStatus.APPROVED: 
-//                btnConfirm.setVisible(!lbShow3);
-//                btnConfirm.setManaged(!lbShow3);
-//                break;
-//            case PurchaseOrderReceivingStatus.VOID:
-//                btnVoid.setVisible(!lbShow3);
-//                btnVoid.setManaged(!lbShow3);
-//                break;
-//        }
-//    }
     private void initStackPaneListener() {
         stackPane1.widthProperty().addListener((observable, oldValue, newWidth) -> {
             double computedWidth = newWidth.doubleValue();
@@ -2602,54 +2698,28 @@ public class DeliveryAcceptance_ConfirmationController implements Initializable,
     }
 
     public void initAttachmentsGrid() {
-        /*FOCUS ON FIRST ROW*/
-        tblRowNoAttachment.setStyle("-fx-alignment: CENTER;-fx-padding: 0 5 0 5;");
-        tblFileNameAttachment.setStyle("-fx-alignment: CENTER;-fx-padding: 0 5 0 5;");
-
-        tblRowNoAttachment.setCellValueFactory(new PropertyValueFactory<ModelDeliveryAcceptance_Attachment, String>("index01"));
-        tblFileNameAttachment.setCellValueFactory(new PropertyValueFactory<ModelDeliveryAcceptance_Attachment, String>("index02"));
-
-        tblAttachments.widthProperty().addListener((ObservableValue<? extends Number> source, Number oldWidth, Number newWidth) -> {
-            TableHeaderRow header = (TableHeaderRow) tblAttachments.lookup("TableHeaderRow");
-            header.reorderingProperty().addListener((ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) -> {
-                header.setReordering(false);
-            });
-        });
-
+        JFXUtil.setColumnCenter(tblRowNoAttachment);
+        JFXUtil.setColumnLeft(tblFileNameAttachment);
+        JFXUtil.setColumnsIndexAndDisableReordering(tblAttachments);
         tblAttachments.setItems(attachment_data);
-
-        if (pnAttachment < 0 || pnAttachment >= attachment_data.size()) {
-            if (!attachment_data.isEmpty()) {
-                /* FOCUS ON FIRST ROW */
-                tblAttachments.getSelectionModel().select(0);
-                tblAttachments.getFocusModel().focus(0);
-                pnAttachment = tblAttachments.getSelectionModel().getSelectedIndex();
-            }
-        } else {
-            /* FOCUS ON THE ROW THAT pnRowDetail POINTS TO */
-            tblAttachments.getSelectionModel().select(pnAttachment);
-            tblAttachments.getFocusModel().focus(pnAttachment);
-        }
-
     }
 
     public void slideImage(int direction) {
         if (attachment_data.size() <= 0) {
             return;
         }
-
-        currentIndex = pnAttachment;
+        int lnRow = Integer.valueOf(attachment_data.get(tblAttachments.getSelectionModel().getSelectedIndex()).getIndex01());
+        currentIndex = lnRow - 1;
         int newIndex = currentIndex + direction;
 
         if (newIndex != -1 && (newIndex <= attachment_data.size() - 1)) {
-            ModelDeliveryAcceptance_Attachment image = attachment_data.get(newIndex);
-            String filePath2 = System.getProperty("sys.default.path.temp") + "/Attachments//" + image.getIndex02();
             TranslateTransition slideOut = new TranslateTransition(Duration.millis(300), imageView);
             slideOut.setByX(direction * -400); // Move left or right
 
-            tblAttachments.getFocusModel().focus(newIndex);
-            tblAttachments.getSelectionModel().select(newIndex);
-            pnAttachment = newIndex;
+            JFXUtil.selectAndFocusRow(tblAttachments, newIndex);
+            int lnIndex = Integer.valueOf(attachment_data.get(newIndex).getIndex01());
+            int lnTempRow = JFXUtil.getDetailTempRow(attachment_data, lnIndex, 3);
+            pnAttachment = lnTempRow;
             loadRecordAttachment(false);
 
             // Create a transition animation
@@ -2664,7 +2734,7 @@ public class DeliveryAcceptance_ConfirmationController implements Initializable,
 
             slideOut.play();
         }
-        if (isImageViewOutOfBounds(imageView, stackPane1)) {
+        if (JFXUtil.isImageViewOutOfBounds(imageView, stackPane1)) {
             resetImageBounds();
         }
     }
@@ -2690,16 +2760,6 @@ public class DeliveryAcceptance_ConfirmationController implements Initializable,
 
         filteredData = new FilteredList<>(main_data, b -> true);
         tblViewPuchaseOrder.setItems(filteredData);
-    }
-
-    private boolean isImageViewOutOfBounds(ImageView imageView, StackPane stackPane) {
-        Bounds clipBounds = stackPane.getClip().getBoundsInParent();
-        Bounds imageBounds = imageView.getBoundsInParent();
-
-        return imageBounds.getMaxX() < clipBounds.getMinX()
-                || imageBounds.getMinX() > clipBounds.getMaxX()
-                || imageBounds.getMaxY() < clipBounds.getMinY()
-                || imageBounds.getMinY() > clipBounds.getMaxY();
     }
 
     public void resetImageBounds() {
@@ -2750,10 +2810,10 @@ public class DeliveryAcceptance_ConfirmationController implements Initializable,
                         switch (event.getCode()) {
                             case TAB:
                             case DOWN:
-                                pnAttachment = moveToNextRow(currentTable, focusedCell);
+                                pnAttachment = Integer.parseInt(attachment_data.get(JFXUtil.moveToNextRow(currentTable)).getIndex03());
                                 break;
                             case UP:
-                                pnAttachment = moveToPreviousRow(currentTable, focusedCell);
+                                pnAttachment = Integer.parseInt(attachment_data.get(JFXUtil.moveToPreviousRow(currentTable)).getIndex03());
                                 break;
 
                             default:

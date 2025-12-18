@@ -74,8 +74,9 @@ public class Login extends Application {
             System.setProperty("user.selected.company", po_props.getProperty("user.selected.company"));
             
             //properties for client token and attachments
-            System.setProperty("sys.default.client.token", "client.token");
-            System.setProperty("sys.default.access.token", "access.token");
+            System.setProperty("sys.default.client.token", System.getProperty("sys.default.path.config") + "/client.token");
+            System.setProperty("sys.default.access.token", System.getProperty("sys.default.path.config") + "/access.token");
+            
             System.setProperty("sys.default.path.temp.attachments", po_props.getProperty("sys.default.path.temp.attachments"));
             
             return true;
