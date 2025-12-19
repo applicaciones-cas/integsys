@@ -962,8 +962,8 @@ public class DashboardController implements Initializable {
                         Tab currentTab = tabpane.getSelectionModel().getSelectedItem();
                         if (currentTab != null) {
                             try {
-                                if (oApp.getIndustry().equals(System.getProperty("sys.main.industry")) ||
-                                    oApp.getIndustry().equals(System.getProperty("sys.general.industry"))) {
+                                if (oApp.getIndustry().equals(System.getProperty("sys.main.industry"))
+                                        || oApp.getIndustry().equals(System.getProperty("sys.general.industry"))) {
                                     loadSelectIndustryAndCompany();
                                 }
                             } catch (IOException e) {
@@ -1377,7 +1377,6 @@ public class DashboardController implements Initializable {
 //        setAnchorPaneVisibleManage(false, anchorLeftSideBarMenu);
 //        setScene(loadAnimateAnchor(psUserManagementFXML));
 //    }
-
     public void Tabclose() {
         int tabsize = tabpane.getTabs().size();
         if (tabsize == 1) {
@@ -1452,7 +1451,6 @@ public class DashboardController implements Initializable {
                     if (tab.getText().equals(newTab.getText())) {
                         tabName.remove(newTab.getText());
                         tabName.add(newTab.getText());
-
                         //applied for specific use//
                         if (newTab.isSelected()) {
                             SIPostingWindowKeyEvent(newTab, fxObj, false);
@@ -1475,55 +1473,55 @@ public class DashboardController implements Initializable {
 
     public class ControllerBinding {
 
-        public final String tabName;
         public final Class<? extends ScreenInterface> controllerClass;
 
-        public ControllerBinding(String tabName, Class<? extends ScreenInterface> controllerClass) {
-            this.tabName = tabName;
+        public ControllerBinding( Class<? extends ScreenInterface> controllerClass) {
             this.controllerClass = controllerClass;
         }
 
         public ControllerBinding(AbstractMap.SimpleEntry<String, Class<? extends ScreenInterface>> entry) {
-            this.tabName = entry.getKey();
             this.controllerClass = entry.getValue();
         }
     }
     ControllerBinding[] controllerArray = new ControllerBinding[]{
-        new ControllerBinding("GENERAL SI Posting", SIPosting_Controller.class),
-        new ControllerBinding("CAR SI Posting", SIPosting_CarController.class),
-        new ControllerBinding("APPLIANCES SI Posting", SIPosting_AppliancesController.class),
-        new ControllerBinding("LP SI Posting", SIPosting_LPController.class),
-        new ControllerBinding("MP SI Posting", SIPosting_MPController.class),
-        new ControllerBinding("MC SI Posting", SIPosting_MCController.class),
-        new ControllerBinding("MC SP  SI Posting", SIPosting_SPMCController.class),
-        new ControllerBinding("CAR SP SI Posting", SIPosting_SPCarController.class),
-        new ControllerBinding("MF SI Posting", SIPosting_MonarchFoodController.class),
-        new ControllerBinding("MH SI Posting", SIPosting_MonarchHospitalityController.class),
-        new ControllerBinding("GENERAL SI Posting History", SIPosting_HistoryController.class),
-        new ControllerBinding("APPLIANCES SI Posting History", SIPosting_HistoryAppliancesController.class),
-        new ControllerBinding("CAR SI Posting History", SIPosting_HistoryCarController.class),
-        new ControllerBinding("LP SI Posting History", SIPosting_HistoryLPController.class),
-        new ControllerBinding("MP SI Posting History", SIPosting_HistoryMPController.class),
-        new ControllerBinding("MC SI Posting History", SIPosting_HistoryMCController.class),
-        new ControllerBinding("MC SP SI Posting History", SIPosting_HistorySPMCController.class),
-        new ControllerBinding("CAR SP SI Posting History", SIPosting_HistorySPCarController.class),
-        new ControllerBinding("MF SI Posting History", SIPosting_HistoryMonarchFoodController.class),
-        new ControllerBinding("MH SI Posting History", SIPosting_HistoryMonarchHospitalityController.class),
-        new ControllerBinding("GENERAL Quotation Entry", POQuotation_EntryController.class),
-        new ControllerBinding("GENERAL Quotation Confirmation", POQuotation_ConfirmationController.class),
-        new ControllerBinding("GENERAL Quotation Approval", POQuotation_ApprovalController.class),
-        new ControllerBinding("GENERAL Quotation History", POQuotation_HistoryController.class)};
+        new ControllerBinding( SIPosting_Controller.class),
+        new ControllerBinding( SIPosting_CarController.class),
+        new ControllerBinding(SIPosting_AppliancesController.class),
+        new ControllerBinding( SIPosting_LPController.class),
+        new ControllerBinding( SIPosting_MPController.class),
+        new ControllerBinding(SIPosting_MCController.class),
+        new ControllerBinding(SIPosting_SPMCController.class),
+        new ControllerBinding(SIPosting_SPCarController.class),
+        new ControllerBinding(SIPosting_MonarchFoodController.class),
+        new ControllerBinding( SIPosting_MonarchHospitalityController.class),
+        new ControllerBinding(SIPosting_HistoryController.class),
+        new ControllerBinding( SIPosting_HistoryAppliancesController.class),
+        new ControllerBinding( SIPosting_HistoryCarController.class),
+        new ControllerBinding( SIPosting_HistoryLPController.class),
+        new ControllerBinding(SIPosting_HistoryMPController.class),
+        new ControllerBinding( SIPosting_HistoryMCController.class),
+        new ControllerBinding( SIPosting_HistorySPMCController.class),
+        new ControllerBinding( SIPosting_HistorySPCarController.class),
+        new ControllerBinding(SIPosting_HistoryMonarchFoodController.class),
+        new ControllerBinding( SIPosting_HistoryMonarchHospitalityController.class),
+        new ControllerBinding( POQuotation_EntryController.class),
+        new ControllerBinding( POQuotation_ConfirmationController.class),
+        new ControllerBinding(POQuotation_ApprovalController.class),
+        new ControllerBinding( POQuotation_HistoryController.class)};
 
     private void SIPostingWindowKeyEvent(Tab newTab, ScreenInterface fxObj, boolean isRemove) {
         for (ControllerBinding cb : controllerArray) {
-            if (cb.tabName.equals(newTab.getText())) {
-                try {
+            try {
+                Object userData = newTab.getUserData();
+                ScreenInterface screen = (ScreenInterface) userData;
+                if (cb.controllerClass.isInstance(screen)) {
                     Object casted = cb.controllerClass.cast(fxObj);
+                    // same controller
                     Method method = isRemove ? cb.controllerClass.getMethod("RemoveWindowEvent") : cb.controllerClass.getMethod("TriggerWindowEvent");
                     method.invoke(casted);
-                } catch (Exception e) {
-                    e.printStackTrace(); // Or log nicely
                 }
+            } catch (Exception e) {
+                e.printStackTrace(); // Or log nicely
                 break;
             }
         }
