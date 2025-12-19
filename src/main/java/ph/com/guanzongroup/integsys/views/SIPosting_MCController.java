@@ -229,7 +229,6 @@ public class SIPosting_MCController implements Initializable, ScreenInterface {
 
         pnEditMode = EditMode.UNKNOWN;
         initButton(pnEditMode);
-
     }
 
     @Override
@@ -287,6 +286,7 @@ public class SIPosting_MCController implements Initializable, ScreenInterface {
             }
         } catch (SQLException | GuanzonException | CloneNotSupportedException | ScriptException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -349,6 +349,7 @@ public class SIPosting_MCController implements Initializable, ScreenInterface {
             stageAttachment.showDialog((Stage) btnClose.getScene().getWindow(), getClass().getResource("/ph/com/guanzongroup/integsys/views/AttachmentDialog.fxml"), controller, "Attachment Dialog", false, false, true);
         } catch (IOException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -392,12 +393,9 @@ public class SIPosting_MCController implements Initializable, ScreenInterface {
                     }
                 });
             }
-        } catch (IOException ex) {
+        } catch (IOException | SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
-        } catch (SQLException ex) {
-            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
-        } catch (GuanzonException ex) {
-            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -559,7 +557,6 @@ public class SIPosting_MCController implements Initializable, ScreenInterface {
                                 ShowMessageFX.Information(null, pxeModuleName, (String) poJSON.get("message"));
                                 JFXUtil.disableAllHighlightByColor(tblViewMainList, "#A7C7E7", highlightedRowsMain);
                                 JFXUtil.highlightByKey(tblViewMainList, String.valueOf(pnMain + 1), "#C1E1C1", highlightedRowsMain);
-
                             }
                         } else {
                             return;
@@ -598,12 +595,12 @@ public class SIPosting_MCController implements Initializable, ScreenInterface {
                     if (currentTab.getId().equals("tabJE")) {
                         populateJE();
                     }
-
                 }
                 initButton(pnEditMode);
             }
         } catch (CloneNotSupportedException | SQLException | GuanzonException | ParseException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -752,7 +749,6 @@ public class SIPosting_MCController implements Initializable, ScreenInterface {
                     break;
                 case "tfTotalDebitAmt":
                     break;
-
             }
             if (JFXUtil.isObjectEqualTo(lsTxtFieldID, "tfTotalCreditAmt", "tfTotalDebitAmt")) {
                 loadRecordJEMaster();
@@ -760,7 +756,6 @@ public class SIPosting_MCController implements Initializable, ScreenInterface {
                 loadRecordMaster();
             }
         }
-
     };
     final ChangeListener<? super Boolean> txtArea_Focus = (o, ov, nv) -> {
         TextArea txtField = (TextArea) ((ReadOnlyBooleanPropertyBase) o).getBean();
@@ -775,7 +770,6 @@ public class SIPosting_MCController implements Initializable, ScreenInterface {
             /*Lost Focus*/
             lsValue = lsValue.trim();
             switch (lsID) {
-
                 case "taRemarks"://Remarks
                     poJSON = poPurchaseReceivingController.PurchaseOrderReceiving().Master().setRemarks(lsValue);
                     if ("error".equals((String) poJSON.get("result"))) {
@@ -969,7 +963,6 @@ public class SIPosting_MCController implements Initializable, ScreenInterface {
                 });
             }
         }
-
     };
 
     final ChangeListener<? super Boolean> txtField_Focus = (o, ov, nv) -> {
@@ -1180,11 +1173,9 @@ public class SIPosting_MCController implements Initializable, ScreenInterface {
                 default:
                     break;
             }
-
-        } catch (GuanzonException ex) {
+        } catch (GuanzonException | SQLException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
-        } catch (SQLException ex) {
-            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -1234,7 +1225,6 @@ public class SIPosting_MCController implements Initializable, ScreenInterface {
                     case "dpReferenceDate":
                         if (poPurchaseReceivingController.PurchaseOrderReceiving().getEditMode() == EditMode.ADDNEW
                                 || poPurchaseReceivingController.PurchaseOrderReceiving().getEditMode() == EditMode.UPDATE) {
-
                             if (selectedDate.isAfter(currentDate)) {
                                 poJSON.put("result", "error");
                                 poJSON.put("message", "Future dates are not allowed.");
@@ -1255,7 +1245,6 @@ public class SIPosting_MCController implements Initializable, ScreenInterface {
                     case "dpSIDate":
                         if (poPurchaseReceivingController.PurchaseOrderReceiving().getEditMode() == EditMode.ADDNEW
                                 || poPurchaseReceivingController.PurchaseOrderReceiving().getEditMode() == EditMode.UPDATE) {
-
                             if (selectedDate.isAfter(currentDate)) {
                                 poJSON.put("result", "error");
                                 poJSON.put("message", "Future dates are not allowed.");
@@ -1278,7 +1267,6 @@ public class SIPosting_MCController implements Initializable, ScreenInterface {
                     case "dpReportMonthYear":
                         if (poPurchaseReceivingController.PurchaseOrderReceiving().getEditMode() == EditMode.ADDNEW
                                 || poPurchaseReceivingController.PurchaseOrderReceiving().getEditMode() == EditMode.UPDATE) {
-
                             if (pbSuccess) {
                                 poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(pnJEDetail).setForMonthOf((SQLUtil.toDate(lsSelectedDate, SQLUtil.FORMAT_SHORT_DATE)));
                             }
@@ -1286,7 +1274,6 @@ public class SIPosting_MCController implements Initializable, ScreenInterface {
                         break;
                     default:
                         break;
-
                 }
                 if (pbSuccess) {
                 } else {
@@ -1304,6 +1291,7 @@ public class SIPosting_MCController implements Initializable, ScreenInterface {
             }
         } catch (SQLException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -1331,17 +1319,15 @@ public class SIPosting_MCController implements Initializable, ScreenInterface {
                                         String.valueOf(poPurchaseReceivingController.PurchaseOrderReceiving().PurchaseOrderReceivingList(lnCtr).getTransactionDate()),
                                         String.valueOf(poPurchaseReceivingController.PurchaseOrderReceiving().PurchaseOrderReceivingList(lnCtr).getTransactionNo())
                                 ));
-                            } catch (SQLException ex) {
+                            } catch (SQLException | GuanzonException ex) {
                                 Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
-                            } catch (GuanzonException ex) {
-                                Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+                                ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
                             }
 
                             if (poPurchaseReceivingController.PurchaseOrderReceiving().PurchaseOrderReceivingList(lnCtr).getTransactionStatus().equals(PurchaseOrderReceivingStatus.POSTED)) {
                                 JFXUtil.highlightByKey(tblViewMainList, String.valueOf(lnCtr + 1), "#C1E1C1", highlightedRowsMain);
                             }
                         }
-
                     }
 
                     if (pnMain < 0 || pnMain
@@ -1378,7 +1364,6 @@ public class SIPosting_MCController implements Initializable, ScreenInterface {
                 }
                 loading.progressIndicator.setVisible(false);
             }
-
         };
         new Thread(task).start(); // Run task in background
     }
@@ -1391,6 +1376,7 @@ public class SIPosting_MCController implements Initializable, ScreenInterface {
             JFXUtil.updateCaretPositions(apBrowse);
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -1454,7 +1440,6 @@ public class SIPosting_MCController implements Initializable, ScreenInterface {
                                 // Optional: add some margin
                                 StackPane.setMargin(btnArrowLeft, new Insets(0, 0, 0, 10));
                                 StackPane.setMargin(btnArrowRight, new Insets(0, 10, 0, 0));
-
                             } else {
                                 // ----- PDF VIEW -----
                                 PDDocument document = PDDocument.load(new File(filePath2));
@@ -1561,7 +1546,6 @@ public class SIPosting_MCController implements Initializable, ScreenInterface {
                         } else {
                             imageView.setImage(null);
                         }
-
                     } catch (Exception e) {
                         imageView.setImage(null);
                     }
@@ -1598,15 +1582,13 @@ public class SIPosting_MCController implements Initializable, ScreenInterface {
             tfCreditAmt.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(pnJEDetail).getCreditAmount(), true));
             tfDebitAmt.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(pnJEDetail).getDebitAmount(), true));
             JFXUtil.updateCaretPositions(apJEDetail);
-        } catch (SQLException ex) {
+        } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
-        } catch (GuanzonException ex) {
-            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
     public void loadRecordDetail() {
-
         try {
             if (pnDetail < 0 || pnDetail > poPurchaseReceivingController.PurchaseOrderReceiving().getDetailCount() - 1) {
                 return;
@@ -1633,12 +1615,10 @@ public class SIPosting_MCController implements Initializable, ScreenInterface {
             cbVatable.setSelected(poPurchaseReceivingController.PurchaseOrderReceiving().Detail(pnDetail).isVatable());
 
             JFXUtil.updateCaretPositions(apDetail);
-        } catch (SQLException ex) {
+        } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
-        } catch (GuanzonException ex) {
-            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
-
     }
 
     public void loadRecordJEMaster() {
@@ -1674,7 +1654,6 @@ public class SIPosting_MCController implements Initializable, ScreenInterface {
             tfTotalDebitAmt.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(lnTotalDebit, true));
             JFXUtil.updateCaretPositions(apJEMaster);
         }
-
     }
 
     public void loadRecordMaster() {
@@ -1734,7 +1713,6 @@ public class SIPosting_MCController implements Initializable, ScreenInterface {
                 tfDiscountRate.setText(String.format("%.2f", Double.isNaN(lnValue) ? 0.00 : lnValue));
                 double lnVat = poPurchaseReceivingController.PurchaseOrderReceiving().Master().getVatRate().doubleValue();
                 tfVatRate.setText(String.format("%.2f", Double.isNaN(lnVat) ? 0.00 : lnVat));
-
             });
             tfDiscountAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poPurchaseReceivingController.PurchaseOrderReceiving().Master().getDiscount().doubleValue(), true));
             tfFreightAmt.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poPurchaseReceivingController.PurchaseOrderReceiving().Master().getFreight().doubleValue()));
@@ -1750,8 +1728,8 @@ public class SIPosting_MCController implements Initializable, ScreenInterface {
             JFXUtil.updateCaretPositions(apMaster);
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
-
     }
 
     private double getGrossTotal() {
@@ -1765,7 +1743,6 @@ public class SIPosting_MCController implements Initializable, ScreenInterface {
 
     public void loadTableDetailFromMain() {
         try {
-
             poJSON = new JSONObject();
 
             ModelDeliveryAcceptance_Main selected = (ModelDeliveryAcceptance_Main) tblViewMainList.getSelectionModel().getSelectedItem();
@@ -1806,9 +1783,9 @@ public class SIPosting_MCController implements Initializable, ScreenInterface {
             Platform.runLater(() -> {
                 loadTableAttachment();
             });
-
         } catch (CloneNotSupportedException | SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -1829,11 +1806,9 @@ public class SIPosting_MCController implements Initializable, ScreenInterface {
                     JEdetails_data.clear();
                     int lnCtr;
                     try {
-
                         if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
                             lnCtr = poPurchaseReceivingController.PurchaseOrderReceiving().Journal().getDetailCount() - 1;
                             while (lnCtr >= 0) {
-
                                 if (JFXUtil.isObjectEqualTo(poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(lnCtr).getAccountCode(), null, "")) {
                                     poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail().remove(lnCtr);
                                 }
@@ -1891,12 +1866,9 @@ public class SIPosting_MCController implements Initializable, ScreenInterface {
                             loadRecordJEDetail();
                         }
                         loadRecordJEMaster();
-                    } catch (SQLException ex) {
+                    } catch (SQLException | GuanzonException | CloneNotSupportedException ex) {
                         Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
-                    } catch (GuanzonException ex) {
-                        Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
-                    } catch (CloneNotSupportedException ex) {
-                        Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+                        ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
                     }
                 });
 
@@ -1911,7 +1883,6 @@ public class SIPosting_MCController implements Initializable, ScreenInterface {
                     tblViewJEDetails.toFront();
                 }
                 loading.progressIndicator.setVisible(false);
-
             }
 
             @Override
@@ -1921,7 +1892,6 @@ public class SIPosting_MCController implements Initializable, ScreenInterface {
                 }
                 loading.progressIndicator.setVisible(false);
             }
-
         };
         new Thread(task).start(); // Run task in background
     }
@@ -1947,7 +1917,6 @@ public class SIPosting_MCController implements Initializable, ScreenInterface {
                         double lnTotal = 0.00;
                         double lnDiscountAmt = 0.00;
                         for (lnCtr = 0; lnCtr < poPurchaseReceivingController.PurchaseOrderReceiving().getDetailCount(); lnCtr++) {
-
                             if (JFXUtil.isObjectEqualTo(poPurchaseReceivingController.PurchaseOrderReceiving().Master().getSalesInvoice(), null, "")) {
                                 poPurchaseReceivingController.PurchaseOrderReceiving().Detail(lnCtr).isVatable(false);
                                 poPurchaseReceivingController.PurchaseOrderReceiving().Master().isVatTaxable(false);
@@ -1997,10 +1966,9 @@ public class SIPosting_MCController implements Initializable, ScreenInterface {
                             loadRecordDetail();
                         }
                         loadRecordMaster();
-                    } catch (SQLException ex) {
+                    } catch (SQLException | GuanzonException ex) {
                         Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
-                    } catch (GuanzonException ex) {
-                        Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+                        ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
                     }
                 });
 
@@ -2015,7 +1983,6 @@ public class SIPosting_MCController implements Initializable, ScreenInterface {
                     tblViewTransDetailList.toFront();
                 }
                 loading.progressIndicator.setVisible(false);
-
             }
 
             @Override
@@ -2025,10 +1992,8 @@ public class SIPosting_MCController implements Initializable, ScreenInterface {
                 }
                 loading.progressIndicator.setVisible(false);
             }
-
         };
         new Thread(task).start(); // Run task in background
-
     }
 
     private void loadTableAttachment() {
@@ -2079,9 +2044,7 @@ public class SIPosting_MCController implements Initializable, ScreenInterface {
                             loadRecordAttachment(false);
                         }
                     } catch (Exception e) {
-
                     }
-
                 });
 
                 return null;
@@ -2104,10 +2067,8 @@ public class SIPosting_MCController implements Initializable, ScreenInterface {
                 }
                 loading.progressIndicator.setVisible(false);
             }
-
         };
         new Thread(task).start(); // Run task in background
-
     }
 
     public void initDatePickers() {
@@ -2163,7 +2124,6 @@ public class SIPosting_MCController implements Initializable, ScreenInterface {
                     } else {
                         tfDebitAmt.requestFocus();
                     }
-
                 }
             }
         });
@@ -2209,7 +2169,6 @@ public class SIPosting_MCController implements Initializable, ScreenInterface {
     }
 
     private void initButton(int fnValue) {
-
         boolean lbShow1 = (fnValue == EditMode.UPDATE);
         boolean lbShow2 = (fnValue == EditMode.READY || fnValue == EditMode.UPDATE);
         boolean lbShow3 = (fnValue == EditMode.READY);
@@ -2247,7 +2206,6 @@ public class SIPosting_MCController implements Initializable, ScreenInterface {
             loadTableAttachment();
             loadRecordAttachment(true);
         });
-
     }
 
     public void initAttachmentsGrid() {
@@ -2294,7 +2252,6 @@ public class SIPosting_MCController implements Initializable, ScreenInterface {
     }
 
     public void initDetailsGrid() {
-
         JFXUtil.setColumnCenter(tblRowNoDetail, tblOrderQuantityDetail, tblReceiveQuantityDetail);
         JFXUtil.setColumnLeft(tblOrderNoDetail, tblBrandDetail, tblDescriptionDetail);
         JFXUtil.setColumnRight(tblCostDetail, tblTotalDetail);
@@ -2386,7 +2343,6 @@ public class SIPosting_MCController implements Initializable, ScreenInterface {
                     }
                     break;
             }
-
         }
     }
 

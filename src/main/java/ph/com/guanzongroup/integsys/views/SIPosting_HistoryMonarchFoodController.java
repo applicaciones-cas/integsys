@@ -278,6 +278,7 @@ public class SIPosting_HistoryMonarchFoodController implements Initializable, Sc
             }
         } catch (SQLException | GuanzonException | CloneNotSupportedException | ScriptException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -340,6 +341,7 @@ public class SIPosting_HistoryMonarchFoodController implements Initializable, Sc
             stageAttachment.showDialog((Stage) btnClose.getScene().getWindow(), getClass().getResource("/ph/com/guanzongroup/integsys/views/AttachmentDialog.fxml"), controller, "Attachment Dialog", false, false, true);
         } catch (IOException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -418,10 +420,9 @@ public class SIPosting_HistoryMonarchFoodController implements Initializable, Sc
                 }
                 initButton(pnEditMode);
             }
-        } catch (CloneNotSupportedException | SQLException | GuanzonException ex) {
+        } catch (SQLException | GuanzonException | CloneNotSupportedException | ScriptException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
-        } catch (ScriptException ex) {
-            Logger.getLogger(SIPosting_HistoryMonarchFoodController.class.getName()).log(Level.SEVERE, null, ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -513,7 +514,6 @@ public class SIPosting_HistoryMonarchFoodController implements Initializable, Sc
                                 populateJE();
                                 loadTableAttachment();
                                 initButton(pnEditMode);
-
                             }
                             loadRecordSearch();
                             return;
@@ -531,14 +531,9 @@ public class SIPosting_HistoryMonarchFoodController implements Initializable, Sc
                 case UP:
                     CommonUtils.SetPreviousFocus(txtField);
             }
-        } catch (GuanzonException ex) {
+        } catch (SQLException | GuanzonException | CloneNotSupportedException | ScriptException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
-        } catch (SQLException ex) {
-            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
-        } catch (CloneNotSupportedException ex) {
-            Logger.getLogger(SIPosting_HistoryMonarchFoodController.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (ScriptException ex) {
-            Logger.getLogger(SIPosting_HistoryMonarchFoodController.class.getName()).log(Level.SEVERE, null, ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -550,6 +545,7 @@ public class SIPosting_HistoryMonarchFoodController implements Initializable, Sc
             JFXUtil.updateCaretPositions(apBrowse);
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -613,7 +609,6 @@ public class SIPosting_HistoryMonarchFoodController implements Initializable, Sc
                                 // Optional: add some margin
                                 StackPane.setMargin(btnArrowLeft, new Insets(0, 0, 0, 10));
                                 StackPane.setMargin(btnArrowRight, new Insets(0, 10, 0, 0));
-
                             } else {
                                 // ----- PDF VIEW -----
                                 PDDocument document = PDDocument.load(new File(filePath2));
@@ -720,7 +715,6 @@ public class SIPosting_HistoryMonarchFoodController implements Initializable, Sc
                         } else {
                             imageView.setImage(null);
                         }
-
                     } catch (Exception e) {
                         imageView.setImage(null);
                     }
@@ -757,15 +751,13 @@ public class SIPosting_HistoryMonarchFoodController implements Initializable, Sc
             tfCreditAmt.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(pnJEDetail).getCreditAmount(), true));
             tfDebitAmt.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(pnJEDetail).getDebitAmount(), true));
             JFXUtil.updateCaretPositions(apJEDetail);
-        } catch (SQLException ex) {
+        } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
-        } catch (GuanzonException ex) {
-            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
     public void loadRecordDetail() {
-
         try {
             if (pnDetail < 0 || pnDetail > poPurchaseReceivingController.PurchaseOrderReceiving().getDetailCount() - 1) {
                 return;
@@ -800,12 +792,10 @@ public class SIPosting_HistoryMonarchFoodController implements Initializable, Sc
             cbVatable.setSelected(poPurchaseReceivingController.PurchaseOrderReceiving().Detail(pnDetail).isVatable());
 
             JFXUtil.updateCaretPositions(apDetail);
-        } catch (SQLException ex) {
+        } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
-        } catch (GuanzonException ex) {
-            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
-
     }
 
     public void loadRecordJEMaster() {
@@ -822,7 +812,6 @@ public class SIPosting_HistoryMonarchFoodController implements Initializable, Sc
 
             String lsStat = statusMap.getOrDefault(lsActive, "UNKNOWN");
             lblJEStatus.setText(lsStat);
-
         });
         if (poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Master().getTransactionNo() != null) {
             tfJETransactionNo.setText(poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Master().getTransactionNo());
@@ -841,12 +830,10 @@ public class SIPosting_HistoryMonarchFoodController implements Initializable, Sc
             tfTotalDebitAmt.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(lnTotalDebit, true));
             JFXUtil.updateCaretPositions(apJEMaster);
         }
-
     }
 
     public void loadRecordMaster() {
         try {
-
             Platform.runLater(() -> {
                 String lsActive = pnEditMode == EditMode.UNKNOWN ? "-1" : poPurchaseReceivingController.PurchaseOrderReceiving().Master().getTransactionStatus();
                 Map<String, String> statusMap = new HashMap<>();
@@ -910,8 +897,8 @@ public class SIPosting_HistoryMonarchFoodController implements Initializable, Sc
             JFXUtil.updateCaretPositions(apMaster);
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
-
     }
 
     private double getGrossTotal() {
@@ -999,12 +986,9 @@ public class SIPosting_HistoryMonarchFoodController implements Initializable, Sc
                             loadRecordJEDetail();
                         }
                         loadRecordJEMaster();
-                    } catch (SQLException ex) {
+                    } catch (SQLException | GuanzonException | CloneNotSupportedException ex) {
                         Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
-                    } catch (GuanzonException ex) {
-                        Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
-                    } catch (CloneNotSupportedException ex) {
-                        Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+                        ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
                     }
                 });
 
@@ -1019,7 +1003,6 @@ public class SIPosting_HistoryMonarchFoodController implements Initializable, Sc
                     tblViewJEDetails.toFront();
                 }
                 loading.progressIndicator.setVisible(false);
-
             }
 
             @Override
@@ -1029,7 +1012,6 @@ public class SIPosting_HistoryMonarchFoodController implements Initializable, Sc
                 }
                 loading.progressIndicator.setVisible(false);
             }
-
         };
         new Thread(task).start(); // Run task in background
     }
@@ -1055,7 +1037,6 @@ public class SIPosting_HistoryMonarchFoodController implements Initializable, Sc
                         double lnTotal = 0.00;
                         double lnDiscountAmt = 0.00;
                         for (lnCtr = 0; lnCtr < poPurchaseReceivingController.PurchaseOrderReceiving().getDetailCount(); lnCtr++) {
-
                             if (JFXUtil.isObjectEqualTo(poPurchaseReceivingController.PurchaseOrderReceiving().Master().getSalesInvoice(), null, "")) {
                                 poPurchaseReceivingController.PurchaseOrderReceiving().Detail(lnCtr).isVatable(false);
                                 JFXUtil.setDisabled(true, cbVatable);
@@ -1104,10 +1085,9 @@ public class SIPosting_HistoryMonarchFoodController implements Initializable, Sc
                             loadRecordDetail();
                         }
                         loadRecordMaster();
-                    } catch (SQLException ex) {
+                    } catch (SQLException | GuanzonException ex) {
                         Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
-                    } catch (GuanzonException ex) {
-                        Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+                        ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
                     }
                 });
 
@@ -1122,7 +1102,6 @@ public class SIPosting_HistoryMonarchFoodController implements Initializable, Sc
                     tblViewTransDetailList.toFront();
                 }
                 loading.progressIndicator.setVisible(false);
-
             }
 
             @Override
@@ -1132,10 +1111,8 @@ public class SIPosting_HistoryMonarchFoodController implements Initializable, Sc
                 }
                 loading.progressIndicator.setVisible(false);
             }
-
         };
         new Thread(task).start(); // Run task in background
-
     }
 
     private void loadTableAttachment() {
@@ -1186,9 +1163,7 @@ public class SIPosting_HistoryMonarchFoodController implements Initializable, Sc
                             loadRecordAttachment(false);
                         }
                     } catch (Exception e) {
-
                     }
-
                 });
 
                 return null;
@@ -1202,7 +1177,6 @@ public class SIPosting_HistoryMonarchFoodController implements Initializable, Sc
                     tblAttachments.toFront();
                 }
                 loading.progressIndicator.setVisible(false);
-
             }
 
             @Override
@@ -1212,10 +1186,8 @@ public class SIPosting_HistoryMonarchFoodController implements Initializable, Sc
                 }
                 loading.progressIndicator.setVisible(false);
             }
-
         };
         new Thread(task).start(); // Run task in background
-
     }
 
     public void initDatePickers() {
@@ -1291,7 +1263,6 @@ public class SIPosting_HistoryMonarchFoodController implements Initializable, Sc
         JFXUtil.setDisabled(true, apMaster, apDetail, apJEMaster, apJEDetail);
         // Manage visibility and managed state of other buttons
         JFXUtil.setButtonsVisibility(lbShow, btnHistory);
-
     }
 
     private void initAttachmentPreviewPane() {
@@ -1302,7 +1273,6 @@ public class SIPosting_HistoryMonarchFoodController implements Initializable, Sc
             loadTableAttachment();
             loadRecordAttachment(true);
         });
-
     }
 
     public void initAttachmentsGrid() {
@@ -1430,7 +1400,6 @@ public class SIPosting_HistoryMonarchFoodController implements Initializable, Sc
                     }
                     break;
             }
-
         }
     }
 
@@ -1446,5 +1415,4 @@ public class SIPosting_HistoryMonarchFoodController implements Initializable, Sc
             cbVatable.setSelected(false);
         });
     }
-
 }
