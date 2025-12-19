@@ -100,8 +100,6 @@ public class APPaymentAdjustment_ConfirmationLPController implements Initializab
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        
-
         poJSON = new JSONObject();
         poAPPaymentAdjustmentController = new CashflowControllers(oApp, null);
         poAPPaymentAdjustmentController.APPaymentAdjustment().initialize(); // Initialize transaction
@@ -144,7 +142,6 @@ public class APPaymentAdjustment_ConfirmationLPController implements Initializab
         //No Category
     }
 
-
     public void loadTableDetailFromMain() {
         try {
             poJSON = new JSONObject();
@@ -165,6 +162,7 @@ public class APPaymentAdjustment_ConfirmationLPController implements Initializab
             }
         } catch (CloneNotSupportedException | SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -258,23 +256,19 @@ public class APPaymentAdjustment_ConfirmationLPController implements Initializab
                             }
                             loadRecordMaster();
                             break;
-
                     }
                     break;
             }
-        } catch (ExceptionInInitializerError ex) {
+        } catch (ExceptionInInitializerError | SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
-        } catch (SQLException ex) {
-            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
-        } catch (GuanzonException ex) {
-            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
     public void loadRecordSearch() {
         try {
             poAPPaymentAdjustmentController.APPaymentAdjustment().getModel().setIndustryId(psIndustryId);
-            if(poAPPaymentAdjustmentController.APPaymentAdjustment().getModel().Industry().getDescription() != null && !"".equals(poAPPaymentAdjustmentController.APPaymentAdjustment().getModel().Industry().getDescription())){
+            if (poAPPaymentAdjustmentController.APPaymentAdjustment().getModel().Industry().getDescription() != null && !"".equals(poAPPaymentAdjustmentController.APPaymentAdjustment().getModel().Industry().getDescription())) {
                 lblSource.setText(poAPPaymentAdjustmentController.APPaymentAdjustment().getModel().Industry().getDescription());
             } else {
                 lblSource.setText("General");
@@ -284,6 +278,7 @@ public class APPaymentAdjustment_ConfirmationLPController implements Initializab
             JFXUtil.updateCaretPositions(apBrowse);
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
     final ChangeListener<? super Boolean> txtMaster_Focus = (o, ov, nv) -> {
@@ -404,12 +399,10 @@ public class APPaymentAdjustment_ConfirmationLPController implements Initializab
                         ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                     }
                     break;
-
             }
             if (!JFXUtil.isObjectEqualTo(lsTxtFieldID, "tfSearchSupplier", "tfSearchCompany", "tfSearchReferenceNo")) {
                 loadRecordMaster();
             }
-
         }
     };
     final ChangeListener<? super Boolean> txtArea_Focus = (o, ov, nv) -> {
@@ -475,7 +468,7 @@ public class APPaymentAdjustment_ConfirmationLPController implements Initializab
                                 || poAPPaymentAdjustmentController.APPaymentAdjustment().getEditMode() == EditMode.UPDATE) {
                             lsServerDate = sdfFormat.format(oApp.getServerDate());
                             lsTransDate = sdfFormat.format(poAPPaymentAdjustmentController.APPaymentAdjustment().getModel().getTransactionDate());
-                            lsSelectedDate = sdfFormat.format(SQLUtil.toDate(JFXUtil.convertToIsoFormat(inputText),  SQLUtil.FORMAT_SHORT_DATE));
+                            lsSelectedDate = sdfFormat.format(SQLUtil.toDate(JFXUtil.convertToIsoFormat(inputText), SQLUtil.FORMAT_SHORT_DATE));
                             currentDate = LocalDate.parse(lsServerDate, DateTimeFormatter.ofPattern(SQLUtil.FORMAT_SHORT_DATE));
                             selectedDate = LocalDate.parse(lsSelectedDate, DateTimeFormatter.ofPattern(SQLUtil.FORMAT_SHORT_DATE));
 
@@ -495,7 +488,7 @@ public class APPaymentAdjustment_ConfirmationLPController implements Initializab
                                         if (!"success".equals((String) poJSON.get("result"))) {
                                             pbSuccess = false;
                                         } else {
-                                            if(Integer.parseInt(poJSON.get("nUserLevl").toString())<= UserRight.ENCODER){
+                                            if (Integer.parseInt(poJSON.get("nUserLevl").toString()) <= UserRight.ENCODER) {
                                                 poJSON.put("result", "error");
                                                 poJSON.put("message", "User is not an authorized approving officer.");
                                                 pbSuccess = false;
@@ -512,7 +505,6 @@ public class APPaymentAdjustment_ConfirmationLPController implements Initializab
                             } else {
                                 if ("error".equals((String) poJSON.get("result"))) {
                                     ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-
                                 }
                             }
 
@@ -540,7 +532,7 @@ public class APPaymentAdjustment_ConfirmationLPController implements Initializab
     }
 
     public void initDatePickers() {
-        JFXUtil.setDatePickerFormat("MM/dd/yyyy",dpTransactionDate);
+        JFXUtil.setDatePickerFormat("MM/dd/yyyy", dpTransactionDate);
         JFXUtil.setActionListener(this::datepicker_Action, dpTransactionDate);
     }
 
@@ -587,10 +579,9 @@ public class APPaymentAdjustment_ConfirmationLPController implements Initializab
                                         String.valueOf(poAPPaymentAdjustmentController.APPaymentAdjustment().APPaymentAdjustmentList(lnCtr).getTransactionDate()),
                                         String.valueOf(poAPPaymentAdjustmentController.APPaymentAdjustment().APPaymentAdjustmentList(lnCtr).getTransactionNo())
                                 ));
-                            } catch (SQLException ex) {
+                            } catch (SQLException | GuanzonException ex) {
                                 Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
-                            } catch (GuanzonException ex) {
-                                Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+                                ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
                             }
 
                             if (poAPPaymentAdjustmentController.APPaymentAdjustment().APPaymentAdjustmentList(lnCtr).getTransactionStatus().equals(APPaymentAdjustmentStatus.CONFIRMED)) {
@@ -633,7 +624,6 @@ public class APPaymentAdjustment_ConfirmationLPController implements Initializab
                 }
                 loading.progressIndicator.setVisible(false);
             }
-
         };
         new Thread(task).start(); // Run task in background
     }
@@ -668,10 +658,9 @@ public class APPaymentAdjustment_ConfirmationLPController implements Initializab
 
             poAPPaymentAdjustmentController.APPaymentAdjustment().computeFields();
             JFXUtil.updateCaretPositions(apMaster);
-        } catch (SQLException ex) {
+        } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
-        } catch (GuanzonException ex) {
-            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -847,14 +836,9 @@ public class APPaymentAdjustment_ConfirmationLPController implements Initializab
                 }
                 initButton(pnEditMode);
             }
-        } catch (ParseException ex) {
+        } catch (ParseException | SQLException | GuanzonException | CloneNotSupportedException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
-        } catch (SQLException ex) {
-            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
-        } catch (GuanzonException ex) {
-            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
-        } catch (CloneNotSupportedException ex) {
-            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -870,7 +854,6 @@ public class APPaymentAdjustment_ConfirmationLPController implements Initializab
     }
 
     private void initButton(int fnValue) {
-
         boolean lbShow1 = (fnValue == EditMode.UPDATE);
 //        boolean lbShow2 = (fnValue == EditMode.READY || fnValue == EditMode.UPDATE);
         boolean lbShow3 = (fnValue == EditMode.READY);
@@ -906,5 +889,4 @@ public class APPaymentAdjustment_ConfirmationLPController implements Initializab
                 break;
         }
     }
-
 }

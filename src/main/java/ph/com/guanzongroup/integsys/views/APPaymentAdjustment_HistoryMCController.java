@@ -35,7 +35,6 @@ import ph.com.guanzongroup.integsys.utility.CustomCommonUtil;
 import ph.com.guanzongroup.integsys.utility.JFXUtil;
 
 public class APPaymentAdjustment_HistoryMCController implements Initializable, ScreenInterface {
-
     private GRiderCAS oApp;
     static CashflowControllers poAPPaymentAdjustmentController;
     private JSONObject poJSON;
@@ -65,7 +64,6 @@ public class APPaymentAdjustment_HistoryMCController implements Initializable, S
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        
         poJSON = new JSONObject();
         poAPPaymentAdjustmentController = new CashflowControllers(oApp, null);
         poAPPaymentAdjustmentController.APPaymentAdjustment().initialize(); // Initialize transaction
@@ -171,12 +169,9 @@ public class APPaymentAdjustment_HistoryMCController implements Initializable, S
                 case UP:
                     CommonUtils.SetPreviousFocus(txtField);
             }
-        } catch (GuanzonException ex) {
+        } catch (GuanzonException | SQLException | CloneNotSupportedException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
-        } catch (SQLException ex) {
-            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
-        } catch (CloneNotSupportedException ex) {
-            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -192,6 +187,7 @@ public class APPaymentAdjustment_HistoryMCController implements Initializable, S
             JFXUtil.updateCaretPositions(apBrowse);
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+                ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -268,12 +264,10 @@ public class APPaymentAdjustment_HistoryMCController implements Initializable, S
             tfDebitAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poAPPaymentAdjustmentController.APPaymentAdjustment().getModel().getDebitAmount().doubleValue(), true));
             tfReferenceNo.setText(poAPPaymentAdjustmentController.APPaymentAdjustment().getModel().getReferenceNo());
             tfCompany.setText(poAPPaymentAdjustmentController.APPaymentAdjustment().getModel().Company().getCompanyName());
-
-        } catch (SQLException ex) {
-            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
-        } catch (GuanzonException ex) {
-            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
-        }
+} catch (SQLException | GuanzonException ex) {
+Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+                ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
+}
     }
 
     @FXML
@@ -319,7 +313,6 @@ public class APPaymentAdjustment_HistoryMCController implements Initializable, S
                 initButton(pnEditMode);
             }
         } catch (Exception e) {
-
         }
     }
 
@@ -328,5 +321,4 @@ public class APPaymentAdjustment_HistoryMCController implements Initializable, S
         JFXUtil.setDisabled(true, apMaster);
         JFXUtil.setButtonsVisibility(true, btnClose);
     }
-
 }
