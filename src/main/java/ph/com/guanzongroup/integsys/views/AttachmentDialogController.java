@@ -303,8 +303,8 @@ public class AttachmentDialogController implements Initializable, ScreenInterfac
                                 delay.setOnFinished(event -> {
                                     Platform.runLater(() -> {
                                         JFXUtil.stackPaneClip(stackPane1);
-                                        scrollPane.setHvalue(0.5);
-                                        scrollPane.setVvalue(0.5);
+//                                        scrollPane.setHvalue(0.0);
+//                                        scrollPane.setVvalue(0.0);
                                     });
                                 });
                                 delay.play();
