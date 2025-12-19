@@ -111,7 +111,6 @@ public class PurchaseOrderReturn_HistoryLPController implements Initializable, S
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-
         poPurchaseReturnController = new PurchaseOrderReturnControllers(oApp, null);
         poJSON = new JSONObject();
         poJSON = poPurchaseReturnController.PurchaseOrderReturn().InitTransaction(); // Initialize transaction
@@ -137,7 +136,6 @@ public class PurchaseOrderReturn_HistoryLPController implements Initializable, S
             poPurchaseReturnController.PurchaseOrderReturn().setCategoryId(psCategoryId);
             poPurchaseReturnController.PurchaseOrderReturn().setWithUI(true);
             loadRecordSearch();
-
         });
     }
 
@@ -211,10 +209,10 @@ public class PurchaseOrderReturn_HistoryLPController implements Initializable, S
                     loadTableDetail();
                 }
                 initButton(pnEditMode);
-
             }
         } catch (CloneNotSupportedException | SQLException | GuanzonException ex) {
-            Logger.getLogger(PurchaseOrderReturn_HistoryLPController.class.getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -235,7 +233,6 @@ public class PurchaseOrderReturn_HistoryLPController implements Initializable, S
                         psSupplierId = "";
                     }
                     break;
-
             }
             if (lsTxtFieldID.equals("tfSearchSupplier") || lsTxtFieldID.equals("tfSearchReferenceNo")) {
                 loadRecordSearch();
@@ -279,7 +276,6 @@ public class PurchaseOrderReturn_HistoryLPController implements Initializable, S
                             }
                             loadRecordSearch();
                             return;
-
                     }
                     break;
                 default:
@@ -295,10 +291,9 @@ public class PurchaseOrderReturn_HistoryLPController implements Initializable, S
                 case UP:
                     CommonUtils.SetPreviousFocus(txtField);
             }
-        } catch (GuanzonException | SQLException ex) {
-            Logger.getLogger(PurchaseOrderReturn_HistoryLPController.class.getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
-        } catch (CloneNotSupportedException ex) {
-            Logger.getLogger(PurchaseOrderReturn_HistoryLPController.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (CloneNotSupportedException | SQLException | GuanzonException ex) {
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -308,20 +303,16 @@ public class PurchaseOrderReturn_HistoryLPController implements Initializable, S
         });
         JFXUtil.setFocusListener(txtField_Focus, tfSearchSupplier, tfSearchReferenceNo);
         JFXUtil.setKeyPressedListener(this::txtField_KeyPressed, apBrowse);
-        
         CustomCommonUtil.inputDecimalOnly(tfCost, tfReceiveQuantity, tfReturnQuantity);
-
     }
 
     public void initDatePickers() {
         JFXUtil.setDatePickerFormat("MM/dd/yyyy",
-dpTransactionDate);
-        
-
+                dpTransactionDate);
     }
 
     public void initDetailsGrid() {
-        JFXUtil.setColumnCenter(tblRowNoDetail, tblReceiveQuantityDetail,tblReturnQuantityDetail);
+        JFXUtil.setColumnCenter(tblRowNoDetail, tblReceiveQuantityDetail, tblReturnQuantityDetail);
         JFXUtil.setColumnLeft(tblBarcodeDetail, tblDescriptionDetail);
         JFXUtil.setColumnRight(tblCostDetail, tblTotalDetail);
         JFXUtil.setColumnsIndexAndDisableReordering(tblViewDetails);
@@ -334,7 +325,6 @@ dpTransactionDate);
     }
 
     public void clearTextFields() {
-
         dpTransactionDate.setValue(null);
 
         JFXUtil.clearTextFields(apMaster, apDetail);
@@ -360,9 +350,9 @@ dpTransactionDate);
             } catch (Exception e) {
                 tfSearchReferenceNo.setText("");
             }
-
         } catch (SQLException | GuanzonException ex) {
-            Logger.getLogger(PurchaseOrderReturn_ConfirmationController.class.getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -380,19 +370,18 @@ dpTransactionDate);
             tfMeasure.setText(poPurchaseReturnController.PurchaseOrderReturn().Detail(pnDetail).Inventory().Measure().getDescription());
 
             tfCost.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poPurchaseReturnController.PurchaseOrderReturn().Detail(pnDetail).getUnitPrce(), true));
-             tfReceiveQuantity.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poPurchaseReturnController.PurchaseOrderReturn().getReceiveQty(pnDetail)));
+            tfReceiveQuantity.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poPurchaseReturnController.PurchaseOrderReturn().getReceiveQty(pnDetail)));
             tfReturnQuantity.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poPurchaseReturnController.PurchaseOrderReturn().Detail(pnDetail).getQuantity()));
 
             JFXUtil.updateCaretPositions(apDetail);
         } catch (SQLException | GuanzonException ex) {
-            Logger.getLogger(PurchaseOrderReturn_HistoryLPController.class.getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
-
     }
 
     public void loadRecordMaster() {
         try {
-
             Platform.runLater(() -> {
                 boolean lbIsReprint = poPurchaseReturnController.PurchaseOrderReturn().Master().getPrint().equals("1") ? true : false;
                 if (lbIsReprint) {
@@ -400,7 +389,6 @@ dpTransactionDate);
                 } else {
                     btnPrint.setText("Print");
                 }
-                
                 boolean lbPrintStat = pnEditMode == EditMode.READY;
                 String lsActive = poPurchaseReturnController.PurchaseOrderReturn().Master().getTransactionStatus();
                 String lsStat = "UNKNOWN";
@@ -430,7 +418,6 @@ dpTransactionDate);
                     default:
                         lsStat = "UNKNOWN";
                         break;
-
                 }
                 lblStatus.setText(lsStat);
                 JFXUtil.setButtonsVisibility(lbPrintStat, btnPrint);
@@ -452,9 +439,9 @@ dpTransactionDate);
 
             JFXUtil.updateCaretPositions(apMaster);
         } catch (SQLException | GuanzonException ex) {
-            Logger.getLogger(PurchaseOrderReturn_HistoryLPController.class.getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
-
     }
 
     private void tableKeyEvents(KeyEvent event) {
@@ -528,7 +515,6 @@ dpTransactionDate);
                     int lnCtr;
                     details_data.clear();
                     try {
-
                         if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
                             lnCtr = poPurchaseReturnController.PurchaseOrderReturn().getDetailCount() - 1;
                             while (lnCtr >= 0) {
@@ -560,11 +546,11 @@ dpTransactionDate);
                                     new ModelPurchaseOrderReturn_Detail(String.valueOf(lnCtr + 1),
                                             String.valueOf(poPurchaseReturnController.PurchaseOrderReturn().Detail(lnCtr).Inventory().getBarCode()),
                                             String.valueOf(poPurchaseReturnController.PurchaseOrderReturn().Detail(lnCtr).Inventory().getDescription()),
-                                               String.valueOf(CustomCommonUtil.setIntegerValueToDecimalFormat(poPurchaseReturnController.PurchaseOrderReturn().Detail(lnCtr).getUnitPrce(), true)),
+                                            String.valueOf(CustomCommonUtil.setIntegerValueToDecimalFormat(poPurchaseReturnController.PurchaseOrderReturn().Detail(lnCtr).getUnitPrce(), true)),
                                             String.valueOf(CustomCommonUtil.setIntegerValueToDecimalFormat(poPurchaseReturnController.PurchaseOrderReturn().getReceiveQty(lnCtr))),
                                             String.valueOf(CustomCommonUtil.setIntegerValueToDecimalFormat(poPurchaseReturnController.PurchaseOrderReturn().Detail(lnCtr).getQuantity())),
                                             String.valueOf(CustomCommonUtil.setIntegerValueToDecimalFormat(lnTotal, true))) //identify total
-                                    );
+                            );
                         }
 
                         if (pnDetail < 0 || pnDetail
@@ -584,9 +570,9 @@ dpTransactionDate);
                         }
                         loadRecordMaster();
                     } catch (SQLException | GuanzonException | CloneNotSupportedException ex) {
-                        Logger.getLogger(PurchaseOrderReturn_HistoryLPController.class.getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+                        Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+                        ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
                     }
-
                 });
 
                 return null;
@@ -600,7 +586,6 @@ dpTransactionDate);
                     tblViewDetails.toFront();
                 }
                 progressIndicator.setVisible(false);
-
             }
 
             @Override
@@ -610,7 +595,6 @@ dpTransactionDate);
                 }
                 progressIndicator.setVisible(false);
             }
-
         };
         new Thread(task).start(); // Run task in background
     }

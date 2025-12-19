@@ -113,7 +113,6 @@ public class PurchaseOrderReturn_HistoryCarController implements Initializable, 
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-
         poPurchaseReturnController = new PurchaseOrderReturnControllers(oApp, null);
         poJSON = new JSONObject();
         poJSON = poPurchaseReturnController.PurchaseOrderReturn().InitTransaction(); // Initialize transaction
@@ -213,10 +212,10 @@ public class PurchaseOrderReturn_HistoryCarController implements Initializable, 
                 }
 
                 initButton(pnEditMode);
-
             }
         } catch (CloneNotSupportedException | SQLException | GuanzonException ex) {
-            Logger.getLogger(PurchaseOrderReturn_EntryController.class.getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -237,7 +236,6 @@ public class PurchaseOrderReturn_HistoryCarController implements Initializable, 
                         psSupplierId = "";
                     }
                     break;
-
             }
             if (lsTxtFieldID.equals("tfSearchSupplier") || lsTxtFieldID.equals("tfSearchReferenceNo")) {
                 loadRecordSearch();
@@ -281,7 +279,6 @@ public class PurchaseOrderReturn_HistoryCarController implements Initializable, 
                             }
                             loadRecordSearch();
                             return;
-
                     }
                     break;
                 default:
@@ -297,10 +294,9 @@ public class PurchaseOrderReturn_HistoryCarController implements Initializable, 
                 case UP:
                     CommonUtils.SetPreviousFocus(txtField);
             }
-        } catch (GuanzonException | SQLException ex) {
-            Logger.getLogger(PurchaseOrderReturn_EntryController.class.getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
-        } catch (CloneNotSupportedException ex) {
-            Logger.getLogger(PurchaseOrderReturn_HistoryCarController.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (CloneNotSupportedException | SQLException | GuanzonException ex) {
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -311,16 +307,13 @@ public class PurchaseOrderReturn_HistoryCarController implements Initializable, 
         JFXUtil.setFocusListener(txtField_Focus, tfSearchSupplier, tfSearchReferenceNo);
 
         JFXUtil.setKeyPressedListener(this::txtField_KeyPressed, apBrowse);
-        
         CustomCommonUtil.inputIntegersOnly(tfReceiveQuantity, tfReturnQuantity);
         CustomCommonUtil.inputDecimalOnly(tfCost);
-
     }
 
     public void initDatePickers() {
         JFXUtil.setDatePickerFormat("MM/dd/yyyy",
-dpTransactionDate);
-        
+                dpTransactionDate);
     }
 
     public void initDetailsGrid() {
@@ -362,9 +355,9 @@ dpTransactionDate);
             } catch (Exception e) {
                 tfSearchReferenceNo.setText("");
             }
-
         } catch (SQLException | GuanzonException ex) {
-            Logger.getLogger(DeliveryAcceptance_HistoryCarController.class.getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -385,19 +378,18 @@ dpTransactionDate);
             tfMeasure.setText(poPurchaseReturnController.PurchaseOrderReturn().Detail(pnDetail).Inventory().Measure().getDescription());
 
             tfCost.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poPurchaseReturnController.PurchaseOrderReturn().Detail(pnDetail).getUnitPrce(), true));
-             tfReceiveQuantity.setText(String.valueOf(poPurchaseReturnController.PurchaseOrderReturn().getReceiveQty(pnDetail).intValue()));
+            tfReceiveQuantity.setText(String.valueOf(poPurchaseReturnController.PurchaseOrderReturn().getReceiveQty(pnDetail).intValue()));
             tfReturnQuantity.setText(String.valueOf(poPurchaseReturnController.PurchaseOrderReturn().Detail(pnDetail).getQuantity().intValue()));
 
             JFXUtil.updateCaretPositions(apDetail);
         } catch (SQLException | GuanzonException ex) {
-            Logger.getLogger(PurchaseOrderReturn_EntryController.class.getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
-
     }
 
     public void loadRecordMaster() {
         try {
-
             Platform.runLater(() -> {
                 boolean lbIsReprint = poPurchaseReturnController.PurchaseOrderReturn().Master().getPrint().equals("1") ? true : false;
                 if (lbIsReprint) {
@@ -435,7 +427,6 @@ dpTransactionDate);
                     default:
                         lsStat = "UNKNOWN";
                         break;
-
                 }
                 lblStatus.setText(lsStat);
                 JFXUtil.setButtonsVisibility(lbPrintStat, btnPrint);
@@ -457,9 +448,9 @@ dpTransactionDate);
 
             JFXUtil.updateCaretPositions(apMaster);
         } catch (SQLException | GuanzonException ex) {
-            Logger.getLogger(PurchaseOrderReturn_EntryController.class.getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
-
     }
 
     private void tableKeyEvents(KeyEvent event) {
@@ -531,7 +522,6 @@ dpTransactionDate);
                     int lnCtr;
                     details_data.clear();
                     try {
-
                         if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
                             lnCtr = poPurchaseReturnController.PurchaseOrderReturn().getDetailCount() - 1;
                             while (lnCtr >= 0) {
@@ -572,11 +562,11 @@ dpTransactionDate);
                                             String.valueOf(poPurchaseReturnController.PurchaseOrderReturn().Detail(lnCtr).InventorySerial().getSerial02()),
                                             String.valueOf(lsCSPlateNo),
                                             String.valueOf(poPurchaseReturnController.PurchaseOrderReturn().Detail(lnCtr).Inventory().getDescription()),
-                                               String.valueOf(CustomCommonUtil.setIntegerValueToDecimalFormat(poPurchaseReturnController.PurchaseOrderReturn().Detail(lnCtr).getUnitPrce(), true)),
+                                            String.valueOf(CustomCommonUtil.setIntegerValueToDecimalFormat(poPurchaseReturnController.PurchaseOrderReturn().Detail(lnCtr).getUnitPrce(), true)),
                                             String.valueOf(poPurchaseReturnController.PurchaseOrderReturn().getReceiveQty(lnCtr).intValue()),
                                             String.valueOf(poPurchaseReturnController.PurchaseOrderReturn().Detail(lnCtr).getQuantity().intValue()),
                                             String.valueOf(CustomCommonUtil.setIntegerValueToDecimalFormat(lnTotal, true)))
-                                    );
+                            );
                         }
 
                         if (pnDetail < 0 || pnDetail
@@ -596,9 +586,9 @@ dpTransactionDate);
                         }
                         loadRecordMaster();
                     } catch (SQLException | GuanzonException | CloneNotSupportedException ex) {
-                        Logger.getLogger(PurchaseOrderReturn_EntryController.class.getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+                        Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+                        ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
                     }
-
                 });
 
                 return null;
@@ -612,7 +602,6 @@ dpTransactionDate);
                     tblViewDetails.toFront();
                 }
                 progressIndicator.setVisible(false);
-
             }
 
             @Override
@@ -622,7 +611,6 @@ dpTransactionDate);
                 }
                 progressIndicator.setVisible(false);
             }
-
         };
         new Thread(task).start(); // Run task in background
     }
@@ -641,5 +629,4 @@ dpTransactionDate);
                 break;
         }
     }
-
 }
