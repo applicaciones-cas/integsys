@@ -84,6 +84,7 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
+import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import org.guanzon.appdriver.constant.DocumentType;
@@ -211,7 +212,6 @@ public class SIPosting_HistoryMPController implements Initializable, ScreenInter
 
         pnEditMode = EditMode.UNKNOWN;
         initButton(pnEditMode);
-
     }
 
     @Override
@@ -269,6 +269,7 @@ public class SIPosting_HistoryMPController implements Initializable, ScreenInter
             }
         } catch (SQLException | GuanzonException | CloneNotSupportedException | ScriptException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -331,6 +332,7 @@ public class SIPosting_HistoryMPController implements Initializable, ScreenInter
             stageAttachment.showDialog((Stage) btnClose.getScene().getWindow(), getClass().getResource("/ph/com/guanzongroup/integsys/views/AttachmentDialog.fxml"), controller, "Attachment Dialog", false, false, true);
         } catch (IOException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -371,12 +373,9 @@ public class SIPosting_HistoryMPController implements Initializable, ScreenInter
                     }
                 });
             }
-        } catch (IOException ex) {
+        } catch (IOException | SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
-        } catch (SQLException ex) {
-            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
-        } catch (GuanzonException ex) {
-            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -473,17 +472,11 @@ public class SIPosting_HistoryMPController implements Initializable, ScreenInter
                     if (currentTab.getId().equals("tabJE")) {
                         populateJE();
                     }
-
                 }
                 initButton(pnEditMode);
-            } catch (CloneNotSupportedException ex) {
-                Logger.getLogger(SIPosting_HistoryMPController.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (SQLException ex) {
-                Logger.getLogger(SIPosting_HistoryMPController.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (GuanzonException ex) {
-                Logger.getLogger(SIPosting_HistoryMPController.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (ScriptException ex) {
-                Logger.getLogger(SIPosting_HistoryMPController.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (CloneNotSupportedException | SQLException | GuanzonException | ScriptException ex) {
+                Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+                ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
             }
         }
     }
@@ -618,15 +611,9 @@ public class SIPosting_HistoryMPController implements Initializable, ScreenInter
                 default:
                     break;
             }
-
-        } catch (GuanzonException ex) {
+        } catch (GuanzonException | SQLException | CloneNotSupportedException | ScriptException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
-        } catch (SQLException ex) {
-            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
-        } catch (CloneNotSupportedException ex) {
-            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
-        } catch (ScriptException ex) {
-            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -638,6 +625,7 @@ public class SIPosting_HistoryMPController implements Initializable, ScreenInter
             JFXUtil.updateCaretPositions(apBrowse);
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -662,7 +650,7 @@ public class SIPosting_HistoryMPController implements Initializable, ScreenInter
                             filePath2 = imageinfo_temp.get((String) attachment_data.get(tblAttachments.getSelectionModel().getSelectedIndex()).getIndex02());
                         } else {
                             // in server
-                            if(poPurchaseReceivingController.PurchaseOrderReceiving().TransactionAttachmentList(pnAttachment).getModel().getImagePath() != null && !"".equals(poPurchaseReceivingController.PurchaseOrderReceiving().TransactionAttachmentList(pnAttachment).getModel().getImagePath())){
+                            if (poPurchaseReceivingController.PurchaseOrderReceiving().TransactionAttachmentList(pnAttachment).getModel().getImagePath() != null && !"".equals(poPurchaseReceivingController.PurchaseOrderReceiving().TransactionAttachmentList(pnAttachment).getModel().getImagePath())) {
                                 filePath2 = poPurchaseReceivingController.PurchaseOrderReceiving().TransactionAttachmentList(pnAttachment).getModel().getImagePath() + "/" + (String) attachment_data.get(tblAttachments.getSelectionModel().getSelectedIndex()).getIndex02();
                             } else {
                                 filePath2 = System.getProperty("sys.default.path.temp.attachments") + "/" + (String) attachment_data.get(tblAttachments.getSelectionModel().getSelectedIndex()).getIndex02();
@@ -701,7 +689,6 @@ public class SIPosting_HistoryMPController implements Initializable, ScreenInter
                                 // Optional: add some margin
                                 StackPane.setMargin(btnArrowLeft, new Insets(0, 0, 0, 10));
                                 StackPane.setMargin(btnArrowRight, new Insets(0, 10, 0, 0));
-
                             } else {
                                 // ----- PDF VIEW -----
                                 PDDocument document = PDDocument.load(new File(filePath2));
@@ -756,47 +743,49 @@ public class SIPosting_HistoryMPController implements Initializable, ScreenInter
 
                                 // ----- ZOOM & PAN -----
                                 final DoubleProperty zoomFactor = new SimpleDoubleProperty(1.0);
-
-                                // Zoom centered on mouse
-                                scrollPane.setOnScroll(event -> {
+                                scrollPane.addEventFilter(ScrollEvent.SCROLL, event -> {
                                     if (event.isControlDown()) {
-                                        double oldZoom = zoomFactor.get();
-                                        double delta = event.getDeltaY() > 0 ? 0.1 : -0.1;
-                                        zoomFactor.set(Math.max(0.1, oldZoom + delta));
+                                        event.consume(); // stop default scroll behavior
 
+                                        double delta = event.getDeltaY() > 0 ? 1.1 : 0.9; // multiplier for smooth zoom in/out
+                                        double oldZoom = zoomFactor.get();
+                                        zoomFactor.set(oldZoom * delta); // scale by multiplier
+
+                                        // Apply scale
+                                        pdfGroup.setScaleX(zoomFactor.get());
+                                        pdfGroup.setScaleY(zoomFactor.get());
+
+                                        // Keep mouse position centered during zoom
                                         Bounds viewportBounds = scrollPane.getViewportBounds();
-                                        Bounds contentBounds = pdfGroup.getLayoutBounds();
+                                        Bounds contentBounds = pdfGroup.getBoundsInParent();
                                         double mouseX = event.getX();
                                         double mouseY = event.getY();
 
                                         double hRatio = (scrollPane.getHvalue() * (contentBounds.getWidth() - viewportBounds.getWidth()) + mouseX) / contentBounds.getWidth();
                                         double vRatio = (scrollPane.getVvalue() * (contentBounds.getHeight() - viewportBounds.getHeight()) + mouseY) / contentBounds.getHeight();
 
-                                        pdfContainer.setScaleX(zoomFactor.get());
-                                        pdfContainer.setScaleY(zoomFactor.get());
-
                                         Platform.runLater(() -> {
-                                            Bounds newBounds = pdfGroup.getLayoutBounds();
+                                            Bounds newBounds = pdfGroup.getBoundsInParent();
                                             double newH = (hRatio * newBounds.getWidth() - mouseX) / (newBounds.getWidth() - viewportBounds.getWidth());
                                             double newV = (vRatio * newBounds.getHeight() - mouseY) / (newBounds.getHeight() - viewportBounds.getHeight());
+
                                             scrollPane.setHvalue(Double.isNaN(newH) ? 0.5 : Math.min(Math.max(0, newH), 1.0));
                                             scrollPane.setVvalue(Double.isNaN(newV) ? 0.5 : Math.min(Math.max(0, newV), 1.0));
                                         });
-
-                                        event.consume();
                                     }
                                 });
 
                                 // Pan with mouse drag
                                 final ObjectProperty<Point2D> lastMouse = new SimpleObjectProperty<>();
                                 pdfGroup.setOnMousePressed(e -> lastMouse.set(new Point2D(e.getSceneX(), e.getSceneY())));
+
                                 pdfGroup.setOnMouseDragged(e -> {
                                     if (lastMouse.get() != null) {
-                                        double deltaX = lastMouse.get().getX() - e.getSceneX();
-                                        double deltaY = lastMouse.get().getY() - e.getSceneY();
+                                        double deltaX = e.getSceneX() - lastMouse.get().getX();
+                                        double deltaY = e.getSceneY() - lastMouse.get().getY();
 
-                                        scrollPane.setHvalue(Math.min(Math.max(0, scrollPane.getHvalue() + deltaX / pdfGroup.getLayoutBounds().getWidth()), 1.0));
-                                        scrollPane.setVvalue(Math.min(Math.max(0, scrollPane.getVvalue() + deltaY / pdfGroup.getLayoutBounds().getHeight()), 1.0));
+                                        pdfGroup.setTranslateX(pdfGroup.getTranslateX() + deltaX);
+                                        pdfGroup.setTranslateY(pdfGroup.getTranslateY() + deltaY);
 
                                         lastMouse.set(new Point2D(e.getSceneX(), e.getSceneY()));
                                     }
@@ -806,7 +795,6 @@ public class SIPosting_HistoryMPController implements Initializable, ScreenInter
                         } else {
                             imageView.setImage(null);
                         }
-
                     } catch (Exception e) {
                         imageView.setImage(null);
                     }
@@ -843,15 +831,13 @@ public class SIPosting_HistoryMPController implements Initializable, ScreenInter
             tfCreditAmt.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(pnJEDetail).getCreditAmount(), true));
             tfDebitAmt.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(pnJEDetail).getDebitAmount(), true));
             JFXUtil.updateCaretPositions(apJEDetail);
-        } catch (SQLException ex) {
+        } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
-        } catch (GuanzonException ex) {
-            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
     public void loadRecordDetail() {
-
         try {
             if (pnDetail < 0 || pnDetail > poPurchaseReceivingController.PurchaseOrderReceiving().getDetailCount() - 1) {
                 return;
@@ -878,12 +864,10 @@ public class SIPosting_HistoryMPController implements Initializable, ScreenInter
             cbVatable.setSelected(poPurchaseReceivingController.PurchaseOrderReceiving().Detail(pnDetail).isVatable());
 
             JFXUtil.updateCaretPositions(apDetail);
-        } catch (SQLException ex) {
+        } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
-        } catch (GuanzonException ex) {
-            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
-
     }
 
     public void loadRecordJEMaster() {
@@ -919,7 +903,6 @@ public class SIPosting_HistoryMPController implements Initializable, ScreenInter
             tfTotalDebitAmt.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(lnTotalDebit, true));
             JFXUtil.updateCaretPositions(apJEMaster);
         }
-
     }
 
     public void loadRecordMaster() {
@@ -976,7 +959,6 @@ public class SIPosting_HistoryMPController implements Initializable, ScreenInter
                 tfDiscountRate.setText(String.format("%.2f", Double.isNaN(lnValue) ? 0.00 : lnValue));
                 double lnVat = poPurchaseReceivingController.PurchaseOrderReceiving().Master().getVatRate().doubleValue();
                 tfVatRate.setText(String.format("%.2f", Double.isNaN(lnVat) ? 0.00 : lnVat));
-
             });
             tfDiscountAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poPurchaseReceivingController.PurchaseOrderReceiving().Master().getDiscount().doubleValue(), true));
             tfFreightAmt.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poPurchaseReceivingController.PurchaseOrderReceiving().Master().getFreight().doubleValue()));
@@ -992,8 +974,8 @@ public class SIPosting_HistoryMPController implements Initializable, ScreenInter
             JFXUtil.updateCaretPositions(apMaster);
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
-
     }
 
     private double getGrossTotal() {
@@ -1022,11 +1004,9 @@ public class SIPosting_HistoryMPController implements Initializable, ScreenInter
                     JEdetails_data.clear();
                     int lnCtr;
                     try {
-
                         if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
                             lnCtr = poPurchaseReceivingController.PurchaseOrderReceiving().Journal().getDetailCount() - 1;
                             while (lnCtr >= 0) {
-
                                 if (JFXUtil.isObjectEqualTo(poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(lnCtr).getAccountCode(), null, "")) {
                                     poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail().remove(lnCtr);
                                 }
@@ -1084,12 +1064,9 @@ public class SIPosting_HistoryMPController implements Initializable, ScreenInter
                             loadRecordJEDetail();
                         }
                         loadRecordJEMaster();
-                    } catch (SQLException ex) {
+                    } catch (SQLException | GuanzonException | CloneNotSupportedException ex) {
                         Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
-                    } catch (GuanzonException ex) {
-                        Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
-                    } catch (CloneNotSupportedException ex) {
-                        Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+                        ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
                     }
                 });
 
@@ -1104,7 +1081,6 @@ public class SIPosting_HistoryMPController implements Initializable, ScreenInter
                     tblViewJEDetails.toFront();
                 }
                 loading.progressIndicator.setVisible(false);
-
             }
 
             @Override
@@ -1114,7 +1090,6 @@ public class SIPosting_HistoryMPController implements Initializable, ScreenInter
                 }
                 loading.progressIndicator.setVisible(false);
             }
-
         };
         new Thread(task).start(); // Run task in background
     }
@@ -1140,7 +1115,6 @@ public class SIPosting_HistoryMPController implements Initializable, ScreenInter
                         double lnTotal = 0.00;
                         double lnDiscountAmt = 0.00;
                         for (lnCtr = 0; lnCtr < poPurchaseReceivingController.PurchaseOrderReceiving().getDetailCount(); lnCtr++) {
-
                             if (JFXUtil.isObjectEqualTo(poPurchaseReceivingController.PurchaseOrderReceiving().Master().getSalesInvoice(), null, "")) {
                                 poPurchaseReceivingController.PurchaseOrderReceiving().Detail(lnCtr).isVatable(false);
                                 JFXUtil.setDisabled(true, cbVatable);
@@ -1189,10 +1163,9 @@ public class SIPosting_HistoryMPController implements Initializable, ScreenInter
                             loadRecordDetail();
                         }
                         loadRecordMaster();
-                    } catch (SQLException ex) {
+                    } catch (SQLException | GuanzonException ex) {
                         Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
-                    } catch (GuanzonException ex) {
-                        Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+                        ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
                     }
                 });
 
@@ -1207,7 +1180,6 @@ public class SIPosting_HistoryMPController implements Initializable, ScreenInter
                     tblViewTransDetailList.toFront();
                 }
                 loading.progressIndicator.setVisible(false);
-
             }
 
             @Override
@@ -1217,10 +1189,8 @@ public class SIPosting_HistoryMPController implements Initializable, ScreenInter
                 }
                 loading.progressIndicator.setVisible(false);
             }
-
         };
         new Thread(task).start(); // Run task in background
-
     }
 
     private void loadTableAttachment() {
@@ -1271,9 +1241,7 @@ public class SIPosting_HistoryMPController implements Initializable, ScreenInter
                             loadRecordAttachment(false);
                         }
                     } catch (Exception e) {
-
                     }
-
                 });
 
                 return null;
@@ -1296,10 +1264,8 @@ public class SIPosting_HistoryMPController implements Initializable, ScreenInter
                 }
                 loading.progressIndicator.setVisible(false);
             }
-
         };
         new Thread(task).start(); // Run task in background
-
     }
 
     public void initDatePickers() {
@@ -1348,7 +1314,6 @@ public class SIPosting_HistoryMPController implements Initializable, ScreenInter
                     } else {
                         tfDebitAmt.requestFocus();
                     }
-
                 }
             }
         });
@@ -1383,7 +1348,6 @@ public class SIPosting_HistoryMPController implements Initializable, ScreenInter
     }
 
     private void initButton(int fnValue) {
-
         boolean lbShow3 = (fnValue == EditMode.READY);
         boolean lbShow4 = (fnValue == EditMode.UNKNOWN || fnValue == EditMode.READY);
         // Manage visibility and managed state of other buttons
@@ -1402,7 +1366,6 @@ public class SIPosting_HistoryMPController implements Initializable, ScreenInter
             loadTableAttachment();
             loadRecordAttachment(true);
         });
-
     }
 
     public void initAttachmentsGrid() {
@@ -1449,7 +1412,6 @@ public class SIPosting_HistoryMPController implements Initializable, ScreenInter
     }
 
     public void initDetailsGrid() {
-
         JFXUtil.setColumnCenter(tblRowNoDetail, tblOrderQuantityDetail, tblReceiveQuantityDetail);
         JFXUtil.setColumnLeft(tblOrderNoDetail, tblBrandDetail, tblDescriptionDetail);
         JFXUtil.setColumnRight(tblCostDetail, tblTotalDetail);
@@ -1532,7 +1494,6 @@ public class SIPosting_HistoryMPController implements Initializable, ScreenInter
                     }
                     break;
             }
-
         }
     }
 

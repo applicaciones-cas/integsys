@@ -164,6 +164,7 @@ public class APPaymentAdjustment_ConfirmationController implements Initializable
             }
         } catch (CloneNotSupportedException | SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -257,16 +258,12 @@ public class APPaymentAdjustment_ConfirmationController implements Initializable
                             }
                             loadRecordMaster();
                             break;
-
                     }
                     break;
             }
-        } catch (ExceptionInInitializerError ex) {
+        } catch (ExceptionInInitializerError | SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
-        } catch (SQLException ex) {
-            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
-        } catch (GuanzonException ex) {
-            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -283,6 +280,7 @@ public class APPaymentAdjustment_ConfirmationController implements Initializable
             JFXUtil.updateCaretPositions(apBrowse);
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
     final ChangeListener<? super Boolean> txtMaster_Focus = (o, ov, nv) -> {
@@ -403,12 +401,10 @@ public class APPaymentAdjustment_ConfirmationController implements Initializable
                         ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                     }
                     break;
-
             }
             if (!JFXUtil.isObjectEqualTo(lsTxtFieldID, "tfSearchSupplier", "tfSearchCompany", "tfSearchReferenceNo")) {
                 loadRecordMaster();
             }
-
         }
     };
     final ChangeListener<? super Boolean> txtArea_Focus = (o, ov, nv) -> {
@@ -511,7 +507,6 @@ public class APPaymentAdjustment_ConfirmationController implements Initializable
                             } else {
                                 if ("error".equals((String) poJSON.get("result"))) {
                                     ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-
                                 }
                             }
 
@@ -586,10 +581,9 @@ public class APPaymentAdjustment_ConfirmationController implements Initializable
                                         String.valueOf(poAPPaymentAdjustmentController.APPaymentAdjustment().APPaymentAdjustmentList(lnCtr).getTransactionDate()),
                                         String.valueOf(poAPPaymentAdjustmentController.APPaymentAdjustment().APPaymentAdjustmentList(lnCtr).getTransactionNo())
                                 ));
-                            } catch (SQLException ex) {
+                            } catch (SQLException | GuanzonException ex) {
                                 Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
-                            } catch (GuanzonException ex) {
-                                Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+                                ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
                             }
 
                             if (poAPPaymentAdjustmentController.APPaymentAdjustment().APPaymentAdjustmentList(lnCtr).getTransactionStatus().equals(APPaymentAdjustmentStatus.CONFIRMED)) {
@@ -632,7 +626,6 @@ public class APPaymentAdjustment_ConfirmationController implements Initializable
                 }
                 loading.progressIndicator.setVisible(false);
             }
-
         };
         new Thread(task).start(); // Run task in background
     }
@@ -667,10 +660,9 @@ public class APPaymentAdjustment_ConfirmationController implements Initializable
 
             poAPPaymentAdjustmentController.APPaymentAdjustment().computeFields();
             JFXUtil.updateCaretPositions(apMaster);
-        } catch (SQLException ex) {
+        } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
-        } catch (GuanzonException ex) {
-            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -846,14 +838,9 @@ public class APPaymentAdjustment_ConfirmationController implements Initializable
                 }
                 initButton(pnEditMode);
             }
-        } catch (ParseException ex) {
+        } catch (ParseException | SQLException | GuanzonException | CloneNotSupportedException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
-        } catch (SQLException ex) {
-            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
-        } catch (GuanzonException ex) {
-            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
-        } catch (CloneNotSupportedException ex) {
-            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -869,7 +856,6 @@ public class APPaymentAdjustment_ConfirmationController implements Initializable
     }
 
     private void initButton(int fnValue) {
-
         boolean lbShow1 = (fnValue == EditMode.UPDATE);
 //        boolean lbShow2 = (fnValue == EditMode.READY || fnValue == EditMode.UPDATE);
         boolean lbShow3 = (fnValue == EditMode.READY);
@@ -905,5 +891,4 @@ public class APPaymentAdjustment_ConfirmationController implements Initializable
                 break;
         }
     }
-
 }

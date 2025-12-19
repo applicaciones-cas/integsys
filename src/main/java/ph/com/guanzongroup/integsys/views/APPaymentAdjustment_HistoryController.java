@@ -171,12 +171,9 @@ public class APPaymentAdjustment_HistoryController implements Initializable, Scr
                 case UP:
                     CommonUtils.SetPreviousFocus(txtField);
             }
-        } catch (GuanzonException ex) {
+        } catch (GuanzonException | SQLException | CloneNotSupportedException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
-        } catch (SQLException ex) {
-            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
-        } catch (CloneNotSupportedException ex) {
-            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -192,6 +189,7 @@ public class APPaymentAdjustment_HistoryController implements Initializable, Scr
             JFXUtil.updateCaretPositions(apBrowse);
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -268,11 +266,9 @@ public class APPaymentAdjustment_HistoryController implements Initializable, Scr
             tfDebitAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poAPPaymentAdjustmentController.APPaymentAdjustment().getModel().getDebitAmount().doubleValue(), true));
             tfReferenceNo.setText(poAPPaymentAdjustmentController.APPaymentAdjustment().getModel().getReferenceNo());
             tfCompany.setText(poAPPaymentAdjustmentController.APPaymentAdjustment().getModel().Company().getCompanyName());
-
-        } catch (SQLException ex) {
+        } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
-        } catch (GuanzonException ex) {
-            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -319,7 +315,6 @@ public class APPaymentAdjustment_HistoryController implements Initializable, Scr
                 initButton(pnEditMode);
             }
         } catch (Exception e) {
-
         }
     }
 
@@ -328,5 +323,4 @@ public class APPaymentAdjustment_HistoryController implements Initializable, Scr
         JFXUtil.setDisabled(true, apMaster);
         JFXUtil.setButtonsVisibility(true, btnClose);
     }
-
 }

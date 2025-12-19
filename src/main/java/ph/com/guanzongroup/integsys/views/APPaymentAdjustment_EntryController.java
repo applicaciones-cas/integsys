@@ -166,16 +166,12 @@ public class APPaymentAdjustment_EntryController implements Initializable, Scree
                             }
                             loadRecordMaster();
                             break;
-
                     }
                     break;
             }
-        } catch (ExceptionInInitializerError ex) {
+        } catch (ExceptionInInitializerError | SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
-        } catch (SQLException ex) {
-            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
-        } catch (GuanzonException ex) {
-            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
     final ChangeListener<? super Boolean> txtMaster_Focus = (o, ov, nv) -> {
@@ -385,7 +381,6 @@ public class APPaymentAdjustment_EntryController implements Initializable, Scree
                             } else {
                                 if ("error".equals((String) poJSON.get("result"))) {
                                     ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-
                                 }
                             }
 
@@ -394,7 +389,6 @@ public class APPaymentAdjustment_EntryController implements Initializable, Scree
                             pbSuccess = true; //Set to original value
                         }
                         break;
-
                 }
             }
         } catch (Exception e) {
@@ -430,7 +424,8 @@ public class APPaymentAdjustment_EntryController implements Initializable, Scree
                 lblSource.setText("General");
             }
         } catch (SQLException | GuanzonException ex) {
-            Logger.getLogger(DeliveryAcceptance_EntryCarController.class.getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -465,10 +460,9 @@ public class APPaymentAdjustment_EntryController implements Initializable, Scree
 
             poAPPaymentAdjustmentController.APPaymentAdjustment().computeFields();
             JFXUtil.updateCaretPositions(apMaster);
-        } catch (SQLException ex) {
+        } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
-        } catch (GuanzonException ex) {
-            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -593,14 +587,9 @@ public class APPaymentAdjustment_EntryController implements Initializable, Scree
 
                 loadRecordMaster();
                 initButton(pnEditMode);
-            } catch (CloneNotSupportedException ex) {
+            } catch (CloneNotSupportedException | SQLException | GuanzonException | ParseException ex) {
                 Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
-            } catch (SQLException ex) {
-                Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
-            } catch (GuanzonException ex) {
-                Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
-            } catch (ParseException ex) {
-                Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+                ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
             }
         }
     }
@@ -630,5 +619,4 @@ public class APPaymentAdjustment_EntryController implements Initializable, Scree
                 break;
         }
     }
-
 }

@@ -80,10 +80,12 @@ import javafx.geometry.Point2D;
 import javafx.geometry.Pos;
 import javafx.scene.Group;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.VBox;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.rendering.PDFRenderer;
 import org.guanzon.appdriver.constant.RecordStatus;
+
 /**
  * FXML Controller class
  *
@@ -276,7 +278,7 @@ public class POReplacement_HistoryMCController implements Initializable, ScreenI
                 }
             } catch (CloneNotSupportedException | SQLException | GuanzonException ex) {
                 Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
-            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
+                ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
             }
         }
     }
@@ -346,7 +348,7 @@ public class POReplacement_HistoryMCController implements Initializable, ScreenI
 
             } catch (IOException ex) {
                 Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
-            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
+                ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
             }
 
         } catch (SQLException | GuanzonException ex) {
@@ -461,7 +463,7 @@ public class POReplacement_HistoryMCController implements Initializable, ScreenI
                             filePath2 = imageinfo_temp.get((String) attachment_data.get(tblAttachments.getSelectionModel().getSelectedIndex()).getIndex02());
                         } else {
                             // in server
-                            if(poController.PurchaseOrderReceiving().TransactionAttachmentList(pnAttachment).getModel().getImagePath() != null && !"".equals(poController.PurchaseOrderReceiving().TransactionAttachmentList(pnAttachment).getModel().getImagePath())){
+                            if (poController.PurchaseOrderReceiving().TransactionAttachmentList(pnAttachment).getModel().getImagePath() != null && !"".equals(poController.PurchaseOrderReceiving().TransactionAttachmentList(pnAttachment).getModel().getImagePath())) {
                                 filePath2 = poController.PurchaseOrderReceiving().TransactionAttachmentList(pnAttachment).getModel().getImagePath() + "/" + (String) attachment_data.get(tblAttachments.getSelectionModel().getSelectedIndex()).getIndex02();
                             } else {
                                 filePath2 = System.getProperty("sys.default.path.temp.attachments") + "/" + (String) attachment_data.get(tblAttachments.getSelectionModel().getSelectedIndex()).getIndex02();
@@ -555,47 +557,49 @@ public class POReplacement_HistoryMCController implements Initializable, ScreenI
 
                                 // ----- ZOOM & PAN -----
                                 final DoubleProperty zoomFactor = new SimpleDoubleProperty(1.0);
-
-                                // Zoom centered on mouse
-                                scrollPane.setOnScroll(event -> {
+                                scrollPane.addEventFilter(ScrollEvent.SCROLL, event -> {
                                     if (event.isControlDown()) {
-                                        double oldZoom = zoomFactor.get();
-                                        double delta = event.getDeltaY() > 0 ? 0.1 : -0.1;
-                                        zoomFactor.set(Math.max(0.1, oldZoom + delta));
+                                        event.consume(); // stop default scroll behavior
 
+                                        double delta = event.getDeltaY() > 0 ? 1.1 : 0.9; // multiplier for smooth zoom in/out
+                                        double oldZoom = zoomFactor.get();
+                                        zoomFactor.set(oldZoom * delta); // scale by multiplier
+
+                                        // Apply scale
+                                        pdfGroup.setScaleX(zoomFactor.get());
+                                        pdfGroup.setScaleY(zoomFactor.get());
+
+                                        // Keep mouse position centered during zoom
                                         Bounds viewportBounds = scrollPane.getViewportBounds();
-                                        Bounds contentBounds = pdfGroup.getLayoutBounds();
+                                        Bounds contentBounds = pdfGroup.getBoundsInParent();
                                         double mouseX = event.getX();
                                         double mouseY = event.getY();
 
                                         double hRatio = (scrollPane.getHvalue() * (contentBounds.getWidth() - viewportBounds.getWidth()) + mouseX) / contentBounds.getWidth();
                                         double vRatio = (scrollPane.getVvalue() * (contentBounds.getHeight() - viewportBounds.getHeight()) + mouseY) / contentBounds.getHeight();
 
-                                        pdfContainer.setScaleX(zoomFactor.get());
-                                        pdfContainer.setScaleY(zoomFactor.get());
-
                                         Platform.runLater(() -> {
-                                            Bounds newBounds = pdfGroup.getLayoutBounds();
+                                            Bounds newBounds = pdfGroup.getBoundsInParent();
                                             double newH = (hRatio * newBounds.getWidth() - mouseX) / (newBounds.getWidth() - viewportBounds.getWidth());
                                             double newV = (vRatio * newBounds.getHeight() - mouseY) / (newBounds.getHeight() - viewportBounds.getHeight());
+
                                             scrollPane.setHvalue(Double.isNaN(newH) ? 0.5 : Math.min(Math.max(0, newH), 1.0));
                                             scrollPane.setVvalue(Double.isNaN(newV) ? 0.5 : Math.min(Math.max(0, newV), 1.0));
                                         });
-
-                                        event.consume();
                                     }
                                 });
 
                                 // Pan with mouse drag
                                 final ObjectProperty<Point2D> lastMouse = new SimpleObjectProperty<>();
                                 pdfGroup.setOnMousePressed(e -> lastMouse.set(new Point2D(e.getSceneX(), e.getSceneY())));
+
                                 pdfGroup.setOnMouseDragged(e -> {
                                     if (lastMouse.get() != null) {
-                                        double deltaX = lastMouse.get().getX() - e.getSceneX();
-                                        double deltaY = lastMouse.get().getY() - e.getSceneY();
+                                        double deltaX = e.getSceneX() - lastMouse.get().getX();
+                                        double deltaY = e.getSceneY() - lastMouse.get().getY();
 
-                                        scrollPane.setHvalue(Math.min(Math.max(0, scrollPane.getHvalue() + deltaX / pdfGroup.getLayoutBounds().getWidth()), 1.0));
-                                        scrollPane.setVvalue(Math.min(Math.max(0, scrollPane.getVvalue() + deltaY / pdfGroup.getLayoutBounds().getHeight()), 1.0));
+                                        pdfGroup.setTranslateX(pdfGroup.getTranslateX() + deltaX);
+                                        pdfGroup.setTranslateY(pdfGroup.getTranslateY() + deltaY);
 
                                         lastMouse.set(new Point2D(e.getSceneX(), e.getSceneY()));
                                     }
@@ -891,7 +895,7 @@ public class POReplacement_HistoryMCController implements Initializable, ScreenI
                             loadRecordMaster();
                         } catch (SQLException | GuanzonException | CloneNotSupportedException ex) {
                             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
-            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
+                            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
                         }
                     });
                 });

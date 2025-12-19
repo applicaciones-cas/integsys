@@ -81,6 +81,7 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
+import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import org.guanzon.appdriver.constant.DocumentType;
@@ -300,7 +301,6 @@ public class POQuotation_ApprovalController implements Initializable, ScreenInte
             lnCount += 1;
             data.put(String.valueOf(lnCount), new Pair<>(String.valueOf(poController.POQuotation().TransactionAttachmentList(lnCtr).getModel().getFileName()),
                     poController.POQuotation().TransactionAttachmentList(lnCtr).getModel().getDocumentType()));
-
         }
         AttachmentDialogController controller = new AttachmentDialogController();
         controller.setOpenedImage(pnAttachment);
@@ -310,8 +310,8 @@ public class POQuotation_ApprovalController implements Initializable, ScreenInte
             stageAttachment.showDialog((Stage) btnClose.getScene().getWindow(), getClass().getResource("/ph/com/guanzongroup/integsys/views/AttachmentDialog.fxml"), controller, "Attachment Dialog", false, false, true);
         } catch (IOException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
-
     }
 
     @FXML
@@ -449,6 +449,7 @@ public class POQuotation_ApprovalController implements Initializable, ScreenInte
             }
         } catch (CloneNotSupportedException | SQLException | GuanzonException | ParseException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -513,7 +514,6 @@ public class POQuotation_ApprovalController implements Initializable, ScreenInte
                             break;
                         }
                         break;
-
                 }
                 loadRecordMaster();
 //                } catch (SQLException | GuanzonException ex) {
@@ -853,6 +853,7 @@ public class POQuotation_ApprovalController implements Initializable, ScreenInte
             }
         } catch (GuanzonException | SQLException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -891,7 +892,6 @@ public class POQuotation_ApprovalController implements Initializable, ScreenInte
                     case "dpTransactionDate":
                         if (poController.POQuotation().getEditMode() == EditMode.ADDNEW
                                 || poController.POQuotation().getEditMode() == EditMode.UPDATE) {
-
                             if (JFXUtil.isObjectEqualTo(poController.POQuotation().Master().getSourceNo(), null, "")) {
                                 if (pbSuccess) {
                                     ShowMessageFX.Warning(null, pxeModuleName, "Source No cannot be empty");
@@ -939,7 +939,6 @@ public class POQuotation_ApprovalController implements Initializable, ScreenInte
                             } else {
                                 if ("error".equals((String) poJSON.get("result"))) {
                                     ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-
                                 }
                             }
 
@@ -1005,6 +1004,7 @@ public class POQuotation_ApprovalController implements Initializable, ScreenInte
             }
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -1022,6 +1022,7 @@ public class POQuotation_ApprovalController implements Initializable, ScreenInte
             JFXUtil.updateCaretPositions(apBrowse);
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -1046,7 +1047,7 @@ public class POQuotation_ApprovalController implements Initializable, ScreenInte
                             filePath2 = imageinfo_temp.get((String) attachment_data.get(tblAttachments.getSelectionModel().getSelectedIndex()).getIndex02());
                         } else {
                             // in server
-                            if(poController.POQuotation().TransactionAttachmentList(pnAttachment).getModel().getImagePath() != null && !"".equals(poController.POQuotation().TransactionAttachmentList(pnAttachment).getModel().getImagePath())){
+                            if (poController.POQuotation().TransactionAttachmentList(pnAttachment).getModel().getImagePath() != null && !"".equals(poController.POQuotation().TransactionAttachmentList(pnAttachment).getModel().getImagePath())) {
                                 filePath2 = poController.POQuotation().TransactionAttachmentList(pnAttachment).getModel().getImagePath() + "/" + (String) attachment_data.get(tblAttachments.getSelectionModel().getSelectedIndex()).getIndex02();
                             } else {
                                 filePath2 = System.getProperty("sys.default.path.temp.attachments") + "/" + (String) attachment_data.get(tblAttachments.getSelectionModel().getSelectedIndex()).getIndex02();
@@ -1085,7 +1086,6 @@ public class POQuotation_ApprovalController implements Initializable, ScreenInte
                                 // Optional: add some margin
                                 StackPane.setMargin(btnArrowLeft, new Insets(0, 0, 0, 10));
                                 StackPane.setMargin(btnArrowRight, new Insets(0, 10, 0, 0));
-
                             } else {
                                 // ----- PDF VIEW -----
                                 PDDocument document = PDDocument.load(new File(filePath2));
@@ -1140,47 +1140,49 @@ public class POQuotation_ApprovalController implements Initializable, ScreenInte
 
                                 // ----- ZOOM & PAN -----
                                 final DoubleProperty zoomFactor = new SimpleDoubleProperty(1.0);
-
-                                // Zoom centered on mouse
-                                scrollPane.setOnScroll(event -> {
+                                scrollPane.addEventFilter(ScrollEvent.SCROLL, event -> {
                                     if (event.isControlDown()) {
-                                        double oldZoom = zoomFactor.get();
-                                        double delta = event.getDeltaY() > 0 ? 0.1 : -0.1;
-                                        zoomFactor.set(Math.max(0.1, oldZoom + delta));
+                                        event.consume(); // stop default scroll behavior
 
+                                        double delta = event.getDeltaY() > 0 ? 1.1 : 0.9; // multiplier for smooth zoom in/out
+                                        double oldZoom = zoomFactor.get();
+                                        zoomFactor.set(oldZoom * delta); // scale by multiplier
+
+                                        // Apply scale
+                                        pdfGroup.setScaleX(zoomFactor.get());
+                                        pdfGroup.setScaleY(zoomFactor.get());
+
+                                        // Keep mouse position centered during zoom
                                         Bounds viewportBounds = scrollPane.getViewportBounds();
-                                        Bounds contentBounds = pdfGroup.getLayoutBounds();
+                                        Bounds contentBounds = pdfGroup.getBoundsInParent();
                                         double mouseX = event.getX();
                                         double mouseY = event.getY();
 
                                         double hRatio = (scrollPane.getHvalue() * (contentBounds.getWidth() - viewportBounds.getWidth()) + mouseX) / contentBounds.getWidth();
                                         double vRatio = (scrollPane.getVvalue() * (contentBounds.getHeight() - viewportBounds.getHeight()) + mouseY) / contentBounds.getHeight();
 
-                                        pdfContainer.setScaleX(zoomFactor.get());
-                                        pdfContainer.setScaleY(zoomFactor.get());
-
                                         Platform.runLater(() -> {
-                                            Bounds newBounds = pdfGroup.getLayoutBounds();
+                                            Bounds newBounds = pdfGroup.getBoundsInParent();
                                             double newH = (hRatio * newBounds.getWidth() - mouseX) / (newBounds.getWidth() - viewportBounds.getWidth());
                                             double newV = (vRatio * newBounds.getHeight() - mouseY) / (newBounds.getHeight() - viewportBounds.getHeight());
+
                                             scrollPane.setHvalue(Double.isNaN(newH) ? 0.5 : Math.min(Math.max(0, newH), 1.0));
                                             scrollPane.setVvalue(Double.isNaN(newV) ? 0.5 : Math.min(Math.max(0, newV), 1.0));
                                         });
-
-                                        event.consume();
                                     }
                                 });
 
                                 // Pan with mouse drag
                                 final ObjectProperty<Point2D> lastMouse = new SimpleObjectProperty<>();
                                 pdfGroup.setOnMousePressed(e -> lastMouse.set(new Point2D(e.getSceneX(), e.getSceneY())));
+
                                 pdfGroup.setOnMouseDragged(e -> {
                                     if (lastMouse.get() != null) {
-                                        double deltaX = lastMouse.get().getX() - e.getSceneX();
-                                        double deltaY = lastMouse.get().getY() - e.getSceneY();
+                                        double deltaX = e.getSceneX() - lastMouse.get().getX();
+                                        double deltaY = e.getSceneY() - lastMouse.get().getY();
 
-                                        scrollPane.setHvalue(Math.min(Math.max(0, scrollPane.getHvalue() + deltaX / pdfGroup.getLayoutBounds().getWidth()), 1.0));
-                                        scrollPane.setVvalue(Math.min(Math.max(0, scrollPane.getVvalue() + deltaY / pdfGroup.getLayoutBounds().getHeight()), 1.0));
+                                        pdfGroup.setTranslateX(pdfGroup.getTranslateX() + deltaX);
+                                        pdfGroup.setTranslateY(pdfGroup.getTranslateY() + deltaY);
 
                                         lastMouse.set(new Point2D(e.getSceneX(), e.getSceneY()));
                                     }
@@ -1190,7 +1192,6 @@ public class POQuotation_ApprovalController implements Initializable, ScreenInte
                         } else {
                             imageView.setImage(null);
                         }
-
                     } catch (Exception e) {
                         imageView.setImage(null);
                     }
@@ -1256,6 +1257,7 @@ public class POQuotation_ApprovalController implements Initializable, ScreenInte
             JFXUtil.updateCaretPositions(apDetail);
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -1300,6 +1302,7 @@ public class POQuotation_ApprovalController implements Initializable, ScreenInte
             JFXUtil.updateCaretPositions(apMaster);
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -1356,9 +1359,9 @@ public class POQuotation_ApprovalController implements Initializable, ScreenInte
             Platform.runLater(() -> {
                 loadTableAttachment.reload();
             });
-
         } catch (SQLException | GuanzonException | CloneNotSupportedException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -1458,6 +1461,7 @@ public class POQuotation_ApprovalController implements Initializable, ScreenInte
                             loadRecordMaster();
                         } catch (CloneNotSupportedException ex) {
                             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+                            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
                         }
                     });
                 });
@@ -1474,7 +1478,6 @@ public class POQuotation_ApprovalController implements Initializable, ScreenInte
                             //retreiving using column index
                             for (int lnCtr = 0; lnCtr <= poController.POQuotation().getPOQuotationCount() - 1; lnCtr++) {
                                 try {
-
                                     main_data.add(new ModelPOQuotation_Main(String.valueOf(lnCtr + 1),
                                             //                                            String.valueOf(poController.POQuotation().POQuotationList(lnCtr).Company().getCompanyName()),
                                             String.valueOf(poController.POQuotation().POQuotationList(lnCtr).Branch().getBranchName()),
@@ -1485,12 +1488,12 @@ public class POQuotation_ApprovalController implements Initializable, ScreenInte
                                     ));
                                 } catch (GuanzonException | SQLException ex) {
                                     Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+                                    ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
                                 }
                                 if (poController.POQuotation().POQuotationList(lnCtr).getTransactionStatus().equals(POQuotationStatus.APPROVED)) {
                                     JFXUtil.highlightByKey(tblViewMainList, String.valueOf(lnCtr + 1), "#C1E1C1", highlightedRowsMain);
                                 }
                             }
-
                         }
 
                         if (pnMain < 0 || pnMain
@@ -1507,7 +1510,6 @@ public class POQuotation_ApprovalController implements Initializable, ScreenInte
                         JFXUtil.loadTab(pgPagination, main_data.size(), ROWS_PER_PAGE, tblViewMainList, filteredData);
                     });
                 });
-
     }
 
     public void initDatePickers() {
@@ -1583,7 +1585,6 @@ public class POQuotation_ApprovalController implements Initializable, ScreenInte
     }
 
     private void initButton(int fnValue) {
-
         boolean lbShow3 = (fnValue == EditMode.READY);
         boolean lbShow4 = (fnValue == EditMode.UNKNOWN || fnValue == EditMode.READY);
         // Manage visibility and managed state of other buttons
@@ -1617,7 +1618,6 @@ public class POQuotation_ApprovalController implements Initializable, ScreenInte
             loadTableAttachment.reload();
             loadRecordAttachment(true);
         });
-
     }
 
     public void slideImage(int direction) {
@@ -1710,7 +1710,6 @@ public class POQuotation_ApprovalController implements Initializable, ScreenInte
                     pnAttachment = newIndex;
                     loadRecordAttachment(true);
                     break;
-
             }
             event.consume();
         }
@@ -1724,5 +1723,4 @@ public class POQuotation_ApprovalController implements Initializable, ScreenInte
             JFXUtil.clearTextFields(apBrowse, apMaster, apDetail, apAttachments);
         });
     }
-
 }

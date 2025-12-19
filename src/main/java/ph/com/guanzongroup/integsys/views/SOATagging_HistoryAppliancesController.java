@@ -99,8 +99,6 @@ public class SOATagging_HistoryAppliancesController implements Initializable, Sc
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        
-
         poSOATaggingController = new CashflowControllers(oApp, null);
         poJSON = poSOATaggingController.SOATagging().InitTransaction(); // Initialize transaction
         if (!"success".equals((String) poJSON.get("result"))) {
@@ -191,10 +189,10 @@ public class SOATagging_HistoryAppliancesController implements Initializable, Sc
                 loadRecordMaster();
                 loadTableDetail();
                 initButton(pnEditMode);
-
             }
         } catch (CloneNotSupportedException | SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -268,6 +266,7 @@ public class SOATagging_HistoryAppliancesController implements Initializable, Sc
             }
         } catch (GuanzonException | SQLException | CloneNotSupportedException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
     ChangeListener<Boolean> txtMaster_Focus = JFXUtil.FocusListener(TextField.class,
@@ -302,9 +301,9 @@ public class SOATagging_HistoryAppliancesController implements Initializable, Sc
             tfSearchSupplier.setText(psSupplierId.equals("") ? "" : poSOATaggingController.SOATagging().Master().Supplier().getCompanyName());
             tfSearchCompany.setText(psCompanyId.equals("") ? "" : poSOATaggingController.SOATagging().Master().Company().getCompanyName());
             JFXUtil.updateCaretPositions(apBrowse);
-
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -325,7 +324,6 @@ public class SOATagging_HistoryAppliancesController implements Initializable, Sc
     }
 
     public void loadRecordDetail() {
-
         try {
             if (pnDetail < 0 || pnDetail > poSOATaggingController.SOATagging().getDetailCount() - 1) {
                 return;
@@ -356,6 +354,7 @@ public class SOATagging_HistoryAppliancesController implements Initializable, Sc
             JFXUtil.updateCaretPositions(apDetail);
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -384,6 +383,7 @@ public class SOATagging_HistoryAppliancesController implements Initializable, Sc
             JFXUtil.updateCaretPositions(apMaster);
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -430,10 +430,9 @@ public class SOATagging_HistoryAppliancesController implements Initializable, Sc
                                             String.valueOf(lnCtr)
                                     ));
                             lsReferenceNo = "";
-                        } catch (SQLException ex) {
+                        } catch (SQLException | GuanzonException ex) {
                             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
-                        } catch (GuanzonException ex) {
-                            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+                            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
                         }
                     }
                     int lnTempRow = JFXUtil.getDetailRow(details_data, pnDetail, 8); //this method is used only when Reverse is applied
@@ -467,7 +466,6 @@ public class SOATagging_HistoryAppliancesController implements Initializable, Sc
                     tblViewTransDetailList.toFront();
                 }
                 loading.progressIndicator.setVisible(false);
-
             }
 
             @Override
@@ -477,10 +475,8 @@ public class SOATagging_HistoryAppliancesController implements Initializable, Sc
                 }
                 loading.progressIndicator.setVisible(false);
             }
-
         };
         new Thread(task).start(); // Run task in background
-
     }
 
     public void initDatePickers() {
@@ -510,7 +506,6 @@ public class SOATagging_HistoryAppliancesController implements Initializable, Sc
     }
 
     private void initButton(int fnValue) {
-
         boolean lbShow3 = (fnValue == EditMode.READY);
         //Ready
         JFXUtil.setButtonsVisibility(lbShow3, btnHistory);
@@ -565,5 +560,4 @@ public class SOATagging_HistoryAppliancesController implements Initializable, Sc
         dpTransactionDate.setValue(null);
         JFXUtil.clearTextFields(apMaster, apDetail, apBrowse);
     }
-
 }

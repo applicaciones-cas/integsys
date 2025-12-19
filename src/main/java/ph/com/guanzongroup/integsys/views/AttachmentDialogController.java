@@ -45,6 +45,7 @@ import javafx.geometry.Pos;
 import javafx.scene.Group;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
+import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.util.Pair;
@@ -239,8 +240,8 @@ public class AttachmentDialogController implements Initializable, ScreenInterfac
                                 StackPane.setMargin(btnArrowRight, new Insets(0, 10, 0, 0));
 
                             } else {
-                                
-                               // ----- PDF VIEW -----
+
+                                // ----- PDF VIEW -----
                                 PDDocument document = PDDocument.load(new File(filePath2));
                                 PDFRenderer renderer = new PDFRenderer(document);
                                 int pageCount = document.getNumberOfPages();
@@ -301,9 +302,9 @@ public class AttachmentDialogController implements Initializable, ScreenInterfac
                                 PauseTransition delay = new PauseTransition(Duration.seconds(2)); // 2-second delay
                                 delay.setOnFinished(event -> {
                                     Platform.runLater(() -> {
-                                    JFXUtil.stackPaneClip(stackPane1);
-                                    scrollPane.setHvalue(0.5);
-                                    scrollPane.setVvalue(0.5);
+                                        JFXUtil.stackPaneClip(stackPane1);
+//                                        scrollPane.setHvalue(0.0);
+//                                        scrollPane.setVvalue(0.0);
                                     });
                                 });
                                 delay.play();
@@ -312,76 +313,53 @@ public class AttachmentDialogController implements Initializable, ScreenInterfac
 
                                 // ----- ZOOM & PAN -----
                                 final DoubleProperty zoomFactor = new SimpleDoubleProperty(1.0);
-
-                                // Zoom centered on mouse
-                                scrollPane.setOnScroll(event -> {
+                                scrollPane.addEventFilter(ScrollEvent.SCROLL, event -> {
                                     if (event.isControlDown()) {
+                                        event.consume(); // stop default scroll behavior
 
+                                        double delta = event.getDeltaY() > 0 ? 1.1 : 0.9; // multiplier for smooth zoom in/out
                                         double oldZoom = zoomFactor.get();
-                                        double delta = event.getDeltaY() > 0 ? 0.1 : -0.1;
-                                        double newZoom = Math.max(0.1, oldZoom + delta);
-                                        zoomFactor.set(newZoom);
+                                        zoomFactor.set(oldZoom * delta); // scale by multiplier
 
+                                        // Apply scale
+                                        pdfGroup.setScaleX(zoomFactor.get());
+                                        pdfGroup.setScaleY(zoomFactor.get());
+
+                                        // Keep mouse position centered during zoom
                                         Bounds viewportBounds = scrollPane.getViewportBounds();
-                                        Bounds contentBounds = pdfGroup.getLayoutBounds();
-
+                                        Bounds contentBounds = pdfGroup.getBoundsInParent();
                                         double mouseX = event.getX();
                                         double mouseY = event.getY();
 
-                                        // 🔑 SAFE ratio calculation (prevents NaN on 1 page)
-                                        double maxX = Math.max(1, contentBounds.getWidth() - viewportBounds.getWidth());
-                                        double maxY = Math.max(1, contentBounds.getHeight() - viewportBounds.getHeight());
-
-                                        double hRatio = (scrollPane.getHvalue() * maxX + mouseX) / contentBounds.getWidth();
-                                        double vRatio = (scrollPane.getVvalue() * maxY + mouseY) / contentBounds.getHeight();
-
-                                        pdfContainer.setScaleX(newZoom);
-                                        pdfContainer.setScaleY(newZoom);
+                                        double hRatio = (scrollPane.getHvalue() * (contentBounds.getWidth() - viewportBounds.getWidth()) + mouseX) / contentBounds.getWidth();
+                                        double vRatio = (scrollPane.getVvalue() * (contentBounds.getHeight() - viewportBounds.getHeight()) + mouseY) / contentBounds.getHeight();
 
                                         Platform.runLater(() -> {
-                                            Bounds newBounds = pdfGroup.getLayoutBounds();
+                                            Bounds newBounds = pdfGroup.getBoundsInParent();
+                                            double newH = (hRatio * newBounds.getWidth() - mouseX) / (newBounds.getWidth() - viewportBounds.getWidth());
+                                            double newV = (vRatio * newBounds.getHeight() - mouseY) / (newBounds.getHeight() - viewportBounds.getHeight());
 
-                                            double newMaxX = Math.max(1, newBounds.getWidth() - viewportBounds.getWidth());
-                                            double newMaxY = Math.max(1, newBounds.getHeight() - viewportBounds.getHeight());
-
-                                            double newH = (hRatio * newBounds.getWidth() - mouseX) / newMaxX;
-                                            double newV = (vRatio * newBounds.getHeight() - mouseY) / newMaxY;
-
-                                            scrollPane.setHvalue(Math.min(Math.max(0, newH), 1));
-                                            scrollPane.setVvalue(Math.min(Math.max(0, newV), 1));
+                                            scrollPane.setHvalue(Double.isNaN(newH) ? 0.5 : Math.min(Math.max(0, newH), 1.0));
+                                            scrollPane.setVvalue(Double.isNaN(newV) ? 0.5 : Math.min(Math.max(0, newV), 1.0));
                                         });
-
-                                        event.consume();
                                     }
                                 });
 
                                 // Pan with mouse drag
                                 final ObjectProperty<Point2D> lastMouse = new SimpleObjectProperty<>();
-
-                                pdfGroup.setOnMousePressed(e ->
-                                        lastMouse.set(new Point2D(e.getSceneX(), e.getSceneY()))
-                                );
+                                pdfGroup.setOnMousePressed(e -> lastMouse.set(new Point2D(e.getSceneX(), e.getSceneY())));
 
                                 pdfGroup.setOnMouseDragged(e -> {
                                     if (lastMouse.get() != null) {
+                                        double deltaX = e.getSceneX() - lastMouse.get().getX();
+                                        double deltaY = e.getSceneY() - lastMouse.get().getY();
 
-                                        double dx = lastMouse.get().getX() - e.getSceneX();
-                                        double dy = lastMouse.get().getY() - e.getSceneY();
-
-                                        double w = Math.max(1, pdfGroup.getLayoutBounds().getWidth());
-                                        double h = Math.max(1, pdfGroup.getLayoutBounds().getHeight());
-
-                                        scrollPane.setHvalue(
-                                                Math.min(Math.max(0, scrollPane.getHvalue() + dx / w), 1)
-                                        );
-                                        scrollPane.setVvalue(
-                                                Math.min(Math.max(0, scrollPane.getVvalue() + dy / h), 1)
-                                        );
+                                        pdfGroup.setTranslateX(pdfGroup.getTranslateX() + deltaX);
+                                        pdfGroup.setTranslateY(pdfGroup.getTranslateY() + deltaY);
 
                                         lastMouse.set(new Point2D(e.getSceneX(), e.getSceneY()));
                                     }
                                 });
-
                                 pdfGroup.setOnMouseReleased(e -> lastMouse.set(null));
                             }
 

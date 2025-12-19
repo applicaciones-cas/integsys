@@ -123,7 +123,6 @@ public class POQuotationRequest_ConfirmationController implements Initializable,
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-
         poController = new QuotationControllers(oApp, null);
         poJSON = new JSONObject();
         poJSON = poController.POQuotationRequest().InitTransaction(); // Initialize transaction
@@ -272,7 +271,6 @@ public class POQuotationRequest_ConfirmationController implements Initializable,
                                         }
                                     }
                                 }
-
                             }
                         } else {
                             return;
@@ -364,6 +362,7 @@ public class POQuotationRequest_ConfirmationController implements Initializable,
             }
         } catch (CloneNotSupportedException | SQLException | GuanzonException | ParseException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -449,6 +448,7 @@ public class POQuotationRequest_ConfirmationController implements Initializable,
                                     }
                                 } catch (GuanzonException | SQLException ex) {
                                     Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+                                    ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
                                 }
                             }
                         }
@@ -563,6 +563,7 @@ public class POQuotationRequest_ConfirmationController implements Initializable,
             }
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -762,6 +763,7 @@ public class POQuotationRequest_ConfirmationController implements Initializable,
             }
         } catch (GuanzonException | SQLException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -800,7 +802,6 @@ public class POQuotationRequest_ConfirmationController implements Initializable,
 
                         if (poController.POQuotationRequest().getEditMode() == EditMode.ADDNEW
                                 || poController.POQuotationRequest().getEditMode() == EditMode.UPDATE) {
-
                             if (selectedDate.isAfter(currentDate)) {
                                 poJSON.put("result", "error");
                                 poJSON.put("message", "Future dates are not allowed.");
@@ -834,7 +835,6 @@ public class POQuotationRequest_ConfirmationController implements Initializable,
                             } else {
                                 if ("error".equals((String) poJSON.get("result"))) {
                                     ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-
                                 }
                             }
 
@@ -853,7 +853,6 @@ public class POQuotationRequest_ConfirmationController implements Initializable,
 
                         if (poController.POQuotationRequest().getEditMode() == EditMode.ADDNEW
                                 || poController.POQuotationRequest().getEditMode() == EditMode.UPDATE) {
-
                             if (selectedDate.isBefore(transactionDate)) {
                                 JFXUtil.setJSONError(poJSON, "Expected Purchase Date cannot be before the transaction date.");
                                 pbSuccess = false;
@@ -880,6 +879,7 @@ public class POQuotationRequest_ConfirmationController implements Initializable,
             }
         } catch (SQLException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -898,6 +898,7 @@ public class POQuotationRequest_ConfirmationController implements Initializable,
             JFXUtil.updateCaretPositions(apBrowse);
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -933,6 +934,7 @@ public class POQuotationRequest_ConfirmationController implements Initializable,
             JFXUtil.updateCaretPositions(apDetail);
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -961,6 +963,7 @@ public class POQuotationRequest_ConfirmationController implements Initializable,
             JFXUtil.updateCaretPositions(apMaster);
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -984,9 +987,9 @@ public class POQuotationRequest_ConfirmationController implements Initializable,
             Platform.runLater(() -> {
                 loadTableDetail.reload();
             });
-
         } catch (CloneNotSupportedException | SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -1048,6 +1051,7 @@ public class POQuotationRequest_ConfirmationController implements Initializable,
                             loadRecordMaster();
                         } catch (SQLException | GuanzonException | CloneNotSupportedException ex) {
                             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+                            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
                         }
                     });
                 });
@@ -1071,6 +1075,7 @@ public class POQuotationRequest_ConfirmationController implements Initializable,
                                     ));
                                 } catch (GuanzonException | SQLException ex) {
                                     Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+                                    ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
                                 }
                                 if (poController.POQuotationRequest().POQuotationRequestList(lnCtr).getTransactionStatus().equals(POQuotationRequestStatus.CONFIRMED)) {
                                     JFXUtil.highlightByKey(tblViewMainList, String.valueOf(lnCtr + 1), "#C1E1C1", highlightedRowsMain);
@@ -1084,7 +1089,6 @@ public class POQuotationRequest_ConfirmationController implements Initializable,
                                 /* FOCUS ON FIRST ROW */
                                 JFXUtil.selectAndFocusRow(tblViewMainList, 0);
                                 pnMain = tblViewMainList.getSelectionModel().getSelectedIndex();
-
                             }
                         } else {
                             /* FOCUS ON THE ROW THAT pnRowDetail POINTS TO */
@@ -1094,13 +1098,11 @@ public class POQuotationRequest_ConfirmationController implements Initializable,
                         JFXUtil.loadTab(pgPagination, main_data.size(), ROWS_PER_PAGE, tblViewMainList, filteredData);
                     });
                 });
-
     }
 
     public void initDatePickers() {
         JFXUtil.setDatePickerFormat("MM/dd/yyyy", dpTransactionDate, dpExpectedDate, dpSearchTransactionDate);
         JFXUtil.setActionListener(this::datepicker_Action, dpTransactionDate, dpExpectedDate, dpSearchTransactionDate);
-
     }
 
     public void initTextFields() {
@@ -1141,7 +1143,6 @@ public class POQuotationRequest_ConfirmationController implements Initializable,
     }
 
     private void initButton(int fnValue) {
-
         boolean lbShow1 = (fnValue == EditMode.UPDATE);
         boolean lbShow3 = (fnValue == EditMode.READY);
         boolean lbShow4 = (fnValue == EditMode.UNKNOWN || fnValue == EditMode.READY);
@@ -1166,7 +1167,6 @@ public class POQuotationRequest_ConfirmationController implements Initializable,
             }
         } catch (Exception e) {
         }
-        
         switch (poController.POQuotationRequest().Master().getTransactionStatus()) {
             case POQuotationRequestStatus.CONFIRMED:
                 JFXUtil.setButtonsVisibility(false, btnConfirm);
@@ -1201,7 +1201,6 @@ public class POQuotationRequest_ConfirmationController implements Initializable,
 
         filteredData = new FilteredList<>(main_data, b -> true);
         tblViewMainList.setItems(filteredData);
-
     }
 
     private void tableKeyEvents(KeyEvent event) {
@@ -1235,5 +1234,4 @@ public class POQuotationRequest_ConfirmationController implements Initializable,
         JFXUtil.setValueToNull(previousSearchedTextField, lastFocusedTextField);
         JFXUtil.clearTextFields(apMaster, apDetail, apBrowse);
     }
-
 }

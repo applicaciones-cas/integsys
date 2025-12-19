@@ -124,7 +124,6 @@ public class PurchaseOrderReturn_EntryMonarchFoodController implements Initializ
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-
         poPurchaseReturnController = new PurchaseOrderReturnControllers(oApp, null);
         poJSON = new JSONObject();
         poJSON = poPurchaseReturnController.PurchaseOrderReturn().InitTransaction(); // Initialize transaction
@@ -251,7 +250,6 @@ public class PurchaseOrderReturn_EntryMonarchFoodController implements Initializ
                             if (lastFocusedTextField instanceof TextField) {
                                 TextField tf = (TextField) lastFocusedTextField;
                                 if (JFXUtil.getTextFieldsIDWithPrompt("Press F3: Search", apMaster, apDetail).contains(tf.getId())) {
-
                                     if (lastFocusedTextField == previousSearchedTextField) {
                                         break;
                                     }
@@ -335,7 +333,6 @@ public class PurchaseOrderReturn_EntryMonarchFoodController implements Initializ
                                 } else {
                                     btnNew.fire();
                                 }
-
                             }
                         } else {
                             return;
@@ -360,12 +357,10 @@ public class PurchaseOrderReturn_EntryMonarchFoodController implements Initializ
                         tfBarcode.requestFocus();
                     }
                 }
-
             }
-        } catch (CloneNotSupportedException | SQLException | GuanzonException ex) {
-            Logger.getLogger(PurchaseOrderReturn_EntryMonarchFoodController.class.getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
-        } catch (ParseException ex) {
-            Logger.getLogger(PurchaseOrderReturn_EntryMonarchFoodController.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (CloneNotSupportedException | SQLException | GuanzonException | ParseException ex) {
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -385,7 +380,6 @@ public class PurchaseOrderReturn_EntryMonarchFoodController implements Initializ
             /*Lost Focus*/
             lsValue = lsValue.trim();
             switch (lsID) {
-
                 case "taRemarks"://Remarks
                     poJSON = poPurchaseReturnController.PurchaseOrderReturn().Master().setRemarks(lsValue);
                     if ("error".equals((String) poJSON.get("result"))) {
@@ -548,16 +542,14 @@ public class PurchaseOrderReturn_EntryMonarchFoodController implements Initializ
                             break;
                         }
                         break;
-
                 }
 
                 loadRecordMaster();
-
             }
         } catch (GuanzonException | SQLException ex) {
-            Logger.getLogger(PurchaseOrderReturn_EntryMonarchFoodController.class.getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
-
     };
 
     public void moveNext() {
@@ -752,10 +744,9 @@ public class PurchaseOrderReturn_EntryMonarchFoodController implements Initializ
                 default:
                     break;
             }
-        } catch (GuanzonException | SQLException ex) {
-            Logger.getLogger(PurchaseOrderReturn_EntryMonarchFoodController.class.getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
-        } catch (CloneNotSupportedException ex) {
-            Logger.getLogger(PurchaseOrderReturn_EntryMonarchFoodController.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (CloneNotSupportedException | SQLException | GuanzonException ex) {
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -770,7 +761,6 @@ public class PurchaseOrderReturn_EntryMonarchFoodController implements Initializ
         JFXUtil.setKeyPressedListener(this::txtField_KeyPressed, apBrowse, apMaster, apDetail);
 
         CustomCommonUtil.inputDecimalOnly(tfCost, tfReceiveQuantity, tfReturnQuantity);
-
     }
 
     boolean pbSuccess = true;
@@ -814,7 +804,7 @@ public class PurchaseOrderReturn_EntryMonarchFoodController implements Initializ
                                 || poPurchaseReturnController.PurchaseOrderReturn().getEditMode() == EditMode.UPDATE) {
                             lsServerDate = sdfFormat.format(oApp.getServerDate());
                             lsTransDate = sdfFormat.format(poPurchaseReturnController.PurchaseOrderReturn().Master().getTransactionDate());
-                            lsSelectedDate = sdfFormat.format(SQLUtil.toDate(JFXUtil.convertToIsoFormat(inputText),  SQLUtil.FORMAT_SHORT_DATE));
+                            lsSelectedDate = sdfFormat.format(SQLUtil.toDate(JFXUtil.convertToIsoFormat(inputText), SQLUtil.FORMAT_SHORT_DATE));
                             currentDate = LocalDate.parse(lsServerDate, DateTimeFormatter.ofPattern(SQLUtil.FORMAT_SHORT_DATE));
                             selectedDate = LocalDate.parse(lsSelectedDate, DateTimeFormatter.ofPattern(SQLUtil.FORMAT_SHORT_DATE));
 
@@ -843,13 +833,13 @@ public class PurchaseOrderReturn_EntryMonarchFoodController implements Initializ
                                 pbSuccess = false;
                                 if (oApp.getUserLevel() <= UserRight.ENCODER) {
                                     if (ShowMessageFX.YesNo(null, pxeModuleName, "Change in Transaction Date Detected\n\n"
-                                        + "If YES, please seek approval to proceed with the new selected date.\n"
-                                        + "If NO, the previous transaction date will be retained.") == true) {
+                                            + "If YES, please seek approval to proceed with the new selected date.\n"
+                                            + "If NO, the previous transaction date will be retained.") == true) {
                                         poJSON = ShowDialogFX.getUserApproval(oApp);
                                         if (!"success".equals((String) poJSON.get("result"))) {
                                             pbSuccess = false;
                                         } else {
-                                            if(Integer.parseInt(poJSON.get("nUserLevl").toString())<= UserRight.ENCODER){
+                                            if (Integer.parseInt(poJSON.get("nUserLevl").toString()) <= UserRight.ENCODER) {
                                                 poJSON.put("result", "error");
                                                 poJSON.put("message", "User is not an authorized approving officer.");
                                                 pbSuccess = false;
@@ -866,17 +856,14 @@ public class PurchaseOrderReturn_EntryMonarchFoodController implements Initializ
                             }
 
                             if (pbSuccess) {
-
                             } else {
                                 if ("error".equals((String) poJSON.get("result"))) {
                                     ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-
                                 }
                             }
                             pbSuccess = false; //Set to false to prevent multiple message box: Conflict with server date vs transaction date validation
                             loadRecordMaster();
                             pbSuccess = true; //Set to original value
-
                         }
                         break;
                     default:
@@ -884,19 +871,17 @@ public class PurchaseOrderReturn_EntryMonarchFoodController implements Initializ
                         break;
                 }
             }
-        } catch (SQLException ex) {
-            Logger.getLogger(PurchaseOrderReturn_EntryMonarchFoodController.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (GuanzonException ex) {
-            Logger.getLogger(PurchaseOrderReturn_EntryMonarchFoodController.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (SQLException | GuanzonException ex) {
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
     public void initDatePickers() {
         JFXUtil.setDatePickerFormat("MM/dd/yyyy",
-dpTransactionDate);
+                dpTransactionDate);
 
         JFXUtil.setActionListener(this::datepicker_Action, dpTransactionDate);
-
     }
 
     public void initDetailsGrid() {
@@ -928,7 +913,8 @@ dpTransactionDate);
         try {
             lblSource.setText(poPurchaseReturnController.PurchaseOrderReturn().Master().Company().getCompanyName() + " - " + poPurchaseReturnController.PurchaseOrderReturn().Master().Industry().getDescription());
         } catch (SQLException | GuanzonException ex) {
-            Logger.getLogger(PurchaseOrderReturn_EntryMonarchFoodController.class.getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -954,9 +940,9 @@ dpTransactionDate);
 
             JFXUtil.updateCaretPositions(apDetail);
         } catch (SQLException | GuanzonException ex) {
-            Logger.getLogger(PurchaseOrderReturn_EntryMonarchFoodController.class.getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
-
     }
 
     public void loadRecordMaster() {
@@ -965,7 +951,6 @@ dpTransactionDate);
         JFXUtil.setDisabled(!lbDisable, tfSupplier, tfReferenceNo, tfPOReceivingNo);
 
         try {
-
             Platform.runLater(() -> {
                 boolean lbPrintStat = pnEditMode == EditMode.READY;
                 String lsActive = poPurchaseReturnController.PurchaseOrderReturn().Master().getTransactionStatus();
@@ -996,7 +981,6 @@ dpTransactionDate);
                     default:
                         lsStat = "UNKNOWN";
                         break;
-
                 }
                 lblStatus.setText(lsStat);
                 JFXUtil.setButtonsVisibility(lbPrintStat, btnPrint);
@@ -1018,9 +1002,9 @@ dpTransactionDate);
 
             JFXUtil.updateCaretPositions(apMaster);
         } catch (SQLException | GuanzonException ex) {
-            Logger.getLogger(PurchaseOrderReturn_EntryMonarchFoodController.class.getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
-
     }
 
     private void tableKeyEvents(KeyEvent event) {
@@ -1093,7 +1077,6 @@ dpTransactionDate);
                     int lnCtr;
                     details_data.clear();
                     try {
-
                         if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
                             lnCtr = poPurchaseReturnController.PurchaseOrderReturn().getDetailCount() - 1;
                             while (lnCtr >= 0) {
@@ -1149,9 +1132,9 @@ dpTransactionDate);
                         }
                         loadRecordMaster();
                     } catch (SQLException | GuanzonException | CloneNotSupportedException ex) {
-                        Logger.getLogger(PurchaseOrderReturn_EntryMonarchFoodController.class.getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+                        Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+                        ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
                     }
-
                 });
 
                 return null;
@@ -1165,7 +1148,6 @@ dpTransactionDate);
                     tblViewDetails.toFront();
                 }
                 progressIndicator.setVisible(false);
-
             }
 
             @Override
@@ -1175,7 +1157,6 @@ dpTransactionDate);
                 }
                 progressIndicator.setVisible(false);
             }
-
         };
         new Thread(task).start(); // Run task in background
     }
@@ -1205,5 +1186,4 @@ dpTransactionDate);
                 break;
         }
     }
-
 }
