@@ -278,7 +278,6 @@ public class POQuotation_HistoryController implements Initializable, ScreenInter
             lnCount += 1;
             data.put(String.valueOf(lnCount), new Pair<>(String.valueOf(poController.POQuotation().TransactionAttachmentList(lnCtr).getModel().getFileName()),
                     poController.POQuotation().TransactionAttachmentList(lnCtr).getModel().getDocumentType()));
-
         }
         AttachmentDialogController controller = new AttachmentDialogController();
         controller.setOpenedImage(pnAttachment);
@@ -288,8 +287,8 @@ public class POQuotation_HistoryController implements Initializable, ScreenInter
             stageAttachment.showDialog((Stage) btnClose.getScene().getWindow(), getClass().getResource("/ph/com/guanzongroup/integsys/views/AttachmentDialog.fxml"), controller, "Attachment Dialog", false, false, true);
         } catch (IOException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
-
     }
 
     @FXML
@@ -350,6 +349,7 @@ public class POQuotation_HistoryController implements Initializable, ScreenInter
             }
         } catch (CloneNotSupportedException | SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -487,6 +487,7 @@ public class POQuotation_HistoryController implements Initializable, ScreenInter
             }
         } catch (GuanzonException | SQLException | CloneNotSupportedException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -504,6 +505,7 @@ public class POQuotation_HistoryController implements Initializable, ScreenInter
             JFXUtil.updateCaretPositions(apBrowse);
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -567,7 +569,6 @@ public class POQuotation_HistoryController implements Initializable, ScreenInter
                                 // Optional: add some margin
                                 StackPane.setMargin(btnArrowLeft, new Insets(0, 0, 0, 10));
                                 StackPane.setMargin(btnArrowRight, new Insets(0, 10, 0, 0));
-
                             } else {
                                 // ----- PDF VIEW -----
                                 PDDocument document = PDDocument.load(new File(filePath2));
@@ -674,7 +675,6 @@ public class POQuotation_HistoryController implements Initializable, ScreenInter
                         } else {
                             imageView.setImage(null);
                         }
-
                     } catch (Exception e) {
                         imageView.setImage(null);
                     }
@@ -713,6 +713,7 @@ public class POQuotation_HistoryController implements Initializable, ScreenInter
             JFXUtil.updateCaretPositions(apDetail);
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -757,6 +758,7 @@ public class POQuotation_HistoryController implements Initializable, ScreenInter
             JFXUtil.updateCaretPositions(apMaster);
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -853,7 +855,6 @@ public class POQuotation_HistoryController implements Initializable, ScreenInter
                         loadRecordMaster();
                     });
                 });
-
     }
 
     public void initDatePickers() {
@@ -903,7 +904,6 @@ public class POQuotation_HistoryController implements Initializable, ScreenInter
         //Unkown || Ready
         JFXUtil.setButtonsVisibility(lbShow2, btnClose);
         JFXUtil.setDisabled(true, apMaster, apDetail, apAttachments);
-
     }
 
     private void initAttachmentPreviewPane() {
@@ -914,7 +914,6 @@ public class POQuotation_HistoryController implements Initializable, ScreenInter
             loadTableAttachment.reload();
             loadRecordAttachment(true);
         });
-
     }
 
     public void slideImage(int direction) {
@@ -997,7 +996,6 @@ public class POQuotation_HistoryController implements Initializable, ScreenInter
                     pnAttachment = newIndex;
                     loadRecordAttachment(true);
                     break;
-
             }
             event.consume();
         }
@@ -1011,5 +1009,4 @@ public class POQuotation_HistoryController implements Initializable, ScreenInter
             JFXUtil.clearTextFields(apMaster, apDetail, apAttachments);
         });
     }
-
 }

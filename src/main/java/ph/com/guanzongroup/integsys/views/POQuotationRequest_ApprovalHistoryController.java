@@ -102,7 +102,6 @@ public class POQuotationRequest_ApprovalHistoryController implements Initializab
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-
         poController = new QuotationControllers(oApp, null);
         poJSON = new JSONObject();
         poJSON = poController.POQuotationRequest().InitTransaction(); // Initialize transaction
@@ -244,6 +243,7 @@ public class POQuotationRequest_ApprovalHistoryController implements Initializab
             }
         } catch (CloneNotSupportedException | SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -307,6 +307,7 @@ public class POQuotationRequest_ApprovalHistoryController implements Initializab
             }, tfSupplier); // default
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -325,6 +326,7 @@ public class POQuotationRequest_ApprovalHistoryController implements Initializab
             }, tfBrand); // default
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -394,7 +396,6 @@ public class POQuotationRequest_ApprovalHistoryController implements Initializab
                             }
                             loadRecordSearch();
                             return;
-
                     }
                     break;
                 default:
@@ -402,6 +403,7 @@ public class POQuotationRequest_ApprovalHistoryController implements Initializab
             }
         } catch (GuanzonException | SQLException | CloneNotSupportedException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -466,6 +468,7 @@ public class POQuotationRequest_ApprovalHistoryController implements Initializab
             JFXUtil.updateCaretPositions(apBrowse);
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -486,12 +489,12 @@ public class POQuotationRequest_ApprovalHistoryController implements Initializab
             JFXUtil.updateCaretPositions(apSupplier);
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
     public void loadRecordDetail() {
         try {
-
             if (pnDetail < 0 || pnDetail > poController.POQuotationRequest().getDetailCount() - 1) {
                 return;
             }
@@ -516,12 +519,12 @@ public class POQuotationRequest_ApprovalHistoryController implements Initializab
             JFXUtil.updateCaretPositions(apDetail);
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
     public void loadRecordMaster() {
         try {
-
             JFXUtil.setStatusValue(lblStatus, POQuotationRequestStatus.class, pnEditMode == EditMode.UNKNOWN ? "-1" : poController.POQuotationRequest().Master().getTransactionStatus());
 
             // Transaction Date
@@ -542,8 +545,8 @@ public class POQuotationRequest_ApprovalHistoryController implements Initializab
             JFXUtil.updateCaretPositions(apMaster);
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
-
     }
 
     public void initLoadTable() {
@@ -594,6 +597,7 @@ public class POQuotationRequest_ApprovalHistoryController implements Initializab
                             }
                         } catch (SQLException | GuanzonException | CloneNotSupportedException ex) {
                             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+                            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
                         }
                     });
                 });
@@ -655,6 +659,7 @@ public class POQuotationRequest_ApprovalHistoryController implements Initializab
                             loadRecordMaster();
                         } catch (SQLException | GuanzonException | CloneNotSupportedException ex) {
                             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+                            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
                         }
                     });
                 });
@@ -663,7 +668,6 @@ public class POQuotationRequest_ApprovalHistoryController implements Initializab
     public void initDatePickers() {
         JFXUtil.setDatePickerFormat("MM/dd/yyyy", dpTransactionDate, dpExpectedDate, dpSearchTransactionDate);
         JFXUtil.setActionListener(this::datepicker_Action, dpTransactionDate, dpExpectedDate, dpSearchTransactionDate);
-
     }
 
     public void initTextFields() {
@@ -756,7 +760,6 @@ public class POQuotationRequest_ApprovalHistoryController implements Initializab
                     pnSupplier = newIndex;
                     loadRecordSupplier();
                     break;
-
             }
             event.consume();
         }
@@ -766,5 +769,4 @@ public class POQuotationRequest_ApprovalHistoryController implements Initializab
         JFXUtil.setValueToNull(previousSearchedTextField, lastFocusedTextField);
         JFXUtil.clearTextFields(apMaster, apDetail, apBrowse, apSupplier);
     }
-
 }

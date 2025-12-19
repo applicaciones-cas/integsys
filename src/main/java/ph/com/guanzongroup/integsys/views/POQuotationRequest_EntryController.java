@@ -104,7 +104,6 @@ public class POQuotationRequest_EntryController implements Initializable, Screen
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-
         poController = new QuotationControllers(oApp, null);
         poJSON = new JSONObject();
         poJSON = poController.POQuotationRequest().InitTransaction(); // Initialize transaction
@@ -321,6 +320,7 @@ public class POQuotationRequest_EntryController implements Initializable, Screen
             }
         } catch (CloneNotSupportedException | SQLException | GuanzonException | ParseException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -349,6 +349,7 @@ public class POQuotationRequest_EntryController implements Initializable, Screen
             JFXUtil.updateCaretPositions(apMaster);
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -383,6 +384,7 @@ public class POQuotationRequest_EntryController implements Initializable, Screen
             JFXUtil.updateCaretPositions(apDetail);
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -444,7 +446,6 @@ public class POQuotationRequest_EntryController implements Initializable, Screen
                             String lsDescription = "";
                             int lnRowCount = 0;
                             for (lnCtr = 0; lnCtr < poController.POQuotationRequest().getDetailCount(); lnCtr++) {
-
                                 if (poController.POQuotationRequest().Detail(lnCtr).isReverse()) {
                                     if (poController.POQuotationRequest().Detail(lnCtr).getStockId() != null) {
                                         lsBarcode = poController.POQuotationRequest().Detail(lnCtr).Inventory().getBarCode();
@@ -485,6 +486,7 @@ public class POQuotationRequest_EntryController implements Initializable, Screen
                             loadRecordMaster();
                         } catch (SQLException | GuanzonException | CloneNotSupportedException ex) {
                             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+                            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
                         }
                     });
                 });
@@ -563,6 +565,7 @@ public class POQuotationRequest_EntryController implements Initializable, Screen
                                     }
                                 } catch (GuanzonException | SQLException ex) {
                                     Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+                                    ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
                                 }
                             }
                         }
@@ -652,6 +655,7 @@ public class POQuotationRequest_EntryController implements Initializable, Screen
             }
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -827,6 +831,7 @@ public class POQuotationRequest_EntryController implements Initializable, Screen
             }
         } catch (GuanzonException | SQLException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -863,7 +868,6 @@ public class POQuotationRequest_EntryController implements Initializable, Screen
                     case "dpTransactionDate":
                         if (poController.POQuotationRequest().getEditMode() == EditMode.ADDNEW
                                 || poController.POQuotationRequest().getEditMode() == EditMode.UPDATE) {
-
                             if (selectedDate.isAfter(currentDate)) {
                                 poJSON.put("result", "error");
                                 poJSON.put("message", "Future dates are not allowed.");
@@ -897,7 +901,6 @@ public class POQuotationRequest_EntryController implements Initializable, Screen
                             } else {
                                 if ("error".equals((String) poJSON.get("result"))) {
                                     ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-
                                 }
                             }
 
@@ -909,7 +912,6 @@ public class POQuotationRequest_EntryController implements Initializable, Screen
                     case "dpExpectedDate":
                         if (poController.POQuotationRequest().getEditMode() == EditMode.ADDNEW
                                 || poController.POQuotationRequest().getEditMode() == EditMode.UPDATE) {
-
                             if (selectedDate.isBefore(transactionDate)) {
                                 JFXUtil.setJSONError(poJSON, "Expected Purchase Date cannot be before the transaction date.");
                                 pbSuccess = false;
@@ -933,6 +935,7 @@ public class POQuotationRequest_EntryController implements Initializable, Screen
             }
         } catch (SQLException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -984,6 +987,7 @@ public class POQuotationRequest_EntryController implements Initializable, Screen
             }
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 

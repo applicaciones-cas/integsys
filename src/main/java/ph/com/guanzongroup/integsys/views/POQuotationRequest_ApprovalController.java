@@ -125,7 +125,6 @@ public class POQuotationRequest_ApprovalController implements Initializable, Scr
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-
         poController = new QuotationControllers(oApp, null);
         poJSON = new JSONObject();
         poJSON = poController.POQuotationRequest().InitTransaction(); // Initialize transaction
@@ -287,7 +286,6 @@ public class POQuotationRequest_ApprovalController implements Initializable, Scr
                                         }
                                     }
                                 }
-
                             }
                         } else {
                             return;
@@ -382,6 +380,7 @@ public class POQuotationRequest_ApprovalController implements Initializable, Scr
             }
         } catch (CloneNotSupportedException | SQLException | GuanzonException | ParseException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -406,6 +405,7 @@ public class POQuotationRequest_ApprovalController implements Initializable, Scr
             }
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -527,6 +527,7 @@ public class POQuotationRequest_ApprovalController implements Initializable, Scr
             }, tfSupplier); // default
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -545,6 +546,7 @@ public class POQuotationRequest_ApprovalController implements Initializable, Scr
             }, tfBrand); // default
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -696,6 +698,7 @@ public class POQuotationRequest_ApprovalController implements Initializable, Scr
             }
         } catch (GuanzonException | SQLException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -761,6 +764,7 @@ public class POQuotationRequest_ApprovalController implements Initializable, Scr
             JFXUtil.updateCaretPositions(apBrowse);
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -786,12 +790,12 @@ public class POQuotationRequest_ApprovalController implements Initializable, Scr
             JFXUtil.updateCaretPositions(apSupplier);
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
     public void loadRecordDetail() {
         try {
-
             if (pnDetail < 0 || pnDetail > poController.POQuotationRequest().getDetailCount() - 1) {
                 return;
             }
@@ -816,12 +820,12 @@ public class POQuotationRequest_ApprovalController implements Initializable, Scr
             JFXUtil.updateCaretPositions(apDetail);
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
     public void loadRecordMaster() {
         try {
-
             JFXUtil.setStatusValue(lblStatus, POQuotationRequestStatus.class, pnEditMode == EditMode.UNKNOWN ? "-1" : poController.POQuotationRequest().Master().getTransactionStatus());
 
             // Transaction Date
@@ -842,8 +846,8 @@ public class POQuotationRequest_ApprovalController implements Initializable, Scr
             JFXUtil.updateCaretPositions(apMaster);
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
-
     }
 
     public void loadTableDetailFromMain() {
@@ -875,9 +879,9 @@ public class POQuotationRequest_ApprovalController implements Initializable, Scr
                         break;
                 }
             });
-
         } catch (CloneNotSupportedException | SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -946,6 +950,7 @@ public class POQuotationRequest_ApprovalController implements Initializable, Scr
                             }
                         } catch (SQLException | GuanzonException | CloneNotSupportedException ex) {
                             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+                            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
                         }
                     });
                 });
@@ -1010,6 +1015,7 @@ public class POQuotationRequest_ApprovalController implements Initializable, Scr
                             loadRecordMaster();
                         } catch (SQLException | GuanzonException | CloneNotSupportedException ex) {
                             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+                            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
                         }
                     });
                 });
@@ -1034,6 +1040,7 @@ public class POQuotationRequest_ApprovalController implements Initializable, Scr
                                     ));
                                 } catch (GuanzonException | SQLException ex) {
                                     Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+                                    ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
                                 }
 
                                 if (poController.POQuotationRequest().POQuotationRequestList(lnCtr).getTransactionStatus().equals(POQuotationRequestStatus.APPROVED)) {
@@ -1056,13 +1063,11 @@ public class POQuotationRequest_ApprovalController implements Initializable, Scr
                         JFXUtil.loadTab(pgPagination, main_data.size(), ROWS_PER_PAGE, tblViewMainList, filteredData);
                     });
                 });
-
     }
 
     public void initDatePickers() {
         JFXUtil.setDatePickerFormat("MM/dd/yyyy", dpTransactionDate, dpExpectedDate, dpSearchTransactionDate);
         JFXUtil.setActionListener(this::datepicker_Action, dpTransactionDate, dpExpectedDate, dpSearchTransactionDate);
-
     }
 
     public void initTextFields() {
@@ -1112,7 +1117,6 @@ public class POQuotationRequest_ApprovalController implements Initializable, Scr
     }
 
     private void initButton(int fnValue) {
-
         boolean lbShow1 = (fnValue == EditMode.UPDATE);
         boolean lbShow3 = (fnValue == EditMode.READY);
         boolean lbShow4 = (fnValue == EditMode.UNKNOWN || fnValue == EditMode.READY);
@@ -1176,7 +1180,6 @@ public class POQuotationRequest_ApprovalController implements Initializable, Scr
 
         filteredData = new FilteredList<>(main_data, b -> true);
         tblViewMainList.setItems(filteredData);
-
     }
 
     private void tableKeyEvents(KeyEvent event) {
@@ -1209,16 +1212,13 @@ public class POQuotationRequest_ApprovalController implements Initializable, Scr
                     pnSupplier = newIndex;
                     loadRecordSupplier();
                     break;
-
             }
             event.consume();
         }
     }
 
     public void clearTextFields() {
-
         JFXUtil.setValueToNull(previousSearchedTextField, lastFocusedTextField);
         JFXUtil.clearTextFields(apMaster, apDetail, apBrowse, apSupplier);
     }
-
 }

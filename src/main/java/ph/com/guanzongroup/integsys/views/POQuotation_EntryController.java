@@ -301,7 +301,6 @@ public class POQuotation_EntryController implements Initializable, ScreenInterfa
             lnCount += 1;
             data.put(String.valueOf(lnCount), new Pair<>(String.valueOf(poController.POQuotation().TransactionAttachmentList(lnCtr).getModel().getFileName()),
                     poController.POQuotation().TransactionAttachmentList(lnCtr).getModel().getDocumentType()));
-
         }
         AttachmentDialogController controller = new AttachmentDialogController();
         controller.setOpenedImage(pnAttachment);
@@ -311,8 +310,8 @@ public class POQuotation_EntryController implements Initializable, ScreenInterfa
             stageAttachment.showDialog((Stage) btnClose.getScene().getWindow(), getClass().getResource("/ph/com/guanzongroup/integsys/views/AttachmentDialog.fxml"), controller, "Attachment Dialog", false, false, true);
         } catch (IOException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
-
     }
 
     @FXML
@@ -602,10 +601,9 @@ public class POQuotation_EntryController implements Initializable, ScreenInterfa
                     moveNext(false, false);
                 }
             }
-        } catch (CloneNotSupportedException | SQLException | GuanzonException | ParseException ex) {
+        } catch (CloneNotSupportedException | SQLException | GuanzonException | ParseException | IOException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
-        } catch (IOException ex) {
-            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -635,6 +633,7 @@ public class POQuotation_EntryController implements Initializable, ScreenInterfa
             JFXUtil.showRetainedHighlight(false, tblViewMainList, "#A7C7E7", plOrderNoPartial, plOrderNoFinal, highlightedRowsMain, false);
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -679,6 +678,7 @@ public class POQuotation_EntryController implements Initializable, ScreenInterfa
             }
         } catch (CloneNotSupportedException | SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
         return true;
     }
@@ -1168,6 +1168,7 @@ public class POQuotation_EntryController implements Initializable, ScreenInterfa
             }
         } catch (GuanzonException | SQLException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -1206,7 +1207,6 @@ public class POQuotation_EntryController implements Initializable, ScreenInterfa
                     case "dpTransactionDate":
                         if (poController.POQuotation().getEditMode() == EditMode.ADDNEW
                                 || poController.POQuotation().getEditMode() == EditMode.UPDATE) {
-
                             if (JFXUtil.isObjectEqualTo(poController.POQuotation().Master().getSourceNo(), null, "")) {
                                 if (pbSuccess) {
                                     ShowMessageFX.Warning(null, pxeModuleName, "Source No cannot be empty");
@@ -1254,7 +1254,6 @@ public class POQuotation_EntryController implements Initializable, ScreenInterfa
                             } else {
                                 if ("error".equals((String) poJSON.get("result"))) {
                                     ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-
                                 }
                             }
 
@@ -1320,6 +1319,7 @@ public class POQuotation_EntryController implements Initializable, ScreenInterfa
             }
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -1332,6 +1332,7 @@ public class POQuotation_EntryController implements Initializable, ScreenInterfa
             }
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -1395,7 +1396,6 @@ public class POQuotation_EntryController implements Initializable, ScreenInterfa
                                 // Optional: add some margin
                                 StackPane.setMargin(btnArrowLeft, new Insets(0, 0, 0, 10));
                                 StackPane.setMargin(btnArrowRight, new Insets(0, 10, 0, 0));
-
                             } else {
                                 // ----- PDF VIEW -----
                                 PDDocument document = PDDocument.load(new File(filePath2));
@@ -1502,7 +1502,6 @@ public class POQuotation_EntryController implements Initializable, ScreenInterfa
                         } else {
                             imageView.setImage(null);
                         }
-
                     } catch (Exception e) {
                         imageView.setImage(null);
                     }
@@ -1562,7 +1561,6 @@ public class POQuotation_EntryController implements Initializable, ScreenInterfa
                         JFXUtil.setDisabled(lbIsUpdate, tfDescription);
                     });
                 }
-
             }
 
             tfDescription.setText(poController.POQuotation().Detail(pnDetail).getDescription());
@@ -1578,6 +1576,7 @@ public class POQuotation_EntryController implements Initializable, ScreenInterfa
             JFXUtil.updateCaretPositions(apDetail);
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -1628,6 +1627,7 @@ public class POQuotation_EntryController implements Initializable, ScreenInterfa
             JFXUtil.updateCaretPositions(apMaster);
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -1668,9 +1668,9 @@ public class POQuotation_EntryController implements Initializable, ScreenInterfa
             Platform.runLater(() -> {
                 loadTableAttachment.reload();
             });
-
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -1778,6 +1778,7 @@ public class POQuotation_EntryController implements Initializable, ScreenInterfa
                             loadRecordMaster();
                         } catch (CloneNotSupportedException ex) {
                             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+                            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
                         }
                     });
                 });
@@ -1808,6 +1809,7 @@ public class POQuotation_EntryController implements Initializable, ScreenInterfa
                                     ));
                                 } catch (GuanzonException | SQLException ex) {
                                     Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+                                    ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
                                 }
                             }
                             loadHighlightFromDetail();
@@ -1827,7 +1829,6 @@ public class POQuotation_EntryController implements Initializable, ScreenInterfa
                         JFXUtil.loadTab(pgPagination, main_data.size(), ROWS_PER_PAGE, tblViewMainList, filteredData);
                     });
                 });
-
     }
 
     public void initDatePickers() {
@@ -1935,7 +1936,6 @@ public class POQuotation_EntryController implements Initializable, ScreenInterfa
             loadTableAttachment.reload();
             loadRecordAttachment(true);
         });
-
     }
 
     public void slideImage(int direction) {
@@ -2031,7 +2031,6 @@ public class POQuotation_EntryController implements Initializable, ScreenInterfa
                     pnAttachment = newIndex;
                     loadRecordAttachment(true);
                     break;
-
             }
             event.consume();
         }
@@ -2045,5 +2044,4 @@ public class POQuotation_EntryController implements Initializable, ScreenInterfa
             JFXUtil.clearTextFields(apMaster, apDetail, apAttachments);
         });
     }
-
 }

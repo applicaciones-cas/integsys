@@ -299,7 +299,6 @@ public class POQuotation_ConfirmationController implements Initializable, Screen
             lnCount += 1;
             data.put(String.valueOf(lnCount), new Pair<>(String.valueOf(poController.POQuotation().TransactionAttachmentList(lnCtr).getModel().getFileName()),
                     poController.POQuotation().TransactionAttachmentList(lnCtr).getModel().getDocumentType()));
-
         }
         AttachmentDialogController controller = new AttachmentDialogController();
         controller.setOpenedImage(pnAttachment);
@@ -309,8 +308,8 @@ public class POQuotation_ConfirmationController implements Initializable, Screen
             stageAttachment.showDialog((Stage) btnClose.getScene().getWindow(), getClass().getResource("/ph/com/guanzongroup/integsys/views/AttachmentDialog.fxml"), controller, "Attachment Dialog", false, false, true);
         } catch (IOException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
-
     }
 
     @FXML
@@ -419,7 +418,6 @@ public class POQuotation_ConfirmationController implements Initializable, Screen
                                     }
                                 }
                                 JFXUtil.disableAllHighlightByColor(tblViewMainList, "#A7C7E7", highlightedRowsMain);
-
                             }
                         } else {
                             return;
@@ -457,7 +455,6 @@ public class POQuotation_ConfirmationController implements Initializable, Screen
                                 JFXUtil.disableAllHighlightByColor(tblViewMainList, "#A7C7E7", highlightedRowsMain);
                                 JFXUtil.highlightByKey(tblViewMainList, String.valueOf(pnMain + 1), "#FAA0A0", highlightedRowsMain);
                             }
-
                         } else {
                             return;
                         }
@@ -597,10 +594,9 @@ public class POQuotation_ConfirmationController implements Initializable, Screen
                     moveNext(false, false);
                 }
             }
-        } catch (CloneNotSupportedException | SQLException | GuanzonException | ParseException ex) {
+        } catch (CloneNotSupportedException | SQLException | GuanzonException | ParseException | IOException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
-        } catch (IOException ex) {
-            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -665,7 +661,6 @@ public class POQuotation_ConfirmationController implements Initializable, Screen
                             break;
                         }
                         break;
-
                 }
                 loadRecordMaster();
 //                } catch (SQLException | GuanzonException ex) {
@@ -1018,6 +1013,7 @@ public class POQuotation_ConfirmationController implements Initializable, Screen
             }
         } catch (GuanzonException | SQLException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -1056,7 +1052,6 @@ public class POQuotation_ConfirmationController implements Initializable, Screen
                     case "dpTransactionDate":
                         if (poController.POQuotation().getEditMode() == EditMode.ADDNEW
                                 || poController.POQuotation().getEditMode() == EditMode.UPDATE) {
-
                             if (JFXUtil.isObjectEqualTo(poController.POQuotation().Master().getSourceNo(), null, "")) {
                                 if (pbSuccess) {
                                     ShowMessageFX.Warning(null, pxeModuleName, "Source No cannot be empty");
@@ -1104,7 +1099,6 @@ public class POQuotation_ConfirmationController implements Initializable, Screen
                             } else {
                                 if ("error".equals((String) poJSON.get("result"))) {
                                     ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-
                                 }
                             }
 
@@ -1170,6 +1164,7 @@ public class POQuotation_ConfirmationController implements Initializable, Screen
             }
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -1187,6 +1182,7 @@ public class POQuotation_ConfirmationController implements Initializable, Screen
             JFXUtil.updateCaretPositions(apBrowse);
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -1250,7 +1246,6 @@ public class POQuotation_ConfirmationController implements Initializable, Screen
                                 // Optional: add some margin
                                 StackPane.setMargin(btnArrowLeft, new Insets(0, 0, 0, 10));
                                 StackPane.setMargin(btnArrowRight, new Insets(0, 10, 0, 0));
-
                             } else {
                                 // ----- PDF VIEW -----
                                 PDDocument document = PDDocument.load(new File(filePath2));
@@ -1357,7 +1352,6 @@ public class POQuotation_ConfirmationController implements Initializable, Screen
                         } else {
                             imageView.setImage(null);
                         }
-
                     } catch (Exception e) {
                         imageView.setImage(null);
                     }
@@ -1417,7 +1411,6 @@ public class POQuotation_ConfirmationController implements Initializable, Screen
                         JFXUtil.setDisabled(lbIsUpdate, tfDescription);
                     });
                 }
-
             }
 
             tfDescription.setText(poController.POQuotation().Detail(pnDetail).getDescription());
@@ -1433,6 +1426,7 @@ public class POQuotation_ConfirmationController implements Initializable, Screen
             JFXUtil.updateCaretPositions(apDetail);
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -1478,6 +1472,7 @@ public class POQuotation_ConfirmationController implements Initializable, Screen
             JFXUtil.updateCaretPositions(apMaster);
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -1534,9 +1529,9 @@ public class POQuotation_ConfirmationController implements Initializable, Screen
             Platform.runLater(() -> {
                 loadTableAttachment.reload();
             });
-
         } catch (SQLException | GuanzonException | CloneNotSupportedException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -1645,6 +1640,7 @@ public class POQuotation_ConfirmationController implements Initializable, Screen
                             loadRecordMaster();
                         } catch (CloneNotSupportedException ex) {
                             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+                            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
                         }
                     });
                 });
@@ -1671,12 +1667,12 @@ public class POQuotation_ConfirmationController implements Initializable, Screen
                                     ));
                                 } catch (GuanzonException | SQLException ex) {
                                     Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+                                    ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
                                 }
                                 if (poController.POQuotation().POQuotationList(lnCtr).getTransactionStatus().equals(POQuotationStatus.CONFIRMED)) {
                                     JFXUtil.highlightByKey(tblViewMainList, String.valueOf(lnCtr + 1), "#C1E1C1", highlightedRowsMain);
                                 }
                             }
-
                         }
 
                         if (pnMain < 0 || pnMain
@@ -1693,7 +1689,6 @@ public class POQuotation_ConfirmationController implements Initializable, Screen
                         JFXUtil.loadTab(pgPagination, main_data.size(), ROWS_PER_PAGE, tblViewMainList, filteredData);
                     });
                 });
-
     }
 
     public void initDatePickers() {
@@ -1771,7 +1766,6 @@ public class POQuotation_ConfirmationController implements Initializable, Screen
     }
 
     private void initButton(int fnValue) {
-
         boolean lbShow1 = (fnValue == EditMode.UPDATE);
         boolean lbShow3 = (fnValue == EditMode.READY);
         boolean lbShow4 = (fnValue == EditMode.UNKNOWN || fnValue == EditMode.READY);
@@ -1816,7 +1810,6 @@ public class POQuotation_ConfirmationController implements Initializable, Screen
             loadTableAttachment.reload();
             loadRecordAttachment(true);
         });
-
     }
 
     public void slideImage(int direction) {
@@ -1912,7 +1905,6 @@ public class POQuotation_ConfirmationController implements Initializable, Screen
                     pnAttachment = newIndex;
                     loadRecordAttachment(true);
                     break;
-
             }
             event.consume();
         }
@@ -1926,5 +1918,4 @@ public class POQuotation_ConfirmationController implements Initializable, Screen
             JFXUtil.clearTextFields(apBrowse, apMaster, apDetail, apAttachments);
         });
     }
-
 }

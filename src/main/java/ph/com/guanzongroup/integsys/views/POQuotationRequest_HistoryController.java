@@ -101,7 +101,6 @@ public class POQuotationRequest_HistoryController implements Initializable, Scre
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-
         poController = new QuotationControllers(oApp, null);
         poJSON = new JSONObject();
         poJSON = poController.POQuotationRequest().InitTransaction(); // Initialize transaction
@@ -203,6 +202,7 @@ public class POQuotationRequest_HistoryController implements Initializable, Scre
             }
         } catch (CloneNotSupportedException | SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -231,6 +231,7 @@ public class POQuotationRequest_HistoryController implements Initializable, Scre
             JFXUtil.updateCaretPositions(apMaster);
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -261,6 +262,7 @@ public class POQuotationRequest_HistoryController implements Initializable, Scre
             JFXUtil.updateCaretPositions(apDetail);
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -363,6 +365,7 @@ public class POQuotationRequest_HistoryController implements Initializable, Scre
                             loadRecordMaster();
                         } catch (SQLException | GuanzonException | CloneNotSupportedException ex) {
                             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+                            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
                         }
                     });
                 });
@@ -383,6 +386,7 @@ public class POQuotationRequest_HistoryController implements Initializable, Scre
             }, tfBrand); // default
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -471,6 +475,7 @@ public class POQuotationRequest_HistoryController implements Initializable, Scre
             }
         } catch (GuanzonException | SQLException | CloneNotSupportedException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -529,7 +534,6 @@ public class POQuotationRequest_HistoryController implements Initializable, Scre
     public void initDatePickers() {
         JFXUtil.setDatePickerFormat("MM/dd/yyyy", dpTransactionDate, dpExpectedDate, dpSearchTransactionDate);
         JFXUtil.setActionListener(this::datepicker_Action, dpTransactionDate, dpExpectedDate, dpSearchTransactionDate);
-
     }
 
     public void initTextFields() {
@@ -575,6 +579,7 @@ public class POQuotationRequest_HistoryController implements Initializable, Scre
             JFXUtil.updateCaretPositions(apBrowse);
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
