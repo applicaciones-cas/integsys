@@ -134,7 +134,6 @@ public class SOATagging_ConfirmationController implements Initializable, ScreenI
     @Override
     public void initialize(URL location, ResourceBundle resources) {
 //        psIndustryId = ""; // general
-        
         poSOATaggingController = new CashflowControllers(oApp, null);
         poJSON = new JSONObject();
         poJSON = poSOATaggingController.SOATagging().InitTransaction(); // Initialize transaction
@@ -368,10 +367,10 @@ public class SOATagging_ConfirmationController implements Initializable, ScreenI
                         tfSourceNo.requestFocus();
                     }
                 }
-
             }
         } catch (CloneNotSupportedException | SQLException | GuanzonException | ParseException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -385,7 +384,6 @@ public class SOATagging_ConfirmationController implements Initializable, ScreenI
         } else {
             loadTableMain();
         }
-
     }
     ChangeListener<Boolean> txtArea_Focus = JFXUtil.FocusListener(TextArea.class,
             (lsID, lsValue) -> {
@@ -431,7 +429,6 @@ public class SOATagging_ConfirmationController implements Initializable, ScreenI
                         });
                         break;
                 }
-
             });
     ChangeListener<Boolean> txtMaster_Focus = JFXUtil.FocusListener(TextField.class,
             (lsID, lsValue) -> {
@@ -679,6 +676,7 @@ public class SOATagging_ConfirmationController implements Initializable, ScreenI
             }
         } catch (GuanzonException | SQLException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -736,7 +734,6 @@ public class SOATagging_ConfirmationController implements Initializable, ScreenI
                                         if (!"success".equals((String) poJSON.get("result"))) {
                                             pbSuccess = false;
                                         } else {
-
                                             if (Integer.parseInt(poJSON.get("nUserLevl").toString()) <= UserRight.ENCODER) {
                                                 poJSON.put("result", "error");
                                                 poJSON.put("message", "User is not an authorized approving officer.");
@@ -744,7 +741,6 @@ public class SOATagging_ConfirmationController implements Initializable, ScreenI
                                             } else {
                                                 poSOATaggingController.SOATagging().Master().setTransactionDate((SQLUtil.toDate(lsSelectedDate, SQLUtil.FORMAT_SHORT_DATE)));
                                             }
-
                                         }
                                     } else {
                                         pbSuccess = false;
@@ -753,7 +749,6 @@ public class SOATagging_ConfirmationController implements Initializable, ScreenI
                             }
 
                             if (pbSuccess) {
-
                             } else {
                                 if ("error".equals((String) poJSON.get("result"))) {
                                     ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
@@ -762,7 +757,6 @@ public class SOATagging_ConfirmationController implements Initializable, ScreenI
                             pbSuccess = false; //Set to false to prevent multiple message box: Conflict with server date vs transaction date validation
                             loadRecordMaster();
                             pbSuccess = true; //Set to original value
-
                         }
                         break;
                     default:
@@ -771,6 +765,7 @@ public class SOATagging_ConfirmationController implements Initializable, ScreenI
             }
         } catch (SQLException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -794,7 +789,6 @@ public class SOATagging_ConfirmationController implements Initializable, ScreenI
 
                     //retreiving using column index
                     for (int lnCtr = 0; lnCtr <= poSOATaggingController.SOATagging().getSOATaggingCount() - 1; lnCtr++) {
-
                         lsTransNo = String.valueOf(poSOATaggingController.SOATagging().APPaymentMasterList(lnCtr).getTransactionNo());
                         try {
                             main_data.add(new ModelSOATagging_Main(String.valueOf(lnCtr + 1),
@@ -804,6 +798,7 @@ public class SOATagging_ConfirmationController implements Initializable, ScreenI
                             ));
                         } catch (SQLException | GuanzonException ex) {
                             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+                            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
                         }
                         if (poSOATaggingController.SOATagging().APPaymentMasterList(lnCtr).getTransactionStatus().equals(SOATaggingStatus.CONFIRMED)) {
                             JFXUtil.highlightByKey(tblViewMainList, String.valueOf(lnCtr + 1), "#C1E1C1", highlightedRowsMain);
@@ -816,7 +811,6 @@ public class SOATagging_ConfirmationController implements Initializable, ScreenI
                             /* FOCUS ON FIRST ROW */
                             JFXUtil.selectAndFocusRow(tblViewMainList, 0);
                             pnMain = tblViewMainList.getSelectionModel().getSelectedIndex();
-
                         }
                     } else {
                         /* FOCUS ON THE ROW THAT pnRowDetail POINTS TO */
@@ -847,7 +841,6 @@ public class SOATagging_ConfirmationController implements Initializable, ScreenI
                 }
                 loading.progressIndicator.setVisible(false);
             }
-
         };
         new Thread(task).start(); // Run task in background
     }
@@ -865,9 +858,9 @@ public class SOATagging_ConfirmationController implements Initializable, ScreenI
             tfSearchSupplier.setText(psSearchSupplierId.equals("") ? "" : poSOATaggingController.SOATagging().Master().Supplier().getCompanyName());
             tfSearchCompany.setText(psSearchCompanyId.equals("") ? "" : poSOATaggingController.SOATagging().Master().Company().getCompanyName());
             JFXUtil.updateCaretPositions(apBrowse);
-
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -926,8 +919,8 @@ public class SOATagging_ConfirmationController implements Initializable, ScreenI
             JFXUtil.updateCaretPositions(apDetail);
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
-
     }
 
     public void loadRecordMaster() {
@@ -955,6 +948,7 @@ public class SOATagging_ConfirmationController implements Initializable, ScreenI
             JFXUtil.updateCaretPositions(apMaster);
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -983,6 +977,7 @@ public class SOATagging_ConfirmationController implements Initializable, ScreenI
             }
         } catch (CloneNotSupportedException | SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -1001,7 +996,6 @@ public class SOATagging_ConfirmationController implements Initializable, ScreenI
                     details_data.clear();
                     int lnCtr;
                     try {
-
                         if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
                             if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
                                 poSOATaggingController.SOATagging().ReloadDetail();
@@ -1076,6 +1070,7 @@ public class SOATagging_ConfirmationController implements Initializable, ScreenI
                         loadRecordMaster();
                     } catch (SQLException | GuanzonException | CloneNotSupportedException ex) {
                         Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+                        ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
                     }
                 });
 
@@ -1229,7 +1224,6 @@ public class SOATagging_ConfirmationController implements Initializable, ScreenI
 
         filteredData = new FilteredList<>(main_data, b -> true);
         tblViewMainList.setItems(filteredData);
-
     }
 
     private void tableKeyEvents(KeyEvent event) {
@@ -1266,5 +1260,4 @@ public class SOATagging_ConfirmationController implements Initializable, ScreenI
         JFXUtil.setValueToNull(previousSearchedTextField, lastFocusedTextField, dpTransactionDate);
         JFXUtil.clearTextFields(apMaster, apDetail, apBrowse);
     }
-
 }

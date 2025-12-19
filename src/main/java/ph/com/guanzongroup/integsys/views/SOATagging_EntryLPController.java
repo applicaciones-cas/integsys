@@ -135,7 +135,6 @@ public class SOATagging_EntryLPController implements Initializable, ScreenInterf
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-
         poSOATaggingController = new CashflowControllers(oApp, null);
         poJSON = new JSONObject();
         poJSON = poSOATaggingController.SOATagging().InitTransaction(); // Initialize transaction
@@ -349,6 +348,7 @@ public class SOATagging_EntryLPController implements Initializable, ScreenInterf
             }
         } catch (CloneNotSupportedException | SQLException | GuanzonException | ParseException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -385,6 +385,7 @@ public class SOATagging_EntryLPController implements Initializable, ScreenInterf
             JFXUtil.showRetainedHighlight(false, tblViewMainList, "#A7C7E7", plOrderNoPartial, plOrderNoFinal, highlightedRowsMain, false);
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -768,6 +769,7 @@ public class SOATagging_EntryLPController implements Initializable, ScreenInterf
             }
         } catch (GuanzonException | SQLException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -824,7 +826,6 @@ public class SOATagging_EntryLPController implements Initializable, ScreenInterf
                                         if (!"success".equals((String) poJSON.get("result"))) {
                                             pbSuccess = false;
                                         } else {
-
                                             if (Integer.parseInt(poJSON.get("nUserLevl").toString()) <= UserRight.ENCODER) {
                                                 poJSON.put("result", "error");
                                                 poJSON.put("message", "User is not an authorized approving officer.");
@@ -840,7 +841,6 @@ public class SOATagging_EntryLPController implements Initializable, ScreenInterf
                             }
 
                             if (pbSuccess) {
-
                             } else {
                                 if ("error".equals((String) poJSON.get("result"))) {
                                     ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
@@ -849,7 +849,6 @@ public class SOATagging_EntryLPController implements Initializable, ScreenInterf
                             pbSuccess = false; //Set to false to prevent multiple message box: Conflict with server date vs transaction date validation
                             loadRecordMaster();
                             pbSuccess = true; //Set to original value
-
                         }
                         break;
                     default:
@@ -858,6 +857,7 @@ public class SOATagging_EntryLPController implements Initializable, ScreenInterf
             }
         } catch (SQLException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -918,6 +918,7 @@ public class SOATagging_EntryLPController implements Initializable, ScreenInterf
                             ));
                         } catch (SQLException | GuanzonException ex) {
                             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+                            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
                         }
                     }
 
@@ -928,7 +929,6 @@ public class SOATagging_EntryLPController implements Initializable, ScreenInterf
                             /* FOCUS ON FIRST ROW */
                             JFXUtil.selectAndFocusRow(tblViewMainList, 0);
                             pnMain = tblViewMainList.getSelectionModel().getSelectedIndex();
-
                         }
                     } else {
                         /* FOCUS ON THE ROW THAT pnRowDetail POINTS TO */
@@ -971,6 +971,7 @@ public class SOATagging_EntryLPController implements Initializable, ScreenInterf
             }
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -1025,6 +1026,7 @@ public class SOATagging_EntryLPController implements Initializable, ScreenInterf
             JFXUtil.updateCaretPositions(apDetail);
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -1060,6 +1062,7 @@ public class SOATagging_EntryLPController implements Initializable, ScreenInterf
             JFXUtil.updateCaretPositions(apMaster);
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -1100,9 +1103,9 @@ public class SOATagging_EntryLPController implements Initializable, ScreenInterf
             } else {
                 ShowMessageFX.Warning(null, pxeModuleName, "Data can only be viewed when in ADD or UPDATE mode.");
             }
-
         } catch (CloneNotSupportedException | SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -1123,7 +1126,6 @@ public class SOATagging_EntryLPController implements Initializable, ScreenInterf
 
                     int lnCtr;
                     try {
-
                         if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
                             if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
                                 poSOATaggingController.SOATagging().ReloadDetail();
@@ -1198,12 +1200,9 @@ public class SOATagging_EntryLPController implements Initializable, ScreenInterf
                             loadRecordDetail();
                         }
                         loadRecordMaster();
-                    } catch (CloneNotSupportedException ex) {
+                    } catch (SQLException | GuanzonException | CloneNotSupportedException ex) {
                         Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
-                    } catch (SQLException ex) {
-                        Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
-                    } catch (GuanzonException ex) {
-                        Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+                        ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
                     }
                 });
 
@@ -1227,10 +1226,8 @@ public class SOATagging_EntryLPController implements Initializable, ScreenInterf
                 }
                 loading.progressIndicator.setVisible(false);
             }
-
         };
         new Thread(task).start(); // Run task in background
-
     }
 
     private void initComboBoxes() {
@@ -1336,7 +1333,6 @@ public class SOATagging_EntryLPController implements Initializable, ScreenInterf
 
         filteredData = new FilteredList<>(main_data, b -> true);
         tblViewMainList.setItems(filteredData);
-
     }
 
     private void tableKeyEvents(KeyEvent event) {
@@ -1369,5 +1365,4 @@ public class SOATagging_EntryLPController implements Initializable, ScreenInterf
         JFXUtil.setValueToNull(previousSearchedTextField, lastFocusedTextField, dpTransactionDate);
         JFXUtil.clearTextFields(apMaster, apDetail);
     }
-
 }
