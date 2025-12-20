@@ -1250,6 +1250,10 @@ public class DisbursementVoucher_VerificationController implements Initializable
                 try {
                     switch (lsID) {
                         case "tfBaseAmount":
+                            if (JFXUtil.isObjectEqualTo(poController.WTaxDeduction(pnDetailBIR).getModel().WithholdingTax().AccountChart().getDescription(), null, "")) {
+                                ShowMessageFX.Warning(null, pxeModuleName, "Particular is blank, unable to input value!");
+                                break;
+                            }
                             lsValue = JFXUtil.removeComma(lsValue);
                             poJSON = poController.WTaxDeduction(pnDetailBIR).getModel().setBaseAmount(Double.valueOf(lsValue));
                             if ("error".equals((String) poJSON.get("result"))) {
