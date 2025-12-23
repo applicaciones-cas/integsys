@@ -1773,6 +1773,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
 
     private void loadRecordMasterCheck() {
         try {
+            JFXUtil.setDisabled(true, tfCheckNo, tfCheckAmount);
             tfCheckNo.setText(poController.CheckPayments().getModel().getCheckNo());
             if (JFXUtil.isObjectEqualTo(poController.CheckPayments().getModel().getCheckNo(), null, "")) {
                 poController.CheckPayments().getModel().setCheckDate(null);
@@ -2005,36 +2006,41 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
             if (!JFXUtil.isObjectEqualTo(pnEditMode, EditMode.ADDNEW, EditMode.UPDATE)) {
                 return;
             }
-            Set<Node> nodes = new HashSet<>();
-            nodes.addAll(apMasterDVCheck.lookupAll(".text-field"));
-            nodes.addAll(apMasterDVCheck.lookupAll(".combo-box"));
-            for (Node node : nodes) {
-                if (!node.isDisabled()) {
-                    continue;
-                }
-                Bounds boundsInScene = node.localToScene(node.getBoundsInLocal());
-                if (boundsInScene.contains(event.getSceneX(), event.getSceneY())) {
-                    if (node instanceof TextField) {
-                        switch (node.getId()) {
-                            case "tfAuthorizedPerson":
-                                ShowMessageFX.Warning(null, pxeModuleName, "Authorized Person field is only available when the \"Claimant Type\" is Authorized Representative.");
-                                break;
-                        }
-                    } else if (node instanceof ComboBox<?>) {
-                        switch (node.getId()) {
-                            case "cmbPayeeType":
-                                ShowMessageFX.Warning(null, pxeModuleName, "Payee Type is only available when \"Check Print by Bank\" is selected.");
-                                break;
-                            case "cmbDisbursementMode":
-                                ShowMessageFX.Warning(null, pxeModuleName, "Disbursement mode is only available when \"Check Print by Bank\" is selected.");
-                                break;
-                            case "cmbClaimantType":
-                                ShowMessageFX.Warning(null, pxeModuleName, "Claimant Type is only available when the \"Disbursement Mode\" is Pick-up.");
-                                break;
+            try {
+                Set<Node> nodes = new HashSet<>();
+                nodes.addAll(apMasterDVCheck.lookupAll(".text-field"));
+                nodes.addAll(apMasterDVCheck.lookupAll(".combo-box"));
+                for (Node node : nodes) {
+                    if (!node.isDisabled()) {
+                        continue;
+                    }
+                    Bounds boundsInScene = node.localToScene(node.getBoundsInLocal());
+                    if (boundsInScene.contains(event.getSceneX(), event.getSceneY())) {
+                        if (node instanceof TextField) {
+                            switch (node.getId()) {
+                                case "tfAuthorizedPerson":
+                                    ShowMessageFX.Warning(null, pxeModuleName, "Authorized Person field is only available when the \"Claimant Type\" is Authorized Representative.");
+                                    break;
+                            }
+                        } else if (node instanceof ComboBox<?>) {
+                            switch (node.getId()) {
+                                case "cmbPayeeType":
+                                    ShowMessageFX.Warning(null, pxeModuleName, "Payee Type is only available when \"Check Print by Bank\" is selected.");
+                                    break;
+                                case "cmbDisbursementMode":
+                                    ShowMessageFX.Warning(null, pxeModuleName, "Disbursement mode is only available when \"Check Print by Bank\" is selected.");
+                                    break;
+                                case "cmbClaimantType":
+                                    ShowMessageFX.Warning(null, pxeModuleName, "Claimant Type is only available when the \"Disbursement Mode\" is Pick-up.");
+                                    break;
+                            }
                         }
                     }
                 }
+            } catch (Exception e) {
+
             }
+
         });
     }
     boolean pbSuccess = true;

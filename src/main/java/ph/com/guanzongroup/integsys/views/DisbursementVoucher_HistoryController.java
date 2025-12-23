@@ -813,6 +813,7 @@ public class DisbursementVoucher_HistoryController implements Initializable, Scr
 
     private void loadRecordMasterCheck() {
         try {
+            JFXUtil.setDisabled(true, tfCheckNo, tfCheckAmount);
             tfCheckNo.setText(poController.CheckPayments().getModel().getCheckNo());
             if (JFXUtil.isObjectEqualTo(poController.CheckPayments().getModel().getCheckNo(), null, "")) {
                 poController.CheckPayments().getModel().setCheckDate(null);
