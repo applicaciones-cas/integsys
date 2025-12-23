@@ -1525,8 +1525,9 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                                         return;
                                     }
                                     break;
+                                } else {
+                                    JFXUtil.textFieldMoveNext(tfDebitAmount);
                                 }
-                                moveNextJE(false, true);
                                 break;
                             case "tfAccountDescription":
                                 poJSON = poController.Journal().SearchAccountCode(pnDetailJE, lsValue, false, poController.Master().getIndustryID(), null);
@@ -1553,7 +1554,6 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                                     }
                                     break;
                                 }
-                                moveNextJE(false, true);
                                 break;
 
                             //apBIRDetail

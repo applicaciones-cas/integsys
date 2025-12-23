@@ -1494,8 +1494,10 @@ public class DisbursementVoucher_VerificationController implements Initializable
                                         return;
                                     }
                                     break;
+                                } else {
+                                    JFXUtil.textFieldMoveNext(tfDebitAmount);
                                 }
-                                moveNextJE(false, true);
+
                                 break;
                             case "tfAccountDescription":
                                 poJSON = poController.Journal().SearchAccountCode(pnDetailJE, lsValue, false, poController.Master().getIndustryID(), null);
@@ -1522,9 +1524,8 @@ public class DisbursementVoucher_VerificationController implements Initializable
                                     }
                                     break;
                                 }
-                                moveNextJE(false, true);
-                                break;
 
+                                break;
                             //apBIRDetail
                             case "tfTaxCode":
                                 poJSON = poController.SearchTaxCode(lsValue, pnDetailBIR, true);
