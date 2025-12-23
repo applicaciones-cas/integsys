@@ -590,7 +590,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
                                                 poController.getMaster(lnCtr).Payee().getPayeeName(),
                                                 lsPaymentForm,
                                                 CustomCommonUtil.formatDateToShortString(poController.getMaster(lnCtr).getTransactionDate()),
-                                                poController.getMaster(lnCtr).getTransactionNo()
+                                                poController.getMaster(lnCtr).getVoucherNo()
                                         ));
                                         if (poController.getMaster(lnCtr).getTransactionStatus().equals(DisbursementStatic.RETURNED)) {
                                             JFXUtil.highlightByKey(tblViewMainList, String.valueOf(lnRowNo), "#FAA0A0", highlightedRowsMain);
