@@ -538,7 +538,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
                 JFXUtil.disableAllHighlightByColor(tblViewMainList, "#A7C7E7", highlightedRowsMain);
                 JFXUtil.highlightByKey(tblViewMainList, String.valueOf(pnRowMain + 1), "#A7C7E7", highlightedRowsMain);
 
-                String lsTransactionNo = selected.getIndex05();
+                String lsTransactionNo = selected.getIndex06();
                 clearTextFields();
                 poJSON = poController.OpenTransaction(lsTransactionNo);
 
@@ -590,7 +590,8 @@ public class DisbursementVoucher_VerificationController implements Initializable
                                                 poController.getMaster(lnCtr).Payee().getPayeeName(),
                                                 lsPaymentForm,
                                                 CustomCommonUtil.formatDateToShortString(poController.getMaster(lnCtr).getTransactionDate()),
-                                                poController.getMaster(lnCtr).getVoucherNo()
+                                                poController.getMaster(lnCtr).getVoucherNo(),
+                                                poController.getMaster(lnCtr).getTransactionNo()
                                         ));
                                         if (poController.getMaster(lnCtr).getTransactionStatus().equals(DisbursementStatic.RETURNED)) {
                                             JFXUtil.highlightByKey(tblViewMainList, String.valueOf(lnRowNo), "#FAA0A0", highlightedRowsMain);
@@ -2238,6 +2239,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
                     break;
                 case DisbursementStatic.VOID:
                 case DisbursementStatic.CANCELLED:
+                default:
                     JFXUtil.setButtonsVisibility(false, btnVerify, btnUpdate);
                     break;
             }
