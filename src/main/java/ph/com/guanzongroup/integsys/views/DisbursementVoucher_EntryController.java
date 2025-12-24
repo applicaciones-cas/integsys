@@ -76,6 +76,7 @@ import org.json.simple.parser.ParseException;
 import ph.com.guanzongroup.cas.cashflow.DisbursementVoucher;
 import ph.com.guanzongroup.cas.cashflow.services.CashflowControllers;
 import ph.com.guanzongroup.cas.cashflow.status.DisbursementStatic;
+import ph.com.guanzongroup.cas.cashflow.status.JournalStatus;
 import ph.com.guanzongroup.integsys.model.ModelBIR_Detail;
 
 /**
@@ -246,7 +247,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                         if (pnEditMode == EditMode.UNKNOWN) {
                             pnDetailJE = 0;
                             pnDetailBIR = 0;
-                        }else{
+                        } else {
                             loadRecordMaster();
                         }
                         break;
@@ -1289,6 +1290,10 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                 try {
                     switch (lsID) {
                         case "tfBaseAmount":
+                            if (JFXUtil.isObjectEqualTo(poController.WTaxDeduction(pnDetailBIR).getModel().WithholdingTax().AccountChart().getDescription(), null, "")) {
+                                ShowMessageFX.Warning(null, pxeModuleName, "Particular is blank, unable to input value!");
+                                break;
+                            }
                             lsValue = JFXUtil.removeComma(lsValue);
                             poJSON = poController.WTaxDeduction(pnDetailBIR).getModel().setBaseAmount(Double.valueOf(lsValue));
                             if ("error".equals((String) poJSON.get("result"))) {
@@ -1520,8 +1525,9 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                                         return;
                                     }
                                     break;
+                                } else {
+                                    JFXUtil.textFieldMoveNext(tfDebitAmount);
                                 }
-                                moveNextJE(false, true);
                                 break;
                             case "tfAccountDescription":
                                 poJSON = poController.Journal().SearchAccountCode(pnDetailJE, lsValue, false, poController.Master().getIndustryID(), null);
@@ -1548,7 +1554,6 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                                     }
                                     break;
                                 }
-                                moveNextJE(false, true);
                                 break;
 
                             //apBIRDetail
@@ -1768,6 +1773,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
 
     private void loadRecordMasterCheck() {
         try {
+            JFXUtil.setDisabled(true, tfCheckNo, tfCheckAmount);
             tfCheckNo.setText(poController.CheckPayments().getModel().getCheckNo());
             if (JFXUtil.isObjectEqualTo(poController.CheckPayments().getModel().getCheckNo(), null, "")) {
                 poController.CheckPayments().getModel().setCheckDate(null);
@@ -1856,7 +1862,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
     }
 
     private void loadRecordMasterJE() {
-        JFXUtil.setStatusValue(lblJournalTransactionStatus, DisbursementStatic.class, pnEditMode == EditMode.UNKNOWN ? "-1" : poController.Journal().Master().getTransactionStatus());
+        JFXUtil.setStatusValue(lblJournalTransactionStatus, JournalStatus.class, pnEditMode == EditMode.UNKNOWN ? "-1" : poController.Journal().Master().getTransactionStatus());
         tfJournalTransactionNo.setText(poController.Journal().Master().getTransactionNo());
         dpJournalTransactionDate.setValue(CustomCommonUtil.parseDateStringToLocalDate(SQLUtil.dateFormat(poController.Journal().Master().getTransactionDate(), SQLUtil.FORMAT_SHORT_DATE)));
         double lnTotalDebit = 0;
@@ -2000,36 +2006,41 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
             if (!JFXUtil.isObjectEqualTo(pnEditMode, EditMode.ADDNEW, EditMode.UPDATE)) {
                 return;
             }
-            Set<Node> nodes = new HashSet<>();
-            nodes.addAll(apMasterDVCheck.lookupAll(".text-field"));
-            nodes.addAll(apMasterDVCheck.lookupAll(".combo-box"));
-            for (Node node : nodes) {
-                if (!node.isDisabled()) {
-                    continue;
-                }
-                Bounds boundsInScene = node.localToScene(node.getBoundsInLocal());
-                if (boundsInScene.contains(event.getSceneX(), event.getSceneY())) {
-                    if (node instanceof TextField) {
-                        switch (node.getId()) {
-                            case "tfAuthorizedPerson":
-                                ShowMessageFX.Warning(null, pxeModuleName, "Authorized Person field is only available when the \"Claimant Type\" is Authorized Representative.");
-                                break;
-                        }
-                    } else if (node instanceof ComboBox<?>) {
-                        switch (node.getId()) {
-                            case "cmbPayeeType":
-                                ShowMessageFX.Warning(null, pxeModuleName, "Payee Type is only available when \"Check Print by Bank\" is selected.");
-                                break;
-                            case "cmbDisbursementMode":
-                                ShowMessageFX.Warning(null, pxeModuleName, "Disbursement mode is only available when \"Check Print by Bank\" is selected.");
-                                break;
-                            case "cmbClaimantType":
-                                ShowMessageFX.Warning(null, pxeModuleName, "Claimant Type is only available when the \"Disbursement Mode\" is Pick-up.");
-                                break;
+            try {
+                Set<Node> nodes = new HashSet<>();
+                nodes.addAll(apMasterDVCheck.lookupAll(".text-field"));
+                nodes.addAll(apMasterDVCheck.lookupAll(".combo-box"));
+                for (Node node : nodes) {
+                    if (!node.isDisabled()) {
+                        continue;
+                    }
+                    Bounds boundsInScene = node.localToScene(node.getBoundsInLocal());
+                    if (boundsInScene.contains(event.getSceneX(), event.getSceneY())) {
+                        if (node instanceof TextField) {
+                            switch (node.getId()) {
+                                case "tfAuthorizedPerson":
+                                    ShowMessageFX.Warning(null, pxeModuleName, "Authorized Person field is only available when the \"Claimant Type\" is Authorized Representative.");
+                                    break;
+                            }
+                        } else if (node instanceof ComboBox<?>) {
+                            switch (node.getId()) {
+                                case "cmbPayeeType":
+                                    ShowMessageFX.Warning(null, pxeModuleName, "Payee Type is only available when \"Check Print by Bank\" is selected.");
+                                    break;
+                                case "cmbDisbursementMode":
+                                    ShowMessageFX.Warning(null, pxeModuleName, "Disbursement mode is only available when \"Check Print by Bank\" is selected.");
+                                    break;
+                                case "cmbClaimantType":
+                                    ShowMessageFX.Warning(null, pxeModuleName, "Claimant Type is only available when the \"Disbursement Mode\" is Pick-up.");
+                                    break;
+                            }
                         }
                     }
                 }
+            } catch (Exception e) {
+
             }
+
         });
     }
     boolean pbSuccess = true;

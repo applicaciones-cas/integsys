@@ -68,7 +68,6 @@ import org.guanzon.appdriver.base.GuanzonException;
 import org.guanzon.appdriver.base.MiscUtil;
 import org.guanzon.appdriver.base.SQLUtil;
 import org.guanzon.appdriver.constant.EditMode;
-import org.guanzon.cas.purchasing.controller.PurchaseOrderReceiving;
 import org.guanzon.cas.purchasing.services.PurchaseOrderReceivingControllers;
 import org.guanzon.cas.purchasing.status.PurchaseOrderReceivingStatus;
 import org.json.simple.JSONObject;
@@ -100,10 +99,8 @@ import javafx.util.Pair;
 import javax.script.ScriptException;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.rendering.PDFRenderer;
-import org.guanzon.appdriver.agent.ShowDialogFX;
 import org.guanzon.appdriver.constant.RecordStatus;
-import org.guanzon.appdriver.constant.UserRight;
-import static ph.com.guanzongroup.integsys.views.SIPosting_HistoryMPController.poPurchaseReceivingController;
+import ph.com.guanzongroup.cas.cashflow.status.JournalStatus;
 
 /**
  *
@@ -1256,7 +1253,7 @@ public class SIPosting_LPController implements Initializable, ScreenInterface {
                                 main_data.add(new ModelDeliveryAcceptance_Main(String.valueOf(lnCtr + 1),
                                         String.valueOf(poPurchaseReceivingController.PurchaseOrderReceiving().PurchaseOrderReceivingList(lnCtr).Supplier().getCompanyName()),
                                         String.valueOf(poPurchaseReceivingController.PurchaseOrderReceiving().PurchaseOrderReceivingList(lnCtr).getTransactionDate()),
-                                        String.valueOf(poPurchaseReceivingController.PurchaseOrderReceiving().PurchaseOrderReceivingList(lnCtr).getTransactionNo())
+                                        String.valueOf(poPurchaseReceivingController.PurchaseOrderReceiving().PurchaseOrderReceivingList(lnCtr).getReferenceNo())
                                 ));
                             } catch (SQLException | GuanzonException ex) {
                                 Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
@@ -1568,20 +1565,7 @@ public class SIPosting_LPController implements Initializable, ScreenInterface {
     }
 
     public void loadRecordJEMaster() {
-        Platform.runLater(() -> {
-            String lsActive = poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Master().getEditMode() == EditMode.UNKNOWN ? "-1" : poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Master().getTransactionStatus();
-            Map<String, String> statusMap = new HashMap<>();
-            statusMap.put(PurchaseOrderReceivingStatus.POSTED, "POSTED");
-            statusMap.put(PurchaseOrderReceivingStatus.PAID, "PAID");
-            statusMap.put(PurchaseOrderReceivingStatus.CONFIRMED, "CONFIRMED");
-            statusMap.put(PurchaseOrderReceivingStatus.OPEN, "OPEN");
-            statusMap.put(PurchaseOrderReceivingStatus.RETURNED, "RETURNED");
-            statusMap.put(PurchaseOrderReceivingStatus.VOID, "VOIDED");
-            statusMap.put(PurchaseOrderReceivingStatus.CANCELLED, "CANCELLED");
-
-            String lsStat = statusMap.getOrDefault(lsActive, "UNKNOWN");
-            lblJEStatus.setText(lsStat);
-        });
+        JFXUtil.setStatusValue(lblJEStatus, JournalStatus.class, pnEditMode == EditMode.UNKNOWN ? "-1" : poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Master().getTransactionStatus());
         if (poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Master().getTransactionNo() != null) {
             tfJETransactionNo.setText(poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Master().getTransactionNo());
             String lsJETransactionDate = CustomCommonUtil.formatDateToShortString(poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Master().getTransactionDate());
