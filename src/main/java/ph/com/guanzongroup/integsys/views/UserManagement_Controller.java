@@ -282,10 +282,18 @@ public class UserManagement_Controller implements Initializable, ScreenInterface
                         initButton(pnEditMode);
                         initTextFields();
                         loadRecordMaster();
+                        
+                        FontAwesomeIconView eyeIcons = new FontAwesomeIconView(FontAwesomeIcon.EYE);
+                        pfPassword.setText(tfPassword.getText());
+                        tfPassword.setVisible(false);
+                        pfPassword.setVisible(true);
+                        eyeIcons.setIcon(FontAwesomeIcon.EYE_SLASH);
+                        eyeIcons.setStyle("-fx-fill: gray; -glyph-size: 20; ");
+                        btnEyeIcon.setGraphic(eyeIcons);
                         break;
                     case "btnUpdate":
                         poJSON = poSysUser.updateRecord();
-                        if("error".equals((String)poJSON.get("result"))){
+                        if("error".equals((String)poJSON.get("result"))){   
                             ShowMessageFX.Warning((String)poJSON.get("message"), lsButton, lsButton);
                             break;
                         }
@@ -376,6 +384,7 @@ public class UserManagement_Controller implements Initializable, ScreenInterface
                         }
                         ShowMessageFX.Warning((String) poJSON.get("message"), pxeModuleName, null);
                         clearTextFields();
+                        
                         Platform.runLater(() -> btnNew.fire());
                         break;
                 }
@@ -615,7 +624,16 @@ public class UserManagement_Controller implements Initializable, ScreenInterface
         JFXUtil.setButtonsVisibility(lbShow, btnSave, btnCancel);
         JFXUtil.setButtonsVisibility(lbShow2, btnUpdate);
         JFXUtil.setButtonsVisibility(lbShow3, btnBrowse, btnClose);
-        if(!lbShow) btnEyeIcon.setDisable(true);
+        if(fnValue == EditMode.ADDNEW || fnValue == EditMode.UPDATE) btnEyeIcon.setDisable(false);
+        if (lbShow3) {
+            FontAwesomeIconView eyeIcon = new FontAwesomeIconView(FontAwesomeIcon.EYE);
+            pfPassword.setText(tfPassword.getText());
+            tfPassword.setVisible(false);
+            pfPassword.setVisible(true);
+            eyeIcon.setIcon(FontAwesomeIcon.EYE_SLASH);
+            eyeIcon.setStyle("-fx-fill: gray; -glyph-size: 20; ");
+            btnEyeIcon.setGraphic(eyeIcon);
+        }
         if((pnEditMode == EditMode.READY ) && !poSysUser.getModel().getUserId().isEmpty()){
             btnStatus.setVisible(true);
             btnStatus.setManaged(true);
