@@ -254,7 +254,7 @@ public class BIRPrintingController implements Initializable, ScreenInterface {
         for (Object item : tblViewMainList.getItems()) {
             ModelBIRPrinting item1 = (ModelBIRPrinting) item;
             String lschecked = item1.getIndex02();
-            String lsDVNO = item1.getIndex03();
+            String lsDVNO = item1.getIndex09();
             String payeetype = item1.getIndex07();
 
             if (lschecked.equals("1")) {
@@ -404,12 +404,13 @@ public class BIRPrintingController implements Initializable, ScreenInterface {
                                     main_data.add(new ModelBIRPrinting(
                                             String.valueOf(lnCntr + 1),
                                             checkedItem.get(lnCntr),
-                                            poController.getMaster(lnCntr).getTransactionNo(),
+                                            poController.getMaster(lnCntr).getVoucherNo(),
                                             CustomCommonUtil.formatDateToShortString(poController.getMaster(lnCntr).getTransactionDate()),
                                             poController.getMaster(lnCntr).Payee().APClient().getCompanyName(),
                                             poController.getMaster(lnCntr).Payee().getPayeeName(),
                                             lsPayeeType,
-                                            CustomCommonUtil.setIntegerValueToDecimalFormat(poController.getMaster(lnCntr).getWithTaxTotal(), false)
+                                            CustomCommonUtil.setIntegerValueToDecimalFormat(poController.getMaster(lnCntr).getWithTaxTotal(), false),
+                                            poController.getMaster(lnCntr).getTransactionNo()
                                     ));
                                 }
                             } else {
@@ -453,11 +454,11 @@ public class BIRPrintingController implements Initializable, ScreenInterface {
                     if (selected != null) {
                         pnMain = tblViewMainList.getSelectionModel().getSelectedIndex();
                     }
-                    if (JFXUtil.isObjectEqualTo(selected.getIndex03(), null, "")) {
+                    if (JFXUtil.isObjectEqualTo(selected.getIndex09(), null, "")) {
                         ShowMessageFX.Warning("Unable to view transaction.", pxeModuleName, null);
                         return;
                     } else {
-                        showDVWindow(selected.getIndex03());
+                        showDVWindow(selected.getIndex09());
                     }
                 } catch (SQLException ex) {
                     Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
