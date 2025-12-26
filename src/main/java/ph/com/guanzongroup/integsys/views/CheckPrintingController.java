@@ -548,7 +548,7 @@ public class CheckPrintingController implements Initializable, ScreenInterface {
                                             checkedItem.get(lnCntr),
                                             poController.getMaster(lnCntr).getVoucherNo(),
                                             CustomCommonUtil.formatDateToShortString(poController.getMaster(lnCntr).getTransactionDate()),
-                                            poController.getMaster(lnCntr).Payee().getPayeeName(),
+                                            poController.getMaster(lnCntr).Payee().Client().getCompanyName(),
                                             poController.getMaster(lnCntr).Payee().getPayeeName(),
                                             poController.getMaster(lnCntr).CheckPayments().Banks().getBankName(),
                                             poController.getMaster(lnCntr).CheckPayments().Bank_Account_Master().getAccountNo(),
