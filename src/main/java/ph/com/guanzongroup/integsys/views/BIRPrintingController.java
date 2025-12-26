@@ -406,7 +406,7 @@ public class BIRPrintingController implements Initializable, ScreenInterface {
                                             checkedItem.get(lnCntr),
                                             poController.getMaster(lnCntr).getVoucherNo(),
                                             CustomCommonUtil.formatDateToShortString(poController.getMaster(lnCntr).getTransactionDate()),
-                                            poController.getMaster(lnCntr).Payee().APClient().getCompanyName(),
+                                            poController.getMaster(lnCntr).Payee().Client().getCompanyName(),
                                             poController.getMaster(lnCntr).Payee().getPayeeName(),
                                             lsPayeeType,
                                             CustomCommonUtil.setIntegerValueToDecimalFormat(poController.getMaster(lnCntr).getWithTaxTotal(), false),

@@ -391,7 +391,7 @@ public class DisbursementVoucher_CertificationController implements Initializabl
                                             checkedItem.get(lnCntr),// 0 as unchecked, 1 as checked
                                             poDisbursementController.getMaster(lnCntr).getVoucherNo(),
                                             CustomCommonUtil.formatDateToShortString(poDisbursementController.getMaster(lnCntr).getTransactionDate()),
-                                            poDisbursementController.getMaster(lnCntr).Payee().getPayeeName(),
+                                            poDisbursementController.getMaster(lnCntr).Payee().Client().getCompanyName(),
                                             poDisbursementController.getMaster(lnCntr).Payee().getPayeeName(),
                                             lsPaymentForm,
                                             lsBankName,
