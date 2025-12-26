@@ -188,8 +188,7 @@ public class CheckImportingController implements Initializable, ScreenInterface 
 //                        }
 //                        poCheckImporting.CheckPayments(lnctr).setCheckNo(main_data.get(lnctr).getIndex07());
 //                    }
-                    pnEditMode = EditMode.UPDATE;
-                    initButtons(pnEditMode);
+                   
                     break;
                 case "btnSave":
                     if (!ShowMessageFX.YesNo(null, pxeModuleName, "Are you sure you want to save the transaction?")) {
@@ -476,6 +475,8 @@ public class CheckImportingController implements Initializable, ScreenInterface 
     if (selectedFile == null) {
         ShowMessageFX.Warning("No file selected.", pxeModuleName, null);
         psImportingFilePath = "";
+        pnEditMode = EditMode.READY;
+        initButtons(pnEditMode);
         return;
     }
 
@@ -535,6 +536,8 @@ public class CheckImportingController implements Initializable, ScreenInterface 
             tblVwMain.setItems(main_data);  // display once all rows processed
             tblVwMain.refresh();
             // update transaction after successful import
+            pnEditMode = EditMode.UPDATE;
+            initButtons(pnEditMode);
 
         });
 
@@ -542,7 +545,7 @@ public class CheckImportingController implements Initializable, ScreenInterface 
         Throwable ex = task.getException();
         ex.printStackTrace();
         ShowMessageFX.Information((String) poJSON.get("message"), pxeModuleName, null);
-        pnEditMode = EditMode.UNKNOWN;
+        pnEditMode = EditMode.READY;
         initButtons(pnEditMode);
         
     });
