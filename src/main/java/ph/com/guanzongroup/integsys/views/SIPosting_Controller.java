@@ -1805,6 +1805,106 @@ public class SIPosting_Controller implements Initializable, ScreenInterface {
         }
     }
 
+    public void loadTableDetail() {
+        pbEntered = false;
+        // Setting data to table detail
+        JFXUtil.disableAllHighlight(tblViewTransDetailList, highlightedRowsDetail);
+
+        JFXUtil.LoadScreenComponents loading = JFXUtil.createLoadingComponents();
+        tblViewTransDetailList.setPlaceholder(loading.loadingPane);
+        loading.progressIndicator.setVisible(true);
+
+        Task<Void> task = new Task<Void>() {
+            @Override
+            protected Void call() throws Exception {
+//                Thread.sleep(1000);
+                // contains try catch, for loop of loading data to observable list until loadTab()
+                Platform.runLater(() -> {
+                    details_data.clear();
+                    int lnCtr;
+                    try {
+                        double lnTotal = 0.00;
+                        double lnDiscountAmt = 0.00;
+                        for (lnCtr = 0; lnCtr < poPurchaseReceivingController.PurchaseOrderReceiving().getDetailCount(); lnCtr++) {
+                            if (JFXUtil.isObjectEqualTo(poPurchaseReceivingController.PurchaseOrderReceiving().Master().getSalesInvoice(), null, "")) {
+                                poPurchaseReceivingController.PurchaseOrderReceiving().Detail(lnCtr).isVatable(false);
+                                poPurchaseReceivingController.PurchaseOrderReceiving().Master().isVatTaxable(false);
+                                JFXUtil.setDisabled(true, cbVatable, cbVatInclusive);
+                            } else {
+                                JFXUtil.setDisabled(false, cbVatable, cbVatInclusive);
+                            }
+
+                            try {
+                                lnTotal = poPurchaseReceivingController.PurchaseOrderReceiving().Detail(lnCtr).getUnitPrce().doubleValue() * poPurchaseReceivingController.PurchaseOrderReceiving().Detail(lnCtr).getQuantity().intValue();
+                                lnDiscountAmt = poPurchaseReceivingController.PurchaseOrderReceiving().Detail(lnCtr).getDiscountAmount().doubleValue()
+                                        + (lnTotal * (poPurchaseReceivingController.PurchaseOrderReceiving().Detail(lnCtr).getDiscountRate().doubleValue() / 100));
+                            } catch (Exception e) {
+                            }
+
+                            if ((!poPurchaseReceivingController.PurchaseOrderReceiving().Detail(lnCtr).getOrderNo().equals("") && poPurchaseReceivingController.PurchaseOrderReceiving().Detail(lnCtr).getOrderNo() != null)
+                                    && poPurchaseReceivingController.PurchaseOrderReceiving().Detail(lnCtr).getOrderQty().intValue() != poPurchaseReceivingController.PurchaseOrderReceiving().Detail(lnCtr).getQuantity().intValue()
+                                    && poPurchaseReceivingController.PurchaseOrderReceiving().Detail(lnCtr).getQuantity().intValue() != 0) {
+                                JFXUtil.highlightByKey(tblViewTransDetailList, String.valueOf(lnCtr + 1), "#FAA0A0", highlightedRowsDetail);
+                            }
+
+                            if (poPurchaseReceivingController.PurchaseOrderReceiving().Detail(lnCtr).getStockId() != null && !"".equals(poPurchaseReceivingController.PurchaseOrderReceiving().Detail(lnCtr).getStockId())) {
+                                details_data.add(
+                                        new ModelDeliveryAcceptance_Detail(String.valueOf(lnCtr + 1),
+                                                String.valueOf(poPurchaseReceivingController.PurchaseOrderReceiving().Detail(lnCtr).getOrderNo()),
+                                                String.valueOf(poPurchaseReceivingController.PurchaseOrderReceiving().Detail(lnCtr).Inventory().Brand().getDescription()),
+                                                String.valueOf(poPurchaseReceivingController.PurchaseOrderReceiving().Detail(lnCtr).Inventory().getDescription()),
+                                                String.valueOf(CustomCommonUtil.setIntegerValueToDecimalFormat(poPurchaseReceivingController.PurchaseOrderReceiving().Detail(lnCtr).getUnitPrce(), true)),
+                                                String.valueOf(poPurchaseReceivingController.PurchaseOrderReceiving().Detail(lnCtr).getOrderQty().intValue()),
+                                                String.valueOf(poPurchaseReceivingController.PurchaseOrderReceiving().Detail(lnCtr).getQuantity().intValue()),
+                                                //                                                String.valueOf(CustomCommonUtil.setIntegerValueToDecimalFormat(lnDiscountAmt, true)),
+                                                String.valueOf(CustomCommonUtil.setIntegerValueToDecimalFormat(lnTotal, true)) //identify total
+                                        ));
+                            }
+                        }
+                        if (pnDetail < 0 || pnDetail
+                                >= details_data.size()) {
+                            if (!details_data.isEmpty()) {
+                                /* FOCUS ON FIRST ROW */
+                                JFXUtil.selectAndFocusRow(tblViewTransDetailList, 0);
+                                pnDetail = tblViewTransDetailList.getSelectionModel().getSelectedIndex();
+                                loadRecordDetail();
+                            }
+                        } else {
+                            /* FOCUS ON THE ROW THAT pnRowDetail POINTS TO */
+                            JFXUtil.selectAndFocusRow(tblViewTransDetailList, pnDetail);
+                            loadRecordDetail();
+                        }
+                        loadRecordMaster();
+                    } catch (SQLException | GuanzonException ex) {
+                        Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+                        ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
+                    }
+                });
+
+                return null;
+            }
+
+            @Override
+            protected void succeeded() {
+                if (details_data == null || details_data.isEmpty()) {
+                    tblViewTransDetailList.setPlaceholder(loading.placeholderLabel);
+                } else {
+                    tblViewTransDetailList.toFront();
+                }
+                loading.progressIndicator.setVisible(false);
+            }
+
+            @Override
+            protected void failed() {
+                if (details_data == null || details_data.isEmpty()) {
+                    tblViewTransDetailList.setPlaceholder(loading.placeholderLabel);
+                }
+                loading.progressIndicator.setVisible(false);
+            }
+        };
+        new Thread(task).start(); // Run task in background
+    }
+
     public void loadTableJEDetail() {
 //        pbEntered = false;
         // Setting data to table detail
@@ -1833,127 +1933,6 @@ public class SIPosting_Controller implements Initializable, ScreenInterface {
                             if ((poPurchaseReceivingController.PurchaseOrderReceiving().Journal().getDetailCount() - 1) >= 0) {
                                 if (poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(poPurchaseReceivingController.PurchaseOrderReceiving().Journal().getDetailCount() - 1).getAccountCode() != null
                                         && !poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(poPurchaseReceivingController.PurchaseOrderReceiving().Journal().getDetailCount() - 1).getAccountCode().equals("")) {
-                                    poPurchaseReceivingController.PurchaseOrderReceiving().Journal().AddDetail();
-                                    poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(poPurchaseReceivingController.PurchaseOrderReceiving().Journal().getDetailCount() - 1).setForMonthOf(oApp.getServerDate());
-                                }
-                            }
-                            if ((poPurchaseReceivingController.PurchaseOrderReceiving().Journal().getDetailCount() - 1) < 0) {
-                                poPurchaseReceivingController.PurchaseOrderReceiving().Journal().AddDetail();
-                                poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(poPurchaseReceivingController.PurchaseOrderReceiving().Journal().getDetailCount() - 1).setForMonthOf(oApp.getServerDate());
-                            }
-                        }
-
-                        String lsReportMonthYear = "";
-                        String lsAcctCode = "";
-                        String lsAccDesc = "";
-                        int lnRowCount = 0;
-                        for (lnCtr = 0; lnCtr < poPurchaseReceivingController.PurchaseOrderReceiving().Journal().getDetailCount(); lnCtr++) {
-                            lsReportMonthYear = CustomCommonUtil.formatDateToShortString(poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(lnCtr).getForMonthOf());
-                            if (poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(lnCtr).getAccountCode() != null) {
-                                lsAcctCode = poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(lnCtr).getAccountCode();
-                            }
-                            if (poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(lnCtr).Account_Chart().getDescription() != null) {
-                                lsAccDesc = poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(lnCtr).Account_Chart().getDescription();
-                            }
-                            if (!poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(lnCtr).isReverse()) {
-                                continue;
-                            }
-                            lnRowCount += 1;
-                            JEdetails_data.add(
-                                    new ModelJournalEntry_Detail(
-                                            String.valueOf(lnRowCount),
-                                            String.valueOf(CustomCommonUtil.parseDateStringToLocalDate(lsReportMonthYear, "yyyy-MM-dd")),
-                                            String.valueOf(lsAcctCode),
-                                            String.valueOf(lsAccDesc),
-                                            String.valueOf(CustomCommonUtil.setIntegerValueToDecimalFormat(poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(lnCtr).getCreditAmount(), true)),
-                                            String.valueOf(CustomCommonUtil.setIntegerValueToDecimalFormat(poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(lnCtr).getDebitAmount(), true)),
-                                            String.valueOf(lnCtr)
-                                    ));
-
-                            lsReportMonthYear = "";
-                            lsAcctCode = "";
-                            lsAccDesc = "";
-                        }
-                        int lnTempRow = JFXUtil.getDetailRow(JEdetails_data, pnJEDetail, 7); //this method is used only when Reverse is applied
-                        if (lnTempRow < 0 || lnTempRow
-                                >= JEdetails_data.size()) {
-                            if (!JEdetails_data.isEmpty()) {
-                                /* FOCUS ON FIRST ROW */
-                                JFXUtil.selectAndFocusRow(tblViewJEDetails, 0);
-                                int lnRow = Integer.parseInt(JEdetails_data.get(0).getIndex07());
-                                pnJEDetail = lnRow;
-                                loadRecordJEDetail();
-                            }
-                        } else {
-                            /* FOCUS ON THE ROW THAT pnDetailBIR POINTS TO */
-                            JFXUtil.selectAndFocusRow(tblViewJEDetails, lnTempRow);
-                            int lnRow = Integer.parseInt(JEdetails_data.get(tblViewJEDetails.getSelectionModel().getSelectedIndex()).getIndex07());
-                            pnJEDetail = lnRow;
-                            loadRecordJEDetail();
-                        }
-                        loadRecordJEMaster();
-                    } catch (SQLException | GuanzonException | CloneNotSupportedException ex) {
-                        Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
-                        ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
-                    }
-                });
-
-                return null;
-            }
-
-            @Override
-            protected void succeeded() {
-                if (JEdetails_data == null || JEdetails_data.isEmpty()) {
-                    tblViewJEDetails.setPlaceholder(loading.placeholderLabel);
-                } else {
-                    tblViewJEDetails.toFront();
-                }
-                loading.progressIndicator.setVisible(false);
-            }
-
-            @Override
-            protected void failed() {
-                if (JEdetails_data == null || JEdetails_data.isEmpty()) {
-                    tblViewJEDetails.setPlaceholder(loading.placeholderLabel);
-                }
-                loading.progressIndicator.setVisible(false);
-            }
-        };
-        new Thread(task).start(); // Run task in background
-    }
-
-    public void loadTableJEDetail() {
-//        pbEntered = false;
-        // Setting data to table detail
-
-        JFXUtil.LoadScreenComponents loading = JFXUtil.createLoadingComponents();
-        tblViewJEDetails.setPlaceholder(loading.loadingPane);
-        loading.progressIndicator.setVisible(true);
-
-        Task<Void> task = new Task<Void>() {
-            @Override
-            protected Void call() throws Exception {
-//                Thread.sleep(1000);
-                // contains try catch, for loop of loading data to observable list until loadTab()
-                Platform.runLater(() -> {
-                    JEdetails_data.clear();
-                    int lnCtr;
-                    try {
-                        if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
-                            lnCtr = poPurchaseReceivingController.PurchaseOrderReceiving().Journal().getDetailCount() - 1;
-                            while (lnCtr >= 0) {
-                                if (!poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(lnCtr).isReverse()) {
-                                    continue;
-                                }
-                                if (JFXUtil.isObjectEqualTo(poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(lnCtr).getAccountCode(), null, "")) {
-                                    poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail().remove(lnCtr);
-                                }
-                                lnCtr--;
-                            }
-                            if ((poPurchaseReceivingController.PurchaseOrderReceiving().Journal().getDetailCount() - 1) >= 0) {
-                                if (poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(poPurchaseReceivingController.PurchaseOrderReceiving().Journal().getDetailCount() - 1).getAccountCode() != null
-                                        && !poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(poPurchaseReceivingController.PurchaseOrderReceiving().Journal().getDetailCount() - 1).getAccountCode().equals("")
-                                        && poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(poPurchaseReceivingController.PurchaseOrderReceiving().Journal().getDetailCount() - 1).isReverse()) {
                                     poPurchaseReceivingController.PurchaseOrderReceiving().Journal().AddDetail();
                                     poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(poPurchaseReceivingController.PurchaseOrderReceiving().Journal().getDetailCount() - 1).setForMonthOf(oApp.getServerDate());
                                 }
