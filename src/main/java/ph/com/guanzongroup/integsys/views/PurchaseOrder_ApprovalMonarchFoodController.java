@@ -959,6 +959,7 @@ public class PurchaseOrder_ApprovalMonarchFoodController implements Initializabl
 
     private void initButtons(int fnEditMode) {
         boolean lbShow = (pnEditMode == EditMode.UPDATE);
+        JFXUtil.setDisabled(!lbShow, cbAddVAT);
 
         btnClose.setVisible(!lbShow);
         btnClose.setManaged(!lbShow);

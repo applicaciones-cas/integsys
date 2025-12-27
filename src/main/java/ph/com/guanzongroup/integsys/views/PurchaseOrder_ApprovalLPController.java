@@ -961,6 +961,7 @@ public class PurchaseOrder_ApprovalLPController implements Initializable, Screen
 
     private void initButtons(int fnEditMode) {
         boolean lbShow = (pnEditMode == EditMode.UPDATE);
+        JFXUtil.setDisabled(!lbShow, cbAddVAT);
 
         btnClose.setVisible(!lbShow);
         btnClose.setManaged(!lbShow);

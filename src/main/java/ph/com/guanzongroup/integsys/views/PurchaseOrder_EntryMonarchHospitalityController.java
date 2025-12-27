@@ -1304,6 +1304,8 @@ public class PurchaseOrder_EntryMonarchHospitalityController implements Initiali
 
     private void initButtons(int fnEditMode) {
         boolean lbShow = (fnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE);
+        JFXUtil.setDisabled(!lbShow, cbAddVAT);
+    
         CustomCommonUtil.setVisible(!lbShow, btnBrowse, btnClose, btnNew);
         CustomCommonUtil.setManaged(!lbShow, btnBrowse, btnClose, btnNew);
 

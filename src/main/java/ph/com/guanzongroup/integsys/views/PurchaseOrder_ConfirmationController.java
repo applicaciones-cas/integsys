@@ -965,6 +965,7 @@ public class PurchaseOrder_ConfirmationController implements Initializable, Scre
 
     private void initButtons(int fnEditMode) {
         boolean lbShow = (pnEditMode == EditMode.UPDATE);
+        JFXUtil.setDisabled(!lbShow, cbAddVAT);
 
         btnClose.setVisible(!lbShow);
         btnClose.setManaged(!lbShow);

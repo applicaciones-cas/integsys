@@ -958,6 +958,7 @@ public class PurchaseOrder_ApprovalCarController implements Initializable, Scree
 
     private void initButtons(int fnEditMode) {
         boolean lbShow = (pnEditMode == EditMode.UPDATE);
+        JFXUtil.setDisabled(!lbShow, cbAddVAT);
 
         btnClose.setVisible(!lbShow);
         btnClose.setManaged(!lbShow);

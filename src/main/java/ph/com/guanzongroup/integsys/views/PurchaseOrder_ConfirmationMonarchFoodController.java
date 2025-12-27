@@ -955,6 +955,7 @@ public class PurchaseOrder_ConfirmationMonarchFoodController implements Initiali
 
     private void initButtons(int fnEditMode) {
         boolean lbShow = (pnEditMode == EditMode.UPDATE);
+        JFXUtil.setDisabled(!lbShow, cbAddVAT);
 
         btnClose.setVisible(!lbShow);
         btnClose.setManaged(!lbShow);

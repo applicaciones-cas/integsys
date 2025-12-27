@@ -777,8 +777,8 @@ public class PurchaseOrder_EntryAppliancesController implements Initializable, S
                     tfDiscountRate.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poPurchasingController.PurchaseOrder().Master().getDiscount().doubleValue()));
                     tfNetAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poPurchasingController.PurchaseOrder().Master().getNetTotal(), true));
 
-            cbAddVAT.setSelected(poPurchasingController.PurchaseOrder().Master().isVatable());
-            tfVATAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poPurchasingController.PurchaseOrder().Master().getVatAmount(), true));
+                    cbAddVAT.setSelected(poPurchasingController.PurchaseOrder().Master().isVatable());
+                    tfVATAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poPurchasingController.PurchaseOrder().Master().getVatAmount(), true));
                     break;
                 case "tfDiscountAmount":
                     lsValue = JFXUtil.removeComma(lsValue);
@@ -1456,6 +1456,8 @@ public class PurchaseOrder_EntryAppliancesController implements Initializable, S
 
     private void initButtons(int fnEditMode) {
         boolean lbShow = (fnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE);
+        JFXUtil.setDisabled(!lbShow, cbAddVAT);
+    
         CustomCommonUtil.setVisible(!lbShow, btnBrowse, btnClose, btnNew);
         CustomCommonUtil.setManaged(!lbShow, btnBrowse, btnClose, btnNew);
 
@@ -1805,8 +1807,8 @@ public class PurchaseOrder_EntryAppliancesController implements Initializable, S
                             ));
                             tfNetAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poPurchasingController.PurchaseOrder().Master().getNetTotal(), true));
 
-            cbAddVAT.setSelected(poPurchasingController.PurchaseOrder().Master().isVatable());
-            tfVATAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poPurchasingController.PurchaseOrder().Master().getVatAmount(), true));
+                            cbAddVAT.setSelected(poPurchasingController.PurchaseOrder().Master().isVatable());
+                            tfVATAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poPurchasingController.PurchaseOrder().Master().getVatAmount(), true));
                         }
                         reselectLastDetailRow();
                         initFields(pnEditMode);
