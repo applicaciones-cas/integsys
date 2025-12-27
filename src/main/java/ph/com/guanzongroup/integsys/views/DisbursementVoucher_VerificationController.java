@@ -635,10 +635,14 @@ public class DisbursementVoucher_VerificationController implements Initializable
                             if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
                                 poController.ReloadDetail();
                             }
-
+                            int lnRowCount = 0;
                             for (int lnCtr = 0; lnCtr < poController.getDetailCount(); lnCtr++) {
+                                if (!poController.Detail(lnCtr).isReverse()) {
+                                    continue;
+                                }
+                                lnRowCount += 1;
                                 details_data.add(
-                                        new ModelDisbursementVoucher_Detail(String.valueOf(lnCtr + 1),
+                                        new ModelDisbursementVoucher_Detail(String.valueOf(lnRowCount),
                                                 poController.Detail(lnCtr).getSourceNo(),
                                                 poController.getSourceCodeDescription(poController.Detail(lnCtr).getSourceCode()),
                                                 CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(lnCtr).getAmountApplied(), true),
@@ -647,20 +651,25 @@ public class DisbursementVoucher_VerificationController implements Initializable
                                                 CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(lnCtr).getDetailVatRates(), false),
                                                 CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(lnCtr).getDetailZeroVat(), true),
                                                 CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(lnCtr).getDetailVatExempt(), true),
-                                                CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(lnCtr).getAmount(), true)
+                                                CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(lnCtr).getAmount(), true),
+                                                String.valueOf(lnCtr)
                                         ));
                             }
-                            if (pnDetail < 0 || pnDetail
+                            int lnTempRow = JFXUtil.getDetailRow(details_data, pnDetail, 11); //this method is used only when Reverse is applied
+                            if (lnTempRow < 0 || lnTempRow
                                     >= details_data.size()) {
                                 if (!details_data.isEmpty()) {
                                     /* FOCUS ON FIRST ROW */
                                     JFXUtil.selectAndFocusRow(tblVwDetails, 0);
-                                    pnDetail = tblVwDetails.getSelectionModel().getSelectedIndex();
+                                    int lnRow = Integer.parseInt(details_data.get(0).getIndex11());
+                                    pnDetail = lnRow;
                                     loadRecordDetail();
                                 }
                             } else {
-                                /* FOCUS ON THE ROW THAT pnRowDetail POINTS TO */
-                                JFXUtil.selectAndFocusRow(tblVwDetails, pnDetail);
+                                /* FOCUS ON THE ROW THAT pnDetailBIR POINTS TO */
+                                JFXUtil.selectAndFocusRow(tblVwDetails, lnTempRow);
+                                int lnRow = Integer.parseInt(details_data.get(tblVwDetails.getSelectionModel().getSelectedIndex()).getIndex11());
+                                pnDetail = lnRow;
                                 loadRecordDetail();
                             }
                             loadRecordMaster();
@@ -682,26 +691,36 @@ public class DisbursementVoucher_VerificationController implements Initializable
                             if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
                                 poController.ReloadJournal();
                             }
+                            int lnRowCount = 0;
                             for (int lnCtr = 0; lnCtr < poController.Journal().getDetailCount(); lnCtr++) {
-                                journal_data.add(new ModelJournalEntry_Detail(String.valueOf(lnCtr + 1),
+                                if (!poController.Journal().Detail(lnCtr).isReverse()) {
+                                    continue;
+                                }
+                                lnRowCount += 1;
+                                journal_data.add(new ModelJournalEntry_Detail(String.valueOf(lnRowCount),
                                         poController.Journal().Detail(lnCtr).getAccountCode() != null ? poController.Journal().Detail(lnCtr).getAccountCode() : "",
                                         poController.Journal().Detail(lnCtr).Account_Chart().getDescription() != null ? poController.Journal().Detail(lnCtr).Account_Chart().getDescription() : "",
                                         CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Journal().Detail(lnCtr).getDebitAmount(), true),
                                         CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Journal().Detail(lnCtr).getCreditAmount(), true),
-                                        CustomCommonUtil.formatDateToShortString(poController.Journal().Detail(lnCtr).getForMonthOf())
+                                        CustomCommonUtil.formatDateToShortString(poController.Journal().Detail(lnCtr).getForMonthOf()),
+                                        String.valueOf(lnCtr)
                                 ));
                             }
-                            if (pnDetailJE < 0 || pnDetailJE
+                            int lnTempRow = JFXUtil.getDetailRow(journal_data, pnDetailJE, 7); //this method is used only when Reverse is applied
+                            if (lnTempRow < 0 || lnTempRow
                                     >= journal_data.size()) {
                                 if (!journal_data.isEmpty()) {
                                     /* FOCUS ON FIRST ROW */
                                     JFXUtil.selectAndFocusRow(tblVwJournalDetails, 0);
-                                    pnDetailJE = tblVwJournalDetails.getSelectionModel().getSelectedIndex();
+                                    int lnRow = Integer.parseInt(journal_data.get(0).getIndex07());
+                                    pnDetailJE = lnRow;
                                     loadRecordDetailJE();
                                 }
                             } else {
-                                /* FOCUS ON THE ROW THAT pnRowDetail POINTS TO */
-                                JFXUtil.selectAndFocusRow(tblVwJournalDetails, pnDetailJE);
+                                /* FOCUS ON THE ROW THAT pnDetailBIR POINTS TO */
+                                JFXUtil.selectAndFocusRow(tblVwJournalDetails, lnTempRow);
+                                int lnRow = Integer.parseInt(journal_data.get(tblVwJournalDetails.getSelectionModel().getSelectedIndex()).getIndex07());
+                                pnDetailJE = lnRow;
                                 loadRecordDetailJE();
                             }
                             loadRecordMasterJE();
@@ -1474,15 +1493,19 @@ public class DisbursementVoucher_VerificationController implements Initializable
                             case "tfAccountCode":
                                 poJSON = poController.Journal().SearchAccountCode(pnDetailJE, lsValue, true, poController.Master().getIndustryID(), null);
                                 if ("error".equals(poJSON.get("result"))) {
-                                    ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-                                    JFXUtil.runWithDelay(0.50, () -> {
+                                    int lnReturned = Integer.parseInt(String.valueOf(poJSON.get("row"))) + 1;
+                                    JFXUtil.runWithDelay(0.70, () -> {
+                                        pnDetailJE = lnReturned;
                                         loadTableDetailJE.reload();
                                     });
+                                    ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                     break;
-                                }
-                                JFXUtil.runWithDelay(0.50, () -> {
+                                } else {
+                                    int lnReturned = Integer.parseInt(String.valueOf(poJSON.get("row")));
+                                    pnDetailJE = lnReturned;
                                     loadTableDetailJE.reload();
-                                });
+                                    JFXUtil.textFieldMoveNext(tfParticular);
+                                }
                                 poJSON = poController.checkExistAcctCode(pnDetailJE, poController.Journal().Detail(pnDetailJE).getAccountCode());
                                 if ("error".equals(poJSON.get("result"))) {
                                     int lnRow = (int) poJSON.get("row");
@@ -1503,15 +1526,19 @@ public class DisbursementVoucher_VerificationController implements Initializable
                             case "tfAccountDescription":
                                 poJSON = poController.Journal().SearchAccountCode(pnDetailJE, lsValue, false, poController.Master().getIndustryID(), null);
                                 if ("error".equals(poJSON.get("result"))) {
-                                    ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-                                    JFXUtil.runWithDelay(0.50, () -> {
+                                    int lnReturned = Integer.parseInt(String.valueOf(poJSON.get("row"))) + 1;
+                                    JFXUtil.runWithDelay(0.70, () -> {
+                                        pnDetailJE = lnReturned;
                                         loadTableDetailJE.reload();
                                     });
+                                    ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                     break;
-                                }
-                                JFXUtil.runWithDelay(0.50, () -> {
+                                } else {
+                                    int lnReturned = Integer.parseInt(String.valueOf(poJSON.get("row")));
+                                    pnDetailJE = lnReturned;
                                     loadTableDetailJE.reload();
-                                });
+                                    JFXUtil.textFieldMoveNext(tfParticular);
+                                }
                                 poJSON = poController.checkExistAcctCode(pnDetailJE, poController.Journal().Detail(pnDetailJE).getAccountCode());
                                 if ("error".equals(poJSON.get("result"))) {
                                     int lnRow = (int) poJSON.get("row");
