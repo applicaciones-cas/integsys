@@ -161,7 +161,7 @@ public class SIPosting_HistoryCarController implements Initializable, ScreenInte
     @FXML
     private DatePicker dpTransactionDate, dpReferenceDate, dpSIDate, dpReportMonthYear, dpJETransactionDate;
     @FXML
-    private CheckBox cbVatInclusive, cbVatable;
+    private CheckBox cbVatInclusive, cbVatable, cbJEReverse;
     @FXML
     private TextArea taRemarks, taJERemarks;
     @FXML

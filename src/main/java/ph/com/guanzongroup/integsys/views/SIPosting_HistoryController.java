@@ -163,7 +163,7 @@ public class SIPosting_HistoryController implements Initializable, ScreenInterfa
     @FXML
     private DatePicker dpTransactionDate, dpReferenceDate, dpSIDate, dpExpiryDate, dpJETransactionDate, dpReportMonthYear;
     @FXML
-    private CheckBox cbVatInclusive, cbVatable;
+    private CheckBox cbVatInclusive, cbVatable, cbJEReverse;
     @FXML
     private TextArea taRemarks, taJERemarks;
     @FXML

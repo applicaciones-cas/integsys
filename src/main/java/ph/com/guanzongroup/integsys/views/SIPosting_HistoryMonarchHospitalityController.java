@@ -162,7 +162,7 @@ public class SIPosting_HistoryMonarchHospitalityController implements Initializa
     @FXML
     private DatePicker dpTransactionDate, dpReferenceDate, dpSIDate, dpJETransactionDate, dpReportMonthYear;
     @FXML
-    private CheckBox cbVatInclusive, cbVatable;
+    private CheckBox cbVatInclusive, cbVatable, cbJEReverse;
     @FXML
     private TextArea taRemarks, taJERemarks;
     @FXML

@@ -168,7 +168,7 @@ public class SIPosting_MCController implements Initializable, ScreenInterface {
     @FXML
     private DatePicker dpTransactionDate, dpReferenceDate, dpReportMonthYear, dpJETransactionDate, dpSIDate;
     @FXML
-    private CheckBox cbVatInclusive, cbVatable;
+    private CheckBox cbVatInclusive, cbVatable, cbJEReverse;
     @FXML
     private TextArea taRemarks, taJERemarks;
     @FXML
@@ -429,6 +429,16 @@ public class SIPosting_MCController implements Initializable, ScreenInterface {
                 case "cbVatable":
                     poPurchaseReceivingController.PurchaseOrderReceiving().Detail(pnDetail).isVatable(cbVatable.isSelected());
                     loadRecordMaster();
+                    break;
+                case "cbJEReverse":
+//                    poJSON = poController.removeWTDeduction(pnDetailJE);
+//                    if (!JFXUtil.isJSONSuccess(poJSON)) {
+//                        ShowMessageFX.Warning(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
+//                    }
+//                    loadTableDetailJE.reload();
+//                    if (checkedBox.isSelected()) {
+//                        moveNext(false, false);
+//                    }
                     break;
             }
         }

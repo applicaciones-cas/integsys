@@ -161,7 +161,7 @@ public class SIPosting_HistoryMCController implements Initializable, ScreenInter
     @FXML
     private DatePicker dpTransactionDate, dpReferenceDate, dpSIDate, dpReportMonthYear, dpJETransactionDate;
     @FXML
-    private CheckBox cbVatInclusive, cbVatable;
+    private CheckBox cbVatInclusive, cbVatable, cbJEReverse;
     @FXML
     private TextArea taRemarks, taJERemarks;
     @FXML
