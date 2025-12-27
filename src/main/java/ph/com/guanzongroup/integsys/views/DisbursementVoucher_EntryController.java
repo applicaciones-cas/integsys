@@ -159,7 +159,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
     @FXML
     private ComboBox cmbPaymentMode, cmbPayeeType, cmbDisbursementMode, cmbClaimantType, cmbCheckStatus, cmbOtherPaymentBTransfer, cmbOtherPayment, cmbTransactionType;
     @FXML
-    private CheckBox chbkPrintByBank, chbkIsCrossCheck, chbkIsPersonOnly, chbkVatClassification, cbReverse;
+    private CheckBox chbkPrintByBank, chbkIsCrossCheck, chbkIsPersonOnly, chbkVatClassification, cbReverse, cbBIRReverse, cbJEReverse;
     @FXML
     private TextArea taDVRemarks, taJournalRemarks;
     @FXML
@@ -1911,7 +1911,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
             tfBaseAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.WTaxDeduction(pnDetailBIR).getModel().getBaseAmount(), false));
             tfTaxRate.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.WTaxDeduction(pnDetailBIR).getModel().WithholdingTax().getTaxRate()));
             tfTotalTaxAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.WTaxDeduction(pnDetailBIR).getModel().getTaxAmount(), false));
-            cbReverse.setSelected(poController.WTaxDeduction(pnDetailBIR).getModel().isReverse());
+            cbBIRReverse.setSelected(poController.WTaxDeduction(pnDetailBIR).getModel().isReverse());
 
             JFXUtil.updateCaretPositions(apBIRDetail);
         } catch (SQLException | GuanzonException ex) {
@@ -2235,6 +2235,26 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                     loadTableDetail.reload();
                     break;
                 case "cbReverse":
+//                    poJSON = poController.removeWTDeduction(pnDetail);
+//                    if (!JFXUtil.isJSONSuccess(poJSON)) {
+//                        ShowMessageFX.Warning(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
+//                    }
+//                    loadTableDetailJE.reload();
+//                    if (checkedBox.isSelected()) {
+//                        moveNext(false, false);
+//                    }
+                    break;
+                case "cbJEReverse":
+//                    poJSON = poController.removeWTDeduction(pnDetailJE);
+//                    if (!JFXUtil.isJSONSuccess(poJSON)) {
+//                        ShowMessageFX.Warning(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
+//                    }
+//                    loadTableDetailJE.reload();
+//                    if (checkedBox.isSelected()) {
+//                        moveNext(false, false);
+//                    }
+                    break;
+                case "cbBIRReverse":
                     poJSON = poController.removeWTDeduction(pnDetailBIR);
                     if (!JFXUtil.isJSONSuccess(poJSON)) {
                         ShowMessageFX.Warning(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
