@@ -727,11 +727,7 @@ public class PurchaseOrder_EntrySPMCController implements Initializable, ScreenI
                     if (!"success".equals((String) poJSON.get("result"))) {
                         ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
                     }
-                    tfDiscountRate.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poPurchasingController.PurchaseOrder().Master().getDiscount().doubleValue()));
-                    tfNetAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poPurchasingController.PurchaseOrder().Master().getNetTotal(), true));
-
-                    cbAddVAT.setSelected(poPurchasingController.PurchaseOrder().Master().isVatable());
-                    tfVATAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poPurchasingController.PurchaseOrder().Master().getVatAmount(), true));
+                    loadRecordMaster();
                     break;
                 case "tfDiscountAmount":
                     lsValue = JFXUtil.removeComma(lsValue);
@@ -739,11 +735,7 @@ public class PurchaseOrder_EntrySPMCController implements Initializable, ScreenI
                     if (!"success".equals((String) poJSON.get("result"))) {
                         ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
                     }
-                    tfDiscountAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poPurchasingController.PurchaseOrder().Master().getAdditionalDiscount(), true));
-                    tfNetAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poPurchasingController.PurchaseOrder().Master().getNetTotal(), true));
-
-                    cbAddVAT.setSelected(poPurchasingController.PurchaseOrder().Master().isVatable());
-                    tfVATAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poPurchasingController.PurchaseOrder().Master().getVatAmount(), true));
+                    loadRecordMaster();
                     break;
                 case "tfAdvancePRate":
                     lsValue = JFXUtil.removeComma(lsValue);
@@ -751,12 +743,7 @@ public class PurchaseOrder_EntrySPMCController implements Initializable, ScreenI
                     if (!"success".equals((String) poJSON.get("result"))) {
                         ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
                     }
-
-                    tfAdvancePRate.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poPurchasingController.PurchaseOrder().Master().getDownPaymentRatesPercentage().doubleValue()));
-                    tfNetAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poPurchasingController.PurchaseOrder().Master().getNetTotal(), true));
-
-                    cbAddVAT.setSelected(poPurchasingController.PurchaseOrder().Master().isVatable());
-                    tfVATAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poPurchasingController.PurchaseOrder().Master().getVatAmount(), true));
+                    loadRecordMaster();
                     break;
                 case "tfAdvancePAmount":
                     lsValue = JFXUtil.removeComma(lsValue);
@@ -764,11 +751,7 @@ public class PurchaseOrder_EntrySPMCController implements Initializable, ScreenI
                     if (!"success".equals((String) poJSON.get("result"))) {
                         ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
                     }
-                    tfAdvancePAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poPurchasingController.PurchaseOrder().Master().getDownPaymentRatesAmount(), true));
-                    tfNetAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poPurchasingController.PurchaseOrder().Master().getNetTotal(), true));
-
-                    cbAddVAT.setSelected(poPurchasingController.PurchaseOrder().Master().isVatable());
-                    tfVATAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poPurchasingController.PurchaseOrder().Master().getVatAmount(), true));
+                    loadRecordMaster();
                     break;
                 case "tfOrderQuantity":
                     break;
@@ -1304,7 +1287,7 @@ public class PurchaseOrder_EntrySPMCController implements Initializable, ScreenI
     private void initButtons(int fnEditMode) {
         boolean lbShow = (fnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE);
         JFXUtil.setDisabled(!lbShow, cbAddVAT);
-    
+
         CustomCommonUtil.setVisible(!lbShow, btnBrowse, btnClose, btnNew);
         CustomCommonUtil.setManaged(!lbShow, btnBrowse, btnClose, btnNew);
 
