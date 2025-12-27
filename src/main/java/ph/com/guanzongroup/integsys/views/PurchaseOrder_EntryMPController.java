@@ -141,6 +141,10 @@ public class PurchaseOrder_EntryMPController implements Initializable, ScreenInt
     private ProgressIndicator piTableStockRequestLoading, piTableDetailLoading;
     @FXML
     private Pagination pagination;
+    @FXML
+    private CheckBox cbAddVAT;
+    @FXML
+    private TextField tfVATAmount;
 
     @Override
     public void setGRider(GRiderCAS foValue) {
@@ -278,6 +282,9 @@ public class PurchaseOrder_EntryMPController implements Initializable, ScreenInt
             tfAdvancePAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poPurchasingController.PurchaseOrder().Master().getDownPaymentRatesAmount(), true));
             tfTotalAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poPurchasingController.PurchaseOrder().Master().getTranTotal(), true));
             tfNetAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poPurchasingController.PurchaseOrder().Master().getNetTotal(), true));
+
+            cbAddVAT.setSelected(poPurchasingController.PurchaseOrder().Master().isVatable());
+            tfVATAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poPurchasingController.PurchaseOrder().Master().getVatAmount(), true));
         } catch (GuanzonException | SQLException ex) {
             Logger.getLogger(PurchaseOrder_EntryMPController.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -768,6 +775,9 @@ public class PurchaseOrder_EntryMPController implements Initializable, ScreenInt
                     }
                     tfDiscountRate.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poPurchasingController.PurchaseOrder().Master().getDiscount().doubleValue()));
                     tfNetAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poPurchasingController.PurchaseOrder().Master().getNetTotal(), true));
+
+                    cbAddVAT.setSelected(poPurchasingController.PurchaseOrder().Master().isVatable());
+                    tfVATAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poPurchasingController.PurchaseOrder().Master().getVatAmount(), true));
                     break;
                 case "tfDiscountAmount":
                     lsValue = JFXUtil.removeComma(lsValue);
@@ -1404,6 +1414,12 @@ public class PurchaseOrder_EntryMPController implements Initializable, ScreenInt
                 initFields(pnEditMode);
             }
         });
+        cbAddVAT.setOnAction(event -> {
+            if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
+                poPurchasingController.PurchaseOrder().Master().isVatable(cbAddVAT.isSelected());
+                loadRecordMaster();
+            }
+        });
     }
 
     private void clearMasterFields() {
@@ -1777,6 +1793,9 @@ public class PurchaseOrder_EntryMPController implements Initializable, ScreenInt
                             tfTotalAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poPurchasingController.PurchaseOrder().Master().getTranTotal(), true
                             ));
                             tfNetAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poPurchasingController.PurchaseOrder().Master().getNetTotal(), true));
+
+                            cbAddVAT.setSelected(poPurchasingController.PurchaseOrder().Master().isVatable());
+                            tfVATAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poPurchasingController.PurchaseOrder().Master().getVatAmount(), true));
                         }
                         reselectLastDetailRow();
                         initFields(pnEditMode);

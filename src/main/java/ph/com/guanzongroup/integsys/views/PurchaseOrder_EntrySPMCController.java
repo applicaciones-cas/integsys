@@ -141,6 +141,10 @@ public class PurchaseOrder_EntrySPMCController implements Initializable, ScreenI
     private ProgressIndicator piTableStockRequestLoading, piTableDetailLoading;
     @FXML
     private Pagination pagination;
+    @FXML
+    private CheckBox cbAddVAT;
+    @FXML
+    private TextField tfVATAmount;
 
     @Override
     public void setGRider(GRiderCAS foValue) {
@@ -280,6 +284,9 @@ public class PurchaseOrder_EntrySPMCController implements Initializable, ScreenI
             tfAdvancePAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poPurchasingController.PurchaseOrder().Master().getDownPaymentRatesAmount(), true));
             tfTotalAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poPurchasingController.PurchaseOrder().Master().getTranTotal(), true));
             tfNetAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poPurchasingController.PurchaseOrder().Master().getNetTotal(), true));
+
+            cbAddVAT.setSelected(poPurchasingController.PurchaseOrder().Master().isVatable());
+            tfVATAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poPurchasingController.PurchaseOrder().Master().getVatAmount(), true));
         } catch (GuanzonException | SQLException ex) {
             Logger.getLogger(PurchaseOrder_EntrySPMCController.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -722,6 +729,9 @@ public class PurchaseOrder_EntrySPMCController implements Initializable, ScreenI
                     }
                     tfDiscountRate.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poPurchasingController.PurchaseOrder().Master().getDiscount().doubleValue()));
                     tfNetAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poPurchasingController.PurchaseOrder().Master().getNetTotal(), true));
+
+                    cbAddVAT.setSelected(poPurchasingController.PurchaseOrder().Master().isVatable());
+                    tfVATAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poPurchasingController.PurchaseOrder().Master().getVatAmount(), true));
                     break;
                 case "tfDiscountAmount":
                     lsValue = JFXUtil.removeComma(lsValue);
@@ -731,6 +741,9 @@ public class PurchaseOrder_EntrySPMCController implements Initializable, ScreenI
                     }
                     tfDiscountAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poPurchasingController.PurchaseOrder().Master().getAdditionalDiscount(), true));
                     tfNetAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poPurchasingController.PurchaseOrder().Master().getNetTotal(), true));
+
+                    cbAddVAT.setSelected(poPurchasingController.PurchaseOrder().Master().isVatable());
+                    tfVATAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poPurchasingController.PurchaseOrder().Master().getVatAmount(), true));
                     break;
                 case "tfAdvancePRate":
                     lsValue = JFXUtil.removeComma(lsValue);
@@ -741,6 +754,9 @@ public class PurchaseOrder_EntrySPMCController implements Initializable, ScreenI
 
                     tfAdvancePRate.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poPurchasingController.PurchaseOrder().Master().getDownPaymentRatesPercentage().doubleValue()));
                     tfNetAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poPurchasingController.PurchaseOrder().Master().getNetTotal(), true));
+
+                    cbAddVAT.setSelected(poPurchasingController.PurchaseOrder().Master().isVatable());
+                    tfVATAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poPurchasingController.PurchaseOrder().Master().getVatAmount(), true));
                     break;
                 case "tfAdvancePAmount":
                     lsValue = JFXUtil.removeComma(lsValue);
@@ -750,6 +766,9 @@ public class PurchaseOrder_EntrySPMCController implements Initializable, ScreenI
                     }
                     tfAdvancePAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poPurchasingController.PurchaseOrder().Master().getDownPaymentRatesAmount(), true));
                     tfNetAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poPurchasingController.PurchaseOrder().Master().getNetTotal(), true));
+
+                    cbAddVAT.setSelected(poPurchasingController.PurchaseOrder().Master().isVatable());
+                    tfVATAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poPurchasingController.PurchaseOrder().Master().getVatAmount(), true));
                     break;
                 case "tfOrderQuantity":
                     break;
@@ -1231,6 +1250,9 @@ public class PurchaseOrder_EntrySPMCController implements Initializable, ScreenI
                                 tfAdvancePAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poPurchasingController.PurchaseOrder().Master().getDownPaymentRatesAmount(), true));
                                 poPurchasingController.PurchaseOrder().computeNetTotal();
                                 tfNetAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poPurchasingController.PurchaseOrder().Master().getNetTotal(), true));
+
+                                cbAddVAT.setSelected(poPurchasingController.PurchaseOrder().Master().isVatable());
+                                tfVATAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poPurchasingController.PurchaseOrder().Master().getVatAmount(), true));
                             } else {
                                 chkbAdvancePayment.setSelected(true);
                                 poPurchasingController.PurchaseOrder().Master().setWithAdvPaym(true);
@@ -1247,6 +1269,12 @@ public class PurchaseOrder_EntrySPMCController implements Initializable, ScreenI
                     chkbAdvancePayment.setSelected(false);
                 }
                 initFields(pnEditMode);
+            }
+        });
+        cbAddVAT.setOnAction(event -> {
+            if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
+                poPurchasingController.PurchaseOrder().Master().isVatable(cbAddVAT.isSelected());
+                loadRecordMaster();
             }
         });
     }
@@ -1617,6 +1645,9 @@ public class PurchaseOrder_EntrySPMCController implements Initializable, ScreenI
                             tfTotalAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poPurchasingController.PurchaseOrder().Master().getTranTotal(), true
                             ));
                             tfNetAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poPurchasingController.PurchaseOrder().Master().getNetTotal(), true));
+
+                            cbAddVAT.setSelected(poPurchasingController.PurchaseOrder().Master().isVatable());
+                            tfVATAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poPurchasingController.PurchaseOrder().Master().getVatAmount(), true));
                         }
                         reselectLastDetailRow();
                         initFields(pnEditMode);
