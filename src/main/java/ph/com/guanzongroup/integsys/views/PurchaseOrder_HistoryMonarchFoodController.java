@@ -112,6 +112,10 @@ public class PurchaseOrder_HistoryMonarchFoodController implements Initializable
     private TableColumn<ModelPurchaseOrderDetail, String> tblRowNoDetail, tblOrderNoDetail, tblBarcodeDetail,
             tblDescriptionDetail, tblCostDetail, tblROQDetail, tblRequestQuantityDetail, tblOrderQuantityDetail,
             tblTotalAmountDetail;
+    @FXML
+    private CheckBox cbAddVAT;
+    @FXML
+    private TextField tfVATAmount;
 
     @Override
     public void setGRider(GRiderCAS foValue) {
@@ -205,6 +209,9 @@ public class PurchaseOrder_HistoryMonarchFoodController implements Initializable
             tfAdvancePAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poPurchasingController.PurchaseOrder().Master().getDownPaymentRatesAmount(), true));
             tfTotalAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poPurchasingController.PurchaseOrder().Master().getTranTotal(), true));
             tfNetAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poPurchasingController.PurchaseOrder().Master().getNetTotal(), true));
+
+            cbAddVAT.setSelected(poPurchasingController.PurchaseOrder().Master().isVatable());
+            tfVATAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poPurchasingController.PurchaseOrder().Master().getVatAmount(), true));
         } catch (GuanzonException | SQLException ex) {
             Logger.getLogger(PurchaseOrder_EntryController.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -456,7 +463,7 @@ public class PurchaseOrder_HistoryMonarchFoodController implements Initializable
                                 orderDetail.Inventory().getBarCode(),
                                 orderDetail.Inventory().getDescription(),
                                 CustomCommonUtil.setIntegerValueToDecimalFormat(orderDetail.getUnitPrice(), true),
-                                      "0",
+                                "0",
                                 CustomCommonUtil.setIntegerValueToDecimalFormat(lnRequestQuantity),
                                 CustomCommonUtil.setIntegerValueToDecimalFormat(orderDetail.getQuantity()),
                                 CustomCommonUtil.setIntegerValueToDecimalFormat(lnTotalAmount, true),

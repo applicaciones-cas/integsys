@@ -112,6 +112,10 @@ public class PurchaseOrder_HistoryAppliancesController implements Initializable,
     @FXML
     private TableColumn<ModelPurchaseOrderDetail, String> tblRowNoDetail, tblOrderNoDetail, tblBarcodeDetail, tblDescriptionDetail,
             tblCostDetail, tblROQDetail, tblRequestQuantityDetail, tblOrderQuantityDetail, tblTotalAmountDetail;
+    @FXML
+    private CheckBox cbAddVAT;
+    @FXML
+    private TextField tfVATAmount;
 
     @Override
     public void setGRider(GRiderCAS foValue) {
@@ -206,6 +210,9 @@ public class PurchaseOrder_HistoryAppliancesController implements Initializable,
             tfAdvancePAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poPurchasingController.PurchaseOrder().Master().getDownPaymentRatesAmount(), true));
             tfTotalAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poPurchasingController.PurchaseOrder().Master().getTranTotal(), true));
             tfNetAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poPurchasingController.PurchaseOrder().Master().getNetTotal(), true));
+
+            cbAddVAT.setSelected(poPurchasingController.PurchaseOrder().Master().isVatable());
+            tfVATAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poPurchasingController.PurchaseOrder().Master().getVatAmount(), true));
         } catch (GuanzonException | SQLException ex) {
             Logger.getLogger(PurchaseOrder_EntryAppliancesController.class.getName()).log(Level.SEVERE, null, ex);
         }
