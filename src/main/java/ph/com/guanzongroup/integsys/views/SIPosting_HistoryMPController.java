@@ -993,6 +993,9 @@ public class SIPosting_HistoryMPController implements Initializable, ScreenInter
                         if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
                             lnCtr = poPurchaseReceivingController.PurchaseOrderReceiving().Journal().getDetailCount() - 1;
                             while (lnCtr >= 0) {
+                                if (!poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(lnCtr).isReverse()) {
+                                    continue;
+                                }
                                 if (JFXUtil.isObjectEqualTo(poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(lnCtr).getAccountCode(), null, "")) {
                                     poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail().remove(lnCtr);
                                 }
@@ -1000,7 +1003,8 @@ public class SIPosting_HistoryMPController implements Initializable, ScreenInter
                             }
                             if ((poPurchaseReceivingController.PurchaseOrderReceiving().Journal().getDetailCount() - 1) >= 0) {
                                 if (poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(poPurchaseReceivingController.PurchaseOrderReceiving().Journal().getDetailCount() - 1).getAccountCode() != null
-                                        && !poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(poPurchaseReceivingController.PurchaseOrderReceiving().Journal().getDetailCount() - 1).getAccountCode().equals("")) {
+                                        && !poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(poPurchaseReceivingController.PurchaseOrderReceiving().Journal().getDetailCount() - 1).getAccountCode().equals("")
+                                        && poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(poPurchaseReceivingController.PurchaseOrderReceiving().Journal().getDetailCount() - 1).isReverse()) {
                                     poPurchaseReceivingController.PurchaseOrderReceiving().Journal().AddDetail();
                                     poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(poPurchaseReceivingController.PurchaseOrderReceiving().Journal().getDetailCount() - 1).setForMonthOf(oApp.getServerDate());
                                 }
@@ -1014,6 +1018,7 @@ public class SIPosting_HistoryMPController implements Initializable, ScreenInter
                         String lsReportMonthYear = "";
                         String lsAcctCode = "";
                         String lsAccDesc = "";
+                        int lnRowCount = 0;
                         for (lnCtr = 0; lnCtr < poPurchaseReceivingController.PurchaseOrderReceiving().Journal().getDetailCount(); lnCtr++) {
                             lsReportMonthYear = CustomCommonUtil.formatDateToShortString(poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(lnCtr).getForMonthOf());
                             if (poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(lnCtr).getAccountCode() != null) {
@@ -1022,31 +1027,40 @@ public class SIPosting_HistoryMPController implements Initializable, ScreenInter
                             if (poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(lnCtr).Account_Chart().getDescription() != null) {
                                 lsAccDesc = poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(lnCtr).Account_Chart().getDescription();
                             }
-
+                            if (!poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(lnCtr).isReverse()) {
+                                continue;
+                            }
+                            lnRowCount += 1;
                             JEdetails_data.add(
-                                    new ModelJournalEntry_Detail(String.valueOf(lnCtr + 1),
+                                    new ModelJournalEntry_Detail(
+                                            String.valueOf(lnRowCount),
                                             String.valueOf(CustomCommonUtil.parseDateStringToLocalDate(lsReportMonthYear, "yyyy-MM-dd")),
                                             String.valueOf(lsAcctCode),
                                             String.valueOf(lsAccDesc),
                                             String.valueOf(CustomCommonUtil.setIntegerValueToDecimalFormat(poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(lnCtr).getCreditAmount(), true)),
-                                            String.valueOf(CustomCommonUtil.setIntegerValueToDecimalFormat(poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(lnCtr).getDebitAmount(), true))) //identify total
-                            );
+                                            String.valueOf(CustomCommonUtil.setIntegerValueToDecimalFormat(poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(lnCtr).getDebitAmount(), true)),
+                                            String.valueOf(lnCtr)
+                                    ));
 
                             lsReportMonthYear = "";
                             lsAcctCode = "";
                             lsAccDesc = "";
                         }
-                        if (pnJEDetail < 0 || pnJEDetail
+                        int lnTempRow = JFXUtil.getDetailRow(JEdetails_data, pnJEDetail, 7); //this method is used only when Reverse is applied
+                        if (lnTempRow < 0 || lnTempRow
                                 >= JEdetails_data.size()) {
                             if (!JEdetails_data.isEmpty()) {
                                 /* FOCUS ON FIRST ROW */
                                 JFXUtil.selectAndFocusRow(tblViewJEDetails, 0);
-                                pnJEDetail = tblViewJEDetails.getSelectionModel().getSelectedIndex();
+                                int lnRow = Integer.parseInt(JEdetails_data.get(0).getIndex07());
+                                pnJEDetail = lnRow;
                                 loadRecordJEDetail();
                             }
                         } else {
-                            /* FOCUS ON THE ROW THAT pnRowDetail POINTS TO */
-                            JFXUtil.selectAndFocusRow(tblViewJEDetails, pnJEDetail);
+                            /* FOCUS ON THE ROW THAT pnDetailBIR POINTS TO */
+                            JFXUtil.selectAndFocusRow(tblViewJEDetails, lnTempRow);
+                            int lnRow = Integer.parseInt(JEdetails_data.get(tblViewJEDetails.getSelectionModel().getSelectedIndex()).getIndex07());
+                            pnJEDetail = lnRow;
                             loadRecordJEDetail();
                         }
                         loadRecordJEMaster();
