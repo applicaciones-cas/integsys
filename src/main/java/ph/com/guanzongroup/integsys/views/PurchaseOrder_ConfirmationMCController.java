@@ -162,7 +162,8 @@ public class PurchaseOrder_ConfirmationMCController implements Initializable, Sc
     public void initialize(URL url, ResourceBundle rb) {
         try {
             poPurchasingController = new PurchaseOrderControllers(poApp, logWrapper);
-            poPurchasingController.PurchaseOrder().setTransactionStatus(PurchaseOrderStatus.OPEN);
+            
+            poPurchasingController.PurchaseOrder().setTransactionStatus(PurchaseOrderStatus.OPEN + PurchaseOrderStatus.RETURNED);
             poPurchasingController.PurchaseOrder().setWithUI(true);
             poJSON = poPurchasingController.PurchaseOrder().InitTransaction();
             if (!"success".equals(poJSON.get("result"))) {
@@ -958,6 +959,7 @@ public class PurchaseOrder_ConfirmationMCController implements Initializable, Sc
         if (fnEditMode == EditMode.READY) {
             switch (poPurchasingController.PurchaseOrder().Master().getConvertedTransactionStatus()) {
                 case PurchaseOrderStatus.OPEN:
+                case PurchaseOrderStatus.RETURNED:
                     CustomCommonUtil.setVisible(true, btnConfirm, btnVoid, btnUpdate, btnPrint);
                     CustomCommonUtil.setManaged(true, btnConfirm, btnVoid, btnUpdate, btnPrint);
                     break;
