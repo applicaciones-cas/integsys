@@ -572,12 +572,6 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                     String lsTransactionNo = selected.getIndex08();
                     String lsPayee = selected.getIndex09();
 
-//                    if (!JFXUtil.isObjectEqualTo(poController.Master().Payee().Client().getCompanyName(), null, "")) {
-//                        if (!poController.Master().Payee().Client().getCompanyName().equals(lsPayee)) {
-//                            ShowMessageFX.Warning(null, pxeModuleName, "Invalid retrieval, ensure it matches to the corresponding supplier ");
-//                            return;
-//                        }
-//                    }
                     poJSON = poController.populateDetail(lsTransactionNo, lsPayableType);
                     if ("error".equals(poJSON.get("result"))) {
                         ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
@@ -934,7 +928,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
         //apDVMaster1
         JFXUtil.setFocusListener(txtMaster_Focus, tfSupplier);
         //apDVDetail
-        JFXUtil.setFocusListener(txtDetail_Focus, tfPurchasedAmountDetail);
+        JFXUtil.setFocusListener(txtDetail_Focus, tfPurchasedAmountDetail, tfVatExemptDetail);
         //apCheck
         JFXUtil.setFocusListener(txtMasterCheck_Focus, tfBankNameCheck, tfBankAccountCheck, tfPayeeName, tfAuthorizedPerson);
         // apMasterDVBTransfer
@@ -1251,7 +1245,6 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
             });
     ChangeListener<Boolean> txtDetailJE_Focus = JFXUtil.FocusListener(TextField.class,
             (lsID, lsValue) -> {
-//                try {
                 switch (lsID) {
                     case "tfAccountCode":
                         if (lsValue.isEmpty()) {
@@ -1311,33 +1304,8 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                 JFXUtil.runWithDelay(0.50, () -> {
                     loadTableDetailJE.reload();
                 });
-//                } catch (SQLException | GuanzonException ex) {
-//                    Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
-//                }
             });
 
-//    private void baseAmountError() {
-//        if ("error".equals(poJSON.get("result"))) {
-//            pbEnteredBIR = false;
-//            int lnReturned = Integer.parseInt(String.valueOf(poJSON.get("row"))) + 1;
-//            JFXUtil.runWithDelay(0.70, () -> {
-//                int lnTempRow = JFXUtil.getDetailTempRow(BIR_data, lnReturned, 7);
-//                pnDetailBIR = lnTempRow;
-//                poController.WTaxDeduction(pnDetailBIR).getModel().setBaseAmount(0.0);
-//                loadTableDetailBIR.reload();
-//            });
-//            ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-//            throw new JFXUtil.BreakLoopException();
-//        } else {
-//            int lnReturned = Integer.parseInt(String.valueOf(poJSON.get("row")));
-//            JFXUtil.runWithDelay(0.80, () -> {
-////          int lnTempRow = JFXUtil.getDetailTempRow(BIR_data, lnReturned, 7); // comment intentional
-//                pnDetailBIR = lnReturned;
-//                loadTableDetailBIR.reload();
-//            });
-//            loadTableDetail.reload();
-//        }
-//    }
     ChangeListener<Boolean> txtBIRDetail_Focus = JFXUtil.FocusListener(TextField.class,
             (lsID, lsValue) -> {
                 try {
@@ -1834,7 +1802,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
         }
 
         boolean lbShow = (poController.Detail(pnDetail).getSourceCode()).equals(DisbursementStatic.SourceCode.PAYMENT_REQUEST);
-        JFXUtil.setDisabled(!lbShow, chbkVatClassification, tfVatableSalesDetail, tfVatExemptDetail, tfVatZeroRatedSalesDetail, tfVatAmountDetail);
+        JFXUtil.setDisabled(!lbShow, chbkVatClassification, tfVatExemptDetail);
         JFXUtil.updateCaretPositions(apDVDetail);
     }
 

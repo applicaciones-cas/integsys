@@ -897,7 +897,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
         //apDVMaster1
         JFXUtil.setFocusListener(txtMaster_Focus, tfSupplier);
         //apDVDetail
-        JFXUtil.setFocusListener(txtDetail_Focus, tfPurchasedAmountDetail);
+        JFXUtil.setFocusListener(txtDetail_Focus, tfPurchasedAmountDetail, tfVatExemptDetail);
         //apCheck
         JFXUtil.setFocusListener(txtMasterCheck_Focus, tfBankNameCheck, tfBankAccountCheck, tfPayeeName, tfAuthorizedPerson);
         // apMasterDVBTransfer
@@ -1002,17 +1002,6 @@ public class DisbursementVoucher_VerificationController implements Initializable
             (lsID, lsValue) -> {
                 /*Lost Focus*/
                 switch (lsID) {
-                    case "tfVatableSalesDetail":
-                        lsValue = JFXUtil.removeComma(lsValue);
-                        poJSON = poController.Detail(pnDetail).setDetailVatSales(Double.valueOf(lsValue));
-                        if (!JFXUtil.isJSONSuccess(poJSON)) {
-                            ShowMessageFX.Warning(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
-                        }
-                        if (pbEnteredDV) {
-                            JFXUtil.textFieldMoveNext(tfVatExemptDetail);
-                            pbEnteredDV = false;
-                        }
-                        break;
                     case "tfVatExemptDetail":
                         lsValue = JFXUtil.removeComma(lsValue);
                         poJSON = poController.Detail(pnDetail).setDetailVatExempt(Double.valueOf(lsValue));
@@ -1021,28 +1010,6 @@ public class DisbursementVoucher_VerificationController implements Initializable
                         }
                         if (pbEnteredDV) {
                             JFXUtil.textFieldMoveNext(tfVatExemptDetail);
-                            pbEnteredDV = false;
-                        }
-                        break;
-                    case "tfVatZeroRatedSalesDetail":
-                        lsValue = JFXUtil.removeComma(lsValue);
-                        poJSON = poController.Detail(pnDetail).setDetailZeroVat(Double.valueOf(lsValue));
-                        if (!JFXUtil.isJSONSuccess(poJSON)) {
-                            ShowMessageFX.Warning(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
-                        }
-                        if (pbEnteredDV) {
-                            JFXUtil.textFieldMoveNext(tfVatZeroRatedSalesDetail);
-                            pbEnteredDV = false;
-                        }
-                        break;
-                    case "tfVatAmountDetail":
-                        lsValue = JFXUtil.removeComma(lsValue);
-                        poJSON = poController.Detail(pnDetail).setDetailVatAmount(Double.valueOf(lsValue));
-                        if (!JFXUtil.isJSONSuccess(poJSON)) {
-                            ShowMessageFX.Warning(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
-                        }
-                        if (pbEnteredDV) {
-                            JFXUtil.textFieldMoveNext(tfVatAmountDetail);
                             pbEnteredDV = false;
                         }
                         break;
@@ -1810,7 +1777,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
             cbReverse.selectedProperty().set(false);
         }
         boolean lbShow = (poController.Detail(pnDetail).getSourceCode()).equals(DisbursementStatic.SourceCode.PAYMENT_REQUEST);
-        JFXUtil.setDisabled(!lbShow, chbkVatClassification, tfVatableSalesDetail, tfVatExemptDetail, tfVatZeroRatedSalesDetail, tfVatAmountDetail);
+        JFXUtil.setDisabled(!lbShow, chbkVatClassification, tfVatExemptDetail);
         JFXUtil.updateCaretPositions(apDVDetail);
     }
 
