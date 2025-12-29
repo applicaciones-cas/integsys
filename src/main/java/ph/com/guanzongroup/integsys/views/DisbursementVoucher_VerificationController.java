@@ -1002,6 +1002,50 @@ public class DisbursementVoucher_VerificationController implements Initializable
             (lsID, lsValue) -> {
                 /*Lost Focus*/
                 switch (lsID) {
+                    case "tfVatableSalesDetail":
+                        lsValue = JFXUtil.removeComma(lsValue);
+                        poJSON = poController.Detail(pnDetail).setDetailVatSales(Double.valueOf(lsValue));
+                        if (!JFXUtil.isJSONSuccess(poJSON)) {
+                            ShowMessageFX.Warning(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
+                        }
+                        if (pbEnteredDV) {
+                            JFXUtil.textFieldMoveNext(tfVatExemptDetail);
+                            pbEnteredDV = false;
+                        }
+                        break;
+                    case "tfVatExemptDetail":
+                        lsValue = JFXUtil.removeComma(lsValue);
+                        poJSON = poController.Detail(pnDetail).setDetailVatExempt(Double.valueOf(lsValue));
+                        if (!JFXUtil.isJSONSuccess(poJSON)) {
+                            ShowMessageFX.Warning(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
+                        }
+                        if (pbEnteredDV) {
+                            JFXUtil.textFieldMoveNext(tfVatExemptDetail);
+                            pbEnteredDV = false;
+                        }
+                        break;
+                    case "tfVatZeroRatedSalesDetail":
+                        lsValue = JFXUtil.removeComma(lsValue);
+                        poJSON = poController.Detail(pnDetail).setDetailZeroVat(Double.valueOf(lsValue));
+                        if (!JFXUtil.isJSONSuccess(poJSON)) {
+                            ShowMessageFX.Warning(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
+                        }
+                        if (pbEnteredDV) {
+                            JFXUtil.textFieldMoveNext(tfVatZeroRatedSalesDetail);
+                            pbEnteredDV = false;
+                        }
+                        break;
+                    case "tfVatAmountDetail":
+                        lsValue = JFXUtil.removeComma(lsValue);
+                        poJSON = poController.Detail(pnDetail).setDetailVatAmount(Double.valueOf(lsValue));
+                        if (!JFXUtil.isJSONSuccess(poJSON)) {
+                            ShowMessageFX.Warning(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
+                        }
+                        if (pbEnteredDV) {
+                            JFXUtil.textFieldMoveNext(tfVatAmountDetail);
+                            pbEnteredDV = false;
+                        }
+                        break;
                     case "tfPurchasedAmountDetail":
                         lsValue = JFXUtil.removeComma(lsValue);
                         Double ldblOrigAmt = poController.Detail(pnDetail).getAmountApplied();
@@ -1012,7 +1056,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
                         poJSON = poController.computeFields();
                         if ("error".equals((String) poJSON.get("result"))) {
                             ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-                            poController.Detail(pnDetail).setAmountApplied(0.0);
+                            poController.Detail(pnDetail).setAmountApplied(0.00);
                             tfPurchasedAmountDetail.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(pnDetail).getAmountApplied(), true));
                             return;
                         }
@@ -1757,10 +1801,16 @@ public class DisbursementVoucher_VerificationController implements Initializable
         tfNetAmountDetail.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(pnDetail).getAmount(), true));
 
         if (!JFXUtil.isObjectEqualTo(poController.Detail(pnDetail).getDetailVatAmount(), null, "")) {
-            if (poController.Detail(pnDetail).getDetailVatAmount() > 0) {
+            if (poController.Detail(pnDetail).getAmountApplied() > 0) {
                 cbReverse.selectedProperty().set(true);
+            } else {
+                cbReverse.selectedProperty().set(false);
             }
+        } else {
+            cbReverse.selectedProperty().set(false);
         }
+        boolean lbShow = (poController.Detail(pnDetail).getSourceCode()).equals(DisbursementStatic.SourceCode.PAYMENT_REQUEST);
+        JFXUtil.setDisabled(!lbShow, chbkVatClassification, tfVatableSalesDetail, tfVatExemptDetail, tfVatZeroRatedSalesDetail, tfVatAmountDetail);
         JFXUtil.updateCaretPositions(apDVDetail);
     }
 
