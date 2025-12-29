@@ -2233,6 +2233,12 @@ public class DisbursementVoucher_VerificationController implements Initializable
                     loadRecordMasterCheck();
                     break;
                 case "chbkVatClassification":
+                    if (poController.getEditMode() == EditMode.ADDNEW || poController.getEditMode() == EditMode.UPDATE) {
+                        if (checkedBox.isSelected() && !poController.Detail(pnDetail).isWithVat()) {
+                            poController.Detail(pnDetail).setDetailVatExempt(0.0000);
+                        }
+                    }
+
                     poJSON = poController.Detail(pnDetail).isWithVat(checkedBox.isSelected());
                     if (!JFXUtil.isJSONSuccess(poJSON)) {
                         ShowMessageFX.Warning(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));

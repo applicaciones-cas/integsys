@@ -1027,17 +1027,6 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
             (lsID, lsValue) -> {
                 /*Lost Focus*/
                 switch (lsID) {
-                    case "tfVatableSalesDetail":
-                        lsValue = JFXUtil.removeComma(lsValue);
-                        poJSON = poController.Detail(pnDetail).setDetailVatSales(Double.valueOf(lsValue));
-                        if (!JFXUtil.isJSONSuccess(poJSON)) {
-                            ShowMessageFX.Warning(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
-                        }
-                        if (pbEnteredDV) {
-                            JFXUtil.textFieldMoveNext(tfVatExemptDetail);
-                            pbEnteredDV = false;
-                        }
-                        break;
                     case "tfVatExemptDetail":
                         lsValue = JFXUtil.removeComma(lsValue);
                         poJSON = poController.Detail(pnDetail).setDetailVatExempt(Double.valueOf(lsValue));
@@ -1046,28 +1035,6 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                         }
                         if (pbEnteredDV) {
                             JFXUtil.textFieldMoveNext(tfVatExemptDetail);
-                            pbEnteredDV = false;
-                        }
-                        break;
-                    case "tfVatZeroRatedSalesDetail":
-                        lsValue = JFXUtil.removeComma(lsValue);
-                        poJSON = poController.Detail(pnDetail).setDetailZeroVat(Double.valueOf(lsValue));
-                        if (!JFXUtil.isJSONSuccess(poJSON)) {
-                            ShowMessageFX.Warning(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
-                        }
-                        if (pbEnteredDV) {
-                            JFXUtil.textFieldMoveNext(tfVatZeroRatedSalesDetail);
-                            pbEnteredDV = false;
-                        }
-                        break;
-                    case "tfVatAmountDetail":
-                        lsValue = JFXUtil.removeComma(lsValue);
-                        poJSON = poController.Detail(pnDetail).setDetailVatAmount(Double.valueOf(lsValue));
-                        if (!JFXUtil.isJSONSuccess(poJSON)) {
-                            ShowMessageFX.Warning(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
-                        }
-                        if (pbEnteredDV) {
-                            JFXUtil.textFieldMoveNext(tfVatAmountDetail);
                             pbEnteredDV = false;
                         }
                         break;
@@ -2263,6 +2230,12 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                     loadRecordMasterCheck();
                     break;
                 case "chbkVatClassification":
+                    if (poController.getEditMode() == EditMode.ADDNEW || poController.getEditMode() == EditMode.UPDATE) {
+                        if (checkedBox.isSelected() && !poController.Detail(pnDetail).isWithVat()) {
+                            poController.Detail(pnDetail).setDetailVatExempt(0.0000);
+                        }
+                    }
+
                     poJSON = poController.Detail(pnDetail).isWithVat(checkedBox.isSelected());
                     if (!JFXUtil.isJSONSuccess(poJSON)) {
                         ShowMessageFX.Warning(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
@@ -2289,6 +2262,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                         moveNextBIR(false, false);
                     }
                     break;
+
             }
         }
     }
