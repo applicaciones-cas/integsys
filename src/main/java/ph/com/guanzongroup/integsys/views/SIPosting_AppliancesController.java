@@ -1136,44 +1136,56 @@ public class SIPosting_AppliancesController implements Initializable, ScreenInte
                         case "tfJEAcctCode":
                             poJSON = poPurchaseReceivingController.PurchaseOrderReceiving().Journal().SearchAccountCode(pnJEDetail, lsValue, true, poPurchaseReceivingController.PurchaseOrderReceiving().Master().getIndustryId(), null);
                             if ("error".equals(poJSON.get("result"))) {
+                                int lnReturned = Integer.parseInt(String.valueOf(poJSON.get("row"))) + 1;
+                                JFXUtil.runWithDelay(0.70, () -> {
+                                    pnJEDetail = lnReturned;
+                                    loadTableJEDetail();
+                                });
                                 ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-                                tfJEAcctCode.setText("");
                                 break;
                             }
 
                             poJSON = poPurchaseReceivingController.PurchaseOrderReceiving().checkExistAcctCode(pnJEDetail, poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(pnJEDetail).getAccountCode());
                             if ("error".equals(poJSON.get("result"))) {
-                                int lnRow = (int) poJSON.get("row");
-                                ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-                                if (pnJEDetail != lnRow) {
-                                    pnJEDetail = lnRow;
+                                int lnReturned = Integer.parseInt(String.valueOf(poJSON.get("row"))) + 1;
+                                JFXUtil.runWithDelay(0.70, () -> {
+                                    pnJEDetail = lnReturned;
                                     loadTableJEDetail();
-                                    return;
-                                }
+                                });
+                                ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                 break;
+                            } else {
+                                int lnReturned = Integer.parseInt(String.valueOf(poJSON.get("row")));
+                                pnJEDetail = lnReturned;
+                                loadTableJEDetail();
                             }
-                            loadTableJEDetail();
                             break;
                         case "tfJEAcctDescription":
                             poJSON = poPurchaseReceivingController.PurchaseOrderReceiving().Journal().SearchAccountCode(pnJEDetail, lsValue, false, poPurchaseReceivingController.PurchaseOrderReceiving().Master().getIndustryId(), null);
                             if ("error".equals(poJSON.get("result"))) {
+                                int lnReturned = Integer.parseInt(String.valueOf(poJSON.get("row"))) + 1;
+                                JFXUtil.runWithDelay(0.70, () -> {
+                                    pnJEDetail = lnReturned;
+                                    loadTableJEDetail();
+                                });
                                 ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-                                tfJEAcctCode.setText("");
                                 break;
                             }
 
                             poJSON = poPurchaseReceivingController.PurchaseOrderReceiving().checkExistAcctCode(pnJEDetail, poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(pnJEDetail).getAccountCode());
                             if ("error".equals(poJSON.get("result"))) {
-                                int lnRow = (int) poJSON.get("row");
-                                ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-                                if (pnJEDetail != lnRow) {
-                                    pnJEDetail = lnRow;
+                                int lnReturned = Integer.parseInt(String.valueOf(poJSON.get("row"))) + 1;
+                                JFXUtil.runWithDelay(0.70, () -> {
+                                    pnJEDetail = lnReturned;
                                     loadTableJEDetail();
-                                    return;
-                                }
+                                });
+                                ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                 break;
+                            } else {
+                                int lnReturned = Integer.parseInt(String.valueOf(poJSON.get("row")));
+                                pnJEDetail = lnReturned;
+                                loadTableJEDetail();
                             }
-                            loadTableJEDetail();
                             break;
                     }
                     break;

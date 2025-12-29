@@ -864,19 +864,57 @@ public class SIPosting_CarController implements Initializable, ScreenInterface {
                     break;
 
                 case "tfJEAcctCode":
-                    if (lsValue.isEmpty()) {
-                        poJSON = poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(pnJEDetail).setAccountCode(lsValue);
-                    }
-                    if ("error".equals((String) poJSON.get("result"))) {
+                    poJSON = poPurchaseReceivingController.PurchaseOrderReceiving().Journal().SearchAccountCode(pnJEDetail, lsValue, true, poPurchaseReceivingController.PurchaseOrderReceiving().Master().getIndustryId(), null);
+                    if ("error".equals(poJSON.get("result"))) {
+                        int lnReturned = Integer.parseInt(String.valueOf(poJSON.get("row"))) + 1;
+                        JFXUtil.runWithDelay(0.70, () -> {
+                            pnJEDetail = lnReturned;
+                            loadTableJEDetail();
+                        });
                         ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                        break;
+                    }
+
+                    poJSON = poPurchaseReceivingController.PurchaseOrderReceiving().checkExistAcctCode(pnJEDetail, poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(pnJEDetail).getAccountCode());
+                    if ("error".equals(poJSON.get("result"))) {
+                        int lnReturned = Integer.parseInt(String.valueOf(poJSON.get("row"))) + 1;
+                        JFXUtil.runWithDelay(0.70, () -> {
+                            pnJEDetail = lnReturned;
+                            loadTableJEDetail();
+                        });
+                        ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                        break;
+                    } else {
+                        int lnReturned = Integer.parseInt(String.valueOf(poJSON.get("row")));
+                        pnJEDetail = lnReturned;
+                        loadTableJEDetail();
                     }
                     break;
                 case "tfJEAcctDescription":
-                    if (lsValue.isEmpty()) {
-                        poJSON = poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(pnJEDetail).setAccountCode(lsValue);
-                    }
-                    if ("error".equals((String) poJSON.get("result"))) {
+                    poJSON = poPurchaseReceivingController.PurchaseOrderReceiving().Journal().SearchAccountCode(pnJEDetail, lsValue, false, poPurchaseReceivingController.PurchaseOrderReceiving().Master().getIndustryId(), null);
+                    if ("error".equals(poJSON.get("result"))) {
+                        int lnReturned = Integer.parseInt(String.valueOf(poJSON.get("row"))) + 1;
+                        JFXUtil.runWithDelay(0.70, () -> {
+                            pnJEDetail = lnReturned;
+                            loadTableJEDetail();
+                        });
                         ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                        break;
+                    }
+
+                    poJSON = poPurchaseReceivingController.PurchaseOrderReceiving().checkExistAcctCode(pnJEDetail, poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(pnJEDetail).getAccountCode());
+                    if ("error".equals(poJSON.get("result"))) {
+                        int lnReturned = Integer.parseInt(String.valueOf(poJSON.get("row"))) + 1;
+                        JFXUtil.runWithDelay(0.70, () -> {
+                            pnJEDetail = lnReturned;
+                            loadTableJEDetail();
+                        });
+                        ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                        break;
+                    } else {
+                        int lnReturned = Integer.parseInt(String.valueOf(poJSON.get("row")));
+                        pnJEDetail = lnReturned;
+                        loadTableJEDetail();
                     }
                     break;
                 case "tfCreditAmt":
