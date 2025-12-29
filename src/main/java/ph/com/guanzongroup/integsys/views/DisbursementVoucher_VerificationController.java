@@ -1500,31 +1500,9 @@ public class DisbursementVoucher_VerificationController implements Initializable
                                     });
                                     ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                     break;
-                                } else {
-                                    int lnReturned = Integer.parseInt(String.valueOf(poJSON.get("row")));
-                                    pnDetailJE = lnReturned;
-                                    loadTableDetailJE.reload();
-                                    JFXUtil.textFieldMoveNext(tfParticular);
-                                }
-                                poJSON = poController.checkExistAcctCode(pnDetailJE, poController.Journal().Detail(pnDetailJE).getAccountCode());
-                                if ("error".equals(poJSON.get("result"))) {
-                                    int lnRow = (int) poJSON.get("row");
-                                    ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-                                    if (pnDetailJE != lnRow) {
-                                        pnDetailJE = lnRow;
-                                        JFXUtil.runWithDelay(0.50, () -> {
-                                            loadTableDetailJE.reload();
-                                        });
-                                        return;
-                                    }
-                                    break;
-                                } else {
-                                    JFXUtil.textFieldMoveNext(tfDebitAmount);
                                 }
 
-                                break;
-                            case "tfAccountDescription":
-                                poJSON = poController.Journal().SearchAccountCode(pnDetailJE, lsValue, false, poController.Master().getIndustryID(), null);
+                                poJSON = poController.checkExistAcctCode(pnDetailJE, poController.Journal().Detail(pnDetailJE).getAccountCode());
                                 if ("error".equals(poJSON.get("result"))) {
                                     int lnReturned = Integer.parseInt(String.valueOf(poJSON.get("row"))) + 1;
                                     JFXUtil.runWithDelay(0.70, () -> {
@@ -1537,23 +1515,37 @@ public class DisbursementVoucher_VerificationController implements Initializable
                                     int lnReturned = Integer.parseInt(String.valueOf(poJSON.get("row")));
                                     pnDetailJE = lnReturned;
                                     loadTableDetailJE.reload();
-                                    JFXUtil.textFieldMoveNext(tfParticular);
+                                    JFXUtil.textFieldMoveNext(tfDebitAmount);
+                                }
+                                break;
+                            case "tfAccountDescription":
+                                poJSON = poController.Journal().SearchAccountCode(pnDetailJE, lsValue, false, poController.Master().getIndustryID(), null);
+                                if ("error".equals(poJSON.get("result"))) {
+                                    int lnReturned = Integer.parseInt(String.valueOf(poJSON.get("row"))) + 1;
+                                    JFXUtil.runWithDelay(0.70, () -> {
+                                        pnDetailJE = lnReturned;
+                                        loadTableDetailJE.reload();
+                                    });
+                                    ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                                    break;
                                 }
                                 poJSON = poController.checkExistAcctCode(pnDetailJE, poController.Journal().Detail(pnDetailJE).getAccountCode());
                                 if ("error".equals(poJSON.get("result"))) {
-                                    int lnRow = (int) poJSON.get("row");
+                                    int lnReturned = Integer.parseInt(String.valueOf(poJSON.get("row"))) + 1;
+                                    JFXUtil.runWithDelay(0.70, () -> {
+                                        pnDetailJE = lnReturned;
+                                        loadTableDetailJE.reload();
+                                    });
                                     ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-                                    if (pnDetailJE != lnRow) {
-                                        pnDetailJE = lnRow;
-                                        JFXUtil.runWithDelay(0.50, () -> {
-                                            loadTableDetailJE.reload();
-                                        });
-                                        return;
-                                    }
                                     break;
+                                } else {
+                                    int lnReturned = Integer.parseInt(String.valueOf(poJSON.get("row")));
+                                    pnDetailJE = lnReturned;
+                                    loadTableDetailJE.reload();
+                                    JFXUtil.textFieldMoveNext(tfDebitAmount);
                                 }
-
                                 break;
+                                
                             //apBIRDetail
                             case "tfTaxCode":
                                 poJSON = poController.SearchTaxCode(lsValue, pnDetailBIR, true);
