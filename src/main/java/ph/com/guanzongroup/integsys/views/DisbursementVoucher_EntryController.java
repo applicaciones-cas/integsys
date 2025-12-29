@@ -572,12 +572,12 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                     String lsTransactionNo = selected.getIndex08();
                     String lsPayee = selected.getIndex09();
 
-                    if (!JFXUtil.isObjectEqualTo(poController.Master().Payee().Client().getCompanyName(), null, "")) {
-                        if (!poController.Master().Payee().Client().getCompanyName().equals(lsPayee)) {
-                            ShowMessageFX.Warning(null, pxeModuleName, "Invalid retrieval, ensure it matches to the corresponding supplier ");
-                            return;
-                        }
-                    }
+//                    if (!JFXUtil.isObjectEqualTo(poController.Master().Payee().Client().getCompanyName(), null, "")) {
+//                        if (!poController.Master().Payee().Client().getCompanyName().equals(lsPayee)) {
+//                            ShowMessageFX.Warning(null, pxeModuleName, "Invalid retrieval, ensure it matches to the corresponding supplier ");
+//                            return;
+//                        }
+//                    }
 
                     poJSON = poController.populateDetail(lsTransactionNo, lsPayableType);
                     if ("error".equals(poJSON.get("result"))) {
