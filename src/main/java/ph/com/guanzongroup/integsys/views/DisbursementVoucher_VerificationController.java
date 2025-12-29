@@ -1480,9 +1480,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
                                     });
                                     break;
                                 }
-                                JFXUtil.runWithDelay(0.50, () -> {
-                                    loadTableDetailJE.reload();
-                                });
+
                                 poJSON = poController.checkExistAcctCode(pnDetailJE, poController.Journal().Detail(pnDetailJE).getAccountCode());
                                 if ("error".equals(poJSON.get("result"))) {
                                     int lnRow = (int) poJSON.get("row");
@@ -1496,6 +1494,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
                                     }
                                     break;
                                 } else {
+                                    loadTableDetailJE.reload();
                                     JFXUtil.textFieldMoveNext(tfDebitAmount);
                                 }
 
@@ -1509,9 +1508,6 @@ public class DisbursementVoucher_VerificationController implements Initializable
                                     });
                                     break;
                                 }
-                                JFXUtil.runWithDelay(0.50, () -> {
-                                    loadTableDetailJE.reload();
-                                });
                                 poJSON = poController.checkExistAcctCode(pnDetailJE, poController.Journal().Detail(pnDetailJE).getAccountCode());
                                 if ("error".equals(poJSON.get("result"))) {
                                     int lnRow = (int) poJSON.get("row");
@@ -1524,6 +1520,9 @@ public class DisbursementVoucher_VerificationController implements Initializable
                                         return;
                                     }
                                     break;
+                                } else {
+                                    loadTableDetailJE.reload();
+                                    JFXUtil.textFieldMoveNext(tfDebitAmount);
                                 }
 
                                 break;

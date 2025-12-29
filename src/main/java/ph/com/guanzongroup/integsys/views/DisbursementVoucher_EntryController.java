@@ -165,7 +165,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
     @FXML
     private TableView tblVwDetails, tblViewMainList, tblVwJournalDetails, tblVwBIRDetails;
     @FXML
-    private TableColumn tblDVRowNo, tblReferenceNo, tblTransactionTypeDetail, tblPurchasedAmount, tblVatableSales, tblVatAmt, tblVatRate, tblVatZeroRatedSales, tblVatExemptSales, tblNetAmount, tblRowNo, tblTransactionType, tblBranchName, tblPayee, tblDueDate, tblRefNo, tblAmountMain, tblJournalRowNo, tblJournalAccountCode, tblJournalAccountDescription, tblJournalDebitAmount, tblJournalCreditAmount, tblJournalReportMonthYear, tblBIRRowNo, tblBIRParticular, tblTaxCode, tblTaxRate, tblBaseAmount, tblTaxAmount;
+    private TableColumn tblDVRowNo, tblReferenceNo, tblTransactionTypeDetail, tblPurchasedAmount, tblVatableSales, tblVatAmt, tblVatRate, tblVatZeroRatedSales, tblVatExemptSales, tblNetAmount, tblRowNo, tblTransactionType, tblBranchName, tblPayee, tblDueDate, tblRefNo, tblAmountMain, tblJournalRowNo, tblJournalAccountCode, tblJournalAccountDescription, tblJournalDebitAmount, tblJournalCreditAmount, tblJournalReportMonthYear, tblBIRRowNo, tblBIRParticular, tblTaxCode, tblBaseAmount, tblTaxRate, tblTaxAmount;
     @FXML
     private Pagination pagination;
 
@@ -1510,9 +1510,6 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                                     });
                                     break;
                                 }
-                                JFXUtil.runWithDelay(0.50, () -> {
-                                    loadTableDetailJE.reload();
-                                });
                                 poJSON = poController.checkExistAcctCode(pnDetailJE, poController.Journal().Detail(pnDetailJE).getAccountCode());
                                 if ("error".equals(poJSON.get("result"))) {
                                     int lnRow = (int) poJSON.get("row");
@@ -1526,6 +1523,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                                     }
                                     break;
                                 } else {
+                                    loadTableDetailJE.reload();
                                     JFXUtil.textFieldMoveNext(tfDebitAmount);
                                 }
                                 break;
@@ -1538,9 +1536,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                                     });
                                     break;
                                 }
-                                JFXUtil.runWithDelay(0.50, () -> {
-                                    loadTableDetailJE.reload();
-                                });
+
                                 poJSON = poController.checkExistAcctCode(pnDetailJE, poController.Journal().Detail(pnDetailJE).getAccountCode());
                                 if ("error".equals(poJSON.get("result"))) {
                                     int lnRow = (int) poJSON.get("row");
@@ -1553,6 +1549,9 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                                         return;
                                     }
                                     break;
+                                } else {
+                                    loadTableDetailJE.reload();
+                                    JFXUtil.textFieldMoveNext(tfDebitAmount);
                                 }
                                 break;
 
