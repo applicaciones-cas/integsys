@@ -1034,7 +1034,6 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                             ShowMessageFX.Warning(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
                         }
                         if (pbEnteredDV) {
-                            JFXUtil.textFieldMoveNext(tfVatExemptDetail);
                             pbEnteredDV = false;
                         }
                         break;
@@ -1746,7 +1745,6 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
         poJSON = poController.computeDetailFields();
         if ("error".equals((String) poJSON.get("result"))) {
             ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-            return;
         }
         tfRefNoDetail.setText(poController.Detail(pnDetail).getSourceNo());
         chbkVatClassification.setSelected(poController.Detail(pnDetail).isWithVat());
