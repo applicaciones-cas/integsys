@@ -159,13 +159,13 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
     @FXML
     private ComboBox cmbPaymentMode, cmbPayeeType, cmbDisbursementMode, cmbClaimantType, cmbCheckStatus, cmbOtherPaymentBTransfer, cmbOtherPayment, cmbTransactionType;
     @FXML
-    private CheckBox chbkPrintByBank, chbkIsCrossCheck, chbkIsPersonOnly, chbkVatClassification, cbReverse, cbBIRReverse, cbJEReverse;
+    private CheckBox chbkPrintByBank, chbkIsCrossCheck, chbkIsPersonOnly, chbkVatClassification, cbReverse, cbJEReverse, cbBIRReverse;
     @FXML
     private TextArea taDVRemarks, taJournalRemarks;
     @FXML
     private TableView tblVwDetails, tblViewMainList, tblVwJournalDetails, tblVwBIRDetails;
     @FXML
-    private TableColumn tblDVRowNo, tblReferenceNo, tblTransactionTypeDetail, tblPurchasedAmount, tblVatableSales, tblVatAmt, tblVatRate, tblVatZeroRatedSales, tblVatExemptSales, tblNetAmount, tblRowNo, tblTransactionType, tblBranchName, tblPayee, tblDueDate, tblRefNo, tblAmountMain, tblJournalRowNo, tblJournalAccountCode, tblJournalAccountDescription, tblJournalDebitAmount, tblJournalCreditAmount, tblJournalReportMonthYear, tblBIRRowNo, tblBIRParticular, tblTaxCode, tblTaxRate, tblBaseAmount, tblTaxAmount;
+    private TableColumn tblDVRowNo, tblReferenceNo, tblTransactionTypeDetail, tblPurchasedAmount, tblVatableSales, tblVatAmt, tblVatRate, tblVatZeroRatedSales, tblVatExemptSales, tblNetAmount, tblRowNo, tblTransactionType, tblBranchName, tblPayee, tblDueDate, tblRefNo, tblAmountMain, tblJournalRowNo, tblJournalAccountCode, tblJournalAccountDescription, tblJournalDebitAmount, tblJournalCreditAmount, tblJournalReportMonthYear, tblBIRRowNo, tblBIRParticular, tblTaxCode, tblBaseAmount, tblTaxRate, tblTaxAmount;
     @FXML
     private Pagination pagination;
 
@@ -901,12 +901,13 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
         int newIndex = 0;
 
         if (moveDown || moveUp) {
-            newIndex = moveDown ? JFXUtil.moveToNextRow(currentTable) : JFXUtil.moveToPreviousRow(currentTable);
             switch (currentTable.getId()) {
                 case "tblVwDetails":
                     if (details_data.isEmpty()) {
                         return;
                     }
+                    newIndex = moveDown ? Integer.parseInt(details_data.get(JFXUtil.moveToNextRow(currentTable)).getIndex11())
+                            : Integer.parseInt(details_data.get(JFXUtil.moveToPreviousRow(currentTable)).getIndex11());
                     pnDetail = newIndex;
                     loadRecordDetail();
                     break;
@@ -914,6 +915,8 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                     if (journal_data.isEmpty()) {
                         return;
                     }
+                    newIndex = moveDown ? Integer.parseInt(journal_data.get(JFXUtil.moveToNextRow(currentTable)).getIndex07())
+                            : Integer.parseInt(journal_data.get(JFXUtil.moveToPreviousRow(currentTable)).getIndex07());
                     pnDetailJE = newIndex;
                     loadRecordDetailJE();
                     break;
@@ -921,6 +924,8 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                     if (BIR_data.isEmpty()) {
                         return;
                     }
+                    newIndex = moveDown ? Integer.parseInt(BIR_data.get(JFXUtil.moveToNextRow(currentTable)).getIndex07())
+                            : Integer.parseInt(BIR_data.get(JFXUtil.moveToPreviousRow(currentTable)).getIndex07());
                     pnDetailBIR = newIndex;
                     loadRecordDetailBIR();
                     break;
@@ -1682,7 +1687,8 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
     public void moveNext(boolean isUp, boolean continueNext) {
         if (continueNext) {
             apDVDetail.requestFocus();
-            pnDetail = isUp ? JFXUtil.moveToPreviousRow(tblVwDetails) : JFXUtil.moveToNextRow(tblVwDetails);
+            pnDetail = isUp ? Integer.parseInt(details_data.get(JFXUtil.moveToPreviousRow(tblVwDetails)).getIndex11())
+                    : Integer.parseInt(details_data.get(JFXUtil.moveToNextRow(tblVwDetails)).getIndex11());
         }
         loadRecordDetail();
         if (pnDetail < 0 || pnDetail > poController.getDetailCount() - 1) {
@@ -1696,7 +1702,8 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
         try {
             if (continueNext) {
                 apJournalDetails.requestFocus();
-                pnDetailJE = isUp ? JFXUtil.moveToPreviousRow(tblVwJournalDetails) : JFXUtil.moveToNextRow(tblVwJournalDetails);
+                pnDetailJE = isUp ? Integer.parseInt(journal_data.get(JFXUtil.moveToPreviousRow(tblVwJournalDetails)).getIndex07())
+                        : Integer.parseInt(journal_data.get(JFXUtil.moveToNextRow(tblVwJournalDetails)).getIndex07());
             }
             loadRecordDetailJE();
             if (pnDetailJE < 0 || pnDetailJE > poController.Journal().getDetailCount() - 1) {
@@ -1717,7 +1724,8 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
         try {
             if (continueNext) {
                 apBIRDetail.requestFocus();
-                pnDetailBIR = isUp ? JFXUtil.moveToPreviousRow(tblVwBIRDetails) : JFXUtil.moveToNextRow(tblVwBIRDetails);
+                pnDetailBIR = isUp ? Integer.parseInt(BIR_data.get(JFXUtil.moveToPreviousRow(tblVwBIRDetails)).getIndex07())
+                        : Integer.parseInt(BIR_data.get(JFXUtil.moveToNextRow(tblVwBIRDetails)).getIndex07());
             }
             loadRecordDetailBIR();
             if (pnDetailBIR < 0 || pnDetailBIR > poController.getWTaxDeductionsCount() - 1) {
