@@ -478,12 +478,15 @@
                                                                   <GridPane AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="5.0">
                                                                      <columnConstraints>
                                                                         <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="105.0" />
+                                                                        <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="10.0" />
                                                                         <ColumnConstraints hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="160.0" />
                                                                         <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="108.0" minWidth="10.0" prefWidth="120.0" />
                                                                         <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="108.0" minWidth="-Infinity" prefWidth="120.0" />
+                                                                        <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="10.0" />
                                                                         <ColumnConstraints hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="160.0" />
                                                                         <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="10.0" prefWidth="120.0" />
                                                                         <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="160.0" />
+                                                                        <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="10.0" />
                                                                         <ColumnConstraints halignment="LEFT" hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="170.0" />
                                                                      </columnConstraints>
                                                                      <rowConstraints>
@@ -496,58 +499,28 @@
                                                                         <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="28.0" vgrow="SOMETIMES" />
                                                                      </rowConstraints>
                                                                      <children>
-                                                                     <Label text="Reference No" GridPane.rowIndex="2">
-                                                                           <padding>
-                                                                              <Insets right="5.0" />
-                                                                           </padding>
-                                                                        </Label>
-                                                                                                        <Label text="VATable" GridPane.columnIndex="3" GridPane.rowIndex="2">
-                                                                           <padding>
-                                                                              <Insets right="5.0" />
-                                                                           </padding>
-                                                                        </Label>
-                                                                                                        <Label text="  VATable Sales" GridPane.columnIndex="3" GridPane.rowIndex="3">
+                                                                     <Label text="Reference No" GridPane.rowIndex="2" />
+                                                                                                <Label text="VATable" GridPane.columnIndex="4" GridPane.rowIndex="2" />
+                                                                                                <Label text="  VATable Sales" GridPane.columnIndex="4" GridPane.rowIndex="3" />
+                                                                                                <Label text="Vat-Exempt Sales" GridPane.columnIndex="4" GridPane.rowIndex="4" />
+                                                                                                <Label text="VAT-Zero Sales" GridPane.columnIndex="4" GridPane.rowIndex="5" />
+                                                                                                <Label text="VAT Rate (%)" visible="false" GridPane.columnIndex="4" GridPane.rowIndex="5">
                                                                            <GridPane.margin>
                                                                               <Insets right="5.0" />
                                                                            </GridPane.margin>
                                                                         </Label>
-                                                                                                        <Label text="Vat-Exempt Sales" GridPane.columnIndex="3" GridPane.rowIndex="4">
-                                                                           <GridPane.margin>
-                                                                              <Insets right="5.0" />
-                                                                           </GridPane.margin>
-                                                                        </Label>
-                                                                                                        <Label text="VAT-Zero Sales" GridPane.columnIndex="3" GridPane.rowIndex="5">
-                                                                           <GridPane.margin>
-                                                                              <Insets right="5.0" />
-                                                                           </GridPane.margin>
-                                                                        </Label>
-                                                                                                        <Label text="VAT Rate (%)" visible="false" GridPane.columnIndex="3" GridPane.rowIndex="5">
-                                                                           <GridPane.margin>
-                                                                              <Insets right="5.0" />
-                                                                           </GridPane.margin>
-                                                                        </Label>
-                                                                                                        <Label text="VAT Amount" GridPane.columnIndex="3" GridPane.rowIndex="6">
-                                                                           <GridPane.margin>
-                                                                              <Insets right="5.0" />
-                                                                           </GridPane.margin>
-                                                                        </Label>
-                                                                                                        <Label text="Amount" GridPane.columnIndex="6" GridPane.rowIndex="5">
-                                                                           <padding>
-                                                                              <Insets right="5.0" />
-                                                                           </padding>
+                                                                                                <Label text="VAT Amount" GridPane.columnIndex="4" GridPane.rowIndex="6" />
+                                                                                                <Label text="Amount" GridPane.columnIndex="8" GridPane.rowIndex="5">
                                                                            <font>
                                                                               <Font name="System Bold" size="12.0" />
                                                                            </font>
                                                                         </Label>
-                                                                                                        <Label text="Net Amount Due" textFill="RED" GridPane.columnIndex="6" GridPane.rowIndex="6">
-                                                                           <padding>
-                                                                              <Insets right="5.0" />
-                                                                           </padding>
+                                                                                                <Label text="Net Amount Due" textFill="RED" GridPane.columnIndex="8" GridPane.rowIndex="6">
                                                                            <font>
                                                                               <Font name="System Bold" size="14.0" />
                                                                            </font>
                                                                         </Label>
-                                                                                                        <Label text="Less: Adv. Paym." visible="false" GridPane.columnIndex="6" GridPane.rowIndex="6">
+                                                                                                <Label text="Less: Adv. Paym." visible="false" GridPane.columnIndex="8" GridPane.rowIndex="6">
                                                                            <GridPane.margin>
                                                                               <Insets right="5.0" />
                                                                            </GridPane.margin>
@@ -555,16 +528,22 @@
                                                                               <Insets right="5.0" />
                                                                            </padding>
                                                                         </Label>
-                                                                                                        <TextField fx:id="tfRefNoDetail" disable="true" editable="false" maxWidth="1.7976931348623157E308" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-                                                                                                        <CheckBox fx:id="chbkVatClassification" disable="true" mnemonicParsing="false" onAction="#cmdCheckBox_Click" GridPane.columnIndex="4" GridPane.rowIndex="2" />
-                                                                                                        <TextField fx:id="tfVatableSalesDetail" alignment="CENTER_RIGHT" disable="true" promptText="0.00" styleClass="DisabledTextField" GridPane.columnIndex="4" GridPane.rowIndex="3" />
-                                                                                                        <TextField fx:id="tfVatExemptDetail" alignment="CENTER_RIGHT" disable="true" promptText="0.00" styleClass="DisabledTextField" GridPane.columnIndex="4" GridPane.rowIndex="4" />
-                                                                                                        <TextField fx:id="tfVatZeroRatedSalesDetail" alignment="CENTER_RIGHT" disable="true" promptText="0.00" styleClass="DisabledTextField" GridPane.columnIndex="4" GridPane.rowIndex="5" />
-                                                                                                        <TextField fx:id="tfVatRateDetail" alignment="CENTER_RIGHT" disable="true" promptText="0.00" visible="false" GridPane.columnIndex="4" GridPane.rowIndex="5" />
-                                                                                                        <TextField fx:id="tfVatAmountDetail" alignment="CENTER_RIGHT" disable="true" promptText="0.00" styleClass="DisabledTextField" GridPane.columnIndex="4" GridPane.rowIndex="6" />
-                                                                                                        <TextField fx:id="tfPurchasedAmountDetail" alignment="CENTER_RIGHT" disable="true" promptText="0.00" GridPane.columnIndex="7" GridPane.rowIndex="5" />
-                                                                                                        <TextField fx:id="tfNetAmountDetail" alignment="CENTER_RIGHT" disable="true" promptText="0.00" style="-fx-font-weight: bold;" styleClass="DisabledTextField" GridPane.columnIndex="7" GridPane.rowIndex="6" />
-                                                                                                    </children>
+                                                                                                <TextField fx:id="tfRefNoDetail" disable="true" editable="false" maxWidth="1.7976931348623157E308" GridPane.columnIndex="2" GridPane.rowIndex="2" />
+                                                                                                <CheckBox fx:id="chbkVatClassification" disable="true" mnemonicParsing="false" onAction="#cmdCheckBox_Click" GridPane.columnIndex="6" GridPane.rowIndex="2" />
+                                                                                                <TextField fx:id="tfVatableSalesDetail" alignment="CENTER_RIGHT" disable="true" promptText="0.00" styleClass="DisabledTextField" GridPane.columnIndex="6" GridPane.rowIndex="3" />
+                                                                                                <TextField fx:id="tfVatExemptDetail" alignment="CENTER_RIGHT" disable="true" promptText="0.00" styleClass="DisabledTextField" GridPane.columnIndex="6" GridPane.rowIndex="4" />
+                                                                                                <TextField fx:id="tfVatZeroRatedSalesDetail" alignment="CENTER_RIGHT" disable="true" promptText="0.00" styleClass="DisabledTextField" GridPane.columnIndex="6" GridPane.rowIndex="5" />
+                                                                                                <TextField fx:id="tfVatRateDetail" alignment="CENTER_RIGHT" disable="true" promptText="0.00" visible="false" GridPane.columnIndex="6" GridPane.rowIndex="5" />
+                                                                                                <TextField fx:id="tfVatAmountDetail" alignment="CENTER_RIGHT" disable="true" promptText="0.00" styleClass="DisabledTextField" GridPane.columnIndex="6" GridPane.rowIndex="6" />
+                                                                                                <TextField fx:id="tfPurchasedAmountDetail" alignment="CENTER_RIGHT" disable="true" promptText="0.00" GridPane.columnIndex="10" GridPane.rowIndex="5" />
+                                                                                                <TextField fx:id="tfNetAmountDetail" alignment="CENTER_RIGHT" disable="true" promptText="0.00" style="-fx-font-weight: bold;" styleClass="DisabledTextField" GridPane.columnIndex="10" GridPane.rowIndex="6">
+                                                                           <font>
+                                                                              <Font name="System Bold" size="12.0" />
+                                                                           </font>
+                                                                        </TextField>
+                                                                        <CheckBox fx:id="cbReverse" mnemonicParsing="false" onAction="#cmdCheckBox_Click" GridPane.columnIndex="10" GridPane.rowIndex="4" />
+                                                                        <Label text="Reverse" GridPane.columnIndex="8" GridPane.rowIndex="4" />
+                                                                                            </children>
                                                                   </GridPane>
                                                                </children>
                                                                <VBox.margin>
@@ -785,7 +764,7 @@
                                                                                 <TextField fx:id="tfBaseAmount" alignment="CENTER_RIGHT" maxWidth="1.7976931348623157E308" promptText="0.00" GridPane.columnIndex="7" GridPane.rowIndex="5" />
                                                                                 <TextField fx:id="tfTaxRate" alignment="CENTER_RIGHT" disable="true" editable="false" maxWidth="1.7976931348623157E308" promptText="0.00" GridPane.columnIndex="7" GridPane.rowIndex="6" />
                                                                                 <TextField fx:id="tfTotalTaxAmount" alignment="CENTER_RIGHT" disable="true" editable="false" maxWidth="1.7976931348623157E308" promptText="0.00" GridPane.columnIndex="7" GridPane.rowIndex="7" />
-                                                            <CheckBox fx:id="cbReverse" mnemonicParsing="false" onAction="#cmdCheckBox_Click" GridPane.columnIndex="7" GridPane.rowIndex="4" />
+                                                            <CheckBox fx:id="cbBIRReverse" mnemonicParsing="false" onAction="#cmdCheckBox_Click" GridPane.columnIndex="7" GridPane.rowIndex="4" />
                                                             <Label text="Reverse" GridPane.columnIndex="5" GridPane.rowIndex="4" />
                                                                             </children>
                                                                         </GridPane>
