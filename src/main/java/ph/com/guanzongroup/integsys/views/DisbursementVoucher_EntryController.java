@@ -669,10 +669,6 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                             }
                             int lnRowCount = 0;
                             for (int lnCtr = 0; lnCtr < poController.getDetailCount(); lnCtr++) {
-//                                if (poController.Detail(lnCtr).isReverse()) {
-//                                    continue;
-//                                }
-
                                 if (JFXUtil.isObjectEqualTo(poController.Detail(lnCtr).getAmountApplied(), null, "")) {
                                     if (Double.valueOf(poController.Detail(lnCtr).getAmountApplied()) <= 0) {
                                         continue;
@@ -1782,6 +1778,12 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
         tfVatAmountDetail.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(pnDetail).getDetailVatAmount(), true));
         tfPurchasedAmountDetail.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(pnDetail).getAmountApplied(), true));
         tfNetAmountDetail.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(pnDetail).getAmount(), true));
+
+        if (!JFXUtil.isObjectEqualTo(poController.Detail(pnDetail).getDetailVatAmount(), null, "")) {
+            if (poController.Detail(pnDetail).getDetailVatAmount() > 0) {
+                cbReverse.selectedProperty().set(true);
+            }
+        }
         JFXUtil.updateCaretPositions(apDVDetail);
     }
 
@@ -2249,13 +2251,9 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                     loadTableDetail.reload();
                     break;
                 case "cbReverse":
-                    if (checkedBox.isSelected()) {
+                    if (!checkedBox.isSelected()) {
                         poController.Detail(pnDetail).setAmountApplied(0.0000);
                     }
-//                    poJSON = poController.removeWTDeduction(pnDetail);
-//                    if (!JFXUtil.isJSONSuccess(poJSON)) {
-//                        ShowMessageFX.Warning(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
-//                    }
                     loadRecordMaster();
                     loadTableDetail.reload();
                     if (checkedBox.isSelected()) {

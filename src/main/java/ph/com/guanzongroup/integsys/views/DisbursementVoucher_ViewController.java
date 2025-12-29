@@ -315,10 +315,6 @@ public class DisbursementVoucher_ViewController implements Initializable, Screen
                         details_data.clear();
                         int lnRowCount = 0;
                         for (int lnCtr = 0; lnCtr < poController.getDetailCount(); lnCtr++) {
-//                            if (poController.Detail(lnCtr).isReverse()) {
-//                                continue;
-//                            }
-
                             if (JFXUtil.isObjectEqualTo(poController.Detail(lnCtr).getAmountApplied(), null, "")) {
                                 if (Double.valueOf(poController.Detail(lnCtr).getAmountApplied()) <= 0) {
                                     continue;
