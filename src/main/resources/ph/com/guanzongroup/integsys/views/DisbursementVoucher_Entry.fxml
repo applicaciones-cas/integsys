@@ -715,10 +715,10 @@
                                                                                     <columns>
                                                                                         <TableColumn fx:id="tblRowNo" maxWidth="30.0" minWidth="30.0" prefWidth="30.0" resizable="false" sortable="false" text="No." />
                                                                                         <TableColumn fx:id="tblTransactionType" maxWidth="100.0" minWidth="100.0" prefWidth="100.0" resizable="false" sortable="false" text="Tran. Type" />
+                                                                                        <TableColumn fx:id="tblRefNo" maxWidth="90.0" minWidth="90.0" prefWidth="90.0" resizable="false" sortable="false" text="Refer No." />
                                                                   <TableColumn fx:id="tblBranchName" maxWidth="150.0" minWidth="150.0" prefWidth="150.0" resizable="false" sortable="false" text="Branch Name" />
                                                                   <TableColumn fx:id="tblPayee" maxWidth="190.0" minWidth="190.0" prefWidth="190.0" resizable="false" sortable="false" text="Payee" />
                                                                                         <TableColumn fx:id="tblDueDate" maxWidth="120.0" minWidth="120.0" prefWidth="120.0" resizable="false" sortable="false" text="Due Date" />
-                                                                                        <TableColumn fx:id="tblRefNo" maxWidth="90.0" minWidth="90.0" prefWidth="90.0" resizable="false" sortable="false" text="Refer No." />
                                                                                         <TableColumn fx:id="tblAmountMain" maxWidth="120.0" minWidth="120.0" prefWidth="120.0" resizable="false" sortable="false" text="Balance" />
                                                                                     </columns>
                                                                                     <GridPane.margin>

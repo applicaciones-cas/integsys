@@ -621,10 +621,10 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                                         ModelDisbursementVoucher_Main loMain = new ModelDisbursementVoucher_Main(
                                                 String.valueOf(main_data.size() + 1),
                                                 obj.get("TransactionType") != null ? obj.get("TransactionType").toString() : "",
-                                                obj.get("sBranchNme") != null ? obj.get("sBranchNme").toString() : "",
-                                                obj.get("Payee") != null ? obj.get("Payee").toString() : "",
-                                                obj.get("dTransact") != null ? obj.get("dTransact").toString() : "",
                                                 obj.get("Reference") != null ? obj.get("Reference").toString() : "",
+                                                obj.get("sBranchNme") != null ? obj.get("sBranchNme").toString() : "",
+                                                obj.get("Payee") != null ? obj.get("Payee").toString() : "", 
+                                                obj.get("dTransact") != null ? obj.get("dTransact").toString() : "",
                                                 obj.get("Balance") != null ? CustomCommonUtil.setIntegerValueToDecimalFormat(obj.get("Balance"), true) : "",
                                                 obj.get("sTransNox") != null ? obj.get("sTransNox").toString() : "",
                                                 obj.get("Payee") != null ? obj.get("Payee").toString() : "",
