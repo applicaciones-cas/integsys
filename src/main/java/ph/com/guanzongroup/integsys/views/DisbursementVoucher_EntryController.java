@@ -1283,7 +1283,9 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                     switch (lsID) {
                         case "tfBaseAmount":
                             if (JFXUtil.isObjectEqualTo(poController.WTaxDeduction(pnDetailBIR).getModel().WithholdingTax().AccountChart().getDescription(), null, "")) {
-                                ShowMessageFX.Warning(null, pxeModuleName, "Particular is blank, unable to input value!");
+                                if (poController.WTaxDeduction(pnDetailBIR).getModel().getBaseAmount() > 0) {
+                                    ShowMessageFX.Warning(null, pxeModuleName, "Particular is blank, unable to input value!");
+                                }
                                 break;
                             }
                             lsValue = JFXUtil.removeComma(lsValue);
