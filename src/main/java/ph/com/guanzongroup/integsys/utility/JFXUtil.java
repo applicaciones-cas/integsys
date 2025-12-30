@@ -2737,33 +2737,37 @@ public class JFXUtil {
     }
 
     public static void handleDisabledNodeClick(AnchorPane anchorPane, Object editMode, Consumer<String> callback) {
-        if (anchorPane == null || callback == null) {
-            return;
-        }
-
-        anchorPane.addEventFilter(MouseEvent.MOUSE_CLICKED, event -> {
-            // Check edit mode
-            if (!JFXUtil.isObjectEqualTo(editMode, EditMode.ADDNEW, EditMode.UPDATE)) {
+        try {
+            if (anchorPane == null || callback == null) {
                 return;
             }
 
-            // Look for disabled nodes under this anchor pane
-            Set<Node> nodes = new HashSet<>();
-            nodes.addAll(anchorPane.lookupAll(".text-field"));
-            nodes.addAll(anchorPane.lookupAll(".combo-box"));
-            nodes.addAll(anchorPane.lookupAll(".check-box"));
-
-            for (Node node : nodes) {
-                if (!node.isDisabled()) {
-                    continue;
+            anchorPane.addEventFilter(MouseEvent.MOUSE_CLICKED, event -> {
+                // Check edit mode
+                if (!JFXUtil.isObjectEqualTo(editMode, EditMode.ADDNEW, EditMode.UPDATE)) {
+                    return;
                 }
 
-                Bounds boundsInScene = node.localToScene(node.getBoundsInLocal());
-                if (boundsInScene.contains(event.getSceneX(), event.getSceneY())) {
-                    callback.accept(node.getId());
-                    return; // stop after first match
+                // Look for disabled nodes under this anchor pane
+                Set<Node> nodes = new HashSet<>();
+                nodes.addAll(anchorPane.lookupAll(".text-field"));
+                nodes.addAll(anchorPane.lookupAll(".combo-box"));
+                nodes.addAll(anchorPane.lookupAll(".check-box"));
+
+                for (Node node : nodes) {
+                    if (!node.isDisabled()) {
+                        continue;
+                    }
+
+                    Bounds boundsInScene = node.localToScene(node.getBoundsInLocal());
+                    if (boundsInScene.contains(event.getSceneX(), event.getSceneY())) {
+                        callback.accept(node.getId());
+                        return; // stop after first match
+                    }
                 }
-            }
-        });
+            });
+        } catch (Exception e) {
+
+        }
     }
 }
