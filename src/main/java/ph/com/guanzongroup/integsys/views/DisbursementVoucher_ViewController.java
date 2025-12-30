@@ -312,47 +312,59 @@ public class DisbursementVoucher_ViewController implements Initializable, Screen
                 details_data,
                 () -> {
                     Platform.runLater(() -> {
-                        details_data.clear();
-                        int lnRowCount = 0;
-                        for (int lnCtr = 0; lnCtr < poController.getDetailCount(); lnCtr++) {
-                            if (JFXUtil.isObjectEqualTo(poController.Detail(lnCtr).getAmountApplied(), null, "")) {
-                                if (Double.valueOf(poController.Detail(lnCtr).getAmountApplied()) <= 0) {
-                                    continue;
+                        try {
+                            details_data.clear();
+                            if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
+                                poController.ReloadDetail();
+                                poJSON = poController.computeDetailFields();
+                                if ("error".equals((String) poJSON.get("result"))) {
+                                    ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                 }
+
                             }
-                            lnRowCount += 1;
-                            details_data.add(
-                                    new ModelDisbursementVoucher_Detail(String.valueOf(lnRowCount),
-                                            poController.Detail(lnCtr).getSourceNo(),
-                                            poController.getSourceCodeDescription(poController.Detail(lnCtr).getSourceCode()),
-                                            CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(lnCtr).getAmountApplied(), true),
-                                            CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(lnCtr).getDetailVatSales(), true),
-                                            String.valueOf(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(lnCtr).getDetailVatAmount(), true)),
-                                            CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(lnCtr).getDetailVatRates(), false),
-                                            CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(lnCtr).getDetailZeroVat(), true),
-                                            CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(lnCtr).getDetailVatExempt(), true),
-                                            CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(lnCtr).getAmount(), true),
-                                            String.valueOf(lnCtr)
-                                    ));
-                        }
-                        int lnTempRow = JFXUtil.getDetailRow(details_data, pnDetail, 11); //this method is used only when Reverse is applied
-                        if (lnTempRow < 0 || lnTempRow
-                                >= details_data.size()) {
-                            if (!details_data.isEmpty()) {
-                                /* FOCUS ON FIRST ROW */
-                                JFXUtil.selectAndFocusRow(tblVwDetails, 0);
-                                int lnRow = Integer.parseInt(details_data.get(0).getIndex11());
+                            int lnRowCount = 0;
+                            for (int lnCtr = 0; lnCtr < poController.getDetailCount(); lnCtr++) {
+                                if (JFXUtil.isObjectEqualTo(poController.Detail(lnCtr).getAmountApplied(), null, "")) {
+                                    if (Double.valueOf(poController.Detail(lnCtr).getAmountApplied()) <= 0) {
+                                        continue;
+                                    }
+                                }
+                                lnRowCount += 1;
+                                details_data.add(
+                                        new ModelDisbursementVoucher_Detail(String.valueOf(lnRowCount),
+                                                poController.Detail(lnCtr).getSourceNo(),
+                                                poController.getSourceCodeDescription(poController.Detail(lnCtr).getSourceCode()),
+                                                CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(lnCtr).getAmountApplied(), true),
+                                                CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(lnCtr).getDetailVatSales(), true),
+                                                String.valueOf(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(lnCtr).getDetailVatAmount(), true)),
+                                                CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(lnCtr).getDetailVatRates(), false),
+                                                CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(lnCtr).getDetailZeroVat(), true),
+                                                CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(lnCtr).getDetailVatExempt(), true),
+                                                CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(lnCtr).getAmount(), true),
+                                                String.valueOf(lnCtr)
+                                        ));
+                            }
+                            int lnTempRow = JFXUtil.getDetailRow(details_data, pnDetail, 11); //this method is used only when Reverse is applied
+                            if (lnTempRow < 0 || lnTempRow
+                                    >= details_data.size()) {
+                                if (!details_data.isEmpty()) {
+                                    /* FOCUS ON FIRST ROW */
+                                    JFXUtil.selectAndFocusRow(tblVwDetails, 0);
+                                    int lnRow = Integer.parseInt(details_data.get(0).getIndex11());
+                                    pnDetail = lnRow;
+                                    loadRecordDetail();
+                                }
+                            } else {
+                                /* FOCUS ON THE ROW THAT pnDetailBIR POINTS TO */
+                                JFXUtil.selectAndFocusRow(tblVwDetails, lnTempRow);
+                                int lnRow = Integer.parseInt(details_data.get(tblVwDetails.getSelectionModel().getSelectedIndex()).getIndex11());
                                 pnDetail = lnRow;
                                 loadRecordDetail();
                             }
-                        } else {
-                            /* FOCUS ON THE ROW THAT pnDetailBIR POINTS TO */
-                            JFXUtil.selectAndFocusRow(tblVwDetails, lnTempRow);
-                            int lnRow = Integer.parseInt(details_data.get(tblVwDetails.getSelectionModel().getSelectedIndex()).getIndex11());
-                            pnDetail = lnRow;
-                            loadRecordDetail();
+                            loadRecordMaster();
+                        } catch (CloneNotSupportedException ex) {
+                            Logger.getLogger(DisbursementVoucher_ViewController.class.getName()).log(Level.SEVERE, null, ex);
                         }
-                        loadRecordMaster();
                     });
                 });
         loadTableDetailBIR = new JFXUtil.ReloadableTableTask(
@@ -502,11 +514,6 @@ public class DisbursementVoucher_ViewController implements Initializable, Screen
 
     private void loadRecordDetail() {
         if (pnDetail < 0 || pnDetail > poController.getDetailCount() - 1) {
-            return;
-        }
-        poJSON = poController.computeDetailFields();
-        if ("error".equals((String) poJSON.get("result"))) {
-            ShowMessageFX.Warning((String) poJSON.get("message"), pxeModuleName, null);
             return;
         }
         tfRefNoDetail.setText(poController.Detail(pnDetail).getSourceNo());

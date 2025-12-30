@@ -633,6 +633,10 @@ public class DisbursementVoucher_VerificationController implements Initializable
                             details_data.clear();
                             if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
                                 poController.ReloadDetail();
+                                poJSON = poController.computeDetailFields();
+                                if ("error".equals((String) poJSON.get("result"))) {
+                                    ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                                }
                             }
                             int lnRowCount = 0;
                             for (int lnCtr = 0; lnCtr < poController.getDetailCount(); lnCtr++) {
@@ -1749,10 +1753,6 @@ public class DisbursementVoucher_VerificationController implements Initializable
     private void loadRecordDetail() {
         if (pnDetail < 0 || pnDetail > poController.getDetailCount() - 1) {
             return;
-        }
-        poJSON = poController.computeDetailFields();
-        if ("error".equals((String) poJSON.get("result"))) {
-            ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
         }
         boolean lbNotNull = !JFXUtil.isObjectEqualTo(poController.Detail(pnDetail).getDetailVatAmount(), null, "");
         boolean lbNotZero = poController.Detail(pnDetail).getAmountApplied() > 0;

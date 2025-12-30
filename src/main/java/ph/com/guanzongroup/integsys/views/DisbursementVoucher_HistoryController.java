@@ -366,37 +366,10 @@ public class DisbursementVoucher_HistoryController implements Initializable, Scr
                             details_data.clear();
                             int lnCtr;
                             if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
-                                lnCtr = poController.getDetailCount() - 1;
-                                while (lnCtr >= 0) {
-                                    if (poController.Detail(lnCtr).getSourceNo() == null || poController.Detail(lnCtr).getSourceNo().equals("")) {
-                                        poController.Detail().remove(lnCtr);
-                                    }
-                                    lnCtr--;
-                                }
-
-                                if ((poController.getDetailCount() - 1) >= 0) {
-                                    if (poController.Detail(poController.getDetailCount() - 1).getSourceNo() != null && !poController.Detail(poController.getDetailCount() - 1).getSourceNo().equals("")) {
-                                        poController.AddDetail();
-                                    }
-                                }
-
-                                if ((poController.getDetailCount() - 1) < 0) {
-                                    poController.AddDetail();
-                                }
-                            }
-
-                            if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
-                                lnCtr = poController.getDetailCount() - 1;
-                                if (lnCtr >= 0) {
-                                    String lsSourceNo = poController.Detail(lnCtr).getSourceNo();
-                                    if (!lsSourceNo.isEmpty() || poController.Detail(lnCtr).getSourceNo() == null) {
-                                        try {
-                                            poController.AddDetail();
-                                        } catch (CloneNotSupportedException ex) {
-                                            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
-                                            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
-                                        }
-                                    }
+                                poController.ReloadDetail();
+                                poJSON = poController.computeDetailFields();
+                                if ("error".equals((String) poJSON.get("result"))) {
+                                    ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                 }
                             }
                             int lnRowCount = 0;
@@ -805,11 +778,6 @@ public class DisbursementVoucher_HistoryController implements Initializable, Scr
 
     private void loadRecordDetail() {
         if (pnDetail < 0 || pnDetail > poController.getDetailCount() - 1) {
-            return;
-        }
-        poJSON = poController.computeDetailFields();
-        if ("error".equals((String) poJSON.get("result"))) {
-            ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
             return;
         }
         tfRefNoDetail.setText(poController.Detail(pnDetail).getSourceNo());
