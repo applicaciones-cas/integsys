@@ -121,14 +121,17 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.util.Callback;
 import java.io.File;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.regex.Pattern;
 import javafx.css.PseudoClass;
 import javafx.scene.control.ButtonBase;
 import javafx.scene.control.MenuItem;
+import org.guanzon.appdriver.constant.EditMode;
 import ph.com.guanzongroup.integsys.views.ScreenInterface;
 
 /**
- * Date : 4/28/2025 Recent update: 12/13/2025
+ * Date : 4/28/2025 Recent update: 12/30/2025
  *
  * @author Aldrich
  */
@@ -540,7 +543,7 @@ public class JFXUtil {
     }
 
     /* used to display pop-up dialog form*/
-    /*NOTE: setOnHidden must be called first before showDialog, to be initialized*/
+ /*NOTE: setOnHidden must be called first before showDialog, to be initialized*/
     public static class StageManager {
 
         private Stage dialog;
@@ -2463,7 +2466,7 @@ public class JFXUtil {
         cache.put(clazz, valueToNameMap);
         return valueToNameMap;
     }
-    
+
     /*Alternative ComboboxListener*/
 //    sample usage
 //    EventHandler<ActionEvent> comboBoxActionListener = JFXUtil.CmbActionListener(
@@ -2698,7 +2701,6 @@ public class JFXUtil {
 //        SOURCE_MAP.put("APAd", "AP Adjustment");
 //        SOURCE_MAP.put("PO", "Purchase Order");
 //    }
-
     public static void setDateValue(DatePicker datePicker, LocalDate value) {
         if (datePicker == null) {
             return;
@@ -2732,5 +2734,36 @@ public class JFXUtil {
         }
 
         protected abstract void onRowMove(TableView<?> currentTable, String currentTableID, boolean moveDown);
+    }
+
+    public static void handleDisabledNodeClick(AnchorPane anchorPane, Object editMode, Consumer<String> callback) {
+        if (anchorPane == null || callback == null) {
+            return;
+        }
+
+        anchorPane.addEventFilter(MouseEvent.MOUSE_CLICKED, event -> {
+            // Check edit mode
+            if (!JFXUtil.isObjectEqualTo(editMode, EditMode.ADDNEW, EditMode.UPDATE)) {
+                return;
+            }
+
+            // Look for disabled nodes under this anchor pane
+            Set<Node> nodes = new HashSet<>();
+            nodes.addAll(anchorPane.lookupAll(".text-field"));
+            nodes.addAll(anchorPane.lookupAll(".combo-box"));
+            nodes.addAll(anchorPane.lookupAll(".check-box"));
+
+            for (Node node : nodes) {
+                if (!node.isDisabled()) {
+                    continue;
+                }
+
+                Bounds boundsInScene = node.localToScene(node.getBoundsInLocal());
+                if (boundsInScene.contains(event.getSceneX(), event.getSceneY())) {
+                    callback.accept(node.getId());
+                    return; // stop after first match
+                }
+            }
+        });
     }
 }

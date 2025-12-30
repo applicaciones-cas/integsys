@@ -1995,45 +1995,33 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
         JFXUtil.setComboBoxActionListener(comboBoxActionListener, cmbPaymentMode, cmbPayeeType, cmbDisbursementMode, cmbClaimantType, cmbCheckStatus, cmbOtherPaymentBTransfer, cmbOtherPayment, cmbTransactionType);
         JFXUtil.initComboBoxCellDesignColor("#FF8201", cmbPaymentMode, cmbPayeeType, cmbDisbursementMode, cmbClaimantType, cmbCheckStatus, cmbOtherPaymentBTransfer, cmbOtherPayment, cmbTransactionType);
 
-        apMasterDVCheck.addEventFilter(MouseEvent.MOUSE_CLICKED, event -> {
-            if (!JFXUtil.isObjectEqualTo(pnEditMode, EditMode.ADDNEW, EditMode.UPDATE)) {
-                return;
+        JFXUtil.handleDisabledNodeClick(apMasterDVCheck, pnEditMode, nodeID -> {
+            switch (nodeID) {
+                case "tfAuthorizedPerson":
+                    ShowMessageFX.Warning(null, pxeModuleName,
+                            "Authorized Person field is only available when the \"Claimant Type\" is Authorized Representative.");
+                    break;
+                case "cmbPayeeType":
+                    ShowMessageFX.Warning(null, pxeModuleName,
+                            "Payee Type is only available when \"Check Print by Bank\" is selected.");
+                    break;
+                case "cmbDisbursementMode":
+                    ShowMessageFX.Warning(null, pxeModuleName,
+                            "Disbursement mode is only available when \"Check Print by Bank\" is selected.");
+                    break;
+                case "cmbClaimantType":
+                    ShowMessageFX.Warning(null, pxeModuleName,
+                            "Claimant Type is only available when the \"Disbursement Mode\" is Pick-up.");
+                    break;
             }
-            try {
-                Set<Node> nodes = new HashSet<>();
-                nodes.addAll(apMasterDVCheck.lookupAll(".text-field"));
-                nodes.addAll(apMasterDVCheck.lookupAll(".combo-box"));
-                for (Node node : nodes) {
-                    if (!node.isDisabled()) {
-                        continue;
-                    }
-                    Bounds boundsInScene = node.localToScene(node.getBoundsInLocal());
-                    if (boundsInScene.contains(event.getSceneX(), event.getSceneY())) {
-                        if (node instanceof TextField) {
-                            switch (node.getId()) {
-                                case "tfAuthorizedPerson":
-                                    ShowMessageFX.Warning(null, pxeModuleName, "Authorized Person field is only available when the \"Claimant Type\" is Authorized Representative.");
-                                    break;
-                            }
-                        } else if (node instanceof ComboBox<?>) {
-                            switch (node.getId()) {
-                                case "cmbPayeeType":
-                                    ShowMessageFX.Warning(null, pxeModuleName, "Payee Type is only available when \"Check Print by Bank\" is selected.");
-                                    break;
-                                case "cmbDisbursementMode":
-                                    ShowMessageFX.Warning(null, pxeModuleName, "Disbursement mode is only available when \"Check Print by Bank\" is selected.");
-                                    break;
-                                case "cmbClaimantType":
-                                    ShowMessageFX.Warning(null, pxeModuleName, "Claimant Type is only available when the \"Disbursement Mode\" is Pick-up.");
-                                    break;
-                            }
-                        }
-                    }
-                }
-            } catch (Exception e) {
-
+        });
+        JFXUtil.handleDisabledNodeClick(apDVDetail, pnEditMode, nodeID -> {
+            switch (nodeID) {
+                case "chbkVatClassification":
+                    ShowMessageFX.Warning(null, pxeModuleName,
+                            "Only enabled if the transaction Type is \"Payment Request\".");
+                    break;
             }
-
         });
     }
     boolean pbSuccess = true;

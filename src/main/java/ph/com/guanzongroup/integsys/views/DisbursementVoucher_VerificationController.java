@@ -1191,7 +1191,6 @@ public class DisbursementVoucher_VerificationController implements Initializable
             });
     ChangeListener<Boolean> txtDetailJE_Focus = JFXUtil.FocusListener(TextField.class,
             (lsID, lsValue) -> {
-//                try {
                 switch (lsID) {
                     case "tfAccountCode":
                         if (lsValue.isEmpty()) {
@@ -1251,33 +1250,8 @@ public class DisbursementVoucher_VerificationController implements Initializable
                 JFXUtil.runWithDelay(0.50, () -> {
                     loadTableDetailJE.reload();
                 });
-//                } catch (SQLException | GuanzonException ex) {
-//                    Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
-//                }
             });
 
-//    private void baseAmountError() {
-//        if ("error".equals(poJSON.get("result"))) {
-//            pbEnteredBIR = false;
-//            int lnReturned = Integer.parseInt(String.valueOf(poJSON.get("row"))) + 1;
-//            JFXUtil.runWithDelay(0.70, () -> {
-//                int lnTempRow = JFXUtil.getDetailTempRow(BIR_data, lnReturned, 7);
-//                pnDetailBIR = lnTempRow;
-//                poController.WTaxDeduction(pnDetailBIR).getModel().setBaseAmount(0.0);
-//                loadTableDetailBIR.reload();
-//            });
-//            ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-//            throw new JFXUtil.BreakLoopException();
-//        } else {
-//            int lnReturned = Integer.parseInt(String.valueOf(poJSON.get("row")));
-//            JFXUtil.runWithDelay(0.80, () -> {
-////          int lnTempRow = JFXUtil.getDetailTempRow(BIR_data, lnReturned, 7); // comment intentional
-//                pnDetailBIR = lnReturned;
-//                loadTableDetailBIR.reload();
-//            });
-//            loadTableDetail.reload();
-//        }
-//    }
     ChangeListener<Boolean> txtBIRDetail_Focus = JFXUtil.FocusListener(TextField.class,
             (lsID, lsValue) -> {
                 try {
@@ -1998,43 +1972,32 @@ public class DisbursementVoucher_VerificationController implements Initializable
         JFXUtil.setComboBoxActionListener(comboBoxActionListener, cmbPaymentMode, cmbPayeeType, cmbDisbursementMode, cmbClaimantType, cmbCheckStatus, cmbOtherPaymentBTransfer, cmbOtherPayment);
         JFXUtil.initComboBoxCellDesignColor("#FF8201", cmbPaymentMode, cmbPayeeType, cmbDisbursementMode, cmbClaimantType, cmbCheckStatus, cmbOtherPaymentBTransfer, cmbOtherPayment);
 
-        apMasterDVCheck.addEventFilter(MouseEvent.MOUSE_CLICKED, event -> {
-            if (!JFXUtil.isObjectEqualTo(pnEditMode, EditMode.ADDNEW, EditMode.UPDATE)) {
-                return;
+        JFXUtil.handleDisabledNodeClick(apMasterDVCheck, pnEditMode, nodeID -> {
+            switch (nodeID) {
+                case "tfAuthorizedPerson":
+                    ShowMessageFX.Warning(null, pxeModuleName,
+                            "Authorized Person field is only available when the \"Claimant Type\" is Authorized Representative.");
+                    break;
+                case "cmbPayeeType":
+                    ShowMessageFX.Warning(null, pxeModuleName,
+                            "Payee Type is only available when \"Check Print by Bank\" is selected.");
+                    break;
+                case "cmbDisbursementMode":
+                    ShowMessageFX.Warning(null, pxeModuleName,
+                            "Disbursement mode is only available when \"Check Print by Bank\" is selected.");
+                    break;
+                case "cmbClaimantType":
+                    ShowMessageFX.Warning(null, pxeModuleName,
+                            "Claimant Type is only available when the \"Disbursement Mode\" is Pick-up.");
+                    break;
             }
-            try {
-                Set<Node> nodes = new HashSet<>();
-                nodes.addAll(apMasterDVCheck.lookupAll(".text-field"));
-                nodes.addAll(apMasterDVCheck.lookupAll(".combo-box"));
-                for (Node node : nodes) {
-                    if (!node.isDisabled()) {
-                        continue;
-                    }
-                    Bounds boundsInScene = node.localToScene(node.getBoundsInLocal());
-                    if (boundsInScene.contains(event.getSceneX(), event.getSceneY())) {
-                        if (node instanceof TextField) {
-                            switch (node.getId()) {
-                                case "tfAuthorizedPerson":
-                                    ShowMessageFX.Warning(null, pxeModuleName, "Authorized Person field is only available when the \"Claimant Type\" is Authorized Representative.");
-                                    break;
-                            }
-                        } else if (node instanceof ComboBox<?>) {
-                            switch (node.getId()) {
-                                case "cmbPayeeType":
-                                    ShowMessageFX.Warning(null, pxeModuleName, "Payee Type is only available when \"Check Print by Bank\" is selected.");
-                                    break;
-                                case "cmbDisbursementMode":
-                                    ShowMessageFX.Warning(null, pxeModuleName, "Disbursement mode is only available when \"Check Print by Bank\" is selected.");
-                                    break;
-                                case "cmbClaimantType":
-                                    ShowMessageFX.Warning(null, pxeModuleName, "Claimant Type is only available when the \"Disbursement Mode\" is Pick-up.");
-                                    break;
-                            }
-                        }
-                    }
-                }
-            } catch (Exception e) {
-
+        });
+        JFXUtil.handleDisabledNodeClick(apDVDetail, pnEditMode, nodeID -> {
+            switch (nodeID) {
+                case "chbkVatClassification":
+                    ShowMessageFX.Warning(null, pxeModuleName,
+                            "Only enabled if the transaction Type is \"Payment Request\".");
+                    break;
             }
         });
     }
