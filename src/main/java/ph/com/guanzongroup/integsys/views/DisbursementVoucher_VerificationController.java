@@ -15,7 +15,6 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -1755,6 +1754,13 @@ public class DisbursementVoucher_VerificationController implements Initializable
         if ("error".equals((String) poJSON.get("result"))) {
             ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
         }
+        boolean lbNotNull = !JFXUtil.isObjectEqualTo(poController.Detail(pnDetail).getDetailVatAmount(), null, "");
+        boolean lbNotZero = poController.Detail(pnDetail).getAmountApplied() > 0;
+        cbReverse.selectedProperty().set(lbNotNull && lbNotZero);
+
+        boolean lbShow = (poController.Detail(pnDetail).getSourceCode()).equals(DisbursementStatic.SourceCode.PAYMENT_REQUEST);
+        JFXUtil.setDisabled(!lbShow, chbkVatClassification, tfVatExemptDetail);
+
         tfRefNoDetail.setText(poController.Detail(pnDetail).getSourceNo());
         chbkVatClassification.setSelected(poController.Detail(pnDetail).isWithVat());
         tfVatableSalesDetail.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(pnDetail).getDetailVatSales(), true));
@@ -1765,17 +1771,6 @@ public class DisbursementVoucher_VerificationController implements Initializable
         tfPurchasedAmountDetail.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(pnDetail).getAmountApplied(), true));
         tfNetAmountDetail.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(pnDetail).getAmount(), true));
 
-        if (!JFXUtil.isObjectEqualTo(poController.Detail(pnDetail).getDetailVatAmount(), null, "")) {
-            if (poController.Detail(pnDetail).getAmountApplied() > 0) {
-                cbReverse.selectedProperty().set(true);
-            } else {
-                cbReverse.selectedProperty().set(false);
-            }
-        } else {
-            cbReverse.selectedProperty().set(false);
-        }
-        boolean lbShow = (poController.Detail(pnDetail).getSourceCode()).equals(DisbursementStatic.SourceCode.PAYMENT_REQUEST);
-        JFXUtil.setDisabled(!lbShow, chbkVatClassification, tfVatExemptDetail);
         JFXUtil.updateCaretPositions(apDVDetail);
     }
 
