@@ -425,48 +425,42 @@ public class DisbursementVoucher_HistoryController implements Initializable, Scr
                 () -> {
                     Platform.runLater(() -> {
                         journal_data.clear();
-                        int lnCtr;
                         try {
                             if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
-                                lnCtr = poController.Journal().getDetailCount() - 1;
-                                while (lnCtr >= 0) {
-                                    if (JFXUtil.isObjectEqualTo(poController.Journal().Detail(lnCtr).getAccountCode(), null, "")) {
-                                        poController.Journal().Detail().remove(lnCtr);
-                                    }
-                                    lnCtr--;
-                                }
-                                if ((poController.Journal().getDetailCount() - 1) >= 0) {
-                                    if (poController.Journal().Detail(poController.Journal().getDetailCount() - 1).getAccountCode() != null
-                                            && !poController.Journal().Detail(poController.Journal().getDetailCount() - 1).getAccountCode().equals("")) {
-                                        poController.Journal().AddDetail();
-                                        poController.Journal().Detail(poController.Journal().getDetailCount() - 1).setForMonthOf(oApp.getServerDate());
-                                    }
-                                }
-                                if ((poController.Journal().getDetailCount() - 1) < 0) {
-                                    poController.Journal().AddDetail();
-                                    poController.Journal().Detail(poController.Journal().getDetailCount() - 1).setForMonthOf(oApp.getServerDate());
-                                }
+                                poController.ReloadJournal();
                             }
-                            for (lnCtr = 0; lnCtr < poController.Journal().getDetailCount(); lnCtr++) {
-                                journal_data.add(new ModelJournalEntry_Detail(String.valueOf(lnCtr + 1),
+                            int lnRowCount = 0;
+                            for (int lnCtr = 0; lnCtr < poController.Journal().getDetailCount(); lnCtr++) {
+                                if (JFXUtil.isObjectEqualTo(poController.Detail(lnCtr).getAmountApplied(), null, "")) {
+                                    if (poController.Journal().Detail(lnCtr).getDebitAmount() <= 0 && poController.Journal().Detail(lnCtr).getCreditAmount() <= 0) {
+                                        continue;
+                                    }
+                                }
+                                lnRowCount += 1;
+                                journal_data.add(new ModelJournalEntry_Detail(String.valueOf(lnRowCount),
                                         poController.Journal().Detail(lnCtr).getAccountCode() != null ? poController.Journal().Detail(lnCtr).getAccountCode() : "",
                                         poController.Journal().Detail(lnCtr).Account_Chart().getDescription() != null ? poController.Journal().Detail(lnCtr).Account_Chart().getDescription() : "",
                                         CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Journal().Detail(lnCtr).getDebitAmount(), true),
                                         CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Journal().Detail(lnCtr).getCreditAmount(), true),
-                                        CustomCommonUtil.formatDateToShortString(poController.Journal().Detail(lnCtr).getForMonthOf())
+                                        CustomCommonUtil.formatDateToShortString(poController.Journal().Detail(lnCtr).getForMonthOf()),
+                                        String.valueOf(lnCtr)
                                 ));
                             }
-                            if (pnDetailJE < 0 || pnDetailJE
+                            int lnTempRow = JFXUtil.getDetailRow(journal_data, pnDetailJE, 07); //this method is used only when Reverse is applied
+                            if (lnTempRow < 0 || lnTempRow
                                     >= journal_data.size()) {
                                 if (!journal_data.isEmpty()) {
                                     /* FOCUS ON FIRST ROW */
                                     JFXUtil.selectAndFocusRow(tblVwJournalDetails, 0);
-                                    pnDetailJE = tblVwJournalDetails.getSelectionModel().getSelectedIndex();
+                                    int lnRow = Integer.parseInt(journal_data.get(0).getIndex07());
+                                    pnDetailJE = lnRow;
                                     loadRecordDetailJE();
                                 }
                             } else {
-                                /* FOCUS ON THE ROW THAT pnRowDetail POINTS TO */
-                                JFXUtil.selectAndFocusRow(tblVwJournalDetails, pnDetailJE);
+                                /* FOCUS ON THE ROW THAT pnDetailBIR POINTS TO */
+                                JFXUtil.selectAndFocusRow(tblVwJournalDetails, lnTempRow);
+                                int lnRow = Integer.parseInt(journal_data.get(tblVwJournalDetails.getSelectionModel().getSelectedIndex()).getIndex07());
+                                pnDetailJE = lnRow;
                                 loadRecordDetailJE();
                             }
                             loadRecordMasterJE();
@@ -621,7 +615,8 @@ public class DisbursementVoucher_HistoryController implements Initializable, Scr
                     if (journal_data.isEmpty()) {
                         return;
                     }
-                    newIndex = moveDown ? JFXUtil.moveToNextRow(currentTable) : JFXUtil.moveToPreviousRow(currentTable);
+                    newIndex = moveDown ? Integer.parseInt(journal_data.get(JFXUtil.moveToNextRow(currentTable)).getIndex07())
+                            : Integer.parseInt(journal_data.get(JFXUtil.moveToPreviousRow(currentTable)).getIndex07());
                     pnDetailJE = newIndex;
                     loadRecordDetailJE();
                     break;
