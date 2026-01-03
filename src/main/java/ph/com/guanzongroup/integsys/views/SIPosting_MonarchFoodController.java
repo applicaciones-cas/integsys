@@ -169,7 +169,7 @@ public class SIPosting_MonarchFoodController implements Initializable, ScreenInt
     @FXML
     private DatePicker dpTransactionDate, dpReferenceDate, dpExpiryDate, dpJETransactionDate, dpReportMonthYear, dpSIDate;
     @FXML
-    private CheckBox cbVatInclusive, cbVatable;
+    private CheckBox cbVatInclusive, cbVatable, cbJEReverse;
     @FXML
     private TextArea taRemarks, taJERemarks;
     @FXML
@@ -374,6 +374,20 @@ public class SIPosting_MonarchFoodController implements Initializable, ScreenInt
                 case "cbVatable":
                     poPurchaseReceivingController.PurchaseOrderReceiving().Detail(pnDetail).isVatable(cbVatable.isSelected());
                     loadRecordMaster();
+                    break;
+                case "cbJEReverse":
+                    if (!checkedBox.isSelected()) {
+                        if(poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(pnJEDetail).getEditMode() == EditMode.ADDNEW){
+                            poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail().remove(pnJEDetail);
+                        } else {
+                            poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(pnJEDetail).setDebitAmount(0.0000);
+                            poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(pnJEDetail).setCreditAmount(0.0000);
+                        }
+                    }
+                    loadTableJEDetail();
+                    if (checkedBox.isSelected()) {
+                        moveNext();
+                    }
                     break;
             }
         }
@@ -723,178 +737,221 @@ public class SIPosting_MonarchFoodController implements Initializable, ScreenInt
     };
     // Method to handle focus change and track the last focused TextField
     final ChangeListener<? super Boolean> txtDetail_Focus = (o, ov, nv) -> {
-        poJSON = new JSONObject();
-        TextField txtPersonalInfo = (TextField) ((ReadOnlyBooleanPropertyBase) o).getBean();
-        String lsTxtFieldID = (txtPersonalInfo.getId());
-        String lsValue = (txtPersonalInfo.getText() == null ? "" : txtPersonalInfo.getText());
-        if (lsValue == null) {
-            return;
-        }
-        if (!nv) {
-            /*Lost Focus*/
-
-            switch (lsTxtFieldID) {
-                case "tfCost":
-                    if (lsValue.isEmpty()) {
-                        lsValue = "0.00";
-                    }
-                    lsValue = JFXUtil.removeComma(lsValue);
-                    double lnNewVal = Double.valueOf(lsValue);
-                    double lnOldVal = poPurchaseReceivingController.PurchaseOrderReceiving().Detail(pnDetail).getUnitPrce().doubleValue();
-
-                    poJSON = poPurchaseReceivingController.PurchaseOrderReceiving().Detail(pnDetail).setUnitPrce((Double.valueOf(lsValue)));
-                    if ("error".equals((String) poJSON.get("result"))) {
-                        System.err.println((String) poJSON.get("message"));
-                        ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-                        break;
-                    }
-
-                    if (pbEntered) {
-                        if (lnNewVal != lnOldVal) {
-                            if ((Double.valueOf(lsValue) > 0
-                                    && poPurchaseReceivingController.PurchaseOrderReceiving().Detail(pnDetail).getStockId() != null
-                                    && !"".equals(poPurchaseReceivingController.PurchaseOrderReceiving().Detail(pnDetail).getStockId()))) {
-                                moveNext();
-                            } else {
-                                moveNext();
-                            }
-                        } else {
-                            moveNext();
-                        }
-                        pbEntered = false;
-                    }
-                    break;
-                case "tfDiscRateDetail":
-                    if (lsValue.isEmpty()) {
-                        lsValue = "0.00";
-                    }
-
-                    if (Double.valueOf(lsValue.replace(",", "")) > 100.00) {
-                        ShowMessageFX.Warning(null, pxeModuleName, "Invalid discount rate.");
-                        break;
-                    }
-
-                    poJSON = poPurchaseReceivingController.PurchaseOrderReceiving().Detail(pnDetail).setDiscountRate((Double.valueOf(lsValue.replace(",", ""))));
-                    if ("error".equals((String) poJSON.get("result"))) {
-                        System.err.println((String) poJSON.get("message"));
-                        ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-                    }
-                    break;
-                case "tfAddlDiscAmtDetail":
-                    if (lsValue.isEmpty()) {
-                        lsValue = "0.0000";
-                    }
-
-                    poJSON = poPurchaseReceivingController.PurchaseOrderReceiving().Detail(pnDetail).setDiscountAmount((Double.valueOf(lsValue.replace(",", ""))));
-                    if ("error".equals((String) poJSON.get("result"))) {
-                        System.err.println((String) poJSON.get("message"));
-                        ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-                    }
-                    break;
-                case "tfJEAcctCode":
-                    if (lsValue.isEmpty()) {
-                        poJSON = poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(pnJEDetail).setAccountCode(lsValue);
-                    }
-                    if ("error".equals((String) poJSON.get("result"))) {
-                        ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-                    }
-                    break;
-                case "tfJEAcctDescription":
-                    if (lsValue.isEmpty()) {
-                        poJSON = poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(pnJEDetail).setAccountCode(lsValue);
-                    }
-                    if ("error".equals((String) poJSON.get("result"))) {
-                        ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-                    }
-                    break;
-                case "tfCreditAmt":
-                    if (lsValue.isEmpty()) {
-                        lsValue = "0.0000";
-                    }
-                    lsValue = JFXUtil.removeComma(lsValue);
-                    lnNewVal = Double.valueOf(lsValue);
-                    lnOldVal = poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(pnJEDetail).getCreditAmount();
-
-                    if (poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(pnJEDetail).getDebitAmount() > 0.0000 && Double.valueOf(lsValue) > 0) {
-                        ShowMessageFX.Warning(null, pxeModuleName, "Debit and credit amounts cannot both have values at the same time.");
-                        poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(pnJEDetail).setCreditAmount(0.0000);
-                        tfCreditAmt.setText("0.0000");
-                        tfCreditAmt.requestFocus();
-                        break;
-                    } else {
-                        poJSON = poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(pnJEDetail).setCreditAmount((Double.valueOf(lsValue)));
-                    }
-                    if ("error".equals((String) poJSON.get("result"))) {
-                        ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-                    }
-
-                    if (pbEntered && lnNewVal > 0) { //unique
-                        if (lnNewVal != lnOldVal) {
-                            if ((Double.valueOf(lsValue) > 0
-                                    && poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(pnJEDetail).getAccountCode() != null
-                                    && !"".equals(poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(pnJEDetail).getAccountCode()))) {
-                                moveNextJE(false);
-                            } else {
-                                moveNextJE(false);
-                            }
-                        } else {
-                            moveNextJE(false);
-                        }
-                        pbEntered = false;
-                    }
-                    break;
-                case "tfDebitAmt":
-                    if (lsValue.isEmpty()) {
-                        lsValue = "0.0000";
-                    }
-                    lsValue = JFXUtil.removeComma(lsValue);
-                    lnNewVal = Double.valueOf(lsValue);
-                    lnOldVal = poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(pnJEDetail).getDebitAmount();
-                    if (poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(pnJEDetail).getCreditAmount() > 0.0000 && Double.valueOf(lsValue) > 0) {
-                        ShowMessageFX.Warning(null, pxeModuleName, "Debit and credit amounts cannot both have values at the same time.");
-                        poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(pnJEDetail).setDebitAmount(0.0000);
-                        tfDebitAmt.setText("0.0000");
-                        tfDebitAmt.requestFocus();
-                        break;
-                    } else {
-                        poJSON = poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(pnJEDetail).setDebitAmount((Double.valueOf(lsValue)));
-                    }
-                    if ("error".equals((String) poJSON.get("result"))) {
-                        ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-                    }
-                    if (pbEntered) {
-                        if (lnNewVal != lnOldVal) {
-                            if ((Double.valueOf(lsValue) > 0
-                                    && poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(pnJEDetail).getAccountCode() != null
-                                    && !"".equals(poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(pnJEDetail).getAccountCode()))) {
-                                moveNextJE(false);
-                            } else {
-                                moveNextJE(false);
-                            }
-                        } else {
-                            moveNextJE(false);
-                        }
-                        pbEntered = false;
-                    }
-                    break;
+        try {
+            poJSON = new JSONObject();
+            TextField txtPersonalInfo = (TextField) ((ReadOnlyBooleanPropertyBase) o).getBean();
+            String lsTxtFieldID = (txtPersonalInfo.getId());
+            String lsValue = (txtPersonalInfo.getText() == null ? "" : txtPersonalInfo.getText());
+            if (lsValue == null) {
+                return;
             }
-            if (JFXUtil.isObjectEqualTo(lsTxtFieldID, "tfJEAcctCode", "tfJEAcctDescription", "tfCreditAmt", "tfDebitAmt")) {
-                Platform.runLater(() -> {
-                    PauseTransition delay = new PauseTransition(Duration.seconds(0.50));
-                    delay.setOnFinished(event -> {
-                        loadTableJEDetail();
+            if (!nv) {
+                /*Lost Focus*/
+
+                switch (lsTxtFieldID) {
+                    case "tfCost":
+                        if (lsValue.isEmpty()) {
+                            lsValue = "0.00";
+                        }
+                        lsValue = JFXUtil.removeComma(lsValue);
+                        double lnNewVal = Double.valueOf(lsValue);
+                        double lnOldVal = poPurchaseReceivingController.PurchaseOrderReceiving().Detail(pnDetail).getUnitPrce().doubleValue();
+
+                        poJSON = poPurchaseReceivingController.PurchaseOrderReceiving().Detail(pnDetail).setUnitPrce((Double.valueOf(lsValue)));
+                        if ("error".equals((String) poJSON.get("result"))) {
+                            System.err.println((String) poJSON.get("message"));
+                            ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                            break;
+                        }
+
+                        if (pbEntered) {
+                            if (lnNewVal != lnOldVal) {
+                                if ((Double.valueOf(lsValue) > 0
+                                        && poPurchaseReceivingController.PurchaseOrderReceiving().Detail(pnDetail).getStockId() != null
+                                        && !"".equals(poPurchaseReceivingController.PurchaseOrderReceiving().Detail(pnDetail).getStockId()))) {
+                                    moveNext();
+                                } else {
+                                    moveNext();
+                                }
+                            } else {
+                                moveNext();
+                            }
+                            pbEntered = false;
+                        }
+                        break;
+                    case "tfDiscRateDetail":
+                        if (lsValue.isEmpty()) {
+                            lsValue = "0.00";
+                        }
+
+                        if (Double.valueOf(lsValue.replace(",", "")) > 100.00) {
+                            ShowMessageFX.Warning(null, pxeModuleName, "Invalid discount rate.");
+                            break;
+                        }
+
+                        poJSON = poPurchaseReceivingController.PurchaseOrderReceiving().Detail(pnDetail).setDiscountRate((Double.valueOf(lsValue.replace(",", ""))));
+                        if ("error".equals((String) poJSON.get("result"))) {
+                            System.err.println((String) poJSON.get("message"));
+                            ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                        }
+                        break;
+                    case "tfAddlDiscAmtDetail":
+                        if (lsValue.isEmpty()) {
+                            lsValue = "0.0000";
+                        }
+
+                        poJSON = poPurchaseReceivingController.PurchaseOrderReceiving().Detail(pnDetail).setDiscountAmount((Double.valueOf(lsValue.replace(",", ""))));
+                        if ("error".equals((String) poJSON.get("result"))) {
+                            System.err.println((String) poJSON.get("message"));
+                            ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                        }
+                        break;
+                    case "tfJEAcctCode":
+                        poJSON = poPurchaseReceivingController.PurchaseOrderReceiving().Journal().SearchAccountCode(pnJEDetail, lsValue, true, poPurchaseReceivingController.PurchaseOrderReceiving().Master().getIndustryId(), null);
+                        if ("error".equals(poJSON.get("result"))) {
+                            int lnReturned = Integer.parseInt(String.valueOf(poJSON.get("row"))) + 1;
+                            JFXUtil.runWithDelay(0.70, () -> {
+                                pnJEDetail = lnReturned;
+                                loadTableJEDetail();
+                            });
+                            ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                            break;
+                        }
+
+                        poJSON = poPurchaseReceivingController.PurchaseOrderReceiving().checkExistAcctCode(pnJEDetail, poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(pnJEDetail).getAccountCode());
+                        if ("error".equals(poJSON.get("result"))) {
+                            int lnReturned = Integer.parseInt(String.valueOf(poJSON.get("row"))) + 1;
+                            JFXUtil.runWithDelay(0.70, () -> {
+                                pnJEDetail = lnReturned;
+                                loadTableJEDetail();
+                            });
+                            ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                            break;
+                        } else {
+                            int lnReturned = Integer.parseInt(String.valueOf(poJSON.get("row")));
+                            pnJEDetail = lnReturned;
+                            loadTableJEDetail();
+                        }
+                        break;
+                    case "tfJEAcctDescription":
+                        poJSON = poPurchaseReceivingController.PurchaseOrderReceiving().Journal().SearchAccountCode(pnJEDetail, lsValue, false, poPurchaseReceivingController.PurchaseOrderReceiving().Master().getIndustryId(), null);
+                        if ("error".equals(poJSON.get("result"))) {
+                            int lnReturned = Integer.parseInt(String.valueOf(poJSON.get("row"))) + 1;
+                            JFXUtil.runWithDelay(0.70, () -> {
+                                pnJEDetail = lnReturned;
+                                loadTableJEDetail();
+                            });
+                            ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                            break;
+                        }
+
+                        poJSON = poPurchaseReceivingController.PurchaseOrderReceiving().checkExistAcctCode(pnJEDetail, poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(pnJEDetail).getAccountCode());
+                        if ("error".equals(poJSON.get("result"))) {
+                            int lnReturned = Integer.parseInt(String.valueOf(poJSON.get("row"))) + 1;
+                            JFXUtil.runWithDelay(0.70, () -> {
+                                pnJEDetail = lnReturned;
+                                loadTableJEDetail();
+                            });
+                            ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                            break;
+                        } else {
+                            int lnReturned = Integer.parseInt(String.valueOf(poJSON.get("row")));
+                            pnJEDetail = lnReturned;
+                            loadTableJEDetail();
+                        }
+                        break;
+                    case "tfCreditAmt":
+                        if (lsValue.isEmpty()) {
+                            lsValue = "0.0000";
+                        }
+                        lsValue = JFXUtil.removeComma(lsValue);
+                        lnNewVal = Double.valueOf(lsValue);
+                        lnOldVal = poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(pnJEDetail).getCreditAmount();
+
+                        if (poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(pnJEDetail).getDebitAmount() > 0.0000 && Double.valueOf(lsValue) > 0) {
+                            ShowMessageFX.Warning(null, pxeModuleName, "Debit and credit amounts cannot both have values at the same time.");
+                            poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(pnJEDetail).setCreditAmount(0.0000);
+                            tfCreditAmt.setText("0.0000");
+                            tfCreditAmt.requestFocus();
+                            break;
+                        } else {
+                            poJSON = poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(pnJEDetail).setCreditAmount((Double.valueOf(lsValue)));
+                        }
+                        if ("error".equals((String) poJSON.get("result"))) {
+                            ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                        }
+
+                        if (pbEntered && lnNewVal > 0) { //unique
+                            if (lnNewVal != lnOldVal) {
+                                if ((Double.valueOf(lsValue) > 0
+                                        && poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(pnJEDetail).getAccountCode() != null
+                                        && !"".equals(poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(pnJEDetail).getAccountCode()))) {
+                                    moveNextJE(false);
+                                } else {
+                                    moveNextJE(false);
+                                }
+                            } else {
+                                moveNextJE(false);
+                            }
+                            pbEntered = false;
+                        }
+                        break;
+                    case "tfDebitAmt":
+                        if (lsValue.isEmpty()) {
+                            lsValue = "0.0000";
+                        }
+                        lsValue = JFXUtil.removeComma(lsValue);
+                        lnNewVal = Double.valueOf(lsValue);
+                        lnOldVal = poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(pnJEDetail).getDebitAmount();
+                        if (poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(pnJEDetail).getCreditAmount() > 0.0000 && Double.valueOf(lsValue) > 0) {
+                            ShowMessageFX.Warning(null, pxeModuleName, "Debit and credit amounts cannot both have values at the same time.");
+                            poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(pnJEDetail).setDebitAmount(0.0000);
+                            tfDebitAmt.setText("0.0000");
+                            tfDebitAmt.requestFocus();
+                            break;
+                        } else {
+                            poJSON = poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(pnJEDetail).setDebitAmount((Double.valueOf(lsValue)));
+                        }
+                        if ("error".equals((String) poJSON.get("result"))) {
+                            ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                        }
+                        if (pbEntered) {
+                            if (lnNewVal != lnOldVal) {
+                                if ((Double.valueOf(lsValue) > 0
+                                        && poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(pnJEDetail).getAccountCode() != null
+                                        && !"".equals(poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(pnJEDetail).getAccountCode()))) {
+                                    moveNextJE(false);
+                                } else {
+                                    moveNextJE(false);
+                                }
+                            } else {
+                                moveNextJE(false);
+                            }
+                            pbEntered = false;
+                        }
+                        break;
+                }
+                if (JFXUtil.isObjectEqualTo(lsTxtFieldID, "tfJEAcctCode", "tfJEAcctDescription", "tfCreditAmt", "tfDebitAmt")) {
+                    Platform.runLater(() -> {
+                        PauseTransition delay = new PauseTransition(Duration.seconds(0.50));
+                        delay.setOnFinished(event -> {
+                            loadTableJEDetail();
+                        });
+                        delay.play();
                     });
-                    delay.play();
-                });
-            } else {
-                Platform.runLater(() -> {
-                    PauseTransition delay = new PauseTransition(Duration.seconds(0.50));
-                    delay.setOnFinished(event -> {
-                        loadTableDetail();
+                } else {
+                    Platform.runLater(() -> {
+                        PauseTransition delay = new PauseTransition(Duration.seconds(0.50));
+                        delay.setOnFinished(event -> {
+                            loadTableDetail();
+                        });
+                        delay.play();
                     });
-                    delay.play();
-                });
+                }
             }
+        } catch (GuanzonException | SQLException ex) {
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     };
 
@@ -1510,7 +1567,8 @@ public class SIPosting_MonarchFoodController implements Initializable, ScreenInt
             } else {
                 JFXUtil.setDisabled(false, tfJEAcctCode, tfJEAcctDescription);
             }
-
+            boolean lbNotZero = poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(pnJEDetail).getDebitAmount() > 0 || poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(pnJEDetail).getCreditAmount() > 0;
+            cbJEReverse.selectedProperty().set(lbNotZero);
             tfJEAcctCode.setText(poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(pnJEDetail).getAccountCode());
             tfJEAcctDescription.setText(poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(pnJEDetail).Account_Chart().getDescription());
             String lsReportMonthYear = CustomCommonUtil.formatDateToShortString(poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(pnJEDetail).getForMonthOf());
@@ -1740,28 +1798,13 @@ public class SIPosting_MonarchFoodController implements Initializable, ScreenInt
                     int lnCtr;
                     try {
                         if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
-                            lnCtr = poPurchaseReceivingController.PurchaseOrderReceiving().Journal().getDetailCount() - 1;
-                            while (lnCtr >= 0) {
-                                if (poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(lnCtr).getAccountCode() == null || poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(lnCtr).getAccountCode().equals("")) {
-                                    poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail().remove(lnCtr);
-                                }
-                                lnCtr--;
-                            }
-                            if ((poPurchaseReceivingController.PurchaseOrderReceiving().Journal().getDetailCount() - 1) >= 0) {
-                                if (poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(poPurchaseReceivingController.PurchaseOrderReceiving().Journal().getDetailCount() - 1).getAccountCode() != null
-                                        && !poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(poPurchaseReceivingController.PurchaseOrderReceiving().Journal().getDetailCount() - 1).getAccountCode().equals("")) {
-                                    poPurchaseReceivingController.PurchaseOrderReceiving().Journal().AddDetail();
-                                    poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(poPurchaseReceivingController.PurchaseOrderReceiving().Journal().getDetailCount() - 1).setForMonthOf(oApp.getServerDate());
-                                }
-                            }
-                            if ((poPurchaseReceivingController.PurchaseOrderReceiving().Journal().getDetailCount() - 1) < 0) {
-                                poPurchaseReceivingController.PurchaseOrderReceiving().Journal().AddDetail();
-                                poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(poPurchaseReceivingController.PurchaseOrderReceiving().Journal().getDetailCount() - 1).setForMonthOf(oApp.getServerDate());
-                            }
+                            poPurchaseReceivingController.PurchaseOrderReceiving().Journal().ReloadDetail();
                         }
+
                         String lsReportMonthYear = "";
                         String lsAcctCode = "";
                         String lsAccDesc = "";
+                        int lnRowCount = 0;
                         for (lnCtr = 0; lnCtr < poPurchaseReceivingController.PurchaseOrderReceiving().Journal().getDetailCount(); lnCtr++) {
                             lsReportMonthYear = CustomCommonUtil.formatDateToShortString(poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(lnCtr).getForMonthOf());
                             if (poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(lnCtr).getAccountCode() != null) {
@@ -1770,31 +1813,43 @@ public class SIPosting_MonarchFoodController implements Initializable, ScreenInt
                             if (poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(lnCtr).Account_Chart().getDescription() != null) {
                                 lsAccDesc = poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(lnCtr).Account_Chart().getDescription();
                             }
-
+                            if (poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(lnCtr).getCreditAmount() <= 0.0000
+                                && poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(lnCtr).getDebitAmount() <= 0.0000
+                                && lsAcctCode != null && !"".equals(lsAcctCode)
+                                && poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(lnCtr).getEditMode() == EditMode.UPDATE) {
+                                continue;
+                            }
+                            lnRowCount += 1;
                             JEdetails_data.add(
-                                    new ModelJournalEntry_Detail(String.valueOf(lnCtr + 1),
+                                    new ModelJournalEntry_Detail(
+                                            String.valueOf(lnRowCount),
                                             String.valueOf(CustomCommonUtil.parseDateStringToLocalDate(lsReportMonthYear, "yyyy-MM-dd")),
                                             String.valueOf(lsAcctCode),
                                             String.valueOf(lsAccDesc),
                                             String.valueOf(CustomCommonUtil.setIntegerValueToDecimalFormat(poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(lnCtr).getCreditAmount(), true)),
-                                            String.valueOf(CustomCommonUtil.setIntegerValueToDecimalFormat(poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(lnCtr).getDebitAmount(), true))) //identify total
-                            );
+                                            String.valueOf(CustomCommonUtil.setIntegerValueToDecimalFormat(poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(lnCtr).getDebitAmount(), true)),
+                                            String.valueOf(lnCtr)
+                                    ));
 
                             lsReportMonthYear = "";
                             lsAcctCode = "";
                             lsAccDesc = "";
                         }
-                        if (pnJEDetail < 0 || pnJEDetail
+                        int lnTempRow = JFXUtil.getDetailRow(JEdetails_data, pnJEDetail, 7); //this method is used only when Reverse is applied
+                        if (lnTempRow < 0 || lnTempRow
                                 >= JEdetails_data.size()) {
                             if (!JEdetails_data.isEmpty()) {
                                 /* FOCUS ON FIRST ROW */
                                 JFXUtil.selectAndFocusRow(tblViewJEDetails, 0);
-                                pnJEDetail = tblViewJEDetails.getSelectionModel().getSelectedIndex();
+                                int lnRow = Integer.parseInt(JEdetails_data.get(0).getIndex07());
+                                pnJEDetail = lnRow;
                                 loadRecordJEDetail();
                             }
                         } else {
-                            /* FOCUS ON THE ROW THAT pnRowDetail POINTS TO */
-                            JFXUtil.selectAndFocusRow(tblViewJEDetails, pnJEDetail);
+                            /* FOCUS ON THE ROW THAT pnDetailBIR POINTS TO */
+                            JFXUtil.selectAndFocusRow(tblViewJEDetails, lnTempRow);
+                            int lnRow = Integer.parseInt(JEdetails_data.get(tblViewJEDetails.getSelectionModel().getSelectedIndex()).getIndex07());
+                            pnJEDetail = lnRow;
                             loadRecordJEDetail();
                         }
                         loadRecordJEMaster();
