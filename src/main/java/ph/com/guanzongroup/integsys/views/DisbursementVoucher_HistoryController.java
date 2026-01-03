@@ -575,7 +575,7 @@ public class DisbursementVoucher_HistoryController implements Initializable, Scr
         });
         tblVwJournalDetails.setOnMouseClicked(event -> {
             if (!journal_data.isEmpty() && event.getClickCount() == 1) {
-                int lnRow = Integer.parseInt(details_data.get(tblVwDetails.getSelectionModel().getSelectedIndex()).getIndex07());
+                int lnRow = Integer.parseInt(journal_data.get(tblVwJournalDetails.getSelectionModel().getSelectedIndex()).getIndex07());
                 pnDetailJE = lnRow;
                 loadRecordDetailJE();
             }
