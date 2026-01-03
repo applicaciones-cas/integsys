@@ -1893,6 +1893,9 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
             if (pnDetailJE < 0 || pnDetailJE > poController.Journal().getDetailCount() - 1) {
                 return;
             }
+            boolean lbShow = poController.Journal().Detail(pnDetailJE).getEditMode() == EditMode.UPDATE;
+            JFXUtil.setDisabled(lbShow, tfAccountCode, tfAccountDescription);
+
             boolean lbNotZero = poController.Journal().Detail(pnDetailJE).getDebitAmount() > 0 || poController.Journal().Detail(pnDetailJE).getCreditAmount() > 0;
             cbJEReverse.selectedProperty().set(lbNotZero);
 
@@ -2257,15 +2260,13 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                     break;
                 case "cbJEReverse":
                     if (!checkedBox.isSelected()) {
-                        poController.Journal().Detail(pnDetailJE).setDebitAmount(0.0000);
-                        poController.Journal().Detail(pnDetailJE).setCreditAmount(0.0000);
+                        if (poController.Journal().Detail(pnDetailJE).getEditMode() == EditMode.ADDNEW) {
+                            poController.Journal().Detail().remove(pnDetailJE);
+                        } else {
+                            poController.Journal().Detail(pnDetailJE).setDebitAmount(0.0000);
+                            poController.Journal().Detail(pnDetailJE).setCreditAmount(0.0000);
+                        }
                     }
-                    loadRecordMasterJE();
-                    loadTableDetailJE.reload();
-                    if (checkedBox.isSelected()) {
-                        moveNextJE(false, false);
-                    }
-                    break;
                 case "cbBIRReverse":
                     poJSON = poController.removeWTDeduction(pnDetailBIR);
                     if (!JFXUtil.isJSONSuccess(poJSON)) {
