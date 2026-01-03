@@ -267,6 +267,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
                     for (Tab tab : tabPanePaymentMode.getTabs()) {
                         if (tab.getText().equals(tabName) && tab.isDisable()) {
                             ShowMessageFX.Warning(null, pxeModuleName, "This tab has been disabled as only one option applies based on the selected payment form.");
+                            JFXUtil.glowOnce(cmbPaymentMode, "#FF8201");
                             event.consume();
                         }
                     }

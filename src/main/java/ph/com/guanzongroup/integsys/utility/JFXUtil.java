@@ -127,6 +127,7 @@ import java.util.regex.Pattern;
 import javafx.css.PseudoClass;
 import javafx.scene.control.ButtonBase;
 import javafx.scene.control.MenuItem;
+import javafx.scene.effect.DropShadow;
 import org.guanzon.appdriver.constant.EditMode;
 import ph.com.guanzongroup.integsys.views.ScreenInterface;
 
@@ -2769,5 +2770,34 @@ public class JFXUtil {
         } catch (Exception e) {
 
         }
+    }
+
+    public static void glowOnce(Node node, String hexColor) {
+        Color glowColor = Color.web(hexColor); // convert hex to Color
+
+        DropShadow glow = new DropShadow();
+        glow.setColor(glowColor);
+        glow.setRadius(0);
+        glow.setSpread(0);
+
+        node.setEffect(glow);
+
+        Timeline timeline = new Timeline(
+                new KeyFrame(Duration.ZERO,
+                        new KeyValue(glow.radiusProperty(), 0),
+                        new KeyValue(glow.spreadProperty(), 0)
+                ),
+                new KeyFrame(Duration.millis(500),
+                        new KeyValue(glow.radiusProperty(), 25),
+                        new KeyValue(glow.spreadProperty(), 0.35)
+                ),
+                new KeyFrame(Duration.millis(1000),
+                        new KeyValue(glow.radiusProperty(), 0),
+                        new KeyValue(glow.spreadProperty(), 0)
+                )
+        );
+
+        timeline.setOnFinished(e -> node.setEffect(null));
+        timeline.play();
     }
 }
