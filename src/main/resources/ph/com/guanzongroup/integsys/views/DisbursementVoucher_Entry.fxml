@@ -809,6 +809,8 @@
                                                                                 <DatePicker fx:id="dpReportMonthYear" GridPane.columnIndex="2" GridPane.rowIndex="2" />
                                                                                 <TextField fx:id="tfDebitAmount" alignment="CENTER_RIGHT" maxWidth="1.7976931348623157E308" promptText="0.00" GridPane.columnIndex="8" GridPane.rowIndex="1" />
                                                                                 <TextField fx:id="tfCreditAmount" alignment="CENTER_RIGHT" maxWidth="1.7976931348623157E308" promptText="0.00" GridPane.columnIndex="8" GridPane.rowIndex="2" />
+                                                            <CheckBox fx:id="cbJEReverse" mnemonicParsing="false" onAction="#cmdCheckBox_Click" GridPane.columnIndex="8" />
+                                                            <Label text="Reverse" GridPane.columnIndex="6" />
                                                                             </children>
                                                                         </GridPane>
                                                                     </children>
