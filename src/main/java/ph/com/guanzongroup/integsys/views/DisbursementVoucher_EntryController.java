@@ -154,13 +154,13 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
     @FXML
     private ComboBox cmbPaymentMode, cmbPayeeType, cmbDisbursementMode, cmbClaimantType, cmbCheckStatus, cmbOtherPaymentBTransfer, cmbOtherPayment, cmbTransactionType;
     @FXML
-    private CheckBox chbkPrintByBank, chbkIsCrossCheck, chbkIsPersonOnly, chbkVatClassification, cbReverse, cbBIRReverse, cbJEReverse;
+    private CheckBox chbkPrintByBank, chbkIsCrossCheck, chbkIsPersonOnly, chbkVatClassification, cbReverse, cbJEReverse, cbBIRReverse;
     @FXML
     private TextArea taDVRemarks, taJournalRemarks;
     @FXML
     private TableView tblVwDetails, tblViewMainList, tblVwJournalDetails, tblVwBIRDetails;
     @FXML
-    private TableColumn tblDVRowNo, tblReferenceNo, tblTransactionTypeDetail, tblPurchasedAmount, tblVatableSales, tblVatAmt, tblVatRate, tblVatZeroRatedSales, tblVatExemptSales, tblNetAmount, tblRowNo, tblTransactionType, tblBranchName, tblPayee, tblDueDate, tblRefNo, tblAmountMain, tblJournalRowNo, tblJournalAccountCode, tblJournalAccountDescription, tblJournalDebitAmount, tblJournalCreditAmount, tblJournalReportMonthYear, tblBIRRowNo, tblBIRParticular, tblTaxCode, tblBaseAmount, tblTaxRate, tblTaxAmount;
+    private TableColumn tblDVRowNo, tblReferenceNo, tblTransactionTypeDetail, tblPurchasedAmount, tblVatableSales, tblVatAmt, tblVatRate, tblVatZeroRatedSales, tblVatExemptSales, tblNetAmount, tblRowNo, tblTransactionType, tblRefNo, tblBranchName, tblPayee, tblDueDate, tblAmountMain, tblJournalRowNo, tblJournalAccountCode, tblJournalAccountDescription, tblJournalDebitAmount, tblJournalCreditAmount, tblJournalReportMonthYear, tblBIRRowNo, tblBIRParticular, tblTaxCode, tblBaseAmount, tblTaxRate, tblTaxAmount;
     @FXML
     private Pagination pagination;
 
@@ -1891,6 +1891,9 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
             if (pnDetailJE < 0 || pnDetailJE > poController.Journal().getDetailCount() - 1) {
                 return;
             }
+            boolean lbNotZero = poController.Journal().Detail(pnDetailJE).getDebitAmount() > 0 || poController.Journal().Detail(pnDetailJE).getCreditAmount() > 0;
+            cbJEReverse.selectedProperty().set(lbNotZero);
+
             tfAccountCode.setText(poController.Journal().Detail(pnDetailJE).getAccountCode());
             tfAccountDescription.setText(poController.Journal().Detail(pnDetailJE).Account_Chart().getDescription());
             dpReportMonthYear.setValue(CustomCommonUtil.parseDateStringToLocalDate(SQLUtil.dateFormat(poController.Journal().Detail(pnDetailJE).getForMonthOf(), SQLUtil.FORMAT_SHORT_DATE)));
@@ -1909,6 +1912,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
             if (pnDetailBIR < 0 || pnDetailBIR > poController.getWTaxDeductionsCount() - 1) {
                 return;
             }
+
             tfBIRTransactionNo.setText(poController.WTaxDeduction(pnDetailBIR).getModel().getTransactionNo());
             String lsPeriodFromDate = CustomCommonUtil.formatDateToShortString(poController.WTaxDeduction(pnDetailBIR).getModel().getPeriodFrom());
             dpPeriodFrom.setValue(CustomCommonUtil.parseDateStringToLocalDate(lsPeriodFromDate, "yyyy-MM-dd"));

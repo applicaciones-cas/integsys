@@ -1872,7 +1872,9 @@ public class DisbursementVoucher_VerificationController implements Initializable
             if (pnDetailJE < 0 || pnDetailJE > poController.Journal().getDetailCount() - 1) {
                 return;
             }
-
+            boolean lbNotZero = poController.Journal().Detail(pnDetailJE).getDebitAmount() > 0 || poController.Journal().Detail(pnDetailJE).getCreditAmount() > 0;
+            cbJEReverse.selectedProperty().set(lbNotZero);
+            
             tfAccountCode.setText(poController.Journal().Detail(pnDetailJE).getAccountCode());
             tfAccountDescription.setText(poController.Journal().Detail(pnDetailJE).Account_Chart().getDescription());
             dpReportMonthYear.setValue(CustomCommonUtil.parseDateStringToLocalDate(SQLUtil.dateFormat(poController.Journal().Detail(pnDetailJE).getForMonthOf(), SQLUtil.FORMAT_SHORT_DATE)));
