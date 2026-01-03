@@ -870,7 +870,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
         );
         tblVwJournalDetails.setOnMouseClicked(event -> {
             if (!journal_data.isEmpty() && event.getClickCount() == 1) {
-                int lnRow = Integer.parseInt(details_data.get(tblVwDetails.getSelectionModel().getSelectedIndex()).getIndex07());
+                int lnRow = Integer.parseInt(journal_data.get(tblVwJournalDetails.getSelectionModel().getSelectedIndex()).getIndex07());
                 pnDetailJE = lnRow;
                 loadRecordDetailJE();
                 moveNextJE(false, false);
@@ -2043,7 +2043,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
             switch (nodeID) {
                 case "chbkVatClassification":
                     ShowMessageFX.Warning(null, pxeModuleName,
-                            "Only enabled if the transaction Type is \"Payment Request\".");
+                            "Only available when the transaction Type is \"Payment Request\".");
                     break;
             }
         });
