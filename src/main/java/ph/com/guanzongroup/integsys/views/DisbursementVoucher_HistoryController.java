@@ -427,7 +427,7 @@ public class DisbursementVoucher_HistoryController implements Initializable, Scr
                         journal_data.clear();
                         try {
                             if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
-                                poController.ReloadJournal();
+                                poController.Journal().ReloadDetail();
                             }
                             int lnRowCount = 0;
                             for (int lnCtr = 0; lnCtr < poController.Journal().getDetailCount(); lnCtr++) {
