@@ -2267,6 +2267,12 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                             poController.Journal().Detail(pnDetailJE).setCreditAmount(0.0000);
                         }
                     }
+                    loadRecordMasterJE();
+                    loadTableDetailJE.reload();
+                    if (checkedBox.isSelected()) {
+                        moveNextJE(false, false);
+                    }
+                    break;
                 case "cbBIRReverse":
                     poJSON = poController.removeWTDeduction(pnDetailBIR);
                     if (!JFXUtil.isJSONSuccess(poJSON)) {

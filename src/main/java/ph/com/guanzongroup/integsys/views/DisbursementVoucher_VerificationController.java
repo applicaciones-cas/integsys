@@ -2239,6 +2239,11 @@ public class DisbursementVoucher_VerificationController implements Initializable
                             poController.Journal().Detail(pnDetailJE).setCreditAmount(0.0000);
                         }
                     }
+                    loadRecordMasterJE();
+                    loadTableDetailJE.reload();
+                    if (checkedBox.isSelected()) {
+                        moveNextJE(false, false);
+                    }
                     break;
                 case "cbBIRReverse":
                     poJSON = poController.removeWTDeduction(pnDetailBIR);
