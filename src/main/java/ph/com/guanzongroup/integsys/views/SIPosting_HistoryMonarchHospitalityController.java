@@ -1195,7 +1195,8 @@ public class SIPosting_HistoryMonarchHospitalityController implements Initializa
         tblViewJEDetails.setOnMouseClicked(event -> {
             ModelJournalEntry_Detail selected = (ModelJournalEntry_Detail) tblViewJEDetails.getSelectionModel().getSelectedItem();
             if (selected != null) {
-                pnJEDetail = Integer.parseInt(selected.getIndex01()) - 1;
+                int lnRow = Integer.parseInt(JEdetails_data.get(tblViewJEDetails.getSelectionModel().getSelectedIndex()).getIndex07());
+                pnJEDetail = lnRow;
                 loadRecordJEDetail();
                 if (JFXUtil.isObjectEqualTo(poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(pnJEDetail).getAccountCode(), null, "")) {
                     tfJEAcctCode.requestFocus();
