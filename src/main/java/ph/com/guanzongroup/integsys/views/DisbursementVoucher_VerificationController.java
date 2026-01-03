@@ -823,8 +823,8 @@ public class DisbursementVoucher_VerificationController implements Initializable
             if (!details_data.isEmpty() && event.getClickCount() == 1) {
                 ModelDisbursementVoucher_Detail selected = (ModelDisbursementVoucher_Detail) tblVwDetails.getSelectionModel().getSelectedItem();
                 if (selected != null) {
-                    pnDetail = tblVwDetails.getSelectionModel().getSelectedIndex();
-                    loadRecordDetail();
+                    int lnRow = Integer.parseInt(details_data.get(tblVwDetails.getSelectionModel().getSelectedIndex()).getIndex11());
+                    pnDetail = lnRow;
                     moveNext(false, false);
                 }
             }
@@ -839,7 +839,8 @@ public class DisbursementVoucher_VerificationController implements Initializable
         );
         tblVwJournalDetails.setOnMouseClicked(event -> {
             if (!journal_data.isEmpty() && event.getClickCount() == 1) {
-                pnDetailJE = tblVwJournalDetails.getSelectionModel().getSelectedIndex();
+                int lnRow = Integer.parseInt(details_data.get(tblVwDetails.getSelectionModel().getSelectedIndex()).getIndex07());
+                pnDetailJE = lnRow;
                 loadRecordDetailJE();
                 moveNextJE(false, false);
             }
@@ -1874,7 +1875,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
             }
             boolean lbNotZero = poController.Journal().Detail(pnDetailJE).getDebitAmount() > 0 || poController.Journal().Detail(pnDetailJE).getCreditAmount() > 0;
             cbJEReverse.selectedProperty().set(lbNotZero);
-            
+
             tfAccountCode.setText(poController.Journal().Detail(pnDetailJE).getAccountCode());
             tfAccountDescription.setText(poController.Journal().Detail(pnDetailJE).Account_Chart().getDescription());
             dpReportMonthYear.setValue(CustomCommonUtil.parseDateStringToLocalDate(SQLUtil.dateFormat(poController.Journal().Detail(pnDetailJE).getForMonthOf(), SQLUtil.FORMAT_SHORT_DATE)));
