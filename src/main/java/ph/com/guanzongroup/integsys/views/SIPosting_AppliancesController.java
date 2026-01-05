@@ -1151,6 +1151,7 @@ public class SIPosting_AppliancesController implements Initializable, ScreenInte
 
                             pnJEDetail = Integer.parseInt(String.valueOf(poJSON.get("row")));
                             loadTableJEDetail();
+                            JFXUtil.textFieldMoveNext(tfCreditAmt);
                             break;
                         case "tfJEAcctDescription":
                             poJSON = poPurchaseReceivingController.PurchaseOrderReceiving().Journal().SearchAccountCode(pnJEDetail, lsValue, false, poPurchaseReceivingController.PurchaseOrderReceiving().Master().getIndustryId(), null);
@@ -1166,6 +1167,7 @@ public class SIPosting_AppliancesController implements Initializable, ScreenInte
 
                             pnJEDetail = Integer.parseInt(String.valueOf(poJSON.get("row")));
                             loadTableJEDetail();
+                            JFXUtil.textFieldMoveNext(tfCreditAmt);
                             break;
                     }
                     break;
