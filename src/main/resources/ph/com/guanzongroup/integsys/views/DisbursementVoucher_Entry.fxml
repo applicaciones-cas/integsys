@@ -564,6 +564,11 @@
                                                                         </TextField>
                                                                         <CheckBox fx:id="cbReverse" mnemonicParsing="false" onAction="#cmdCheckBox_Click" GridPane.columnIndex="10" GridPane.rowIndex="4" />
                                                                         <Label text="Reverse" GridPane.columnIndex="8" GridPane.rowIndex="4" />
+                                                                        <HBox alignment="CENTER_RIGHT" prefHeight="100.0" prefWidth="200.0" GridPane.columnIndex="10" GridPane.rowIndex="2">
+                                                                           <children>
+                                                                              <Button fx:id="btnUndo" mnemonicParsing="false" text="Undo" />
+                                                                           </children>
+                                                                        </HBox>
                                                                                             </children>
                                                                   </GridPane>
                                                                </children>
