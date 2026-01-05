@@ -566,7 +566,14 @@
                                                                         <Label text="Reverse" GridPane.columnIndex="8" GridPane.rowIndex="4" />
                                                                         <HBox alignment="CENTER_RIGHT" prefHeight="100.0" prefWidth="200.0" GridPane.columnIndex="10" GridPane.rowIndex="2">
                                                                            <children>
-                                                                              <Button fx:id="btnUndo" mnemonicParsing="false" text="Undo" />
+                                                                              <Button fx:id="btnUndo" mnemonicParsing="false" prefHeight="30.0" prefWidth="30.0" styleClass="button_process_v4">
+                                                                                 <font>
+                                                                                    <Font name="System Bold" size="12.0" />
+                                                                                 </font>
+                                                                                 <graphic>
+                                                                                    <FontAwesomeIconView glyphName="UNDO" />
+                                                                                 </graphic>
+                                                                              </Button>
                                                                            </children>
                                                                         </HBox>
                                                                                             </children>
