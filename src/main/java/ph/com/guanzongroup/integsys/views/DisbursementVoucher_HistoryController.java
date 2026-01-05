@@ -374,8 +374,8 @@ public class DisbursementVoucher_HistoryController implements Initializable, Scr
                             }
                             int lnRowCount = 0;
                             for (lnCtr = 0; lnCtr < poController.getDetailCount(); lnCtr++) {
-                                if (JFXUtil.isObjectEqualTo(poController.Detail(lnCtr).getAmountApplied(), null, "")) {
-                                    if (Double.valueOf(poController.Detail(lnCtr).getAmountApplied()) <= 0) {
+                                if (poController.Detail(lnCtr).getSourceNo() != null && !"".equals(poController.Detail(lnCtr).getSourceNo())) {
+                                    if (poController.Detail(lnCtr).getAmountApplied() <= 0.0000 && poController.Detail(lnCtr).getEditMode() != EditMode.ADDNEW) {
                                         continue;
                                     }
                                 }
