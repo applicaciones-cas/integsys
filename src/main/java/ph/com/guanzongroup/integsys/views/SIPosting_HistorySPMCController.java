@@ -919,15 +919,17 @@ public class SIPosting_HistorySPMCController implements Initializable, ScreenInt
                         int lnRowCount = 0;
                         for (lnCtr = 0; lnCtr < poPurchaseReceivingController.PurchaseOrderReceiving().Journal().getDetailCount(); lnCtr++) {
                             lsReportMonthYear = CustomCommonUtil.formatDateToShortString(poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(lnCtr).getForMonthOf());
-                            if (poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(lnCtr).getAccountCode() != null) {
-                                lsAcctCode = poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(lnCtr).getAccountCode();
+                            lsAcctCode = poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(lnCtr).getAccountCode();
+                            lsAccDesc = poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(lnCtr).Account_Chart().getDescription();
+                            if (lsAcctCode == null) {
+                                lsAcctCode = "";
                             }
-                            if (poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(lnCtr).Account_Chart().getDescription() != null) {
-                                lsAccDesc = poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(lnCtr).Account_Chart().getDescription();
+                            if (lsAccDesc == null) {
+                                lsAccDesc = "";
                             }
                             if (poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(lnCtr).getCreditAmount() <= 0.0000
                                 && poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(lnCtr).getDebitAmount() <= 0.0000
-                                && lsAcctCode != null && !"".equals(lsAcctCode)
+                                && !"".equals(lsAcctCode)
                                 && poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(lnCtr).getEditMode() == EditMode.UPDATE) {
                                 continue;
                             }

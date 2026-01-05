@@ -1140,7 +1140,7 @@ public class SIPosting_AppliancesController implements Initializable, ScreenInte
                         case "tfJEAcctCode":
                             poJSON = poPurchaseReceivingController.PurchaseOrderReceiving().Journal().SearchAccountCode(pnJEDetail, lsValue, true, poPurchaseReceivingController.PurchaseOrderReceiving().Master().getIndustryId(), null);
                             if ("error".equals(poJSON.get("result"))) {
-                                int lnReturned = Integer.parseInt(String.valueOf(poJSON.get("row"))) + 1;
+                                int lnReturned = Integer.parseInt(String.valueOf(poJSON.get("row")));
                                 JFXUtil.runWithDelay(0.70, () -> {
                                     pnJEDetail = lnReturned;
                                     loadTableJEDetail();
@@ -1149,25 +1149,13 @@ public class SIPosting_AppliancesController implements Initializable, ScreenInte
                                 break;
                             }
 
-                            poJSON = poPurchaseReceivingController.PurchaseOrderReceiving().checkExistAcctCode(pnJEDetail, poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(pnJEDetail).getAccountCode());
-                            if ("error".equals(poJSON.get("result"))) {
-                                int lnReturned = Integer.parseInt(String.valueOf(poJSON.get("row"))) + 1;
-                                JFXUtil.runWithDelay(0.70, () -> {
-                                    pnJEDetail = lnReturned;
-                                    loadTableJEDetail();
-                                });
-                                ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-                                break;
-                            } else {
-                                int lnReturned = Integer.parseInt(String.valueOf(poJSON.get("row")));
-                                pnJEDetail = lnReturned;
-                                loadTableJEDetail();
-                            }
+                            pnJEDetail = Integer.parseInt(String.valueOf(poJSON.get("row")));
+                            loadTableJEDetail();
                             break;
                         case "tfJEAcctDescription":
                             poJSON = poPurchaseReceivingController.PurchaseOrderReceiving().Journal().SearchAccountCode(pnJEDetail, lsValue, false, poPurchaseReceivingController.PurchaseOrderReceiving().Master().getIndustryId(), null);
                             if ("error".equals(poJSON.get("result"))) {
-                                int lnReturned = Integer.parseInt(String.valueOf(poJSON.get("row"))) + 1;
+                                int lnReturned = Integer.parseInt(String.valueOf(poJSON.get("row")));
                                 JFXUtil.runWithDelay(0.70, () -> {
                                     pnJEDetail = lnReturned;
                                     loadTableJEDetail();
@@ -1176,20 +1164,8 @@ public class SIPosting_AppliancesController implements Initializable, ScreenInte
                                 break;
                             }
 
-                            poJSON = poPurchaseReceivingController.PurchaseOrderReceiving().checkExistAcctCode(pnJEDetail, poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(pnJEDetail).getAccountCode());
-                            if ("error".equals(poJSON.get("result"))) {
-                                int lnReturned = Integer.parseInt(String.valueOf(poJSON.get("row"))) + 1;
-                                JFXUtil.runWithDelay(0.70, () -> {
-                                    pnJEDetail = lnReturned;
-                                    loadTableJEDetail();
-                                });
-                                ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-                                break;
-                            } else {
-                                int lnReturned = Integer.parseInt(String.valueOf(poJSON.get("row")));
-                                pnJEDetail = lnReturned;
-                                loadTableJEDetail();
-                            }
+                            pnJEDetail = Integer.parseInt(String.valueOf(poJSON.get("row")));
+                            loadTableJEDetail();
                             break;
                     }
                     break;
@@ -1827,15 +1803,17 @@ public class SIPosting_AppliancesController implements Initializable, ScreenInte
                         int lnRowCount = 0;
                         for (lnCtr = 0; lnCtr < poPurchaseReceivingController.PurchaseOrderReceiving().Journal().getDetailCount(); lnCtr++) {
                             lsReportMonthYear = CustomCommonUtil.formatDateToShortString(poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(lnCtr).getForMonthOf());
-                            if (poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(lnCtr).getAccountCode() != null) {
-                                lsAcctCode = poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(lnCtr).getAccountCode();
+                            lsAcctCode = poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(lnCtr).getAccountCode();
+                            lsAccDesc = poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(lnCtr).Account_Chart().getDescription();
+                            if (lsAcctCode == null) {
+                                lsAcctCode = "";
                             }
-                            if (poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(lnCtr).Account_Chart().getDescription() != null) {
-                                lsAccDesc = poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(lnCtr).Account_Chart().getDescription();
+                            if (lsAccDesc == null) {
+                                lsAccDesc = "";
                             }
                             if (poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(lnCtr).getCreditAmount() <= 0.0000
                                 && poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(lnCtr).getDebitAmount() <= 0.0000
-                                && lsAcctCode != null && !"".equals(lsAcctCode)
+                                && !"".equals(lsAcctCode)
                                 && poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(lnCtr).getEditMode() == EditMode.UPDATE) {
                                 continue;
                             }
