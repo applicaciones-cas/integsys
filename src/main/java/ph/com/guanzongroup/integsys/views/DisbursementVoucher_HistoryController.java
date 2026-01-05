@@ -446,7 +446,7 @@ public class DisbursementVoucher_HistoryController implements Initializable, Scr
                                 if (poController.Journal().Detail(lnCtr).getCreditAmount() <= 0.0000
                                         && poController.Journal().Detail(lnCtr).getDebitAmount() <= 0.0000
                                         && !"".equals(lsAcctCode)
-                                        && poController.Journal().Detail(lnCtr).getEditMode() == EditMode.UPDATE) {
+                                        && poController.Journal().Detail(lnCtr).getEditMode() != EditMode.ADDNEW) {
                                     continue;
                                 }
                                 lnRowCount += 1;

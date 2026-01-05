@@ -736,8 +736,10 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                                 if (lsAccDesc == null) {
                                     lsAccDesc = "";
                                 }
-                                if (poController.Journal().Detail(lnCtr).getCreditAmount() <= 0.0000 && poController.Journal().Detail(lnCtr).getDebitAmount() <= 0.0000
-                                        && !"".equals(lsAcctCode) && poController.Journal().Detail(lnCtr).getEditMode() == EditMode.UPDATE) {
+                                if (poController.Journal().Detail(lnCtr).getCreditAmount() <= 0.0000
+                                        && poController.Journal().Detail(lnCtr).getDebitAmount() <= 0.0000
+                                        && !"".equals(lsAcctCode)
+                                        && poController.Journal().Detail(lnCtr).getEditMode() != EditMode.ADDNEW) {
                                     continue;
                                 }
                                 lnRowCount += 1;
