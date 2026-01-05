@@ -429,22 +429,41 @@ public class DisbursementVoucher_HistoryController implements Initializable, Scr
                             if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
                                 poController.Journal().ReloadDetail();
                             }
+                            String lsReportMonthYear = "";
+                            String lsAcctCode = "";
+                            String lsAccDesc = "";
                             int lnRowCount = 0;
                             for (int lnCtr = 0; lnCtr < poController.Journal().getDetailCount(); lnCtr++) {
-                                if (JFXUtil.isObjectEqualTo(poController.Detail(lnCtr).getAmountApplied(), null, "")) {
-                                    if (poController.Journal().Detail(lnCtr).getDebitAmount() <= 0 && poController.Journal().Detail(lnCtr).getCreditAmount() <= 0) {
-                                        continue;
-                                    }
+                                lsReportMonthYear = CustomCommonUtil.formatDateToShortString(poController.Journal().Detail(lnCtr).getForMonthOf());
+                                lsAcctCode = poController.Journal().Detail(lnCtr).getAccountCode();
+                                lsAccDesc = poController.Journal().Detail(lnCtr).Account_Chart().getDescription();
+                                if (lsAcctCode == null) {
+                                    lsAcctCode = "";
+                                }
+                                if (lsAccDesc == null) {
+                                    lsAccDesc = "";
+                                }
+                                if (poController.Journal().Detail(lnCtr).getCreditAmount() <= 0.0000
+                                        && poController.Journal().Detail(lnCtr).getDebitAmount() <= 0.0000
+                                        && !"".equals(lsAcctCode)
+                                        && poController.Journal().Detail(lnCtr).getEditMode() == EditMode.UPDATE) {
+                                    continue;
                                 }
                                 lnRowCount += 1;
-                                journal_data.add(new ModelJournalEntry_Detail(String.valueOf(lnRowCount),
-                                        poController.Journal().Detail(lnCtr).getAccountCode() != null ? poController.Journal().Detail(lnCtr).getAccountCode() : "",
-                                        poController.Journal().Detail(lnCtr).Account_Chart().getDescription() != null ? poController.Journal().Detail(lnCtr).Account_Chart().getDescription() : "",
-                                        CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Journal().Detail(lnCtr).getDebitAmount(), true),
-                                        CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Journal().Detail(lnCtr).getCreditAmount(), true),
-                                        CustomCommonUtil.formatDateToShortString(poController.Journal().Detail(lnCtr).getForMonthOf()),
-                                        String.valueOf(lnCtr)
-                                ));
+                                journal_data.add(
+                                        new ModelJournalEntry_Detail(
+                                                String.valueOf(lnRowCount),
+                                                String.valueOf(lsAcctCode),
+                                                String.valueOf(lsAccDesc),
+                                                String.valueOf(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Journal().Detail(lnCtr).getDebitAmount(), true)),
+                                                String.valueOf(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Journal().Detail(lnCtr).getCreditAmount(), true)),
+                                                String.valueOf(CustomCommonUtil.parseDateStringToLocalDate(lsReportMonthYear, "yyyy-MM-dd")),
+                                                String.valueOf(lnCtr)
+                                        ));
+
+                                lsReportMonthYear = "";
+                                lsAcctCode = "";
+                                lsAccDesc = "";
                             }
                             int lnTempRow = JFXUtil.getDetailRow(journal_data, pnDetailJE, 07); //this method is used only when Reverse is applied
                             if (lnTempRow < 0 || lnTempRow
@@ -470,6 +489,7 @@ public class DisbursementVoucher_HistoryController implements Initializable, Scr
                         }
                     });
                 });
+        
         loadTableDetailBIR = new JFXUtil.ReloadableTableTask(
                 tblVwBIRDetails,
                 BIR_data,
