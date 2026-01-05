@@ -659,7 +659,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
                                 lnRowCount += 1;
                                 details_data.add(
                                         new ModelDisbursementVoucher_Detail(String.valueOf(lnRowCount),
-                                                poController.Detail(lnCtr).getSourceNo(),
+                                                poController.getReferenceNo(lnCtr),
                                                 poController.getSourceCodeDescription(poController.Detail(lnCtr).getSourceCode()),
                                                 CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(lnCtr).getAmountApplied(), true),
                                                 CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(lnCtr).getDetailVatSales(), true),
@@ -1788,7 +1788,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
         boolean lbShow = (poController.Detail(pnDetail).getSourceCode()).equals(DisbursementStatic.SourceCode.PAYMENT_REQUEST);
         JFXUtil.setDisabled(!lbShow, chbkVatClassification, tfVatExemptDetail);
 
-        tfRefNoDetail.setText(poController.Detail(pnDetail).getSourceNo());
+        tfRefNoDetail.setText(poController.getReferenceNo(pnDetail));
         chbkVatClassification.setSelected(poController.Detail(pnDetail).isWithVat());
         tfVatableSalesDetail.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(pnDetail).getDetailVatSales(), true));
         tfVatExemptDetail.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(pnDetail).getDetailVatExempt(), true));
@@ -1938,7 +1938,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
             }
             boolean lbShow = poController.WTaxDeduction(pnDetailBIR).getModel().getEditMode() == EditMode.UPDATE;
             JFXUtil.setDisabled(lbShow, tfTaxCode, tfParticular);
-            
+
             tfBIRTransactionNo.setText(poController.WTaxDeduction(pnDetailBIR).getModel().getTransactionNo());
             String lsPeriodFromDate = CustomCommonUtil.formatDateToShortString(poController.WTaxDeduction(pnDetailBIR).getModel().getPeriodFrom());
             dpPeriodFrom.setValue(CustomCommonUtil.parseDateStringToLocalDate(lsPeriodFromDate, "yyyy-MM-dd"));

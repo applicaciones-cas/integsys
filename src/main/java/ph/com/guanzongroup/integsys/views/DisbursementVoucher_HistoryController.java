@@ -382,7 +382,7 @@ public class DisbursementVoucher_HistoryController implements Initializable, Scr
                                 lnRowCount += 1;
                                 details_data.add(
                                         new ModelDisbursementVoucher_Detail(String.valueOf(lnRowCount),
-                                                poController.Detail(lnCtr).getSourceNo(),
+                                                poController.getReferenceNo(lnCtr),
                                                 poController.getSourceCodeDescription(poController.Detail(lnCtr).getSourceCode()),
                                                 CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(lnCtr).getAmountApplied(), true),
                                                 CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(lnCtr).getDetailVatSales(), true),
@@ -797,7 +797,7 @@ public class DisbursementVoucher_HistoryController implements Initializable, Scr
         if (pnDetail < 0 || pnDetail > poController.getDetailCount() - 1) {
             return;
         }
-        tfRefNoDetail.setText(poController.Detail(pnDetail).getSourceNo());
+        tfRefNoDetail.setText(poController.getReferenceNo(pnDetail));
         chbkVatClassification.setSelected(poController.Detail(pnDetail).isWithVat());
         tfVatableSalesDetail.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(pnDetail).getDetailVatSales(), true));
         tfVatExemptDetail.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(pnDetail).getDetailVatExempt(), true));
