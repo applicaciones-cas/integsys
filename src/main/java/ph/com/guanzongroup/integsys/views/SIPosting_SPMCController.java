@@ -836,7 +836,7 @@ public class SIPosting_SPMCController implements Initializable, ScreenInterface 
                             int lnReturned = Integer.parseInt(String.valueOf(poJSON.get("row")));
                             JFXUtil.runWithDelay(0.70, () -> {
                                 pnJEDetail = lnReturned;
-                                loadTableDetail();
+                                loadTableJEDetail();
                             });
                             return;
                         }
@@ -856,7 +856,7 @@ public class SIPosting_SPMCController implements Initializable, ScreenInterface 
                             int lnReturned = Integer.parseInt(String.valueOf(poJSON.get("row")));
                             JFXUtil.runWithDelay(0.70, () -> {
                                 pnJEDetail = lnReturned;
-                                loadTableDetail();
+                                loadTableJEDetail();
                             });
                             return;
                         } else {
@@ -865,7 +865,7 @@ public class SIPosting_SPMCController implements Initializable, ScreenInterface 
                     }
                     if (pbEntered) {
                         JFXUtil.runWithDelay(0.50, () -> {
-                            loadTableDetail();
+                            loadTableJEDetail();
                             JFXUtil.runWithDelay(0.50, () -> {
                                 moveNextJE(false);
                                 pbEntered = false;
