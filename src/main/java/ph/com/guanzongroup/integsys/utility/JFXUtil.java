@@ -127,12 +127,13 @@ import java.util.regex.Pattern;
 import javafx.css.PseudoClass;
 import javafx.scene.control.ButtonBase;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.Tooltip;
 import javafx.scene.effect.DropShadow;
 import org.guanzon.appdriver.constant.EditMode;
 import ph.com.guanzongroup.integsys.views.ScreenInterface;
 
 /**
- * Date : 4/28/2025 Recent update: 12/30/2025
+ * Date : 4/28/2025 Recent update: 01/05/2026
  *
  * @author Aldrich
  */
@@ -2799,5 +2800,25 @@ public class JFXUtil {
 
         timeline.setOnFinished(e -> node.setEffect(null));
         timeline.play();
+    }
+
+    public static void applyHoverTooltip(String message, Node... nodes) {
+        if (message == null || nodes == null) {
+            return;
+        }
+
+        for (Node node : nodes) {
+            if (node != null) {
+                Tooltip tooltip = new Tooltip(message);
+
+                tooltip.setShowDelay(Duration.ZERO);
+                tooltip.setStyle(
+                        "-fx-font-size: 10px;"
+                        + "-fx-padding: 6 10 6 10;"
+                );
+
+                Tooltip.install(node, tooltip);
+            }
+        }
     }
 }

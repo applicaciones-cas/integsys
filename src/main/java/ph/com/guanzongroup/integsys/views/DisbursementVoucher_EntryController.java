@@ -486,7 +486,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                 pnEditMode = EditMode.UNKNOWN;
             }
 
-            if (JFXUtil.isObjectEqualTo(lsButton, "btnRetrieve", "btnSearch")) {
+            if (JFXUtil.isObjectEqualTo(lsButton, "btnRetrieve", "btnSearch", "btnUndo")) {
             } else {
                 loadRecordMaster();
                 loadTableDetail.reload();
@@ -988,6 +988,8 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
         JFXUtil.inputDecimalOnly(tfVatZeroRatedSales, tfVatZeroRatedSalesDetail, tfVatRateDetail, tfTaxRate);
         JFXUtil.setCommaFormatter(tfCheckAmount, tfPaymentAmountBTransfer, tfPaymentAmount, tfTotalAmount, tfVatAmountMaster, tfTotalNetAmount, tfVatAmountDetail, tfPurchasedAmountDetail, tfNetAmountDetail, tfTotalDebitAmount, tfTotalCreditAmount, tfDebitAmount, tfCreditAmount, tfTotalTaxAmount, tfBaseAmount);
         JFXUtil.setCheckboxHoverCursor(chbkPrintByBank, chbkIsCrossCheck, chbkIsPersonOnly, chbkVatClassification);
+
+        JFXUtil.applyHoverTooltip("Undo Reversed item", btnUndo);
     }
     ChangeListener<Boolean> txtSearch_Focus = JFXUtil.FocusListener(TextField.class,
             (lsID, lsValue) -> {
@@ -1951,6 +1953,8 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
             if (pnDetailBIR < 0 || pnDetailBIR > poController.getWTaxDeductionsCount() - 1) {
                 return;
             }
+            boolean lbShow = poController.WTaxDeduction(pnDetailBIR).getModel().getEditMode() == EditMode.UPDATE;
+            JFXUtil.setDisabled(lbShow, tfTaxCode, tfParticular);
 
             tfBIRTransactionNo.setText(poController.WTaxDeduction(pnDetailBIR).getModel().getTransactionNo());
             String lsPeriodFromDate = CustomCommonUtil.formatDateToShortString(poController.WTaxDeduction(pnDetailBIR).getModel().getPeriodFrom());
@@ -2285,6 +2289,11 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                 case "cbReverse":
                     if (!checkedBox.isSelected()) {
                         poController.Detail(pnDetail).setAmountApplied(0.0000);
+                    }
+                    poJSON = poController.computeFields();
+                    if (!JFXUtil.isJSONSuccess(poJSON)) {
+                        ShowMessageFX.Warning(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
+                        poController.Detail(pnDetail).setAmountApplied(poController.Detail(pnDetail).getAmount());
                     }
                     loadRecordMaster();
                     loadTableDetail.reload();

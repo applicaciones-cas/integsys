@@ -135,7 +135,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
     @FXML
     private TextField tfSearchIndustry, tfSearchTransaction, tfSearchSupplier, tfDVTransactionNo, tfSupplier, tfVoucherNo, tfBankNameCheck, tfBankAccountCheck, tfPayeeName, tfCheckNo, tfCheckAmount, tfAuthorizedPerson, tfBankNameBTransfer, tfBankAccountBTransfer, tfPaymentAmountBTransfer, tfSupplierBank, tfSupplierAccountNoBTransfer, tfBankTransReferNo, tfBankNameOnlinePayment, tfBankAccountOnlinePayment, tfPaymentAmount, tfSupplierServiceName, tfSupplierAccountNo, tfPaymentReferenceNo, tfTotalAmount, tfVatableSales, tfVatAmountMaster, tfVatZeroRatedSales, tfVatExemptSales, tfLessWHTax, tfTotalNetAmount, tfRefNoDetail, tfVatableSalesDetail, tfVatExemptDetail, tfVatZeroRatedSalesDetail, tfVatRateDetail, tfVatAmountDetail, tfPurchasedAmountDetail, tfNetAmountDetail, tfJournalTransactionNo, tfTotalDebitAmount, tfTotalCreditAmount, tfAccountCode, tfAccountDescription, tfDebitAmount, tfCreditAmount, tfBIRTransactionNo, tfTaxCode, tfParticular, tfBaseAmount, tfTaxRate, tfTotalTaxAmount;
     @FXML
-    private Button btnUpdate, btnSave, btnCancel, btnVerify, btnVoid, btnRetrieve, btnHistory, btnClose;
+    private Button btnUpdate, btnSave, btnCancel, btnVerify, btnVoid, btnRetrieve, btnHistory, btnClose, btnUndo;
     @FXML
     private TabPane tabPaneMain, tabPanePaymentMode;
     @FXML
@@ -308,7 +308,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
     }
 
     private void initButtonsClickActions() {
-        List<Button> buttons = Arrays.asList(btnUpdate, btnSave, btnCancel, btnVerify, btnVoid, btnRetrieve, btnHistory, btnClose);
+        List<Button> buttons = Arrays.asList(btnUpdate, btnSave, btnCancel, btnVerify, btnVoid, btnRetrieve, btnHistory, btnClose, btnUndo);
         buttons.forEach(button -> button.setOnAction(this::cmdButton_Click));
     }
 
@@ -459,6 +459,20 @@ public class DisbursementVoucher_VerificationController implements Initializable
                         return;
                     }
                     break;
+                case "btnUndo":
+                    for (int lnCtr = poController.getDetailCount() - 1; lnCtr >= 0; lnCtr--) {
+                        if (poController.Detail(lnCtr).getEditMode() == EditMode.UPDATE) {
+                            if (poController.Detail(lnCtr).getAmountApplied() <= 0.0000) {
+                                poController.Detail(lnCtr).setAmountApplied(poController.Detail(lnCtr).getAmount());
+                                break;
+                            }
+                        }
+                    }
+                    loadTableDetail.reload();
+//                    JFXUtil.selectAndFocusRow(tblVwDetails, 0);
+//                    int lnRow = Integer.parseInt(details_data.get(0).getIndex11());
+//                    pnDetail = lnRow;
+                    break;
                 default:
                     ShowMessageFX.Warning(null, pxeModuleName, "Button is not registered, Please contact admin to assist about the unregistered button");
                     break;
@@ -473,7 +487,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
                 pnEditMode = EditMode.UNKNOWN;
             }
 
-            if (JFXUtil.isObjectEqualTo(lsButton, "btnRetrieve", "btnSearch")) {
+            if (JFXUtil.isObjectEqualTo(lsButton, "btnRetrieve", "btnSearch", "btnUndo")) {
             } else {
                 loadRecordMaster();
                 loadTableDetail.reload();
@@ -945,6 +959,8 @@ public class DisbursementVoucher_VerificationController implements Initializable
         JFXUtil.inputDecimalOnly(tfVatZeroRatedSales, tfVatZeroRatedSalesDetail, tfVatRateDetail, tfTaxRate);
         JFXUtil.setCommaFormatter(tfCheckAmount, tfPaymentAmountBTransfer, tfPaymentAmount, tfTotalAmount, tfVatAmountMaster, tfTotalNetAmount, tfVatAmountDetail, tfPurchasedAmountDetail, tfNetAmountDetail, tfTotalCreditAmount, tfTotalDebitAmount, tfDebitAmount, tfCreditAmount, tfTotalTaxAmount, tfBaseAmount);
         JFXUtil.setCheckboxHoverCursor(chbkPrintByBank, chbkIsCrossCheck, chbkIsPersonOnly, chbkVatClassification);
+
+        JFXUtil.applyHoverTooltip("Undo Reverse", btnUndo);
     }
     ChangeListener<Boolean> txtSearch_Focus = JFXUtil.FocusListener(TextField.class,
             (lsID, lsValue) -> {
@@ -1920,6 +1936,9 @@ public class DisbursementVoucher_VerificationController implements Initializable
             if (pnDetailBIR < 0 || pnDetailBIR > poController.getWTaxDeductionsCount() - 1) {
                 return;
             }
+            boolean lbShow = poController.WTaxDeduction(pnDetailBIR).getModel().getEditMode() == EditMode.UPDATE;
+            JFXUtil.setDisabled(lbShow, tfTaxCode, tfParticular);
+            
             tfBIRTransactionNo.setText(poController.WTaxDeduction(pnDetailBIR).getModel().getTransactionNo());
             String lsPeriodFromDate = CustomCommonUtil.formatDateToShortString(poController.WTaxDeduction(pnDetailBIR).getModel().getPeriodFrom());
             dpPeriodFrom.setValue(CustomCommonUtil.parseDateStringToLocalDate(lsPeriodFromDate, "yyyy-MM-dd"));
@@ -2247,6 +2266,11 @@ public class DisbursementVoucher_VerificationController implements Initializable
                     if (!checkedBox.isSelected()) {
                         poController.Detail(pnDetail).setAmountApplied(0.0000);
                     }
+                    poJSON = poController.computeFields();
+                    if (!JFXUtil.isJSONSuccess(poJSON)) {
+                        ShowMessageFX.Warning(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
+                        poController.Detail(pnDetail).setAmountApplied(poController.Detail(pnDetail).getAmount());
+                    }
                     loadRecordMaster();
                     loadTableDetail.reload();
                     if (checkedBox.isSelected()) {
@@ -2294,6 +2318,9 @@ public class DisbursementVoucher_VerificationController implements Initializable
 
         JFXUtil.setDisabled(!lbShow, apDVMaster1, apDVMaster2, apDVMaster3, apDVDetail,
                 apMasterDVCheck, apMasterDVBTransfer, apMasterDVOp, apJournalMaster, apJournalDetails, apBIRDetail);
+
+        JFXUtil.setButtonsVisibility(fnEditMode == EditMode.UPDATE, btnUndo);
+
         if (fnEditMode == EditMode.READY) {
             switch (poController.Master().getTransactionStatus()) {
                 case DisbursementStatic.OPEN:
