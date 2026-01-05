@@ -1802,9 +1802,6 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
         boolean lbShow = (poController.Detail(pnDetail).getSourceCode()).equals(DisbursementStatic.SourceCode.PAYMENT_REQUEST);
         JFXUtil.setDisabled(!lbShow, chbkVatClassification, tfVatExemptDetail);
 
-        boolean lbShow2 = poController.Detail(pnDetail).getEditMode() == EditMode.UPDATE;
-        JFXUtil.setButtonsVisibility(lbShow2, btnUndo);
-
         tfRefNoDetail.setText(poController.Detail(pnDetail).getSourceNo());
         chbkVatClassification.setSelected(poController.Detail(pnDetail).isWithVat());
         tfVatableSalesDetail.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(pnDetail).getDetailVatSales(), true));
@@ -2334,6 +2331,8 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
 
         JFXUtil.setDisabled(!lbShow, apDVMaster1, apDVMaster2, apDVMaster3, apDVDetail,
                 apMasterDVCheck, apMasterDVBTransfer, apMasterDVOp, apJournalMaster, apJournalDetails, apBIRDetail);
+
+        JFXUtil.setButtonsVisibility(fnEditMode == EditMode.UPDATE, btnUndo);
 
         if (fnEditMode == EditMode.READY) {
             switch (poController.Master().getTransactionStatus()) {
