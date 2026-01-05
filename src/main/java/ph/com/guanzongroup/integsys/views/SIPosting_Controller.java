@@ -431,7 +431,7 @@ public class SIPosting_Controller implements Initializable, ScreenInterface {
                     break;
                 case "cbJEReverse":
                     if (!checkedBox.isSelected()) {
-                        if(poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(pnJEDetail).getEditMode() == EditMode.ADDNEW){
+                        if (poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(pnJEDetail).getEditMode() == EditMode.ADDNEW) {
                             poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail().remove(pnJEDetail);
                         } else {
                             poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(pnJEDetail).setDebitAmount(0.0000);
@@ -892,91 +892,67 @@ public class SIPosting_Controller implements Initializable, ScreenInterface {
                     }
                     break;
                 case "tfCreditAmt":
-                    if (lsValue.isEmpty()) {
-                        lsValue = "0.0000";
-                    }
                     lsValue = JFXUtil.removeComma(lsValue);
-                    lnNewVal = Double.valueOf(lsValue);
-                    lnOldVal = poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(pnJEDetail).getCreditAmount();
-
-                    if (poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(pnJEDetail).getDebitAmount() > 0.0000 && Double.valueOf(lsValue) > 0) {
+                    if (poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(pnJEDetail).getDebitAmount() > 0.0000 && Double.parseDouble(lsValue) > 0) {
                         ShowMessageFX.Warning(null, pxeModuleName, "Debit and credit amounts cannot both have values at the same time.");
-                        poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(pnJEDetail).setCreditAmount(0.0000);
-                        tfCreditAmt.setText("0.0000");
-                        tfCreditAmt.requestFocus();
+                        poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(pnJEDetail).setDebitAmount(0.0000);
+                        JFXUtil.textFieldMoveNext(tfCreditAmt);
                         break;
                     } else {
-                        poJSON = poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(pnJEDetail).setCreditAmount((Double.valueOf(lsValue)));
-                    }
-                    if ("error".equals((String) poJSON.get("result"))) {
-                        ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-                    }
-
-                    if (pbEntered && lnNewVal > 0) { //unique
-                        if (lnNewVal != lnOldVal) {
-                            if ((Double.valueOf(lsValue) > 0
-                                    && poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(pnJEDetail).getAccountCode() != null
-                                    && !"".equals(poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(pnJEDetail).getAccountCode()))) {
-                                moveNextJE(false);
-                            } else {
-                                moveNextJE(false);
-                            }
-                        } else {
-                            moveNextJE(false);
+                        poJSON = poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(pnJEDetail).setCreditAmount((Double.parseDouble(lsValue)));
+                        if ("error".equals((String) poJSON.get("result"))) {
+                            ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                            int lnReturned = Integer.parseInt(String.valueOf(poJSON.get("row")));
+                            JFXUtil.runWithDelay(0.70, () -> {
+                                pnJEDetail = lnReturned;
+                                loadTableDetail();
+                            });
+                            return;
                         }
-                        pbEntered = false;
                     }
                     break;
                 case "tfDebitAmt":
-                    if (lsValue.isEmpty()) {
-                        lsValue = "0.0000";
-                    }
                     lsValue = JFXUtil.removeComma(lsValue);
-                    lnNewVal = Double.valueOf(lsValue);
-                    lnOldVal = poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(pnJEDetail).getDebitAmount();
-                    if (poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(pnJEDetail).getCreditAmount() > 0.0000 && Double.valueOf(lsValue) > 0) {
+                    if (poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(pnJEDetail).getCreditAmount() > 0.0000 && Double.parseDouble(lsValue) > 0) {
                         ShowMessageFX.Warning(null, pxeModuleName, "Debit and credit amounts cannot both have values at the same time.");
-                        poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(pnJEDetail).setDebitAmount(0.0000);
-                        tfDebitAmt.setText("0.0000");
-                        tfDebitAmt.requestFocus();
+                        poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(pnJEDetail).setCreditAmount(0.0000);
+                        JFXUtil.textFieldMoveNext(tfDebitAmt);
                         break;
                     } else {
-                        poJSON = poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(pnJEDetail).setDebitAmount((Double.valueOf(lsValue)));
-                    }
-                    if ("error".equals((String) poJSON.get("result"))) {
-                        ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                        poJSON = poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(pnJEDetail).setDebitAmount((Double.parseDouble(lsValue)));
+                        if ("error".equals((String) poJSON.get("result"))) {
+                            ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                            int lnReturned = Integer.parseInt(String.valueOf(poJSON.get("row")));
+                            JFXUtil.runWithDelay(0.70, () -> {
+                                pnJEDetail = lnReturned;
+                                loadTableDetail();
+                            });
+                            return;
+                        } else {
+
+                        }
                     }
                     if (pbEntered) {
-                        if (lnNewVal != lnOldVal) {
-                            if ((Double.valueOf(lsValue) > 0
-                                    && poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(pnJEDetail).getAccountCode() != null
-                                    && !"".equals(poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(pnJEDetail).getAccountCode()))) {
+                        JFXUtil.runWithDelay(0.50, () -> {
+                            loadTableDetail();
+                            JFXUtil.runWithDelay(0.50, () -> {
                                 moveNextJE(false);
-                            } else {
-                                moveNextJE(false);
-                            }
-                        } else {
-                            moveNextJE(false);
-                        }
-                        pbEntered = false;
+                                pbEntered = false;
+                            });
+                        });
+
                     }
                     break;
             }
             if (JFXUtil.isObjectEqualTo(lsTxtFieldID, "tfJEAcctCode", "tfJEAcctDescription", "tfCreditAmt", "tfDebitAmt")) {
-                Platform.runLater(() -> {
-                    PauseTransition delay = new PauseTransition(Duration.seconds(0.50));
-                    delay.setOnFinished(event -> {
+                if (!JFXUtil.isObjectEqualTo(lsTxtFieldID, "tfDebitAmt")) {
+                    JFXUtil.runWithDelay(0.50, () -> {
                         loadTableJEDetail();
                     });
-                    delay.play();
-                });
+                }
             } else {
-                Platform.runLater(() -> {
-                    PauseTransition delay = new PauseTransition(Duration.seconds(0.50));
-                    delay.setOnFinished(event -> {
-                        loadTableDetail();
-                    });
-                    delay.play();
+                JFXUtil.runWithDelay(0.50, () -> {
+                    loadTableDetail();
                 });
             }
         }
@@ -1033,7 +1009,8 @@ public class SIPosting_Controller implements Initializable, ScreenInterface {
 
     public void moveNextJE(boolean isUp) {
         apJEDetail.requestFocus();
-        pnJEDetail = isUp ? JFXUtil.moveToPreviousRow(tblViewJEDetails) : JFXUtil.moveToNextRow(tblViewJEDetails);
+        pnJEDetail = isUp ? Integer.parseInt(JEdetails_data.get(JFXUtil.moveToPreviousRow(tblViewJEDetails)).getIndex07())
+                : Integer.parseInt(JEdetails_data.get(JFXUtil.moveToNextRow(tblViewJEDetails)).getIndex07());
         loadRecordJEDetail();
         if (JFXUtil.isObjectEqualTo(poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(pnJEDetail).getAccountCode(), null, "")) {
             tfJEAcctCode.requestFocus();
@@ -1937,9 +1914,9 @@ public class SIPosting_Controller implements Initializable, ScreenInterface {
                                 lsAccDesc = "";
                             }
                             if (poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(lnCtr).getCreditAmount() <= 0.0000
-                                && poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(lnCtr).getDebitAmount() <= 0.0000
-                                && !"".equals(lsAcctCode)
-                                && poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(lnCtr).getEditMode() == EditMode.UPDATE) {
+                                    && poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(lnCtr).getDebitAmount() <= 0.0000
+                                    && !"".equals(lsAcctCode)
+                                    && poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(lnCtr).getEditMode() == EditMode.UPDATE) {
                                 continue;
                             }
                             lnRowCount += 1;
