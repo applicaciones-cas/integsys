@@ -453,11 +453,11 @@ public class DisbursementVoucher_HistoryController implements Initializable, Scr
                                 journal_data.add(
                                         new ModelJournalEntry_Detail(
                                                 String.valueOf(lnRowCount),
+                                                String.valueOf(CustomCommonUtil.parseDateStringToLocalDate(lsReportMonthYear, "yyyy-MM-dd")),
                                                 String.valueOf(lsAcctCode),
                                                 String.valueOf(lsAccDesc),
                                                 String.valueOf(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Journal().Detail(lnCtr).getDebitAmount(), true)),
                                                 String.valueOf(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Journal().Detail(lnCtr).getCreditAmount(), true)),
-                                                String.valueOf(CustomCommonUtil.parseDateStringToLocalDate(lsReportMonthYear, "yyyy-MM-dd")),
                                                 String.valueOf(lnCtr)
                                         ));
 
@@ -489,7 +489,7 @@ public class DisbursementVoucher_HistoryController implements Initializable, Scr
                         }
                     });
                 });
-        
+
         loadTableDetailBIR = new JFXUtil.ReloadableTableTask(
                 tblVwBIRDetails,
                 BIR_data,

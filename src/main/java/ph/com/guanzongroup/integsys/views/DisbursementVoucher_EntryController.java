@@ -736,21 +736,19 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                                 if (lsAccDesc == null) {
                                     lsAccDesc = "";
                                 }
-                                if (poController.Journal().Detail(lnCtr).getCreditAmount() <= 0.0000
-                                        && poController.Journal().Detail(lnCtr).getDebitAmount() <= 0.0000
-                                        && !"".equals(lsAcctCode)
-                                        && poController.Journal().Detail(lnCtr).getEditMode() == EditMode.UPDATE) {
+                                if (poController.Journal().Detail(lnCtr).getCreditAmount() <= 0.0000 && poController.Journal().Detail(lnCtr).getDebitAmount() <= 0.0000
+                                        && !"".equals(lsAcctCode) && poController.Journal().Detail(lnCtr).getEditMode() == EditMode.UPDATE) {
                                     continue;
                                 }
                                 lnRowCount += 1;
                                 journal_data.add(
                                         new ModelJournalEntry_Detail(
                                                 String.valueOf(lnRowCount),
+                                                String.valueOf(CustomCommonUtil.parseDateStringToLocalDate(lsReportMonthYear, "yyyy-MM-dd")),
                                                 String.valueOf(lsAcctCode),
                                                 String.valueOf(lsAccDesc),
                                                 String.valueOf(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Journal().Detail(lnCtr).getDebitAmount(), true)),
                                                 String.valueOf(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Journal().Detail(lnCtr).getCreditAmount(), true)),
-                                                String.valueOf(CustomCommonUtil.parseDateStringToLocalDate(lsReportMonthYear, "yyyy-MM-dd")),
                                                 String.valueOf(lnCtr)
                                         ));
 
@@ -1270,11 +1268,14 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                             poJSON = poController.Journal().Detail(pnDetailJE).setDebitAmount((Double.parseDouble(lsValue)));
                             if ("error".equals((String) poJSON.get("result"))) {
                                 ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-                                JFXUtil.runWithDelay(0.50, () -> {
+                                int lnReturned = Integer.parseInt(String.valueOf(poJSON.get("row")));
+                                JFXUtil.runWithDelay(0.70, () -> {
+                                    pnDetailJE = lnReturned;
                                     loadTableDetailJE.reload();
-                                    JFXUtil.textFieldMoveNext(tfDebitAmount);
                                 });
                                 return;
+                            } else {
+
                             }
                         }
                         break;
@@ -1289,22 +1290,30 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                             poJSON = poController.Journal().Detail(pnDetailJE).setCreditAmount((Double.parseDouble(lsValue)));
                             if ("error".equals((String) poJSON.get("result"))) {
                                 ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-                                JFXUtil.runWithDelay(0.50, () -> {
+                                int lnReturned = Integer.parseInt(String.valueOf(poJSON.get("row")));
+                                JFXUtil.runWithDelay(0.70, () -> {
+                                    pnDetailJE = lnReturned;
                                     loadTableDetailJE.reload();
-                                    JFXUtil.textFieldMoveNext(tfCreditAmount);
                                 });
                                 return;
                             }
                         }
                         if (pbEnteredJE) {
-                            moveNextJE(false, true);
-                            pbEnteredJE = false;
+                            JFXUtil.runWithDelay(0.50, () -> {
+                                loadTableDetailJE.reload();
+                                JFXUtil.runWithDelay(0.50, () -> {
+                                    moveNextJE(false, true);
+                                });
+                                pbEnteredJE = false;
+                            });
                         }
                         break;
                 }
-                JFXUtil.runWithDelay(0.50, () -> {
-                    loadTableDetailJE.reload();
-                });
+                if (!JFXUtil.isObjectEqualTo(lsID, "tfCreditAmount")) {
+                    JFXUtil.runWithDelay(0.50, () -> {
+                        loadTableDetailJE.reload();
+                    });
+                }
             });
 
     ChangeListener<Boolean> txtBIRDetail_Focus = JFXUtil.FocusListener(TextField.class,
@@ -1535,9 +1544,11 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                                     });
                                     ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                     break;
+                                } else {
+                                    pnDetailJE = Integer.parseInt(String.valueOf(poJSON.get("row")));
+                                    loadTableDetailJE.reload();
+                                    JFXUtil.textFieldMoveNext(tfDebitAmount);
                                 }
-                                pnDetailJE = Integer.parseInt(String.valueOf(poJSON.get("row")));
-                                loadTableDetailJE.reload();
 
 //                                poJSON = poController.checkExistAcctCode(pnDetailJE, poController.Journal().Detail(pnDetailJE).getAccountCode());
 //                                if ("error".equals(poJSON.get("result"))) {
@@ -1568,10 +1579,11 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                                     });
                                     ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                     break;
+                                } else {
+                                    pnDetailJE = Integer.parseInt(String.valueOf(poJSON.get("row")));
+                                    loadTableDetailJE.reload();
+                                    JFXUtil.textFieldMoveNext(tfDebitAmount);
                                 }
-
-                                pnDetailJE = Integer.parseInt(String.valueOf(poJSON.get("row")));
-                                loadTableDetailJE.reload();
                                 break;
 
                             //apBIRDetail
