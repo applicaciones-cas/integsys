@@ -1732,7 +1732,7 @@ public class SIPosting_MonarchHospitalityController implements Initializable, Sc
                             if (poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(lnCtr).getCreditAmount() <= 0.0000
                                     && poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(lnCtr).getDebitAmount() <= 0.0000
                                     && !"".equals(lsAcctCode)
-                                    && poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(lnCtr).getEditMode() == EditMode.UPDATE) {
+                                    && poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(lnCtr).getEditMode() != EditMode.ADDNEW) {
                                 continue;
                             }
                             lnRowCount += 1;
