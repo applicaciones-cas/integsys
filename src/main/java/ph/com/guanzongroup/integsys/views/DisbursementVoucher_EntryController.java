@@ -142,7 +142,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
     @FXML
     private Label lblSource, lblDVTransactionStatus, lblJournalTransactionStatus;
     @FXML
-    private Button btnBrowse, btnNew, btnUpdate, btnSearch, btnSave, btnCancel, btnVoid, btnHistory, btnRetrieve, btnClose;
+    private Button btnBrowse, btnNew, btnUpdate, btnSearch, btnSave, btnCancel, btnVoid, btnHistory, btnRetrieve, btnClose, btnUndo;
     @FXML
     private TabPane tabPaneMain, tabPanePaymentMode;
     @FXML
@@ -320,7 +320,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
     }
 
     private void initButtonsClickActions() {
-        List<Button> buttons = Arrays.asList(btnBrowse, btnNew, btnUpdate, btnSearch, btnSave, btnCancel, btnVoid, btnRetrieve, btnHistory, btnClose);
+        List<Button> buttons = Arrays.asList(btnBrowse, btnNew, btnUpdate, btnSearch, btnSave, btnCancel, btnVoid, btnRetrieve, btnHistory, btnClose, btnUndo);
         buttons.forEach(button -> button.setOnAction(this::cmdButton_Click));
     }
 
@@ -460,6 +460,17 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                     } else {
                         return;
                     }
+                    break;
+                case "btnUndo":
+                    for (int lnCtr = poController.getDetailCount() - 1; lnCtr >= 0; lnCtr--) {
+                        if (poController.Detail(lnCtr).getEditMode() == EditMode.UPDATE) {
+                            if (poController.Detail(lnCtr).getAmountApplied() <= 0.0000) {
+                                poController.Detail(lnCtr).setAmountApplied(poController.Detail(lnCtr).getAmount());
+                                break;
+                            }
+                        }
+                    }
+                    loadTableDetail.reload();
                     break;
                 default:
                     ShowMessageFX.Warning(null, pxeModuleName, "Button is not registered, Please contact admin to assist about the unregistered button");
@@ -1790,6 +1801,9 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
 
         boolean lbShow = (poController.Detail(pnDetail).getSourceCode()).equals(DisbursementStatic.SourceCode.PAYMENT_REQUEST);
         JFXUtil.setDisabled(!lbShow, chbkVatClassification, tfVatExemptDetail);
+
+        boolean lbShow2 = poController.Detail(pnDetail).getEditMode() == EditMode.UPDATE;
+        JFXUtil.setButtonsVisibility(lbShow2, btnUndo);
 
         tfRefNoDetail.setText(poController.Detail(pnDetail).getSourceNo());
         chbkVatClassification.setSelected(poController.Detail(pnDetail).isWithVat());
