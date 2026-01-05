@@ -2010,6 +2010,23 @@ public class SIPosting_MonarchHospitalityController implements Initializable, Sc
             }
         });
         JFXUtil.setCheckboxHoverCursor(apMaster, apDetail);
+
+        JFXUtil.handleDisabledNodeClick(apMaster, pnEditMode, nodeID -> {
+            switch (nodeID) {
+                case "cbVatInclusive":
+                    ShowMessageFX.Warning(null, pxeModuleName,
+                            "Only available when Invoice No is provided.");
+                    break;
+            }
+        });
+        JFXUtil.handleDisabledNodeClick(apDetail, pnEditMode, nodeID -> {
+            switch (nodeID) {
+                case "cbVatable":
+                    ShowMessageFX.Warning(null, pxeModuleName,
+                            "Only available when Invoice No is provided.");
+                    break;
+            }
+        });
     }
 
     public void initTableOnClick() {
