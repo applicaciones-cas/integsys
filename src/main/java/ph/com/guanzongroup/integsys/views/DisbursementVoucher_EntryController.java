@@ -470,6 +470,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                                     return;
                                 }
                                 poController.Detail(lnCtr).setAmountApplied(poController.Detail(lnCtr).getAmount());
+                                pnDetail = lnCtr;
                                 lbFound = true;
                                 break;
                             }
@@ -683,7 +684,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                             int lnRowCount = 0;
                             for (int lnCtr = 0; lnCtr < poController.getDetailCount(); lnCtr++) {
                                 if (poController.Detail(lnCtr).getSourceNo() != null && !"".equals(poController.Detail(lnCtr).getSourceNo())) {
-                                    if (poController.Detail(lnCtr).getAmountApplied() <= 0.0000 && poController.Detail(lnCtr).getEditMode() != EditMode.ADDNEW) {
+                                    if (poController.Detail(lnCtr).getAmountApplied() == 0.0000 && poController.Detail(lnCtr).getEditMode() != EditMode.ADDNEW) {
                                         continue;
                                     }
                                 }
