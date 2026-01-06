@@ -1427,6 +1427,7 @@ public class JFXUtil {
     }
 
     /*Alternative version of inputDecimalOnly; restricts to 1 dot, commas not allowed*/
+    /*Ideal for Rates Field*/
     public static void inputDecimalOnly(TextField... foTxtFields) {
         Pattern pattern = Pattern.compile("\\d*(\\.\\d*)?");
         for (TextField txtField : foTxtFields) {
