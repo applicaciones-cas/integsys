@@ -133,7 +133,7 @@ import org.guanzon.appdriver.constant.EditMode;
 import ph.com.guanzongroup.integsys.views.ScreenInterface;
 
 /**
- * Date : 4/28/2025 Recent update: 01/05/2026
+ * Date : 4/28/2025 Recent update: 01/06/2026
  *
  * @author Aldrich
  */
@@ -1337,7 +1337,8 @@ public class JFXUtil {
         int newCaretPos;
     }
 
-    /*Sets real-time comma formatting to a textfield (containing numbers/digits)*/
+    /*Sets real-time comma formatting to a textfield containing numbers or digits*/
+ /*Restricts 1 dot*/
  /*Does not recommend setting to other real time textfield formatter*/
     public static void setCommaFormatter(TextField... textFields) {
 
@@ -2703,6 +2704,7 @@ public class JFXUtil {
 //        SOURCE_MAP.put("APAd", "AP Adjustment");
 //        SOURCE_MAP.put("PO", "Purchase Order");
 //    }
+    /*Sets Value in datepicker without triggering the Action Listener*/
     public static void setDateValue(DatePicker datePicker, LocalDate value) {
         if (datePicker == null) {
             return;
@@ -2716,6 +2718,7 @@ public class JFXUtil {
         }
     }
 
+    /*Shortcut for detecting up and down of tableview*/
     public abstract static class TableKeyEvent implements EventHandler<KeyEvent> {
 
         @Override
@@ -2738,6 +2741,8 @@ public class JFXUtil {
         protected abstract void onRowMove(TableView<?> currentTable, String currentTableID, boolean moveDown);
     }
 
+    /*Detect clicks in disabled Nodes and returns IDs in callback*/
+ /*Requires parent Anchorpane of the Node and pnEditMode*/
     public static void handleDisabledNodeClick(AnchorPane anchorPane, Object editMode, Consumer<String> callback) {
         try {
             if (anchorPane == null || callback == null) {
@@ -2773,6 +2778,8 @@ public class JFXUtil {
         }
     }
 
+    /*Enables glow effect around a Node*/
+ /*Requires Node Id and hex Color (e.g. #H1H1H1)*/
     public static void glowOnce(Node node, String hexColor) {
         Color glowColor = Color.web(hexColor); // convert hex to Color
 
@@ -2802,6 +2809,8 @@ public class JFXUtil {
         timeline.play();
     }
 
+    /*Displays customized tooltip for Node hover*/
+ /*Requires message & any count of nodes*/
     public static void applyHoverTooltip(String message, Node... nodes) {
         if (message == null || nodes == null) {
             return;
