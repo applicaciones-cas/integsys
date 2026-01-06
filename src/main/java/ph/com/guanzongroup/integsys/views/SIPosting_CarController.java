@@ -1000,7 +1000,8 @@ public class SIPosting_CarController implements Initializable, ScreenInterface {
 
     public void moveNextJE(boolean isUp) {
         apJEDetail.requestFocus();
-        pnJEDetail = isUp ? JFXUtil.moveToPreviousRow(tblViewJEDetails) : JFXUtil.moveToNextRow(tblViewJEDetails);
+        pnJEDetail = isUp ? Integer.parseInt(JEdetails_data.get(JFXUtil.moveToPreviousRow(tblViewJEDetails)).getIndex07())
+                : Integer.parseInt(JEdetails_data.get(JFXUtil.moveToNextRow(tblViewJEDetails)).getIndex07());
         loadRecordJEDetail();
         if (JFXUtil.isObjectEqualTo(poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(pnJEDetail).getAccountCode(), null, "")) {
             tfJEAcctCode.requestFocus();
