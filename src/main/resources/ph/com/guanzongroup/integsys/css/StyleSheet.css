@@ -227,6 +227,36 @@
     -fx-text-fill: black;
 }
 
+
+.button_process_v4 {
+    -fx-background-color: #7F7F7F;
+    -fx-text-fill: white;
+    -fx-cursor: hand;
+}
+.button_process_v4:hover
+{
+    -fx-background-color: #FF8201;
+    -fx-text-fill: black;
+}
+.button_process_v4:disabled
+{
+    -fx-opacity: 1;
+}
+.button_process_v4:hover > .glyph-icon
+{
+    -fx-fill: black;
+}
+
+.button_process_v4 > .glyph-icon {
+    -fx-fill: white;
+}
+
+.button_process_v4:selected{
+    -fx-background-color: #FF8201;
+    -fx-text-fill: black;
+}
+
+
 .button_process3 {
     -fx-background-color: #7F7F7F;
     -fx-text-fill: white;

@@ -121,14 +121,19 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.util.Callback;
 import java.io.File;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.regex.Pattern;
 import javafx.css.PseudoClass;
 import javafx.scene.control.ButtonBase;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.Tooltip;
+import javafx.scene.effect.DropShadow;
+import org.guanzon.appdriver.constant.EditMode;
 import ph.com.guanzongroup.integsys.views.ScreenInterface;
 
 /**
- * Date : 4/28/2025 Recent update: 12/13/2025
+ * Date : 4/28/2025 Recent update: 01/06/2026
  *
  * @author Aldrich
  */
@@ -540,7 +545,7 @@ public class JFXUtil {
     }
 
     /* used to display pop-up dialog form*/
-    /*NOTE: setOnHidden must be called first before showDialog, to be initialized*/
+ /*NOTE: setOnHidden must be called first before showDialog, to be initialized*/
     public static class StageManager {
 
         private Stage dialog;
@@ -1332,7 +1337,8 @@ public class JFXUtil {
         int newCaretPos;
     }
 
-    /*Sets real-time comma formatting to a textfield (containing numbers/digits)*/
+    /*Sets real-time comma formatting to a textfield containing numbers or digits*/
+ /*Restricts 1 dot*/
  /*Does not recommend setting to other real time textfield formatter*/
     public static void setCommaFormatter(TextField... textFields) {
 
@@ -2463,7 +2469,7 @@ public class JFXUtil {
         cache.put(clazz, valueToNameMap);
         return valueToNameMap;
     }
-    
+
     /*Alternative ComboboxListener*/
 //    sample usage
 //    EventHandler<ActionEvent> comboBoxActionListener = JFXUtil.CmbActionListener(
@@ -2698,7 +2704,7 @@ public class JFXUtil {
 //        SOURCE_MAP.put("APAd", "AP Adjustment");
 //        SOURCE_MAP.put("PO", "Purchase Order");
 //    }
-
+    /*Sets Value in datepicker without triggering the Action Listener*/
     public static void setDateValue(DatePicker datePicker, LocalDate value) {
         if (datePicker == null) {
             return;
@@ -2712,6 +2718,7 @@ public class JFXUtil {
         }
     }
 
+    /*Shortcut for detecting up and down of tableview*/
     public abstract static class TableKeyEvent implements EventHandler<KeyEvent> {
 
         @Override
@@ -2732,5 +2739,95 @@ public class JFXUtil {
         }
 
         protected abstract void onRowMove(TableView<?> currentTable, String currentTableID, boolean moveDown);
+    }
+
+    /*Detect clicks in disabled Nodes and returns IDs in callback*/
+ /*Requires parent Anchorpane of the Node and pnEditMode*/
+    public static void handleDisabledNodeClick(AnchorPane anchorPane, Object editMode, Consumer<String> callback) {
+        try {
+            if (anchorPane == null || callback == null) {
+                return;
+            }
+
+            anchorPane.addEventFilter(MouseEvent.MOUSE_CLICKED, event -> {
+                // Check edit mode
+                if (!JFXUtil.isObjectEqualTo(editMode, EditMode.ADDNEW, EditMode.UPDATE)) {
+                    return;
+                }
+
+                // Look for disabled nodes under this anchor pane
+                Set<Node> nodes = new HashSet<>();
+                nodes.addAll(anchorPane.lookupAll(".text-field"));
+                nodes.addAll(anchorPane.lookupAll(".combo-box"));
+                nodes.addAll(anchorPane.lookupAll(".check-box"));
+
+                for (Node node : nodes) {
+                    if (!node.isDisabled()) {
+                        continue;
+                    }
+
+                    Bounds boundsInScene = node.localToScene(node.getBoundsInLocal());
+                    if (boundsInScene.contains(event.getSceneX(), event.getSceneY())) {
+                        callback.accept(node.getId());
+                        return; // stop after first match
+                    }
+                }
+            });
+        } catch (Exception e) {
+
+        }
+    }
+
+    /*Enables glow effect around a Node*/
+ /*Requires Node Id and hex Color (e.g. #H1H1H1)*/
+    public static void glowOnce(Node node, String hexColor) {
+        Color glowColor = Color.web(hexColor); // convert hex to Color
+
+        DropShadow glow = new DropShadow();
+        glow.setColor(glowColor);
+        glow.setRadius(0);
+        glow.setSpread(0);
+
+        node.setEffect(glow);
+
+        Timeline timeline = new Timeline(
+                new KeyFrame(Duration.ZERO,
+                        new KeyValue(glow.radiusProperty(), 0),
+                        new KeyValue(glow.spreadProperty(), 0)
+                ),
+                new KeyFrame(Duration.millis(500),
+                        new KeyValue(glow.radiusProperty(), 25),
+                        new KeyValue(glow.spreadProperty(), 0.35)
+                ),
+                new KeyFrame(Duration.millis(1000),
+                        new KeyValue(glow.radiusProperty(), 0),
+                        new KeyValue(glow.spreadProperty(), 0)
+                )
+        );
+
+        timeline.setOnFinished(e -> node.setEffect(null));
+        timeline.play();
+    }
+
+    /*Displays customized tooltip for Node hover*/
+ /*Requires message & any count of nodes*/
+    public static void applyHoverTooltip(String message, Node... nodes) {
+        if (message == null || nodes == null) {
+            return;
+        }
+
+        for (Node node : nodes) {
+            if (node != null) {
+                Tooltip tooltip = new Tooltip(message);
+
+                tooltip.setShowDelay(Duration.ZERO);
+                tooltip.setStyle(
+                        "-fx-font-size: 10px;"
+                        + "-fx-padding: 6 10 6 10;"
+                );
+
+                Tooltip.install(node, tooltip);
+            }
+        }
     }
 }
