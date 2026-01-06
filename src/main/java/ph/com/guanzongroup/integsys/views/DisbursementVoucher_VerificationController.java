@@ -460,18 +460,23 @@ public class DisbursementVoucher_VerificationController implements Initializable
                     }
                     break;
                 case "btnUndo":
+                    boolean lbFound = false;
                     for (int lnCtr = poController.getDetailCount() - 1; lnCtr >= 0; lnCtr--) {
                         if (poController.Detail(lnCtr).getEditMode() == EditMode.UPDATE) {
                             if (poController.Detail(lnCtr).getAmountApplied() <= 0.0000) {
+                                if (!ShowMessageFX.YesNo(null, "Undo Reversed item", "Are you sure you want to undo reversed item?")) {
+                                    return;
+                                }
                                 poController.Detail(lnCtr).setAmountApplied(poController.Detail(lnCtr).getAmount());
+                                lbFound = true;
                                 break;
                             }
                         }
                     }
+                    if (!lbFound) {
+                        ShowMessageFX.Information(null, pxeModuleName, "No Reversed item found");
+                    }
                     loadTableDetail.reload();
-//                    JFXUtil.selectAndFocusRow(tblVwDetails, 0);
-//                    int lnRow = Integer.parseInt(details_data.get(0).getIndex11());
-//                    pnDetail = lnRow;
                     break;
                 default:
                     ShowMessageFX.Warning(null, pxeModuleName, "Button is not registered, Please contact admin to assist about the unregistered button");
@@ -957,7 +962,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
 
         JFXUtil.setKeyPressedListener(this::txtField_KeyPressed, apBrowse, apDVMaster1, apMasterDVCheck, apMasterDVBTransfer, apMasterDVOp, apDVDetail, apJournalDetails, apBIRDetail);
         JFXUtil.inputDecimalOnly(tfVatZeroRatedSales, tfVatZeroRatedSalesDetail, tfVatRateDetail, tfTaxRate);
-        JFXUtil.setCommaFormatter(tfVatExemptDetail,tfCheckAmount, tfPaymentAmountBTransfer, tfPaymentAmount, tfTotalAmount, tfVatAmountMaster, tfTotalNetAmount, tfVatAmountDetail, tfPurchasedAmountDetail, tfNetAmountDetail, tfTotalCreditAmount, tfTotalDebitAmount, tfDebitAmount, tfCreditAmount, tfTotalTaxAmount, tfBaseAmount);
+        JFXUtil.setCommaFormatter(tfVatExemptDetail, tfCheckAmount, tfPaymentAmountBTransfer, tfPaymentAmount, tfTotalAmount, tfVatAmountMaster, tfTotalNetAmount, tfVatAmountDetail, tfPurchasedAmountDetail, tfNetAmountDetail, tfTotalCreditAmount, tfTotalDebitAmount, tfDebitAmount, tfCreditAmount, tfTotalTaxAmount, tfBaseAmount);
         JFXUtil.setCheckboxHoverCursor(chbkPrintByBank, chbkIsCrossCheck, chbkIsPersonOnly, chbkVatClassification);
 
         JFXUtil.applyHoverTooltip("Undo Reverse", btnUndo);
