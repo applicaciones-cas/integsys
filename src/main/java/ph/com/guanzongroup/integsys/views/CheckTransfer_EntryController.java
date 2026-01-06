@@ -33,6 +33,7 @@ import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
@@ -73,6 +74,7 @@ public class CheckTransfer_EntryController implements Initializable, ScreenInter
     private CheckTransfer poAppController;
     private ObservableList<Model_Check_Transfer_Detail> laTransactionDetail;
     private int pnSelectMaster, pnEditMode, pnTransactionDetail;
+    private final Set<String> existingTrans = new HashSet<>();
 
     private unloadForm poUnload = new unloadForm();
 
@@ -183,6 +185,7 @@ public class CheckTransfer_EntryController implements Initializable, ScreenInter
 
                 reloadTableDetail();
                 loadSelectedTransactionDetail(pnTransactionDetail);
+                btnRetrieve.fire();
             } catch (CloneNotSupportedException | SQLException | GuanzonException ex) {
 
                 poLogWrapper.severe(psFormName + " :" + ex.getMessage());
@@ -420,6 +423,7 @@ public class CheckTransfer_EntryController implements Initializable, ScreenInter
                     loadRetrieveFilter();
                     loadTransactionCheckList(String.valueOf(dpFilterFrom.getValue()), String.valueOf(dpFilterThru.getValue()));
 
+                    collectExistingTransactions();
                     break;
                 case "btnClose":
                     if (ShowMessageFX.YesNo("Are you sure you want to close this form?", psFormName, null)) {
@@ -683,6 +687,7 @@ public class CheckTransfer_EntryController implements Initializable, ScreenInter
 
                 });
 
+                collectExistingTransactions();
                 overlay.setVisible(false);
                 pi.setVisible(false);
             }
@@ -778,6 +783,20 @@ public class CheckTransfer_EntryController implements Initializable, ScreenInter
             }
         }
 
+        tblViewMaster.setRowFactory(tv -> new TableRow<Model_Check_Payments>() {
+            @Override
+            protected void updateItem(Model_Check_Payments item, boolean empty) {
+                super.updateItem(item, empty);
+
+                if (item == null || empty) {
+                    setStyle("");
+                } else if (existingTrans.contains(item.getTransactionNo())) {
+                    setStyle("-fx-background-color: #A7C7E7;");
+                } else {
+                    setStyle("");
+                }
+            }
+        });
         clearAllInputs();
     }
 
@@ -1053,5 +1072,15 @@ public class CheckTransfer_EntryController implements Initializable, ScreenInter
             }
         }
         return controls;
+    }
+
+    private void collectExistingTransactions() {
+        existingTrans.clear();
+
+        poAppController.getDetailList().forEach(detail -> {
+            existingTrans.add(detail.getSourceNo());
+        });
+
+        tblViewMaster.refresh();
     }
 }
