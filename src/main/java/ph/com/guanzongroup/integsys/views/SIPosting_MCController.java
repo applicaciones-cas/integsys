@@ -2057,7 +2057,7 @@ public class SIPosting_MCController implements Initializable, ScreenInterface {
                 tfDebitAmt, tfAddlDiscAmtDetail, tfSRPAmount);
 
         CustomCommonUtil.inputIntegersOnly(tfReceiveQuantity, tfSINo);
-        CustomCommonUtil.inputDecimalOnly(tfDiscountRate, tfDiscRateDetail, tfVatRate);
+        JFXUtil.inputDecimalOnly(tfDiscountRate, tfDiscRateDetail, tfVatRate);
 
         // Combobox
         JFXUtil.initComboBoxCellDesignColor(cmbAttachmentType, "#FF8201");
