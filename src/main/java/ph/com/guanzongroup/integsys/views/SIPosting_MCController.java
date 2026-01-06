@@ -2312,10 +2312,10 @@ public class SIPosting_MCController implements Initializable, ScreenInterface {
                         switch (event.getCode()) {
                             case TAB:
                             case DOWN:
-                                pnJEDetail = JFXUtil.moveToNextRow(currentTable);
+                                pnJEDetail = Integer.parseInt(JEdetails_data.get(JFXUtil.moveToNextRow(currentTable)).getIndex07());
                                 break;
                             case UP:
-                                pnJEDetail = JFXUtil.moveToPreviousRow(currentTable);
+                                pnJEDetail = Integer.parseInt(JEdetails_data.get(JFXUtil.moveToPreviousRow(currentTable)).getIndex07());
                                 break;
 
                             default:
