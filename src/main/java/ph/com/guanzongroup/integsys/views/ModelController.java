@@ -102,7 +102,7 @@ public class ModelController implements Initializable, ScreenInterface {
             InitTextFields();
             ClickButton();
             initTabAnchor();
-            
+
             if (oParameters.Model().getEditMode() == EditMode.ADDNEW) {
                 initButton(pnEditMode);
                 initTabAnchor();
@@ -210,7 +210,7 @@ public class ModelController implements Initializable, ScreenInterface {
                         String Status = oParameters.Model().getModel().getRecordStatus();
                         String id = oParameters.Model().getModel().getModelCode();
                         JSONObject poJsON;
-                        
+
                         switch (Status) {
                             case "0":
                                 if (ShowMessageFX.YesNo(null, pxeModuleName, "Do you want to Activate this Parameter?") == true) {
@@ -233,11 +233,10 @@ public class ModelController implements Initializable, ScreenInterface {
                                 break;
                             case "1":
                                 if (ShowMessageFX.YesNo(null, pxeModuleName, "Do you want to Deactivate this Parameter?") == true) {
-                                   
-                                    
+
                                     System.out.println("EDIT MODE : " + oParameters.Model().getEditMode());
                                     ShowMessageFX.Information(String.valueOf(oParameters.Model().getEditMode()), "Computerized Accounting System", pxeModuleName);
-                                    
+
                                     poJsON = oParameters.Model().deactivateRecord();
                                     if ("error".equals(poJsON.get("result"))) {
                                         ShowMessageFX.Information((String) poJsON.get("message"), "Computerized Accounting System", pxeModuleName);
@@ -416,7 +415,7 @@ public class ModelController implements Initializable, ScreenInterface {
                         oParameters.Model().getModel().setDescription(lsValue);
                         break;
                     case 5:
-//                        oParameters.Model().getModel().set(Integer.parseInt(lsValue));
+                        oParameters.Model().getModel().setManufactureYear(Integer.parseInt(lsValue));
                         break;
 
                     default:
@@ -438,7 +437,7 @@ public class ModelController implements Initializable, ScreenInterface {
             txtField02.setText(oParameters.Model().getModel().Brand().getDescription());
             txtField03.setText(oParameters.Model().getModel().getModelCode());
             txtField04.setText(oParameters.Model().getModel().getDescription());
-//        txtField05.setText(String.valueOf(oParameters.Model().getModel().getYearModel()));
+            txtField05.setText(String.valueOf(oParameters.Model().getModel().getManufactureYear()));
 //            txtField06.setText(oParameters.Model().getModel().M().getDescription());
 
             switch (oParameters.Model().getModel().getRecordStatus()) {
