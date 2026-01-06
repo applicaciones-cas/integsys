@@ -986,7 +986,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
 
         JFXUtil.setKeyPressedListener(this::txtField_KeyPressed, apDVMaster1, apMasterDVCheck, apMasterDVBTransfer, apMasterDVOp, apDVDetail, apMainList, apJournalDetails, apBIRDetail);
         JFXUtil.inputDecimalOnly(tfVatZeroRatedSales, tfVatZeroRatedSalesDetail, tfVatRateDetail, tfTaxRate);
-        JFXUtil.setCommaFormatter(tfCheckAmount, tfPaymentAmountBTransfer, tfPaymentAmount, tfTotalAmount, tfVatAmountMaster, tfTotalNetAmount, tfVatAmountDetail, tfPurchasedAmountDetail, tfNetAmountDetail, tfTotalDebitAmount, tfTotalCreditAmount, tfDebitAmount, tfCreditAmount, tfTotalTaxAmount, tfBaseAmount);
+        JFXUtil.setCommaFormatter(tfVatExemptDetail,tfCheckAmount, tfPaymentAmountBTransfer, tfPaymentAmount, tfTotalAmount, tfVatAmountMaster, tfTotalNetAmount, tfVatAmountDetail, tfPurchasedAmountDetail, tfNetAmountDetail, tfTotalDebitAmount, tfTotalCreditAmount, tfDebitAmount, tfCreditAmount, tfTotalTaxAmount, tfBaseAmount);
         JFXUtil.setCheckboxHoverCursor(chbkPrintByBank, chbkIsCrossCheck, chbkIsPersonOnly, chbkVatClassification);
 
         JFXUtil.applyHoverTooltip("Undo Reversed item", btnUndo);
