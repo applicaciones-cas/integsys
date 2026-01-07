@@ -461,6 +461,18 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                         return;
                     }
                     break;
+                case "btnVoid":
+                    if (ShowMessageFX.YesNo(null, "Close Tab", "Are you sure you want to void this transaction?")) {
+                        poJSON = poController.VoidTransaction(poController.Master().getTransactionNo());
+                        if ("error".equals((String) poJSON.get("result"))) {
+                            ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                            return;
+                        } else {
+                        }
+                    } else {
+                        return;
+                    }
+                    break;
                 case "btnUndo":
                     boolean lbFound = false;
                     for (int lnCtr = poController.getDetailCount() - 1; lnCtr >= 0; lnCtr--) {
@@ -2355,6 +2367,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
             switch (poController.Master().getTransactionStatus()) {
                 case DisbursementStatic.OPEN:
                     JFXUtil.setButtonsVisibility(true, btnUpdate);
+                    JFXUtil.setButtonsVisibility(true, btnVoid);
                     break;
                 case DisbursementStatic.VERIFIED:
                     JFXUtil.setButtonsVisibility(true, btnUpdate);
