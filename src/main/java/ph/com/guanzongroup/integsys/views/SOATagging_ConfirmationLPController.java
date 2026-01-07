@@ -1136,7 +1136,7 @@ public class SOATagging_ConfirmationLPController implements Initializable, Scree
         JFXUtil.handleDisabledNodeClick(apDetail, pnEditMode, nodeID -> {
             switch (nodeID) {
                 case "cmbSourceCode":
-                    ShowMessageFX.Warning(null, pxeModuleName, "Disabled for existing item.");
+                    ShowMessageFX.Warning(null, pxeModuleName, "This option is disabled as Source No already exists.");
                     break;
             }
         });
