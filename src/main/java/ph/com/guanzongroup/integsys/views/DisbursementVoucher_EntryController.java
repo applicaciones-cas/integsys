@@ -1799,7 +1799,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
             return;
         }
         boolean lbNotNull = !JFXUtil.isObjectEqualTo(poController.Detail(pnDetail).getDetailVatAmount(), null, "");
-        boolean lbNotZero = poController.Detail(pnDetail).getAmountApplied() > 0;
+        boolean lbNotZero = poController.Detail(pnDetail).getAmountApplied() != 0;
         cbReverse.selectedProperty().set(lbNotNull && lbNotZero);
 
         boolean lbShow = (poController.Detail(pnDetail).getSourceCode()).equals(DisbursementStatic.SourceCode.PAYMENT_REQUEST);
