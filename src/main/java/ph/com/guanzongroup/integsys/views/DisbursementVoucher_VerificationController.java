@@ -463,7 +463,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
                     boolean lbFound = false;
                     for (int lnCtr = poController.getDetailCount() - 1; lnCtr >= 0; lnCtr--) {
                         if (poController.Detail(lnCtr).getEditMode() == EditMode.UPDATE) {
-                            if (poController.Detail(lnCtr).getAmountApplied() <= 0.0000) {
+                            if (poController.Detail(lnCtr).getAmountApplied() == 0.0000) {
                                 if (!ShowMessageFX.YesNo(null, "Undo Reversed item", "Are you sure you want to undo reversed item?")) {
                                     return;
                                 }
