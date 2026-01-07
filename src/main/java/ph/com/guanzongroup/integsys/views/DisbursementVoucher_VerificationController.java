@@ -94,8 +94,6 @@ public class DisbursementVoucher_VerificationController implements Initializable
     private String psCompanyId = "";
     private String psCategoryId = "";
     private String psSupplierPayeeId = "";
-    private String psSearchSupplierID = "";
-    private String psSearchTransactionNo = "";
 
     private unloadForm poUnload = new unloadForm();
     private ObservableList<ModelDisbursementVoucher_Main> main_data = FXCollections.observableArrayList();
@@ -126,7 +124,6 @@ public class DisbursementVoucher_VerificationController implements Initializable
     ObservableList<String> cOtherPayment = FXCollections.observableArrayList("FLOATING");
     ObservableList<String> cOtherPaymentBTransfer = FXCollections.observableArrayList("FLOATING");
 
-    private EventHandler<ActionEvent> claimantTypeHandler;
     /* DV  & Journal */
     @FXML
     private AnchorPane AnchorMain, apBrowse, apButton, apMasterDetail, apDVMaster1, apMasterDVCheck, apMasterDVBTransfer, apMasterDVOp, apDVMaster2, apDVMaster3, apDVDetail, apJournalMaster, apJournalDetails, apBIRDetail;
@@ -656,7 +653,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
                                 }
                             }
                             int lnRowCount = 0;
-                            for (int lnCtr = 0; lnCtr < poController.getDetailCount(); lnCtr++) {
+                            for (int lnCtr = 0; lnCtr < poController.getDetailCount() - 1; lnCtr++) {
                                 if (poController.Detail(lnCtr).getSourceNo() != null && !"".equals(poController.Detail(lnCtr).getSourceNo())) {
                                     if (poController.Detail(lnCtr).getAmountApplied() == 0.0000 && poController.Detail(lnCtr).getEditMode() != EditMode.ADDNEW) {
                                         continue;
@@ -979,13 +976,11 @@ public class DisbursementVoucher_VerificationController implements Initializable
                     case "tfSearchSupplier":
                         if (lsValue.isEmpty()) {
                             poController.setSearchPayee("");
-                            psSearchSupplierID = "";
                             loadTableMain.reload();
                         }
                         break;
                     case "tfSearchTransaction":
                         if (lsValue.isEmpty()) {
-                            psSearchTransactionNo = "";
                             loadTableMain.reload();
                         }
                         break;
@@ -1402,7 +1397,6 @@ public class DisbursementVoucher_VerificationController implements Initializable
                                 }
                                 break;
                             case "tfSearchTransaction":
-                                psSearchTransactionNo = tfSearchTransaction.getText();
                                 loadTableMain.reload();
                                 break;
                             case "tfSearchSupplier":
@@ -1411,7 +1405,6 @@ public class DisbursementVoucher_VerificationController implements Initializable
                                     ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                     return;
                                 } else {
-                                    psSearchSupplierID = poController.Master().getPayeeID();
                                     loadRecordSearch();
                                     loadTableMain.reload();
                                 }
