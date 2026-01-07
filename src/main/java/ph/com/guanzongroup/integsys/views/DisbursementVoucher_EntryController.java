@@ -462,12 +462,24 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                     }
                     break;
                 case "btnVoid":
-                    if (ShowMessageFX.YesNo(null, pxeModuleName, "Are you sure you want to void this transaction?")) {
-                        poJSON = poController.VoidTransaction(poController.Master().getTransactionNo());
-                        if ("error".equals((String) poJSON.get("result"))) {
-                            ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-                            return;
-                        } else {
+                    if (ShowMessageFX.YesNo(null, pxeModuleName, "Are you sure you want to void transaction?")) {
+                        pnEditMode = poController.getEditMode();
+                        if (pnEditMode == EditMode.READY) {
+                            if (!poController.existJournal().equals("")) {
+                                poJSON = poController.VoidTransaction("");
+                                if ("error".equals((String) poJSON.get("result"))) {
+                                    ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                                    return;
+                                } else {
+                                    ShowMessageFX.Information(null, pxeModuleName, (String) poJSON.get("message"));
+                                    pnEditMode = poController.getEditMode();
+                                    JFXUtil.disableAllHighlightByColor(tblViewMainList, "#A7C7E7", highlightedRowsMain);
+                                    JFXUtil.highlightByKey(tblViewMainList, String.valueOf(pnMain + 1), "#FAA0A0", highlightedRowsMain);
+                                }
+                            } else {
+                                ShowMessageFX.Warning(null, pxeModuleName, "This transaction has no journal entry. Please add a journal entry by updating the transaction to enable void.");
+                                return;
+                            }
                         }
                     } else {
                         return;

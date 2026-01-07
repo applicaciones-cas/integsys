@@ -418,7 +418,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
                         lsTransaction = "cancel";
                     } else {
                     }
-                    if (ShowMessageFX.YesNo(null, "Close Tab", "Are you sure you want to " + lsTransaction + " transaction?")) {
+                    if (ShowMessageFX.YesNo(null, pxeModuleName, "Are you sure you want to " + lsTransaction + " transaction?")) {
                         pnEditMode = poController.getEditMode();
                         if (pnEditMode == EditMode.READY) {
                             if (!poController.existJournal().equals("")) {
