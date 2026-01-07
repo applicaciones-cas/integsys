@@ -1555,25 +1555,6 @@ public class DisbursementVoucher_VerificationController implements Initializable
                                     loadTableDetailJE.reload();
                                     JFXUtil.textFieldMoveNext(tfDebitAmount);
                                 }
-
-//                                poJSON = poController.checkExistAcctCode(pnDetailJE, poController.Journal().Detail(pnDetailJE).getAccountCode());
-//                                if ("error".equals(poJSON.get("result"))) {
-//                                    int lnRow = (int) poJSON.get("row");
-//                                    ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-//                                    if (pnDetailJE != lnRow) {
-//                                        pnDetailJE = lnRow;
-//                                        JFXUtil.runWithDelay(0.50, () -> {
-//                                            loadTableDetailJE.reload();
-//                                        });
-//                                        return;
-//                                    }
-//                                    break;
-//                                } else {
-//                                    int lnReturned = Integer.parseInt(String.valueOf(poJSON.get("row")));
-//                                    pnDetailJE = lnReturned;
-//                                    loadTableDetailJE.reload();
-//                                    JFXUtil.textFieldMoveNext(tfDebitAmount);
-//                                }
                                 break;
                             case "tfAccountDescription":
                                 poJSON = poController.Journal().SearchAccountCode(pnDetailJE, lsValue, false, poController.Master().getIndustryID(), null);
