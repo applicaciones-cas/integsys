@@ -1133,6 +1133,13 @@ public class SOATagging_ConfirmationMPController implements Initializable, Scree
         JFXUtil.setCommaFormatter(tfVatAmount, tfDiscountAmount, tfZeroVatSales, tfNonVatSales, tfVatExemptSales);
         
         JFXUtil.setCheckboxHoverCursor(apDetail);
+        JFXUtil.handleDisabledNodeClick(apDetail, pnEditMode, nodeID -> {
+            switch (nodeID) {
+                case "cmbSourceCode":
+                    ShowMessageFX.Warning(null, pxeModuleName, "Disabled for existing item.");
+                    break;
+            }
+        });
     }
 
     public void initTableOnClick() {

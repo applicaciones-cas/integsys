@@ -1131,8 +1131,15 @@ public class SOATagging_ConfirmationCarController implements Initializable, Scre
 
         JFXUtil.setKeyPressedListener(this::txtField_KeyPressed, apBrowse, apMaster, apDetail);
         JFXUtil.setCommaFormatter(tfVatAmount, tfDiscountAmount, tfZeroVatSales, tfNonVatSales, tfVatExemptSales);
-        
+
         JFXUtil.setCheckboxHoverCursor(apDetail);
+        JFXUtil.handleDisabledNodeClick(apDetail, pnEditMode, nodeID -> {
+            switch (nodeID) {
+                case "cmbSourceCode":
+                    ShowMessageFX.Warning(null, pxeModuleName, "Disabled for existing item.");
+                    break;
+            }
+        });
     }
 
     public void initTableOnClick() {
