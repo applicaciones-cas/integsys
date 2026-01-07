@@ -580,7 +580,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                         + poController.Master().Payee().getPayeeName();
 
                 if (!JFXUtil.isObjectEqualTo(poController.Detail(lnCtr).getAmount(), null, "")) {
-                    if (poController.Detail(lnCtr).getAmount() > 0.0000) {
+                    if (poController.Detail(lnCtr).getAmount() != 0.0000) {
                         plOrderNoPartial.add(new Pair<>(lsHighlightbasis, "1"));
                     } else {
                         plOrderNoPartial.add(new Pair<>(lsHighlightbasis, "0"));
