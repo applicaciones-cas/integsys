@@ -462,7 +462,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                     }
                     break;
                 case "btnVoid":
-                    if (ShowMessageFX.YesNo(null, "Close Tab", "Are you sure you want to void this transaction?")) {
+                    if (ShowMessageFX.YesNo(null, pxeModuleName, "Are you sure you want to void this transaction?")) {
                         poJSON = poController.VoidTransaction(poController.Master().getTransactionNo());
                         if ("error".equals((String) poJSON.get("result"))) {
                             ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
