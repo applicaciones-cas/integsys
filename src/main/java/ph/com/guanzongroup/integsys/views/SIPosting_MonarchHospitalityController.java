@@ -1996,7 +1996,7 @@ public class SIPosting_MonarchHospitalityController implements Initializable, Sc
                 tfDebitAmt, tfAddlDiscAmtDetail, tfSRPAmount);
 
         CustomCommonUtil.inputIntegersOnly(tfReceiveQuantity, tfSINo);
-        CustomCommonUtil.inputDecimalOnly(tfDiscountRate, tfDiscRateDetail, tfVatRate);
+        JFXUtil.inputDecimalOnly(tfDiscountRate, tfDiscRateDetail, tfVatRate);
         // Combobox
         JFXUtil.initComboBoxCellDesignColor(cmbAttachmentType, "#FF8201");
         cmbAttachmentType.setItems(documentType);
@@ -2250,10 +2250,10 @@ public class SIPosting_MonarchHospitalityController implements Initializable, Sc
                         switch (event.getCode()) {
                             case TAB:
                             case DOWN:
-                                pnJEDetail = JFXUtil.moveToNextRow(currentTable);
+                                pnJEDetail = Integer.parseInt(JEdetails_data.get(JFXUtil.moveToNextRow(currentTable)).getIndex07());
                                 break;
                             case UP:
-                                pnJEDetail = JFXUtil.moveToPreviousRow(currentTable);
+                                pnJEDetail = Integer.parseInt(JEdetails_data.get(JFXUtil.moveToPreviousRow(currentTable)).getIndex07());
                                 break;
 
                             default:

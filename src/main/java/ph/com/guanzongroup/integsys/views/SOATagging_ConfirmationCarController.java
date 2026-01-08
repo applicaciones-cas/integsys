@@ -18,7 +18,6 @@ import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.application.Platform;
-import javafx.beans.property.ReadOnlyBooleanPropertyBase;
 import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -55,7 +54,6 @@ import org.guanzon.appdriver.base.SQLUtil;
 import org.guanzon.appdriver.constant.EditMode;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.ParseException;
-import ph.com.guanzongroup.cas.cashflow.SOATagging;
 import java.text.SimpleDateFormat;
 import java.time.format.DateTimeFormatter;
 import java.util.concurrent.atomic.AtomicReference;
@@ -1132,8 +1130,16 @@ public class SOATagging_ConfirmationCarController implements Initializable, Scre
         JFXUtil.setFocusListener(txtDetail_Focus, tfSourceNo, tfReferenceNo, tfAppliedAmtDetail);
 
         JFXUtil.setKeyPressedListener(this::txtField_KeyPressed, apBrowse, apMaster, apDetail);
-        JFXUtil.setCommaFormatter(tfVatAmount, tfDiscountAmount, tfZeroVatSales, tfNonVatSales, tfVatExemptSales, tfAppliedAmtDetail);
+        JFXUtil.setCommaFormatter(tfVatAmount, tfDiscountAmount, tfZeroVatSales, tfNonVatSales, tfVatExemptSales);
+
         JFXUtil.setCheckboxHoverCursor(apDetail);
+        JFXUtil.handleDisabledNodeClick(apDetail, pnEditMode, nodeID -> {
+            switch (nodeID) {
+                case "cmbSourceCode":
+                    ShowMessageFX.Warning(null, pxeModuleName, "This option is disabled as Source No already exists.");
+                    break;
+            }
+        });
     }
 
     public void initTableOnClick() {
@@ -1172,6 +1178,7 @@ public class SOATagging_ConfirmationCarController implements Initializable, Scre
         boolean lbShow1 = (fnValue == EditMode.UPDATE);
         boolean lbShow3 = (fnValue == EditMode.READY);
         boolean lbShow4 = (fnValue == EditMode.UNKNOWN || fnValue == EditMode.READY);
+        JFXUtil.setDisabled(true, tfAppliedAmtDetail);
         // Manage visibility and managed state of other buttons
         //Update 
         JFXUtil.setButtonsVisibility(lbShow1, btnSearch, btnSave, btnCancel);

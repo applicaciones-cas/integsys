@@ -242,8 +242,8 @@
                                                                      </font>
                                                                   </Label>
                                                                   <TextField fx:id="tfCompany" layoutX="105.0" layoutY="140.0" maxHeight="25.0" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.rowIndex="4" />
-                                                                  <Label layoutX="596.0" layoutY="85.0" text="Discount Amount" GridPane.columnIndex="6" GridPane.rowIndex="3" />
-                                                                  <TextField fx:id="tfDiscountAmount" alignment="CENTER_RIGHT" layoutX="674.0" layoutY="80.0" promptText="0.0000" GridPane.columnIndex="8" GridPane.rowIndex="3" />
+                                                                  <Label layoutX="596.0" layoutY="85.0" text="Discount Amount" visible="false" GridPane.columnIndex="6" GridPane.rowIndex="3" />
+                                                                  <TextField fx:id="tfDiscountAmount" alignment="CENTER_RIGHT" layoutX="674.0" layoutY="80.0" promptText="0.0000" visible="false" GridPane.columnIndex="8" GridPane.rowIndex="3" />
                                                                   <Label layoutX="571.0" layoutY="115.0" text="Freight" GridPane.columnIndex="6" GridPane.rowIndex="4" />
                                                                   <TextField fx:id="tfFreight" alignment="CENTER_RIGHT" layoutX="674.0" layoutY="110.0" promptText="0.00" GridPane.columnIndex="8" GridPane.rowIndex="4" />
                                                                       </children>
