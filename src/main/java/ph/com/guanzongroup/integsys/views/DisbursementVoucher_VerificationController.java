@@ -653,11 +653,13 @@ public class DisbursementVoucher_VerificationController implements Initializable
                                 }
                             }
                             int lnRowCount = 0;
-                            for (int lnCtr = 0; lnCtr < poController.getDetailCount() - 1; lnCtr++) {
+                            for (int lnCtr = 0; lnCtr < poController.getDetailCount(); lnCtr++) {
                                 if (poController.Detail(lnCtr).getSourceNo() != null && !"".equals(poController.Detail(lnCtr).getSourceNo())) {
                                     if (poController.Detail(lnCtr).getAmountApplied() == 0.0000 && poController.Detail(lnCtr).getEditMode() != EditMode.ADDNEW) {
                                         continue;
                                     }
+                                } else {
+                                    continue;
                                 }
                                 lnRowCount += 1;
                                 details_data.add(
