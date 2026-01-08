@@ -363,7 +363,7 @@ public class PayeeController implements Initializable, ScreenInterface {
                             if ("error".equalsIgnoreCase(poJson.get("result").toString())) {
                                 ShowMessageFX.Information((String) poJson.get("message"), "Computerized Acounting System", pxeModuleName);
                             }
-                            oParameters.Payee().getModel().setAPClientID(oAPClient.APClientMaster().getModel().getClientId());
+                            oParameters.Payee().getModel().setClientID(oAPClient.APClientMaster().getModel().getClientId());
                             txtField05.setText((String) oAPClient.APClientMaster().getModel().Client().getCompanyName());
                             break;
                     }
