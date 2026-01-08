@@ -325,7 +325,7 @@ public class DisbursementVoucher_ViewController implements Initializable, Screen
                             int lnRowCount = 0;
                             for (int lnCtr = 0; lnCtr < poController.getDetailCount(); lnCtr++) {
                                 if (poController.Detail(lnCtr).getSourceNo() != null && !"".equals(poController.Detail(lnCtr).getSourceNo())) {
-                                    if (poController.Detail(lnCtr).getAmountApplied() <= 0.0000 && poController.Detail(lnCtr).getEditMode() != EditMode.ADDNEW) {
+                                    if (poController.Detail(lnCtr).getAmountApplied() == 0.0000 && poController.Detail(lnCtr).getEditMode() != EditMode.ADDNEW) {
                                         continue;
                                     }
                                 }

@@ -231,7 +231,7 @@ public class CheckAssignmentController implements Initializable {
         tfDVNo.setText(poController.Master().getTransactionNo());
         tfCheckNo.setText(poController.CheckPayments().getModel().getCheckNo());
         dpCheckDate.setValue(CustomCommonUtil.parseDateStringToLocalDate(SQLUtil.dateFormat(poController.CheckPayments().getModel().getCheckDate(), SQLUtil.FORMAT_SHORT_DATE)));
-        tfCheckAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Master().getTransactionTotal(), true));
+        tfCheckAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Master().getNetTotal(), true));
         taRemarks.setText(poController.Master().getRemarks());
     }
 

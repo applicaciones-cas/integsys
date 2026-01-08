@@ -935,9 +935,9 @@ public class SIPosting_HistoryLPController implements Initializable, ScreenInter
                                 lsAccDesc = "";
                             }
                             if (poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(lnCtr).getCreditAmount() <= 0.0000
-                                && poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(lnCtr).getDebitAmount() <= 0.0000
-                                && !"".equals(lsAcctCode)
-                                && poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(lnCtr).getEditMode() != EditMode.ADDNEW) {
+                                    && poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(lnCtr).getDebitAmount() <= 0.0000
+                                    && !"".equals(lsAcctCode)
+                                    && poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(lnCtr).getEditMode() != EditMode.ADDNEW) {
                                 continue;
                             }
                             lnRowCount += 1;
@@ -1375,10 +1375,10 @@ public class SIPosting_HistoryLPController implements Initializable, ScreenInter
                         switch (event.getCode()) {
                             case TAB:
                             case DOWN:
-                                pnJEDetail = JFXUtil.moveToNextRow(currentTable);
+                                pnJEDetail = Integer.parseInt(JEdetails_data.get(JFXUtil.moveToNextRow(currentTable)).getIndex07());
                                 break;
                             case UP:
-                                pnJEDetail = JFXUtil.moveToPreviousRow(currentTable);
+                                pnJEDetail = Integer.parseInt(JEdetails_data.get(JFXUtil.moveToPreviousRow(currentTable)).getIndex07());
                                 break;
 
                             default:

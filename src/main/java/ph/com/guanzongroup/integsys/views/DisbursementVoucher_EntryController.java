@@ -461,15 +461,40 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                         return;
                     }
                     break;
+                case "btnVoid":
+                    if (ShowMessageFX.YesNo(null, pxeModuleName, "Are you sure you want to void transaction?")) {
+                        pnEditMode = poController.getEditMode();
+                        if (pnEditMode == EditMode.READY) {
+                            if (!poController.existJournal().equals("")) {
+                                poJSON = poController.VoidTransaction("");
+                                if ("error".equals((String) poJSON.get("result"))) {
+                                    ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                                    return;
+                                } else {
+                                    ShowMessageFX.Information(null, pxeModuleName, (String) poJSON.get("message"));
+                                    pnEditMode = poController.getEditMode();
+                                    JFXUtil.disableAllHighlightByColor(tblViewMainList, "#A7C7E7", highlightedRowsMain);
+                                    JFXUtil.highlightByKey(tblViewMainList, String.valueOf(pnMain + 1), "#FAA0A0", highlightedRowsMain);
+                                }
+                            } else {
+                                ShowMessageFX.Warning(null, pxeModuleName, "This transaction has no journal entry. Please add a journal entry by updating the transaction to enable void.");
+                                return;
+                            }
+                        }
+                    } else {
+                        return;
+                    }
+                    break;
                 case "btnUndo":
                     boolean lbFound = false;
                     for (int lnCtr = poController.getDetailCount() - 1; lnCtr >= 0; lnCtr--) {
                         if (poController.Detail(lnCtr).getEditMode() == EditMode.UPDATE) {
-                            if (poController.Detail(lnCtr).getAmountApplied() <= 0.0000) {
+                            if (poController.Detail(lnCtr).getAmountApplied() == 0.0000) {
                                 if (!ShowMessageFX.YesNo(null, "Undo Reversed item", "Are you sure you want to undo reversed item?")) {
                                     return;
                                 }
                                 poController.Detail(lnCtr).setAmountApplied(poController.Detail(lnCtr).getAmount());
+                                pnDetail = lnCtr;
                                 lbFound = true;
                                 break;
                             }
@@ -555,7 +580,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                         + poController.Master().Payee().getPayeeName();
 
                 if (!JFXUtil.isObjectEqualTo(poController.Detail(lnCtr).getAmount(), null, "")) {
-                    if (poController.Detail(lnCtr).getAmount() > 0.0000) {
+                    if (poController.Detail(lnCtr).getAmount() != 0.0000) {
                         plOrderNoPartial.add(new Pair<>(lsHighlightbasis, "1"));
                     } else {
                         plOrderNoPartial.add(new Pair<>(lsHighlightbasis, "0"));
@@ -683,7 +708,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                             int lnRowCount = 0;
                             for (int lnCtr = 0; lnCtr < poController.getDetailCount(); lnCtr++) {
                                 if (poController.Detail(lnCtr).getSourceNo() != null && !"".equals(poController.Detail(lnCtr).getSourceNo())) {
-                                    if (poController.Detail(lnCtr).getAmountApplied() <= 0.0000 && poController.Detail(lnCtr).getEditMode() != EditMode.ADDNEW) {
+                                    if (poController.Detail(lnCtr).getAmountApplied() == 0.0000 && poController.Detail(lnCtr).getEditMode() != EditMode.ADDNEW) {
                                         continue;
                                     }
                                 }
@@ -993,8 +1018,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
         JFXUtil.setFocusListener(txtBIRDetail_Focus, tfBaseAmount, tfTaxCode, tfParticular, tfTaxCode);
 
         JFXUtil.setKeyPressedListener(this::txtField_KeyPressed, apDVMaster1, apMasterDVCheck, apMasterDVBTransfer, apMasterDVOp, apDVDetail, apMainList, apJournalDetails, apBIRDetail);
-        JFXUtil.inputDecimalOnly(tfVatZeroRatedSales, tfVatZeroRatedSalesDetail, tfVatRateDetail, tfTaxRate);
-        JFXUtil.setCommaFormatter(tfVatExemptDetail, tfCheckAmount, tfPaymentAmountBTransfer, tfPaymentAmount, tfTotalAmount, tfVatAmountMaster, tfTotalNetAmount, tfVatAmountDetail, tfPurchasedAmountDetail, tfNetAmountDetail, tfTotalDebitAmount, tfTotalCreditAmount, tfDebitAmount, tfCreditAmount, tfTotalTaxAmount, tfBaseAmount);
+        JFXUtil.setCommaFormatter(tfDebitAmount, tfCreditAmount, tfBaseAmount, tfCheckAmount, tfVatExemptDetail);
         JFXUtil.setCheckboxHoverCursor(chbkPrintByBank, chbkIsCrossCheck, chbkIsPersonOnly, chbkVatClassification);
 
         JFXUtil.applyHoverTooltip("Undo Reversed item", btnUndo);
@@ -1572,25 +1596,6 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                                     loadTableDetailJE.reload();
                                     JFXUtil.textFieldMoveNext(tfDebitAmount);
                                 }
-
-//                                poJSON = poController.checkExistAcctCode(pnDetailJE, poController.Journal().Detail(pnDetailJE).getAccountCode());
-//                                if ("error".equals(poJSON.get("result"))) {
-//                                    int lnRow = (int) poJSON.get("row");
-//                                    ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-//                                    if (pnDetailJE != lnRow) {
-//                                        pnDetailJE = lnRow;
-//                                        JFXUtil.runWithDelay(0.50, () -> {
-//                                            loadTableDetailJE.reload();
-//                                        });
-//                                        return;
-//                                    }
-//                                    break;
-//                                } else {
-//                                    int lnReturned = Integer.parseInt(String.valueOf(poJSON.get("row")));
-//                                    pnDetailJE = lnReturned;
-//                                    loadTableDetailJE.reload();
-//                                    JFXUtil.textFieldMoveNext(tfDebitAmount);
-//                                }
                                 break;
                             case "tfAccountDescription":
                                 poJSON = poController.Journal().SearchAccountCode(pnDetailJE, lsValue, false, poController.Master().getIndustryID(), null);
@@ -1806,7 +1811,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
             return;
         }
         boolean lbNotNull = !JFXUtil.isObjectEqualTo(poController.Detail(pnDetail).getDetailVatAmount(), null, "");
-        boolean lbNotZero = poController.Detail(pnDetail).getAmountApplied() > 0;
+        boolean lbNotZero = poController.Detail(pnDetail).getAmountApplied() != 0;
         cbReverse.selectedProperty().set(lbNotNull && lbNotZero);
 
         boolean lbShow = (poController.Detail(pnDetail).getSourceCode()).equals(DisbursementStatic.SourceCode.PAYMENT_REQUEST);
@@ -2355,6 +2360,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
             switch (poController.Master().getTransactionStatus()) {
                 case DisbursementStatic.OPEN:
                     JFXUtil.setButtonsVisibility(true, btnUpdate);
+                    JFXUtil.setButtonsVisibility(true, btnVoid);
                     break;
                 case DisbursementStatic.VERIFIED:
                     JFXUtil.setButtonsVisibility(true, btnUpdate);
