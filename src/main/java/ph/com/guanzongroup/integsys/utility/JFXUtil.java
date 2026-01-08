@@ -121,6 +121,7 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.util.Callback;
 import java.io.File;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.regex.Pattern;
@@ -133,7 +134,7 @@ import org.guanzon.appdriver.constant.EditMode;
 import ph.com.guanzongroup.integsys.views.ScreenInterface;
 
 /**
- * Date : 4/28/2025 Recent update: 01/06/2026
+ * Date : 4/28/2025 Recent update: 01/08/2026
  *
  * @author Aldrich
  */
@@ -1416,6 +1417,97 @@ public class JFXUtil {
         }
     }
 
+    /*V2 - Allows negative*/
+    public static void setCommaFormatter2(TextField... textFields) {
+
+        DecimalFormat finalFormat = (DecimalFormat) NumberFormat.getNumberInstance(Locale.US);
+        finalFormat.setGroupingUsed(true);
+        finalFormat.setMinimumFractionDigits(2);
+        finalFormat.setMaximumFractionDigits(2);
+
+        for (TextField textField : textFields) {
+            final CommaFormater data = new CommaFormater();
+            data.isUpdating = false;
+            data.isAdjusting = new AtomicBoolean(false);
+            data.newCaretPos = 0;
+            // Disables other character
+            UnaryOperator<TextFormatter.Change> filter = change -> {
+                String newText = change.getControlNewText();
+
+                // Allow digits, comma, dot, and minus
+                if (!newText.matches("[\\d,\\.\\-]*")) {
+                    return null;
+                }
+
+                // Allow only ONE dot
+                long dotCount = newText.chars().filter(c -> c == '.').count();
+                if (dotCount > 1) {
+                    return null;
+                }
+
+                // Allow only ONE minus sign
+                int minusCount = (int) newText.chars().filter(c -> c == '-').count();
+                if (minusCount > 1) {
+                    return null;
+                }
+
+                // Minus sign must be at the START only
+                if (newText.contains("-") && !newText.startsWith("-")) {
+                    return null;
+                }
+
+                return change;
+            };
+            textField.setTextFormatter(new TextFormatter<>(filter));
+            // Real-time formatting
+            textField.textProperty().addListener((obs, oldValue, newValue) -> {
+                if (data.isAdjusting.get() == true) {
+                    return;
+                }
+                try {
+                    if (data.isUpdating) {
+                        return;
+                    }
+                    data.isUpdating = true;
+                    String clean = newValue.replaceAll(",", "");
+                    if (clean.isEmpty() || clean.equals(".") || clean.matches("0*\\.0*")) {
+                        data.isUpdating = false;
+                        return;
+                    }
+                    try {
+                        String integerPart = clean;
+                        String decimalPart = "";
+                        int dotIndex = clean.indexOf(".");
+                        if (dotIndex >= 0) {
+                            integerPart = clean.substring(0, dotIndex);
+                            decimalPart = clean.substring(dotIndex);
+                        }
+                        long integerVal = integerPart.isEmpty() ? 0 : Long.parseLong(integerPart);
+                        String formattedInteger = NumberFormat.getIntegerInstance(Locale.US).format(integerVal);
+                        String formatted = formattedInteger + decimalPart;
+                        Platform.runLater(() -> {
+                            data.isAdjusting.set(true);
+                            int originalCaretPos = textField.getCaretPosition();
+                            textField.setText(formatted);
+                            int offset = formatted.length() - newValue.length();
+                            data.newCaretPos = originalCaretPos + offset;
+                            data.newCaretPos = Math.max(0, Math.min(formatted.length(), data.newCaretPos));
+                            data.isAdjusting.set(false);
+                        });
+                        Platform.runLater(() -> {
+                            textField.positionCaret(data.newCaretPos);
+                        });
+                    } catch (Exception e) {
+                    }
+                    data.isUpdating = false;
+                } catch (Exception e) {
+                    data.isUpdating = false;
+                }
+
+            });
+        }
+    }
+
     /*Alternative version of inputDecimalOnly; commas not allowed*/
     public static void inputIntegersOnly(TextField... foTxtFields) {
         Pattern pattern = Pattern.compile("[0-9]*");
@@ -1427,7 +1519,7 @@ public class JFXUtil {
     }
 
     /*Alternative version of inputDecimalOnly; restricts to 1 dot, commas not allowed*/
-    /*Ideal for Rates Field*/
+ /*Ideal for Rates Field*/
     public static void inputDecimalOnly(TextField... foTxtFields) {
         Pattern pattern = Pattern.compile("\\d*(\\.\\d*)?");
         for (TextField txtField : foTxtFields) {
@@ -2745,38 +2837,42 @@ public class JFXUtil {
     /*Detect clicks in disabled Nodes and returns IDs in callback*/
  /*Requires parent Anchorpane of the Node and pnEditMode*/
     public static void handleDisabledNodeClick(AnchorPane anchorPane, Object editMode, Consumer<String> callback) {
-        try {
-            if (anchorPane == null || callback == null) {
+        if (anchorPane == null || callback == null) {
+            return;
+        }
+        anchorPane.addEventFilter(MouseEvent.MOUSE_CLICKED, event -> {
+            // Validate edit mode
+            if (!JFXUtil.isObjectEqualTo(editMode, EditMode.ADDNEW, EditMode.UPDATE)) {
                 return;
             }
-
-            anchorPane.addEventFilter(MouseEvent.MOUSE_CLICKED, event -> {
-                // Check edit mode
-                if (!JFXUtil.isObjectEqualTo(editMode, EditMode.ADDNEW, EditMode.UPDATE)) {
-                    return;
+            // Collect nodes
+            Set<Node> nodes = new HashSet<>();
+            nodes.addAll(anchorPane.lookupAll(".text-field"));
+            nodes.addAll(anchorPane.lookupAll(".combo-box"));
+            nodes.addAll(anchorPane.lookupAll(".check-box"));
+            if (nodes.isEmpty()) {
+                return; // nothing to check
+            }
+            for (Node node : nodes) {
+                // Must be disabled
+                if (!node.isDisabled()) {
+                    continue;
+                }
+                // Must have a valid ID
+                String nodeId = node.getId();
+                if (nodeId == null || nodeId.trim().isEmpty()) {
+                    continue;
                 }
 
-                // Look for disabled nodes under this anchor pane
-                Set<Node> nodes = new HashSet<>();
-                nodes.addAll(anchorPane.lookupAll(".text-field"));
-                nodes.addAll(anchorPane.lookupAll(".combo-box"));
-                nodes.addAll(anchorPane.lookupAll(".check-box"));
-
-                for (Node node : nodes) {
-                    if (!node.isDisabled()) {
-                        continue;
-                    }
-
-                    Bounds boundsInScene = node.localToScene(node.getBoundsInLocal());
-                    if (boundsInScene.contains(event.getSceneX(), event.getSceneY())) {
-                        callback.accept(node.getId());
-                        return; // stop after first match
-                    }
+                Bounds boundsInScene = node.localToScene(node.getBoundsInLocal());
+                // Click must be inside the disabled node
+                if (boundsInScene.contains(event.getSceneX(), event.getSceneY())) {
+                    callback.accept(nodeId);
+                    return; // stop immediately after first valid hit
                 }
-            });
-        } catch (Exception e) {
-
-        }
+            }
+            // No disabled node detected → callback is NOT called
+        });
     }
 
     /*Enables glow effect around a Node*/
@@ -2828,6 +2924,33 @@ public class JFXUtil {
                 );
 
                 Tooltip.install(node, tooltip);
+            }
+        }
+    }
+
+    public static void setVisibility(boolean visible, Node... nodes) {
+        if (nodes == null) {
+            return;
+        }
+
+        for (Node node : nodes) {
+            if (node != null) {
+                node.setVisible(visible);
+            }
+        }
+    }
+
+    /*Alternative to switch case, lines saver*/
+    public static void altSwitch(String key, Object[][] cases) {
+        for (Object[] c : cases) {
+            String[] keys = (String[]) c[0];
+            Runnable action = (Runnable) c[1];
+
+            for (String k : keys) {
+                if (k.equals(key)) {
+                    action.run();
+                    return;
+                }
             }
         }
     }
