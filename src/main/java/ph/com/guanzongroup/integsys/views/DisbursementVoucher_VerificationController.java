@@ -353,6 +353,14 @@ public class DisbursementVoucher_VerificationController implements Initializable
                         poController.Master().setModifiedDate(oApp.getServerDate());
                         poController.Master().setModifyingId(oApp.getUserID());
                     }
+                    
+                    //Recheck transaction status
+                    poJSON = poController.checkUpdateTransaction(false);
+                    if (!"success".equals((String) poJSON.get("result"))) {
+                        ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                        return;
+                    }
+                    
                     poJSON = poController.SaveTransaction();
                     if (!"success".equals((String) poJSON.get("result"))) {
                         ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));

@@ -407,6 +407,14 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                         poController.Master().setModifiedDate(oApp.getServerDate());
                         poController.Master().setModifyingId(oApp.getUserID());
                     }
+                    
+                    //Recheck transaction status
+                    poJSON = poController.checkUpdateTransaction(true);
+                    if (!"success".equals((String) poJSON.get("result"))) {
+                        ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                        return;
+                    }
+                    
                     poJSON = poController.SaveTransaction();
                     if (!"success".equals((String) poJSON.get("result"))) {
                         ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
