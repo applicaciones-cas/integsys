@@ -389,7 +389,21 @@ public class PaymentRequest_HistoryController implements Initializable, ScreenIn
                         ShowMessageFX.Warning((String) poJSON.get("message"), "Search Information", null);
                     }
                     break;
-                case "btnHistory":
+                case "btnTransHistory":
+                    if (pnEditMode != EditMode.READY && pnEditMode != EditMode.UPDATE) {
+                        ShowMessageFX.Warning("No transaction status history to load!", psFormName, null);
+                        return;
+                    }
+
+                    try {
+                        poGLControllers.PaymentRequest().ShowStatusHistory();
+                    } catch (NullPointerException npe) {
+                        Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(npe), npe);
+                        ShowMessageFX.Error("No transaction status history to load!", psFormName, null);
+                    } catch (Exception ex) {
+                        Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+                        ShowMessageFX.Error(MiscUtil.getException(ex), psFormName, null);
+                    }
                     break;
                 case "btnClose":
                     if (ShowMessageFX.YesNo("Are you sure you want to close this form?", psFormName, null)) {

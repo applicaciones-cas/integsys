@@ -61,6 +61,7 @@ import org.guanzon.appdriver.base.CommonUtils;
 import org.guanzon.appdriver.base.GRiderCAS;
 import org.guanzon.appdriver.base.GuanzonException;
 import org.guanzon.appdriver.base.LogWrapper;
+import org.guanzon.appdriver.base.MiscUtil;
 import org.guanzon.appdriver.base.SQLUtil;
 import org.guanzon.appdriver.constant.EditMode;
 import org.guanzon.appdriver.constant.UserRight;
@@ -162,8 +163,7 @@ public class PurchaseOrder_ApprovalMCController implements Initializable, Screen
     public void initialize(URL url, ResourceBundle rb) {
         try {
             poPurchasingController = new PurchaseOrderControllers(poApp, logWrapper);
-            poPurchasingController.PurchaseOrder().setTransactionStatus(PurchaseOrderStatus.CONFIRMED
-                    + PurchaseOrderStatus.RETURNED);
+            poPurchasingController.PurchaseOrder().setTransactionStatus(PurchaseOrderStatus.CONFIRMED);
             poPurchasingController.PurchaseOrder().setWithUI(true);
             poJSON = poPurchasingController.PurchaseOrder().InitTransaction();
             if (!"success".equals(poJSON.get("result"))) {
@@ -442,6 +442,20 @@ public class PurchaseOrder_ApprovalMCController implements Initializable, Screen
                     loadTableMain();
                     break;
                 case "btnTransHistory":
+                    if (pnEditMode != EditMode.READY && pnEditMode != EditMode.UPDATE) {
+                        ShowMessageFX.Warning("No transaction status history to load!", psFormName, null);
+                        return;
+                    }
+
+                    try {
+                        poPurchasingController.PurchaseOrder().ShowStatusHistory();
+                    } catch (NullPointerException npe) {
+                        Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(npe), npe);
+                        ShowMessageFX.Error("No transaction status history to load!", psFormName, null);
+                    } catch (Exception ex) {
+                        Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+                        ShowMessageFX.Error(MiscUtil.getException(ex), psFormName, null);
+                    }
                     break;
                 case "btnReturn":
                     if (ShowMessageFX.YesNo(null, psFormName, "Are you sure you want to return transaction?")) {

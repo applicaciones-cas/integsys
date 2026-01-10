@@ -51,6 +51,7 @@ import org.guanzon.appdriver.agent.ShowMessageFX;
 import org.guanzon.appdriver.base.CommonUtils;
 import org.guanzon.appdriver.base.GRiderCAS;
 import org.guanzon.appdriver.base.GuanzonException;
+import org.guanzon.appdriver.base.MiscUtil;
 import org.guanzon.appdriver.base.SQLUtil;
 import org.guanzon.appdriver.constant.EditMode;
 import org.json.simple.JSONObject;
@@ -287,7 +288,20 @@ public class CheckPrintRequest_ConfirmationController implements Initializable, 
                         return;
                     }
                 case "btnHistory":
-                    ShowMessageFX.Warning("Button History is Underdevelopment.", pxeModuleName, null);
+                    if (pnEditMode != EditMode.READY && pnEditMode != EditMode.UPDATE) {
+                        ShowMessageFX.Warning("No transaction status history to load!", pxeModuleName, null);
+                        return;
+                    }
+
+                    try {
+                        poCheckPrintingRequestController.ShowStatusHistory();
+                    } catch (NullPointerException npe) {
+                        Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(npe), npe);
+                        ShowMessageFX.Error("No transaction status history to load!", pxeModuleName, null);
+                    } catch (Exception ex) {
+                        Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+                        ShowMessageFX.Error(MiscUtil.getException(ex), pxeModuleName, null);
+                    }
                     break;
                 case "btnRetrieve":
                     loadTableMain();
