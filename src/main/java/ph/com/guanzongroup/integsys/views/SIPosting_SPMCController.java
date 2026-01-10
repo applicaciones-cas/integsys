@@ -826,7 +826,7 @@ public class SIPosting_SPMCController implements Initializable, ScreenInterface 
                     lsValue = JFXUtil.removeComma(lsValue);
                     if (poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(pnJEDetail).getDebitAmount() > 0.0000 && Double.parseDouble(lsValue) > 0) {
                         ShowMessageFX.Warning(null, pxeModuleName, "Debit and credit amounts cannot both have values at the same time.");
-                        poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(pnJEDetail).setDebitAmount(0.0000);
+                        poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(pnJEDetail).setCreditAmount(0.0000);
                         JFXUtil.textFieldMoveNext(tfCreditAmt);
                         break;
                     } else {
@@ -846,7 +846,7 @@ public class SIPosting_SPMCController implements Initializable, ScreenInterface 
                     lsValue = JFXUtil.removeComma(lsValue);
                     if (poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(pnJEDetail).getCreditAmount() > 0.0000 && Double.parseDouble(lsValue) > 0) {
                         ShowMessageFX.Warning(null, pxeModuleName, "Debit and credit amounts cannot both have values at the same time.");
-                        poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(pnJEDetail).setCreditAmount(0.0000);
+                        poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(pnJEDetail).setDebitAmount(0.0000);
                         JFXUtil.textFieldMoveNext(tfDebitAmt);
                         break;
                     } else {
@@ -876,11 +876,9 @@ public class SIPosting_SPMCController implements Initializable, ScreenInterface 
                     break;
             }
             if (JFXUtil.isObjectEqualTo(lsTxtFieldID, "tfJEAcctCode", "tfJEAcctDescription", "tfCreditAmt", "tfDebitAmt")) {
-                if (!JFXUtil.isObjectEqualTo(lsTxtFieldID, "tfDebitAmt")) {
-                    JFXUtil.runWithDelay(0.50, () -> {
-                        loadTableJEDetail();
-                    });
-                }
+                JFXUtil.runWithDelay(0.50, () -> {
+                    loadTableJEDetail();
+                });
             } else {
                 JFXUtil.runWithDelay(0.50, () -> {
                     loadTableDetail();
