@@ -288,7 +288,20 @@ public class DisbursementVoucher_HistoryController implements Initializable, Scr
                     loadTableDetail.reload();
                     break;
                 case "btnHistory":
-                    ShowMessageFX.Warning(null, pxeModuleName, "Button History is Underdevelopment.");
+                    if(pnEditMode != EditMode.READY && pnEditMode != EditMode.UPDATE){
+                        ShowMessageFX.Warning("No transaction status history to load!", pxeModuleName, null);
+                        return;
+                    } 
+
+                    try {
+                        poController.ShowStatusHistory();
+                    }  catch (NullPointerException npe) {
+                        Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(npe), npe);
+                        ShowMessageFX.Error("No transaction status history to load!", pxeModuleName, null);
+                    } catch (Exception ex) {
+                        Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+                        ShowMessageFX.Error(MiscUtil.getException(ex), pxeModuleName, null);
+                    }
                     break;
                 case "btnClose":
                     if (ShowMessageFX.YesNo(null, "Close Tab", "Are you sure you want to close this Tab?")) {
