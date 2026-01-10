@@ -1327,7 +1327,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                         lsValue = JFXUtil.removeComma(lsValue);
                         if (poController.Journal().Detail(pnDetailJE).getCreditAmount() > 0.0000 && Double.parseDouble(lsValue) > 0) {
                             ShowMessageFX.Warning(null, pxeModuleName, "Debit and credit amounts cannot both have values at the same time.");
-                            poController.Journal().Detail(pnDetailJE).setCreditAmount(0.0000);
+                            poController.Journal().Detail(pnDetailJE).setDebitAmount(0.0000);
                             JFXUtil.textFieldMoveNext(tfDebitAmount);
                             break;
                         } else {
@@ -1349,7 +1349,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                         lsValue = JFXUtil.removeComma(lsValue);
                         if (poController.Journal().Detail(pnDetailJE).getDebitAmount() > 0.0000 && Double.parseDouble(lsValue) > 0) {
                             ShowMessageFX.Warning(null, pxeModuleName, "Debit and credit amounts cannot both have values at the same time.");
-                            poController.Journal().Detail(pnDetailJE).setDebitAmount(0.0000);
+                            poController.Journal().Detail(pnDetailJE).setCreditAmount(0.0000);
                             JFXUtil.textFieldMoveNext(tfCreditAmount);
                             break;
                         } else {

@@ -353,14 +353,14 @@ public class DisbursementVoucher_VerificationController implements Initializable
                         poController.Master().setModifiedDate(oApp.getServerDate());
                         poController.Master().setModifyingId(oApp.getUserID());
                     }
-                    
+
                     //Recheck transaction status
                     poJSON = poController.checkUpdateTransaction(false);
                     if (!"success".equals((String) poJSON.get("result"))) {
                         ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                         return;
                     }
-                    
+
                     poJSON = poController.SaveTransaction();
                     if (!"success".equals((String) poJSON.get("result"))) {
                         ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
@@ -1275,7 +1275,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
                         lsValue = JFXUtil.removeComma(lsValue);
                         if (poController.Journal().Detail(pnDetailJE).getCreditAmount() > 0.0000 && Double.parseDouble(lsValue) > 0) {
                             ShowMessageFX.Warning(null, pxeModuleName, "Debit and credit amounts cannot both have values at the same time.");
-                            poController.Journal().Detail(pnDetailJE).setCreditAmount(0.0000);
+                            poController.Journal().Detail(pnDetailJE).setDebitAmount(0.0000);
                             JFXUtil.textFieldMoveNext(tfDebitAmount);
                             break;
                         } else {
@@ -1297,7 +1297,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
                         lsValue = JFXUtil.removeComma(lsValue);
                         if (poController.Journal().Detail(pnDetailJE).getDebitAmount() > 0.0000 && Double.parseDouble(lsValue) > 0) {
                             ShowMessageFX.Warning(null, pxeModuleName, "Debit and credit amounts cannot both have values at the same time.");
-                            poController.Journal().Detail(pnDetailJE).setDebitAmount(0.0000);
+                            poController.Journal().Detail(pnDetailJE).setCreditAmount(0.0000);
                             JFXUtil.textFieldMoveNext(tfCreditAmount);
                             break;
                         } else {
