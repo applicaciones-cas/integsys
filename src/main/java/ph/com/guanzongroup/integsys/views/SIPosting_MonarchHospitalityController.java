@@ -452,6 +452,20 @@ public class SIPosting_MonarchHospitalityController implements Initializable, Sc
                             return;
                         }
                     case "btnHistory":
+                        if(pnEditMode != EditMode.READY && pnEditMode != EditMode.UPDATE){
+                            ShowMessageFX.Warning("No transaction status history to load!", pxeModuleName, null);
+                            return;
+                        } 
+                        
+                        try {
+                            poPurchaseReceivingController.PurchaseOrderReceiving().ShowStatusHistory();
+                        }  catch (NullPointerException npe) {
+                            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(npe), npe);
+                            ShowMessageFX.Error("No transaction status history to load!", pxeModuleName, null);
+                        } catch (Exception ex) {
+                            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+                            ShowMessageFX.Error(MiscUtil.getException(ex), pxeModuleName, null);
+                        }
                         break;
                     case "btnRetrieve":
                         //Retrieve data from purchase order to table main
@@ -825,7 +839,7 @@ public class SIPosting_MonarchHospitalityController implements Initializable, Sc
                     lsValue = JFXUtil.removeComma(lsValue);
                     if (poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(pnJEDetail).getDebitAmount() > 0.0000 && Double.parseDouble(lsValue) > 0) {
                         ShowMessageFX.Warning(null, pxeModuleName, "Debit and credit amounts cannot both have values at the same time.");
-                        poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(pnJEDetail).setDebitAmount(0.0000);
+                        poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(pnJEDetail).setCreditAmount(0.0000);
                         JFXUtil.textFieldMoveNext(tfCreditAmt);
                         break;
                     } else {
@@ -845,7 +859,7 @@ public class SIPosting_MonarchHospitalityController implements Initializable, Sc
                     lsValue = JFXUtil.removeComma(lsValue);
                     if (poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(pnJEDetail).getCreditAmount() > 0.0000 && Double.parseDouble(lsValue) > 0) {
                         ShowMessageFX.Warning(null, pxeModuleName, "Debit and credit amounts cannot both have values at the same time.");
-                        poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(pnJEDetail).setCreditAmount(0.0000);
+                        poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(pnJEDetail).setDebitAmount(0.0000);
                         JFXUtil.textFieldMoveNext(tfDebitAmt);
                         break;
                     } else {
@@ -875,11 +889,9 @@ public class SIPosting_MonarchHospitalityController implements Initializable, Sc
                     break;
             }
             if (JFXUtil.isObjectEqualTo(lsTxtFieldID, "tfJEAcctCode", "tfJEAcctDescription", "tfCreditAmt", "tfDebitAmt")) {
-                if (!JFXUtil.isObjectEqualTo(lsTxtFieldID, "tfDebitAmt")) {
-                    JFXUtil.runWithDelay(0.50, () -> {
-                        loadTableJEDetail();
-                    });
-                }
+                JFXUtil.runWithDelay(0.50, () -> {
+                    loadTableJEDetail();
+                });
             } else {
                 JFXUtil.runWithDelay(0.50, () -> {
                     loadTableDetail();

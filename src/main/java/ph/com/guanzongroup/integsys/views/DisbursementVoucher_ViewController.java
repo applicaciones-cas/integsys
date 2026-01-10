@@ -103,7 +103,7 @@ public class DisbursementVoucher_ViewController implements Initializable, Screen
     @FXML
     private StackPane StackPane;
     @FXML
-    private Button btnClose;
+    private Button btnHistory, btnClose;
     @FXML
     private TabPane tabPaneMain, tabPanePaymentMode;
     @FXML
@@ -279,7 +279,7 @@ public class DisbursementVoucher_ViewController implements Initializable, Screen
     }
 
     private void initButtonsClickActions() {
-        List<Button> buttons = Arrays.asList(btnClose);
+        List<Button> buttons = Arrays.asList(btnHistory, btnClose);
         buttons.forEach(button -> button.setOnAction(this::cmdButton_Click));
     }
 
@@ -287,6 +287,22 @@ public class DisbursementVoucher_ViewController implements Initializable, Screen
         poJSON = new JSONObject();
         String lsButton = ((Button) event.getSource()).getId();
         switch (lsButton) {
+            case "btnHistory":
+                if (pnEditMode != EditMode.READY && pnEditMode != EditMode.UPDATE) {
+                    ShowMessageFX.Warning("No transaction status history to load!", pxeModuleName, null);
+                    return;
+                }
+
+                try {
+                    poController.ShowStatusHistory();
+                } catch (NullPointerException npe) {
+                    Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(npe), npe);
+                    ShowMessageFX.Error("No transaction status history to load!", pxeModuleName, null);
+                } catch (Exception ex) {
+                    Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+                    ShowMessageFX.Error(MiscUtil.getException(ex), pxeModuleName, null);
+                }
+                break;
             case "btnClose":
                 if (ShowMessageFX.YesNo(null, "Close Tab", "Are you sure you want to close this Tab?")) {
                     CommonUtils.closeStage(btnClose);

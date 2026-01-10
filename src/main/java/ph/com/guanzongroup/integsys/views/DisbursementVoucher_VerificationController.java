@@ -321,7 +321,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
                         ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                         return;
                     }
-                    
+
                     poJSON = poController.UpdateTransaction();
                     if ("error".equals((String) poJSON.get("result"))) {
                         ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
@@ -337,6 +337,13 @@ public class DisbursementVoucher_VerificationController implements Initializable
                     JFXUtil.initiateBtnSearch(pxeModuleName, lastFocusedTextField, previousSearchedTextField, apBrowse, apDVMaster1, apMasterDVCheck, apMasterDVBTransfer, apMasterDVOp, apDVDetail, apJournalDetails);
                     break;
                 case "btnSave":
+                    //Recheck transaction status
+                    poJSON = poController.checkUpdateTransaction(false);
+                    if (!"success".equals((String) poJSON.get("result"))) {
+                        ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                        return;
+                    }
+                    
                     if (!ShowMessageFX.YesNo(null, pxeModuleName, "Are you sure you want to save the transaction?")) {
                         return;
                     }
@@ -353,6 +360,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
                         poController.Master().setModifiedDate(oApp.getServerDate());
                         poController.Master().setModifyingId(oApp.getUserID());
                     }
+
                     poJSON = poController.SaveTransaction();
                     if (!"success".equals((String) poJSON.get("result"))) {
                         ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
@@ -381,7 +389,20 @@ public class DisbursementVoucher_VerificationController implements Initializable
                         return;
                     }
                 case "btnHistory":
-                    ShowMessageFX.Warning(null, pxeModuleName, "Button History is under development.");
+                    if(pnEditMode != EditMode.READY && pnEditMode != EditMode.UPDATE){
+                        ShowMessageFX.Warning("No transaction status history to load!", pxeModuleName, null);
+                        return;
+                    } 
+
+                    try {
+                        poController.ShowStatusHistory();
+                    }  catch (NullPointerException npe) {
+                        Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(npe), npe);
+                        ShowMessageFX.Error("No transaction status history to load!", pxeModuleName, null);
+                    } catch (Exception ex) {
+                        Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+                        ShowMessageFX.Error(MiscUtil.getException(ex), pxeModuleName, null);
+                    }
                     break;
                 case "btnRetrieve":
                     loadTableMain.reload();
@@ -972,6 +993,10 @@ public class DisbursementVoucher_VerificationController implements Initializable
         JFXUtil.setCheckboxHoverCursor(chbkPrintByBank, chbkIsCrossCheck, chbkIsPersonOnly, chbkVatClassification);
 
         JFXUtil.applyHoverTooltip("Undo Reverse", btnUndo);
+        Platform.runLater(() -> {
+            JFXUtil.setVerticalScroll(taDVRemarks);
+            JFXUtil.setVerticalScroll(taJournalRemarks);
+        });
     }
     ChangeListener<Boolean> txtSearch_Focus = JFXUtil.FocusListener(TextField.class,
             (lsID, lsValue) -> {
@@ -1263,7 +1288,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
                         lsValue = JFXUtil.removeComma(lsValue);
                         if (poController.Journal().Detail(pnDetailJE).getCreditAmount() > 0.0000 && Double.parseDouble(lsValue) > 0) {
                             ShowMessageFX.Warning(null, pxeModuleName, "Debit and credit amounts cannot both have values at the same time.");
-                            poController.Journal().Detail(pnDetailJE).setCreditAmount(0.0000);
+                            poController.Journal().Detail(pnDetailJE).setDebitAmount(0.0000);
                             JFXUtil.textFieldMoveNext(tfDebitAmount);
                             break;
                         } else {
@@ -1285,7 +1310,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
                         lsValue = JFXUtil.removeComma(lsValue);
                         if (poController.Journal().Detail(pnDetailJE).getDebitAmount() > 0.0000 && Double.parseDouble(lsValue) > 0) {
                             ShowMessageFX.Warning(null, pxeModuleName, "Debit and credit amounts cannot both have values at the same time.");
-                            poController.Journal().Detail(pnDetailJE).setDebitAmount(0.0000);
+                            poController.Journal().Detail(pnDetailJE).setCreditAmount(0.0000);
                             JFXUtil.textFieldMoveNext(tfCreditAmount);
                             break;
                         } else {
@@ -1311,11 +1336,9 @@ public class DisbursementVoucher_VerificationController implements Initializable
                         }
                         break;
                 }
-                if (!JFXUtil.isObjectEqualTo(lsID, "tfCreditAmount")) {
-                    JFXUtil.runWithDelay(0.50, () -> {
-                        loadTableDetailJE.reload();
-                    });
-                }
+                JFXUtil.runWithDelay(0.50, () -> {
+                    loadTableDetailJE.reload();
+                });
             });
 
     ChangeListener<Boolean> txtBIRDetail_Focus = JFXUtil.FocusListener(TextField.class,
@@ -1615,47 +1638,19 @@ public class DisbursementVoucher_VerificationController implements Initializable
                         event.consume();
                         break;
                     case UP:
-                        switch (lsID) {
-                            case "tfPurchasedAmountDetail":
-                            case "tfTaxCodeDetail":
-                            case "tfParticularsDetail":
-                                moveNext(true, true);
-                                break;
-                            case "tfAccountCode":
-                            case "tfAccountDescription":
-                            case "tfDebitAmount":
-                            case "tfCreditAmount":
-                                moveNextJE(true, true);
-                                break;
-                            case "tfTaxCode":
-                            case "tfParticular":
-                            case "tfBaseAmount":
-                            case "tfTaxRate":
-                                moveNextBIR(true, true);
-                                break;
-                        }
+                        JFXUtil.altSwitch(lsID, new Object[][]{
+                            {new String[]{"tfPurchasedAmountDetail", "tfTaxCodeDetail", "tfParticularsDetail"}, (Runnable) () -> moveNext(true, true)},
+                            {new String[]{"tfAccountCode", "tfAccountDescription", "tfCreditAmount"}, (Runnable) () -> moveNextJE(true, true)},
+                            {new String[]{"tfTaxCode", "tfParticular", "tfBaseAmount", "tfTaxRate"}, (Runnable) () -> moveNextBIR(true, true)}
+                        });
                         event.consume();
                         break;
                     case DOWN:
-                        switch (lsID) {
-                            case "tfPurchasedAmountDetail":
-                            case "tfTaxCodeDetail":
-                            case "tfParticularsDetail":
-                                moveNext(false, true);
-                                break;
-                            case "tfAccountCode":
-                            case "tfAccountDescription":
-                            case "tfDebitAmount":
-                            case "tfCreditAmount":
-                                moveNextJE(false, true);
-                                break;
-                            case "tfTaxCode":
-                            case "tfParticular":
-                            case "tfBaseAmount":
-                            case "tfTaxRate":
-                                moveNextBIR(false, true);
-                                break;
-                        }
+                        JFXUtil.altSwitch(lsID, new Object[][]{
+                            {new String[]{"tfPurchasedAmountDetail", "tfTaxCodeDetail", "tfParticularsDetail"}, (Runnable) () -> moveNext(false, true)},
+                            {new String[]{"tfAccountCode", "tfAccountDescription", "tfCreditAmount"}, (Runnable) () -> moveNextJE(false, true)},
+                            {new String[]{"tfTaxCode", "tfParticular", "tfBaseAmount", "tfTaxRate"}, (Runnable) () -> moveNextBIR(false, true)}
+                        });
                         event.consume();
                         break;
                     default:
