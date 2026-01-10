@@ -368,6 +368,20 @@ public class DeliveryAcceptance_EntryCarController implements Initializable, Scr
                             return;
                         }
                     case "btnHistory":
+                        if(pnEditMode != EditMode.READY && pnEditMode != EditMode.UPDATE){
+                            ShowMessageFX.Warning("No transaction status history to load!", pxeModuleName, null);
+                            return;
+                        } 
+                        
+                        try {
+                            poPurchaseReceivingController.PurchaseOrderReceiving().ShowStatusHistory();
+                        }  catch (NullPointerException npe) {
+                            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(npe), npe);
+                            ShowMessageFX.Error("No transaction status history to load!", pxeModuleName, null);
+                        } catch (Exception ex) {
+                            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+                            ShowMessageFX.Error(MiscUtil.getException(ex), pxeModuleName, null);
+                        }
                         break;
                     case "btnRetrieve":
                         //Retrieve data from purchase order to table main
