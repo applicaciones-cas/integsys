@@ -660,6 +660,10 @@ public class DisbursementVoucher_HistoryController implements Initializable, Scr
         //Initialise  TextField Focus
         JFXUtil.setFocusListener(txtSearch_Focus, tfSearchTransaction, tfSearchSupplier);
         JFXUtil.setKeyPressedListener(this::txtField_KeyPressed, apBrowse);
+        Platform.runLater(() -> {
+            JFXUtil.setVerticalScroll(taDVRemarks);
+            JFXUtil.setVerticalScroll(taJournalRemarks);
+        });
     }
     ChangeListener<Boolean> txtSearch_Focus = JFXUtil.FocusListener(TextField.class,
             (lsID, lsValue) -> {

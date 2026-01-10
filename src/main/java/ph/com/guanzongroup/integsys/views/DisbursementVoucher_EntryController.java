@@ -372,7 +372,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                         ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                         return;
                     }
-                    
+
                     poJSON = poController.UpdateTransaction();
                     if ("error".equals((String) poJSON.get("result"))) {
                         ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
@@ -1029,6 +1029,10 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
         JFXUtil.setCheckboxHoverCursor(chbkPrintByBank, chbkIsCrossCheck, chbkIsPersonOnly, chbkVatClassification);
 
         JFXUtil.applyHoverTooltip("Undo Reversed item", btnUndo);
+        Platform.runLater(() -> {
+            JFXUtil.setVerticalScroll(taDVRemarks);
+            JFXUtil.setVerticalScroll(taJournalRemarks);
+        });
     }
     ChangeListener<Boolean> txtSearch_Focus = JFXUtil.FocusListener(TextField.class,
             (lsID, lsValue) -> {
@@ -1363,11 +1367,9 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                         }
                         break;
                 }
-                if (!JFXUtil.isObjectEqualTo(lsID, "tfCreditAmount")) {
-                    JFXUtil.runWithDelay(0.50, () -> {
-                        loadTableDetailJE.reload();
-                    });
-                }
+                JFXUtil.runWithDelay(0.50, () -> {
+                    loadTableDetailJE.reload();
+                });
             });
 
     ChangeListener<Boolean> txtBIRDetail_Focus = JFXUtil.FocusListener(TextField.class,
@@ -1663,47 +1665,19 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                         break;
 
                     case UP:
-                        switch (lsID) {
-                            case "tfPurchasedAmountDetail":
-                            case "tfTaxCodeDetail":
-                            case "tfParticularsDetail":
-                                moveNext(true, true);
-                                break;
-                            case "tfAccountCode":
-                            case "tfAccountDescription":
-                            case "tfDebitAmount":
-                            case "tfCreditAmount":
-                                moveNextJE(true, true);
-                                break;
-                            case "tfTaxCode":
-                            case "tfParticular":
-                            case "tfBaseAmount":
-                            case "tfTaxRate":
-                                moveNextBIR(true, true);
-                                break;
-                        }
+                        JFXUtil.altSwitch(lsID, new Object[][]{
+                            {new String[]{"tfPurchasedAmountDetail", "tfTaxCodeDetail", "tfParticularsDetail"}, (Runnable) () -> moveNext(true, true)},
+                            {new String[]{"tfAccountCode", "tfAccountDescription", "tfCreditAmount"}, (Runnable) () -> moveNextJE(true, true)},
+                            {new String[]{"tfTaxCode", "tfParticular", "tfBaseAmount", "tfTaxRate"}, (Runnable) () -> moveNextBIR(true, true)}
+                        });
                         event.consume();
                         break;
                     case DOWN:
-                        switch (lsID) {
-                            case "tfPurchasedAmountDetail":
-                            case "tfTaxCodeDetail":
-                            case "tfParticularsDetail":
-                                moveNext(false, true);
-                                break;
-                            case "tfAccountCode":
-                            case "tfAccountDescription":
-                            case "tfDebitAmount":
-                            case "tfCreditAmount":
-                                moveNextJE(false, true);
-                                break;
-                            case "tfTaxCode":
-                            case "tfParticular":
-                            case "tfBaseAmount":
-                            case "tfTaxRate":
-                                moveNextBIR(false, true);
-                                break;
-                        }
+                        JFXUtil.altSwitch(lsID, new Object[][]{
+                            {new String[]{"tfPurchasedAmountDetail", "tfTaxCodeDetail", "tfParticularsDetail"}, (Runnable) () -> moveNext(false, true)},
+                            {new String[]{"tfAccountCode", "tfAccountDescription", "tfCreditAmount"}, (Runnable) () -> moveNextJE(false, true)},
+                            {new String[]{"tfTaxCode", "tfParticular", "tfBaseAmount", "tfTaxRate"}, (Runnable) () -> moveNextBIR(false, true)}
+                        });
                         event.consume();
                         break;
                     default:
