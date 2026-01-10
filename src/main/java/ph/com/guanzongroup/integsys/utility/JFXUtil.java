@@ -1057,9 +1057,9 @@ public class JFXUtil {
 
     /*Applies customed orange colored vertical scroll bar in textArea*/
     public static void setVerticalScroll(TextArea textArea) {
+        textArea.setWrapText(true);
         textArea.applyCss();
         textArea.layout();
-
         textArea.setStyle(
                 "-fx-font-size: 10pt;"
                 + "-fx-border-radius: 2px;"
