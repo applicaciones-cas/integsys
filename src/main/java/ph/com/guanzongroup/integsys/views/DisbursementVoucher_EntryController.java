@@ -388,6 +388,15 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                     JFXUtil.initiateBtnSearch(pxeModuleName, lastFocusedTextField, previousSearchedTextField, apBrowse, apDVMaster1, apMasterDVCheck, apMasterDVBTransfer, apMasterDVOp, apDVDetail, apJournalDetails, apBIRDetail);
                     break;
                 case "btnSave":
+                    //Recheck transaction status
+                    if(pnEditMode == EditMode.UPDATE){
+                        poJSON = poController.checkUpdateTransaction(true);
+                        if (!"success".equals((String) poJSON.get("result"))) {
+                            ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                            return;
+                        }
+                    }
+                    
                     if (!ShowMessageFX.YesNo(null, pxeModuleName, "Are you sure you want to save the transaction?")) {
                         return;
                     }
@@ -406,13 +415,6 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
 
                         poController.Master().setModifiedDate(oApp.getServerDate());
                         poController.Master().setModifyingId(oApp.getUserID());
-                    }
-                    
-                    //Recheck transaction status
-                    poJSON = poController.checkUpdateTransaction(true);
-                    if (!"success".equals((String) poJSON.get("result"))) {
-                        ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-                        return;
                     }
                     
                     poJSON = poController.SaveTransaction();
