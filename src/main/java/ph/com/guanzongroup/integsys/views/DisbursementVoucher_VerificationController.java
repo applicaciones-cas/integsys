@@ -343,7 +343,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
                         ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                         return;
                     }
-                    
+
                     if (!ShowMessageFX.YesNo(null, pxeModuleName, "Are you sure you want to save the transaction?")) {
                         return;
                     }
@@ -389,14 +389,14 @@ public class DisbursementVoucher_VerificationController implements Initializable
                         return;
                     }
                 case "btnHistory":
-                    if(pnEditMode != EditMode.READY && pnEditMode != EditMode.UPDATE){
+                    if (pnEditMode != EditMode.READY && pnEditMode != EditMode.UPDATE) {
                         ShowMessageFX.Warning("No transaction status history to load!", pxeModuleName, null);
                         return;
-                    } 
+                    }
 
                     try {
                         poController.ShowStatusHistory();
-                    }  catch (NullPointerException npe) {
+                    } catch (NullPointerException npe) {
                         Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(npe), npe);
                         ShowMessageFX.Error("No transaction status history to load!", pxeModuleName, null);
                     } catch (Exception ex) {
@@ -1768,7 +1768,8 @@ public class DisbursementVoucher_VerificationController implements Initializable
         boolean lbNotZero = poController.Detail(pnDetail).getAmountApplied() != 0;
         cbReverse.selectedProperty().set(lbNotNull && lbNotZero);
 
-        boolean lbShow = (poController.Detail(pnDetail).getSourceCode()).equals(DisbursementStatic.SourceCode.PAYMENT_REQUEST);
+        boolean lbShow = (poController.Detail(pnDetail).getSourceCode()).equals(DisbursementStatic.SourceCode.PAYMENT_REQUEST)
+                || (poController.Detail(pnDetail).getSourceCode()).equals(DisbursementStatic.SourceCode.AP_ADJUSTMENT);
         JFXUtil.setDisabled(!lbShow, chbkVatClassification, tfVatExemptDetail);
 
         tfRefNoDetail.setText(poController.getReferenceNo(pnDetail));
@@ -2041,7 +2042,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
             switch (nodeID) {
                 case "chbkVatClassification":
                     ShowMessageFX.Warning(null, pxeModuleName,
-                            "Only available when the transaction Type is \"Payment Request\".");
+                            "Only available when the transaction Type is \"Payment Request\" or \"AP Adjustment\".");
                     break;
             }
         });
