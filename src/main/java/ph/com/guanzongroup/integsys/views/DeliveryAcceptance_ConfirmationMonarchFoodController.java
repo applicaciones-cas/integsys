@@ -464,7 +464,7 @@ public class DeliveryAcceptance_ConfirmationMonarchFoodController implements Ini
                         break;
                     case "btnVoid":
                         poJSON = new JSONObject();
-                        if (ShowMessageFX.YesNo(null, "Close Tab", "Are you sure you want to void transaction?") == true) {
+                        if (ShowMessageFX.YesNo(null, pxeModuleName, "Are you sure you want to void transaction?") == true) {
                             if (PurchaseOrderReceivingStatus.CONFIRMED.equals(poPurchaseReceivingController.PurchaseOrderReceiving().Master().getTransactionStatus())) {
                                 poJSON = poPurchaseReceivingController.PurchaseOrderReceiving().CancelTransaction("");
                             } else {
@@ -484,7 +484,7 @@ public class DeliveryAcceptance_ConfirmationMonarchFoodController implements Ini
                         break;
                     case "btnReturn":
                         poJSON = new JSONObject();
-                        if (ShowMessageFX.YesNo(null, "Close Tab", "Are you sure you want to return transaction?") == true) {
+                        if (ShowMessageFX.YesNo(null, pxeModuleName, "Are you sure you want to return transaction?") == true) {
                             poJSON = poPurchaseReceivingController.PurchaseOrderReceiving().ReturnTransaction("");
                             if ("error".equals((String) poJSON.get("result"))) {
                                 ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
@@ -2216,6 +2216,13 @@ public class DeliveryAcceptance_ConfirmationMonarchFoodController implements Ini
     }
 
     public void initTextFields() {
+        JFXUtil.handleDisabledNodeClick(apDetail, pnEditMode, node -> {
+            switch (node) {
+                case "tfCost":
+                    ShowMessageFX.Information(null, pxeModuleName, "This field is restricted and can only be modified by non-Encoder users.");
+                    break;
+            }
+        });
 
         tfSearchSupplier.focusedProperty().addListener(txtField_Focus);
         tfSearchReferenceNo.focusedProperty().addListener(txtField_Focus);
@@ -2245,7 +2252,7 @@ public class DeliveryAcceptance_ConfirmationMonarchFoodController implements Ini
             textField.setOnKeyPressed(this::txtField_KeyPressed);
         }
         JFXUtil.initComboBoxCellDesignColor(cmbAttachmentType, "#FF8201");
-        CustomCommonUtil.inputDecimalOnly(tfReceiveQuantity, tfDiscountRate, tfDiscountAmount, tfCost, tfReceiveQuantity);
+        JFXUtil.inputDecimalOnly(tfReceiveQuantity, tfDiscountRate, tfDiscountAmount, tfCost, tfReceiveQuantity);
         // Combobox
         cmbAttachmentType.setItems(documentType);
         cmbAttachmentType.setOnAction(event -> {
