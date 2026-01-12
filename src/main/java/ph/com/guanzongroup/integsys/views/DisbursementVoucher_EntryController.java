@@ -1048,9 +1048,9 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
         JFXUtil.setFocusListener(txtBIRDetail_Focus, tfBaseAmount, tfTaxCode, tfParticular, tfTaxCode);
 
         JFXUtil.setKeyPressedListener(this::txtField_KeyPressed, apDVMaster1, apMasterDVCheck, apMasterDVBTransfer, apMasterDVOp, apDVDetail, apMainList, apJournalDetails, apBIRDetail);
-        JFXUtil.setCommaFormatter(tfDebitAmount, tfCreditAmount, tfBaseAmount, tfCheckAmount, tfVatExemptDetail);
+        JFXUtil.setCommaFormatter(tfDebitAmount, tfCreditAmount, tfBaseAmount, tfCheckAmount);
         JFXUtil.setCheckboxHoverCursor(chbkPrintByBank, chbkIsCrossCheck, chbkIsPersonOnly, chbkVatClassification);
-
+        JFXUtil.setCommaFormatter2(tfVatExemptDetail);
         JFXUtil.applyHoverTooltip("Undo Reversed item", btnUndo);
         Platform.runLater(() -> {
             JFXUtil.setVerticalScroll(taDVRemarks);

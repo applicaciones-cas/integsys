@@ -989,9 +989,9 @@ public class DisbursementVoucher_VerificationController implements Initializable
         JFXUtil.setFocusListener(txtBIRDetail_Focus, tfBaseAmount, tfTaxCode, tfParticular, tfTaxCode);
 
         JFXUtil.setKeyPressedListener(this::txtField_KeyPressed, apBrowse, apDVMaster1, apMasterDVCheck, apMasterDVBTransfer, apMasterDVOp, apDVDetail, apJournalDetails, apBIRDetail);
-        JFXUtil.setCommaFormatter(tfDebitAmount, tfCreditAmount, tfBaseAmount, tfCheckAmount, tfVatExemptDetail);
+        JFXUtil.setCommaFormatter(tfDebitAmount, tfCreditAmount, tfBaseAmount, tfCheckAmount);
         JFXUtil.setCheckboxHoverCursor(chbkPrintByBank, chbkIsCrossCheck, chbkIsPersonOnly, chbkVatClassification);
-
+        JFXUtil.setCommaFormatter2(tfVatExemptDetail);
         JFXUtil.applyHoverTooltip("Undo Reverse", btnUndo);
         Platform.runLater(() -> {
             JFXUtil.setVerticalScroll(taDVRemarks);
