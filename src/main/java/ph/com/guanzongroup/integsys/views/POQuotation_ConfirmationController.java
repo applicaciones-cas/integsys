@@ -630,6 +630,13 @@ public class POQuotation_ConfirmationController implements Initializable, Screen
 //                try {
                 /*Lost Focus*/
                 switch (lsID) {
+                    case "tfReferenceNo":
+                        poJSON = poController.POQuotation().Master().setReferenceNo(lsValue);
+                        if ("error".equals(poJSON.get("result"))) {
+                            ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                            break;
+                        }
+                        break;
                     case "tfTerm":
                         if (lsValue.isEmpty()) {
                             poJSON = poController.POQuotation().Master().setTerm("");
@@ -1675,7 +1682,8 @@ public class POQuotation_ConfirmationController implements Initializable, Screen
                                             String.valueOf(poController.POQuotation().POQuotationList(lnCtr).Branch().getBranchName()),
                                             String.valueOf(poController.POQuotation().POQuotationList(lnCtr).Supplier().getCompanyName()),
                                             String.valueOf(CustomCommonUtil.formatDateToShortString(poController.POQuotation().POQuotationList(lnCtr).getTransactionDate())),
-                                            safeGet(poController.POQuotation().POQuotationList(lnCtr).POQuotationRequest().getTransactionNo()),
+//                                            safeGet(poController.POQuotation().POQuotationList(lnCtr).POQuotationRequest().getTransactionNo()),
+                                            safeGet(poController.POQuotation().POQuotationList(lnCtr).getReferenceNo()),
                                             String.valueOf(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.POQuotation().POQuotationList(lnCtr).getTransactionTotal(), true))
                                     ));
                                 } catch (GuanzonException | SQLException ex) {
@@ -1712,7 +1720,7 @@ public class POQuotation_ConfirmationController implements Initializable, Screen
     public void initTextFields() {
         JFXUtil.setFocusListener(txtField_Focus, tfSearchBranch, tfSearchSupplier, tfSearchDepartment, tfSearchCategory, tfSearchReferenceNo);
         JFXUtil.setFocusListener(txtArea_Focus, taRemarks);
-        JFXUtil.setFocusListener(txtMaster_Focus, tfTerm, tfDiscRate, tfAddlDiscAmt, tfFreight);
+        JFXUtil.setFocusListener(txtMaster_Focus, tfTerm, tfDiscRate, tfAddlDiscAmt, tfFreight, tfReferenceNo);
 
         JFXUtil.setFocusListener(txtDetail_Focus, tfReplaceId, tfReplaceDescription, tfUnitPrice, tfQuantity,
                 tfDiscRateDetail, tfAddlDiscAmtDetail);
