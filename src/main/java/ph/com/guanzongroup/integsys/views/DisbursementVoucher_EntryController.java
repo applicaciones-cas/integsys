@@ -2354,7 +2354,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
         JFXUtil.setButtonsVisibility(!lbShow, btnBrowse, btnClose, btnNew);
         JFXUtil.setButtonsVisibility(lbShow, btnSearch, btnSave, btnCancel);
         JFXUtil.setButtonsVisibility(false, btnUpdate, btnVoid);
-        JFXUtil.setButtonsVisibility(fnEditMode != EditMode.READY, btnHistory);
+        JFXUtil.setButtonsVisibility(fnEditMode == EditMode.READY, btnHistory);
 
         JFXUtil.setDisabled(!lbShow, apDVMaster1, apDVMaster2, apDVMaster3, apDVDetail,
                 apMasterDVCheck, apMasterDVBTransfer, apMasterDVOp, apJournalMaster, apJournalDetails, apBIRDetail);

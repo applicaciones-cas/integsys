@@ -288,14 +288,14 @@ public class DisbursementVoucher_HistoryController implements Initializable, Scr
                     loadTableDetail.reload();
                     break;
                 case "btnHistory":
-                    if(pnEditMode != EditMode.READY && pnEditMode != EditMode.UPDATE){
+                    if (pnEditMode != EditMode.READY && pnEditMode != EditMode.UPDATE) {
                         ShowMessageFX.Warning("No transaction status history to load!", pxeModuleName, null);
                         return;
-                    } 
+                    }
 
                     try {
                         poController.ShowStatusHistory();
-                    }  catch (NullPointerException npe) {
+                    } catch (NullPointerException npe) {
                         Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(npe), npe);
                         ShowMessageFX.Error("No transaction status history to load!", pxeModuleName, null);
                     } catch (Exception ex) {
@@ -974,7 +974,7 @@ public class DisbursementVoucher_HistoryController implements Initializable, Scr
     private void initButton(int fnEditMode) {
         boolean lbShow = (fnEditMode == EditMode.ADDNEW || fnEditMode == EditMode.UPDATE);
         JFXUtil.setButtonsVisibility(!lbShow, btnBrowse, btnClose);
-        JFXUtil.setButtonsVisibility(fnEditMode != EditMode.READY, btnHistory);
+        JFXUtil.setButtonsVisibility(fnEditMode == EditMode.READY, btnHistory);
 
         JFXUtil.setDisabled(!lbShow, apDVMaster1, apDVMaster2, apDVMaster3, apDVDetail,
                 apMasterDVCheck, apMasterDVBTransfer, apMasterDVOp, apJournalMaster, apJournalDetails, apBIRDetail);
