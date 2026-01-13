@@ -675,7 +675,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
                             details_data.clear();
                             if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
                                 poController.ReloadDetail();
-                                poJSON = poController.computeDetailFields();
+                                poJSON = poController.computeDetailFields(true);
                                 if ("error".equals((String) poJSON.get("result"))) {
                                     ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                 }
@@ -1104,7 +1104,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
                         if (!JFXUtil.isJSONSuccess(poJSON)) {
                             ShowMessageFX.Warning(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
                         }
-                        poJSON = poController.computeFields();
+                        poJSON = poController.computeFields(true);
                         if ("error".equals((String) poJSON.get("result"))) {
                             ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                             poController.Detail(pnDetail).setAmountApplied(0.00);
@@ -1736,7 +1736,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
     private void loadRecordMaster() {
         try {
             initDVMasterTabs();
-            poController.computeFields();
+            poController.computeFields(false);
             JFXUtil.setStatusValue(lblDVTransactionStatus, DisbursementStatic.class, pnEditMode == EditMode.UNKNOWN ? "-1" : poController.Master().getTransactionStatus());
             JFXUtil.setDisabled(true, tfSupplier);
             tfDVTransactionNo.setText(poController.Master().getTransactionNo() != null ? poController.Master().getTransactionNo() : "");
@@ -2250,7 +2250,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
                     if (!checkedBox.isSelected()) {
                         poController.Detail(pnDetail).setAmountApplied(0.0000);
                     }
-                    poJSON = poController.computeFields();
+                    poJSON = poController.computeFields(true);
                     if (!JFXUtil.isJSONSuccess(poJSON)) {
                         ShowMessageFX.Warning(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
                         poController.Detail(pnDetail).setAmountApplied(poController.Detail(pnDetail).getAmount());

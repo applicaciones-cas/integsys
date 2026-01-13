@@ -332,7 +332,7 @@ public class DisbursementVoucher_ViewController implements Initializable, Screen
                             details_data.clear();
                             if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
                                 poController.ReloadDetail();
-                                poJSON = poController.computeDetailFields();
+                                poJSON = poController.computeDetailFields(true);
                                 if ("error".equals((String) poJSON.get("result"))) {
                                     ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                 }
@@ -505,7 +505,7 @@ public class DisbursementVoucher_ViewController implements Initializable, Screen
         try {
             initDVMasterTabs();
             poJSON = new JSONObject();
-            poController.computeFields();
+            poController.computeFields(false);
             JFXUtil.setStatusValue(lblDVTransactionStatus, DisbursementStatic.class, poController.Master().getTransactionStatus());
             tfDVTransactionNo.setText(poController.Master().getTransactionNo() != null ? poController.Master().getTransactionNo() : "");
             dpDVTransactionDate.setValue(CustomCommonUtil.parseDateStringToLocalDate(SQLUtil.dateFormat(poController.Master().getTransactionDate(), SQLUtil.FORMAT_SHORT_DATE)));

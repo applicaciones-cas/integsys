@@ -380,7 +380,7 @@ public class DisbursementVoucher_HistoryController implements Initializable, Scr
                             int lnCtr;
                             if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
                                 poController.ReloadDetail();
-                                poJSON = poController.computeDetailFields();
+                                poJSON = poController.computeDetailFields(true);
                                 if ("error".equals((String) poJSON.get("result"))) {
                                     ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                 }
@@ -769,7 +769,7 @@ public class DisbursementVoucher_HistoryController implements Initializable, Scr
             initDVMasterTabs();
             poJSON = new JSONObject();
             poController.computeTaxAmount();
-            poJSON = poController.computeFields();
+            poJSON = poController.computeFields(true);
             if ("error".equals((String) poJSON.get("result"))) {
                 ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                 return;
@@ -784,7 +784,7 @@ public class DisbursementVoucher_HistoryController implements Initializable, Scr
             tfVoucherNo.setText(poController.Master().getVoucherNo());
             tfSupplier.setText(poController.Master().Payee().Client().getCompanyName() != null ? poController.Master().Payee().Client().getCompanyName() : "");
 
-            poJSON = poController.computeFields();
+            poJSON = poController.computeFields(true);
             if ("error".equals((String) poJSON.get("result"))) {
                 ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                 return;

@@ -730,7 +730,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                             details_data.clear();
                             if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
                                 poController.ReloadDetail();
-                                poJSON = poController.computeDetailFields();
+                                poJSON = poController.computeDetailFields(true);
                                 if ("error".equals((String) poJSON.get("result"))) {
                                     ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                 }
@@ -1142,6 +1142,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                 /*Lost Focus*/
                 switch (lsID) {
                     case "tfVatExemptDetail":
+                        double lnOldVal = poController.Detail(pnDetail).getDetailVatExempt();
                         lsValue = JFXUtil.removeComma(lsValue);
                         poJSON = poController.Detail(pnDetail).setDetailVatExempt(Double.valueOf(lsValue));
                         if (!JFXUtil.isJSONSuccess(poJSON)) {
@@ -1158,7 +1159,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                         if (!JFXUtil.isJSONSuccess(poJSON)) {
                             ShowMessageFX.Warning(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
                         }
-                        poJSON = poController.computeFields();
+                        poJSON = poController.computeFields(true);
                         if ("error".equals((String) poJSON.get("result"))) {
                             ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                             poController.Detail(pnDetail).setAmountApplied(0.00);
@@ -1787,7 +1788,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
     private void loadRecordMaster() {
         try {
             initDVMasterTabs();
-            poController.computeFields();
+            poController.computeFields(false);
             JFXUtil.setStatusValue(lblDVTransactionStatus, DisbursementStatic.class, pnEditMode == EditMode.UNKNOWN ? "-1" : poController.Master().getTransactionStatus());
             tfDVTransactionNo.setText(poController.Master().getTransactionNo() != null ? poController.Master().getTransactionNo() : "");
             dpDVTransactionDate.setValue(CustomCommonUtil.parseDateStringToLocalDate(SQLUtil.dateFormat(poController.Master().getTransactionDate(), SQLUtil.FORMAT_SHORT_DATE)));
@@ -2308,7 +2309,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                     if (!checkedBox.isSelected()) {
                         poController.Detail(pnDetail).setAmountApplied(0.0000);
                     }
-                    poJSON = poController.computeFields();
+                    poJSON = poController.computeFields(true);
                     if (!JFXUtil.isJSONSuccess(poJSON)) {
                         ShowMessageFX.Warning(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
                         poController.Detail(pnDetail).setAmountApplied(poController.Detail(pnDetail).getAmount());
