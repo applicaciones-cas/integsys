@@ -297,14 +297,14 @@ public class APPaymentAdjustment_HistoryLPController implements Initializable, S
                         psSupplierId = poAPPaymentAdjustmentController.APPaymentAdjustment().getModel().getClientId();
                         break;
                     case "btnHistory":
-                        if(pnEditMode != EditMode.READY && pnEditMode != EditMode.UPDATE){
+                        if (pnEditMode != EditMode.READY && pnEditMode != EditMode.UPDATE) {
                             ShowMessageFX.Warning("No transaction status history to load!", pxeModuleName, null);
                             return;
-                        } 
-                        
+                        }
+
                         try {
                             poAPPaymentAdjustmentController.APPaymentAdjustment().ShowStatusHistory();
-                        }  catch (NullPointerException npe) {
+                        } catch (NullPointerException npe) {
                             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(npe), npe);
                             ShowMessageFX.Error("No transaction status history to load!", pxeModuleName, null);
                         } catch (Exception ex) {
@@ -335,5 +335,6 @@ public class APPaymentAdjustment_HistoryLPController implements Initializable, S
         //Unkown || Ready
         JFXUtil.setDisabled(true, apMaster);
         JFXUtil.setButtonsVisibility(true, btnClose);
+        JFXUtil.setButtonsVisibility(fnValue == EditMode.READY, btnHistory);
     }
 }

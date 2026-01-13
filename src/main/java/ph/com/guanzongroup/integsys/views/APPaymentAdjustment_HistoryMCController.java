@@ -35,6 +35,7 @@ import ph.com.guanzongroup.integsys.utility.CustomCommonUtil;
 import ph.com.guanzongroup.integsys.utility.JFXUtil;
 
 public class APPaymentAdjustment_HistoryMCController implements Initializable, ScreenInterface {
+
     private GRiderCAS oApp;
     static CashflowControllers poAPPaymentAdjustmentController;
     private JSONObject poJSON;
@@ -187,7 +188,7 @@ public class APPaymentAdjustment_HistoryMCController implements Initializable, S
             JFXUtil.updateCaretPositions(apBrowse);
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
-                ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -264,10 +265,10 @@ public class APPaymentAdjustment_HistoryMCController implements Initializable, S
             tfDebitAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poAPPaymentAdjustmentController.APPaymentAdjustment().getModel().getDebitAmount().doubleValue(), true));
             tfReferenceNo.setText(poAPPaymentAdjustmentController.APPaymentAdjustment().getModel().getReferenceNo());
             tfCompany.setText(poAPPaymentAdjustmentController.APPaymentAdjustment().getModel().Company().getCompanyName());
-} catch (SQLException | GuanzonException ex) {
-Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
-                ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
-}
+        } catch (SQLException | GuanzonException ex) {
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
+        }
     }
 
     @FXML
@@ -296,14 +297,14 @@ Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
                         psSupplierId = poAPPaymentAdjustmentController.APPaymentAdjustment().getModel().getClientId();
                         break;
                     case "btnHistory":
-                        if(pnEditMode != EditMode.READY && pnEditMode != EditMode.UPDATE){
+                        if (pnEditMode != EditMode.READY && pnEditMode != EditMode.UPDATE) {
                             ShowMessageFX.Warning("No transaction status history to load!", pxeModuleName, null);
                             return;
-                        } 
-                        
+                        }
+
                         try {
                             poAPPaymentAdjustmentController.APPaymentAdjustment().ShowStatusHistory();
-                        }  catch (NullPointerException npe) {
+                        } catch (NullPointerException npe) {
                             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(npe), npe);
                             ShowMessageFX.Error("No transaction status history to load!", pxeModuleName, null);
                         } catch (Exception ex) {
@@ -334,5 +335,6 @@ Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
         //Unkown || Ready
         JFXUtil.setDisabled(true, apMaster);
         JFXUtil.setButtonsVisibility(true, btnClose);
+        JFXUtil.setButtonsVisibility(fnValue == EditMode.READY, btnHistory);
     }
 }
