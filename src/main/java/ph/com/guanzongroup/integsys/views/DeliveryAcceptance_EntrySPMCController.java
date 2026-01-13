@@ -1082,6 +1082,13 @@ public class DeliveryAcceptance_EntrySPMCController implements Initializable, Sc
     }
 
     public void initTextFields() {
+        JFXUtil.handleDisabledNodeClick(apDetail, pnEditMode, node -> {
+            switch (node) {
+                case "tfCost":
+                    ShowMessageFX.Information(null, pxeModuleName, "This field is restricted and can only be modified by non-Encoder users.");
+                    break;
+            }
+        });
 
         tfSupplier.focusedProperty().addListener(txtMaster_Focus);
         tfTrucking.focusedProperty().addListener(txtMaster_Focus);
@@ -1108,7 +1115,7 @@ public class DeliveryAcceptance_EntrySPMCController implements Initializable, Sc
             textField.setOnKeyPressed(this::txtField_KeyPressed);
         }
         CustomCommonUtil.inputIntegersOnly(tfReceiveQuantity);
-        CustomCommonUtil.inputDecimalOnly(tfDiscountRate, tfDiscountAmount, tfCost);
+        JFXUtil.inputDecimalOnly(tfDiscountRate, tfDiscountAmount, tfCost);
 
     }
 

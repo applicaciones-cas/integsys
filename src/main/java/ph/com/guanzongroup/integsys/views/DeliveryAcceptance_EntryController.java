@@ -1215,6 +1215,13 @@ public class DeliveryAcceptance_EntryController implements Initializable, Screen
     }
 
     public void initTextFields() {
+        JFXUtil.handleDisabledNodeClick(apDetail, pnEditMode, node -> {
+            switch (node) {
+                case "tfCost":
+                    ShowMessageFX.Information(null, pxeModuleName, "This field is restricted and can only be modified by non-Encoder users.");
+                    break;
+            }
+        });
 
         tfSupplier.focusedProperty().addListener(txtMaster_Focus);
         tfTrucking.focusedProperty().addListener(txtMaster_Focus);
@@ -1240,7 +1247,7 @@ public class DeliveryAcceptance_EntryController implements Initializable, Screen
         for (TextField textField : textFields) {
             textField.setOnKeyPressed(this::txtField_KeyPressed);
         }
-        CustomCommonUtil.inputDecimalOnly(tfReceiveQuantity, tfDiscountRate, tfDiscountAmount, tfCost);
+        JFXUtil.inputDecimalOnly(tfReceiveQuantity, tfDiscountRate, tfDiscountAmount, tfCost);
     }
 
     boolean pbSuccess = true;

@@ -1236,6 +1236,13 @@ public class DeliveryAcceptance_EntryAppliancesController implements Initializab
     }
 
     public void initTextFields() {
+        JFXUtil.handleDisabledNodeClick(apDetail, pnEditMode, node -> {
+            switch (node) {
+                case "tfCost":
+                    ShowMessageFX.Information(null, pxeModuleName, "This field is restricted and can only be modified by non-Encoder users.");
+                    break;
+            }
+        });
 
         tfTransactionNo.focusedProperty().addListener(txtMaster_Focus);
 
@@ -1264,7 +1271,7 @@ public class DeliveryAcceptance_EntryAppliancesController implements Initializab
             textField.setOnKeyPressed(this::txtField_KeyPressed);
         }
         CustomCommonUtil.inputIntegersOnly(tfReceiveQuantity);
-        CustomCommonUtil.inputDecimalOnly(tfDiscountRate, tfDiscountAmount, tfCost);
+        JFXUtil.inputDecimalOnly(tfDiscountRate, tfDiscountAmount, tfCost);
 
     }
 

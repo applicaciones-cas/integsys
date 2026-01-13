@@ -389,14 +389,14 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                     break;
                 case "btnSave":
                     //Recheck transaction status
-                    if(pnEditMode == EditMode.UPDATE){
+                    if (pnEditMode == EditMode.UPDATE) {
                         poJSON = poController.checkUpdateTransaction(true);
                         if (!"success".equals((String) poJSON.get("result"))) {
                             ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                             return;
                         }
                     }
-                    
+
                     if (!ShowMessageFX.YesNo(null, pxeModuleName, "Are you sure you want to save the transaction?")) {
                         return;
                     }
@@ -416,7 +416,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                         poController.Master().setModifiedDate(oApp.getServerDate());
                         poController.Master().setModifyingId(oApp.getUserID());
                     }
-                    
+
                     poJSON = poController.SaveTransaction();
                     if (!"success".equals((String) poJSON.get("result"))) {
                         ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
@@ -466,14 +466,14 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                         return;
                     }
                 case "btnHistory":
-                    if(pnEditMode != EditMode.READY && pnEditMode != EditMode.UPDATE){
+                    if (pnEditMode != EditMode.READY && pnEditMode != EditMode.UPDATE) {
                         ShowMessageFX.Warning("No transaction status history to load!", pxeModuleName, null);
                         return;
-                    } 
+                    }
 
                     try {
                         poController.ShowStatusHistory();
-                    }  catch (NullPointerException npe) {
+                    } catch (NullPointerException npe) {
                         Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(npe), npe);
                         ShowMessageFX.Error("No transaction status history to load!", pxeModuleName, null);
                     } catch (Exception ex) {
@@ -1048,9 +1048,9 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
         JFXUtil.setFocusListener(txtBIRDetail_Focus, tfBaseAmount, tfTaxCode, tfParticular, tfTaxCode);
 
         JFXUtil.setKeyPressedListener(this::txtField_KeyPressed, apDVMaster1, apMasterDVCheck, apMasterDVBTransfer, apMasterDVOp, apDVDetail, apMainList, apJournalDetails, apBIRDetail);
-        JFXUtil.setCommaFormatter(tfDebitAmount, tfCreditAmount, tfBaseAmount, tfCheckAmount, tfVatExemptDetail);
+        JFXUtil.setCommaFormatter(tfDebitAmount, tfCreditAmount, tfBaseAmount, tfCheckAmount);
         JFXUtil.setCheckboxHoverCursor(chbkPrintByBank, chbkIsCrossCheck, chbkIsPersonOnly, chbkVatClassification);
-
+        JFXUtil.setCommaFormatter2(tfVatExemptDetail);
         JFXUtil.applyHoverTooltip("Undo Reversed item", btnUndo);
         Platform.runLater(() -> {
             JFXUtil.setVerticalScroll(taDVRemarks);
@@ -1818,7 +1818,8 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
         boolean lbNotZero = poController.Detail(pnDetail).getAmountApplied() != 0;
         cbReverse.selectedProperty().set(lbNotNull && lbNotZero);
 
-        boolean lbShow = (poController.Detail(pnDetail).getSourceCode()).equals(DisbursementStatic.SourceCode.PAYMENT_REQUEST);
+        boolean lbShow = (poController.Detail(pnDetail).getSourceCode()).equals(DisbursementStatic.SourceCode.PAYMENT_REQUEST)
+                || (poController.Detail(pnDetail).getSourceCode()).equals(DisbursementStatic.SourceCode.AP_ADJUSTMENT);
         JFXUtil.setDisabled(!lbShow, chbkVatClassification, tfVatExemptDetail);
 
         tfRefNoDetail.setText(poController.getReferenceNo(pnDetail));
@@ -2098,7 +2099,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
             switch (nodeID) {
                 case "chbkVatClassification":
                     ShowMessageFX.Warning(null, pxeModuleName,
-                            "Only available when the transaction Type is \"Payment Request\".");
+                            "Only available when the transaction Type is \"Payment Request\" or \"AP Adjustment\".");
                     break;
             }
         });
@@ -2353,7 +2354,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
         JFXUtil.setButtonsVisibility(!lbShow, btnBrowse, btnClose, btnNew);
         JFXUtil.setButtonsVisibility(lbShow, btnSearch, btnSave, btnCancel);
         JFXUtil.setButtonsVisibility(false, btnUpdate, btnVoid);
-        JFXUtil.setButtonsVisibility(fnEditMode != EditMode.ADDNEW && fnEditMode != EditMode.UNKNOWN, btnHistory);
+        JFXUtil.setButtonsVisibility(fnEditMode == EditMode.READY, btnHistory);
 
         JFXUtil.setDisabled(!lbShow, apDVMaster1, apDVMaster2, apDVMaster3, apDVDetail,
                 apMasterDVCheck, apMasterDVBTransfer, apMasterDVOp, apJournalMaster, apJournalDetails, apBIRDetail);
