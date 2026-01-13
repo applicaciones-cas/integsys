@@ -1142,7 +1142,6 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                 /*Lost Focus*/
                 switch (lsID) {
                     case "tfVatExemptDetail":
-                        double lnOldVal = poController.Detail(pnDetail).getDetailVatExempt();
                         lsValue = JFXUtil.removeComma(lsValue);
                         poJSON = poController.Detail(pnDetail).setDetailVatExempt(Double.valueOf(lsValue));
                         if (!JFXUtil.isJSONSuccess(poJSON)) {
@@ -2298,10 +2297,19 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                             poController.Detail(pnDetail).setDetailVatExempt(poController.Detail(pnDetail).getAmountApplied());
                         }
                     }
-
+                    double lnOldVal = poController.Detail(pnDetail).getDetailVatExempt();
                     poJSON = poController.Detail(pnDetail).isWithVat(checkedBox.isSelected());
                     if (!JFXUtil.isJSONSuccess(poJSON)) {
                         ShowMessageFX.Warning(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
+                    } else {
+                        poJSON = poController.computeFields(true);
+                        if (!JFXUtil.isJSONSuccess(poJSON)) {
+                            if (ShowMessageFX.YesNo(null, pxeModuleName, "Values will be modified and may result in invalid computation.\n"
+                                    + "Correction may be required. Proceed?")) {
+                            } else {
+                                poController.Detail(pnDetail).setDetailVatExempt(lnOldVal);
+                            }
+                        }
                     }
                     loadTableDetail.reload();
                     break;
