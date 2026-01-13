@@ -769,11 +769,8 @@ public class DisbursementVoucher_HistoryController implements Initializable, Scr
             initDVMasterTabs();
             poJSON = new JSONObject();
             poController.computeTaxAmount();
-            poJSON = poController.computeFields(true);
-            if ("error".equals((String) poJSON.get("result"))) {
-                ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-                return;
-            }
+            poController.computeFields(false);
+            
             JFXUtil.setStatusValue(lblDVTransactionStatus, DisbursementStatic.class, pnEditMode == EditMode.UNKNOWN ? "-1" : poController.Master().getTransactionStatus());
 
             tfDVTransactionNo.setText(poController.Master().getTransactionNo() != null ? poController.Master().getTransactionNo() : "");
