@@ -351,7 +351,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
                         return;
                     }
 
-                    if (pnEditMode == EditMode.UPDATE || pnEditMode == EditMode.ADDNEW) {
+                    if (pnEditMode == EditMode.UPDATE) {
                         if (oApp.getUserLevel() > UserRight.ENCODER) {
                             if (!pbIsCheckedJournalTab) {
                                 ShowMessageFX.Warning(null, pxeModuleName, "Please check the Journal Entry before saving."); //only require check this only if higher than encoder
