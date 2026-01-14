@@ -442,7 +442,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
                                 if (!pbIsCheckedJournalTab) {
                                     ShowMessageFX.Warning(null, pxeModuleName, "Please check the Journal Entry before verifying.");
                                     return;
-                                } else if (!pbIsCheckedBIRTab) {
+                                } else if (poController.Master().getVATAmount() > 0.0000 && !pbIsCheckedBIRTab) {
                                     ShowMessageFX.Warning(null, pxeModuleName, "Please check the BIR 2307 before verifying.");
                                     return;
                                 } else {
