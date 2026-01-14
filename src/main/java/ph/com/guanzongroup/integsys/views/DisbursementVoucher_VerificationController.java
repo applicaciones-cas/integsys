@@ -340,7 +340,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
                 case "btnSave":
                     //Recheck transaction status
                     if (pnEditMode == EditMode.UPDATE) {
-                        poJSON = poController.checkUpdateTransaction(true);
+                        poJSON = poController.checkUpdateTransaction(false);
                         if (!"success".equals((String) poJSON.get("result"))) {
                             ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                             return;
@@ -379,7 +379,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
                     if ("success".equals(poJSON.get("result"))) {
                         pnEditMode = poController.getEditMode();
                     }
-                    if (pnEditMode == EditMode.READY) {
+                    if (pnEditMode == EditMode.READY && !DisbursementStatic.VERIFIED.equals(poController.Master().getTransactionStatus())) {
                         if (ShowMessageFX.YesNo(null, pxeModuleName, "Do you want to verify this transaction?")) { //requires to review journal entry
                             if (oApp.getUserLevel() >= UserRight.ENCODER) {
                                 if (!poController.existJournal().equals("")) {
