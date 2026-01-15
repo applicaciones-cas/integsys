@@ -134,7 +134,7 @@ import org.guanzon.appdriver.constant.EditMode;
 import ph.com.guanzongroup.integsys.views.ScreenInterface;
 
 /**
- * Date : 4/28/2025 Recent update: 01/08/2026
+ * Date : 4/28/2025 Recent update: 01/13/2026
  *
  * @author Aldrich
  */
@@ -1470,7 +1470,7 @@ public class JFXUtil {
                     }
                     data.isUpdating = true;
                     String clean = newValue.replaceAll(",", "");
-                    if (clean.isEmpty() || clean.equals(".") || clean.matches("0*\\.0*")) {
+                    if (clean.isEmpty() || clean.equals(".") || clean.matches("-?0*\\.?0*")) {
                         data.isUpdating = false;
                         return;
                     }
@@ -1757,12 +1757,21 @@ public class JFXUtil {
 
     /*Removes comma character existing in a string containing number*/
     public static String removeComma(String numberStr) {
-        if (numberStr == null || numberStr.equals("")) {
+        if (numberStr == null || numberStr.isEmpty()) {
             return "0";
         }
-        String result = numberStr.replace(",", "");
-        return result.isEmpty() ? "0" : result;
+
+        // Remove commas
+        String clean = numberStr.replace(",", "");
+
+        // Check if it's exactly negative zero
+        if (clean.matches("-0+(\\.0+)?")) {
+            return "0";
+        }
+
+        return clean.isEmpty() ? "0" : clean;
     }
+
 
     /*Changes checkbox cursor type on hover, depending if enabled/disabled*/
  /*Requires anchorPane to check any checkbox existing in the anchorPane*/
