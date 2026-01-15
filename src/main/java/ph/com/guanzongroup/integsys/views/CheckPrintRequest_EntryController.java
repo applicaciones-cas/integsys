@@ -507,9 +507,16 @@ public class CheckPrintRequest_EntryController implements Initializable, ScreenI
             dpTransactionDate.setValue(CustomCommonUtil.parseDateStringToLocalDate(SQLUtil.dateFormat(poCheckPrintingRequestController.Master().getTransactionDate(), SQLUtil.FORMAT_SHORT_DATE)));
             tfTransactionNo.setText(poCheckPrintingRequestController.Master().getTransactionNo() != null ? poCheckPrintingRequestController.Master().getTransactionNo() : "");
             tfBankName.setText(poCheckPrintingRequestController.Master().Banks().getBankName() != null ? poCheckPrintingRequestController.Master().Banks().getBankName() : "");
-            tfTotalAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poCheckPrintingRequestController.Master().getTotalAmount(), true));
+//            tfTotalAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poCheckPrintingRequestController.Master().getTotalAmount(), true));
             taRemarks.setText(poCheckPrintingRequestController.Master().getRemarks() != null ? poCheckPrintingRequestController.Master().getRemarks() : "");
             chbkUploaded.setSelected(poCheckPrintingRequestController.Master().isUploaded());
+            int detailCount = poCheckPrintingRequestController.getDetailCount();
+            double totalNetAmount = 0.0;
+            for (int lnCtr = detailCount - 1; lnCtr >= 0; lnCtr--) {
+                double checkAmt = poCheckPrintingRequestController.Detail(lnCtr).DisbursementMaster().getNetTotal();
+                totalNetAmount += checkAmt;
+            }
+            tfTotalAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(totalNetAmount));
         } catch (GuanzonException | SQLException ex) {
             Logger.getLogger(CheckPrintRequest_EntryController.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -539,10 +546,10 @@ public class CheckPrintRequest_EntryController implements Initializable, ScreenI
             try {
                 tfReferNo.setText(poCheckPrintingRequestController.Detail(pnDetail).getSourceNo());
                 tfCheckNo.setText(poCheckPrintingRequestController.Detail(pnDetail).DisbursementMaster().CheckPayments().getCheckNo());
-                tfCheckAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poCheckPrintingRequestController.Master().getTotalAmount(), true));
+                tfCheckAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poCheckPrintingRequestController.Detail(pnDetail).DisbursementMaster().getNetTotal(), true));
                 tfPayeeNAme.setText(poCheckPrintingRequestController.Detail(pnDetail).DisbursementMaster().CheckPayments().Payee().getPayeeName());
                 tfDVNo.setText(poCheckPrintingRequestController.Detail(pnDetail).DisbursementMaster().getTransactionNo());
-                tfDVAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poCheckPrintingRequestController.Detail(pnDetail).DisbursementMaster().getTransactionTotal(), true));
+                tfDVAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poCheckPrintingRequestController.Detail(pnDetail).DisbursementMaster().getNetTotal(), true));
                 dpDVDate.setValue(CustomCommonUtil.parseDateStringToLocalDate(SQLUtil.dateFormat(poCheckPrintingRequestController.Detail(pnDetail).DisbursementMaster().getTransactionDate(), SQLUtil.FORMAT_SHORT_DATE)));
                 dpCheckDate.setValue(poCheckPrintingRequestController.Detail(pnDetail).DisbursementMaster().CheckPayments().getCheckDate() != null
                         ? CustomCommonUtil.parseDateStringToLocalDate(SQLUtil.dateFormat(poCheckPrintingRequestController.Detail(pnDetail).DisbursementMaster().CheckPayments().getCheckDate(), SQLUtil.FORMAT_SHORT_DATE))
@@ -552,6 +559,7 @@ public class CheckPrintRequest_EntryController implements Initializable, ScreenI
                         ? Integer.valueOf(poCheckPrintingRequestController.Detail(pnDetail).DisbursementMaster().CheckPayments().getPayeeType()) : -1);
                 taRemarksDetails.setText(poCheckPrintingRequestController.Detail(pnDetail).DisbursementMaster().CheckPayments().getRemarks() != null ? poCheckPrintingRequestController.Detail(pnDetail).DisbursementMaster().CheckPayments().getRemarks() : "");
 
+                
             } catch (SQLException | GuanzonException ex) {
                 Logger.getLogger(CheckPrintRequest_EntryController.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -571,6 +579,7 @@ public class CheckPrintRequest_EntryController implements Initializable, ScreenI
                     poJSON = poCheckPrintingRequestController.addCheckPaymentToCheckPrintRequest(lsTransactionNo);
                     if ("success".equals(poJSON.get("result"))) {
                         JFXUtil.highlightByKey(tblVwMain, lsTransactionNo, "#A7C7E7", highlightedRowsMain);
+                        
                     } else {
                         if (Boolean.parseBoolean(String.valueOf(poJSON.get("warning")))) {
                             ShowMessageFX.Warning((String) poJSON.get("message"), pxeModuleName, null);
@@ -660,13 +669,13 @@ public class CheckPrintRequest_EntryController implements Initializable, ScreenI
                                                 poCheckPrintingRequestController.Detail(lnCtr).getSourceNo(),
                                                 poCheckPrintingRequestController.Detail(lnCtr).DisbursementMaster().getTransactionNo(),
                                                 CustomCommonUtil.formatDateToShortString(poCheckPrintingRequestController.Detail(lnCtr).DisbursementMaster().getTransactionDate()),
-                                                CustomCommonUtil.setIntegerValueToDecimalFormat(poCheckPrintingRequestController.Detail(lnCtr).CheckPayments().getAmount(), true),
+                                                CustomCommonUtil.setIntegerValueToDecimalFormat(poCheckPrintingRequestController.Detail(lnCtr).DisbursementMaster().getNetTotal(), true),
                                                 poCheckPrintingRequestController.Detail(lnCtr).CheckPayments().getCheckNo(),
                                                 poCheckPrintingRequestController.Detail(lnCtr).CheckPayments().getCheckDate() != null
                                                 ? CustomCommonUtil.formatDateToShortString(
                                                         poCheckPrintingRequestController.Detail(lnCtr).CheckPayments().getCheckDate())
                                                 : "",
-                                                CustomCommonUtil.setIntegerValueToDecimalFormat(poCheckPrintingRequestController.Detail(lnCtr).DisbursementMaster().CheckPayments().getAmount(), true)
+                                                CustomCommonUtil.setIntegerValueToDecimalFormat(poCheckPrintingRequestController.Detail(lnCtr).DisbursementMaster().getNetTotal(), true)
                                         ));
 
                             } catch (SQLException | GuanzonException ex) {
@@ -885,10 +894,17 @@ public class CheckPrintRequest_EntryController implements Initializable, ScreenI
             }
             poJSON = new JSONObject();
             if (!nv) {
-                switch (lsID) {
-                    case "taRemarks":
-                        poCheckPrintingRequestController.Master().setRemarks(lsValue);
-                        break;
+                try {
+                    switch (lsID) {
+                        case "taRemarks":
+                                poCheckPrintingRequestController.Master().setRemarks(lsValue);
+                            break;
+                        case "taRemarksDetails": 
+                                poCheckPrintingRequestController.Detail(pnDetail).DisbursementMaster().CheckPayments().setRemarks(lsValue);
+                            break;
+                    }
+                } catch (SQLException | GuanzonException ex) {
+                    Logger.getLogger(CheckPrintRequest_EntryController.class.getName()).log(Level.SEVERE, null, ex);
                 }
             } else {
                 txtArea.selectAll();
