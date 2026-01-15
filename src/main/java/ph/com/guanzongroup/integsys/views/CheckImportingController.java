@@ -461,8 +461,100 @@ public class CheckImportingController implements Initializable, ScreenInterface 
             }
     }
     
+//    private void handleImportFile(ActionEvent event) {
+//    poJSON = new JSONObject();
+//    FileChooser fileChooser = new FileChooser();
+//    fileChooser.setTitle("Import File");
+//    fileChooser.getExtensionFilters().addAll(
+//        new FileChooser.ExtensionFilter("CSV Files (*.csv)", "*.csv"),
+//        new FileChooser.ExtensionFilter("Excel Files (*.xlsx, *.xls)", "*.xlsx", "*.xls")
+//    );
+//
+//    Stage currentStage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+//    File selectedFile = fileChooser.showOpenDialog(currentStage);
+//    if (selectedFile == null) {
+//        ShowMessageFX.Warning("No file selected.", pxeModuleName, null);
+//        psImportingFilePath = "";
+//        pnEditMode = EditMode.READY;
+//        initButtons(pnEditMode);
+//        return;
+//    }
+//
+//    psImportingFilePath = selectedFile.getAbsolutePath();
+//    System.out.println("Imported File: " + psImportingFilePath);
+//
+//    // run heavy import in a background thread
+//    Task<ObservableList<CheckImporting.CheckRequest>> task =
+//        new Task<ObservableList<CheckImporting.CheckRequest>>() {
+//
+//        @Override
+//        protected ObservableList<CheckImporting.CheckRequest> call() throws Exception {
+//            List<CheckImporting.CheckRequest> merged = new ArrayList<>();
+//
+//            // Step 1: read Excel/CSV rows into CheckRequest list
+//            List<CheckPaymentImporting.CheckRequest> rawRows =
+//                poCheckImporting.importToList(selectedFile.toPath());
+//
+//            // Step 2: process each row individually
+//            for (int lnCtr = 0; lnCtr < rawRows.size(); lnCtr++) {
+//                CheckPaymentImporting.CheckRequest row = rawRows.get(lnCtr);
+//                String voucherNo = row.getVoucherNo();
+//
+//                if (voucherNo == null || voucherNo.trim().isEmpty()) {
+//                    continue;
+//                }
+//
+//                // Call DB/service for this voucher
+//                 poJSON = poCheckImporting.getDVwithAuthorizeCheckPayment(voucherNo);
+//                if ("error".equals(poJSON.get("result"))) {
+//                    ShowMessageFX.Information((String) poJSON.get("message"), pxeModuleName, null);
+//                    break;
+//                }
+//
+//                // Optionally merge DB data into the row
+//                // row.setAmount(result.optDouble("amount"));
+//                // Build and add the model object
+//                main_data.add(new ModelCheckImporting(
+//                        String.valueOf(lnCtr),
+//                        poCheckImporting.CheckPayments(lnCtr).getSourceNo(),
+//                        CustomCommonUtil.formatDateToShortString(poCheckImporting.CheckPayments(lnCtr).getTransactionDate()),
+//                        poCheckImporting.CheckPayments(lnCtr).Banks().getBankName(),
+//                        row.getVoucherNo(),
+//                        CustomCommonUtil.formatDateToShortString(poCheckImporting.CheckPayments(lnCtr).getTransactionDate()),
+//                        row.getCheckNo(),
+//                        row.getCheckDate(),
+//                        ""
+//                ));
+//            }
+//
+//            return FXCollections.observableArrayList(merged);
+//        }
+//    };
+//
+//        task.setOnSucceeded(e -> {
+//            ObservableList<CheckImporting.CheckRequest> items = task.getValue();
+//            tblVwMain.setItems(main_data);  // display once all rows processed
+//            tblVwMain.refresh();
+//            // update transaction after successful import
+//            pnEditMode = EditMode.UPDATE;
+//            initButtons(pnEditMode);
+//
+//        });
+//
+//    task.setOnFailed(e -> {
+//        Throwable ex = task.getException();
+//        ex.printStackTrace();
+//        ShowMessageFX.Information((String) poJSON.get("message"), pxeModuleName, null);
+//        pnEditMode = EditMode.READY;
+//        initButtons(pnEditMode);
+//        
+//    });
+//
+//    new Thread(task).start();
+//}
     private void handleImportFile(ActionEvent event) {
     poJSON = new JSONObject();
+
     FileChooser fileChooser = new FileChooser();
     fileChooser.setTitle("Import File");
     fileChooser.getExtensionFilters().addAll(
@@ -472,6 +564,7 @@ public class CheckImportingController implements Initializable, ScreenInterface 
 
     Stage currentStage = (Stage) ((Node) event.getSource()).getScene().getWindow();
     File selectedFile = fileChooser.showOpenDialog(currentStage);
+
     if (selectedFile == null) {
         ShowMessageFX.Warning("No file selected.", pxeModuleName, null);
         psImportingFilePath = "";
@@ -483,20 +576,19 @@ public class CheckImportingController implements Initializable, ScreenInterface 
     psImportingFilePath = selectedFile.getAbsolutePath();
     System.out.println("Imported File: " + psImportingFilePath);
 
-    // run heavy import in a background thread
     Task<ObservableList<CheckImporting.CheckRequest>> task =
         new Task<ObservableList<CheckImporting.CheckRequest>>() {
 
         @Override
         protected ObservableList<CheckImporting.CheckRequest> call() throws Exception {
+
             List<CheckImporting.CheckRequest> merged = new ArrayList<>();
 
-            // Step 1: read Excel/CSV rows into CheckRequest list
             List<CheckPaymentImporting.CheckRequest> rawRows =
                 poCheckImporting.importToList(selectedFile.toPath());
 
-            // Step 2: process each row individually
             for (int lnCtr = 0; lnCtr < rawRows.size(); lnCtr++) {
+
                 CheckPaymentImporting.CheckRequest row = rawRows.get(lnCtr);
                 String voucherNo = row.getVoucherNo();
 
@@ -504,23 +596,29 @@ public class CheckImportingController implements Initializable, ScreenInterface 
                     continue;
                 }
 
-                // Call DB/service for this voucher
-                 poJSON = poCheckImporting.getDVwithAuthorizeCheckPayment(voucherNo);
+                poJSON = poCheckImporting.getDVwithAuthorizeCheckPayment(voucherNo);
                 if ("error".equals(poJSON.get("result"))) {
                     ShowMessageFX.Information((String) poJSON.get("message"), pxeModuleName, null);
                     break;
                 }
 
-                // Optionally merge DB data into the row
-                // row.setAmount(result.optDouble("amount"));
-                // Build and add the model object
+                // 🔒 SAFETY GUARD (minimal)
+                try {
+                    poCheckImporting.CheckPayments(0);
+                } catch (IndexOutOfBoundsException ex) {
+                    continue; // no DB record for this voucher
+                }
+
+                // ✅ KEEPING YOUR ORIGINAL LOGIC (only index changed)
                 main_data.add(new ModelCheckImporting(
                         String.valueOf(lnCtr + 1),
-                        poCheckImporting.CheckPayments(lnCtr).getSourceNo(),
-                        CustomCommonUtil.formatDateToShortString(poCheckImporting.CheckPayments(lnCtr).getTransactionDate()),
-                        poCheckImporting.CheckPayments(lnCtr).Banks().getBankName(),
+                        poCheckImporting.CheckPayments(0).getSourceNo(),
+                        CustomCommonUtil.formatDateToShortString(
+                                poCheckImporting.CheckPayments(0).getTransactionDate()),
+                        poCheckImporting.CheckPayments(0).Banks().getBankName(),
                         row.getVoucherNo(),
-                        CustomCommonUtil.formatDateToShortString(poCheckImporting.CheckPayments(lnCtr).getTransactionDate()),
+                        CustomCommonUtil.formatDateToShortString(
+                                poCheckImporting.CheckPayments(0).getTransactionDate()),
                         row.getCheckNo(),
                         row.getCheckDate(),
                         ""
@@ -531,26 +629,26 @@ public class CheckImportingController implements Initializable, ScreenInterface 
         }
     };
 
-        task.setOnSucceeded(e -> {
-            ObservableList<CheckImporting.CheckRequest> items = task.getValue();
-            tblVwMain.setItems(main_data);  // display once all rows processed
-            tblVwMain.refresh();
-            // update transaction after successful import
-            pnEditMode = EditMode.UPDATE;
-            initButtons(pnEditMode);
+    task.setOnSucceeded(e -> {
+        tblVwMain.setItems(main_data);
+        tblVwMain.refresh();
 
-        });
+        pnEditMode = EditMode.UPDATE;
+        initButtons(pnEditMode);
+    });
 
     task.setOnFailed(e -> {
         Throwable ex = task.getException();
         ex.printStackTrace();
+
         ShowMessageFX.Information((String) poJSON.get("message"), pxeModuleName, null);
         pnEditMode = EditMode.READY;
         initButtons(pnEditMode);
-        
     });
 
     new Thread(task).start();
 }
+
+
 
 }
