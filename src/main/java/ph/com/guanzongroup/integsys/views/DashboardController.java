@@ -226,6 +226,7 @@ public class DashboardController implements Initializable {
 
 //            setDropShadowEffectsLeftSideBar(anchorLeftSideBarMenu);
 //            setDropShadowEffectsRightSideBar(anchorRightSideBarMenu);
+            initKeyEvent();
             Platform.runLater(() -> {
                 AnchorPane root = (AnchorPane) MainAnchor;
                 Scene scene = root.getScene();
@@ -260,7 +261,23 @@ public class DashboardController implements Initializable {
             e.printStackTrace();
         }
     }
-    
+
+    private void initKeyEvent() {
+        Platform.runLater(() -> {
+            AnchorPane root = (AnchorPane) MainAnchor;
+            Scene scene = root.getScene();
+            if (scene != null) {
+                setKeyEvent(scene);
+            } else {
+                root.sceneProperty().addListener((obs, oldScene, newScene) -> {
+                    if (newScene != null) {
+                        setKeyEvent(newScene);
+                    }
+                });
+            }
+        });
+    }
+
     @FXML
     private void showMenu(ActionEvent event) throws SQLException {
         loadMenu();
@@ -953,27 +970,35 @@ public class DashboardController implements Initializable {
         anchorPane.setEffect(shadow);
     }
 
+    public void eventf12(Tab currentTab) {
+        if (LoginControllerHolder.getLogInStatus()) {
+            //check here if the user level is supervisor
+            //check if the current tab is not entry
+            if (LoginControllerHolder.getLogInStatus()) {
+                if (currentTab != null) {
+                    try {
+                        if (oApp.getIndustry().equals(System.getProperty("sys.main.industry"))
+                                || oApp.getIndustry().equals(System.getProperty("sys.general.industry"))) {
+                            psFormName = tabpane.getSelectionModel().getSelectedItem().getText();
+                            loadSelectIndustryAndCompany();
+                        }
+                    } catch (IOException e) {
+                        ShowMessageFX.Warning("Unable to load selection window.", "Error", e.getMessage());
+                    }
+                }
+            }
+        }
+    }
+
+    public Tab getTab() {
+        Tab currentTab = tabpane.getSelectionModel().getSelectedItem();
+        return currentTab;
+    }
+
     private void setKeyEvent(Scene scene) {
         scene.setOnKeyPressed(event -> {
             if (event.getCode() == KeyCode.F12) {
-                if (LoginControllerHolder.getLogInStatus()) {
-                    //check here if the user level is supervisor
-                    //check if the current tab is not entry
-                    if (LoginControllerHolder.getLogInStatus()) {
-                        Tab currentTab = tabpane.getSelectionModel().getSelectedItem();
-                        if (currentTab != null) {
-                            try {
-                                if (oApp.getIndustry().equals(System.getProperty("sys.main.industry"))
-                                        || oApp.getIndustry().equals(System.getProperty("sys.general.industry"))) {
-                                    psFormName = tabpane.getSelectionModel().getSelectedItem().getText();
-                                    loadSelectIndustryAndCompany();
-                                }
-                            } catch (IOException e) {
-                                ShowMessageFX.Warning("Unable to load selection window.", "Error", e.getMessage());
-                            }
-                        }
-                    }
-                }
+                eventf12(getTab());
             }
         }
         );
@@ -1021,31 +1046,39 @@ public class DashboardController implements Initializable {
                 //change form name base on selected industry
                 //  /com/rmj/guanzongroup/sidebarmenus/views/DeliveryAcceptance_ConfirmationCar.fxml
 
-                JSONObject loJSON =  getFxml(psFormName);
-                if("error".equals((String) loJSON.get("result"))){
+                JSONObject loJSON = getFxml(psFormName);
+                if ("error".equals((String) loJSON.get("result"))) {
                     ShowMessageFX.Warning("This form is currently unavailable.", "Computerized Accounting System", MODULE);
                     return;
                 }
                 if (oApp != null) {
+                    //Mandatory close the current tab
+                    for (Tab tab : tabpane.getTabs()) {
+                        if (tab.getText().equals(psFormName)) {
+                            tabpane.getTabs().remove(tab);
+                            tabName.remove(psFormName);
+                            break;
+                        }
+                    }
                     boolean isNewTab = (checktabs(SetTabTitle(psFormName)) == 1);
                     if (isNewTab || !lsOldCompany.equals(psCompanyID)) {
                         String command = (String) loJSON.get("sCommandx");
                         String commandType = (String) loJSON.get("sCmdTypex");
-                        TreeNode node = new TreeNode((String) loJSON.get("sMenuCDxx")
-                                                , (String) loJSON.get("sMenuGrpx")
-                                                , (String) loJSON.get("sMenuName")
-                                                , (String) loJSON.get("sMenuDesc")
-                                                , command
-                                                , commandType
-                                                , (String) loJSON.get("sFormName")
-                                                , (String) loJSON.get("sObjectNm")
-                                                , (String) loJSON.get("sIndstCdx")
-                                                , (String) loJSON.get("sCategrCd"));
+                        TreeNode node = new TreeNode((String) loJSON.get("sMenuCDxx"),
+                                (String) loJSON.get("sMenuGrpx"),
+                                (String) loJSON.get("sMenuName"),
+                                (String) loJSON.get("sMenuDesc"),
+                                command,
+                                commandType,
+                                (String) loJSON.get("sFormName"),
+                                (String) loJSON.get("sObjectNm"),
+                                (String) loJSON.get("sIndstCdx"),
+                                (String) loJSON.get("sCategrCd"));
 
                         if (!command.isEmpty() && !commandType.isEmpty()) {
                             if (node.getFxmlPath() != null) {
                                 setScene2(loadAnimate(node));
-                        }
+                            }
                         } else {
                             ShowMessageFX.Warning("This form is currently unavailable.", "Computerized Accounting System", MODULE);
                         }
@@ -1067,38 +1100,38 @@ public class DashboardController implements Initializable {
 
         }
     }
-    
-    private JSONObject getFxml(String fsFormName){
+
+    private JSONObject getFxml(String fsFormName) {
         JSONObject loJSON = new JSONObject();
         try {
-            String lsSQL = "SELECT a.sMenuCDxx" +
-                            ", a.sMenuGrpx" +
-                            ", a.sMenuName" +
-                            ", a.sMenuDesc" +
-                            ", b.sCommandx" +
-                            ", b.sCmdTypex" +
-                            ", b.sFormName" +
-                            ", b.sObjectNm" +
-                            ", b.sIndstCdx" +
-                            ", b.sCategrCd from xxxsysmenu a " +
-                            "LEFT JOIN xxxsysmenuothers b ON b.sMenuCDxx = a.sMenuCDxx AND b.cRecdStat = " + SQLUtil.toSQL(RecordStatus.ACTIVE);
+            String lsSQL = "SELECT a.sMenuCDxx"
+                    + ", a.sMenuGrpx"
+                    + ", a.sMenuName"
+                    + ", a.sMenuDesc"
+                    + ", b.sCommandx"
+                    + ", b.sCmdTypex"
+                    + ", b.sFormName"
+                    + ", b.sObjectNm"
+                    + ", b.sIndstCdx"
+                    + ", b.sCategrCd from xxxsysmenu a "
+                    + "LEFT JOIN xxxsysmenuothers b ON b.sMenuCDxx = a.sMenuCDxx AND b.cRecdStat = " + SQLUtil.toSQL(RecordStatus.ACTIVE);
             lsSQL = MiscUtil.addCondition(lsSQL, " a.sMenuDesc LIKE " + SQLUtil.toSQL(fsFormName)
-                                                  +  " AND a.cRecdStat = " + SQLUtil.toSQL(RecordStatus.ACTIVE));
+                    + " AND a.cRecdStat = " + SQLUtil.toSQL(RecordStatus.ACTIVE));
             System.out.println("Executing SQL: " + lsSQL);
             ResultSet loRS = oApp.executeQuery(lsSQL);
             try {
                 if (MiscUtil.RecordCount(loRS) > 0) {
-                    if(loRS.next()){
-                            loJSON.put("sMenuCDxx", loRS.getString("sMenuCDxx"));
-                            loJSON.put("sMenuGrpx", loRS.getString("sMenuGrpx"));
-                            loJSON.put("sMenuName", loRS.getString("sMenuName"));
-                            loJSON.put("sMenuDesc", loRS.getString("sMenuDesc"));
-                            loJSON.put("sCommandx", loRS.getString("sCommandx"));
-                            loJSON.put("sCmdTypex", loRS.getString("sCmdTypex"));
-                            loJSON.put("sFormName", loRS.getString("sFormName"));
-                            loJSON.put("sObjectNm", loRS.getString("sObjectNm"));
-                            loJSON.put("sIndstCdx", loRS.getString("sIndstCdx"));
-                            loJSON.put("sCategrCd", loRS.getString("sCategrCd"));
+                    if (loRS.next()) {
+                        loJSON.put("sMenuCDxx", loRS.getString("sMenuCDxx"));
+                        loJSON.put("sMenuGrpx", loRS.getString("sMenuGrpx"));
+                        loJSON.put("sMenuName", loRS.getString("sMenuName"));
+                        loJSON.put("sMenuDesc", loRS.getString("sMenuDesc"));
+                        loJSON.put("sCommandx", loRS.getString("sCommandx"));
+                        loJSON.put("sCmdTypex", loRS.getString("sCmdTypex"));
+                        loJSON.put("sFormName", loRS.getString("sFormName"));
+                        loJSON.put("sObjectNm", loRS.getString("sObjectNm"));
+                        loJSON.put("sIndstCdx", loRS.getString("sIndstCdx"));
+                        loJSON.put("sCategrCd", loRS.getString("sCategrCd"));
                         return loJSON;
                     }
                 }
@@ -1112,7 +1145,7 @@ public class DashboardController implements Initializable {
         loJSON.put("result", "error");
         return loJSON;
     }
-    
+
     public String SetTabTitle(String menuaction) {
         if (menuaction.contains(".fxml")) {
         }
@@ -1300,7 +1333,7 @@ public class DashboardController implements Initializable {
                 selectedTab.setText(newTitle);
                 selectedTab.setContent(content);
                 selectedTab.setContextMenu(createContextMenu(tabpane, selectedTab, oApp));
-                
+
                 selectedTab.setOnCloseRequest(event -> {
                     if (ShowMessageFX.YesNo(null, "Close Tab", "Are you sure, do you want to close tab?")) {
                         tabName.remove(selectedTab.getText());
@@ -1532,7 +1565,7 @@ public class DashboardController implements Initializable {
 
         public final Class<? extends ScreenInterface> controllerClass;
 
-        public ControllerBinding( Class<? extends ScreenInterface> controllerClass) {
+        public ControllerBinding(Class<? extends ScreenInterface> controllerClass) {
             this.controllerClass = controllerClass;
         }
 
@@ -1541,46 +1574,57 @@ public class DashboardController implements Initializable {
         }
     }
     ControllerBinding[] controllerArray = new ControllerBinding[]{
-        new ControllerBinding( SIPosting_Controller.class),
-        new ControllerBinding( SIPosting_CarController.class),
+        new ControllerBinding(SIPosting_Controller.class),
+        new ControllerBinding(SIPosting_CarController.class),
         new ControllerBinding(SIPosting_AppliancesController.class),
-        new ControllerBinding( SIPosting_LPController.class),
-        new ControllerBinding( SIPosting_MPController.class),
+        new ControllerBinding(SIPosting_LPController.class),
+        new ControllerBinding(SIPosting_MPController.class),
         new ControllerBinding(SIPosting_MCController.class),
         new ControllerBinding(SIPosting_SPMCController.class),
         new ControllerBinding(SIPosting_SPCarController.class),
         new ControllerBinding(SIPosting_MonarchFoodController.class),
-        new ControllerBinding( SIPosting_MonarchHospitalityController.class),
+        new ControllerBinding(SIPosting_MonarchHospitalityController.class),
         new ControllerBinding(SIPosting_HistoryController.class),
-        new ControllerBinding( SIPosting_HistoryAppliancesController.class),
-        new ControllerBinding( SIPosting_HistoryCarController.class),
-        new ControllerBinding( SIPosting_HistoryLPController.class),
+        new ControllerBinding(SIPosting_HistoryAppliancesController.class),
+        new ControllerBinding(SIPosting_HistoryCarController.class),
+        new ControllerBinding(SIPosting_HistoryLPController.class),
         new ControllerBinding(SIPosting_HistoryMPController.class),
-        new ControllerBinding( SIPosting_HistoryMCController.class),
-        new ControllerBinding( SIPosting_HistorySPMCController.class),
-        new ControllerBinding( SIPosting_HistorySPCarController.class),
+        new ControllerBinding(SIPosting_HistoryMCController.class),
+        new ControllerBinding(SIPosting_HistorySPMCController.class),
+        new ControllerBinding(SIPosting_HistorySPCarController.class),
         new ControllerBinding(SIPosting_HistoryMonarchFoodController.class),
-        new ControllerBinding( SIPosting_HistoryMonarchHospitalityController.class),
-        new ControllerBinding( POQuotation_EntryController.class),
-        new ControllerBinding( POQuotation_ConfirmationController.class),
+        new ControllerBinding(SIPosting_HistoryMonarchHospitalityController.class),
+        new ControllerBinding(POQuotation_EntryController.class),
+        new ControllerBinding(POQuotation_ConfirmationController.class),
         new ControllerBinding(POQuotation_ApprovalController.class),
-        new ControllerBinding( POQuotation_HistoryController.class)};
+        new ControllerBinding(POQuotation_HistoryController.class)};
 
     private void SIPostingWindowKeyEvent(Tab newTab, ScreenInterface fxObj, boolean isRemove) {
         for (ControllerBinding cb : controllerArray) {
-            try {
-                Object userData = newTab.getUserData();
-                ScreenInterface screen = (ScreenInterface) userData;
-                if (cb.controllerClass.isInstance(screen)) {
-                    Object casted = cb.controllerClass.cast(fxObj);
-                    // same controller
-                    Method method = isRemove ? cb.controllerClass.getMethod("RemoveWindowEvent") : cb.controllerClass.getMethod("TriggerWindowEvent");
-                    method.invoke(casted);
-                }
-            } catch (Exception e) {
-                e.printStackTrace(); // Or log nicely
-                break;
+            Object userData = newTab.getUserData();
+
+            if (!(userData instanceof ScreenInterface)) {
+                continue;
             }
+            ScreenInterface screen = (ScreenInterface) userData;
+            if (!cb.controllerClass.isInstance(screen)) {
+                continue;
+            }
+            Object casted = cb.controllerClass.cast(fxObj);
+            try {
+                String methodName = isRemove ? "RemoveWindowEvent" : "TriggerWindowEvent";
+
+                Method method = cb.controllerClass.getMethod(methodName);
+                method.invoke(casted);
+            } catch (NoSuchMethodException e) {
+                initKeyEvent();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            if (isRemove) {
+                initKeyEvent();
+            }
+            break; // stop loop once matched
         }
     }
 

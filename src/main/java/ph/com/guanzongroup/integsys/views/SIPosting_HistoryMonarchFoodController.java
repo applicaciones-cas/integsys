@@ -292,11 +292,13 @@ public class SIPosting_HistoryMonarchFoodController implements Initializable, Sc
     private void setKeyEvent(Scene scene) {
         scene.setOnKeyPressed(event -> {
             if (event.getCode() == KeyCode.F5) {
-                System.out.println("tested key press");
 
                 if (JFXUtil.isObjectEqualTo(poPurchaseReceivingController.PurchaseOrderReceiving().getEditMode(), EditMode.READY, EditMode.UPDATE)) {
                     showAttachmentDialog();
                 }
+            }
+            if (event.getCode() == KeyCode.F12) {
+                LoginControllerHolder.getMainController().eventf12(LoginControllerHolder.getMainController().getTab());
             }
         }
         );
@@ -382,14 +384,14 @@ public class SIPosting_HistoryMonarchFoodController implements Initializable, Sc
                         }
                         break;
                     case "btnHistory":
-                        if(pnEditMode != EditMode.READY && pnEditMode != EditMode.UPDATE){
+                        if (pnEditMode != EditMode.READY && pnEditMode != EditMode.UPDATE) {
                             ShowMessageFX.Warning("No transaction status history to load!", pxeModuleName, null);
                             return;
-                        } 
-                        
+                        }
+
                         try {
                             poPurchaseReceivingController.PurchaseOrderReceiving().ShowStatusHistory();
-                        }  catch (NullPointerException npe) {
+                        } catch (NullPointerException npe) {
                             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(npe), npe);
                             ShowMessageFX.Error("No transaction status history to load!", pxeModuleName, null);
                         } catch (Exception ex) {
@@ -946,9 +948,9 @@ public class SIPosting_HistoryMonarchFoodController implements Initializable, Sc
                                 lsAccDesc = "";
                             }
                             if (poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(lnCtr).getCreditAmount() <= 0.0000
-                                && poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(lnCtr).getDebitAmount() <= 0.0000
-                                && !"".equals(lsAcctCode)
-                                && poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(lnCtr).getEditMode() != EditMode.ADDNEW) {
+                                    && poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(lnCtr).getDebitAmount() <= 0.0000
+                                    && !"".equals(lsAcctCode)
+                                    && poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(lnCtr).getEditMode() != EditMode.ADDNEW) {
                                 continue;
                             }
                             lnRowCount += 1;

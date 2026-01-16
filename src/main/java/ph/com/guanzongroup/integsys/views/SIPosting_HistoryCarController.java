@@ -295,6 +295,9 @@ public class SIPosting_HistoryCarController implements Initializable, ScreenInte
                     showAttachmentDialog();
                 }
             }
+            if (event.getCode() == KeyCode.F12) {
+                LoginControllerHolder.getMainController().eventf12(LoginControllerHolder.getMainController().getTab());
+            }
         }
         );
         scene.focusOwnerProperty().addListener((obs, oldNode, newNode) -> {
@@ -343,7 +346,6 @@ public class SIPosting_HistoryCarController implements Initializable, ScreenInte
     public void setKeyEventSerial(Scene scene) {
         scene.setOnKeyPressed(event -> {
             if (event.getCode() == KeyCode.F5) {
-                System.out.println("tested key press");
 
                 if (JFXUtil.isObjectEqualTo(poPurchaseReceivingController.PurchaseOrderReceiving().getEditMode(), EditMode.READY, EditMode.UPDATE)) {
                     showAttachmentDialog();
@@ -453,14 +455,14 @@ public class SIPosting_HistoryCarController implements Initializable, ScreenInte
                         }
                         break;
                     case "btnHistory":
-                        if(pnEditMode != EditMode.READY && pnEditMode != EditMode.UPDATE){
+                        if (pnEditMode != EditMode.READY && pnEditMode != EditMode.UPDATE) {
                             ShowMessageFX.Warning("No transaction status history to load!", pxeModuleName, null);
                             return;
-                        } 
-                        
+                        }
+
                         try {
                             poPurchaseReceivingController.PurchaseOrderReceiving().ShowStatusHistory();
-                        }  catch (NullPointerException npe) {
+                        } catch (NullPointerException npe) {
                             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(npe), npe);
                             ShowMessageFX.Error("No transaction status history to load!", pxeModuleName, null);
                         } catch (Exception ex) {

@@ -263,11 +263,13 @@ public class POQuotation_EntryController implements Initializable, ScreenInterfa
     private void setKeyEvent(Scene scene) {
         scene.setOnKeyPressed(event -> {
             if (event.getCode() == KeyCode.F5) {
-                System.out.println("tested key press");
 
                 if (JFXUtil.isObjectEqualTo(poController.POQuotation().getEditMode(), EditMode.ADDNEW, EditMode.READY, EditMode.UPDATE)) {
                     showAttachmentDialog();
                 }
+            }
+            if (event.getCode() == KeyCode.F12) {
+                LoginControllerHolder.getMainController().eventf12(LoginControllerHolder.getMainController().getTab());
             }
         }
         );
