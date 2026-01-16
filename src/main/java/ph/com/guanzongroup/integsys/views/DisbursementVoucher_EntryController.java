@@ -120,6 +120,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
     private int pnAttachment = 0;
     private boolean pbIsCheckedJournalTab = false;
     private boolean pbIsCheckedBIRTab = false;
+    private boolean pbIsCheckedAttachmentTab = false;
     private final String pxeModuleName = "Disbursement Voucher";
     private DisbursementVoucher poController;
     public int pnEditMode;
@@ -240,6 +241,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
             initMainGrid();
             initDetailJEGrid();
             initDetailBIRGrid();
+            initAttachmentsGrid();
             initTableOnClick();
             initTabPane();
             clearTextFields();
@@ -261,6 +263,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                 psTransactionType = DisbursementStatic.SourceCode.LOAD_ALL;
                 btnNew.fire();
             });
+            initAttachmentPreviewPane();
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
             ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
@@ -296,6 +299,17 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                             if (poController.Detail(0).getSourceNo() != null && !poController.Detail(0).getSourceNo().isEmpty()) {
                                 pbIsCheckedBIRTab = true;
                                 populateBIR();
+                            } else {
+                                JFXUtil.clickTabByTitleText(tabPaneMain, "Disbursement Voucher");
+                                ShowMessageFX.Warning(null, pxeModuleName, "Please provide at least one valid disbursement detail to proceed.");
+                            }
+                        }
+                        break;
+                    case "Attachments":
+                        if (pnEditMode == EditMode.READY || pnEditMode == EditMode.UPDATE || pnEditMode == EditMode.ADDNEW) {
+                            if (poController.Detail(0).getSourceNo() != null && !poController.Detail(0).getSourceNo().isEmpty()) {
+                                pbIsCheckedAttachmentTab = true;
+                                loadTableAttachment.reload();
                             } else {
                                 JFXUtil.clickTabByTitleText(tabPaneMain, "Disbursement Voucher");
                                 ShowMessageFX.Warning(null, pxeModuleName, "Please provide at least one valid disbursement detail to proceed.");
@@ -595,6 +609,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                 loadTableDetail.reload();
                 loadTableDetailJE.reload();
                 loadTableDetailBIR.reload();
+                loadTableAttachment.reload();
             }
             initButton(pnEditMode);
             if (lsButton.equals("btnUpdate")) {

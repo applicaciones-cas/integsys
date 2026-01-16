@@ -200,6 +200,7 @@ public class DisbursementVoucher_ViewController implements Initializable, Screen
                 initDatePicker();
                 initDetailGrid();
                 initDetailBIRGrid();
+                initAttachmentsGrid();
                 initTableOnClick();
                 initTabPane();
                 clearTextFields();
@@ -224,6 +225,7 @@ public class DisbursementVoucher_ViewController implements Initializable, Screen
                         CommonUtils.closeStage(btnClose);
                     });
                 }
+                initAttachmentPreviewPane();
             } catch (SQLException | GuanzonException | CloneNotSupportedException | ScriptException ex) {
                 Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
                 ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
@@ -257,6 +259,11 @@ public class DisbursementVoucher_ViewController implements Initializable, Screen
                     case "BIR 2307":
                         if (pnEditMode == EditMode.READY || pnEditMode == EditMode.UPDATE || pnEditMode == EditMode.ADDNEW) {
                             populateBIR();
+                        }
+                        break;
+                    case "Attachments":
+                        if (pnEditMode == EditMode.READY || pnEditMode == EditMode.UPDATE || pnEditMode == EditMode.ADDNEW) {
+                            loadTableAttachment.reload();
                         }
                         break;
                 }
@@ -357,6 +364,7 @@ public class DisbursementVoucher_ViewController implements Initializable, Screen
             loadRecordMaster();
             loadTableDetail.reload();
             loadTableDetailBIR.reload();
+            loadTableAttachment.reload();
             initButton(pnEditMode);
         }
     }

@@ -201,6 +201,7 @@ public class DisbursementVoucher_HistoryController implements Initializable, Scr
             initDetailGrid();
             initDetailJEGrid();
             initDetailBIRGrid();
+            initAttachmentsGrid();
             initTableOnClick();
             initTabPane();
             clearTextFields();
@@ -218,6 +219,7 @@ public class DisbursementVoucher_HistoryController implements Initializable, Scr
                 poController.Master().setBranchCode(oApp.getBranchCode());
                 loadRecordSearch();
             });
+            initAttachmentPreviewPane();
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
             ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
@@ -247,6 +249,11 @@ public class DisbursementVoucher_HistoryController implements Initializable, Scr
                     case "BIR 2307":
                         if (pnEditMode == EditMode.READY || pnEditMode == EditMode.UPDATE || pnEditMode == EditMode.ADDNEW) {
                             populateBIR();
+                        }
+                        break;
+                    case "Attachments":
+                        if (pnEditMode == EditMode.READY || pnEditMode == EditMode.UPDATE || pnEditMode == EditMode.ADDNEW) {
+                            loadTableAttachment.reload();
                         }
                         break;
                 }
@@ -368,6 +375,7 @@ public class DisbursementVoucher_HistoryController implements Initializable, Scr
                 loadTableDetail.reload();
                 loadTableDetailJE.reload();
                 loadTableDetailBIR.reload();
+                loadTableAttachment.reload();
             }
             initButton(pnEditMode);
         } catch (CloneNotSupportedException | SQLException | GuanzonException | ScriptException ex) {
