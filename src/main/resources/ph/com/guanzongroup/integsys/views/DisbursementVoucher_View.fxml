@@ -15,6 +15,7 @@
 <?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.effect.Blend?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.ColumnConstraints?>
@@ -24,7 +25,7 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
-<?import javafx.scene.image.ImageView?>
+
 <AnchorPane fx:id="AnchorMain" prefHeight="844.0" prefWidth="1045.0" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1">
     <children>
         <StackPane fx:id="StackPane" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
@@ -599,7 +600,7 @@
                                                           <ColumnConstraints hgrow="SOMETIMES" prefWidth="650.0" />
                                                         </columnConstraints>
                                                         <rowConstraints>
-                                                          <RowConstraints maxHeight="60.0" minHeight="20.0" prefHeight="20.0" vgrow="SOMETIMES" />
+                                                          <RowConstraints maxHeight="87.0" minHeight="20.0" prefHeight="20.0" vgrow="SOMETIMES" />
                                                           <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                                                         </rowConstraints>
                                                          <children>
@@ -614,6 +615,7 @@
                                                                     <rowConstraints>
                                                                       <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="28.0" vgrow="SOMETIMES" />
                                                                       <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="28.0" vgrow="SOMETIMES" />
+                                                                        <RowConstraints maxHeight="-Infinity" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                                                                     </rowConstraints>
                                                                      <children>
                                                                         <Label text="Attachment No">
@@ -628,6 +630,8 @@
                                                                         </Label>
                                                                         <TextField fx:id="tfAttachmentNo" disable="true" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="154.0" styleClass="DisabledTextField" GridPane.columnIndex="2" />
                                                                         <ComboBox fx:id="cmbAttachmentType" disable="true" prefHeight="26.0" prefWidth="207.0" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+                                                                        <Label fx:id="tfAttachmentSource" text="Source" GridPane.rowIndex="2" />
+                                                                        <TextField maxWidth="-Infinity" minWidth="-Infinity" prefHeight="25.0" prefWidth="153.0" GridPane.columnIndex="2" GridPane.rowIndex="2" />
                                                                      </children>
                                                                   </GridPane>
                                                                </children>
@@ -655,12 +659,12 @@
                                           <StackPane fx:id="stackPane1" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="5.0">
                                              <children>
                                                 <ImageView fx:id="imageView" fitHeight="150.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true" />
-                                                <Button fx:id="btnArrowLeft" mnemonicParsing="false"  prefHeight="33.0" prefWidth="38.0" styleClass="button_process" stylesheets="@../css/StyleSheet.css" StackPane.alignment="CENTER_LEFT">
+                                                <Button fx:id="btnArrowLeft" mnemonicParsing="false" prefHeight="33.0" prefWidth="38.0" styleClass="button_process" stylesheets="@../css/StyleSheet.css" StackPane.alignment="CENTER_LEFT">
                                                    <graphic>
                                                       <FontAwesomeIconView fill="WHITE" glyphName="ANGLE_LEFT" size="27.0" />
                                                    </graphic>
                                                 </Button>
-                                                <Button fx:id="btnArrowRight" mnemonicParsing="false"  prefHeight="33.0" prefWidth="38.0" styleClass="button_process" stylesheets="@../css/StyleSheet.css" StackPane.alignment="CENTER_RIGHT">
+                                                <Button fx:id="btnArrowRight" mnemonicParsing="false" prefHeight="33.0" prefWidth="38.0" styleClass="button_process" stylesheets="@../css/StyleSheet.css" StackPane.alignment="CENTER_RIGHT">
                                                    <graphic>
                                                       <FontAwesomeIconView fill="WHITE" glyphName="ANGLE_RIGHT" size="27.0" />
                                                    </graphic>

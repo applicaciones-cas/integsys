@@ -147,7 +147,7 @@ public class DisbursementVoucher_ViewController implements Initializable, Screen
     @FXML
     private CheckBox chbkPrintByBank, chbkIsCrossCheck, chbkIsPersonOnly, chbkVatClassification;
     @FXML
-    private Label lblDVTransactionStatus;
+    private Label lblDVTransactionStatus, tfAttachmentSource;
     @FXML
     private TextArea taDVRemarks;
     @FXML
@@ -825,7 +825,7 @@ public class DisbursementVoucher_ViewController implements Initializable, Screen
                 int lnAttachmentType = 0;
                 lnAttachmentType = Integer.parseInt(lsAttachmentType);
                 cmbAttachmentType.getSelectionModel().select(lnAttachmentType);
-
+                tfAttachmentSource.setText(poController.TransactionAttachmentSource(pnAttachment));
                 if (lbloadImage) {
                     try {
                         String filePath = (String) attachment_data.get(tblAttachments.getSelectionModel().getSelectedIndex()).getIndex02();
