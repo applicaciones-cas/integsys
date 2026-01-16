@@ -263,6 +263,11 @@ public class DisbursementVoucher_ViewController implements Initializable, Screen
                         break;
                     case "Attachments":
                         if (pnEditMode == EditMode.READY || pnEditMode == EditMode.UPDATE || pnEditMode == EditMode.ADDNEW) {
+                            try {
+                                poController.loadAttachments();
+                            } catch (GuanzonException | SQLException ex) {
+                                Logger.getLogger(DisbursementVoucher_EntryController.class.getName()).log(Level.SEVERE, null, ex);
+                            }
                             loadTableAttachment.reload();
                         }
                         break;

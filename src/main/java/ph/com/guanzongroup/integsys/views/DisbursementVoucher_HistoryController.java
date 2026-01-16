@@ -253,6 +253,11 @@ public class DisbursementVoucher_HistoryController implements Initializable, Scr
                         break;
                     case "Attachments":
                         if (pnEditMode == EditMode.READY || pnEditMode == EditMode.UPDATE || pnEditMode == EditMode.ADDNEW) {
+                            try {
+                                poController.loadAttachments();
+                            } catch (GuanzonException | SQLException ex) {
+                                Logger.getLogger(DisbursementVoucher_EntryController.class.getName()).log(Level.SEVERE, null, ex);
+                            }
                             loadTableAttachment.reload();
                         }
                         break;
@@ -1252,7 +1257,7 @@ public class DisbursementVoucher_HistoryController implements Initializable, Scr
         JFXUtil.setComboBoxItems(new JFXUtil.Pairs<>(cPaymentMode, cmbPaymentMode), new JFXUtil.Pairs<>(cPayeeType, cmbPayeeType),
                 new JFXUtil.Pairs<>(cDisbursementMode, cmbDisbursementMode), new JFXUtil.Pairs<>(cClaimantType, cmbClaimantType),
                 new JFXUtil.Pairs<>(cCheckStatus, cmbCheckStatus), new JFXUtil.Pairs<>(cOtherPaymentBTransfer, cmbOtherPaymentBTransfer),
-                new JFXUtil.Pairs<>(cOtherPayment, cmbOtherPayment));
+                new JFXUtil.Pairs<>(cOtherPayment, cmbOtherPayment), new JFXUtil.Pairs<>(documentType, cmbAttachmentType));
     }
 
     private void initDatePicker() {
