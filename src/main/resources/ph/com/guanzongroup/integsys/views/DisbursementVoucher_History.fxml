@@ -818,7 +818,7 @@
                                                                         <TextField fx:id="tfAttachmentNo" disable="true" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="154.0" styleClass="DisabledTextField" GridPane.columnIndex="2" />
                                                                         <ComboBox fx:id="cmbAttachmentType" disable="true" prefHeight="26.0" prefWidth="207.0" GridPane.columnIndex="2" GridPane.rowIndex="1" />
                                                                               <Label text="Source" GridPane.rowIndex="2" />
-                                                                              <TextField fx:id="tfAttachmentSource" maxWidth="-Infinity" minWidth="-Infinity" prefHeight="25.0" prefWidth="154.0" GridPane.columnIndex="2" GridPane.rowIndex="2" />
+                                                                              <TextField fx:id="tfAttachmentSource" prefHeight="25.0" prefWidth="154.0" GridPane.columnIndex="2" GridPane.rowIndex="2" />
                                                                      </children>
                                                                   </GridPane>
                                                                </children>
