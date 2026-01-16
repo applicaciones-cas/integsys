@@ -1051,6 +1051,14 @@ public class DashboardController implements Initializable {
                     return;
                 }
                 if (oApp != null) {
+                    //Mandatory close the current tab
+                    for (Tab tab : tabpane.getTabs()) {
+                        if (tab.getText().equals(psFormName)) {
+                            tabpane.getTabs().remove(tab);
+                            tabName.remove(psFormName);
+                            break;
+                        }
+                    }
                     boolean isNewTab = (checktabs(SetTabTitle(psFormName)) == 1);
                     if (isNewTab || !lsOldCompany.equals(psCompanyID)) {
                         String command = (String) loJSON.get("sCommandx");
