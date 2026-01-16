@@ -979,6 +979,7 @@ public class DashboardController implements Initializable {
                     try {
                         if (oApp.getIndustry().equals(System.getProperty("sys.main.industry"))
                                 || oApp.getIndustry().equals(System.getProperty("sys.general.industry"))) {
+                            psFormName = tabpane.getSelectionModel().getSelectedItem().getText();
                             loadSelectIndustryAndCompany();
                         }
                     } catch (IOException e) {
