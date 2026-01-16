@@ -6,6 +6,8 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -158,11 +160,14 @@ public class SelectIndustryCompany implements Initializable, ScreenInterface {
                         if (industryOptions.get(0).getIndustryID().equals(System.getProperty("user.selected.industry"))){
                             cmbIndustry.getSelectionModel().select(lnCtr);
                             psIndustryID = industryOptions.get(lnCtr).getIndustryID();
-                            
+
                             companyOptions = FXCollections.observableArrayList(getAllCompanies(industryOptions.get(lnCtr)));
                         }
                     }
                 }
+                cmbIndustry.setOnAction(event -> {
+                    psIndustryID = industryOptions.get(cmbIndustry.getSelectionModel().getSelectedIndex()).getIndustryID();
+                });
                 
 
                 cmbCompany.setItems(companyOptions);
@@ -174,6 +179,9 @@ public class SelectIndustryCompany implements Initializable, ScreenInterface {
                         }
                     }
                 }
+                cmbCompany.setOnAction(event -> {
+                    psCompanyID = companyOptions.get(cmbCompany.getSelectionModel().getSelectedIndex()).getCompanyId();
+                });
             } else {
                 psIndustryID = System.getProperty("user.selected.industry");
                 psCompanyID = System.getProperty("user.selected.company");
