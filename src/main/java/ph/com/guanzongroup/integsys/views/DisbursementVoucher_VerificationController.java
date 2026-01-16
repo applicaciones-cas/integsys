@@ -98,7 +98,6 @@ import ph.com.guanzongroup.cas.cashflow.status.DisbursementStatic;
 import ph.com.guanzongroup.cas.cashflow.status.JournalStatus;
 import ph.com.guanzongroup.integsys.model.ModelBIR_Detail;
 import ph.com.guanzongroup.integsys.model.ModelDeliveryAcceptance_Attachment;
-import static ph.com.guanzongroup.integsys.views.POReplacement_ConfirmationController.poController;
 
 /**
  * FXML Controller class
