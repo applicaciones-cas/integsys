@@ -240,11 +240,13 @@ public class POQuotation_HistoryController implements Initializable, ScreenInter
     private void setKeyEvent(Scene scene) {
         scene.setOnKeyPressed(event -> {
             if (event.getCode() == KeyCode.F5) {
-                System.out.println("tested key press");
 
                 if (JFXUtil.isObjectEqualTo(poController.POQuotation().getEditMode(), EditMode.READY, EditMode.UPDATE)) {
                     showAttachmentDialog();
                 }
+            }
+            if (event.getCode() == KeyCode.F12) {
+                LoginControllerHolder.getMainController().eventf12(LoginControllerHolder.getMainController().getTab());
             }
         }
         );

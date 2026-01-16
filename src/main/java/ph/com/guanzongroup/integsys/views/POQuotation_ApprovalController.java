@@ -263,11 +263,13 @@ public class POQuotation_ApprovalController implements Initializable, ScreenInte
     private void setKeyEvent(Scene scene) {
         scene.setOnKeyPressed(event -> {
             if (event.getCode() == KeyCode.F5) {
-                System.out.println("tested key press");
 
                 if (JFXUtil.isObjectEqualTo(poController.POQuotation().getEditMode(), EditMode.ADDNEW, EditMode.READY, EditMode.UPDATE)) {
                     showAttachmentDialog();
                 }
+            }
+            if (event.getCode() == KeyCode.F12) {
+                LoginControllerHolder.getMainController().eventf12(LoginControllerHolder.getMainController().getTab());
             }
         }
         );
@@ -1496,7 +1498,7 @@ public class POQuotation_ApprovalController implements Initializable, ScreenInte
                                             String.valueOf(poController.POQuotation().POQuotationList(lnCtr).Branch().getBranchName()),
                                             String.valueOf(poController.POQuotation().POQuotationList(lnCtr).Supplier().getCompanyName()),
                                             String.valueOf(CustomCommonUtil.formatDateToShortString(poController.POQuotation().POQuotationList(lnCtr).getTransactionDate())),
-//                                            safeGet(poController.POQuotation().POQuotationList(lnCtr).POQuotationRequest().getTransactionNo()),
+                                            //                                            safeGet(poController.POQuotation().POQuotationList(lnCtr).POQuotationRequest().getTransactionNo()),
                                             safeGet(poController.POQuotation().POQuotationList(lnCtr).getReferenceNo()),
                                             String.valueOf(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.POQuotation().POQuotationList(lnCtr).getTransactionTotal(), true))
                                     ));
