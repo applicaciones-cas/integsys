@@ -953,11 +953,11 @@ public class DisbursementVoucher_ViewController implements Initializable, Screen
     }
 
     private void initButton(int fnEditMode) {
-        JFXUtil.setDisabled(true, apDVMaster1, apDVMaster2, apDVMaster3, apDVDetail, apMasterDVCheck, apMasterDVBTransfer, apMasterDVOp, apBIRDetail);
+        JFXUtil.setDisabled(true, apDVMaster1, apDVMaster2, apDVMaster3, apDVDetail, apMasterDVCheck, apMasterDVBTransfer, apMasterDVOp, apBIRDetail, apAttachments);
     }
 
     private void clearTextFields() {
         JFXUtil.setValueToNull(previousSearchedTextField, lastFocusedTextField);
-        JFXUtil.clearTextFields(apDVMaster1, apDVDetail, apDVMaster2, apDVMaster3, apMasterDVCheck, apMasterDVBTransfer, apMasterDVOp, apBIRDetail);
+        JFXUtil.clearTextFields(apDVMaster1, apDVDetail, apDVMaster2, apDVMaster3, apMasterDVCheck, apMasterDVBTransfer, apMasterDVOp, apBIRDetail, apAttachments);
     }
 }
