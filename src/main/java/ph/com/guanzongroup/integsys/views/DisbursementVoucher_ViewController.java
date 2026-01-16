@@ -76,6 +76,7 @@ import org.guanzon.appdriver.base.SQLUtil;
 import org.guanzon.appdriver.constant.DocumentType;
 import org.guanzon.appdriver.constant.EditMode;
 import org.guanzon.appdriver.constant.Logical;
+import org.guanzon.appdriver.constant.RecordStatus;
 import org.json.simple.JSONObject;
 import ph.com.guanzongroup.cas.cashflow.DisbursementVoucher;
 import ph.com.guanzongroup.cas.cashflow.services.CashflowControllers;
@@ -479,6 +480,53 @@ public class DisbursementVoucher_ViewController implements Initializable, Screen
                         }
                     });
                 });
+        loadTableAttachment = new JFXUtil.ReloadableTableTask(
+                tblAttachments,
+                attachment_data,
+                () -> {
+                    imageviewerutil.scaleFactor = 1.0;
+                    JFXUtil.resetImageBounds(imageView, stackPane1);
+                    Platform.runLater(() -> {
+                        try {
+                            attachment_data.clear();
+                            int lnCtr;
+                            int lnCount = 0;
+                            for (lnCtr = 0; lnCtr < poController.getTransactionAttachmentCount(); lnCtr++) {
+                                if (RecordStatus.INACTIVE.equals(poController.TransactionAttachmentList(lnCtr).getModel().getRecordStatus())) {
+                                    continue;
+                                }
+                                lnCount += 1;
+                                attachment_data.add(
+                                        new ModelDeliveryAcceptance_Attachment(String.valueOf(lnCount),
+                                                String.valueOf(poController.TransactionAttachmentList(lnCtr).getModel().getFileName()),
+                                                String.valueOf(lnCtr)
+                                        ));
+                            }
+                            int lnTempRow = JFXUtil.getDetailRow(attachment_data, pnAttachment, 3); //this method is used only when Reverse is applied
+                            if (lnTempRow < 0 || lnTempRow
+                                    >= attachment_data.size()) {
+                                if (!attachment_data.isEmpty()) {
+                                    /* FOCUS ON FIRST ROW */
+                                    JFXUtil.selectAndFocusRow(tblAttachments, 0);
+                                    int lnRow = Integer.parseInt(attachment_data.get(0).getIndex03());
+                                    pnAttachment = lnRow;
+                                    loadRecordAttachment(true);
+                                }
+                            } else {
+                                /* FOCUS ON THE ROW THAT pnRowDetail POINTS TO */
+                                JFXUtil.selectAndFocusRow(tblAttachments, lnTempRow);
+                                int lnRow = Integer.parseInt(attachment_data.get(tblAttachments.getSelectionModel().getSelectedIndex()).getIndex03());
+                                pnAttachment = lnRow;
+                                loadRecordAttachment(true);
+                            }
+                            if (attachment_data.size() <= 0) {
+                                loadRecordAttachment(false);
+                            }
+                        } catch (Exception e) {
+                        }
+                    });
+                }
+        );
     }
 
     private void initAttachmentPreviewPane() {
