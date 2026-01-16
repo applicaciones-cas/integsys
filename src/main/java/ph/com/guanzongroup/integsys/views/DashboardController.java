@@ -87,6 +87,7 @@ import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.geometry.Bounds;
 import javafx.scene.shape.Rectangle;
+import org.guanzon.appdriver.constant.RecordStatus;
 import org.json.simple.JSONArray;
 
 public class DashboardController implements Initializable {
@@ -259,7 +260,7 @@ public class DashboardController implements Initializable {
             e.printStackTrace();
         }
     }
-
+    
     @FXML
     private void showMenu(ActionEvent event) throws SQLException {
         loadMenu();
@@ -964,6 +965,7 @@ public class DashboardController implements Initializable {
                             try {
                                 if (oApp.getIndustry().equals(System.getProperty("sys.main.industry"))
                                         || oApp.getIndustry().equals(System.getProperty("sys.general.industry"))) {
+                                    psFormName = tabpane.getSelectionModel().getSelectedItem().getText();
                                     loadSelectIndustryAndCompany();
                                 }
                             } catch (IOException e) {
@@ -1019,21 +1021,31 @@ public class DashboardController implements Initializable {
                 //change form name base on selected industry
                 //  /com/rmj/guanzongroup/sidebarmenus/views/DeliveryAcceptance_ConfirmationCar.fxml
 
-                System.out.println("OLD : " + psFormName);
-                String originalString = psFormName;
-                String updatedString = originalString.replace(lsOldForm + ".fxml", lsIndustry + ".fxml");
-
-                // Print the updated string
-                System.out.println(originalString);
-                System.out.println(updatedString);
-                psFormName = updatedString;
-
-                System.out.println("NEW : " + psFormName);
+                JSONObject loJSON =  getFxml(psFormName);
+                if("error".equals((String) loJSON.get("result"))){
+                    ShowMessageFX.Warning("This form is currently unavailable.", "Computerized Accounting System", MODULE);
+                    return;
+                }
                 if (oApp != null) {
                     boolean isNewTab = (checktabs(SetTabTitle(psFormName)) == 1);
                     if (isNewTab || !lsOldCompany.equals(psCompanyID)) {
-                        if (!psFormName.isEmpty() && psFormName.contains(".fxml")) {
-                            setScene2(loadAnimateExchange(psFormName));
+                        String command = (String) loJSON.get("sCommandx");
+                        String commandType = (String) loJSON.get("sCmdTypex");
+                        TreeNode node = new TreeNode((String) loJSON.get("sMenuCDxx")
+                                                , (String) loJSON.get("sMenuGrpx")
+                                                , (String) loJSON.get("sMenuName")
+                                                , (String) loJSON.get("sMenuDesc")
+                                                , command
+                                                , commandType
+                                                , (String) loJSON.get("sFormName")
+                                                , (String) loJSON.get("sObjectNm")
+                                                , (String) loJSON.get("sIndstCdx")
+                                                , (String) loJSON.get("sCategrCd"));
+
+                        if (!command.isEmpty() && !commandType.isEmpty()) {
+                            if (node.getFxmlPath() != null) {
+                                setScene2(loadAnimate(node));
+                        }
                         } else {
                             ShowMessageFX.Warning("This form is currently unavailable.", "Computerized Accounting System", MODULE);
                         }
@@ -1055,7 +1067,52 @@ public class DashboardController implements Initializable {
 
         }
     }
-
+    
+    private JSONObject getFxml(String fsFormName){
+        JSONObject loJSON = new JSONObject();
+        try {
+            String lsSQL = "SELECT a.sMenuCDxx" +
+                            ", a.sMenuGrpx" +
+                            ", a.sMenuName" +
+                            ", a.sMenuDesc" +
+                            ", b.sCommandx" +
+                            ", b.sCmdTypex" +
+                            ", b.sFormName" +
+                            ", b.sObjectNm" +
+                            ", b.sIndstCdx" +
+                            ", b.sCategrCd from xxxsysmenu a " +
+                            "LEFT JOIN xxxsysmenuothers b ON b.sMenuCDxx = a.sMenuCDxx AND b.cRecdStat = " + SQLUtil.toSQL(RecordStatus.ACTIVE);
+            lsSQL = MiscUtil.addCondition(lsSQL, " a.sMenuDesc LIKE " + SQLUtil.toSQL(fsFormName)
+                                                  +  " AND a.cRecdStat = " + SQLUtil.toSQL(RecordStatus.ACTIVE));
+            System.out.println("Executing SQL: " + lsSQL);
+            ResultSet loRS = oApp.executeQuery(lsSQL);
+            try {
+                if (MiscUtil.RecordCount(loRS) > 0) {
+                    if(loRS.next()){
+                            loJSON.put("sMenuCDxx", loRS.getString("sMenuCDxx"));
+                            loJSON.put("sMenuGrpx", loRS.getString("sMenuGrpx"));
+                            loJSON.put("sMenuName", loRS.getString("sMenuName"));
+                            loJSON.put("sMenuDesc", loRS.getString("sMenuDesc"));
+                            loJSON.put("sCommandx", loRS.getString("sCommandx"));
+                            loJSON.put("sCmdTypex", loRS.getString("sCmdTypex"));
+                            loJSON.put("sFormName", loRS.getString("sFormName"));
+                            loJSON.put("sObjectNm", loRS.getString("sObjectNm"));
+                            loJSON.put("sIndstCdx", loRS.getString("sIndstCdx"));
+                            loJSON.put("sCategrCd", loRS.getString("sCategrCd"));
+                        return loJSON;
+                    }
+                }
+                MiscUtil.close(loRS);
+            } catch (SQLException e) {
+                System.out.println("No record loaded.");
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+        }
+        loJSON.put("result", "error");
+        return loJSON;
+    }
+    
     public String SetTabTitle(String menuaction) {
         if (menuaction.contains(".fxml")) {
         }
@@ -1243,7 +1300,7 @@ public class DashboardController implements Initializable {
                 selectedTab.setText(newTitle);
                 selectedTab.setContent(content);
                 selectedTab.setContextMenu(createContextMenu(tabpane, selectedTab, oApp));
-
+                
                 selectedTab.setOnCloseRequest(event -> {
                     if (ShowMessageFX.YesNo(null, "Close Tab", "Are you sure, do you want to close tab?")) {
                         tabName.remove(selectedTab.getText());
