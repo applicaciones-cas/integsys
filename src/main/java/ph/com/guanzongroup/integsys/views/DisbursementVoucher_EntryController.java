@@ -71,7 +71,6 @@ import static javafx.scene.input.KeyCode.F3;
 import static javafx.scene.input.KeyCode.TAB;
 import static javafx.scene.input.KeyCode.UP;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.StackPane;
@@ -99,6 +98,7 @@ import ph.com.guanzongroup.cas.cashflow.DisbursementVoucher;
 import ph.com.guanzongroup.cas.cashflow.services.CashflowControllers;
 import ph.com.guanzongroup.cas.cashflow.status.DisbursementStatic;
 import ph.com.guanzongroup.cas.cashflow.status.JournalStatus;
+import ph.com.guanzongroup.cas.cashflow.status.OtherPaymentStatus;
 import ph.com.guanzongroup.integsys.model.ModelBIR_Detail;
 import ph.com.guanzongroup.integsys.model.ModelDeliveryAcceptance_Attachment;
 
@@ -163,8 +163,6 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
     ObservableList<String> cCheckStatus = FXCollections.observableArrayList("FLOATING", "OPEN",
             "CLEARED  / POSTED", "CANCELLED", "STALED", "HOLD / STOP PAYMENT",
             "BOUNCED / DISCHONORED", "VOID");
-    ObservableList<String> cOtherPayment = FXCollections.observableArrayList("FLOATING");
-    ObservableList<String> cOtherPaymentBTransfer = FXCollections.observableArrayList("FLOATING");
     ObservableList<String> documentType = ModelDeliveryAcceptance_Attachment.documentType;
     /* DV  & Journal */
     @FXML
@@ -178,11 +176,11 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
     @FXML
     private Tab tabDetails, tabCheck, tabBankTransfer, tabOnlinePayment, tabJournal, tabBIR, tabAttachments;
     @FXML
-    private TextField tfDVTransactionNo, tfSupplier, tfVoucherNo, tfBankNameCheck, tfBankAccountCheck, tfPayeeName, tfCheckNo, tfCheckAmount, tfAuthorizedPerson, tfBankNameBTransfer, tfBankAccountBTransfer, tfPaymentAmountBTransfer, tfSupplierBank, tfSupplierAccountNoBTransfer, tfBankTransReferNo, tfBankNameOnlinePayment, tfBankAccountOnlinePayment, tfPaymentAmount, tfSupplierServiceName, tfSupplierAccountNo, tfPaymentReferenceNo, tfTotalAmount, tfVatableSales, tfVatAmountMaster, tfVatZeroRatedSales, tfVatExemptSales, tfLessWHTax, tfTotalNetAmount, tfRefNoDetail, tfVatableSalesDetail, tfVatExemptDetail, tfVatZeroRatedSalesDetail, tfVatRateDetail, tfVatAmountDetail, tfPurchasedAmountDetail, tfNetAmountDetail, tfSearchBranch, tfSearchPayee, tfJournalTransactionNo, tfTotalDebitAmount, tfTotalCreditAmount, tfAccountCode, tfAccountDescription, tfDebitAmount, tfCreditAmount, tfBIRTransactionNo, tfTaxCode, tfParticular, tfBaseAmount, tfTaxRate, tfTotalTaxAmount, tfAttachmentNo, tfAttachmentSource;
+    private TextField tfDVTransactionNo, tfSupplier, tfVoucherNo, tfBankNameCheck, tfBankAccountCheck, tfPayeeName, tfCheckNo, tfCheckAmount, tfAuthorizedPerson, tfBankNameBTransfer, tfBankAccountBTransfer, tfPaymentAmountBTransfer, tfSupplierBank, tfSupplierAccountNoBTransfer, tfBankTransReferNo, tfPaymentStatusBTransfer, tfBankNameOnlinePayment, tfBankAccountOnlinePayment, tfPaymentAmount, tfSupplierServiceName, tfSupplierAccountNo, tfPaymentReferenceNo, tfOnlinePaymentStatus, tfTotalAmount, tfVatableSales, tfVatAmountMaster, tfVatZeroRatedSales, tfVatExemptSales, tfLessWHTax, tfTotalNetAmount, tfRefNoDetail, tfVatableSalesDetail, tfVatExemptDetail, tfVatZeroRatedSalesDetail, tfVatRateDetail, tfVatAmountDetail, tfPurchasedAmountDetail, tfNetAmountDetail, tfSearchBranch, tfSearchPayee, tfJournalTransactionNo, tfTotalDebitAmount, tfTotalCreditAmount, tfAccountCode, tfAccountDescription, tfDebitAmount, tfCreditAmount, tfBIRTransactionNo, tfTaxCode, tfParticular, tfBaseAmount, tfTaxRate, tfTotalTaxAmount, tfAttachmentNo, tfAttachmentSource;
     @FXML
     private DatePicker dpDVTransactionDate, dpCheckDate, dpJournalTransactionDate, dpReportMonthYear, dpPeriodFrom, dpPeriodTo;
     @FXML
-    private ComboBox cmbPaymentMode, cmbPayeeType, cmbDisbursementMode, cmbClaimantType, cmbCheckStatus, cmbOtherPaymentBTransfer, cmbOtherPayment, cmbTransactionType, cmbAttachmentType;
+    private ComboBox cmbPaymentMode, cmbPayeeType, cmbDisbursementMode, cmbClaimantType, cmbCheckStatus, cmbTransactionType, cmbAttachmentType;
     @FXML
     private CheckBox chbkPrintByBank, chbkIsCrossCheck, chbkIsPersonOnly, chbkVatClassification, cbReverse, cbJEReverse, cbBIRReverse;
     @FXML
@@ -1509,6 +1507,18 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                 try {
                     /*Lost Focus*/
                     switch (lsID) {
+                        case "tfBankNameOnlinePayment":
+                            if (lsValue.isEmpty()) {
+                                poController.OtherPayments().getModel().setBankID("");
+                                poController.OtherPayments().getModel().setBankAcountID("");
+                            }
+                            break;
+                        case "tfBankAccountOnlinePayment":
+                            if (lsValue.isEmpty()) {
+                                poController.OtherPayments().getModel().setBankID("");
+                                poController.OtherPayments().getModel().setBankAcountID("");
+                            }
+                            break;
                         case "tfSupplierServiceName":
                             if (lsValue.isEmpty()) {
                                 poController.OtherPayments().getModel().Banks().setBankCode("");
@@ -1517,16 +1527,6 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                         case "tfSupplierAccountNo":
                             if (lsValue.isEmpty()) {
                                 poController.OtherPayments().getModel().Bank_Account_Master().setAccountCode("");
-                            }
-                            break;
-                        case "tfBankAccountOnlinePayment":
-                            if (lsValue.isEmpty()) {
-                                poController.OtherPayments().getModel().Bank_Account_Master().setAccountCode("");
-                            }
-                            break;
-                        case "tfBankNameOnlinePayment":
-                            if (lsValue.isEmpty()) {
-                                poController.OtherPayments().getModel().Banks().setBankCode("");
                             }
                             break;
                     }
@@ -1811,16 +1811,28 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                                 break;
 
                             //apMasterDVOp
+                            case "tfBankNameOnlinePayment":
+                                poJSON = poController.OtherPayments().searchBanks(lsValue, lsValue);
+                                if ("error".equals((String) poJSON.get("result"))) {
+                                    ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                                } else {
+                                    JFXUtil.textFieldMoveNext(tfBankAccountBTransfer);
+                                }
+                                loadRecordMasterOnlinePayment();
+                                break;
+                            case "tfBankAccountOnlinePayment":
+                                poJSON = poController.OtherPayments().searchBankAcounts(lsValue, lsValue);
+                                if ("error".equals((String) poJSON.get("result"))) {
+                                    ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                                } else {
+                                    JFXUtil.textFieldMoveNext(tfSupplierBank);
+                                }
+                                loadRecordMasterOnlinePayment();
+                                break;
                             case "tfSupplierServiceName":
                                 loadRecordMasterOnlinePayment();
                                 break;
                             case "tfSupplierAccountNo":
-                                loadRecordMasterOnlinePayment();
-                                break;
-                            case "tfBankNameOnlinePayment":
-                                loadRecordMasterOnlinePayment();
-                                break;
-                            case "tfBankAccountOnlinePayment":
                                 loadRecordMasterOnlinePayment();
                                 break;
 
@@ -2099,6 +2111,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
 
     private void loadRecordMasterBankTransfer() {
         try {
+            JFXUtil.setStatusValue(tfPaymentStatusBTransfer, OtherPaymentStatus.class, pnEditMode == EditMode.UNKNOWN ? "-1" : poController.OtherPayments().getModel().getTransactionStatus());
             tfBankNameBTransfer.setText(poController.OtherPayments().getModel().Banks().getBankName() != null ? poController.OtherPayments().getModel().Banks().getBankName() : "");
             tfBankAccountBTransfer.setText(poController.OtherPayments().getModel().Bank_Account_Master().getAccountNo() != null ? poController.OtherPayments().getModel().Bank_Account_Master().getAccountNo() : "");
             if (true) {
@@ -2109,8 +2122,6 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
             tfSupplierAccountNoBTransfer.setText(poController.CheckPayments().getModel().Bank_Account_Master().getAccountNo() != null ? poController.CheckPayments().getModel().Bank_Account_Master().getAccountNo() : "");
 
             tfBankTransReferNo.setText(poController.OtherPayments().getModel().getReferNox() != null ? poController.OtherPayments().getModel().getReferNox() : "");
-            JFXUtil.setCmbValue(cmbOtherPaymentBTransfer, !poController.OtherPayments().getModel().getTransactionStatus().equals("") ? Integer.valueOf(poController.OtherPayments().getModel().getTransactionStatus()) : -1);
-
             JFXUtil.updateCaretPositions(apMasterDVBTransfer);
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
@@ -2123,14 +2134,13 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
             if (true) {
                 return;
             }
+            JFXUtil.setStatusValue(tfOnlinePaymentStatus, OtherPaymentStatus.class, pnEditMode == EditMode.UNKNOWN ? "-1" : poController.OtherPayments().getModel().getTransactionStatus());
             tfBankNameOnlinePayment.setText(poController.OtherPayments().getModel().Banks().getBankName() != null ? poController.OtherPayments().getModel().Banks().getBankName() : "");
             tfBankAccountOnlinePayment.setText(poController.OtherPayments().getModel().Bank_Account_Master().getAccountNo() != null ? poController.OtherPayments().getModel().Bank_Account_Master().getAccountNo() : "");
             tfPaymentAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.OtherPayments().getModel().getTotalAmount(), true));
             tfSupplierServiceName.setText(poController.OtherPayments().getModel().Banks().getBankName() != null ? poController.OtherPayments().getModel().Banks().getBankName() : "");
             tfSupplierAccountNo.setText(poController.OtherPayments().getModel().Bank_Account_Master().getAccountNo() != null ? poController.OtherPayments().getModel().Bank_Account_Master().getAccountNo() : "");
             tfPaymentReferenceNo.setText(poController.OtherPayments().getModel().getReferNox() != null ? poController.OtherPayments().getModel().getReferNox() : "");
-            JFXUtil.setCmbValue(cmbOtherPayment, !poController.OtherPayments().getModel().getTransactionStatus().equals("") ? Integer.valueOf(poController.OtherPayments().getModel().getTransactionStatus()) : -1);
-
             JFXUtil.updateCaretPositions(apMasterDVOp);
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
@@ -2454,14 +2464,6 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                         }
                         loadRecordMasterCheck();
                         break;
-                    case "cmbOtherPaymentBTransfer":
-                        if ((pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) && cmbOtherPaymentBTransfer.getSelectionModel().getSelectedIndex() >= 0) {
-                        }
-                        break;
-                    case "cmbOtherPayment":
-                        if ((pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) && cmbOtherPayment.getSelectionModel().getSelectedIndex() >= 0) {
-                        }
-                        break;
                 }
             }
     );
@@ -2469,12 +2471,11 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
     private void initComboBoxes() {
         JFXUtil.setComboBoxItems(new JFXUtil.Pairs<>(cPaymentMode, cmbPaymentMode), new JFXUtil.Pairs<>(cPayeeType, cmbPayeeType),
                 new JFXUtil.Pairs<>(cDisbursementMode, cmbDisbursementMode), new JFXUtil.Pairs<>(cClaimantType, cmbClaimantType),
-                new JFXUtil.Pairs<>(cCheckStatus, cmbCheckStatus), new JFXUtil.Pairs<>(cOtherPaymentBTransfer, cmbOtherPaymentBTransfer),
-                new JFXUtil.Pairs<>(cOtherPayment, cmbOtherPayment), new JFXUtil.Pairs<>(cTransactionType, cmbTransactionType),
+                new JFXUtil.Pairs<>(cCheckStatus, cmbCheckStatus), new JFXUtil.Pairs<>(cTransactionType, cmbTransactionType),
                 new JFXUtil.Pairs<>(documentType, cmbAttachmentType));
 
-        JFXUtil.setComboBoxActionListener(comboBoxActionListener, cmbPaymentMode, cmbPayeeType, cmbDisbursementMode, cmbClaimantType, cmbCheckStatus, cmbOtherPaymentBTransfer, cmbOtherPayment, cmbTransactionType);
-        JFXUtil.initComboBoxCellDesignColor("#FF8201", cmbPaymentMode, cmbPayeeType, cmbDisbursementMode, cmbClaimantType, cmbCheckStatus, cmbOtherPaymentBTransfer, cmbOtherPayment, cmbTransactionType);
+        JFXUtil.setComboBoxActionListener(comboBoxActionListener, cmbPaymentMode, cmbPayeeType, cmbDisbursementMode, cmbClaimantType, cmbCheckStatus, cmbTransactionType);
+        JFXUtil.initComboBoxCellDesignColor("#FF8201", cmbPaymentMode, cmbPayeeType, cmbDisbursementMode, cmbClaimantType, cmbCheckStatus, cmbTransactionType);
 
         JFXUtil.handleDisabledNodeClick(apMasterDVCheck, pnEditMode, nodeID -> {
             switch (nodeID) {
