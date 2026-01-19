@@ -121,7 +121,6 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.util.Callback;
 import java.io.File;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.regex.Pattern;
@@ -134,7 +133,7 @@ import org.guanzon.appdriver.constant.EditMode;
 import ph.com.guanzongroup.integsys.views.ScreenInterface;
 
 /**
- * Date : 4/28/2025 Recent update: 01/13/2026
+ * Date : 4/28/2025 Recent update: 01/19/2026
  *
  * @author Aldrich
  */
@@ -2962,5 +2961,38 @@ public class JFXUtil {
                 }
             }
         }
+    }
+
+    public static void checkDisabledTabs(TabPane tabPane, Consumer<Tab> action) {
+        tabPane.addEventFilter(MouseEvent.MOUSE_PRESSED, event -> {
+            for (Node node : tabPane.lookupAll(".tab")) {
+                if (node.localToScene(node.getBoundsInLocal())
+                        .contains(event.getSceneX(), event.getSceneY())) {
+
+                    Label label = (Label) node.lookup(".tab-label");
+                    if (label == null) {
+                        return;
+                    }
+                    String tabText = label.getText();
+                    for (Tab tab : tabPane.getTabs()) {
+                        if (tab.isDisable() && tabText.equals(tab.getText())) {
+                            action.accept(tab);
+                            event.consume();
+                            return;
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    public static void onTabSelected(TabPane tabPane, Consumer<String> onTabTitleSelected) {
+        tabPane.getSelectionModel()
+                .selectedItemProperty()
+                .addListener((obs, oldTab, newTab) -> {
+                    if (newTab != null) {
+                        onTabTitleSelected.accept(newTab.getText());
+                    }
+                });
     }
 }
