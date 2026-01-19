@@ -1749,7 +1749,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
 
                             //apMasterDVBTransfer
                             case "tfBankNameBTransfer":
-                                poJSON = poController.OtherPayments().searchBanks(lsValue, lsValue);
+                                poJSON = poController.SearchBanks(lsValue, false);
                                 if ("error".equals((String) poJSON.get("result"))) {
                                     ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                 } else {
@@ -1758,7 +1758,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
                                 loadRecordMasterBankTransfer();
                                 break;
                             case "tfBankAccountBTransfer":
-                                poJSON = poController.OtherPayments().searchBankAcounts(lsValue, lsValue);
+                                poJSON = poController.SearchBankAccount(lsValue, poController.OtherPayments().getModel().getBankID(), false);
                                 if ("error".equals((String) poJSON.get("result"))) {
                                     ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                 } else {
@@ -1790,7 +1790,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
 
                             //apMasterDVOp
                             case "tfBankNameOnlinePayment":
-                                poJSON = poController.OtherPayments().searchBanks(lsValue, lsValue);
+                                poJSON = poController.SearchBanks(lsValue, false);
                                 if ("error".equals((String) poJSON.get("result"))) {
                                     ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                 } else {
@@ -1799,7 +1799,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
                                 loadRecordMasterOnlinePayment();
                                 break;
                             case "tfBankAccountOnlinePayment":
-                                poJSON = poController.OtherPayments().searchBankAcounts(lsValue, lsValue);
+                                poJSON = poController.SearchBankAccount(lsValue, poController.OtherPayments().getModel().getBankID(), false);
                                 if ("error".equals((String) poJSON.get("result"))) {
                                     ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                 } else {

@@ -1775,7 +1775,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
 
                             //apMasterDVBTransfer
                             case "tfBankNameBTransfer":
-                                poJSON = poController.OtherPayments().searchBanks(lsValue, lsValue);
+                                poJSON = poController.SearchBanks(lsValue, false);
                                 if ("error".equals((String) poJSON.get("result"))) {
                                     ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                 } else {
@@ -1784,7 +1784,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                                 loadRecordMasterBankTransfer();
                                 break;
                             case "tfBankAccountBTransfer":
-                                poJSON = poController.OtherPayments().searchBankAcounts(lsValue, lsValue);
+                                poJSON = poController.SearchBankAccount(lsValue, poController.OtherPayments().getModel().getBankID(), false);
                                 if ("error".equals((String) poJSON.get("result"))) {
                                     ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                 } else {
@@ -1812,7 +1812,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
 
                             //apMasterDVOp
                             case "tfBankNameOnlinePayment":
-                                poJSON = poController.OtherPayments().searchBanks(lsValue, lsValue);
+                                poJSON = poController.SearchBanks(lsValue, false);
                                 if ("error".equals((String) poJSON.get("result"))) {
                                     ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                 } else {
@@ -1821,7 +1821,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                                 loadRecordMasterOnlinePayment();
                                 break;
                             case "tfBankAccountOnlinePayment":
-                                poJSON = poController.OtherPayments().searchBankAcounts(lsValue, lsValue);
+                                poJSON = poController.SearchBankAccount(lsValue, poController.OtherPayments().getModel().getBankID(), false);
                                 if ("error".equals((String) poJSON.get("result"))) {
                                     ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                 } else {
