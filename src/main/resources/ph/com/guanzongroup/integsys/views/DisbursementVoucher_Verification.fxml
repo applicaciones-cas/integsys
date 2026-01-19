@@ -832,7 +832,7 @@
                                                           <ColumnConstraints hgrow="SOMETIMES" prefWidth="650.0" />
                                                         </columnConstraints>
                                                         <rowConstraints>
-                                                          <RowConstraints maxHeight="87.0" minHeight="87.0" prefHeight="87.0" vgrow="SOMETIMES" />
+                                                          <RowConstraints maxHeight="90.0" minHeight="90.0" prefHeight="90.0" vgrow="SOMETIMES" />
                                                           <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                                                         </rowConstraints>
                                                          <children>
