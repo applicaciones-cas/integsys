@@ -1458,7 +1458,6 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                         break;
                     case "tfBankAccountBTransfer":
                         if (lsValue.isEmpty()) {
-                            poController.OtherPayments().getModel().setBankID("");
                             poController.OtherPayments().getModel().setBankAcountID("");
                         }
                         break;
@@ -1517,7 +1516,6 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                             break;
                         case "tfBankAccountOnlinePayment":
                             if (lsValue.isEmpty()) {
-                                poController.OtherPayments().getModel().setBankID("");
                                 poController.OtherPayments().getModel().setBankAcountID("");
                             }
                             break;
@@ -1818,7 +1816,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                                 if ("error".equals((String) poJSON.get("result"))) {
                                     ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                 } else {
-                                    JFXUtil.textFieldMoveNext(tfBankAccountBTransfer);
+                                    JFXUtil.textFieldMoveNext(tfBankAccountOnlinePayment);
                                 }
                                 loadRecordMasterOnlinePayment();
                                 break;
@@ -1827,7 +1825,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                                 if ("error".equals((String) poJSON.get("result"))) {
                                     ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                 } else {
-                                    JFXUtil.textFieldMoveNext(tfSupplierBank);
+                                    JFXUtil.textFieldMoveNext(tfSupplierServiceName);
                                 }
                                 loadRecordMasterOnlinePayment();
                                 break;
