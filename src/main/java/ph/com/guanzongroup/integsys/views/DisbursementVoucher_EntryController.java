@@ -270,73 +270,85 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
     }
 
     public void initTabPane() {
-        tabPaneMain.getSelectionModel().selectedItemProperty().addListener((obs, oldTab, newTab) -> {
-            if (newTab != null) {
-                String tabTitle = newTab.getText();
-                switch (tabTitle) {
-                    case "Disbursement Voucher":
-                        if (pnEditMode == EditMode.UNKNOWN) {
-                            pnDetailJE = 0;
-                            pnDetailBIR = 0;
+        JFXUtil.onTabSelected(tabPaneMain, tabTitle -> {
+            switch (tabTitle) {
+                case "Disbursement Voucher":
+                    if (pnEditMode == EditMode.UNKNOWN) {
+                        pnDetailJE = 0;
+                        pnDetailBIR = 0;
+                    } else {
+                        loadRecordMaster();
+                    }
+                    break;
+                case "Journal":
+                    if (pnEditMode == EditMode.READY || pnEditMode == EditMode.UPDATE || pnEditMode == EditMode.ADDNEW) {
+                        if (poController.Detail(0).getSourceNo() != null && !poController.Detail(0).getSourceNo().isEmpty()) {
+                            pbIsCheckedJournalTab = true;
+                            populateJE();
                         } else {
-                            loadRecordMaster();
+                            JFXUtil.clickTabByTitleText(tabPaneMain, "Disbursement Voucher");
+                            ShowMessageFX.Warning(null, pxeModuleName, "Please provide at least one valid disbursement detail to proceed.");
+                        }
+                    }
+                    break;
+                case "BIR 2307":
+                    if (pnEditMode == EditMode.READY || pnEditMode == EditMode.UPDATE || pnEditMode == EditMode.ADDNEW) {
+                        if (poController.Detail(0).getSourceNo() != null && !poController.Detail(0).getSourceNo().isEmpty()) {
+                            pbIsCheckedBIRTab = true;
+                            populateBIR();
+                        } else {
+                            JFXUtil.clickTabByTitleText(tabPaneMain, "Disbursement Voucher");
+                            ShowMessageFX.Warning(null, pxeModuleName, "Please provide at least one valid disbursement detail to proceed.");
+                        }
+                    }
+                    break;
+                case "Attachments":
+                    if (pnEditMode == EditMode.READY || pnEditMode == EditMode.UPDATE || pnEditMode == EditMode.ADDNEW) {
+                        if (poController.Detail(0).getSourceNo() != null && !poController.Detail(0).getSourceNo().isEmpty()) {
+                            pbIsCheckedAttachmentTab = true;
+                            try {
+                                poController.loadAttachments();
+                            } catch (GuanzonException | SQLException ex) {
+                                Logger.getLogger(DisbursementVoucher_EntryController.class.getName()).log(Level.SEVERE, null, ex);
+                            }
+                            loadTableAttachment.reload();
+                        } else {
+                            JFXUtil.clickTabByTitleText(tabPaneMain, "Disbursement Voucher");
+                            ShowMessageFX.Warning(null, pxeModuleName, "Please provide at least one valid disbursement detail to proceed.");
+                        }
+                    }
+                    break;
+            }
+        });
+        JFXUtil.onTabSelected(tabPanePaymentMode, tabTitle -> {
+            try {
+                switch (tabTitle) {
+                    case "Check":
+                        if (pnEditMode == EditMode.READY || pnEditMode == EditMode.UPDATE || pnEditMode == EditMode.ADDNEW) {
+                            poController.populateCheck();
+                            loadRecordMasterCheck();
                         }
                         break;
-                    case "Journal":
+                    case "Bank Transfer":
                         if (pnEditMode == EditMode.READY || pnEditMode == EditMode.UPDATE || pnEditMode == EditMode.ADDNEW) {
-                            if (poController.Detail(0).getSourceNo() != null && !poController.Detail(0).getSourceNo().isEmpty()) {
-                                pbIsCheckedJournalTab = true;
-                                populateJE();
-                            } else {
-                                JFXUtil.clickTabByTitleText(tabPaneMain, "Disbursement Voucher");
-                                ShowMessageFX.Warning(null, pxeModuleName, "Please provide at least one valid disbursement detail to proceed.");
-                            }
+                            poController.populateOtherPayment();
+                            loadRecordMasterBankTransfer();
                         }
                         break;
-                    case "BIR 2307":
+                    case "E-Wallet":
                         if (pnEditMode == EditMode.READY || pnEditMode == EditMode.UPDATE || pnEditMode == EditMode.ADDNEW) {
-                            if (poController.Detail(0).getSourceNo() != null && !poController.Detail(0).getSourceNo().isEmpty()) {
-                                pbIsCheckedBIRTab = true;
-                                populateBIR();
-                            } else {
-                                JFXUtil.clickTabByTitleText(tabPaneMain, "Disbursement Voucher");
-                                ShowMessageFX.Warning(null, pxeModuleName, "Please provide at least one valid disbursement detail to proceed.");
-                            }
-                        }
-                        break;
-                    case "Attachments":
-                        if (pnEditMode == EditMode.READY || pnEditMode == EditMode.UPDATE || pnEditMode == EditMode.ADDNEW) {
-                            if (poController.Detail(0).getSourceNo() != null && !poController.Detail(0).getSourceNo().isEmpty()) {
-                                pbIsCheckedAttachmentTab = true;
-                                try {
-                                    poController.loadAttachments();
-                                } catch (GuanzonException | SQLException ex) {
-                                    Logger.getLogger(DisbursementVoucher_EntryController.class.getName()).log(Level.SEVERE, null, ex);
-                                }
-                                loadTableAttachment.reload();
-                            } else {
-                                JFXUtil.clickTabByTitleText(tabPaneMain, "Disbursement Voucher");
-                                ShowMessageFX.Warning(null, pxeModuleName, "Please provide at least one valid disbursement detail to proceed.");
-                            }
                         }
                         break;
                 }
+            } catch (SQLException | GuanzonException | CloneNotSupportedException | ScriptException ex) {
+                Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+                ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
             }
         });
 
-        tabPanePaymentMode.addEventFilter(MouseEvent.MOUSE_PRESSED, event -> {
-            tabPanePaymentMode.lookupAll(".tab").forEach(node -> {
-                if (node.localToScene(node.getBoundsInLocal()).contains(event.getSceneX(), event.getSceneY())) {
-                    String tabName = ((javafx.scene.control.Label) node.lookup(".tab-label")).getText();
-                    for (Tab tab : tabPanePaymentMode.getTabs()) {
-                        if (tab.getText().equals(tabName) && tab.isDisable()) {
-                            ShowMessageFX.Warning(null, pxeModuleName, "This tab has been disabled as only one option applies based on the selected payment form.");
-                            JFXUtil.glowOnce(cmbPaymentMode, "#FF8201");
-                            event.consume();
-                        }
-                    }
-                }
-            });
+        JFXUtil.checkDisabledTabs(tabPanePaymentMode, tab -> {
+            ShowMessageFX.Warning(null, pxeModuleName, "This tab has been disabled as only one option applies based on the selected payment form.");
+            JFXUtil.glowOnce(cmbPaymentMode, "#FF8201");
         });
     }
 
@@ -1440,13 +1452,14 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                 switch (lsID) {
                     case "tfBankNameBTransfer":
                         if (lsValue.isEmpty()) {
-                            poController.CheckPayments().getModel().setBankID("");
-                            poController.CheckPayments().getModel().setBankAcountID("");
+                            poController.OtherPayments().getModel().setBankID("");
+                            poController.OtherPayments().getModel().setBankAcountID("");
                         }
                         break;
                     case "tfBankAccountBTransfer":
                         if (lsValue.isEmpty()) {
-                            poController.CheckPayments().getModel().setBankAcountID("");
+                            poController.OtherPayments().getModel().setBankID("");
+                            poController.OtherPayments().getModel().setBankAcountID("");
                         }
                         break;
                     case "tfSupplierBank":
@@ -1762,7 +1775,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
 
                             //apMasterDVBTransfer
                             case "tfBankNameBTransfer":
-                                poJSON = poController.SearchBanks(lsValue, false);
+                                poJSON = poController.OtherPayments().searchBanks(lsValue, lsValue);
                                 if ("error".equals((String) poJSON.get("result"))) {
                                     ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                 } else {
@@ -1771,7 +1784,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                                 loadRecordMasterBankTransfer();
                                 break;
                             case "tfBankAccountBTransfer":
-                                poJSON = poController.SearchBankAccount(lsValue, poController.CheckPayments().getModel().getBankID(), false);
+                                poJSON = poController.OtherPayments().searchBankAcounts(lsValue, lsValue);
                                 if ("error".equals((String) poJSON.get("result"))) {
                                     ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                 } else {
@@ -2086,8 +2099,8 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
 
     private void loadRecordMasterBankTransfer() {
         try {
-            tfBankNameBTransfer.setText(poController.CheckPayments().getModel().Banks().getBankName() != null ? poController.CheckPayments().getModel().Banks().getBankName() : "");
-            tfBankAccountBTransfer.setText(poController.CheckPayments().getModel().Bank_Account_Master().getAccountNo() != null ? poController.CheckPayments().getModel().Bank_Account_Master().getAccountNo() : "");
+            tfBankNameBTransfer.setText(poController.OtherPayments().getModel().Banks().getBankName() != null ? poController.OtherPayments().getModel().Banks().getBankName() : "");
+            tfBankAccountBTransfer.setText(poController.OtherPayments().getModel().Bank_Account_Master().getAccountNo() != null ? poController.OtherPayments().getModel().Bank_Account_Master().getAccountNo() : "");
             if (true) {
                 return; //temporarily as there is no getTotalAmount yet
             }
