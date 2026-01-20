@@ -268,10 +268,12 @@ public class OtherPaymentStatusController implements Initializable, ScreenInterf
                 switch (lsID) {
                     case "tfSearchBankName":
                         if (lsValue.isEmpty()) {
+                            poController.setSearchBank("");
                         }
                         break;
                     case "tfSearchBankAccount":
                         if (lsValue.isEmpty()) {
+                            poController.setSearchBankAccount("");
                         }
                         break;
                     case "tfSearchIndustry":
