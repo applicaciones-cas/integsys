@@ -429,7 +429,6 @@ public class DisbursementVoucher_VerificationController implements Initializable
                     poJSON = poController.updatePaymentsStatus();
                     if ("error".equals(poJSON.get("result"))) {
                         ShowMessageFX.Warning(null, pxeModuleName,  (String) poJSON.get("message"));
-                        return;
                     }
                     
                     poJSON = poController.OpenTransaction(poController.Master().getTransactionNo());

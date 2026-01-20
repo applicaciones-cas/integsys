@@ -477,7 +477,6 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                     poJSON = poController.updatePaymentsStatus();
                     if ("error".equals(poJSON.get("result"))) {
                         ShowMessageFX.Warning(null, pxeModuleName,  (String) poJSON.get("message"));
-                        return;
                     }
                     
                     poJSON = poController.OpenTransaction(poController.Master().getTransactionNo());
