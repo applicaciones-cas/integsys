@@ -574,7 +574,7 @@ public class OtherPaymentStatusController implements Initializable, ScreenInterf
         JFXUtil.setButtonsVisibility(lbShow, btnSave, btnCancel);
         JFXUtil.setButtonsVisibility(false, btnUpdate);
         JFXUtil.setButtonsVisibility(fnEditMode != EditMode.UNKNOWN, btnHistory);
-        
+        JFXUtil.setDisabled(!lbShow, apMaster);
         if (fnEditMode == EditMode.READY) {
             switch (poController.OtherPayments().getModel().getTransactionStatus()) {
                 case CheckStatus.FLOAT:
