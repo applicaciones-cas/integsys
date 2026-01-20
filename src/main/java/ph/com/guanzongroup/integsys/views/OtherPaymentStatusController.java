@@ -81,7 +81,7 @@ public class OtherPaymentStatusController implements Initializable, ScreenInterf
 
     private final Map<String, List<String>> highlightedRowsMain = new HashMap<>();
 
-    ObservableList<String> cCheckState = FXCollections.observableArrayList("FLOAT", "OPEN", "POSTED", "CANCELLED", "VOID");
+    ObservableList<String> cCheckState = FXCollections.observableArrayList("FLOAT", "OPEN", "POSTED", "CANCELLED");
 
     JFXUtil.ReloadableTableTask loadTableMain;
     @FXML
@@ -284,21 +284,10 @@ public class OtherPaymentStatusController implements Initializable, ScreenInterf
                 String selected = "";
                 switch (cmbId) {
                     case "cmbPaymentStatus":
-                        switch (String.valueOf(selectedValue)) {
-                            case "FLOAT":
-                                selected = "0";
-                                break;
-                            case "OPEN":
-                                selected = "1";
-                                break;
-                            case "POSTED":
-                                selected = "2";
-                                break;
-                            case "CANCELLED":
-                                selected = "3";
-                                break;
+                        poJSON = poController.OtherPayments().getModel().setTransactionStatus(String.valueOf(selectedIndex));
+                        if (!JFXUtil.isJSONSuccess(poJSON)) {
+                            ShowMessageFX.Warning((String) poJSON.get("message"), pxeModuleName, null);
                         }
-                        poController.OtherPayments().getModel().setTransactionStatus(selected);
                         break;
                 }
                 loadRecordMaster();
@@ -554,7 +543,7 @@ public class OtherPaymentStatusController implements Initializable, ScreenInterf
         ModelDisbursementVoucher_Main selected = (ModelDisbursementVoucher_Main) tblViewMainList.getSelectionModel().getSelectedItem();
         if (selected != null) {
             try {
-                int pnRowMain = Integer.parseInt(selected.getIndex01()) ;
+                int pnRowMain = Integer.parseInt(selected.getIndex01());
                 pnMain = pnRowMain - 1;
                 String lsTransactionNo = selected.getIndex05();
                 clearTextFields();
