@@ -301,7 +301,7 @@ public class OtherPaymentStatusController implements Initializable, ScreenInterf
             (cmbId, selectedIndex, selectedValue) -> {
                 switch (cmbId) {
                     case "cmbPaymentStatus":
-                        poController.OtherPayments().getModel().setTransactionStatus(String.valueOf(selectedValue));
+                        poController.OtherPayments().getModel().setTransactionStatus(String.valueOf(selectedIndex));
                         break;
                 }
                 loadRecordMaster();
