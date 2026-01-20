@@ -543,8 +543,8 @@ public class OtherPaymentStatusController implements Initializable, ScreenInterf
         ModelDisbursementVoucher_Main selected = (ModelDisbursementVoucher_Main) tblViewMainList.getSelectionModel().getSelectedItem();
         if (selected != null) {
             try {
-                int pnRowMain = Integer.parseInt(selected.getIndex01());
-                pnMain = pnRowMain - 1;
+                int pnRowMain = Integer.parseInt(selected.getIndex01()) - 1;
+                pnMain = pnRowMain;
                 String lsTransactionNo = selected.getIndex05();
                 clearTextFields();
                 poJSON = poController.OpenTransaction(lsTransactionNo);
