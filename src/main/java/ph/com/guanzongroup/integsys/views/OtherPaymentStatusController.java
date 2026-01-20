@@ -493,7 +493,7 @@ public class OtherPaymentStatusController implements Initializable, ScreenInterf
                                                     poController.poDisbursementMaster(lnCntr).getTransactionNo()
                                             ));
                                             if (poController.poDisbursementMaster(lnCntr).CheckPayments().getTransactionStatus().equals(CheckStatus.POSTED)) {
-                                                plOrderNoPartial.add(new Pair<>(String.valueOf(lnCntr + 1), "1"));
+                                                JFXUtil.highlightByKey(tblViewMainList, String.valueOf(lnCntr + 1), "#C1E1C1", highlightedRowsMain);
                                             }
                                         }
                                     } else {
@@ -592,7 +592,6 @@ public class OtherPaymentStatusController implements Initializable, ScreenInterf
     }
 
     private void clearTextFields() {
-        JFXUtil.setValueToNull(null, previousSearchedTextField, lastFocusedTextField);
         JFXUtil.clearTextFields(apMaster);
     }
 
