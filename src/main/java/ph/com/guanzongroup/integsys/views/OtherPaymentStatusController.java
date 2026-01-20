@@ -80,14 +80,7 @@ public class OtherPaymentStatusController implements Initializable, ScreenInterf
     private ObservableList<ModelDisbursementVoucher_Main> main_data = FXCollections.observableArrayList();
     private FilteredList<ModelDisbursementVoucher_Main> filteredMain_Data;
 
-    private Object lastFocusedTextField = null;
-    private Object previousSearchedTextField = null;
-
-    List<Pair<String, String>> plOrderNoPartial = new ArrayList<>();
-    List<Pair<String, String>> plOrderNoFinal = new ArrayList<>();
-
     private final Map<String, List<String>> highlightedRowsMain = new HashMap<>();
-    private final Map<Integer, List<String>> highlightedRowsDetail = new HashMap<>();
 
     ObservableList<String> cCheckState = FXCollections.observableArrayList("OPEN", "CLEAR", "CANCELLATION", "STALE", "HOLD",
             "BOUNCED / DISCHONORED");
@@ -192,7 +185,6 @@ public class OtherPaymentStatusController implements Initializable, ScreenInterf
                         return;
                     }
                     pnEditMode = poController.getEditMode();
-                    pagination.toFront();
                     break;
                 case "btnCancel":
                     if (ShowMessageFX.YesNo(null, pxeModuleName, "Do you want to disregard changes?")) {
@@ -238,7 +230,6 @@ public class OtherPaymentStatusController implements Initializable, ScreenInterf
                     ShowMessageFX.Information((String) poJSON.get("message"), pxeModuleName, null);
                     pnEditMode = EditMode.UNKNOWN;
                     JFXUtil.disableAllHighlightByColor(tblViewMainList, "#A7C7E7", highlightedRowsMain);
-                    pagination.toBack();
                     break;
                 case "btnRetrieve":
                     loadTableMain.reload();
