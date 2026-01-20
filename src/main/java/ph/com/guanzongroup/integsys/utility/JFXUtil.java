@@ -8,6 +8,7 @@ import com.sun.javafx.scene.control.skin.TableHeaderRow;
 import com.sun.javafx.scene.control.skin.TableViewSkin;
 import com.sun.javafx.scene.control.skin.VirtualFlow;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
+import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -123,12 +124,20 @@ import javafx.util.Callback;
 import java.io.File;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Pattern;
+import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.SimpleDoubleProperty;
 import javafx.css.PseudoClass;
+import javafx.embed.swing.SwingFXUtils;
+import javafx.geometry.Point2D;
 import javafx.scene.control.ButtonBase;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.Tooltip;
 import javafx.scene.effect.DropShadow;
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.rendering.PDFRenderer;
 import org.guanzon.appdriver.constant.EditMode;
 import ph.com.guanzongroup.integsys.views.ScreenInterface;
 
@@ -648,6 +657,113 @@ public class JFXUtil {
         clip.setLayoutX(4);
         clip.setLayoutY(4);
         stackPane1.setClip(clip);
+    }
+
+    public static void PDFViewConfig(String filePath2, StackPane stackPane1, Button btnArrowLeft, Button btnArrowRight, Double ldstackPaneWidth, Double ldstackPaneHeight) {
+        try {
+            PDDocument document = PDDocument.load(new File(filePath2));
+            PDFRenderer renderer = new PDFRenderer(document);
+            int pageCount = document.getNumberOfPages();
+
+            // Container for PDF pages
+            VBox pdfContainer = new VBox(10);
+            pdfContainer.setAlignment(Pos.CENTER); // center pages
+            pdfContainer.setPrefWidth(ldstackPaneWidth);
+
+            for (int i = 0; i < pageCount; i++) {
+                BufferedImage pageImage = renderer.renderImageWithDPI(i, 150);
+                Image fxImage = SwingFXUtils.toFXImage(pageImage, null);
+                ImageView pageView = new ImageView(fxImage);
+
+                pageView.setPreserveRatio(true);
+                pageView.setFitWidth(ldstackPaneWidth);
+                JFXUtil.adjustImageSize(fxImage, pageView, ldstackPaneWidth, ldstackPaneHeight);
+
+                pdfContainer.getChildren().add(pageView);
+            }
+
+            // Wrap VBox in a Group for scaling
+            Group pdfGroup = new Group(pdfContainer);
+
+            // Wrap Group in a StackPane to center content
+            StackPane centerPane = new StackPane(pdfGroup);
+            centerPane.setAlignment(Pos.CENTER);
+
+            // ScrollPane wraps the centerPane
+            ScrollPane scrollPane = new ScrollPane(centerPane);
+            scrollPane.setPannable(true);
+            scrollPane.setFitToWidth(true);
+            scrollPane.setFitToHeight(true);
+
+            // Stack PDF and buttons
+            stackPane1.getChildren().setAll(scrollPane, btnArrowLeft, btnArrowRight);
+            StackPane.setAlignment(btnArrowLeft, Pos.CENTER_LEFT);
+            StackPane.setAlignment(btnArrowRight, Pos.CENTER_RIGHT);
+            StackPane.setMargin(btnArrowLeft, new Insets(0, 0, 0, 10));
+            StackPane.setMargin(btnArrowRight, new Insets(0, 10, 0, 0));
+
+            PauseTransition delay = new PauseTransition(Duration.seconds(2)); // 2-second delay
+            delay.setOnFinished(event -> {
+                Platform.runLater(() -> {
+                    JFXUtil.stackPaneClip(stackPane1);
+                });
+            });
+            delay.play();
+            document.close();
+
+            // ----- ZOOM & PAN -----
+            final DoubleProperty zoomFactor = new SimpleDoubleProperty(1.0);
+            scrollPane.addEventFilter(ScrollEvent.SCROLL, event -> {
+                if (event.isControlDown()) {
+                    event.consume(); // stop default scroll behavior
+
+                    double delta = event.getDeltaY() > 0 ? 1.1 : 0.9; // multiplier for smooth zoom in/out
+                    double oldZoom = zoomFactor.get();
+                    zoomFactor.set(oldZoom * delta); // scale by multiplier
+
+                    // Apply scale
+                    pdfGroup.setScaleX(zoomFactor.get());
+                    pdfGroup.setScaleY(zoomFactor.get());
+
+                    // Keep mouse position centered during zoom
+                    Bounds viewportBounds = scrollPane.getViewportBounds();
+                    Bounds contentBounds = pdfGroup.getBoundsInParent();
+                    double mouseX = event.getX();
+                    double mouseY = event.getY();
+
+                    double hRatio = (scrollPane.getHvalue() * (contentBounds.getWidth() - viewportBounds.getWidth()) + mouseX) / contentBounds.getWidth();
+                    double vRatio = (scrollPane.getVvalue() * (contentBounds.getHeight() - viewportBounds.getHeight()) + mouseY) / contentBounds.getHeight();
+
+                    Platform.runLater(() -> {
+                        Bounds newBounds = pdfGroup.getBoundsInParent();
+                        double newH = (hRatio * newBounds.getWidth() - mouseX) / (newBounds.getWidth() - viewportBounds.getWidth());
+                        double newV = (vRatio * newBounds.getHeight() - mouseY) / (newBounds.getHeight() - viewportBounds.getHeight());
+
+                        scrollPane.setHvalue(Double.isNaN(newH) ? 0.5 : Math.min(Math.max(0, newH), 1.0));
+                        scrollPane.setVvalue(Double.isNaN(newV) ? 0.5 : Math.min(Math.max(0, newV), 1.0));
+                    });
+                }
+            });
+
+            // Pan with mouse drag
+            final ObjectProperty<Point2D> lastMouse = new SimpleObjectProperty<>();
+            pdfGroup.setOnMousePressed(e -> lastMouse.set(new Point2D(e.getSceneX(), e.getSceneY())));
+
+            pdfGroup.setOnMouseDragged(e -> {
+                if (lastMouse.get() != null) {
+                    double deltaX = e.getSceneX() - lastMouse.get().getX();
+                    double deltaY = e.getSceneY() - lastMouse.get().getY();
+
+                    pdfGroup.setTranslateX(pdfGroup.getTranslateX() + deltaX);
+                    pdfGroup.setTranslateY(pdfGroup.getTranslateY() + deltaY);
+
+                    lastMouse.set(new Point2D(e.getSceneX(), e.getSceneY()));
+                }
+            });
+            pdfGroup.setOnMouseReleased(e -> lastMouse.set(null));
+        } catch (IOException ex) {
+            Logger.getLogger(JFXUtil.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     /* Used for displaying attachment */
