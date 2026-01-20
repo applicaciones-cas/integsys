@@ -320,22 +320,20 @@ public class OtherPaymentStatusController implements Initializable, ScreenInterf
                     case F3:
                         switch (lsID) {
                             case "tfSearchBankName":
-                                poJSON = poController.SearchBanks(lsValue, false);
+                                poJSON = poController.SearchBanks(lsValue);
                                 if ("error".equals((String) poJSON.get("result"))) {
                                     ShowMessageFX.Warning((String) poJSON.get("message"), pxeModuleName, null);
-                                    break;
+                                    return;
                                 }
-                                psSearchBankName = poController.OtherPayments().getModel().getBankID();
                                 loadRecordSearch();
                                 loadTableMain.reload();
                                 break;
                             case "tfSearchBankAccount":
-                                poJSON = poController.SearchBankAccount(lsValue, poController.OtherPayments().getModel().getBankID(), false);
+                                poJSON = poController.SearchBankAccount(lsValue, poController.getSearchBankId(), false);
                                 if ("error".equals((String) poJSON.get("result"))) {
                                     ShowMessageFX.Warning((String) poJSON.get("message"), pxeModuleName, null);
-                                    break;
+                                    return;
                                 }
-                                psSearchBankAccount = poController.OtherPayments().getModel().getBankAcountID();
                                 loadRecordSearch();
                                 loadTableMain.reload();
                                 break;
@@ -425,10 +423,8 @@ public class OtherPaymentStatusController implements Initializable, ScreenInterf
     private void loadRecordSearch() {
         try {
             tfSearchIndustry.setText(poController.getSearchIndustry());
-//            tfSearchBankName.setText("");
-//            tfSearchBankAccount.setText("");
-            tfSearchBankName.setText(poController.OtherPayments().getModel().Banks().getBankName() != null ? poController.OtherPayments().getModel().Banks().getBankName() : "");
-            tfSearchBankAccount.setText(poController.OtherPayments().getModel().Bank_Account_Master().getAccountNo() != null ? poController.OtherPayments().getModel().Bank_Account_Master().getAccountNo() : "");
+            tfSearchBankName.setText(poController.getSearchBank());
+            tfSearchBankAccount.setText(poController.getSearchBankAccount());
             lblSource.setText(poController.Master().Company().getCompanyName() + " - " + poController.Master().Industry().getDescription());
             JFXUtil.updateCaretPositions(apBrowse);
         } catch (SQLException | GuanzonException ex) {
