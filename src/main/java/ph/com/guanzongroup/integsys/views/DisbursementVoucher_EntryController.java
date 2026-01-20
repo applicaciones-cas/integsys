@@ -473,6 +473,13 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                     JFXUtil.showRetainedHighlight(true, tblViewMainList, "#A7C7E7", plOrderNoPartial, plOrderNoFinal, highlightedRowsMain, true);
 
                     ShowMessageFX.Information(null, pxeModuleName, (String) poJSON.get("message"));
+                    
+                    poJSON = poController.updatePaymentsStatus();
+                    if ("error".equals(poJSON.get("result"))) {
+                        ShowMessageFX.Warning(null, pxeModuleName,  (String) poJSON.get("message"));
+                        return;
+                    }
+                    
                     poJSON = poController.OpenTransaction(poController.Master().getTransactionNo());
                     if ("success".equals(poJSON.get("result"))) {
                         pnEditMode = poController.getEditMode();
