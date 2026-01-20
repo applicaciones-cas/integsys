@@ -47,8 +47,10 @@ import org.guanzon.appdriver.constant.EditMode;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.ParseException;
 import ph.com.guanzongroup.cas.cashflow.CheckStatusUpdate;
+import ph.com.guanzongroup.cas.cashflow.OtherPaymentStatusUpdate;
 import ph.com.guanzongroup.cas.cashflow.services.CashflowControllers;
 import ph.com.guanzongroup.cas.cashflow.status.CheckStatus;
+import ph.com.guanzongroup.cas.cashflow.status.OtherPaymentStatus;
 import ph.com.guanzongroup.integsys.model.ModelDisbursementVoucher_Main;
 import ph.com.guanzongroup.integsys.utility.CustomCommonUtil;
 import ph.com.guanzongroup.integsys.utility.JFXUtil;
@@ -64,8 +66,8 @@ public class OtherPaymentStatusController implements Initializable, ScreenInterf
     private JSONObject poJSON;
     private static final int ROWS_PER_PAGE = 50;
     private int pnMain = 0;
-    private final String pxeModuleName = "Check Status Update";
-    private CheckStatusUpdate poController;
+    private final String pxeModuleName = "Other Payment Status Update";
+    private OtherPaymentStatusUpdate poController;
     public int pnEditMode;
 
     private String psIndustryId = "";
@@ -82,8 +84,7 @@ public class OtherPaymentStatusController implements Initializable, ScreenInterf
 
     private final Map<String, List<String>> highlightedRowsMain = new HashMap<>();
 
-    ObservableList<String> cCheckState = FXCollections.observableArrayList("OPEN", "CLEAR", "CANCELLATION", "STALE", "HOLD",
-            "BOUNCED / DISCHONORED");
+    ObservableList<String> cCheckState = FXCollections.observableArrayList("FLOAT", "OPEN", "CANCELLATION", "POSTED");
 
     JFXUtil.ReloadableTableTask loadTableMain;
     @FXML
@@ -133,7 +134,7 @@ public class OtherPaymentStatusController implements Initializable, ScreenInterf
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         try {
-            poController = new CashflowControllers(oApp, null).CheckStatusUpdate();
+            poController = new CashflowControllers(oApp, null).OtherPaymentStatusUpdate();
             poController.setWithUI(true);
             poJSON = poController.InitTransaction(); // Initialize transaction
             if (!"success".equals((String) poJSON.get("result"))) {
@@ -150,11 +151,10 @@ public class OtherPaymentStatusController implements Initializable, ScreenInterf
             initButton(pnEditMode);
             pagination.setPageCount(0);
             Platform.runLater(() -> {
+                poController.setCompanyID(psCompanyId);
                 poController.setIndustryID(psIndustryId);
                 poController.Master().setIndustryID(psIndustryId);
                 poController.Master().setCompanyID(psCompanyId);
-                poController.setCompanyID(psCompanyId);
-                poController.CheckPayments().getModel().setIndustryID(psIndustryId);
                 loadRecordSearch();
             });
         } catch (SQLException | GuanzonException ex) {
@@ -179,11 +179,6 @@ public class OtherPaymentStatusController implements Initializable, ScreenInterf
                         ShowMessageFX.Warning((String) poJSON.get("message"), pxeModuleName, null);
                         return;
                     }
-                    poJSON = poController.setCheckpayment();
-                    if ("error".equals((String) poJSON.get("message"))) {
-                        ShowMessageFX.Warning((String) poJSON.get("message"), pxeModuleName, null);
-                        return;
-                    }
                     pnEditMode = poController.getEditMode();
                     break;
                 case "btnCancel":
@@ -200,17 +195,9 @@ public class OtherPaymentStatusController implements Initializable, ScreenInterf
                     if (!ShowMessageFX.YesNo(null, pxeModuleName, "Are you sure you want to save the transaction?")) {
                         return;
                     }
-//                    if (!isSavingValid()) {
-//                        return;
-//                    }
-                    if (pnEditMode == EditMode.UPDATE) {
-                        poController.Master().setModifiedDate(oApp.getServerDate());
-                        poController.Master().setModifyingId(oApp.getUserID());
-                    }
-                    switch (poController.CheckPayments().getModel().getTransactionStatus()) {
-                        case CheckStatus.CANCELLED:
-                        case CheckStatus.STALED:
-                        case CheckStatus.BOUNCED:
+                    
+                    switch (poController.OtherPayments().getModel().getTransactionStatus()) {
+                        case OtherPaymentStatus.CANCELLED:
                             poJSON = poController.ReturnTransaction("");
                             if (!"success".equals((String) poJSON.get("result"))) {
                                 ShowMessageFX.Warning((String) poJSON.get("message"), pxeModuleName, null);
@@ -279,7 +266,7 @@ public class OtherPaymentStatusController implements Initializable, ScreenInterf
                             }
                             break;
                         case "tfSearchBankAccount":
-                            poJSON = poController.SearhBankAccount(lsValue, poController.CheckPayments().getModel().getBankID(), false);
+                            poJSON = poController.SearchBankAccount(lsValue, poController.OtherPayments().getModel().getBankID(), false);
                             if ("error".equals((String) poJSON.get("result"))) {
                                 ShowMessageFX.Warning((String) poJSON.get("message"), pxeModuleName, null);
                                 return;
@@ -309,7 +296,7 @@ public class OtherPaymentStatusController implements Initializable, ScreenInterf
             (cmbId, selectedIndex, selectedValue) -> {
                 switch (cmbId) {
                     case "cmbPaymentStatus":
-                        poController.CheckPayments().getModel().setTransactionStatus(String.valueOf(selectedValue));
+                        poController.OtherPayments().getModel().setTransactionStatus(String.valueOf(selectedValue));
                         break;
                 }
                 loadRecordMaster();
@@ -335,17 +322,17 @@ public class OtherPaymentStatusController implements Initializable, ScreenInterf
                                     ShowMessageFX.Warning((String) poJSON.get("message"), pxeModuleName, null);
                                     return;
                                 }
-                                psSearchBankName = poController.CheckPayments().getModel().getBankID();
+                                psSearchBankName = poController.OtherPayments().getModel().getBankID();
                                 loadRecordSearch();
                                 loadTableMain.reload();
                                 break;
                             case "tfSearchBankAccount":
-                                poJSON = poController.SearhBankAccount(lsValue, poController.CheckPayments().getModel().getBankID(), false);
+                                poJSON = poController.SearchBankAccount(lsValue, poController.OtherPayments().getModel().getBankID(), false);
                                 if ("error".equals((String) poJSON.get("result"))) {
                                     ShowMessageFX.Warning((String) poJSON.get("message"), pxeModuleName, null);
                                     return;
                                 }
-                                psSearchBankAccount = poController.CheckPayments().getModel().getBankAcountID();
+                                psSearchBankAccount = poController.OtherPayments().getModel().getBankAcountID();
                                 loadRecordSearch();
                                 loadTableMain.reload();
                                 break;
@@ -404,7 +391,7 @@ public class OtherPaymentStatusController implements Initializable, ScreenInterf
                             }
 
                             if (pbSuccess) {
-                                poController.CheckPayments().getModel().setCheckDate((SQLUtil.toDate(lsSelectedDate, SQLUtil.FORMAT_SHORT_DATE)));
+//                                poController.OtherPayments().getModel().setCheckDate((SQLUtil.toDate(lsSelectedDate, SQLUtil.FORMAT_SHORT_DATE)));
                             } else {
                                 if ("error".equals((String) poJSON.get("result"))) {
                                     ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
@@ -430,8 +417,8 @@ public class OtherPaymentStatusController implements Initializable, ScreenInterf
 //            tfSearchBankName.setText("");
 //            tfSearchBankAccount.setText("");
 //            tfSearchDVNo.setText("");
-            tfSearchBankName.setText(poController.CheckPayments().getModel().Banks().getBankName() != null ? poController.CheckPayments().getModel().Banks().getBankName() : "");
-            tfSearchBankAccount.setText(poController.CheckPayments().getModel().Bank_Account_Master().getAccountNo() != null ? poController.CheckPayments().getModel().Bank_Account_Master().getAccountNo() : "");
+            tfSearchBankName.setText(poController.OtherPayments().getModel().Banks().getBankName() != null ? poController.OtherPayments().getModel().Banks().getBankName() : "");
+            tfSearchBankAccount.setText(poController.OtherPayments().getModel().Bank_Account_Master().getAccountNo() != null ? poController.OtherPayments().getModel().Bank_Account_Master().getAccountNo() : "");
             lblSource.setText(poController.Master().Company().getCompanyName() + " - " + poController.Master().Industry().getDescription());
 
         } catch (SQLException | GuanzonException ex) {
@@ -441,24 +428,19 @@ public class OtherPaymentStatusController implements Initializable, ScreenInterf
 
     private void loadRecordMaster() {
         try {
-            poJSON = poController.setCheckpayment();
-            if ("error".equals((String) poJSON.get("message"))) {
-                ShowMessageFX.Warning((String) poJSON.get("message"), pxeModuleName, null);
-                return;
-            }
             tfTransactionNo.setText(poController.Master().getTransactionNo());
             dpTransactionDate.setValue(CustomCommonUtil.parseDateStringToLocalDate(SQLUtil.dateFormat(poController.Master().getTransactionDate(), SQLUtil.FORMAT_SHORT_DATE)));
 
-            tfBankName.setText(poController.CheckPayments().getModel().Banks().getBankName() != null ? poController.CheckPayments().getModel().Banks().getBankName() : "");
-            tfBankAccount.setText(poController.CheckPayments().getModel().getBankAcountID() != null ? poController.CheckPayments().getModel().getBankAcountID() : "");
-            tfPayeeName.setText(poController.Master().CheckPayments().Payee().getPayeeName() != null ? poController.Master().CheckPayments().Payee().getPayeeName() : "");
-            JFXUtil.setCmbValue(cmbPaymentStatus, Integer.parseInt(poController.CheckPayments().getModel().getTransactionStatus()));
+            tfBankName.setText(poController.OtherPayments().getModel().Banks().getBankName() != null ? poController.OtherPayments().getModel().Banks().getBankName() : "");
+            tfBankAccount.setText(poController.OtherPayments().getModel().getBankAcountID() != null ? poController.OtherPayments().getModel().getBankAcountID() : "");
+            tfPayeeName.setText(poController.Master().Payee().getPayeeName() != null ? poController.Master().Payee().getPayeeName() : "");
+            JFXUtil.setCmbValue(cmbPaymentStatus, Integer.parseInt(poController.OtherPayments().getModel().getTransactionStatus()));
             tfVoucherNo.setText(poController.Master().getVoucherNo());
-            tfCheckNo.setText(poController.Master().CheckPayments().getCheckNo());
-            dpCheckDate.setValue(poController.CheckPayments().getModel().getCheckDate() != null
-                    ? CustomCommonUtil.parseDateStringToLocalDate(SQLUtil.dateFormat(poController.CheckPayments().getModel().getCheckDate(), SQLUtil.FORMAT_SHORT_DATE))
+            tfCheckNo.setText(poController.OtherPayments().getModel().getReferNox());
+            dpCheckDate.setValue(poController.OtherPayments().getModel().getTransactionDate()!= null
+                    ? CustomCommonUtil.parseDateStringToLocalDate(SQLUtil.dateFormat(poController.OtherPayments().getModel().getTransactionDate(), SQLUtil.FORMAT_SHORT_DATE))
                     : null);
-            tfCheckAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.CheckPayments().getModel().getAmount(), true));
+            tfCheckAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.OtherPayments().getModel().getTotalAmount(), true));
 
         } catch (GuanzonException | SQLException ex) {
             Logger.getLogger(OtherPaymentStatusController.class.getName()).log(Level.SEVERE, null, ex);
@@ -481,18 +463,18 @@ public class OtherPaymentStatusController implements Initializable, ScreenInterf
                         Platform.runLater(() -> {
                             try {
                                 main_data.clear();
-                                poJSON = poController.getDisbursement(psSearchBankName, psSearchBankAccount, psSearchCheckNo);
+                                poJSON = poController.loadTransactionList(tfSearchIndustry.getText(), tfSearchBankName.getText(), tfSearchBankAccount.getText(), tfSearchDVNo.getText());
                                 if ("success".equals(poJSON.get("result"))) {
-                                    if (poController.getDisbursementMasterCount() > 0) {
-                                        for (int lnCntr = 0; lnCntr <= poController.getDisbursementMasterCount() - 1; lnCntr++) {
+                                    if (poController.getOtherPaymentList().size() > 0) {
+                                        for (int lnCntr = 0; lnCntr <= poController.getOtherPaymentList().size() - 1; lnCntr++) {
                                             main_data.add(new ModelDisbursementVoucher_Main(
                                                     String.valueOf(lnCntr + 1),
-                                                    poController.poDisbursementMaster(lnCntr).CheckPayments().Banks().getBankName(),
-                                                    poController.poDisbursementMaster(lnCntr).CheckPayments().Bank_Account_Master().getAccountNo(),
-                                                    poController.poDisbursementMaster(lnCntr).CheckPayments().getCheckNo(),
-                                                    poController.poDisbursementMaster(lnCntr).getTransactionNo()
+                                                    poController.getOtherPayment(lnCntr).Banks().getBankName(),
+                                                    poController.getOtherPayment(lnCntr).Bank_Account_Master().getAccountNo(),
+                                                    poController.getOtherPayment(lnCntr).getReferNox(),
+                                                    poController.getOtherPayment(lnCntr).DisbursementMaster().getVoucherNo()
                                             ));
-                                            if (poController.poDisbursementMaster(lnCntr).CheckPayments().getTransactionStatus().equals(CheckStatus.POSTED)) {
+                                            if (OtherPaymentStatus.POSTED.equals(poController.getOtherPayment(lnCntr).getTransactionStatus())) {
                                                 JFXUtil.highlightByKey(tblViewMainList, String.valueOf(lnCntr + 1), "#C1E1C1", highlightedRowsMain);
                                             }
                                         }
@@ -567,9 +549,10 @@ public class OtherPaymentStatusController implements Initializable, ScreenInterf
                 pnEditMode = poController.getEditMode();
                 loadRecordMaster();
                 initButton(pnEditMode);
-            } catch (SQLException | GuanzonException | CloneNotSupportedException ex) {
-                Logger.getLogger(OtherPaymentStatusController.class.getName()).log(Level.SEVERE, null, ex);
-            }
+            } catch (SQLException | GuanzonException | CloneNotSupportedException | ScriptException ex) {
+                Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+                ShowMessageFX.Warning(null, pxeModuleName,MiscUtil.getException(ex));
+            } 
         }
     }
 
@@ -581,7 +564,7 @@ public class OtherPaymentStatusController implements Initializable, ScreenInterf
         JFXUtil.setButtonsVisibility(fnEditMode != EditMode.UNKNOWN, btnHistory);
 
         if (fnEditMode == EditMode.READY) {
-            switch (poController.CheckPayments().getModel().getTransactionStatus()) {
+            switch (poController.OtherPayments().getModel().getTransactionStatus()) {
                 case CheckStatus.FLOAT:
                 case CheckStatus.OPEN:
                 case CheckStatus.STOP_PAYMENT:
