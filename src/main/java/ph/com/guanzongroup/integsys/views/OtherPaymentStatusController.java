@@ -61,7 +61,7 @@ import ph.com.guanzongroup.integsys.utility.JFXUtil;
  * @author User
  */
 public class OtherPaymentStatusController implements Initializable, ScreenInterface {
-
+    
     private GRiderCAS oApp;
     private JSONObject poJSON;
     private static final int ROWS_PER_PAGE = 50;
@@ -69,36 +69,36 @@ public class OtherPaymentStatusController implements Initializable, ScreenInterf
     private final String pxeModuleName = "Other Payment Status Update";
     private OtherPaymentStatusUpdate poController;
     public int pnEditMode;
-
+    
     private String psIndustryId = "";
     private String psCompanyId = "";
     private String psCategoryId = "";
     private String psSearchBankName = "";
     private String psSearchBankAccount = "";
     private String psSearchCheckNo = "";
-
+    
     private unloadForm poUnload = new unloadForm();
-
+    
     private ObservableList<ModelDisbursementVoucher_Main> main_data = FXCollections.observableArrayList();
     private FilteredList<ModelDisbursementVoucher_Main> filteredMain_Data;
-
+    
     private final Map<String, List<String>> highlightedRowsMain = new HashMap<>();
-
+    
     ObservableList<String> cCheckState = FXCollections.observableArrayList("FLOAT", "OPEN", "CANCELLATION", "POSTED");
-
+    
     JFXUtil.ReloadableTableTask loadTableMain;
     @FXML
     private AnchorPane AnchorMain, apBrowse, apButton, apMaster;
     @FXML
-    private TextField tfSearchBankName, tfSearchBankAccount, tfSearchDVNo, tfSearchIndustry, tfBankName, tfBankAccount, tfTransactionNo, tfCheckNo, tfPayeeName, tfCheckAmount, tfVoucherNo;
-    @FXML
     private Label lblSource;
+    @FXML
+    private TextField tfSearchIndustry, tfSearchBankName, tfSearchBankAccount, tfSearchDVNo, tfTransactionNo, tfBankName, tfBankAccount, tfSupplierBank, tfVoucherNo, tfReferenceNo, tfPaymentAmount, tfSupplierAccountNo;
     @FXML
     private HBox hbButtons;
     @FXML
     private Button btnUpdate, btnSave, btnCancel, btnRetrieve, btnHistory, btnClose;
     @FXML
-    private DatePicker dpTransactionDate, dpCheckDate;
+    private DatePicker dpTransactionDate, dpPostingDate;
     @FXML
     private ComboBox cmbPaymentStatus;
     @FXML
@@ -107,22 +107,22 @@ public class OtherPaymentStatusController implements Initializable, ScreenInterf
     private TableColumn tblRowNo, tblBankName, tblBankAccount, tblCheckNo, tblReferenceNo;
     @FXML
     private Pagination pagination;
-
+    
     @Override
     public void setGRider(GRiderCAS foValue) {
         oApp = foValue;
     }
-
+    
     @Override
     public void setIndustryID(String fsValue) {
         psIndustryId = fsValue;
     }
-
+    
     @Override
     public void setCompanyID(String fsValue) {
         psCompanyId = fsValue;
     }
-
+    
     @Override
     public void setCategoryID(String fsValue) {
         psCategoryId = fsValue;
@@ -161,7 +161,7 @@ public class OtherPaymentStatusController implements Initializable, ScreenInterf
             Logger.getLogger(OtherPaymentStatusController.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-
+    
     @FXML
     void cmdButton_Click(ActionEvent event) {
         try {
@@ -241,17 +241,17 @@ public class OtherPaymentStatusController implements Initializable, ScreenInterf
             Logger.getLogger(OtherPaymentStatusController.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-
+    
     private void initDatePicker() {
-        JFXUtil.setDatePickerFormat("MM/dd/yyyy", dpTransactionDate, dpCheckDate);
-        JFXUtil.setActionListener(this::datepicker_Action, dpTransactionDate, dpCheckDate);
+        JFXUtil.setDatePickerFormat("MM/dd/yyyy", dpTransactionDate, dpPostingDate);
+        JFXUtil.setActionListener(this::datepicker_Action, dpTransactionDate, dpPostingDate);
     }
-
+    
     private void initTextFields() {
         //Initialise  TextField KeyPressed
         JFXUtil.setFocusListener(txtBrowse_Focus, tfSearchBankName, tfSearchBankAccount, tfSearchDVNo, tfSearchIndustry);
-        JFXUtil.setFocusListener(txtMaster_Focus, tfCheckAmount);
-
+        JFXUtil.setFocusListener(txtMaster_Focus, tfPaymentAmount);
+        
         JFXUtil.setKeyPressedListener(this::txtField_KeyPressed, apBrowse, apMaster);
     }
     ChangeListener<Boolean> txtBrowse_Focus = JFXUtil.FocusListener(TextField.class,
@@ -275,6 +275,11 @@ public class OtherPaymentStatusController implements Initializable, ScreenInterf
                         case "tfSearchDVNo":
                             break;
                         case "tfSearchIndustry":
+                            poJSON = poController.SearchIndustry(lsValue, false);
+                            if ("error".equals((String) poJSON.get("result"))) {
+                                ShowMessageFX.Warning((String) poJSON.get("message"), pxeModuleName, null);
+                                return;
+                            }
                             break;
                     }
                     loadRecordSearch();
@@ -283,15 +288,15 @@ public class OtherPaymentStatusController implements Initializable, ScreenInterf
                     ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
                 }
             });
-
+    
     ChangeListener<Boolean> txtMaster_Focus = JFXUtil.FocusListener(TextField.class,
             (lsID, lsValue) -> {
                 switch (lsID) {
-                    case "tfCheckAmount":
+                    case "tfPaymentAmount":
                         break;
                 }
             });
-
+    
     EventHandler<ActionEvent> comboBoxActionListener = JFXUtil.CmbActionListener(
             (cmbId, selectedIndex, selectedValue) -> {
                 switch (cmbId) {
@@ -301,13 +306,13 @@ public class OtherPaymentStatusController implements Initializable, ScreenInterf
                 }
                 loadRecordMaster();
             });
-
+    
     private void txtField_KeyPressed(KeyEvent event) {
         TextField txtField = (TextField) event.getSource();
         String lsID = (((TextField) event.getSource()).getId());
         String lsValue = (txtField.getText() == null ? "" : txtField.getText());
         poJSON = new JSONObject();
-
+        
         try {
             if (null != event.getCode()) {
                 switch (event.getCode()) {
@@ -336,14 +341,14 @@ public class OtherPaymentStatusController implements Initializable, ScreenInterf
                                 loadRecordSearch();
                                 loadTableMain.reload();
                                 break;
-
+                            
                         }
                         CommonUtils.SetNextFocus((TextField) event.getSource());
                         event.consume();
                         break;
                     default:
                         break;
-
+                    
                 }
             }
         } catch (SQLException | GuanzonException ex) {
@@ -352,7 +357,7 @@ public class OtherPaymentStatusController implements Initializable, ScreenInterf
         }
     }
     boolean pbSuccess = true;
-
+    
     private void datepicker_Action(ActionEvent event) {
         poJSON = new JSONObject();
         JFXUtil.setJSONSuccess(poJSON, "success");
@@ -364,7 +369,7 @@ public class OtherPaymentStatusController implements Initializable, ScreenInterf
                 SimpleDateFormat sdfFormat = new SimpleDateFormat(SQLUtil.FORMAT_SHORT_DATE);
                 LocalDate currentDate = null, transactionDate = null, referenceDate = null, selectedDate = null;
                 String lsServerDate = "", lsTransDate = "", lsRefDate = "", lsSelectedDate = "";
-
+                
                 if (inputText == null || "".equals(inputText) || "01/01/1900".equals(inputText)) {
                     return;
                 }
@@ -372,24 +377,24 @@ public class OtherPaymentStatusController implements Initializable, ScreenInterf
                 currentDate = LocalDate.parse(lsServerDate, DateTimeFormatter.ofPattern(SQLUtil.FORMAT_SHORT_DATE));
                 lsSelectedDate = sdfFormat.format(SQLUtil.toDate(JFXUtil.convertToIsoFormat(inputText), SQLUtil.FORMAT_SHORT_DATE));
                 selectedDate = LocalDate.parse(lsSelectedDate, DateTimeFormatter.ofPattern(SQLUtil.FORMAT_SHORT_DATE));
-
+                
                 switch (datePicker.getId()) {
-                    case "dpCheckDate":
+                    case "dpPostingDate":
                         //back date not allowed
                         if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
                             lsTransDate = sdfFormat.format(poController.Master().getTransactionDate());
                             transactionDate = LocalDate.parse(lsTransDate, DateTimeFormatter.ofPattern(SQLUtil.FORMAT_SHORT_DATE));
-
+                            
                             if (selectedDate.isAfter(currentDate)) {
                                 JFXUtil.setJSONError(poJSON, "Future dates are not allowed.");
                                 pbSuccess = false;
                             }
-
+                            
                             if (pbSuccess && (selectedDate.isAfter(transactionDate))) {
                                 JFXUtil.setJSONError(poJSON, "Check date cannot be later than the transaction date.");
                                 pbSuccess = false;
                             }
-
+                            
                             if (pbSuccess) {
 //                                poController.OtherPayments().getModel().setCheckDate((SQLUtil.toDate(lsSelectedDate, SQLUtil.FORMAT_SHORT_DATE)));
                             } else {
@@ -410,49 +415,55 @@ public class OtherPaymentStatusController implements Initializable, ScreenInterf
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
         }
     }
-
+    
     private void loadRecordSearch() {
         try {
-//            tfSearchIndustry.setText(""); poController.getSearchIndustry()
+            tfSearchIndustry.setText(poController.getSearchIndustry());
 //            tfSearchBankName.setText("");
 //            tfSearchBankAccount.setText("");
-//            tfSearchDVNo.setText("");
             tfSearchBankName.setText(poController.OtherPayments().getModel().Banks().getBankName() != null ? poController.OtherPayments().getModel().Banks().getBankName() : "");
             tfSearchBankAccount.setText(poController.OtherPayments().getModel().Bank_Account_Master().getAccountNo() != null ? poController.OtherPayments().getModel().Bank_Account_Master().getAccountNo() : "");
             lblSource.setText(poController.Master().Company().getCompanyName() + " - " + poController.Master().Industry().getDescription());
-
+            JFXUtil.updateCaretPositions(apBrowse);
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(OtherPaymentStatusController.class.getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
         }
     }
-
+    
     private void loadRecordMaster() {
         try {
+            boolean lbShow = OtherPaymentStatus.POSTED.equals(poController.getOtherPayment(pnMain).getTransactionStatus());
+            JFXUtil.setDisabled(!lbShow, tfReferenceNo, dpPostingDate);
+            JFXUtil.setDisabled(true, tfSupplierBank, tfSupplierAccountNo);
+            
             tfTransactionNo.setText(poController.Master().getTransactionNo());
             dpTransactionDate.setValue(CustomCommonUtil.parseDateStringToLocalDate(SQLUtil.dateFormat(poController.Master().getTransactionDate(), SQLUtil.FORMAT_SHORT_DATE)));
-
+            
             tfBankName.setText(poController.OtherPayments().getModel().Banks().getBankName() != null ? poController.OtherPayments().getModel().Banks().getBankName() : "");
             tfBankAccount.setText(poController.OtherPayments().getModel().getBankAcountID() != null ? poController.OtherPayments().getModel().getBankAcountID() : "");
-            tfPayeeName.setText(poController.Master().Payee().getPayeeName() != null ? poController.Master().Payee().getPayeeName() : "");
+            tfReferenceNo.setText(poController.Master().Payee().getPayeeName() != null ? poController.Master().Payee().getPayeeName() : "");
             JFXUtil.setCmbValue(cmbPaymentStatus, Integer.parseInt(poController.OtherPayments().getModel().getTransactionStatus()));
             tfVoucherNo.setText(poController.Master().getVoucherNo());
-            tfCheckNo.setText(poController.OtherPayments().getModel().getReferNox());
-            dpCheckDate.setValue(poController.OtherPayments().getModel().getTransactionDate()!= null
+            tfReferenceNo.setText(poController.OtherPayments().getModel().getReferNox());
+            dpPostingDate.setValue(poController.OtherPayments().getModel().getTransactionDate() != null
                     ? CustomCommonUtil.parseDateStringToLocalDate(SQLUtil.dateFormat(poController.OtherPayments().getModel().getTransactionDate(), SQLUtil.FORMAT_SHORT_DATE))
                     : null);
-            tfCheckAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.OtherPayments().getModel().getTotalAmount(), true));
-
+            tfPaymentAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.OtherPayments().getModel().getTotalAmount(), true));
+            
+            tfSupplierBank.setText("");
+            tfSupplierAccountNo.setText("");
+            JFXUtil.updateCaretPositions(apMaster);
         } catch (GuanzonException | SQLException ex) {
             Logger.getLogger(OtherPaymentStatusController.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-
+    
     private void initComboBoxes() {
         JFXUtil.setComboBoxItems(new JFXUtil.Pairs<>(cCheckState, cmbPaymentStatus));
         JFXUtil.setComboBoxActionListener(comboBoxActionListener, cmbPaymentStatus);
         JFXUtil.initComboBoxCellDesignColor("#FF8201", cmbPaymentStatus);
     }
-
+    
     private void initLoadTable() {
         loadTableMain = new JFXUtil.ReloadableTableTask(
                 tblViewMainList,
@@ -505,16 +516,16 @@ public class OtherPaymentStatusController implements Initializable, ScreenInterf
                     }
                 });
     }
-
+    
     private void initMainGrid() {
         JFXUtil.setColumnCenter(tblRowNo, tblCheckNo, tblReferenceNo);
         JFXUtil.setColumnLeft(tblBankName, tblBankAccount);
         JFXUtil.setColumnsIndexAndDisableReordering(tblViewMainList);
-
+        
         filteredMain_Data = new FilteredList<>(main_data, b -> true);
         tblViewMainList.setItems(filteredMain_Data);
     }
-
+    
     private void initTableOnClick() {
         tblViewMainList.setOnMouseClicked(event -> {
             if (pnEditMode != EditMode.UPDATE) {
@@ -526,10 +537,11 @@ public class OtherPaymentStatusController implements Initializable, ScreenInterf
                 }
             }
         });
-
+        
         JFXUtil.applyRowHighlighting(tblViewMainList, item -> ((ModelDisbursementVoucher_Main) item).getIndex01(), highlightedRowsMain);
+        JFXUtil.adjustColumnForScrollbar(tblViewMainList);
     }
-
+    
     private void loadTableDetailFromMain() {
         poJSON = new JSONObject();
         ModelDisbursementVoucher_Main selected = (ModelDisbursementVoucher_Main) tblViewMainList.getSelectionModel().getSelectedItem();
@@ -551,18 +563,18 @@ public class OtherPaymentStatusController implements Initializable, ScreenInterf
                 initButton(pnEditMode);
             } catch (SQLException | GuanzonException | CloneNotSupportedException | ScriptException ex) {
                 Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
-                ShowMessageFX.Warning(null, pxeModuleName,MiscUtil.getException(ex));
-            } 
+                ShowMessageFX.Warning(null, pxeModuleName, MiscUtil.getException(ex));
+            }
         }
     }
-
+    
     private void initButton(int fnEditMode) {
         boolean lbShow = (fnEditMode == EditMode.UPDATE);
         JFXUtil.setButtonsVisibility(!lbShow, btnClose);
         JFXUtil.setButtonsVisibility(lbShow, btnSave, btnCancel);
         JFXUtil.setButtonsVisibility(false, btnUpdate);
         JFXUtil.setButtonsVisibility(fnEditMode != EditMode.UNKNOWN, btnHistory);
-
+        
         if (fnEditMode == EditMode.READY) {
             switch (poController.OtherPayments().getModel().getTransactionStatus()) {
                 case CheckStatus.FLOAT:
@@ -573,9 +585,9 @@ public class OtherPaymentStatusController implements Initializable, ScreenInterf
             }
         }
     }
-
+    
     private void clearTextFields() {
         JFXUtil.clearTextFields(apMaster);
     }
-
+    
 }

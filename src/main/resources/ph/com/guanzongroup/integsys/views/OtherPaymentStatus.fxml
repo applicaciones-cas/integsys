@@ -169,7 +169,7 @@
                                                     <children>
                                                         <GridPane layoutX="11.0" layoutY="6.0" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="5.0">
                                                             <columnConstraints>
-                                                                <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="80.0" />
+                                                                <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="120.0" />
                                                                 <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="10.0" />
                                                                 <ColumnConstraints hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="150.0" />
                                                                 <ColumnConstraints hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="150.0" />
@@ -187,10 +187,11 @@
                                                                 <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="30.0" vgrow="SOMETIMES" />
                                                                 <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="28.0" vgrow="SOMETIMES" />
                                                                 <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="28.0" vgrow="SOMETIMES" />
+                                                <RowConstraints maxHeight="-Infinity" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                                                                 <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="28.0" vgrow="SOMETIMES" />
                                                             </rowConstraints>
                                                             <children>
-                                                            <Label text="DV No." GridPane.rowIndex="2">
+                                                            <Label text="Transaction No." GridPane.rowIndex="2">
                                                                     <font>
                                                                         <Font name="System Bold" size="14.0" />
                                                                     </font>
@@ -198,22 +199,24 @@
                                                                 <Label text="Date" GridPane.rowIndex="4" />
                                                                 <Label text="Bank" GridPane.rowIndex="5" />
                                                                 <Label text="Bank Account" GridPane.rowIndex="6" />
-                                                                <Label text="Payee Name" GridPane.rowIndex="7" />
-                                                                <Label text="Status" GridPane.rowIndex="8" />
+                                                                <Label text="Supplier Bank" GridPane.rowIndex="7" />
+                                                                <Label text="Status" GridPane.rowIndex="9" />
                                                                 <Label text="Voucher No." GridPane.columnIndex="5" GridPane.rowIndex="4" />
-                                                                <Label text="Check No." GridPane.columnIndex="5" GridPane.rowIndex="5" />
-                                                                <Label text="Check Date" GridPane.columnIndex="5" GridPane.rowIndex="6" />
-                                                                <Label text="Check Amount" GridPane.columnIndex="5" GridPane.rowIndex="7" />
+                                                                <Label text="Reference No." GridPane.columnIndex="5" GridPane.rowIndex="5" />
+                                                                <Label text="Posting Date" GridPane.columnIndex="5" GridPane.rowIndex="6" />
+                                                                <Label text="Payment Amount" GridPane.columnIndex="5" GridPane.rowIndex="7" />
                                                                 <TextField fx:id="tfTransactionNo" disable="true" editable="false" maxHeight="25.0" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="150.0" style="-fx-font-weight: bold;" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.rowIndex="2" />
                                                                 <DatePicker fx:id="dpTransactionDate" disable="true" editable="false" maxWidth="150.0" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.rowIndex="4" />
                                                                 <TextField fx:id="tfBankName" disable="true" editable="false" maxHeight="25.0" maxWidth="1.7976931348623157E308" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.rowIndex="5" />
                                                                 <TextField fx:id="tfBankAccount" disable="true" editable="false" maxHeight="25.0" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.rowIndex="6" />
-                                                                <TextField fx:id="tfPayeeName" disable="true" editable="false" maxHeight="25.0" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.rowIndex="7" />
-                                                                <ComboBox fx:id="cmbPaymentStatus" maxWidth="1.7976931348623157E308" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.rowIndex="8" />
+                                                                <TextField fx:id="tfSupplierBank" disable="true" editable="false" maxHeight="25.0" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.rowIndex="7" />
+                                                                <ComboBox fx:id="cmbPaymentStatus" maxWidth="1.7976931348623157E308" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.rowIndex="9" />
                                                                 <TextField fx:id="tfVoucherNo" disable="true" editable="false" maxHeight="25.0" maxWidth="1.7976931348623157E308" GridPane.columnIndex="7" GridPane.rowIndex="4" />
-                                                                <TextField fx:id="tfCheckNo" disable="true" editable="false" maxHeight="25.0" maxWidth="1.7976931348623157E308" GridPane.columnIndex="7" GridPane.rowIndex="5" />
-                                                                <DatePicker fx:id="dpCheckDate" disable="true" editable="false" GridPane.columnIndex="7" GridPane.rowIndex="6" />
-                                                                <TextField fx:id="tfCheckAmount" alignment="CENTER_RIGHT" editable="false" maxHeight="25.0" maxWidth="1.7976931348623157E308" GridPane.columnIndex="7" GridPane.rowIndex="7" />
+                                                                <TextField fx:id="tfReferenceNo" disable="true" editable="false" maxHeight="25.0" maxWidth="1.7976931348623157E308" GridPane.columnIndex="7" GridPane.rowIndex="5" />
+                                                                <DatePicker fx:id="dpPostingDate" disable="true" editable="false" GridPane.columnIndex="7" GridPane.rowIndex="6" />
+                                                                <TextField fx:id="tfPaymentAmount" alignment="CENTER_RIGHT" editable="false" maxHeight="25.0" maxWidth="1.7976931348623157E308" GridPane.columnIndex="7" GridPane.rowIndex="7" />
+                                                <Label text="Supplier Acc. No" GridPane.rowIndex="8" />
+                                                <TextField fx:id="tfSupplierAccountNo" minWidth="-Infinity" prefWidth="300.0" GridPane.columnIndex="2" GridPane.rowIndex="8" />
                                                             </children>
                                                         </GridPane>
                                                     </children>
