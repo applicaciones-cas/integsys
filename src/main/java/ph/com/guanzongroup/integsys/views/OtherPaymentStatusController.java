@@ -5,7 +5,6 @@ import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -35,7 +34,6 @@ import static javafx.scene.input.KeyCode.TAB;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
-import javafx.util.Pair;
 import javax.script.ScriptException;
 import org.guanzon.appdriver.agent.ShowMessageFX;
 import org.guanzon.appdriver.base.CommonUtils;
@@ -46,7 +44,6 @@ import org.guanzon.appdriver.base.SQLUtil;
 import org.guanzon.appdriver.constant.EditMode;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.ParseException;
-import ph.com.guanzongroup.cas.cashflow.CheckStatusUpdate;
 import ph.com.guanzongroup.cas.cashflow.OtherPaymentStatusUpdate;
 import ph.com.guanzongroup.cas.cashflow.services.CashflowControllers;
 import ph.com.guanzongroup.cas.cashflow.status.CheckStatus;
@@ -61,7 +58,7 @@ import ph.com.guanzongroup.integsys.utility.JFXUtil;
  * @author User
  */
 public class OtherPaymentStatusController implements Initializable, ScreenInterface {
-    
+
     private GRiderCAS oApp;
     private JSONObject poJSON;
     private static final int ROWS_PER_PAGE = 50;
@@ -69,23 +66,23 @@ public class OtherPaymentStatusController implements Initializable, ScreenInterf
     private final String pxeModuleName = "Other Payment Status Update";
     private OtherPaymentStatusUpdate poController;
     public int pnEditMode;
-    
+
     private String psIndustryId = "";
     private String psCompanyId = "";
     private String psCategoryId = "";
     private String psSearchBankName = "";
     private String psSearchBankAccount = "";
     private String psSearchCheckNo = "";
-    
+
     private unloadForm poUnload = new unloadForm();
-    
+
     private ObservableList<ModelDisbursementVoucher_Main> main_data = FXCollections.observableArrayList();
     private FilteredList<ModelDisbursementVoucher_Main> filteredMain_Data;
-    
+
     private final Map<String, List<String>> highlightedRowsMain = new HashMap<>();
-    
-    ObservableList<String> cCheckState = FXCollections.observableArrayList("FLOAT", "OPEN", "CANCELLATION", "POSTED");
-    
+
+    ObservableList<String> cCheckState = FXCollections.observableArrayList("FLOAT", "OPEN", "POSTED", "CANCELLED", "VOID");
+
     JFXUtil.ReloadableTableTask loadTableMain;
     @FXML
     private AnchorPane AnchorMain, apBrowse, apButton, apMaster;
@@ -107,22 +104,22 @@ public class OtherPaymentStatusController implements Initializable, ScreenInterf
     private TableColumn tblRowNo, tblBankName, tblBankAccount, tblCheckNo, tblReferenceNo;
     @FXML
     private Pagination pagination;
-    
+
     @Override
     public void setGRider(GRiderCAS foValue) {
         oApp = foValue;
     }
-    
+
     @Override
     public void setIndustryID(String fsValue) {
         psIndustryId = fsValue;
     }
-    
+
     @Override
     public void setCompanyID(String fsValue) {
         psCompanyId = fsValue;
     }
-    
+
     @Override
     public void setCategoryID(String fsValue) {
         psCategoryId = fsValue;
@@ -161,7 +158,7 @@ public class OtherPaymentStatusController implements Initializable, ScreenInterf
             Logger.getLogger(OtherPaymentStatusController.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    
+
     @FXML
     void cmdButton_Click(ActionEvent event) {
         try {
@@ -195,7 +192,7 @@ public class OtherPaymentStatusController implements Initializable, ScreenInterf
                     if (!ShowMessageFX.YesNo(null, pxeModuleName, "Are you sure you want to save the transaction?")) {
                         return;
                     }
-                    
+
                     switch (poController.OtherPayments().getModel().getTransactionStatus()) {
                         case OtherPaymentStatus.CANCELLED:
                             poJSON = poController.ReturnTransaction("");
@@ -241,54 +238,39 @@ public class OtherPaymentStatusController implements Initializable, ScreenInterf
             Logger.getLogger(OtherPaymentStatusController.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    
+
     private void initDatePicker() {
         JFXUtil.setDatePickerFormat("MM/dd/yyyy", dpTransactionDate, dpPostingDate);
         JFXUtil.setActionListener(this::datepicker_Action, dpTransactionDate, dpPostingDate);
     }
-    
+
     private void initTextFields() {
         //Initialise  TextField KeyPressed
         JFXUtil.setFocusListener(txtBrowse_Focus, tfSearchBankName, tfSearchBankAccount, tfSearchDVNo, tfSearchIndustry);
         JFXUtil.setFocusListener(txtMaster_Focus, tfPaymentAmount);
-        
+
         JFXUtil.setKeyPressedListener(this::txtField_KeyPressed, apBrowse, apMaster);
     }
     ChangeListener<Boolean> txtBrowse_Focus = JFXUtil.FocusListener(TextField.class,
             (lsID, lsValue) -> {
-                try {
-                    switch (lsID) {
-                        case "tfSearchBankName":
-                            poJSON = poController.SearchBanks(lsValue, false);
-                            if ("error".equals((String) poJSON.get("result"))) {
-                                ShowMessageFX.Warning((String) poJSON.get("message"), pxeModuleName, null);
-                                return;
-                            }
-                            break;
-                        case "tfSearchBankAccount":
-                            poJSON = poController.SearchBankAccount(lsValue, poController.OtherPayments().getModel().getBankID(), false);
-                            if ("error".equals((String) poJSON.get("result"))) {
-                                ShowMessageFX.Warning((String) poJSON.get("message"), pxeModuleName, null);
-                                return;
-                            }
-                            break;
-                        case "tfSearchDVNo":
-                            break;
-                        case "tfSearchIndustry":
-                            poJSON = poController.SearchIndustry(lsValue, false);
-                            if ("error".equals((String) poJSON.get("result"))) {
-                                ShowMessageFX.Warning((String) poJSON.get("message"), pxeModuleName, null);
-                                return;
-                            }
-                            break;
-                    }
-                    loadRecordSearch();
-                } catch (SQLException | GuanzonException ex) {
-                    Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
-                    ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
+                switch (lsID) {
+                    case "tfSearchBankName":
+                        if (lsValue.isEmpty()) {
+                        }
+                        break;
+                    case "tfSearchBankAccount":
+                        if (lsValue.isEmpty()) {
+                        }
+                        break;
+                    case "tfSearchIndustry":
+                        if (lsValue.isEmpty()) {
+                            poController.setSearchIndustry("");
+                        }
+                        break;
                 }
+                loadRecordSearch();
             });
-    
+
     ChangeListener<Boolean> txtMaster_Focus = JFXUtil.FocusListener(TextField.class,
             (lsID, lsValue) -> {
                 switch (lsID) {
@@ -296,23 +278,38 @@ public class OtherPaymentStatusController implements Initializable, ScreenInterf
                         break;
                 }
             });
-    
+
     EventHandler<ActionEvent> comboBoxActionListener = JFXUtil.CmbActionListener(
             (cmbId, selectedIndex, selectedValue) -> {
+                String selected = "";
                 switch (cmbId) {
                     case "cmbPaymentStatus":
-                        poController.OtherPayments().getModel().setTransactionStatus(String.valueOf(selectedIndex));
+                        switch (String.valueOf(selectedValue)) {
+                            case "FLOAT":
+                                selected = "0";
+                                break;
+                            case "OPEN":
+                                selected = "1";
+                                break;
+                            case "POSTED":
+                                selected = "2";
+                                break;
+                            case "CANCELLED":
+                                selected = "3";
+                                break;
+                        }
+                        poController.OtherPayments().getModel().setTransactionStatus(selected);
                         break;
                 }
                 loadRecordMaster();
             });
-    
+
     private void txtField_KeyPressed(KeyEvent event) {
         TextField txtField = (TextField) event.getSource();
         String lsID = (((TextField) event.getSource()).getId());
         String lsValue = (txtField.getText() == null ? "" : txtField.getText());
         poJSON = new JSONObject();
-        
+
         try {
             if (null != event.getCode()) {
                 switch (event.getCode()) {
@@ -325,7 +322,7 @@ public class OtherPaymentStatusController implements Initializable, ScreenInterf
                                 poJSON = poController.SearchBanks(lsValue, false);
                                 if ("error".equals((String) poJSON.get("result"))) {
                                     ShowMessageFX.Warning((String) poJSON.get("message"), pxeModuleName, null);
-                                    return;
+                                    break;
                                 }
                                 psSearchBankName = poController.OtherPayments().getModel().getBankID();
                                 loadRecordSearch();
@@ -335,20 +332,28 @@ public class OtherPaymentStatusController implements Initializable, ScreenInterf
                                 poJSON = poController.SearchBankAccount(lsValue, poController.OtherPayments().getModel().getBankID(), false);
                                 if ("error".equals((String) poJSON.get("result"))) {
                                     ShowMessageFX.Warning((String) poJSON.get("message"), pxeModuleName, null);
-                                    return;
+                                    break;
                                 }
                                 psSearchBankAccount = poController.OtherPayments().getModel().getBankAcountID();
                                 loadRecordSearch();
                                 loadTableMain.reload();
                                 break;
-                            
+                            case "tfSearchIndustry":
+                                poJSON = poController.SearchIndustry(lsValue, false);
+                                if ("error".equals((String) poJSON.get("result"))) {
+                                    ShowMessageFX.Warning((String) poJSON.get("message"), pxeModuleName, null);
+                                    break;
+                                }
+                                loadRecordSearch();
+                                loadTableMain.reload();
+                                break;
+
                         }
-                        CommonUtils.SetNextFocus((TextField) event.getSource());
                         event.consume();
                         break;
                     default:
                         break;
-                    
+
                 }
             }
         } catch (SQLException | GuanzonException ex) {
@@ -357,7 +362,7 @@ public class OtherPaymentStatusController implements Initializable, ScreenInterf
         }
     }
     boolean pbSuccess = true;
-    
+
     private void datepicker_Action(ActionEvent event) {
         poJSON = new JSONObject();
         JFXUtil.setJSONSuccess(poJSON, "success");
@@ -369,7 +374,7 @@ public class OtherPaymentStatusController implements Initializable, ScreenInterf
                 SimpleDateFormat sdfFormat = new SimpleDateFormat(SQLUtil.FORMAT_SHORT_DATE);
                 LocalDate currentDate = null, transactionDate = null, referenceDate = null, selectedDate = null;
                 String lsServerDate = "", lsTransDate = "", lsRefDate = "", lsSelectedDate = "";
-                
+
                 if (inputText == null || "".equals(inputText) || "01/01/1900".equals(inputText)) {
                     return;
                 }
@@ -377,24 +382,24 @@ public class OtherPaymentStatusController implements Initializable, ScreenInterf
                 currentDate = LocalDate.parse(lsServerDate, DateTimeFormatter.ofPattern(SQLUtil.FORMAT_SHORT_DATE));
                 lsSelectedDate = sdfFormat.format(SQLUtil.toDate(JFXUtil.convertToIsoFormat(inputText), SQLUtil.FORMAT_SHORT_DATE));
                 selectedDate = LocalDate.parse(lsSelectedDate, DateTimeFormatter.ofPattern(SQLUtil.FORMAT_SHORT_DATE));
-                
+
                 switch (datePicker.getId()) {
                     case "dpPostingDate":
                         //back date not allowed
                         if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
                             lsTransDate = sdfFormat.format(poController.Master().getTransactionDate());
                             transactionDate = LocalDate.parse(lsTransDate, DateTimeFormatter.ofPattern(SQLUtil.FORMAT_SHORT_DATE));
-                            
+
                             if (selectedDate.isAfter(currentDate)) {
                                 JFXUtil.setJSONError(poJSON, "Future dates are not allowed.");
                                 pbSuccess = false;
                             }
-                            
+
                             if (pbSuccess && (selectedDate.isAfter(transactionDate))) {
                                 JFXUtil.setJSONError(poJSON, "Check date cannot be later than the transaction date.");
                                 pbSuccess = false;
                             }
-                            
+
                             if (pbSuccess) {
 //                                poController.OtherPayments().getModel().setCheckDate((SQLUtil.toDate(lsSelectedDate, SQLUtil.FORMAT_SHORT_DATE)));
                             } else {
@@ -415,7 +420,7 @@ public class OtherPaymentStatusController implements Initializable, ScreenInterf
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
         }
     }
-    
+
     private void loadRecordSearch() {
         try {
             tfSearchIndustry.setText(poController.getSearchIndustry());
@@ -429,16 +434,16 @@ public class OtherPaymentStatusController implements Initializable, ScreenInterf
             Logger.getLogger(OtherPaymentStatusController.class.getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
         }
     }
-    
+
     private void loadRecordMaster() {
         try {
             boolean lbShow = OtherPaymentStatus.POSTED.equals(poController.getOtherPayment(pnMain).getTransactionStatus());
             JFXUtil.setDisabled(!lbShow, tfReferenceNo, dpPostingDate);
             JFXUtil.setDisabled(true, tfSupplierBank, tfSupplierAccountNo);
-            
+
             tfTransactionNo.setText(poController.Master().getTransactionNo());
             dpTransactionDate.setValue(CustomCommonUtil.parseDateStringToLocalDate(SQLUtil.dateFormat(poController.Master().getTransactionDate(), SQLUtil.FORMAT_SHORT_DATE)));
-            
+
             tfBankName.setText(poController.OtherPayments().getModel().Banks().getBankName() != null ? poController.OtherPayments().getModel().Banks().getBankName() : "");
             tfBankAccount.setText(poController.OtherPayments().getModel().getBankAcountID() != null ? poController.OtherPayments().getModel().getBankAcountID() : "");
             tfReferenceNo.setText(poController.Master().Payee().getPayeeName() != null ? poController.Master().Payee().getPayeeName() : "");
@@ -449,7 +454,7 @@ public class OtherPaymentStatusController implements Initializable, ScreenInterf
                     ? CustomCommonUtil.parseDateStringToLocalDate(SQLUtil.dateFormat(poController.OtherPayments().getModel().getTransactionDate(), SQLUtil.FORMAT_SHORT_DATE))
                     : null);
             tfPaymentAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.OtherPayments().getModel().getTotalAmount(), true));
-            
+
             tfSupplierBank.setText("");
             tfSupplierAccountNo.setText("");
             JFXUtil.updateCaretPositions(apMaster);
@@ -457,13 +462,13 @@ public class OtherPaymentStatusController implements Initializable, ScreenInterf
             Logger.getLogger(OtherPaymentStatusController.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    
+
     private void initComboBoxes() {
         JFXUtil.setComboBoxItems(new JFXUtil.Pairs<>(cCheckState, cmbPaymentStatus));
         JFXUtil.setComboBoxActionListener(comboBoxActionListener, cmbPaymentStatus);
         JFXUtil.initComboBoxCellDesignColor("#FF8201", cmbPaymentStatus);
     }
-    
+
     private void initLoadTable() {
         loadTableMain = new JFXUtil.ReloadableTableTask(
                 tblViewMainList,
@@ -482,8 +487,8 @@ public class OtherPaymentStatusController implements Initializable, ScreenInterf
                                                     String.valueOf(lnCntr + 1),
                                                     poController.getOtherPayment(lnCntr).Banks().getBankName(),
                                                     poController.getOtherPayment(lnCntr).Bank_Account_Master().getAccountNo(),
-                                                    poController.getOtherPayment(lnCntr).getReferNox(),
-                                                    poController.getOtherPayment(lnCntr).DisbursementMaster().getVoucherNo()
+                                                    poController.getOtherPayment(lnCntr).DisbursementMaster().getVoucherNo(),
+                                                    poController.getOtherPayment(lnCntr).DisbursementMaster().getTransactionNo()
                                             ));
                                             if (OtherPaymentStatus.POSTED.equals(poController.getOtherPayment(lnCntr).getTransactionStatus())) {
                                                 JFXUtil.highlightByKey(tblViewMainList, String.valueOf(lnCntr + 1), "#C1E1C1", highlightedRowsMain);
@@ -493,6 +498,8 @@ public class OtherPaymentStatusController implements Initializable, ScreenInterf
                                         main_data.clear();
                                         filteredMain_Data.clear();
                                     }
+                                } else {
+                                    ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                 }
                                 if (pnMain < 0 || pnMain
                                         >= main_data.size()) {
@@ -516,16 +523,16 @@ public class OtherPaymentStatusController implements Initializable, ScreenInterf
                     }
                 });
     }
-    
+
     private void initMainGrid() {
         JFXUtil.setColumnCenter(tblRowNo, tblCheckNo, tblReferenceNo);
         JFXUtil.setColumnLeft(tblBankName, tblBankAccount);
         JFXUtil.setColumnsIndexAndDisableReordering(tblViewMainList);
-        
+
         filteredMain_Data = new FilteredList<>(main_data, b -> true);
         tblViewMainList.setItems(filteredMain_Data);
     }
-    
+
     private void initTableOnClick() {
         tblViewMainList.setOnMouseClicked(event -> {
             if (pnEditMode != EditMode.UPDATE) {
@@ -537,11 +544,11 @@ public class OtherPaymentStatusController implements Initializable, ScreenInterf
                 }
             }
         });
-        
+
         JFXUtil.applyRowHighlighting(tblViewMainList, item -> ((ModelDisbursementVoucher_Main) item).getIndex01(), highlightedRowsMain);
         JFXUtil.adjustColumnForScrollbar(tblViewMainList);
     }
-    
+
     private void loadTableDetailFromMain() {
         poJSON = new JSONObject();
         ModelDisbursementVoucher_Main selected = (ModelDisbursementVoucher_Main) tblViewMainList.getSelectionModel().getSelectedItem();
@@ -567,7 +574,7 @@ public class OtherPaymentStatusController implements Initializable, ScreenInterf
             }
         }
     }
-    
+
     private void initButton(int fnEditMode) {
         boolean lbShow = (fnEditMode == EditMode.UPDATE);
         JFXUtil.setButtonsVisibility(!lbShow, btnClose);
@@ -585,9 +592,9 @@ public class OtherPaymentStatusController implements Initializable, ScreenInterf
             }
         }
     }
-    
+
     private void clearTextFields() {
         JFXUtil.clearTextFields(apMaster);
     }
-    
+
 }
