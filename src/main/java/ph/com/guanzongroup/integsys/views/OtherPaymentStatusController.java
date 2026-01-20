@@ -348,6 +348,9 @@ public class OtherPaymentStatusController implements Initializable, ScreenInterf
                                 loadRecordSearch();
                                 loadTableMain.reload();
                                 break;
+                            case "tfSearchDVNo":
+                                loadTableMain.reload();
+                                break;
 
                         }
                         event.consume();
