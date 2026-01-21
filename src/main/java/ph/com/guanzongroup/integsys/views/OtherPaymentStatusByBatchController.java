@@ -340,10 +340,13 @@ public class OtherPaymentStatusByBatchController implements Initializable, Scree
                                                     poController.getOtherPayment(lnCntr).getTransactionNo()
                                             ));
                                         }
-                                    }
+                                    } else {
+                                        main_data.clear();
+                                        checkedItem.clear();
+                                    } 
                                 } else {
-                                    main_data.clear();
-                                    checkedItem.clear();
+                                    ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                                    return;
                                 }
                                 if (main_data.isEmpty()) {
                                     ShowMessageFX.Warning(null, pxeModuleName, "No records found");
