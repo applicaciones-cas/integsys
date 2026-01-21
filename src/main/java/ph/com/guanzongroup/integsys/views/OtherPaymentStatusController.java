@@ -160,8 +160,10 @@ public class OtherPaymentStatusController implements Initializable, ScreenInterf
 
     private void resetComboboxValue() {
         cCheckState = FXCollections.observableArrayList("FLOAT", "OPEN", "POSTED", "CANCELLED");
-
-        if (poController.Master().getTransactionStatus().equals(EditMode.UPDATE)) {
+        cmbPaymentStatus.setValue(null);
+        cmbPaymentStatus.getSelectionModel().clearSelection();
+        cmbPaymentStatus.getItems().clear();
+        if (Integer.parseInt(poController.Master().getTransactionStatus()) == (EditMode.UPDATE)) {
             switch (poController.Master().getDisbursementType()) {
                 case DisbursementStatic.DisbursementType.CHECK:
                     break;
@@ -197,8 +199,9 @@ public class OtherPaymentStatusController implements Initializable, ScreenInterf
                     }
                     if (poController.OtherPayments().getModel().getTransactionStatus().equals(OtherPaymentStatus.FLOAT)) {
                         poController.OtherPayments().getModel().setTransactionStatus(OtherPaymentStatus.OPEN);
-                        loadRecordMaster();
+
                     }
+                    loadRecordMaster();
                     pnEditMode = poController.getEditMode();
                     break;
                 case "btnCancel":
