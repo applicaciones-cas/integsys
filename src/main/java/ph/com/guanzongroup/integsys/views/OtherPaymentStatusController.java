@@ -54,7 +54,7 @@ import ph.com.guanzongroup.integsys.utility.JFXUtil;
 /**
  * FXML Controller class
  *
- * @author User
+ * @author Team 1
  */
 public class OtherPaymentStatusController implements Initializable, ScreenInterface {
 
@@ -68,7 +68,8 @@ public class OtherPaymentStatusController implements Initializable, ScreenInterf
 
     private String psIndustryId = "";
     private String psCompanyId = "";
-    private String psCategoryId = "";;
+    private String psCategoryId = "";
+    ;
 
     private unloadForm poUnload = new unloadForm();
 
@@ -151,7 +152,8 @@ public class OtherPaymentStatusController implements Initializable, ScreenInterf
                 loadRecordSearch();
             });
         } catch (SQLException | GuanzonException ex) {
-            Logger.getLogger(OtherPaymentStatusController.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -190,10 +192,10 @@ public class OtherPaymentStatusController implements Initializable, ScreenInterf
                         poController.ShowStatusHistory();
                     } catch (NullPointerException npe) {
                         Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(npe), npe);
-                        ShowMessageFX.Error("No transaction status history to load!", pxeModuleName, null);
+                        ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(npe));
                     } catch (Exception ex) {
                         Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
-                        ShowMessageFX.Error(MiscUtil.getException(ex), pxeModuleName, null);
+                        ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
                     }
                     break;
                 case "btnSave":
@@ -243,7 +245,8 @@ public class OtherPaymentStatusController implements Initializable, ScreenInterf
             }
             initButton(pnEditMode);
         } catch (CloneNotSupportedException | SQLException | GuanzonException | ParseException | ScriptException ex) {
-            Logger.getLogger(OtherPaymentStatusController.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -347,18 +350,16 @@ public class OtherPaymentStatusController implements Initializable, ScreenInterf
                             case "tfSearchDVNo":
                                 loadTableMain.reload();
                                 break;
-
                         }
                         event.consume();
                         break;
                     default:
                         break;
-
                 }
             }
         } catch (SQLException | GuanzonException ex) {
-            Logger.getLogger(OtherPaymentStatusController.class
-                    .getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
     boolean pbSuccess = true;
@@ -418,6 +419,7 @@ public class OtherPaymentStatusController implements Initializable, ScreenInterf
             }
         } catch (SQLException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -429,7 +431,8 @@ public class OtherPaymentStatusController implements Initializable, ScreenInterf
             lblSource.setText(poController.Master().Company().getCompanyName() + " - " + poController.Master().Industry().getDescription());
             JFXUtil.updateCaretPositions(apBrowse);
         } catch (SQLException | GuanzonException ex) {
-            Logger.getLogger(OtherPaymentStatusController.class.getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -457,7 +460,8 @@ public class OtherPaymentStatusController implements Initializable, ScreenInterf
             tfSupplierAccountNo.setText("");
             JFXUtil.updateCaretPositions(apMaster);
         } catch (GuanzonException | SQLException ex) {
-            Logger.getLogger(OtherPaymentStatusController.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -512,7 +516,8 @@ public class OtherPaymentStatusController implements Initializable, ScreenInterf
                                 }
                                 JFXUtil.loadTab(pagination, main_data.size(), ROWS_PER_PAGE, tblViewMainList, filteredMain_Data);
                             } catch (GuanzonException | SQLException ex) {
-                                Logger.getLogger(OtherPaymentStatusController.class.getName()).log(Level.SEVERE, null, ex);
+                                Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+                                ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
                             }
                         });
                     } catch (InterruptedException ex) {
@@ -568,7 +573,7 @@ public class OtherPaymentStatusController implements Initializable, ScreenInterf
                 initButton(pnEditMode);
             } catch (SQLException | GuanzonException | CloneNotSupportedException | ScriptException ex) {
                 Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
-                ShowMessageFX.Warning(null, pxeModuleName, MiscUtil.getException(ex));
+                ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
             }
         }
     }
@@ -594,5 +599,4 @@ public class OtherPaymentStatusController implements Initializable, ScreenInterf
     private void clearTextFields() {
         JFXUtil.clearTextFields(apMaster);
     }
-
 }
