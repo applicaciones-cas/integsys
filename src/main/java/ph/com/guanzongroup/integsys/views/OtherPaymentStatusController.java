@@ -439,12 +439,12 @@ public class OtherPaymentStatusController implements Initializable, ScreenInterf
                             }
 
                             if (pbSuccess && (selectedDate.isAfter(transactionDate))) {
-                                JFXUtil.setJSONError(poJSON, "Check date cannot be later than the transaction date.");
+                                JFXUtil.setJSONError(poJSON, "Posted date cannot be later than the transaction date.");
                                 pbSuccess = false;
                             }
 
                             if (pbSuccess) {
-//                                poController.OtherPayments().getModel().setCheckDate((SQLUtil.toDate(lsSelectedDate, SQLUtil.FORMAT_SHORT_DATE)));
+                                poController.OtherPayments().getModel().setPostedDate((SQLUtil.toDate(lsSelectedDate, SQLUtil.FORMAT_SHORT_DATE)));
                             } else {
                                 if ("error".equals((String) poJSON.get("result"))) {
                                     ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
@@ -510,8 +510,8 @@ public class OtherPaymentStatusController implements Initializable, ScreenInterf
             JFXUtil.setCmbValue(cmbPaymentStatus, selected);
             tfVoucherNo.setText(poController.Master().getVoucherNo());
             tfReferenceNo.setText(poController.OtherPayments().getModel().getReferNox());
-            dpPostingDate.setValue(poController.OtherPayments().getModel().getTransactionDate() != null
-                    ? CustomCommonUtil.parseDateStringToLocalDate(SQLUtil.dateFormat(poController.OtherPayments().getModel().getTransactionDate(), SQLUtil.FORMAT_SHORT_DATE))
+            dpPostingDate.setValue(poController.OtherPayments().getModel().getPostedDate()!= null
+                    ? CustomCommonUtil.parseDateStringToLocalDate(SQLUtil.dateFormat(poController.OtherPayments().getModel().getPostedDate(), SQLUtil.FORMAT_SHORT_DATE))
                     : null);
             tfPaymentAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.OtherPayments().getModel().getTotalAmount(), true));
 
