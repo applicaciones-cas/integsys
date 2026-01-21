@@ -2630,23 +2630,31 @@ public class JFXUtil {
     public static String setStatusValue(Node node, Class<?> clazz, String value) {
         String text = getNameByValue(clazz, value);
 
+        // replace "_" with space
+        if (text != null) {
+            text = text.replace("_", " ");
+        }
+
+        final String finalText = text;
+
         Platform.runLater(() -> {
             if (node instanceof Label) {
-                ((Label) node).setText(text);
+                ((Label) node).setText(finalText);
             } else if (node instanceof TextField) {
-                ((TextField) node).setText(text);
+                ((TextField) node).setText(finalText);
             } else if (node instanceof TextArea) {
-                ((TextArea) node).setText(text);
+                ((TextArea) node).setText(finalText);
             } else if (node instanceof Button) {
-                ((Button) node).setText(text);
+                ((Button) node).setText(finalText);
             } else {
-                //if null
+                // unsupported node
             }
         });
-        return text;
+
+        return finalText;
     }
 
-    //private
+// private
     private static String getNameByValue(Class<?> clazz, String value) {
         if ("-1".equals(value) || JFXUtil.isObjectEqualTo(value, null, "")) {
             return "UNKNOWN";
@@ -2875,23 +2883,28 @@ public class JFXUtil {
     /*ComboBox value setter; Prevents listener to trigger while setting value*/
  /*requires combobox id and index value to be selected*/
     public static <T> void setCmbValue(ComboBox<T> comboBox, Object value) {
-        if (comboBox == null || value == null) {
+        if (comboBox == null) {
             return;
         }
 
         EventHandler<ActionEvent> originalHandler = comboBox.getOnAction();
         comboBox.setOnAction(null);
 
+        // ✅ If null or -1 → select index -1
+        if (value == null || (value instanceof Integer && (Integer) value == -1)) {
+            comboBox.getSelectionModel().select(-1);
+            comboBox.setOnAction(originalHandler);
+            return;
+        }
+
         if (value instanceof Integer) {
             int index = (Integer) value;
-
             if (index >= 0 && index < comboBox.getItems().size()) {
                 comboBox.getSelectionModel().select(index);
             }
 
         } else if (value instanceof String) {
             String title = (String) value;
-
             for (T item : comboBox.getItems()) {
                 if (title.equals(String.valueOf(item))) {
                     comboBox.getSelectionModel().select(item);
@@ -2902,6 +2915,7 @@ public class JFXUtil {
 
         comboBox.setOnAction(originalHandler);
     }
+
 
     /*Returns description or code of the source type*/
  /*Requires string value(for comparison) and boolean if the string value is code(to return description); alternatively*/

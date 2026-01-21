@@ -87,7 +87,7 @@ public class OtherPaymentStatusController implements Initializable, ScreenInterf
     @FXML
     private Label lblSource;
     @FXML
-    private TextField tfSearchIndustry, tfSearchBankName, tfSearchBankAccount, tfSearchDVNo, tfTransactionNo, tfBankName, tfBankAccount, tfSupplierBank, tfVoucherNo, tfReferenceNo, tfPaymentAmount, tfSupplierAccountNo;
+    private TextField tfSearchIndustry, tfSearchBankName, tfSearchBankAccount, tfSearchDVNo, tfTransactionNo, tfBankName, tfBankAccount, tfSupplierBank, tfVoucherNo, tfReferenceNo, tfPaymentAmount, tfSupplierAccountNo, tfDisbursementType;
     @FXML
     private HBox hbButtons;
     @FXML
@@ -160,9 +160,6 @@ public class OtherPaymentStatusController implements Initializable, ScreenInterf
 
     private void resetComboboxValue() {
         cCheckState = FXCollections.observableArrayList("FLOAT", "OPEN", "POSTED", "CANCELLED");
-        cmbPaymentStatus.setValue(null);
-        cmbPaymentStatus.getSelectionModel().clearSelection();
-        cmbPaymentStatus.getItems().clear();
         if (pnEditMode == (EditMode.UPDATE)) {
             switch (poController.Master().getDisbursementType()) {
                 case DisbursementStatic.DisbursementType.CHECK:
@@ -178,6 +175,7 @@ public class OtherPaymentStatusController implements Initializable, ScreenInterf
         }
 
         JFXUtil.setComboBoxItems(new JFXUtil.Pairs<>(cCheckState, cmbPaymentStatus));
+        apMaster.requestFocus();
     }
 
     @FXML
@@ -322,6 +320,7 @@ public class OtherPaymentStatusController implements Initializable, ScreenInterf
                         }
                         break;
                 }
+                loadRecordMaster();
             });
 
     EventHandler<ActionEvent> comboBoxActionListener = JFXUtil.CmbActionListener(
@@ -494,8 +493,7 @@ public class OtherPaymentStatusController implements Initializable, ScreenInterf
 
             tfBankName.setText(poController.OtherPayments().getModel().Banks().getBankName() != null ? poController.OtherPayments().getModel().Banks().getBankName() : "");
             tfBankAccount.setText(poController.OtherPayments().getModel().getBankAcountID() != null ? poController.OtherPayments().getModel().getBankAcountID() : "");
-            tfReferenceNo.setText(poController.Master().CheckPayments().getCheckNo() != null ? poController.Master().CheckPayments().getCheckNo() : "");
-
+            tfReferenceNo.setText(poController.OtherPayments().getModel().getReferNox() != null ? poController.OtherPayments().getModel().getReferNox() : "");
             String selected = "";
             switch (Integer.parseInt(poController.OtherPayments().getModel().getTransactionStatus())) {
                 case 0:
@@ -512,12 +510,11 @@ public class OtherPaymentStatusController implements Initializable, ScreenInterf
                     break;
             }
             if (Integer.parseInt(poController.OtherPayments().getModel().getTransactionStatus()) == 0) {
-                JFXUtil.setCmbValue(cmbPaymentStatus, null);
+                JFXUtil.setCmbValue(cmbPaymentStatus, -1);
             } else {
                 JFXUtil.setCmbValue(cmbPaymentStatus, selected);
             }
             tfVoucherNo.setText(poController.Master().getVoucherNo());
-            tfReferenceNo.setText(poController.OtherPayments().getModel().getReferNox());
             dpPostingDate.setValue(poController.OtherPayments().getModel().getPostedDate() != null
                     ? CustomCommonUtil.parseDateStringToLocalDate(SQLUtil.dateFormat(poController.OtherPayments().getModel().getPostedDate(), SQLUtil.FORMAT_SHORT_DATE))
                     : null);
@@ -525,6 +522,8 @@ public class OtherPaymentStatusController implements Initializable, ScreenInterf
 
             tfSupplierBank.setText("");
             tfSupplierAccountNo.setText("");
+
+            JFXUtil.setStatusValue(tfDisbursementType, DisbursementStatic.DisbursementType.class, poController.Master().getDisbursementType());
             JFXUtil.updateCaretPositions(apMaster);
         } catch (GuanzonException | SQLException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);

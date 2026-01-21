@@ -203,9 +203,9 @@
                                                                 <Label text="Supplier Acc. No" GridPane.rowIndex="8" />
                                                                 <Label text="Status" GridPane.rowIndex="9" />
                                                                 <Label text="Voucher No." GridPane.columnIndex="5" GridPane.rowIndex="4" />
-                                                                <Label text="Reference No." GridPane.columnIndex="5" GridPane.rowIndex="5" />
-                                                                <Label text="Posting Date" GridPane.columnIndex="5" GridPane.rowIndex="6" />
-                                                                <Label text="Payment Amount" GridPane.columnIndex="5" GridPane.rowIndex="7" />
+                                                                <Label text="Reference No." GridPane.columnIndex="5" GridPane.rowIndex="6" />
+                                                                <Label text="Posting Date" GridPane.columnIndex="5" GridPane.rowIndex="7" />
+                                                                <Label text="Payment Amount" GridPane.columnIndex="5" GridPane.rowIndex="8" />
                                                                 <TextField fx:id="tfTransactionNo" disable="true" editable="false" maxHeight="25.0" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="150.0" style="-fx-font-weight: bold;" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.rowIndex="2" />
                                                                 <DatePicker fx:id="dpTransactionDate" disable="true" editable="false" maxWidth="150.0" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.rowIndex="4" />
                                                                 <TextField fx:id="tfBankName" disable="true" editable="false" maxHeight="25.0" maxWidth="1.7976931348623157E308" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.rowIndex="5" />
@@ -214,9 +214,11 @@
                                                                 <TextField fx:id="tfSupplierAccountNo" minWidth="-Infinity" prefWidth="300.0" GridPane.columnIndex="2" GridPane.rowIndex="8" />
                                                                 <ComboBox fx:id="cmbPaymentStatus" maxWidth="1.7976931348623157E308" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.rowIndex="9" />
                                                                 <TextField fx:id="tfVoucherNo" disable="true" editable="false" maxHeight="25.0" maxWidth="1.7976931348623157E308" GridPane.columnIndex="7" GridPane.rowIndex="4" />
-                                                                <TextField fx:id="tfReferenceNo" disable="true" editable="false" maxHeight="25.0" maxWidth="1.7976931348623157E308" GridPane.columnIndex="7" GridPane.rowIndex="5" />
-                                                                <DatePicker fx:id="dpPostingDate" disable="true" editable="false" GridPane.columnIndex="7" GridPane.rowIndex="6" />
-                                                                <TextField fx:id="tfPaymentAmount" alignment="CENTER_RIGHT" editable="false" maxHeight="25.0" maxWidth="1.7976931348623157E308" GridPane.columnIndex="7" GridPane.rowIndex="7" />
+                                                                <TextField fx:id="tfReferenceNo" maxHeight="25.0" maxWidth="1.7976931348623157E308" GridPane.columnIndex="7" GridPane.rowIndex="6" />
+                                                                <DatePicker fx:id="dpPostingDate" GridPane.columnIndex="7" GridPane.rowIndex="7" />
+                                                                <TextField fx:id="tfPaymentAmount" alignment="CENTER_RIGHT" editable="false" maxHeight="25.0" maxWidth="1.7976931348623157E308" GridPane.columnIndex="7" GridPane.rowIndex="8" />
+                                                <Label text="DV Type" GridPane.columnIndex="5" GridPane.rowIndex="5" />
+                                                <TextField fx:id="tfDisbursementType" disable="true" editable="false" maxHeight="25.0" maxWidth="1.7976931348623157E308" GridPane.columnIndex="7" GridPane.rowIndex="5" />
                                                             </children>
                                                         </GridPane>
                                                     </children>
