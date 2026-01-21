@@ -331,12 +331,12 @@ public class OtherPaymentStatusByBatchController implements Initializable, Scree
                                                     checkedItem.get(lnCntr),
                                                     poController.getOtherPayment(lnCntr).getVoucherNo(),
                                                     CustomCommonUtil.formatDateToShortString(poController.getOtherPayment(lnCntr).getTransactionDate()),
-                                                    poController.getOtherPayment(lnCntr).Payee().getPayeeName(),
                                                     poController.getOtherPayment(lnCntr).OtherPayments().Banks().getBankName(),
                                                     poController.getOtherPayment(lnCntr).OtherPayments().Bank_Account_Master().getAccountNo(),
                                                     poController.getOtherPayment(lnCntr).OtherPayments().getReferNox(),
-                                                    CustomCommonUtil.setIntegerValueToDecimalFormat(poController.getOtherPayment(lnCntr).OtherPayments().getTotalAmount(), true),
+                                                    "POST DATE", //poController.getOtherPayment(lnCntr).Payee().getPayeeName()
                                                     lsCheckStatus,
+                                                    CustomCommonUtil.setIntegerValueToDecimalFormat(poController.getOtherPayment(lnCntr).OtherPayments().getTotalAmount(), true),
                                                     poController.getOtherPayment(lnCntr).getTransactionNo()
                                             ));
                                         }
@@ -441,7 +441,7 @@ public class OtherPaymentStatusByBatchController implements Initializable, Scree
             String lschecked = item1.getIndex02();
             String lsTransactionNo = item1.getIndex11();
             String lsbanks = item1.getIndex06();
-            String lsStatus = item1.getIndex10();
+            String lsStatus = item1.getIndex09();
             if (lschecked.equals("1")) {
                 checkedItems.add(lsTransactionNo);
                 banks.add(lsbanks);
