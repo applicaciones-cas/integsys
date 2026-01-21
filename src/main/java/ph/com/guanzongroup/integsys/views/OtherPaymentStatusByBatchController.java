@@ -45,7 +45,7 @@ import ph.com.guanzongroup.integsys.utility.JFXUtil;
 /**
  * FXML Controller class
  *
- * @author User
+ * @author Team 1
  */
 public class OtherPaymentStatusByBatchController implements Initializable, ScreenInterface {
 
@@ -456,7 +456,7 @@ public class OtherPaymentStatusByBatchController implements Initializable, Scree
 
     public void showAssignWindow(List<String> fsTransactionNos) throws SQLException {
         poJSON = new JSONObject();
-        stageDV.closeDialog();
+        stageAssign.closeDialog();
 
         CheckClearingAssignController controller = new CheckClearingAssignController();
         controller.setGRider(oApp);
