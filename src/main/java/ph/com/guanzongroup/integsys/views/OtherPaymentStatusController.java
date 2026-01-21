@@ -486,7 +486,7 @@ public class OtherPaymentStatusController implements Initializable, ScreenInterf
         try {
             resetComboboxValue();
             boolean lbShow = OtherPaymentStatus.POSTED.equals(poController.OtherPayments().getModel().getTransactionStatus());
-            JFXUtil.setDisabled(!lbShow, tfReferenceNo, dpPostingDate);
+            JFXUtil.setDisabled(!lbShow, dpPostingDate);
             JFXUtil.setDisabled(true, tfSupplierBank, tfSupplierAccountNo);
 
             tfTransactionNo.setText(poController.Master().getTransactionNo());
@@ -511,11 +511,15 @@ public class OtherPaymentStatusController implements Initializable, ScreenInterf
                     selected = "CANCELLED";
                     break;
             }
-            JFXUtil.setCmbValue(cmbPaymentStatus, selected);
+            if (Integer.parseInt(poController.OtherPayments().getModel().getTransactionStatus()) == 0) {
+                JFXUtil.setCmbValue(cmbPaymentStatus, null);
+            } else {
+                JFXUtil.setCmbValue(cmbPaymentStatus, selected);
+            }
             tfVoucherNo.setText(poController.Master().getVoucherNo());
             tfReferenceNo.setText(poController.OtherPayments().getModel().getReferNox());
-            dpPostingDate.setValue(poController.OtherPayments().getModel().getTransactionDate() != null
-                    ? CustomCommonUtil.parseDateStringToLocalDate(SQLUtil.dateFormat(poController.OtherPayments().getModel().getTransactionDate(), SQLUtil.FORMAT_SHORT_DATE))
+            dpPostingDate.setValue(poController.OtherPayments().getModel().getPostedDate() != null
+                    ? CustomCommonUtil.parseDateStringToLocalDate(SQLUtil.dateFormat(poController.OtherPayments().getModel().getPostedDate(), SQLUtil.FORMAT_SHORT_DATE))
                     : null);
             tfPaymentAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.OtherPayments().getModel().getTotalAmount(), true));
 
