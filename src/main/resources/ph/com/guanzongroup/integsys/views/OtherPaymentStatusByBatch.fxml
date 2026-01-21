@@ -163,7 +163,6 @@
                                                                 <TableColumn fx:id="tblBankName" maxWidth="250.0" minWidth="250.0" prefWidth="250.0" resizable="false" sortable="false" text="Bank Name" />
                                                                 <TableColumn fx:id="tblBankAccount" maxWidth="180.0" minWidth="180.0" prefWidth="180.0" resizable="false" sortable="false" text="Bank Account" />
                                                                 <TableColumn fx:id="tblReferenceNo" maxWidth="180.0" minWidth="180.0" prefWidth="180.0" resizable="false" sortable="false" text="Reference No." />
-                                                                <TableColumn fx:id="tblPostDate" maxWidth="180.0" minWidth="180.0" prefWidth="180.0" resizable="false" sortable="false" text="Post Date" />
                                                 <TableColumn fx:id="tblPaymentStatus" maxWidth="120.0" minWidth="120.0" prefWidth="120.0" resizable="false" sortable="false" text="Payment Status" />
                                                                 <TableColumn fx:id="tblPaymentAmount" maxWidth="120.0" minWidth="120.0" prefWidth="120.0" resizable="false" sortable="false" text="Payment Amount" />
                                                             </columns>

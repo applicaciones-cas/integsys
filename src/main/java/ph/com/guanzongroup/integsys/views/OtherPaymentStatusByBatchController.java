@@ -38,6 +38,7 @@ import org.json.simple.JSONObject;
 import ph.com.guanzongroup.cas.cashflow.DisbursementVoucher;
 import ph.com.guanzongroup.cas.cashflow.OtherPaymentStatusUpdate;
 import ph.com.guanzongroup.cas.cashflow.services.CashflowControllers;
+import ph.com.guanzongroup.cas.cashflow.status.DisbursementStatic;
 import ph.com.guanzongroup.cas.cashflow.status.OtherPaymentStatus;
 import ph.com.guanzongroup.integsys.model.ModelDisbursementVoucher_Main;
 import ph.com.guanzongroup.integsys.utility.CustomCommonUtil;
@@ -85,7 +86,7 @@ public class OtherPaymentStatusByBatchController implements Initializable, Scree
     @FXML
     private TableView tblViewMainList;
     @FXML
-    private TableColumn tblRowNo, tblCheckBox, tblDVNo, tblDVDate, tblBankName, tblBankAccount, tblReferenceNo, tblPostDate, tblPaymentStatus, tblPaymentAmount;
+    private TableColumn tblRowNo, tblCheckBox, tblDVNo, tblDVDate,tblDisbursementType, tblBankName, tblBankAccount, tblReferenceNo, tblPaymentStatus, tblPaymentAmount;
     @FXML
     private CheckBox chckSelectAll;
     @FXML
@@ -326,22 +327,31 @@ public class OtherPaymentStatusByBatchController implements Initializable, Scree
                                 main_data.clear();
                                 if (poController.getOtherPaymentList().size() > 0) {
                                     for (int lnCntr = 0; lnCntr <= poController.getOtherPaymentList().size() - 1; lnCntr++) {
-                                        String lsCheckStatus;
+                                        String lsStatus;
                                         switch (poController.getOtherPayment(lnCntr).OtherPayments().getTransactionStatus()) {
                                             case OtherPaymentStatus.FLOAT:
-                                                lsCheckStatus = "FLOAT";
+                                                lsStatus = "FLOAT";
                                                 break;
                                             case OtherPaymentStatus.OPEN:
-                                                lsCheckStatus = "OPEN";
+                                                lsStatus = "OPEN";
                                                 break;
                                             case OtherPaymentStatus.POSTED:
-                                                lsCheckStatus = "POSTED";
+                                                lsStatus = "POSTED";
                                                 break;
                                             case OtherPaymentStatus.CANCELLED:
-                                                lsCheckStatus = "CANCELLED";
+                                                lsStatus = "CANCELLED";
                                                 break;
                                             default:
-                                                lsCheckStatus = "UNKNOWN";
+                                                lsStatus = "UNKNOWN";
+                                                break;
+                                        }
+                                        String lsDVType;
+                                        switch (poController.getOtherPayment(lnCntr).getDisbursementType()) {
+                                            case DisbursementStatic.DisbursementType.WIRED:
+                                                lsDVType = "BANK TRANSFER";
+                                                break;
+                                            default:
+                                                lsDVType = "E-WALLET";
                                                 break;
                                         }
                                         checkedItem.add("0");
@@ -350,11 +360,11 @@ public class OtherPaymentStatusByBatchController implements Initializable, Scree
                                                 checkedItem.get(lnCntr),
                                                 poController.getOtherPayment(lnCntr).getVoucherNo(),
                                                 CustomCommonUtil.formatDateToShortString(poController.getOtherPayment(lnCntr).getTransactionDate()),
+                                                lsDVType,
                                                 poController.getOtherPayment(lnCntr).OtherPayments().Banks().getBankName(),
                                                 poController.getOtherPayment(lnCntr).OtherPayments().Bank_Account_Master().getAccountNo(),
                                                 poController.getOtherPayment(lnCntr).OtherPayments().getReferNox(),
-                                                CustomCommonUtil.formatDateToShortString(poController.getOtherPayment(lnCntr).OtherPayments().getPostedDate()),
-                                                lsCheckStatus,
+                                                lsStatus,
                                                 CustomCommonUtil.setIntegerValueToDecimalFormat(poController.getOtherPayment(lnCntr).OtherPayments().getTotalAmount(), true),
                                                 poController.getOtherPayment(lnCntr).getTransactionNo()
                                         ));
@@ -400,7 +410,7 @@ public class OtherPaymentStatusByBatchController implements Initializable, Scree
     }
 
     private void initMainGrid() {
-        JFXUtil.setColumnCenter(tblRowNo, tblDVNo, tblDVDate, tblReferenceNo, tblPostDate);
+        JFXUtil.setColumnCenter(tblRowNo, tblDVNo, tblDVDate, tblReferenceNo, tblDisbursementType);
         JFXUtil.setColumnLeft(tblCheckBox, tblBankName, tblBankAccount, tblPaymentStatus);
         JFXUtil.setColumnRight(tblPaymentAmount);
         JFXUtil.setColumnsIndexAndDisableReordering(tblViewMainList);
@@ -461,7 +471,7 @@ public class OtherPaymentStatusByBatchController implements Initializable, Scree
             ModelDisbursementVoucher_Main item1 = (ModelDisbursementVoucher_Main) item;
             String lschecked = item1.getIndex02();
             String lsTransactionNo = item1.getIndex11();
-            String lsbanks = item1.getIndex06();
+            String lsbanks = item1.getIndex07();
             String lsStatus = item1.getIndex09();
             if (lschecked.equals("1")) {
                 checkedItems.add(lsTransactionNo);
