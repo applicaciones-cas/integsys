@@ -163,7 +163,7 @@ public class OtherPaymentStatusController implements Initializable, ScreenInterf
         cmbPaymentStatus.setValue(null);
         cmbPaymentStatus.getSelectionModel().clearSelection();
         cmbPaymentStatus.getItems().clear();
-        if (Integer.parseInt(poController.Master().getTransactionStatus()) == (EditMode.UPDATE)) {
+        if (pnEditMode == (EditMode.UPDATE)) {
             switch (poController.Master().getDisbursementType()) {
                 case DisbursementStatic.DisbursementType.CHECK:
                     break;
@@ -197,12 +197,14 @@ public class OtherPaymentStatusController implements Initializable, ScreenInterf
                         ShowMessageFX.Warning((String) poJSON.get("message"), pxeModuleName, null);
                         return;
                     }
-                    if (poController.OtherPayments().getModel().getTransactionStatus().equals(OtherPaymentStatus.FLOAT)) {
-                        poController.OtherPayments().getModel().setTransactionStatus(OtherPaymentStatus.OPEN);
-
+                    if (poController.getOtherPayment(pnMain).getTransactionStatus().equals(OtherPaymentStatus.FLOAT)) {
+                        poController.getOtherPayment(pnMain).setTransactionStatus((OtherPaymentStatus.OPEN));
                     }
-                    loadRecordMaster();
+                    if (poController.OtherPayments().getModel().getTransactionStatus().equals(OtherPaymentStatus.FLOAT)) {
+                        poController.OtherPayments().getModel().setTransactionStatus((OtherPaymentStatus.OPEN));
+                    }
                     pnEditMode = poController.getEditMode();
+                    loadRecordMaster();
                     break;
                 case "btnCancel":
                     if (ShowMessageFX.YesNo(null, pxeModuleName, "Do you want to disregard changes?")) {
@@ -439,12 +441,12 @@ public class OtherPaymentStatusController implements Initializable, ScreenInterf
                             }
 
                             if (pbSuccess && (selectedDate.isAfter(transactionDate))) {
-                                JFXUtil.setJSONError(poJSON, "Posted date cannot be later than the transaction date.");
+                                JFXUtil.setJSONError(poJSON, "Check date cannot be later than the transaction date.");
                                 pbSuccess = false;
                             }
 
                             if (pbSuccess) {
-                                poController.OtherPayments().getModel().setPostedDate((SQLUtil.toDate(lsSelectedDate, SQLUtil.FORMAT_SHORT_DATE)));
+//                                poController.OtherPayments().getModel().setCheckDate((SQLUtil.toDate(lsSelectedDate, SQLUtil.FORMAT_SHORT_DATE)));
                             } else {
                                 if ("error".equals((String) poJSON.get("result"))) {
                                     ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
@@ -481,7 +483,7 @@ public class OtherPaymentStatusController implements Initializable, ScreenInterf
     private void loadRecordMaster() {
         try {
             resetComboboxValue();
-            boolean lbShow = OtherPaymentStatus.POSTED.equals(poController.getOtherPayment(pnMain).getTransactionStatus());
+            boolean lbShow = OtherPaymentStatus.POSTED.equals(poController.OtherPayments().getModel().getTransactionStatus());
             JFXUtil.setDisabled(!lbShow, tfReferenceNo, dpPostingDate);
             JFXUtil.setDisabled(true, tfSupplierBank, tfSupplierAccountNo);
 
@@ -490,7 +492,7 @@ public class OtherPaymentStatusController implements Initializable, ScreenInterf
 
             tfBankName.setText(poController.OtherPayments().getModel().Banks().getBankName() != null ? poController.OtherPayments().getModel().Banks().getBankName() : "");
             tfBankAccount.setText(poController.OtherPayments().getModel().getBankAcountID() != null ? poController.OtherPayments().getModel().getBankAcountID() : "");
-            tfReferenceNo.setText(poController.Master().Payee().getPayeeName() != null ? poController.Master().Payee().getPayeeName() : "");
+            tfReferenceNo.setText(poController.Master().CheckPayments().getCheckNo() != null ? poController.Master().CheckPayments().getCheckNo() : "");
 
             String selected = "";
             switch (Integer.parseInt(poController.OtherPayments().getModel().getTransactionStatus())) {
@@ -510,8 +512,8 @@ public class OtherPaymentStatusController implements Initializable, ScreenInterf
             JFXUtil.setCmbValue(cmbPaymentStatus, selected);
             tfVoucherNo.setText(poController.Master().getVoucherNo());
             tfReferenceNo.setText(poController.OtherPayments().getModel().getReferNox());
-            dpPostingDate.setValue(poController.OtherPayments().getModel().getPostedDate()!= null
-                    ? CustomCommonUtil.parseDateStringToLocalDate(SQLUtil.dateFormat(poController.OtherPayments().getModel().getPostedDate(), SQLUtil.FORMAT_SHORT_DATE))
+            dpPostingDate.setValue(poController.OtherPayments().getModel().getTransactionDate() != null
+                    ? CustomCommonUtil.parseDateStringToLocalDate(SQLUtil.dateFormat(poController.OtherPayments().getModel().getTransactionDate(), SQLUtil.FORMAT_SHORT_DATE))
                     : null);
             tfPaymentAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.OtherPayments().getModel().getTotalAmount(), true));
 
