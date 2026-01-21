@@ -546,10 +546,10 @@ public class OtherPaymentStatusController implements Initializable, ScreenInterf
                                         for (int lnCntr = 0; lnCntr <= poController.getOtherPaymentList().size() - 1; lnCntr++) {
                                             main_data.add(new ModelDisbursementVoucher_Main(
                                                     String.valueOf(lnCntr + 1),
-                                                    poController.getOtherPayment(lnCntr).Banks().getBankName(),
-                                                    poController.getOtherPayment(lnCntr).Bank_Account_Master().getAccountNo(),
-                                                    poController.getOtherPayment(lnCntr).DisbursementMaster().getVoucherNo(),
-                                                    poController.getOtherPayment(lnCntr).DisbursementMaster().getTransactionNo()
+                                                    poController.getOtherPayment(lnCntr).OtherPayments().Banks().getBankName(),
+                                                    poController.getOtherPayment(lnCntr).OtherPayments().Bank_Account_Master().getAccountNo(),
+                                                    poController.getOtherPayment(lnCntr).getVoucherNo(),
+                                                    poController.getOtherPayment(lnCntr).getTransactionNo()
                                             ));
                                             if (OtherPaymentStatus.POSTED.equals(poController.getOtherPayment(lnCntr).getTransactionStatus())) {
                                                 JFXUtil.highlightByKey(tblViewMainList, String.valueOf(lnCntr + 1), "#C1E1C1", highlightedRowsMain);

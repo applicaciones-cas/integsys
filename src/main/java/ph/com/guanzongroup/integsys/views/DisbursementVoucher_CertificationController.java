@@ -369,17 +369,13 @@ public class DisbursementVoucher_CertificationController implements Initializabl
                                             break;
                                         case DisbursementStatic.DisbursementType.DIGITAL_PAYMENT:
                                             lsPaymentForm = "ONLINE PAYMENT";
-//                                            if (otherIndex < poDisbursementController.OtherPayments().getOtherPaymentsCount()) {
-//                                                lsBankName = poDisbursementController.OtherPayments().poOtherPayments(otherIndex).Banks().getBankName();
-//                                                lsBankAccount = poDisbursementController.OtherPayments().poOtherPayments(otherIndex).getBankAccountID();
-//                                            }
+                                            lsBankName = poDisbursementController.getMaster(lnCntr).OtherPayments().Banks().getBankName();
+                                            lsBankAccount = poDisbursementController.getMaster(lnCntr).OtherPayments().Bank_Account_Master().getAccountNo();
                                             break;
                                         case DisbursementStatic.DisbursementType.WIRED:
                                             lsPaymentForm = "BANK TRANSFER";
-//                                            if (otherIndex < poDisbursementController.OtherPayments().getOtherPaymentsCount()) {
-//                                                lsBankName = poDisbursementController.OtherPayments().poOtherPayments(otherIndex).Banks().getBankName();
-//                                                lsBankAccount = poDisbursementController.OtherPayments().poOtherPayments(otherIndex).getBankAccountID();
-//                                            }
+                                            lsBankName = poDisbursementController.getMaster(lnCntr).OtherPayments().Banks().getBankName();
+                                            lsBankAccount = poDisbursementController.getMaster(lnCntr).OtherPayments().Bank_Account_Master().getAccountNo();
                                             break;
                                         default:
                                             lsPaymentForm = "";
