@@ -36,9 +36,12 @@ import org.guanzon.appdriver.base.MiscUtil;
 import org.json.simple.JSONObject;
 import ph.com.guanzongroup.cas.cashflow.CheckStatusUpdate;
 import ph.com.guanzongroup.cas.cashflow.DisbursementVoucher;
+import ph.com.guanzongroup.cas.cashflow.OtherPaymentStatusUpdate;
 import ph.com.guanzongroup.cas.cashflow.services.CashflowControllers;
 import ph.com.guanzongroup.cas.cashflow.status.CheckStatus;
+import ph.com.guanzongroup.cas.cashflow.status.OtherPaymentStatus;
 import ph.com.guanzongroup.integsys.model.ModelCheckPrinting;
+import ph.com.guanzongroup.integsys.model.ModelDisbursementVoucher_Main;
 import ph.com.guanzongroup.integsys.utility.CustomCommonUtil;
 import ph.com.guanzongroup.integsys.utility.JFXUtil;
 
@@ -53,8 +56,7 @@ public class OtherPaymentStatusByBatchController implements Initializable, Scree
     private JSONObject poJSON;
     private static final int ROWS_PER_PAGE = 50;
     private final String pxeModuleName = "Other Payment Status By Batch";
-    private CheckStatusUpdate poController;
-    private DisbursementVoucher poDisbursementController;
+    private OtherPaymentStatusUpdate poController;
     public int pnEditMode;
 
     private String psIndustryId = "";
@@ -66,8 +68,8 @@ public class OtherPaymentStatusByBatchController implements Initializable, Scree
 
     private unloadForm poUnload = new unloadForm();
 
-    private ObservableList<ModelCheckPrinting> main_data = FXCollections.observableArrayList();
-    private FilteredList<ModelCheckPrinting> filteredMain_Data;
+    private ObservableList<ModelDisbursementVoucher_Main> main_data = FXCollections.observableArrayList();
+    private FilteredList<ModelDisbursementVoucher_Main> filteredMain_Data;
     JFXUtil.ReloadableTableTask loadTableMain;
     BooleanProperty disableRowCheckbox = new SimpleBooleanProperty(false);
     ArrayList<String> checkedItem = new ArrayList<>();
@@ -79,7 +81,7 @@ public class OtherPaymentStatusByBatchController implements Initializable, Scree
     @FXML
     private Label lblSource;
     @FXML
-    private TextField tfSearchBankName, tfSearchBankAccount;
+    private TextField tfSearchBankName, tfSearchBankAccount, tfSearchIndustry, tfSearchDVNo;
     @FXML
     private Button btnClear, btnRetrieve, btnClose;
     @FXML
@@ -117,14 +119,12 @@ public class OtherPaymentStatusByBatchController implements Initializable, Scree
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         try {
-            poController = new CashflowControllers(oApp, null).CheckStatusUpdate();
+            poController = new CashflowControllers(oApp, null).OtherPaymentStatusUpdate();
             poJSON = new JSONObject();
             poJSON = poController.InitTransaction(); // Initialize transaction
             if (!"success".equals((String) poJSON.get("result"))) {
                 ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
             }
-            poController.Master().setIndustryID(psIndustryId);
-            poController.Master().setCompanyID(psCompanyId);
             initTextFields();
             initMainGrid();
             initTableOnClick();
@@ -135,6 +135,8 @@ public class OtherPaymentStatusByBatchController implements Initializable, Scree
                 checkedItems.clear();
             }
             Platform.runLater(() -> {
+                poController.Master().setIndustryID(psIndustryId);
+                poController.Master().setCompanyID(psCompanyId);
                 loadRecordSearch();
             });
         } catch (SQLException | GuanzonException ex) {
@@ -204,9 +206,11 @@ public class OtherPaymentStatusByBatchController implements Initializable, Scree
 
     private void loadRecordSearch() {
         try {
-//            tfSearchBankName.setText(poController.getSearchBank());
-//            tfSearchBankAccount.setText(poController.getSearchBankAccount());
+            tfSearchIndustry.setText(poController.getSearchIndustry());
+            tfSearchBankName.setText(poController.getSearchBank());
+            tfSearchBankAccount.setText(poController.getSearchBankAccount());
             lblSource.setText(poController.Master().Company().getCompanyName() + " - " + poController.Master().Industry().getDescription());
+            JFXUtil.updateCaretPositions(apBrowse);
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
             ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
@@ -217,12 +221,17 @@ public class OtherPaymentStatusByBatchController implements Initializable, Scree
                 switch (lsID) {
                     case "tfSearchBankName":
                         if (lsValue.isEmpty()) {
-//                            poController.setSearchBank("");
+                            poController.setSearchBank("");
                         }
                         break;
                     case "tfSearchBankAccount":
                         if (lsValue.isEmpty()) {
-//                            poController.setSearchBankAccount("");
+                            poController.setSearchBankAccount("");
+                        }
+                        break;
+                    case "tfSearchIndustry":
+                        if (lsValue.isEmpty()) {
+                            poController.setSearchIndustry("");
                         }
                         break;
                 }
@@ -241,24 +250,38 @@ public class OtherPaymentStatusByBatchController implements Initializable, Scree
                     case F3:
                         switch (lsID) {
                             case "tfSearchBankName":
-                                poController.setCheckpayment();
-                                poJSON = poController.SearchBanks(lsValue, true);
+                                poJSON = poController.SearchBanks(lsValue);
                                 if ("error".equals((String) poJSON.get("result"))) {
-                                    ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                                    ShowMessageFX.Warning((String) poJSON.get("message"), pxeModuleName, null);
                                     return;
                                 }
+                                loadRecordSearch();
+                                loadTableMain.reload();
                                 break;
                             case "tfSearchBankAccount":
-                                poController.setCheckpayment();
-                                poJSON = poController.SearhBankAccount(lsValue, psSearchBankID, false);
+                                poJSON = poController.SearchBankAccount(lsValue, poController.getSearchBankId(), false);
                                 if ("error".equals((String) poJSON.get("result"))) {
-                                    ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                                    ShowMessageFX.Warning((String) poJSON.get("message"), pxeModuleName, null);
                                     return;
                                 }
+                                loadRecordSearch();
+                                loadTableMain.reload();
+                                break;
+                            case "tfSearchIndustry":
+                                poJSON = poController.SearchIndustry(lsValue, false);
+                                if ("error".equals((String) poJSON.get("result"))) {
+                                    ShowMessageFX.Warning((String) poJSON.get("message"), pxeModuleName, null);
+                                    break;
+                                }
+                                loadRecordSearch();
+                                loadTableMain.reload();
+                                break;
+                            case "tfSearchDVNo":
+                                loadTableMain.reload();
                                 break;
                         }
-                        loadRecordSearch();
-                        loadTableMain.reload();
+                        event.consume();
+                        break;
                     default:
                         break;
                 }
@@ -279,39 +302,42 @@ public class OtherPaymentStatusByBatchController implements Initializable, Scree
                         Platform.runLater(() -> {
                             try {
                                 main_data.clear();
-                                poJSON = poController.getDisbursement(psSearchBankID, psSearchBankAccountID);
-//                                poJSON = poController.loadTransactionList(tfSearchBankName.getText(), tfSearchBankAccount.getText());
+                                poJSON = poController.loadTransactionList(tfSearchIndustry.getText(), tfSearchBankName.getText(), tfSearchBankAccount.getText(), tfSearchDVNo.getText());
                                 if ("success".equals(poJSON.get("result"))) {
                                     checkedItem.clear();
-                                    if (poController.getDisbursementMasterCount() > 0) {
-                                        for (int lnCntr = 0; lnCntr < poController.getDisbursementMasterCount(); lnCntr++) {
+                                    if (poController.getOtherPaymentList().size() > 0) {
+                                        for (int lnCntr = 0; lnCntr <= poController.getOtherPaymentList().size() - 1; lnCntr++) {
                                             String lsCheckStatus;
-                                            switch (poController.poDisbursementMaster(lnCntr).CheckPayments().getTransactionStatus()) {
-                                                case CheckStatus.OPEN:
+                                            switch (poController.getOtherPayment(lnCntr).getTransactionStatus()) {
+                                                case OtherPaymentStatus.FLOAT:
+                                                    lsCheckStatus = "FLOAT";
+                                                    break;
+                                                case OtherPaymentStatus.OPEN:
                                                     lsCheckStatus = "OPEN";
                                                     break;
-                                                case CheckStatus.STOP_PAYMENT:
-                                                    lsCheckStatus = "HOLD";
-                                                    break;
-                                                case CheckStatus.POSTED:
+                                                case OtherPaymentStatus.POSTED:
                                                     lsCheckStatus = "CLEARED";
+                                                    break;
+                                                case OtherPaymentStatus.CANCELLED:
+                                                    lsCheckStatus = "CANCELLED";
                                                     break;
                                                 default:
                                                     lsCheckStatus = "UNKNOWN";
                                                     break;
                                             }
                                             checkedItem.add("0");
-                                            main_data.add(new ModelCheckPrinting(
+                                            main_data.add(new ModelDisbursementVoucher_Main(
                                                     String.valueOf(lnCntr + 1),
                                                     checkedItem.get(lnCntr),
-                                                    poController.poDisbursementMaster(lnCntr).getTransactionNo(),
-                                                    CustomCommonUtil.formatDateToShortString(poController.poDisbursementMaster(lnCntr).getTransactionDate()),
-                                                    poController.poDisbursementMaster(lnCntr).CheckPayments().Banks().getBankName(),
-                                                    poController.poDisbursementMaster(lnCntr).CheckPayments().Bank_Account_Master().getAccountNo(),
-                                                    poController.poDisbursementMaster(lnCntr).CheckPayments().getCheckNo(),
-                                                    CustomCommonUtil.formatDateToShortString(poController.poDisbursementMaster(lnCntr).getTransactionDate()),
+                                                    poController.getOtherPayment(lnCntr).getVoucherNo(),
+                                                    CustomCommonUtil.formatDateToShortString(poController.getOtherPayment(lnCntr).getTransactionDate()),
+                                                    poController.getOtherPayment(lnCntr).Payee().getPayeeName(),
+                                                    poController.getOtherPayment(lnCntr).OtherPayments().Banks().getBankName(),
+                                                    poController.getOtherPayment(lnCntr).OtherPayments().Bank_Account_Master().getAccountNo(),
+                                                    poController.getOtherPayment(lnCntr).OtherPayments().getReferNox(),
+                                                    CustomCommonUtil.setIntegerValueToDecimalFormat(poController.getOtherPayment(lnCntr).OtherPayments().getTotalAmount(), true),
                                                     lsCheckStatus,
-                                                    CustomCommonUtil.setIntegerValueToDecimalFormat(poController.poDisbursementMaster(lnCntr).CheckPayments().getAmount(), true)
+                                                    poController.getOtherPayment(lnCntr).getTransactionNo()
                                             ));
                                         }
                                     }
@@ -387,12 +413,12 @@ public class OtherPaymentStatusByBatchController implements Initializable, Scree
         tblViewMainList.setOnMouseClicked(event -> {
             if (tblViewMainList.getSelectionModel().getSelectedIndex() >= 0 && event.getClickCount() == 2) {
                 try {
-                    ModelCheckPrinting selected = (ModelCheckPrinting) tblViewMainList.getSelectionModel().getSelectedItem();
-                    if (selected.getIndex03().isEmpty() && selected.getIndex03() == null) {
+                    ModelDisbursementVoucher_Main selected = (ModelDisbursementVoucher_Main) tblViewMainList.getSelectionModel().getSelectedItem();
+                    if (selected.getIndex11().isEmpty() && selected.getIndex11() == null) {
                         ShowMessageFX.Warning("Unable to view, transaction no. is invalid", pxeModuleName, null);
                         return;
                     }
-                    showDVWindow(selected.getIndex03());
+                    showDVWindow(selected.getIndex11());
                 } catch (SQLException ex) {
                     Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
                     ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
@@ -408,18 +434,18 @@ public class OtherPaymentStatusByBatchController implements Initializable, Scree
     private JSONObject validateSelectedItem() {
         poJSON = new JSONObject();
         ArrayList<String> banks = new ArrayList<>();
-        ArrayList<String> checkStatus = new ArrayList<>();
+        ArrayList<String> status = new ArrayList<>();
         checkedItems.clear();
         for (Object item : tblViewMainList.getItems()) {
-            ModelCheckPrinting item1 = (ModelCheckPrinting) item;
+            ModelDisbursementVoucher_Main item1 = (ModelDisbursementVoucher_Main) item;
             String lschecked = item1.getIndex02();
-            String lsDVNO = item1.getIndex11();
-            String lsbanks = item1.getIndex07();
-            String lscheckStatus = item1.getIndex09();
+            String lsTransactionNo = item1.getIndex11();
+            String lsbanks = item1.getIndex06();
+            String lsStatus = item1.getIndex10();
             if (lschecked.equals("1")) {
-                checkedItems.add(lsDVNO);
+                checkedItems.add(lsTransactionNo);
                 banks.add(lsbanks);
-                checkStatus.add(lscheckStatus);
+                status.add(lsStatus);
             }
         }
         if (checkedItems.isEmpty()) {
@@ -436,8 +462,8 @@ public class OtherPaymentStatusByBatchController implements Initializable, Scree
             String lsDVNO = (checkedItems.get(lnCtr));
             if (firstBank == null) {
                 firstBank = banks.get(lnCtr); // store the first encountered bank
-                firstStatus = checkStatus.get(lnCtr);
-            } else if (!firstBank.equals(banks) && !firstStatus.equals(checkStatus)) {
+                firstStatus = status.get(lnCtr);
+            } else if (!firstBank.equals(banks) && !firstStatus.equals(status)) {
                 allSameBank = false;
                 break; // no need to continue checking
             }
@@ -460,7 +486,7 @@ public class OtherPaymentStatusByBatchController implements Initializable, Scree
 
         CheckClearingAssignController controller = new CheckClearingAssignController();
         controller.setGRider(oApp);
-        controller.setCheckStatusUpdate(poController);
+//        controller.setCheckStatusUpdate(poController);
         controller.setTransaction(fsTransactionNos);  // Pass the list here
         try {
             stageAssign.setOnHidden(event -> {
@@ -479,10 +505,10 @@ public class OtherPaymentStatusByBatchController implements Initializable, Scree
     public void showDVWindow(String fsTransactionNo) throws SQLException {
         poJSON = new JSONObject();
         stageDV.closeDialog();
-
+        DisbursementVoucher loObject = new CashflowControllers(oApp, null).DisbursementVoucher();
         DisbursementVoucher_ViewController controller = new DisbursementVoucher_ViewController();
         controller.setGRider(oApp);
-        controller.setDisbursement(poDisbursementController);
+        controller.setDisbursement(loObject);
         controller.setTransaction(fsTransactionNo);
         try {
             stageDV.showDialog((Stage) AnchorMain.getScene().getWindow(), getClass().getResource("/ph/com/guanzongroup/integsys/views/DisbursementVoucher_View.fxml"), controller,
