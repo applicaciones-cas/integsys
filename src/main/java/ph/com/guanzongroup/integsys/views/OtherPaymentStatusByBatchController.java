@@ -29,6 +29,7 @@ import static javafx.scene.input.KeyCode.F3;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
+import javax.script.ScriptException;
 import org.guanzon.appdriver.agent.ShowMessageFX;
 import org.guanzon.appdriver.base.GRiderCAS;
 import org.guanzon.appdriver.base.GuanzonException;
@@ -180,6 +181,7 @@ public class OtherPaymentStatusByBatchController implements Initializable, Scree
                         break;
                     }
                     if (!checkedItems.isEmpty()) {
+                        postTransaction(checkedItems);
                     }
                     break;
                 case "btnRetrieve":
@@ -327,7 +329,7 @@ public class OtherPaymentStatusByBatchController implements Initializable, Scree
                                                     lsCheckStatus = "OPEN";
                                                     break;
                                                 case OtherPaymentStatus.POSTED:
-                                                    lsCheckStatus = "CLEARED";
+                                                    lsCheckStatus = "POSTED";
                                                     break;
                                                 case OtherPaymentStatus.CANCELLED:
                                                     lsCheckStatus = "CANCELLED";
@@ -345,7 +347,7 @@ public class OtherPaymentStatusByBatchController implements Initializable, Scree
                                                     poController.getOtherPayment(lnCntr).OtherPayments().Banks().getBankName(),
                                                     poController.getOtherPayment(lnCntr).OtherPayments().Bank_Account_Master().getAccountNo(),
                                                     poController.getOtherPayment(lnCntr).OtherPayments().getReferNox(),
-                                                    "POST DATE", //poController.getOtherPayment(lnCntr).Payee().getPayeeName()
+                                                    CustomCommonUtil.formatDateToShortString(poController.getOtherPayment(lnCntr).OtherPayments().getPostedDate()),
                                                     lsCheckStatus,
                                                     CustomCommonUtil.setIntegerValueToDecimalFormat(poController.getOtherPayment(lnCntr).OtherPayments().getTotalAmount(), true),
                                                     poController.getOtherPayment(lnCntr).getTransactionNo()
@@ -493,6 +495,69 @@ public class OtherPaymentStatusByBatchController implements Initializable, Scree
         }
         poJSON.put("result", "success");
         return poJSON;
+    }
+    
+    public void postTransaction(List<String> fsTransactionNos) {
+        poJSON = new JSONObject();
+        boolean lbSuccess = false;
+        String lsRefNo = "";
+        try {
+            for(int lnCtr = 0; lnCtr < fsTransactionNos.size(); lnCtr++){
+                poJSON = poController.OpenTransaction(fsTransactionNos.get(lnCtr));
+                if ("error".equals((String) poJSON.get("result"))) {
+                    ShowMessageFX.Warning(null, pxeModuleName, "Transaction posting has been terminated.\n" + (String) poJSON.get("message"));
+                    break;
+                }
+                poJSON = poController.UpdateTransaction();
+                if ("error".equals((String) poJSON.get("result"))) {
+                    ShowMessageFX.Warning(null, pxeModuleName, "Transaction posting has been terminated.\n" + (String) poJSON.get("message"));
+                    break;
+                }
+
+                poController.OtherPayments().getModel().setPostedDate(oApp.getServerDate());
+                poJSON = poController.SaveTransaction();
+                if ("error".equals((String) poJSON.get("result"))) {
+                    ShowMessageFX.Warning(null, pxeModuleName, "Transaction posting has been terminated.\n" + (String) poJSON.get("message"));
+                    break;
+                }
+                
+                if(lsRefNo.isEmpty()){
+                    lsRefNo = poController.Master().getVoucherNo();
+                } else {
+                    lsRefNo = lsRefNo + ", " + poController.Master().getVoucherNo();
+                }
+                
+                if(!lbSuccess){
+                    lbSuccess = true;
+                }
+            }
+            
+            if(lbSuccess){
+                ShowMessageFX.Warning(null, pxeModuleName, "Reference No: " + lsRefNo + " Successfully posted.");
+            }
+        
+        } catch (CloneNotSupportedException | GuanzonException | ScriptException | SQLException ex) {
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+        }
+        
+//        stageAssign.closeDialog();
+//        
+//        CheckClearingAssignController controller = new CheckClearingAssignController();
+//        controller.setGRider(oApp);
+////        controller.setCheckStatusUpdate(poController);
+//        controller.setTransaction(fsTransactionNos);  // Pass the list here
+//        try {
+//            stageAssign.setOnHidden(event -> {
+//                chckSelectAll.setSelected(false);
+//                loadTableMain.reload();
+//                checkedItem.clear();
+//            });
+//            stageAssign.showDialog((Stage) AnchorMain.getScene().getWindow(), getClass().getResource("/ph/com/guanzongroup/integsys/views/CheckClearingAssign.fxml"), controller,
+//                    "Assign Dialog", true, true, false);
+//        } catch (IOException ex) {
+//            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+//            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
+//        }
     }
 
     public void showDVWindow(String fsTransactionNo) throws SQLException {
