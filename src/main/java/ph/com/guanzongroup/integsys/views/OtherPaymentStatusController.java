@@ -197,9 +197,6 @@ public class OtherPaymentStatusController implements Initializable, ScreenInterf
                         ShowMessageFX.Warning((String) poJSON.get("message"), pxeModuleName, null);
                         return;
                     }
-                    if (poController.getOtherPayment(pnMain).getTransactionStatus().equals(OtherPaymentStatus.FLOAT)) {
-                        poController.getOtherPayment(pnMain).setTransactionStatus((OtherPaymentStatus.OPEN));
-                    }
                     if (poController.OtherPayments().getModel().getTransactionStatus().equals(OtherPaymentStatus.FLOAT)) {
                         poController.OtherPayments().getModel().setTransactionStatus((OtherPaymentStatus.OPEN));
                     }
@@ -288,7 +285,7 @@ public class OtherPaymentStatusController implements Initializable, ScreenInterf
     private void initTextFields() {
         //Initialise  TextField KeyPressed
         JFXUtil.setFocusListener(txtBrowse_Focus, tfSearchBankName, tfSearchBankAccount, tfSearchDVNo, tfSearchIndustry);
-        JFXUtil.setFocusListener(txtMaster_Focus, tfPaymentAmount);
+        JFXUtil.setFocusListener(txtMaster_Focus, tfReferenceNo);
 
         JFXUtil.setKeyPressedListener(this::txtField_KeyPressed, apBrowse, apMaster);
     }
@@ -317,7 +314,12 @@ public class OtherPaymentStatusController implements Initializable, ScreenInterf
     ChangeListener<Boolean> txtMaster_Focus = JFXUtil.FocusListener(TextField.class,
             (lsID, lsValue) -> {
                 switch (lsID) {
-                    case "tfPaymentAmount":
+                    case "tfReferenceNo":
+                        poJSON = poController.OtherPayments().getModel().setReferNox(lsValue);
+                        if (!JFXUtil.isJSONSuccess(poJSON)) {
+                            ShowMessageFX.Warning((String) poJSON.get("message"), pxeModuleName, null);
+                            poController.OtherPayments().getModel().setReferNox("");
+                        }
                         break;
                 }
             });
@@ -446,7 +448,7 @@ public class OtherPaymentStatusController implements Initializable, ScreenInterf
                             }
 
                             if (pbSuccess) {
-//                                poController.OtherPayments().getModel().setCheckDate((SQLUtil.toDate(lsSelectedDate, SQLUtil.FORMAT_SHORT_DATE)));
+                                poController.OtherPayments().getModel().setPostedDate((SQLUtil.toDate(lsSelectedDate, SQLUtil.FORMAT_SHORT_DATE)));
                             } else {
                                 if ("error".equals((String) poJSON.get("result"))) {
                                     ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
@@ -553,7 +555,7 @@ public class OtherPaymentStatusController implements Initializable, ScreenInterf
                                                     poController.getOtherPayment(lnCntr).getVoucherNo(),
                                                     poController.getOtherPayment(lnCntr).getTransactionNo()
                                             ));
-                                            if (OtherPaymentStatus.POSTED.equals(poController.getOtherPayment(lnCntr).getTransactionStatus())) {
+                                            if (OtherPaymentStatus.POSTED.equals(poController.getOtherPayment(lnCntr).OtherPayments().getTransactionStatus())) {
                                                 JFXUtil.highlightByKey(tblViewMainList, String.valueOf(lnCntr + 1), "#C1E1C1", highlightedRowsMain);
                                             }
                                         }
