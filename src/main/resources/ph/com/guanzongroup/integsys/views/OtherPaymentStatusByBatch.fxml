@@ -97,7 +97,7 @@
                             <children>
                                 <HBox alignment="CENTER_LEFT" prefHeight="75.0" prefWidth="1482.0" spacing="5.0" style="-fx-background-color: E9E9E9;" styleClass="button_process" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                     <children>
-                                        <Button fx:id="btnPost" contentDisplay="TOP" ellipsisString="" minWidth="120.0" mnemonicParsing="false" onAction="#cmdButton_Click" prefHeight="70.0" prefWidth="70.0" styleClass="button_process" stylesheets="@../css/StyleSheet.css" text="Post">
+                                        <Button fx:id="btnPost" contentDisplay="TOP" ellipsisString="" mnemonicParsing="false" onAction="#cmdButton_Click" prefHeight="70.0" prefWidth="70.0" styleClass="button_process" stylesheets="@../css/StyleSheet.css" text="Post">
                                             <graphic>
                                                 <FontAwesomeIconView glyphName="CHECK" size="20" />
                                             </graphic>
@@ -159,12 +159,13 @@
                                                                 </TableColumn>
                                                                 <TableColumn fx:id="tblDVNo" maxWidth="150.0" minWidth="150.0" prefWidth="150.0" resizable="false" sortable="false" text="DV No" />
                                                                 <TableColumn fx:id="tblDVDate" maxWidth="120.0" minWidth="120.0" prefWidth="120.0" resizable="false" sortable="false" text="Date" />
+                                                <TableColumn fx:id="tblDisbursementType" maxWidth="150.0" minWidth="150.0" prefWidth="150.0" resizable="false" sortable="false" text="Disbursement Type" />
                                                                 <TableColumn fx:id="tblBankName" maxWidth="250.0" minWidth="250.0" prefWidth="250.0" resizable="false" sortable="false" text="Bank Name" />
                                                                 <TableColumn fx:id="tblBankAccount" maxWidth="180.0" minWidth="180.0" prefWidth="180.0" resizable="false" sortable="false" text="Bank Account" />
                                                                 <TableColumn fx:id="tblReferenceNo" maxWidth="180.0" minWidth="180.0" prefWidth="180.0" resizable="false" sortable="false" text="Reference No." />
                                                                 <TableColumn fx:id="tblPostDate" maxWidth="180.0" minWidth="180.0" prefWidth="180.0" resizable="false" sortable="false" text="Post Date" />
-                                                <TableColumn fx:id="tblPaymentStatus" maxWidth="150.0" minWidth="150.0" prefWidth="150.0" resizable="false" sortable="false" text="Payment Status" />
-                                                                <TableColumn fx:id="tblPaymentAmount" maxWidth="150.0" minWidth="150.0" prefWidth="150.0" resizable="false" sortable="false" text="Payment Amount" />
+                                                <TableColumn fx:id="tblPaymentStatus" maxWidth="120.0" minWidth="120.0" prefWidth="120.0" resizable="false" sortable="false" text="Payment Status" />
+                                                                <TableColumn fx:id="tblPaymentAmount" maxWidth="120.0" minWidth="120.0" prefWidth="120.0" resizable="false" sortable="false" text="Payment Amount" />
                                                             </columns>
                                                             <GridPane.margin>
                                                                 <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
