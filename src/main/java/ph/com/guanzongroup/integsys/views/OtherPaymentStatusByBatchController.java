@@ -321,7 +321,7 @@ public class OtherPaymentStatusByBatchController implements Initializable, Scree
                                     if (poController.getOtherPaymentList().size() > 0) {
                                         for (int lnCntr = 0; lnCntr <= poController.getOtherPaymentList().size() - 1; lnCntr++) {
                                             String lsCheckStatus;
-                                            switch (poController.getOtherPayment(lnCntr).getTransactionStatus()) {
+                                            switch (poController.getOtherPayment(lnCntr).OtherPayments().getTransactionStatus()) {
                                                 case OtherPaymentStatus.FLOAT:
                                                     lsCheckStatus = "FLOAT";
                                                     break;
