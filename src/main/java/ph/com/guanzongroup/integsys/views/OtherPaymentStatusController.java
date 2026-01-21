@@ -597,12 +597,18 @@ public class OtherPaymentStatusController implements Initializable, ScreenInterf
 
     private void initTableOnClick() {
         tblViewMainList.setOnMouseClicked(event -> {
-            if (pnEditMode != EditMode.UPDATE) {
+            if (event.getClickCount() == 2) {
+
+                if (pnEditMode != EditMode.UPDATE) {
+                } else {
+                    if (!ShowMessageFX.YesNo(null, pxeModuleName, "An open transaction is currently in update mode.\n"
+                            + "Are you sure you want to switch to another transaction?")) {
+                        return;
+                    }
+                }
                 pnMain = tblViewMainList.getSelectionModel().getSelectedIndex();
                 if (pnMain >= 0) {
-                    if (event.getClickCount() == 2) {
-                        loadTableDetailFromMain();
-                    }
+                    loadTableDetailFromMain();
                 }
             }
         });
