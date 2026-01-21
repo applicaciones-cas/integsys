@@ -34,13 +34,10 @@ import org.guanzon.appdriver.base.GRiderCAS;
 import org.guanzon.appdriver.base.GuanzonException;
 import org.guanzon.appdriver.base.MiscUtil;
 import org.json.simple.JSONObject;
-import ph.com.guanzongroup.cas.cashflow.CheckStatusUpdate;
 import ph.com.guanzongroup.cas.cashflow.DisbursementVoucher;
 import ph.com.guanzongroup.cas.cashflow.OtherPaymentStatusUpdate;
 import ph.com.guanzongroup.cas.cashflow.services.CashflowControllers;
-import ph.com.guanzongroup.cas.cashflow.status.CheckStatus;
 import ph.com.guanzongroup.cas.cashflow.status.OtherPaymentStatus;
-import ph.com.guanzongroup.integsys.model.ModelCheckPrinting;
 import ph.com.guanzongroup.integsys.model.ModelDisbursementVoucher_Main;
 import ph.com.guanzongroup.integsys.utility.CustomCommonUtil;
 import ph.com.guanzongroup.integsys.utility.JFXUtil;
@@ -135,6 +132,8 @@ public class OtherPaymentStatusByBatchController implements Initializable, Scree
                 checkedItems.clear();
             }
             Platform.runLater(() -> {
+                poController.setIndustryID(psIndustryId);
+                poController.setCompanyID(psCompanyId);
                 poController.Master().setIndustryID(psIndustryId);
                 poController.Master().setCompanyID(psCompanyId);
                 loadRecordSearch();
@@ -392,7 +391,7 @@ public class OtherPaymentStatusByBatchController implements Initializable, Scree
     }
 
     private void initCheckboxes() {
-        JFXUtil.addCheckboxColumns(ModelCheckPrinting.class, tblViewMainList, disableRowCheckbox,
+        JFXUtil.addCheckboxColumns(ModelDisbursementVoucher_Main.class, tblViewMainList, disableRowCheckbox,
                 (row, rowIndex, colIndex, newVal) -> {
                     boolean lbisTrue = newVal;
                     switch (colIndex) {
