@@ -2874,17 +2874,32 @@ public class JFXUtil {
 
     /*ComboBox value setter; Prevents listener to trigger while setting value*/
  /*requires combobox id and index value to be selected*/
-    public static void setCmbValue(ComboBox<?> comboBox, int value) {
-        // Save original listener
-        EventHandler<ActionEvent> originalHandler = comboBox.getOnAction();
-        // Temporarily remove listener to prevent triggering events
-        comboBox.setOnAction(null);
-        // Safe cast for flexibility
-        if (value < 0) {
-            comboBox.getSelectionModel().select(value);
-        } else {
-            comboBox.getSelectionModel().select(value);
+    public static <T> void setCmbValue(ComboBox<T> comboBox, Object value) {
+        if (comboBox == null || value == null) {
+            return;
         }
+
+        EventHandler<ActionEvent> originalHandler = comboBox.getOnAction();
+        comboBox.setOnAction(null);
+
+        if (value instanceof Integer) {
+            int index = (Integer) value;
+
+            if (index >= 0 && index < comboBox.getItems().size()) {
+                comboBox.getSelectionModel().select(index);
+            }
+
+        } else if (value instanceof String) {
+            String title = (String) value;
+
+            for (T item : comboBox.getItems()) {
+                if (title.equals(String.valueOf(item))) {
+                    comboBox.getSelectionModel().select(item);
+                    break;
+                }
+            }
+        }
+
         comboBox.setOnAction(originalHandler);
     }
 
@@ -3102,6 +3117,7 @@ public class JFXUtil {
         });
     }
 
+    /*Used to enhance readability*/
     public static void onTabSelected(TabPane tabPane, Consumer<String> onTabTitleSelected) {
         tabPane.getSelectionModel()
                 .selectedItemProperty()

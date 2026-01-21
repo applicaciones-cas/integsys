@@ -58,7 +58,7 @@ import ph.com.guanzongroup.integsys.utility.JFXUtil;
  * @author Team 1
  */
 public class OtherPaymentStatusController implements Initializable, ScreenInterface {
-    
+
     private GRiderCAS oApp;
     private JSONObject poJSON;
     private static final int ROWS_PER_PAGE = 50;
@@ -66,21 +66,21 @@ public class OtherPaymentStatusController implements Initializable, ScreenInterf
     private final String pxeModuleName = "Other Payment Status Update";
     private OtherPaymentStatusUpdate poController;
     public int pnEditMode;
-    
+
     private String psIndustryId = "";
     private String psCompanyId = "";
     private String psCategoryId = "";
     ;
 
     private unloadForm poUnload = new unloadForm();
-    
+
     private ObservableList<ModelDisbursementVoucher_Main> main_data = FXCollections.observableArrayList();
     private FilteredList<ModelDisbursementVoucher_Main> filteredMain_Data;
-    
+
     private final Map<String, List<String>> highlightedRowsMain = new HashMap<>();
-    
+
     ObservableList<String> cCheckState = FXCollections.observableArrayList("FLOAT", "OPEN", "POSTED", "CANCELLED");
-    
+
     JFXUtil.ReloadableTableTask loadTableMain;
     @FXML
     private AnchorPane AnchorMain, apBrowse, apButton, apMaster;
@@ -102,22 +102,22 @@ public class OtherPaymentStatusController implements Initializable, ScreenInterf
     private TableColumn tblRowNo, tblBankName, tblBankAccount, tblCheckNo, tblReferenceNo;
     @FXML
     private Pagination pagination;
-    
+
     @Override
     public void setGRider(GRiderCAS foValue) {
         oApp = foValue;
     }
-    
+
     @Override
     public void setIndustryID(String fsValue) {
         psIndustryId = fsValue;
     }
-    
+
     @Override
     public void setCompanyID(String fsValue) {
         psCompanyId = fsValue;
     }
-    
+
     @Override
     public void setCategoryID(String fsValue) {
         psCategoryId = fsValue;
@@ -157,10 +157,10 @@ public class OtherPaymentStatusController implements Initializable, ScreenInterf
             ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
-    
+
     private void resetComboboxValue() {
         cCheckState = FXCollections.observableArrayList("FLOAT", "OPEN", "POSTED", "CANCELLED");
-        
+
         if (poController.Master().getTransactionStatus().equals(EditMode.UPDATE)) {
             switch (poController.Master().getDisbursementType()) {
                 case DisbursementStatic.DisbursementType.CHECK:
@@ -174,10 +174,10 @@ public class OtherPaymentStatusController implements Initializable, ScreenInterf
                     break;
             }
         }
-        
+
         JFXUtil.setComboBoxItems(new JFXUtil.Pairs<>(cCheckState, cmbPaymentStatus));
     }
-    
+
     @FXML
     void cmdButton_Click(ActionEvent event) {
         try {
@@ -195,7 +195,10 @@ public class OtherPaymentStatusController implements Initializable, ScreenInterf
                         ShowMessageFX.Warning((String) poJSON.get("message"), pxeModuleName, null);
                         return;
                     }
-                    
+                    if (poController.OtherPayments().getModel().getTransactionStatus().equals(OtherPaymentStatus.FLOAT)) {
+                        poController.OtherPayments().getModel().setTransactionStatus(OtherPaymentStatus.OPEN);
+                        loadRecordMaster();
+                    }
                     pnEditMode = poController.getEditMode();
                     break;
                 case "btnCancel":
@@ -224,7 +227,7 @@ public class OtherPaymentStatusController implements Initializable, ScreenInterf
                     if (!ShowMessageFX.YesNo(null, pxeModuleName, "Are you sure you want to save the transaction?")) {
                         return;
                     }
-                    
+
                     switch (poController.OtherPayments().getModel().getTransactionStatus()) {
                         case OtherPaymentStatus.CANCELLED:
                             poJSON = poController.ReturnTransaction("");
@@ -271,17 +274,17 @@ public class OtherPaymentStatusController implements Initializable, ScreenInterf
             ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
-    
+
     private void initDatePicker() {
         JFXUtil.setDatePickerFormat("MM/dd/yyyy", dpTransactionDate, dpPostingDate);
         JFXUtil.setActionListener(this::datepicker_Action, dpTransactionDate, dpPostingDate);
     }
-    
+
     private void initTextFields() {
         //Initialise  TextField KeyPressed
         JFXUtil.setFocusListener(txtBrowse_Focus, tfSearchBankName, tfSearchBankAccount, tfSearchDVNo, tfSearchIndustry);
         JFXUtil.setFocusListener(txtMaster_Focus, tfPaymentAmount);
-        
+
         JFXUtil.setKeyPressedListener(this::txtField_KeyPressed, apBrowse, apMaster);
     }
     ChangeListener<Boolean> txtBrowse_Focus = JFXUtil.FocusListener(TextField.class,
@@ -305,7 +308,7 @@ public class OtherPaymentStatusController implements Initializable, ScreenInterf
                 }
                 loadRecordSearch();
             });
-    
+
     ChangeListener<Boolean> txtMaster_Focus = JFXUtil.FocusListener(TextField.class,
             (lsID, lsValue) -> {
                 switch (lsID) {
@@ -313,7 +316,7 @@ public class OtherPaymentStatusController implements Initializable, ScreenInterf
                         break;
                 }
             });
-    
+
     EventHandler<ActionEvent> comboBoxActionListener = JFXUtil.CmbActionListener(
             (cmbId, selectedIndex, selectedValue) -> {
                 String selected = "";
@@ -341,13 +344,13 @@ public class OtherPaymentStatusController implements Initializable, ScreenInterf
                 }
                 loadRecordMaster();
             });
-    
+
     private void txtField_KeyPressed(KeyEvent event) {
         TextField txtField = (TextField) event.getSource();
         String lsID = (((TextField) event.getSource()).getId());
         String lsValue = (txtField.getText() == null ? "" : txtField.getText());
         poJSON = new JSONObject();
-        
+
         try {
             if (null != event.getCode()) {
                 switch (event.getCode()) {
@@ -399,7 +402,7 @@ public class OtherPaymentStatusController implements Initializable, ScreenInterf
         }
     }
     boolean pbSuccess = true;
-    
+
     private void datepicker_Action(ActionEvent event) {
         poJSON = new JSONObject();
         JFXUtil.setJSONSuccess(poJSON, "success");
@@ -411,7 +414,7 @@ public class OtherPaymentStatusController implements Initializable, ScreenInterf
                 SimpleDateFormat sdfFormat = new SimpleDateFormat(SQLUtil.FORMAT_SHORT_DATE);
                 LocalDate currentDate = null, transactionDate = null, referenceDate = null, selectedDate = null;
                 String lsServerDate = "", lsTransDate = "", lsRefDate = "", lsSelectedDate = "";
-                
+
                 if (inputText == null || "".equals(inputText) || "01/01/1900".equals(inputText)) {
                     return;
                 }
@@ -419,24 +422,24 @@ public class OtherPaymentStatusController implements Initializable, ScreenInterf
                 currentDate = LocalDate.parse(lsServerDate, DateTimeFormatter.ofPattern(SQLUtil.FORMAT_SHORT_DATE));
                 lsSelectedDate = sdfFormat.format(SQLUtil.toDate(JFXUtil.convertToIsoFormat(inputText), SQLUtil.FORMAT_SHORT_DATE));
                 selectedDate = LocalDate.parse(lsSelectedDate, DateTimeFormatter.ofPattern(SQLUtil.FORMAT_SHORT_DATE));
-                
+
                 switch (datePicker.getId()) {
                     case "dpPostingDate":
                         //back date not allowed
                         if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
                             lsTransDate = sdfFormat.format(poController.Master().getTransactionDate());
                             transactionDate = LocalDate.parse(lsTransDate, DateTimeFormatter.ofPattern(SQLUtil.FORMAT_SHORT_DATE));
-                            
+
                             if (selectedDate.isAfter(currentDate)) {
                                 JFXUtil.setJSONError(poJSON, "Future dates are not allowed.");
                                 pbSuccess = false;
                             }
-                            
+
                             if (pbSuccess && (selectedDate.isAfter(transactionDate))) {
                                 JFXUtil.setJSONError(poJSON, "Check date cannot be later than the transaction date.");
                                 pbSuccess = false;
                             }
-                            
+
                             if (pbSuccess) {
 //                                poController.OtherPayments().getModel().setCheckDate((SQLUtil.toDate(lsSelectedDate, SQLUtil.FORMAT_SHORT_DATE)));
                             } else {
@@ -458,7 +461,7 @@ public class OtherPaymentStatusController implements Initializable, ScreenInterf
             ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
-    
+
     private void loadRecordSearch() {
         try {
             tfSearchIndustry.setText(poController.getSearchIndustry());
@@ -471,28 +474,44 @@ public class OtherPaymentStatusController implements Initializable, ScreenInterf
             ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
-    
+
     private void loadRecordMaster() {
         try {
             resetComboboxValue();
             boolean lbShow = OtherPaymentStatus.POSTED.equals(poController.getOtherPayment(pnMain).getTransactionStatus());
             JFXUtil.setDisabled(!lbShow, tfReferenceNo, dpPostingDate);
             JFXUtil.setDisabled(true, tfSupplierBank, tfSupplierAccountNo);
-            
+
             tfTransactionNo.setText(poController.Master().getTransactionNo());
             dpTransactionDate.setValue(CustomCommonUtil.parseDateStringToLocalDate(SQLUtil.dateFormat(poController.Master().getTransactionDate(), SQLUtil.FORMAT_SHORT_DATE)));
-            
+
             tfBankName.setText(poController.OtherPayments().getModel().Banks().getBankName() != null ? poController.OtherPayments().getModel().Banks().getBankName() : "");
             tfBankAccount.setText(poController.OtherPayments().getModel().getBankAcountID() != null ? poController.OtherPayments().getModel().getBankAcountID() : "");
             tfReferenceNo.setText(poController.Master().Payee().getPayeeName() != null ? poController.Master().Payee().getPayeeName() : "");
-            JFXUtil.setCmbValue(cmbPaymentStatus, Integer.parseInt(poController.OtherPayments().getModel().getTransactionStatus()));
+
+            String selected = "";
+            switch (Integer.parseInt(poController.OtherPayments().getModel().getTransactionStatus())) {
+                case 0:
+                    selected = "FLOAT";
+                    break;
+                case 1:
+                    selected = "OPEN";
+                    break;
+                case 2:
+                    selected = "POSTED";
+                    break;
+                case 3:
+                    selected = "CANCELLED";
+                    break;
+            }
+            JFXUtil.setCmbValue(cmbPaymentStatus, selected);
             tfVoucherNo.setText(poController.Master().getVoucherNo());
             tfReferenceNo.setText(poController.OtherPayments().getModel().getReferNox());
             dpPostingDate.setValue(poController.OtherPayments().getModel().getTransactionDate() != null
                     ? CustomCommonUtil.parseDateStringToLocalDate(SQLUtil.dateFormat(poController.OtherPayments().getModel().getTransactionDate(), SQLUtil.FORMAT_SHORT_DATE))
                     : null);
             tfPaymentAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.OtherPayments().getModel().getTotalAmount(), true));
-            
+
             tfSupplierBank.setText("");
             tfSupplierAccountNo.setText("");
             JFXUtil.updateCaretPositions(apMaster);
@@ -501,13 +520,13 @@ public class OtherPaymentStatusController implements Initializable, ScreenInterf
             ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
-    
+
     private void initComboBoxes() {
         JFXUtil.setComboBoxItems(new JFXUtil.Pairs<>(cCheckState, cmbPaymentStatus));
         JFXUtil.setComboBoxActionListener(comboBoxActionListener, cmbPaymentStatus);
         JFXUtil.initComboBoxCellDesignColor("#FF8201", cmbPaymentStatus);
     }
-    
+
     private void initLoadTable() {
         loadTableMain = new JFXUtil.ReloadableTableTask(
                 tblViewMainList,
@@ -563,16 +582,16 @@ public class OtherPaymentStatusController implements Initializable, ScreenInterf
                     }
                 });
     }
-    
+
     private void initMainGrid() {
         JFXUtil.setColumnCenter(tblRowNo, tblCheckNo, tblReferenceNo);
         JFXUtil.setColumnLeft(tblBankName, tblBankAccount);
         JFXUtil.setColumnsIndexAndDisableReordering(tblViewMainList);
-        
+
         filteredMain_Data = new FilteredList<>(main_data, b -> true);
         tblViewMainList.setItems(filteredMain_Data);
     }
-    
+
     private void initTableOnClick() {
         tblViewMainList.setOnMouseClicked(event -> {
             if (pnEditMode != EditMode.UPDATE) {
@@ -584,11 +603,11 @@ public class OtherPaymentStatusController implements Initializable, ScreenInterf
                 }
             }
         });
-        
+
         JFXUtil.applyRowHighlighting(tblViewMainList, item -> ((ModelDisbursementVoucher_Main) item).getIndex01(), highlightedRowsMain);
         JFXUtil.adjustColumnForScrollbar(tblViewMainList);
     }
-    
+
     private void loadTableDetailFromMain() {
         poJSON = new JSONObject();
         ModelDisbursementVoucher_Main selected = (ModelDisbursementVoucher_Main) tblViewMainList.getSelectionModel().getSelectedItem();
@@ -614,7 +633,7 @@ public class OtherPaymentStatusController implements Initializable, ScreenInterf
             }
         }
     }
-    
+
     private void initButton(int fnEditMode) {
         boolean lbShow = (fnEditMode == EditMode.UPDATE);
         JFXUtil.setButtonsVisibility(!lbShow, btnClose);
@@ -632,7 +651,7 @@ public class OtherPaymentStatusController implements Initializable, ScreenInterf
             }
         }
     }
-    
+
     private void clearTextFields() {
         JFXUtil.clearTextFields(apMaster);
     }
