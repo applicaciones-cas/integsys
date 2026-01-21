@@ -36,7 +36,6 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javax.script.ScriptException;
 import org.guanzon.appdriver.agent.ShowMessageFX;
-import org.guanzon.appdriver.base.CommonUtils;
 import org.guanzon.appdriver.base.GRiderCAS;
 import org.guanzon.appdriver.base.GuanzonException;
 import org.guanzon.appdriver.base.MiscUtil;
@@ -69,10 +68,7 @@ public class OtherPaymentStatusController implements Initializable, ScreenInterf
 
     private String psIndustryId = "";
     private String psCompanyId = "";
-    private String psCategoryId = "";
-    private String psSearchBankName = "";
-    private String psSearchBankAccount = "";
-    private String psSearchCheckNo = "";
+    private String psCategoryId = "";;
 
     private unloadForm poUnload = new unloadForm();
 
