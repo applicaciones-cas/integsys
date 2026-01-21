@@ -97,9 +97,9 @@
                             <children>
                                 <HBox alignment="CENTER_LEFT" prefHeight="75.0" prefWidth="1482.0" spacing="5.0" style="-fx-background-color: E9E9E9;" styleClass="button_process" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                     <children>
-                                        <Button fx:id="btnClear" contentDisplay="TOP" ellipsisString="" minWidth="120.0" mnemonicParsing="false" onAction="#cmdButton_Click" prefHeight="70.0" prefWidth="70.0" styleClass="button_process" stylesheets="@../css/StyleSheet.css" text="Assign Status">
+                                        <Button fx:id="btnPost" contentDisplay="TOP" ellipsisString="" minWidth="120.0" mnemonicParsing="false" onAction="#cmdButton_Click" prefHeight="70.0" prefWidth="70.0" styleClass="button_process" stylesheets="@../css/StyleSheet.css" text="Post">
                                             <graphic>
-                                                <FontAwesomeIconView glyphName="EDIT" size="20" />
+                                                <FontAwesomeIconView glyphName="CHECK" size="20" />
                                             </graphic>
                                             <effect>
                                                 <Blend />

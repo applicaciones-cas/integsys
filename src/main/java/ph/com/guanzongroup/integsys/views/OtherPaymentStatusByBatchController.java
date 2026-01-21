@@ -80,7 +80,7 @@ public class OtherPaymentStatusByBatchController implements Initializable, Scree
     @FXML
     private TextField tfSearchBankName, tfSearchBankAccount, tfSearchIndustry, tfSearchDVNo;
     @FXML
-    private Button btnClear, btnRetrieve, btnClose;
+    private Button btnPost, btnRetrieve, btnClose;
     @FXML
     private TableView tblViewMainList;
     @FXML
@@ -168,19 +168,18 @@ public class OtherPaymentStatusByBatchController implements Initializable, Scree
 
     @FXML
     private void cmdButton_Click(ActionEvent event) {
-        try {
+//        try {
             poJSON = new JSONObject();
             String lsButton = ((Button) event.getSource()).getId();
 
             switch (lsButton) {
-                case "btnClear":
+                case "btnPost":
                     poJSON = validateSelectedItem();
                     if ("error".equals(poJSON.get("result"))) {
                         ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                         break;
                     }
                     if (!checkedItems.isEmpty()) {
-                        showAssignWindow(checkedItems);
                     }
                     break;
                 case "btnRetrieve":
@@ -197,10 +196,10 @@ public class OtherPaymentStatusByBatchController implements Initializable, Scree
                     ShowMessageFX.Warning("Please contact admin to assist about no button available", pxeModuleName, null);
                     break;
             }
-        } catch (SQLException ex) {
-            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
-            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
-        }
+//        } catch (SQLException ex) {
+//            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+//            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
+//        }
     }
 
     private void loadRecordSearch() {
@@ -291,6 +290,19 @@ public class OtherPaymentStatusByBatchController implements Initializable, Scree
         }
     }
 
+//    private void retrieveDisbursements() {
+//        try {
+//            poJSON = poController.loadTransactionList(tfSearchIndustry.getText(), tfSearchBankName.getText(), tfSearchBankAccount.getText(), tfSearchDVNo.getText());
+//            if ("success".equals(poJSON.get("result"))) {
+//                loadTableMain.reload();
+//            } else {
+//                ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+//            }
+//        } catch (SQLException | GuanzonException ex) {
+//            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+//            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
+//        }
+//    }
     private void initLoadTable() {
         loadTableMain = new JFXUtil.ReloadableTableTask(
                 tblViewMainList,
@@ -342,7 +354,7 @@ public class OtherPaymentStatusByBatchController implements Initializable, Scree
                                     } else {
                                         main_data.clear();
                                         checkedItem.clear();
-                                    } 
+                                    }
                                 } else {
                                     ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                     return;
@@ -368,6 +380,7 @@ public class OtherPaymentStatusByBatchController implements Initializable, Scree
                                     JFXUtil.selectAndFocusRow(tblViewMainList, pnMain);
                                 }
                                 JFXUtil.loadTab(pagination, main_data.size(), ROWS_PER_PAGE, tblViewMainList, filteredMain_Data);
+                                initButtons();
                             } catch (SQLException | GuanzonException ex) {
                                 Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
                                 ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
@@ -430,7 +443,7 @@ public class OtherPaymentStatusByBatchController implements Initializable, Scree
     }
 
     private void initButtons() {
-        JFXUtil.setButtonsVisibility(!main_data.isEmpty(), btnClear);
+        JFXUtil.setButtonsVisibility(!main_data.isEmpty(), btnPost);
     }
 
     private JSONObject validateSelectedItem() {
@@ -460,12 +473,12 @@ public class OtherPaymentStatusByBatchController implements Initializable, Scree
         boolean allSameBank = true;
         String firstBank = null, firstStatus = null;
 
-        for (int lnCtr = 0; lnCtr <= checkedItems.size() - 1; lnCtr++) {
+        for (int lnCtr = 0; lnCtr < checkedItems.size() - 1; lnCtr++) {
             String lsDVNO = (checkedItems.get(lnCtr));
             if (firstBank == null) {
                 firstBank = banks.get(lnCtr); // store the first encountered bank
                 firstStatus = status.get(lnCtr);
-            } else if (!firstBank.equals(banks) && !firstStatus.equals(status)) {
+            } else if (!firstBank.equals(banks.get(lnCtr)) && !firstStatus.equals(status.get(lnCtr))) {
                 allSameBank = false;
                 break; // no need to continue checking
             }
@@ -480,28 +493,6 @@ public class OtherPaymentStatusByBatchController implements Initializable, Scree
         }
         poJSON.put("result", "success");
         return poJSON;
-    }
-
-    public void showAssignWindow(List<String> fsTransactionNos) throws SQLException {
-        poJSON = new JSONObject();
-        stageAssign.closeDialog();
-
-        CheckClearingAssignController controller = new CheckClearingAssignController();
-        controller.setGRider(oApp);
-//        controller.setCheckStatusUpdate(poController);
-        controller.setTransaction(fsTransactionNos);  // Pass the list here
-        try {
-            stageAssign.setOnHidden(event -> {
-                chckSelectAll.setSelected(false);
-                loadTableMain.reload();
-                checkedItem.clear();
-            });
-            stageAssign.showDialog((Stage) AnchorMain.getScene().getWindow(), getClass().getResource("/ph/com/guanzongroup/integsys/views/CheckClearingAssign.fxml"), controller,
-                    "Assign Dialog", true, true, false);
-        } catch (IOException ex) {
-            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
-            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
-        }
     }
 
     public void showDVWindow(String fsTransactionNo) throws SQLException {
