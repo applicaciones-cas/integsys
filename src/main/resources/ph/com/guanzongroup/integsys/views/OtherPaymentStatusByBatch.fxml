@@ -164,8 +164,8 @@
                                                                 <TableColumn fx:id="tblBankAccount" maxWidth="180.0" minWidth="180.0" prefWidth="180.0" resizable="false" sortable="false" text="Bank Account" />
                                                                 <TableColumn fx:id="tblReferenceNo" maxWidth="180.0" minWidth="180.0" prefWidth="180.0" resizable="false" sortable="false" text="Reference No." />
                                                                 <TableColumn fx:id="tblPostDate" maxWidth="180.0" minWidth="180.0" prefWidth="180.0" resizable="false" sortable="false" text="Post Date" />
-                                                <TableColumn fx:id="tblPaymentStatus" maxWidth="150.0" minWidth="150.0" prefWidth="150.0" resizable="false" sortable="false" text="Payment Status" />
-                                                                <TableColumn fx:id="tblPaymentAmount" maxWidth="150.0" minWidth="150.0" prefWidth="150.0" resizable="false" sortable="false" text="Payment Amount" />
+                                                <TableColumn fx:id="tblPaymentStatus" maxWidth="120.0" minWidth="120.0" prefWidth="120.0" resizable="false" sortable="false" text="Payment Status" />
+                                                                <TableColumn fx:id="tblPaymentAmount" maxWidth="120.0" minWidth="120.0" prefWidth="120.0" resizable="false" sortable="false" text="Payment Amount" />
                                                             </columns>
                                                             <GridPane.margin>
                                                                 <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
