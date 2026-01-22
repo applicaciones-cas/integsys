@@ -353,7 +353,7 @@ public class OtherPaymentStatusByBatchController implements Initializable, Scree
                                                 lsDVType = "BANK TRANSFER";
                                                 break;
                                             default:
-                                                lsDVType = "E-WALLET";
+                                                lsDVType = "DIGITAL PAYMENT";
                                                 break;
                                         }
                                         main_data.add(new ModelDisbursementVoucher_Main(
