@@ -131,10 +131,8 @@ public class OtherPaymentStatusByBatchController implements Initializable, Scree
             initButtons();
             initLoadTable();
             initCheckboxes();
-            if (main_data.isEmpty()) {
-                checkedItems.clear();
-            }
             Platform.runLater(() -> {
+                poController.setTransactionStatus(OtherPaymentStatus.OPEN);
                 poController.setIndustryID(psIndustryId);
                 poController.setCompanyID(psCompanyId);
                 poController.Master().setIndustryID(psIndustryId);
@@ -175,6 +173,10 @@ public class OtherPaymentStatusByBatchController implements Initializable, Scree
         String lsButton = ((Button) event.getSource()).getId();
         switch (lsButton) {
             case "btnPost":
+                if (checkedItems.isEmpty()) {
+                    ShowMessageFX.Information(null, pxeModuleName, "No items selected to post.");
+                    return;
+                }
                 if (ShowMessageFX.YesNo(null, pxeModuleName, "Are you sure you want to post the selected disbursement(s)?")) {
                     poJSON = validateSelectedItem();
                     if ("error".equals(poJSON.get("result"))) {

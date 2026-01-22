@@ -146,6 +146,7 @@ public class OtherPaymentStatusController implements Initializable, ScreenInterf
             initButton(pnEditMode);
             pagination.setPageCount(0);
             Platform.runLater(() -> {
+                poController.setTransactionStatus(OtherPaymentStatus.OPEN + OtherPaymentStatus.FLOAT);
                 poController.setCompanyID(psCompanyId);
                 poController.setIndustryID(psIndustryId);
                 poController.Master().setIndustryID(psIndustryId);
