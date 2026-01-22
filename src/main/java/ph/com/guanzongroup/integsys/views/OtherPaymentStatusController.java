@@ -87,7 +87,7 @@ public class OtherPaymentStatusController implements Initializable, ScreenInterf
     @FXML
     private Label lblSource;
     @FXML
-    private TextField tfSearchIndustry, tfSearchBankName, tfSearchBankAccount, tfSearchDVNo, tfTransactionNo, tfBankName, tfBankAccount, tfSupplierBank, tfVoucherNo, tfReferenceNo, tfPaymentAmount, tfSupplierAccountNo, tfDisbursementType;
+    private TextField tfSearchIndustry, tfSearchBankName, tfSearchBankAccount, tfSearchDVNo, tfTransactionNo, tfBankName, tfBankAccount, tfSupplierBank, tfSupplierAccountNo, tfVoucherNo, tfReferenceNo, tfPaymentAmount, tfDisbursementType;
     @FXML
     private HBox hbButtons;
     @FXML
@@ -99,7 +99,7 @@ public class OtherPaymentStatusController implements Initializable, ScreenInterf
     @FXML
     private TableView tblViewMainList;
     @FXML
-    private TableColumn tblRowNo, tblBankName, tblBankAccount, tblCheckNo, tblReferenceNo;
+    private TableColumn tblRowNo, tblDVNo, tblDVDate, tblBankName, tblBankAccount, tblReferenceNo;
     @FXML
     private Pagination pagination;
 
@@ -553,9 +553,11 @@ public class OtherPaymentStatusController implements Initializable, ScreenInterf
                                         for (int lnCntr = 0; lnCntr <= poController.getOtherPaymentList().size() - 1; lnCntr++) {
                                             main_data.add(new ModelDisbursementVoucher_Main(
                                                     String.valueOf(lnCntr + 1),
+                                                    poController.getOtherPayment(lnCntr).getVoucherNo(),
+                                                    CustomCommonUtil.formatDateToShortString(poController.getOtherPayment(lnCntr).getTransactionDate()),
                                                     poController.getOtherPayment(lnCntr).OtherPayments().Banks().getBankName(),
                                                     poController.getOtherPayment(lnCntr).OtherPayments().Bank_Account_Master().getAccountNo(),
-                                                    poController.getOtherPayment(lnCntr).getVoucherNo(),
+                                                    poController.getOtherPayment(lnCntr).OtherPayments().getReferNox(),
                                                     poController.getOtherPayment(lnCntr).getTransactionNo()
                                             ));
                                             if (OtherPaymentStatus.POSTED.equals(poController.getOtherPayment(lnCntr).OtherPayments().getTransactionStatus())) {
@@ -594,7 +596,7 @@ public class OtherPaymentStatusController implements Initializable, ScreenInterf
     }
 
     private void initMainGrid() {
-        JFXUtil.setColumnCenter(tblRowNo, tblCheckNo, tblReferenceNo);
+        JFXUtil.setColumnCenter(tblRowNo, tblDVNo, tblDVDate, tblReferenceNo);
         JFXUtil.setColumnLeft(tblBankName, tblBankAccount);
         JFXUtil.setColumnsIndexAndDisableReordering(tblViewMainList);
 
