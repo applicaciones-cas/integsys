@@ -50,8 +50,8 @@
                                                 <ColumnConstraints halignment="RIGHT" hgrow="ALWAYS" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="10.0" />
                                                 <ColumnConstraints halignment="RIGHT" hgrow="ALWAYS" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="150.0" />
                                                 <ColumnConstraints halignment="CENTER" hgrow="ALWAYS" maxWidth="50.0" minWidth="50.0" prefWidth="50.0" />
-                                                <ColumnConstraints halignment="RIGHT" hgrow="ALWAYS" maxWidth="348.0" minWidth="348.0" prefWidth="348.0" />
-                                    <ColumnConstraints halignment="RIGHT" hgrow="ALWAYS" maxWidth="1.7976931348623157E308" minWidth="200.0" prefWidth="227.0" />
+                                                <ColumnConstraints halignment="RIGHT" hgrow="ALWAYS" maxWidth="319.0" minWidth="319.0" prefWidth="319.0" />
+                                    <ColumnConstraints halignment="RIGHT" hgrow="ALWAYS" maxWidth="1.7976931348623157E308" minWidth="200.0" prefWidth="256.0" />
                                             </columnConstraints>
                                             <rowConstraints>
                                                 <RowConstraints />
@@ -78,7 +78,7 @@
                                                         <Font name="System Bold" size="14.0" />
                                                     </font>
                                                 </Label>
-                                                <Label fx:id="lblSource" alignment="CENTER_RIGHT" maxWidth="1.7976931348623157E308" prefHeight="20.0" prefWidth="348.0" text="Company - Industry" GridPane.columnIndex="16" GridPane.rowIndex="1">
+                                                <Label fx:id="lblSource" alignment="CENTER_RIGHT" maxWidth="1.7976931348623157E308" prefHeight="20.0" prefWidth="356.0" text="Company - Industry" GridPane.columnIndex="16" GridPane.rowIndex="1">
                                                     <font>
                                                         <Font name="System Bold" size="14.0" />
                                                     </font>
@@ -252,10 +252,11 @@
                                                         <TableView fx:id="tblViewMainList" minWidth="242.0" GridPane.rowIndex="1">
                                                             <columns>
                                                                 <TableColumn fx:id="tblRowNo" maxWidth="30.0" minWidth="30.0" prefWidth="30.0" resizable="false" sortable="false" text="No." />
-                                                                <TableColumn fx:id="tblBankName" maxWidth="236.0" minWidth="236.0" prefWidth="236.0" resizable="false" sortable="false" text="Bank Name" />
-                                                                <TableColumn fx:id="tblBankAccount" maxWidth="236.0" minWidth="236.0" prefWidth="236.0" resizable="false" sortable="false" text="Bank Account" />
-                                                                <TableColumn fx:id="tblCheckNo" maxWidth="120.0" minWidth="120.0" prefWidth="120.0" resizable="false" sortable="false" text="Check No." />
-                                                                <TableColumn fx:id="tblReferenceNo" maxWidth="150.0" minWidth="150.0" prefWidth="150.0" resizable="false" sortable="false" text="Refer No." />
+                                                <TableColumn fx:id="tblDVNo" maxWidth="88.0" minWidth="88.0" prefWidth="88.0" resizable="false" sortable="false" text="DV No." />
+                                                <TableColumn fx:id="tblDVDate" maxWidth="110.0" minWidth="110.0" prefWidth="110.0" resizable="false" sortable="false" text="DV Date" />
+                                                                <TableColumn fx:id="tblBankName" maxWidth="192.0" minWidth="192.0" prefWidth="192.0" resizable="false" sortable="false" text="Bank Name" />
+                                                                <TableColumn fx:id="tblBankAccount" maxWidth="192.0" minWidth="192.0" prefWidth="192.0" resizable="false" sortable="false" text="Bank Account" />
+                                                                <TableColumn fx:id="tblReferenceNo" maxWidth="150.0" minWidth="118.0" prefWidth="127.0" resizable="false" sortable="false" text="Refer No." />
                                                             </columns>
                                                             <GridPane.margin>
                                                                 <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
