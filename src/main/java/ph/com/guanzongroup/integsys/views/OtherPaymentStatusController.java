@@ -375,7 +375,7 @@ public class OtherPaymentStatusController implements Initializable, ScreenInterf
                                 retrieveDisbursements();
                                 break;
                             case "tfSearchBankAccount":
-                                poJSON = poController.SearchBankAccount(lsValue, poController.getSearchBankId(), false);
+                                poJSON = poController.SearchBankAccount(lsValue, poController.getSearchBankId());
                                 if ("error".equals((String) poJSON.get("result"))) {
                                     ShowMessageFX.Warning((String) poJSON.get("message"), pxeModuleName, null);
                                     return;

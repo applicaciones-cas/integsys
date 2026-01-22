@@ -258,7 +258,7 @@ public class OtherPaymentStatusByBatchController implements Initializable, Scree
                                 retrieveDisbursements();
                                 break;
                             case "tfSearchBankAccount":
-                                poJSON = poController.SearchBankAccount(lsValue, poController.getSearchBankId(), false);
+                                poJSON = poController.SearchBankAccount(lsValue, poController.getSearchBankId());
                                 if ("error".equals((String) poJSON.get("result"))) {
                                     ShowMessageFX.Warning((String) poJSON.get("message"), pxeModuleName, null);
                                     return;
@@ -325,6 +325,24 @@ public class OtherPaymentStatusByBatchController implements Initializable, Scree
                                 main_data.clear();
                                 if (poController.getOtherPaymentList().size() > 0) {
                                     for (int lnCntr = 0; lnCntr <= poController.getOtherPaymentList().size() - 1; lnCntr++) {
+                                        String lsStatus;
+                                        switch (poController.getOtherPayment(lnCntr).OtherPayments().getTransactionStatus()) {
+                                            case OtherPaymentStatus.FLOAT:
+                                                lsStatus = "FLOAT";
+                                                break;
+                                            case OtherPaymentStatus.OPEN:
+                                                lsStatus = "OPEN";
+                                                break;
+                                            case OtherPaymentStatus.POSTED:
+                                                lsStatus = "POSTED";
+                                                break;
+                                            case OtherPaymentStatus.CANCELLED:
+                                                lsStatus = "CANCELLED";
+                                                break;
+                                            default:
+                                                lsStatus = "UNKNOWN";
+                                                break;
+                                        }
                                         main_data.add(new ModelDisbursementVoucher_Main(
                                                 String.valueOf(lnCntr + 1),
                                                 checkedItem.get(lnCntr),
@@ -334,7 +352,7 @@ public class OtherPaymentStatusByBatchController implements Initializable, Scree
                                                 poController.getOtherPayment(lnCntr).OtherPayments().Banks().getBankName(),
                                                 poController.getOtherPayment(lnCntr).OtherPayments().Bank_Account_Master().getAccountNo(),
                                                 poController.getOtherPayment(lnCntr).OtherPayments().getReferNox(),
-                                                JFXUtil.setStatusValue(null, OtherPaymentStatus.class, poController.getOtherPayment(lnCntr).OtherPayments().getTransactionStatus()),
+                                                lsStatus,
                                                 CustomCommonUtil.setIntegerValueToDecimalFormat(poController.getOtherPayment(lnCntr).OtherPayments().getTotalAmount(), true),
                                                 poController.getOtherPayment(lnCntr).getTransactionNo()
                                         ));
