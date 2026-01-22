@@ -251,7 +251,7 @@ public class OtherPaymentStatusController implements Initializable, ScreenInterf
                     JFXUtil.disableAllHighlightByColor(tblViewMainList, "#A7C7E7", highlightedRowsMain);
                     break;
                 case "btnRetrieve":
-                    loadTableMain.reload();
+                    retrieveDisbursements();
                     break;
                 case "btnClose":
                     if (ShowMessageFX.YesNo("Are you sure you want to close this Tab?", "Close Tab", null)) {
@@ -372,7 +372,7 @@ public class OtherPaymentStatusController implements Initializable, ScreenInterf
                                     return;
                                 }
                                 loadRecordSearch();
-                                loadTableMain.reload();
+                                retrieveDisbursements();
                                 break;
                             case "tfSearchBankAccount":
                                 poJSON = poController.SearchBankAccount(lsValue, poController.getSearchBankId(), false);
@@ -381,7 +381,7 @@ public class OtherPaymentStatusController implements Initializable, ScreenInterf
                                     return;
                                 }
                                 loadRecordSearch();
-                                loadTableMain.reload();
+                                retrieveDisbursements();
                                 break;
                             case "tfSearchIndustry":
                                 poJSON = poController.SearchIndustry(lsValue, false);
@@ -390,10 +390,10 @@ public class OtherPaymentStatusController implements Initializable, ScreenInterf
                                     break;
                                 }
                                 loadRecordSearch();
-                                loadTableMain.reload();
+                                retrieveDisbursements();
                                 break;
                             case "tfSearchDVNo":
-                                loadTableMain.reload();
+                                retrieveDisbursements();
                                 break;
                         }
                         event.consume();
@@ -537,6 +537,20 @@ public class OtherPaymentStatusController implements Initializable, ScreenInterf
         JFXUtil.initComboBoxCellDesignColor("#FF8201", cmbPaymentStatus);
     }
 
+    private void retrieveDisbursements() {
+        try {
+            poJSON = poController.loadTransactionList(tfSearchIndustry.getText(), tfSearchBankName.getText(), tfSearchBankAccount.getText(), tfSearchDVNo.getText());
+            if ("success".equals(poJSON.get("result"))) {
+            } else {
+                ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+            }
+            loadTableMain.reload();
+        } catch (SQLException | GuanzonException ex) {
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
+        }
+    }
+
     private void initLoadTable() {
         loadTableMain = new JFXUtil.ReloadableTableTask(
                 tblViewMainList,
@@ -547,30 +561,26 @@ public class OtherPaymentStatusController implements Initializable, ScreenInterf
                         Platform.runLater(() -> {
                             try {
                                 main_data.clear();
-                                poJSON = poController.loadTransactionList(tfSearchIndustry.getText(), tfSearchBankName.getText(), tfSearchBankAccount.getText(), tfSearchDVNo.getText());
-                                if ("success".equals(poJSON.get("result"))) {
-                                    if (poController.getOtherPaymentList().size() > 0) {
-                                        for (int lnCntr = 0; lnCntr <= poController.getOtherPaymentList().size() - 1; lnCntr++) {
-                                            main_data.add(new ModelDisbursementVoucher_Main(
-                                                    String.valueOf(lnCntr + 1),
-                                                    poController.getOtherPayment(lnCntr).getVoucherNo(),
-                                                    CustomCommonUtil.formatDateToShortString(poController.getOtherPayment(lnCntr).getTransactionDate()),
-                                                    poController.getOtherPayment(lnCntr).OtherPayments().Banks().getBankName(),
-                                                    poController.getOtherPayment(lnCntr).OtherPayments().Bank_Account_Master().getAccountNo(),
-                                                    poController.getOtherPayment(lnCntr).OtherPayments().getReferNox(),
-                                                    poController.getOtherPayment(lnCntr).getTransactionNo()
-                                            ));
-                                            if (OtherPaymentStatus.POSTED.equals(poController.getOtherPayment(lnCntr).OtherPayments().getTransactionStatus())) {
-                                                JFXUtil.highlightByKey(tblViewMainList, String.valueOf(lnCntr + 1), "#C1E1C1", highlightedRowsMain);
-                                            }
+                                if (poController.getOtherPaymentList().size() > 0) {
+                                    for (int lnCntr = 0; lnCntr <= poController.getOtherPaymentList().size() - 1; lnCntr++) {
+                                        main_data.add(new ModelDisbursementVoucher_Main(
+                                                String.valueOf(lnCntr + 1),
+                                                poController.getOtherPayment(lnCntr).getVoucherNo(),
+                                                CustomCommonUtil.formatDateToShortString(poController.getOtherPayment(lnCntr).getTransactionDate()),
+                                                poController.getOtherPayment(lnCntr).OtherPayments().Banks().getBankName(),
+                                                poController.getOtherPayment(lnCntr).OtherPayments().Bank_Account_Master().getAccountNo(),
+                                                poController.getOtherPayment(lnCntr).OtherPayments().getReferNox(),
+                                                poController.getOtherPayment(lnCntr).getTransactionNo()
+                                        ));
+                                        if (OtherPaymentStatus.POSTED.equals(poController.getOtherPayment(lnCntr).OtherPayments().getTransactionStatus())) {
+                                            JFXUtil.highlightByKey(tblViewMainList, String.valueOf(lnCntr + 1), "#C1E1C1", highlightedRowsMain);
                                         }
-                                    } else {
-                                        main_data.clear();
-                                        filteredMain_Data.clear();
                                     }
                                 } else {
-                                    ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                                    main_data.clear();
+                                    filteredMain_Data.clear();
                                 }
+
                                 if (pnMain < 0 || pnMain
                                         >= main_data.size()) {
                                     if (!main_data.isEmpty()) {
@@ -633,7 +643,7 @@ public class OtherPaymentStatusController implements Initializable, ScreenInterf
             try {
                 int pnRowMain = Integer.parseInt(selected.getIndex01()) - 1;
                 pnMain = pnRowMain;
-                String lsTransactionNo = selected.getIndex05();
+                String lsTransactionNo = selected.getIndex07();
                 clearTextFields();
                 poJSON = poController.OpenTransaction(lsTransactionNo);
                 if ("error".equals(poJSON.get("result"))) {
