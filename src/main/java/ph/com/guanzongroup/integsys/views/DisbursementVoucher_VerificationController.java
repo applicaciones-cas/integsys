@@ -230,6 +230,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
                 poController.setCompanyID(psCompanyId);
                 poController.setCategoryID(psCategoryId);
                 poController.Master().setBranchCode(oApp.getBranchCode());
+                poController.setTransactionStatus(DisbursementStatic.OPEN+DisbursementStatic.VERIFIED+DisbursementStatic.RETURNED);
                 loadRecordSearch();
             });
             initAttachmentPreviewPane();
@@ -707,11 +708,6 @@ public class DisbursementVoucher_VerificationController implements Initializable
                                 if (poController.getMasterList().size() > 0) {
                                     for (int lnCtr = 0; lnCtr <= poController.getMasterList().size() - 1; lnCtr++) {
                                         String lsPaymentForm = "";
-                                        //Retrieve Open or Returned DV transactions only
-                                        if (!JFXUtil.isObjectEqualTo(poController.getMaster(lnCtr).getTransactionStatus(),
-                                                DisbursementStatic.OPEN, DisbursementStatic.RETURNED, DisbursementStatic.VERIFIED)) {
-                                            continue;
-                                        }
                                         lsPaymentForm = JFXUtil.setStatusValue(null, DisbursementStatic.DisbursementType.class, poController.getMaster(lnCtr).getDisbursementType());
                                         lnRowNo += 1;
                                         main_data.add(new ModelDisbursementVoucher_Main(
