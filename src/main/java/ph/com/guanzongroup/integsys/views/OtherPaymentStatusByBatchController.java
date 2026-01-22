@@ -512,6 +512,7 @@ public class OtherPaymentStatusByBatchController implements Initializable, Scree
                     break;
                 }
 
+                poController.OtherPayments().getModel().setTransactionStatus(OtherPaymentStatus.POSTED);
                 poController.OtherPayments().getModel().setPostedDate(oApp.getServerDate());
                 poJSON = poController.SaveTransaction();
                 if ("error".equals((String) poJSON.get("result"))) {
@@ -531,7 +532,7 @@ public class OtherPaymentStatusByBatchController implements Initializable, Scree
             }
 
             if (lbSuccess) {
-                ShowMessageFX.Warning(null, pxeModuleName, "Reference No: " + lsRefNo + " Successfully posted.");
+                ShowMessageFX.Information(null, pxeModuleName, "Reference No: " + lsRefNo + " Successfully posted.");
             }
 
         } catch (CloneNotSupportedException | GuanzonException | ScriptException | SQLException ex) {
