@@ -508,12 +508,12 @@ public class OtherPaymentStatusByBatchController implements Initializable, Scree
             for (int lnCtr = 0; lnCtr < fsTransactionNos.size(); lnCtr++) {
                 poJSON = poController.OpenTransaction(fsTransactionNos.get(lnCtr));
                 if ("error".equals((String) poJSON.get("result"))) {
-                    ShowMessageFX.Warning(null, pxeModuleName, "Transaction posting has been terminated due to an error in DV No" + fsDVNos.get(lnCtr) + ":\n" + (String) poJSON.get("message"));
+                    ShowMessageFX.Warning((String) poJSON.get("message"), pxeModuleName, "Transaction posting has been terminated due to an error in DV No " + fsDVNos.get(lnCtr));
                     break;
                 }
                 poJSON = poController.UpdateTransaction();
                 if ("error".equals((String) poJSON.get("result"))) {
-                    ShowMessageFX.Warning(null, pxeModuleName, "Transaction posting has been terminated due to an error in DV No" + fsDVNos.get(lnCtr) + ":\n" + (String) poJSON.get("message"));
+                    ShowMessageFX.Warning((String) poJSON.get("message"), pxeModuleName, "Transaction posting has been terminated due to an error in DV No " + fsDVNos.get(lnCtr));
                     break;
                 }
 
@@ -521,7 +521,7 @@ public class OtherPaymentStatusByBatchController implements Initializable, Scree
                 poController.OtherPayments().getModel().setPostedDate(oApp.getServerDate());
                 poJSON = poController.SaveTransaction();
                 if ("error".equals((String) poJSON.get("result"))) {
-                    ShowMessageFX.Warning(null, pxeModuleName, "Transaction posting has been terminated due to an error in DV No " + fsDVNos.get(lnCtr) + ":\n" + (String) poJSON.get("message"));
+                    ShowMessageFX.Warning((String) poJSON.get("message"), pxeModuleName, "Transaction posting has been terminated due to an error in DV No " + fsDVNos.get(lnCtr));
                     break;
                 }
 
