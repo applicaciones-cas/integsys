@@ -196,9 +196,15 @@ public class OtherPaymentStatusController implements Initializable, ScreenInterf
                         ShowMessageFX.Warning((String) poJSON.get("message"), pxeModuleName, null);
                         return;
                     }
+
                     if (poController.OtherPayments().getModel().getTransactionStatus().equals(OtherPaymentStatus.FLOAT)) {
-                        poController.OtherPayments().getModel().setTransactionStatus((OtherPaymentStatus.OPEN));
+                        if (poController.Master().getDisbursementType().equals(DisbursementStatic.DisbursementType.DIGITAL_PAYMENT)) {
+                            poController.OtherPayments().getModel().setTransactionStatus((OtherPaymentStatus.POSTED));
+                        } else {
+                            poController.OtherPayments().getModel().setTransactionStatus((OtherPaymentStatus.OPEN));
+                        }
                     }
+
                     pnEditMode = poController.getEditMode();
                     loadRecordMaster();
                     break;
@@ -441,9 +447,12 @@ public class OtherPaymentStatusController implements Initializable, ScreenInterf
                                 JFXUtil.setJSONError(poJSON, "Future dates are not allowed.");
                                 pbSuccess = false;
                             }
-
+                            if (selectedDate.isBefore(transactionDate)) {
+                                JFXUtil.setJSONError(poJSON, "Posting date cannot be before than the transaction date.");
+                                pbSuccess = false;
+                            }
                             if (pbSuccess && (selectedDate.isAfter(transactionDate))) {
-                                JFXUtil.setJSONError(poJSON, "Check date cannot be later than the transaction date.");
+                                JFXUtil.setJSONError(poJSON, "Posting date cannot be later than the transaction date.");
                                 pbSuccess = false;
                             }
 
@@ -484,9 +493,23 @@ public class OtherPaymentStatusController implements Initializable, ScreenInterf
 
     private void loadRecordMaster() {
         try {
-            resetComboboxValue();
             boolean lbShow = OtherPaymentStatus.POSTED.equals(poController.OtherPayments().getModel().getTransactionStatus());
-            JFXUtil.setDisabled(!lbShow, dpPostingDate);
+
+            if (poController.OtherPayments().getModel().getTransactionStatus().equals(OtherPaymentStatus.POSTED) && pnEditMode == EditMode.UPDATE) {
+                if (JFXUtil.isObjectEqualTo(poController.OtherPayments().getModel().getPostedDate(), null, "")) {
+                    SimpleDateFormat sdfFormat = new SimpleDateFormat(SQLUtil.FORMAT_SHORT_DATE);
+                    String lsTransDate = sdfFormat.format(poController.Master().getTransactionDate());
+                    poController.OtherPayments().getModel().setPostedDate(SQLUtil.toDate(lsTransDate, SQLUtil.FORMAT_SHORT_DATE));
+                }
+            }
+            if (!lbShow) {
+//                poController.OtherPayments().getModel().setPostedDate(null);
+            }
+
+            resetComboboxValue();
+            Platform.runLater(() -> {
+                JFXUtil.setDisabled(!lbShow, dpPostingDate);
+            });
             JFXUtil.setDisabled(true, tfSupplierBank, tfSupplierAccountNo);
 
             tfTransactionNo.setText(poController.Master().getTransactionNo());
