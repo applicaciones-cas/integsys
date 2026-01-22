@@ -410,8 +410,8 @@ public class OtherPaymentStatusByBatchController implements Initializable, Scree
     }
 
     private void initMainGrid() {
-        JFXUtil.setColumnCenter(tblRowNo, tblDVNo, tblDVDate, tblReferenceNo, tblDisbursementType);
-        JFXUtil.setColumnLeft(tblCheckBox, tblBankName, tblBankAccount, tblPaymentStatus);
+        JFXUtil.setColumnCenter(tblRowNo, tblDVNo, tblDVDate, tblReferenceNo, tblDisbursementType,tblPaymentStatus);
+        JFXUtil.setColumnLeft(tblCheckBox, tblBankName, tblBankAccount);
         JFXUtil.setColumnRight(tblPaymentAmount);
         JFXUtil.setColumnsIndexAndDisableReordering(tblViewMainList);
 
@@ -488,7 +488,7 @@ public class OtherPaymentStatusByBatchController implements Initializable, Scree
         boolean allSameBank = true;
         String firstBank = null, firstStatus = null;
 
-        for (int lnCtr = 0; lnCtr < checkedItems.size() - 1; lnCtr++) {
+        for (int lnCtr = 0; lnCtr < checkedItems.size(); lnCtr++) {
             String lsDVNO = (checkedItems.get(lnCtr));
             if (firstBank == null) {
                 firstBank = banks.get(lnCtr); // store the first encountered bank
@@ -497,7 +497,6 @@ public class OtherPaymentStatusByBatchController implements Initializable, Scree
                 allSameBank = false;
                 break; // no need to continue checking
             }
-            checkedItems.add(lsDVNO);
         }
         if (!allSameBank) {
             poJSON.put("message", "Selected items must belong to the same bank and payment status.");
