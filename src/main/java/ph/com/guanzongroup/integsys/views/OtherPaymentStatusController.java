@@ -502,8 +502,8 @@ public class OtherPaymentStatusController implements Initializable, ScreenInterf
                     poController.OtherPayments().getModel().setPostedDate(SQLUtil.toDate(lsTransDate, SQLUtil.FORMAT_SHORT_DATE));
                 }
             }
-            if (!lbShow) {
-//                poController.OtherPayments().getModel().setPostedDate(null);
+            if (!lbShow && pnEditMode == EditMode.UPDATE) {
+                poController.OtherPayments().getModel().setPostedDate(null);
             }
 
             resetComboboxValue();
