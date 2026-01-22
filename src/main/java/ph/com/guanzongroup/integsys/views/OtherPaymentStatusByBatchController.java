@@ -73,6 +73,7 @@ public class OtherPaymentStatusByBatchController implements Initializable, Scree
     BooleanProperty disableRowCheckbox = new SimpleBooleanProperty(false);
     ArrayList<String> checkedItem = new ArrayList<>();
     ArrayList<String> checkedItems = new ArrayList<>();
+    ArrayList<String> checkedItemsDVNo = new ArrayList<>();
     JFXUtil.StageManager stageDV = new JFXUtil.StageManager();
     JFXUtil.StageManager stageAssign = new JFXUtil.StageManager();
     @FXML
@@ -182,7 +183,8 @@ public class OtherPaymentStatusByBatchController implements Initializable, Scree
                     break;
                 }
                 if (!checkedItems.isEmpty()) {
-                    postTransaction(checkedItems);
+                    postTransaction(checkedItems, checkedItemsDVNo);
+                    retrieveDisbursements();
                 }
                 break;
             case "btnRetrieve":
@@ -455,6 +457,7 @@ public class OtherPaymentStatusByBatchController implements Initializable, Scree
         ArrayList<String> banks = new ArrayList<>();
         ArrayList<String> status = new ArrayList<>();
         checkedItems.clear();
+        checkedItemsDVNo.clear();
         for (Object item : tblViewMainList.getItems()) {
             ModelDisbursementVoucher_Main item1 = (ModelDisbursementVoucher_Main) item;
             String lschecked = item1.getIndex02();
@@ -463,6 +466,7 @@ public class OtherPaymentStatusByBatchController implements Initializable, Scree
             String lsStatus = item1.getIndex09();
             if (lschecked.equals("1")) {
                 checkedItems.add(lsTransactionNo);
+                checkedItemsDVNo.add(item1.getIndex03());
                 banks.add(lsbanks);
                 status.add(lsStatus);
             }
@@ -495,20 +499,21 @@ public class OtherPaymentStatusByBatchController implements Initializable, Scree
         return poJSON;
     }
 
-    public void postTransaction(List<String> fsTransactionNos) {
+    public void postTransaction(List<String> fsTransactionNos, List<String> fsDVNos) {
         poJSON = new JSONObject();
         boolean lbSuccess = false;
         String lsRefNo = "";
+
         try {
             for (int lnCtr = 0; lnCtr < fsTransactionNos.size(); lnCtr++) {
                 poJSON = poController.OpenTransaction(fsTransactionNos.get(lnCtr));
                 if ("error".equals((String) poJSON.get("result"))) {
-                    ShowMessageFX.Warning(null, pxeModuleName, "Transaction posting has been terminated.\n" + (String) poJSON.get("message"));
+                    ShowMessageFX.Warning(null, pxeModuleName, "Transaction posting has been terminated due to an error in DV No" + fsDVNos.get(lnCtr) + ":\n" + (String) poJSON.get("message"));
                     break;
                 }
                 poJSON = poController.UpdateTransaction();
                 if ("error".equals((String) poJSON.get("result"))) {
-                    ShowMessageFX.Warning(null, pxeModuleName, "Transaction posting has been terminated.\n" + (String) poJSON.get("message"));
+                    ShowMessageFX.Warning(null, pxeModuleName, "Transaction posting has been terminated due to an error in DV No" + fsDVNos.get(lnCtr) + ":\n" + (String) poJSON.get("message"));
                     break;
                 }
 
@@ -516,14 +521,14 @@ public class OtherPaymentStatusByBatchController implements Initializable, Scree
                 poController.OtherPayments().getModel().setPostedDate(oApp.getServerDate());
                 poJSON = poController.SaveTransaction();
                 if ("error".equals((String) poJSON.get("result"))) {
-                    ShowMessageFX.Warning(null, pxeModuleName, "Transaction posting has been terminated.\n" + (String) poJSON.get("message"));
+                    ShowMessageFX.Warning(null, pxeModuleName, "Transaction posting has been terminated due to an error in DV No " + fsDVNos.get(lnCtr) + ":\n" + (String) poJSON.get("message"));
                     break;
                 }
 
                 if (lsRefNo.isEmpty()) {
                     lsRefNo = poController.Master().getVoucherNo();
                 } else {
-                    lsRefNo = lsRefNo + ", " + poController.Master().getVoucherNo();
+                    lsRefNo = lsRefNo + ", " + poController.Master().getVoucherNo(); //to display multiple
                 }
 
                 if (!lbSuccess) {
@@ -532,31 +537,13 @@ public class OtherPaymentStatusByBatchController implements Initializable, Scree
             }
 
             if (lbSuccess) {
-                ShowMessageFX.Information(null, pxeModuleName, "Reference No: " + lsRefNo + " Successfully posted.");
+                ShowMessageFX.Information(null, pxeModuleName, "Posting process finished.\nReference No/s posted: " + lsRefNo + ".");
             }
 
         } catch (CloneNotSupportedException | GuanzonException | ScriptException | SQLException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
         }
 
-//        stageAssign.closeDialog();
-//        
-//        CheckClearingAssignController controller = new CheckClearingAssignController();
-//        controller.setGRider(oApp);
-////        controller.setCheckStatusUpdate(poController);
-//        controller.setTransaction(fsTransactionNos);  // Pass the list here
-//        try {
-//            stageAssign.setOnHidden(event -> {
-//                chckSelectAll.setSelected(false);
-//                loadTableMain.reload();
-//                checkedItem.clear();
-//            });
-//            stageAssign.showDialog((Stage) AnchorMain.getScene().getWindow(), getClass().getResource("/ph/com/guanzongroup/integsys/views/CheckClearingAssign.fxml"), controller,
-//                    "Assign Dialog", true, true, false);
-//        } catch (IOException ex) {
-//            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
-//            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
-//        }
     }
 
     public void showDVWindow(String fsTransactionNo) throws SQLException {
