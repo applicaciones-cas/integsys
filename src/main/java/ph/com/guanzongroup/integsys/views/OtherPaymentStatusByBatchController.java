@@ -86,7 +86,7 @@ public class OtherPaymentStatusByBatchController implements Initializable, Scree
     @FXML
     private TableView tblViewMainList;
     @FXML
-    private TableColumn tblRowNo, tblCheckBox, tblDVNo, tblDVDate, tblDisbursementType, tblBankName, tblBankAccount, tblReferenceNo, tblPaymentStatus, tblPaymentAmount;
+    private TableColumn tblRowNo, tblCheckBox, tblDVNo, tblDVDate,tblDisbursementType, tblBankName, tblBankAccount, tblReferenceNo, tblPaymentStatus, tblPaymentAmount;
     @FXML
     private CheckBox chckSelectAll;
     @FXML
@@ -354,6 +354,7 @@ public class OtherPaymentStatusByBatchController implements Initializable, Scree
                                                 lsDVType = "E-WALLET";
                                                 break;
                                         }
+                                        checkedItem.add("0");
                                         main_data.add(new ModelDisbursementVoucher_Main(
                                                 String.valueOf(lnCntr + 1),
                                                 checkedItem.get(lnCntr),
@@ -409,7 +410,7 @@ public class OtherPaymentStatusByBatchController implements Initializable, Scree
     }
 
     private void initMainGrid() {
-        JFXUtil.setColumnCenter(tblRowNo, tblDVNo, tblDVDate, tblReferenceNo, tblDisbursementType, tblPaymentStatus);
+        JFXUtil.setColumnCenter(tblRowNo, tblDVNo, tblDVDate, tblReferenceNo, tblDisbursementType,tblPaymentStatus);
         JFXUtil.setColumnLeft(tblCheckBox, tblBankName, tblBankAccount);
         JFXUtil.setColumnRight(tblPaymentAmount);
         JFXUtil.setColumnsIndexAndDisableReordering(tblViewMainList);
