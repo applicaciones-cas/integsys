@@ -171,20 +171,20 @@ public class OtherPaymentStatusByBatchController implements Initializable, Scree
 
     @FXML
     private void cmdButton_Click(ActionEvent event) {
-//        try {
         poJSON = new JSONObject();
         String lsButton = ((Button) event.getSource()).getId();
-
         switch (lsButton) {
             case "btnPost":
-                poJSON = validateSelectedItem();
-                if ("error".equals(poJSON.get("result"))) {
-                    ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-                    break;
-                }
-                if (!checkedItems.isEmpty()) {
-                    postTransaction(checkedItems, checkedItemsDVNo);
-                    retrieveDisbursements();
+                if (ShowMessageFX.YesNo(null, pxeModuleName, "Are you sure you want to post the selected disbursement(s)?")) {
+                    poJSON = validateSelectedItem();
+                    if ("error".equals(poJSON.get("result"))) {
+                        ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                        break;
+                    }
+                    if (!checkedItems.isEmpty()) {
+                        postTransaction(checkedItems, checkedItemsDVNo);
+                        retrieveDisbursements();
+                    }
                 }
                 break;
             case "btnRetrieve":
@@ -193,7 +193,7 @@ public class OtherPaymentStatusByBatchController implements Initializable, Scree
                 retrieveDisbursements();
                 break;
             case "btnClose":
-                if (ShowMessageFX.YesNo("Are you sure you want to close this Tab?", "Close Tab", null)) {
+                if (ShowMessageFX.YesNo(null, "Close Tab", "Are you sure you want to close this Tab?")) {
                     poUnload.unloadForm(AnchorMain, oApp, pxeModuleName);
                 }
                 break;
@@ -201,10 +201,6 @@ public class OtherPaymentStatusByBatchController implements Initializable, Scree
                 ShowMessageFX.Warning("Please contact admin to assist about no button available", pxeModuleName, null);
                 break;
         }
-//        } catch (SQLException ex) {
-//            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
-//            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
-//        }
     }
 
     private void loadRecordSearch() {
@@ -329,43 +325,16 @@ public class OtherPaymentStatusByBatchController implements Initializable, Scree
                                 main_data.clear();
                                 if (poController.getOtherPaymentList().size() > 0) {
                                     for (int lnCntr = 0; lnCntr <= poController.getOtherPaymentList().size() - 1; lnCntr++) {
-                                        String lsStatus;
-                                        switch (poController.getOtherPayment(lnCntr).OtherPayments().getTransactionStatus()) {
-                                            case OtherPaymentStatus.FLOAT:
-                                                lsStatus = "FLOAT";
-                                                break;
-                                            case OtherPaymentStatus.OPEN:
-                                                lsStatus = "OPEN";
-                                                break;
-                                            case OtherPaymentStatus.POSTED:
-                                                lsStatus = "POSTED";
-                                                break;
-                                            case OtherPaymentStatus.CANCELLED:
-                                                lsStatus = "CANCELLED";
-                                                break;
-                                            default:
-                                                lsStatus = "UNKNOWN";
-                                                break;
-                                        }
-                                        String lsDVType;
-                                        switch (poController.getOtherPayment(lnCntr).getDisbursementType()) {
-                                            case DisbursementStatic.DisbursementType.WIRED:
-                                                lsDVType = "BANK TRANSFER";
-                                                break;
-                                            default:
-                                                lsDVType = "DIGITAL PAYMENT";
-                                                break;
-                                        }
                                         main_data.add(new ModelDisbursementVoucher_Main(
                                                 String.valueOf(lnCntr + 1),
                                                 checkedItem.get(lnCntr),
                                                 poController.getOtherPayment(lnCntr).getVoucherNo(),
                                                 CustomCommonUtil.formatDateToShortString(poController.getOtherPayment(lnCntr).getTransactionDate()),
-                                                lsDVType,
+                                                JFXUtil.setStatusValue(null, DisbursementStatic.DisbursementType.class, poController.getOtherPayment(lnCntr).getDisbursementType()),
                                                 poController.getOtherPayment(lnCntr).OtherPayments().Banks().getBankName(),
                                                 poController.getOtherPayment(lnCntr).OtherPayments().Bank_Account_Master().getAccountNo(),
                                                 poController.getOtherPayment(lnCntr).OtherPayments().getReferNox(),
-                                                lsStatus,
+                                                JFXUtil.setStatusValue(null, OtherPaymentStatus.class, poController.getOtherPayment(lnCntr).OtherPayments().getTransactionStatus()),
                                                 CustomCommonUtil.setIntegerValueToDecimalFormat(poController.getOtherPayment(lnCntr).OtherPayments().getTotalAmount(), true),
                                                 poController.getOtherPayment(lnCntr).getTransactionNo()
                                         ));
@@ -436,7 +405,7 @@ public class OtherPaymentStatusByBatchController implements Initializable, Scree
                 try {
                     ModelDisbursementVoucher_Main selected = (ModelDisbursementVoucher_Main) tblViewMainList.getSelectionModel().getSelectedItem();
                     if (selected.getIndex11().isEmpty() && selected.getIndex11() == null) {
-                        ShowMessageFX.Warning("Unable to view, transaction no. is invalid", pxeModuleName, null);
+                        ShowMessageFX.Warning("Unable to view: The transaction number is invalid.", pxeModuleName, null);
                         return;
                     }
                     showDVWindow(selected.getIndex11());
