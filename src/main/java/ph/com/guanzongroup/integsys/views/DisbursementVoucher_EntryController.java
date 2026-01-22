@@ -141,7 +141,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
             DisbursementStatic.SourceCode.CASH_PAYABLE
     );
     ObservableList<String> cPaymentMode = FXCollections.observableArrayList(
-            "CHECK", "WIRED", "DIGITAL PAYMENT");
+            "CHECK", "BANK TRANSFER", "DIGITAL PAYMENT");
     ObservableList<String> cDisbursementMode = FXCollections.observableArrayList("DELIVER", "PICK-UP");
     ObservableList<String> cPayeeType = FXCollections.observableArrayList("INDIVIDUAL", "CORPORATION");
     ObservableList<String> cClaimantType = FXCollections.observableArrayList("AUTHORIZED REPRESENTATIVE", "PAYEE");
@@ -318,7 +318,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                             loadRecordMasterBankTransfer();
                         }
                         break;
-                    case "E-Wallet":
+                    case "Digital Payment":
                         if (pnEditMode == EditMode.READY || pnEditMode == EditMode.UPDATE || pnEditMode == EditMode.ADDNEW) {
                             poController.populateOtherPayment();
                             loadRecordMasterBankTransfer();
@@ -356,7 +356,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                 break;
             case DisbursementStatic.DisbursementType.DIGITAL_PAYMENT:
                 JFXUtil.setDisabled(!lbShow, tabOnlinePayment);
-                JFXUtil.clickTabByTitleText(tabPanePaymentMode, "E-Wallet");
+                JFXUtil.clickTabByTitleText(tabPanePaymentMode, "Digital Payment");
                 loadRecordMasterOnlinePayment();
                 //must reset data of online payment
                 break;
