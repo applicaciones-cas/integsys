@@ -2673,9 +2673,9 @@ public class JFXUtil {
                         if ("VOID".equals(fieldName)) {
                             fieldName = "VOIDED";
                         }
-                        if ("DIGITAL PAYMENT".equals(fieldName)) {
-                            fieldName = "E-WALLET";
-                        }
+//                        if ("DIGITAL PAYMENT".equals(fieldName)) {
+//                            fieldName = "E-WALLET";
+//                        }
                         if ("WIRED".equals(fieldName)) {
                             fieldName = "BANK TRANSFER";
                         }

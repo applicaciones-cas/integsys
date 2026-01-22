@@ -217,7 +217,7 @@
                                                                 <TextField fx:id="tfReferenceNo" maxHeight="25.0" maxWidth="1.7976931348623157E308" GridPane.columnIndex="7" GridPane.rowIndex="6" />
                                                                 <DatePicker fx:id="dpPostingDate" GridPane.columnIndex="7" GridPane.rowIndex="7" />
                                                                 <TextField fx:id="tfPaymentAmount" alignment="CENTER_RIGHT" editable="false" maxHeight="25.0" maxWidth="1.7976931348623157E308" GridPane.columnIndex="7" GridPane.rowIndex="8" />
-                                                <Label text="DV Type" GridPane.columnIndex="5" GridPane.rowIndex="5" />
+                                                <Label text="Payment Form" GridPane.columnIndex="5" GridPane.rowIndex="5" />
                                                 <TextField fx:id="tfDisbursementType" disable="true" editable="false" maxHeight="25.0" maxWidth="1.7976931348623157E308" GridPane.columnIndex="7" GridPane.rowIndex="5" />
                                                             </children>
                                                         </GridPane>
