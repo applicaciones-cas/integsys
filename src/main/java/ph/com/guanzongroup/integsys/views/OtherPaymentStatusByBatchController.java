@@ -86,7 +86,7 @@ public class OtherPaymentStatusByBatchController implements Initializable, Scree
     @FXML
     private TableView tblViewMainList;
     @FXML
-    private TableColumn tblRowNo, tblCheckBox, tblDVNo, tblDVDate,tblDisbursementType, tblBankName, tblBankAccount, tblReferenceNo, tblPaymentStatus, tblPaymentAmount;
+    private TableColumn tblRowNo, tblCheckBox, tblDVNo, tblDVDate, tblDisbursementType, tblBankName, tblBankAccount, tblReferenceNo, tblPaymentStatus, tblPaymentAmount;
     @FXML
     private CheckBox chckSelectAll;
     @FXML
@@ -295,20 +295,20 @@ public class OtherPaymentStatusByBatchController implements Initializable, Scree
 
     private void retrieveDisbursements() {
         try {
+            chckSelectAll.setSelected(false);
+            checkedItem.clear();
+            checkedItems.clear();
             poJSON = poController.loadTransactionList(tfSearchIndustry.getText(), tfSearchBankName.getText(), tfSearchBankAccount.getText(), tfSearchDVNo.getText());
             if ("success".equals(poJSON.get("result"))) {
                 Platform.runLater(() -> {
-                    chckSelectAll.setSelected(false);
-                    checkedItem.clear();
-                    checkedItems.clear();
-                    for (int lnCntr = 0; lnCntr < poController.getMasterList().size(); lnCntr++) {
+                    for (int lnCntr = 0; lnCntr < poController.getOtherPaymentList().size(); lnCntr++) {
                         checkedItem.add("0");
                     }
                 });
-                loadTableMain.reload();
             } else {
                 ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
             }
+            loadTableMain.reload();
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
             ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
@@ -354,7 +354,6 @@ public class OtherPaymentStatusByBatchController implements Initializable, Scree
                                                 lsDVType = "E-WALLET";
                                                 break;
                                         }
-                                        checkedItem.add("0");
                                         main_data.add(new ModelDisbursementVoucher_Main(
                                                 String.valueOf(lnCntr + 1),
                                                 checkedItem.get(lnCntr),
@@ -371,17 +370,6 @@ public class OtherPaymentStatusByBatchController implements Initializable, Scree
                                     }
                                 } else {
                                     main_data.clear();
-                                    checkedItem.clear();
-                                    checkedItems.clear();
-                                }
-
-                                if (main_data.isEmpty()) {
-                                    ShowMessageFX.Warning(null, pxeModuleName, "No records found");
-                                    checkedItems.clear();
-                                    Platform.runLater(() -> {
-                                        chckSelectAll.setSelected(false);
-                                        checkedItem.clear();
-                                    });
                                 }
 
                                 if (pnMain < 0 || pnMain
@@ -410,7 +398,7 @@ public class OtherPaymentStatusByBatchController implements Initializable, Scree
     }
 
     private void initMainGrid() {
-        JFXUtil.setColumnCenter(tblRowNo, tblDVNo, tblDVDate, tblReferenceNo, tblDisbursementType,tblPaymentStatus);
+        JFXUtil.setColumnCenter(tblRowNo, tblDVNo, tblDVDate, tblReferenceNo, tblDisbursementType, tblPaymentStatus);
         JFXUtil.setColumnLeft(tblCheckBox, tblBankName, tblBankAccount);
         JFXUtil.setColumnRight(tblPaymentAmount);
         JFXUtil.setColumnsIndexAndDisableReordering(tblViewMainList);
