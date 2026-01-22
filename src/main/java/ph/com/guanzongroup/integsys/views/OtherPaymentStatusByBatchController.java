@@ -173,8 +173,8 @@ public class OtherPaymentStatusByBatchController implements Initializable, Scree
         String lsButton = ((Button) event.getSource()).getId();
         switch (lsButton) {
             case "btnPost":
-                if (checkedItems.isEmpty()) {
-                    ShowMessageFX.Information(null, pxeModuleName, "No items selected to post.");
+                if (checkedItem.isEmpty()) {
+                    ShowMessageFX.Warning(null, pxeModuleName, "No items selected to post.");
                     return;
                 }
                 if (ShowMessageFX.YesNo(null, pxeModuleName, "Are you sure you want to post the selected disbursement(s)?")) {
