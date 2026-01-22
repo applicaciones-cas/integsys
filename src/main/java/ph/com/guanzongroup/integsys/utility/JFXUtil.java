@@ -142,7 +142,7 @@ import org.guanzon.appdriver.constant.EditMode;
 import ph.com.guanzongroup.integsys.views.ScreenInterface;
 
 /**
- * Date : 4/28/2025 Recent update: 01/19/2026
+ * Date : 4/28/2025 Recent update: 01/22/2026
  *
  * @author Aldrich
  */
@@ -2630,31 +2630,23 @@ public class JFXUtil {
     public static String setStatusValue(Node node, Class<?> clazz, String value) {
         String text = getNameByValue(clazz, value);
 
-        // replace "_" with space
-        if (text != null) {
-            text = text.replace("_", " ");
-        }
-
-        final String finalText = text;
-
         Platform.runLater(() -> {
             if (node instanceof Label) {
-                ((Label) node).setText(finalText);
+                ((Label) node).setText(text);
             } else if (node instanceof TextField) {
-                ((TextField) node).setText(finalText);
+                ((TextField) node).setText(text);
             } else if (node instanceof TextArea) {
-                ((TextArea) node).setText(finalText);
+                ((TextArea) node).setText(text);
             } else if (node instanceof Button) {
-                ((Button) node).setText(finalText);
+                ((Button) node).setText(text);
             } else {
-                // unsupported node
+                //if null
             }
         });
-
-        return finalText;
+        return text;
     }
 
-// private
+    //private
     private static String getNameByValue(Class<?> clazz, String value) {
         if ("-1".equals(value) || JFXUtil.isObjectEqualTo(value, null, "")) {
             return "UNKNOWN";
@@ -2664,9 +2656,9 @@ public class JFXUtil {
 
     //private
     private static Map<String, String> buildValueToNameMap(Class<?> clazz) {
-        if (cache.containsKey(clazz)) {
-            return cache.get(clazz);
-        }
+//        if (cache.containsKey(clazz)) {
+//            return cache.get(clazz);
+//        }
         Map<String, String> valueToNameMap = new HashMap<>();
         for (Field field : clazz.getDeclaredFields()) {
             if (Modifier.isStatic(field.getModifiers())) {
@@ -2674,12 +2666,15 @@ public class JFXUtil {
                     Object value = field.get(null);
                     if (value instanceof String) {
                         String fieldName = field.getName();
+                        if (fieldName != null) {
+                            fieldName = fieldName.replace("_", " ");
+                        }
                         // Special handling: if field name is VOID, change to VOIDED
                         if ("VOID".equals(fieldName)) {
                             fieldName = "VOIDED";
                         }
                         if ("DIGITAL PAYMENT".equals(fieldName)) {
-                            fieldName = "ONLINE PAYMENT";
+                            fieldName = "E-WALLET";
                         }
                         if ("WIRED".equals(fieldName)) {
                             fieldName = "BANK TRANSFER";
