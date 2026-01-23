@@ -661,19 +661,10 @@ public class OtherPaymentStatusController implements Initializable, ScreenInterf
         if (selected != null) {
             try {
                 String lsTransactionNo = selected.getIndex07();
-                if (pnEditMode == EditMode.UPDATE) {
-                    if (poController.Master().getTransactionNo().equals(lsTransactionNo)) {
-                        if (!ShowMessageFX.YesNo(null, pxeModuleName, "Transaction is currently in update mode.\n"
-                                + "Reload the transaction?")) {
-                            return;
-                        }
-                    } else {
-                        if (!ShowMessageFX.YesNo(null, pxeModuleName, "An open transaction is currently in update mode.\n"
-                                + "Are you sure you want to switch to another transaction?")) {
-                            return;
-                        }
-                    }
+                if (!JFXUtil.loadValidation(pnEditMode, pxeModuleName, poController.Master().getTransactionNo(), lsTransactionNo)) {
+                    return;
                 }
+                
                 int pnRowMain = Integer.parseInt(selected.getIndex01()) - 1;
                 pnMain = pnRowMain;
 

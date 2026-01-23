@@ -2769,7 +2769,8 @@ public class JFXUtil {
         return new AbstractMap.SimpleEntry<>(getFormattedClassTitle(clazz), clazz);
     }
 
-    /*Throws similar break functionality*/
+    /*Alternative to break*/
+ /*Throws similar break functionality*/
     public static class BreakLoopException extends RuntimeException {
     }
 
@@ -3168,5 +3169,22 @@ public class JFXUtil {
                 delay.play();
             }
         });
+    }
+
+    public static boolean loadValidation(int pnEditMode, String pxeModuleName, String lsCurrentTransNo, String lsTransactionNo) {
+        if (pnEditMode == EditMode.UPDATE) {
+            if (lsCurrentTransNo.equals(lsTransactionNo)) {
+                if (!ShowMessageFX.YesNo(null, pxeModuleName, "Transaction is currently in update mode.\n"
+                        + "Reload the transaction?")) {
+                    return false;
+                }
+            } else {
+                if (!ShowMessageFX.YesNo(null, pxeModuleName, "Transaction is currently in update mode.\n"
+                        + "Are you sure you want to switch to another transaction?")) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 }
