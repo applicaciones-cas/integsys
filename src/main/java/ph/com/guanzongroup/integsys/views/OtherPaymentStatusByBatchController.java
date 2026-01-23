@@ -75,7 +75,6 @@ public class OtherPaymentStatusByBatchController implements Initializable, Scree
     ArrayList<String> checkedItems = new ArrayList<>();
     ArrayList<String> checkedItemsDVNo = new ArrayList<>();
     JFXUtil.StageManager stageDV = new JFXUtil.StageManager();
-    JFXUtil.StageManager stageAssign = new JFXUtil.StageManager();
     @FXML
     private AnchorPane AnchorMain, apBrowse, apButton;
     @FXML
@@ -173,7 +172,8 @@ public class OtherPaymentStatusByBatchController implements Initializable, Scree
         String lsButton = ((Button) event.getSource()).getId();
         switch (lsButton) {
             case "btnPost":
-                if (checkedItem.isEmpty()) {
+                boolean hasChecked = checkedItem.contains("1");
+                if (!hasChecked) {
                     ShowMessageFX.Warning(null, pxeModuleName, "No items selected to post.");
                     return;
                 }
