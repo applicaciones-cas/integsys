@@ -3136,4 +3136,37 @@ public class JFXUtil {
                     }
                 });
     }
+
+    public static void showTooltip(String message, Node... nodes) {
+        if (message == null || message.trim().isEmpty() || nodes == null || nodes.length == 0) {
+            return;
+        }
+
+        Platform.runLater(() -> {
+            Tooltip tooltip = new Tooltip(message);
+            tooltip.setStyle(
+                    "-fx-font-size: 12px;"
+                    + "-fx-padding: 6 10 6 10;"
+            );
+
+            for (Node node : nodes) {
+                if (node == null || node.getScene() == null) {
+                    continue;
+                }
+
+                double x = node.localToScreen(node.getBoundsInLocal()).getMinX();
+                double y = node.localToScreen(node.getBoundsInLocal()).getMaxY();
+
+                tooltip.show(node, x, y);
+
+                PauseTransition delay = new PauseTransition(Duration.seconds(5));
+                delay.setOnFinished(e -> {
+                    if (tooltip.isShowing()) {
+                        tooltip.hide();
+                    }
+                });
+                delay.play();
+            }
+        });
+    }
 }

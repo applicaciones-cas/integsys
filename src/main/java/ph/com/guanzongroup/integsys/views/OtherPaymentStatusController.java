@@ -200,8 +200,10 @@ public class OtherPaymentStatusController implements Initializable, ScreenInterf
                     if (poController.OtherPayments().getModel().getTransactionStatus().equals(OtherPaymentStatus.FLOAT)) {
                         if (poController.Master().getDisbursementType().equals(DisbursementStatic.DisbursementType.DIGITAL_PAYMENT)) {
                             poController.OtherPayments().getModel().setTransactionStatus((OtherPaymentStatus.POSTED));
+                            JFXUtil.showTooltip("Default status: POSTED. Can be changed.", cmbPaymentStatus);
                         } else {
                             poController.OtherPayments().getModel().setTransactionStatus((OtherPaymentStatus.OPEN));
+                            JFXUtil.showTooltip("Default status: OPEN. Can be changed.", cmbPaymentStatus);
                         }
                     }
 
