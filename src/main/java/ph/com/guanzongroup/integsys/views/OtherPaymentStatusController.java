@@ -187,7 +187,7 @@ public class OtherPaymentStatusController implements Initializable, ScreenInterf
             switch (lsButton) {
                 case "btnUpdate":
                     poJSON = poController.OpenTransaction(poController.Master().getTransactionNo());
-                    if ("error".equals((String) poJSON.get("result"))) {
+                    if ("error".equals((String) poJSON.get("resulf"))) {
                         ShowMessageFX.Warning((String) poJSON.get("message"), pxeModuleName, null);
                         return;
                     }
@@ -644,15 +644,8 @@ public class OtherPaymentStatusController implements Initializable, ScreenInterf
         tblViewMainList.setOnMouseClicked(event -> {
             if (event.getClickCount() == 2) {
 
-                if (pnEditMode != EditMode.UPDATE) {
-                } else {
-                    if (!ShowMessageFX.YesNo(null, pxeModuleName, "An open transaction is currently in update mode.\n"
-                            + "Are you sure you want to switch to another transaction?")) {
-                        return;
-                    }
-                }
-                pnMain = tblViewMainList.getSelectionModel().getSelectedIndex();
-                if (pnMain >= 0) {
+                int lnRow = tblViewMainList.getSelectionModel().getSelectedIndex();
+                if (lnRow >= 0) {
                     loadTableDetailFromMain();
                 }
             }
@@ -667,9 +660,23 @@ public class OtherPaymentStatusController implements Initializable, ScreenInterf
         ModelDisbursementVoucher_Main selected = (ModelDisbursementVoucher_Main) tblViewMainList.getSelectionModel().getSelectedItem();
         if (selected != null) {
             try {
+                String lsTransactionNo = selected.getIndex07();
+                if (pnEditMode == EditMode.UPDATE) {
+                    if (poController.Master().getTransactionNo().equals(lsTransactionNo)) {
+                        if (!ShowMessageFX.YesNo(null, pxeModuleName, "Transaction is currently in update mode.\n"
+                                + "Reload the transaction?")) {
+                            return;
+                        }
+                    } else {
+                        if (!ShowMessageFX.YesNo(null, pxeModuleName, "An open transaction is currently in update mode.\n"
+                                + "Are you sure you want to switch to another transaction?")) {
+                            return;
+                        }
+                    }
+                }
                 int pnRowMain = Integer.parseInt(selected.getIndex01()) - 1;
                 pnMain = pnRowMain;
-                String lsTransactionNo = selected.getIndex07();
+
                 clearTextFields();
                 poJSON = poController.OpenTransaction(lsTransactionNo);
                 if ("error".equals(poJSON.get("result"))) {
