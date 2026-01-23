@@ -230,7 +230,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
                 poController.setCompanyID(psCompanyId);
                 poController.setCategoryID(psCategoryId);
                 poController.Master().setBranchCode(oApp.getBranchCode());
-                poController.setTransactionStatus(DisbursementStatic.OPEN+DisbursementStatic.VERIFIED+DisbursementStatic.RETURNED);
+                poController.setTransactionStatus(DisbursementStatic.OPEN + DisbursementStatic.VERIFIED + DisbursementStatic.RETURNED);
                 loadRecordSearch();
             });
             initAttachmentPreviewPane();
@@ -665,12 +665,25 @@ public class DisbursementVoucher_VerificationController implements Initializable
         ModelDisbursementVoucher_Main selected = (ModelDisbursementVoucher_Main) tblViewMainList.getSelectionModel().getSelectedItem();
         if (selected != null) {
             try {
+                String lsTransactionNo = selected.getIndex06();
+                if (pnEditMode == EditMode.UPDATE) {
+                    if (poController.Master().getTransactionNo().equals(lsTransactionNo)) {
+                        if (!ShowMessageFX.YesNo(null, pxeModuleName, "Transaction is currently in update mode.\n"
+                                + "Reload the transaction?")) {
+                            return;
+                        }
+                    } else {
+                        if (!ShowMessageFX.YesNo(null, pxeModuleName, "An open transaction is currently in update mode.\n"
+                                + "Are you sure you want to switch to another transaction?")) {
+                            return;
+                        }
+                    }
+                }
+
                 int pnRowMain = Integer.parseInt(selected.getIndex01()) - 1;
                 pnMain = pnRowMain;
                 JFXUtil.disableAllHighlightByColor(tblViewMainList, "#A7C7E7", highlightedRowsMain);
                 JFXUtil.highlightByKey(tblViewMainList, String.valueOf(pnRowMain + 1), "#A7C7E7", highlightedRowsMain);
-
-                String lsTransactionNo = selected.getIndex06();
                 clearTextFields();
                 poJSON = poController.OpenTransaction(lsTransactionNo);
 
