@@ -54,6 +54,7 @@ import org.guanzon.appdriver.base.GRiderCAS;
 import org.guanzon.appdriver.base.LogWrapper;
 import org.guanzon.appdriver.constant.EditMode;
 import org.guanzon.appdriver.base.GuanzonException;
+import org.guanzon.appdriver.base.MiscUtil;
 import org.guanzon.cas.inv.model.Model_Inv_Master;
 import org.guanzon.cas.inv.model.Model_Inventory;
 import org.guanzon.cas.purchasing.model.Model_PO_Detail;
@@ -169,6 +170,13 @@ public class POCancellation_HistoryControllerLP_Food implements Initializable, S
         } catch (SQLException | GuanzonException e) {
             Logger.getLogger(POCancellation_HistoryControllerLP_Food.class.getName()).log(Level.SEVERE, null, e);
             poLogWrapper.severe(psFormName + " :" + e.getMessage());
+
+            if (Platform.isFxApplicationThread()) {
+                ShowMessageFX.Warning(MiscUtil.getException(e), psFormName, null);
+            } else {
+                Platform.runLater(() -> ShowMessageFX.Warning(MiscUtil.getException(e), psFormName, null));
+            }
+
         }
     }
 
@@ -183,6 +191,13 @@ public class POCancellation_HistoryControllerLP_Food implements Initializable, S
             loadSelectedTransactionDetail(pnTransactionDetail);
         } catch (SQLException | GuanzonException | CloneNotSupportedException ex) {
             poLogWrapper.severe(psFormName + " :" + ex.getMessage());
+
+            if (Platform.isFxApplicationThread()) {
+                ShowMessageFX.Warning(MiscUtil.getException(ex), psFormName, null);
+            } else {
+                Platform.runLater(() -> ShowMessageFX.Warning(MiscUtil.getException(ex), psFormName, null));
+            }
+
         }
     }
 
@@ -289,6 +304,13 @@ public class POCancellation_HistoryControllerLP_Food implements Initializable, S
             Logger.getLogger(DeliverySchedule_EntryController.class
                     .getName()).log(Level.SEVERE, null, e);
             poLogWrapper.severe(psFormName + " :" + e.getMessage());
+
+            if (Platform.isFxApplicationThread()) {
+                ShowMessageFX.Warning(MiscUtil.getException(e), psFormName, null);
+            } else {
+                Platform.runLater(() -> ShowMessageFX.Warning(MiscUtil.getException(e), psFormName, null));
+            }
+
         }
     }
 
@@ -375,6 +397,13 @@ public class POCancellation_HistoryControllerLP_Food implements Initializable, S
             Logger.getLogger(DeliverySchedule_EntryController.class
                     .getName()).log(Level.SEVERE, null, ex);
             poLogWrapper.severe(psFormName + " :" + ex.getMessage());
+            
+                if (Platform.isFxApplicationThread()) {
+                    ShowMessageFX.Warning(MiscUtil.getException(ex), psFormName, null);
+                } else {
+                    Platform.runLater(() -> ShowMessageFX.Warning(MiscUtil.getException(ex), psFormName, null));
+                }
+
         }
     }
 
@@ -451,6 +480,13 @@ public class POCancellation_HistoryControllerLP_Food implements Initializable, S
             Logger.getLogger(DeliverySchedule_EntryController.class
                     .getName()).log(Level.SEVERE, null, ex);
             poLogWrapper.severe(psFormName + " :" + ex.getMessage());
+            
+                if (Platform.isFxApplicationThread()) {
+                    ShowMessageFX.Warning(MiscUtil.getException(ex), psFormName, null);
+                } else {
+                    Platform.runLater(() -> ShowMessageFX.Warning(MiscUtil.getException(ex), psFormName, null));
+                }
+
         }
     }
 
@@ -471,6 +507,13 @@ public class POCancellation_HistoryControllerLP_Food implements Initializable, S
             tfCancelAmount.setText(CommonUtils.NumberFormat(poAppController.getMaster().getTransactionTotal(), "###,##0.0000"));
         } catch (SQLException | GuanzonException e) {
             poLogWrapper.severe(psFormName, e.getMessage());
+            
+                if (Platform.isFxApplicationThread()) {
+                    ShowMessageFX.Warning(MiscUtil.getException(e), psFormName, null);
+                } else {
+                    Platform.runLater(() -> ShowMessageFX.Warning(MiscUtil.getException(e), psFormName, null));
+                }
+
         }
     }
 
@@ -617,6 +660,13 @@ public class POCancellation_HistoryControllerLP_Food implements Initializable, S
             } catch (IllegalAccessException e) {
                 e.printStackTrace();
                 poLogWrapper.severe(psFormName + " :" + e.getMessage());
+                
+                if (Platform.isFxApplicationThread()) {
+                    ShowMessageFX.Warning(MiscUtil.getException(e), psFormName, null);
+                } else {
+                    Platform.runLater(() -> ShowMessageFX.Warning(MiscUtil.getException(e), psFormName, null));
+                }
+
             }
         }
     }
