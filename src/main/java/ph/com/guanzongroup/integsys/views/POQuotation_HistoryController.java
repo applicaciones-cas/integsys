@@ -712,8 +712,8 @@ public class POQuotation_HistoryController implements Initializable, ScreenInter
             if (pnDetail < 0 || pnDetail > poController.POQuotation().getDetailCount() - 1) {
                 return;
             }
-            tfBrand.setText(poController.POQuotation().Detail(pnDetail).Brand().getDescription());
-            tfModel.setText(poController.POQuotation().Detail(pnDetail).Model().getDescription());
+            tfBrand.setText(poController.POQuotation().Detail(pnDetail).Inventory().Brand().getDescription());
+            tfModel.setText(poController.POQuotation().Detail(pnDetail).Inventory().Model().getDescription());
             tfColor.setText(poController.POQuotation().Detail(pnDetail).Inventory().Color().getDescription());
             tfMeasure.setText(poController.POQuotation().Detail(pnDetail).Inventory().Measure().getDescription());
 

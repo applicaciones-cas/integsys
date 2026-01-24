@@ -96,6 +96,7 @@ import org.guanzon.appdriver.constant.UserRight;
 import org.guanzon.cas.purchasing.services.QuotationControllers;
 import org.guanzon.cas.purchasing.status.POQuotationStatus;
 import static ph.com.guanzongroup.integsys.views.POQuotation_EntryController.poController;
+import static ph.com.guanzongroup.integsys.views.POQuotation_HistoryController.poController;
 
 /**
  *
@@ -1295,8 +1296,8 @@ public class POQuotation_ApprovalController implements Initializable, ScreenInte
 
                 JFXUtil.setDisabled(false, tfReplaceId, tfReplaceDescription, tfUnitPrice, tfQuantity, tfDiscRateDetail, tfAddlDiscAmtDetail);
             }
-            tfBrand.setText(poController.POQuotation().Detail(pnDetail).Brand().getDescription());
-            tfModel.setText(poController.POQuotation().Detail(pnDetail).Model().getDescription());
+            tfBrand.setText(poController.POQuotation().Detail(pnDetail).Inventory().Brand().getDescription());
+            tfModel.setText(poController.POQuotation().Detail(pnDetail).Inventory().Model().getDescription());
             tfColor.setText(poController.POQuotation().Detail(pnDetail).Inventory().Color().getDescription());
             tfMeasure.setText(poController.POQuotation().Detail(pnDetail).Inventory().Measure().getDescription());
 

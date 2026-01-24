@@ -1470,8 +1470,8 @@ public class POQuotation_ConfirmationController implements Initializable, Screen
                     });
                 }
             }
-            tfBrand.setText(poController.POQuotation().Detail(pnDetail).Brand().getDescription());
-            tfModel.setText(poController.POQuotation().Detail(pnDetail).Model().getDescription());
+            tfBrand.setText(poController.POQuotation().Detail(pnDetail).Inventory().Brand().getDescription());
+            tfModel.setText(poController.POQuotation().Detail(pnDetail).Inventory().Model().getDescription());
             tfColor.setText(poController.POQuotation().Detail(pnDetail).Inventory().Color().getDescription());
             tfMeasure.setText(poController.POQuotation().Detail(pnDetail).Inventory().Measure().getDescription());
 
