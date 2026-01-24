@@ -7,6 +7,7 @@ import java.sql.SQLException;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyBooleanPropertyBase;
 import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
@@ -103,11 +104,8 @@ public class ModelController implements Initializable, ScreenInterface {
             ClickButton();
             initTabAnchor();
 
-            if (oParameters.Model().getEditMode() == EditMode.ADDNEW) {
-                initButton(pnEditMode);
-                initTabAnchor();
-                loadRecord();
-            }
+            Platform.runLater(() -> btnNew.fire());
+            
             pbLoaded = true;
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(ModelController.class.getName()).log(Level.SEVERE, null, ex);
@@ -151,9 +149,9 @@ public class ModelController implements Initializable, ScreenInterface {
                         clearAllFields();
                         txtField02.requestFocus();
                         JSONObject poJSON = oParameters.Model().newRecord();
-                        pnEditMode = EditMode.READY;
+                        pnEditMode = oParameters.Model().getEditMode();
                         if ("success".equals((String) poJSON.get("result"))) {
-                            pnEditMode = EditMode.ADDNEW;
+                            pnEditMode = oParameters.Model().getEditMode();
                             initButton(pnEditMode);
                             initTabAnchor();
                             loadRecord();
@@ -170,7 +168,8 @@ public class ModelController implements Initializable, ScreenInterface {
                             txtSeeks01.clear();
                             break;
                         }
-                        pnEditMode = EditMode.READY;
+                        pnEditMode = oParameters.Model().getEditMode();
+                        initButton(pnEditMode);
                         loadRecord();
                         initTabAnchor();
                         break;
@@ -182,6 +181,7 @@ public class ModelController implements Initializable, ScreenInterface {
                         }
                         pnEditMode = oParameters.Model().getEditMode();
                         initButton(pnEditMode);
+                        cbField02.setDisable(false); 
                         initTabAnchor();
                         break;
                     case "btnCancel":
@@ -194,28 +194,27 @@ public class ModelController implements Initializable, ScreenInterface {
                         }
                         break;
                     case "btnSave":
+                        ShowMessageFX.Information(String.valueOf(oParameters.Model().getEditMode()), "Computerized Acounting System", pxeModuleName);
                         oParameters.Model().getModel().setModifyingId(oApp.getUserID());
                         oParameters.Model().getModel().setModifiedDate(oApp.getServerDate());
                         JSONObject saveResult = oParameters.Model().saveRecord();
                         if ("success".equals((String) saveResult.get("result"))) {
                             ShowMessageFX.Information((String) saveResult.get("message"), "Computerized Acounting System", pxeModuleName);
-                            pnEditMode = EditMode.UNKNOWN;
-                            initButton(pnEditMode);
                             clearAllFields();
+                            Platform.runLater(() -> btnNew.fire());
                         } else {
                             ShowMessageFX.Information((String) saveResult.get("message"), "Computerized Acounting System", pxeModuleName);
                         }
                         break;
                     case "btnActivate":
                         String Status = oParameters.Model().getModel().getRecordStatus();
-                        String id = oParameters.Model().getModel().getModelCode();
+                        String id = oParameters.Model().getModel().getModelId();
                         JSONObject poJsON;
 
                         switch (Status) {
                             case "0":
                                 if (ShowMessageFX.YesNo(null, pxeModuleName, "Do you want to Activate this Parameter?") == true) {
-                                    ShowMessageFX.Information(String.valueOf(oParameters.Model().getEditMode()), "Computerized Accounting System", pxeModuleName);
-                                    oParameters.Model().initialize();
+                                    
                                     poJsON = oParameters.Model().activateRecord();
                                     if ("error".equals(poJsON.get("result"))) {
                                         ShowMessageFX.Information((String) poJsON.get("message"), "Computerized Accounting System", pxeModuleName);
@@ -233,10 +232,7 @@ public class ModelController implements Initializable, ScreenInterface {
                                 break;
                             case "1":
                                 if (ShowMessageFX.YesNo(null, pxeModuleName, "Do you want to Deactivate this Parameter?") == true) {
-
-                                    System.out.println("EDIT MODE : " + oParameters.Model().getEditMode());
-                                    ShowMessageFX.Information(String.valueOf(oParameters.Model().getEditMode()), "Computerized Accounting System", pxeModuleName);
-
+                                    
                                     poJsON = oParameters.Model().deactivateRecord();
                                     if ("error".equals(poJsON.get("result"))) {
                                         ShowMessageFX.Information((String) poJsON.get("message"), "Computerized Accounting System", pxeModuleName);
@@ -271,6 +267,7 @@ public class ModelController implements Initializable, ScreenInterface {
         txtSeeks01.clear();
         cbField01.setSelected(false);
         cbField02.setSelected(false);
+        cbField02.setDisable(true); 
     }
 
     private void initButton(int fnValue) {
@@ -282,6 +279,9 @@ public class ModelController implements Initializable, ScreenInterface {
         btnSave.setManaged(lbShow);
         btnUpdate.setVisible(!lbShow);
         btnUpdate.setManaged(!lbShow);
+        
+        btnActivate.setVisible(!lbShow);
+        btnActivate.setManaged(!lbShow);
 
         btnBrowse.setVisible(!lbShow);
         btnBrowse.setManaged(!lbShow);
@@ -290,6 +290,11 @@ public class ModelController implements Initializable, ScreenInterface {
 
         btnClose.setVisible(true);
         btnClose.setManaged(true);
+        
+        if (fnValue == EditMode.UNKNOWN){
+            btnActivate.setVisible(false);
+            btnActivate.setManaged(false);
+        }
     }
 
     private void InitTextFields() {
@@ -298,7 +303,6 @@ public class ModelController implements Initializable, ScreenInterface {
         txtField03.focusedProperty().addListener(txtField_Focus);
         txtField04.focusedProperty().addListener(txtField_Focus);
         txtField05.focusedProperty().addListener(txtField_Focus);
-        txtField06.focusedProperty().addListener(txtField_Focus);
 
         txtField02.setOnKeyPressed(this::txtField_KeyPressed);
         txtField06.setOnKeyPressed(this::txtField_KeyPressed);
@@ -323,7 +327,6 @@ public class ModelController implements Initializable, ScreenInterface {
                                 break;
                             }
                             txtSeeks01.setText((String) oParameters.Model().getModel().getDescription());
-                            pnEditMode = EditMode.READY;
                             loadRecord();
                             break;
                     }
@@ -362,12 +365,14 @@ public class ModelController implements Initializable, ScreenInterface {
                             txtField02.setText((String) oParameters.Brand().getModel().getDescription());
                             break;
                         case 06:
-                            poJson = oParameters.Model().searchRecord(lsValue, false);
+                            ShowMessageFX.Information(String.valueOf(oParameters.Model().getEditMode()), "Computerized Acounting System", pxeModuleName);
+                            poJson = oParameters.Model().searchRecordbyMainModel(lsValue, false);
                             if ("error".equalsIgnoreCase(poJson.get("result").toString())) {
                                 ShowMessageFX.Information((String) poJson.get("message"), "Computerized Acounting System", pxeModuleName);
                             }
-                            oParameters.Model().getModel().setModelId(oParameters.Model().getModel().getDescription());
-                            txtField06.setText((String) oParameters.Model().getModel().getDescription());
+                            //oParameters.Model().getModel().setMainModelId(oParameters.Model().getModel().getModelId());
+                            txtField06.setText(poJson.get("Description").toString());
+                            
                             break;
                     }
                 case ENTER:
@@ -404,18 +409,22 @@ public class ModelController implements Initializable, ScreenInterface {
                 switch (lnIndex) {
                     case 1:
                         oParameters.Model().getModel().setModelId(lsValue);
+                        ShowMessageFX.Information(String.valueOf(oParameters.Model().getEditMode()), "Computerized Acounting System", pxeModuleName);
                         break;
 //                    case 2:
 //                        oParameters.Model().getModel().setDescription(lsValue);
 //                        break;
                     case 3:
                         oParameters.Model().getModel().setModelCode(lsValue);
+                        ShowMessageFX.Information(String.valueOf(oParameters.Model().getEditMode()), "Computerized Acounting System", pxeModuleName);
                         break;
                     case 4:
                         oParameters.Model().getModel().setDescription(lsValue);
+                        ShowMessageFX.Information(String.valueOf(oParameters.Model().getEditMode()), "Computerized Acounting System", pxeModuleName);
                         break;
                     case 5:
                         oParameters.Model().getModel().setManufactureYear(Integer.parseInt(lsValue));
+                        ShowMessageFX.Information(String.valueOf(oParameters.Model().getEditMode()), "Computerized Acounting System", pxeModuleName);
                         break;
 
                     default:
@@ -431,6 +440,8 @@ public class ModelController implements Initializable, ScreenInterface {
 
     private void loadRecord() {
         try {
+            JSONObject poJson;
+            poJson = new JSONObject();
             boolean lbActive = oParameters.Model().getModel().getRecordStatus() == "1";
 
             txtField01.setText(oParameters.Model().getModel().getModelId());
@@ -438,7 +449,14 @@ public class ModelController implements Initializable, ScreenInterface {
             txtField03.setText(oParameters.Model().getModel().getModelCode());
             txtField04.setText(oParameters.Model().getModel().getDescription());
             txtField05.setText(String.valueOf(oParameters.Model().getModel().getManufactureYear()));
-//            txtField06.setText(oParameters.Model().getModel().M().getDescription());
+            poJson = oParameters.Model().getMainModelName(oParameters.Model().getModel().getMainModelId());
+            if ("error".equalsIgnoreCase(poJson.get("result").toString())) {
+                txtField06.setText(poJson.get("Description").toString());       
+            }else{
+                txtField06.setText(poJson.get("Description").toString());          
+            }
+            
+           
 
             switch (oParameters.Model().getModel().getRecordStatus()) {
                 case "1":

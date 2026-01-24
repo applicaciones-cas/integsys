@@ -6,6 +6,7 @@ import java.sql.SQLException;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyBooleanPropertyBase;
 import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
@@ -116,6 +117,7 @@ public class BrandController implements Initializable, ScreenInterface {
             LogWrapper logwrapr = new LogWrapper("CAS", System.getProperty("sys.default.path.temp") + "cas-error.log");
             oParameters = new ParamControllers(oApp, logwrapr);
             oParameters.Brand().setRecordStatus("0123");
+            oParameters.Brand().getModel().setIndustryCode(oApp.getIndustry());
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(BrandController.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -148,9 +150,10 @@ public class BrandController implements Initializable, ScreenInterface {
                         clearAllFields();
                         txtField02.requestFocus();
                         JSONObject poJSON = oParameters.Brand().newRecord();
-                        pnEditMode = EditMode.READY;
+                        oParameters.Brand().getModel().setIndustryCode(oApp.getIndustry());
+                        pnEditMode = oParameters.Brand().getEditMode();
                         if ("success".equals((String) poJSON.get("result"))) {
-                            pnEditMode = EditMode.ADDNEW;
+                            pnEditMode = oParameters.Brand().getEditMode();
                             initButton(pnEditMode);
                             initTabAnchor();
                             loadRecord();
@@ -167,7 +170,8 @@ public class BrandController implements Initializable, ScreenInterface {
                             txtSeeks01.clear();
                             break;
                         }
-                        pnEditMode = EditMode.READY;
+                        pnEditMode = oParameters.Brand().getEditMode();
+                        initButton(pnEditMode);
                         loadRecord();
                         initTabAnchor();
                         break;
@@ -196,9 +200,8 @@ public class BrandController implements Initializable, ScreenInterface {
                         JSONObject saveResult = oParameters.Brand().saveRecord();
                         if ("success".equals((String) saveResult.get("result"))) {
                             ShowMessageFX.Information((String) saveResult.get("message"), "Computerized Acounting System", pxeModuleName);
-                            pnEditMode = EditMode.UNKNOWN;
-                            initButton(pnEditMode);
                             clearAllFields();
+                            Platform.runLater(() -> btnNew.fire());
                         } else {
                             ShowMessageFX.Information((String) saveResult.get("message"), "Computerized Acounting System", pxeModuleName);
                         }
@@ -211,8 +214,6 @@ public class BrandController implements Initializable, ScreenInterface {
                         switch (Status) {
                             case "0":
                                 if (ShowMessageFX.YesNo(null, pxeModuleName, "Do you want to Activate this Parameter?") == true) {
-                                    ShowMessageFX.Information(String.valueOf(oParameters.Brand().getEditMode()), "Computerized Accounting System", pxeModuleName);
-                                    oParameters.Brand().initialize();
                                     poJsON = oParameters.Brand().activateRecord();
                                     if ("error".equals(poJsON.get("result"))) {
                                         ShowMessageFX.Information((String) poJsON.get("message"), "Computerized Accounting System", pxeModuleName);
@@ -230,10 +231,6 @@ public class BrandController implements Initializable, ScreenInterface {
                                 break;
                             case "1":
                                 if (ShowMessageFX.YesNo(null, pxeModuleName, "Do you want to Deactivate this Parameter?") == true) {
-
-                                    System.out.println("EDIT MODE : " + oParameters.Brand().getEditMode());
-                                    ShowMessageFX.Information(String.valueOf(oParameters.Brand().getEditMode()), "Computerized Accounting System", pxeModuleName);
-
                                     poJsON = oParameters.Brand().deactivateRecord();
                                     if ("error".equals(poJsON.get("result"))) {
                                         ShowMessageFX.Information((String) poJsON.get("message"), "Computerized Accounting System", pxeModuleName);
@@ -265,6 +262,7 @@ public class BrandController implements Initializable, ScreenInterface {
     private void clearAllFields() {
         txtField01.clear();
         txtField02.clear();
+        txtField03.clear();
         txtSeeks01.clear();
         cbField01.setSelected(false);
     }
@@ -278,6 +276,9 @@ public class BrandController implements Initializable, ScreenInterface {
         btnSave.setManaged(lbShow);
         btnUpdate.setVisible(!lbShow);
         btnUpdate.setManaged(!lbShow);
+        
+        btnActivate.setVisible(!lbShow);
+        btnActivate.setManaged(!lbShow);
 
         btnBrowse.setVisible(!lbShow);
         btnBrowse.setManaged(!lbShow);
@@ -286,12 +287,15 @@ public class BrandController implements Initializable, ScreenInterface {
 
         btnClose.setVisible(true);
         btnClose.setManaged(true);
+        if (fnValue == EditMode.UNKNOWN){
+            btnActivate.setVisible(false);
+            btnActivate.setManaged(false);
+        }
     }
 
     private void InitTextFields() {
         txtField01.focusedProperty().addListener(txtField_Focus);
         txtField02.focusedProperty().addListener(txtField_Focus);
-        txtField03.setOnKeyPressed(this::txtField_KeyPressed);
         txtSeeks01.setOnKeyPressed(this::txtSeeks_KeyPressed);
     }
 
@@ -336,7 +340,7 @@ public class BrandController implements Initializable, ScreenInterface {
     }
 
     private void txtField_KeyPressed(KeyEvent event) {
-        try {
+
             TextField txtField = (TextField) event.getSource();
             int lnIndex = Integer.parseInt(((TextField) event.getSource()).getId().substring(8, 10));
             String lsValue = (txtField.getText() == null ? "" : txtField.getText());
@@ -344,17 +348,7 @@ public class BrandController implements Initializable, ScreenInterface {
             poJson = new JSONObject();
             switch (event.getCode()) {
                 case F3:
-                    switch (lnIndex) {
-                        case 03:
-                            poJson = oParameters.Category().searchRecord(lsValue, false);
-                            if ("error".equalsIgnoreCase(poJson.get("result").toString())) {
-                                ShowMessageFX.Information((String) poJson.get("message"), "Computerized Acounting System", pxeModuleName);
-                            }
-                            oParameters.Category().getModel().setCategoryId(oParameters.Category().getModel().getCategoryId());
-                            txtField03.setText((String) oParameters.Category().getModel().getDescription());
-                            break;
-
-                    }
+                    
                 case ENTER:
             }
             switch (event.getCode()) {
@@ -366,11 +360,6 @@ public class BrandController implements Initializable, ScreenInterface {
                 case UP:
                     CommonUtils.SetPreviousFocus(txtField);
             }
-        } catch (SQLException ex) {
-            Logger.getLogger(BrandController.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (GuanzonException ex) {
-            Logger.getLogger(BrandController.class.getName()).log(Level.SEVERE, null, ex);
-        }
     }
     final ChangeListener<? super Boolean> txtField_Focus = (o, ov, nv) -> {
         if (!pbLoaded) {
@@ -412,7 +401,7 @@ public class BrandController implements Initializable, ScreenInterface {
 
             txtField01.setText(oParameters.Brand().getModel().getBrandId());
             txtField02.setText(oParameters.Brand().getModel().getDescription());
-//            txtField03.setText(oParameters.Brand().getModel().().getDescription());
+            txtField03.setText(oParameters.Brand().getModel().Industry().getDescription());
 
             switch (oParameters.Brand().getModel().getRecordStatus()) {
                 case "1":

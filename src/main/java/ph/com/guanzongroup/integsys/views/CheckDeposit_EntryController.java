@@ -579,7 +579,7 @@ public class CheckDeposit_EntryController implements Initializable, ScreenInterf
                                 break;
 
                             case "tfBankMaster":
-                                if (!isJSONSuccess(poAppController.searchTransactionBankMasterFilter(tfBankMaster.getText(), false),
+                                if (!isJSONSuccess(poAppController.searchTransactionBankMasterFilter(tfBankMaster.getText() != null ? tfBankMaster.getText() : "", false),
                                         "Initialize Search Check! ")) {
                                     return;
                                 }
@@ -588,7 +588,7 @@ public class CheckDeposit_EntryController implements Initializable, ScreenInterf
                                 break;
 
                             case "tfBankAccountNo":
-                                if (!isJSONSuccess(poAppController.searchTransactionBankAccount(tfBankAccountNo.getText(), true, false),
+                                if (!isJSONSuccess(poAppController.searchTransactionBankAccount(tfBankAccountNo.getText() != null ? tfBankAccountNo.getText() : "", true, false),
                                         "Initialize Search Check! ")) {
                                     return;
                                 }
@@ -596,7 +596,7 @@ public class CheckDeposit_EntryController implements Initializable, ScreenInterf
                                 break;
 
                             case "tfBankAccountName":
-                                if (!isJSONSuccess(poAppController.searchTransactionBankAccount(tfBankAccountName.getText(), false, false),
+                                if (!isJSONSuccess(poAppController.searchTransactionBankAccount(tfBankAccountName.getText()!= null ? tfBankAccountName.getText() : "", false, false),
                                         "Initialize Search Check! ")) {
                                     return;
                                 }
@@ -946,7 +946,11 @@ public class CheckDeposit_EntryController implements Initializable, ScreenInterf
             });
             tblColDetailDate.setCellValueFactory((loModel) -> {
                 try {
-                    return new SimpleStringProperty(String.valueOf(loModel.getValue().CheckPayment().getCheckDate()));
+                    return new SimpleStringProperty(
+                            loModel.getValue().CheckPayment().getCheckDate() == null
+                            ? ""
+                            : loModel.getValue().CheckPayment().getCheckDate().toString()
+                    );
                 } catch (SQLException | GuanzonException e) {
                     poLogWrapper.severe(psFormName, e.getMessage());
                     return new SimpleStringProperty("");
