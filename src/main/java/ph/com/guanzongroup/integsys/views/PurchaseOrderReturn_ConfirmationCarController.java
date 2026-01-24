@@ -99,6 +99,7 @@ public class PurchaseOrderReturn_ConfirmationCarController implements Initializa
 
     private FilteredList<ModelPurchaseOrderReturn_Main> filteredData;
     private FilteredList<ModelPurchaseOrderReturn_Detail> filteredDataDetail;
+    private boolean tooltipShown = false;
 
     private int pnAttachment;
 
@@ -660,6 +661,10 @@ public class PurchaseOrderReturn_ConfirmationCarController implements Initializa
                             loadRecordSearch();
                             return;
                         case "tfSearchReferenceNo":
+                            if (!tooltipShown) {
+                                JFXUtil.showTooltip("NOTE: Results appear directly in the table view, no pop-up dialog.", tfSearchReferenceNo);
+                                tooltipShown = true;
+                            }
                             retrievePOR();
                             return;
                         case "tfEngineNo":

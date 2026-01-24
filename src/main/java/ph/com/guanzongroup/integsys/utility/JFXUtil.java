@@ -8,6 +8,7 @@ import com.sun.javafx.scene.control.skin.TableHeaderRow;
 import com.sun.javafx.scene.control.skin.TableViewSkin;
 import com.sun.javafx.scene.control.skin.VirtualFlow;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
+import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -121,20 +122,27 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.util.Callback;
 import java.io.File;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Pattern;
+import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.SimpleDoubleProperty;
 import javafx.css.PseudoClass;
+import javafx.embed.swing.SwingFXUtils;
+import javafx.geometry.Point2D;
 import javafx.scene.control.ButtonBase;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.Tooltip;
 import javafx.scene.effect.DropShadow;
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.rendering.PDFRenderer;
 import org.guanzon.appdriver.constant.EditMode;
 import ph.com.guanzongroup.integsys.views.ScreenInterface;
 
 /**
- * Date : 4/28/2025 Recent update: 01/13/2026
+ * Date : 4/28/2025 Recent update: 01/22/2026
  *
  * @author Aldrich
  */
@@ -649,6 +657,113 @@ public class JFXUtil {
         clip.setLayoutX(4);
         clip.setLayoutY(4);
         stackPane1.setClip(clip);
+    }
+
+    public static void PDFViewConfig(String filePath2, StackPane stackPane1, Button btnArrowLeft, Button btnArrowRight, Double ldstackPaneWidth, Double ldstackPaneHeight) {
+        try {
+            PDDocument document = PDDocument.load(new File(filePath2));
+            PDFRenderer renderer = new PDFRenderer(document);
+            int pageCount = document.getNumberOfPages();
+
+            // Container for PDF pages
+            VBox pdfContainer = new VBox(10);
+            pdfContainer.setAlignment(Pos.CENTER); // center pages
+            pdfContainer.setPrefWidth(ldstackPaneWidth);
+
+            for (int i = 0; i < pageCount; i++) {
+                BufferedImage pageImage = renderer.renderImageWithDPI(i, 150);
+                Image fxImage = SwingFXUtils.toFXImage(pageImage, null);
+                ImageView pageView = new ImageView(fxImage);
+
+                pageView.setPreserveRatio(true);
+                pageView.setFitWidth(ldstackPaneWidth);
+                JFXUtil.adjustImageSize(fxImage, pageView, ldstackPaneWidth, ldstackPaneHeight);
+
+                pdfContainer.getChildren().add(pageView);
+            }
+
+            // Wrap VBox in a Group for scaling
+            Group pdfGroup = new Group(pdfContainer);
+
+            // Wrap Group in a StackPane to center content
+            StackPane centerPane = new StackPane(pdfGroup);
+            centerPane.setAlignment(Pos.CENTER);
+
+            // ScrollPane wraps the centerPane
+            ScrollPane scrollPane = new ScrollPane(centerPane);
+            scrollPane.setPannable(true);
+            scrollPane.setFitToWidth(true);
+            scrollPane.setFitToHeight(true);
+
+            // Stack PDF and buttons
+            stackPane1.getChildren().setAll(scrollPane, btnArrowLeft, btnArrowRight);
+            StackPane.setAlignment(btnArrowLeft, Pos.CENTER_LEFT);
+            StackPane.setAlignment(btnArrowRight, Pos.CENTER_RIGHT);
+            StackPane.setMargin(btnArrowLeft, new Insets(0, 0, 0, 10));
+            StackPane.setMargin(btnArrowRight, new Insets(0, 10, 0, 0));
+
+            PauseTransition delay = new PauseTransition(Duration.seconds(2)); // 2-second delay
+            delay.setOnFinished(event -> {
+                Platform.runLater(() -> {
+                    JFXUtil.stackPaneClip(stackPane1);
+                });
+            });
+            delay.play();
+            document.close();
+
+            // ----- ZOOM & PAN -----
+            final DoubleProperty zoomFactor = new SimpleDoubleProperty(1.0);
+            scrollPane.addEventFilter(ScrollEvent.SCROLL, event -> {
+                if (event.isControlDown()) {
+                    event.consume(); // stop default scroll behavior
+
+                    double delta = event.getDeltaY() > 0 ? 1.1 : 0.9; // multiplier for smooth zoom in/out
+                    double oldZoom = zoomFactor.get();
+                    zoomFactor.set(oldZoom * delta); // scale by multiplier
+
+                    // Apply scale
+                    pdfGroup.setScaleX(zoomFactor.get());
+                    pdfGroup.setScaleY(zoomFactor.get());
+
+                    // Keep mouse position centered during zoom
+                    Bounds viewportBounds = scrollPane.getViewportBounds();
+                    Bounds contentBounds = pdfGroup.getBoundsInParent();
+                    double mouseX = event.getX();
+                    double mouseY = event.getY();
+
+                    double hRatio = (scrollPane.getHvalue() * (contentBounds.getWidth() - viewportBounds.getWidth()) + mouseX) / contentBounds.getWidth();
+                    double vRatio = (scrollPane.getVvalue() * (contentBounds.getHeight() - viewportBounds.getHeight()) + mouseY) / contentBounds.getHeight();
+
+                    Platform.runLater(() -> {
+                        Bounds newBounds = pdfGroup.getBoundsInParent();
+                        double newH = (hRatio * newBounds.getWidth() - mouseX) / (newBounds.getWidth() - viewportBounds.getWidth());
+                        double newV = (vRatio * newBounds.getHeight() - mouseY) / (newBounds.getHeight() - viewportBounds.getHeight());
+
+                        scrollPane.setHvalue(Double.isNaN(newH) ? 0.5 : Math.min(Math.max(0, newH), 1.0));
+                        scrollPane.setVvalue(Double.isNaN(newV) ? 0.5 : Math.min(Math.max(0, newV), 1.0));
+                    });
+                }
+            });
+
+            // Pan with mouse drag
+            final ObjectProperty<Point2D> lastMouse = new SimpleObjectProperty<>();
+            pdfGroup.setOnMousePressed(e -> lastMouse.set(new Point2D(e.getSceneX(), e.getSceneY())));
+
+            pdfGroup.setOnMouseDragged(e -> {
+                if (lastMouse.get() != null) {
+                    double deltaX = e.getSceneX() - lastMouse.get().getX();
+                    double deltaY = e.getSceneY() - lastMouse.get().getY();
+
+                    pdfGroup.setTranslateX(pdfGroup.getTranslateX() + deltaX);
+                    pdfGroup.setTranslateY(pdfGroup.getTranslateY() + deltaY);
+
+                    lastMouse.set(new Point2D(e.getSceneX(), e.getSceneY()));
+                }
+            });
+            pdfGroup.setOnMouseReleased(e -> lastMouse.set(null));
+        } catch (IOException ex) {
+            Logger.getLogger(JFXUtil.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     /* Used for displaying attachment */
@@ -2541,9 +2656,9 @@ public class JFXUtil {
 
     //private
     private static Map<String, String> buildValueToNameMap(Class<?> clazz) {
-        if (cache.containsKey(clazz)) {
-            return cache.get(clazz);
-        }
+//        if (cache.containsKey(clazz)) {
+//            return cache.get(clazz);
+//        }
         Map<String, String> valueToNameMap = new HashMap<>();
         for (Field field : clazz.getDeclaredFields()) {
             if (Modifier.isStatic(field.getModifiers())) {
@@ -2551,13 +2666,16 @@ public class JFXUtil {
                     Object value = field.get(null);
                     if (value instanceof String) {
                         String fieldName = field.getName();
+                        if (fieldName != null) {
+                            fieldName = fieldName.replace("_", " ");
+                        }
                         // Special handling: if field name is VOID, change to VOIDED
                         if ("VOID".equals(fieldName)) {
                             fieldName = "VOIDED";
                         }
-                        if ("DIGITAL PAYMENT".equals(fieldName)) {
-                            fieldName = "ONLINE PAYMENT";
-                        }
+//                        if ("DIGITAL PAYMENT".equals(fieldName)) {
+//                            fieldName = "E-WALLET";
+//                        }
                         if ("WIRED".equals(fieldName)) {
                             fieldName = "BANK TRANSFER";
                         }
@@ -2604,8 +2722,8 @@ public class JFXUtil {
     }
 
     /*Requests focus on a textfield, only if its object condition is null or blank*/
-    public static void requestFocusNullField(Object[][] checks, TextField fallback) {
-        TextField target = Stream.of(checks)
+    public static void requestFocusNullField(Object[][] checks, TextInputControl fallback) {
+        TextInputControl target = Stream.of(checks)
                 .filter(c -> {
                     try {
                         return isObjectEqualTo(c[0], null, "");
@@ -2613,8 +2731,8 @@ public class JFXUtil {
                         return false;
                     }
                 })
-                .map(c -> (TextField) c[1])
-                .filter(tf -> tf != null && !tf.isDisabled())
+                .map(c -> (TextInputControl) c[1])
+                .filter(ctrl -> ctrl != null && !ctrl.isDisabled())
                 .findFirst()
                 .orElse(null);
 
@@ -2651,7 +2769,8 @@ public class JFXUtil {
         return new AbstractMap.SimpleEntry<>(getFormattedClassTitle(clazz), clazz);
     }
 
-    /*Throws similar break functionality*/
+    /*Alternative to break*/
+ /*Throws similar break functionality*/
     public static class BreakLoopException extends RuntimeException {
     }
 
@@ -2759,19 +2878,40 @@ public class JFXUtil {
 
     /*ComboBox value setter; Prevents listener to trigger while setting value*/
  /*requires combobox id and index value to be selected*/
-    public static void setCmbValue(ComboBox<?> comboBox, int value) {
-        // Save original listener
-        EventHandler<ActionEvent> originalHandler = comboBox.getOnAction();
-        // Temporarily remove listener to prevent triggering events
-        comboBox.setOnAction(null);
-        // Safe cast for flexibility
-        if (value < 0) {
-            comboBox.getSelectionModel().select(value);
-        } else {
-            comboBox.getSelectionModel().select(value);
+    public static <T> void setCmbValue(ComboBox<T> comboBox, Object value) {
+        if (comboBox == null) {
+            return;
         }
+
+        EventHandler<ActionEvent> originalHandler = comboBox.getOnAction();
+        comboBox.setOnAction(null);
+
+        // ✅ If null or -1 → select index -1
+        if (value == null || (value instanceof Integer && (Integer) value == -1)) {
+            comboBox.getSelectionModel().select(-1);
+            comboBox.setOnAction(originalHandler);
+            return;
+        }
+
+        if (value instanceof Integer) {
+            int index = (Integer) value;
+            if (index >= 0 && index < comboBox.getItems().size()) {
+                comboBox.getSelectionModel().select(index);
+            }
+
+        } else if (value instanceof String) {
+            String title = (String) value;
+            for (T item : comboBox.getItems()) {
+                if (title.equals(String.valueOf(item))) {
+                    comboBox.getSelectionModel().select(item);
+                    break;
+                }
+            }
+        }
+
         comboBox.setOnAction(originalHandler);
     }
+
 
     /*Returns description or code of the source type*/
  /*Requires string value(for comparison) and boolean if the string value is code(to return description); alternatively*/
@@ -2962,5 +3102,89 @@ public class JFXUtil {
                 }
             }
         }
+    }
+
+    public static void checkDisabledTabs(TabPane tabPane, Consumer<Tab> action) {
+        tabPane.addEventFilter(MouseEvent.MOUSE_PRESSED, event -> {
+            for (Node node : tabPane.lookupAll(".tab")) {
+                if (node.localToScene(node.getBoundsInLocal())
+                        .contains(event.getSceneX(), event.getSceneY())) {
+
+                    Label label = (Label) node.lookup(".tab-label");
+                    if (label == null) {
+                        return;
+                    }
+                    String tabText = label.getText();
+                    for (Tab tab : tabPane.getTabs()) {
+                        if (tab.isDisable() && tabText.equals(tab.getText())) {
+                            action.accept(tab);
+                            event.consume();
+                            return;
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    /*Used to enhance readability*/
+    public static void onTabSelected(TabPane tabPane, Consumer<String> onTabTitleSelected) {
+        tabPane.getSelectionModel()
+                .selectedItemProperty()
+                .addListener((obs, oldTab, newTab) -> {
+                    if (newTab != null) {
+                        onTabTitleSelected.accept(newTab.getText());
+                    }
+                });
+    }
+
+    public static void showTooltip(String message, Node... nodes) {
+        if (message == null || message.trim().isEmpty() || nodes == null || nodes.length == 0) {
+            return;
+        }
+
+        Platform.runLater(() -> {
+            Tooltip tooltip = new Tooltip(message);
+            tooltip.setStyle(
+                    "-fx-font-size: 12px;"
+                    + "-fx-padding: 6 10 6 10;"
+            );
+
+            for (Node node : nodes) {
+                if (node == null || node.getScene() == null) {
+                    continue;
+                }
+
+                double x = node.localToScreen(node.getBoundsInLocal()).getMinX();
+                double y = node.localToScreen(node.getBoundsInLocal()).getMaxY();
+
+                tooltip.show(node, x, y);
+
+                PauseTransition delay = new PauseTransition(Duration.seconds(5));
+                delay.setOnFinished(e -> {
+                    if (tooltip.isShowing()) {
+                        tooltip.hide();
+                    }
+                });
+                delay.play();
+            }
+        });
+    }
+
+    public static boolean loadValidation(int pnEditMode, String pxeModuleName, String lsCurrentTransNo, String lsTransactionNo) {
+        if (pnEditMode == EditMode.UPDATE) {
+            if (lsCurrentTransNo.equals(lsTransactionNo)) {
+                if (!ShowMessageFX.YesNo(null, pxeModuleName, "Transaction is currently in update mode.\n"
+                        + "Reload the transaction?")) {
+                    return false;
+                }
+            } else {
+                if (!ShowMessageFX.YesNo(null, pxeModuleName, "Transaction is currently in update mode.\n"
+                        + "Are you sure you want to switch to another transaction?")) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 }
