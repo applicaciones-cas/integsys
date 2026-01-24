@@ -125,6 +125,7 @@ public class POReplacement_ConfirmationSPCarController implements Initializable,
     ObservableList<String> documentType = ModelDeliveryAcceptance_Attachment.documentType;
     private FilteredList<ModelDeliveryAcceptance_Main> filteredData;
     private FilteredList<ModelDeliveryAcceptance_Detail> filteredDataDetail;
+    private boolean tooltipShown = false;
     Map<String, String> imageinfo_temp = new HashMap<>();
 
     private FileChooser fileChooser;
@@ -843,6 +844,10 @@ public class POReplacement_ConfirmationSPCarController implements Initializable,
                             loadRecordSearch();
                             return;
                         case "tfSearchReferenceNo":
+                            if (!tooltipShown) {
+                                JFXUtil.showTooltip("NOTE: Results appear directly in the table view, no pop-up dialog.", tfSearchReferenceNo);
+                                tooltipShown = true;
+                            }
                             poController.PurchaseOrderReceiving().Master().setTransactionNo(lsValue);
                             retrievePOR();
                             return;

@@ -124,6 +124,7 @@ public class POReplacement_ConfirmationAppliancesController implements Initializ
     ObservableList<String> documentType = ModelDeliveryAcceptance_Attachment.documentType;
     private FilteredList<ModelDeliveryAcceptance_Main> filteredData;
     private FilteredList<ModelDeliveryAcceptance_Detail> filteredDataDetail;
+    private boolean tooltipShown = false;
     Map<String, String> imageinfo_temp = new HashMap<>();
 
     private FileChooser fileChooser;
@@ -920,6 +921,10 @@ public class POReplacement_ConfirmationAppliancesController implements Initializ
                             loadRecordSearch();
                             return;
                         case "tfSearchReferenceNo":
+                            if (!tooltipShown) {
+                                JFXUtil.showTooltip("NOTE: Results appear directly in the table view, no pop-up dialog.", tfSearchReferenceNo);
+                                tooltipShown = true;
+                            }
                             retrievePOR();
                             return;
                         case "tfTrucking":
