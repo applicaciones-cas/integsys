@@ -55,6 +55,7 @@ import org.guanzon.appdriver.base.GRiderCAS;
 import org.guanzon.appdriver.base.LogWrapper;
 import org.guanzon.appdriver.constant.EditMode;
 import org.guanzon.appdriver.base.GuanzonException;
+import org.guanzon.appdriver.base.MiscUtil;
 import org.guanzon.cas.inv.model.Model_Inv_Master;
 import org.guanzon.cas.inv.model.Model_Inventory;
 import org.guanzon.cas.purchasing.model.Model_PO_Detail;
@@ -182,8 +183,13 @@ public class POCancellation_ConfirmationControllerAppliance implements Initializ
             initControlEvents();
 
         } catch (SQLException | GuanzonException e) {
-            Logger.getLogger(POCancellation_ConfirmationControllerAppliance.class.getName()).log(Level.SEVERE, null, e);
+            Logger.getLogger(POCancellation_ConfirmationController.class.getName()).log(Level.SEVERE, null, e);
             poLogWrapper.severe(psFormName + " :" + e.getMessage());
+            if (Platform.isFxApplicationThread()) {
+                ShowMessageFX.Warning(MiscUtil.getException(e), psFormName, null);
+            } else {
+                Platform.runLater(() -> ShowMessageFX.Warning(MiscUtil.getException(e), psFormName, null));
+            }
         }
     }
 
@@ -222,6 +228,11 @@ public class POCancellation_ConfirmationControllerAppliance implements Initializ
             } catch (CloneNotSupportedException | SQLException | GuanzonException ex) {
 
                 poLogWrapper.severe(psFormName + " :" + ex.getMessage());
+                if (Platform.isFxApplicationThread()) {
+                    ShowMessageFX.Warning(MiscUtil.getException(ex), psFormName, null);
+                } else {
+                    Platform.runLater(() -> ShowMessageFX.Warning(MiscUtil.getException(ex), psFormName, null));
+                }
 
             }
 
@@ -241,6 +252,11 @@ public class POCancellation_ConfirmationControllerAppliance implements Initializ
             loadSelectedTransactionDetail(pnTransactionDetail);
         } catch (SQLException | GuanzonException | CloneNotSupportedException ex) {
             poLogWrapper.severe(psFormName + " :" + ex.getMessage());
+            if (Platform.isFxApplicationThread()) {
+                ShowMessageFX.Warning(MiscUtil.getException(ex), psFormName, null);
+            } else {
+                Platform.runLater(() -> ShowMessageFX.Warning(MiscUtil.getException(ex), psFormName, null));
+            }
         }
     }
 
@@ -505,9 +521,14 @@ public class POCancellation_ConfirmationControllerAppliance implements Initializ
 
             initButtonDisplay(poAppController.getEditMode());
 
-        } catch (CloneNotSupportedException | NumberFormatException | SQLException | GuanzonException e) {
+        } catch (Exception e) {
             e.printStackTrace();
             poLogWrapper.severe(psFormName + " :" + e.getMessage());
+            if (Platform.isFxApplicationThread()) {
+                ShowMessageFX.Warning(MiscUtil.getException(e), psFormName, null);
+            } else {
+                Platform.runLater(() -> ShowMessageFX.Warning(MiscUtil.getException(e), psFormName, null));
+            }
         }
     }
 
@@ -572,6 +593,11 @@ public class POCancellation_ConfirmationControllerAppliance implements Initializ
             }
         } catch (SQLException | GuanzonException | CloneNotSupportedException ex) {
             poLogWrapper.severe(psFormName + " :" + ex.getMessage());
+            if (Platform.isFxApplicationThread()) {
+                ShowMessageFX.Warning(MiscUtil.getException(ex), psFormName, null);
+            } else {
+                Platform.runLater(() -> ShowMessageFX.Warning(MiscUtil.getException(ex), psFormName, null));
+            }
         }
     };
 
@@ -643,6 +669,11 @@ public class POCancellation_ConfirmationControllerAppliance implements Initializ
         } catch (Exception ex) {
             ex.printStackTrace();
             poLogWrapper.severe(psFormName + " :" + ex.getMessage());
+            if (Platform.isFxApplicationThread()) {
+                ShowMessageFX.Warning(MiscUtil.getException(ex), psFormName, null);
+            } else {
+                Platform.runLater(() -> ShowMessageFX.Warning(MiscUtil.getException(ex), psFormName, null));
+            }
         }
     }
 
@@ -712,7 +743,7 @@ public class POCancellation_ConfirmationControllerAppliance implements Initializ
                                 loadTransactionMaster();
                                 break;
 
-                        }
+                                }
                     case UP:
                         CommonUtils.SetPreviousFocus((TextField) event.getSource());
                         return;
@@ -725,6 +756,11 @@ public class POCancellation_ConfirmationControllerAppliance implements Initializ
         } catch (CloneNotSupportedException | SQLException | GuanzonException ex) {
             ex.printStackTrace();
             poLogWrapper.severe(psFormName + " :" + ex.getMessage());
+            if (Platform.isFxApplicationThread()) {
+                ShowMessageFX.Warning(MiscUtil.getException(ex), psFormName, null);
+            } else {
+                Platform.runLater(() -> ShowMessageFX.Warning(MiscUtil.getException(ex), psFormName, null));
+            }
         }
     }
 
@@ -797,6 +833,12 @@ public class POCancellation_ConfirmationControllerAppliance implements Initializ
             }
         } catch (SQLException | GuanzonException e) {
             poLogWrapper.severe(psFormName, e.getMessage());
+
+            if (Platform.isFxApplicationThread()) {
+                ShowMessageFX.Warning(MiscUtil.getException(e), psFormName, null);
+            } else {
+                Platform.runLater(() -> ShowMessageFX.Warning(MiscUtil.getException(e), psFormName, null));
+            }
         }
     }
 
@@ -984,9 +1026,15 @@ public class POCancellation_ConfirmationControllerAppliance implements Initializ
                     loButton.setVisible(visible);
                     loButton.setManaged(visible);
                 }
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
-                poLogWrapper.severe(psFormName + " :" + e.getMessage());
+            } catch (IllegalAccessException ex) {
+                ex.printStackTrace();
+                poLogWrapper.severe(psFormName + " :" + ex.getMessage());
+
+                if (Platform.isFxApplicationThread()) {
+                    ShowMessageFX.Warning(MiscUtil.getException(ex), psFormName, null);
+                } else {
+                    Platform.runLater(() -> ShowMessageFX.Warning(MiscUtil.getException(ex), psFormName, null));
+                }
             }
         }
     }
@@ -1165,6 +1213,12 @@ public class POCancellation_ConfirmationControllerAppliance implements Initializ
                 } catch (SQLException | GuanzonException ex) {
 
                     poLogWrapper.severe(psFormName + " :" + ex.getMessage());
+
+                    if (Platform.isFxApplicationThread()) {
+                        ShowMessageFX.Warning(MiscUtil.getException(ex), psFormName, null);
+                    } else {
+                        Platform.runLater(() -> ShowMessageFX.Warning(MiscUtil.getException(ex), psFormName, null));
+                    }
                     return true;
                 }
             });
@@ -1306,6 +1360,12 @@ public class POCancellation_ConfirmationControllerAppliance implements Initializ
             } catch (IllegalAccessException e) {
                 e.printStackTrace();
                 poLogWrapper.severe(psFormName + " :" + e.getMessage());
+
+                if (Platform.isFxApplicationThread()) {
+                    ShowMessageFX.Warning(MiscUtil.getException(e), psFormName, null);
+                } else {
+                    Platform.runLater(() -> ShowMessageFX.Warning(MiscUtil.getException(e), psFormName, null));
+                }
             }
         }
         return controls;
