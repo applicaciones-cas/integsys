@@ -378,7 +378,7 @@
                                                             <Font size="12.0" />
                                                          </font>
                                                       </Label>
-                                                      <TextField fx:id="tfCheckNo" maxHeight="25.0" promptText="Press F3: Search" GridPane.columnIndex="7" GridPane.columnSpan="2" />
+                                                      <TextField fx:id="tfCheckNo" editable="false" maxHeight="25.0" GridPane.columnIndex="7" GridPane.columnSpan="2" />
                                                       <Label text="Note" GridPane.rowIndex="3">
                                                          <font>
                                                             <Font size="12.0" />

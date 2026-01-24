@@ -155,7 +155,7 @@
                                                 <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                                              </padding>
                                                             </CheckBox>
-                                          <TextField fx:id="txtField03" promptText="Press F3: Search" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="2">
+                                          <TextField fx:id="txtField03" editable="false" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="2">
                                              <font>
                                                 <Font size="14.0" />
                                              </font>
@@ -163,7 +163,7 @@
                                                 <Insets left="5.0" />
                                              </padding>
                                           </TextField>
-                                          <Label contentDisplay="RIGHT" layoutX="20.0" layoutY="45.0" text=" Category Name" GridPane.rowIndex="2">
+                                          <Label contentDisplay="RIGHT" layoutX="20.0" layoutY="45.0" text="Industry" GridPane.rowIndex="2">
                                              <graphic>
                                                 <Text fill="RED" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="Text2" text="*">
                                                    <font>
@@ -172,7 +172,7 @@
                                                 </Text>
                                              </graphic>
                                              <GridPane.margin>
-                                                <Insets left="5.0" />
+                                                <Insets left="10.0" />
                                              </GridPane.margin>
                                           </Label>
                                        </children>

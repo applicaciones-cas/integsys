@@ -241,8 +241,8 @@ public class CheckDeposit_ConfirmationController implements Initializable, Scree
                             break;
 
                         case "tfBankMaster":
-                            if (!isJSONSuccess(poAppController.searchTransactionBankFilter(tfBankMaster.getText(), false),
-                                    "Initialize Search Check! ")) {
+                            if (!isJSONSuccess(poAppController.searchTransactionBankFilter(tfBankMaster.getText() != null ? tfBankMaster.getText() : "", false),
+                                        "Initialize Search Check! ")) {
                                 return;
                             }
 
@@ -250,16 +250,16 @@ public class CheckDeposit_ConfirmationController implements Initializable, Scree
                             break;
 
                         case "tfBankAccountNo":
-                            if (!isJSONSuccess(poAppController.searchTransactionBankAccount(tfBankAccountNo.getText(), true, false),
-                                    "Initialize Search Check! ")) {
+                            if (!isJSONSuccess(poAppController.searchTransactionBankAccount(tfBankAccountNo.getText() != null ? tfBankAccountNo.getText() : "", true, false),
+                                        "Initialize Search Check! ")) {
                                 return;
                             }
                             loadTransactionMaster();
                             break;
 
                         case "tfBankAccountName":
-                            if (!isJSONSuccess(poAppController.searchTransactionBankAccount(tfBankAccountName.getText(), false, false),
-                                    "Initialize Search Check! ")) {
+                            if (!isJSONSuccess(poAppController.searchTransactionBankAccount(tfBankAccountName.getText()!= null ? tfBankAccountName.getText() : "", false, false),
+                                        "Initialize Search Check! ")) {
                                 return;
                             }
                             loadTransactionMaster();
@@ -449,17 +449,6 @@ public class CheckDeposit_ConfirmationController implements Initializable, Scree
                         ShowMessageFX.Information("Please load transaction before proceeding..", psFormName, "");
                         return;
                     }
-                    if (ShowMessageFX.OkayCancel(null, psFormName, "Do you want to Confirm transaction?") == true) {
-                        if (!isJSONSuccess(poAppController.CloseTransaction(), "Initialize Close Transaction")) {
-                            return;
-                        }
-                        if (ShowMessageFX.OkayCancel(null, psFormName, "Do you want to Print transaction?") == true) {
-                            if (!isJSONSuccess(poAppController.printDepositSlip(), "Initialize Print Transaction")) {
-                                return;
-                            }
-                        }
-                    }
-
                     if (!isJSONSuccess(poAppController.SaveTransaction(), "Initialize Save Transaction")) {
                         return;
                     }
@@ -682,7 +671,7 @@ public class CheckDeposit_ConfirmationController implements Initializable, Scree
     }
 
     private final ChangeListener<? super Boolean> txtArea_Focus = (o, ov, nv) -> {
-        TextField loTextField = (TextField) ((ReadOnlyBooleanPropertyBase) o).getBean();
+        TextArea loTextField = (TextArea) ((ReadOnlyBooleanPropertyBase) o).getBean();
         String lsTextFieldID = loTextField.getId();
         String lsValue = loTextField.getText();
         if (lsValue == null) {
@@ -707,8 +696,8 @@ public class CheckDeposit_ConfirmationController implements Initializable, Scree
     };
 
     private void txtArea_KeyPressed(KeyEvent event) {
-        TextField loTxtField = (TextField) event.getSource();
-        String txtFieldID = ((TextField) event.getSource()).getId();
+        TextArea loTxtField = (TextArea) event.getSource();
+        String txtFieldID = ((TextArea) event.getSource()).getId();
         String lsValue = "";
         if (loTxtField.getText() == null) {
             lsValue = "";
@@ -831,9 +820,10 @@ public class CheckDeposit_ConfirmationController implements Initializable, Scree
             } else {
                 btnVoid.setText("Void");
             }
-            if (poAppController.getBanksMaster().getBankName() != null) {
-                tfBankMaster.setText(poAppController.getBanksMaster().getBankName());
-            }
+             tfBankMaster.setText(poAppController.getMaster().BankAccount().Banks().getBankName());
+//            if (poAppController.getBanksMaster().getBankName() != null) {
+//               
+//            }
         } catch (SQLException | GuanzonException e) {
             poLogWrapper.severe(psFormName, e.getMessage());
         }
@@ -1007,7 +997,11 @@ public class CheckDeposit_ConfirmationController implements Initializable, Scree
             });
             tblColDetailDate.setCellValueFactory((loModel) -> {
                 try {
-                    return new SimpleStringProperty(String.valueOf(loModel.getValue().CheckPayment().getCheckDate()));
+                    return new SimpleStringProperty(
+                            loModel.getValue().CheckPayment().getCheckDate() == null
+                            ? ""
+                            : loModel.getValue().CheckPayment().getCheckDate().toString()
+                    );
                 } catch (SQLException | GuanzonException e) {
                     poLogWrapper.severe(psFormName, e.getMessage());
                     return new SimpleStringProperty("");
@@ -1050,7 +1044,7 @@ public class CheckDeposit_ConfirmationController implements Initializable, Scree
     }
 
     private void getLoadedTransaction() throws SQLException, GuanzonException, CloneNotSupportedException {
-        clearAllInputs();
+//        clearAllInputs();
         loadTransactionMaster();
         reloadTableDetail();
         loadSelectedTransactionDetail(pnTransactionDetail);
