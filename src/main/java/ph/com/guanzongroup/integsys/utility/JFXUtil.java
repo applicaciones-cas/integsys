@@ -2722,8 +2722,8 @@ public class JFXUtil {
     }
 
     /*Requests focus on a textfield, only if its object condition is null or blank*/
-    public static void requestFocusNullField(Object[][] checks, TextField fallback) {
-        TextField target = Stream.of(checks)
+    public static void requestFocusNullField(Object[][] checks, TextInputControl fallback) {
+        TextInputControl target = Stream.of(checks)
                 .filter(c -> {
                     try {
                         return isObjectEqualTo(c[0], null, "");
@@ -2731,8 +2731,8 @@ public class JFXUtil {
                         return false;
                     }
                 })
-                .map(c -> (TextField) c[1])
-                .filter(tf -> tf != null && !tf.isDisabled())
+                .map(c -> (TextInputControl) c[1])
+                .filter(ctrl -> ctrl != null && !ctrl.isDisabled())
                 .findFirst()
                 .orElse(null);
 
