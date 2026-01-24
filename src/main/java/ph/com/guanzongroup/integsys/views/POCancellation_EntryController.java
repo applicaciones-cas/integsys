@@ -161,8 +161,7 @@ public class POCancellation_EntryController implements Initializable, ScreenInte
             poLogWrapper = new LogWrapper(psFormName, psFormName);
             poAppController = new POController(poApp, poLogWrapper).POCancellation();
             poAppController.setTransactionStatus(POCancellationStatus.OPEN);
-            //remove if not general
-            psIndustryID = "";
+
             //initlalize and validate transaction objects from class controller
             if (!isJSONSuccess(poAppController.initTransaction(), psFormName)) {
                 unloadForm appUnload = new unloadForm();
