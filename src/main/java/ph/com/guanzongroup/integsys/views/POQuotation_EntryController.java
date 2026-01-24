@@ -976,6 +976,18 @@ public class POQuotation_EntryController implements Initializable, ScreenInterfa
             String lsValue = input.getText() == null ? "" : input.getText();
             poJSON = new JSONObject();
             switch (event.getCode()) {
+                case UP:
+                    if (JFXUtil.isObjectEqualTo(lsID, "taDescription")) {
+                        moveNext(true, true);
+                        event.consume();
+                    }
+                    break;
+                case DOWN:
+                    if (JFXUtil.isObjectEqualTo(lsID, "taDescription")) {
+                        moveNext(false, true);
+                        event.consume();
+                    }
+                    break;
                 case F3:
                     switch (lsID) {
                         case "taDescription":
@@ -1602,11 +1614,11 @@ public class POQuotation_EntryController implements Initializable, ScreenInterfa
                     });
                 }
             }
-            tfBrand.setText(poController.POQuotation().Detail(pnDetail).Brand().getDescription());
-            tfModel.setText(poController.POQuotation().Detail(pnDetail).Model().getDescription());
+            tfBrand.setText(poController.POQuotation().Detail(pnDetail).Inventory().Brand().getDescription());
+            tfModel.setText(poController.POQuotation().Detail(pnDetail).Inventory().Model().getDescription());
             tfColor.setText(poController.POQuotation().Detail(pnDetail).Inventory().Color().getDescription());
             tfMeasure.setText(poController.POQuotation().Detail(pnDetail).Inventory().Measure().getDescription());
-            
+
             taDescription.setText(poController.POQuotation().Detail(pnDetail).getDescription());
             tfReplaceId.setText(poController.POQuotation().Detail(pnDetail).ReplacedInventory().getBarCode());
             tfReplaceDescription.setText(poController.POQuotation().Detail(pnDetail).getReplaceDescription());

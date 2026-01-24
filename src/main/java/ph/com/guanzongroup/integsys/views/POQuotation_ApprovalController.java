@@ -716,6 +716,18 @@ public class POQuotation_ApprovalController implements Initializable, ScreenInte
             String lsValue = input.getText() == null ? "" : input.getText();
             poJSON = new JSONObject();
             switch (event.getCode()) {
+                case UP:
+                    if (JFXUtil.isObjectEqualTo(lsID, "taDescription")) {
+                        moveNext(true, true);
+                        event.consume();
+                    }
+                    break;
+                case DOWN:
+                    if (JFXUtil.isObjectEqualTo(lsID, "taDescription")) {
+                        moveNext(false, true);
+                        event.consume();
+                    }
+                    break;
                 case F3:
                     switch (lsID) {
                         case "taDescription":
