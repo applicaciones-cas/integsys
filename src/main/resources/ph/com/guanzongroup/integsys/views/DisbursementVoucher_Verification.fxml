@@ -185,7 +185,7 @@
                                                                     <children>
                                                                         <VBox spacing="5.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                                                             <children>
-                                                                                <AnchorPane style="-fx-border-color: orange;">
+                                                                                <AnchorPane style="-fx-border-color: FF8201;">
                                                                                     <children>
                                                                                         <VBox prefHeight="200.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
                                                                                             <children>
@@ -474,7 +474,7 @@
                                                                                         </VBox>
                                                                                     </children>
                                                                                 </AnchorPane>
-                                                                                <AnchorPane fx:id="apDVDetail" style="-fx-border-color: orange;">
+                                                                                <AnchorPane fx:id="apDVDetail" style="-fx-border-color: FF8201;">
                                                                <children>
                                                                   <GridPane AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="5.0">
                                                                      <columnConstraints>
@@ -563,7 +563,7 @@
                                                                   <Insets />
                                                                </VBox.margin>
                                                                                 </AnchorPane>
-                                                                                <AnchorPane style="-fx-border-color: orange;" VBox.vgrow="ALWAYS">
+                                                                                <AnchorPane style="-fx-border-color: FF8201;" VBox.vgrow="ALWAYS">
                                                                                     <children>
                                                                                         <TableView fx:id="tblVwDetails" layoutX="6.0" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="5.0">
                                                                                             <columns>
@@ -603,7 +603,7 @@
                                                     <children>
                                                         <VBox maxWidth="950.0" prefHeight="339.0" prefWidth="950.0" spacing="5.0" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="5.0">
                                                             <children>
-                                                                <AnchorPane fx:id="apJournalMaster" style="-fx-border-color: orange;">
+                                                                <AnchorPane fx:id="apJournalMaster" style="-fx-border-color: FF8201;">
                                                                     <children>
                                                                         <GridPane layoutX="11.0" layoutY="6.0" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="5.0">
                                                                             <columnConstraints>
@@ -658,7 +658,7 @@
                                                                         </GridPane>
                                                                     </children>
                                                                 </AnchorPane>
-                                                                <AnchorPane fx:id="apJournalDetails" minWidth="800.0" style="-fx-border-color: orange;">
+                                                                <AnchorPane fx:id="apJournalDetails" minWidth="800.0" style="-fx-border-color: FF8201;">
                                                                     <children>
                                                                         <GridPane AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="5.0">
                                                                             <columnConstraints>
@@ -694,7 +694,7 @@
                                                                         </GridPane>
                                                                     </children>
                                                                 </AnchorPane>
-                                                                <AnchorPane style="-fx-border-color: orange;" VBox.vgrow="ALWAYS">
+                                                                <AnchorPane style="-fx-border-color: FF8201;" VBox.vgrow="ALWAYS">
                                                                     <children>
                                                                         <GridPane AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="5.0">
                                                                             <columnConstraints>
@@ -734,7 +734,7 @@
                                                     <children>
                                                         <VBox prefHeight="339.0" spacing="5.0" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="5.0">
                                                             <children>
-                                                                <AnchorPane fx:id="apBIRDetail" style="-fx-border-color: orange;">
+                                                                <AnchorPane fx:id="apBIRDetail" style="-fx-border-color: FF8201;">
                                                                     <children>
                                                                         <GridPane layoutX="11.0" layoutY="6.0" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="5.0">
                                                                             <columnConstraints>
@@ -785,7 +785,7 @@
                                                                         </GridPane>
                                                                     </children>
                                                                 </AnchorPane>
-                                                                <AnchorPane style="-fx-border-color: orange;" VBox.vgrow="ALWAYS">
+                                                                <AnchorPane style="-fx-border-color: FF8201;" VBox.vgrow="ALWAYS">
                                                                     <children>
                                                                         <GridPane AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="5.0">
                                                                             <columnConstraints>
@@ -921,7 +921,7 @@
                             </Tab>
                                     </tabs>
                                 </TabPane>
-                                        <AnchorPane style="-fx-border-color: orange;">
+                                        <AnchorPane style="-fx-border-color: FF8201;">
                                             <children>
                                                 <GridPane AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                                     <columnConstraints>

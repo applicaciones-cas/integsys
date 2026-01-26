@@ -275,7 +275,7 @@
                                                                               <DatePicker fx:id="dpSIDate" GridPane.columnIndex="7" GridPane.rowIndex="4" />
                                                       <TextField fx:id="tfReferenceNo" maxHeight="25.0" GridPane.columnIndex="7" GridPane.rowIndex="3" />
                                                                               <TextField fx:id="tfSINo" GridPane.columnIndex="7" GridPane.rowIndex="6" />
-                                                                          <TextField fx:id="tfTerm" maxHeight="25.0" maxWidth="-Infinity" promptText="Press F3: Search" GridPane.columnIndex="2" GridPane.rowIndex="6" />
+                                                                          <TextField fx:id="tfTerm" maxHeight="25.0" maxWidth="-Infinity" GridPane.columnIndex="2" GridPane.rowIndex="6" />
                                                                               <TextField fx:id="tfTransactionTotal" alignment="CENTER_RIGHT" disable="true" editable="false" layoutX="738.0" layoutY="80.0" promptText="0.0000" styleClass="DisabledTextField" GridPane.columnIndex="11" GridPane.rowIndex="2" />
                                                                               <TextField fx:id="tfDiscountRate" alignment="CENTER_RIGHT" promptText="0.00" GridPane.columnIndex="11" GridPane.rowIndex="3" />
                                                                               <TextField fx:id="tfDiscountAmount" alignment="CENTER_RIGHT" promptText="0.0000" GridPane.columnIndex="11" GridPane.rowIndex="4" />
