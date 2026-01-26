@@ -99,6 +99,7 @@ public class PurchaseOrderReturn_ConfirmationSPMCController implements Initializ
 
     private FilteredList<ModelPurchaseOrderReturn_Main> filteredData;
     private FilteredList<ModelPurchaseOrderReturn_Detail> filteredDataDetail;
+    private boolean tooltipShown = false;
 
     private int pnAttachment;
 
@@ -669,6 +670,10 @@ public class PurchaseOrderReturn_ConfirmationSPMCController implements Initializ
                             loadRecordSearch();
                             return;
                         case "tfSearchReferenceNo":
+                            if (!tooltipShown) {
+                                JFXUtil.showTooltip("NOTE: Results appear directly in the table view, no pop-up dialog.", tfSearchReferenceNo);
+                                tooltipShown = true;
+                            }
                             retrievePOR();
                             return;
                         case "tfBarcode":

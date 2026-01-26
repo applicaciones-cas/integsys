@@ -6,6 +6,7 @@ import java.sql.SQLException;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyBooleanPropertyBase;
 import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
@@ -148,9 +149,10 @@ public class CategoryController implements Initializable, ScreenInterface {
                         clearAllFields();
                         txtField02.requestFocus();
                         JSONObject poJSON = oParameters.Category().newRecord();
-                        pnEditMode = EditMode.READY;
+                        oParameters.Brand().getModel().setIndustryCode(oApp.getIndustry());
+                        pnEditMode = oParameters.Category().getEditMode();
                         if ("success".equals((String) poJSON.get("result"))) {
-                            pnEditMode = EditMode.ADDNEW;
+                             pnEditMode = oParameters.Category().getEditMode();
                             initButton(pnEditMode);
                             initTabAnchor();
                             loadRecord();
@@ -167,7 +169,8 @@ public class CategoryController implements Initializable, ScreenInterface {
                             txtSeeks01.clear();
                             break;
                         }
-                        pnEditMode = oParameters.Category().getEditMode();
+                        pnEditMode = oParameters.Category().getEditMode();                        
+                        initButton(pnEditMode);
                         loadRecord();
                         initTabAnchor();
                         break;
@@ -196,9 +199,8 @@ public class CategoryController implements Initializable, ScreenInterface {
                         JSONObject saveResult = oParameters.Category().saveRecord();
                         if ("success".equals((String) saveResult.get("result"))) {
                             ShowMessageFX.Information((String) saveResult.get("message"), "Computerized Acounting System", pxeModuleName);
-                            pnEditMode = EditMode.UNKNOWN;
-                            initButton(pnEditMode);
                             clearAllFields();
+                            Platform.runLater(() -> btnNew.fire());
                         } else {
                             ShowMessageFX.Information((String) saveResult.get("message"), "Computerized Acounting System", pxeModuleName);
                         }
@@ -211,8 +213,6 @@ public class CategoryController implements Initializable, ScreenInterface {
                         switch (Status) {
                             case "0":
                                 if (ShowMessageFX.YesNo(null, pxeModuleName, "Do you want to Activate this Parameter?") == true) {
-                                    ShowMessageFX.Information(String.valueOf(oParameters.Category().getEditMode()), "Computerized Accounting System", pxeModuleName);
-                                    oParameters.Category().initialize();
                                     poJsON = oParameters.Category().activateRecord();
                                     if ("error".equals(poJsON.get("result"))) {
                                         ShowMessageFX.Information((String) poJsON.get("message"), "Computerized Accounting System", pxeModuleName);
@@ -230,10 +230,6 @@ public class CategoryController implements Initializable, ScreenInterface {
                                 break;
                             case "1":
                                 if (ShowMessageFX.YesNo(null, pxeModuleName, "Do you want to Deactivate this Parameter?") == true) {
-
-                                    System.out.println("EDIT MODE : " + oParameters.Category().getEditMode());
-                                    ShowMessageFX.Information(String.valueOf(oParameters.Category().getEditMode()), "Computerized Accounting System", pxeModuleName);
-
                                     poJsON = oParameters.Category().deactivateRecord();
                                     if ("error".equals(poJsON.get("result"))) {
                                         ShowMessageFX.Information((String) poJsON.get("message"), "Computerized Accounting System", pxeModuleName);
@@ -274,6 +270,9 @@ public class CategoryController implements Initializable, ScreenInterface {
         btnSave.setManaged(lbShow);
         btnUpdate.setVisible(!lbShow);
         btnUpdate.setManaged(!lbShow);
+        
+        btnActivate.setVisible(!lbShow);
+        btnActivate.setManaged(!lbShow);
 
         btnBrowse.setVisible(!lbShow);
         btnBrowse.setManaged(!lbShow);
@@ -282,6 +281,10 @@ public class CategoryController implements Initializable, ScreenInterface {
 
         btnClose.setVisible(true);
         btnClose.setManaged(true);
+        if (fnValue == EditMode.UNKNOWN){
+            btnActivate.setVisible(false);
+            btnActivate.setManaged(false);
+        }
     }
 
     private void InitTextFields() {

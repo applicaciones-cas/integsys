@@ -4,8 +4,6 @@
  */
 package ph.com.guanzongroup.integsys.views;
 
-import java.awt.image.BufferedImage;
-import java.io.File;
 import ph.com.guanzongroup.integsys.model.ModelDisbursementVoucher_Detail;
 import ph.com.guanzongroup.integsys.model.ModelJournalEntry_Detail;
 import ph.com.guanzongroup.integsys.utility.CustomCommonUtil;
@@ -25,28 +23,19 @@ import java.util.logging.Logger;
 import javafx.animation.PauseTransition;
 import javafx.animation.TranslateTransition;
 import javafx.application.Platform;
-import javafx.beans.property.DoubleProperty;
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleDoubleProperty;
-import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.geometry.Bounds;
 import javafx.geometry.Insets;
-import javafx.geometry.Point2D;
 import javafx.geometry.Pos;
-import javafx.scene.Group;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
-import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TableColumn;
@@ -61,15 +50,10 @@ import static javafx.scene.input.KeyCode.ENTER;
 import static javafx.scene.input.KeyCode.F3;
 import static javafx.scene.input.KeyCode.TAB;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.input.MouseEvent;
-import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
 import javafx.util.Duration;
 import javax.script.ScriptException;
-import org.apache.pdfbox.pdmodel.PDDocument;
-import org.apache.pdfbox.rendering.PDFRenderer;
 import org.guanzon.appdriver.agent.ShowMessageFX;
 import org.guanzon.appdriver.base.CommonUtils;
 import org.guanzon.appdriver.base.GRiderCAS;
@@ -85,6 +69,7 @@ import ph.com.guanzongroup.cas.cashflow.DisbursementVoucher;
 import ph.com.guanzongroup.cas.cashflow.services.CashflowControllers;
 import ph.com.guanzongroup.cas.cashflow.status.DisbursementStatic;
 import ph.com.guanzongroup.cas.cashflow.status.JournalStatus;
+import ph.com.guanzongroup.cas.cashflow.status.OtherPaymentStatus;
 import ph.com.guanzongroup.integsys.model.ModelBIR_Detail;
 import ph.com.guanzongroup.integsys.model.ModelDeliveryAcceptance_Attachment;
 
@@ -120,15 +105,13 @@ public class DisbursementVoucher_HistoryController implements Initializable, Scr
     JFXUtil.ReloadableTableTask loadTableDetail, loadTableDetailJE, loadTableDetailBIR, loadTableAttachment;
     private final JFXUtil.ImageViewer imageviewerutil = new JFXUtil.ImageViewer();
     ObservableList<String> cPaymentMode = FXCollections.observableArrayList(
-            "CHECK", "WIRED", "DIGITAL PAYMENT");
+            "CHECK", "BANK TRANSFER", "DIGITAL PAYMENT");
     ObservableList<String> cDisbursementMode = FXCollections.observableArrayList("DELIVER", "PICK-UP");
     ObservableList<String> cPayeeType = FXCollections.observableArrayList("INDIVIDUAL", "CORPORATION");
     ObservableList<String> cClaimantType = FXCollections.observableArrayList("AUTHORIZED REPRESENTATIVE", "PAYEE");
     ObservableList<String> cCheckStatus = FXCollections.observableArrayList("FLOATING", "OPEN",
             "CLEARED  / POSTED", "CANCELLED", "STALED", "HOLD / STOP PAYMENT",
             "BOUNCED / DISCHONORED", "VOID");
-    ObservableList<String> cOtherPayment = FXCollections.observableArrayList("FLOATING");
-    ObservableList<String> cOtherPaymentBTransfer = FXCollections.observableArrayList("FLOATING");
     ObservableList<String> documentType = ModelDeliveryAcceptance_Attachment.documentType;
     private int currentIndex = 0;
     /* DV  & Journal */
@@ -137,7 +120,7 @@ public class DisbursementVoucher_HistoryController implements Initializable, Scr
     @FXML
     private Label lblSource, lblDVTransactionStatus, lblJournalTransactionStatus;
     @FXML
-    private TextField tfSearchTransaction, tfSearchSupplier, tfDVTransactionNo, tfSupplier, tfVoucherNo, tfBankNameCheck, tfBankAccountCheck, tfPayeeName, tfCheckNo, tfCheckAmount, tfAuthorizedPerson, tfBankNameBTransfer, tfBankAccountBTransfer, tfPaymentAmountBTransfer, tfSupplierBank, tfSupplierAccountNoBTransfer, tfBankTransReferNo, tfBankNameOnlinePayment, tfBankAccountOnlinePayment, tfPaymentAmount, tfSupplierServiceName, tfSupplierAccountNo, tfPaymentReferenceNo, tfTotalAmount, tfVatableSales, tfVatAmountMaster, tfVatZeroRatedSales, tfVatExemptSales, tfLessWHTax, tfTotalNetAmount, tfRefNoDetail, tfVatableSalesDetail, tfVatExemptDetail, tfVatZeroRatedSalesDetail, tfVatRateDetail, tfVatAmountDetail, tfPurchasedAmountDetail, tfNetAmountDetail, tfJournalTransactionNo, tfTotalDebitAmount, tfTotalCreditAmount, tfAccountCode, tfAccountDescription, tfDebitAmount, tfCreditAmount, tfBIRTransactionNo, tfTaxCode, tfParticular, tfBaseAmount, tfTaxRate, tfTotalTaxAmount, tfAttachmentNo, tfAttachmentSource;
+    private TextField tfSearchTransaction, tfSearchSupplier, tfDVTransactionNo, tfSupplier, tfVoucherNo, tfBankNameCheck, tfBankAccountCheck, tfPayeeName, tfCheckNo, tfCheckAmount, tfAuthorizedPerson, tfBankNameBTransfer, tfBankAccountBTransfer, tfPaymentAmountBTransfer, tfSupplierBank, tfSupplierAccountNoBTransfer, tfBankTransReferNo, tfPaymentStatusBTransfer, tfBankNameOnlinePayment, tfBankAccountOnlinePayment, tfPaymentAmount, tfSupplierServiceName, tfSupplierAccountNo, tfPaymentReferenceNo, tfOnlinePaymentStatus, tfTotalAmount, tfVatableSales, tfVatAmountMaster, tfVatZeroRatedSales, tfVatExemptSales, tfLessWHTax, tfTotalNetAmount, tfRefNoDetail, tfVatableSalesDetail, tfVatExemptDetail, tfVatZeroRatedSalesDetail, tfVatRateDetail, tfVatAmountDetail, tfPurchasedAmountDetail, tfNetAmountDetail, tfJournalTransactionNo, tfTotalDebitAmount, tfTotalCreditAmount, tfAccountCode, tfAccountDescription, tfDebitAmount, tfCreditAmount, tfBIRTransactionNo, tfTaxCode, tfParticular, tfBaseAmount, tfTaxRate, tfTotalTaxAmount, tfAttachmentNo, tfAttachmentSource;
     @FXML
     private Button btnBrowse, btnHistory, btnClose, btnArrowLeft, btnArrowRight;
     @FXML
@@ -147,7 +130,7 @@ public class DisbursementVoucher_HistoryController implements Initializable, Scr
     @FXML
     private DatePicker dpDVTransactionDate, dpCheckDate, dpJournalTransactionDate, dpReportMonthYear, dpPeriodFrom, dpPeriodTo;
     @FXML
-    private ComboBox cmbPaymentMode, cmbPayeeType, cmbDisbursementMode, cmbClaimantType, cmbCheckStatus, cmbOtherPaymentBTransfer, cmbOtherPayment, cmbAttachmentType;
+    private ComboBox cmbPaymentMode, cmbPayeeType, cmbDisbursementMode, cmbClaimantType, cmbCheckStatus, cmbAttachmentType;
     @FXML
     private CheckBox chbkPrintByBank, chbkIsCrossCheck, chbkIsPersonOnly, chbkVatClassification;
     @FXML
@@ -228,56 +211,83 @@ public class DisbursementVoucher_HistoryController implements Initializable, Scr
     }
 
     public void initTabPane() {
-        tabPaneMain.getSelectionModel().selectedItemProperty().addListener((obs, oldTab, newTab) -> {
-            if (newTab != null) {
-                String tabTitle = newTab.getText();
-                switch (tabTitle) {
-                    case "Disbursement Voucher":
-                        if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
-                            pnDetailJE = 0;
+        JFXUtil.onTabSelected(tabPaneMain, tabTitle -> {
+            switch (tabTitle) {
+                case "Disbursement Voucher":
+                    if (pnEditMode == EditMode.UNKNOWN) {
+                        pnDetailJE = 0;
+                        pnDetailBIR = 0;
+                    } else {
+                        loadRecordMaster();
+                    }
+                    break;
+                case "Journal":
+                    if (pnEditMode == EditMode.READY || pnEditMode == EditMode.UPDATE || pnEditMode == EditMode.ADDNEW) {
+                        if (poController.Detail(0).getSourceNo() != null && !poController.Detail(0).getSourceNo().isEmpty()) {
+                            populateJE();
+                        } else {
+                            JFXUtil.clickTabByTitleText(tabPaneMain, "Disbursement Voucher");
+                            ShowMessageFX.Warning(null, pxeModuleName, "Please provide at least one valid disbursement detail to proceed.");
                         }
-                        break;
-                    case "Journal":
-                        if (pnEditMode == EditMode.READY || pnEditMode == EditMode.UPDATE || pnEditMode == EditMode.ADDNEW) {
-                            if (poController.Detail(0).getSourceNo() != null && !poController.Detail(0).getSourceNo().isEmpty()) {
-                                populateJE();
-                            } else {
-                                CustomCommonUtil.switchToTab(tabDetails, tabPaneMain);
-                                ShowMessageFX.Warning(null, pxeModuleName, "Please provide at least one valid disbursement detail to proceed.");
-                            }
-                        }
-                        break;
-                    case "BIR 2307":
-                        if (pnEditMode == EditMode.READY || pnEditMode == EditMode.UPDATE || pnEditMode == EditMode.ADDNEW) {
+                    }
+                    break;
+                case "BIR 2307":
+                    if (pnEditMode == EditMode.READY || pnEditMode == EditMode.UPDATE || pnEditMode == EditMode.ADDNEW) {
+                        if (poController.Detail(0).getSourceNo() != null && !poController.Detail(0).getSourceNo().isEmpty()) {
                             populateBIR();
+                        } else {
+                            JFXUtil.clickTabByTitleText(tabPaneMain, "Disbursement Voucher");
+                            ShowMessageFX.Warning(null, pxeModuleName, "Please provide at least one valid disbursement detail to proceed.");
                         }
-                        break;
-                    case "Attachments":
-                        if (pnEditMode == EditMode.READY || pnEditMode == EditMode.UPDATE || pnEditMode == EditMode.ADDNEW) {
+                    }
+                    break;
+                case "Attachments":
+                    if (pnEditMode == EditMode.READY || pnEditMode == EditMode.UPDATE || pnEditMode == EditMode.ADDNEW) {
+                        if (poController.Detail(0).getSourceNo() != null && !poController.Detail(0).getSourceNo().isEmpty()) {
                             try {
                                 poController.loadAttachments();
                             } catch (GuanzonException | SQLException ex) {
                                 Logger.getLogger(DisbursementVoucher_EntryController.class.getName()).log(Level.SEVERE, null, ex);
                             }
                             loadTableAttachment.reload();
+                        } else {
+                            JFXUtil.clickTabByTitleText(tabPaneMain, "Disbursement Voucher");
+                            ShowMessageFX.Warning(null, pxeModuleName, "Please provide at least one valid disbursement detail to proceed.");
+                        }
+                    }
+                    break;
+            }
+        });
+        JFXUtil.onTabSelected(tabPanePaymentMode, tabTitle -> {
+            try {
+                switch (tabTitle) {
+                    case "Check":
+                        if (pnEditMode == EditMode.READY || pnEditMode == EditMode.UPDATE || pnEditMode == EditMode.ADDNEW) {
+                            poController.populateCheck();
+                            loadRecordMasterCheck();
+                        }
+                        break;
+                    case "Bank Transfer":
+                        if (pnEditMode == EditMode.READY || pnEditMode == EditMode.UPDATE || pnEditMode == EditMode.ADDNEW) {
+                            poController.populateOtherPayment();
+                            loadRecordMasterBankTransfer();
+                        }
+                        break;
+                    case "Digital Payment":
+                        if (pnEditMode == EditMode.READY || pnEditMode == EditMode.UPDATE || pnEditMode == EditMode.ADDNEW) {
+                            poController.populateOtherPayment();
+                            loadRecordMasterBankTransfer();
                         }
                         break;
                 }
+            } catch (SQLException | GuanzonException | CloneNotSupportedException | ScriptException ex) {
+                Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+                ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
             }
         });
-
-        tabPanePaymentMode.addEventFilter(MouseEvent.MOUSE_PRESSED, event -> {
-            tabPanePaymentMode.lookupAll(".tab").forEach(node -> {
-                if (node.localToScene(node.getBoundsInLocal()).contains(event.getSceneX(), event.getSceneY())) {
-                    String tabName = ((javafx.scene.control.Label) node.lookup(".tab-label")).getText();
-                    for (Tab tab : tabPanePaymentMode.getTabs()) {
-                        if (tab.getText().equals(tabName) && tab.isDisable()) {
-                            ShowMessageFX.Warning(null, pxeModuleName, "This tab has been disabled as only one option applies based on the selected payment form.");
-                            event.consume();
-                        }
-                    }
-                }
-            });
+        JFXUtil.checkDisabledTabs(tabPanePaymentMode, tab -> {
+            ShowMessageFX.Warning(null, pxeModuleName, "This tab has been disabled as only one option applies based on the selected payment form.");
+            JFXUtil.glowOnce(cmbPaymentMode, "#FF8201");
         });
     }
 
@@ -299,7 +309,7 @@ public class DisbursementVoucher_HistoryController implements Initializable, Scr
                 break;
             case DisbursementStatic.DisbursementType.DIGITAL_PAYMENT:
                 JFXUtil.setDisabled(false, tabOnlinePayment);
-                JFXUtil.clickTabByTitleText(tabPanePaymentMode, "E-Wallet");
+                JFXUtil.clickTabByTitleText(tabPanePaymentMode, "Digital Payment");
                 loadRecordMasterOnlinePayment();
                 //must reset data of online payment
                 break;
@@ -1018,15 +1028,17 @@ public class DisbursementVoucher_HistoryController implements Initializable, Scr
 
     private void loadRecordMasterBankTransfer() {
         try {
-            tfBankNameBTransfer.setText(poController.CheckPayments().getModel().Banks().getBankName() != null ? poController.CheckPayments().getModel().Banks().getBankName() : "");
-            tfBankAccountBTransfer.setText(poController.CheckPayments().getModel().Bank_Account_Master().getAccountNo() != null ? poController.CheckPayments().getModel().Bank_Account_Master().getAccountNo() : "");
+            JFXUtil.setStatusValue(tfPaymentStatusBTransfer, OtherPaymentStatus.class, pnEditMode == EditMode.UNKNOWN ? "-1" : poController.OtherPayments().getModel().getTransactionStatus());
+            tfBankNameBTransfer.setText(poController.OtherPayments().getModel().Banks().getBankName() != null ? poController.OtherPayments().getModel().Banks().getBankName() : "");
+            tfBankAccountBTransfer.setText(poController.OtherPayments().getModel().Bank_Account_Master().getAccountNo() != null ? poController.OtherPayments().getModel().Bank_Account_Master().getAccountNo() : "");
             tfPaymentAmountBTransfer.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.OtherPayments().getModel().getTotalAmount(), true));
+
+            if (true) {
+                return; //temporarily as there is no getTotalAmount yet
+            }
             tfSupplierBank.setText(poController.CheckPayments().getModel().Supplier().getCompanyName() != null ? poController.CheckPayments().getModel().Supplier().getCompanyName() : "");
             tfSupplierAccountNoBTransfer.setText(poController.CheckPayments().getModel().Bank_Account_Master().getAccountNo() != null ? poController.CheckPayments().getModel().Bank_Account_Master().getAccountNo() : "");
-
             tfBankTransReferNo.setText(poController.OtherPayments().getModel().getReferNox() != null ? poController.OtherPayments().getModel().getReferNox() : "");
-            JFXUtil.setCmbValue(cmbOtherPaymentBTransfer, !poController.OtherPayments().getModel().getTransactionStatus().equals("") ? Integer.valueOf(poController.OtherPayments().getModel().getTransactionStatus()) : -1);
-
             JFXUtil.updateCaretPositions(apMasterDVBTransfer);
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
@@ -1036,17 +1048,16 @@ public class DisbursementVoucher_HistoryController implements Initializable, Scr
 
     private void loadRecordMasterOnlinePayment() {
         try {
+            JFXUtil.setStatusValue(tfOnlinePaymentStatus, OtherPaymentStatus.class, pnEditMode == EditMode.UNKNOWN ? "-1" : poController.OtherPayments().getModel().getTransactionStatus());
+            tfBankNameOnlinePayment.setText(poController.OtherPayments().getModel().Banks().getBankName() != null ? poController.OtherPayments().getModel().Banks().getBankName() : "");
+            tfBankAccountOnlinePayment.setText(poController.OtherPayments().getModel().Bank_Account_Master().getAccountNo() != null ? poController.OtherPayments().getModel().Bank_Account_Master().getAccountNo() : "");
+            tfPaymentAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.OtherPayments().getModel().getTotalAmount(), true));
             if (true) {
                 return;
             }
-            tfPaymentAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.OtherPayments().getModel().getTotalAmount(), true));
-            tfPaymentReferenceNo.setText(poController.OtherPayments().getModel().getReferNox() != null ? poController.OtherPayments().getModel().getReferNox() : "");
-            JFXUtil.setCmbValue(cmbOtherPayment, !poController.OtherPayments().getModel().getTransactionStatus().equals("") ? Integer.valueOf(poController.OtherPayments().getModel().getTransactionStatus()) : -1);
             tfSupplierServiceName.setText(poController.OtherPayments().getModel().Banks().getBankName() != null ? poController.OtherPayments().getModel().Banks().getBankName() : "");
             tfSupplierAccountNo.setText(poController.OtherPayments().getModel().Bank_Account_Master().getAccountNo() != null ? poController.OtherPayments().getModel().Bank_Account_Master().getAccountNo() : "");
-            tfBankNameOnlinePayment.setText(poController.OtherPayments().getModel().Banks().getBankName() != null ? poController.OtherPayments().getModel().Banks().getBankName() : "");
-            tfBankAccountOnlinePayment.setText(poController.OtherPayments().getModel().Bank_Account_Master().getAccountNo() != null ? poController.OtherPayments().getModel().Bank_Account_Master().getAccountNo() : "");
-
+            tfPaymentReferenceNo.setText(poController.OtherPayments().getModel().getReferNox() != null ? poController.OtherPayments().getModel().getReferNox() : "");
             JFXUtil.updateCaretPositions(apMasterDVOp);
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
@@ -1176,106 +1187,7 @@ public class DisbursementVoucher_HistoryController implements Initializable, Scr
 
                             } else {
                                 // ----- PDF VIEW -----
-                                PDDocument document = PDDocument.load(new File(filePath2));
-                                PDFRenderer renderer = new PDFRenderer(document);
-                                int pageCount = document.getNumberOfPages();
-
-                                // Container for PDF pages
-                                VBox pdfContainer = new VBox(10);
-                                pdfContainer.setAlignment(Pos.CENTER); // center pages
-                                pdfContainer.setPrefWidth(imageviewerutil.ldstackPaneWidth);
-
-                                for (int i = 0; i < pageCount; i++) {
-                                    BufferedImage pageImage = renderer.renderImageWithDPI(i, 150);
-                                    Image fxImage = SwingFXUtils.toFXImage(pageImage, null);
-                                    ImageView pageView = new ImageView(fxImage);
-
-                                    pageView.setPreserveRatio(true);
-                                    pageView.setFitWidth(imageviewerutil.ldstackPaneWidth);
-                                    JFXUtil.adjustImageSize(fxImage, pageView, imageviewerutil.ldstackPaneWidth, imageviewerutil.ldstackPaneHeight);
-
-                                    pdfContainer.getChildren().add(pageView);
-                                }
-
-                                // Wrap VBox in a Group for scaling
-                                Group pdfGroup = new Group(pdfContainer);
-
-                                // Wrap Group in a StackPane to center content
-                                StackPane centerPane = new StackPane(pdfGroup);
-                                centerPane.setAlignment(Pos.CENTER);
-
-                                // ScrollPane wraps the centerPane
-                                ScrollPane scrollPane = new ScrollPane(centerPane);
-                                scrollPane.setPannable(true);
-                                scrollPane.setFitToWidth(true);
-                                scrollPane.setFitToHeight(true);
-
-                                // Stack PDF and buttons
-                                stackPane1.getChildren().setAll(scrollPane, btnArrowLeft, btnArrowRight);
-                                StackPane.setAlignment(btnArrowLeft, Pos.CENTER_LEFT);
-                                StackPane.setAlignment(btnArrowRight, Pos.CENTER_RIGHT);
-                                StackPane.setMargin(btnArrowLeft, new Insets(0, 0, 0, 10));
-                                StackPane.setMargin(btnArrowRight, new Insets(0, 10, 0, 0));
-
-                                PauseTransition delay = new PauseTransition(Duration.seconds(2)); // 2-second delay
-                                delay.setOnFinished(event -> {
-                                    Platform.runLater(() -> {
-                                        JFXUtil.stackPaneClip(stackPane1);
-                                    });
-                                });
-                                delay.play();
-                                document.close();
-
-                                // ----- ZOOM & PAN -----
-                                final DoubleProperty zoomFactor = new SimpleDoubleProperty(1.0);
-                                scrollPane.addEventFilter(ScrollEvent.SCROLL, event -> {
-                                    if (event.isControlDown()) {
-                                        event.consume(); // stop default scroll behavior
-
-                                        double delta = event.getDeltaY() > 0 ? 1.1 : 0.9; // multiplier for smooth zoom in/out
-                                        double oldZoom = zoomFactor.get();
-                                        zoomFactor.set(oldZoom * delta); // scale by multiplier
-
-                                        // Apply scale
-                                        pdfGroup.setScaleX(zoomFactor.get());
-                                        pdfGroup.setScaleY(zoomFactor.get());
-
-                                        // Keep mouse position centered during zoom
-                                        Bounds viewportBounds = scrollPane.getViewportBounds();
-                                        Bounds contentBounds = pdfGroup.getBoundsInParent();
-                                        double mouseX = event.getX();
-                                        double mouseY = event.getY();
-
-                                        double hRatio = (scrollPane.getHvalue() * (contentBounds.getWidth() - viewportBounds.getWidth()) + mouseX) / contentBounds.getWidth();
-                                        double vRatio = (scrollPane.getVvalue() * (contentBounds.getHeight() - viewportBounds.getHeight()) + mouseY) / contentBounds.getHeight();
-
-                                        Platform.runLater(() -> {
-                                            Bounds newBounds = pdfGroup.getBoundsInParent();
-                                            double newH = (hRatio * newBounds.getWidth() - mouseX) / (newBounds.getWidth() - viewportBounds.getWidth());
-                                            double newV = (vRatio * newBounds.getHeight() - mouseY) / (newBounds.getHeight() - viewportBounds.getHeight());
-
-                                            scrollPane.setHvalue(Double.isNaN(newH) ? 0.5 : Math.min(Math.max(0, newH), 1.0));
-                                            scrollPane.setVvalue(Double.isNaN(newV) ? 0.5 : Math.min(Math.max(0, newV), 1.0));
-                                        });
-                                    }
-                                });
-
-                                // Pan with mouse drag
-                                final ObjectProperty<Point2D> lastMouse = new SimpleObjectProperty<>();
-                                pdfGroup.setOnMousePressed(e -> lastMouse.set(new Point2D(e.getSceneX(), e.getSceneY())));
-
-                                pdfGroup.setOnMouseDragged(e -> {
-                                    if (lastMouse.get() != null) {
-                                        double deltaX = e.getSceneX() - lastMouse.get().getX();
-                                        double deltaY = e.getSceneY() - lastMouse.get().getY();
-
-                                        pdfGroup.setTranslateX(pdfGroup.getTranslateX() + deltaX);
-                                        pdfGroup.setTranslateY(pdfGroup.getTranslateY() + deltaY);
-
-                                        lastMouse.set(new Point2D(e.getSceneX(), e.getSceneY()));
-                                    }
-                                });
-                                pdfGroup.setOnMouseReleased(e -> lastMouse.set(null));
+                                JFXUtil.PDFViewConfig(filePath2, stackPane1, btnArrowLeft, btnArrowRight, imageviewerutil.ldstackPaneWidth, imageviewerutil.ldstackPaneHeight);
                             }
                         } else {
                             imageView.setImage(null);
@@ -1304,8 +1216,7 @@ public class DisbursementVoucher_HistoryController implements Initializable, Scr
     private void initComboBoxes() {
         JFXUtil.setComboBoxItems(new JFXUtil.Pairs<>(cPaymentMode, cmbPaymentMode), new JFXUtil.Pairs<>(cPayeeType, cmbPayeeType),
                 new JFXUtil.Pairs<>(cDisbursementMode, cmbDisbursementMode), new JFXUtil.Pairs<>(cClaimantType, cmbClaimantType),
-                new JFXUtil.Pairs<>(cCheckStatus, cmbCheckStatus), new JFXUtil.Pairs<>(cOtherPaymentBTransfer, cmbOtherPaymentBTransfer),
-                new JFXUtil.Pairs<>(cOtherPayment, cmbOtherPayment), new JFXUtil.Pairs<>(documentType, cmbAttachmentType));
+                new JFXUtil.Pairs<>(cCheckStatus, cmbCheckStatus), new JFXUtil.Pairs<>(documentType, cmbAttachmentType));
     }
 
     private void initDatePicker() {

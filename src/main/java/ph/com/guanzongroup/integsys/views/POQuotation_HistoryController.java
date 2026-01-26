@@ -78,7 +78,6 @@ import org.apache.pdfbox.rendering.PDFRenderer;
 import org.guanzon.appdriver.constant.RecordStatus;
 import org.guanzon.cas.purchasing.services.QuotationControllers;
 import org.guanzon.cas.purchasing.status.POQuotationStatus;
-import static ph.com.guanzongroup.integsys.views.POQuotation_EntryController.poController;
 
 /**
  *
@@ -123,9 +122,11 @@ public class POQuotation_HistoryController implements Initializable, ScreenInter
     Scene scene = null;
 
     @FXML
-    private AnchorPane apMainAnchor, apBrowse, apButton, apTransactionInfo, apMaster, apDetail, apAttachments, apAttachmentButtons;
+    private AnchorPane apMainAnchor, apBrowse, apButton, apTransactionInfo, apMaster, apDetail, apAttachments;
     @FXML
     private Label lblSource, lblStatus;
+    @FXML
+    private TextField tfSearchBranch, tfSearchSupplier, tfSearchCategory, tfSearchReferenceNo, tfSearchDepartment, tfTransactionNo, tfReferenceNo, tfBranch, tfDepartment, tfSupplier, tfAddress, tfSourceNo, tfCategory, tfTerm, tfContact, tfGrossAmount, tfDiscRate, tfAddlDiscAmt, tfFreight, tfVATAmount, tfTransactionTotal, tfCompany, tfReplaceId, tfReplaceDescription, tfUnitPrice, tfDiscRateDetail, tfAddlDiscAmtDetail, tfQuantity, tfCost, tfBrand, tfModel, tfColor, tfMeasure, tfAttachmentNo;
     @FXML
     private HBox hbButtons, hboxid;
     @FXML
@@ -135,18 +136,15 @@ public class POQuotation_HistoryController implements Initializable, ScreenInter
     @FXML
     private Tab tabInformation, tabAttachments;
     @FXML
-    private TextField tfTransactionNo, tfReferenceNo, tfBranch, tfDepartment, tfSupplier, tfAddress, tfSourceNo, tfCategory, tfTerm, tfContact, tfGrossAmount, tfDiscRate, tfAddlDiscAmt, tfFreight, tfVATAmount, tfTransactionTotal, tfCompany, tfDescription, tfReplaceId, tfReplaceDescription, tfUnitPrice, tfQuantity, tfDiscRateDetail, tfAddlDiscAmtDetail, tfCost, tfAttachmentNo,
-            tfSearchBranch, tfSearchDepartment, tfSearchSupplier, tfSearchCategory, tfSearchReferenceNo;
-    @FXML
     private DatePicker dpTransactionDate, dpReferenceDate, dpValidityDate;
     @FXML
     private CheckBox cbVatable, cbReverse;
     @FXML
-    private TextArea taRemarks;
+    private TextArea taRemarks, taDescription;
     @FXML
     private TableView tblViewTransDetails, tblAttachments;
     @FXML
-    private TableColumn tblRowNoDetail, tblReplacementDetail, tblDescriptionDetail, tblUnitPriceDetail, tblDiscountDetail, tblQuantityDetail, tblTotalDetail, tblRowNoAttachment, tblFileNameAttachment;
+    private TableColumn tblRowNoDetail, tblDescriptionDetail, tblReplacementDetail, tblUnitPriceDetail, tblDiscountDetail, tblQuantityDetail, tblTotalDetail, tblRowNoAttachment, tblFileNameAttachment;
     @FXML
     private ComboBox cmbAttachmentType;
     @FXML
@@ -167,7 +165,6 @@ public class POQuotation_HistoryController implements Initializable, ScreenInter
             System.err.println((String) poJSON.get("message"));
             ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
         }
-        JFXUtil.checkIfFolderExists(poJSON, System.getProperty("sys.default.path.temp") + "/Attachments//");
         initTextFields();
         initDatePickers();
         initDetailsGrid();
@@ -715,7 +712,12 @@ public class POQuotation_HistoryController implements Initializable, ScreenInter
             if (pnDetail < 0 || pnDetail > poController.POQuotation().getDetailCount() - 1) {
                 return;
             }
-            tfDescription.setText(poController.POQuotation().Detail(pnDetail).getDescription());
+            tfBrand.setText(poController.POQuotation().Detail(pnDetail).Inventory().Brand().getDescription());
+            tfModel.setText(poController.POQuotation().Detail(pnDetail).Inventory().Model().getDescription());
+            tfColor.setText(poController.POQuotation().Detail(pnDetail).Inventory().Color().getDescription());
+            tfMeasure.setText(poController.POQuotation().Detail(pnDetail).Inventory().Measure().getDescription());
+
+            taDescription.setText(poController.POQuotation().Detail(pnDetail).getDescription());
             tfReplaceId.setText(poController.POQuotation().Detail(pnDetail).ReplacedInventory().getBarCode());
             tfReplaceDescription.setText(poController.POQuotation().Detail(pnDetail).ReplacedInventory().getDescription());
             tfUnitPrice.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.POQuotation().Detail(pnDetail).getUnitPrice(), true));
