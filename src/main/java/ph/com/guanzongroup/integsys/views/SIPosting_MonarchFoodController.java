@@ -154,7 +154,7 @@ public class SIPosting_MonarchFoodController implements Initializable, ScreenInt
     @FXML
     private DatePicker dpTransactionDate, dpReferenceDate, dpExpiryDate, dpJETransactionDate, dpReportMonthYear, dpSIDate;
     @FXML
-    private CheckBox cbVatInclusive, cbVatable, cbJEReverse;
+    private CheckBox cbVatInclusive, cbToFollowInv, cbVatable, cbJEReverse;
     @FXML
     private TextArea taRemarks, taJERemarks;
     @FXML
@@ -375,6 +375,14 @@ public class SIPosting_MonarchFoodController implements Initializable, ScreenInt
                     if (checkedBox.isSelected()) {
                         moveNext();
                     }
+                    break;
+                case "cbToFollowInv":
+                    if (checkedBox.isSelected()) {
+                        poJSON = poPurchaseReceivingController.PurchaseOrderReceiving().Master().setSalesInvoice("To-follow");
+                    } else {
+                        poJSON = poPurchaseReceivingController.PurchaseOrderReceiving().Master().setSalesInvoice("");
+                    }
+                    loadRecordMaster();
                     break;
             }
         }
@@ -1509,6 +1517,14 @@ public class SIPosting_MonarchFoodController implements Initializable, ScreenInt
             tfReferenceNo.setText(poPurchaseReceivingController.PurchaseOrderReceiving().Master().getReferenceNo());
             String lsSIDate = CustomCommonUtil.formatDateToShortString(poPurchaseReceivingController.PurchaseOrderReceiving().Master().getSalesInvoiceDate());
             dpSIDate.setValue(JFXUtil.isObjectEqualTo(lsSIDate, "1900-01-01") ? null : CustomCommonUtil.parseDateStringToLocalDate(lsSIDate, "yyyy-MM-dd"));
+            boolean lbShow = poPurchaseReceivingController.PurchaseOrderReceiving().Master().getSalesInvoice().equals("To-follow");
+            cbToFollowInv.setSelected(lbShow);
+            JFXUtil.setDisabled(lbShow, tfSINo);
+            if (lbShow) {
+                tfSINo.setTextFormatter(null);
+            } else {
+                CustomCommonUtil.inputIntegersOnly(tfSINo);
+            }
             tfSINo.setText(poPurchaseReceivingController.PurchaseOrderReceiving().Master().getSalesInvoice());
             tfTerm.setText(poPurchaseReceivingController.PurchaseOrderReceiving().Master().Term().getDescription());
             taRemarks.setText(poPurchaseReceivingController.PurchaseOrderReceiving().Master().getRemarks());

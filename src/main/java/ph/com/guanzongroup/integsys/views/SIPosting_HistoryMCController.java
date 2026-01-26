@@ -146,7 +146,7 @@ public class SIPosting_HistoryMCController implements Initializable, ScreenInter
     @FXML
     private DatePicker dpTransactionDate, dpReferenceDate, dpSIDate, dpReportMonthYear, dpJETransactionDate;
     @FXML
-    private CheckBox cbVatInclusive, cbVatable, cbJEReverse;
+    private CheckBox cbVatInclusive, cbToFollowInv, cbVatable, cbJEReverse;
     @FXML
     private TextArea taRemarks, taJERemarks;
     @FXML
@@ -859,6 +859,14 @@ public class SIPosting_HistoryMCController implements Initializable, ScreenInter
             dpReferenceDate.setValue(CustomCommonUtil.parseDateStringToLocalDate(lsReferenceDate, "yyyy-MM-dd"));
             dpSIDate.setValue(JFXUtil.isObjectEqualTo(lsSIDate, "1900-01-01") ? null : CustomCommonUtil.parseDateStringToLocalDate(lsSIDate, "yyyy-MM-dd"));
             tfReferenceNo.setText(poPurchaseReceivingController.PurchaseOrderReceiving().Master().getReferenceNo());
+            boolean lbShow = poPurchaseReceivingController.PurchaseOrderReceiving().Master().getSalesInvoice().equals("To-follow");
+            cbToFollowInv.setSelected(lbShow);
+            JFXUtil.setDisabled(lbShow, tfSINo);
+            if (lbShow) {
+                tfSINo.setTextFormatter(null);
+            } else {
+                CustomCommonUtil.inputIntegersOnly(tfSINo);
+            }
             tfSINo.setText(poPurchaseReceivingController.PurchaseOrderReceiving().Master().getSalesInvoice());
             tfTerm.setText(poPurchaseReceivingController.PurchaseOrderReceiving().Master().Term().getDescription());
             taRemarks.setText(poPurchaseReceivingController.PurchaseOrderReceiving().Master().getRemarks());
