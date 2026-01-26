@@ -1515,9 +1515,10 @@ public class SIPosting_SPCarController implements Initializable, ScreenInterface
             tfReferenceNo.setText(poPurchaseReceivingController.PurchaseOrderReceiving().Master().getReferenceNo());
             String lsSIDate = CustomCommonUtil.formatDateToShortString(poPurchaseReceivingController.PurchaseOrderReceiving().Master().getSalesInvoiceDate());
             dpSIDate.setValue(JFXUtil.isObjectEqualTo(lsSIDate, "1900-01-01") ? null : CustomCommonUtil.parseDateStringToLocalDate(lsSIDate, "yyyy-MM-dd"));
-            cbToFollowInv.setSelected(poPurchaseReceivingController.PurchaseOrderReceiving().Master().getSalesInvoice().equals("To-follow"));
-            JFXUtil.setDisabled(cbVatInclusive.isSelected(), tfSINo);
-            if (cbVatInclusive.isSelected()) {
+            boolean lbShow = poPurchaseReceivingController.PurchaseOrderReceiving().Master().getSalesInvoice().equals("To-follow");
+            cbToFollowInv.setSelected(lbShow);
+            JFXUtil.setDisabled(lbShow, tfSINo);
+            if (lbShow) {
                 tfSINo.setTextFormatter(null);
             } else {
                 CustomCommonUtil.inputIntegersOnly(tfSINo);

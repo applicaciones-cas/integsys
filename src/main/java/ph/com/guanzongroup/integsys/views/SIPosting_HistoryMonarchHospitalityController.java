@@ -756,9 +756,10 @@ public class SIPosting_HistoryMonarchHospitalityController implements Initializa
             dpReferenceDate.setValue(CustomCommonUtil.parseDateStringToLocalDate(lsReferenceDate, "yyyy-MM-dd"));
             dpSIDate.setValue(JFXUtil.isObjectEqualTo(lsSIDate, "1900-01-01") ? null : CustomCommonUtil.parseDateStringToLocalDate(lsSIDate, "yyyy-MM-dd"));
             tfReferenceNo.setText(poPurchaseReceivingController.PurchaseOrderReceiving().Master().getReferenceNo());
-            cbToFollowInv.setSelected(poPurchaseReceivingController.PurchaseOrderReceiving().Master().getSalesInvoice().equals("To-follow"));
-            JFXUtil.setDisabled(cbVatInclusive.isSelected(), tfSINo);
-            if (cbVatInclusive.isSelected()) {
+            boolean lbShow = poPurchaseReceivingController.PurchaseOrderReceiving().Master().getSalesInvoice().equals("To-follow");
+            cbToFollowInv.setSelected(lbShow);
+            JFXUtil.setDisabled(lbShow, tfSINo);
+            if (lbShow) {
                 tfSINo.setTextFormatter(null);
             } else {
                 CustomCommonUtil.inputIntegersOnly(tfSINo);
