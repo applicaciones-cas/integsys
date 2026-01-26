@@ -377,7 +377,7 @@ public class SIPosting_LPController implements Initializable, ScreenInterface {
                     }
                     break;
                 case "cbToFollowInv":
-                    if (cbVatInclusive.isSelected()) {
+                    if (checkedBox.isSelected()) {
                         poJSON = poPurchaseReceivingController.PurchaseOrderReceiving().Master().setSalesInvoice("To-follow");
                     } else {
                         poJSON = poPurchaseReceivingController.PurchaseOrderReceiving().Master().setSalesInvoice("");

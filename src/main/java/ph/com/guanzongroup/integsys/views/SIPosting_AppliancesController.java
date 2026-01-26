@@ -429,7 +429,7 @@ public class SIPosting_AppliancesController implements Initializable, ScreenInte
                     }
                     break;
                 case "cbToFollowInv":
-                    if (cbVatInclusive.isSelected()) {
+                    if (checkedBox.isSelected()) {
                         poJSON = poPurchaseReceivingController.PurchaseOrderReceiving().Master().setSalesInvoice("To-follow");
                     } else {
                         poJSON = poPurchaseReceivingController.PurchaseOrderReceiving().Master().setSalesInvoice("");
