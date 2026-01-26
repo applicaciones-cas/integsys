@@ -27,6 +27,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Control;
 import javafx.scene.control.DatePicker;
@@ -57,6 +58,7 @@ import ph.com.guanzongroup.cas.cashflow.model.Model_Check_Payments;
 import ph.com.guanzongroup.cas.cashflow.status.CheckDepositStatus;
 import ph.com.guanzongroup.cas.cashflow.model.Model_Check_Deposit_Detail;
 import ph.com.guanzongroup.cas.cashflow.services.CheckController;
+import ph.com.guanzongroup.integsys.utility.CustomCommonUtil;
 
 /**
  * FXML Controller class
@@ -66,16 +68,19 @@ import ph.com.guanzongroup.cas.cashflow.services.CheckController;
 public class CheckDeposit_EntryController implements Initializable, ScreenInterface {
 
     private GRiderCAS poApp;
+    private JSONObject poJSON;
     private LogWrapper poLogWrapper;
     private String psFormName = "Check Deposit Entry";
     private String psIndustryID;
     private Control lastFocusedControl;
     private CheckDeposit poAppController;
     private ObservableList<Model_Check_Deposit_Detail> laTransactionDetail;
-    private int pnSelectMaster, pnEditMode, pnTransactionDetail;
+    private int pnSelectMaster, pnEditMode, pnTransactionDetail = 0;
     private final Set<String> existingTrans = new HashSet<>();
 
     private unloadForm poUnload = new unloadForm();
+    @FXML
+    private CheckBox cbReverse;
 
     @FXML
     private AnchorPane apMainAnchor, apBrowse, apMaster, apDetail, apButton, apTransaction;
@@ -197,15 +202,42 @@ public class CheckDeposit_EntryController implements Initializable, ScreenInterf
     @FXML
     void ontblDetailClicked(MouseEvent e) {
         try {
-            pnTransactionDetail = tblViewDetails.getSelectionModel().getSelectedIndex() + 1;
-            if (pnTransactionDetail <= 0) {
+            pnTransactionDetail = tblViewDetails.getSelectionModel().getSelectedIndex();
+            if (pnTransactionDetail < 0) {
                 return;
             }
-
             loadSelectedTransactionDetail(pnTransactionDetail);
         } catch (SQLException | GuanzonException | CloneNotSupportedException ex) {
             ex.printStackTrace();
             poLogWrapper.severe(psFormName + " :" + ex.getMessage());
+        }
+    }
+    @FXML
+    private void cmdCheckBox_Click(ActionEvent event) {
+        poJSON = new JSONObject();
+        Object source = event.getSource();
+        if (source instanceof CheckBox) {
+            try {
+                CheckBox checkedBox = (CheckBox) source;
+                switch (checkedBox.getId()) {
+                    case "cbReverse": // this is the id
+                        if (poAppController.getEditMode() == EditMode.ADDNEW) {
+                            if (poAppController.Detail(pnTransactionDetail).getSourceNo() != null
+                                    || !poAppController.Detail(pnTransactionDetail).getSourceNo().isEmpty()) {
+                                if (!checkedBox.isSelected()) {
+                                    poAppController.Detail().remove(pnTransactionDetail);
+                                }
+                            }
+                        } else {
+                            poAppController.Detail(pnTransactionDetail).isReverse(checkedBox.isSelected());
+                        }
+                        reloadTableDetail();
+                        loadSelectedTransactionDetail(pnTransactionDetail);
+                        break;
+                }
+            } catch (SQLException | GuanzonException | CloneNotSupportedException ex) {
+                Logger.getLogger(CheckDeposit_EntryController.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
     }
 
@@ -482,7 +514,7 @@ public class CheckDeposit_EntryController implements Initializable, ScreenInterf
                         break;
 
                     case "tfNote":
-                        poAppController.getDetail(pnTransactionDetail).setRemarks(lsValue);
+                        poAppController.Detail(pnTransactionDetail).setRemarks(lsValue);
                         loadSelectedTransactionDetail(pnTransactionDetail);
 
                         break;
@@ -753,30 +785,69 @@ public class CheckDeposit_EntryController implements Initializable, ScreenInterf
         }
     }
 
-    private void loadSelectedTransactionDetail(int fnRow) throws SQLException, GuanzonException, CloneNotSupportedException {
+    private void loadSelectedTransactionDetail(int fnrow)
+            throws SQLException, GuanzonException, CloneNotSupportedException {
 
-        int tblIndex = fnRow - 1;
-        tfCheckTransNo.setText(tblColDetailReference.getCellData(tblIndex));
-        tfBank.setText(tblColDetailBank.getCellData(tblIndex));
-        tfPayee.setText(tblColDetailPayee.getCellData(tblIndex));
-        tfCheckNo.setText(tblColDetailCheckNo.getCellData(tblIndex));
-        tfCheckAmount.setText(tblColDetailCheckAmount.getCellData(tblIndex));
+        tfCheckTransNo.setText(poAppController.Detail(pnTransactionDetail).CheckPayment().getTransactionNo() != null
+                ? poAppController.Detail(pnTransactionDetail).CheckPayment().getTransactionNo()
+                : ""
+        );
 
-        tfNote.setText(poAppController.getDetail(fnRow).getRemarks());
-        dpCheckDate.setValue(ParseDate(poAppController.getDetail(fnRow).CheckPayment().getTransactionDate()));
+        tfBank.setText( poAppController.Detail(pnTransactionDetail).CheckPayment().Banks() != null
+                ? poAppController.Detail(pnTransactionDetail).CheckPayment().Banks().getBankName()
+                : ""
+        );
+
+        tfPayee.setText( poAppController.Detail(pnTransactionDetail).CheckPayment().Payee() != null
+                ? poAppController.Detail(pnTransactionDetail).CheckPayment().Payee().getPayeeName()
+                : ""
+        );
+
+        tfCheckNo.setText( poAppController.Detail(pnTransactionDetail).CheckPayment().getCheckNo() != null
+                ? poAppController.Detail(pnTransactionDetail).CheckPayment().getCheckNo()
+                : ""
+        );
+
+        tfCheckAmount.setText(
+                poAppController.Detail(pnTransactionDetail) != null
+                && poAppController.Detail(pnTransactionDetail).CheckPayment() != null
+                ? CustomCommonUtil.setIntegerValueToDecimalFormat(
+                        poAppController.Detail(pnTransactionDetail).CheckPayment().getAmount(), true)
+                : ""
+        );
+
+        tfNote.setText(poAppController.Detail(pnTransactionDetail).getRemarks() != null
+                ? poAppController.Detail(pnTransactionDetail).getRemarks()
+                : ""
+        );
+
+        dpCheckDate.setValue( poAppController.Detail(pnTransactionDetail).CheckPayment().getTransactionDate() != null
+                ? ParseDate(
+                        poAppController.Detail(pnTransactionDetail)
+                                .CheckPayment()
+                                .getTransactionDate())
+                : null
+        );
+
+        cbReverse.setSelected(
+                poAppController.Detail(pnTransactionDetail) != null
+                && poAppController.Detail(pnTransactionDetail).isReverse()
+        );
+
         recomputeTotal();
     }
 
+
     private void recomputeTotal() throws SQLException, GuanzonException {
         double lnTotal = 0.00;
-        for (int lnCtr = 1; lnCtr <= poAppController.getDetailCount(); lnCtr++) {
-            if (poAppController.getDetail(lnCtr).getSourceNo() == null || poAppController.getDetail(lnCtr).getSourceNo().isEmpty()) {
-                continue;
-            }
-            lnTotal = lnTotal + poAppController.getDetail(lnCtr).CheckPayment().getAmount();
-        }
-        poAppController.getMaster().setTransactionTotalDeposit(lnTotal);
-        tfTotal.setText(CommonUtils.NumberFormat(poAppController.getMaster().getTransactionTotalDeposit(), "###,##0.0000"));
+//        for (int lnCtr = 1; lnCtr <= poAppController.getDetailCount(); lnCtr++) {
+//            if (poAppController.Detail(lnCtr).getSourceNo() == null || poAppController.Detail(lnCtr).getSourceNo().isEmpty()) {
+//                continue;
+//            }
+//            lnTotal = lnTotal + poAppController.Detail(lnCtr).CheckPayment().getAmount();
+//        }
+//        poAppController.getMaster().setTransactionTotalDeposit(lnTotal);
+//        tfTotal.setText(CommonUtils.NumberFormat(poAppController.getMaster().getTransactionTotalDeposit(), "###,##0.0000"));
 
     }
 
@@ -806,6 +877,9 @@ public class CheckDeposit_EntryController implements Initializable, ScreenInterf
                 controllerFocusTracker(loControlField);
             } else if (loControl instanceof ComboBox) {
                 ComboBox loControlField = (ComboBox) loControl;
+                controllerFocusTracker(loControlField);
+            }else if (loControl instanceof CheckBox) {
+                CheckBox loControlField = (CheckBox) loControl;
                 controllerFocusTracker(loControlField);
             }
         }
@@ -914,8 +988,8 @@ public class CheckDeposit_EntryController implements Initializable, ScreenInterf
             tblColDetailCheckAmount.setStyle("-fx-alignment: CENTER-RIGHT; -fx-padding: 0 5 0 0;");
 
             tblColDetailNo.setCellValueFactory((loModel) -> {
-                int index = tblViewDetails.getItems().indexOf(loModel.getValue()) + 1;
-                return new SimpleStringProperty(String.valueOf(index));
+                int index = tblViewDetails.getItems().indexOf(loModel.getValue());
+                return new SimpleStringProperty(String.valueOf(index + 1));
             });
 
             tblColDetailReference.setCellValueFactory((loModel) -> {
@@ -978,18 +1052,26 @@ public class CheckDeposit_EntryController implements Initializable, ScreenInterf
     }
 
     private void reloadTableDetail() {
-        List<Model_Check_Deposit_Detail> rawDetail = poAppController.getDetailList();
-        laTransactionDetail.setAll(rawDetail);
+        try {
+            List<Model_Check_Deposit_Detail> rawDetail = poAppController.getDetailList();
+            laTransactionDetail.setAll(rawDetail);
 
-        // Restore or select last row
-        int indexToSelect = (pnTransactionDetail >= 1 && pnTransactionDetail < laTransactionDetail.size())
-                ? pnTransactionDetail - 1
-                : laTransactionDetail.size() - 1;
+            // Restore or select last row
+//        int indexToSelect = (pnTransactionDetail >= 1 && pnTransactionDetail < laTransactionDetail.size())
+//                ? pnTransactionDetail
+//                : laTransactionDetail.size() - 1;
+            tblViewDetails.getSelectionModel().select(pnTransactionDetail);
 
-        tblViewDetails.getSelectionModel().select(indexToSelect);
-
-        pnTransactionDetail = tblViewDetails.getSelectionModel().getSelectedIndex() + 1; // Not focusedIndex
-        tblViewDetails.refresh();
+//pnTransactionDetail = tblViewDetails.getSelectionModel().getSelectedIndex(); // Not focusedIndex
+            tblViewDetails.refresh();
+            poJSON = poAppController.computeMasterFields();
+            if ("success".equals((String) poJSON.get("result"))) {
+                tfTotal.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poAppController.getMaster().getTransactionTotalDeposit(), true));
+            }
+            
+        } catch (SQLException | GuanzonException ex) {
+            Logger.getLogger(CheckDeposit_EntryController.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     private void getLoadedTransaction() throws SQLException, GuanzonException, CloneNotSupportedException {
@@ -1094,7 +1176,8 @@ public class CheckDeposit_EntryController implements Initializable, ScreenInterf
                         || value instanceof Button
                         || value instanceof TableView
                         || value instanceof DatePicker
-                        || value instanceof ComboBox) {
+                        || value instanceof ComboBox
+                        || value instanceof CheckBox) {
                     controls.add((Control) value);
                 }
             } catch (IllegalAccessException e) {
