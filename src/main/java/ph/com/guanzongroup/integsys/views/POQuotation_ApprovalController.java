@@ -423,7 +423,7 @@ public class POQuotation_ApprovalController implements Initializable, ScreenInte
                         ShowMessageFX.Warning(null, pxeModuleName, "Button with name " + lsButton + " not registered.");
                         break;
                 }
-                if (JFXUtil.isObjectEqualTo(lsButton, "btnApprove", "btnDisapprove")) {
+                if (JFXUtil.isObjectEqualTo(lsButton, "btnApprove", "btnDisapprove","btnReturn")) {
                     poController.POQuotation().resetMaster();
                     poController.POQuotation().resetOthers();
                     poController.POQuotation().Detail().clear();
@@ -1544,6 +1544,7 @@ public class POQuotation_ApprovalController implements Initializable, ScreenInte
             case POQuotationStatus.APPROVED:
                 JFXUtil.setButtonsVisibility(false, btnApprove, btnDisapprove);
                 break;
+            case POQuotationStatus.RETURNED:
             case POQuotationStatus.VOID:
             case POQuotationStatus.CANCELLED:
                 JFXUtil.setButtonsVisibility(false, btnApprove, btnDisapprove);
