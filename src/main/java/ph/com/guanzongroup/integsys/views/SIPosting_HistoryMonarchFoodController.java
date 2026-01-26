@@ -761,6 +761,12 @@ public class SIPosting_HistoryMonarchFoodController implements Initializable, Sc
             dpSIDate.setValue(JFXUtil.isObjectEqualTo(lsSIDate, "1900-01-01") ? null : CustomCommonUtil.parseDateStringToLocalDate(lsSIDate, "yyyy-MM-dd"));
             tfReferenceNo.setText(poPurchaseReceivingController.PurchaseOrderReceiving().Master().getReferenceNo());
             cbToFollowInv.setSelected(poPurchaseReceivingController.PurchaseOrderReceiving().Master().getSalesInvoice().equals("To-follow"));
+            JFXUtil.setDisabled(cbVatInclusive.isSelected(), tfSINo);
+            if (cbVatInclusive.isSelected()) {
+                tfSINo.setTextFormatter(null);
+            } else {
+                CustomCommonUtil.inputIntegersOnly(tfSINo);
+            }
             tfSINo.setText(poPurchaseReceivingController.PurchaseOrderReceiving().Master().getSalesInvoice());
             tfTerm.setText(poPurchaseReceivingController.PurchaseOrderReceiving().Master().Term().getDescription());
             taRemarks.setText(poPurchaseReceivingController.PurchaseOrderReceiving().Master().getRemarks());

@@ -429,13 +429,10 @@ public class SIPosting_AppliancesController implements Initializable, ScreenInte
                     }
                     break;
                 case "cbToFollowInv":
-                    JFXUtil.setDisabled(cbVatInclusive.isSelected(), tfSINo);
                     if (cbVatInclusive.isSelected()) {
-                        tfSINo.setTextFormatter(null);
                         poJSON = poPurchaseReceivingController.PurchaseOrderReceiving().Master().setSalesInvoice("To-follow");
                     } else {
                         poJSON = poPurchaseReceivingController.PurchaseOrderReceiving().Master().setSalesInvoice("");
-                        CustomCommonUtil.inputIntegersOnly(tfSINo);
                     }
                     loadRecordMaster();
                     break;
@@ -1576,6 +1573,12 @@ public class SIPosting_AppliancesController implements Initializable, ScreenInte
             String lsSIDate = CustomCommonUtil.formatDateToShortString(poPurchaseReceivingController.PurchaseOrderReceiving().Master().getSalesInvoiceDate());
             dpSIDate.setValue(JFXUtil.isObjectEqualTo(lsSIDate, "1900-01-01") ? null : CustomCommonUtil.parseDateStringToLocalDate(lsSIDate, "yyyy-MM-dd"));
             cbToFollowInv.setSelected(poPurchaseReceivingController.PurchaseOrderReceiving().Master().getSalesInvoice().equals("To-follow"));
+            JFXUtil.setDisabled(cbVatInclusive.isSelected(), tfSINo);
+            if (cbVatInclusive.isSelected()) {
+                tfSINo.setTextFormatter(null);
+            } else {
+                CustomCommonUtil.inputIntegersOnly(tfSINo);
+            }
             tfSINo.setText(poPurchaseReceivingController.PurchaseOrderReceiving().Master().getSalesInvoice());
             tfTerm.setText(poPurchaseReceivingController.PurchaseOrderReceiving().Master().Term().getDescription());
             taRemarks.setText(poPurchaseReceivingController.PurchaseOrderReceiving().Master().getRemarks());
