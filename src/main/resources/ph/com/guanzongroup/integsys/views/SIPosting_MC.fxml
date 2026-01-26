@@ -283,7 +283,7 @@
                                                                                  <font>
                                                                                     <Font size="12.0" />
                                                                                  </font></Label>
-                                                                          <Label text="Term" GridPane.columnIndex="5" GridPane.rowIndex="6">
+                                                                          <Label text="Term" GridPane.rowIndex="6">
                                                                                  <font>
                                                                                     <Font size="12.0" />
                                                                                  </font></Label>
@@ -313,7 +313,7 @@
                                                                               <Label text="VAT inclusive" GridPane.columnIndex="9" GridPane.rowIndex="6" />
                                                                               <Label text="VAT able Sales" GridPane.columnIndex="9" GridPane.rowIndex="8" />
                                                                               <Label text="VAT Amount" GridPane.columnIndex="9" GridPane.rowIndex="9" />
-                                                                              <Label text="Invoice No" GridPane.columnIndex="5" GridPane.rowIndex="5" />
+                                                                              <Label text="Invoice No" GridPane.columnIndex="5" GridPane.rowIndex="6" />
                                                                               <Label text="Zero VAT Sales" GridPane.columnIndex="9" GridPane.rowIndex="10" />
                                                                               <Label text="VAT-Exempt Sales" GridPane.columnIndex="9" GridPane.rowIndex="11" />
                                                                               <Label text="Transaction Total" GridPane.columnIndex="9" GridPane.rowIndex="2">
@@ -330,8 +330,8 @@
                                                                         <DatePicker fx:id="dpReferenceDate" GridPane.columnIndex="7" GridPane.rowIndex="2" />
                                                                               <DatePicker fx:id="dpSIDate" GridPane.columnIndex="7" GridPane.rowIndex="4" />
                                                       <TextField fx:id="tfReferenceNo" maxHeight="25.0" GridPane.columnIndex="7" GridPane.rowIndex="3" />
-                                                                              <TextField fx:id="tfSINo" GridPane.columnIndex="7" GridPane.rowIndex="5" />
-                                                                          <TextField fx:id="tfTerm" maxHeight="25.0" maxWidth="-Infinity" promptText="Press F3: Search" GridPane.columnIndex="7" GridPane.rowIndex="6" />
+                                                                              <TextField fx:id="tfSINo" GridPane.columnIndex="7" GridPane.rowIndex="6" />
+                                                                          <TextField fx:id="tfTerm" maxHeight="25.0" maxWidth="-Infinity" promptText="Press F3: Search" GridPane.columnIndex="2" GridPane.rowIndex="6" />
                                                                               <TextField fx:id="tfTransactionTotal" alignment="CENTER_RIGHT" disable="true" editable="false" layoutX="738.0" layoutY="80.0" promptText="0.0000" styleClass="DisabledTextField" GridPane.columnIndex="11" GridPane.rowIndex="2" />
                                                                               <TextField fx:id="tfDiscountRate" alignment="CENTER_RIGHT" promptText="0.00" GridPane.columnIndex="11" GridPane.rowIndex="3" />
                                                                               <TextField fx:id="tfDiscountAmount" alignment="CENTER_RIGHT" promptText="0.0000" GridPane.columnIndex="11" GridPane.rowIndex="4" />
@@ -350,6 +350,8 @@
                                                          </GridPane.margin>
                                                       </TextArea>
                                                                               <Label text="Invoice Date" GridPane.columnIndex="5" GridPane.rowIndex="4" />
+                                                                              <CheckBox fx:id="cbToFollowInv" mnemonicParsing="false" GridPane.columnIndex="7" GridPane.rowIndex="5" />
+                                                                              <Label text="To-follow Inv" GridPane.columnIndex="5" GridPane.rowIndex="5" />
                                                                       </children>
                                                                   </GridPane>
                                                               </children>
