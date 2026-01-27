@@ -1983,11 +1983,10 @@ public class SIPosting_MonarchFoodController implements Initializable, ScreenInt
                     return;
                 }
             }
-            if (lbShow) {
+            if (PurchaseOrderReceivingStatus.POSTED.equals(poPurchaseReceivingController.PurchaseOrderReceiving().Master().getTransactionStatus())) {
                 ShowMessageFX.Warning(null, pxeModuleName, "Ony Invoice date, To follow Inv, & Invoice No are available to edit.");
                 return;
-            }
-            switch (nodeID) {
+            }            switch (nodeID) {
                 case "cbVatInclusive":
                     if (JFXUtil.isObjectEqualTo(poPurchaseReceivingController.PurchaseOrderReceiving().Master().getSalesInvoice(), null, "")
                             && !PurchaseOrderReceivingStatus.POSTED.equals(poPurchaseReceivingController.PurchaseOrderReceiving().Master().getTransactionStatus())) {
