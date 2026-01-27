@@ -1771,8 +1771,11 @@ public class SIPosting_SPCarController implements Initializable, ScreenInterface
                             if (lbShow1) {
                                 lbIsEnable = false;
                             }
+                        } else {
+                            if (PurchaseOrderReceivingStatus.POSTED.equals(poPurchaseReceivingController.PurchaseOrderReceiving().Master().getTransactionStatus())) {
+                                lbIsEnable = false;
+                            }
                         }
-
                         double lnTotal = 0.00;
                         double lnDiscountAmt = 0.00;
                         for (lnCtr = 0; lnCtr < poPurchaseReceivingController.PurchaseOrderReceiving().getDetailCount(); lnCtr++) {
