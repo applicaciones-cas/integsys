@@ -56,6 +56,7 @@ import org.guanzon.appdriver.base.GRiderCAS;
 import org.guanzon.appdriver.base.LogWrapper;
 import org.guanzon.appdriver.constant.EditMode;
 import org.guanzon.appdriver.base.GuanzonException;
+import org.guanzon.appdriver.base.MiscUtil;
 import org.guanzon.cas.inv.model.Model_Inv_Master;
 import org.guanzon.cas.inv.model.Model_Inventory;
 import org.guanzon.cas.purchasing.model.Model_PO_Detail;
@@ -145,9 +146,7 @@ public class POCancellation_HistoryController implements Initializable, ScreenIn
         try {
             poLogWrapper = new LogWrapper(psFormName, psFormName);
             poAppController = new POController(poApp, poLogWrapper).POCancellation();
-       
-            //remove if not general
-            psIndustryID = "";
+
             //initlalize and validate transaction objects from class controller
             if (!isJSONSuccess(poAppController.initTransaction(), psFormName)) {
                 unloadForm appUnload = new unloadForm();
@@ -172,6 +171,12 @@ public class POCancellation_HistoryController implements Initializable, ScreenIn
         } catch (SQLException | GuanzonException e) {
             Logger.getLogger(POCancellation_HistoryController.class.getName()).log(Level.SEVERE, null, e);
             poLogWrapper.severe(psFormName + " :" + e.getMessage());
+
+            if (Platform.isFxApplicationThread()) {
+                ShowMessageFX.Warning(MiscUtil.getException(e), psFormName, null);
+            } else {
+                Platform.runLater(() -> ShowMessageFX.Warning(MiscUtil.getException(e), psFormName, null));
+            }
         }
     }
 
@@ -186,6 +191,13 @@ public class POCancellation_HistoryController implements Initializable, ScreenIn
             loadSelectedTransactionDetail(pnTransactionDetail);
         } catch (SQLException | GuanzonException | CloneNotSupportedException ex) {
             poLogWrapper.severe(psFormName + " :" + ex.getMessage());
+
+            if (Platform.isFxApplicationThread()) {
+                ShowMessageFX.Warning(MiscUtil.getException(ex), psFormName, null);
+            } else {
+                Platform.runLater(() -> ShowMessageFX.Warning(MiscUtil.getException(ex), psFormName, null));
+            }
+
         }
     }
 
@@ -292,6 +304,13 @@ public class POCancellation_HistoryController implements Initializable, ScreenIn
             Logger.getLogger(DeliverySchedule_EntryController.class
                     .getName()).log(Level.SEVERE, null, e);
             poLogWrapper.severe(psFormName + " :" + e.getMessage());
+
+            if (Platform.isFxApplicationThread()) {
+                ShowMessageFX.Warning(MiscUtil.getException(e), psFormName, null);
+            } else {
+                Platform.runLater(() -> ShowMessageFX.Warning(MiscUtil.getException(e), psFormName, null));
+            }
+
         }
     }
 
@@ -378,6 +397,13 @@ public class POCancellation_HistoryController implements Initializable, ScreenIn
             Logger.getLogger(DeliverySchedule_EntryController.class
                     .getName()).log(Level.SEVERE, null, ex);
             poLogWrapper.severe(psFormName + " :" + ex.getMessage());
+
+            if (Platform.isFxApplicationThread()) {
+                ShowMessageFX.Warning(MiscUtil.getException(ex), psFormName, null);
+            } else {
+                Platform.runLater(() -> ShowMessageFX.Warning(MiscUtil.getException(ex), psFormName, null));
+            }
+
         }
     }
 
@@ -454,6 +480,13 @@ public class POCancellation_HistoryController implements Initializable, ScreenIn
             Logger.getLogger(DeliverySchedule_EntryController.class
                     .getName()).log(Level.SEVERE, null, ex);
             poLogWrapper.severe(psFormName + " :" + ex.getMessage());
+
+            if (Platform.isFxApplicationThread()) {
+                ShowMessageFX.Warning(MiscUtil.getException(ex), psFormName, null);
+            } else {
+                Platform.runLater(() -> ShowMessageFX.Warning(MiscUtil.getException(ex), psFormName, null));
+            }
+
         }
     }
 
@@ -474,6 +507,13 @@ public class POCancellation_HistoryController implements Initializable, ScreenIn
             tfCancelAmount.setText(CommonUtils.NumberFormat(poAppController.getMaster().getTransactionTotal(), "###,##0.0000"));
         } catch (SQLException | GuanzonException e) {
             poLogWrapper.severe(psFormName, e.getMessage());
+
+            if (Platform.isFxApplicationThread()) {
+                ShowMessageFX.Warning(MiscUtil.getException(e), psFormName, null);
+            } else {
+                Platform.runLater(() -> ShowMessageFX.Warning(MiscUtil.getException(e), psFormName, null));
+            }
+
         }
     }
 
@@ -620,6 +660,13 @@ public class POCancellation_HistoryController implements Initializable, ScreenIn
             } catch (IllegalAccessException e) {
                 e.printStackTrace();
                 poLogWrapper.severe(psFormName + " :" + e.getMessage());
+
+                if (Platform.isFxApplicationThread()) {
+                    ShowMessageFX.Warning(MiscUtil.getException(e), psFormName, null);
+                } else {
+                    Platform.runLater(() -> ShowMessageFX.Warning(MiscUtil.getException(e), psFormName, null));
+                }
+
             }
         }
     }
@@ -646,6 +693,7 @@ public class POCancellation_HistoryController implements Initializable, ScreenIn
                 } catch (SQLException | GuanzonException e) {
                     poLogWrapper.severe(psFormName, e.getMessage());
                     return new SimpleStringProperty("");
+
                 }
             });
 
