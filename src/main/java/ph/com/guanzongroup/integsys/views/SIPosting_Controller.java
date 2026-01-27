@@ -1629,8 +1629,7 @@ public class SIPosting_Controller implements Initializable, ScreenInterface {
             boolean lbShow2 = (pnEditMode == EditMode.READY || pnEditMode == EditMode.UPDATE);
             boolean lbShow3 = (pnEditMode == EditMode.READY);
             boolean lbShow4 = lbShow2 && poPurchaseReceivingController.PurchaseOrderReceiving().Master().getTransactionStatus().equals(PurchaseOrderReceivingStatus.POSTED)
-                    && poPurchaseReceivingController.PurchaseOrderReceiving().Master().getSalesInvoice().equals("To-follow")
-                    && poPurchaseReceivingController.PurchaseOrderReceiving().Master().getTransactionStatus().equals(PurchaseOrderReceivingStatus.POSTED);
+                    && poPurchaseReceivingController.PurchaseOrderReceiving().Master().getSalesInvoice().equals("To-follow");
             if (lbShow4) {
                 JFXUtil.setButtonsVisibility(lbShow3, btnUpdate);
                 if (lbShow1) {
