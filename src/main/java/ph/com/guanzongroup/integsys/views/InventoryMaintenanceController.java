@@ -334,9 +334,9 @@ public class InventoryMaintenanceController implements Initializable, ScreenInte
                     if (ShowMessageFX.OkayCancel(null, psFormName, "Do you want to disregard changes?") == true) {
                         poAppController = new InvControllers(poApp, poLogWrapper).InventoryMaster();
                         poAppController.initialize();
-                        //initlalize and validate record objects from class controller
-                        unloadForm appUnload = new unloadForm();
-                        appUnload.unloadForm(apMainAnchor, poApp, psFormName);
+//                        //initlalize and validate record objects from class controller
+//                        unloadForm appUnload = new unloadForm();
+//                        appUnload.unloadForm(apMainAnchor, poApp, psFormName);
 
                         //background thread
                         Platform.runLater(() -> {
