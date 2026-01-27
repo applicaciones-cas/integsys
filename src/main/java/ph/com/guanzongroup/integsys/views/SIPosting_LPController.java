@@ -131,6 +131,7 @@ public class SIPosting_LPController implements Initializable, ScreenInterface {
     private final Map<String, List<String>> highlightedRowsDetail = new HashMap<>();
     AtomicReference<Object> lastFocusedTextField = new AtomicReference<>();
     AtomicReference<Object> previousSearchedTextField = new AtomicReference<>();
+    private boolean tooltipShown = false;
 
     private Stage dialogStage = null;
     private final JFXUtil.ImageViewer imageviewerutil = new JFXUtil.ImageViewer();
@@ -1049,8 +1050,11 @@ public class SIPosting_LPController implements Initializable, ScreenInterface {
                             retrievePOR();
                             return;
                         case "tfSearchReferenceNo":
-                            retrievePOR();
-                            return;
+                            if (!tooltipShown) {
+                                JFXUtil.showTooltip("NOTE: Results appear directly in the table view, no pop-up dialog.", tfSearchReferenceNo);
+                                tooltipShown = true;
+                            }
+                            retrievePOR();                            return;
                         case "tfTerm":
                             poJSON = poPurchaseReceivingController.PurchaseOrderReceiving().SearchTerm(lsValue, false);
                             if ("error".equals(poJSON.get("result"))) {

@@ -131,6 +131,7 @@ public class SIPosting_AppliancesController implements Initializable, ScreenInte
 
     AtomicReference<Object> lastFocusedTextField = new AtomicReference<>();
     AtomicReference<Object> previousSearchedTextField = new AtomicReference<>();
+    private boolean tooltipShown = false;
 
     private final JFXUtil.ImageViewer imageviewerutil = new JFXUtil.ImageViewer();
     JFXUtil.StageManager stageAttachment = new JFXUtil.StageManager();
@@ -1108,8 +1109,11 @@ public class SIPosting_AppliancesController implements Initializable, ScreenInte
                             retrievePOR();
                             return;
                         case "tfSearchReferenceNo":
-                            retrievePOR();
-                            return;
+                            if (!tooltipShown) {
+                                JFXUtil.showTooltip("NOTE: Results appear directly in the table view, no pop-up dialog.", tfSearchReferenceNo);
+                                tooltipShown = true;
+                            }
+                            retrievePOR();                            return;
                         case "tfTerm":
                             poJSON = poPurchaseReceivingController.PurchaseOrderReceiving().SearchTerm(lsValue, false);
                             if ("error".equals(poJSON.get("result"))) {
