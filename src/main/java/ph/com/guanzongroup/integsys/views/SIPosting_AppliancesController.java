@@ -435,7 +435,7 @@ public class SIPosting_AppliancesController implements Initializable, ScreenInte
                     } else {
                         poJSON = poPurchaseReceivingController.PurchaseOrderReceiving().Master().setSalesInvoice("");
                     }
-                    loadRecordMaster();
+                    loadTableDetail();
                     break;
             }
         }

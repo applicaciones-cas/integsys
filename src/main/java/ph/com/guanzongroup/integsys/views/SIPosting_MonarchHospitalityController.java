@@ -383,7 +383,7 @@ public class SIPosting_MonarchHospitalityController implements Initializable, Sc
                     } else {
                         poJSON = poPurchaseReceivingController.PurchaseOrderReceiving().Master().setSalesInvoice("");
                     }
-                    loadRecordMaster();
+                    loadTableDetail();
                     break;
             }
         }

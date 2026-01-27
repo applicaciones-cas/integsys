@@ -436,7 +436,7 @@ public class SIPosting_Controller implements Initializable, ScreenInterface {
                     } else {
                         poJSON = poPurchaseReceivingController.PurchaseOrderReceiving().Master().setSalesInvoice("");
                     }
-                    loadRecordMaster();
+                    loadTableDetail();
                     break;
             }
         }

@@ -383,7 +383,7 @@ public class SIPosting_MonarchFoodController implements Initializable, ScreenInt
                     } else {
                         poJSON = poPurchaseReceivingController.PurchaseOrderReceiving().Master().setSalesInvoice("");
                     }
-                    loadRecordMaster();
+                    loadTableDetail();
                     break;
             }
         }

@@ -382,7 +382,7 @@ public class SIPosting_SPCarController implements Initializable, ScreenInterface
                     } else {
                         poJSON = poPurchaseReceivingController.PurchaseOrderReceiving().Master().setSalesInvoice("");
                     }
-                    loadRecordMaster();
+                    loadTableDetail();
                     break;
             }
         }
