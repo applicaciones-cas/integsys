@@ -1008,6 +1008,12 @@ public class JFXUtil {
                 TextField editor = dp.getEditor();
                 editor.setEditable(!disable);
                 editor.setDisable(false); // VERY IMPORTANT
+            } else if (obj instanceof TextArea) {
+                TextArea ta = (TextArea) obj;
+                ta.setDisable(disable);
+                ta.setEditable(!disable);
+                ta.setMouseTransparent(false);
+                ta.setCursor(!disable ? Cursor.TEXT : Cursor.DEFAULT);
             } else if (obj instanceof TextField) {
                 TextField tf = (TextField) obj;
                 tf.setDisable(disable);
