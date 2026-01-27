@@ -1570,7 +1570,7 @@ public class SIPosting_MPController implements Initializable, ScreenInterface {
             tfReferenceNo.setText(poPurchaseReceivingController.PurchaseOrderReceiving().Master().getReferenceNo());
             String lsSIDate = CustomCommonUtil.formatDateToShortString(poPurchaseReceivingController.PurchaseOrderReceiving().Master().getSalesInvoiceDate());
             dpSIDate.setValue(JFXUtil.isObjectEqualTo(lsSIDate, "1900-01-01") ? null : CustomCommonUtil.parseDateStringToLocalDate(lsSIDate, "yyyy-MM-dd"));
-            boolean lbShow = poPurchaseReceivingController.PurchaseOrderReceiving().Master().getSalesInvoice().equals("To-follow");
+            boolean lbShow = "To-follow".equals(poPurchaseReceivingController.PurchaseOrderReceiving().Master().getSalesInvoice());
             cbToFollowInv.setSelected(lbShow);
             JFXUtil.setDisabled(lbShow, tfSINo);
             if (lbShow) {
@@ -1609,8 +1609,8 @@ public class SIPosting_MPController implements Initializable, ScreenInterface {
             boolean lbShow1 = (pnEditMode == EditMode.UPDATE);
             boolean lbShow2 = (pnEditMode == EditMode.READY || pnEditMode == EditMode.UPDATE);
             boolean lbShow3 = (pnEditMode == EditMode.READY);
-            boolean lbShow4 = lbShow2 && poPurchaseReceivingController.PurchaseOrderReceiving().Master().getTransactionStatus().equals(PurchaseOrderReceivingStatus.POSTED)
-                    && poPurchaseReceivingController.PurchaseOrderReceiving().Master().getSalesInvoice().equals("To-follow");
+            boolean lbShow4 = lbShow2 && PurchaseOrderReceivingStatus.POSTED.equals(poPurchaseReceivingController.PurchaseOrderReceiving().Master().getTransactionStatus())
+                    && "To-follow".equals(poPurchaseReceivingController.PurchaseOrderReceiving().Master().getSalesInvoice());
             if (lbShow4) {
                 JFXUtil.setButtonsVisibility(lbShow3, btnUpdate);
                 if (lbShow1) {
@@ -1806,8 +1806,8 @@ public class SIPosting_MPController implements Initializable, ScreenInterface {
                         boolean lbIsEnable = true;
                         boolean lbShow1 = (pnEditMode == EditMode.UPDATE);
                         boolean lbShow2 = (pnEditMode == EditMode.READY || pnEditMode == EditMode.UPDATE);
-                        boolean lbShow4 = lbShow2 && poPurchaseReceivingController.PurchaseOrderReceiving().Master().getTransactionStatus().equals(PurchaseOrderReceivingStatus.POSTED)
-                                && poPurchaseReceivingController.PurchaseOrderReceiving().Master().getSalesInvoice().equals("To-follow");
+                        boolean lbShow4 = lbShow2 && PurchaseOrderReceivingStatus.POSTED.equals(poPurchaseReceivingController.PurchaseOrderReceiving().Master().getTransactionStatus())
+                                && "To-follow".equals(poPurchaseReceivingController.PurchaseOrderReceiving().Master().getSalesInvoice());
                         if (lbShow4) {
                             if (lbShow1) {
                                 lbIsEnable = false;
@@ -2015,7 +2015,7 @@ public class SIPosting_MPController implements Initializable, ScreenInterface {
             switch (nodeID) {
                 case "cbVatInclusive":
                     if (JFXUtil.isObjectEqualTo(poPurchaseReceivingController.PurchaseOrderReceiving().Master().getSalesInvoice(), null, "")
-                            && !poPurchaseReceivingController.PurchaseOrderReceiving().Master().getTransactionStatus().equals(PurchaseOrderReceivingStatus.POSTED)) {
+                            && !PurchaseOrderReceivingStatus.POSTED.equals(poPurchaseReceivingController.PurchaseOrderReceiving().Master().getTransactionStatus())) {
                         ShowMessageFX.Warning(null, pxeModuleName,
                                 "Only available when Invoice No is provided or To-follow.");
                     }
@@ -2026,7 +2026,7 @@ public class SIPosting_MPController implements Initializable, ScreenInterface {
             switch (nodeID) {
                 case "cbVatable":
                     if (JFXUtil.isObjectEqualTo(poPurchaseReceivingController.PurchaseOrderReceiving().Master().getSalesInvoice(), null, "")
-                            && !poPurchaseReceivingController.PurchaseOrderReceiving().Master().getTransactionStatus().equals(PurchaseOrderReceivingStatus.POSTED)) {
+                            && !PurchaseOrderReceivingStatus.POSTED.equals(poPurchaseReceivingController.PurchaseOrderReceiving().Master().getTransactionStatus())) {
                         ShowMessageFX.Warning(null, pxeModuleName,
                                 "Only available when Invoice No is provided or To-follow.");
                     }

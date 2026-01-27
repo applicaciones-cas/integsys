@@ -833,7 +833,7 @@ public class SIPosting_HistoryMPController implements Initializable, ScreenInter
             dpReferenceDate.setValue(CustomCommonUtil.parseDateStringToLocalDate(lsReferenceDate, "yyyy-MM-dd"));
             dpSIDate.setValue(JFXUtil.isObjectEqualTo(lsSIDate, "1900-01-01") ? null : CustomCommonUtil.parseDateStringToLocalDate(lsSIDate, "yyyy-MM-dd"));
             tfReferenceNo.setText(poPurchaseReceivingController.PurchaseOrderReceiving().Master().getReferenceNo());
-            boolean lbShow = poPurchaseReceivingController.PurchaseOrderReceiving().Master().getSalesInvoice().equals("To-follow");
+            boolean lbShow = "To-follow".equals(poPurchaseReceivingController.PurchaseOrderReceiving().Master().getSalesInvoice());
             cbToFollowInv.setSelected(lbShow);
             JFXUtil.setDisabled(lbShow, tfSINo);
             if (lbShow) {
