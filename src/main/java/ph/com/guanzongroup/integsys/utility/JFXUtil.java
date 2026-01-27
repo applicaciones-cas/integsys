@@ -998,21 +998,31 @@ public class JFXUtil {
  /* Requires boolean & Nodes*/
     public static void setDisabled(boolean disable, Object... elements) {
         for (Object obj : elements) {
-            if (obj instanceof Node) {
-                Node node = (Node) obj;
-                node.setDisable(disable);
 
-                if (node instanceof TextField) {
-                    ((TextField) node).setEditable(!disable);
-                    if (disable) {
-                        if (!node.getStyleClass().contains("DisabledTextField")) {
-                            node.getStyleClass().add("DisabledTextField");
-                        }
-                    } else {
-                        node.getStyleClass().remove("DisabledTextField");
+            if (obj instanceof DatePicker) {
+                DatePicker dp = (DatePicker) obj;
 
+                // Disable picker button but keep editor accessible
+                dp.setDisable(disable);
+
+                TextField editor = dp.getEditor();
+                editor.setEditable(!disable);
+                editor.setDisable(false); // VERY IMPORTANT
+            } else if (obj instanceof TextField) {
+                TextField tf = (TextField) obj;
+                tf.setDisable(disable);
+                tf.setEditable(!disable);
+
+                if (disable) {
+                    if (!tf.getStyleClass().contains("DisabledTextField")) {
+                        tf.getStyleClass().add("DisabledTextField");
                     }
+                } else {
+                    tf.getStyleClass().remove("DisabledTextField");
                 }
+
+            } else if (obj instanceof Node) {
+                ((Node) obj).setDisable(disable);
 
             } else if (obj instanceof Tab) {
                 ((Tab) obj).setDisable(disable);
