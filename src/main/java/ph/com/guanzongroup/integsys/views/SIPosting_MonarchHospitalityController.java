@@ -1558,6 +1558,10 @@ public class SIPosting_MonarchHospitalityController implements Initializable, Sc
                     JFXUtil.setDisabled(true, apDetail, apAttachments, apJEMaster, apJEDetail);
                     JFXUtil.setDisabledExcept(true, apMaster, dpSIDate, cbToFollowInv);
                 }
+            } else {
+                JFXUtil.setDisabled(!lbShow1, tfReferenceNo, tfSINo, tfTerm, tfDiscountRate, tfDiscountAmount, tfFreightAmt,
+                        tfVatRate, taRemarks);
+                JFXUtil.setDisabled(!lbShow1, apMaster, apDetail, apJEDetail, apJEMaster, apAttachments);
             }
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
