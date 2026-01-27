@@ -1968,6 +1968,18 @@ public class SIPosting_MonarchFoodController implements Initializable, ScreenInt
         JFXUtil.setCheckboxHoverCursor(apMaster, apDetail);
 
         JFXUtil.handleDisabledNodeClick(apMaster, pnEditMode, nodeID -> {
+            boolean lbShow = PurchaseOrderReceivingStatus.POSTED.equals(poPurchaseReceivingController.PurchaseOrderReceiving().Master().getTransactionStatus())
+                    && "To-follow".equals(poPurchaseReceivingController.PurchaseOrderReceiving().Master().getSalesInvoice());
+            if (nodeID.equals("tfSINo")) {
+                if (lbShow) {
+                    ShowMessageFX.Warning(null, pxeModuleName, "Modify \"To-follow Inv\" to enable editing Invoice No field.");
+                    return;
+                }
+            }
+            if (lbShow) {
+                ShowMessageFX.Warning(null, pxeModuleName, "Ony Invoice date, To follow Inv, & Invoice No are available to edit.");
+                return;
+            }
             switch (nodeID) {
                 case "cbVatInclusive":
                     if (JFXUtil.isObjectEqualTo(poPurchaseReceivingController.PurchaseOrderReceiving().Master().getSalesInvoice(), null, "")
