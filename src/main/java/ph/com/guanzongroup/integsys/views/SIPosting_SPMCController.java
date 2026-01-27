@@ -1991,7 +1991,7 @@ public class SIPosting_SPMCController implements Initializable, ScreenInterface 
                     if (JFXUtil.isObjectEqualTo(poPurchaseReceivingController.PurchaseOrderReceiving().Master().getSalesInvoice(), null, "")
                             && !PurchaseOrderReceivingStatus.POSTED.equals(poPurchaseReceivingController.PurchaseOrderReceiving().Master().getTransactionStatus())) {
                         ShowMessageFX.Warning(null, pxeModuleName,
-                                "Only available when Invoice No is provided or To-follow.");
+                               "Only available when Invoice No is provided or set \"To-follow\".");
                     }
                     break;
             }
@@ -2002,7 +2002,7 @@ public class SIPosting_SPMCController implements Initializable, ScreenInterface 
                     if (JFXUtil.isObjectEqualTo(poPurchaseReceivingController.PurchaseOrderReceiving().Master().getSalesInvoice(), null, "")
                             && !PurchaseOrderReceivingStatus.POSTED.equals(poPurchaseReceivingController.PurchaseOrderReceiving().Master().getTransactionStatus())) {
                         ShowMessageFX.Warning(null, pxeModuleName,
-                                "Only available when Invoice No is provided or To-follow.");
+                               "Only available when Invoice No is provided or set \"To-follow\".");
                     }
                     break;
             }
