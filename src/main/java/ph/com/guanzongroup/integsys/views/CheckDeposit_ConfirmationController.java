@@ -26,6 +26,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Control;
 import javafx.scene.control.DatePicker;
@@ -57,6 +58,7 @@ import ph.com.guanzongroup.cas.cashflow.model.Model_Check_Deposit_Detail;
 import ph.com.guanzongroup.cas.cashflow.model.Model_Check_Deposit_Master;
 import ph.com.guanzongroup.cas.cashflow.CheckDeposit;
 import ph.com.guanzongroup.cas.cashflow.services.CheckController;
+import ph.com.guanzongroup.integsys.utility.CustomCommonUtil;
 
 /**
  * FXML Controller class
@@ -66,18 +68,22 @@ import ph.com.guanzongroup.cas.cashflow.services.CheckController;
 public class CheckDeposit_ConfirmationController implements Initializable, ScreenInterface {
 
     private GRiderCAS poApp;
+    private JSONObject poJSON;
     private LogWrapper poLogWrapper;
     private String psFormName = "Check Deposit Confirmation";
     private String psIndustryID;
     private Control lastFocusedControl;
     private CheckDeposit poAppController;
     private ObservableList<Model_Check_Deposit_Detail> laTransactionDetail;
-    private int pnSelectMaster, pnEditMode, pnTransactionDetail;
+    private int pnSelectMaster, pnEditMode, pnTransactionDetail = 0;
 
     private unloadForm poUnload = new unloadForm();
 
     @FXML
     private AnchorPane apMainAnchor, apBrowse, apMaster, apDetail, apButton, apTransaction;
+    
+    @FXML
+    private CheckBox cbReverse;
 
     @FXML
     private TextField tfSearchBankAccountNo, tfSearchTransNo, tfTransactionNo,
@@ -196,15 +202,47 @@ public class CheckDeposit_ConfirmationController implements Initializable, Scree
     @FXML
     void ontblDetailClicked(MouseEvent e) {
         try {
-            pnTransactionDetail = tblViewDetails.getSelectionModel().getSelectedIndex() + 1;
-            if (pnTransactionDetail <= 0) {
+            pnTransactionDetail = tblViewDetails.getSelectionModel().getSelectedIndex();
+            if (pnTransactionDetail < 0) {
                 return;
             }
-
             loadSelectedTransactionDetail(pnTransactionDetail);
         } catch (SQLException | GuanzonException | CloneNotSupportedException ex) {
             ex.printStackTrace();
             poLogWrapper.severe(psFormName + " :" + ex.getMessage());
+        }
+    }
+    
+    @FXML
+    private void cmdCheckBox_Click(ActionEvent event) {
+        poJSON = new JSONObject();
+        Object source = event.getSource();
+        if (source instanceof CheckBox) {
+            try {
+                CheckBox checkedBox = (CheckBox) source;
+                switch (checkedBox.getId()) {
+                    case "cbReverse": // this is the id
+                        if (poAppController.getEditMode() == EditMode.ADDNEW
+                                || poAppController.getEditMode() == EditMode.UPDATE
+                                && poAppController.getMaster().getTransactionStatus().equals(CheckDepositStatus.OPEN)
+                                || poAppController.getMaster().getTransactionStatus().equals(CheckDepositStatus.CONFIRMED)) {
+                            if (poAppController.Detail(pnTransactionDetail).getSourceNo() != null
+                                    || !poAppController.Detail(pnTransactionDetail).getSourceNo().isEmpty()) {
+                                if (!checkedBox.isSelected()) {
+                                    poAppController.Detail().remove(pnTransactionDetail);
+                                    pnTransactionDetail = pnTransactionDetail - 1;
+                                }
+                            }
+                        } else {
+                            poAppController.Detail(pnTransactionDetail).isReverse(checkedBox.isSelected());
+                        }
+                        reloadTableDetail();
+                        loadSelectedTransactionDetail(pnTransactionDetail);
+                        break;
+                }
+            } catch (SQLException | GuanzonException | CloneNotSupportedException ex) {
+                Logger.getLogger(CheckDeposit_EntryController.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
     }
 
@@ -449,14 +487,26 @@ public class CheckDeposit_ConfirmationController implements Initializable, Scree
                         ShowMessageFX.Information("Please load transaction before proceeding..", psFormName, "");
                         return;
                     }
+
                     if (!isJSONSuccess(poAppController.SaveTransaction(), "Initialize Save Transaction")) {
                         return;
                     }
+
+                    if (ShowMessageFX.OkayCancel(null, psFormName, "Do you want to Confirm transaction?") == true) {
+                        if (!isJSONSuccess(poAppController.CloseTransaction(), "Initialize Close Transaction")) {
+                            return;
+                        }
+                        if (ShowMessageFX.OkayCancel(null, psFormName, "Do you want to Print transaction?") == true) {
+                            if (!isJSONSuccess(poAppController.printDepositSlip(), "Initialize Print Transaction")) {
+                                return;
+                            }
+                        }
+                    }
+
                     getLoadedTransaction();
                     pnEditMode = poAppController.getEditMode();
-
                     break;
-
+                    
                 case "btnCancel":
                     if (ShowMessageFX.OkayCancel(null, psFormName, "Do you want to disregard changes?") == true) {
                         poAppController = new CheckController(poApp, poLogWrapper).CheckDeposit();
@@ -549,7 +599,7 @@ public class CheckDeposit_ConfirmationController implements Initializable, Scree
                         break;
 
                     case "tfNote":
-                        poAppController.getDetail(pnTransactionDetail).setRemarks(lsValue);
+                        poAppController.Detail(pnTransactionDetail).setRemarks(lsValue);
                         loadSelectedTransactionDetail(pnTransactionDetail);
 
                         break;
@@ -829,30 +879,68 @@ public class CheckDeposit_ConfirmationController implements Initializable, Scree
         }
     }
 
-    private void loadSelectedTransactionDetail(int fnRow) throws SQLException, GuanzonException, CloneNotSupportedException {
+    private void loadSelectedTransactionDetail(int fnrow)
+            throws SQLException, GuanzonException, CloneNotSupportedException {
 
-        int tblIndex = fnRow - 1;
-        tfCheckTransNo.setText(tblColDetailReference.getCellData(tblIndex));
-        tfBank.setText(tblColDetailBank.getCellData(tblIndex));
-        tfPayee.setText(tblColDetailPayee.getCellData(tblIndex));
-        tfCheckNo.setText(tblColDetailCheckNo.getCellData(tblIndex));
-        tfCheckAmount.setText(tblColDetailCheckAmount.getCellData(tblIndex));
+        tfCheckTransNo.setText(poAppController.Detail(pnTransactionDetail).CheckPayment().getTransactionNo() != null
+                ? poAppController.Detail(pnTransactionDetail).CheckPayment().getTransactionNo()
+                : ""
+        );
 
-        tfNote.setText(poAppController.getDetail(fnRow).getRemarks());
-        dpCheckDate.setValue(ParseDate(poAppController.getDetail(fnRow).CheckPayment().getTransactionDate()));
+        tfBank.setText( poAppController.Detail(pnTransactionDetail).CheckPayment().Banks() != null
+                ? poAppController.Detail(pnTransactionDetail).CheckPayment().Banks().getBankName()
+                : ""
+        );
+
+        tfPayee.setText( poAppController.Detail(pnTransactionDetail).CheckPayment().Payee() != null
+                ? poAppController.Detail(pnTransactionDetail).CheckPayment().Payee().getPayeeName()
+                : ""
+        );
+
+        tfCheckNo.setText( poAppController.Detail(pnTransactionDetail).CheckPayment().getCheckNo() != null
+                ? poAppController.Detail(pnTransactionDetail).CheckPayment().getCheckNo()
+                : ""
+        );
+
+        tfCheckAmount.setText(
+                poAppController.Detail(pnTransactionDetail) != null
+                && poAppController.Detail(pnTransactionDetail).CheckPayment() != null
+                ? CustomCommonUtil.setIntegerValueToDecimalFormat(
+                        poAppController.Detail(pnTransactionDetail).CheckPayment().getAmount(), true)
+                : ""
+        );
+
+        tfNote.setText(poAppController.Detail(pnTransactionDetail).getRemarks() != null
+                ? poAppController.Detail(pnTransactionDetail).getRemarks()
+                : ""
+        );
+
+        dpCheckDate.setValue( poAppController.Detail(pnTransactionDetail).CheckPayment().getTransactionDate() != null
+                ? ParseDate(
+                        poAppController.Detail(pnTransactionDetail)
+                                .CheckPayment()
+                                .getTransactionDate())
+                : null
+        );
+
+        cbReverse.setSelected(
+                poAppController.Detail(pnTransactionDetail) != null
+                && poAppController.Detail(pnTransactionDetail).isReverse()
+        );
+
         recomputeTotal();
     }
 
     private void recomputeTotal() throws SQLException, GuanzonException {
         double lnTotal = 0.00;
-        for (int lnCtr = 1; lnCtr <= poAppController.getDetailCount(); lnCtr++) {
-            if (poAppController.getDetail(lnCtr).getSourceNo() == null || poAppController.getDetail(lnCtr).getSourceNo().isEmpty()) {
-                continue;
-            }
-            lnTotal = lnTotal + poAppController.getDetail(lnCtr).CheckPayment().getAmount();
-        }
-        poAppController.getMaster().setTransactionTotalDeposit(lnTotal);
-        tfTotal.setText(CommonUtils.NumberFormat(poAppController.getMaster().getTransactionTotalDeposit(), "###,##0.0000"));
+//        for (int lnCtr = 1; lnCtr <= poAppController.getDetailCount(); lnCtr++) {
+//            if (poAppController.Detail(lnCtr).getSourceNo() == null || poAppController.Detail(lnCtr).getSourceNo().isEmpty()) {
+//                continue;
+//            }
+//            lnTotal = lnTotal + poAppController.Detail(lnCtr).CheckPayment().getAmount();
+//        }
+//        poAppController.getMaster().setTransactionTotalDeposit(lnTotal);
+//        tfTotal.setText(CommonUtils.NumberFormat(poAppController.getMaster().getTransactionTotalDeposit(), "###,##0.0000"));
 
     }
 
@@ -1029,18 +1117,38 @@ public class CheckDeposit_ConfirmationController implements Initializable, Scree
     }
 
     private void reloadTableDetail() {
-        List<Model_Check_Deposit_Detail> rawDetail = poAppController.getDetailList();
-        laTransactionDetail.setAll(rawDetail);
+        try {
+            List<Model_Check_Deposit_Detail> rawDetail = poAppController.getDetailList();
+            List<Model_Check_Deposit_Detail> displayList = new ArrayList<>();
 
-        // Restore or select last row
-        int indexToSelect = (pnTransactionDetail >= 1 && pnTransactionDetail < laTransactionDetail.size())
-                ? pnTransactionDetail - 1
-                : laTransactionDetail.size() - 1;
+            boolean hasEmptyRow = false; // track if we already added a new empty row
 
-        tblViewDetails.getSelectionModel().select(indexToSelect);
+            for (Model_Check_Deposit_Detail detail : rawDetail) {
+                boolean isEmptyRow = (detail.getSourceNo() == null || detail.getSourceNo().trim().isEmpty());
 
-        pnTransactionDetail = tblViewDetails.getSelectionModel().getSelectedIndex() + 1; // Not focusedIndex
-        tblViewDetails.refresh();
+                if (isEmptyRow) {
+                    // Add only one empty row for new transaction
+                    if (!hasEmptyRow) {
+                        displayList.add(detail);
+                        hasEmptyRow = true;
+                    }
+                } else if (detail.isReverse()) {
+                    // Add existing rows where cReverse = "+"
+                    displayList.add(detail);
+                }
+            }
+            laTransactionDetail.setAll(displayList);
+            tblViewDetails.getSelectionModel().select(pnTransactionDetail);
+
+            tblViewDetails.refresh();
+            poJSON = poAppController.computeMasterFields();
+            if ("success".equals((String) poJSON.get("result"))) {
+                tfTotal.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poAppController.getMaster().getTransactionTotalDeposit(), true));
+            }
+
+        } catch (SQLException | GuanzonException ex) {
+            Logger.getLogger(CheckDeposit_EntryController.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     private void getLoadedTransaction() throws SQLException, GuanzonException, CloneNotSupportedException {

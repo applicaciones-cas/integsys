@@ -15,6 +15,7 @@ import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyBooleanPropertyBase;
 import javafx.beans.property.SimpleStringProperty;
@@ -221,11 +222,15 @@ public class CheckDeposit_EntryController implements Initializable, ScreenInterf
                 CheckBox checkedBox = (CheckBox) source;
                 switch (checkedBox.getId()) {
                     case "cbReverse": // this is the id
-                        if (poAppController.getEditMode() == EditMode.ADDNEW) {
+                        if (poAppController.getEditMode() == EditMode.ADDNEW
+                                || poAppController.getEditMode() == EditMode.UPDATE
+                                && poAppController.getMaster().getTransactionStatus().equals(CheckDepositStatus.OPEN)
+                                || poAppController.getMaster().getTransactionStatus().equals(CheckDepositStatus.CONFIRMED)) {
                             if (poAppController.Detail(pnTransactionDetail).getSourceNo() != null
                                     || !poAppController.Detail(pnTransactionDetail).getSourceNo().isEmpty()) {
                                 if (!checkedBox.isSelected()) {
                                     poAppController.Detail().remove(pnTransactionDetail);
+                                    pnTransactionDetail = pnTransactionDetail - 1;
                                 }
                             }
                         } else {
@@ -403,6 +408,7 @@ public class CheckDeposit_EntryController implements Initializable, ScreenInterf
                     if (!isJSONSuccess(poAppController.UpdateTransaction(), "Initialize UPdate Transaction")) {
                         return;
                     }
+                    poAppController.AddDetail();
                     getLoadedTransaction();
                     pnEditMode = poAppController.getEditMode();
                     break;
@@ -1054,21 +1060,33 @@ public class CheckDeposit_EntryController implements Initializable, ScreenInterf
     private void reloadTableDetail() {
         try {
             List<Model_Check_Deposit_Detail> rawDetail = poAppController.getDetailList();
-            laTransactionDetail.setAll(rawDetail);
+            List<Model_Check_Deposit_Detail> displayList = new ArrayList<>();
 
-            // Restore or select last row
-//        int indexToSelect = (pnTransactionDetail >= 1 && pnTransactionDetail < laTransactionDetail.size())
-//                ? pnTransactionDetail
-//                : laTransactionDetail.size() - 1;
+            boolean hasEmptyRow = false; // track if we already added a new empty row
+
+            for (Model_Check_Deposit_Detail detail : rawDetail) {
+                boolean isEmptyRow = (detail.getSourceNo() == null || detail.getSourceNo().trim().isEmpty());
+
+                if (isEmptyRow) {
+                    // Add only one empty row for new transaction
+                    if (!hasEmptyRow) {
+                        displayList.add(detail);
+                        hasEmptyRow = true;
+                    }
+                } else if (detail.isReverse()) {
+                    // Add existing rows where cReverse = "+"
+                    displayList.add(detail);
+                }
+            }
+            laTransactionDetail.setAll(displayList);
             tblViewDetails.getSelectionModel().select(pnTransactionDetail);
 
-//pnTransactionDetail = tblViewDetails.getSelectionModel().getSelectedIndex(); // Not focusedIndex
             tblViewDetails.refresh();
             poJSON = poAppController.computeMasterFields();
             if ("success".equals((String) poJSON.get("result"))) {
                 tfTotal.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poAppController.getMaster().getTransactionTotalDeposit(), true));
             }
-            
+
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(CheckDeposit_EntryController.class.getName()).log(Level.SEVERE, null, ex);
         }
