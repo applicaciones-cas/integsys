@@ -1548,9 +1548,10 @@ public class SIPosting_AppliancesController implements Initializable, ScreenInte
                     JFXUtil.setDisabledExcept(true, apMaster, dpSIDate, cbToFollowInv);
                 }
             } else {
-                JFXUtil.setDisabled(!lbShow1, tfReferenceNo, tfSINo, tfTerm, tfDiscountRate, tfDiscountAmount, tfFreightAmt,
-                        tfVatRate, taRemarks, dpReferenceDate);
-                JFXUtil.setDisabled(!lbShow1, apMaster, apDetail, apJEDetail, apJEMaster, apAttachments);
+                if (!PurchaseOrderReceivingStatus.POSTED.equals(poPurchaseReceivingController.PurchaseOrderReceiving().Master().getTransactionStatus())) {
+                    JFXUtil.setDisabled(!lbShow1, tfReferenceNo, tfSINo, tfTerm, tfDiscountRate, tfDiscountAmount, tfFreightAmt,
+                            tfVatRate, taRemarks, dpReferenceDate);
+                }
             }
             poPurchaseReceivingController.PurchaseOrderReceiving().Master().setSupplierId(psSupplierId);
             poPurchaseReceivingController.PurchaseOrderReceiving().Master().setBranchCode(psBranchId);
