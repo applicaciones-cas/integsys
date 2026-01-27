@@ -56,6 +56,7 @@ import org.guanzon.appdriver.base.GRiderCAS;
 import org.guanzon.appdriver.base.LogWrapper;
 import org.guanzon.appdriver.constant.EditMode;
 import org.guanzon.appdriver.base.GuanzonException;
+import org.guanzon.appdriver.base.MiscUtil;
 import org.guanzon.cas.inv.model.Model_Inv_Master;
 import org.guanzon.cas.inv.model.Model_Inventory;
 import org.guanzon.cas.purchasing.model.Model_PO_Detail;
@@ -184,8 +185,13 @@ public class POCancellation_ConfirmationControllerMonarch_Food implements Initia
             initControlEvents();
 
         } catch (SQLException | GuanzonException e) {
-            Logger.getLogger(POCancellation_ConfirmationControllerMonarch_Food.class.getName()).log(Level.SEVERE, null, e);
+            Logger.getLogger(POCancellation_ConfirmationController.class.getName()).log(Level.SEVERE, null, e);
             poLogWrapper.severe(psFormName + " :" + e.getMessage());
+            if (Platform.isFxApplicationThread()) {
+                ShowMessageFX.Warning(MiscUtil.getException(e), psFormName, null);
+            } else {
+                Platform.runLater(() -> ShowMessageFX.Warning(MiscUtil.getException(e), psFormName, null));
+            }
         }
     }
 
@@ -224,6 +230,11 @@ public class POCancellation_ConfirmationControllerMonarch_Food implements Initia
             } catch (CloneNotSupportedException | SQLException | GuanzonException ex) {
 
                 poLogWrapper.severe(psFormName + " :" + ex.getMessage());
+                if (Platform.isFxApplicationThread()) {
+                    ShowMessageFX.Warning(MiscUtil.getException(ex), psFormName, null);
+                } else {
+                    Platform.runLater(() -> ShowMessageFX.Warning(MiscUtil.getException(ex), psFormName, null));
+                }
 
             }
 
@@ -243,6 +254,11 @@ public class POCancellation_ConfirmationControllerMonarch_Food implements Initia
             loadSelectedTransactionDetail(pnTransactionDetail);
         } catch (SQLException | GuanzonException | CloneNotSupportedException ex) {
             poLogWrapper.severe(psFormName + " :" + ex.getMessage());
+            if (Platform.isFxApplicationThread()) {
+                ShowMessageFX.Warning(MiscUtil.getException(ex), psFormName, null);
+            } else {
+                Platform.runLater(() -> ShowMessageFX.Warning(MiscUtil.getException(ex), psFormName, null));
+            }
         }
     }
 
@@ -523,9 +539,13 @@ public class POCancellation_ConfirmationControllerMonarch_Food implements Initia
             initButtonDisplay(poAppController.getEditMode());
 
         } catch (Exception e) {
-            Logger.getLogger(DeliverySchedule_EntryController.class
-                    .getName()).log(Level.SEVERE, null, e);
+            e.printStackTrace();
             poLogWrapper.severe(psFormName + " :" + e.getMessage());
+            if (Platform.isFxApplicationThread()) {
+                ShowMessageFX.Warning(MiscUtil.getException(e), psFormName, null);
+            } else {
+                Platform.runLater(() -> ShowMessageFX.Warning(MiscUtil.getException(e), psFormName, null));
+            }
         }
     }
 
@@ -590,6 +610,11 @@ public class POCancellation_ConfirmationControllerMonarch_Food implements Initia
             }
         } catch (SQLException | GuanzonException | CloneNotSupportedException ex) {
             poLogWrapper.severe(psFormName + " :" + ex.getMessage());
+            if (Platform.isFxApplicationThread()) {
+                ShowMessageFX.Warning(MiscUtil.getException(ex), psFormName, null);
+            } else {
+                Platform.runLater(() -> ShowMessageFX.Warning(MiscUtil.getException(ex), psFormName, null));
+            }
         }
     };
 
@@ -659,9 +684,13 @@ public class POCancellation_ConfirmationControllerMonarch_Food implements Initia
                 }
             }
         } catch (Exception ex) {
-            Logger.getLogger(DeliverySchedule_EntryController.class
-                    .getName()).log(Level.SEVERE, null, ex);
+            ex.printStackTrace();
             poLogWrapper.severe(psFormName + " :" + ex.getMessage());
+            if (Platform.isFxApplicationThread()) {
+                ShowMessageFX.Warning(MiscUtil.getException(ex), psFormName, null);
+            } else {
+                Platform.runLater(() -> ShowMessageFX.Warning(MiscUtil.getException(ex), psFormName, null));
+            }
         }
     }
 
@@ -755,10 +784,14 @@ public class POCancellation_ConfirmationControllerMonarch_Food implements Initia
 
                 }
             }
-        } catch (Exception ex) {
-            Logger.getLogger(DeliverySchedule_EntryController.class
-                    .getName()).log(Level.SEVERE, null, ex);
+        } catch (CloneNotSupportedException | SQLException | GuanzonException ex) {
+            ex.printStackTrace();
             poLogWrapper.severe(psFormName + " :" + ex.getMessage());
+            if (Platform.isFxApplicationThread()) {
+                ShowMessageFX.Warning(MiscUtil.getException(ex), psFormName, null);
+            } else {
+                Platform.runLater(() -> ShowMessageFX.Warning(MiscUtil.getException(ex), psFormName, null));
+            }
         }
     }
 
@@ -793,9 +826,7 @@ public class POCancellation_ConfirmationControllerMonarch_Food implements Initia
                 overlay.setVisible(false);
                 pi.setVisible(false);
                 Throwable ex = getException();
-                Logger
-                        .getLogger(DeliverySchedule_EntryController.class
-                                .getName()).log(Level.SEVERE, null, ex);
+                ex.printStackTrace();
                 poLogWrapper.severe(psFormName + " : " + ex.getMessage());
             }
 
@@ -833,6 +864,12 @@ public class POCancellation_ConfirmationControllerMonarch_Food implements Initia
             }
         } catch (SQLException | GuanzonException e) {
             poLogWrapper.severe(psFormName, e.getMessage());
+
+            if (Platform.isFxApplicationThread()) {
+                ShowMessageFX.Warning(MiscUtil.getException(e), psFormName, null);
+            } else {
+                Platform.runLater(() -> ShowMessageFX.Warning(MiscUtil.getException(e), psFormName, null));
+            }
         }
     }
 
@@ -1022,9 +1059,15 @@ public class POCancellation_ConfirmationControllerMonarch_Food implements Initia
                     loButton.setVisible(visible);
                     loButton.setManaged(visible);
                 }
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
-                poLogWrapper.severe(psFormName + " :" + e.getMessage());
+            } catch (IllegalAccessException ex) {
+                ex.printStackTrace();
+                poLogWrapper.severe(psFormName + " :" + ex.getMessage());
+
+                if (Platform.isFxApplicationThread()) {
+                    ShowMessageFX.Warning(MiscUtil.getException(ex), psFormName, null);
+                } else {
+                    Platform.runLater(() -> ShowMessageFX.Warning(MiscUtil.getException(ex), psFormName, null));
+                }
             }
         }
     }
@@ -1203,6 +1246,12 @@ public class POCancellation_ConfirmationControllerMonarch_Food implements Initia
                 } catch (SQLException | GuanzonException ex) {
 
                     poLogWrapper.severe(psFormName + " :" + ex.getMessage());
+
+                    if (Platform.isFxApplicationThread()) {
+                        ShowMessageFX.Warning(MiscUtil.getException(ex), psFormName, null);
+                    } else {
+                        Platform.runLater(() -> ShowMessageFX.Warning(MiscUtil.getException(ex), psFormName, null));
+                    }
                     return true;
                 }
             });
@@ -1344,6 +1393,12 @@ public class POCancellation_ConfirmationControllerMonarch_Food implements Initia
             } catch (IllegalAccessException e) {
                 e.printStackTrace();
                 poLogWrapper.severe(psFormName + " :" + e.getMessage());
+
+                if (Platform.isFxApplicationThread()) {
+                    ShowMessageFX.Warning(MiscUtil.getException(e), psFormName, null);
+                } else {
+                    Platform.runLater(() -> ShowMessageFX.Warning(MiscUtil.getException(e), psFormName, null));
+                }
             }
         }
         return controls;
