@@ -1605,6 +1605,19 @@ public class SIPosting_MPController implements Initializable, ScreenInterface {
             tfAdvancePayment.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poPurchaseReceivingController.PurchaseOrderReceiving().getAdvancePayment(), true));
 
             JFXUtil.updateCaretPositions(apMaster);
+
+            boolean lbShow1 = (pnEditMode == EditMode.UPDATE);
+            boolean lbShow2 = (pnEditMode == EditMode.READY || pnEditMode == EditMode.UPDATE);
+            boolean lbShow3 = (pnEditMode == EditMode.READY);
+            boolean lbShow4 = lbShow2 && poPurchaseReceivingController.PurchaseOrderReceiving().Master().getTransactionStatus().equals(PurchaseOrderReceivingStatus.POSTED)
+                    && poPurchaseReceivingController.PurchaseOrderReceiving().Master().getSalesInvoice().equals("To-follow");
+            if (lbShow4) {
+                JFXUtil.setButtonsVisibility(lbShow3, btnUpdate);
+                if (lbShow1) {
+                    JFXUtil.setDisabled(true, apDetail, apAttachments, apJEMaster, apJEDetail);
+                    JFXUtil.setDisabledExcept(true, apMaster, dpSIDate, cbToFollowInv);
+                }
+            }
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
             ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
@@ -1790,15 +1803,28 @@ public class SIPosting_MPController implements Initializable, ScreenInterface {
                     details_data.clear();
                     int lnCtr;
                     try {
+                        boolean lbIsEnable = true;
+                        boolean lbShow1 = (pnEditMode == EditMode.UPDATE);
+                        boolean lbShow2 = (pnEditMode == EditMode.READY || pnEditMode == EditMode.UPDATE);
+                        boolean lbShow4 = lbShow2 && poPurchaseReceivingController.PurchaseOrderReceiving().Master().getTransactionStatus().equals(PurchaseOrderReceivingStatus.POSTED)
+                                && poPurchaseReceivingController.PurchaseOrderReceiving().Master().getSalesInvoice().equals("To-follow");
+                        if (lbShow4) {
+                            if (lbShow1) {
+                                lbIsEnable = false;
+                            }
+                        }
+
                         double lnTotal = 0.00;
                         double lnDiscountAmt = 0.00;
                         for (lnCtr = 0; lnCtr < poPurchaseReceivingController.PurchaseOrderReceiving().getDetailCount(); lnCtr++) {
-                            if (JFXUtil.isObjectEqualTo(poPurchaseReceivingController.PurchaseOrderReceiving().Master().getSalesInvoice(), null, "")) {
-                                poPurchaseReceivingController.PurchaseOrderReceiving().Detail(lnCtr).isVatable(false);
-                                poPurchaseReceivingController.PurchaseOrderReceiving().Master().isVatTaxable(false);
-                                JFXUtil.setDisabled(true, cbVatable, cbVatInclusive);
-                            } else {
-                                JFXUtil.setDisabled(false, cbVatable, cbVatInclusive);
+                            if (lbIsEnable) {
+                                if (JFXUtil.isObjectEqualTo(poPurchaseReceivingController.PurchaseOrderReceiving().Master().getSalesInvoice(), null, "")) {
+                                    poPurchaseReceivingController.PurchaseOrderReceiving().Detail(lnCtr).isVatable(false);
+                                    poPurchaseReceivingController.PurchaseOrderReceiving().Master().isVatTaxable(false);
+                                    JFXUtil.setDisabled(true, cbVatable, cbVatInclusive);
+                                } else {
+                                    JFXUtil.setDisabled(false, cbVatable, cbVatInclusive);
+                                }
                             }
 
                             try {
@@ -1988,16 +2014,22 @@ public class SIPosting_MPController implements Initializable, ScreenInterface {
         JFXUtil.handleDisabledNodeClick(apMaster, pnEditMode, nodeID -> {
             switch (nodeID) {
                 case "cbVatInclusive":
-                    ShowMessageFX.Warning(null, pxeModuleName,
-                            "Only available when Invoice No is provided.");
+                    if (JFXUtil.isObjectEqualTo(poPurchaseReceivingController.PurchaseOrderReceiving().Master().getSalesInvoice(), null, "")
+                            && !poPurchaseReceivingController.PurchaseOrderReceiving().Master().getTransactionStatus().equals(PurchaseOrderReceivingStatus.POSTED)) {
+                        ShowMessageFX.Warning(null, pxeModuleName,
+                                "Only available when Invoice No is provided or To-follow.");
+                    }
                     break;
             }
         });
         JFXUtil.handleDisabledNodeClick(apDetail, pnEditMode, nodeID -> {
             switch (nodeID) {
                 case "cbVatable":
-                    ShowMessageFX.Warning(null, pxeModuleName,
-                            "Only available when Invoice No is provided.");
+                    if (JFXUtil.isObjectEqualTo(poPurchaseReceivingController.PurchaseOrderReceiving().Master().getSalesInvoice(), null, "")
+                            && !poPurchaseReceivingController.PurchaseOrderReceiving().Master().getTransactionStatus().equals(PurchaseOrderReceivingStatus.POSTED)) {
+                        ShowMessageFX.Warning(null, pxeModuleName,
+                                "Only available when Invoice No is provided or To-follow.");
+                    }
                     break;
             }
         });
