@@ -2,6 +2,7 @@ package ph.com.guanzongroup.integsys.views;
 
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
+import java.io.IOException;
 import java.net.URL;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -230,10 +231,10 @@ public class LoginController implements Initializable, ScreenInterface {
 
                             LoginControllerHolder.setLogInStatus(true);
                         }
-                    } catch (SQLException | GuanzonException ex) {
+                    } catch (SQLException | GuanzonException | IOException ex) {
                         rootPane.getChildren().remove(spinnerPane);
                         Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
-                    }
+                    } 
                 }
 
             });
