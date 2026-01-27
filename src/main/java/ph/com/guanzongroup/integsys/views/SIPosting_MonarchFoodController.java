@@ -1481,6 +1481,22 @@ public class SIPosting_MonarchFoodController implements Initializable, ScreenInt
 
     public void loadRecordMaster() {
         try {
+            boolean lbShow1 = (pnEditMode == EditMode.UPDATE);
+            boolean lbShow2 = (pnEditMode == EditMode.READY || pnEditMode == EditMode.UPDATE);
+            boolean lbShow3 = (pnEditMode == EditMode.READY);
+            boolean lbShow4 = lbShow2 && PurchaseOrderReceivingStatus.POSTED.equals(poPurchaseReceivingController.PurchaseOrderReceiving().Master().getTransactionStatus())
+                    && "To-follow".equals(poPurchaseReceivingController.PurchaseOrderReceiving().Master().getSalesInvoice());
+            if (lbShow4) {
+                JFXUtil.setButtonsVisibility(lbShow3, btnUpdate);
+                if (lbShow1) {
+                    JFXUtil.setDisabled(true, apDetail, apAttachments, apJEMaster, apJEDetail);
+                    JFXUtil.setDisabledExcept(true, apMaster, dpSIDate, cbToFollowInv);
+                }
+            } else {
+                JFXUtil.setDisabled(!lbShow1, tfReferenceNo, tfSINo, tfTerm, tfDiscountRate, tfDiscountAmount, tfFreightAmt,
+                        tfVatRate, taRemarks);
+                JFXUtil.setDisabled(!lbShow1, apMaster, apDetail, apJEDetail, apJEMaster, apAttachments);
+            }
             poPurchaseReceivingController.PurchaseOrderReceiving().Master().setSupplierId(psSupplierId);
             poPurchaseReceivingController.PurchaseOrderReceiving().Master().setBranchCode(psBranchId);
             Platform.runLater(() -> {
@@ -1555,23 +1571,6 @@ public class SIPosting_MonarchFoodController implements Initializable, ScreenInt
             tfAdvancePayment.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poPurchaseReceivingController.PurchaseOrderReceiving().getAdvancePayment(), true));
 
             JFXUtil.updateCaretPositions(apMaster);
-
-            boolean lbShow1 = (pnEditMode == EditMode.UPDATE);
-            boolean lbShow2 = (pnEditMode == EditMode.READY || pnEditMode == EditMode.UPDATE);
-            boolean lbShow3 = (pnEditMode == EditMode.READY);
-            boolean lbShow4 = lbShow2 && PurchaseOrderReceivingStatus.POSTED.equals(poPurchaseReceivingController.PurchaseOrderReceiving().Master().getTransactionStatus())
-                    && "To-follow".equals(poPurchaseReceivingController.PurchaseOrderReceiving().Master().getSalesInvoice());
-            if (lbShow4) {
-                JFXUtil.setButtonsVisibility(lbShow3, btnUpdate);
-                if (lbShow1) {
-                    JFXUtil.setDisabled(true, apDetail, apAttachments, apJEMaster, apJEDetail);
-                    JFXUtil.setDisabledExcept(true, apMaster, dpSIDate, cbToFollowInv);
-                }
-            } else {
-                JFXUtil.setDisabled(!lbShow1, tfReferenceNo, tfSINo, tfTerm, tfDiscountRate, tfDiscountAmount, tfFreightAmt,
-                        tfVatRate, taRemarks);
-                JFXUtil.setDisabled(!lbShow1, apMaster, apDetail, apJEDetail, apJEMaster, apAttachments);
-            }
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
             ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
