@@ -60,7 +60,6 @@ import javafx.scene.control.ScrollBar;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.Group;
-import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -104,7 +103,6 @@ import javafx.stage.Popup;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.stage.WindowEvent;
-import javafx.util.Duration;
 import javafx.util.Pair;
 import javafx.util.StringConverter;
 import org.apache.poi.ss.formula.functions.T;
@@ -122,8 +120,10 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.util.Callback;
 import java.io.File;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.WeakHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
@@ -140,9 +140,12 @@ import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.rendering.PDFRenderer;
 import org.guanzon.appdriver.constant.EditMode;
 import ph.com.guanzongroup.integsys.views.ScreenInterface;
+import javafx.animation.*;
+import javafx.scene.Node;
+import javafx.util.Duration;
 
 /**
- * Date : 4/28/2025 Recent update: 01/22/2026
+ * Date : 4/28/2025 Recent update: 01/26/2026
  *
  * @author Aldrich
  */
@@ -1025,6 +1028,46 @@ public class JFXUtil {
 
             } else {
                 System.out.println("Unsupported element type: " + obj.getClass().getSimpleName());
+            }
+        }
+    }
+
+    public static void setDisabledExcept(boolean disable, Object container, Object... exceptions) {
+        if (!(container instanceof Parent)) {
+            return;
+        }
+
+        Set<javafx.scene.Node> exceptionSet = new java.util.HashSet<>();
+        for (Object obj : exceptions) {
+            if (obj instanceof javafx.scene.Node) {
+                exceptionSet.add((javafx.scene.Node) obj);
+            }
+        }
+
+        disableRecursively((Parent) container, disable, exceptionSet);
+    }
+
+    private static void disableRecursively(
+            Parent parent,
+            boolean disable,
+            java.util.Set<javafx.scene.Node> exceptions
+    ) {
+        for (javafx.scene.Node node : parent.getChildrenUnmodifiable()) {
+
+            // EXCEPTION → fully enabled, do NOT touch its children
+            if (exceptions.contains(node)) {
+                node.setDisable(false);
+                continue; // ← critical
+            }
+
+            // Do NOT disable GridPane itself
+            if (!(node instanceof javafx.scene.layout.GridPane)) {
+                node.setDisable(disable);
+            }
+
+            // Traverse children
+            if (node instanceof Parent) {
+                disableRecursively((Parent) node, disable, exceptions);
             }
         }
     }
@@ -3138,6 +3181,59 @@ public class JFXUtil {
                 });
     }
 
+    public static boolean loadValidation(int pnEditMode, String pxeModuleName, String lsCurrentTransNo, String lsTransactionNo) {
+        if (pnEditMode == EditMode.UPDATE) {
+            if (lsCurrentTransNo.equals(lsTransactionNo)) {
+                if (!ShowMessageFX.YesNo(null, pxeModuleName, "Transaction is currently in update mode.\n"
+                        + "Reload the transaction?")) {
+                    return false;
+                }
+            } else {
+                if (!ShowMessageFX.YesNo(null, pxeModuleName, "Transaction is currently in update mode.\n"
+                        + "Are you sure you want to switch to another transaction?")) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    public static void fadeInFromBottom(double seconds, Node... nodes) {
+        for (Node node : nodes) {
+
+            // store original translateY (important for layouts)
+            double originalTranslateY = node.getTranslateY();
+
+            node.setOpacity(0);
+            node.setVisible(true);
+            node.setTranslateY(originalTranslateY + 20); // start lower
+
+            FadeTransition fade = new FadeTransition(Duration.seconds(seconds), node);
+            fade.setFromValue(0);
+            fade.setToValue(1);
+
+            TranslateTransition moveUp = new TranslateTransition(Duration.seconds(seconds), node);
+            moveUp.setFromY(originalTranslateY + 20);
+            moveUp.setToY(originalTranslateY);
+
+            ParallelTransition animation
+                    = new ParallelTransition(node, fade, moveUp);
+
+            animation.play();
+        }
+    }
+
+    public static void fadeIn(double seconds, Node... nodes) {
+        for (Node node : nodes) {
+            node.setOpacity(0); // start invisible
+            node.setVisible(true); // ensure node is visible
+            FadeTransition ft = new FadeTransition(Duration.seconds(seconds), node);
+            ft.setFromValue(0);
+            ft.setToValue(1);
+            ft.play();
+        }
+    }
+
     public static void showTooltip(String message, Node... nodes) {
         if (message == null || message.trim().isEmpty() || nodes == null || nodes.length == 0) {
             return;
@@ -3171,20 +3267,40 @@ public class JFXUtil {
         });
     }
 
-    public static boolean loadValidation(int pnEditMode, String pxeModuleName, String lsCurrentTransNo, String lsTransactionNo) {
-        if (pnEditMode == EditMode.UPDATE) {
-            if (lsCurrentTransNo.equals(lsTransactionNo)) {
-                if (!ShowMessageFX.YesNo(null, pxeModuleName, "Transaction is currently in update mode.\n"
-                        + "Reload the transaction?")) {
-                    return false;
-                }
-            } else {
-                if (!ShowMessageFX.YesNo(null, pxeModuleName, "Transaction is currently in update mode.\n"
-                        + "Are you sure you want to switch to another transaction?")) {
-                    return false;
-                }
-            }
+    public static void animateFontAwesomeIcons(double timeSeconds, int direction, ToggleButton... buttons) {
+        if (buttons == null || buttons.length == 0) {
+            return;
         }
-        return true;
+
+        for (ToggleButton button : buttons) {
+            Node icon = button.getGraphic();
+            if (icon == null) {
+                continue;
+            }
+
+            double offset = 12;
+            double fromX = (direction == 0) ? -offset : offset;
+
+            // Initial state
+            icon.setOpacity(0);
+            icon.setTranslateX(fromX);
+
+            FadeTransition fade = new FadeTransition(
+                    Duration.seconds(1), icon
+            );
+            fade.setFromValue(0);
+            fade.setToValue(1);
+
+            TranslateTransition slide = new TranslateTransition(
+                    Duration.seconds(timeSeconds), icon
+            );
+            slide.setFromX(fromX);
+            slide.setToX(0);
+
+            ParallelTransition animation
+                    = new ParallelTransition(fade, slide);
+
+            animation.play();
+        }
     }
 }
