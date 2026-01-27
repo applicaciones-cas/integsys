@@ -3042,6 +3042,9 @@ public class JFXUtil {
             nodes.addAll(anchorPane.lookupAll(".text-field"));
             nodes.addAll(anchorPane.lookupAll(".combo-box"));
             nodes.addAll(anchorPane.lookupAll(".check-box"));
+            nodes.addAll(anchorPane.lookupAll(".text-area"));
+            nodes.addAll(anchorPane.lookupAll(".date-picker"));
+            nodes.addAll(anchorPane.lookupAll(".button"));
             if (nodes.isEmpty()) {
                 return; // nothing to check
             }
