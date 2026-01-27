@@ -1742,6 +1742,10 @@ public class SIPosting_Controller implements Initializable, ScreenInterface {
                             if (lbShow1) {
                                 lbIsEnable = false;
                             }
+                        } else {
+                            if (PurchaseOrderReceivingStatus.POSTED.equals(poPurchaseReceivingController.PurchaseOrderReceiving().Master().getTransactionStatus())) {
+                                lbIsEnable = false;
+                            }
                         }
 
                         double lnTotal = 0.00;
