@@ -1551,7 +1551,7 @@ public class SIPosting_CarController implements Initializable, ScreenInterface {
                 }
             } else {
                 JFXUtil.setDisabled(!lbShow1, tfReferenceNo, tfSINo, tfTerm, tfDiscountRate, tfDiscountAmount, tfFreightAmt,
-                        tfVatRate, taRemarks);
+                        tfVatRate, taRemarks, dpReferenceDate);
                 JFXUtil.setDisabled(!lbShow1, apMaster, apDetail, apJEDetail, apJEMaster, apAttachments);
             }
             Platform.runLater(() -> {

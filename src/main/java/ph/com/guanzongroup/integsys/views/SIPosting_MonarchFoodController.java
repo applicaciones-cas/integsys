@@ -1494,7 +1494,7 @@ public class SIPosting_MonarchFoodController implements Initializable, ScreenInt
                 }
             } else {
                 JFXUtil.setDisabled(!lbShow1, tfReferenceNo, tfSINo, tfTerm, tfDiscountRate, tfDiscountAmount, tfFreightAmt,
-                        tfVatRate, taRemarks);
+                        tfVatRate, taRemarks, dpReferenceDate);
                 JFXUtil.setDisabled(!lbShow1, apMaster, apDetail, apJEDetail, apJEMaster, apAttachments);
             }
             poPurchaseReceivingController.PurchaseOrderReceiving().Master().setSupplierId(psSupplierId);

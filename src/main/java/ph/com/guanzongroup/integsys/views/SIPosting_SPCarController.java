@@ -1492,7 +1492,7 @@ public class SIPosting_SPCarController implements Initializable, ScreenInterface
                 }
             } else {
                 JFXUtil.setDisabled(!lbShow1, tfReferenceNo, tfSINo, tfTerm, tfDiscountRate, tfDiscountAmount, tfFreightAmt,
-                        tfVatRate, taRemarks);
+                        tfVatRate, taRemarks, dpReferenceDate);
                 JFXUtil.setDisabled(!lbShow1, apMaster, apDetail, apJEDetail, apJEMaster, apAttachments);
             }
             poPurchaseReceivingController.PurchaseOrderReceiving().Master().setSupplierId(psSupplierId);
