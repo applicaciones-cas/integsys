@@ -46,9 +46,9 @@ public class Login extends Application {
             instance_ui.setGRider(instance);
 
             Application.launch(instance_ui.getClass());
-        } catch (SQLException | GuanzonException e) {
+        } catch (SQLException | GuanzonException | IOException e) {
             Logger.getLogger(Login.class.getName()).log(Level.SEVERE, null, e);
-        }
+        } 
     }
     
     @Override
