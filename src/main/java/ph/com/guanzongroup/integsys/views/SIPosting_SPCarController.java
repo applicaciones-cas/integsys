@@ -1485,7 +1485,6 @@ public class SIPosting_SPCarController implements Initializable, ScreenInterface
             boolean lbShow4 = lbShow2 && JFXUtil.isObjectEqualTo(poPurchaseReceivingController.PurchaseOrderReceiving().Master().getTransactionStatus(), PurchaseOrderReceivingStatus.POSTED, PurchaseOrderReceivingStatus.PAID)
                     && "To-follow".equals(poPurchaseReceivingController.PurchaseOrderReceiving().Master().getSalesInvoice());
             if (lbShow4) {
-                JFXUtil.setButtonsVisibility(lbShow3, btnUpdate);
                 if (lbShow1) {
                     JFXUtil.setDisabled(true, apDetail, apAttachments, apJEMaster, apJEDetail);
                     JFXUtil.setDisabledExcept(true, apMaster, dpSIDate, cbToFollowInv);
@@ -2092,6 +2091,11 @@ public class SIPosting_SPCarController implements Initializable, ScreenInterface
             case PurchaseOrderReceivingStatus.RETURNED:
                 JFXUtil.setButtonsVisibility(false, btnUpdate);
                 break;
+        }
+        boolean lbShow5 = lbShow2 && JFXUtil.isObjectEqualTo(poPurchaseReceivingController.PurchaseOrderReceiving().Master().getTransactionStatus(), PurchaseOrderReceivingStatus.POSTED, PurchaseOrderReceivingStatus.PAID)
+                && "To-follow".equals(poPurchaseReceivingController.PurchaseOrderReceiving().Master().getSalesInvoice());
+        if (lbShow5) {
+            JFXUtil.setButtonsVisibility(lbShow3, btnUpdate);
         }
     }
 

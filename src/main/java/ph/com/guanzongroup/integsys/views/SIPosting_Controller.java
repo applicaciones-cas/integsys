@@ -1321,8 +1321,8 @@ public class SIPosting_Controller implements Initializable, ScreenInterface {
                                 Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
                                 ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
                             }
-                            
-                            if (JFXUtil.isObjectEqualTo(poPurchaseReceivingController.PurchaseOrderReceiving().PurchaseOrderReceivingList(lnCtr).getTransactionStatus(), PurchaseOrderReceivingStatus.POSTED,PurchaseOrderReceivingStatus.PAID)) {
+
+                            if (JFXUtil.isObjectEqualTo(poPurchaseReceivingController.PurchaseOrderReceiving().PurchaseOrderReceivingList(lnCtr).getTransactionStatus(), PurchaseOrderReceivingStatus.POSTED, PurchaseOrderReceivingStatus.PAID)) {
                                 JFXUtil.highlightByKey(tblViewMainList, String.valueOf(lnCtr + 1), "C1E1C1", highlightedRowsMain);
                             }
                         }
@@ -1559,7 +1559,6 @@ public class SIPosting_Controller implements Initializable, ScreenInterface {
             boolean lbShow4 = lbShow2 && JFXUtil.isObjectEqualTo(poPurchaseReceivingController.PurchaseOrderReceiving().Master().getTransactionStatus(), PurchaseOrderReceivingStatus.POSTED, PurchaseOrderReceivingStatus.PAID)
                     && "To-follow".equals(poPurchaseReceivingController.PurchaseOrderReceiving().Master().getSalesInvoice());
             if (lbShow4) {
-                JFXUtil.setButtonsVisibility(lbShow3, btnUpdate);
                 if (lbShow1) {
                     JFXUtil.setDisabled(true, apDetail, apAttachments, apJEMaster, apJEDetail);
                     JFXUtil.setDisabledExcept(true, apMaster, dpSIDate, cbToFollowInv);
@@ -2171,6 +2170,11 @@ public class SIPosting_Controller implements Initializable, ScreenInterface {
             case PurchaseOrderReceivingStatus.RETURNED:
                 JFXUtil.setButtonsVisibility(false, btnUpdate);
                 break;
+        }
+        boolean lbShow5 = lbShow2 && JFXUtil.isObjectEqualTo(poPurchaseReceivingController.PurchaseOrderReceiving().Master().getTransactionStatus(), PurchaseOrderReceivingStatus.POSTED, PurchaseOrderReceivingStatus.PAID)
+                && "To-follow".equals(poPurchaseReceivingController.PurchaseOrderReceiving().Master().getSalesInvoice());
+        if (lbShow5) {
+            JFXUtil.setButtonsVisibility(lbShow3, btnUpdate);
         }
     }
 
