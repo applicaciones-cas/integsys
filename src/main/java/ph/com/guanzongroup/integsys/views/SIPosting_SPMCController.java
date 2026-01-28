@@ -1984,7 +1984,7 @@ public class SIPosting_SPMCController implements Initializable, ScreenInterface 
                 }
             }
             if (JFXUtil.isObjectEqualTo(poPurchaseReceivingController.PurchaseOrderReceiving().Master().getTransactionStatus(), PurchaseOrderReceivingStatus.POSTED, PurchaseOrderReceivingStatus.PAID)) {
-                ShowMessageFX.Warning(null, pxeModuleName, "Ony Invoice date, To follow Inv, & Invoice No are available to edit.");
+                ShowMessageFX.Warning(null, pxeModuleName, "Only the Invoice Date, To Follow Invoice, and Invoice No. are editable for posted and paid transaction.");
                 return;
             }            switch (nodeID) {
                 case "cbVatInclusive":
