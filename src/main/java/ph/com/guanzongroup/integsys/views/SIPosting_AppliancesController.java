@@ -2035,7 +2035,7 @@ public class SIPosting_AppliancesController implements Initializable, ScreenInte
                 }
             }
             if (JFXUtil.isObjectEqualTo(poPurchaseReceivingController.PurchaseOrderReceiving().Master().getTransactionStatus(), PurchaseOrderReceivingStatus.POSTED, PurchaseOrderReceivingStatus.PAID)) {
-                ShowMessageFX.Warning(null, pxeModuleName, "Only the Invoice Date, To Follow Invoice, and Invoice No. are editable for posted and paid transaction.");
+                ShowMessageFX.Warning(null, pxeModuleName, "Only the Invoice Date, To Follow Invoice, and Invoice No. are editable\nfor posted and paid transactions.");
                 return;
             }            switch (nodeID) {
                 case "cbVatInclusive":
@@ -2301,15 +2301,13 @@ public class SIPosting_AppliancesController implements Initializable, ScreenInte
     public void clearTextFields() {
         Platform.runLater(() -> {
             imageinfo_temp.clear();
-            JFXUtil.setValueToNull(previousSearchedTextField, lastFocusedTextField, dpTransactionDate, dpReferenceDate, dpReportMonthYear, dpSIDate);
+            JFXUtil.setValueToNull(previousSearchedTextField, lastFocusedTextField);
             psSearchSupplierId = "";
             psSearchBranchId = "";
             psSupplierId = "";
             psBranchId = "";
             JFXUtil.clearTextFields(apMaster, apDetail, apJEDetail, apJEMaster, apAttachments);
 
-            cbVatInclusive.setSelected(false);
-            cbVatable.setSelected(false);
             closeDialog();
         });
     }

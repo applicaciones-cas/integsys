@@ -1306,12 +1306,10 @@ public class SIPosting_HistoryLPController implements Initializable, ScreenInter
         Platform.runLater(() -> {
             stageAttachment.closeDialog();
             imageinfo_temp.clear();
-            JFXUtil.setValueToNull(previousSearchedTextField, lastFocusedTextField, dpTransactionDate, dpReferenceDate, dpSIDate, dpExpiryDate, dpReportMonthYear);
+            JFXUtil.setValueToNull(previousSearchedTextField, lastFocusedTextField);
             psSupplierId = "";
             psBranchId = "";
             JFXUtil.clearTextFields(apMaster, apDetail, apJEDetail, apJEMaster, apAttachments);
-            cbVatInclusive.setSelected(false);
-            cbVatable.setSelected(false);
         });
     }
 }
