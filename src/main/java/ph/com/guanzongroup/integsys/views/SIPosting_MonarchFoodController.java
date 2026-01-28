@@ -545,7 +545,7 @@ public class SIPosting_MonarchFoodController implements Initializable, ScreenInt
                     clearTextFields();
                 }
 
-                if (JFXUtil.isObjectEqualTo(lsButton, "btnArrowRight", "btnArrowLeft", "btnRetrieve")) {
+                if (JFXUtil.isObjectEqualTo(lsButton, "btnArrowRight", "btnArrowLeft", "btnRetrieve", "btnHistory")) {
                 } else {
                     loadRecordMaster();
                     loadTableDetail();

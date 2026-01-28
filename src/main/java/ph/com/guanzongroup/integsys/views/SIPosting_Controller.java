@@ -605,7 +605,7 @@ public class SIPosting_Controller implements Initializable, ScreenInterface {
                     clearTextFields();
                 }
 
-                if (JFXUtil.isObjectEqualTo(lsButton, "btnArrowRight", "btnArrowLeft", "btnRetrieve")) {
+                if (JFXUtil.isObjectEqualTo(lsButton, "btnArrowRight", "btnArrowLeft", "btnRetrieve", "btnHistory")) {
                 } else {
                     loadRecordMaster();
                     loadTableDetail();
@@ -2059,7 +2059,8 @@ public class SIPosting_Controller implements Initializable, ScreenInterface {
             if (PurchaseOrderReceivingStatus.POSTED.equals(poPurchaseReceivingController.PurchaseOrderReceiving().Master().getTransactionStatus())) {
                 ShowMessageFX.Warning(null, pxeModuleName, "Ony Invoice date, To follow Inv, & Invoice No are available to edit.");
                 return;
-            }            switch (nodeID) {
+            }
+            switch (nodeID) {
                 case "cbVatInclusive":
                     if (JFXUtil.isObjectEqualTo(poPurchaseReceivingController.PurchaseOrderReceiving().Master().getSalesInvoice(), null, "")
                             && !PurchaseOrderReceivingStatus.POSTED.equals(poPurchaseReceivingController.PurchaseOrderReceiving().Master().getTransactionStatus())) {
@@ -2075,7 +2076,7 @@ public class SIPosting_Controller implements Initializable, ScreenInterface {
                     if (JFXUtil.isObjectEqualTo(poPurchaseReceivingController.PurchaseOrderReceiving().Master().getSalesInvoice(), null, "")
                             && !PurchaseOrderReceivingStatus.POSTED.equals(poPurchaseReceivingController.PurchaseOrderReceiving().Master().getTransactionStatus())) {
                         ShowMessageFX.Warning(null, pxeModuleName,
-                               "Only available when Invoice No is provided or set \"To-follow\".");
+                                "Only available when Invoice No is provided or set \"To-follow\".");
                     }
                     break;
             }
