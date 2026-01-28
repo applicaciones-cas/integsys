@@ -300,7 +300,8 @@ public class POCancellation_ConfirmationControllerMP implements Initializable, S
 
                         getLoadedTransaction();
                         initButtonDisplay(poAppController.getEditMode());
-                        break;
+
+                        return;
                     }
 
                     switch (lastFocusedControl.getId()) {
@@ -490,6 +491,8 @@ public class POCancellation_ConfirmationControllerMP implements Initializable, S
                     if (lastFocusedControl == null) {
                         loadTransactionList("a.sTransNox", tfSearchTransaction.getText() != null ? tfSearchTransaction.getText() : "");
                         reloadTablePurchase();
+
+                        return;
                     }
                     switch (lastFocusedControl.getId()) {
                         case "tfSearchTransaction":
@@ -744,7 +747,7 @@ public class POCancellation_ConfirmationControllerMP implements Initializable, S
                                 loadTransactionMaster();
                                 break;
 
-                                }
+                        }
                     case UP:
                         CommonUtils.SetPreviousFocus((TextField) event.getSource());
                         return;

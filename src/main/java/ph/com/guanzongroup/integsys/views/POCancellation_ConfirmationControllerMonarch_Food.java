@@ -316,7 +316,8 @@ public class POCancellation_ConfirmationControllerMonarch_Food implements Initia
 
                         getLoadedTransaction();
                         initButtonDisplay(poAppController.getEditMode());
-                        break;
+
+                        return;
                     }
 
                     switch (lastFocusedControl.getId()) {
@@ -506,6 +507,8 @@ public class POCancellation_ConfirmationControllerMonarch_Food implements Initia
                     if (lastFocusedControl == null) {
                         loadTransactionList("a.sTransNox", tfSearchTransaction.getText() != null ? tfSearchTransaction.getText() : "");
                         reloadTablePurchase();
+
+                        return;
                     }
                     switch (lastFocusedControl.getId()) {
                         case "tfSearchTransaction":
@@ -524,6 +527,7 @@ public class POCancellation_ConfirmationControllerMonarch_Food implements Initia
                             loadTransactionList("a.sTransNox", tfSearchTransaction.getText() != null ? tfSearchTransaction.getText() : "");
                             reloadTablePurchase();
 
+                            break;
                     }
                     break;
                 case "btnClose":
