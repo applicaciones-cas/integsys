@@ -316,7 +316,8 @@ public class POCancellation_ConfirmationControllerMC_SP implements Initializable
 
                         getLoadedTransaction();
                         initButtonDisplay(poAppController.getEditMode());
-                        break;
+
+                        return;
                     }
 
                     switch (lastFocusedControl.getId()) {
@@ -501,11 +502,13 @@ public class POCancellation_ConfirmationControllerMC_SP implements Initializable
                     reloadTableDetail();
                     loadSelectedTransactionDetail(pnTransactionDetail);
                     break;
-                case "btnRetrieve":
+               case "btnRetrieve":
 
                     if (lastFocusedControl == null) {
                         loadTransactionList("a.sTransNox", tfSearchTransaction.getText() != null ? tfSearchTransaction.getText() : "");
                         reloadTablePurchase();
+
+                        return;
                     }
                     switch (lastFocusedControl.getId()) {
                         case "tfSearchTransaction":
@@ -524,6 +527,7 @@ public class POCancellation_ConfirmationControllerMC_SP implements Initializable
                             loadTransactionList("a.sTransNox", tfSearchTransaction.getText() != null ? tfSearchTransaction.getText() : "");
                             reloadTablePurchase();
 
+                            break;
                     }
                     break;
                 case "btnClose":

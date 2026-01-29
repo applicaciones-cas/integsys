@@ -316,7 +316,7 @@ public class POCancellation_ConfirmationControllerLP_Food implements Initializab
 
                         getLoadedTransaction();
                         initButtonDisplay(poAppController.getEditMode());
-                        break;
+                        return;
                     }
 
                     switch (lastFocusedControl.getId()) {
@@ -506,6 +506,8 @@ public class POCancellation_ConfirmationControllerLP_Food implements Initializab
                     if (lastFocusedControl == null) {
                         loadTransactionList("a.sTransNox", tfSearchTransaction.getText() != null ? tfSearchTransaction.getText() : "");
                         reloadTablePurchase();
+
+                        return;
                     }
                     switch (lastFocusedControl.getId()) {
                         case "tfSearchTransaction":
@@ -524,6 +526,7 @@ public class POCancellation_ConfirmationControllerLP_Food implements Initializab
                             loadTransactionList("a.sTransNox", tfSearchTransaction.getText() != null ? tfSearchTransaction.getText() : "");
                             reloadTablePurchase();
 
+                            break;
                     }
                     break;
                 case "btnClose":
