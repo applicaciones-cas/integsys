@@ -1053,7 +1053,7 @@ public class PurchaseOrder_ApprovalSPCarController implements Initializable, Scr
             protected Void call() throws Exception {
                 try {
                     main_data.clear();
-                    poJSON = poPurchasingController.PurchaseOrder().getPurchaseOrder(
+                    poJSON = poPurchasingController.PurchaseOrder().getConfirmedPurchaseOrder(
                             psSupplierID,
                             psReferID);
                     if ("success".equals(poJSON.get("result"))) {
