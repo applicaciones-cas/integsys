@@ -625,7 +625,11 @@ public class CheckDeposit_HistoryController implements Initializable, ScreenInte
             });
             tblColDetailDate.setCellValueFactory((loModel) -> {
                 try {
-                    return new SimpleStringProperty(String.valueOf(loModel.getValue().CheckPayment().getCheckDate()));
+                    return new SimpleStringProperty(
+                            loModel.getValue().CheckPayment().getCheckDate() == null
+                            ? ""
+                            : loModel.getValue().CheckPayment().getCheckDate().toString()
+                    );
                 } catch (SQLException | GuanzonException e) {
                     poLogWrapper.severe(psFormName, e.getMessage());
                     return new SimpleStringProperty("");
