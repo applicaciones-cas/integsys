@@ -1268,6 +1268,7 @@ public class PurchaseOrder_EntrySPMCController implements Initializable, ScreenI
 
     private void clearMasterFields() {
         /* Master Fields*/
+        lblTransactionStatus.setText("UNKNOWN");
         pnTblDetailRow = -1;
         dpTransactionDate.setValue(null);
         dpExpectedDlvrDate.setValue(null);
