@@ -937,6 +937,7 @@ public class PurchaseOrder_ConfirmationLPController implements Initializable, Sc
 
     private void clearMasterFields() {
         /* Master Fields*/
+        lblTransactionStatus.setText("UNKNOWN");
         pnTblDetailRow = -1;
         dpTransactionDate.setValue(null);
         dpExpectedDlvrDate.setValue(null);

@@ -1423,6 +1423,7 @@ public class PurchaseOrder_EntryMPController implements Initializable, ScreenInt
 
     private void clearMasterFields() {
         /* Master Fields*/
+        lblTransactionStatus.setText("UNKNOWN");
         pnTblDetailRow = -1;
         dpTransactionDate.setValue(null);
         dpExpectedDlvrDate.setValue(null);

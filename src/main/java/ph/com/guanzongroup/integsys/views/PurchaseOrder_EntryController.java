@@ -1275,6 +1275,7 @@ public class PurchaseOrder_EntryController implements Initializable, ScreenInter
 
     private void clearMasterFields() {
         /* Master Fields*/
+        lblTransactionStatus.setText("UNKNOWN");
         pnTblDetailRow = -1;
         dpTransactionDate.setValue(null);
         dpExpectedDlvrDate.setValue(null);

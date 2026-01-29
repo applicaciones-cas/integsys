@@ -1432,6 +1432,7 @@ public class PurchaseOrder_EntryAppliancesController implements Initializable, S
 
     private void clearMasterFields() {
         /* Master Fields*/
+        lblTransactionStatus.setText("UNKNOWN");
         pnTblDetailRow = -1;
         dpTransactionDate.setValue(null);
         dpExpectedDlvrDate.setValue(null);
