@@ -25,6 +25,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Control;
 import javafx.scene.control.DatePicker;
@@ -50,6 +51,7 @@ import ph.com.guanzongroup.cas.cashflow.status.CheckDepositStatus;
 import ph.com.guanzongroup.cas.cashflow.status.CheckTransferStatus;
 import ph.com.guanzongroup.cas.cashflow.model.Model_Check_Deposit_Detail;
 import ph.com.guanzongroup.cas.cashflow.services.CheckController;
+import ph.com.guanzongroup.integsys.utility.CustomCommonUtil;
 
 /**
  * FXML Controller class
@@ -59,15 +61,18 @@ import ph.com.guanzongroup.cas.cashflow.services.CheckController;
 public class CheckDeposit_HistoryController implements Initializable, ScreenInterface {
     
     private GRiderCAS poApp;
+    private JSONObject poJSON;
     private LogWrapper poLogWrapper;
     private String psFormName = "Check Deposit History";
     private String psIndustryID;
     private Control lastFocusedControl;
     private CheckDeposit poAppController;
     private ObservableList<Model_Check_Deposit_Detail> laTransactionDetail;
-    private int pnSelectMaster, pnEditMode, pnTransactionDetail;
+    private int pnSelectMaster, pnEditMode, pnTransactionDetail = 0;
     
     private unloadForm poUnload = new unloadForm();
+    @FXML
+    private CheckBox cbReverse;
     
     @FXML
     private AnchorPane apMainAnchor, apBrowse, apMaster, apDetail, apButton, apTransaction;
@@ -152,15 +157,46 @@ public class CheckDeposit_HistoryController implements Initializable, ScreenInte
     @FXML
     void ontblDetailClicked(MouseEvent e) {
         try {
-            pnTransactionDetail = tblViewDetails.getSelectionModel().getSelectedIndex() + 1;
-            if (pnTransactionDetail <= 0) {
+            pnTransactionDetail = tblViewDetails.getSelectionModel().getSelectedIndex();
+            if (pnTransactionDetail < 0) {
                 return;
             }
-            
             loadSelectedTransactionDetail(pnTransactionDetail);
         } catch (SQLException | GuanzonException | CloneNotSupportedException ex) {
             ex.printStackTrace();
             poLogWrapper.severe(psFormName + " :" + ex.getMessage());
+        }
+    }
+    @FXML
+    private void cmdCheckBox_Click(ActionEvent event) {
+        poJSON = new JSONObject();
+        Object source = event.getSource();
+        if (source instanceof CheckBox) {
+            try {
+                CheckBox checkedBox = (CheckBox) source;
+                switch (checkedBox.getId()) {
+                    case "cbReverse": // this is the id
+                        if (poAppController.getEditMode() == EditMode.ADDNEW
+                                || poAppController.getEditMode() == EditMode.UPDATE
+                                && poAppController.getMaster().getTransactionStatus().equals(CheckDepositStatus.OPEN)
+                                || poAppController.getMaster().getTransactionStatus().equals(CheckDepositStatus.CONFIRMED)) {
+                            if (poAppController.Detail(pnTransactionDetail).getSourceNo() != null
+                                    || !poAppController.Detail(pnTransactionDetail).getSourceNo().isEmpty()) {
+                                if (!checkedBox.isSelected()) {
+                                    poAppController.Detail().remove(pnTransactionDetail);
+                                    pnTransactionDetail = pnTransactionDetail - 1;
+                                }
+                            }
+                        } else {
+                            poAppController.Detail(pnTransactionDetail).isReverse(checkedBox.isSelected());
+                        }
+                        reloadTableDetail();
+                        loadSelectedTransactionDetail(pnTransactionDetail);
+                        break;
+                }
+            } catch (SQLException | GuanzonException | CloneNotSupportedException ex) {
+                Logger.getLogger(CheckDeposit_EntryController.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
     }
     
@@ -406,18 +442,55 @@ public class CheckDeposit_HistoryController implements Initializable, ScreenInte
         }
     }
     
-    private void loadSelectedTransactionDetail(int fnRow) throws SQLException, GuanzonException, CloneNotSupportedException {
-        
-        int tblIndex = fnRow - 1;
-        tfCheckTransNo.setText(tblColDetailReference.getCellData(tblIndex));
-        tfBank.setText(tblColDetailBank.getCellData(tblIndex));
-        tfPayee.setText(tblColDetailPayee.getCellData(tblIndex));
-        tfCheckNo.setText(tblColDetailCheckNo.getCellData(tblIndex));
-        tfCheckAmount.setText(tblColDetailCheckAmount.getCellData(tblIndex));
-        
-        tfNote.setText(poAppController.getDetail(fnRow).getRemarks());
-        dpCheckDate.setValue(ParseDate(poAppController.getDetail(fnRow).CheckPayment().getTransactionDate()));
-        
+    private void loadSelectedTransactionDetail(int fnrow)
+            throws SQLException, GuanzonException, CloneNotSupportedException {
+
+        tfCheckTransNo.setText(poAppController.Detail(pnTransactionDetail).CheckPayment().getTransactionNo() != null
+                ? poAppController.Detail(pnTransactionDetail).CheckPayment().getTransactionNo()
+                : ""
+        );
+
+        tfBank.setText( poAppController.Detail(pnTransactionDetail).CheckPayment().Banks() != null
+                ? poAppController.Detail(pnTransactionDetail).CheckPayment().Banks().getBankName()
+                : ""
+        );
+
+        tfPayee.setText( poAppController.Detail(pnTransactionDetail).CheckPayment().Payee() != null
+                ? poAppController.Detail(pnTransactionDetail).CheckPayment().Payee().getPayeeName()
+                : ""
+        );
+
+        tfCheckNo.setText( poAppController.Detail(pnTransactionDetail).CheckPayment().getCheckNo() != null
+                ? poAppController.Detail(pnTransactionDetail).CheckPayment().getCheckNo()
+                : ""
+        );
+
+        tfCheckAmount.setText(
+                poAppController.Detail(pnTransactionDetail) != null
+                && poAppController.Detail(pnTransactionDetail).CheckPayment() != null
+                ? CustomCommonUtil.setIntegerValueToDecimalFormat(
+                        poAppController.Detail(pnTransactionDetail).CheckPayment().getAmount(), true)
+                : ""
+        );
+
+        tfNote.setText(poAppController.Detail(pnTransactionDetail).getRemarks() != null
+                ? poAppController.Detail(pnTransactionDetail).getRemarks()
+                : ""
+        );
+
+        dpCheckDate.setValue( poAppController.Detail(pnTransactionDetail).CheckPayment().getTransactionDate() != null
+                ? ParseDate(
+                        poAppController.Detail(pnTransactionDetail)
+                                .CheckPayment()
+                                .getTransactionDate())
+                : null
+        );
+
+        cbReverse.setSelected(
+                poAppController.Detail(pnTransactionDetail) != null
+                && poAppController.Detail(pnTransactionDetail).isReverse()
+        );
+
     }
     
     private void initControlEvents() {
@@ -552,7 +625,11 @@ public class CheckDeposit_HistoryController implements Initializable, ScreenInte
             });
             tblColDetailDate.setCellValueFactory((loModel) -> {
                 try {
-                    return new SimpleStringProperty(String.valueOf(loModel.getValue().CheckPayment().getCheckDate()));
+                    return new SimpleStringProperty(
+                            loModel.getValue().CheckPayment().getCheckDate() == null
+                            ? ""
+                            : loModel.getValue().CheckPayment().getCheckDate().toString()
+                    );
                 } catch (SQLException | GuanzonException e) {
                     poLogWrapper.severe(psFormName, e.getMessage());
                     return new SimpleStringProperty("");
@@ -580,18 +657,38 @@ public class CheckDeposit_HistoryController implements Initializable, ScreenInte
     }
     
     private void reloadTableDetail() {
-        List<Model_Check_Deposit_Detail> rawDetail = poAppController.getDetailList();
-        laTransactionDetail.setAll(rawDetail);
+        try {
+            List<Model_Check_Deposit_Detail> rawDetail = poAppController.getDetailList();
+            List<Model_Check_Deposit_Detail> displayList = new ArrayList<>();
 
-        // Restore or select last row
-        int indexToSelect = (pnTransactionDetail >= 1 && pnTransactionDetail < laTransactionDetail.size())
-                ? pnTransactionDetail - 1
-                : laTransactionDetail.size() - 1;
-        
-        tblViewDetails.getSelectionModel().select(indexToSelect);
-        
-        pnTransactionDetail = tblViewDetails.getSelectionModel().getSelectedIndex() + 1; // Not focusedIndex
-        tblViewDetails.refresh();
+            boolean hasEmptyRow = false; // track if we already added a new empty row
+
+            for (Model_Check_Deposit_Detail detail : rawDetail) {
+                boolean isEmptyRow = (detail.getSourceNo() == null || detail.getSourceNo().trim().isEmpty());
+
+                if (isEmptyRow) {
+                    // Add only one empty row for new transaction
+                    if (!hasEmptyRow) {
+                        displayList.add(detail);
+                        hasEmptyRow = true;
+                    }
+                } else if (detail.isReverse()) {
+                    // Add existing rows where cReverse = "+"
+                    displayList.add(detail);
+                }
+            }
+            laTransactionDetail.setAll(displayList);
+            tblViewDetails.getSelectionModel().select(pnTransactionDetail);
+
+            tblViewDetails.refresh();
+            poJSON = poAppController.computeMasterFields();
+            if ("success".equals((String) poJSON.get("result"))) {
+                tfTotal.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poAppController.getMaster().getTransactionTotalDeposit(), true));
+            }
+
+        } catch (SQLException | GuanzonException ex) {
+            Logger.getLogger(CheckDeposit_EntryController.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
     
     private void getLoadedTransaction() throws SQLException, GuanzonException, CloneNotSupportedException {

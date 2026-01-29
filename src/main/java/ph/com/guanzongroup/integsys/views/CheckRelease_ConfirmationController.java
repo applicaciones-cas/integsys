@@ -380,9 +380,7 @@ public class CheckRelease_ConfirmationController implements Initializable, Scree
                     break;
                     
                 case "btnRetrieve":
-                    
                     switch (lastFocusedControl.getId()) {
-                        
                         case "dpCheckDtFrm":
                         case "dpCheckDTTo":
                             if (!isJSONSuccess(poAppController.LoadCheckListByDate(String.valueOf(dpCheckDtFrm.getValue()), String.valueOf(dpCheckDTTo.getValue())),
