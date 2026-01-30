@@ -1682,7 +1682,7 @@ public class JFXUtil {
         }
     }
 
-    /*Alternative version of inputDecimalOnly; commas not allowed*/
+    /*Alternative version of inputDecimalOnly;*/
     public static void inputIntegersOnly(TextField... foTxtFields) {
         Pattern pattern = Pattern.compile("[0-9]*");
         for (TextField txtField : foTxtFields) {
@@ -1692,28 +1692,17 @@ public class JFXUtil {
         }
     }
 
-    /*Alternative version of inputDecimalOnly; restricts to 1 dot, commas not allowed*/
- /*Ideal for Rates Field*/
+    /*Alternative version of inputDecimalOnly; */
+
     public static void inputDecimalOnly(TextField... foTxtFields) {
-        Pattern pattern = Pattern.compile("\\d*(\\.\\d*)?");
+        Pattern pattern = Pattern.compile("[0-9,.]*");
         for (TextField txtField : foTxtFields) {
             if (txtField != null) {
-                txtField.setTextFormatter(new TextFormatter<>(change -> {
-                    String newText = change.getControlNewText();
-                    if (newText.isEmpty()) {
-                        return change;
-                    }
-                    if (newText.contains(",")) {
-                        return change;
-                    }
-                    if (!pattern.matcher(newText).matches()) {
-                        return null;
-                    }
-                    return change;
-                }));
+                txtField.setTextFormatter(new TextFormaterUtil(pattern));
             }
         }
     }
+
 
     /*Experimental; customed Month & Year only picker*/
     public static class MonthYearPicker {
