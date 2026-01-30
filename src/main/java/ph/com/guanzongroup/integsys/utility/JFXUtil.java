@@ -1682,7 +1682,7 @@ public class JFXUtil {
         }
     }
 
-    /*Alternative version of inputDecimalOnly; commas not allowed*/
+    /*Alternative version of inputDecimalOnly;*/
     public static void inputIntegersOnly(TextField... foTxtFields) {
         Pattern pattern = Pattern.compile("[0-9]*");
         for (TextField txtField : foTxtFields) {
@@ -1692,25 +1692,28 @@ public class JFXUtil {
         }
     }
 
-    /*Alternative version of inputDecimalOnly; restricts to 1 dot, commas not allowed*/
- /*Ideal for Rates Field*/
+    /*Alternative version of inputDecimalOnly; restricts to 1 dot */
     public static void inputDecimalOnly(TextField... foTxtFields) {
-        Pattern pattern = Pattern.compile("\\d*(\\.\\d*)?");
         for (TextField txtField : foTxtFields) {
             if (txtField != null) {
-                txtField.setTextFormatter(new TextFormatter<>(change -> {
+                UnaryOperator<TextFormatter.Change> filter = change -> {
                     String newText = change.getControlNewText();
-                    if (newText.isEmpty()) {
-                        return change;
-                    }
-                    if (newText.contains(",")) {
+
+                    // Allow only digits, commas, and at most one dot
+                    if (!newText.matches("[0-9,]*\\.?[0-9]*")) {
                         return null;
                     }
-                    if (!pattern.matcher(newText).matches()) {
+
+                    // Only one dot allowed
+                    long dotCount = newText.chars().filter(ch -> ch == '.').count();
+                    if (dotCount > 1) {
                         return null;
                     }
+
                     return change;
-                }));
+                };
+
+                txtField.setTextFormatter(new TextFormatter<>(filter));
             }
         }
     }
@@ -3189,7 +3192,8 @@ public class JFXUtil {
         });
     }
 
-    /*Used to enhance readability*/
+    /*Detects tab selected returns id*/
+ /*Used to enhance readability*/
     public static void onTabSelected(TabPane tabPane, Consumer<String> onTabTitleSelected) {
         tabPane.getSelectionModel()
                 .selectedItemProperty()
@@ -3217,6 +3221,7 @@ public class JFXUtil {
         return true;
     }
 
+    /*Creates fade in and moving up simultaneously animation*/
     public static void fadeInFromBottom(double seconds, Node... nodes) {
         for (Node node : nodes) {
 
@@ -3242,6 +3247,7 @@ public class JFXUtil {
         }
     }
 
+    /*Adds fades in effect in node*/
     public static void fadeIn(double seconds, Node... nodes) {
         for (Node node : nodes) {
             node.setOpacity(0); // start invisible
@@ -3253,6 +3259,7 @@ public class JFXUtil {
         }
     }
 
+    /*Displays 5 secs tooltip to particular node*/
     public static void showTooltip(String message, Node... nodes) {
         if (message == null || message.trim().isEmpty() || nodes == null || nodes.length == 0) {
             return;

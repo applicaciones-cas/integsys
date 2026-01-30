@@ -941,6 +941,7 @@ public class PurchaseOrder_ApprovalCarController implements Initializable, Scree
 
     private void clearMasterFields() {
         /* Master Fields*/
+        lblTransactionStatus.setText("UNKNOWN");
         pnTblDetailRow = -1;
         dpTransactionDate.setValue(null);
         dpExpectedDlvrDate.setValue(null);
@@ -987,10 +988,15 @@ public class PurchaseOrder_ApprovalCarController implements Initializable, Scree
                 case PurchaseOrderStatus.APPROVED:
                     CustomCommonUtil.setVisible(true, btnPrint);
                     CustomCommonUtil.setManaged(true, btnPrint);
+                    //Recheck the exact status
+                    if(!poPurchasingController.PurchaseOrder().Master().getTransactionStatus().equals(poPurchasingController.PurchaseOrder().Master().getConvertedTransactionStatus())){
+                        CustomCommonUtil.setVisible(true, btnReturn);
+                        CustomCommonUtil.setManaged(true, btnReturn);
+                    }
                     break;
                 case PurchaseOrderStatus.RETURNED:
-                    CustomCommonUtil.setVisible(true, btnVoid, btnUpdate, btnPrint);
-                    CustomCommonUtil.setManaged(true, btnVoid, btnUpdate, btnPrint);
+                    CustomCommonUtil.setVisible(true, btnVoid,btnPrint);
+                    CustomCommonUtil.setManaged(true, btnVoid,btnPrint);
                     break;
             }
         }
@@ -1044,7 +1050,7 @@ public class PurchaseOrder_ApprovalCarController implements Initializable, Scree
             protected Void call() throws Exception {
                 try {
                     main_data.clear();
-                    poJSON = poPurchasingController.PurchaseOrder().getPurchaseOrder(
+                    poJSON = poPurchasingController.PurchaseOrder().getConfirmedPurchaseOrder(
                             psSupplierID,
                             psReferID);
                     if ("success".equals(poJSON.get("result"))) {

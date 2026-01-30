@@ -928,6 +928,7 @@ public class PurchaseOrder_ConfirmationAppliancesController implements Initializ
 
     private void clearMasterFields() {
         /* Master Fields*/
+        lblTransactionStatus.setText("UNKNOWN");
         pnTblDetailRow = -1;
         dpTransactionDate.setValue(null);
         dpExpectedDlvrDate.setValue(null);
