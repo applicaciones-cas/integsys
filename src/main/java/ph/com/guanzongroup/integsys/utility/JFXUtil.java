@@ -1704,7 +1704,7 @@ public class JFXUtil {
                         return change;
                     }
                     if (newText.contains(",")) {
-                        return null;
+                        return change;
                     }
                     if (!pattern.matcher(newText).matches()) {
                         return null;
@@ -3189,7 +3189,8 @@ public class JFXUtil {
         });
     }
 
-    /*Used to enhance readability*/
+    /*Detects tab selected returns id*/
+ /*Used to enhance readability*/
     public static void onTabSelected(TabPane tabPane, Consumer<String> onTabTitleSelected) {
         tabPane.getSelectionModel()
                 .selectedItemProperty()
@@ -3217,6 +3218,7 @@ public class JFXUtil {
         return true;
     }
 
+    /*Creates fade in and moving up simultaneously animation*/
     public static void fadeInFromBottom(double seconds, Node... nodes) {
         for (Node node : nodes) {
 
@@ -3242,6 +3244,7 @@ public class JFXUtil {
         }
     }
 
+    /*Adds fades in effect in node*/
     public static void fadeIn(double seconds, Node... nodes) {
         for (Node node : nodes) {
             node.setOpacity(0); // start invisible
@@ -3253,6 +3256,7 @@ public class JFXUtil {
         }
     }
 
+    /*Displays 5 secs tooltip to particular node*/
     public static void showTooltip(String message, Node... nodes) {
         if (message == null || message.trim().isEmpty() || nodes == null || nodes.length == 0) {
             return;
