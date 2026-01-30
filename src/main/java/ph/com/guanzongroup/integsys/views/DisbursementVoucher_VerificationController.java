@@ -121,6 +121,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
     private final ObservableList<ModelDeliveryAcceptance_Attachment> attachment_data = FXCollections.observableArrayList();
     AtomicReference<Object> lastFocusedTextField = new AtomicReference<>();
     AtomicReference<Object> previousSearchedTextField = new AtomicReference<>();
+    private boolean tooltipShown = false;
     private boolean pbEnteredDV = false;
     private boolean pbEnteredJE = false;
     private boolean pbEnteredBIR = false;
@@ -1658,6 +1659,10 @@ public class DisbursementVoucher_VerificationController implements Initializable
                                 }
                                 break;
                             case "tfSearchTransaction":
+                                if (!tooltipShown) {
+                                    JFXUtil.showTooltip("NOTE: Results appear directly in the table view, no pop-up dialog.", tfSearchTransaction);
+                                    tooltipShown = true;
+                                }
                                 loadTableMain.reload();
                                 break;
                             case "tfSearchSupplier":
