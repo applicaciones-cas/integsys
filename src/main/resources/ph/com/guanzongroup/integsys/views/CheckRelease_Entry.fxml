@@ -3,6 +3,7 @@
 <?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.DatePicker?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TableColumn?>
@@ -278,15 +279,15 @@
                                   </AnchorPane>
                                    <AnchorPane fx:id="apDetail" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" style="-fx-border-color: FF8201;">
                                       <children>
-                                          <GridPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" vgap="4.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                          <GridPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                               <columnConstraints>
                                                   <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="120.0" />
                               <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="10.0" />
                                                   <ColumnConstraints hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="150.0" />
-                                                      <ColumnConstraints hgrow="SOMETIMES" maxWidth="1.7976931348623157E308" minWidth="10.0" prefWidth="100.0" />
-                              <ColumnConstraints hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="80.0" />
+                                                      <ColumnConstraints hgrow="SOMETIMES" maxWidth="1.7976931348623157E308" minWidth="10.0" prefWidth="141.0" />
+                              <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="134.0" minWidth="-Infinity" prefWidth="126.0" />
                                                   <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="20.0" />
-                              <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="85.0" />
+                              <ColumnConstraints hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="85.0" />
                                                       <ColumnConstraints maxWidth="-Infinity" minWidth="10.0" prefWidth="100.0" />
                                               </columnConstraints>
                                               <rowConstraints>
@@ -295,7 +296,6 @@
                                                   <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="28.0" vgrow="SOMETIMES" />
                                                       <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="30.0" vgrow="SOMETIMES" />
                               <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="28.0" vgrow="SOMETIMES" />
-                                                      <RowConstraints maxHeight="-Infinity" minHeight="28.0" prefHeight="28.0" vgrow="SOMETIMES" />
                                               </rowConstraints>
                                               <children>
                                                   <Label text="Payee" GridPane.rowIndex="1">
@@ -308,38 +308,39 @@
                                                             <Font size="12.0" />
                                                          </font>
                                                       </Label>
-                                                  <Label text="Check Amount" GridPane.rowIndex="4">
+                                                  <Label text="Check Amount" GridPane.columnIndex="4" GridPane.rowIndex="2">
                                                       <font>
                                                           <Font name="System Bold" size="14.0" />
                                                       </font>
                                                   </Label>
                                                   <TextField fx:id="tfPayee" editable="false" maxHeight="25.0" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.rowIndex="1" />
-                                                  <TextField fx:id="tfParticular" alignment="TOP_LEFT" editable="false" maxHeight="1.7976931348623157E308" GridPane.columnIndex="2" GridPane.columnSpan="6" GridPane.rowIndex="2" />
-                              <TextField fx:id="tfCheckAmt" alignment="CENTER_RIGHT" promptText="0.0000" GridPane.columnIndex="2" GridPane.columnSpan="6" GridPane.rowIndex="4" />
+                                                  <TextField fx:id="tfParticular" alignment="TOP_LEFT" editable="false" maxHeight="1.7976931348623157E308" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.rowIndex="2" />
+                              <TextField fx:id="tfCheckAmt" alignment="CENTER_RIGHT" editable="false" promptText="0.0000" GridPane.columnIndex="6" GridPane.columnSpan="2" GridPane.rowIndex="2" />
                                                       <Label text="Check Reference">
                                                          <font>
                                                             <Font size="12.0" />
                                                          </font>
                                                       </Label>
                                                       <TextField fx:id="tfSearchCheckRef" maxHeight="25.0" promptText="Press F3: Search" GridPane.columnIndex="2" GridPane.columnSpan="2" />
-                                                      <DatePicker fx:id="dpCheckDate" editable="false" GridPane.columnIndex="2" GridPane.rowIndex="3" />
-                                                      <Label text="Check Date" GridPane.rowIndex="3">
+                                                      <DatePicker fx:id="dpCheckDate" editable="false" maxWidth="1.7976931348623157E308" prefHeight="25.0" GridPane.columnIndex="6" GridPane.columnSpan="2" />
+                                                      <Label text="Check Date" GridPane.columnIndex="4">
                                                          <font>
                                                             <Font size="12.0" />
                                                          </font>
                                                       </Label>
-                                                      <Label alignment="CENTER_RIGHT" maxWidth="1.7976931348623157E308" text="Check No" GridPane.columnIndex="4" GridPane.rowIndex="3">
+                                                      <Label alignment="CENTER_RIGHT" maxWidth="1.7976931348623157E308" text="Check No" GridPane.columnIndex="4" GridPane.rowIndex="1">
                                                          <font>
                                                             <Font size="12.0" />
                                                          </font>
                                                       </Label>
-                                                      <TextField fx:id="tfCheckNo" editable="false" maxHeight="25.0" GridPane.columnIndex="6" GridPane.columnSpan="2" GridPane.rowIndex="3" />
-                                                      <Label text="Note" GridPane.rowIndex="5">
+                                                      <TextField fx:id="tfCheckNo" editable="false" maxHeight="25.0" GridPane.columnIndex="6" GridPane.columnSpan="2" GridPane.rowIndex="1" />
+                                                      <Label text="Note" GridPane.rowIndex="3">
                                                          <font>
                                                             <Font size="12.0" />
                                                          </font>
                                                       </Label>
-                                                      <TextField fx:id="tfNote" maxHeight="25.0" GridPane.columnIndex="2" GridPane.columnSpan="2147483647" GridPane.rowIndex="5" />
+                                                      <TextField fx:id="tfNote" maxHeight="25.0" GridPane.columnIndex="2" GridPane.columnSpan="2147483647" GridPane.rowIndex="3" />
+                                                      <CheckBox fx:id="cbReverse" mnemonicParsing="false" nodeOrientation="RIGHT_TO_LEFT" onAction="#cmdCheckBox_Click" prefHeight="17.0" prefWidth="64.0" text="Reverse" textAlignment="RIGHT" GridPane.columnIndex="6" GridPane.rowIndex="4" />
                                               </children>
                                           </GridPane>
                                       </children>

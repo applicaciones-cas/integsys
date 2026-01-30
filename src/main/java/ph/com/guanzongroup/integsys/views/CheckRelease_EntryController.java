@@ -27,6 +27,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Control;
 import javafx.scene.control.DatePicker;
@@ -62,6 +63,7 @@ import ph.com.guanzongroup.cas.cashflow.status.CheckReleaseStatus;
 public class CheckRelease_EntryController implements Initializable, ScreenInterface {
 
     private GRiderCAS poApp;
+    private JSONObject poJSON;
     private LogWrapper poLogWrapper;
     private String psFormName = "Check Release Entry";
     private String psIndustryID;
@@ -75,6 +77,8 @@ public class CheckRelease_EntryController implements Initializable, ScreenInterf
     private ObservableList<Model_Check_Release_Detail> laCheckListDetail;
 
     private int pnSelectMaster, pnTransactionDetail, pnEditMode;
+    @FXML
+    private CheckBox cbReverse;
 
     @FXML
     private AnchorPane apMainAnchor, apMaster, apDetail, apCheckDettail, apTransaction;
@@ -202,6 +206,33 @@ public class CheckRelease_EntryController implements Initializable, ScreenInterf
                     .getName()).log(Level.SEVERE, null, ex);
         }
     }
+    @FXML
+    private void cmdCheckBox_Click(ActionEvent event) {
+        poJSON = new JSONObject();
+        Object source = event.getSource();
+        if (source instanceof CheckBox) {
+            CheckBox checkedBox = (CheckBox) source;
+            switch (checkedBox.getId()) {
+                case "cbReverse": // this is the id
+                    if (poAppController.getEditMode() == EditMode.ADDNEW
+                            || poAppController.getEditMode() == EditMode.UPDATE
+                            && poAppController.GetMaster().getTransactionStatus().equals(CheckReleaseStatus.OPEN)) {
+                        if (poAppController.Detail(pnTransactionDetail).getSourceNo() != null
+                                || !poAppController.Detail(pnTransactionDetail).getSourceNo().isEmpty()) {
+                            if (!checkedBox.isSelected()) {
+                                poAppController.Detail().remove(pnTransactionDetail);
+                                pnTransactionDetail = pnTransactionDetail - 1;
+                            }
+                        }
+                    } else {
+                        poAppController.Detail(pnTransactionDetail).isReverse(checkedBox.isSelected());
+                    }
+                    reloadTableDetail();
+                    //loadSelectedTransactionDetail(pnTransactionDetail);
+                    break;
+            }
+        }
+    }
 
     @FXML
     void ontblDetailClicked(MouseEvent e) {
@@ -312,48 +343,55 @@ public class CheckRelease_EntryController implements Initializable, ScreenInterf
                     break;
 
                 case "btnBrowse":
-                    if (lastFocusedControl == null) {
-                        ShowMessageFX.Information(null, psFormName,
-                                "Search unavailable. Please ensure a searchable field is selected or focused before proceeding..");
-                        break;
+                    if(lastFocusedControl == null){
+                            if (!tfTransNo.getText().isEmpty()) {
+                                if (ShowMessageFX.OkayCancel(null, "Search Transaction! by Trasaction", "Are you sure you want replace loaded Transaction?") == false) {
+                                    return;
+                                }
+                            }
+                            if (!isJSONSuccess(poAppController.SearchTransaction(tfSearchTransNo.getText().toString(), true), "Initialize Search Check Release Master")) {
+                                break;
+                            }
+                            clearAllInputs();
+                            getLoadedTransaction();
+                            lastFocusedControl = null;
+                            break;
                     }
 
                     switch (lastFocusedControl.getId()) {
-
                         case "tfSearchTransNo":
                             if (!isJSONSuccess(poAppController.SearchTransaction(tfSearchTransNo.getText().toString(), true), "Initialize Search Check Release Master")) {
                                 break;
                             }
-
                             clearAllInputs();
                             getLoadedTransaction();
-
+                            lastFocusedControl = null;
                             break;
-
                         case "tfSearchReceived":
                             if (!isJSONSuccess(poAppController.SearchTransaction(tfSearchReceived.getText().toString(), false), "Initialize Search Check Release Master")) {
                                 return;
                             }
-
                             clearAllInputs();
                             getLoadedTransaction();
-
+                            lastFocusedControl = null;
                             break;
-
                         case "tfSearchPayee":
                             if (!isJSONSuccess(poAppController.SearchCheckTransaction(tfSearchPayee.getText().toString(),
                                     true, false), "Initialize Search Check Release Master")) {
                                 break;
                             }
                             LoadCheckPayments();
+                            lastFocusedControl = null;
                             break;
-
                         case "tfSearchCheck":
                             if (!isJSONSuccess(poAppController.SearchCheckTransaction(tfSearchCheck.getText().toString(), false, false), "Initialize Search Check Release Master")) {
                                 break;
                             }
                             LoadCheckPayments();
+                            lastFocusedControl = null;
                             break;
+                        
+                            
                     }
                     break;
 
@@ -592,23 +630,23 @@ public class CheckRelease_EntryController implements Initializable, ScreenInterf
                             if (!ShowMessageFX.OkayCancel("Check amount is 0. It will be disregarded on saving detail list. Continue?", "Initalize Check Amount", null)) {
 
                                 //set back to default amount and focus
-                                tfCheckAmt.setText(String.valueOf(poAppController.GetDetail(pnTransactionDetail).CheckPayment().getAmount()));
+                                tfCheckAmt.setText(String.valueOf(poAppController.Detail(pnTransactionDetail).CheckPayment().getAmount()));
                                 tfCheckAmt.requestFocus();
                                 return;
                             }
                         }
 
                         //check set amount, should be '0' (to remove from saving) or exact original amount
-                        if ((ldblCheckAmt != poAppController.GetDetail(pnTransactionDetail).CheckPayment().getAmount()) && ldblCheckAmt > 0) {
+                        if ((ldblCheckAmt != poAppController.Detail(pnTransactionDetail).CheckPayment().getAmount()) && ldblCheckAmt > 0) {
                             ShowMessageFX.Information("Check amount should be zero or same as original amount!", "Initalize Check Amount", null);
 
                             //set back to default amount and put focus
-                            tfCheckAmt.setText(String.valueOf(poAppController.GetDetail(pnTransactionDetail).CheckPayment().getAmount()));
+                            tfCheckAmt.setText(String.valueOf(poAppController.Detail(pnTransactionDetail).CheckPayment().getAmount()));
                             tfCheckAmt.requestFocus();
                             return;
                         }
 
-                        poAppController.GetDetail(pnTransactionDetail).CheckPayment().setAmount(Double.parseDouble(tfCheckAmt.getText().toString()));
+                        poAppController.Detail(pnTransactionDetail).CheckPayment().setAmount(Double.parseDouble(tfCheckAmt.getText().toString()));
                         ComputeTotal();
                         getLoadedTransaction();
                         break;
@@ -618,7 +656,7 @@ public class CheckRelease_EntryController implements Initializable, ScreenInterf
                         break;
 
                     case "tfNote":
-                        poAppController.GetDetail(pnTransactionDetail).CheckPayment().setRemarks(tfNote.getText().toString());
+                        poAppController.Detail(pnTransactionDetail).CheckPayment().setRemarks(tfNote.getText().toString());
                         break;
                 }
             } else {
@@ -681,7 +719,7 @@ public class CheckRelease_EntryController implements Initializable, ScreenInterf
                 pnTransactionDetail = pnTransactionDetail - 1;
             }
 
-            Model_Check_Payments loCheck = poAppController.GetDetail(pnTransactionDetail).CheckPayment();
+            Model_Check_Payments loCheck = poAppController.Detail(pnTransactionDetail).CheckPayment();
 
             tfSearchCheckRef.setText(loCheck.getTransactionNo());
             tfPayee.setText(loCheck.Payee().getPayeeName());
@@ -690,6 +728,10 @@ public class CheckRelease_EntryController implements Initializable, ScreenInterf
             tfCheckNo.setText(loCheck.getCheckNo());
             tfCheckAmt.setText(String.valueOf(loCheck.getAmount()));
             tfNote.setText(loCheck.getRemarks());
+            cbReverse.setSelected(
+                    poAppController.Detail(pnTransactionDetail) != null
+                    && poAppController.Detail(pnTransactionDetail).isReverse()
+            );
 
         } catch (Exception e) {
             Logger.getLogger(CheckRelease_EntryController.class.getName()).log(Level.SEVERE, null, e);
@@ -733,7 +775,12 @@ public class CheckRelease_EntryController implements Initializable, ScreenInterf
 
                 tblColTransDate.setCellValueFactory((loModel) -> {
                     try {
-                        return new SimpleStringProperty(String.valueOf(loModel.getValue().getTransactionDate()));
+                        
+                        return new SimpleStringProperty(
+                                loModel.getValue().getTransactionDate() == null
+                                ? ""
+                                : loModel.getValue().getTransactionDate().toString()
+                        );
                     } catch (Exception e) {
                         poLogWrapper.severe(psFormName, e.getMessage());
                         return new SimpleStringProperty("");
@@ -829,7 +876,11 @@ public class CheckRelease_EntryController implements Initializable, ScreenInterf
 
             tblColDetailCheckDt.setCellValueFactory((loModel) -> {
                 try {
-                    return new SimpleStringProperty(String.valueOf(loModel.getValue().CheckPayment().getCheckDate()));
+                    return new SimpleStringProperty(
+                            loModel.getValue().CheckPayment().getCheckDate() == null
+                            ? ""
+                            : loModel.getValue().CheckPayment().getCheckDate().toString()
+                    );
                 } catch (Exception e) {
                     poLogWrapper.severe(psFormName, e.getMessage());
                     return new SimpleStringProperty("");
@@ -886,6 +937,9 @@ public class CheckRelease_EntryController implements Initializable, ScreenInterf
                 DatePicker loControlField = (DatePicker) loControl;
                 controllerFocusTracker(loControlField);
                 loControlField.focusedProperty().addListener(dPicker_Focus);
+            } else if (loControl instanceof CheckBox) {
+                CheckBox loControlField = (CheckBox) loControl;
+                controllerFocusTracker(loControlField);
             }
         }
 
