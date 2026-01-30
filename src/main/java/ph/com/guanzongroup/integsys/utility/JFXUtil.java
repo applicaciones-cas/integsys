@@ -1692,17 +1692,31 @@ public class JFXUtil {
         }
     }
 
-    /*Alternative version of inputDecimalOnly; */
-
+    /*Alternative version of inputDecimalOnly; restricts to 1 dot */
     public static void inputDecimalOnly(TextField... foTxtFields) {
-        Pattern pattern = Pattern.compile("[0-9,.]*");
         for (TextField txtField : foTxtFields) {
             if (txtField != null) {
-                txtField.setTextFormatter(new TextFormaterUtil(pattern));
+                UnaryOperator<TextFormatter.Change> filter = change -> {
+                    String newText = change.getControlNewText();
+
+                    // Allow only digits, commas, and at most one dot
+                    if (!newText.matches("[0-9,]*\\.?[0-9]*")) {
+                        return null;
+                    }
+
+                    // Only one dot allowed
+                    long dotCount = newText.chars().filter(ch -> ch == '.').count();
+                    if (dotCount > 1) {
+                        return null;
+                    }
+
+                    return change;
+                };
+
+                txtField.setTextFormatter(new TextFormatter<>(filter));
             }
         }
     }
-
 
     /*Experimental; customed Month & Year only picker*/
     public static class MonthYearPicker {
