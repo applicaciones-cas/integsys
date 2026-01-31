@@ -1722,6 +1722,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
                                 } else {
                                     JFXUtil.textFieldMoveNext(tfPayeeName);
                                 }
+                                loadRecordMaster();
                                 loadRecordMasterCheck();
                                 break;
                             case "tfPayeeName":
@@ -2529,6 +2530,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
                                 poController.CheckPayments().getModel().setClaimant("");
                                 poController.CheckPayments().getModel().setAuthorize(null);
                             } else {
+                                loadRecordMaster();
                                 loadRecordMasterCheck();
                                 return;
                             }
@@ -2540,6 +2542,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
                         ShowMessageFX.Warning(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
                     }
 
+                    loadRecordMaster();
                     loadRecordMasterCheck();
                     break;
                 case "chbkIsCrossCheck":
