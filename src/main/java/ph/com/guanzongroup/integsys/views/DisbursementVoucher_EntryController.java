@@ -714,6 +714,17 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                     moveNext(false, false);
                     JFXUtil.runWithDelay(0.50, () -> {
                         loadTableMain.reload();
+                        switch(poController.Master().getDisbursementType()){
+                            case DisbursementStatic.DisbursementType.CHECK:
+                                loadRecordMasterCheck();
+                                break;
+                            case DisbursementStatic.DisbursementType.WIRED:
+                                loadRecordMasterBankTransfer();
+                                break;
+                            case DisbursementStatic.DisbursementType.DIGITAL_PAYMENT:
+                                loadRecordMasterOnlinePayment();
+                                break;
+                        }
                     });
                 } catch (CloneNotSupportedException | SQLException | GuanzonException ex) {
                     Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
@@ -1744,6 +1755,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                                 } else {
                                     JFXUtil.textFieldMoveNext(tfPayeeName);
                                 }
+                                loadRecordMaster();
                                 loadRecordMasterCheck();
                                 break;
                             case "tfPayeeName":
@@ -2556,6 +2568,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                                 poController.CheckPayments().getModel().setClaimant("");
                                 poController.CheckPayments().getModel().setAuthorize(null);
                             } else {
+                                loadRecordMaster();
                                 loadRecordMasterCheck();
                                 return;
                             }
@@ -2567,6 +2580,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                         ShowMessageFX.Warning(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
                     }
 
+                    loadRecordMaster();
                     loadRecordMasterCheck();
                     break;
                 case "chbkIsCrossCheck":
