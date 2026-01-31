@@ -25,6 +25,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Control;
 import javafx.scene.control.DatePicker;
@@ -43,6 +44,7 @@ import org.guanzon.appdriver.agent.ShowMessageFX;
 import org.guanzon.appdriver.base.GRiderCAS;
 import org.guanzon.appdriver.base.GuanzonException;
 import org.guanzon.appdriver.base.LogWrapper;
+import org.guanzon.appdriver.constant.EditMode;
 import org.json.simple.JSONObject;
 import ph.com.guanzongroup.cas.cashflow.model.Model_Check_Payments;
 import ph.com.guanzongroup.cas.cashflow.status.CheckReleaseStatus;
@@ -56,6 +58,7 @@ import ph.com.guanzongroup.cas.cashflow.services.CheckController;
 public class CheckRelease_HistoryController implements Initializable, ScreenInterface{
     
     private GRiderCAS poApp;
+    private JSONObject poJSON;
     private LogWrapper poLogWrapper;
     private String psFormName = "Check Release History";
     private String psIndustryID;
@@ -68,6 +71,8 @@ public class CheckRelease_HistoryController implements Initializable, ScreenInte
     private ObservableList<Model_Check_Release_Detail> laCheckListDetail;
     
     private int pnSelectMaster, pnTransactionDetail, pnEditMode;
+    @FXML
+    private CheckBox cbReverse;
     
     @FXML
     private AnchorPane apMainAnchor, apMaster, apDetail, apCheckDettail, apTransaction;
@@ -110,7 +115,7 @@ public class CheckRelease_HistoryController implements Initializable, ScreenInte
             //background thread
             Platform.runLater(() -> {
                 
-                poAppController.setTransactionStatus("10");
+                poAppController.setTransactionStatus("102");
                 poAppController.setIndustryID(psIndustryID);
                 
                 System.err.println("Initialize value : Industry >" + psIndustryID);
@@ -155,6 +160,37 @@ public class CheckRelease_HistoryController implements Initializable, ScreenInte
     }
     
     @FXML
+    private void cmdCheckBox_Click(ActionEvent event) {
+        poJSON = new JSONObject();
+        Object source = event.getSource();
+        if (source instanceof CheckBox) {
+            
+                CheckBox checkedBox = (CheckBox) source;
+                switch (checkedBox.getId()) {
+                    case "cbReverse": // this is the id
+                        if (poAppController.getEditMode() == EditMode.ADDNEW
+                                || poAppController.getEditMode() == EditMode.UPDATE
+                                && poAppController.GetMaster().getTransactionStatus().equals(CheckReleaseStatus.OPEN)
+                                || poAppController.GetMaster().getTransactionStatus().equals(CheckReleaseStatus.CONFIRMED)) {
+                            if (poAppController.Detail(pnTransactionDetail).getSourceNo() != null
+                                    || !poAppController.Detail(pnTransactionDetail).getSourceNo().isEmpty()) {
+                                if (!checkedBox.isSelected()) {
+                                    poAppController.Detail().remove(pnTransactionDetail);
+                                    pnTransactionDetail = pnTransactionDetail - 1;
+                                }
+                            }
+                        } else {
+                            poAppController.Detail(pnTransactionDetail).isReverse(checkedBox.isSelected());
+                        }
+                        reloadTableDetail();
+                        
+                        break;
+                }
+            
+        }
+    }
+    
+    @FXML
     private void cmdButton_Click(ActionEvent event) {
         try{
             
@@ -163,12 +199,20 @@ public class CheckRelease_HistoryController implements Initializable, ScreenInte
             switch (btnID) {
                     
                 case "btnBrowse":
-                    if (lastFocusedControl == null) {
-                        ShowMessageFX.Information(null, psFormName,
-                                "Search unavailable. Please ensure a searchable field is selected or focused before proceeding..");
-                        break;
+                   if(lastFocusedControl == null){
+                            if (!tfTransNo.getText().isEmpty()) {
+                                if (ShowMessageFX.OkayCancel(null, "Search Transaction! by Trasaction", "Are you sure you want replace loaded Transaction?") == false) {
+                                    return;
+                                }
+                            }
+                            if (!isJSONSuccess(poAppController.SearchTransaction(tfSearchTransNo.getText().toString(), true), "Initialize Search Check Release Master")) {
+                                break;
+                            }
+                            clearAllInputs();
+                            getLoadedTransaction();
+                            lastFocusedControl = null;
+                            break;
                     }
-
                     switch (lastFocusedControl.getId()) {
                         
                         case "tfSearchTransNo":
@@ -199,7 +243,7 @@ public class CheckRelease_HistoryController implements Initializable, ScreenInte
                     }
                     
                     ShowMessageFX.Information("Transaction posted successfully", "Check Release History", null);
-                    
+                    getLoadedTransaction();
                     reloadTableDetail();
                     pnEditMode = poAppController.getEditMode();
                     break;
@@ -333,7 +377,7 @@ public class CheckRelease_HistoryController implements Initializable, ScreenInte
             tfReceivedBy.setText(poAppController.GetMaster().getReceivedBy());
             taRemarks.setText(poAppController.GetMaster().getRemarks());
             tfTotal.setText((String.valueOf(poAppController.GetMaster().getTransactionTotal())));
-            
+            initButtonDisplay();
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(CheckRelease_HistoryController.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -349,7 +393,7 @@ public class CheckRelease_HistoryController implements Initializable, ScreenInte
             //deduct 1, if index selected is equal to list size
             if (pnTransactionDetail == poAppController.getDetailCount()) { pnTransactionDetail = pnTransactionDetail - 1; }
 
-            Model_Check_Payments loCheck = poAppController.GetDetail(pnTransactionDetail).CheckPayment();
+            Model_Check_Payments loCheck = poAppController.Detail(pnTransactionDetail).CheckPayment();
 
             tfSearchCheckRef.setText(loCheck.getTransactionNo());
             tfPayee.setText(loCheck.Payee().getPayeeName());

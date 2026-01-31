@@ -932,7 +932,7 @@ private void recomputeTotal() throws SQLException, GuanzonException {
             } else if (loControl instanceof ComboBox) {
                 ComboBox loControlField = (ComboBox) loControl;
                 controllerFocusTracker(loControlField);
-            }else if (loControl instanceof CheckBox) {
+            } else if (loControl instanceof CheckBox) {
                 CheckBox loControlField = (CheckBox) loControl;
                 controllerFocusTracker(loControlField);
             }
