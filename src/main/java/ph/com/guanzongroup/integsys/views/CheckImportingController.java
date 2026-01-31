@@ -197,9 +197,16 @@ public class CheckImportingController implements Initializable, ScreenInterface 
                     for (int lnctr = 0; lnctr < main_data.size(); lnctr++) {
                         String Transaction = poCheckImporting.getCheckTransaction(String.valueOf(main_data.get(lnctr).getIndex02()), "DISb");
                         String CheckNo = String.valueOf(main_data.get(lnctr).getIndex07());
+                        String Checkdate = String.valueOf(main_data.get(lnctr).getIndex06());
+                        double amt = main_data.get(lnctr).getIndex10() == null
+                                ? 0.0
+                                : Double.parseDouble(
+                                        String.valueOf(main_data.get(lnctr).getIndex10()).trim()
+                                );
+                        
 //                        updateChecks(Transaction,lnctr);
 //                        poJSON = poCheckImporting.saveRecord();
-                       poJSON =  poCheckImporting.updateChecks(Transaction,CheckNo);
+                       poJSON =  poCheckImporting.updateChecks(Transaction,CheckNo,Checkdate,amt);
                         if (!"success".equals((String) poJSON.get("result"))) {
                             ShowMessageFX.Warning((String) poJSON.get("message"), pxeModuleName, null);
                             return;
@@ -212,6 +219,7 @@ public class CheckImportingController implements Initializable, ScreenInterface 
                     break;
                 case "btnCancel":
                     if (ShowMessageFX.YesNo("Do you want to disregard changes?", pxeModuleName, null)) {
+                        main_data.clear();
                         psImportingFilePath = "";
                         loadTableMain();
                         pnEditMode = EditMode.UNKNOWN;
@@ -621,7 +629,8 @@ public class CheckImportingController implements Initializable, ScreenInterface 
                                 poCheckImporting.CheckPayments(0).getTransactionDate()),
                         row.getCheckNo(),
                         row.getCheckDate(),
-                        ""
+                            "",
+                        String.valueOf(row.getAmount())
                 ));
             }
 
