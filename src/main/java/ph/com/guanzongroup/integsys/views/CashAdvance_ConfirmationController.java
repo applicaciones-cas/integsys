@@ -65,6 +65,7 @@ public class CashAdvance_ConfirmationController implements Initializable, Screen
     private String psCompanyId = "";
     private static final int ROWS_PER_PAGE = 50;
     int pnMain = 0;
+    boolean tooltipShown = false;
     AtomicReference<Object> lastFocusedTextField = new AtomicReference<>();
     AtomicReference<Object> previousSearchedTextField = new AtomicReference<>();
     private ObservableList<ModelCashAdvance> main_data = FXCollections.observableArrayList();
@@ -147,6 +148,12 @@ public class CashAdvance_ConfirmationController implements Initializable, Screen
             if (selected != null) {
                 int pnRowMain = Integer.parseInt(selected.getIndex01()) - 1;
                 pnMain = pnRowMain;
+                String lsTransNo = selected.getIndex06();
+
+                if (!JFXUtil.loadValidation(pnEditMode, pxeModuleName, poController.CashAdvanceList(pnMain).getTransactionNo(), lsTransNo)) {
+                    return;
+                }
+
                 JFXUtil.disableAllHighlightByColor(tblViewMainList, "#A7C7E7", highlightedRowsMain);
                 JFXUtil.highlightByKey(tblViewMainList, String.valueOf(pnRowMain + 1), "#A7C7E7", highlightedRowsMain);
 
@@ -215,6 +222,10 @@ public class CashAdvance_ConfirmationController implements Initializable, Screen
                             retrieveCashAdvance();
                             return;
                         case "tfSearchVoucherNo":
+                            if (!tooltipShown) {
+                                JFXUtil.showTooltip("NOTE: Results appear directly in the table view, no pop-up dialog.", tfSearchVoucherNo);
+                                tooltipShown = true;
+                            }
                             retrieveCashAdvance();
                             return;
                         case "tfPayee":
@@ -443,7 +454,8 @@ public class CashAdvance_ConfirmationController implements Initializable, Screen
                                             CustomCommonUtil.formatDateToShortString(poController.CashAdvanceList(lnCtr).getTransactionDate()),
                                             String.valueOf(poController.CashAdvanceList(lnCtr).getVoucher()),
                                             String.valueOf(poController.CashAdvanceList(lnCtr).getPayeeName()),
-                                            String.valueOf(poController.CashAdvanceList(lnCtr).Department().getDescription())
+                                            String.valueOf(poController.CashAdvanceList(lnCtr).Department().getDescription()),
+                                            String.valueOf(poController.CashAdvanceList(lnCtr).getTransactionNo())
                                     ));
 
                                     if (poController.CashAdvanceList(lnCtr).getTransactionStatus().equals(CashAdvanceStatus.CONFIRMED)) {

@@ -65,6 +65,8 @@ public class CashAdvance_ReleaseController implements Initializable, ScreenInter
     private String psCompanyId = "";
     private static final int ROWS_PER_PAGE = 50;
     int pnMain = 0;
+    boolean tooltipShown = false;
+
     AtomicReference<Object> lastFocusedTextField = new AtomicReference<>();
     AtomicReference<Object> previousSearchedTextField = new AtomicReference<>();
     private boolean pbEntered = false;
@@ -219,6 +221,10 @@ public class CashAdvance_ReleaseController implements Initializable, ScreenInter
                             retrieveCashAdvance();
                             return;
                         case "tfSearchVoucherNo":
+                            if (!tooltipShown) {
+                                JFXUtil.showTooltip("NOTE: Results appear directly in the table view, no pop-up dialog.", tfSearchVoucherNo);
+                                tooltipShown = true;
+                            }
                             retrieveCashAdvance();
                             return;
                         case "tfPayee":

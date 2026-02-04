@@ -68,6 +68,7 @@ public class CashAdvance_ByBatchController implements Initializable, ScreenInter
     public int pnEditMode;
     int pnMain = 0;
     private unloadForm poUnload = new unloadForm();
+    boolean tooltipShown = false;
 
     private ObservableList<ModelCashAdvance> main_data = FXCollections.observableArrayList();
     private FilteredList<ModelCashAdvance> filteredMain_Data;
@@ -288,6 +289,10 @@ public class CashAdvance_ByBatchController implements Initializable, ScreenInter
                                 retrieveCashAdvance();
                                 return;
                             case "tfSearchVoucherNo":
+                                if (!tooltipShown) {
+                                    JFXUtil.showTooltip("NOTE: Results appear directly in the table view, no pop-up dialog.", tfSearchVoucherNo);
+                                    tooltipShown = true;
+                                }
                                 retrieveCashAdvance();
                                 return;
                         }
