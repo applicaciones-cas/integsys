@@ -186,10 +186,10 @@ public class CashAdvance_ByBatchController implements Initializable, ScreenInter
     public void loadRecordSearch() {
         try {
             poController.getModel().setIndustryId(psIndustryId);
-            if (poController.getModel().Industry().getDescription() != null && !"".equals(poController.getModel().Industry().getDescription())) {
-                lblSource.setText(poController.getModel().Industry().getDescription());
+            if (poController.getModel().Company().getCompanyName() != null && !"".equals(poController.getModel().Company().getCompanyName())) {
+                lblSource.setText(poController.getModel().Company().getCompanyName());
             } else {
-                lblSource.setText("General");
+                lblSource.setText("");
             }
             tfSearchIndustry.setText(poController.getSearchIndustry());
             tfSearchPayee.setText(poController.getSearchPayee());
@@ -323,6 +323,7 @@ public class CashAdvance_ByBatchController implements Initializable, ScreenInter
             });
         }
         loadTableMain.reload();
+        JFXUtil.runWithDelay(0.50, () -> initButtons());
     }
 
     public void initLoadTable() {
@@ -347,7 +348,7 @@ public class CashAdvance_ByBatchController implements Initializable, ScreenInter
                                             String.valueOf(poController.CashAdvanceList(lnCtr).getPayeeName()),
                                             String.valueOf(poController.CashAdvanceList(lnCtr).getCreditedTo()),
                                             String.valueOf(poController.CashAdvanceList(lnCtr).Department().getDescription()),
-                                            String.valueOf(poController.CashAdvanceList(lnCtr).getAdvanceAmount())
+                                            CustomCommonUtil.setIntegerValueToDecimalFormat(String.valueOf(poController.CashAdvanceList(lnCtr).getAdvanceAmount()))
                                     ));
 
                                     if (poController.CashAdvanceList(lnCtr).getTransactionStatus().equals(CashAdvanceStatus.CONFIRMED)) {

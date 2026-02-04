@@ -149,8 +149,8 @@
                                                         <TableColumn fx:id="tblDate" maxWidth="130.0" minWidth="130.0" prefWidth="130.0" resizable="false" sortable="false" text="Date" />
                                                         <TableColumn fx:id="tblPayeeName" maxWidth="250.0" minWidth="250.0" prefWidth="250.0" resizable="false" sortable="false" text="Payee Name" />
                                                         <TableColumn fx:id="tblCreditedTo" maxWidth="150.0" minWidth="150.0" prefWidth="150.0" resizable="false" sortable="false" text="Credited To" />
-                                                        <TableColumn fx:id="tblRequestingDepartment" maxWidth="200.0" minWidth="200.0" prefWidth="200.0" resizable="false" sortable="false" text="Req. Department" />
-                                                        <TableColumn fx:id="tblAmountToAdvance" maxWidth="150.0" minWidth="150.0" prefWidth="150.0" resizable="false" sortable="false" text="Amt to Advance" />
+                                                        <TableColumn fx:id="tblRequestingDepartment" maxWidth="230.0" minWidth="230.0" prefWidth="230.0" resizable="false" sortable="false" text="Req. Department" />
+                                                        <TableColumn fx:id="tblAmountToAdvance" maxWidth="120.0" minWidth="120.0" prefWidth="120.0" resizable="false" sortable="false" text="Amt to Advance" />
                                                     </columns>
                                                     <GridPane.margin>
                                                         <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
