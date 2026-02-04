@@ -120,7 +120,6 @@ public class CashAdvance_ViewController implements Initializable, ScreenInterfac
                 }
                 poJSON = poController.OpenTransaction(psTransactionNo);
                 if (!"error".equals((String) poJSON.get("result"))) {
-
                     pnEditMode = poController.getEditMode();
                     initButton(pnEditMode);
                 } else {
@@ -181,7 +180,7 @@ public class CashAdvance_ViewController implements Initializable, ScreenInterfac
 
     public void loadRecordMaster() {
         try {
-            lblStatus.setText(poController.getStatus(poController.getModel().getTransactionStatus().toUpperCase()));
+            lblStatus.setText(poController.getStatus(poController.getModel().getTransactionStatus()).toUpperCase());
             tfTransactionNo.setText(poController.getModel().getTransactionNo());
 
             // Transaction Date
@@ -190,11 +189,10 @@ public class CashAdvance_ViewController implements Initializable, ScreenInterfac
 
             tfVoucherNo.setText(poController.getModel().getVoucher());
             tfPayee.setText(poController.getModel().Payee().getPayeeName());
-            tfCreditedTo.setText(poController.getModel().Client().getCompanyName());
-            tfRequestingDepartment.setText(poController.getModel().getDepartmentRequest());
-            tfAmountToAdvance.setText("");
+            tfCreditedTo.setText(poController.getModel().Credited().getCompanyName());
+            tfRequestingDepartment.setText(poController.getModel().Department().getDescription());
             taRemarks.setText(poController.getModel().getRemarks());
-            tfAmountToAdvance.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.getModel().getAdvanceAmount().doubleValue(), true));
+            tfAmountToAdvance.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.getModel().getAdvanceAmount(), true));
 
             JFXUtil.updateCaretPositions(apMaster);
         } catch (SQLException | GuanzonException ex) {
