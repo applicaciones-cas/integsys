@@ -242,14 +242,12 @@ public class CashAdvance_ByBatchController implements Initializable, ScreenInter
                     case "tfSearchIndustry":
                         if (lsValue.isEmpty()) {
                             poController.setSearchIndustry("");
-                            retrieveCashAdvance();
                             loadTableMain.reload();
                         }
                         break;
                     case "tfSearchPayee":
                         if (lsValue.isEmpty()) {
                             poController.setSearchIndustry("");
-                            retrieveCashAdvance();
                             loadTableMain.reload();
                         }
                         break;
@@ -402,7 +400,7 @@ public class CashAdvance_ByBatchController implements Initializable, ScreenInter
     }
 
     private void initButtons() {
-        JFXUtil.setButtonsVisibility(!main_data.isEmpty(), btnDisapproved);
+        JFXUtil.setButtonsVisibility(!main_data.isEmpty(), btnApproved, btnDisapproved);
         disableRowCheckbox.set(main_data.isEmpty()); // set enable/disable in checkboxes in requirements
         JFXUtil.setDisabled(main_data.isEmpty(), chckSelectAll);
     }
