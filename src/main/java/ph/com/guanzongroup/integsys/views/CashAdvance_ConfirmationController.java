@@ -223,15 +223,8 @@ public class CashAdvance_ConfirmationController implements Initializable, Screen
                                 ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                 tfPayee.setText("");
                                 break;
-                            }
-                            loadRecordMaster();
-                            break;
-                        case "tfRequestingDepartment":
-                            poJSON = poController.SearchDepartment(lsValue, false);
-                            if ("error".equals(poJSON.get("result"))) {
-                                ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-                                tfRequestingDepartment.setText("");
-                                break;
+                            } else {
+                                JFXUtil.textFieldMoveNext(tfCreditedTo);
                             }
                             loadRecordMaster();
                             break;
@@ -241,9 +234,23 @@ public class CashAdvance_ConfirmationController implements Initializable, Screen
                                 ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                 tfCreditedTo.setText("");
                                 break;
+                            } else {
+                                JFXUtil.textFieldMoveNext(tfRequestingDepartment);
                             }
                             loadRecordMaster();
                             break;
+                        case "tfRequestingDepartment":
+                            poJSON = poController.SearchDepartment(lsValue, false);
+                            if ("error".equals(poJSON.get("result"))) {
+                                ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                                tfRequestingDepartment.setText("");
+                                break;
+                            } else {
+                                JFXUtil.textFieldMoveNext(tfAmountToAdvance);
+                            }
+                            loadRecordMaster();
+                            break;
+
                     }
                     break;
             }
