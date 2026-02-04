@@ -120,10 +120,8 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.util.Callback;
 import java.io.File;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.WeakHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
@@ -2334,51 +2332,6 @@ public class JFXUtil {
         }
     }
 
-//    public static <T> void enableAutoFillOnFocusWithDropdownHighlight(String hexColor, ComboBox<T>... comboBoxes) {
-//        for (ComboBox<T> comboBox : comboBoxes) {
-//            comboBox.setEditable(false);
-//
-//            // Only style dropdown list cells — do not change display
-//            comboBox.setCellFactory(cb -> new ListCell<T>() {
-//                @Override
-//                protected void updateItem(T item, boolean empty) {
-//                    super.updateItem(item, empty);
-//                    if (empty || item == null) {
-//                        setText(null);
-//                        setStyle("");
-//                    } else {
-//                        setText(item.toString());
-//                        if (comboBox.getSelectionModel().getSelectedItem() != null
-//                                && comboBox.getSelectionModel().getSelectedItem().equals(item)) {
-//                            setStyle("-fx-background-color: " + hexColor + "; -fx-text-fill: white;");
-//                        } else {
-//                            setStyle("");
-//                        }
-//                    }
-//                }
-//            });
-//
-//            // On key typed, select the first item starting with that character (case-insensitive)
-//            comboBox.addEventFilter(KeyEvent.KEY_TYPED, event -> {
-//                if (!comboBox.isFocused()) {
-//                    return;
-//                }
-//
-//                String typedChar = event.getCharacter().toLowerCase();
-//                ObservableList<T> items = comboBox.getItems();
-//
-//                for (T item : items) {
-//                    if (item != null && item.toString().toLowerCase().startsWith(typedChar)) {
-//                        comboBox.getSelectionModel().select(item);
-//                        break;
-//                    }
-//                }
-//
-//                event.consume();
-//            });
-//        }
-//    }
-//
     /*Shortened loadTable loader*/
     //sample usage
 // JFXUtil.ReloadableTableTask loadTableDetail;
