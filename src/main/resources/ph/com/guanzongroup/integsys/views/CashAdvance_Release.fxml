@@ -74,8 +74,8 @@
                                        </font>
                                     </Label>
                                     <TextField fx:id="tfSearchIndustry" layoutX="512.0" layoutY="11.0" promptText="Press F3: Search" GridPane.columnIndex="2" />
-                                    <TextField fx:id="tfSearchSupplier" promptText="Press F3: Search" GridPane.columnIndex="6" />
-                                    <TextField fx:id="tfSearchReferenceNo" promptText="Press F3: Search" GridPane.columnIndex="10" />
+                                    <TextField fx:id="tfSearchPayee" promptText="Press F3: Search" GridPane.columnIndex="6" />
+                                    <TextField fx:id="tfSearchVoucherNo" promptText="Press F3: Search" GridPane.columnIndex="10" />
                                  </children>
                               </GridPane>
                            </children>
