@@ -449,7 +449,6 @@ public class CashAdvance_ByBatchController implements Initializable, ScreenInter
         }
         Platform.runLater(() -> {
             retrieveCashAdvance();
-            loadTableMain.reload();
         });
     }
 
