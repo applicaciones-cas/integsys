@@ -31,18 +31,22 @@ import org.guanzon.appdriver.base.GuanzonException;
 import org.guanzon.appdriver.base.MiscUtil;
 import org.guanzon.appdriver.base.SQLUtil;
 import org.guanzon.appdriver.constant.EditMode;
-import ph.com.guanzongroup.cas.cashflow.status.APPaymentAdjustmentStatus;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.ParseException;
+import ph.com.guanzongroup.cas.cashflow.CashAdvance;
 import ph.com.guanzongroup.cas.cashflow.services.CashflowControllers;
 import ph.com.guanzongroup.cas.cashflow.status.CashAdvanceStatus;
 import ph.com.guanzongroup.integsys.utility.CustomCommonUtil;
 import ph.com.guanzongroup.integsys.utility.JFXUtil;
 
+/**
+ *
+ * @author Team 1 : Aldrich & Arsiela 02032026
+ */
 public class CashAdvance_EntryController implements Initializable, ScreenInterface {
 
     private GRiderCAS oApp;
-    static CashflowControllers poController;
+    static CashAdvance poController;
     private JSONObject poJSON;
     public int pnEditMode;
     private String pxeModuleName = JFXUtil.getFormattedClassTitle(this.getClass());
@@ -68,12 +72,10 @@ public class CashAdvance_EntryController implements Initializable, ScreenInterfa
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-//        psIndustryId = ""; // general
-
         poJSON = new JSONObject();
-        poController = new CashflowControllers(oApp, null);
-        poController.CashAdvance().initialize(); // Initialize transaction
-        poController.CashAdvance().initFields();
+        poController = new CashflowControllers(oApp, null).CashAdvance();
+        poController.initialize(); // Initialize transaction
+        poController.initFields();
         initTextFields();
         initDatePickers();
         clearTextFields();
@@ -81,11 +83,11 @@ public class CashAdvance_EntryController implements Initializable, ScreenInterfa
         initButton(pnEditMode);
 
         Platform.runLater(() -> {
-            poController.CashAdvance().getModel().setIndustryId(psIndustryId);
-            poController.CashAdvance().getModel().setCompanyId(psCompanyId);
-            poController.CashAdvance().setIndustryId(psIndustryId);
-            poController.CashAdvance().setCompanyId(psCompanyId);
-            poController.CashAdvance().setWithUI(true);
+            poController.getModel().setIndustryId(psIndustryId);
+            poController.getModel().setCompanyId(psCompanyId);
+            poController.setIndustryId(psIndustryId);
+            poController.setCompanyId(psCompanyId);
+            poController.setWithUI(true);
             loadRecordSearch();
             btnNew.fire();
         });
@@ -106,7 +108,8 @@ public class CashAdvance_EntryController implements Initializable, ScreenInterfa
 
     @Override
     public void setCompanyID(String fsValue) {
-        //Company is not autoset
+        System.out.println(fsValue);
+        this.psCompanyId = fsValue;
     }
 
     @Override
@@ -130,18 +133,16 @@ public class CashAdvance_EntryController implements Initializable, ScreenInterfa
                 case F3:
                     switch (lsID) {
                         case "tfPayee":
-                            poJSON = poController.CashAdvance().SearchPayee(lsValue, false, false);
+                            poJSON = poController.SearchPayee(lsValue, false, false);
                             if ("error".equals(poJSON.get("result"))) {
                                 ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                 tfPayee.setText("");
-                                psCompanyId = "";
                                 break;
                             }
-                            psCompanyId = poController.CashAdvance().getModel().getCompanyId();
                             loadRecordMaster();
                             break;
                         case "tfRequestingDepartment":
-                            poJSON = poController.CashAdvance().SearchDepartment(lsValue, false);
+                            poJSON = poController.SearchDepartment(lsValue, false);
                             if ("error".equals(poJSON.get("result"))) {
                                 ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                 tfRequestingDepartment.setText("");
@@ -150,7 +151,7 @@ public class CashAdvance_EntryController implements Initializable, ScreenInterfa
                             loadRecordMaster();
                             break;
                         case "tfCreditedTo":
-                            poJSON = poController.CashAdvance().SearchCreditedTo(lsValue, false);
+                            poJSON = poController.SearchCreditedTo(lsValue, false);
                             if ("error".equals(poJSON.get("result"))) {
                                 ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                 tfCreditedTo.setText("");
@@ -171,26 +172,27 @@ public class CashAdvance_EntryController implements Initializable, ScreenInterfa
             (lsID, lsValue) -> {
                 switch (lsID) {
                     case "tfVoucherNo":
-                        poJSON = poController.CashAdvance().getModel().setVoucher(lsValue);
+                        poJSON = poController.getModel().setVoucher(lsValue);
                         break;
                     case "tfPayee":
                         if (lsValue.isEmpty()) {
-                            poJSON = poController.CashAdvance().getModel().setClientId("");
+                            poJSON = poController.getModel().setClientId("");
+                            poJSON = poController.getModel().setPayeeName("");
                         }
                         break;
                     case "tfCreditedTo":
                         if (lsValue.isEmpty()) {
-                            poJSON = poController.CashAdvance().getModel().setClientId("");
+                            poJSON = poController.getModel().setCreditedTo("");
                         }
                         break;
                     case "tfRequestingDepartment":
                         if (lsValue.isEmpty()) {
-                            poJSON = poController.CashAdvance().getModel().setDepartmentRequest("");
+                            poJSON = poController.getModel().setDepartmentRequest("");
                         }
                         break;
                     case "tfAmountToAdvance":
                         lsValue = JFXUtil.removeComma(lsValue);
-                        poJSON = poController.CashAdvance().getModel().setAdvanceAmount(Double.valueOf(lsValue));
+                        poJSON = poController.getModel().setAdvanceAmount(Double.valueOf(lsValue));
                         break;
                 }
                 loadRecordMaster();
@@ -200,7 +202,7 @@ public class CashAdvance_EntryController implements Initializable, ScreenInterfa
             (lsID, lsValue) -> {
                 switch (lsID) {
                     case "taRemarks":
-                        poJSON = poController.CashAdvance().getModel().setRemarks(lsValue);
+                        poJSON = poController.getModel().setRemarks(lsValue);
                         if ("error".equals((String) poJSON.get("result"))) {
                             System.err.println((String) poJSON.get("message"));
                             ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
@@ -243,7 +245,7 @@ public class CashAdvance_EntryController implements Initializable, ScreenInterfa
                         }
 
                         if (pbSuccess) {
-                            poController.CashAdvance().getModel().setTransactionDate((SQLUtil.toDate(lsSelectedDate, SQLUtil.FORMAT_SHORT_DATE)));
+                            poController.getModel().setTransactionDate((SQLUtil.toDate(lsSelectedDate, SQLUtil.FORMAT_SHORT_DATE)));
                         } else {
                             if ("error".equals((String) poJSON.get("result"))) {
                                 ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
@@ -286,8 +288,8 @@ public class CashAdvance_EntryController implements Initializable, ScreenInterfa
 
     public void loadRecordSearch() {
         try {
-            if (poController.CashAdvance().getModel().Industry().getDescription() != null && !"".equals(poController.CashAdvance().getModel().Industry().getDescription())) {
-                lblSource.setText(poController.CashAdvance().getModel().Industry().getDescription());
+            if (poController.getModel().Industry().getDescription() != null && !"".equals(poController.getModel().Industry().getDescription())) {
+                lblSource.setText(poController.getModel().Industry().getDescription());
             } else {
                 lblSource.setText("General");
             }
@@ -299,20 +301,20 @@ public class CashAdvance_EntryController implements Initializable, ScreenInterfa
 
     public void loadRecordMaster() {
         try {
-            lblStatus.setText(poController.CashAdvance().getStatus(poController.CashAdvance().getModel().getTransactionStatus().toUpperCase()));
-            tfTransactionNo.setText(poController.CashAdvance().getModel().getTransactionNo());
+            lblStatus.setText(poController.getStatus(poController.getModel().getTransactionStatus()).toUpperCase());
+            tfTransactionNo.setText(poController.getModel().getTransactionNo());
 
             // Transaction Date
-            String lsTransactionDate = CustomCommonUtil.formatDateToShortString(poController.CashAdvance().getModel().getTransactionDate());
+            String lsTransactionDate = CustomCommonUtil.formatDateToShortString(poController.getModel().getTransactionDate());
             dpAdvanceDate.setValue(CustomCommonUtil.parseDateStringToLocalDate(lsTransactionDate, "yyyy-MM-dd"));
 
-            tfVoucherNo.setText(poController.CashAdvance().getModel().getVoucher());
-            tfPayee.setText(poController.CashAdvance().getModel().Payee().getPayeeName());
-            tfCreditedTo.setText(poController.CashAdvance().getModel().Client().getCompanyName());
-            tfRequestingDepartment.setText(poController.CashAdvance().getModel().getDepartmentRequest());
+            tfVoucherNo.setText(poController.getModel().getVoucher());
+            tfPayee.setText(poController.getModel().getPayeeName());
+            tfCreditedTo.setText(poController.getModel().Credited().getCompanyName());
+            tfRequestingDepartment.setText(poController.getModel().Department().getDescription());
             tfAmountToAdvance.setText("");
-            taRemarks.setText(poController.CashAdvance().getModel().getRemarks());
-            tfAmountToAdvance.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.CashAdvance().getModel().getAdvanceAmount().doubleValue(), true));
+            taRemarks.setText(poController.getModel().getRemarks());
+            tfAmountToAdvance.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.getModel().getAdvanceAmount().doubleValue(), true));
 
             JFXUtil.updateCaretPositions(apMaster);
         } catch (SQLException | GuanzonException ex) {
@@ -331,48 +333,53 @@ public class CashAdvance_EntryController implements Initializable, ScreenInterfa
                 String lsButton = clickedButton.getId();
                 switch (lsButton) {
                     case "btnBrowse":
-//                        poController.CashAdvance().getModel().setTransactionStatus(APPaymentAdjustmentStatus.RETURNED + "" + APPaymentAdjustmentStatus.OPEN);
-                        poController.CashAdvance().setRecordStatus(APPaymentAdjustmentStatus.OPEN);
-                        poJSON = poController.CashAdvance().searchTransaction();
+                        poController.setRecordStatus(CashAdvanceStatus.OPEN);
+                        poJSON = poController.searchTransaction();
                         if ("error".equalsIgnoreCase((String) poJSON.get("result"))) {
                             ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                             tfTransactionNo.requestFocus();
                             return;
                         }
-                        pnEditMode = poController.CashAdvance().getEditMode();
+                        pnEditMode = poController.getEditMode();
                         break;
                     case "btnNew":
                         //Clear data
-                        poController.CashAdvance().resetMaster();
+                        poController.resetMaster();
                         clearTextFields();
 
-                        poJSON = poController.CashAdvance().NewTransaction();
+                        poJSON = poController.NewTransaction();
                         if ("error".equals((String) poJSON.get("result"))) {
                             ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                             return;
                         }
-                        poController.CashAdvance().initFields();
-                        pnEditMode = poController.CashAdvance().getEditMode();
+                        poController.initFields();
+                        pnEditMode = poController.getEditMode();
                         break;
                     case "btnUpdate":
-                        poJSON = poController.CashAdvance().UpdateTransaction();
+                        poJSON = poController.UpdateTransaction();
                         if ("error".equals((String) poJSON.get("result"))) {
                             ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                             return;
                         }
-                        pnEditMode = poController.CashAdvance().getEditMode();
+                        pnEditMode = poController.getEditMode();
                         break;
                     case "btnVoid":
-                        if (poController.CashAdvance().getModel().getTransactionStatus().equals(CashAdvanceStatus.CONFIRMED)) {
-                            poJSON = poController.CashAdvance().CancelTransaction("");
+                        if (ShowMessageFX.YesNo(null, "Close Tab", "Are you sure you want to void the transaction?") == false) {
+                            return;
+                        }
+                            
+                        if (CashAdvanceStatus.CONFIRMED.equals(poController.getModel().getTransactionStatus())) {
+                            poJSON = poController.CancelTransaction("");
                         } else {
-                            poJSON = poController.CashAdvance().VoidTransaction("");
+                            poJSON = poController.VoidTransaction("");
                         }
                         if ("error".equals((String) poJSON.get("result"))) {
                             ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                             return;
+                        } else {
+                            ShowMessageFX.Information(null, pxeModuleName, (String) poJSON.get("message"));
                         }
-                        pnEditMode = poController.CashAdvance().getEditMode();
+                        pnEditMode = poController.getEditMode();
                         break;
                     case "btnSearch":
                         JFXUtil.initiateBtnSearch(pxeModuleName, lastFocusedTextField, previousSearchedTextField, apMaster);
@@ -380,9 +387,9 @@ public class CashAdvance_EntryController implements Initializable, ScreenInterfa
                     case "btnCancel":
                         if (ShowMessageFX.OkayCancel(null, pxeModuleName, "Do you want to disregard changes?") == true) {
                             //Clear data
-                            poController.CashAdvance().resetMaster();
                             clearTextFields();
-                            poController.CashAdvance().getModel().setIndustryId(psIndustryId);
+                            poController.resetMaster();
+                            poController.initFields();
                             pnEditMode = EditMode.UNKNOWN;
                             break;
                         } else {
@@ -395,7 +402,7 @@ public class CashAdvance_EntryController implements Initializable, ScreenInterfa
                         }
 
                         try {
-                            poController.CashAdvance().ShowStatusHistory();
+                            poController.ShowStatusHistory();
                         } catch (NullPointerException npe) {
                             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(npe), npe);
                             ShowMessageFX.Error("No transaction status history to load!", pxeModuleName, null);
@@ -408,7 +415,7 @@ public class CashAdvance_EntryController implements Initializable, ScreenInterfa
                         //Validator
                         poJSON = new JSONObject();
                         if (ShowMessageFX.YesNo(null, "Close Tab", "Are you sure you want to save the transaction?") == true) {
-                            poJSON = poController.CashAdvance().SaveTransaction();
+                            poJSON = poController.SaveTransaction();
                             if (!"success".equals((String) poJSON.get("result"))) {
                                 ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                 return;
@@ -416,15 +423,15 @@ public class CashAdvance_EntryController implements Initializable, ScreenInterfa
                                 ShowMessageFX.Information(null, pxeModuleName, (String) poJSON.get("message"));
 
                                 // Confirmation Prompt
-                                JSONObject loJSON = poController.CashAdvance().OpenTransaction(poController.CashAdvance().getModel().getTransactionNo());
+                                JSONObject loJSON = poController.OpenTransaction(poController.getModel().getTransactionNo());
                                 if ("success".equals(loJSON.get("result"))) {
-                                    if (poController.CashAdvance().getModel().getTransactionStatus().equals(APPaymentAdjustmentStatus.OPEN)) {
+                                    if (poController.getModel().getTransactionStatus().equals(CashAdvanceStatus.OPEN)) {
                                         if (ShowMessageFX.YesNo(null, pxeModuleName, "Do you want to confirm this transaction?")) {
-                                            loJSON = poController.CashAdvance().ConfirmTransaction("");
+                                            loJSON = poController.ConfirmTransaction("");
                                             if ("success".equals((String) loJSON.get("result"))) {
                                                 ShowMessageFX.Information((String) loJSON.get("message"), pxeModuleName, null);
                                             } else {
-                                                ShowMessageFX.Information((String) loJSON.get("message"), pxeModuleName, null);
+                                                ShowMessageFX.Warning((String) loJSON.get("message"), pxeModuleName, null);
                                             }
                                         }
                                     }
@@ -464,20 +471,18 @@ public class CashAdvance_EntryController implements Initializable, ScreenInterfa
         // Manage visibility and managed state of other buttons
         JFXUtil.setButtonsVisibility(!lbShow, btnNew);
         JFXUtil.setButtonsVisibility(lbShow, btnSearch, btnSave, btnCancel);
-        JFXUtil.setButtonsVisibility(lbShow2, btnUpdate, btnHistory);
+        JFXUtil.setButtonsVisibility(lbShow2, btnUpdate, btnHistory, btnVoid);
         JFXUtil.setButtonsVisibility(lbShow3, btnBrowse, btnClose);
 
 //        apMaster.setDisable(!lbShow);
         JFXUtil.setDisabled(!lbShow, taRemarks);
         JFXUtil.setDisabled(lbShow3, apMaster);
 
-        switch (poController.CashAdvance().getModel().getTransactionStatus()) {
-            case APPaymentAdjustmentStatus.PAID:
-                JFXUtil.setButtonsVisibility(false, btnUpdate);
-                break;
-            case APPaymentAdjustmentStatus.VOID:
-            case APPaymentAdjustmentStatus.CANCELLED:
-                JFXUtil.setButtonsVisibility(false, btnUpdate);
+        switch (poController.getModel().getTransactionStatus()) {
+            case CashAdvanceStatus.RELEASED:
+            case CashAdvanceStatus.VOID:
+            case CashAdvanceStatus.CANCELLED:
+                JFXUtil.setButtonsVisibility(false, btnUpdate, btnVoid);
                 break;
         }
     }

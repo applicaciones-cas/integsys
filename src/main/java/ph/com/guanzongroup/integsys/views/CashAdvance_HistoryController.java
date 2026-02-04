@@ -25,25 +25,25 @@ import org.guanzon.appdriver.base.GRiderCAS;
 import org.guanzon.appdriver.base.GuanzonException;
 import org.guanzon.appdriver.base.MiscUtil;
 import org.guanzon.appdriver.constant.EditMode;
-import ph.com.guanzongroup.cas.cashflow.status.CashAdvanceStatus;
 import org.json.simple.JSONObject;
+import ph.com.guanzongroup.cas.cashflow.CashAdvance;
 import ph.com.guanzongroup.cas.cashflow.services.CashflowControllers;
 import ph.com.guanzongroup.integsys.utility.CustomCommonUtil;
 import ph.com.guanzongroup.integsys.utility.JFXUtil;
 
 /**
  *
- * @author Team 1
+ * @author Team 1 : Aldrich & Arsiela 02032026
  */
 public class CashAdvance_HistoryController implements Initializable, ScreenInterface {
 
     private GRiderCAS oApp;
-    static CashflowControllers poController;
+    static CashAdvance poController;
     private JSONObject poJSON;
     public int pnEditMode;
     private String pxeModuleName = JFXUtil.getFormattedClassTitle(this.getClass());
     private String psIndustryId = "";
-    private String psCategoryId = "";
+    private String psCompanyId = "";
 
     @FXML
     private AnchorPane apMainAnchor, apBrowse, apButton, apMaster;
@@ -64,8 +64,8 @@ public class CashAdvance_HistoryController implements Initializable, ScreenInter
     public void initialize(URL location, ResourceBundle resources) {
 //        psIndustryId = ""; // general
         poJSON = new JSONObject();
-        poController = new CashflowControllers(oApp, null);
-        poController.CashAdvance().initialize(); // Initialize transaction
+        poController = new CashflowControllers(oApp, null).CashAdvance();
+        poController.initialize(); // Initialize transaction
         initTextFields();
         initDatePickers();
         clearTextFields();
@@ -73,9 +73,11 @@ public class CashAdvance_HistoryController implements Initializable, ScreenInter
         initButton(pnEditMode);
 
         Platform.runLater(() -> {
-            poController.CashAdvance().getModel().setIndustryId(psIndustryId);
-            poController.CashAdvance().setIndustryId(psIndustryId);
-            poController.CashAdvance().setWithUI(true);
+            poController.getModel().setIndustryId(psIndustryId);
+            poController.getModel().setCompanyId(psCompanyId);
+            poController.setIndustryId(psIndustryId);
+            poController.setCompanyId(psCompanyId);
+            poController.setWithUI(true);
             loadRecordSearch();
         });
     }
@@ -92,12 +94,12 @@ public class CashAdvance_HistoryController implements Initializable, ScreenInter
 
     @Override
     public void setCompanyID(String fsValue) {
-//        psCompanyId = fsValue;
+        psCompanyId = fsValue;
     }
 
     @Override
     public void setCategoryID(String fsValue) {
-        psCategoryId = fsValue;
+        // No Category
     }
 
     private void txtField_KeyPressed(KeyEvent event) {
@@ -110,39 +112,31 @@ public class CashAdvance_HistoryController implements Initializable, ScreenInter
                 case F3:
                     switch (lsID) {
                         case "tfSearchIndustry":
-                            poJSON = poController.CashAdvance().SearchIndustry(lsValue, false);
+                            poJSON = poController.SearchIndustry(lsValue, false);
                             if ("error".equals(poJSON.get("result"))) {
                                 ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                 tfSearchIndustry.setText("");
                                 break;
-                            } else {
-                            }
+                            } 
                             loadRecordSearch();
                             return;
                         case "tfSearchPayee":
-                            poJSON = poController.CashAdvance().SearchPayee(lsValue, false, true);
+                            poJSON = poController.SearchPayee(lsValue, false, true);
                             if ("error".equals(poJSON.get("result"))) {
                                 ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                 tfSearchPayee.setText("");
                                 break;
-                            } else {
-                            }
+                            } 
                             loadRecordSearch();
                             return;
                         case "tfSearchVoucherNo":
-                            poController.CashAdvance().setRecordStatus(CashAdvanceStatus.OPEN
-                                    + "" + CashAdvanceStatus.CONFIRMED
-                                    + "" + CashAdvanceStatus.VOID
-                                    + "" + CashAdvanceStatus.CANCELLED
-                                    + "" + CashAdvanceStatus.RELEASED);
-                            poJSON = poController.CashAdvance().searchTransaction(tfSearchIndustry.getText(), tfSearchPayee.getText(), tfSearchVoucherNo.getText());
+                            poJSON = poController.searchTransaction(tfSearchIndustry.getText(), tfSearchPayee.getText(), tfSearchVoucherNo.getText());
                             if ("error".equals(poJSON.get("result"))) {
                                 ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                 tfSearchVoucherNo.setText("");
                                 return;
                             } else {
-//                                psSupplierId = poController.CashAdvance().getModel().getClientId();
-                                pnEditMode = poController.CashAdvance().getEditMode();
+                                pnEditMode = poController.getEditMode();
                                 loadRecordMaster();
                                 initButton(pnEditMode);
                             }
@@ -171,14 +165,14 @@ public class CashAdvance_HistoryController implements Initializable, ScreenInter
 
     public void loadRecordSearch() {
         try {
-            poController.CashAdvance().getModel().setIndustryId(psIndustryId);
-            if (poController.CashAdvance().getModel().Industry().getDescription() != null && !"".equals(poController.CashAdvance().getModel().Industry().getDescription())) {
-                lblSource.setText(poController.CashAdvance().getModel().Industry().getDescription());
+            poController.getModel().setCompanyId(psCompanyId);
+            if (poController.getModel().Company().getCompanyName()!= null && !"".equals(poController.getModel().Company().getCompanyName())) {
+                lblSource.setText(poController.getModel().Company().getCompanyName());
             } else {
-                lblSource.setText("General");
+                lblSource.setText("");
             }
-            tfSearchIndustry.setText(poController.CashAdvance().getSearchIndustry());
-            tfSearchPayee.setText(poController.CashAdvance().getSearchPayee());
+            tfSearchIndustry.setText(poController.getSearchIndustry());
+            tfSearchPayee.setText(poController.getSearchPayee());
             JFXUtil.updateCaretPositions(apBrowse);
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
@@ -191,12 +185,12 @@ public class CashAdvance_HistoryController implements Initializable, ScreenInter
                 switch (lsID) {
                     case "tfSearchIndustry":
                         if (lsValue.isEmpty()) {
-                            poController.CashAdvance().setSearchIndustry("");
+                            poController.setSearchIndustry("");
                         }
                         break;
                     case "tfSearchSupplier":
                         if (lsValue.isEmpty()) {
-                            poController.CashAdvance().setSearchIndustry("");
+                            poController.setSearchIndustry("");
                         }
                         break;
                 }
@@ -217,20 +211,19 @@ public class CashAdvance_HistoryController implements Initializable, ScreenInter
 
     public void loadRecordMaster() {
         try {
-            lblStatus.setText(poController.CashAdvance().getStatus(poController.CashAdvance().getModel().getTransactionStatus().toUpperCase()));
-            tfTransactionNo.setText(poController.CashAdvance().getModel().getTransactionNo());
+            lblStatus.setText(poController.getStatus(poController.getModel().getTransactionStatus()).toUpperCase());
+            tfTransactionNo.setText(poController.getModel().getTransactionNo());
 
             // Transaction Date
-            String lsTransactionDate = CustomCommonUtil.formatDateToShortString(poController.CashAdvance().getModel().getTransactionDate());
+            String lsTransactionDate = CustomCommonUtil.formatDateToShortString(poController.getModel().getTransactionDate());
             dpAdvanceDate.setValue(CustomCommonUtil.parseDateStringToLocalDate(lsTransactionDate, "yyyy-MM-dd"));
 
-            tfVoucherNo.setText(poController.CashAdvance().getModel().getVoucher());
-            tfPayee.setText(poController.CashAdvance().getModel().Payee().getPayeeName());
-            tfCreditedTo.setText(poController.CashAdvance().getModel().Client().getCompanyName());
-            tfRequestingDepartment.setText(poController.CashAdvance().getModel().getDepartmentRequest());
-            tfAmountToAdvance.setText("");
-            taRemarks.setText(poController.CashAdvance().getModel().getRemarks());
-            tfAmountToAdvance.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.CashAdvance().getModel().getAdvanceAmount().doubleValue(), true));
+            tfVoucherNo.setText(poController.getModel().getVoucher());
+            tfPayee.setText(poController.getModel().Payee().getPayeeName());
+            tfCreditedTo.setText(poController.getModel().Credited().getCompanyName());
+            tfRequestingDepartment.setText(poController.getModel().Department().getDescription());
+            taRemarks.setText(poController.getModel().getRemarks());
+            tfAmountToAdvance.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.getModel().getAdvanceAmount(), true));
 
             JFXUtil.updateCaretPositions(apMaster);
         } catch (SQLException | GuanzonException ex) {
@@ -249,18 +242,13 @@ public class CashAdvance_HistoryController implements Initializable, ScreenInter
                 String lsButton = clickedButton.getId();
                 switch (lsButton) {
                     case "btnBrowse":
-                        poController.CashAdvance().setRecordStatus(CashAdvanceStatus.OPEN
-                                + "" + CashAdvanceStatus.CONFIRMED
-                                + "" + CashAdvanceStatus.VOID
-                                + "" + CashAdvanceStatus.CANCELLED
-                                + "" + CashAdvanceStatus.RELEASED);
-                        poJSON = poController.CashAdvance().searchTransaction(tfSearchIndustry.getText(), tfSearchPayee.getText(), tfSearchVoucherNo.getText());
+                        poJSON = poController.searchTransaction(tfSearchIndustry.getText(), tfSearchPayee.getText(), tfSearchVoucherNo.getText());
                         if ("error".equalsIgnoreCase((String) poJSON.get("result"))) {
                             ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                             tfTransactionNo.requestFocus();
                             return;
                         }
-                        pnEditMode = poController.CashAdvance().getEditMode();
+                        pnEditMode = poController.getEditMode();
                         break;
                     case "btnHistory":
                         if (pnEditMode != EditMode.READY && pnEditMode != EditMode.UPDATE) {
@@ -269,7 +257,7 @@ public class CashAdvance_HistoryController implements Initializable, ScreenInter
                         }
 
                         try {
-                            poController.CashAdvance().ShowStatusHistory();
+                            poController.ShowStatusHistory();
                         } catch (NullPointerException npe) {
                             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(npe), npe);
                             ShowMessageFX.Error("No transaction status history to load!", pxeModuleName, null);
@@ -293,7 +281,9 @@ public class CashAdvance_HistoryController implements Initializable, ScreenInter
                 loadRecordMaster();
                 initButton(pnEditMode);
             }
-        } catch (Exception e) {
+        } catch (CloneNotSupportedException | SQLException | GuanzonException ex) {
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
