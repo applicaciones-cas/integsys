@@ -451,8 +451,8 @@ public class CashAdvance_ConfirmationController implements Initializable, Screen
                                 //retreiving using column index
                                 for (int lnCtr = 0; lnCtr <= poController.getCashAdvanceCount() - 1; lnCtr++) {
                                     main_data.add(new ModelCashAdvance(String.valueOf(lnCtr + 1),
-                                            CustomCommonUtil.formatDateToShortString(poController.CashAdvanceList(lnCtr).getTransactionDate()),
                                             String.valueOf(poController.CashAdvanceList(lnCtr).getVoucher()),
+                                            CustomCommonUtil.formatDateToShortString(poController.CashAdvanceList(lnCtr).getTransactionDate()),
                                             String.valueOf(poController.CashAdvanceList(lnCtr).getPayeeName()),
                                             String.valueOf(poController.CashAdvanceList(lnCtr).Department().getDescription()),
                                             String.valueOf(poController.CashAdvanceList(lnCtr).getTransactionNo())

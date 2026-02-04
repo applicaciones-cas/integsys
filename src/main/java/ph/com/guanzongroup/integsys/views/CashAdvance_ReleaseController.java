@@ -442,10 +442,10 @@ public class CashAdvance_ReleaseController implements Initializable, ScreenInter
                                 //retreiving using column index
                                 for (int lnCtr = 0; lnCtr <= poController.getCashAdvanceCount() - 1; lnCtr++) {
                                     main_data.add(new ModelCashAdvance(String.valueOf(lnCtr + 1),
-                                            CustomCommonUtil.formatDateToShortString(poController.CashAdvanceList(lnCtr).getTransactionDate()),
                                             String.valueOf(poController.CashAdvanceList(lnCtr).getVoucher()),
+                                            CustomCommonUtil.formatDateToShortString(poController.CashAdvanceList(lnCtr).getTransactionDate()),
                                             String.valueOf(poController.CashAdvanceList(lnCtr).getPayeeName()),
-                                            String.valueOf(poController.CashAdvanceList(lnCtr).getDepartmentRequest())
+                                            String.valueOf(poController.CashAdvanceList(lnCtr).Department().getDescription())
                                     ));
 
                                     if (poController.CashAdvanceList(lnCtr).getTransactionStatus().equals(CashAdvanceStatus.CONFIRMED)) {
@@ -466,7 +466,7 @@ public class CashAdvance_ReleaseController implements Initializable, ScreenInter
                                 JFXUtil.selectAndFocusRow(tblViewMainList, pnMain);
                             }
                             JFXUtil.loadTab(pgPagination, main_data.size(), ROWS_PER_PAGE, tblViewMainList, filteredData);
-                        } catch (InterruptedException ex) {
+                        } catch (InterruptedException | SQLException | GuanzonException ex) {
                             Logger.getLogger(CashAdvance_ReleaseController.class.getName()).log(Level.SEVERE, null, ex);
                         }
                     });

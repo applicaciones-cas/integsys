@@ -346,7 +346,7 @@ public class CashAdvance_ByBatchController implements Initializable, ScreenInter
                                             String.valueOf(poController.CashAdvanceList(lnCtr).getVoucher()),
                                             String.valueOf(poController.CashAdvanceList(lnCtr).getPayeeName()),
                                             String.valueOf(poController.CashAdvanceList(lnCtr).getCreditedTo()),
-                                            String.valueOf(poController.CashAdvanceList(lnCtr).getDepartmentRequest()),
+                                            String.valueOf(poController.CashAdvanceList(lnCtr).Department().getDescription()),
                                             String.valueOf(poController.CashAdvanceList(lnCtr).getAdvanceAmount())
                                     ));
 
@@ -368,7 +368,7 @@ public class CashAdvance_ByBatchController implements Initializable, ScreenInter
                                 JFXUtil.selectAndFocusRow(tblViewMainList, pnMain);
                             }
                             JFXUtil.loadTab(pagination, main_data.size(), ROWS_PER_PAGE, tblViewMainList, filteredData);
-                        } catch (InterruptedException ex) {
+                        } catch (InterruptedException | SQLException | GuanzonException ex) {
                             Logger.getLogger(CashAdvance_ConfirmationController.class.getName()).log(Level.SEVERE, null, ex);
                         }
                     });
