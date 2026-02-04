@@ -337,9 +337,12 @@ public class CashAdvance_ByBatchController implements Initializable, ScreenInter
                                 //retreiving using column index
                                 for (int lnCtr = 0; lnCtr <= poController.getCashAdvanceCount() - 1; lnCtr++) {
                                     main_data.add(new ModelCashAdvance(String.valueOf(lnCtr + 1),
-                                            String.valueOf(poController.CashAdvanceList(lnCtr).getVoucher()),
+                                            checkedItem.get(lnCtr),// 0 as unchecked, 1 as checked
+                                            String.valueOf(poController.CashAdvanceList(lnCtr).getTransactionNo()),
                                             CustomCommonUtil.formatDateToShortString(poController.CashAdvanceList(lnCtr).getTransactionDate()),
+                                            String.valueOf(poController.CashAdvanceList(lnCtr).getVoucher()),
                                             String.valueOf(poController.CashAdvanceList(lnCtr).getPayeeName()),
+                                            String.valueOf(poController.CashAdvanceList(lnCtr).getCreditedTo()),
                                             String.valueOf(poController.CashAdvanceList(lnCtr).getDepartmentRequest()),
                                             String.valueOf(poController.CashAdvanceList(lnCtr).getAdvanceAmount())
                                     ));
