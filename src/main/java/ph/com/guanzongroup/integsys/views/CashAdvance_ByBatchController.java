@@ -37,12 +37,14 @@ import static javafx.scene.input.KeyCode.TAB;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
+import javax.script.ScriptException;
 import org.guanzon.appdriver.agent.ShowMessageFX;
 import org.guanzon.appdriver.base.GRiderCAS;
 import org.guanzon.appdriver.base.GuanzonException;
 import org.guanzon.appdriver.base.MiscUtil;
 import org.json.simple.JSONObject;
 import org.guanzon.appdriver.base.CommonUtils;
+import org.json.simple.parser.ParseException;
 import ph.com.guanzongroup.cas.cashflow.CashAdvance;
 import ph.com.guanzongroup.cas.cashflow.services.CashflowControllers;
 import ph.com.guanzongroup.cas.cashflow.status.CashAdvanceStatus;
@@ -424,53 +426,58 @@ public class CashAdvance_ByBatchController implements Initializable, ScreenInter
     }
 
     private void handleCashAdvanceAction(String action) {
-        if (checkedItem.stream().anyMatch("1"::equals)) {
-        } else {
-            ShowMessageFX.Warning(null, pxeModuleName, "No items were selected to " + action + ".");
-            return;
-        }
-        if (!ShowMessageFX.OkayCancel(null, pxeModuleName, "Are you sure you want to " + action + " selected item/s?")) {
-            return;
-        }
-        checkedItems.clear();
-        for (Object item : tblViewMainList.getItems()) {
-            ModelCashAdvance item1 = (ModelCashAdvance) item;
-            String lschecked = item1.getIndex02();
-            String lsVoucherNO = item1.getIndex03();
-            String Remarks = action;
-            if (lschecked.equals("1")) {
-                checkedItems.add(lsVoucherNO);
+        try {
+            if (checkedItem.stream().anyMatch("1"::equals)) {
+            } else {
+                ShowMessageFX.Warning(null, pxeModuleName, "No items were selected to " + action + ".");
+                return;
             }
-        }
-        switch (action) {
-            case "approve":
-//                poJSON = poController.ApproveTransaction("", checkedItems);
-                if (!"success".equals((String) poJSON.get("result"))) {
-                    ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-                    break;
-                } else {
-                    ShowMessageFX.Information(null, pxeModuleName, (String) poJSON.get("message"));
+            if (!ShowMessageFX.OkayCancel(null, pxeModuleName, "Are you sure you want to " + action + " selected item/s?")) {
+                return;
+            }
+            checkedItems.clear();
+            for (Object item : tblViewMainList.getItems()) {
+                ModelCashAdvance item1 = (ModelCashAdvance) item;
+                String lschecked = item1.getIndex02();
+                String lsVoucherNO = item1.getIndex03();
+                String Remarks = action;
+                if (lschecked.equals("1")) {
+                    checkedItems.add(lsVoucherNO);
                 }
-                chckSelectAll.setSelected(false);
-                checkedItem.clear();
-                break;
-            case "disapprove":
-//                poJSON = poController.DisapproveTransaction("", checkedItems);
-                if (!"success".equals((String) poJSON.get("result"))) {
-                    ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+            }
+            switch (action) {
+                case "approve":
+                    poJSON = poController.ConfirmTransaction("", checkedItems);
+                    if (!"success".equals((String) poJSON.get("result"))) {
+                        ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                        break;
+                    } else {
+                        ShowMessageFX.Information(null, pxeModuleName, (String) poJSON.get("message"));
+                    }
+                    chckSelectAll.setSelected(false);
+                    checkedItem.clear();
                     break;
-                } else {
-                    ShowMessageFX.Information(null, pxeModuleName, (String) poJSON.get("message"));
-                }
-                chckSelectAll.setSelected(false);
-                checkedItem.clear();
-                break;
-            default:
-                throw new AssertionError();
+                case "disapprove":
+                    poJSON = poController.DisApproveTransaction("", checkedItems);
+                    if (!"success".equals((String) poJSON.get("result"))) {
+                        ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                        break;
+                    } else {
+                        ShowMessageFX.Information(null, pxeModuleName, (String) poJSON.get("message"));
+                    }
+                    chckSelectAll.setSelected(false);
+                    checkedItem.clear();
+                    break;
+                default:
+                    throw new AssertionError();
+            }
+            Platform.runLater(() -> {
+                retrieveCashAdvance();
+            });
+        } catch (ParseException | SQLException | GuanzonException | CloneNotSupportedException | ScriptException ex) {
+            Logger.getLogger(CashAdvance_ByBatchController.class.getName()).log(Level.SEVERE, null, ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
-        Platform.runLater(() -> {
-            retrieveCashAdvance();
-        });
     }
 
     public void showCashAdvanceWindow(String fsTransactionNo) throws SQLException {
