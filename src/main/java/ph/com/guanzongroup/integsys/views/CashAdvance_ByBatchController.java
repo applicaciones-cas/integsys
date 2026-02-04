@@ -126,9 +126,9 @@ public class CashAdvance_ByBatchController implements Initializable, ScreenInter
         poJSON = new JSONObject();
         poController.setWithUI(true);
         poController.initialize();
-        if (!"success".equals((String) poJSON.get("result"))) {
-            ShowMessageFX.Error(null, pxeModuleName, (String) poJSON.get("message"));
-        }
+//        if (!"success".equals((String) poJSON.get("result"))) {
+//            ShowMessageFX.Error(null, pxeModuleName, (String) poJSON.get("message"));
+//        }
         initLoadTable();
         initButtonsClickActions();
         initTextFields();
