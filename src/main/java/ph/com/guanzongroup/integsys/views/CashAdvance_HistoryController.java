@@ -44,6 +44,7 @@ public class CashAdvance_HistoryController implements Initializable, ScreenInter
     private String pxeModuleName = JFXUtil.getFormattedClassTitle(this.getClass());
     private String psIndustryId = "";
     private String psCompanyId = "";
+    private String psSearchVoucherNo = "";
 
     @FXML
     private AnchorPane apMainAnchor, apBrowse, apButton, apMaster;
@@ -137,6 +138,7 @@ public class CashAdvance_HistoryController implements Initializable, ScreenInter
                                 return;
                             } else {
                                 pnEditMode = poController.getEditMode();
+                                psSearchVoucherNo = poController.getModel().getTransactionNo();
                                 loadRecordMaster();
                                 initButton(pnEditMode);
                             }
@@ -173,6 +175,7 @@ public class CashAdvance_HistoryController implements Initializable, ScreenInter
             }
             tfSearchIndustry.setText(poController.getSearchIndustry());
             tfSearchPayee.setText(poController.getSearchPayee());
+            tfSearchVoucherNo.setText(psSearchVoucherNo);
             JFXUtil.updateCaretPositions(apBrowse);
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
@@ -188,9 +191,14 @@ public class CashAdvance_HistoryController implements Initializable, ScreenInter
                             poController.setSearchIndustry("");
                         }
                         break;
-                    case "tfSearchSupplier":
+                    case "tfSearchPayee":
                         if (lsValue.isEmpty()) {
-                            poController.setSearchIndustry("");
+                            poController.setSearchPayee("");
+                        }
+                        break;
+                    case "tfSearchVoucherNo":
+                        if (lsValue.isEmpty()) {
+                            psSearchVoucherNo = "";
                         }
                         break;
                 }

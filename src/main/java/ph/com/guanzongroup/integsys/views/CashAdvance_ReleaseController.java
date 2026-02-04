@@ -283,9 +283,9 @@ public class CashAdvance_ReleaseController implements Initializable, ScreenInter
                             loadTableMain.reload();
                         }
                         break;
-                    case "tfSearchSupplier":
+                    case "tfSearchPayee":
                         if (lsValue.isEmpty()) {
-                            poController.setSearchIndustry("");
+                            poController.setSearchPayee("");
                             loadTableMain.reload();
                         }
                         break;

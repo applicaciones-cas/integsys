@@ -244,7 +244,7 @@ public class CashAdvance_ByBatchController implements Initializable, ScreenInter
                         break;
                     case "tfSearchPayee":
                         if (lsValue.isEmpty()) {
-                            poController.setSearchIndustry("");
+                            poController.setSearchPayee("");
                             loadTableMain.reload();
                         }
                         break;
