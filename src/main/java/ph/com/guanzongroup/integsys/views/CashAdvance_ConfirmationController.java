@@ -668,8 +668,8 @@ public class CashAdvance_ConfirmationController implements Initializable, Screen
         if (!"success".equals((String) poJSON.get("result"))) {
             ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
         } else {
-            loadTableMain.reload();
         }
+        loadTableMain.reload();
     }
 
     private void initButton(int fnValue) {

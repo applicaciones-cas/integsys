@@ -314,8 +314,15 @@ public class CashAdvance_ByBatchController implements Initializable, ScreenInter
         if (!"success".equals((String) poJSON.get("result"))) {
             ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
         } else {
-            loadTableMain.reload();
+            Platform.runLater(() -> {
+                chckSelectAll.setSelected(false);
+                checkedItem.clear();
+                for (int lnCtr = 0; lnCtr <= poController.getCashAdvanceCount() - 1; lnCtr++) {
+                    checkedItem.add("0");
+                }
+            });
         }
+        loadTableMain.reload();
     }
 
     public void initLoadTable() {
