@@ -91,7 +91,7 @@ public class CashAdvance_ByBatchController implements Initializable, ScreenInter
     @FXML
     private TableView tblViewMainList;
     @FXML
-    private TableColumn tblRowNo, tblCheckBox, tblVoucherNo, tblDate, tblPayeeName, tblCreditedTo, tblRequestingDepartment, tblAmountToAdvance;
+    private TableColumn tblRowNo, tblCheckBox, tblTransactionNo, tblVoucherNo, tblDate, tblPayeeName, tblCreditedTo, tblRequestingDepartment, tblAmountToAdvance;
     @FXML
     private CheckBox chckSelectAll;
     @FXML
@@ -377,7 +377,7 @@ public class CashAdvance_ByBatchController implements Initializable, ScreenInter
     }
 
     private void initMainGrid() {
-        JFXUtil.setColumnCenter(tblRowNo, tblVoucherNo, tblDate);
+        JFXUtil.setColumnCenter(tblRowNo, tblTransactionNo, tblVoucherNo, tblDate);
         JFXUtil.setColumnLeft(tblCheckBox, tblPayeeName, tblRequestingDepartment);
         JFXUtil.setColumnRight(tblCreditedTo, tblAmountToAdvance);
         JFXUtil.setColumnsIndexAndDisableReordering(tblViewMainList);
