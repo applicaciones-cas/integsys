@@ -601,10 +601,9 @@ public class CashAdvance_ReleaseController implements Initializable, ScreenInter
         JFXUtil.setButtonsVisibility(lbShow3, btnHistory, btnConfirm);
 
         //Unkown || Ready
-        JFXUtil.setDisabled(!lbShow1, apMaster);
         JFXUtil.setButtonsVisibility(lbShow4, btnClose);
 
-        JFXUtil.setDisabled(true, dpAdvanceDate, tfVoucherNo, tfPayee, tfCreditedTo, tfRequestingDepartment, taRemarks);
+        JFXUtil.setDisabled(true, apMaster);
         switch (poController.getModel().getTransactionStatus()) {
             case CashAdvanceStatus.RELEASED:
             case CashAdvanceStatus.VOID:
