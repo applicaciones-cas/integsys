@@ -239,16 +239,15 @@ public class CashAdvance_ByBatchController implements Initializable, ScreenInter
                     case "tfSearchIndustry":
                         if (lsValue.isEmpty()) {
                             poController.setSearchIndustry("");
-                            loadTableMain.reload();
                         }
                         break;
                     case "tfSearchPayee":
                         if (lsValue.isEmpty()) {
                             poController.setSearchPayee("");
-                            loadTableMain.reload();
                         }
                         break;
                 }
+                loadTableMain.reload();
                 loadRecordSearch();
             });
 

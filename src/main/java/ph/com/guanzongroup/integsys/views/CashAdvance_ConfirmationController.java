@@ -276,16 +276,15 @@ public class CashAdvance_ConfirmationController implements Initializable, Screen
                     case "tfSearchIndustry":
                         if (lsValue.isEmpty()) {
                             poController.setSearchIndustry("");
-                            loadTableMain.reload();
                         }
                         break;
                     case "tfSearchPayee":
                         if (lsValue.isEmpty()) {
                             poController.setSearchPayee("");
-                            loadTableMain.reload();
                         }
                         break;
                 }
+                loadTableMain.reload();
                 loadRecordSearch();
             });
     ChangeListener<Boolean> txtMaster_Focus = JFXUtil.FocusListener(TextField.class,
