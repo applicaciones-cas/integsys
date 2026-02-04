@@ -61,19 +61,19 @@
                                                         <Font name="System Bold" size="14.0" />
                                                     </font>
                                                 </Label>
+                                    <TextField fx:id="tfSearchIndustry" maxWidth="1.7976931348623157E308" promptText="Press F3: Search" GridPane.columnIndex="2" GridPane.rowIndex="1" />
                                                 <TextField fx:id="tfSearchPayee" maxWidth="1.7976931348623157E308" promptText="Press F3: Search" GridPane.columnIndex="6" GridPane.rowIndex="1" />
                                                 <Label text="Voucher No" GridPane.columnIndex="8" GridPane.rowIndex="1">
                                                     <font>
                                                         <Font name="System Bold" size="14.0" />
                                                     </font>
                                                 </Label>
-                                                <TextField fx:id="tfSearchVoucherNo" maxWidth="1.7976931348623157E308" promptText="Press F3: Search" GridPane.columnIndex="10" GridPane.rowIndex="1" />
                                     <Label text="Industry" GridPane.rowIndex="1">
                                        <font>
                                           <Font name="System Bold" size="14.0" />
                                        </font>
                                     </Label>
-                                    <TextField fx:id="tfSearchIndustry" maxWidth="1.7976931348623157E308" promptText="Press F3: Search" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+                                                <TextField fx:id="tfSearchVoucherNo" maxWidth="1.7976931348623157E308" promptText="Press F3: Search" GridPane.columnIndex="10" GridPane.rowIndex="1" />
                                             </children>
                                         </GridPane>
                                     </children>
@@ -86,7 +86,7 @@
                             <children>
                                 <HBox alignment="CENTER_LEFT" prefHeight="75.0" prefWidth="1482.0" spacing="5.0" style="-fx-background-color: E9E9E9;" styleClass="button_process" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                     <children>
-                              <Button fx:id="btnDisapproved1" contentDisplay="TOP" ellipsisString="" maxWidth="120.0" minWidth="100.0" mnemonicParsing="false" prefHeight="70.0" prefWidth="83.0" styleClass="button_process" stylesheets="@../css/StyleSheet.css" text="Approve">
+                              <Button fx:id="btnApproved" contentDisplay="TOP" ellipsisString="" maxWidth="120.0" minWidth="100.0" mnemonicParsing="false" prefHeight="70.0" prefWidth="83.0" styleClass="button_process" stylesheets="@../css/StyleSheet.css" text="Approve">
                                  <graphic>
                                     <FontAwesomeIconView glyphName="THUMBS_UP" size="20" />
                                  </graphic>

@@ -84,9 +84,9 @@ public class CashAdvance_ByBatchController implements Initializable, ScreenInter
     @FXML
     private Label lblSource;
     @FXML
-    private TextField tfSearchPayee, tfSearchVoucherNo, tfSearchIndustry;
+    private TextField tfSearchIndustry, tfSearchPayee, tfSearchVoucherNo;
     @FXML
-    private Button btnDisapproved1, btnDisapproved, btnRetrieve, btnClose;
+    private Button btnApproved, btnDisapproved, btnRetrieve, btnClose;
     @FXML
     private TableView tblViewMainList;
     @FXML
@@ -209,11 +209,8 @@ public class CashAdvance_ByBatchController implements Initializable, ScreenInter
         String lsButton = ((Button) event.getSource()).getId();
 
         switch (lsButton) {
-            case "btnCertify":
-                handleCashAdvanceAction("certify");
-                break;
-            case "btnReturn":
-                handleCashAdvanceAction("return");
+            case "btnApproved":
+                handleCashAdvanceAction("approve");
                 break;
             case "btnDisapproved":
                 handleCashAdvanceAction("disapprove");
@@ -423,26 +420,15 @@ public class CashAdvance_ByBatchController implements Initializable, ScreenInter
         for (Object item : tblViewMainList.getItems()) {
             ModelCashAdvance item1 = (ModelCashAdvance) item;
             String lschecked = item1.getIndex02();
-            String lsDVNO = item1.getIndex03();
+            String lsVoucherNO = item1.getIndex03();
             String Remarks = action;
             if (lschecked.equals("1")) {
-                checkedItems.add(lsDVNO);
+                checkedItems.add(lsVoucherNO);
             }
         }
 //        switch (action) {
-//            case "certify":
-//                poJSON = poController.CertifyTransaction(action, checkedItems);
-//                if (!"success".equals((String) poJSON.get("result"))) {
-//                    ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-//                    break;
-//                } else {
-//                    ShowMessageFX.Information(null, pxeModuleName, (String) poJSON.get("message"));
-//                }
-//                chckSelectAll.setSelected(false);
-//                checkedItem.clear();
-//                break;
-//            case "return":
-//                poJSON = poController.ReturnTransaction(action, checkedItems);
+//            case "disapprove":
+//                poJSON = poController.ApproveTransaction("", checkedItems);
 //                if (!"success".equals((String) poJSON.get("result"))) {
 //                    ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
 //                    break;
