@@ -63,24 +63,29 @@ public class CashAdvance_HistoryController implements Initializable, ScreenInter
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-//        psIndustryId = ""; // general
-        poJSON = new JSONObject();
-        poController = new CashflowControllers(oApp, null).CashAdvance();
-        poController.initialize(); // Initialize transaction
-        initTextFields();
-        initDatePickers();
-        clearTextFields();
-        pnEditMode = EditMode.UNKNOWN;
-        initButton(pnEditMode);
-
-        Platform.runLater(() -> {
-            poController.getModel().setIndustryId(psIndustryId);
-            poController.getModel().setCompanyId(psCompanyId);
-            poController.setIndustryId(psIndustryId);
-            poController.setCompanyId(psCompanyId);
-            poController.setWithUI(true);
-            loadRecordSearch();
-        });
+        try {
+            //        psIndustryId = ""; // general
+            poJSON = new JSONObject();
+            poController = new CashflowControllers(oApp, null).CashAdvance();
+            poController.InitTransaction(); // Initialize transaction
+            initTextFields();
+            initDatePickers();
+            clearTextFields();
+            pnEditMode = EditMode.UNKNOWN;
+            initButton(pnEditMode);
+            
+            Platform.runLater(() -> {
+                poController.Master().setIndustryId(psIndustryId);
+                poController.Master().setCompanyId(psCompanyId);
+                poController.setIndustryId(psIndustryId);
+                poController.setCompanyId(psCompanyId);
+                poController.setWithUI(true);
+                loadRecordSearch();
+            });
+        } catch (SQLException | GuanzonException ex) {
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE,MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
+        }
     }
 
     @Override
@@ -138,7 +143,7 @@ public class CashAdvance_HistoryController implements Initializable, ScreenInter
                                 return;
                             } else {
                                 pnEditMode = poController.getEditMode();
-                                psSearchVoucherNo = poController.getModel().getTransactionNo();
+                                psSearchVoucherNo = poController.Master().getTransactionNo();
                                 loadRecordMaster();
                                 initButton(pnEditMode);
                             }
@@ -167,9 +172,9 @@ public class CashAdvance_HistoryController implements Initializable, ScreenInter
 
     public void loadRecordSearch() {
         try {
-            poController.getModel().setCompanyId(psCompanyId);
-            if (poController.getModel().Company().getCompanyName() != null && !"".equals(poController.getModel().Company().getCompanyName())) {
-                lblSource.setText(poController.getModel().Company().getCompanyName());
+            poController.Master().setCompanyId(psCompanyId);
+            if (poController.Master().Company().getCompanyName() != null && !"".equals(poController.Master().Company().getCompanyName())) {
+                lblSource.setText(poController.Master().Company().getCompanyName());
             } else {
                 lblSource.setText("");
             }
@@ -220,19 +225,19 @@ public class CashAdvance_HistoryController implements Initializable, ScreenInter
 
     public void loadRecordMaster() {
         try {
-            lblStatus.setText(poController.getStatus(poController.getModel().getTransactionStatus()).toUpperCase());
-            tfTransactionNo.setText(poController.getModel().getTransactionNo());
+            lblStatus.setText(poController.getStatus(poController.Master().getTransactionStatus()).toUpperCase());
+            tfTransactionNo.setText(poController.Master().getTransactionNo());
 
             // Transaction Date
-            String lsTransactionDate = CustomCommonUtil.formatDateToShortString(poController.getModel().getTransactionDate());
+            String lsTransactionDate = CustomCommonUtil.formatDateToShortString(poController.Master().getTransactionDate());
             dpAdvanceDate.setValue(CustomCommonUtil.parseDateStringToLocalDate(lsTransactionDate, "yyyy-MM-dd"));
 
-            tfVoucherNo.setText(poController.getModel().getVoucher());
-            tfPayee.setText(poController.getModel().Payee().getPayeeName());
-            tfCreditedTo.setText(poController.getModel().Credited().getCompanyName());
-            tfRequestingDepartment.setText(poController.getModel().Department().getDescription());
-            taRemarks.setText(poController.getModel().getRemarks());
-            tfAmountToAdvance.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.getModel().getAdvanceAmount(), true));
+            tfVoucherNo.setText(poController.Master().getVoucher());
+            tfPayee.setText(poController.Master().Payee().getPayeeName());
+            tfCreditedTo.setText(poController.Master().Credited().getCompanyName());
+            tfRequestingDepartment.setText(poController.Master().Department().getDescription());
+            taRemarks.setText(poController.Master().getRemarks());
+            tfAmountToAdvance.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Master().getAdvanceAmount(), true));
 
             JFXUtil.updateCaretPositions(apMaster);
         } catch (SQLException | GuanzonException ex) {

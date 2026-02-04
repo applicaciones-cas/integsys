@@ -113,7 +113,7 @@ public class CashAdvance_ViewController implements Initializable, ScreenInterfac
                 initDatePicker();
                 clearTextFields();
                 btnClose.setOnAction(this::cmdButton_Click);
-                poController.initialize(); // Initialize transaction
+                poController.InitTransaction(); // Initialize transaction
                 if (!"success".equals((String) poJSON.get("result"))) {
                     ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                     CommonUtils.closeStage(btnClose);
@@ -180,19 +180,19 @@ public class CashAdvance_ViewController implements Initializable, ScreenInterfac
 
     public void loadRecordMaster() {
         try {
-            lblStatus.setText(poController.getStatus(poController.getModel().getTransactionStatus()).toUpperCase());
-            tfTransactionNo.setText(poController.getModel().getTransactionNo());
+            lblStatus.setText(poController.getStatus(poController.Master().getTransactionStatus()).toUpperCase());
+            tfTransactionNo.setText(poController.Master().getTransactionNo());
 
             // Transaction Date
-            String lsTransactionDate = CustomCommonUtil.formatDateToShortString(poController.getModel().getTransactionDate());
+            String lsTransactionDate = CustomCommonUtil.formatDateToShortString(poController.Master().getTransactionDate());
             dpAdvanceDate.setValue(CustomCommonUtil.parseDateStringToLocalDate(lsTransactionDate, "yyyy-MM-dd"));
 
-            tfVoucherNo.setText(poController.getModel().getVoucher());
-            tfPayee.setText(poController.getModel().Payee().getPayeeName());
-            tfCreditedTo.setText(poController.getModel().Credited().getCompanyName());
-            tfRequestingDepartment.setText(poController.getModel().Department().getDescription());
-            taRemarks.setText(poController.getModel().getRemarks());
-            tfAmountToAdvance.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.getModel().getAdvanceAmount(), true));
+            tfVoucherNo.setText(poController.Master().getVoucher());
+            tfPayee.setText(poController.Master().Payee().getPayeeName());
+            tfCreditedTo.setText(poController.Master().Credited().getCompanyName());
+            tfRequestingDepartment.setText(poController.Master().Department().getDescription());
+            taRemarks.setText(poController.Master().getRemarks());
+            tfAmountToAdvance.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Master().getAdvanceAmount(), true));
 
             JFXUtil.updateCaretPositions(apMaster);
         } catch (SQLException | GuanzonException ex) {

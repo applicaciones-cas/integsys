@@ -122,27 +122,33 @@ public class CashAdvance_ByBatchController implements Initializable, ScreenInter
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        poController = new CashflowControllers(oApp, null).CashAdvance();
-//        poController.setTransactionStatus(CashAdvanceStatus.CONFIRMED);
-        poJSON = new JSONObject();
-        poController.setWithUI(true);
-        poController.initialize();
-//        if (!"success".equals((String) poJSON.get("result"))) {
-//            ShowMessageFX.Error(null, pxeModuleName, (String) poJSON.get("message"));
-//        }
-        initLoadTable();
-        initButtonsClickActions();
-        initTextFields();
-        initMainGrid();
-        initTableOnClick();
-        initCheckboxes();
-        initButtons();
-        pagination.setPageCount(1);
-        Platform.runLater(() -> {
-            poController.setIndustryId(psIndustryId);
-            poController.setCompanyId(psCompanyId);
-            loadRecordSearch();
-        });
+        try {
+            poController = new CashflowControllers(oApp, null).CashAdvance();
+                poJSON = new JSONObject();
+                poJSON = poController.InitTransaction();
+                if (!"success".equals((String) poJSON.get("result"))) {
+                    ShowMessageFX.Error(null, pxeModuleName, (String) poJSON.get("message"));
+                }
+                initLoadTable();
+                initButtonsClickActions();
+                initTextFields();
+                initMainGrid();
+                initTableOnClick();
+                initCheckboxes();
+                initButtons();
+                pagination.setPageCount(1);
+                Platform.runLater(() -> {
+                    poController.Master().setIndustryId(psIndustryId);
+                    poController.Master().setCompanyId(psCompanyId);
+                    poController.setIndustryId(psIndustryId);
+                    poController.setCompanyId(psCompanyId);
+                    poController.setWithUI(true);
+                    loadRecordSearch();
+                });
+        } catch (SQLException | GuanzonException ex) {
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE,MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
+        }
     }
 
     @FXML
@@ -185,9 +191,9 @@ public class CashAdvance_ByBatchController implements Initializable, ScreenInter
 
     public void loadRecordSearch() {
         try {
-            poController.getModel().setIndustryId(psIndustryId);
-            if (poController.getModel().Company().getCompanyName() != null && !"".equals(poController.getModel().Company().getCompanyName())) {
-                lblSource.setText(poController.getModel().Company().getCompanyName());
+            poController.Master().setIndustryId(psIndustryId);
+            if (poController.Master().Company().getCompanyName() != null && !"".equals(poController.Master().Company().getCompanyName())) {
+                lblSource.setText(poController.Master().Company().getCompanyName());
             } else {
                 lblSource.setText("");
             }
@@ -309,7 +315,7 @@ public class CashAdvance_ByBatchController implements Initializable, ScreenInter
 
     public void retrieveCashAdvance() {
         poJSON = new JSONObject();
-        poController.setRecordStatus(CashAdvanceStatus.OPEN + "" + CashAdvanceStatus.CONFIRMED);
+        poController.setTransactionStatus(CashAdvanceStatus.OPEN + "" + CashAdvanceStatus.CONFIRMED);
         poJSON = poController.loadTransactionList(tfSearchIndustry.getText(), tfSearchPayee.getText(), tfSearchVoucherNo.getText());
         if (!"success".equals((String) poJSON.get("result"))) {
             ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
