@@ -86,6 +86,14 @@
                             <children>
                                 <HBox alignment="CENTER_LEFT" prefHeight="75.0" prefWidth="1482.0" spacing="5.0" style="-fx-background-color: E9E9E9;" styleClass="button_process" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                     <children>
+                              <Button fx:id="btnApproved" contentDisplay="TOP" ellipsisString="" maxWidth="120.0" minWidth="100.0" mnemonicParsing="false" prefHeight="70.0" prefWidth="83.0" styleClass="button_process" stylesheets="@../css/StyleSheet.css" text="Approve">
+                                 <graphic>
+                                    <FontAwesomeIconView glyphName="THUMBS_UP" size="20" />
+                                 </graphic>
+                                 <effect>
+                                    <Blend />
+                                 </effect>
+                              </Button>
                                         <Button fx:id="btnDisapproved" contentDisplay="TOP" ellipsisString="" maxWidth="120.0" minWidth="100.0" mnemonicParsing="false" prefHeight="70.0" prefWidth="83.0" styleClass="button_process" stylesheets="@../css/StyleSheet.css" text="Disapprove">
                                             <graphic>
                                                 <FontAwesomeIconView glyphName="THUMBS_DOWN" size="20" />

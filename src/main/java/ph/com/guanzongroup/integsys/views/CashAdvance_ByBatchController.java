@@ -87,7 +87,7 @@ public class CashAdvance_ByBatchController implements Initializable, ScreenInter
     @FXML
     private TextField tfSearchIndustry, tfSearchPayee, tfSearchVoucherNo;
     @FXML
-    private Button btnDisapproved, btnRetrieve, btnClose;
+    private Button btnApproved, btnDisapproved, btnRetrieve, btnClose;
     @FXML
     private TableView tblViewMainList;
     @FXML
@@ -216,6 +216,9 @@ public class CashAdvance_ByBatchController implements Initializable, ScreenInter
         String lsButton = ((Button) event.getSource()).getId();
 
         switch (lsButton) {
+            case "btnApproved":
+                handleCashAdvanceAction("approve");
+                break;
             case "btnDisapproved":
                 handleCashAdvanceAction("disapprove");
                 break;
@@ -415,7 +418,7 @@ public class CashAdvance_ByBatchController implements Initializable, ScreenInter
     }
 
     private void initButtons() {
-        JFXUtil.setButtonsVisibility(!main_data.isEmpty(), btnDisapproved);
+        JFXUtil.setButtonsVisibility(!main_data.isEmpty(), btnApproved, btnDisapproved);
         disableRowCheckbox.set(main_data.isEmpty()); // set enable/disable in checkboxes in requirements
         JFXUtil.setDisabled(main_data.isEmpty(), chckSelectAll);
     }
@@ -440,8 +443,19 @@ public class CashAdvance_ByBatchController implements Initializable, ScreenInter
             }
         }
         switch (action) {
+            case "approve":
+//                poJSON = poController.ApproveTransaction("", checkedItems);
+                if (!"success".equals((String) poJSON.get("result"))) {
+                    ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                    break;
+                } else {
+                    ShowMessageFX.Information(null, pxeModuleName, (String) poJSON.get("message"));
+                }
+                chckSelectAll.setSelected(false);
+                checkedItem.clear();
+                break;
             case "disapprove":
-//                poJSON = poController.CancelTransaction("", checkedItems);
+//                poJSON = poController.DisapproveTransaction("", checkedItems);
                 if (!"success".equals((String) poJSON.get("result"))) {
                     ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                     break;
