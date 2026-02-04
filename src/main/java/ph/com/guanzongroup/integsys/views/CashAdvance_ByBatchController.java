@@ -248,8 +248,8 @@ public class CashAdvance_ByBatchController implements Initializable, ScreenInter
                             loadTableMain.reload();
                         }
                         break;
-
                 }
+                loadRecordSearch();
             });
 
     private void txtField_KeyPressed(KeyEvent event) {

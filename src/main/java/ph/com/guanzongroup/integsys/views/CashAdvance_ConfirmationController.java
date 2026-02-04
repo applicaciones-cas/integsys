@@ -256,7 +256,7 @@ public class CashAdvance_ConfirmationController implements Initializable, Screen
     public void loadRecordSearch() {
         try {
             poController.getModel().setCompanyId(psCompanyId);
-            if (poController.getModel().Company().getCompanyName()!= null && !"".equals(poController.getModel().Company().getCompanyName())) {
+            if (poController.getModel().Company().getCompanyName() != null && !"".equals(poController.getModel().Company().getCompanyName())) {
                 lblSource.setText(poController.getModel().Company().getCompanyName());
             } else {
                 lblSource.setText("");
@@ -276,18 +276,17 @@ public class CashAdvance_ConfirmationController implements Initializable, Screen
                     case "tfSearchIndustry":
                         if (lsValue.isEmpty()) {
                             poController.setSearchIndustry("");
-                            retrieveCashAdvance();
                             loadTableMain.reload();
                         }
-                        break; 
+                        break;
                     case "tfSearchPayee":
                         if (lsValue.isEmpty()) {
                             poController.setSearchPayee("");
-                            retrieveCashAdvance();
                             loadTableMain.reload();
                         }
                         break;
                 }
+                loadRecordSearch();
             });
     ChangeListener<Boolean> txtMaster_Focus = JFXUtil.FocusListener(TextField.class,
             (lsID, lsValue) -> {
@@ -461,7 +460,7 @@ public class CashAdvance_ConfirmationController implements Initializable, Screen
                             JFXUtil.loadTab(pgPagination, main_data.size(), ROWS_PER_PAGE, tblViewMainList, filteredData);
                         } catch (InterruptedException | SQLException | GuanzonException ex) {
                             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
-                            ShowMessageFX.Error(null, pxeModuleName,MiscUtil.getException(ex));
+                            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
                         }
                     });
 
@@ -626,7 +625,7 @@ public class CashAdvance_ConfirmationController implements Initializable, Screen
                         break;
                 }
 
-                if (JFXUtil.isObjectEqualTo(lsButton, "btnSave", "btnConfirm",  "btnVoid", "btnCancel")) {
+                if (JFXUtil.isObjectEqualTo(lsButton, "btnSave", "btnConfirm", "btnVoid", "btnCancel")) {
                     clearTextFields();
                     poController.resetMaster();
                     pnEditMode = EditMode.UNKNOWN;
