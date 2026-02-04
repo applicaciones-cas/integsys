@@ -117,7 +117,7 @@ public class CashAdvance_HistoryController implements Initializable, ScreenInter
                                 ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                 tfSearchIndustry.setText("");
                                 break;
-                            } 
+                            }
                             loadRecordSearch();
                             return;
                         case "tfSearchPayee":
@@ -126,7 +126,7 @@ public class CashAdvance_HistoryController implements Initializable, ScreenInter
                                 ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                 tfSearchPayee.setText("");
                                 break;
-                            } 
+                            }
                             loadRecordSearch();
                             return;
                         case "tfSearchVoucherNo":
@@ -166,7 +166,7 @@ public class CashAdvance_HistoryController implements Initializable, ScreenInter
     public void loadRecordSearch() {
         try {
             poController.getModel().setCompanyId(psCompanyId);
-            if (poController.getModel().Company().getCompanyName()!= null && !"".equals(poController.getModel().Company().getCompanyName())) {
+            if (poController.getModel().Company().getCompanyName() != null && !"".equals(poController.getModel().Company().getCompanyName())) {
                 lblSource.setText(poController.getModel().Company().getCompanyName());
             } else {
                 lblSource.setText("");
@@ -194,6 +194,7 @@ public class CashAdvance_HistoryController implements Initializable, ScreenInter
                         }
                         break;
                 }
+                loadRecordSearch();
             });
 
     public void initTextFields() {
