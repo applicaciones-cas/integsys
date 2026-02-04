@@ -1,0 +1,306 @@
+package ph.com.guanzongroup.integsys.views;
+
+import java.net.URL;
+import java.sql.SQLException;
+import java.util.ResourceBundle;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javafx.application.Platform;
+import javafx.beans.value.ChangeListener;
+import javafx.event.ActionEvent;
+import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
+import javafx.scene.control.Button;
+import javafx.scene.control.DatePicker;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
+import static javafx.scene.input.KeyCode.ENTER;
+import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.HBox;
+import org.guanzon.appdriver.agent.ShowMessageFX;
+import org.guanzon.appdriver.base.CommonUtils;
+import org.guanzon.appdriver.base.GRiderCAS;
+import org.guanzon.appdriver.base.GuanzonException;
+import org.guanzon.appdriver.base.MiscUtil;
+import org.guanzon.appdriver.constant.EditMode;
+import ph.com.guanzongroup.cas.cashflow.status.CashAdvanceStatus;
+import org.json.simple.JSONObject;
+import ph.com.guanzongroup.cas.cashflow.services.CashflowControllers;
+import ph.com.guanzongroup.integsys.utility.CustomCommonUtil;
+import ph.com.guanzongroup.integsys.utility.JFXUtil;
+
+/**
+ *
+ * @author Team 1
+ */
+public class CashAdvance_HistoryController implements Initializable, ScreenInterface {
+
+    private GRiderCAS oApp;
+    static CashflowControllers poController;
+    private JSONObject poJSON;
+    public int pnEditMode;
+    private String pxeModuleName = JFXUtil.getFormattedClassTitle(this.getClass());
+    private String psIndustryId = "";
+    private String psCategoryId = "";
+
+    @FXML
+    private AnchorPane apMainAnchor, apBrowse, apButton, apMaster;
+    @FXML
+    private Label lblSource, lblStatus;
+    @FXML
+    private TextField tfSearchIndustry, tfSearchPayee, tfSearchVoucherNo, tfTransactionNo, tfVoucherNo, tfPayee, tfCreditedTo, tfRequestingDepartment, tfAmountToAdvance;
+    @FXML
+    private HBox hbButtons, hboxid;
+    @FXML
+    private Button btnBrowse, btnHistory, btnClose;
+    @FXML
+    private DatePicker dpAdvanceDate;
+    @FXML
+    private TextArea taRemarks;
+
+    @Override
+    public void initialize(URL location, ResourceBundle resources) {
+//        psIndustryId = ""; // general
+        poJSON = new JSONObject();
+        poController = new CashflowControllers(oApp, null);
+        poController.CashAdvance().initialize(); // Initialize transaction
+        initTextFields();
+        initDatePickers();
+        clearTextFields();
+        pnEditMode = EditMode.UNKNOWN;
+        initButton(pnEditMode);
+
+        Platform.runLater(() -> {
+            poController.CashAdvance().getModel().setIndustryId(psIndustryId);
+            poController.CashAdvance().setIndustryId(psIndustryId);
+            poController.CashAdvance().setWithUI(true);
+            loadRecordSearch();
+        });
+    }
+
+    @Override
+    public void setGRider(GRiderCAS foValue) {
+        oApp = foValue;
+    }
+
+    @Override
+    public void setIndustryID(String fsValue) {
+        psIndustryId = fsValue;
+    }
+
+    @Override
+    public void setCompanyID(String fsValue) {
+//        psCompanyId = fsValue;
+    }
+
+    @Override
+    public void setCategoryID(String fsValue) {
+        psCategoryId = fsValue;
+    }
+
+    private void txtField_KeyPressed(KeyEvent event) {
+        try {
+            TextField txtField = (TextField) event.getSource();
+            String lsID = (((TextField) event.getSource()).getId());
+            String lsValue = (txtField.getText() == null ? "" : txtField.getText());
+            poJSON = new JSONObject();
+            switch (event.getCode()) {
+                case F3:
+                    switch (lsID) {
+                        case "tfSearchIndustry":
+                            poJSON = poController.CashAdvance().SearchIndustry(lsValue, false);
+                            if ("error".equals(poJSON.get("result"))) {
+                                ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                                tfSearchIndustry.setText("");
+                                break;
+                            } else {
+                            }
+                            loadRecordSearch();
+                            return;
+                        case "tfSearchPayee":
+                            poJSON = poController.CashAdvance().SearchPayee(lsValue, false, true);
+                            if ("error".equals(poJSON.get("result"))) {
+                                ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                                tfSearchPayee.setText("");
+                                break;
+                            } else {
+                            }
+                            loadRecordSearch();
+                            return;
+                        case "tfSearchVoucherNo":
+                            poController.CashAdvance().setRecordStatus(CashAdvanceStatus.OPEN
+                                    + "" + CashAdvanceStatus.CONFIRMED
+                                    + "" + CashAdvanceStatus.VOID
+                                    + "" + CashAdvanceStatus.CANCELLED
+                                    + "" + CashAdvanceStatus.RELEASED);
+                            poJSON = poController.CashAdvance().searchTransaction(tfSearchIndustry.getText(), tfSearchPayee.getText(), tfSearchVoucherNo.getText());
+                            if ("error".equals(poJSON.get("result"))) {
+                                ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                                tfSearchVoucherNo.setText("");
+                                return;
+                            } else {
+//                                psSupplierId = poController.CashAdvance().getModel().getClientId();
+                                pnEditMode = poController.CashAdvance().getEditMode();
+                                loadRecordMaster();
+                                initButton(pnEditMode);
+                            }
+                            loadRecordSearch();
+                            return;
+                    }
+                    break;
+                default:
+                    break;
+            }
+
+            switch (event.getCode()) {
+                case ENTER:
+                    CommonUtils.SetNextFocus(txtField);
+                case DOWN:
+                    CommonUtils.SetNextFocus(txtField);
+                    break;
+                case UP:
+                    CommonUtils.SetPreviousFocus(txtField);
+            }
+        } catch (GuanzonException | SQLException | CloneNotSupportedException ex) {
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
+        }
+    }
+
+    public void loadRecordSearch() {
+        try {
+            poController.CashAdvance().getModel().setIndustryId(psIndustryId);
+            if (poController.CashAdvance().getModel().Industry().getDescription() != null && !"".equals(poController.CashAdvance().getModel().Industry().getDescription())) {
+                lblSource.setText(poController.CashAdvance().getModel().Industry().getDescription());
+            } else {
+                lblSource.setText("General");
+            }
+            tfSearchIndustry.setText(poController.CashAdvance().getSearchIndustry());
+            tfSearchPayee.setText(poController.CashAdvance().getSearchPayee());
+            JFXUtil.updateCaretPositions(apBrowse);
+        } catch (SQLException | GuanzonException ex) {
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
+        }
+    }
+
+    ChangeListener<Boolean> txtBrowse_Focus = JFXUtil.FocusListener(TextField.class,
+            (lsID, lsValue) -> {
+                switch (lsID) {
+                    case "tfSearchIndustry":
+                        if (lsValue.isEmpty()) {
+                            poController.CashAdvance().setSearchIndustry("");
+                        }
+                        break;
+                    case "tfSearchSupplier":
+                        if (lsValue.isEmpty()) {
+                            poController.CashAdvance().setSearchIndustry("");
+                        }
+                        break;
+                }
+            });
+
+    public void initTextFields() {
+        JFXUtil.setFocusListener(txtBrowse_Focus, tfSearchIndustry, tfSearchPayee, tfSearchVoucherNo);
+        JFXUtil.setKeyPressedListener(this::txtField_KeyPressed, apBrowse);
+    }
+
+    public void initDatePickers() {
+        JFXUtil.setDatePickerFormat("MM/dd/yyyy", dpAdvanceDate);
+    }
+
+    public void clearTextFields() {
+        JFXUtil.clearTextFields(apMaster);
+    }
+
+    public void loadRecordMaster() {
+        try {
+            lblStatus.setText(poController.CashAdvance().getStatus(poController.CashAdvance().getModel().getTransactionStatus().toUpperCase()));
+            tfTransactionNo.setText(poController.CashAdvance().getModel().getTransactionNo());
+
+            // Transaction Date
+            String lsTransactionDate = CustomCommonUtil.formatDateToShortString(poController.CashAdvance().getModel().getTransactionDate());
+            dpAdvanceDate.setValue(CustomCommonUtil.parseDateStringToLocalDate(lsTransactionDate, "yyyy-MM-dd"));
+
+            tfVoucherNo.setText(poController.CashAdvance().getModel().getVoucher());
+            tfPayee.setText(poController.CashAdvance().getModel().Payee().getPayeeName());
+            tfCreditedTo.setText(poController.CashAdvance().getModel().Client().getCompanyName());
+            tfRequestingDepartment.setText(poController.CashAdvance().getModel().getDepartmentRequest());
+            tfAmountToAdvance.setText("");
+            taRemarks.setText(poController.CashAdvance().getModel().getRemarks());
+            tfAmountToAdvance.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.CashAdvance().getModel().getAdvanceAmount().doubleValue(), true));
+
+            JFXUtil.updateCaretPositions(apMaster);
+        } catch (SQLException | GuanzonException ex) {
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
+        }
+    }
+
+    @FXML
+    private void cmdButton_Click(ActionEvent event) {
+        poJSON = new JSONObject();
+        try {
+            Object source = event.getSource();
+            if (source instanceof Button) {
+                Button clickedButton = (Button) source;
+                String lsButton = clickedButton.getId();
+                switch (lsButton) {
+                    case "btnBrowse":
+                        poController.CashAdvance().setRecordStatus(CashAdvanceStatus.OPEN
+                                + "" + CashAdvanceStatus.CONFIRMED
+                                + "" + CashAdvanceStatus.VOID
+                                + "" + CashAdvanceStatus.CANCELLED
+                                + "" + CashAdvanceStatus.RELEASED);
+                        poJSON = poController.CashAdvance().searchTransaction(tfSearchIndustry.getText(), tfSearchPayee.getText(), tfSearchVoucherNo.getText());
+                        if ("error".equalsIgnoreCase((String) poJSON.get("result"))) {
+                            ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                            tfTransactionNo.requestFocus();
+                            return;
+                        }
+                        pnEditMode = poController.CashAdvance().getEditMode();
+                        break;
+                    case "btnHistory":
+                        if (pnEditMode != EditMode.READY && pnEditMode != EditMode.UPDATE) {
+                            ShowMessageFX.Warning("No transaction status history to load!", pxeModuleName, null);
+                            return;
+                        }
+
+                        try {
+                            poController.CashAdvance().ShowStatusHistory();
+                        } catch (NullPointerException npe) {
+                            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(npe), npe);
+                            ShowMessageFX.Error("No transaction status history to load!", pxeModuleName, null);
+                        } catch (Exception ex) {
+                            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+                            ShowMessageFX.Error(MiscUtil.getException(ex), pxeModuleName, null);
+                        }
+                        break;
+                    case "btnClose":
+                        unloadForm appUnload = new unloadForm();
+                        if (ShowMessageFX.OkayCancel(null, "Close Tab", "Are you sure you want to close this Tab?") == true) {
+                            appUnload.unloadForm(apMainAnchor, oApp, pxeModuleName);
+                        } else {
+                            return;
+                        }
+                        break;
+                    default:
+                        break;
+                }
+
+                loadRecordMaster();
+                initButton(pnEditMode);
+            }
+        } catch (Exception e) {
+        }
+    }
+
+    private void initButton(int fnValue) {
+        //Unkown || Ready
+        JFXUtil.setDisabled(true, apMaster);
+        JFXUtil.setButtonsVisibility(true, btnClose);
+        JFXUtil.setButtonsVisibility(fnValue == EditMode.READY, btnHistory);
+    }
+}
