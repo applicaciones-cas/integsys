@@ -124,29 +124,29 @@ public class CashAdvance_ByBatchController implements Initializable, ScreenInter
     public void initialize(URL url, ResourceBundle rb) {
         try {
             poController = new CashflowControllers(oApp, null).CashAdvance();
-                poJSON = new JSONObject();
-                poJSON = poController.InitTransaction();
-                if (!"success".equals((String) poJSON.get("result"))) {
-                    ShowMessageFX.Error(null, pxeModuleName, (String) poJSON.get("message"));
-                }
-                initLoadTable();
-                initButtonsClickActions();
-                initTextFields();
-                initMainGrid();
-                initTableOnClick();
-                initCheckboxes();
-                initButtons();
-                pagination.setPageCount(1);
-                Platform.runLater(() -> {
-                    poController.Master().setIndustryId(psIndustryId);
-                    poController.Master().setCompanyId(psCompanyId);
-                    poController.setIndustryId(psIndustryId);
-                    poController.setCompanyId(psCompanyId);
-                    poController.setWithUI(true);
-                    loadRecordSearch();
-                });
+            poJSON = new JSONObject();
+            poJSON = poController.InitTransaction();
+            if (!"success".equals((String) poJSON.get("result"))) {
+                ShowMessageFX.Error(null, pxeModuleName, (String) poJSON.get("message"));
+            }
+            initLoadTable();
+            initButtonsClickActions();
+            initTextFields();
+            initMainGrid();
+            initTableOnClick();
+            initCheckboxes();
+            initButtons();
+            pagination.setPageCount(1);
+            Platform.runLater(() -> {
+                poController.Master().setIndustryId(psIndustryId);
+                poController.Master().setCompanyId(psCompanyId);
+                poController.setIndustryId(psIndustryId);
+                poController.setCompanyId(psCompanyId);
+                poController.setWithUI(true);
+                loadRecordSearch();
+            });
         } catch (SQLException | GuanzonException ex) {
-            Logger.getLogger(getClass().getName()).log(Level.SEVERE,MiscUtil.getException(ex), ex);
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
             ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
@@ -349,10 +349,10 @@ public class CashAdvance_ByBatchController implements Initializable, ScreenInter
                                     main_data.add(new ModelCashAdvance(String.valueOf(lnCtr + 1),
                                             checkedItem.get(lnCtr),// 0 as unchecked, 1 as checked
                                             String.valueOf(poController.CashAdvanceList(lnCtr).getTransactionNo()),
-                                            CustomCommonUtil.formatDateToShortString(poController.CashAdvanceList(lnCtr).getTransactionDate()),
                                             String.valueOf(poController.CashAdvanceList(lnCtr).getVoucher()),
+                                            CustomCommonUtil.formatDateToShortString(poController.CashAdvanceList(lnCtr).getTransactionDate()),
                                             String.valueOf(poController.CashAdvanceList(lnCtr).getPayeeName()),
-                                            String.valueOf(poController.CashAdvanceList(lnCtr).getCreditedTo()),
+                                            String.valueOf(poController.CashAdvanceList(lnCtr).Credited().getCompanyName()),
                                             String.valueOf(poController.CashAdvanceList(lnCtr).Department().getDescription()),
                                             CustomCommonUtil.setIntegerValueToDecimalFormat(String.valueOf(poController.CashAdvanceList(lnCtr).getAdvanceAmount()))
                                     ));

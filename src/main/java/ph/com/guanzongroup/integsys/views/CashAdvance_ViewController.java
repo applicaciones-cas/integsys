@@ -114,14 +114,15 @@ public class CashAdvance_ViewController implements Initializable, ScreenInterfac
                 clearTextFields();
                 btnClose.setOnAction(this::cmdButton_Click);
                 poController.InitTransaction(); // Initialize transaction
-                if (!"success".equals((String) poJSON.get("result"))) {
-                    ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-                    CommonUtils.closeStage(btnClose);
-                }
+//                if (!"success".equals((String) poJSON.get("result"))) {
+//                    ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+//                    CommonUtils.closeStage(btnClose);
+//                }
                 poJSON = poController.OpenTransaction(psTransactionNo);
                 if (!"error".equals((String) poJSON.get("result"))) {
                     pnEditMode = poController.getEditMode();
                     initButton(pnEditMode);
+                    loadRecordMaster();
                 } else {
                     Platform.runLater(() -> {
                         ShowMessageFX.Warning((String) poJSON.get("message"), pxeModuleName, null);
