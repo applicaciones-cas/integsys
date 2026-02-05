@@ -82,7 +82,7 @@ public class CashAdvance_EntryController implements Initializable, ScreenInterfa
             clearTextFields();
             pnEditMode = EditMode.UNKNOWN;
             initButton(pnEditMode);
-            
+
             Platform.runLater(() -> {
                 poController.Master().setIndustryId(psIndustryId);
                 poController.Master().setCompanyId(psCompanyId);
@@ -92,10 +92,10 @@ public class CashAdvance_EntryController implements Initializable, ScreenInterfa
                 loadRecordSearch();
                 btnNew.fire();
             });
-            
+
             JFXUtil.initKeyClickObject(apMainAnchor, lastFocusedTextField, previousSearchedTextField);
         } catch (SQLException | GuanzonException ex) {
-            Logger.getLogger(getClass().getName()).log(Level.SEVERE,MiscUtil.getException(ex), ex);
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
             ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
@@ -300,7 +300,7 @@ public class CashAdvance_EntryController implements Initializable, ScreenInterfa
     public void loadRecordSearch() {
         try {
             if (poController.Master().Industry().getDescription() != null && !"".equals(poController.Master().Industry().getDescription())) {
-                lblSource.setText(poController.Master().Industry().getDescription());
+                lblSource.setText(poController.Master().Company().getCompanyName() + " - " + poController.Master().Industry().getDescription());
             } else {
                 lblSource.setText("General");
             }
@@ -464,7 +464,11 @@ public class CashAdvance_EntryController implements Initializable, ScreenInterfa
                     default:
                         break;
                 }
-
+                if (JFXUtil.isObjectEqualTo(lsButton, "btnSave", "btnCancel", "btnVoid")) {
+                    poController.resetMaster();
+                    clearTextFields();
+                    pnEditMode = EditMode.UNKNOWN;
+                }
                 loadRecordMaster();
                 initButton(pnEditMode);
             } catch (CloneNotSupportedException | SQLException | GuanzonException | ParseException ex) {

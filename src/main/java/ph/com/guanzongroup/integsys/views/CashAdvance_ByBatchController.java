@@ -209,7 +209,7 @@ public class CashAdvance_ByBatchController implements Initializable, ScreenInter
     }
 
     private void initButtonsClickActions() {
-        List<Button> buttons = Arrays.asList(btnDisapproved, btnRetrieve, btnClose);
+        List<Button> buttons = Arrays.asList(btnApproved, btnDisapproved, btnRetrieve, btnClose);
         buttons.forEach(button -> button.setOnAction(this::cmdButton_Click));
     }
 
@@ -320,7 +320,7 @@ public class CashAdvance_ByBatchController implements Initializable, ScreenInter
 
     public void retrieveCashAdvance() {
         poJSON = new JSONObject();
-        poController.setTransactionStatus(CashAdvanceStatus.OPEN + "" + CashAdvanceStatus.CONFIRMED);
+        poController.setTransactionStatus(CashAdvanceStatus.OPEN);
         poJSON = poController.loadTransactionList(tfSearchIndustry.getText(), tfSearchPayee.getText(), tfSearchVoucherNo.getText());
         if (!"success".equals((String) poJSON.get("result"))) {
             ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
@@ -334,7 +334,10 @@ public class CashAdvance_ByBatchController implements Initializable, ScreenInter
             });
         }
         loadTableMain.reload();
-        JFXUtil.runWithDelay(0.50, () -> initButtons());
+        JFXUtil.runWithDelay(0.50, () -> {
+            initButtons();
+            initButtons();
+        });
     }
 
     public void initLoadTable() {
@@ -361,10 +364,6 @@ public class CashAdvance_ByBatchController implements Initializable, ScreenInter
                                             String.valueOf(poController.CashAdvanceList(lnCtr).Department().getDescription()),
                                             CustomCommonUtil.setIntegerValueToDecimalFormat(String.valueOf(poController.CashAdvanceList(lnCtr).getAdvanceAmount()))
                                     ));
-
-                                    if (poController.CashAdvanceList(lnCtr).getTransactionStatus().equals(CashAdvanceStatus.CONFIRMED)) {
-                                        JFXUtil.highlightByKey(tblViewMainList, String.valueOf(lnCtr + 1), "#C1E1C1", highlightedRowsMain);
-                                    }
                                 }
                             }
 
