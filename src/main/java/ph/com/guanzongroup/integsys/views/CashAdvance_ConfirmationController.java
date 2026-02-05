@@ -588,6 +588,8 @@ public class CashAdvance_ConfirmationController implements Initializable, Screen
                                             loJSON = poController.ConfirmTransaction("");
                                             if ("success".equals((String) loJSON.get("result"))) {
                                                 ShowMessageFX.Information((String) loJSON.get("message"), pxeModuleName, null);
+                                                JFXUtil.disableAllHighlightByColor(tblViewMainList, "#A7C7E7", highlightedRowsMain);
+                                                JFXUtil.highlightByKey(tblViewMainList, String.valueOf(pnMain + 1), "#C1E1C1", highlightedRowsMain);
                                             } else {
                                                 ShowMessageFX.Warning((String) loJSON.get("message"), pxeModuleName, null);
                                             }
