@@ -225,7 +225,7 @@ public class CashAdvance_ReleaseController implements Initializable, ScreenInter
 //                                tfSearchPayee.setText("");
 //                                break;
 //                            }
-                            loadRecordSearch();
+//                            loadRecordSearch();
                             retrieveCashAdvance();
                             return;
                         case "tfSearchVoucherNo":

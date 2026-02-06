@@ -221,7 +221,7 @@ public class CashAdvance_ConfirmationController implements Initializable, Screen
                             loadRecordSearch();
                             retrieveCashAdvance();
                             return;
-//                        case "tfSearchPayee":
+                        case "tfSearchPayee":
 //                            poJSON = poController.SearchPayee(lsValue, false, true);
 //                            if ("error".equals(poJSON.get("result"))) {
 //                                ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
@@ -229,8 +229,8 @@ public class CashAdvance_ConfirmationController implements Initializable, Screen
 //                                break;
 //                            }
 //                            loadRecordSearch();
-//                            retrieveCashAdvance();
-//                            return;
+                            retrieveCashAdvance();
+                            return;
                         case "tfSearchVoucherNo":
                             if (!tooltipShown) {
                                 JFXUtil.showTooltip("NOTE: Results appear directly in the table view, no pop-up dialog.", tfSearchVoucherNo);
