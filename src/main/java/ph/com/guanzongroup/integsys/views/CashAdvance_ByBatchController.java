@@ -355,10 +355,10 @@ public class CashAdvance_ByBatchController implements Initializable, ScreenInter
                                 //retreiving using column index
                                 for (int lnCtr = 0; lnCtr <= poController.getCashAdvanceCount() - 1; lnCtr++) {
                                     String lsCreditedTo = "";
-                                    if (poController.Master().CreditedToOthers().getPayeeName() != null && !"".equals(poController.Master().CreditedToOthers().getPayeeName())) {
-                                        lsCreditedTo = (poController.Master().CreditedToOthers().getPayeeName());
+                                    if (poController.CashAdvanceList(lnCtr).getPayeeName() != null && !"".equals(poController.CashAdvanceList(lnCtr).getPayeeName())) {
+                                        lsCreditedTo = (poController.CashAdvanceList(lnCtr).getPayeeName());
                                     } else {
-                                        lsCreditedTo = (poController.Master().Credited().getCompanyName());
+                                        lsCreditedTo = (poController.CashAdvanceList(lnCtr).Credited().getCompanyName());
                                     }
                                     main_data.add(new ModelCashAdvance(String.valueOf(lnCtr + 1),
                                             checkedItem.get(lnCtr),// 0 as unchecked, 1 as checked

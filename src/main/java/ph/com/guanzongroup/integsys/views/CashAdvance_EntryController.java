@@ -220,7 +220,7 @@ public class CashAdvance_EntryController implements Initializable, ScreenInterfa
                         poJSON = poController.Master().setAdvanceAmount(Double.valueOf(lsValue));
                         break;
                 }
-                JFXUtil.runWithDelay(0.5, () -> {
+                JFXUtil.runWithDelay(0.8, () -> {
                     loadRecordMaster();
                 });
             });

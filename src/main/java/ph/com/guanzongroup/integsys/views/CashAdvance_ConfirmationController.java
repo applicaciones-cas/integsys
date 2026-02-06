@@ -353,7 +353,7 @@ public class CashAdvance_ConfirmationController implements Initializable, Screen
                         poJSON = poController.Master().setAdvanceAmount(Double.valueOf(lsValue));
                         break;
                 }
-                JFXUtil.runWithDelay(0.5, () -> {
+                JFXUtil.runWithDelay(0.8, () -> {
                     loadRecordMaster();
                 });
             });
