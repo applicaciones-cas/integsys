@@ -296,7 +296,7 @@ public class CashAdvance_ByBatchController implements Initializable, ScreenInter
 //                                    tfSearchPayee.setText("");
 //                                    break;
 //                                }
-                                loadRecordSearch();
+//                                loadRecordSearch();
                                 retrieveCashAdvance();
                                 return;
                             case "tfSearchVoucherNo":
