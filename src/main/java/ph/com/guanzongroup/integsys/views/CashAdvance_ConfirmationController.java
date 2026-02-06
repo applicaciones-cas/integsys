@@ -353,7 +353,9 @@ public class CashAdvance_ConfirmationController implements Initializable, Screen
                         poJSON = poController.Master().setAdvanceAmount(Double.valueOf(lsValue));
                         break;
                 }
-                loadRecordMaster();
+                JFXUtil.runWithDelay(0.5, () -> {
+                    loadRecordMaster();
+                });
             });
 
     ChangeListener<Boolean> txtArea_Focus = JFXUtil.FocusListener(TextArea.class,
@@ -519,7 +521,6 @@ public class CashAdvance_ConfirmationController implements Initializable, Screen
             tfPettyCash.setText(poController.Master().PettyCash().getPettyCashDescription());
             tfPayee.setText(poController.Master().getPayeeName());
             tfRequestingDepartment.setText(poController.Master().Department().getDescription());
-            tfAmountToAdvance.setText("");
             taRemarks.setText(poController.Master().getRemarks());
             tfAmountToAdvance.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Master().getAdvanceAmount().doubleValue(), true));
 
@@ -567,17 +568,21 @@ public class CashAdvance_ConfirmationController implements Initializable, Screen
             switch (checkedBox.getId()) {
                 case "cbOtherPayee": // this is the id
                     if (!tfPayee.getText().isEmpty()) {
-                        if (ShowMessageFX.YesNo(null, pxeModuleName, "Payee name is not empty, Are you sure you want to check others?\n") == false) {
-                            return;
+                        String stat = checkedBox.isSelected() ? "check" : "uncheck";
+                        if (ShowMessageFX.YesNo(null, pxeModuleName, "Payee name is not empty, Are you sure you want to " + stat + " others?\n") == false) {
+                            checkedBox.setSelected(false);
+                            break;
                         }
                         poController.Master().setClientId("");
                         poController.Master().setPayeeName("");
                     }
                     break;
                 case "cbOtherCreditedTo": // this is the id
+                    String stat = checkedBox.isSelected() ? "check" : "uncheck";
                     if (!tfCreditedTo.getText().isEmpty()) {
-                        if (ShowMessageFX.YesNo(null, pxeModuleName, "Credited To is not empty, Are you sure you want to check others?\n") == false) {
-                            return;
+                        if (ShowMessageFX.YesNo(null, pxeModuleName, "Credited To is not empty, Are you sure you want to " + stat + " others?\n") == false) {
+                            checkedBox.setSelected(false);
+                            break;
                         }
                         poController.Master().setCreditedTo("");
                     }

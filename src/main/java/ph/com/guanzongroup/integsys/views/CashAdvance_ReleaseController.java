@@ -456,7 +456,7 @@ public class CashAdvance_ReleaseController implements Initializable, ScreenInter
                                             String.valueOf(poController.CashAdvanceList(lnCtr).Department().getDescription())
                                     ));
 
-                                    if (poController.CashAdvanceList(lnCtr).getTransactionStatus().equals(CashAdvanceStatus.CONFIRMED)) {
+                                    if (poController.CashAdvanceList(lnCtr).getTransactionStatus().equals(CashAdvanceStatus.RELEASED)) {
                                         JFXUtil.highlightByKey(tblViewMainList, String.valueOf(lnCtr + 1), "#C1E1C1", highlightedRowsMain);
                                     }
                                 }
@@ -494,7 +494,6 @@ public class CashAdvance_ReleaseController implements Initializable, ScreenInter
             tfPettyCash.setText(poController.Master().PettyCash().getPettyCashDescription());
             tfPayee.setText(poController.Master().getPayeeName());
             tfRequestingDepartment.setText(poController.Master().Department().getDescription());
-            tfAmountToAdvance.setText("");
             taRemarks.setText(poController.Master().getRemarks());
             tfAmountToAdvance.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Master().getAdvanceAmount().doubleValue(), true));
             boolean lbPayeeOthers = (poController.Master().getClientId() == null || "".equals(poController.Master().getClientId()))
