@@ -254,7 +254,7 @@ public class CashAdvance_ReleaseController implements Initializable, ScreenInter
                             loadRecordMaster();
                             break;
                         case "tfCreditedTo":
-                            poJSON = poController.SearchCreditedTo(lsValue, false,cbOtherCreditedTo.isSelected());
+                            poJSON = poController.SearchCreditedTo(lsValue, false, cbOtherCreditedTo.isSelected());
                             if ("error".equals(poJSON.get("result"))) {
                                 ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                 tfCreditedTo.setText("");
@@ -490,17 +490,17 @@ public class CashAdvance_ReleaseController implements Initializable, ScreenInter
             // Transaction Date
             String lsTransactionDate = CustomCommonUtil.formatDateToShortString(poController.Master().getTransactionDate());
             dpAdvanceDate.setValue(CustomCommonUtil.parseDateStringToLocalDate(lsTransactionDate, "yyyy-MM-dd"));
-             tfVoucherNo.setText(poController.Master().getVoucher());
+            tfVoucherNo.setText(poController.Master().getVoucher());
             tfPettyCash.setText(poController.Master().PettyCash().getPettyCashDescription());
             tfPayee.setText(poController.Master().getPayeeName());
             tfRequestingDepartment.setText(poController.Master().Department().getDescription());
             tfAmountToAdvance.setText("");
             taRemarks.setText(poController.Master().getRemarks());
             tfAmountToAdvance.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Master().getAdvanceAmount().doubleValue(), true));
-            boolean lbPayeeOthers = (poController.Master().getClientId() == null || "".equals(poController.Master().getClientId())) 
-                                    && poController.Master().getPayeeName() != null && !"".equals(poController.Master().getPayeeName());
+            boolean lbPayeeOthers = (poController.Master().getClientId() == null || "".equals(poController.Master().getClientId()))
+                    && poController.Master().getPayeeName() != null && !"".equals(poController.Master().getPayeeName());
             cbOtherPayee.setSelected(lbPayeeOthers);
-            if(poController.Master().CreditedToOthers().getPayeeName() != null && !"".equals(poController.Master().CreditedToOthers().getPayeeName())){
+            if (poController.Master().CreditedToOthers().getPayeeName() != null && !"".equals(poController.Master().CreditedToOthers().getPayeeName())) {
                 tfCreditedTo.setText(poController.Master().CreditedToOthers().getPayeeName());
                 cbOtherCreditedTo.setSelected(true);
             } else {
@@ -512,6 +512,11 @@ public class CashAdvance_ReleaseController implements Initializable, ScreenInter
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
             ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
+    }
+
+    @FXML
+    private void cmdCheckBox_Click(ActionEvent event) {
+
     }
 
     @FXML

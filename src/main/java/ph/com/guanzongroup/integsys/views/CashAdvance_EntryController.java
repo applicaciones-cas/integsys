@@ -340,15 +340,33 @@ public class CashAdvance_EntryController implements Initializable, ScreenInterfa
             tfAmountToAdvance.setText("");
             taRemarks.setText(poController.Master().getRemarks());
             tfAmountToAdvance.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Master().getAdvanceAmount().doubleValue(), true));
-            boolean lbPayeeOthers = (poController.Master().getClientId() == null || "".equals(poController.Master().getClientId())) 
-                                    && poController.Master().getPayeeName() != null && !"".equals(poController.Master().getPayeeName());
-            cbOtherPayee.setSelected(lbPayeeOthers);
-            if(poController.Master().CreditedToOthers().getPayeeName() != null && !"".equals(poController.Master().CreditedToOthers().getPayeeName())){
-                tfCreditedTo.setText(poController.Master().CreditedToOthers().getPayeeName());
-                cbOtherCreditedTo.setSelected(true);
+
+            if (cbOtherPayee.isSelected() && JFXUtil.isObjectEqualTo(pnEditMode, EditMode.ADDNEW, EditMode.UPDATE)) {
+                if (JFXUtil.isObjectEqualTo(poController.Master().getClientId(), null, "")
+                        && !JFXUtil.isObjectEqualTo(poController.Master().getPayeeName(), null, "")) {
+                    cbOtherPayee.setSelected(true);
+                }
             } else {
-                tfCreditedTo.setText(poController.Master().Credited().getCompanyName());
-                cbOtherCreditedTo.setSelected(false);
+                boolean lbPayeeOthers = (poController.Master().getClientId() == null || "".equals(poController.Master().getClientId()))
+                        && poController.Master().getPayeeName() != null && !"".equals(poController.Master().getPayeeName());
+                cbOtherPayee.setSelected(lbPayeeOthers);
+            }
+
+            if (cbOtherCreditedTo.isSelected() && JFXUtil.isObjectEqualTo(pnEditMode, EditMode.ADDNEW, EditMode.UPDATE)) {
+                if (poController.Master().CreditedToOthers().getPayeeName() != null && !"".equals(poController.Master().CreditedToOthers().getPayeeName())) {
+                    tfCreditedTo.setText(poController.Master().CreditedToOthers().getPayeeName());
+                    cbOtherCreditedTo.setSelected(true);
+                } else {
+                    tfCreditedTo.setText(poController.Master().Credited().getCompanyName());
+                }
+            } else {
+                if (poController.Master().CreditedToOthers().getPayeeName() != null && !"".equals(poController.Master().CreditedToOthers().getPayeeName())) {
+                    tfCreditedTo.setText(poController.Master().CreditedToOthers().getPayeeName());
+                    cbOtherCreditedTo.setSelected(true);
+                } else {
+                    tfCreditedTo.setText(poController.Master().Credited().getCompanyName());
+                    cbOtherCreditedTo.setSelected(false);
+                }
             }
 
             JFXUtil.updateCaretPositions(apMaster);
@@ -366,15 +384,24 @@ public class CashAdvance_EntryController implements Initializable, ScreenInterfa
             CheckBox checkedBox = (CheckBox) source;
             switch (checkedBox.getId()) {
                 case "cbOtherPayee": // this is the id
-                    poController.Master().setClientId("");
-                    poController.Master().setPayeeName("");
-                    tfPayee.setText("");
+                    if (!tfPayee.getText().isEmpty()) {
+                        if (ShowMessageFX.YesNo(null, pxeModuleName, "Payee name is not empty, Are you sure you want to check others?\n") == false) {
+                            return;
+                        }
+                        poController.Master().setClientId("");
+                        poController.Master().setPayeeName("");
+                    }
                     break;
                 case "cbOtherCreditedTo": // this is the id
-                    poController.Master().setCreditedTo("");
-                    tfCreditedTo.setText("");
+                    if (!tfCreditedTo.getText().isEmpty()) {
+                        if (ShowMessageFX.YesNo(null, pxeModuleName, "Credited To is not empty, Are you sure you want to check others?\n") == false) {
+                            return;
+                        }
+                        poController.Master().setCreditedTo("");
+                    }
                     break;
             }
+            loadRecordMaster();
         }
     }
 

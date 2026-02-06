@@ -242,10 +242,10 @@ public class CashAdvance_HistoryController implements Initializable, ScreenInter
             tfRequestingDepartment.setText(poController.Master().Department().getDescription());
             taRemarks.setText(poController.Master().getRemarks());
             tfAmountToAdvance.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Master().getAdvanceAmount().doubleValue(), true));
-            boolean lbPayeeOthers = (poController.Master().getClientId() == null || "".equals(poController.Master().getClientId())) 
-                                    && poController.Master().getPayeeName() != null && !"".equals(poController.Master().getPayeeName());
+            boolean lbPayeeOthers = (poController.Master().getClientId() == null || "".equals(poController.Master().getClientId()))
+                    && poController.Master().getPayeeName() != null && !"".equals(poController.Master().getPayeeName());
             cbOtherPayee.setSelected(lbPayeeOthers);
-            if(poController.Master().CreditedToOthers().getPayeeName() != null && !"".equals(poController.Master().CreditedToOthers().getPayeeName())){
+            if (poController.Master().CreditedToOthers().getPayeeName() != null && !"".equals(poController.Master().CreditedToOthers().getPayeeName())) {
                 tfCreditedTo.setText(poController.Master().CreditedToOthers().getPayeeName());
                 cbOtherCreditedTo.setSelected(true);
             } else {
@@ -257,6 +257,11 @@ public class CashAdvance_HistoryController implements Initializable, ScreenInter
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
             ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
+    }
+
+    @FXML
+    private void cmdCheckBox_Click(ActionEvent event) {
+
     }
 
     @FXML

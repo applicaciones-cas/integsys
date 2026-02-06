@@ -144,6 +144,11 @@ public class CashAdvance_ViewController implements Initializable, ScreenInterfac
         buttons.forEach(button -> button.setOnAction(this::cmdButton_Click));
     }
 
+    @FXML
+    private void cmdCheckBox_Click(ActionEvent event) {
+
+    }
+
     private void cmdButton_Click(ActionEvent event) {
         poJSON = new JSONObject();
         String lsButton = ((Button) event.getSource()).getId();
@@ -191,17 +196,17 @@ public class CashAdvance_ViewController implements Initializable, ScreenInterfac
             String lsTransactionDate = CustomCommonUtil.formatDateToShortString(poController.Master().getTransactionDate());
             dpAdvanceDate.setValue(CustomCommonUtil.parseDateStringToLocalDate(lsTransactionDate, "yyyy-MM-dd"));
 
-             tfVoucherNo.setText(poController.Master().getVoucher());
+            tfVoucherNo.setText(poController.Master().getVoucher());
             tfPettyCash.setText(poController.Master().PettyCash().getPettyCashDescription());
             tfPayee.setText(poController.Master().getPayeeName());
             tfRequestingDepartment.setText(poController.Master().Department().getDescription());
             tfAmountToAdvance.setText("");
             taRemarks.setText(poController.Master().getRemarks());
             tfAmountToAdvance.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Master().getAdvanceAmount().doubleValue(), true));
-            boolean lbPayeeOthers = (poController.Master().getClientId() == null || "".equals(poController.Master().getClientId())) 
-                                    && poController.Master().getPayeeName() != null && !"".equals(poController.Master().getPayeeName());
+            boolean lbPayeeOthers = (poController.Master().getClientId() == null || "".equals(poController.Master().getClientId()))
+                    && poController.Master().getPayeeName() != null && !"".equals(poController.Master().getPayeeName());
             cbOtherPayee.setSelected(lbPayeeOthers);
-            if(poController.Master().CreditedToOthers().getPayeeName() != null && !"".equals(poController.Master().CreditedToOthers().getPayeeName())){
+            if (poController.Master().CreditedToOthers().getPayeeName() != null && !"".equals(poController.Master().CreditedToOthers().getPayeeName())) {
                 tfCreditedTo.setText(poController.Master().CreditedToOthers().getPayeeName());
                 cbOtherCreditedTo.setSelected(true);
             } else {
