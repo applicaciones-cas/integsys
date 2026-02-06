@@ -232,11 +232,11 @@ public class CashAdvance_ConfirmationController implements Initializable, Screen
                             retrieveCashAdvance();
                             return;
                         case "tfSearchVoucherNo":
+                            retrieveCashAdvance();
                             if (!tooltipShown) {
                                 JFXUtil.showTooltip("NOTE: Results appear directly in the table view, no pop-up dialog.", tfSearchVoucherNo);
                                 tooltipShown = true;
                             }
-                            retrieveCashAdvance();
                             return;
                         case "tfPettyCash":
                             poJSON = poController.SearchPettyCash(lsValue, false);
@@ -509,6 +509,7 @@ public class CashAdvance_ConfirmationController implements Initializable, Screen
 
     public void loadRecordMaster() {
         try {
+            JFXUtil.setDisabled(true, dpAdvanceDate);
             lblStatus.setText(poController.getStatus(poController.Master().getTransactionStatus()).toUpperCase());
             tfTransactionNo.setText(poController.Master().getTransactionNo());
 

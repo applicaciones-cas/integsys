@@ -299,11 +299,11 @@ public class CashAdvance_ByBatchController implements Initializable, ScreenInter
                                 retrieveCashAdvance();
                                 return;
                             case "tfSearchVoucherNo":
+                                retrieveCashAdvance();
                                 if (!tooltipShown) {
                                     JFXUtil.showTooltip("NOTE: Results appear directly in the table view, no pop-up dialog.", tfSearchVoucherNo);
                                     tooltipShown = true;
                                 }
-                                retrieveCashAdvance();
                                 return;
                         }
                         event.consume();
