@@ -18,6 +18,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
@@ -66,11 +67,13 @@ public class CashAdvance_ViewController implements Initializable, ScreenInterfac
     @FXML
     private Label lblStatus;
     @FXML
-    private TextField tfTransactionNo, tfVoucherNo, tfPayee, tfCreditedTo, tfRequestingDepartment, tfAmountToAdvance;
+    private TextField tfTransactionNo, tfVoucherNo, tfPayee, tfCreditedTo, tfRequestingDepartment, tfAmountToAdvance, tfPettyCash;
     @FXML
     private DatePicker dpAdvanceDate;
     @FXML
     private TextArea taRemarks;
+    @FXML
+    private CheckBox cbOtherPayee, cbOtherCreditedTo;
 
     @Override
     public void setGRider(GRiderCAS foValue) {
@@ -189,6 +192,7 @@ public class CashAdvance_ViewController implements Initializable, ScreenInterfac
             dpAdvanceDate.setValue(CustomCommonUtil.parseDateStringToLocalDate(lsTransactionDate, "yyyy-MM-dd"));
 
             tfVoucherNo.setText(poController.Master().getVoucher());
+            tfPettyCash.setText("");
             tfPayee.setText(poController.Master().Payee().getPayeeName());
             tfCreditedTo.setText(poController.Master().Credited().getCompanyName());
             tfRequestingDepartment.setText(poController.Master().Department().getDescription());

@@ -4,6 +4,7 @@
 <?import java.net.URL?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.DatePicker?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TextArea?>
@@ -197,8 +198,8 @@
                                                                           <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="10.0" />
                                                                           <ColumnConstraints hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="139.0" />
                                                                           <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="150.0" />
-                                                                          <ColumnConstraints halignment="LEFT" hgrow="SOMETIMES" maxWidth="1.7976931348623157E308" minWidth="-Infinity" prefWidth="20.0" />
-                                                      <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="139.0" />
+                                                                          <ColumnConstraints halignment="LEFT" hgrow="SOMETIMES" maxWidth="1.7976931348623157E308" minWidth="-Infinity" prefWidth="10.0" />
+                                                      <ColumnConstraints halignment="LEFT" hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="139.0" />
                                                       <ColumnConstraints halignment="LEFT" hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="10.0" />
                                                       <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="120.0" />
                                                       <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="10.0" />
@@ -208,6 +209,7 @@
                                                                           <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="28.0" vgrow="SOMETIMES" />
                                                                               <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="10.0" vgrow="SOMETIMES" />
                                                                           <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="28.0" vgrow="SOMETIMES" />
+                                                                  <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="28.0" vgrow="SOMETIMES" />
                                                                   <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="28.0" vgrow="SOMETIMES" />
                                                                   <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="28.0" vgrow="SOMETIMES" />
                                                                           <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="28.0" vgrow="SOMETIMES" />
@@ -231,26 +233,26 @@
                                                                                  <font>
                                                                                     <Font size="12.0" />
                                                                                  </font></Label>
-                                                                  <Label layoutX="404.0" layoutY="54.0" text="Amount to Advance" GridPane.columnIndex="7" GridPane.rowIndex="8">
+                                                                  <Label layoutX="404.0" layoutY="54.0" text="Amount to Advance" GridPane.columnIndex="7" GridPane.rowIndex="9">
                                                                      <font>
                                                                         <Font name="System Bold" size="12.0" />
                                                                      </font>
                                                                   </Label>
-                                                                          <Label text="Credited To" GridPane.rowIndex="5">
+                                                                          <Label text="Credited To" GridPane.rowIndex="6">
                                                                                  <font>
                                                                                     <Font size="12.0" />
                                                                                  </font></Label>
-                                                                          <Label text="Remarks" GridPane.rowIndex="7">
+                                                                          <Label text="Remarks" GridPane.rowIndex="8">
                                                                                  <font>
                                                                                     <Font size="12.0" />
                                                                                  </font></Label>
-                                                                  <Label layoutX="44.0" layoutY="82.0" text="Req. Dept." GridPane.rowIndex="6">
+                                                                  <Label layoutX="44.0" layoutY="82.0" text="Req. Dept." GridPane.rowIndex="7">
                                                                      <font>
                                                                         <Font size="12.0" />
                                                                      </font>
                                                                   </Label>
                                                                   <Label text="Voucher No" GridPane.rowIndex="3" />
-                                                                  <Label layoutX="46.0" layoutY="112.0" text="Payee" GridPane.rowIndex="4">
+                                                                  <Label layoutX="46.0" layoutY="112.0" text="Payee" GridPane.rowIndex="5">
                                                                      <font>
                                                                         <Font size="12.0" />
                                                                      </font>
@@ -258,15 +260,19 @@
                                                                           <TextField fx:id="tfTransactionNo" editable="false" maxHeight="25.0" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="139.0" style="-fx-font-weight: bold;" styleClass="DisabledTextField" GridPane.columnIndex="2" GridPane.columnSpan="2" />
                                                                               <DatePicker fx:id="dpAdvanceDate" GridPane.columnIndex="2" GridPane.rowIndex="2" />
                                                                   <TextField fx:id="tfVoucherNo" GridPane.columnIndex="2" GridPane.rowIndex="3" />
-                                                                  <TextField fx:id="tfPayee" layoutX="100.0" layoutY="107.0" maxHeight="25.0" promptText="Press F3: Search" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.rowIndex="4" />
-                                                                          <TextField fx:id="tfCreditedTo" maxHeight="25.0" promptText="Press F3: Search" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.rowIndex="5" />
-                                                                  <TextField fx:id="tfRequestingDepartment" layoutX="85.0" layoutY="78.0" maxHeight="25.0" promptText="Press F3: Search" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.rowIndex="6" />
-                                                                  <TextField fx:id="tfAmountToAdvance" alignment="CENTER_RIGHT" layoutX="499.0" layoutY="50.0" maxHeight="25.0" promptText="0.0000" GridPane.columnIndex="9" GridPane.rowIndex="8" />
-                                                      <TextArea fx:id="taRemarks" wrapText="true" GridPane.columnIndex="2" GridPane.columnSpan="4" GridPane.rowIndex="7" GridPane.rowSpan="2">
+                                                                  <TextField fx:id="tfPayee" layoutX="100.0" layoutY="107.0" maxHeight="25.0" promptText="Press F3: Search" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.rowIndex="5" />
+                                                                          <TextField fx:id="tfCreditedTo" maxHeight="25.0" promptText="Press F3: Search" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.rowIndex="6" />
+                                                                  <TextField fx:id="tfRequestingDepartment" layoutX="85.0" layoutY="78.0" maxHeight="25.0" promptText="Press F3: Search" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.rowIndex="7" />
+                                                                  <TextField fx:id="tfAmountToAdvance" alignment="CENTER_RIGHT" layoutX="499.0" layoutY="50.0" maxHeight="25.0" promptText="0.0000" GridPane.columnIndex="9" GridPane.rowIndex="9" />
+                                                      <TextArea fx:id="taRemarks" wrapText="true" GridPane.columnIndex="2" GridPane.columnSpan="4" GridPane.rowIndex="8" GridPane.rowSpan="2">
                                                          <GridPane.margin>
                                                             <Insets top="1.0" />
                                                          </GridPane.margin>
                                                       </TextArea>
+                                                                  <Label text="Petty Cash" GridPane.rowIndex="4" />
+                                                                  <TextField fx:id="tfPettyCash" minWidth="-Infinity" prefWidth="289.0" promptText="Press F3: Search" GridPane.columnIndex="2" GridPane.rowIndex="4" />
+                                                                  <CheckBox fx:id="cbOtherPayee" mnemonicParsing="false" onAction="#cmdCheckBox_Click" text="Others" GridPane.columnIndex="5" GridPane.rowIndex="5" />
+                                                                  <CheckBox fx:id="cbOtherCreditedTo" mnemonicParsing="false" onAction="#cmdCheckBox_Click" text="Others" GridPane.columnIndex="5" GridPane.rowIndex="6" />
                                                                       </children>
                                                                   </GridPane>
                                                               </children>

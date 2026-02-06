@@ -11,6 +11,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
@@ -51,7 +52,7 @@ public class CashAdvance_HistoryController implements Initializable, ScreenInter
     @FXML
     private Label lblSource, lblStatus;
     @FXML
-    private TextField tfSearchIndustry, tfSearchPayee, tfSearchVoucherNo, tfTransactionNo, tfVoucherNo, tfPayee, tfCreditedTo, tfRequestingDepartment, tfAmountToAdvance;
+    private TextField tfSearchIndustry, tfSearchPayee, tfSearchVoucherNo, tfTransactionNo, tfVoucherNo, tfPayee, tfCreditedTo, tfRequestingDepartment, tfAmountToAdvance, tfPettyCash;
     @FXML
     private HBox hbButtons, hboxid;
     @FXML
@@ -60,6 +61,8 @@ public class CashAdvance_HistoryController implements Initializable, ScreenInter
     private DatePicker dpAdvanceDate;
     @FXML
     private TextArea taRemarks;
+    @FXML
+    private CheckBox cbOtherPayee, cbOtherCreditedTo;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -73,7 +76,7 @@ public class CashAdvance_HistoryController implements Initializable, ScreenInter
             clearTextFields();
             pnEditMode = EditMode.UNKNOWN;
             initButton(pnEditMode);
-            
+
             Platform.runLater(() -> {
                 poController.Master().setIndustryId(psIndustryId);
                 poController.Master().setCompanyId(psCompanyId);
@@ -83,7 +86,7 @@ public class CashAdvance_HistoryController implements Initializable, ScreenInter
                 loadRecordSearch();
             });
         } catch (SQLException | GuanzonException ex) {
-            Logger.getLogger(getClass().getName()).log(Level.SEVERE,MiscUtil.getException(ex), ex);
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
             ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
@@ -233,6 +236,7 @@ public class CashAdvance_HistoryController implements Initializable, ScreenInter
             dpAdvanceDate.setValue(CustomCommonUtil.parseDateStringToLocalDate(lsTransactionDate, "yyyy-MM-dd"));
 
             tfVoucherNo.setText(poController.Master().getVoucher());
+            tfPettyCash.setText("");
             tfPayee.setText(poController.Master().Payee().getPayeeName());
             tfCreditedTo.setText(poController.Master().Credited().getCompanyName());
             tfRequestingDepartment.setText(poController.Master().Department().getDescription());

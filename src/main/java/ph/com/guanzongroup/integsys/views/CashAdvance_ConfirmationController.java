@@ -21,6 +21,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.Pagination;
@@ -79,7 +80,7 @@ public class CashAdvance_ConfirmationController implements Initializable, Screen
     @FXML
     private Label lblSource, lblStatus;
     @FXML
-    private TextField tfSearchIndustry, tfSearchPayee, tfSearchVoucherNo, tfTransactionNo, tfVoucherNo, tfPayee, tfCreditedTo, tfRequestingDepartment, tfAmountToAdvance;
+    private TextField tfSearchIndustry, tfSearchPayee, tfSearchVoucherNo, tfTransactionNo, tfVoucherNo, tfPayee, tfCreditedTo, tfRequestingDepartment, tfAmountToAdvance, tfPettyCash;
     @FXML
     private HBox hbButtons, hboxid;
     @FXML
@@ -88,6 +89,8 @@ public class CashAdvance_ConfirmationController implements Initializable, Screen
     private DatePicker dpAdvanceDate;
     @FXML
     private TextArea taRemarks;
+    @FXML
+    private CheckBox cbOtherPayee, cbOtherCreditedTo;
     @FXML
     private TableView tblViewMainList;
     @FXML
@@ -234,6 +237,17 @@ public class CashAdvance_ConfirmationController implements Initializable, Screen
                             }
                             retrieveCashAdvance();
                             return;
+                        case "tfPettyCash":
+                            poJSON = poController.SearchPettyCash(lsValue, false, false);
+                            if ("error".equals(poJSON.get("result"))) {
+                                ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                                tfPayee.setText("");
+                                break;
+                            } else {
+                                JFXUtil.textFieldMoveNext(tfCreditedTo);
+                            }
+                            loadRecordMaster();
+                            break;
                         case "tfPayee":
                             poJSON = poController.SearchPayee(lsValue, false, false);
                             if ("error".equals(poJSON.get("result"))) {
@@ -501,6 +515,7 @@ public class CashAdvance_ConfirmationController implements Initializable, Screen
             dpAdvanceDate.setValue(CustomCommonUtil.parseDateStringToLocalDate(lsTransactionDate, "yyyy-MM-dd"));
 
             tfVoucherNo.setText(poController.Master().getVoucher());
+            tfPettyCash.setText("");
             tfPayee.setText(poController.Master().Payee().getPayeeName());
             tfCreditedTo.setText(poController.Master().Credited().getCompanyName());
             tfRequestingDepartment.setText(poController.Master().Department().getDescription());
@@ -515,6 +530,20 @@ public class CashAdvance_ConfirmationController implements Initializable, Screen
         }
     }
 
+    @FXML
+    private void cmdCheckBox_Click(ActionEvent event) {
+        poJSON = new JSONObject();
+        Object source = event.getSource();
+        if (source instanceof CheckBox) {
+            CheckBox checkedBox = (CheckBox) source;
+            switch (checkedBox.getId()) {
+                case "cbOtherPayee": // this is the id
+                    break;
+                case "cbOtherCreditedTo": // this is the id
+                    break;
+            }
+        }
+    }
     @FXML
     private void cmdButton_Click(ActionEvent event) {
         poJSON = new JSONObject();

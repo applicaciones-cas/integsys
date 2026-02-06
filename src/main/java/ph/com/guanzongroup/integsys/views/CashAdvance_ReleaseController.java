@@ -21,6 +21,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.Pagination;
@@ -81,7 +82,7 @@ public class CashAdvance_ReleaseController implements Initializable, ScreenInter
     @FXML
     private Label lblSource, lblStatus;
     @FXML
-    private TextField tfSearchIndustry, tfSearchPayee, tfSearchVoucherNo, tfTransactionNo, tfVoucherNo, tfPayee, tfCreditedTo, tfRequestingDepartment, tfAmountToAdvance;
+    private TextField tfSearchIndustry, tfSearchPayee, tfSearchVoucherNo, tfTransactionNo, tfVoucherNo, tfPayee, tfCreditedTo, tfRequestingDepartment, tfAmountToAdvance, tfPettyCash;
     @FXML
     private HBox hbButtons, hboxid;
     @FXML
@@ -90,6 +91,8 @@ public class CashAdvance_ReleaseController implements Initializable, ScreenInter
     private DatePicker dpAdvanceDate;
     @FXML
     private TextArea taRemarks;
+    @FXML
+    private CheckBox cbOtherPayee, cbOtherCreditedTo;
     @FXML
     private TableView tblViewMainList;
     @FXML
@@ -101,7 +104,7 @@ public class CashAdvance_ReleaseController implements Initializable, ScreenInter
     public void initialize(URL location, ResourceBundle resources) {
         try {
             //        psIndustryId = ""; // general
-            
+
             poJSON = new JSONObject();
             poController = new CashflowControllers(oApp, null).CashAdvance();
             poController.InitTransaction(); // Initialize transaction
@@ -123,8 +126,8 @@ public class CashAdvance_ReleaseController implements Initializable, ScreenInter
                 loadRecordSearch();
             });
             JFXUtil.initKeyClickObject(apMainAnchor, lastFocusedTextField, previousSearchedTextField);
-        }  catch (SQLException | GuanzonException ex) {
-            Logger.getLogger(getClass().getName()).log(Level.SEVERE,MiscUtil.getException(ex), ex);
+        } catch (SQLException | GuanzonException ex) {
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
             ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
@@ -488,6 +491,7 @@ public class CashAdvance_ReleaseController implements Initializable, ScreenInter
             String lsTransactionDate = CustomCommonUtil.formatDateToShortString(poController.Master().getTransactionDate());
             dpAdvanceDate.setValue(CustomCommonUtil.parseDateStringToLocalDate(lsTransactionDate, "yyyy-MM-dd"));
             tfVoucherNo.setText(poController.Master().getVoucher());
+            tfPettyCash.setText("");
             tfPayee.setText(poController.Master().Payee().getPayeeName());
             tfCreditedTo.setText(poController.Master().Credited().getCompanyName());
             tfRequestingDepartment.setText(poController.Master().Department().getDescription());
