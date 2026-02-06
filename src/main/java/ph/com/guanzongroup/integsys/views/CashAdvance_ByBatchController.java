@@ -290,12 +290,12 @@ public class CashAdvance_ByBatchController implements Initializable, ScreenInter
                                 retrieveCashAdvance();
                                 return;
                             case "tfSearchPayee":
-                                poJSON = poController.SearchPayee(lsValue, false, true);
-                                if ("error".equals(poJSON.get("result"))) {
-                                    ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-                                    tfSearchPayee.setText("");
-                                    break;
-                                }
+//                                poJSON = poController.SearchPayee(lsValue, false, true);
+//                                if ("error".equals(poJSON.get("result"))) {
+//                                    ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+//                                    tfSearchPayee.setText("");
+//                                    break;
+//                                }
                                 loadRecordSearch();
                                 retrieveCashAdvance();
                                 return;
@@ -354,13 +354,19 @@ public class CashAdvance_ByBatchController implements Initializable, ScreenInter
                             if (poController.getCashAdvanceCount() > 0) {
                                 //retreiving using column index
                                 for (int lnCtr = 0; lnCtr <= poController.getCashAdvanceCount() - 1; lnCtr++) {
+                                    String lsCreditedTo = "";
+                                    if (poController.Master().CreditedToOthers().getPayeeName() != null && !"".equals(poController.Master().CreditedToOthers().getPayeeName())) {
+                                        lsCreditedTo = (poController.Master().CreditedToOthers().getPayeeName());
+                                    } else {
+                                        lsCreditedTo = (poController.Master().Credited().getCompanyName());
+                                    }
                                     main_data.add(new ModelCashAdvance(String.valueOf(lnCtr + 1),
                                             checkedItem.get(lnCtr),// 0 as unchecked, 1 as checked
                                             String.valueOf(poController.CashAdvanceList(lnCtr).getTransactionNo()),
                                             String.valueOf(poController.CashAdvanceList(lnCtr).getVoucher()),
                                             CustomCommonUtil.formatDateToShortString(poController.CashAdvanceList(lnCtr).getTransactionDate()),
                                             String.valueOf(poController.CashAdvanceList(lnCtr).getPayeeName()),
-                                            String.valueOf(poController.CashAdvanceList(lnCtr).Credited().getCompanyName()),
+                                            lsCreditedTo,
                                             String.valueOf(poController.CashAdvanceList(lnCtr).Department().getDescription()),
                                             CustomCommonUtil.setIntegerValueToDecimalFormat(String.valueOf(poController.CashAdvanceList(lnCtr).getAdvanceAmount()))
                                     ));
