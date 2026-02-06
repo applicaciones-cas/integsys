@@ -141,10 +141,10 @@ public class CashAdvance_EntryController implements Initializable, ScreenInterfa
                 case F3:
                     switch (lsID) {
                         case "tfPettyCash":
-                            poJSON = poController.SearchPettyCash(lsValue, false, false);
+                            poJSON = poController.SearchPettyCash(lsValue, false);
                             if ("error".equals(poJSON.get("result"))) {
                                 ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-                                tfPayee.setText("");
+                                tfPettyCash.setText("");
                                 break;
                             } else {
                                 JFXUtil.textFieldMoveNext(tfCreditedTo);
@@ -152,7 +152,7 @@ public class CashAdvance_EntryController implements Initializable, ScreenInterfa
                             loadRecordMaster();
                             break;
                         case "tfPayee":
-                            poJSON = poController.SearchPayee(lsValue, false, false);
+                            poJSON = poController.SearchPayee(lsValue, false, cbOtherPayee.isSelected());
                             if ("error".equals(poJSON.get("result"))) {
                                 ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                 tfPayee.setText("");
@@ -163,7 +163,7 @@ public class CashAdvance_EntryController implements Initializable, ScreenInterfa
                             loadRecordMaster();
                             break;
                         case "tfCreditedTo":
-                            poJSON = poController.SearchCreditedTo(lsValue, false);
+                            poJSON = poController.SearchCreditedTo(lsValue, false, cbOtherCreditedTo.isSelected());
                             if ("error".equals(poJSON.get("result"))) {
                                 ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                 tfCreditedTo.setText("");
@@ -334,13 +334,22 @@ public class CashAdvance_EntryController implements Initializable, ScreenInterfa
             dpAdvanceDate.setValue(CustomCommonUtil.parseDateStringToLocalDate(lsTransactionDate, "yyyy-MM-dd"));
 
             tfVoucherNo.setText(poController.Master().getVoucher());
-            tfPettyCash.setText("");
+            tfPettyCash.setText(poController.Master().PettyCash().getPettyCashDescription());
             tfPayee.setText(poController.Master().getPayeeName());
-            tfCreditedTo.setText(poController.Master().Credited().getCompanyName());
             tfRequestingDepartment.setText(poController.Master().Department().getDescription());
             tfAmountToAdvance.setText("");
             taRemarks.setText(poController.Master().getRemarks());
             tfAmountToAdvance.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Master().getAdvanceAmount().doubleValue(), true));
+            boolean lbPayeeOthers = (poController.Master().getClientId() == null || "".equals(poController.Master().getClientId())) 
+                                    && poController.Master().getPayeeName() != null && !"".equals(poController.Master().getPayeeName());
+            cbOtherPayee.setSelected(lbPayeeOthers);
+            if(poController.Master().CreditedToOthers().getPayeeName() != null && !"".equals(poController.Master().CreditedToOthers().getPayeeName())){
+                tfCreditedTo.setText(poController.Master().CreditedToOthers().getPayeeName());
+                cbOtherCreditedTo.setSelected(true);
+            } else {
+                tfCreditedTo.setText(poController.Master().Credited().getCompanyName());
+                cbOtherCreditedTo.setSelected(false);
+            }
 
             JFXUtil.updateCaretPositions(apMaster);
         } catch (SQLException | GuanzonException ex) {
