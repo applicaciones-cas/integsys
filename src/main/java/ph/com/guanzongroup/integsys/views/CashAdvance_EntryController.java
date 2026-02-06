@@ -366,8 +366,13 @@ public class CashAdvance_EntryController implements Initializable, ScreenInterfa
             CheckBox checkedBox = (CheckBox) source;
             switch (checkedBox.getId()) {
                 case "cbOtherPayee": // this is the id
+                    poController.Master().setClientId("");
+                    poController.Master().setPayeeName("");
+                    tfPayee.setText("");
                     break;
                 case "cbOtherCreditedTo": // this is the id
+                    poController.Master().setCreditedTo("");
+                    tfCreditedTo.setText("");
                     break;
             }
         }
