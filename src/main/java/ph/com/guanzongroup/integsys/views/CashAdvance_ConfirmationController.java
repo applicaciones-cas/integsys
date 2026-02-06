@@ -301,7 +301,6 @@ public class CashAdvance_ConfirmationController implements Initializable, Screen
                 lblSource.setText("");
             }
             tfSearchIndustry.setText(poController.getSearchIndustry());
-            tfSearchPayee.setText(poController.getSearchPayee());
             JFXUtil.updateCaretPositions(apBrowse);
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);

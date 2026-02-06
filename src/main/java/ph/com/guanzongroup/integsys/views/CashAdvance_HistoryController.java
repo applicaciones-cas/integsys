@@ -183,7 +183,6 @@ public class CashAdvance_HistoryController implements Initializable, ScreenInter
                 lblSource.setText("");
             }
             tfSearchIndustry.setText(poController.getSearchIndustry());
-            tfSearchPayee.setText(poController.getSearchPayee());
             tfSearchVoucherNo.setText(psSearchVoucherNo);
             JFXUtil.updateCaretPositions(apBrowse);
         } catch (SQLException | GuanzonException ex) {
