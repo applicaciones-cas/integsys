@@ -11,6 +11,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
@@ -51,7 +52,7 @@ public class CashAdvance_HistoryController implements Initializable, ScreenInter
     @FXML
     private Label lblSource, lblStatus;
     @FXML
-    private TextField tfSearchIndustry, tfSearchPayee, tfSearchVoucherNo, tfTransactionNo, tfVoucherNo, tfPayee, tfCreditedTo, tfRequestingDepartment, tfAmountToAdvance;
+    private TextField tfSearchIndustry, tfSearchPayee, tfSearchVoucherNo, tfTransactionNo, tfVoucherNo, tfPayee, tfCreditedTo, tfRequestingDepartment, tfAmountToAdvance, tfPettyCash;
     @FXML
     private HBox hbButtons, hboxid;
     @FXML
@@ -60,6 +61,8 @@ public class CashAdvance_HistoryController implements Initializable, ScreenInter
     private DatePicker dpAdvanceDate;
     @FXML
     private TextArea taRemarks;
+    @FXML
+    private CheckBox cbOtherPayee, cbOtherCreditedTo;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -73,7 +76,7 @@ public class CashAdvance_HistoryController implements Initializable, ScreenInter
             clearTextFields();
             pnEditMode = EditMode.UNKNOWN;
             initButton(pnEditMode);
-            
+
             Platform.runLater(() -> {
                 poController.Master().setIndustryId(psIndustryId);
                 poController.Master().setCompanyId(psCompanyId);
@@ -83,7 +86,7 @@ public class CashAdvance_HistoryController implements Initializable, ScreenInter
                 loadRecordSearch();
             });
         } catch (SQLException | GuanzonException ex) {
-            Logger.getLogger(getClass().getName()).log(Level.SEVERE,MiscUtil.getException(ex), ex);
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
             ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
@@ -126,15 +129,16 @@ public class CashAdvance_HistoryController implements Initializable, ScreenInter
                             }
                             loadRecordSearch();
                             return;
+//                        case "tfSearchPayee":
+//                            poJSON = poController.SearchPayee(lsValue, false, true);
+//                            if ("error".equals(poJSON.get("result"))) {
+//                                ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+//                                tfSearchPayee.setText("");
+//                                break;
+//                            }
+//                            loadRecordSearch();
+//                            return;
                         case "tfSearchPayee":
-                            poJSON = poController.SearchPayee(lsValue, false, true);
-                            if ("error".equals(poJSON.get("result"))) {
-                                ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-                                tfSearchPayee.setText("");
-                                break;
-                            }
-                            loadRecordSearch();
-                            return;
                         case "tfSearchVoucherNo":
                             poJSON = poController.searchTransaction(tfSearchIndustry.getText(), tfSearchPayee.getText(), tfSearchVoucherNo.getText());
                             if ("error".equals(poJSON.get("result"))) {
@@ -179,7 +183,6 @@ public class CashAdvance_HistoryController implements Initializable, ScreenInter
                 lblSource.setText("");
             }
             tfSearchIndustry.setText(poController.getSearchIndustry());
-            tfSearchPayee.setText(poController.getSearchPayee());
             tfSearchVoucherNo.setText(psSearchVoucherNo);
             JFXUtil.updateCaretPositions(apBrowse);
         } catch (SQLException | GuanzonException ex) {
@@ -233,17 +236,31 @@ public class CashAdvance_HistoryController implements Initializable, ScreenInter
             dpAdvanceDate.setValue(CustomCommonUtil.parseDateStringToLocalDate(lsTransactionDate, "yyyy-MM-dd"));
 
             tfVoucherNo.setText(poController.Master().getVoucher());
-            tfPayee.setText(poController.Master().Payee().getPayeeName());
-            tfCreditedTo.setText(poController.Master().Credited().getCompanyName());
+            tfPettyCash.setText(poController.Master().PettyCash().getPettyCashDescription());
+            tfPayee.setText(poController.Master().getPayeeName());
             tfRequestingDepartment.setText(poController.Master().Department().getDescription());
             taRemarks.setText(poController.Master().getRemarks());
-            tfAmountToAdvance.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Master().getAdvanceAmount(), true));
-
+            tfAmountToAdvance.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Master().getAdvanceAmount().doubleValue(), true));
+            boolean lbPayeeOthers = (poController.Master().getClientId() == null || "".equals(poController.Master().getClientId()))
+                    && poController.Master().getPayeeName() != null && !"".equals(poController.Master().getPayeeName());
+            cbOtherPayee.setSelected(lbPayeeOthers);
+            if (poController.Master().CreditedToOthers().getPayeeName() != null && !"".equals(poController.Master().CreditedToOthers().getPayeeName())) {
+                tfCreditedTo.setText(poController.Master().CreditedToOthers().getPayeeName());
+                cbOtherCreditedTo.setSelected(true);
+            } else {
+                tfCreditedTo.setText(poController.Master().Credited().getCompanyName());
+                cbOtherCreditedTo.setSelected(false);
+            }
             JFXUtil.updateCaretPositions(apMaster);
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
             ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
+    }
+
+    @FXML
+    private void cmdCheckBox_Click(ActionEvent event) {
+
     }
 
     @FXML
