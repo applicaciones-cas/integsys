@@ -45,9 +45,6 @@ public class CashAdvance_ViewController implements Initializable, ScreenInterfac
 
     private GRiderCAS oApp;
     private JSONObject poJSON;
-    private int pnDetail = 0;
-    private int pnDetailBIR = 0;
-    private int pnAttachment = 0;
     private final String pxeModuleName = "Cash Advance View";
     private CashAdvance poController;
     public int pnEditMode;
