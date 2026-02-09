@@ -478,6 +478,7 @@ public class CashAdvance_EntryController implements Initializable, ScreenInterfa
                             clearTextFields();
                             poController.resetMaster();
                             poController.initFields();
+                            poController.Master().setTransactionStatus(String.valueOf(EditMode.UNKNOWN));
                             pnEditMode = EditMode.UNKNOWN;
                             break;
                         } else {
