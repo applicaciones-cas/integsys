@@ -240,10 +240,10 @@ public class CashAdvance_ConfirmationController implements Initializable, Screen
                             poJSON = poController.SearchPettyCash(lsValue, false);
                             if ("error".equals(poJSON.get("result"))) {
                                 ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-                                tfPayee.setText("");
+                                tfPettyCash.setText("");
                                 break;
                             } else {
-                                JFXUtil.textFieldMoveNext(tfCreditedTo);
+                                JFXUtil.textFieldMoveNext(tfPayee);
                             }
                             loadRecordMaster();
                             break;

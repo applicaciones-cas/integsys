@@ -147,7 +147,7 @@ public class CashAdvance_EntryController implements Initializable, ScreenInterfa
                                 tfPettyCash.setText("");
                                 break;
                             } else {
-                                JFXUtil.textFieldMoveNext(tfCreditedTo);
+                                JFXUtil.textFieldMoveNext(tfPayee);
                             }
                             loadRecordMaster();
                             break;
