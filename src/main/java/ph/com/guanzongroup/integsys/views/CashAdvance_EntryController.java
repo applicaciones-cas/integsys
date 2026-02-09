@@ -329,7 +329,7 @@ public class CashAdvance_EntryController implements Initializable, ScreenInterfa
     public void loadRecordMaster() {
         try {
             JFXUtil.setDisabled(true, dpAdvanceDate);
-            lblStatus.setText(poController.getStatus(poController.Master().getTransactionStatus()).toUpperCase());
+            lblStatus.setText(pnEditMode == EditMode.UNKNOWN ? "UNKNOWN" : poController.getStatus(poController.Master().getTransactionStatus()).toUpperCase());
             tfTransactionNo.setText(poController.Master().getTransactionNo());
 
             // Transaction Date

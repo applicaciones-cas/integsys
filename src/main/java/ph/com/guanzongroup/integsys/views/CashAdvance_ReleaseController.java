@@ -168,6 +168,7 @@ public class CashAdvance_ReleaseController implements Initializable, ScreenInter
                     ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                     return;
                 }
+                pnEditMode = poController.getEditMode();
                 loadRecordMaster();
             }
         } catch (CloneNotSupportedException | SQLException | GuanzonException ex) {
@@ -483,7 +484,7 @@ public class CashAdvance_ReleaseController implements Initializable, ScreenInter
 
     public void loadRecordMaster() {
         try {
-            lblStatus.setText(poController.getStatus(poController.Master().getTransactionStatus()).toUpperCase());
+            lblStatus.setText(pnEditMode == EditMode.UNKNOWN ? "UNKNOWN" : poController.getStatus(poController.Master().getTransactionStatus()).toUpperCase());
             tfTransactionNo.setText(poController.Master().getTransactionNo());
 
             // Transaction Date

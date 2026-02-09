@@ -172,6 +172,7 @@ public class CashAdvance_ConfirmationController implements Initializable, Screen
                     ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                     return;
                 }
+                pnEditMode = poController.getEditMode();
                 loadRecordMaster();
             }
         } catch (CloneNotSupportedException | SQLException | GuanzonException ex) {
@@ -510,7 +511,7 @@ public class CashAdvance_ConfirmationController implements Initializable, Screen
     public void loadRecordMaster() {
         try {
             JFXUtil.setDisabled(true, dpAdvanceDate);
-            lblStatus.setText(poController.getStatus(poController.Master().getTransactionStatus()).toUpperCase());
+            lblStatus.setText(pnEditMode == EditMode.UNKNOWN ? "UNKNOWN" : poController.getStatus(poController.Master().getTransactionStatus()).toUpperCase());
             tfTransactionNo.setText(poController.Master().getTransactionNo());
 
             // Transaction Date
