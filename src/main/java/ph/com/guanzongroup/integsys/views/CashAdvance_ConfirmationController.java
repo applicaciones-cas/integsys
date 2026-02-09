@@ -49,7 +49,6 @@ import ph.com.guanzongroup.cas.cashflow.status.CashAdvanceStatus;
 import ph.com.guanzongroup.integsys.model.ModelCashAdvance;
 import ph.com.guanzongroup.integsys.utility.CustomCommonUtil;
 import ph.com.guanzongroup.integsys.utility.JFXUtil;
-import static ph.com.guanzongroup.integsys.views.CashAdvance_EntryController.poController;
 
 /**
  *
@@ -68,6 +67,7 @@ public class CashAdvance_ConfirmationController implements Initializable, Screen
     private static final int ROWS_PER_PAGE = 50;
     int pnMain = 0;
     boolean tooltipShown = false;
+    boolean tooltipShown2 = false;
     AtomicReference<Object> lastFocusedTextField = new AtomicReference<>();
     AtomicReference<Object> previousSearchedTextField = new AtomicReference<>();
     private ObservableList<ModelCashAdvance> main_data = FXCollections.observableArrayList();
@@ -172,6 +172,7 @@ public class CashAdvance_ConfirmationController implements Initializable, Screen
                     ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                     return;
                 }
+                pnEditMode = poController.getEditMode();
                 loadRecordMaster();
             }
         } catch (CloneNotSupportedException | SQLException | GuanzonException ex) {
@@ -222,19 +223,16 @@ public class CashAdvance_ConfirmationController implements Initializable, Screen
                             retrieveCashAdvance();
                             return;
                         case "tfSearchPayee":
-//                            poJSON = poController.SearchPayee(lsValue, false, true);
-//                            if ("error".equals(poJSON.get("result"))) {
-//                                ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-//                                tfSearchPayee.setText("");
-//                                break;
-//                            }
-//                            loadRecordSearch();
                             retrieveCashAdvance();
+                            if (!tooltipShown2) {
+                                JFXUtil.showTooltip("NOTE: Results appear directly in the table view, no pop-up dialog.", txtField);
+                                tooltipShown2 = true;
+                            }
                             return;
                         case "tfSearchVoucherNo":
                             retrieveCashAdvance();
                             if (!tooltipShown) {
-                                JFXUtil.showTooltip("NOTE: Results appear directly in the table view, no pop-up dialog.", tfSearchVoucherNo);
+                                JFXUtil.showTooltip("NOTE: Results appear directly in the table view, no pop-up dialog.", txtField);
                                 tooltipShown = true;
                             }
                             return;
@@ -242,10 +240,10 @@ public class CashAdvance_ConfirmationController implements Initializable, Screen
                             poJSON = poController.SearchPettyCash(lsValue, false);
                             if ("error".equals(poJSON.get("result"))) {
                                 ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-                                tfPayee.setText("");
+                                tfPettyCash.setText("");
                                 break;
                             } else {
-                                JFXUtil.textFieldMoveNext(tfCreditedTo);
+                                JFXUtil.textFieldMoveNext(tfPayee);
                             }
                             loadRecordMaster();
                             break;
@@ -510,7 +508,7 @@ public class CashAdvance_ConfirmationController implements Initializable, Screen
     public void loadRecordMaster() {
         try {
             JFXUtil.setDisabled(true, dpAdvanceDate);
-            lblStatus.setText(poController.getStatus(poController.Master().getTransactionStatus()).toUpperCase());
+            lblStatus.setText(pnEditMode == EditMode.UNKNOWN ? "UNKNOWN" : poController.getStatus(poController.Master().getTransactionStatus()).toUpperCase());
             tfTransactionNo.setText(poController.Master().getTransactionNo());
 
             // Transaction Date
@@ -524,31 +522,25 @@ public class CashAdvance_ConfirmationController implements Initializable, Screen
             taRemarks.setText(poController.Master().getRemarks());
             tfAmountToAdvance.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Master().getAdvanceAmount().doubleValue(), true));
 
+            boolean lbPayeeOthers = JFXUtil.isObjectEqualTo(poController.Master().getClientId(), null, "")
+                    && !JFXUtil.isObjectEqualTo(poController.Master().getPayeeName(), null, "") && pbContinue;
             if (cbOtherPayee.isSelected() && JFXUtil.isObjectEqualTo(pnEditMode, EditMode.ADDNEW, EditMode.UPDATE)) {
-                if (JFXUtil.isObjectEqualTo(poController.Master().getClientId(), null, "")
-                        && !JFXUtil.isObjectEqualTo(poController.Master().getPayeeName(), null, "")) {
+                if (lbPayeeOthers) {
                     cbOtherPayee.setSelected(true);
                 }
             } else {
-                boolean lbPayeeOthers = (poController.Master().getClientId() == null || "".equals(poController.Master().getClientId()))
-                        && poController.Master().getPayeeName() != null && !"".equals(poController.Master().getPayeeName());
                 cbOtherPayee.setSelected(lbPayeeOthers);
             }
 
+            boolean lbCreditedTo = !JFXUtil.isObjectEqualTo(poController.Master().CreditedToOthers().getPayeeName(), null, "");
+            tfCreditedTo.setText(lbCreditedTo ? poController.Master().CreditedToOthers().getPayeeName() : poController.Master().Credited().getCompanyName());
             if (cbOtherCreditedTo.isSelected() && JFXUtil.isObjectEqualTo(pnEditMode, EditMode.ADDNEW, EditMode.UPDATE)) {
-                if (poController.Master().CreditedToOthers().getPayeeName() != null && !"".equals(poController.Master().CreditedToOthers().getPayeeName())) {
-                    tfCreditedTo.setText(poController.Master().CreditedToOthers().getPayeeName());
+                if (lbCreditedTo && pbContinue) {
                     cbOtherCreditedTo.setSelected(true);
-                } else {
-                    tfCreditedTo.setText(poController.Master().Credited().getCompanyName());
                 }
             } else {
-                if (poController.Master().CreditedToOthers().getPayeeName() != null && !"".equals(poController.Master().CreditedToOthers().getPayeeName())) {
-                    tfCreditedTo.setText(poController.Master().CreditedToOthers().getPayeeName());
-                    cbOtherCreditedTo.setSelected(true);
-                } else {
-                    tfCreditedTo.setText(poController.Master().Credited().getCompanyName());
-                    cbOtherCreditedTo.setSelected(false);
+                if (pbContinue) {
+                    cbOtherCreditedTo.setSelected(lbCreditedTo);
                 }
             }
 
@@ -559,6 +551,8 @@ public class CashAdvance_ConfirmationController implements Initializable, Screen
         }
     }
 
+    boolean pbContinue = true;
+
     @FXML
     private void cmdCheckBox_Click(ActionEvent event) {
         poJSON = new JSONObject();
@@ -566,26 +560,30 @@ public class CashAdvance_ConfirmationController implements Initializable, Screen
         if (source instanceof CheckBox) {
             CheckBox checkedBox = (CheckBox) source;
             switch (checkedBox.getId()) {
-                case "cbOtherPayee": // this is the id
+                case "cbOtherPayee":
                     if (!tfPayee.getText().isEmpty()) {
                         String stat = checkedBox.isSelected() ? "check" : "uncheck";
+                        pbContinue = false; // inserted due to lost focus delay; edge case
                         if (ShowMessageFX.YesNo(null, pxeModuleName, "Payee name is not empty, Are you sure you want to " + stat + " others?\n") == false) {
-                            checkedBox.setSelected(false);
+                            checkedBox.setSelected(stat.equals("check") ? false : true);
                             break;
                         }
                         poController.Master().setClientId("");
                         poController.Master().setPayeeName("");
                     }
+                    pbContinue = true;
                     break;
-                case "cbOtherCreditedTo": // this is the id
-                    String stat = checkedBox.isSelected() ? "check" : "uncheck";
+                case "cbOtherCreditedTo":
                     if (!tfCreditedTo.getText().isEmpty()) {
+                        String stat = checkedBox.isSelected() ? "check" : "uncheck";
+                        pbContinue = false; // inserted due to lost focus delay; edge case
                         if (ShowMessageFX.YesNo(null, pxeModuleName, "Credited To is not empty, Are you sure you want to " + stat + " others?\n") == false) {
-                            checkedBox.setSelected(false);
+                            checkedBox.setSelected(stat.equals("check") ? false : true);
                             break;
                         }
                         poController.Master().setCreditedTo("");
                     }
+                    pbContinue = true;
                     break;
             }
             loadRecordMaster();
