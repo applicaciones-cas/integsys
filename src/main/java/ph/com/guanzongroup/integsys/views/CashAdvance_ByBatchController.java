@@ -71,6 +71,7 @@ public class CashAdvance_ByBatchController implements Initializable, ScreenInter
     int pnMain = 0;
     private unloadForm poUnload = new unloadForm();
     boolean tooltipShown = false;
+    boolean tooltipShown2 = false;
 
     private ObservableList<ModelCashAdvance> main_data = FXCollections.observableArrayList();
     private FilteredList<ModelCashAdvance> filteredMain_Data;
@@ -289,19 +290,16 @@ public class CashAdvance_ByBatchController implements Initializable, ScreenInter
                                 retrieveCashAdvance();
                                 return;
                             case "tfSearchPayee":
-//                                poJSON = poController.SearchPayee(lsValue, false, true);
-//                                if ("error".equals(poJSON.get("result"))) {
-//                                    ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-//                                    tfSearchPayee.setText("");
-//                                    break;
-//                                }
-//                                loadRecordSearch();
                                 retrieveCashAdvance();
+                                if (!tooltipShown2) {
+                                    JFXUtil.showTooltip("NOTE: Results appear directly in the table view, no pop-up dialog.", txtField);
+                                    tooltipShown2 = true;
+                                }
                                 return;
                             case "tfSearchVoucherNo":
                                 retrieveCashAdvance();
                                 if (!tooltipShown) {
-                                    JFXUtil.showTooltip("NOTE: Results appear directly in the table view, no pop-up dialog.", tfSearchVoucherNo);
+                                    JFXUtil.showTooltip("NOTE: Results appear directly in the table view, no pop-up dialog.", txtField);
                                     tooltipShown = true;
                                 }
                                 return;

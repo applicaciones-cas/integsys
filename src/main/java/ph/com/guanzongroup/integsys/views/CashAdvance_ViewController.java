@@ -45,9 +45,6 @@ public class CashAdvance_ViewController implements Initializable, ScreenInterfac
 
     private GRiderCAS oApp;
     private JSONObject poJSON;
-    private int pnDetail = 0;
-    private int pnDetailBIR = 0;
-    private int pnAttachment = 0;
     private final String pxeModuleName = "Cash Advance View";
     private CashAdvance poController;
     public int pnEditMode;
@@ -189,7 +186,7 @@ public class CashAdvance_ViewController implements Initializable, ScreenInterfac
 
     public void loadRecordMaster() {
         try {
-            lblStatus.setText(poController.getStatus(poController.Master().getTransactionStatus()).toUpperCase());
+            lblStatus.setText(pnEditMode == EditMode.UNKNOWN ? "UNKNOWN" : poController.getStatus(poController.Master().getTransactionStatus()).toUpperCase());
             tfTransactionNo.setText(poController.Master().getTransactionNo());
 
             // Transaction Date

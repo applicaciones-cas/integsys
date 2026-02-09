@@ -67,6 +67,7 @@ public class CashAdvance_ReleaseController implements Initializable, ScreenInter
     private static final int ROWS_PER_PAGE = 50;
     int pnMain = 0;
     boolean tooltipShown = false;
+    boolean tooltipShown2 = false;
 
     AtomicReference<Object> lastFocusedTextField = new AtomicReference<>();
     AtomicReference<Object> previousSearchedTextField = new AtomicReference<>();
@@ -168,6 +169,7 @@ public class CashAdvance_ReleaseController implements Initializable, ScreenInter
                     ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                     return;
                 }
+                pnEditMode = poController.getEditMode();
                 loadRecordMaster();
             }
         } catch (CloneNotSupportedException | SQLException | GuanzonException ex) {
@@ -219,19 +221,16 @@ public class CashAdvance_ReleaseController implements Initializable, ScreenInter
                             retrieveCashAdvance();
                             return;
                         case "tfSearchPayee":
-//                            poJSON = poController.SearchPayee(lsValue, false, true);
-//                            if ("error".equals(poJSON.get("result"))) {
-//                                ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-//                                tfSearchPayee.setText("");
-//                                break;
-//                            }
-//                            loadRecordSearch();
                             retrieveCashAdvance();
+                            if (!tooltipShown2) {
+                                JFXUtil.showTooltip("NOTE: Results appear directly in the table view, no pop-up dialog.", txtField);
+                                tooltipShown2 = true;
+                            }
                             return;
                         case "tfSearchVoucherNo":
                             retrieveCashAdvance();
                             if (!tooltipShown) {
-                                JFXUtil.showTooltip("NOTE: Results appear directly in the table view, no pop-up dialog.", tfSearchVoucherNo);
+                                JFXUtil.showTooltip("NOTE: Results appear directly in the table view, no pop-up dialog.", txtField);
                                 tooltipShown = true;
                             }
                             return;
@@ -483,7 +482,7 @@ public class CashAdvance_ReleaseController implements Initializable, ScreenInter
 
     public void loadRecordMaster() {
         try {
-            lblStatus.setText(poController.getStatus(poController.Master().getTransactionStatus()).toUpperCase());
+            lblStatus.setText(pnEditMode == EditMode.UNKNOWN ? "UNKNOWN" : poController.getStatus(poController.Master().getTransactionStatus()).toUpperCase());
             tfTransactionNo.setText(poController.Master().getTransactionNo());
 
             // Transaction Date
