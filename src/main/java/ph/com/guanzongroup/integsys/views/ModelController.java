@@ -194,7 +194,6 @@ public class ModelController implements Initializable, ScreenInterface {
                         }
                         break;
                     case "btnSave":
-                        ShowMessageFX.Information(String.valueOf(oParameters.Model().getEditMode()), "Computerized Acounting System", pxeModuleName);
                         oParameters.Model().getModel().setModifyingId(oApp.getUserID());
                         oParameters.Model().getModel().setModifiedDate(oApp.getServerDate());
                         JSONObject saveResult = oParameters.Model().saveRecord();
@@ -365,7 +364,6 @@ public class ModelController implements Initializable, ScreenInterface {
                             txtField02.setText((String) oParameters.Brand().getModel().getDescription());
                             break;
                         case 06:
-                            ShowMessageFX.Information(String.valueOf(oParameters.Model().getEditMode()), "Computerized Acounting System", pxeModuleName);
                             poJson = oParameters.Model().searchRecordbyMainModel(lsValue, false);
                             if ("error".equalsIgnoreCase(poJson.get("result").toString())) {
                                 ShowMessageFX.Information((String) poJson.get("message"), "Computerized Acounting System", pxeModuleName);
@@ -409,22 +407,18 @@ public class ModelController implements Initializable, ScreenInterface {
                 switch (lnIndex) {
                     case 1:
                         oParameters.Model().getModel().setModelId(lsValue);
-                        ShowMessageFX.Information(String.valueOf(oParameters.Model().getEditMode()), "Computerized Acounting System", pxeModuleName);
                         break;
 //                    case 2:
 //                        oParameters.Model().getModel().setDescription(lsValue);
 //                        break;
                     case 3:
                         oParameters.Model().getModel().setModelCode(lsValue);
-                        ShowMessageFX.Information(String.valueOf(oParameters.Model().getEditMode()), "Computerized Acounting System", pxeModuleName);
                         break;
                     case 4:
                         oParameters.Model().getModel().setDescription(lsValue);
-                        ShowMessageFX.Information(String.valueOf(oParameters.Model().getEditMode()), "Computerized Acounting System", pxeModuleName);
                         break;
                     case 5:
                         oParameters.Model().getModel().setManufactureYear(Integer.parseInt(lsValue));
-                        ShowMessageFX.Information(String.valueOf(oParameters.Model().getEditMode()), "Computerized Acounting System", pxeModuleName);
                         break;
 
                     default:
