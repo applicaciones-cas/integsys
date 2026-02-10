@@ -635,8 +635,8 @@ public class DisbursementVoucher_ViewController implements Initializable, Screen
                 loadRecordDetailBIR();
             }
         });
-        JFXUtil.setKeyEventFilter(this::tableKeyEvents, tblVwDetails, tblVwBIRDetails);
-        JFXUtil.adjustColumnForScrollbar(tblVwDetails, tblVwBIRDetails);
+        JFXUtil.setKeyEventFilter(this::tableKeyEvents, tblVwDetails, tblVwBIRDetails, tblAttachments);
+        JFXUtil.adjustColumnForScrollbar(tblVwDetails, tblVwBIRDetails, tblAttachments);
     }
 
     private void tableKeyEvents(KeyEvent event) {
