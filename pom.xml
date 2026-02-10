@@ -205,7 +205,12 @@
             <artifactId>pdfbox</artifactId>
             <version>2.0.29</version>
         </dependency>
-
+        <dependency>
+            <groupId>org.guanzon</groupId>
+            <artifactId>cas-tbjhandler</artifactId>
+            <version>0.2-SNAPSHOT</version>
+            <type>jar</type>
+        </dependency>
     </dependencies>
     <profiles>
         <profile>
