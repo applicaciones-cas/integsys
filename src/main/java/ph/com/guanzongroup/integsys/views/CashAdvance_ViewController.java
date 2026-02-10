@@ -18,6 +18,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
@@ -44,9 +45,6 @@ public class CashAdvance_ViewController implements Initializable, ScreenInterfac
 
     private GRiderCAS oApp;
     private JSONObject poJSON;
-    private int pnDetail = 0;
-    private int pnDetailBIR = 0;
-    private int pnAttachment = 0;
     private final String pxeModuleName = "Cash Advance View";
     private CashAdvance poController;
     public int pnEditMode;
@@ -66,11 +64,13 @@ public class CashAdvance_ViewController implements Initializable, ScreenInterfac
     @FXML
     private Label lblStatus;
     @FXML
-    private TextField tfTransactionNo, tfVoucherNo, tfPayee, tfCreditedTo, tfRequestingDepartment, tfAmountToAdvance;
+    private TextField tfTransactionNo, tfVoucherNo, tfPayee, tfCreditedTo, tfRequestingDepartment, tfAmountToAdvance, tfPettyCash;
     @FXML
     private DatePicker dpAdvanceDate;
     @FXML
     private TextArea taRemarks;
+    @FXML
+    private CheckBox cbOtherPayee, cbOtherCreditedTo;
 
     @Override
     public void setGRider(GRiderCAS foValue) {
@@ -141,6 +141,11 @@ public class CashAdvance_ViewController implements Initializable, ScreenInterfac
         buttons.forEach(button -> button.setOnAction(this::cmdButton_Click));
     }
 
+    @FXML
+    private void cmdCheckBox_Click(ActionEvent event) {
+
+    }
+
     private void cmdButton_Click(ActionEvent event) {
         poJSON = new JSONObject();
         String lsButton = ((Button) event.getSource()).getId();
@@ -181,7 +186,7 @@ public class CashAdvance_ViewController implements Initializable, ScreenInterfac
 
     public void loadRecordMaster() {
         try {
-            lblStatus.setText(poController.getStatus(poController.Master().getTransactionStatus()).toUpperCase());
+            lblStatus.setText(pnEditMode == EditMode.UNKNOWN ? "UNKNOWN" : poController.getStatus(poController.Master().getTransactionStatus()).toUpperCase());
             tfTransactionNo.setText(poController.Master().getTransactionNo());
 
             // Transaction Date
@@ -189,12 +194,21 @@ public class CashAdvance_ViewController implements Initializable, ScreenInterfac
             dpAdvanceDate.setValue(CustomCommonUtil.parseDateStringToLocalDate(lsTransactionDate, "yyyy-MM-dd"));
 
             tfVoucherNo.setText(poController.Master().getVoucher());
-            tfPayee.setText(poController.Master().Payee().getPayeeName());
-            tfCreditedTo.setText(poController.Master().Credited().getCompanyName());
+            tfPettyCash.setText(poController.Master().PettyCash().getPettyCashDescription());
+            tfPayee.setText(poController.Master().getPayeeName());
             tfRequestingDepartment.setText(poController.Master().Department().getDescription());
             taRemarks.setText(poController.Master().getRemarks());
-            tfAmountToAdvance.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Master().getAdvanceAmount(), true));
-
+            tfAmountToAdvance.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Master().getAdvanceAmount().doubleValue(), true));
+            boolean lbPayeeOthers = (poController.Master().getClientId() == null || "".equals(poController.Master().getClientId()))
+                    && poController.Master().getPayeeName() != null && !"".equals(poController.Master().getPayeeName());
+            cbOtherPayee.setSelected(lbPayeeOthers);
+            if (poController.Master().CreditedToOthers().getPayeeName() != null && !"".equals(poController.Master().CreditedToOthers().getPayeeName())) {
+                tfCreditedTo.setText(poController.Master().CreditedToOthers().getPayeeName());
+                cbOtherCreditedTo.setSelected(true);
+            } else {
+                tfCreditedTo.setText(poController.Master().Credited().getCompanyName());
+                cbOtherCreditedTo.setSelected(false);
+            }
             JFXUtil.updateCaretPositions(apMaster);
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);

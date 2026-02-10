@@ -21,6 +21,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.Pagination;
@@ -66,6 +67,7 @@ public class CashAdvance_ReleaseController implements Initializable, ScreenInter
     private static final int ROWS_PER_PAGE = 50;
     int pnMain = 0;
     boolean tooltipShown = false;
+    boolean tooltipShown2 = false;
 
     AtomicReference<Object> lastFocusedTextField = new AtomicReference<>();
     AtomicReference<Object> previousSearchedTextField = new AtomicReference<>();
@@ -81,7 +83,7 @@ public class CashAdvance_ReleaseController implements Initializable, ScreenInter
     @FXML
     private Label lblSource, lblStatus;
     @FXML
-    private TextField tfSearchIndustry, tfSearchPayee, tfSearchVoucherNo, tfTransactionNo, tfVoucherNo, tfPayee, tfCreditedTo, tfRequestingDepartment, tfAmountToAdvance;
+    private TextField tfSearchIndustry, tfSearchPayee, tfSearchVoucherNo, tfTransactionNo, tfVoucherNo, tfPayee, tfCreditedTo, tfRequestingDepartment, tfAmountToAdvance, tfPettyCash;
     @FXML
     private HBox hbButtons, hboxid;
     @FXML
@@ -90,6 +92,8 @@ public class CashAdvance_ReleaseController implements Initializable, ScreenInter
     private DatePicker dpAdvanceDate;
     @FXML
     private TextArea taRemarks;
+    @FXML
+    private CheckBox cbOtherPayee, cbOtherCreditedTo;
     @FXML
     private TableView tblViewMainList;
     @FXML
@@ -101,7 +105,7 @@ public class CashAdvance_ReleaseController implements Initializable, ScreenInter
     public void initialize(URL location, ResourceBundle resources) {
         try {
             //        psIndustryId = ""; // general
-            
+
             poJSON = new JSONObject();
             poController = new CashflowControllers(oApp, null).CashAdvance();
             poController.InitTransaction(); // Initialize transaction
@@ -123,8 +127,8 @@ public class CashAdvance_ReleaseController implements Initializable, ScreenInter
                 loadRecordSearch();
             });
             JFXUtil.initKeyClickObject(apMainAnchor, lastFocusedTextField, previousSearchedTextField);
-        }  catch (SQLException | GuanzonException ex) {
-            Logger.getLogger(getClass().getName()).log(Level.SEVERE,MiscUtil.getException(ex), ex);
+        } catch (SQLException | GuanzonException ex) {
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
             ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
@@ -165,6 +169,7 @@ public class CashAdvance_ReleaseController implements Initializable, ScreenInter
                     ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                     return;
                 }
+                pnEditMode = poController.getEditMode();
                 loadRecordMaster();
             }
         } catch (CloneNotSupportedException | SQLException | GuanzonException ex) {
@@ -216,24 +221,21 @@ public class CashAdvance_ReleaseController implements Initializable, ScreenInter
                             retrieveCashAdvance();
                             return;
                         case "tfSearchPayee":
-                            poJSON = poController.SearchPayee(lsValue, false, true);
-                            if ("error".equals(poJSON.get("result"))) {
-                                ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-                                tfSearchPayee.setText("");
-                                break;
-                            }
-                            loadRecordSearch();
                             retrieveCashAdvance();
+                            if (!tooltipShown2) {
+                                JFXUtil.showTooltip("NOTE: Results appear directly in the table view, no pop-up dialog.", txtField);
+                                tooltipShown2 = true;
+                            }
                             return;
                         case "tfSearchVoucherNo":
+                            retrieveCashAdvance();
                             if (!tooltipShown) {
-                                JFXUtil.showTooltip("NOTE: Results appear directly in the table view, no pop-up dialog.", tfSearchVoucherNo);
+                                JFXUtil.showTooltip("NOTE: Results appear directly in the table view, no pop-up dialog.", txtField);
                                 tooltipShown = true;
                             }
-                            retrieveCashAdvance();
                             return;
                         case "tfPayee":
-                            poJSON = poController.SearchPayee(lsValue, false, false);
+                            poJSON = poController.SearchPayee(lsValue, false, cbOtherPayee.isSelected());
                             if ("error".equals(poJSON.get("result"))) {
                                 ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                 tfPayee.setText("");
@@ -251,7 +253,7 @@ public class CashAdvance_ReleaseController implements Initializable, ScreenInter
                             loadRecordMaster();
                             break;
                         case "tfCreditedTo":
-                            poJSON = poController.SearchCreditedTo(lsValue, false);
+                            poJSON = poController.SearchCreditedTo(lsValue, false, cbOtherCreditedTo.isSelected());
                             if ("error".equals(poJSON.get("result"))) {
                                 ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                 tfCreditedTo.setText("");
@@ -277,7 +279,6 @@ public class CashAdvance_ReleaseController implements Initializable, ScreenInter
                 lblSource.setText("");
             }
             tfSearchIndustry.setText(poController.getSearchIndustry());
-            tfSearchPayee.setText(poController.getSearchPayee());
             JFXUtil.updateCaretPositions(apBrowse);
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
@@ -453,7 +454,7 @@ public class CashAdvance_ReleaseController implements Initializable, ScreenInter
                                             String.valueOf(poController.CashAdvanceList(lnCtr).Department().getDescription())
                                     ));
 
-                                    if (poController.CashAdvanceList(lnCtr).getTransactionStatus().equals(CashAdvanceStatus.CONFIRMED)) {
+                                    if (poController.CashAdvanceList(lnCtr).getTransactionStatus().equals(CashAdvanceStatus.RELEASED)) {
                                         JFXUtil.highlightByKey(tblViewMainList, String.valueOf(lnCtr + 1), "#C1E1C1", highlightedRowsMain);
                                     }
                                 }
@@ -481,24 +482,38 @@ public class CashAdvance_ReleaseController implements Initializable, ScreenInter
 
     public void loadRecordMaster() {
         try {
-            lblStatus.setText(poController.getStatus(poController.Master().getTransactionStatus()).toUpperCase());
+            lblStatus.setText(pnEditMode == EditMode.UNKNOWN ? "UNKNOWN" : poController.getStatus(poController.Master().getTransactionStatus()).toUpperCase());
             tfTransactionNo.setText(poController.Master().getTransactionNo());
 
             // Transaction Date
             String lsTransactionDate = CustomCommonUtil.formatDateToShortString(poController.Master().getTransactionDate());
             dpAdvanceDate.setValue(CustomCommonUtil.parseDateStringToLocalDate(lsTransactionDate, "yyyy-MM-dd"));
             tfVoucherNo.setText(poController.Master().getVoucher());
-            tfPayee.setText(poController.Master().Payee().getPayeeName());
-            tfCreditedTo.setText(poController.Master().Credited().getCompanyName());
+            tfPettyCash.setText(poController.Master().PettyCash().getPettyCashDescription());
+            tfPayee.setText(poController.Master().getPayeeName());
             tfRequestingDepartment.setText(poController.Master().Department().getDescription());
             taRemarks.setText(poController.Master().getRemarks());
-            tfAmountToAdvance.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Master().getAdvanceAmount(), true));
-
+            tfAmountToAdvance.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Master().getAdvanceAmount().doubleValue(), true));
+            boolean lbPayeeOthers = (poController.Master().getClientId() == null || "".equals(poController.Master().getClientId()))
+                    && poController.Master().getPayeeName() != null && !"".equals(poController.Master().getPayeeName());
+            cbOtherPayee.setSelected(lbPayeeOthers);
+            if (poController.Master().CreditedToOthers().getPayeeName() != null && !"".equals(poController.Master().CreditedToOthers().getPayeeName())) {
+                tfCreditedTo.setText(poController.Master().CreditedToOthers().getPayeeName());
+                cbOtherCreditedTo.setSelected(true);
+            } else {
+                tfCreditedTo.setText(poController.Master().Credited().getCompanyName());
+                cbOtherCreditedTo.setSelected(false);
+            }
             JFXUtil.updateCaretPositions(apMaster);
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
             ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
+    }
+
+    @FXML
+    private void cmdCheckBox_Click(ActionEvent event) {
+
     }
 
     @FXML

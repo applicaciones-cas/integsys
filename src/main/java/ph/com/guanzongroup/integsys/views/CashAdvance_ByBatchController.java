@@ -71,6 +71,7 @@ public class CashAdvance_ByBatchController implements Initializable, ScreenInter
     int pnMain = 0;
     private unloadForm poUnload = new unloadForm();
     boolean tooltipShown = false;
+    boolean tooltipShown2 = false;
 
     private ObservableList<ModelCashAdvance> main_data = FXCollections.observableArrayList();
     private FilteredList<ModelCashAdvance> filteredMain_Data;
@@ -200,7 +201,6 @@ public class CashAdvance_ByBatchController implements Initializable, ScreenInter
                 lblSource.setText("");
             }
             tfSearchIndustry.setText(poController.getSearchIndustry());
-            tfSearchPayee.setText(poController.getSearchPayee());
             JFXUtil.updateCaretPositions(apBrowse);
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
@@ -290,21 +290,18 @@ public class CashAdvance_ByBatchController implements Initializable, ScreenInter
                                 retrieveCashAdvance();
                                 return;
                             case "tfSearchPayee":
-                                poJSON = poController.SearchPayee(lsValue, false, true);
-                                if ("error".equals(poJSON.get("result"))) {
-                                    ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-                                    tfSearchPayee.setText("");
-                                    break;
-                                }
-                                loadRecordSearch();
                                 retrieveCashAdvance();
+                                if (!tooltipShown2) {
+                                    JFXUtil.showTooltip("NOTE: Results appear directly in the table view, no pop-up dialog.", txtField);
+                                    tooltipShown2 = true;
+                                }
                                 return;
                             case "tfSearchVoucherNo":
+                                retrieveCashAdvance();
                                 if (!tooltipShown) {
-                                    JFXUtil.showTooltip("NOTE: Results appear directly in the table view, no pop-up dialog.", tfSearchVoucherNo);
+                                    JFXUtil.showTooltip("NOTE: Results appear directly in the table view, no pop-up dialog.", txtField);
                                     tooltipShown = true;
                                 }
-                                retrieveCashAdvance();
                                 return;
                         }
                         event.consume();
@@ -354,13 +351,19 @@ public class CashAdvance_ByBatchController implements Initializable, ScreenInter
                             if (poController.getCashAdvanceCount() > 0) {
                                 //retreiving using column index
                                 for (int lnCtr = 0; lnCtr <= poController.getCashAdvanceCount() - 1; lnCtr++) {
+                                    String lsCreditedTo = "";
+                                    if (poController.CashAdvanceList(lnCtr).getPayeeName() != null && !"".equals(poController.CashAdvanceList(lnCtr).getPayeeName())) {
+                                        lsCreditedTo = (poController.CashAdvanceList(lnCtr).getPayeeName());
+                                    } else {
+                                        lsCreditedTo = (poController.CashAdvanceList(lnCtr).Credited().getCompanyName());
+                                    }
                                     main_data.add(new ModelCashAdvance(String.valueOf(lnCtr + 1),
                                             checkedItem.get(lnCtr),// 0 as unchecked, 1 as checked
                                             String.valueOf(poController.CashAdvanceList(lnCtr).getTransactionNo()),
                                             String.valueOf(poController.CashAdvanceList(lnCtr).getVoucher()),
                                             CustomCommonUtil.formatDateToShortString(poController.CashAdvanceList(lnCtr).getTransactionDate()),
                                             String.valueOf(poController.CashAdvanceList(lnCtr).getPayeeName()),
-                                            String.valueOf(poController.CashAdvanceList(lnCtr).Credited().getCompanyName()),
+                                            lsCreditedTo,
                                             String.valueOf(poController.CashAdvanceList(lnCtr).Department().getDescription()),
                                             CustomCommonUtil.setIntegerValueToDecimalFormat(String.valueOf(poController.CashAdvanceList(lnCtr).getAdvanceAmount()))
                                     ));
