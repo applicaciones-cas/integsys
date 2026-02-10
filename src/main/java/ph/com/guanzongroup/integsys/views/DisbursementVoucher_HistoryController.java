@@ -787,8 +787,8 @@ public class DisbursementVoucher_HistoryController implements Initializable, Scr
                 loadRecordDetailBIR();
             }
         });
-        JFXUtil.setKeyEventFilter(this::tableKeyEvents, tblVwDetails, tblVwJournalDetails);
-        JFXUtil.adjustColumnForScrollbar(tblVwDetails, tblVwJournalDetails);
+        JFXUtil.setKeyEventFilter(this::tableKeyEvents, tblVwDetails, tblVwJournalDetails, tblAttachments);
+        JFXUtil.adjustColumnForScrollbar(tblVwDetails, tblVwJournalDetails, tblAttachments);
     }
 
     private void tableKeyEvents(KeyEvent event) {
@@ -829,6 +829,15 @@ public class DisbursementVoucher_HistoryController implements Initializable, Scr
                             : Integer.parseInt(BIR_data.get(JFXUtil.moveToPreviousRow(currentTable)).getIndex07());
                     pnDetailBIR = newIndex;
                     loadRecordDetailBIR();
+                    break;
+                case "tblAttachments":
+                    if (attachment_data.isEmpty()) {
+                        return;
+                    }
+                    newIndex = moveDown ? Integer.parseInt(attachment_data.get(JFXUtil.moveToNextRow(currentTable)).getIndex03())
+                            : Integer.parseInt(attachment_data.get(JFXUtil.moveToPreviousRow(currentTable)).getIndex03());
+                    pnAttachment = newIndex;
+                    loadRecordAttachment(true);
                     break;
             }
             event.consume();
