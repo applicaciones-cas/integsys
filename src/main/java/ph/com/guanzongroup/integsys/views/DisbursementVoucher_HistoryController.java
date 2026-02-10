@@ -762,6 +762,16 @@ public class DisbursementVoucher_HistoryController implements Initializable, Scr
     }
 
     private void initTableOnClick() {
+        tblAttachments.setOnMouseClicked(event -> {
+            pnAttachment = tblAttachments.getSelectionModel().getSelectedIndex();
+            if (pnAttachment >= 0) {
+                imageviewerutil.scaleFactor = 1.0;
+                int lnRow = Integer.parseInt(attachment_data.get(tblAttachments.getSelectionModel().getSelectedIndex()).getIndex03());
+                pnAttachment = lnRow;
+                loadRecordAttachment(true);
+                JFXUtil.resetImageBounds(imageView, stackPane1);
+            }
+        });
         tblVwDetails.setOnMouseClicked(event -> {
             if (!details_data.isEmpty() && event.getClickCount() == 1) {
                 ModelDisbursementVoucher_Detail selected = (ModelDisbursementVoucher_Detail) tblVwDetails.getSelectionModel().getSelectedItem();
@@ -787,8 +797,8 @@ public class DisbursementVoucher_HistoryController implements Initializable, Scr
                 loadRecordDetailBIR();
             }
         });
-        JFXUtil.setKeyEventFilter(this::tableKeyEvents, tblVwDetails, tblVwJournalDetails);
-        JFXUtil.adjustColumnForScrollbar(tblVwDetails, tblVwJournalDetails);
+        JFXUtil.setKeyEventFilter(this::tableKeyEvents, tblVwDetails, tblVwJournalDetails, tblAttachments);
+        JFXUtil.adjustColumnForScrollbar(tblVwDetails, tblVwJournalDetails, tblAttachments);
     }
 
     private void tableKeyEvents(KeyEvent event) {
@@ -829,6 +839,15 @@ public class DisbursementVoucher_HistoryController implements Initializable, Scr
                             : Integer.parseInt(BIR_data.get(JFXUtil.moveToPreviousRow(currentTable)).getIndex07());
                     pnDetailBIR = newIndex;
                     loadRecordDetailBIR();
+                    break;
+                case "tblAttachments":
+                    if (attachment_data.isEmpty()) {
+                        return;
+                    }
+                    newIndex = moveDown ? Integer.parseInt(attachment_data.get(JFXUtil.moveToNextRow(currentTable)).getIndex03())
+                            : Integer.parseInt(attachment_data.get(JFXUtil.moveToPreviousRow(currentTable)).getIndex03());
+                    pnAttachment = newIndex;
+                    loadRecordAttachment(true);
                     break;
             }
             event.consume();
