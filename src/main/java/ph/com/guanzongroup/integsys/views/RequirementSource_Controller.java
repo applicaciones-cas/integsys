@@ -25,7 +25,6 @@ import org.guanzon.appdriver.base.GRiderCAS;
 import org.guanzon.appdriver.base.GuanzonException;
 import org.guanzon.appdriver.base.MiscUtil;
 import org.guanzon.appdriver.constant.EditMode;
-import ph.com.guanzongroup.cas.cashflow.status.APPaymentAdjustmentStatus;
 import org.json.simple.JSONObject;
 import ph.com.guanzongroup.cas.sales.t1.RequirementsSource;
 import ph.com.guanzongroup.cas.sales.t1.services.SalesControllers;
@@ -218,8 +217,7 @@ public class RequirementSource_Controller implements Initializable, ScreenInterf
                 String lsButton = clickedButton.getId();
                 switch (lsButton) {
                     case "btnBrowse":
-//                        poController.getModel().setTransactionStatus(APPaymentAdjustmentStatus.RETURNED + "" + APPaymentAdjustmentStatus.OPEN);
-                        poController.setRecordStatus(APPaymentAdjustmentStatus.OPEN);
+//                        poController.setRecordStatus(RecordStatus.ACTIVE);
                         poJSON = poController.searchRecord("", pbEntered);
                         if ("error".equalsIgnoreCase((String) poJSON.get("result"))) {
                             ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
@@ -279,7 +277,7 @@ public class RequirementSource_Controller implements Initializable, ScreenInterf
                     case "btnActivate":
                         //Validator
                         poJSON = new JSONObject();
-                        if (ShowMessageFX.YesNo(null, "Close Tab", "Are you sure you want to activate the transaction?") == true) {
+                        if (ShowMessageFX.YesNo(null, pxeModuleName, "Are you sure you want to activate the transaction?") == true) {
                             poJSON = poController.activateRecord();
                             if (!"success".equals((String) poJSON.get("result"))) {
                                 ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
