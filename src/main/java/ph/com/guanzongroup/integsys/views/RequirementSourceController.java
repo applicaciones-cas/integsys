@@ -25,13 +25,14 @@ import org.guanzon.appdriver.base.GRiderCAS;
 import org.guanzon.appdriver.base.GuanzonException;
 import org.guanzon.appdriver.base.MiscUtil;
 import org.guanzon.appdriver.constant.EditMode;
+import org.guanzon.appdriver.constant.RecordStatus;
 import org.json.simple.JSONObject;
 import ph.com.guanzongroup.cas.sales.t1.RequirementsSource;
 import ph.com.guanzongroup.cas.sales.t1.services.SalesControllers;
 
 import ph.com.guanzongroup.integsys.utility.JFXUtil;
 
-public class RequirementSource_Controller implements Initializable, ScreenInterface {
+public class RequirementSourceController implements Initializable, ScreenInterface {
 
     private GRiderCAS oApp;
     static RequirementsSource poController;
@@ -173,20 +174,6 @@ public class RequirementSource_Controller implements Initializable, ScreenInterf
                 }
             });
 
-    @FXML
-    private void cmdCheckBox_Click(ActionEvent event) {
-        poJSON = new JSONObject();
-        Object source = event.getSource();
-        if (source instanceof CheckBox) {
-            CheckBox checkedBox = (CheckBox) source;
-            switch (checkedBox.getId()) {
-                case "cbActive": // this is the id
-                    poController.getModel().setRecordStatus(checkedBox.isSelected());
-            }
-            loadRecordMaster();
-        }
-    }
-
     public void initTextFields() {
         JFXUtil.setFocusListener(txtMaster_Focus, tfRequirementSource, tfDescription);
         JFXUtil.setFocusListener(txtBrowse_Focus, tfSearchDescription);
@@ -204,7 +191,7 @@ public class RequirementSource_Controller implements Initializable, ScreenInterf
     public void loadRecordMaster() {
         tfRequirementSource.setText("");
         tfDescription.setText("");
-        cbActive.setSelected(poController.getModel().getRecordStatus());
+        cbActive.setSelected(poController.getModel().isActive());
     }
 
     @FXML
@@ -277,8 +264,20 @@ public class RequirementSource_Controller implements Initializable, ScreenInterf
                     case "btnActivate":
                         //Validator
                         poJSON = new JSONObject();
-                        if (ShowMessageFX.YesNo(null, pxeModuleName, "Are you sure you want to activate the transaction?") == true) {
-                            poJSON = poController.activateRecord();
+                        String lsStat = "";
+                        if ((poController.getModel().isActive() ? "1" : "0").equals(RecordStatus.ACTIVE)) {
+                            lsStat = "deactivate";
+                            btnActivate.setText("Deactivate");
+                        } else {
+                            lsStat = "activate";
+                            btnActivate.setText("Activate");
+                        }
+                        if (ShowMessageFX.YesNo(null, pxeModuleName, "Are you sure you want to " + lsStat + " the transaction?") == true) {
+                            if ((poController.getModel().isActive() ? "1" : "0").equals(RecordStatus.ACTIVE)) {
+                                poJSON = poController.deactivateRecord();
+                            } else {
+                                poJSON = poController.activateRecord();
+                            }
                             if (!"success".equals((String) poJSON.get("result"))) {
                                 ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                 return;
@@ -319,7 +318,7 @@ public class RequirementSource_Controller implements Initializable, ScreenInterf
         // Manage visibility and managed state of other buttons
         JFXUtil.setButtonsVisibility(!lbShow, btnNew);
         JFXUtil.setButtonsVisibility(lbShow, btnSave, btnCancel);
-        JFXUtil.setButtonsVisibility(lbShow2, btnUpdate);
+        JFXUtil.setButtonsVisibility(lbShow2, btnUpdate, btnActivate);
         JFXUtil.setButtonsVisibility(lbShow3, btnBrowse, btnClose);
 
         JFXUtil.setDisabled(lbShow3, apMaster);
