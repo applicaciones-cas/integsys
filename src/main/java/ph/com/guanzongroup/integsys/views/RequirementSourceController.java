@@ -160,8 +160,10 @@ public class RequirementSourceController implements Initializable, ScreenInterfa
                     switch (lsID) {
                         case "tfSearchDescription":
                             if (lsValue.isEmpty()) {
-                                poController.getModel().setDescription("");
-                                poController.initialize();
+                                if (!JFXUtil.isObjectEqualTo(pnEditMode, EditMode.ADDNEW, EditMode.UPDATE)) {
+                                    poController.getModel().setDescription("");
+                                    poController.initialize();
+                                }
                             }
                             break;
                     }
@@ -182,11 +184,12 @@ public class RequirementSourceController implements Initializable, ScreenInterfa
     }
 
     public void clearTextFields() {
-        JFXUtil.clearTextFields(apMaster);
+        JFXUtil.clearTextFields(apBrowse, apMaster);
     }
 
     public void loadRecordSearch() {
         tfSearchDescription.setText(poController.getModel().getDescription());
+        JFXUtil.updateCaretPositions(apBrowse);
     }
 
     public void loadRecordMaster() {
