@@ -29,9 +29,12 @@ import org.guanzon.appdriver.constant.RecordStatus;
 import org.json.simple.JSONObject;
 import ph.com.guanzongroup.cas.sales.t1.RequirementsSource;
 import ph.com.guanzongroup.cas.sales.t1.services.SalesControllers;
-
 import ph.com.guanzongroup.integsys.utility.JFXUtil;
 
+/**
+ *
+ * @author Team 1
+ */
 public class RequirementSourceController implements Initializable, ScreenInterface {
 
     private GRiderCAS oApp;
@@ -123,10 +126,12 @@ public class RequirementSourceController implements Initializable, ScreenInterfa
                             if ("error".equals(poJSON.get("result"))) {
                                 ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                 txtField.setText("");
-                                psCompanyId = "";
                                 break;
                             }
+                            loadRecordSearch();
                             loadRecordMaster();
+                            pnEditMode = poController.getEditMode();
+                            initButton(pnEditMode);
                             break;
                     }
                     break;
@@ -139,12 +144,6 @@ public class RequirementSourceController implements Initializable, ScreenInterfa
     ChangeListener<Boolean> txtMaster_Focus = JFXUtil.FocusListener(TextField.class,
             (lsID, lsValue) -> {
                 switch (lsID) {
-                    case "tfRequirementSource":
-                        poJSON = poController.getModel().setRequirementCode(lsValue);
-                        if (!JFXUtil.isJSONSuccess(poJSON)) {
-                            ShowMessageFX.Information(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
-                        }
-                        break;
                     case "tfDescription":
                         poJSON = poController.getModel().setDescription(lsValue);
                         if (!JFXUtil.isJSONSuccess(poJSON)) {
@@ -160,14 +159,16 @@ public class RequirementSourceController implements Initializable, ScreenInterfa
                 try {
                     switch (lsID) {
                         case "tfSearchDescription":
-                            poJSON = poController.searchRecord(lsValue, false);
-                            if (!JFXUtil.isJSONSuccess(poJSON)) {
-                                ShowMessageFX.Information(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
+                            if (lsValue.isEmpty()) {
+                                poController.getModel().setDescription("");
+                                poController.initialize();
                             }
                             break;
                     }
                     loadRecordSearch();
                     loadRecordMaster();
+                    pnEditMode = poController.getEditMode();
+                    initButton(pnEditMode);
                 } catch (ExceptionInInitializerError | SQLException | GuanzonException ex) {
                     Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
                     ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
@@ -175,7 +176,7 @@ public class RequirementSourceController implements Initializable, ScreenInterfa
             });
 
     public void initTextFields() {
-        JFXUtil.setFocusListener(txtMaster_Focus, tfRequirementSource, tfDescription);
+        JFXUtil.setFocusListener(txtMaster_Focus, tfDescription);
         JFXUtil.setFocusListener(txtBrowse_Focus, tfSearchDescription);
         JFXUtil.setKeyPressedListener(this::txtField_KeyPressed, apMaster, apBrowse);
     }
@@ -189,8 +190,8 @@ public class RequirementSourceController implements Initializable, ScreenInterfa
     }
 
     public void loadRecordMaster() {
-        tfRequirementSource.setText("");
-        tfDescription.setText("");
+        tfRequirementSource.setText(poController.getModel().getRequirementCode());
+        tfDescription.setText(poController.getModel().getDescription());
         cbActive.setSelected(poController.getModel().isActive());
     }
 
@@ -223,7 +224,6 @@ public class RequirementSourceController implements Initializable, ScreenInterfa
                             ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                             return;
                         }
-                        poController.initialize();
                         pnEditMode = poController.getEditMode();
                         break;
                     case "btnUpdate":
@@ -237,7 +237,7 @@ public class RequirementSourceController implements Initializable, ScreenInterfa
                     case "btnCancel":
                         if (ShowMessageFX.OkayCancel(null, pxeModuleName, "Do you want to disregard changes?") == true) {
                             //Clear data
-//                            poController.resetMaster();
+                            poController.initialize();
                             clearTextFields();
 //                            poController.getModel().setIndustryId(psIndustryId);
                             pnEditMode = EditMode.UNKNOWN;
@@ -279,12 +279,13 @@ public class RequirementSourceController implements Initializable, ScreenInterfa
                                 poJSON = poController.activateRecord();
                             }
                             if (!"success".equals((String) poJSON.get("result"))) {
-                                ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                                ShowMessageFX.Warning(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
                                 return;
                             } else {
-                                ShowMessageFX.Information(null, pxeModuleName, (String) poJSON.get("message"));
-                                btnNew.fire();
+                                ShowMessageFX.Information(null, pxeModuleName, "Record " + lsStat + "d successfully");
+                                poController.initialize();
                             }
+                            pnEditMode = poController.getEditMode();
                         } else {
                             return;
                         }
@@ -322,5 +323,11 @@ public class RequirementSourceController implements Initializable, ScreenInterfa
         JFXUtil.setButtonsVisibility(lbShow3, btnBrowse, btnClose);
 
         JFXUtil.setDisabled(lbShow3, apMaster);
+
+        if ((poController.getModel().isActive() ? "1" : "0").equals(RecordStatus.ACTIVE)) {
+            btnActivate.setText("Deactivate");
+        } else {
+            btnActivate.setText("Activate");
+        }
     }
 }
