@@ -3,9 +3,6 @@ package ph.com.guanzongroup.integsys.views;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import java.net.URL;
 import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Level;
@@ -13,9 +10,7 @@ import java.util.logging.Logger;
 import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyBooleanPropertyBase;
 import javafx.beans.value.ChangeListener;
-import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.collections.transformation.FilteredList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -41,8 +36,6 @@ import org.guanzon.appdriver.constant.EditMode;
 import org.json.simple.JSONObject;
 import ph.com.guanzongroup.cas.sales.t1.RequirementsSourcePerGroup;
 import ph.com.guanzongroup.cas.sales.t1.services.SalesControllers;
-import ph.com.guanzongroup.integsys.model.ModelListParameter;
-import ph.com.guanzongroup.integsys.model.ModelResultSet;
 import ph.com.guanzongroup.integsys.model.ModelSalesInquiry_Detail;
 import ph.com.guanzongroup.integsys.utility.JFXUtil;
 
@@ -50,27 +43,18 @@ public class RequirementSourcePerGroupController implements Initializable, Scree
 
     private GRiderCAS oApp;
     private final String pxeModuleName = "Requirement Source Per Group";
-    private int pnEditMode, pnMain;
+    private int pnEditMode;
     private RequirementsSourcePerGroup oParameters;
     JSONObject poJSON = new JSONObject();
-    private boolean state = false;
     private boolean pbLoaded = false;
-    private int pnInventory = 0;
-    private int pnRow = 0;
-    private ObservableList<ModelResultSet> data = FXCollections.observableArrayList();
     ObservableList<String> ClientType = ModelSalesInquiry_Detail.ClientType;
     ObservableList<String> cPaymentMode = ModelSalesInquiry_Detail.PurchaseType;
-    private ObservableList<ModelListParameter> main_data = FXCollections.observableArrayList();
     AtomicReference<Object> lastFocusedTextField = new AtomicReference<>();
     AtomicReference<Object> previousSearchedTextField = new AtomicReference<>();
-    JFXUtil.ReloadableTableTask loadTableList;
-    private FilteredList<ModelListParameter> filteredData;
-    private final Map<String, List<String>> highlightedRowsMain = new HashMap<>();
     @FXML
     private AnchorPane AnchorMain, apMaster, apSearch;
     @FXML
     private HBox hbButtons;
-
     @FXML
     private Button btnBrowse,btnSearch,
             btnNew,
@@ -79,21 +63,17 @@ public class RequirementSourcePerGroupController implements Initializable, Scree
             btnCancel,
             btnActivate,
             btnClose;
-
     @FXML
     private FontAwesomeIconView faActivate;
-
     @FXML
     private TextField txtField01,
             txtField02,
             txtSeeks01;
-
     @FXML
     private CheckBox cbActive, cbRequired;
-    
     @FXML
     private ComboBox cmbCustomerType, cmbPaymentMode;
-    
+  
     @Override
     public void setGRider(GRiderCAS foValue) {
         oApp = foValue;
@@ -386,13 +366,6 @@ public class RequirementSourcePerGroupController implements Initializable, Scree
         if (source instanceof CheckBox) {
             CheckBox checkedBox = (CheckBox) source;
             switch (checkedBox.getId()) {
-//                case "cbActive":
-//                    poJSON = oParameters.getModel().isActive(cbActive.isSelected());
-//                    if (!JFXUtil.isJSONSuccess(poJSON)) {
-//                        ShowMessageFX.Warning(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
-//                    }
-//                    loadRecord();
-//                    break;
                 case "cbRequired":
                     poJSON = oParameters.getModel().isRequired(cbRequired.isSelected());
                     if (!JFXUtil.isJSONSuccess(poJSON)) {
@@ -433,115 +406,5 @@ public class RequirementSourcePerGroupController implements Initializable, Scree
         JFXUtil.initComboBoxCellDesignColor("#FF8201", cmbPaymentMode, cmbCustomerType);
 
     }
-    //Feature
-//    public void initLoadTable() {
-//        loadTableList = new JFXUtil.ReloadableTableTask(
-//                tblViewList,
-//                main_data,
-//                () -> {
-//                    Platform.runLater(() -> {
-//                        try {
-//                            Thread.sleep(100);
-//                            main_data.clear();
-//                            if (oParameters.getParameterCount() > 0) {
-//                                //retreiving using column index
-//                                for (int lnCtr = 0; lnCtr <= oParameters.getParameterCount() - 1; lnCtr++) {
-//                                    main_data.add(new ModelListParameter(String.valueOf(lnCtr + 1),
-//                                            String.valueOf(oParameters.ParameterList(lnCtr).RequirementSource().getDescription()),
-//                                            String.valueOf(oParameters.ParameterList(lnCtr).getCustomerGroup()),
-//                                            String.valueOf(oParameters.ParameterList(lnCtr).getPaymentMode()),
-//                                            String.valueOf(oParameters.ParameterList(lnCtr).getRequirementId())
-//                                    ));
-//                                }
-//                            }
-//
-//                            if (pnMain < 0 || pnMain
-//                                    >= main_data.size()) {
-//                                if (!main_data.isEmpty()) {
-//                                    /* FOCUS ON FIRST ROW */
-//                                    JFXUtil.selectAndFocusRow(tblViewList, 0);
-//                                    pnMain = tblViewList.getSelectionModel().getSelectedIndex();
-//                                }
-//                            } else {
-//                                /* FOCUS ON THE ROW THAT pnRowDetail POINTS TO */
-//                                JFXUtil.selectAndFocusRow(tblViewList, pnMain);
-//                            }
-//                        } catch (InterruptedException | SQLException | GuanzonException ex) {
-//                            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
-//                            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
-//                        }
-//                    });
-//
-//                });
-//
-//    }
-//    
-//
-//    public void loadTableDetailFromMain() {
-//        try {
-//            poJSON = new JSONObject();
-//
-//            ModelListParameter selected = (ModelListParameter) tblViewList.getSelectionModel().getSelectedItem();
-//            if (selected != null) {
-//                String lsTransNo = selected.getIndex08();
-//                if (!JFXUtil.loadValidation(pnEditMode, pxeModuleName, oParameters.getModel().getRequirementId(), lsTransNo)) {
-//                    return;
-//                }
-//
-//                int pnRowMain = Integer.parseInt(selected.getIndex01()) - 1;
-//                pnMain = pnRowMain;
-//
-//                JFXUtil.disableAllHighlightByColor(tblViewList, "#A7C7E7", highlightedRowsMain);
-//                JFXUtil.highlightByKey(tblViewList, String.valueOf(pnRowMain + 1), "#A7C7E7", highlightedRowsMain);
-//
-//                poJSON = oParameters.openRecord(oParameters.ParameterList(pnMain).getRequirementId());
-//                if ("error".equals((String) poJSON.get("result"))) {
-//                    ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-//                    return;
-//                }
-//                pnEditMode = oParameters.getEditMode();
-//                initButton(pnEditMode);
-//                loadRecord();
-//            }
-//        } catch (SQLException | GuanzonException ex) {
-//            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
-//            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
-//        }
-//    }
-//    
-//    public void loadList() {
-//        poJSON = new JSONObject();
-//        System.out.println("customer type : " + cmbCustomerType.getSelectionModel().getSelectedIndex());
-//        System.out.println("payment mode : " + cmbPaymentMode.getSelectionModel().getSelectedIndex());
-//        poJSON = oParameters.loadParameterList(String.valueOf(cmbCustomerType.getSelectionModel().getSelectedIndex()),String.valueOf(cmbPaymentMode.getSelectionModel().getSelectedIndex()));
-//        if ("error".equals((String) poJSON.get("result"))) {
-//            ShowMessageFX.Information((String) poJSON.get("message"), "Computerized Acounting System", pxeModuleName);
-//            return;
-//        }
-//        loadTableList.reload();
-//    }
-//    public void initTableOnClick() {
-//        tblViewList.setOnMouseClicked(event -> {
-//            pnMain = tblViewList.getSelectionModel().getSelectedIndex();
-//            if (pnMain >= 0) {
-//                if (event.getClickCount() == 2) {
-//                    loadTableDetailFromMain();
-//                    pnEditMode = oParameters.getEditMode();
-//                    initButton(pnEditMode);
-//                }
-//            }
-//        });
-//        JFXUtil.applyRowHighlighting(tblViewList, item -> ((ModelListParameter) item).getIndex01(), highlightedRowsMain);
-//        JFXUtil.adjustColumnForScrollbar(tblViewList);
-//    }
-//
-//    public void initMainGrid() {
-//        JFXUtil.setColumnCenter(tblRow);
-//        JFXUtil.setColumnLeft(tblRequirement, tblCustomerType, tblPaymentMode);
-//        JFXUtil.setColumnsIndexAndDisableReordering(tblViewList);
-//
-//        filteredData = new FilteredList<>(main_data, b -> true);
-//        tblViewList.setItems(filteredData);
-//    }
 
 }
