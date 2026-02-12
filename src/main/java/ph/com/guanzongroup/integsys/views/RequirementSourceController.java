@@ -64,6 +64,8 @@ public class RequirementSourceController implements Initializable, ScreenInterfa
             poJSON = new JSONObject();
             poController = new SalesControllers(oApp, null).RequirementsSource();
             poController.initialize(); // Initialize transaction
+            poController.setRecordStatus("0123");
+
             initTextFields();
             clearTextFields();
             pnEditMode = EditMode.UNKNOWN;
@@ -162,7 +164,8 @@ public class RequirementSourceController implements Initializable, ScreenInterfa
                             if (lsValue.isEmpty()) {
                                 if (!JFXUtil.isObjectEqualTo(pnEditMode, EditMode.ADDNEW, EditMode.UPDATE)) {
                                     poController.getModel().setDescription("");
-                                    poController.initialize();
+                                    poController.initialize(); // Initialize transaction
+                                    poController.setRecordStatus("0123");
                                 }
                             }
                             break;
@@ -193,6 +196,11 @@ public class RequirementSourceController implements Initializable, ScreenInterfa
     }
 
     public void loadRecordMaster() {
+        if (poController.getModel().isActive()) {
+            btnActivate.setText("Deactivate");
+        } else {
+            btnActivate.setText("Activate");
+        }
         tfRequirementSource.setText(poController.getModel().getRequirementCode());
         tfDescription.setText(poController.getModel().getDescription());
         cbActive.setSelected(poController.getModel().isActive());
@@ -240,7 +248,8 @@ public class RequirementSourceController implements Initializable, ScreenInterfa
                     case "btnCancel":
                         if (ShowMessageFX.OkayCancel(null, pxeModuleName, "Do you want to disregard changes?") == true) {
                             //Clear data
-                            poController.initialize();
+                            poController.initialize(); // Initialize transaction
+                            poController.setRecordStatus("0123");
                             clearTextFields();
 //                            poController.getModel().setIndustryId(psIndustryId);
                             pnEditMode = EditMode.UNKNOWN;
@@ -268,7 +277,7 @@ public class RequirementSourceController implements Initializable, ScreenInterfa
                         //Validator
                         poJSON = new JSONObject();
                         String lsStat = "";
-                        if ((poController.getModel().isActive() ? "1" : "0").equals(RecordStatus.ACTIVE)) {
+                        if (poController.getModel().isActive()) {
                             lsStat = "deactivate";
                             btnActivate.setText("Deactivate");
                         } else {
@@ -276,7 +285,7 @@ public class RequirementSourceController implements Initializable, ScreenInterfa
                             btnActivate.setText("Activate");
                         }
                         if (ShowMessageFX.YesNo(null, pxeModuleName, "Are you sure you want to " + lsStat + " the transaction?") == true) {
-                            if ((poController.getModel().isActive() ? "1" : "0").equals(RecordStatus.ACTIVE)) {
+                            if (poController.getModel().isActive()) {
                                 poJSON = poController.deactivateRecord();
                             } else {
                                 poJSON = poController.activateRecord();
@@ -286,7 +295,8 @@ public class RequirementSourceController implements Initializable, ScreenInterfa
                                 return;
                             } else {
                                 ShowMessageFX.Information(null, pxeModuleName, "Record " + lsStat + "d successfully");
-                                poController.initialize();
+                                poController.initialize(); // Initialize transaction
+                                poController.setRecordStatus("0123");
                             }
                             pnEditMode = poController.getEditMode();
                         } else {
@@ -327,10 +337,8 @@ public class RequirementSourceController implements Initializable, ScreenInterfa
 
         JFXUtil.setDisabled(lbShow3, apMaster);
 
-        if ((poController.getModel().isActive() ? "1" : "0").equals(RecordStatus.ACTIVE)) {
-            btnActivate.setText("Deactivate");
-        } else {
-            btnActivate.setText("Activate");
+        if (lbShow2) {
+            JFXUtil.setButtonsVisibility(poController.getModel().isActive(), btnUpdate);
         }
     }
 }
