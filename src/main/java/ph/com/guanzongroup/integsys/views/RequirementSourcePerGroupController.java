@@ -23,15 +23,12 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import static javafx.scene.input.KeyCode.DOWN;
 import static javafx.scene.input.KeyCode.ENTER;
 import static javafx.scene.input.KeyCode.F3;
 import static javafx.scene.input.KeyCode.UP;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import org.guanzon.appdriver.agent.ShowMessageFX;
@@ -41,7 +38,6 @@ import org.guanzon.appdriver.base.GuanzonException;
 import org.guanzon.appdriver.base.LogWrapper;
 import org.guanzon.appdriver.base.MiscUtil;
 import org.guanzon.appdriver.constant.EditMode;
-import org.guanzon.cas.parameter.services.ParamControllers;
 import org.json.simple.JSONObject;
 import ph.com.guanzongroup.cas.sales.t1.RequirementsSourcePerGroup;
 import ph.com.guanzongroup.cas.sales.t1.services.SalesControllers;
@@ -97,11 +93,6 @@ public class RequirementSourcePerGroupController implements Initializable, Scree
     
     @FXML
     private ComboBox cmbCustomerType, cmbPaymentMode;
-    @FXML
-    private TableView tblViewList;
-    
-    @FXML
-    private TableColumn tblRow, tblRequirement, tblCustomerType, tblPaymentMode;
     
     @Override
     public void setGRider(GRiderCAS foValue) {
@@ -128,9 +119,6 @@ public class RequirementSourcePerGroupController implements Initializable, Scree
         InitTextFields();
         initComboBoxes();
         ClickButton();
-        initMainGrid();
-        initTableOnClick();
-        initLoadTable();
         pbLoaded = true;
         JFXUtil.initKeyClickObject(AnchorMain, lastFocusedTextField, previousSearchedTextField); // for btnSearch Reference
         Platform.runLater(() -> {
@@ -141,6 +129,7 @@ public class RequirementSourcePerGroupController implements Initializable, Scree
     private void initializeObject() {
         LogWrapper logwrapr = new LogWrapper("CAS", System.getProperty("sys.default.path.temp") + "cas-error.log");
         oParameters = new SalesControllers(oApp, logwrapr).RequirementsSourcePerGroup();
+        oParameters.setWithUI(true);
         oParameters.setRecordStatus("0123");
     }
 
@@ -172,37 +161,37 @@ public class RequirementSourcePerGroupController implements Initializable, Scree
                         clearAllFields();
                         poJSON = oParameters.newRecord();
                         if ("success".equals((String) poJSON.get("result"))) {
-                            loadRecord();
-                            loadList();
                             txtField02.requestFocus();
                             pnEditMode = oParameters.getEditMode();
+                            initButton(pnEditMode);
+                            loadRecord();
                         } else {
-                            ShowMessageFX.Information((String) poJSON.get("message"), "Computerized Acounting System", pxeModuleName);
+                            ShowMessageFX.Warning((String) poJSON.get("message"), "Computerized Acounting System", pxeModuleName);
                             pnEditMode = EditMode.UNKNOWN;
+                            initButton(pnEditMode);
                         }
-                        initButton(pnEditMode);
                         break;
                     case "btnBrowse":
                         String lsValue = (txtSeeks01.getText() == null) ? "" : txtSeeks01.getText();
                         poJSON = oParameters.searchRecord(lsValue, false);
                         if ("error".equals((String) poJSON.get("result"))) {
-                            ShowMessageFX.Information((String) poJSON.get("message"), "Computerized Acounting System", pxeModuleName);
+                            ShowMessageFX.Warning((String) poJSON.get("message"), "Computerized Acounting System", pxeModuleName);
                             txtSeeks01.clear();
-                            break;
-                        }
-                        pnEditMode = EditMode.READY;
-                        loadRecord();
-                        
-                        break;
-                    case "btnUpdate":
-                        poJSON = oParameters.updateRecord();
-                        if ("error".equals((String) poJSON.get("result"))) {
-                            ShowMessageFX.Information((String) poJSON.get("message"), "Computerized Acounting System", pxeModuleName);
                             break;
                         }
                         pnEditMode = oParameters.getEditMode();
                         initButton(pnEditMode);
-                        
+                        loadRecord();
+                        break;
+                    case "btnUpdate":
+                        poJSON = oParameters.updateRecord();
+                        if ("error".equals((String) poJSON.get("result"))) {
+                            ShowMessageFX.Warning((String) poJSON.get("message"), "Computerized Acounting System", pxeModuleName);
+                            break;
+                        }
+                        pnEditMode = oParameters.getEditMode();
+                        initButton(pnEditMode);
+                        loadRecord();
                         break;
                     case "btnCancel":
                         if (ShowMessageFX.YesNo("Do you really want to cancel this record? \nAny data collected will not be kept.", "Computerized Acounting System", pxeModuleName)) {
@@ -210,12 +199,9 @@ public class RequirementSourcePerGroupController implements Initializable, Scree
                             initializeObject();
                             pnEditMode = EditMode.UNKNOWN;
                             initButton(pnEditMode);
-                            
                         }
                         break;
                     case "btnSave":
-                        oParameters.getModel().setModifyingId(oApp.getUserID());
-                        oParameters.getModel().setModifiedDate(oApp.getServerDate());
                         poJSON = oParameters.saveRecord();
                         if ("success".equals((String) poJSON.get("result"))) {
                             ShowMessageFX.Information((String) poJSON.get("message"), "Computerized Acounting System", pxeModuleName);
@@ -223,7 +209,7 @@ public class RequirementSourcePerGroupController implements Initializable, Scree
                                 btnNew.fire();
                             });
                         } else {
-                            ShowMessageFX.Information((String) poJSON.get("message"), "Computerized Acounting System", pxeModuleName);
+                            ShowMessageFX.Warning((String) poJSON.get("message"), "Computerized Acounting System", pxeModuleName);
                         }
                         break;
                     case "btnSearch":
@@ -231,40 +217,29 @@ public class RequirementSourcePerGroupController implements Initializable, Scree
                         break;
                     case "btnActivate":
                         String id = oParameters.getModel().getRequirementId();
-                        if(oParameters.getModel().isActive()){
-                            if (ShowMessageFX.YesNo(null, pxeModuleName, "Do you want to Deactivate this Parameter?") == true) {
-                                poJSON = oParameters.deactivateRecord();
-                                if ("error".equals(poJSON.get("result"))) {
-                                    ShowMessageFX.Information((String) poJSON.get("message"), "Computerized Accounting System", pxeModuleName);
-                                    break;
-                                }
-                                poJSON = oParameters.openRecord(id);
-                                if ("error".equals(poJSON.get("result"))) {
-                                    ShowMessageFX.Information((String) poJSON.get("message"), "Computerized Accounting System", pxeModuleName);
-                                    break;
-                                }
-                                clearAllFields();
-                                loadRecord();
-                                ShowMessageFX.Information((String) poJSON.get("message"), "Computerized Accounting System", pxeModuleName);
+                        if (ShowMessageFX.YesNo(null, pxeModuleName, "Do you want to "+btnActivate.getText().toLowerCase()+" this Parameter?") == true) {
+                            if(oParameters.getModel().isActive()){
+                                poJSON = oParameters.DeactivateRecord();
+                            } else {
+                                poJSON = oParameters.ActivateRecord();
                             }
-                        } else {
-                            if (ShowMessageFX.YesNo(null, pxeModuleName, "Do you want to Activate this Parameter?") == true) {
-                                oParameters.initialize();
-                                poJSON = oParameters.activateRecord();
-                                if ("error".equals(poJSON.get("result"))) {
-                                    ShowMessageFX.Information((String) poJSON.get("message"), "Computerized Accounting System", pxeModuleName);
-                                    break;
-                                }
-                                poJSON = oParameters.openRecord(id);
-                                if ("error".equals(poJSON.get("result"))) {
-                                    ShowMessageFX.Information((String) poJSON.get("message"), "Computerized Accounting System", pxeModuleName);
-                                    break;
-                                }
-                                clearAllFields();
-                                loadRecord();
-                                ShowMessageFX.Information((String) poJSON.get("message"), "Computerized Accounting System", pxeModuleName);
+                            if ("error".equals(poJSON.get("result"))) {
+                                ShowMessageFX.Warning((String) poJSON.get("message"), "Computerized Accounting System", pxeModuleName);
+                                break;
                             }
                         }
+                        
+                        ShowMessageFX.Information((String) poJSON.get("message"), "Computerized Accounting System", pxeModuleName);
+                        
+                        poJSON = oParameters.openRecord(id);
+                        if ("error".equals(poJSON.get("result"))) {
+                            ShowMessageFX.Information((String) poJSON.get("message"), "Computerized Accounting System", pxeModuleName);
+                            break;
+                        }
+                        
+                        pnEditMode = oParameters.getEditMode();
+                        initButton(pnEditMode);
+                        loadRecord();
                         break;
                 }
             } catch (SQLException | GuanzonException | CloneNotSupportedException ex) {
@@ -279,23 +254,27 @@ public class RequirementSourcePerGroupController implements Initializable, Scree
         txtSeeks01.clear();
         cbActive.setSelected(false);
         cbRequired.setSelected(false);
-        main_data.clear();
-        JFXUtil.setValueToNull(previousSearchedTextField, lastFocusedTextField);
+        JFXUtil.setCmbValue(cmbPaymentMode, -1);
+        JFXUtil.setCmbValue(cmbCustomerType, -1);
     }
 
     private void initButton(int fnValue) {
+        boolean lbShow1 = (fnValue == EditMode.READY);
         boolean lbShow = (fnValue == EditMode.ADDNEW || fnValue == EditMode.UPDATE);
-        JFXUtil.setButtonsVisibility(!lbShow, btnActivate,btnNew,btnUpdate,btnBrowse, btnClose);
+        
+        JFXUtil.setButtonsVisibility(!lbShow, btnNew,btnBrowse, btnClose);
         JFXUtil.setButtonsVisibility(lbShow, btnSearch,btnCancel,btnSave);
+        JFXUtil.setButtonsVisibility(lbShow1, btnUpdate,btnActivate);
         
         //fields
-        JFXUtil.setDisabled(!lbShow, txtField02);
+        JFXUtil.setDisabled(!lbShow, txtField02, cmbCustomerType,cmbPaymentMode, cbRequired);
     }
 
     private void InitTextFields() {
         txtField02.focusedProperty().addListener(txtField_Focus);
         txtSeeks01.setOnKeyPressed(this::txtSeeks_KeyPressed);
         txtField02.setOnKeyPressed(this::txtSeeks_KeyPressed);
+        JFXUtil.setCheckboxHoverCursor(cbActive, cbRequired);
     }
 
     private void txtSeeks_KeyPressed(KeyEvent event) {
@@ -303,31 +282,30 @@ public class RequirementSourcePerGroupController implements Initializable, Scree
             TextField txtField = (TextField) event.getSource();
             int lnIndex = Integer.parseInt(((TextField) event.getSource()).getId().substring(8, 10));
             String lsValue = (txtField.getText() == null ? "" : txtField.getText());
-            JSONObject poJson;
-            poJson = new JSONObject();
+            poJSON = new JSONObject();
             switch (event.getCode()) {
                 case F3:
                     switch (lnIndex) {
                         case 01:
-                            poJson = oParameters.searchRecord(lsValue, false);
-                            if ("error".equals((String) poJson.get("result"))) {
-                                ShowMessageFX.Information((String) poJson.get("message"), "Computerized Acounting System", pxeModuleName);
+                            poJSON = oParameters.searchRecord(lsValue, false);
+                            if ("error".equals((String) poJSON.get("result"))) {
+                                ShowMessageFX.Information((String) poJSON.get("message"), "Computerized Acounting System", pxeModuleName);
                                 txtSeeks01.clear();
                                 break;
                             }
                             txtSeeks01.setText((String) oParameters.getModel().RequirementSource().getDescription());
-                            pnEditMode = EditMode.READY;
+                            pnEditMode = oParameters.getEditMode();
+                            initButton(pnEditMode);
                             loadRecord();
                             break;
                         case 02:
-                            poJson = oParameters.SearchRequirmentSource(lsValue, false);
-                            if ("error".equals((String) poJson.get("result"))) {
-                                ShowMessageFX.Information((String) poJson.get("message"), "Computerized Acounting System", pxeModuleName);
+                            poJSON = oParameters.SearchRequirmentSource(lsValue, false);
+                            if ("error".equals((String) poJSON.get("result"))) {
+                                ShowMessageFX.Information((String) poJSON.get("message"), "Computerized Acounting System", pxeModuleName);
                                 txtField02.clear();
                                 break;
                             }
                             loadRecord();
-                            loadList();
                             break;
                     }
                 case ENTER:
@@ -390,7 +368,9 @@ public class RequirementSourcePerGroupController implements Initializable, Scree
             } else {
                 btnActivate.setText("Activate");
                 faActivate.setGlyphName("CHECK");
+                JFXUtil.setButtonsVisibility(false, btnUpdate);
             }
+            
             JFXUtil.setCmbValue(cmbPaymentMode, !oParameters.getModel().getPaymentMode().equals("") ? Integer.valueOf(oParameters.getModel().getPaymentMode()) : -1);
             JFXUtil.setCmbValue(cmbCustomerType, !oParameters.getModel().getCustomerGroup().equals("") ? Integer.valueOf(oParameters.getModel().getCustomerGroup()) : -1);
         } catch (SQLException | GuanzonException ex) {
@@ -400,9 +380,29 @@ public class RequirementSourcePerGroupController implements Initializable, Scree
     }
 
     @FXML
-    void checkBox_Clicked(MouseEvent event) {
-        oParameters.getModel().isActive(cbActive.isSelected());
-        oParameters.getModel().isRequired(cbRequired.isSelected());
+    void checkBox_Clicked(ActionEvent event) {
+        poJSON = new JSONObject();
+        Object source = event.getSource();
+        if (source instanceof CheckBox) {
+            CheckBox checkedBox = (CheckBox) source;
+            switch (checkedBox.getId()) {
+//                case "cbActive":
+//                    poJSON = oParameters.getModel().isActive(cbActive.isSelected());
+//                    if (!JFXUtil.isJSONSuccess(poJSON)) {
+//                        ShowMessageFX.Warning(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
+//                    }
+//                    loadRecord();
+//                    break;
+                case "cbRequired":
+                    poJSON = oParameters.getModel().isRequired(cbRequired.isSelected());
+                    if (!JFXUtil.isJSONSuccess(poJSON)) {
+                        ShowMessageFX.Warning(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
+                    }
+                    loadRecord();
+                    break;
+            }
+        }
+        
     }
     
     EventHandler<ActionEvent> comboBoxActionListener = JFXUtil.CmbActionListener(
@@ -414,7 +414,6 @@ public class RequirementSourcePerGroupController implements Initializable, Scree
                             ShowMessageFX.Warning(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
                         }
                         loadRecord();
-                        loadList();
                         break;
                     case "cmbCustomerType":
                         poJSON = oParameters.getModel().setCustomerGroup(String.valueOf(selectedIndex));
@@ -422,12 +421,10 @@ public class RequirementSourcePerGroupController implements Initializable, Scree
                             ShowMessageFX.Warning(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
                         }
                         loadRecord();
-                        loadList();
                         break;
                 }
             }
     );
-
 
     private void initComboBoxes() {
         JFXUtil.setComboBoxItems(new JFXUtil.Pairs<>(cPaymentMode, cmbPaymentMode), 
@@ -436,114 +433,115 @@ public class RequirementSourcePerGroupController implements Initializable, Scree
         JFXUtil.initComboBoxCellDesignColor("#FF8201", cmbPaymentMode, cmbCustomerType);
 
     }
-    public void initLoadTable() {
-        loadTableList = new JFXUtil.ReloadableTableTask(
-                tblViewList,
-                main_data,
-                () -> {
-                    Platform.runLater(() -> {
-                        try {
-                            Thread.sleep(100);
-                            main_data.clear();
-                            if (oParameters.getParameterCount() > 0) {
-                                //retreiving using column index
-                                for (int lnCtr = 0; lnCtr <= oParameters.getParameterCount() - 1; lnCtr++) {
-                                    main_data.add(new ModelListParameter(String.valueOf(lnCtr + 1),
-                                            String.valueOf(oParameters.ParameterList(lnCtr).RequirementSource().getDescription()),
-                                            String.valueOf(oParameters.ParameterList(lnCtr).getCustomerGroup()),
-                                            String.valueOf(oParameters.ParameterList(lnCtr).getPaymentMode()),
-                                            String.valueOf(oParameters.ParameterList(lnCtr).getRequirementId())
-                                    ));
-                                }
-                            }
-
-                            if (pnMain < 0 || pnMain
-                                    >= main_data.size()) {
-                                if (!main_data.isEmpty()) {
-                                    /* FOCUS ON FIRST ROW */
-                                    JFXUtil.selectAndFocusRow(tblViewList, 0);
-                                    pnMain = tblViewList.getSelectionModel().getSelectedIndex();
-                                }
-                            } else {
-                                /* FOCUS ON THE ROW THAT pnRowDetail POINTS TO */
-                                JFXUtil.selectAndFocusRow(tblViewList, pnMain);
-                            }
-                        } catch (InterruptedException | SQLException | GuanzonException ex) {
-                            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
-                            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
-                        }
-                    });
-
-                });
-
-    }
-    
-
-    public void loadTableDetailFromMain() {
-        try {
-            poJSON = new JSONObject();
-
-            ModelListParameter selected = (ModelListParameter) tblViewList.getSelectionModel().getSelectedItem();
-            if (selected != null) {
-                String lsTransNo = selected.getIndex05();
-                if (!JFXUtil.loadValidation(pnEditMode, pxeModuleName, oParameters.getModel().getRequirementId(), lsTransNo)) {
-                    return;
-                }
-
-                int pnRowMain = Integer.parseInt(selected.getIndex01()) - 1;
-                pnMain = pnRowMain;
-
-                JFXUtil.disableAllHighlightByColor(tblViewList, "#A7C7E7", highlightedRowsMain);
-                JFXUtil.highlightByKey(tblViewList, String.valueOf(pnRowMain + 1), "#A7C7E7", highlightedRowsMain);
-
-                poJSON = oParameters.openRecord(oParameters.ParameterList(pnMain).getRequirementId());
-                if ("error".equals((String) poJSON.get("result"))) {
-                    ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-                    return;
-                }
-                pnEditMode = oParameters.getEditMode();
-                initButton(pnEditMode);
-                loadRecord();
-            }
-        } catch (SQLException | GuanzonException ex) {
-            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
-            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
-        }
-    }
-    
-    public void loadList() {
-        poJSON = new JSONObject();
-        System.out.println("customer type : " + cmbCustomerType.getSelectionModel().getSelectedIndex());
-        System.out.println("payment mode : " + cmbPaymentMode.getSelectionModel().getSelectedIndex());
-        poJSON = oParameters.loadParameterList(String.valueOf(cmbCustomerType.getSelectionModel().getSelectedIndex()),String.valueOf(cmbPaymentMode.getSelectionModel().getSelectedIndex()));
-        if ("error".equals((String) poJSON.get("result"))) {
-            ShowMessageFX.Information((String) poJSON.get("message"), "Computerized Acounting System", pxeModuleName);
-            return;
-        }
-        loadTableList.reload();
-    }
-    public void initTableOnClick() {
-        tblViewList.setOnMouseClicked(event -> {
-            pnMain = tblViewList.getSelectionModel().getSelectedIndex();
-            if (pnMain >= 0) {
-                if (event.getClickCount() == 2) {
-                    loadTableDetailFromMain();
-                    pnEditMode = oParameters.getEditMode();
-                    initButton(pnEditMode);
-                }
-            }
-        });
-        JFXUtil.applyRowHighlighting(tblViewList, item -> ((ModelListParameter) item).getIndex01(), highlightedRowsMain);
-        JFXUtil.adjustColumnForScrollbar(tblViewList);
-    }
-
-    public void initMainGrid() {
-        JFXUtil.setColumnCenter(tblRow);
-        JFXUtil.setColumnLeft(tblRequirement, tblCustomerType, tblPaymentMode);
-        JFXUtil.setColumnsIndexAndDisableReordering(tblViewList);
-
-        filteredData = new FilteredList<>(main_data, b -> true);
-        tblViewList.setItems(filteredData);
-    }
+    //Feature
+//    public void initLoadTable() {
+//        loadTableList = new JFXUtil.ReloadableTableTask(
+//                tblViewList,
+//                main_data,
+//                () -> {
+//                    Platform.runLater(() -> {
+//                        try {
+//                            Thread.sleep(100);
+//                            main_data.clear();
+//                            if (oParameters.getParameterCount() > 0) {
+//                                //retreiving using column index
+//                                for (int lnCtr = 0; lnCtr <= oParameters.getParameterCount() - 1; lnCtr++) {
+//                                    main_data.add(new ModelListParameter(String.valueOf(lnCtr + 1),
+//                                            String.valueOf(oParameters.ParameterList(lnCtr).RequirementSource().getDescription()),
+//                                            String.valueOf(oParameters.ParameterList(lnCtr).getCustomerGroup()),
+//                                            String.valueOf(oParameters.ParameterList(lnCtr).getPaymentMode()),
+//                                            String.valueOf(oParameters.ParameterList(lnCtr).getRequirementId())
+//                                    ));
+//                                }
+//                            }
+//
+//                            if (pnMain < 0 || pnMain
+//                                    >= main_data.size()) {
+//                                if (!main_data.isEmpty()) {
+//                                    /* FOCUS ON FIRST ROW */
+//                                    JFXUtil.selectAndFocusRow(tblViewList, 0);
+//                                    pnMain = tblViewList.getSelectionModel().getSelectedIndex();
+//                                }
+//                            } else {
+//                                /* FOCUS ON THE ROW THAT pnRowDetail POINTS TO */
+//                                JFXUtil.selectAndFocusRow(tblViewList, pnMain);
+//                            }
+//                        } catch (InterruptedException | SQLException | GuanzonException ex) {
+//                            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+//                            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
+//                        }
+//                    });
+//
+//                });
+//
+//    }
+//    
+//
+//    public void loadTableDetailFromMain() {
+//        try {
+//            poJSON = new JSONObject();
+//
+//            ModelListParameter selected = (ModelListParameter) tblViewList.getSelectionModel().getSelectedItem();
+//            if (selected != null) {
+//                String lsTransNo = selected.getIndex08();
+//                if (!JFXUtil.loadValidation(pnEditMode, pxeModuleName, oParameters.getModel().getRequirementId(), lsTransNo)) {
+//                    return;
+//                }
+//
+//                int pnRowMain = Integer.parseInt(selected.getIndex01()) - 1;
+//                pnMain = pnRowMain;
+//
+//                JFXUtil.disableAllHighlightByColor(tblViewList, "#A7C7E7", highlightedRowsMain);
+//                JFXUtil.highlightByKey(tblViewList, String.valueOf(pnRowMain + 1), "#A7C7E7", highlightedRowsMain);
+//
+//                poJSON = oParameters.openRecord(oParameters.ParameterList(pnMain).getRequirementId());
+//                if ("error".equals((String) poJSON.get("result"))) {
+//                    ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+//                    return;
+//                }
+//                pnEditMode = oParameters.getEditMode();
+//                initButton(pnEditMode);
+//                loadRecord();
+//            }
+//        } catch (SQLException | GuanzonException ex) {
+//            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+//            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
+//        }
+//    }
+//    
+//    public void loadList() {
+//        poJSON = new JSONObject();
+//        System.out.println("customer type : " + cmbCustomerType.getSelectionModel().getSelectedIndex());
+//        System.out.println("payment mode : " + cmbPaymentMode.getSelectionModel().getSelectedIndex());
+//        poJSON = oParameters.loadParameterList(String.valueOf(cmbCustomerType.getSelectionModel().getSelectedIndex()),String.valueOf(cmbPaymentMode.getSelectionModel().getSelectedIndex()));
+//        if ("error".equals((String) poJSON.get("result"))) {
+//            ShowMessageFX.Information((String) poJSON.get("message"), "Computerized Acounting System", pxeModuleName);
+//            return;
+//        }
+//        loadTableList.reload();
+//    }
+//    public void initTableOnClick() {
+//        tblViewList.setOnMouseClicked(event -> {
+//            pnMain = tblViewList.getSelectionModel().getSelectedIndex();
+//            if (pnMain >= 0) {
+//                if (event.getClickCount() == 2) {
+//                    loadTableDetailFromMain();
+//                    pnEditMode = oParameters.getEditMode();
+//                    initButton(pnEditMode);
+//                }
+//            }
+//        });
+//        JFXUtil.applyRowHighlighting(tblViewList, item -> ((ModelListParameter) item).getIndex01(), highlightedRowsMain);
+//        JFXUtil.adjustColumnForScrollbar(tblViewList);
+//    }
+//
+//    public void initMainGrid() {
+//        JFXUtil.setColumnCenter(tblRow);
+//        JFXUtil.setColumnLeft(tblRequirement, tblCustomerType, tblPaymentMode);
+//        JFXUtil.setColumnsIndexAndDisableReordering(tblViewList);
+//
+//        filteredData = new FilteredList<>(main_data, b -> true);
+//        tblViewList.setItems(filteredData);
+//    }
 
 }
