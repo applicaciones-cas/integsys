@@ -286,9 +286,9 @@ public class RequirementSourceController implements Initializable, ScreenInterfa
                         }
                         if (ShowMessageFX.YesNo(null, pxeModuleName, "Are you sure you want to " + lsStat + " the transaction?") == true) {
                             if (poController.getModel().isActive()) {
-                                poJSON = poController.deactivateRecord();
+                                poJSON = poController.DeactivateRecord();
                             } else {
-                                poJSON = poController.activateRecord();
+                                poJSON = poController.ActivateRecord();
                             }
                             if (!"success".equals((String) poJSON.get("result"))) {
                                 ShowMessageFX.Warning(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
