@@ -182,7 +182,7 @@ public class BanksController implements Initializable, ScreenInterface {
                         }
                         break;
                     case "btnSave":
-                        oParameters.getModel().setModifyingId(oApp.getUserID());
+                        oParameters.getModel().setModifyingId(oApp.Encrypt(oApp.getUserID()));
                         oParameters.getModel().setModifiedDate(oApp.getServerDate());
                         poJSON = oParameters.saveRecord();
                         if ("success".equals((String) poJSON.get("result"))) {

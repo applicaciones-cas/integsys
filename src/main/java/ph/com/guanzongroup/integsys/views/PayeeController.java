@@ -183,7 +183,7 @@ public class PayeeController implements Initializable, ScreenInterface {
                         }
                         break;
                     case "btnSave":
-                        oParameters.Payee().getModel().setModifyingId(oApp.getUserID());
+                        oParameters.Payee().getModel().setModifyingId(oApp.Encrypt(oApp.getUserID()));
                         oParameters.Payee().getModel().setModifiedDate(oApp.getServerDate());
                         poJSON = oParameters.Payee().saveRecord();
                         if ("success".equals((String) poJSON.get("result"))) {
