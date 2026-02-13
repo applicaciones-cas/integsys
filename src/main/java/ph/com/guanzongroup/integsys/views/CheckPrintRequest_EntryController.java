@@ -557,7 +557,7 @@ public class CheckPrintRequest_EntryController implements Initializable, ScreenI
 
                 cmbPayeeType.getSelectionModel().select(!poCheckPrintingRequestController.Detail(pnDetail).DisbursementMaster().CheckPayments().getPayeeType().equals("")
                         ? Integer.valueOf(poCheckPrintingRequestController.Detail(pnDetail).DisbursementMaster().CheckPayments().getPayeeType()) : -1);
-                taRemarksDetails.setText(poCheckPrintingRequestController.Detail(pnDetail).DisbursementMaster().CheckPayments().getRemarks() != null ? poCheckPrintingRequestController.Detail(pnDetail).DisbursementMaster().CheckPayments().getRemarks() : "");
+                taRemarksDetails.setText(poCheckPrintingRequestController.Detail(pnDetail).getdetailRemarks()!= null ? poCheckPrintingRequestController.Detail(pnDetail).getdetailRemarks() : "");
 
                 
             } catch (SQLException | GuanzonException ex) {
@@ -675,7 +675,8 @@ public class CheckPrintRequest_EntryController implements Initializable, ScreenI
                                                 ? CustomCommonUtil.formatDateToShortString(
                                                         poCheckPrintingRequestController.Detail(lnCtr).CheckPayments().getCheckDate())
                                                 : "",
-                                                CustomCommonUtil.setIntegerValueToDecimalFormat(poCheckPrintingRequestController.Detail(lnCtr).DisbursementMaster().getNetTotal(), true)
+                                                CustomCommonUtil.setIntegerValueToDecimalFormat(poCheckPrintingRequestController.Detail(lnCtr).DisbursementMaster().getNetTotal(), true),
+                                                poCheckPrintingRequestController.Detail(lnCtr).CheckPayments().getRemarks()
                                         ));
 
                             } catch (SQLException | GuanzonException ex) {
@@ -745,8 +746,9 @@ public class CheckPrintRequest_EntryController implements Initializable, ScreenI
             if (!details_data.isEmpty()) {
                 if (event.getClickCount() == 1) {
                     pnDetail = tblVwDetail.getSelectionModel().getSelectedIndex();
+                    System.out.println("SELECTED INDEX : " + pnDetail);
                     loadRecordDetail();
-                    taRemarksDetails.requestFocus();
+//                  taRemarksDetails.requestFocus();
                     initFields(pnEditMode);
                 }
             }
@@ -894,18 +896,16 @@ public class CheckPrintRequest_EntryController implements Initializable, ScreenI
             }
             poJSON = new JSONObject();
             if (!nv) {
-                try {
                     switch (lsID) {
                         case "taRemarks":
                                 poCheckPrintingRequestController.Master().setRemarks(lsValue);
                             break;
                         case "taRemarksDetails": 
-                                poCheckPrintingRequestController.Detail(pnDetail).DisbursementMaster().CheckPayments().setRemarks(lsValue);
+                                poCheckPrintingRequestController.Detail(pnDetail).setdetailRemarks(lsValue);
+                                
                             break;
                     }
-                } catch (SQLException | GuanzonException ex) {
-                    Logger.getLogger(CheckPrintRequest_EntryController.class.getName()).log(Level.SEVERE, null, ex);
-                }
+                
             } else {
                 txtArea.selectAll();
             }
@@ -924,23 +924,24 @@ public class CheckPrintRequest_EntryController implements Initializable, ScreenI
                     pbEnteredDV = true;
                     CommonUtils.SetNextFocus(txtArea);
                     switch (lsID) {
-                        case "taRemarksDetails":
-                            try {
-                            poCheckPrintingRequestController.Detail(pnDetail).DisbursementMaster().CheckPayments().setRemarks(taRemarksDetails.getText());
-                        } catch (SQLException | GuanzonException ex) {
-                            Logger.getLogger(CheckPrintRequest_EntryController.class.getName()).log(Level.SEVERE, null, ex);
-                        }
-                        Platform.runLater(() -> {
-                            PauseTransition delay = new PauseTransition(Duration.seconds(0.50));
-                            delay.setOnFinished(event1 -> {
-                                pnDetail = JFXUtil.moveToNextRow(tblVwDetail);
-                                apDetail.requestFocus();
-                                loadRecordDetail();
-                            });
-                            delay.play();
-                        });
-                        loadTableDetail();
-                        event.consume();
+                        case "xx":
+//                            try {
+////                            poCheckPrintingRequestController.Detail(pnDetail).CheckPayments().setRemarks(taRemarksDetails.getText());
+////                            System.out.println("DETAIL REMARKS : "  + poCheckPrintingRequestController.Detail(pnDetail).CheckPayments().getRemarks());
+//                        } catch (SQLException | GuanzonException ex) {
+//                            Logger.getLogger(CheckPrintRequest_EntryController.class.getName()).log(Level.SEVERE, null, ex);
+//                        }
+//                        Platform.runLater(() -> {
+//                            PauseTransition delay = new PauseTransition(Duration.seconds(0.50));
+//                            delay.setOnFinished(event1 -> {
+//                                pnDetail = JFXUtil.moveToNextRow(tblVwDetail);
+//                                apDetail.requestFocus();
+//                                loadRecordDetail();
+//                            });
+//                            delay.play();
+//                        });
+//                        loadTableDetail();
+//                        event.consume();
                         break;
 
                     }
@@ -948,23 +949,23 @@ public class CheckPrintRequest_EntryController implements Initializable, ScreenI
                     break;
                 case UP:
                     switch (lsID) {
-                        case "taRemarksDetails":
-                            pnDetail = JFXUtil.moveToPreviousRow(tblVwDetail);
-                            apDetail.requestFocus();
-                            loadRecordDetail();
-                            event.consume();
-                            break;
+                        case "xx":
+//                            pnDetail = JFXUtil.moveToPreviousRow(tblVwDetail);
+//                            apDetail.requestFocus();
+//                            loadRecordDetail();
+//                            event.consume();
+//                            break;
                     }
                     event.consume();
                     break;
                 case DOWN:
                     switch (lsID) {
-                        case "taRemarksDetails":
-                            pnDetail = JFXUtil.moveToNextRow(tblVwDetail);
-                            apDetail.requestFocus();
-                            loadRecordDetail();
-                            event.consume();
-                            break;
+//                        case "taRemarksDetails":
+//                            pnDetail = JFXUtil.moveToNextRow(tblVwDetail);
+//                            apDetail.requestFocus();
+//                            loadRecordDetail();
+//                            event.consume();
+//                            break;
                     }
                     break;
                 default:
