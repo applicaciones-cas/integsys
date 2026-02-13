@@ -550,7 +550,7 @@ public class CheckPrintRequest_ConfirmationController implements Initializable, 
 
                 cmbPayeeType.getSelectionModel().select(!poCheckPrintingRequestController.Detail(pnDetail).DisbursementMaster().CheckPayments().getPayeeType().equals("")
                         ? Integer.valueOf(poCheckPrintingRequestController.Detail(pnDetail).DisbursementMaster().CheckPayments().getPayeeType()) : -1);
-                taRemarksDetails.setText(poCheckPrintingRequestController.Detail(pnDetail).DisbursementMaster().CheckPayments().getRemarks() != null ? poCheckPrintingRequestController.Detail(pnDetail).DisbursementMaster().CheckPayments().getRemarks() : "");
+                taRemarksDetails.setText(poCheckPrintingRequestController.Detail(pnDetail).getdetailRemarks()!= null ? poCheckPrintingRequestController.Detail(pnDetail).getdetailRemarks() : "");
 
             } catch (SQLException | GuanzonException ex) {
                 Logger.getLogger(CheckPrintRequest_EntryController.class.getName()).log(Level.SEVERE, null, ex);
@@ -679,7 +679,7 @@ public class CheckPrintRequest_ConfirmationController implements Initializable, 
             if (!details_data.isEmpty()) {
                 if (event.getClickCount() == 1) {
                     pnDetail = tblVwDetail.getSelectionModel().getSelectedIndex();
-                    taRemarksDetails.requestFocus();
+//                    taRemarksDetails.requestFocus();
                     loadRecordDetail();
                     initFields(pnEditMode);
                 }
@@ -801,17 +801,13 @@ public class CheckPrintRequest_ConfirmationController implements Initializable, 
             }
             poJSON = new JSONObject();
             if (!nv) {
-                try {
-                    switch (lsID) {
-                        case "taRemarks":
-                            poCheckPrintingRequestController.Master().setRemarks(lsValue);
-                            break;
-                         case "taRemarksDetails": 
-                                    poCheckPrintingRequestController.Detail(pnDetail).DisbursementMaster().CheckPayments().setRemarks(lsValue);
-                                break;
-                    }
-                } catch (SQLException | GuanzonException ex) {
-                    Logger.getLogger(CheckPrintRequest_EntryController.class.getName()).log(Level.SEVERE, null, ex);
+                switch (lsID) {
+                    case "taRemarks":
+                        poCheckPrintingRequestController.Master().setRemarks(lsValue);
+                        break;
+                    case "taRemarksDetails":
+                        poCheckPrintingRequestController.Detail(pnDetail).setdetailRemarks(lsValue);
+                        break;
                 }
             } else {
                 txtArea.selectAll();
@@ -828,51 +824,13 @@ public class CheckPrintRequest_ConfirmationController implements Initializable, 
             switch (event.getCode()) {
                 case TAB:
                 case ENTER:
-                    pbEnteredDV = true;
-                    CommonUtils.SetNextFocus(txtArea);
-                    switch (lsID) {
-                        case "taRemarksDetails":
-                              try {
-                            poCheckPrintingRequestController.Detail(pnDetail).DisbursementMaster().CheckPayments().setRemarks(taRemarksDetails.getText());
-                        } catch (SQLException | GuanzonException ex) {
-                            Logger.getLogger(CheckPrintRequest_EntryController.class.getName()).log(Level.SEVERE, null, ex);
-                        }
-                        Platform.runLater(() -> {
-                            PauseTransition delay = new PauseTransition(Duration.seconds(0.50));
-                            delay.setOnFinished(event1 -> {
-                                pnDetail = JFXUtil.moveToNextRow(tblVwDetail);
-                                apDetail.requestFocus();
-                                loadRecordDetail();
-                            });
-                            delay.play();
-                        });
-                        loadTableDetail();
-                        event.consume();
-                        break;
-                    }
-                    event.consume();
+                    
                     break;
                 case UP:
-                    switch (lsID) {
-                        case "taRemarksDetails":
-                            pnDetail = JFXUtil.moveToPreviousRow(tblVwDetail);
-                            apDetail.requestFocus();
-                            loadRecordDetail();
-                            event.consume();
-                            break;
-                    }
-                    event.consume();
+                    
                     break;
                 case DOWN:
-                    switch (lsID) {
-                        case "taRemarksDetails":
-                            pnDetail = JFXUtil.moveToNextRow(tblVwDetail);
-                            apDetail.requestFocus();
-                            loadRecordDetail();
-                            event.consume();
-                            break;
-                    }
-                    break;
+                    
                 default:
                     break;
 
