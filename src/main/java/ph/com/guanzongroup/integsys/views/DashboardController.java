@@ -48,7 +48,6 @@ import javafx.scene.control.TreeCell;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.Dragboard;
-import javafx.scene.input.KeyCode;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.AnchorPane;
@@ -86,6 +85,7 @@ import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.geometry.Bounds;
+import javafx.scene.input.KeyCode;
 import javafx.scene.shape.Rectangle;
 import org.guanzon.appdriver.constant.RecordStatus;
 import org.json.simple.JSONArray;
@@ -204,6 +204,8 @@ public class DashboardController implements Initializable {
     private Label lblNotifCount;
     boolean menu1 = false;
     boolean menu2 = false;
+    AnchorPane root;
+    Scene scene;
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -223,28 +225,13 @@ public class DashboardController implements Initializable {
             initButtonClickActions();
             setTreeViewStyle(tvLeftSideBar);
             setTreeViewStyleMonitor(tvRightSideBar);
-
 //            setDropShadowEffectsLeftSideBar(anchorLeftSideBarMenu);
 //            setDropShadowEffectsRightSideBar(anchorRightSideBarMenu);
-            initKeyEvent();
-            Platform.runLater(() -> {
-                AnchorPane root = (AnchorPane) MainAnchor;
-                Scene scene = root.getScene();
-                if (scene != null) {
-                    setKeyEvent(scene);
-                } else {
-                    root.sceneProperty().addListener((obs, oldScene, newScene) -> {
-                        if (newScene != null) {
-                            setKeyEvent(newScene);
-                        }
-                    });
-                }
-            });
-
             JFXUtil.applyToggleHoverAnimation(btnMenu, btnHelp, btnLogout, btnSysMonitor);
             JFXUtil.applyHoverFadeToButtons("#FFFFFF", "#552B00", btnMinimize, btnClose);
             JFXUtil.placeClockInAnchorPane(apClock, 25);
-
+            JSONObject poJSON = new JSONObject();
+            JFXUtil.checkIfFolderExists(poJSON, System.getProperty("sys.default.path.temp") + "/Attachments//");
 //            switch (System.getProperty("user.selected.industry")) {
 //                case "06":
 //                    loadDummyMenu();
@@ -260,22 +247,6 @@ public class DashboardController implements Initializable {
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
-
-    private void initKeyEvent() {
-        Platform.runLater(() -> {
-            AnchorPane root = (AnchorPane) MainAnchor;
-            Scene scene = root.getScene();
-            if (scene != null) {
-                setKeyEvent(scene);
-            } else {
-                root.sceneProperty().addListener((obs, oldScene, newScene) -> {
-                    if (newScene != null) {
-                        setKeyEvent(newScene);
-                    }
-                });
-            }
-        });
     }
 
     @FXML
@@ -970,6 +941,46 @@ public class DashboardController implements Initializable {
         anchorPane.setEffect(shadow);
     }
 
+    public Tab getTab() {
+        Tab currentTab = tabpane.getSelectionModel().getSelectedItem();
+        return currentTab;
+    }
+
+    ChangeListener<Scene> WindowKeyEvent = (obs, oldScene, newScene) -> {
+        if (newScene != null) {
+            setKeyEvent(newScene);
+        }
+    };
+
+    private void initKeyEvent() {
+        Platform.runLater(() -> {
+            root = (AnchorPane) MainAnchor;
+            scene = root.getScene();
+            if (scene != null) {
+                setKeyEvent(scene);
+            } else {
+                root.sceneProperty().addListener(WindowKeyEvent);
+            }
+        });
+    }
+
+    private void setKeyEvent(Scene scene) {
+        scene.setOnKeyPressed(event -> {
+            if (event.getCode() == KeyCode.F12) {
+                eventf12(getTab());
+            }
+        });
+    }
+
+    public void removewindowEvent() {
+        if (root != null) {
+            root.sceneProperty().removeListener(WindowKeyEvent);
+        }
+        if (scene != null) {
+            scene.setOnKeyPressed(null);
+        }
+    }
+
     public void eventf12(Tab currentTab) {
         if (LoginControllerHolder.getLogInStatus()) {
             //check here if the user level is supervisor
@@ -988,20 +999,6 @@ public class DashboardController implements Initializable {
                 }
             }
         }
-    }
-
-    public Tab getTab() {
-        Tab currentTab = tabpane.getSelectionModel().getSelectedItem();
-        return currentTab;
-    }
-
-    private void setKeyEvent(Scene scene) {
-        scene.setOnKeyPressed(event -> {
-            if (event.getCode() == KeyCode.F12) {
-                eventf12(getTab());
-            }
-        }
-        );
     }
 
     private void loadSelectIndustryAndCompany() throws IOException {
@@ -1342,7 +1339,6 @@ public class DashboardController implements Initializable {
                         event.consume();
                     }
                 });
-
                 selectedTab.setOnSelectionChanged(event -> {
                     ObservableList<Tab> tabs = tabpane.getTabs();
                     for (Tab tab : tabs) {
@@ -1536,6 +1532,7 @@ public class DashboardController implements Initializable {
             });
 
             newTab.setOnSelectionChanged(event -> {
+
                 ObservableList<Tab> tabs = tabpane.getTabs();
                 for (Tab tab : tabs) {
                     if (tab.getText().equals(newTab.getText())) {
@@ -1547,6 +1544,7 @@ public class DashboardController implements Initializable {
                         } else {
                             SIPostingWindowKeyEvent(newTab, fxObj, true);
                         }
+
                         break;
                     }
                 }
@@ -1597,7 +1595,8 @@ public class DashboardController implements Initializable {
         new ControllerBinding(POQuotation_EntryController.class),
         new ControllerBinding(POQuotation_ConfirmationController.class),
         new ControllerBinding(POQuotation_ApprovalController.class),
-        new ControllerBinding(POQuotation_HistoryController.class)};
+        new ControllerBinding(POQuotation_HistoryController.class)
+    };
 
     private void SIPostingWindowKeyEvent(Tab newTab, ScreenInterface fxObj, boolean isRemove) {
         for (ControllerBinding cb : controllerArray) {
