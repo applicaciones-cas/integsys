@@ -120,8 +120,10 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.util.Callback;
 import java.io.File;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.WeakHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
@@ -1046,6 +1048,8 @@ public class JFXUtil {
         }
     }
 
+    /* Disables all nodes in a parent AnchorPane with exception*/
+ /* Requires boolean & Nodes*/
     public static void setDisabledExcept(boolean disable, Object container, Object... exceptions) {
         if (!(container instanceof Parent)) {
             return;
@@ -2331,6 +2335,7 @@ public class JFXUtil {
             cb.setOnAction(listener);
         }
     }
+//
 
     /*Shortened loadTable loader*/
     //sample usage
@@ -3095,6 +3100,26 @@ public class JFXUtil {
         }
     }
 
+    public static void applyHoverTooltipDelay(double delay, String message, Node... nodes) {
+        if (message == null || nodes == null) {
+            return;
+        }
+
+        for (Node node : nodes) {
+            if (node != null) {
+                Tooltip tooltip = new Tooltip(message);
+
+                tooltip.setShowDelay(Duration.seconds(delay));
+                tooltip.setStyle(
+                        "-fx-font-size: 10px;"
+                        + "-fx-padding: 6 10 6 10;"
+                );
+
+                Tooltip.install(node, tooltip);
+            }
+        }
+    }
+
     public static void setVisibility(boolean visible, Node... nodes) {
         if (nodes == null) {
             return;
@@ -3279,6 +3304,31 @@ public class JFXUtil {
             ParallelTransition animation
                     = new ParallelTransition(fade, slide);
 
+            animation.play();
+        }
+    }
+
+    public static void playUpwardFadeOut(double delaySeconds, double durationSeconds, Node... nodes) {
+        for (Node node : nodes) {
+            if (node == null) {
+                continue;
+            }
+
+            FadeTransition fade = new FadeTransition(
+                    Duration.seconds(durationSeconds), node
+            );
+            fade.setFromValue(1.0);
+            fade.setToValue(0.0);
+
+            TranslateTransition moveUp = new TranslateTransition(
+                    Duration.seconds(durationSeconds), node
+            );
+            moveUp.setFromY(0);
+            moveUp.setToY(-20); // upward movement (adjust as needed)
+
+            ParallelTransition animation
+                    = new ParallelTransition(node, fade, moveUp);
+            animation.setDelay(Duration.seconds(delaySeconds));
             animation.play();
         }
     }
