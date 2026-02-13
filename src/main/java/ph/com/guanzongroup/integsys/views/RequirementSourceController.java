@@ -1,5 +1,6 @@
 package ph.com.guanzongroup.integsys.views;
 
+import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import java.net.URL;
 import java.sql.SQLException;
 import java.util.ResourceBundle;
@@ -10,7 +11,6 @@ import javafx.beans.value.ChangeListener;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.TextField;
@@ -25,7 +25,6 @@ import org.guanzon.appdriver.base.GRiderCAS;
 import org.guanzon.appdriver.base.GuanzonException;
 import org.guanzon.appdriver.base.MiscUtil;
 import org.guanzon.appdriver.constant.EditMode;
-import org.guanzon.appdriver.constant.RecordStatus;
 import org.json.simple.JSONObject;
 import ph.com.guanzongroup.cas.sales.t1.RequirementsSource;
 import ph.com.guanzongroup.cas.sales.t1.services.SalesControllers;
@@ -52,7 +51,7 @@ public class RequirementSourceController implements Initializable, ScreenInterfa
     @FXML
     private Button btnBrowse, btnNew, btnSave, btnUpdate, btnCancel, btnActivate, btnClose;
     @FXML
-    private Node faActivate;
+    private FontAwesomeIconView faActivate;
     @FXML
     private TextField tfRequirementSource, tfDescription, tfSearchDescription;
     @FXML
@@ -197,8 +196,11 @@ public class RequirementSourceController implements Initializable, ScreenInterfa
 
     public void loadRecordMaster() {
         if (poController.getModel().isActive()) {
+            faActivate.setGlyphName("CLOSE");
             btnActivate.setText("Deactivate");
+//            btnActivate.setGraphic(icon);
         } else {
+            faActivate.setGlyphName("CHECK");
             btnActivate.setText("Activate");
         }
         tfRequirementSource.setText(poController.getModel().getRequirementCode());

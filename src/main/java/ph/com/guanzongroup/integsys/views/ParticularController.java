@@ -29,6 +29,7 @@ import java.util.logging.Logger;
 import org.guanzon.appdriver.base.GRiderCAS;
 import org.guanzon.appdriver.base.GuanzonException;
 import ph.com.guanzongroup.cas.cashflow.services.CashflowControllers;
+import ph.com.guanzongroup.integsys.utility.JFXUtil;
 
 public class ParticularController implements Initializable, ScreenInterface {
 
@@ -130,7 +131,7 @@ public class ParticularController implements Initializable, ScreenInterface {
                 unloadForm appUnload = new unloadForm();
                 switch (clickedButton.getId()) {
                     case "btnClose":
-                        if (ShowMessageFX.YesNo("Do you really want to cancel this record? \nAny data collected will not be kept.", "Computerized Acounting System", pxeModuleName)) {
+                        if (ShowMessageFX.OkayCancel("Are you sure you want to close this Tab?", "Close Tab", null) == true) {
                             appUnload.unloadForm(AnchorMain, oApp, pxeModuleName);
                         }
                         break;
@@ -145,7 +146,7 @@ public class ParticularController implements Initializable, ScreenInterface {
                             initTabAnchor();
                             loadRecord();
                         } else {
-                            ShowMessageFX.Information((String) poJSON.get("message"), "Computerized Acounting System", pxeModuleName);
+                            ShowMessageFX.Information((String) poJSON.get("message"), pxeModuleName, null);
                             initTabAnchor();
                         }
                         break;
@@ -153,7 +154,7 @@ public class ParticularController implements Initializable, ScreenInterface {
                         String lsValue = (txtSeeks01.getText() == null) ? "" : txtSeeks01.getText();
                         poJSON = oParameters.Particular().searchRecord(lsValue, false);
                         if ("error".equals((String) poJSON.get("result"))) {
-                            ShowMessageFX.Information((String) poJSON.get("message"), "Computerized Acounting System", pxeModuleName);
+                            ShowMessageFX.Information((String) poJSON.get("message"), pxeModuleName, null);
                             txtSeeks01.clear();
                             break;
                         }
@@ -165,7 +166,7 @@ public class ParticularController implements Initializable, ScreenInterface {
                     case "btnUpdate":
                         poJSON = oParameters.Particular().updateRecord();
                         if ("error".equals((String) poJSON.get("result"))) {
-                            ShowMessageFX.Information((String) poJSON.get("message"), "Computerized Acounting System", pxeModuleName);
+                            ShowMessageFX.Information((String) poJSON.get("message"), pxeModuleName, null);
                             break;
                         }
                         pnEditMode = oParameters.Particular().getEditMode();
@@ -173,11 +174,10 @@ public class ParticularController implements Initializable, ScreenInterface {
                         initTabAnchor();
                         break;
                     case "btnCancel":
-                        if (ShowMessageFX.YesNo("Do you really want to cancel this record? \nAny data collected will not be kept.", "Computerized Acounting System", pxeModuleName)) {
-                            clearAllFields();
+                        if (ShowMessageFX.YesNo("Do you really want to cancel this record? \nAny data collected will not be kept.", "Computerized Acounting System", null)) {
                             initializeObject();
                             pnEditMode = EditMode.UNKNOWN;
-                            initButton(pnEditMode);
+                            oParameters.Particular().initialize();
                             initTabAnchor();
                         }
                         break;
@@ -186,12 +186,11 @@ public class ParticularController implements Initializable, ScreenInterface {
                         oParameters.Particular().getModel().setModifiedDate(oApp.getServerDate());
                         JSONObject saveResult = oParameters.Particular().saveRecord();
                         if ("success".equals((String) saveResult.get("result"))) {
-                            ShowMessageFX.Information((String) saveResult.get("message"), "Computerized Acounting System", pxeModuleName);
+                            ShowMessageFX.Information((String) saveResult.get("message"), pxeModuleName, null);
                             pnEditMode = EditMode.UNKNOWN;
-                            initButton(pnEditMode);
-                            clearAllFields();
+                            oParameters.Particular().initialize();
                         } else {
-                            ShowMessageFX.Information((String) saveResult.get("message"), "Computerized Acounting System", pxeModuleName);
+                            ShowMessageFX.Information((String) saveResult.get("message"), pxeModuleName, null);
                         }
                         break;
                     case "btnActivate":
@@ -201,45 +200,43 @@ public class ParticularController implements Initializable, ScreenInterface {
 
                         switch (Status) {
                             case "0":
-                                if (ShowMessageFX.YesNo(null, pxeModuleName, "Do you want to Activate this Parameter?") == true) {
-                                    oParameters.Particular().initialize();
+                                if (ShowMessageFX.YesNo(null, pxeModuleName, "Do you want to activate this record?") == true) {
                                     poJsON = oParameters.Particular().activateRecord();
                                     if ("error".equals(poJsON.get("result"))) {
-                                        ShowMessageFX.Information((String) poJsON.get("message"), "Computerized Accounting System", pxeModuleName);
+                                        ShowMessageFX.Information((String) poJsON.get("message"), pxeModuleName, null);
                                         break;
+                                    } else {
+                                        ShowMessageFX.Information("Record activated successfully", pxeModuleName, null);
                                     }
                                     poJsON = oParameters.Particular().openRecord(id);
                                     if ("error".equals(poJsON.get("result"))) {
-                                        ShowMessageFX.Information((String) poJsON.get("message"), "Computerized Accounting System", pxeModuleName);
+                                        ShowMessageFX.Information((String) poJsON.get("message"), pxeModuleName, null);
                                         break;
                                     }
-                                    clearAllFields();
-                                    loadRecord();
-                                    ShowMessageFX.Information((String) poJsON.get("message"), "Computerized Accounting System", pxeModuleName);
                                 }
                                 break;
                             case "1":
-                                if (ShowMessageFX.YesNo(null, pxeModuleName, "Do you want to Deactivate this Parameter?") == true) {
-                                    ShowMessageFX.Information(String.valueOf(oParameters.Particular().getEditMode()), "Computerized Accounting System", pxeModuleName);
-
+                                if (ShowMessageFX.YesNo(null, pxeModuleName, "Do you want to deactivate this record?") == true) {
                                     poJsON = oParameters.Particular().deactivateRecord();
                                     if ("error".equals(poJsON.get("result"))) {
-                                        ShowMessageFX.Information((String) poJsON.get("message"), "Computerized Accounting System", pxeModuleName);
+                                        ShowMessageFX.Information((String) poJsON.get("message"), pxeModuleName, null);
                                         break;
+                                    } else {
+                                        ShowMessageFX.Information("Record deactivated successfully", pxeModuleName, null);
                                     }
                                     poJsON = oParameters.Particular().openRecord(id);
                                     if ("error".equals(poJsON.get("result"))) {
-                                        ShowMessageFX.Information((String) poJsON.get("message"), "Computerized Accounting System", pxeModuleName);
+                                        ShowMessageFX.Information((String) poJsON.get("message"), pxeModuleName, null);
                                         break;
                                     }
-                                    clearAllFields();
-                                    loadRecord();
-                                    ShowMessageFX.Information((String) poJsON.get("message"), "Computerized Accounting System", pxeModuleName);
                                 }
                                 break;
                         }
 
                 }
+                clearAllFields();
+                initButton(pnEditMode);
+                loadRecord();
             } catch (SQLException | GuanzonException | CloneNotSupportedException ex) {
                 Logger.getLogger(ParticularController.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -257,27 +254,23 @@ public class ParticularController implements Initializable, ScreenInterface {
 
     private void initButton(int fnValue) {
         boolean lbShow = (fnValue == EditMode.ADDNEW || fnValue == EditMode.UPDATE);
-
+        boolean lbShow2 = (fnValue == EditMode.READY);
         btnCancel.setVisible(lbShow);
         btnCancel.setManaged(lbShow);
         btnSave.setVisible(lbShow);
         btnSave.setManaged(lbShow);
-        btnUpdate.setVisible(!lbShow);
-        btnUpdate.setManaged(!lbShow);
 
         btnBrowse.setVisible(!lbShow);
         btnBrowse.setManaged(!lbShow);
         btnNew.setVisible(!lbShow);
         btnNew.setManaged(!lbShow);
 
-        btnClose.setVisible(true);
-        btnClose.setManaged(true);
+        JFXUtil.setButtonsVisibility(lbShow2, btnUpdate);
+        JFXUtil.setDisabled(!lbShow, AnchorInputs);
     }
 
     private void InitTextFields() {
-        txtField01.focusedProperty().addListener(txtField_Focus);
-        txtField02.focusedProperty().addListener(txtField_Focus);
-        txtField03.focusedProperty().addListener(txtField_Focus);
+        JFXUtil.setFocusListener(txtField_Focus, txtField01, txtField02, txtField03);
         txtField03.setOnKeyPressed(this::txtField_KeyPressed);
         txtSeeks01.setOnKeyPressed(this::txtSeeks_KeyPressed);
     }
@@ -286,7 +279,6 @@ public class ParticularController implements Initializable, ScreenInterface {
         if (!pbLoaded) {
             return;
         }
-
         TextField txtField = (TextField) ((ReadOnlyBooleanPropertyBase) o).getBean();
         int lnIndex = Integer.parseInt(txtField.getId().substring(8, 10));
         String lsValue = txtField.getText();
@@ -370,6 +362,7 @@ public class ParticularController implements Initializable, ScreenInterface {
                             txtSeeks01.setText((String) oParameters.Particular().getModel().getDescription());
                             pnEditMode = EditMode.READY;
                             loadRecord();
+                            initButton(pnEditMode);
                             break;
                     }
                 case ENTER:
@@ -391,6 +384,8 @@ public class ParticularController implements Initializable, ScreenInterface {
     private void loadRecord() {
         try {
             boolean lbActive = oParameters.Particular().getModel().getRecordStatus() == "1";
+            boolean lbShow = pnEditMode == EditMode.READY;
+            JFXUtil.setButtonsVisibility(lbShow, btnActivate);
 
             psPrimary = oParameters.Particular().getModel().getParticularID();
 
@@ -420,29 +415,20 @@ public class ParticularController implements Initializable, ScreenInterface {
             System.err.println("Error: AnchorInput is not initialized.");
             return;
         }
-
         boolean isEditable = (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE);
         AnchorInputs.setDisable(!isEditable);
     }
 
     @FXML
     void cbField01_Clicked(MouseEvent event) {
-        if (cbField01.isSelected()) {
-            try {
+        try {
+            if (cbField01.isSelected()) {
                 oParameters.Particular().getModel().setRecordStatus("1");
-            } catch (SQLException ex) {
-                Logger.getLogger(ParticularController.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (GuanzonException ex) {
-                Logger.getLogger(ParticularController.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        } else {
-            try {
+            } else {
                 oParameters.Particular().getModel().setRecordStatus("0");
-            } catch (SQLException ex) {
-                Logger.getLogger(ParticularController.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (GuanzonException ex) {
-                Logger.getLogger(ParticularController.class.getName()).log(Level.SEVERE, null, ex);
             }
+        } catch (SQLException | GuanzonException ex) {
+            Logger.getLogger(ParticularController.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 

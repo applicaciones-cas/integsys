@@ -15,6 +15,7 @@ import java.util.logging.Logger;
 import javafx.animation.FadeTransition;
 import javafx.animation.PauseTransition;
 import javafx.application.Platform;
+import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -22,6 +23,7 @@ import javafx.event.EventHandler;
 import javafx.fxml.Initializable;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
@@ -31,6 +33,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.VBox;
 import javafx.util.Duration;
 import org.guanzon.appdriver.agent.ShowMessageFX;
 import org.guanzon.appdriver.agent.systables.SystemUser;
@@ -62,7 +65,7 @@ public class LoginController implements Initializable, ScreenInterface {
     ObservableList<ModelLog_In_Industry> industryOptions = FXCollections.observableArrayList();
     ObservableList<ModelLog_In_Company> companyOptions = FXCollections.observableArrayList();
     ObservableList<ModelLog_In_User> users = FXCollections.observableArrayList();
-
+    boolean enterProceed = true;
     @FXML
     private TextField tfUsername;
     @FXML
@@ -78,7 +81,9 @@ public class LoginController implements Initializable, ScreenInterface {
     @FXML
     private ComboBox cmbIndustry, cmbCompany;
     @FXML
-    private AnchorPane rootPane, loadingPane, spinnerPane;
+    private AnchorPane rootPane, loadingPane, spinnerPane, apRoot1, apRoot2, apRoot3;
+    @FXML
+    private VBox vboxmain;
 
     @Override
     public void setGRider(GRiderCAS foValue) {
@@ -101,8 +106,12 @@ public class LoginController implements Initializable, ScreenInterface {
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
+        JFXUtil.fadeIn(1, vboxmain);
+        JFXUtil.fadeIn(2, apRoot3);
+
         DashboardController mainController = LoginControllerHolder.getMainController();
         mainController.triggervbox();
+        mainController.removewindowEvent();
 
         tfPassword.textProperty().bindBidirectional(pfPassword.textProperty());
 
@@ -113,8 +122,40 @@ public class LoginController implements Initializable, ScreenInterface {
 
         initComboBox();
         initTextFields();
+        TriggerWindowEvent();
     }
 
+    public void TriggerWindowEvent() {
+        AnchorPane root = (AnchorPane) rootPane;
+        Scene scene = root.getScene();
+        if (scene != null) {
+            setKeyEvent(scene);
+        } else {
+            root.sceneProperty().addListener(WindowKeyEvent);
+        }
+    }
+    ChangeListener<Scene> WindowKeyEvent = (obs, oldScene, newScene) -> {
+        if (newScene != null) {
+            setKeyEvent(newScene);
+        }
+    };
+
+    private void setKeyEvent(Scene scene) {
+        scene.setOnKeyPressed(event -> {
+            if (event.getCode() == KeyCode.ENTER) {
+                if (!LoginControllerHolder.getLogInStatus()) {
+                    if (enterProceed) {
+                        btnSignIn.fire();
+                    }
+                }
+            }
+            if (event.getCode() == KeyCode.F12) {
+                LoginControllerHolder.getMainController().eventf12(LoginControllerHolder.getMainController().getTab());
+            }
+        }
+        );
+
+    }
     EventHandler<KeyEvent> tabKeyHandler = event -> {
         if (event.getCode() != KeyCode.TAB) {
             return;
@@ -156,6 +197,8 @@ public class LoginController implements Initializable, ScreenInterface {
     }
 
     private void handleLoadingScreen(AnchorPane pane, JSONObject poJSON) {
+        enterProceed = false;
+        rootPane.requestFocus();
         spinnerPane = new AnchorPane();
         spinnerPane.setPrefSize(400, 300);
         spinnerPane.setStyle("-fx-background-color: #F4F4F4;");
@@ -192,6 +235,7 @@ public class LoginController implements Initializable, ScreenInterface {
             double lnDuration = 0.8;
             if ("success".equals((String) poJSON.get("result"))) {
                 lnDuration = 1.5;
+                JFXUtil.playUpwardFadeOut(0.6, .70, apRoot1, apRoot2, vboxmain, rootPane);
             }
             PauseTransition wait = new PauseTransition(Duration.seconds(lnDuration));
             wait.setOnFinished(done -> {
@@ -200,6 +244,7 @@ public class LoginController implements Initializable, ScreenInterface {
                     fadeOutLoad.setFromValue(1.0);
                     fadeOutLoad.setToValue(0.0);
                     fadeOutLoad.setOnFinished(ea -> {
+                        enterProceed = true;
                         rootPane.getChildren().remove(spinnerPane);
                         Platform.runLater(() -> {
                             ShowMessageFX.Warning((String) poJSON.get("message"), MODULE, null);
@@ -207,6 +252,7 @@ public class LoginController implements Initializable, ScreenInterface {
                     });
                     fadeOutLoad.play();
                 } else {
+                    enterProceed = true;
                     try {
                         if (!oApp.logUser("gRider", (String) poJSON.get("userId"))) {
                             Platform.runLater(() -> {
@@ -214,17 +260,18 @@ public class LoginController implements Initializable, ScreenInterface {
                                 ShowMessageFX.Warning(oApp.getMessage(), MODULE, null);
                             });
                         } else {
+
                             DashboardController dashboardController = LoginControllerHolder.getMainController();
                             dashboardController.triggervbox2();
                             dashboardController.setUserIndustry(psIndustryID);
                             dashboardController.setUserCompany(psCompanyID);
                             dashboardController.changeUserInfo();
                             dashboardController.notificationChecker();
-                            
+
                             //set the orignal industry and company
                             System.setProperty("sys.industry", psIndustryID);
                             System.setProperty("sys.company", psCompanyID);
-                            
+
                             //set the original to selected industry and company
                             System.setProperty("user.selected.industry", psIndustryID);
                             System.setProperty("user.selected.company", psCompanyID);
@@ -234,7 +281,7 @@ public class LoginController implements Initializable, ScreenInterface {
                     } catch (SQLException | GuanzonException | IOException ex) {
                         rootPane.getChildren().remove(spinnerPane);
                         Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
-                    } 
+                    }
                 }
 
             });
