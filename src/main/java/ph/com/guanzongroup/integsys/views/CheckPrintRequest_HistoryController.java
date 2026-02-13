@@ -303,7 +303,7 @@ public class CheckPrintRequest_HistoryController implements Initializable, Scree
 
                 cmbPayeeType.getSelectionModel().select(!poCheckPrintingRequestController.Detail(pnDetail).DisbursementMaster().CheckPayments().getPayeeType().equals("")
                         ? Integer.valueOf(poCheckPrintingRequestController.Detail(pnDetail).DisbursementMaster().CheckPayments().getPayeeType()) : -1);
-                taRemarksDetails.setText(poCheckPrintingRequestController.Detail(pnDetail).DisbursementMaster().CheckPayments().getRemarks() != null ? poCheckPrintingRequestController.Detail(pnDetail).DisbursementMaster().CheckPayments().getRemarks() : "");
+                taRemarksDetails.setText(poCheckPrintingRequestController.Detail(pnDetail).getdetailRemarks()!= null ? poCheckPrintingRequestController.Detail(pnDetail).getdetailRemarks() : "");
 
             } catch (SQLException | GuanzonException ex) {
                 Logger.getLogger(CheckPrintRequest_EntryController.class.getName()).log(Level.SEVERE, null, ex);
@@ -418,7 +418,7 @@ public class CheckPrintRequest_HistoryController implements Initializable, Scree
                 if (event.getClickCount() == 1) {
                     pnDetail = tblVwDetail.getSelectionModel().getSelectedIndex();
                     loadRecordDetail();
-                    taRemarksDetails.requestFocus();
+//                    taRemarksDetails.requestFocus();
                     initFields(pnEditMode);
                 }
             }
