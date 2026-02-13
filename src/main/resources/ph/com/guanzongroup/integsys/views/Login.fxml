@@ -27,9 +27,9 @@
             <children>
                 <BorderPane prefHeight="890.0" prefWidth="1219.0">
                     <center>
-                        <VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" style="-fx-border-color: orange; -fx-border-radius: 10;" BorderPane.alignment="CENTER">
+                        <VBox fx:id="vboxmain" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" style="-fx-border-color: orange; -fx-border-radius: 10;" BorderPane.alignment="CENTER">
                             <children>
-                                <AnchorPane maxWidth="1.7976931348623157E308">
+                                <AnchorPane fx:id="apRoot1" maxWidth="1.7976931348623157E308">
                                     <children>
                                         <ImageView fitWidth="800.0" layoutX="81.0" layoutY="14.0" pickOnBounds="true" preserveRatio="true" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                             <image>
@@ -134,7 +134,7 @@
                               </AnchorPane>
                                     </children>
                                 </AnchorPane>
-                                <AnchorPane prefWidth="200.0">
+                                <AnchorPane fx:id="apRoot2" prefWidth="200.0">
                                     <children>
                                         <GridPane AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                             <columnConstraints>
@@ -166,7 +166,7 @@
                         </VBox>
                     </center>
                     <bottom>
-                        <AnchorPane BorderPane.alignment="CENTER">
+                        <AnchorPane fx:id="apRoot3" BorderPane.alignment="CENTER">
                             <children>
                                 <GridPane AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
                                     <columnConstraints>

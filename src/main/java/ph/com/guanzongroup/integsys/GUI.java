@@ -1,9 +1,12 @@
 package ph.com.guanzongroup.integsys;
+
+import java.io.InputStream;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
@@ -42,8 +45,13 @@ public class GUI extends Application {
         stage.setY(bounds.getMinY());
         stage.setWidth(bounds.getWidth());
         stage.setHeight(bounds.getHeight());
+
+        InputStream iconStream = getClass().getResourceAsStream("/ph/com/guanzongroup/integsys/images/app_logo.png");
+        Image icon = new Image(iconStream);
+        stage.getIcons().add(icon);
         stage.centerOnScreen();
         stage.show();
+
     }
 
     public static void main(String[] args) {
