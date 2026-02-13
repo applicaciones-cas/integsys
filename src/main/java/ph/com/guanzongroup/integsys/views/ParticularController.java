@@ -178,6 +178,7 @@ public class ParticularController implements Initializable, ScreenInterface {
                             initializeObject();
                             pnEditMode = EditMode.UNKNOWN;
                             oParameters.Particular().initialize();
+                            oParameters.Particular().setRecordStatus("0123");
                             initTabAnchor();
                         }
                         break;
@@ -189,6 +190,7 @@ public class ParticularController implements Initializable, ScreenInterface {
                             ShowMessageFX.Information((String) saveResult.get("message"), pxeModuleName, null);
                             pnEditMode = EditMode.UNKNOWN;
                             oParameters.Particular().initialize();
+                            oParameters.Particular().setRecordStatus("0123");
                         } else {
                             ShowMessageFX.Information((String) saveResult.get("message"), pxeModuleName, null);
                         }
