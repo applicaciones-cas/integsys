@@ -108,6 +108,7 @@ public class BanksController implements Initializable, ScreenInterface {
             LogWrapper logwrapr = new LogWrapper("CAS", System.getProperty("sys.default.path.temp") + "cas-error.log");
             oParameters = new ParamControllers(oApp, logwrapr).Banks();
             oParameters.setRecordStatus("0123");
+            oParameters.setWithUI(true);
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
             ShowMessageFX.Information(MiscUtil.getException(ex), "Computerized Acounting System", pxeModuleName);

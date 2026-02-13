@@ -26,21 +26,24 @@ import org.json.simple.JSONObject;
 import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javafx.application.Platform;
 import org.guanzon.appdriver.base.GRiderCAS;
 import org.guanzon.appdriver.base.GuanzonException;
+import org.guanzon.appdriver.base.MiscUtil;
+import org.guanzon.appdriver.constant.RecordStatus;
 import org.guanzon.cas.client.services.ClientControllers;
+import ph.com.guanzongroup.cas.cashflow.Payee;
 import ph.com.guanzongroup.cas.cashflow.services.CashflowControllers;
+import ph.com.guanzongroup.integsys.utility.JFXUtil;
 
 public class PayeeController implements Initializable, ScreenInterface {
 
     private GRiderCAS oApp;
-    private final String pxeModuleName = "Payee";
-    private int pnEditMode;
     private CashflowControllers oParameters;
-    private boolean state = false;
+    private final String pxeModuleName = "Payee";
+    JSONObject poJSON = new JSONObject();
+    private int pnEditMode;
     private boolean pbLoaded = false;
-    private String psPrimary = "";
-    private String lbStat = "";
     @FXML
     private AnchorPane AnchorMain, AnchorInputs;
 
@@ -92,16 +95,13 @@ public class PayeeController implements Initializable, ScreenInterface {
             initButton(pnEditMode);
             InitTextFields();
             ClickButton();
-            initTabAnchor();
-
-            if (oParameters.Payee().getEditMode() == EditMode.ADDNEW) {
-                initButton(pnEditMode);
-                initTabAnchor();
-                loadRecord();
-            }
+            Platform.runLater(() -> {
+                btnNew.fire();
+            });
             pbLoaded = true;
         } catch (SQLException | GuanzonException ex) {
-            Logger.getLogger(PayeeController.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(MiscUtil.getException(ex), "Computerized Acounting System", pxeModuleName);
         }
     }
 
@@ -110,8 +110,9 @@ public class PayeeController implements Initializable, ScreenInterface {
             LogWrapper logwrapr = new LogWrapper("CAS", System.getProperty("sys.default.path.temp") + "cas-error.log");
             oParameters = new CashflowControllers(oApp, logwrapr);
             oParameters.Payee().setRecordStatus("0123");
+            oParameters.Payee().setWithUI(true);
         } catch (SQLException | GuanzonException ex) {
-            Logger.getLogger(PayeeController.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
         }
     }
 
@@ -140,41 +141,38 @@ public class PayeeController implements Initializable, ScreenInterface {
                         break;
                     case "btnNew":
                         clearAllFields();
-                        txtField02.requestFocus();
-                        JSONObject poJSON = oParameters.Payee().newRecord();
-                        pnEditMode = oParameters.Payee().getEditMode();
+                        poJSON = oParameters.Payee().newRecord();
                         if ("success".equals((String) poJSON.get("result"))) {
+                            oParameters.Payee().getModel().setRecordStatus(RecordStatus.ACTIVE);
+                            txtField02.requestFocus();
                             pnEditMode = oParameters.Payee().getEditMode();
                             initButton(pnEditMode);
-                            initTabAnchor();
                             loadRecord();
                         } else {
-                            ShowMessageFX.Information((String) poJSON.get("message"), "Computerized Acounting System", pxeModuleName);
-                            initTabAnchor();
+                            ShowMessageFX.Warning((String) poJSON.get("message"), "Computerized Acounting System", pxeModuleName);
                         }
                         break;
                     case "btnBrowse":
                         String lsValue = (txtSeeks01.getText() == null) ? "" : txtSeeks01.getText();
                         poJSON = oParameters.Payee().searchRecord(lsValue, false);
                         if ("error".equals((String) poJSON.get("result"))) {
-                            ShowMessageFX.Information((String) poJSON.get("message"), "Computerized Acounting System", pxeModuleName);
+                            ShowMessageFX.Warning((String) poJSON.get("message"), "Computerized Acounting System", pxeModuleName);
                             txtSeeks01.clear();
-                            break;
-                        }
-                        pnEditMode = EditMode.READY;
-
-                        loadRecord();
-                        initTabAnchor();
-                        break;
-                    case "btnUpdate":
-                        poJSON = oParameters.Payee().updateRecord();
-                        if ("error".equals((String) poJSON.get("result"))) {
-                            ShowMessageFX.Information((String) poJSON.get("message"), "Computerized Acounting System", pxeModuleName);
                             break;
                         }
                         pnEditMode = oParameters.Payee().getEditMode();
                         initButton(pnEditMode);
-                        initTabAnchor();
+                        loadRecord();
+                        break;
+                    case "btnUpdate":
+                        poJSON = oParameters.Payee().updateRecord();
+                        if ("error".equals((String) poJSON.get("result"))) {
+                            ShowMessageFX.Warning((String) poJSON.get("message"), "Computerized Acounting System", pxeModuleName);
+                            break;
+                        }
+                        pnEditMode = oParameters.Payee().getEditMode();
+                        initButton(pnEditMode);
+                        loadRecord();
                         break;
                     case "btnCancel":
                         if (ShowMessageFX.YesNo("Do you really want to cancel this record? \nAny data collected will not be kept.", "Computerized Acounting System", pxeModuleName)) {
@@ -182,70 +180,57 @@ public class PayeeController implements Initializable, ScreenInterface {
                             initializeObject();
                             pnEditMode = EditMode.UNKNOWN;
                             initButton(pnEditMode);
-                            initTabAnchor();
                         }
                         break;
                     case "btnSave":
                         oParameters.Payee().getModel().setModifyingId(oApp.getUserID());
                         oParameters.Payee().getModel().setModifiedDate(oApp.getServerDate());
-                        JSONObject saveResult = oParameters.Payee().saveRecord();
-                        if ("success".equals((String) saveResult.get("result"))) {
-                            ShowMessageFX.Information((String) saveResult.get("message"), "Computerized Acounting System", pxeModuleName);
-                            pnEditMode = EditMode.UNKNOWN;
-                            initButton(pnEditMode);
-                            clearAllFields();
+                        poJSON = oParameters.Payee().saveRecord();
+                        if ("success".equals((String) poJSON.get("result"))) {
+                            ShowMessageFX.Information((String) poJSON.get("message"), "Computerized Acounting System", pxeModuleName);
+                            Platform.runLater(() -> {
+                                btnNew.fire();
+                            });
                         } else {
-                            ShowMessageFX.Information((String) saveResult.get("message"), "Computerized Acounting System", pxeModuleName);
+                            ShowMessageFX.Warning((String) poJSON.get("message"), "Computerized Acounting System", pxeModuleName);
                         }
                         break;
                     case "btnActivate":
-                        String Status = oParameters.Payee().getModel().getRecordStatus();
                         String id = oParameters.Payee().getModel().getPayeeID();
-                        JSONObject poJsON;
-
-                        switch (Status) {
-                            case "0":
-                                if (ShowMessageFX.YesNo(null, pxeModuleName, "Do you want to Activate this Parameter?") == true) {
-                                    oParameters.Payee().initialize();
-                                    poJsON = oParameters.Payee().activateRecord();
-                                    if ("error".equals(poJsON.get("result"))) {
-                                        ShowMessageFX.Information((String) poJsON.get("message"), "Computerized Accounting System", pxeModuleName);
-                                        break;
-                                    }
-                                    poJsON = oParameters.Payee().openRecord(id);
-                                    if ("error".equals(poJsON.get("result"))) {
-                                        ShowMessageFX.Information((String) poJsON.get("message"), "Computerized Accounting System", pxeModuleName);
-                                        break;
-                                    }
-                                    clearAllFields();
-                                    loadRecord();
-                                    ShowMessageFX.Information((String) poJsON.get("message"), "Computerized Accounting System", pxeModuleName);
+                        if (ShowMessageFX.YesNo(null, pxeModuleName, "Do you want to "+btnActivate.getText().toLowerCase()+" this Parameter?") == true) {
+                            if(RecordStatus.ACTIVE.equals(oParameters.Payee().getModel().getRecordStatus())){
+                                poJSON = oParameters.Payee().deactivateRecord();
+                                if ("error".equals(poJSON.get("result"))) {
+                                    ShowMessageFX.Warning((String) poJSON.get("message"), "Computerized Accounting System", pxeModuleName);
+                                    break;
+                                } else {
+                                    ShowMessageFX.Information("Parameter deactivated successfully", "Computerized Accounting System", pxeModuleName);
                                 }
-                                break;
-                            case "1":
-                                if (ShowMessageFX.YesNo(null, pxeModuleName, "Do you want to Deactivate this Parameter?") == true) {
-                                    ShowMessageFX.Information(String.valueOf(oParameters.Payee().getEditMode()), "Computerized Accounting System", pxeModuleName);
-
-                                    poJsON = oParameters.Payee().deactivateRecord();
-                                    if ("error".equals(poJsON.get("result"))) {
-                                        ShowMessageFX.Information((String) poJsON.get("message"), "Computerized Accounting System", pxeModuleName);
-                                        break;
-                                    }
-                                    poJsON = oParameters.Payee().openRecord(id);
-                                    if ("error".equals(poJsON.get("result"))) {
-                                        ShowMessageFX.Information((String) poJsON.get("message"), "Computerized Accounting System", pxeModuleName);
-                                        break;
-                                    }
-                                    clearAllFields();
-                                    loadRecord();
-                                    ShowMessageFX.Information((String) poJsON.get("message"), "Computerized Accounting System", pxeModuleName);
+                            } else {
+                                poJSON = oParameters.Payee().activateRecord();
+                                if ("error".equals(poJSON.get("result"))) {
+                                    ShowMessageFX.Warning((String) poJSON.get("message"), "Computerized Accounting System", pxeModuleName);
+                                    break;
+                                } else {
+                                    ShowMessageFX.Information("Parameter activated successfully", "Computerized Accounting System", pxeModuleName);
                                 }
-                                break;
+                            }
                         }
+                        
+                        poJSON = oParameters.Payee().openRecord(id);
+                        if ("error".equals(poJSON.get("result"))) {
+                            ShowMessageFX.Information((String) poJSON.get("message"), "Computerized Accounting System", pxeModuleName);
+                            break;
+                        }
+                        
+                        pnEditMode = oParameters.Payee().getEditMode();
+                        initButton(pnEditMode);
+                        loadRecord();
+                        break;
 
                 }
             } catch (SQLException | GuanzonException | CloneNotSupportedException ex) {
-                Logger.getLogger(PayeeController.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
             }
         }
     }
@@ -262,22 +247,15 @@ public class PayeeController implements Initializable, ScreenInterface {
     }
 
     private void initButton(int fnValue) {
+        boolean lbShow1 = (fnValue == EditMode.READY);
         boolean lbShow = (fnValue == EditMode.ADDNEW || fnValue == EditMode.UPDATE);
-
-        btnCancel.setVisible(lbShow);
-        btnCancel.setManaged(lbShow);
-        btnSave.setVisible(lbShow);
-        btnSave.setManaged(lbShow);
-        btnUpdate.setVisible(!lbShow);
-        btnUpdate.setManaged(!lbShow);
-
-        btnBrowse.setVisible(!lbShow);
-        btnBrowse.setManaged(!lbShow);
-        btnNew.setVisible(!lbShow);
-        btnNew.setManaged(!lbShow);
-
-        btnClose.setVisible(true);
-        btnClose.setManaged(true);
+        
+        JFXUtil.setButtonsVisibility(!lbShow, btnNew,btnBrowse, btnClose);
+        JFXUtil.setButtonsVisibility(lbShow, btnCancel,btnSave);
+        JFXUtil.setButtonsVisibility(lbShow1, btnUpdate,btnActivate);
+        
+        //fields
+        JFXUtil.setDisabled(!lbShow, txtField02, txtField03, txtField04, txtField05);
     }
 
     private void InitTextFields() {
@@ -308,11 +286,23 @@ public class PayeeController implements Initializable, ScreenInterface {
         if (!nv) {
             try {
                 switch (lnIndex) {
-                    case 1:
-                        oParameters.Payee().getModel().setPayeeID(lsValue);
-                        break;
                     case 2:
                         oParameters.Payee().getModel().setPayeeName(lsValue);
+                        break;
+                    case 3:
+                        if(lsValue.isEmpty()){
+                            oParameters.Payee().getModel().setParticularID("");
+                        }
+                        break;
+                    case 4:
+                        if(lsValue.isEmpty()){
+                            oParameters.Payee().getModel().setAPClientID("");
+                        }
+                        break;
+                    case 5:
+                        if(lsValue.isEmpty()){
+                            oParameters.Payee().getModel().setClientID("");
+                        }
                         break;
                     default:
                         break;
@@ -331,8 +321,8 @@ public class PayeeController implements Initializable, ScreenInterface {
             int lnIndex = Integer.parseInt(((TextField) event.getSource()).getId().substring(8, 10));
             String lsValue = (txtField.getText() == null ? "" : txtField.getText());
             JSONObject poJson;
-            poJson = new JSONObject();
-            ClientControllers oAPClient;
+            poJSON = new JSONObject();
+            ClientControllers loController;
             switch (event.getCode()) {
                 case F3:
 
@@ -344,64 +334,25 @@ public class PayeeController implements Initializable, ScreenInterface {
                                 ShowMessageFX.Information((String) poJson.get("message"), "Computerized Acounting System", pxeModuleName);
                             }
                             oParameters.Payee().getModel().setParticularID(oParameters.Particular().getModel().getParticularID());
-                            txtField03.setText((String) oParameters.Particular().getModel().getDescription());
+                            loadRecord();
                             break;
 
                         case 04:
-
-                            oAPClient = new ClientControllers(oApp, null);
-                            poJson = oAPClient.APClientMaster().searchRecord(lsValue, false);
+                            loController = new ClientControllers(oApp, null);
+                            poJson = loController.APClientMaster().searchRecord(lsValue, false);
                             if ("error".equalsIgnoreCase(poJson.get("result").toString())) {
                                 ShowMessageFX.Information((String) poJson.get("message"), "Computerized Acounting System", pxeModuleName);
                             }
-                            oParameters.Payee().getModel().setAPClientID(oAPClient.APClientMaster().getModel().getClientId());
-                            txtField04.setText((String) oAPClient.APClientMaster().getModel().Client().getCompanyName());
+                            oParameters.Payee().getModel().setAPClientID(loController.APClientMaster().getModel().getClientId());
+                            loadRecord();
                             break;
                         case 05:
-                            oAPClient = new ClientControllers(oApp, null);
-                            poJson = oAPClient.APClientMaster().searchRecord(lsValue, false);
+                            loController = new ClientControllers(oApp, null);
+                            poJson = loController.APClientMaster().searchRecord(lsValue, false);
                             if ("error".equalsIgnoreCase(poJson.get("result").toString())) {
                                 ShowMessageFX.Information((String) poJson.get("message"), "Computerized Acounting System", pxeModuleName);
                             }
-                            oParameters.Payee().getModel().setClientID(oAPClient.APClientMaster().getModel().getClientId());
-                            txtField05.setText((String) oAPClient.APClientMaster().getModel().Client().getCompanyName());
-                            break;
-                    }
-                case ENTER:
-            }
-            switch (event.getCode()) {
-                case ENTER:
-                    CommonUtils.SetNextFocus(txtField);
-                case DOWN:
-                    CommonUtils.SetNextFocus(txtField);
-                    break;
-                case UP:
-                    CommonUtils.SetPreviousFocus(txtField);
-            }
-        } catch (SQLException | GuanzonException ex) {
-            Logger.getLogger(PayeeController.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }
-
-    private void txtSeeks_KeyPressed(KeyEvent event) {
-        try {
-            TextField txtField = (TextField) event.getSource();
-            int lnIndex = Integer.parseInt(((TextField) event.getSource()).getId().substring(8, 10));
-            String lsValue = (txtField.getText() == null ? "" : txtField.getText());
-            JSONObject poJson;
-            poJson = new JSONObject();
-            switch (event.getCode()) {
-                case F3:
-                    switch (lnIndex) {
-                        case 01:
-                            poJson = oParameters.Payee().searchRecord(lsValue, false);
-                            if ("error".equals((String) poJson.get("result"))) {
-                                ShowMessageFX.Information((String) poJson.get("message"), "Computerized Acounting System", pxeModuleName);
-                                txtSeeks01.clear();
-                                break;
-                            }
-                            txtSeeks01.setText((String) oParameters.Payee().getModel().getPayeeName());
-                            pnEditMode = EditMode.READY;
+                            oParameters.Payee().getModel().setClientID(loController.APClientMaster().getModel().getClientId());
                             loadRecord();
                             break;
                     }
@@ -417,16 +368,51 @@ public class PayeeController implements Initializable, ScreenInterface {
                     CommonUtils.SetPreviousFocus(txtField);
             }
         } catch (SQLException | GuanzonException ex) {
-            Logger.getLogger(PayeeController.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    private void txtSeeks_KeyPressed(KeyEvent event) {
+        try {
+            TextField txtField = (TextField) event.getSource();
+            int lnIndex = Integer.parseInt(((TextField) event.getSource()).getId().substring(8, 10));
+            String lsValue = (txtField.getText() == null ? "" : txtField.getText());
+            JSONObject poJson;
+            poJSON = new JSONObject();
+            switch (event.getCode()) {
+                case F3:
+                    switch (lnIndex) {
+                        case 01:
+                            poJSON = oParameters.Payee().searchRecord(lsValue, false);
+                            if ("error".equals((String) poJSON.get("result"))) {
+                                ShowMessageFX.Information((String) poJSON.get("message"), "Computerized Acounting System", pxeModuleName);
+                                txtSeeks01.clear();
+                                break;
+                            }
+                            txtSeeks01.setText((String) oParameters.Payee().getModel().getPayeeName());
+                            pnEditMode = oParameters.Payee().getEditMode();
+                            initButton(pnEditMode);
+                            loadRecord();
+                            break;
+                    }
+                case ENTER:
+            }
+            switch (event.getCode()) {
+                case ENTER:
+                    CommonUtils.SetNextFocus(txtField);
+                case DOWN:
+                    CommonUtils.SetNextFocus(txtField);
+                    break;
+                case UP:
+                    CommonUtils.SetPreviousFocus(txtField);
+            }
+        } catch (SQLException | GuanzonException ex) {
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
         }
     }
 
     private void loadRecord() {
         try {
-            boolean lbActive = oParameters.Payee().getModel().getRecordStatus() == "1";
-
-            psPrimary = oParameters.Payee().getModel().getPayeeID();
-
             txtField01.setText(oParameters.Payee().getModel().getPayeeID());
             txtField02.setText(oParameters.Payee().getModel().getPayeeName());
             txtField03.setText(oParameters.Payee().getModel().Particular().getDescription());
@@ -446,39 +432,9 @@ public class PayeeController implements Initializable, ScreenInterface {
                     break;
             }
         } catch (SQLException | GuanzonException ex) {
-            Logger.getLogger(PayeeController.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(MiscUtil.getException(ex), "Computerized Acounting System", pxeModuleName);
         }
-    }
-
-    @FXML
-    void cbField01_Clicked(MouseEvent event) {
-        if (cbField01.isSelected()) {
-            try {
-                oParameters.Payee().getModel().setRecordStatus("1");
-            } catch (SQLException ex) {
-                Logger.getLogger(PayeeController.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (GuanzonException ex) {
-                Logger.getLogger(PayeeController.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        } else {
-            try {
-                oParameters.Payee().getModel().setRecordStatus("0");
-            } catch (SQLException ex) {
-                Logger.getLogger(PayeeController.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (GuanzonException ex) {
-                Logger.getLogger(PayeeController.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        }
-    }
-
-    private void initTabAnchor() {
-        if (AnchorInputs == null) {
-            System.err.println("Error: AnchorInput is not initialized.");
-            return;
-        }
-
-        boolean isEditable = (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE);
-        AnchorInputs.setDisable(!isEditable);
     }
 
 }
