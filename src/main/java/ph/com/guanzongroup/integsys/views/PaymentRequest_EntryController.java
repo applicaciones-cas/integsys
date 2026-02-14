@@ -23,7 +23,9 @@ import java.time.format.DateTimeParseException;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.logging.Level;
@@ -73,6 +75,8 @@ import javafx.scene.layout.StackPane;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.util.Duration;
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.rendering.PDFRenderer;
 import org.guanzon.appdriver.agent.ShowMessageFX;
 import org.guanzon.appdriver.base.CommonUtils;
 import org.guanzon.appdriver.base.GRiderCAS;
@@ -83,10 +87,12 @@ import org.guanzon.appdriver.base.SQLUtil;
 import org.guanzon.appdriver.constant.DocumentType;
 import org.guanzon.appdriver.constant.EditMode;
 import org.guanzon.appdriver.constant.Logical;
+import org.guanzon.appdriver.constant.RecordStatus;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.ParseException;
 import ph.com.guanzongroup.cas.cashflow.services.CashflowControllers;
 import ph.com.guanzongroup.cas.cashflow.status.PaymentRequestStatus;
+import ph.com.guanzongroup.integsys.utility.JFXUtil;
 
 /**
  * FXML Controller class
@@ -128,11 +134,15 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
     private int currentIndex = 0;
     double ldstackPaneWidth = 0;
     double ldstackPaneHeight = 0;
+    Map<String, String> imageinfo_temp = new HashMap<>();
+    private final JFXUtil.ImageViewer imageviewerutil = new JFXUtil.ImageViewer();
 
     private ObservableList<ModelTableMain> main_data = FXCollections.observableArrayList();
     private ObservableList<ModelTableDetail> detail_data = FXCollections.observableArrayList();
     private ObservableList<ModelPRFAttachment> attachment_data = FXCollections.observableArrayList();
     ObservableList<String> documentType = ModelPRFAttachment.documentType;
+    
+    JFXUtil.ReloadableTableTask loadTableAttachment;
 
     @FXML
     private TabPane ImTabPane;
@@ -281,6 +291,7 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
         initStackPaneListener();
         initButtons(pnEditMode);
         initFields(pnEditMode);
+        initLoadTable();
         initComboBoxCellDesign(cmbAttachmentType);
         cmbAttachmentType.setItems(documentType);
         cmbAttachmentType.setOnAction(event -> {
@@ -680,51 +691,79 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
                             Path imgPath = selectedFile.toPath();
                             Image loimage = new Image(Files.newInputStream(imgPath));
                             imageView.setImage(loimage);
-
-                            // Add attachment in controller
-                            poJSON = poGLControllers.PaymentRequest().addAttachment();
-                            if ("error".equals((String) poJSON.get("result"))) {
-                                ShowMessageFX.Warning(null, psFormName, (String) poJSON.get("message"));
-                                return;
-                            }
-
-                            // Save image to a temp directory
-                            String imgPath2 = selectedFile.getName();
-
-                            pnAttachment = poGLControllers.PaymentRequest().getTransactionAttachmentCount() - 1;
-                            Path destPath = Paths.get("D:\\GGC_Maven_Systems\\temp\\attachments\\" + imgPath2);
-                            Files.copy(selectedFile.toPath(), destPath, StandardCopyOption.REPLACE_EXISTING);
-                            Path parentDir = destPath.getParent(); // Get the parent directory path
-
-                            try {
-                                if (!Files.exists(parentDir)) {
-                                    Files.createDirectories(parentDir); // Create directories if they don't exist
-                                    System.out.println("Directories created: " + parentDir);
-                                }
-                            } catch (IOException e) {
-                                System.err.println("Error creating directories: " + e.getMessage());
-                            }
+                            
+                            
+                            String imgPath2 = selectedFile.getName().toString();
                             for (int lnCtr = 0; lnCtr <= poGLControllers.PaymentRequest().getTransactionAttachmentCount() - 1; lnCtr++) {
-                                if (imgPath2.equals(poGLControllers.PaymentRequest().TransactionAttachmentList(lnCtr).getModel().getFileName())) {
-                                    ShowMessageFX.Warning(null, psFormName, "File name already exist.");
+                                if (imgPath2.equals(poGLControllers.PaymentRequest().TransactionAttachmentList(lnCtr).getModel().getFileName())
+                                        && RecordStatus.ACTIVE.equals(poGLControllers.PaymentRequest().TransactionAttachmentList(lnCtr).getModel().getRecordStatus())) {
+                                    ShowMessageFX.Warning(null, psFormName, "File name already exists.");
                                     pnAttachment = lnCtr;
                                     loadRecordAttachment(true);
                                     return;
                                 }
                             }
-                            pnAttachment = poGLControllers.PaymentRequest().getTransactionAttachmentCount() - 1;
-                            poGLControllers.PaymentRequest().TransactionAttachmentList(pnAttachment).getModel().setFileName(imgPath2);
-                            poGLControllers.PaymentRequest().TransactionAttachmentList(pnAttachment).getModel().setSourceNo(poGLControllers.PaymentRequest().Master().getTransactionNo());
-                            poGLControllers.PaymentRequest().TransactionAttachmentList(pnAttachment).getModel().getTransactionNo();
-                            loadTableAttachment();
+                            
+                            if (imageinfo_temp.containsKey(selectedFile.getName().toString())) {
+                                ShowMessageFX.Warning(null, psFormName, "File name already exists.");
+                                loadRecordAttachment(true);
+                                return;
+                            } else {
+                                imageinfo_temp.put(selectedFile.getName().toString(), imgPath.toString());
+                            }
+                            
+                            //Limit maximum pages of pdf to add
+                            if (imgPath2.toLowerCase().endsWith(".pdf")) {
+                                try (PDDocument document = PDDocument.load(selectedFile)) {
+                                    PDFRenderer pdfRenderer = new PDFRenderer(document);
+                                    int pageCount = document.getNumberOfPages();
+                                    if (pageCount > 5) {
+                                        ShowMessageFX.Warning(null, psFormName, "PDF exceeds maximum allowed pages.");
+                                        return;
+                                    }
+                                }
+                            }
+
+                            pnAttachment = poGLControllers.PaymentRequest().addAttachment(imgPath2);
+                            //Copy file to Attachment path
+                            poGLControllers.PaymentRequest().copyFile(selectedFile.toString());
+                            loadTableAttachment.reload();
                             tblAttachments.getFocusModel().focus(pnAttachment);
                             tblAttachments.getSelectionModel().select(pnAttachment);
+
                         } catch (IOException ex) {
                             Logger.getLogger(PaymentRequest_EntryController.class.getName()).log(Level.SEVERE, null, ex);
                         }
                     }
                     break;
                 case "btnRemoveAttachment":
+                    if (poGLControllers.PaymentRequest().getTransactionAttachmentCount() <= 0) {
+                            return;
+                        } else {
+                            for (int lnCtr = 0; lnCtr < poGLControllers.PaymentRequest().getTransactionAttachmentCount(); lnCtr++) {
+                                if (RecordStatus.INACTIVE.equals(poGLControllers.PaymentRequest().TransactionAttachmentList(lnCtr).getModel().getRecordStatus())) {
+                                    if (pnAttachment == lnCtr) {
+                                        return;
+                                    }
+                                }
+                            }
+                        }
+                        poJSON = poGLControllers.PaymentRequest().removeAttachment(pnAttachment);
+                        if ("error".equals((String) poJSON.get("result"))) {
+                            ShowMessageFX.Warning(null, psFormName, (String) poJSON.get("message"));
+                            return;
+                        }
+                        attachment_data.remove(tblAttachments.getSelectionModel().getSelectedIndex());
+                        if (pnAttachment != 0) {
+                            pnAttachment -= 1;
+                        }
+                        imageinfo_temp.clear();
+                        loadRecordAttachment(false);
+                        loadTableAttachment.reload();
+                        if (attachment_data.size() <= 0) {
+                            JFXUtil.clearTextFields(apAttachments);
+                        }
+                        initAttachmentsGrid();
                     break;
                 case "btnArrowLeft":
                     slideImage(-1);
@@ -741,7 +780,7 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
             } else {
                 loadRecordMaster();
                 loadTableDetail();
-                loadTableAttachment();
+//                loadTableAttachment();
             }
             initButtons(pnEditMode);
             initFields(pnEditMode);
@@ -816,6 +855,57 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
             }
         } catch (Exception e) {
         }
+    }
+    
+    public void initLoadTable() {
+        loadTableAttachment = new JFXUtil.ReloadableTableTask(
+                tblAttachments,
+                attachment_data,
+                () -> {
+                    imageviewerutil.scaleFactor = 1.0;
+                    JFXUtil.resetImageBounds(imageView, stackPane1);
+                    Platform.runLater(() -> {
+                        try {
+                            attachment_data.clear();
+                            int lnCtr;
+                            int lnCount = 0;
+                            for (lnCtr = 0; lnCtr < poGLControllers.PaymentRequest().getTransactionAttachmentCount(); lnCtr++) {
+                                if (RecordStatus.INACTIVE.equals(poGLControllers.PaymentRequest().TransactionAttachmentList(lnCtr).getModel().getRecordStatus())) {
+                                    continue;
+                                }
+                                lnCount += 1;
+                                attachment_data.add(
+                                        new ModelPRFAttachment(String.valueOf(lnCount),
+                                                String.valueOf(poGLControllers.PaymentRequest().TransactionAttachmentList(lnCtr).getModel().getFileName()),
+                                                String.valueOf(lnCtr)
+                                        ));
+                            }
+                            int lnTempRow = JFXUtil.getDetailRow(attachment_data, pnAttachment, 3); //this method is used only when Reverse is applied
+                            if (lnTempRow < 0 || lnTempRow
+                                    >= attachment_data.size()) {
+                                if (!attachment_data.isEmpty()) {
+                                    /* FOCUS ON FIRST ROW */
+                                    JFXUtil.selectAndFocusRow(tblAttachments, 0);
+                                    int lnRow = Integer.parseInt(attachment_data.get(0).getIndex03());
+                                    pnAttachment = lnRow;
+                                    loadRecordAttachment(true);
+                                }
+                            } else {
+                                /* FOCUS ON THE ROW THAT pnRowDetail POINTS TO */
+                                JFXUtil.selectAndFocusRow(tblAttachments, lnTempRow);
+                                int lnRow = Integer.parseInt(attachment_data.get(tblAttachments.getSelectionModel().getSelectedIndex()).getIndex03());
+                                pnAttachment = lnRow;
+                                loadRecordAttachment(true);
+                            }
+                            if (attachment_data.size() <= 0) {
+                                loadRecordAttachment(false);
+                            }
+                        } catch (Exception e) {
+                        }
+                    });
+                }
+        );
+
     }
 
     private void loadTableAttachment() {
