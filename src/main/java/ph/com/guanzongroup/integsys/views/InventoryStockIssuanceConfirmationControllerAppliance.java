@@ -59,14 +59,12 @@ import org.guanzon.cas.inv.warehouse.model.Model_Cluster_Delivery_Master;
 import org.guanzon.cas.inv.warehouse.model.Model_Inventory_Transfer_Detail;
 import org.guanzon.cas.inv.warehouse.services.DeliveryIssuanceControllers;
 
-
-
 /**
  * FXML Controller class
  *
  * @author User
  */
-public class InventoryStockIssuanceConfimationController implements Initializable, ScreenInterface {
+public class InventoryStockIssuanceConfirmationControllerAppliance implements Initializable, ScreenInterface {
 
     private GRiderCAS poApp;
     private LogWrapper poLogWrapper;
@@ -213,7 +211,7 @@ public class InventoryStockIssuanceConfimationController implements Initializabl
                 loadSelectedTransactionDetail(poAppController.getDetailCount());
                 reloadTableDetailOther();
             } catch (CloneNotSupportedException | SQLException | GuanzonException ex) {
-                Logger.getLogger(DeliverySchedule_EntryController.class.getName()).log(Level.SEVERE, null, ex);
+
                 poLogWrapper.severe(psFormName + " :" + ex.getMessage());
 
             }
@@ -558,9 +556,9 @@ public class InventoryStockIssuanceConfimationController implements Initializabl
                         return;
                     }
                     if (!isJSONSuccess(poAppController.retrieveDetail(pnTransactionDetail), "Initialize retrieve stock request transaction")) {
-
+                        
                     }
-
+                    
                     reloadTableDetail();
                     loadSelectedTransactionDetail(pnTransactionDetail);
                     reloadTableDetailOther();
@@ -904,7 +902,7 @@ public class InventoryStockIssuanceConfimationController implements Initializabl
 
         dpDeliveryDate.setValue(ParseDate(poAppController.getDetail(fnRow).InventoryTransfer().getMaster().getTransactionDate()));
         taDeliveryRemarks.setText(poAppController.getDetail(fnRow).InventoryTransfer().getMaster().getRemarks());
-        initButtonDisplayDetail(poAppController.getDetail(fnRow).InventoryTransfer().getMaster().getEditMode());
+        initButtonDisplayDetail( poAppController.getDetail(fnRow).InventoryTransfer().getMaster().getEditMode());
     }
 
     private void loadSelectedTransactionDetailOther(int fnRow) throws SQLException, GuanzonException, CloneNotSupportedException {

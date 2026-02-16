@@ -64,7 +64,7 @@ import org.guanzon.cas.inv.warehouse.services.DeliveryIssuanceControllers;
  *
  * @author User
  */
-public class InventoryStockIssuanceConfimationControllerMC_SP implements Initializable, ScreenInterface {
+public class InventoryStockIssuanceConfirmationControllerMonarch_Food implements Initializable, ScreenInterface {
 
     private GRiderCAS poApp;
     private LogWrapper poLogWrapper;
@@ -902,8 +902,7 @@ public class InventoryStockIssuanceConfimationControllerMC_SP implements Initial
 
         dpDeliveryDate.setValue(ParseDate(poAppController.getDetail(fnRow).InventoryTransfer().getMaster().getTransactionDate()));
         taDeliveryRemarks.setText(poAppController.getDetail(fnRow).InventoryTransfer().getMaster().getRemarks());
-        initButtonDisplayDetail(poAppController.getDetail(fnRow).InventoryTransfer().getMaster().getEditMode()
-        );
+        initButtonDisplayDetail(poAppController.getDetail(fnRow).InventoryTransfer().getMaster().getEditMode());
     }
 
     private void loadSelectedTransactionDetailOther(int fnRow) throws SQLException, GuanzonException, CloneNotSupportedException {

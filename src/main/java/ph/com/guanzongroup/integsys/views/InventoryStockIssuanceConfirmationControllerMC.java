@@ -64,7 +64,7 @@ import org.guanzon.cas.inv.warehouse.services.DeliveryIssuanceControllers;
  *
  * @author User
  */
-public class InventoryStockIssuanceConfimationControllerAppliance implements Initializable, ScreenInterface {
+public class InventoryStockIssuanceConfirmationControllerMC implements Initializable, ScreenInterface {
 
     private GRiderCAS poApp;
     private LogWrapper poLogWrapper;
@@ -556,9 +556,9 @@ public class InventoryStockIssuanceConfimationControllerAppliance implements Ini
                         return;
                     }
                     if (!isJSONSuccess(poAppController.retrieveDetail(pnTransactionDetail), "Initialize retrieve stock request transaction")) {
-                        
+
                     }
-                    
+
                     reloadTableDetail();
                     loadSelectedTransactionDetail(pnTransactionDetail);
                     reloadTableDetailOther();
@@ -902,7 +902,7 @@ public class InventoryStockIssuanceConfimationControllerAppliance implements Ini
 
         dpDeliveryDate.setValue(ParseDate(poAppController.getDetail(fnRow).InventoryTransfer().getMaster().getTransactionDate()));
         taDeliveryRemarks.setText(poAppController.getDetail(fnRow).InventoryTransfer().getMaster().getRemarks());
-        initButtonDisplayDetail( poAppController.getDetail(fnRow).InventoryTransfer().getMaster().getEditMode());
+        initButtonDisplayDetail(poAppController.getDetail(fnRow).InventoryTransfer().getMaster().getEditMode());
     }
 
     private void loadSelectedTransactionDetailOther(int fnRow) throws SQLException, GuanzonException, CloneNotSupportedException {

@@ -59,12 +59,14 @@ import org.guanzon.cas.inv.warehouse.model.Model_Cluster_Delivery_Master;
 import org.guanzon.cas.inv.warehouse.model.Model_Inventory_Transfer_Detail;
 import org.guanzon.cas.inv.warehouse.services.DeliveryIssuanceControllers;
 
+
+
 /**
  * FXML Controller class
  *
  * @author User
  */
-public class InventoryStockIssuanceConfimationControllerCar_SP implements Initializable, ScreenInterface {
+public class InventoryStockIssuanceConfirmationController implements Initializable, ScreenInterface {
 
     private GRiderCAS poApp;
     private LogWrapper poLogWrapper;
@@ -211,7 +213,7 @@ public class InventoryStockIssuanceConfimationControllerCar_SP implements Initia
                 loadSelectedTransactionDetail(poAppController.getDetailCount());
                 reloadTableDetailOther();
             } catch (CloneNotSupportedException | SQLException | GuanzonException ex) {
-
+                Logger.getLogger(DeliverySchedule_EntryController.class.getName()).log(Level.SEVERE, null, ex);
                 poLogWrapper.severe(psFormName + " :" + ex.getMessage());
 
             }

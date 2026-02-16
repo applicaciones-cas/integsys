@@ -64,7 +64,7 @@ import org.guanzon.cas.inv.warehouse.services.DeliveryIssuanceControllers;
  *
  * @author User
  */
-public class InventoryStockIssuanceConfimationControllerCar implements Initializable, ScreenInterface {
+public class InventoryStockIssuanceConfirmationControllerCar_SP implements Initializable, ScreenInterface {
 
     private GRiderCAS poApp;
     private LogWrapper poLogWrapper;
@@ -444,7 +444,7 @@ public class InventoryStockIssuanceConfimationControllerCar implements Initializ
                         }
 
                         reloadTableDetail();
-                        clearAllInputs();
+//                        clearAllInputs();
                         pnEditMode = poAppController.getEditMode();
                         break;
                     }
@@ -776,7 +776,7 @@ public class InventoryStockIssuanceConfimationControllerCar implements Initializ
                 }
             }
         } catch (SQLException | GuanzonException | CloneNotSupportedException ex) {
-            Logger.getLogger(InventoryStockIssuanceConfimationController.class
+            Logger.getLogger(DeliverySchedule_EntryController.class
                     .getName()).log(Level.SEVERE, null, ex);
             poLogWrapper.severe(psFormName + " :" + ex.getMessage());
         }
@@ -985,7 +985,6 @@ public class InventoryStockIssuanceConfimationControllerCar implements Initializ
         loadDeliveryTypes();
         initButtonDisplay(poAppController.getEditMode());
         initButtonDisplayDetail(EditMode.UNKNOWN);
-
     }
 
     private void initButtonDisplayDetail(int fnEditMode) {
