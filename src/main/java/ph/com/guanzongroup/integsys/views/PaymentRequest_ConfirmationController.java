@@ -331,7 +331,7 @@ public class PaymentRequest_ConfirmationController implements Initializable, Scr
             tfDiscountAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poGLControllers.PaymentRequest().Master().getDiscountAmount(), true));
             tfTotalVATableAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poGLControllers.PaymentRequest().Master().getTaxAmount(), true));
             tfNetAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poGLControllers.PaymentRequest().Master().getNetTotal(), true));
-            taRemarks.setText(poGLControllers.PaymentRequest().Master().Payee().getPayeeName());
+            taRemarks.setText(poGLControllers.PaymentRequest().Master().getRemarks());
             lblStatus.setText("");
             String lsStatus = "";
             switch (poGLControllers.PaymentRequest().Master().getTransactionStatus()) {

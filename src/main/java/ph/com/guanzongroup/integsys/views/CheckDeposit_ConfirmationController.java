@@ -179,8 +179,10 @@ public class CheckDeposit_ConfirmationController implements Initializable, Scree
         if (e.getClickCount() == 2 && !e.isConsumed()) {
             try {
                 e.consume();
-                if (ShowMessageFX.OkayCancel(null, "Search Transaction! by Trasaction", "Are you sure you want replace loaded Transaction?") == false) {
-                    return;
+                if (!tfTransactionNo.getText().isEmpty()) {
+                    if (ShowMessageFX.OkayCancel(null, "Search Transaction! by Trasaction", "Are you sure you want replace loaded Transaction?") == false) {
+                        return;
+                    }
                 }
                 if (!isJSONSuccess(poAppController.searchTransaction(tblColTransNo.getCellData(pnSelectMaster), true, true), psFormName)) {
 //                    ShowMessageFX.Information("Failed to add detail", psFormName, null);
@@ -399,6 +401,7 @@ public class CheckDeposit_ConfirmationController implements Initializable, Scree
                             return;
                         }
                         getLoadedTransaction();
+                        loadTransactionMasterList(tfSearchBankAccountNo.getText().trim(), "b.sActNumbr");
                         pnEditMode = poAppController.getEditMode();
                         break;
                     }
@@ -421,6 +424,7 @@ public class CheckDeposit_ConfirmationController implements Initializable, Scree
 
                         }
                         getLoadedTransaction();
+                        loadTransactionMasterList(tfSearchBankAccountNo.getText().trim(), "b.sActNumbr");
                         pnEditMode = poAppController.getEditMode();
                         break;
                     }
@@ -428,7 +432,7 @@ public class CheckDeposit_ConfirmationController implements Initializable, Scree
 
                 case "btnPrint":
                     if (poAppController.getMaster().getTransactionStatus().equalsIgnoreCase(CheckTransferStatus.OPEN)) {
-                        if (ShowMessageFX.OkayCancel(null, psFormName, "Do you want to close the transaction ?") == true) {
+                        if (ShowMessageFX.OkayCancel(null, psFormName, "Do you want to Confirm the transaction ?") == true) {
                             if (!isJSONSuccess(poAppController.CloseTransaction(),
                                     "Initialize Close Transaction")) {
                                 return;
@@ -504,7 +508,9 @@ public class CheckDeposit_ConfirmationController implements Initializable, Scree
                     }
 
                     getLoadedTransaction();
+                    loadTransactionMasterList(tfSearchBankAccountNo.getText().trim(), "b.sActNumbr");
                     pnEditMode = poAppController.getEditMode();
+                    
                     break;
                     
                 case "btnCancel":
@@ -1017,6 +1023,11 @@ public class CheckDeposit_ConfirmationController implements Initializable, Scree
 
         apMaster.setDisable(!lbShow);
         apDetail.setDisable(!lbShow);
+        
+        if (poAppController.getMaster().getTransactionStatus().equals(CheckDepositStatus.CONFIRMED)){
+            CustomCommonUtil.setVisible(false, btnApprove);
+            CustomCommonUtil.setManaged(false, btnApprove);
+        }
     }
 
     private void initButtonControls(boolean visible, String... buttonFxIdsToShow) {

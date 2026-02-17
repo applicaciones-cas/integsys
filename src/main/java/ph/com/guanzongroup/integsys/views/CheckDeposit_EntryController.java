@@ -436,7 +436,7 @@ public class CheckDeposit_EntryController implements Initializable, ScreenInterf
 
                     getLoadedTransaction();
                     pnEditMode = poAppController.getEditMode();
-
+                    btnNew.fire();
                     break;
 
                 case "btnCancel":
