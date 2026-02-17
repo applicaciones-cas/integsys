@@ -254,6 +254,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
                     break;
                 case "Journal":
                     if (pnEditMode == EditMode.READY || pnEditMode == EditMode.UPDATE || pnEditMode == EditMode.ADDNEW) {
+                        JFXUtil.clearTextFields(apJournalDetails, apJournalMaster);
                         if (poController.Detail(0).getSourceNo() != null && !poController.Detail(0).getSourceNo().isEmpty()) {
                             pbIsCheckedJournalTab = true;
                             populateJE();
@@ -265,6 +266,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
                     break;
                 case "BIR 2307":
                     if (pnEditMode == EditMode.READY || pnEditMode == EditMode.UPDATE || pnEditMode == EditMode.ADDNEW) {
+                        JFXUtil.clearTextFields(apBIRDetail);
                         if (poController.Detail(0).getSourceNo() != null && !poController.Detail(0).getSourceNo().isEmpty()) {
                             pbIsCheckedBIRTab = true;
                             populateBIR();
@@ -276,6 +278,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
                     break;
                 case "Attachments":
                     if (pnEditMode == EditMode.READY || pnEditMode == EditMode.UPDATE || pnEditMode == EditMode.ADDNEW) {
+                        JFXUtil.clearTextFields(apAttachments);
                         if (poController.Detail(0).getSourceNo() != null && !poController.Detail(0).getSourceNo().isEmpty()) {
                             pbIsCheckedAttachmentTab = true;
                             try {
@@ -676,8 +679,8 @@ public class DisbursementVoucher_VerificationController implements Initializable
                 JFXUtil.disableAllHighlightByColor(tblViewMainList, "#A7C7E7", highlightedRowsMain);
                 JFXUtil.highlightByKey(tblViewMainList, String.valueOf(pnRowMain + 1), "#A7C7E7", highlightedRowsMain);
                 clearTextFields();
+                JFXUtil.clickTabByTitleText(tabPaneMain, "Disbursement Voucher");
                 poJSON = poController.OpenTransaction(lsTransactionNo);
-
                 if ("error".equals((String) poJSON.get("result"))) {
                     poController.resetTransaction();
                     pnEditMode = EditMode.UNKNOWN;

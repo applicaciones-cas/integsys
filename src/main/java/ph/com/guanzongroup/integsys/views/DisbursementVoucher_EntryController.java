@@ -265,6 +265,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                     break;
                 case "Journal":
                     if (pnEditMode == EditMode.READY || pnEditMode == EditMode.UPDATE || pnEditMode == EditMode.ADDNEW) {
+                        JFXUtil.clearTextFields(apJournalDetails, apJournalMaster);
                         if (poController.Detail(0).getSourceNo() != null && !poController.Detail(0).getSourceNo().isEmpty()) {
                             pbIsCheckedJournalTab = true;
                             populateJE();
@@ -276,6 +277,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                     break;
                 case "BIR 2307":
                     if (pnEditMode == EditMode.READY || pnEditMode == EditMode.UPDATE || pnEditMode == EditMode.ADDNEW) {
+                        JFXUtil.clearTextFields(apBIRDetail);
                         if (poController.Detail(0).getSourceNo() != null && !poController.Detail(0).getSourceNo().isEmpty()) {
                             pbIsCheckedBIRTab = true;
                             populateBIR();
@@ -287,6 +289,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                     break;
                 case "Attachments":
                     if (pnEditMode == EditMode.READY || pnEditMode == EditMode.UPDATE || pnEditMode == EditMode.ADDNEW) {
+                        JFXUtil.clearTextFields(apAttachments);
                         if (poController.Detail(0).getSourceNo() != null && !poController.Detail(0).getSourceNo().isEmpty()) {
                             pbIsCheckedAttachmentTab = true;
                             try {
@@ -703,7 +706,6 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                     String lsPayableType = selected.getIndex11();
                     String lsTransactionNo = selected.getIndex08();
                     String lsPayee = selected.getIndex09();
-
                     poJSON = poController.populateDetail(lsTransactionNo, lsPayableType);
                     if ("error".equals(poJSON.get("result"))) {
                         ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
@@ -714,7 +716,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                     moveNext(false, false);
                     JFXUtil.runWithDelay(0.50, () -> {
                         loadTableMain.reload();
-                        switch(poController.Master().getDisbursementType()){
+                        switch (poController.Master().getDisbursementType()) {
                             case DisbursementStatic.DisbursementType.CHECK:
                                 loadRecordMasterCheck();
                                 break;
