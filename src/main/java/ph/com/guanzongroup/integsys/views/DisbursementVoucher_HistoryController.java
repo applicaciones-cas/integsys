@@ -223,6 +223,7 @@ public class DisbursementVoucher_HistoryController implements Initializable, Scr
                     break;
                 case "Journal":
                     if (pnEditMode == EditMode.READY || pnEditMode == EditMode.UPDATE || pnEditMode == EditMode.ADDNEW) {
+                        JFXUtil.clearTextFields(apJournalDetails, apJournalMaster);
                         if (poController.Detail(0).getSourceNo() != null && !poController.Detail(0).getSourceNo().isEmpty()) {
                             populateJE();
                         } else {
@@ -233,6 +234,7 @@ public class DisbursementVoucher_HistoryController implements Initializable, Scr
                     break;
                 case "BIR 2307":
                     if (pnEditMode == EditMode.READY || pnEditMode == EditMode.UPDATE || pnEditMode == EditMode.ADDNEW) {
+                        JFXUtil.clearTextFields(apBIRDetail);
                         if (poController.Detail(0).getSourceNo() != null && !poController.Detail(0).getSourceNo().isEmpty()) {
                             populateBIR();
                         } else {
@@ -243,6 +245,7 @@ public class DisbursementVoucher_HistoryController implements Initializable, Scr
                     break;
                 case "Attachments":
                     if (pnEditMode == EditMode.READY || pnEditMode == EditMode.UPDATE || pnEditMode == EditMode.ADDNEW) {
+                        JFXUtil.clearTextFields(apAttachments);
                         if (poController.Detail(0).getSourceNo() != null && !poController.Detail(0).getSourceNo().isEmpty()) {
                             try {
                                 poController.loadAttachments();

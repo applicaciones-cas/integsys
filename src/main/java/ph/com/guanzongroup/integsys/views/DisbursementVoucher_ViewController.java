@@ -228,6 +228,7 @@ public class DisbursementVoucher_ViewController implements Initializable, Screen
                     break;
                 case "BIR 2307":
                     if (pnEditMode == EditMode.READY || pnEditMode == EditMode.UPDATE || pnEditMode == EditMode.ADDNEW) {
+                        JFXUtil.clearTextFields(apBIRDetail);
                         if (poController.Detail(0).getSourceNo() != null && !poController.Detail(0).getSourceNo().isEmpty()) {
                             populateBIR();
                         } else {
@@ -238,6 +239,7 @@ public class DisbursementVoucher_ViewController implements Initializable, Screen
                     break;
                 case "Attachments":
                     if (pnEditMode == EditMode.READY || pnEditMode == EditMode.UPDATE || pnEditMode == EditMode.ADDNEW) {
+                        JFXUtil.clearTextFields(apAttachments);
                         if (poController.Detail(0).getSourceNo() != null && !poController.Detail(0).getSourceNo().isEmpty()) {
                             try {
                                 poController.loadAttachments();
