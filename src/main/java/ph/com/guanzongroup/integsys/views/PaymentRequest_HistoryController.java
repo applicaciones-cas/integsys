@@ -291,7 +291,7 @@ public class PaymentRequest_HistoryController implements Initializable, ScreenIn
             tfDiscountAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poGLControllers.PaymentRequest().Master().getDiscountAmount(), true));
             tfTotalVATableAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poGLControllers.PaymentRequest().Master().getTaxAmount(), true));
             tfNetAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poGLControllers.PaymentRequest().Master().getNetTotal(), true));
-            taRemarks.setText(poGLControllers.PaymentRequest().Master().Payee().getPayeeName());
+            taRemarks.setText(poGLControllers.PaymentRequest().Master().getRemarks());
             lblStatus.setText("");
             String lsStatus = "";
             switch (poGLControllers.PaymentRequest().Master().getTransactionStatus()) {
