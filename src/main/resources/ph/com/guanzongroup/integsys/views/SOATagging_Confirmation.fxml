@@ -24,7 +24,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane id="AnchorPane" fx:id="apMainAnchor" minWidth="1377.0" prefHeight="789.0" prefWidth="1463.0" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane id="AnchorPane" fx:id="apMainAnchor" minWidth="1377.0" prefHeight="789.0" prefWidth="1493.0" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1">
     <children>
         <StackPane AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
             <children>
@@ -456,6 +456,7 @@
                                                                   <TableColumn fx:id="tblSupplier" editable="false" maxWidth="290.0" minWidth="-1.0" prefWidth="290.0" resizable="false" sortable="false" style="-fx-font-size: 12;" text="Supplier" />
                                                                   <TableColumn fx:id="tblDate" editable="false" maxWidth="85.0" minWidth="85.0" prefWidth="85.0" resizable="false" sortable="false" style="-fx-font-size: 12;" text="Date" />
                                                                   <TableColumn fx:id="tblReferenceNo" editable="false" maxWidth="127.0" minWidth="127.0" prefWidth="127.0" resizable="false" sortable="false" style="-fx-font-size: 12;" text="Refer No." />
+                                                      <TableColumn fx:id="tblAmount" editable="false" maxWidth="127.0" minWidth="127.0" prefWidth="127.0" resizable="false" sortable="false" style="-fx-font-size: 12;" text="Amount" />
                                                               </columns>
                                                               <GridPane.margin>
                                                                   <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
