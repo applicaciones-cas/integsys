@@ -117,7 +117,7 @@ public class SOATagging_EntryCarController implements Initializable, ScreenInter
     @FXML
     private TableView tblViewTransDetailList, tblViewMainList;
     @FXML
-    private TableColumn tblRowNoDetail, tblSourceNoDetail, tblSourceCodeDetail, tblReferenceNoDetail, tblCreditAmtDetail, tblDebitAmtDetail, tblAppliedAmtDetail, tblRowNo, tblTransType, tblSupplier, tblDate, tblReferenceNo;
+    private TableColumn tblAmount, tblRowNoDetail, tblSourceNoDetail, tblSourceCodeDetail, tblReferenceNoDetail, tblCreditAmtDetail, tblDebitAmtDetail, tblAppliedAmtDetail, tblRowNo, tblTransType, tblSupplier, tblDate, tblReferenceNo;
     @FXML
     private Pagination pgPagination;
     @FXML
@@ -893,15 +893,18 @@ public class SOATagging_EntryCarController implements Initializable, ScreenInter
                     String lsTransDate = "";
                     String lsTransNoBasis = "";
                     String lsTransType = "";
+                    String lsAmount = "";
                     //retreiving using column index
                     for (int lnCtr = 0; lnCtr <= poSOATaggingController.SOATagging().getPayablesCount() - 1; lnCtr++) {
                         try {
+                            Double ldblBalance = 0.0000;
                             switch (poSOATaggingController.SOATagging().PayableType(lnCtr)) {
                                 case SOATaggingStatic.PaymentRequest:
                                     lsPayeeName = poSOATaggingController.SOATagging().PaymentRequestList(lnCtr).Payee().getPayeeName();
                                     lsTransNo = poSOATaggingController.SOATagging().PaymentRequestList(lnCtr).getSeriesNo();
                                     lsTransDate = String.valueOf(poSOATaggingController.SOATagging().PaymentRequestList(lnCtr).getTransactionDate());
                                     lsTransNoBasis = poSOATaggingController.SOATagging().PaymentRequestList(lnCtr).getTransactionNo();
+                                    ldblBalance = poSOATaggingController.SOATagging().PaymentRequestList(lnCtr).getNetTotal() - poSOATaggingController.SOATagging().PaymentRequestList(lnCtr).getAmountPaid();
                                     lsTransType = "PRF";
                                     break;
                                 case SOATaggingStatic.APPaymentAdjustment:
@@ -909,6 +912,10 @@ public class SOATagging_EntryCarController implements Initializable, ScreenInter
                                     lsTransNo = poSOATaggingController.SOATagging().CachePayableList(lnCtr).getReferNo();
                                     lsTransDate = String.valueOf(poSOATaggingController.SOATagging().CachePayableList(lnCtr).getTransactionDate());
                                     lsTransNoBasis = poSOATaggingController.SOATagging().CachePayableList(lnCtr).getSourceNo();
+                                    ldblBalance = poSOATaggingController.SOATagging().CachePayableList(lnCtr).getNetTotal() - poSOATaggingController.SOATagging().CachePayableList(lnCtr).getAmountPaid();
+                                    if (poSOATaggingController.SOATagging().CachePayableList(lnCtr).getReceivables() > 0.0000) {
+                                        ldblBalance = -ldblBalance;
+                                    }
                                     lsTransType = "AP Payment Adjustment";
                                     break;
                                 case SOATaggingStatic.POReceiving:
@@ -917,15 +924,18 @@ public class SOATagging_EntryCarController implements Initializable, ScreenInter
                                     lsTransDate = String.valueOf(poSOATaggingController.SOATagging().CachePayableList(lnCtr).getTransactionDate());
                                     lsTransNoBasis = poSOATaggingController.SOATagging().CachePayableList(lnCtr).getSourceNo()
                                             + poSOATaggingController.SOATagging().CachePayableList(lnCtr).Client().getCompanyName();
+                                    ldblBalance = poSOATaggingController.SOATagging().CachePayableList(lnCtr).getNetTotal() - poSOATaggingController.SOATagging().CachePayableList(lnCtr).getAmountPaid();
                                     lsTransType = "PO Receiving";
                                     break;
                             }
+                            lsAmount = CustomCommonUtil.setIntegerValueToDecimalFormat(ldblBalance, true);
                             String lsHighlightbasis = lsTransNoBasis + lsTransType;
                             main_data.add(new ModelSOATagging_Main(String.valueOf(lnCtr + 1),
                                     lsTransType,
                                     lsPayeeName,
                                     lsTransDate,
                                     lsTransNo,
+                                    lsAmount,
                                     lsHighlightbasis
                             ));
                         } catch (SQLException | GuanzonException ex) {
@@ -1297,7 +1307,7 @@ public class SOATagging_EntryCarController implements Initializable, ScreenInter
             }
         });
 
-        JFXUtil.applyRowHighlighting(tblViewMainList, item -> ((ModelSOATagging_Main) item).getIndex06(), highlightedRowsMain);
+        JFXUtil.applyRowHighlighting(tblViewMainList, item -> ((ModelSOATagging_Main) item).getIndex07(), highlightedRowsMain);
         tblViewTransDetailList.addEventFilter(KeyEvent.KEY_PRESSED, this::tableKeyEvents);
         JFXUtil.adjustColumnForScrollbar(tblViewTransDetailList, tblViewMainList); // need to use computed-size in min-width of the column to work
     }
@@ -1343,6 +1353,7 @@ public class SOATagging_EntryCarController implements Initializable, ScreenInter
     public void initMainGrid() {
         JFXUtil.setColumnCenter(tblRowNo, tblDate, tblReferenceNo);
         JFXUtil.setColumnLeft(tblTransType, tblSupplier);
+        JFXUtil.setColumnRight(tblAmount);
         JFXUtil.setColumnsIndexAndDisableReordering(tblViewMainList);
 
         filteredData = new FilteredList<>(main_data, b -> true);

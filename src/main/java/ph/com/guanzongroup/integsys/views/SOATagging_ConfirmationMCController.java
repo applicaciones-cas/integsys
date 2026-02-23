@@ -800,12 +800,12 @@ public class SOATagging_ConfirmationMCController implements Initializable, Scree
 
                     //retreiving using column index
                     for (int lnCtr = 0; lnCtr <= poSOATaggingController.SOATagging().getSOATaggingCount() - 1; lnCtr++) {
-                        lsTransNo = String.valueOf(poSOATaggingController.SOATagging().APPaymentMasterList(lnCtr).getTransactionNo());
+                        lsTransNo = String.valueOf(poSOATaggingController.SOATagging().APPaymentMasterList(lnCtr).getSOANumber());
                         try {
                             main_data.add(new ModelSOATagging_Main(String.valueOf(lnCtr + 1),
                                     String.valueOf(poSOATaggingController.SOATagging().APPaymentMasterList(lnCtr).Supplier().getCompanyName()),
                                     String.valueOf(poSOATaggingController.SOATagging().APPaymentMasterList(lnCtr).getTransactionDate()),
-                                    String.valueOf(poSOATaggingController.SOATagging().APPaymentMasterList(lnCtr).getTransactionNo())
+                                    String.valueOf(poSOATaggingController.SOATagging().APPaymentMasterList(lnCtr).getSOANumber())
                             ));
                         } catch (SQLException | GuanzonException ex) {
                             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
