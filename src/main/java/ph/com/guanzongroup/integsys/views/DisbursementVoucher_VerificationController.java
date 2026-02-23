@@ -2050,7 +2050,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
             dpCheckDate.setValue(poController.CheckPayments().getModel().getCheckDate() != null
                     ? CustomCommonUtil.parseDateStringToLocalDate(SQLUtil.dateFormat(poController.CheckPayments().getModel().getCheckDate(), SQLUtil.FORMAT_SHORT_DATE))
                     : null);
-            JFXUtil.setDisabled(JFXUtil.isObjectEqualTo(poController.CheckPayments().getModel().getCheckNo(), null, ""), dpCheckDate);
+
             tfCheckAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.CheckPayments().getModel().getAmount(), true));
             chbkIsCrossCheck.setSelected(poController.CheckPayments().getModel().isCross());
             chbkIsPersonOnly.setSelected(poController.CheckPayments().getModel().isPayee());
@@ -2078,12 +2078,6 @@ public class DisbursementVoucher_VerificationController implements Initializable
                     && poController.CheckPayments().getModel().getDesbursementMode().equals("1")
                     && poController.CheckPayments().getModel().getClaimant().equals("0");
             JFXUtil.setDisabled(!lbValidation03, tfAuthorizedPerson);
-
-            boolean lbShow = Logical.YES.equals(poController.Master().getBankPrint());
-            JFXUtil.setDisabled(lbShow, dpCheckDate);
-            if (lbShow) {
-                poController.CheckPayments().getModel().setCheckDate(null);
-            }
 
             JFXUtil.updateCaretPositions(apMasterDVCheck);
         } catch (SQLException | GuanzonException ex) {
