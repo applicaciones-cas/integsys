@@ -284,7 +284,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
                             try {
                                 poController.loadAttachments();
                             } catch (GuanzonException | SQLException ex) {
-                                Logger.getLogger(DisbursementVoucher_EntryController.class.getName()).log(Level.SEVERE, null, ex);
+                                Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
                             }
                             loadTableAttachment.reload();
                         } else {
@@ -394,24 +394,20 @@ public class DisbursementVoucher_VerificationController implements Initializable
                     break;
                 case "btnSave":
                     //Recheck transaction status
-                    if (pnEditMode == EditMode.UPDATE) {
-                        poJSON = poController.checkUpdateTransaction(false);
-                        if (!"success".equals((String) poJSON.get("result"))) {
-                            ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-                            return;
-                        }
+                    poJSON = poController.checkUpdateTransaction(false);
+                    if (!"success".equals((String) poJSON.get("result"))) {
+                        ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                        return;
                     }
 
                     if (!ShowMessageFX.YesNo(null, pxeModuleName, "Are you sure you want to save the transaction?")) {
                         return;
                     }
 
-                    if (pnEditMode == EditMode.UPDATE) {
-                        if (oApp.getUserLevel() > UserRight.ENCODER) {
-                            if (!pbIsCheckedJournalTab) {
-                                ShowMessageFX.Warning(null, pxeModuleName, "Please check the Journal Entry before saving."); //only require check this only if higher than encoder
-                                return;
-                            }
+                    if (DisbursementStatic.VERIFIED.equals(poController.Master().getTransactionStatus())) {
+                        if (!pbIsCheckedJournalTab) {
+                            ShowMessageFX.Warning(null, pxeModuleName, "Please check the Journal Entry before saving."); //only require check this only if higher than encoder
+                            return;
                         }
                         if (poController.Master().getVATAmount() > 0.0000) {
                             if (!pbIsCheckedBIRTab) {
@@ -419,9 +415,6 @@ public class DisbursementVoucher_VerificationController implements Initializable
                                 return;
                             }
                         }
-
-                        poController.Master().setModifiedDate(oApp.getServerDate());
-                        poController.Master().setModifyingId(oApp.getUserID());
                     }
                     poJSON = poController.SaveTransaction();
                     if (!"success".equals((String) poJSON.get("result"))) {
@@ -442,28 +435,26 @@ public class DisbursementVoucher_VerificationController implements Initializable
                     }
                     if (pnEditMode == EditMode.READY && !DisbursementStatic.VERIFIED.equals(poController.Master().getTransactionStatus())) {
                         if (ShowMessageFX.YesNo(null, pxeModuleName, "Do you want to verify this transaction?")) { //requires to review journal entry
-                            if (oApp.getUserLevel() >= UserRight.ENCODER) {
-                                if (!poController.existJournal().equals("")) {
-                                    if (!pbIsCheckedJournalTab) {
-                                        ShowMessageFX.Warning(null, pxeModuleName, "Please check the Journal Entry before saving.");
-                                        break;
-                                    } else if (poController.Master().getVATAmount() > 0.0000 && !pbIsCheckedBIRTab) {
-                                        ShowMessageFX.Warning(null, pxeModuleName, "Please check the BIR 2307 before saving.");
+                            if (!poController.existJournal().equals("")) {
+                                if (!pbIsCheckedJournalTab) {
+                                    ShowMessageFX.Warning(null, pxeModuleName, "Please check the Journal Entry before saving.");
+                                    break;
+                                } else if (!pbIsCheckedBIRTab && poController.Master().getVATAmount() > 0.0000) {
+                                    ShowMessageFX.Warning(null, pxeModuleName, "Please check the BIR 2307 before verifying.");
+                                    break;
+                                } else {
+                                    poJSON = poController.VerifyTransaction("");
+                                    if ("error".equals((String) poJSON.get("result"))) {
+                                        ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                         break;
                                     } else {
-                                        poJSON = poController.VerifyTransaction("");
-                                        if ("error".equals((String) poJSON.get("result"))) {
-                                            ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-                                            break;
-                                        } else {
-                                            ShowMessageFX.Information(null, pxeModuleName, (String) poJSON.get("message"));
-                                            JFXUtil.highlightByKey(tblViewMainList, String.valueOf(pnMain + 1), "#C1E1C1", highlightedRowsMain);
-                                        }
+                                        ShowMessageFX.Information(null, pxeModuleName, (String) poJSON.get("message"));
+                                        JFXUtil.highlightByKey(tblViewMainList, String.valueOf(pnMain + 1), "#C1E1C1", highlightedRowsMain);
                                     }
-                                } else {
-                                    ShowMessageFX.Warning(null, pxeModuleName, "No journal entry found. Add a journal entry and save before verifying.");
-                                    break;
                                 }
+                            } else {
+                                ShowMessageFX.Warning(null, pxeModuleName, "No journal entry found. Add a journal entry and save before verifying.");
+                                break;
                             }
                         }
                     }
@@ -503,9 +494,14 @@ public class DisbursementVoucher_VerificationController implements Initializable
                                 if (!pbIsCheckedJournalTab) {
                                     ShowMessageFX.Warning(null, pxeModuleName, "Please check the Journal Entry before verifying.");
                                     return;
-                                } else if (poController.Master().getVATAmount() > 0.0000 && !pbIsCheckedBIRTab) {
-                                    ShowMessageFX.Warning(null, pxeModuleName, "Please check the BIR 2307 before verifying.");
-                                    return;
+                                } else if (poController.Master().getTransactionStatus().equals(DisbursementStatic.VERIFIED)) {
+                                    if (oApp.getUserLevel() > UserRight.ENCODER && !pbIsCheckedBIRTab) {
+                                        ShowMessageFX.Warning(null, pxeModuleName, "Please check the BIR 2307 before verifying.");
+                                        return;
+                                    }
+//                                } else if (poController.Master().getVATAmount() > 0.0000 && !pbIsCheckedBIRTab) {
+//                                    ShowMessageFX.Warning(null, pxeModuleName, "Please check the BIR 2307 before verifying.");
+//                                    return;
                                 } else {
                                     poJSON = poController.VerifyTransaction("Verified");
                                     if ("error".equals((String) poJSON.get("result"))) {
@@ -2011,32 +2007,45 @@ public class DisbursementVoucher_VerificationController implements Initializable
     }
 
     private void loadRecordDetail() {
-        if (pnDetail < 0 || pnDetail > poController.getDetailCount() - 1) {
-            return;
+        try {
+            if (pnDetail < 0 || pnDetail > poController.getDetailCount() - 1) {
+                return;
+            }
+            boolean lbNotNull = !JFXUtil.isObjectEqualTo(poController.Detail(pnDetail).getDetailVatAmount(), null, "");
+            boolean lbNotZero = poController.Detail(pnDetail).getAmountApplied() != 0;
+            cbReverse.selectedProperty().set(lbNotNull && lbNotZero);
+
+            boolean lbShow = (poController.Detail(pnDetail).getSourceCode()).equals(DisbursementStatic.SourceCode.PAYMENT_REQUEST)
+                    || (poController.Detail(pnDetail).getSourceCode()).equals(DisbursementStatic.SourceCode.AP_ADJUSTMENT)
+                    || (poController.Detail(pnDetail).getSourceCode().equals(DisbursementStatic.SourceCode.ACCOUNTS_PAYABLE)
+                    && (poController.Detail(pnDetail).SOADetail().getSourceCode().equals(DisbursementStatic.SourceCode.AP_ADJUSTMENT)
+                    || poController.Detail(pnDetail).SOADetail().getSourceCode().equals(DisbursementStatic.SourceCode.PAYMENT_REQUEST)));
+            JFXUtil.setDisabled(!lbShow, chbkVatClassification, tfVatExemptDetail);
+
+            JFXUtil.setDisabled(!lbShow, chbkVatClassification, tfVatExemptDetail);
+
+            tfRefNoDetail.setText(poController.getReferenceNo(pnDetail));
+            chbkVatClassification.setSelected(poController.Detail(pnDetail).isWithVat());
+            tfVatableSalesDetail.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(pnDetail).getDetailVatSales(), true));
+            tfVatExemptDetail.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(pnDetail).getDetailVatExempt(), true));
+            tfVatZeroRatedSalesDetail.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(pnDetail).getDetailZeroVat(), true));
+            tfVatAmountDetail.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(pnDetail).getDetailVatAmount(), true));
+            tfVatRateDetail.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(pnDetail).getDetailVatRates(), false));
+            tfPurchasedAmountDetail.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(pnDetail).getAmountApplied(), true));
+            tfNetAmountDetail.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(pnDetail).getAmount(), true));
+
+            JFXUtil.updateCaretPositions(apDVDetail);
+        } catch (SQLException | GuanzonException ex) {
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
-        boolean lbNotNull = !JFXUtil.isObjectEqualTo(poController.Detail(pnDetail).getDetailVatAmount(), null, "");
-        boolean lbNotZero = poController.Detail(pnDetail).getAmountApplied() != 0;
-        cbReverse.selectedProperty().set(lbNotNull && lbNotZero);
-
-        boolean lbShow = (poController.Detail(pnDetail).getSourceCode()).equals(DisbursementStatic.SourceCode.PAYMENT_REQUEST)
-                || (poController.Detail(pnDetail).getSourceCode()).equals(DisbursementStatic.SourceCode.AP_ADJUSTMENT);
-        JFXUtil.setDisabled(!lbShow, chbkVatClassification, tfVatExemptDetail);
-
-        tfRefNoDetail.setText(poController.getReferenceNo(pnDetail));
-        chbkVatClassification.setSelected(poController.Detail(pnDetail).isWithVat());
-        tfVatableSalesDetail.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(pnDetail).getDetailVatSales(), true));
-        tfVatExemptDetail.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(pnDetail).getDetailVatExempt(), true));
-        tfVatZeroRatedSalesDetail.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(pnDetail).getDetailZeroVat(), true));
-        tfVatRateDetail.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(pnDetail).getDetailVatRates(), false));
-        tfVatAmountDetail.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(pnDetail).getDetailVatAmount(), true));
-        tfPurchasedAmountDetail.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(pnDetail).getAmountApplied(), true));
-        tfNetAmountDetail.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(pnDetail).getAmount(), true));
-
-        JFXUtil.updateCaretPositions(apDVDetail);
     }
 
     private void loadRecordMasterCheck() {
         try {
+            boolean lbShow = tabPanePaymentMode.getSelectionModel().getSelectedItem().equals("Check");
+            JFXUtil.setDisabled(lbShow, dpCheckDate);
+
             JFXUtil.setDisabled(true, tfCheckNo, tfCheckAmount);
             tfCheckNo.setText(poController.CheckPayments().getModel().getCheckNo());
             if (JFXUtil.isObjectEqualTo(poController.CheckPayments().getModel().getCheckNo(), null, "")) {
