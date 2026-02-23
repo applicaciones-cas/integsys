@@ -409,11 +409,9 @@ public class DisbursementVoucher_VerificationController implements Initializable
                             ShowMessageFX.Warning(null, pxeModuleName, "Please check the Journal Entry before saving."); //only require check this only if higher than encoder
                             return;
                         }
-                        if (poController.Master().getVATAmount() > 0.0000) {
-                            if (!pbIsCheckedBIRTab) {
-                                ShowMessageFX.Warning(null, pxeModuleName, "Please check the BIR 2307 before saving."); // check this for encoder or and higher
-                                return;
-                            }
+                        if (!pbIsCheckedBIRTab && poController.Master().getVATAmount() > 0.0000) {
+                            ShowMessageFX.Warning(null, pxeModuleName, "Please check the BIR 2307 before saving."); // check this for encoder or and higher
+                            return;
                         }
                     }
                     poJSON = poController.SaveTransaction();
