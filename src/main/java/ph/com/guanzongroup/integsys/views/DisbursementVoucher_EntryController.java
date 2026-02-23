@@ -442,19 +442,16 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                     break;
                 case "btnSave":
                     //Recheck transaction status
-                    if (pnEditMode == EditMode.UPDATE) {
-                        poJSON = poController.checkUpdateTransaction(true);
-                        if (!"success".equals((String) poJSON.get("result"))) {
-                            ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-                            return;
-                        }
+                    poJSON = poController.checkUpdateTransaction(true);
+                    if (!"success".equals((String) poJSON.get("result"))) {
+                        ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                        return;
                     }
 
                     if (!ShowMessageFX.YesNo(null, pxeModuleName, "Are you sure you want to save the transaction?")) {
                         return;
                     }
 
-                    if (pnEditMode == EditMode.UPDATE || pnEditMode == EditMode.ADDNEW) {
 //                        if (oApp.getUserLevel() > UserRight.ENCODER) {
 //                            if (!pbIsCheckedJournalTab) {
 //                                ShowMessageFX.Warning(null, pxeModuleName, "Please check the Journal Entry before saving."); //only require check this only if higher than encoder
@@ -465,10 +462,6 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
 //                            ShowMessageFX.Warning(null, pxeModuleName, "Please check the BIR 2307 before saving."); // check this for encoder or and higher
 //                            return;
 //                        }
-
-                        poController.Master().setModifiedDate(oApp.getServerDate());
-                        poController.Master().setModifyingId(oApp.getUserID());
-                    }
                     poJSON = poController.SaveTransaction();
                     if (!"success".equals((String) poJSON.get("result"))) {
                         ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
