@@ -83,7 +83,7 @@
                         </AnchorPane>
                     </top>
                     <bottom>
-                        <AnchorPane fx:id="apButton" BorderPane.alignment="CENTER">
+                        <AnchorPane fx:id="apButton" prefHeight="80.0" BorderPane.alignment="CENTER">
                             <children>
                                 <HBox alignment="CENTER_LEFT" spacing="5.0" style="-fx-background-color: E9E9E9;" styleClass="button_process" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                     <children>
@@ -103,7 +103,7 @@
                                     <Blend />
                                  </effect>
                                  <graphic>
-                                    <FontAwesomeIconView glyphName="SEARCH" size="20" />
+                                    <FontAwesomeIconView glyphName="FOLDER_OPEN" size="20" />
                                  </graphic>
                                  <font>
                                     <Font size="12.0" />
@@ -264,12 +264,12 @@
                                                       <DatePicker fx:id="dpTransactionDate" editable="false" GridPane.columnIndex="2" GridPane.rowIndex="2" />
                                                   <TextField fx:id="tfDestination" maxHeight="25.0" promptText="Press F3: Search" GridPane.columnIndex="2" GridPane.columnSpan="5" GridPane.rowIndex="3" />
                                                   <TextField fx:id="tfDepartment" maxHeight="25.0" promptText="Press F3: Search" GridPane.columnIndex="2" GridPane.columnSpan="5" GridPane.rowIndex="4" />
-                                                      <TextField fx:id="tfTotal" alignment="CENTER_RIGHT" disable="true" promptText="0.00" styleClass="DisabledTextField" GridPane.columnIndex="10" GridPane.rowIndex="6" />
                               <TextArea fx:id="taRemarks" prefHeight="27.0" GridPane.columnIndex="2" GridPane.columnSpan="5" GridPane.rowIndex="5" GridPane.rowSpan="2">
                                  <GridPane.margin>
                                     <Insets top="1.0" />
                                  </GridPane.margin>
                               </TextArea>
+                                                      <TextField fx:id="tfTotal" alignment="CENTER_RIGHT" disable="true" promptText="0.00" styleClass="DisabledTextField" GridPane.columnIndex="10" GridPane.rowIndex="6" />
                                               </children>
                                           </GridPane>
                                       </children>
@@ -303,6 +303,14 @@
                                                       <RowConstraints maxHeight="-Infinity" minHeight="28.0" prefHeight="30.0" vgrow="SOMETIMES" />
                                               </rowConstraints>
                                               <children>
+                                                      <TextField fx:id="tfCheckTransNo" maxHeight="25.0" promptText="Press F3: Search" GridPane.columnIndex="2" GridPane.columnSpan="2" />
+                                                  <TextField fx:id="tfBank" alignment="TOP_LEFT" maxHeight="1.7976931348623157E308" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.rowIndex="1" />
+                                                  <TextField fx:id="tfPayee" maxHeight="25.0" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.rowIndex="2" />
+                                                      <TextField fx:id="tfNote" maxHeight="25.0" GridPane.columnIndex="2" GridPane.columnSpan="7" GridPane.rowIndex="3" />
+                                                      <TextField fx:id="tfCheckNo" maxHeight="25.0" promptText="Press F3: Search" GridPane.columnIndex="7" GridPane.columnSpan="2" />
+                                                      <DatePicker fx:id="dpCheckDate" editable="false" GridPane.columnIndex="7" GridPane.columnSpan="2" GridPane.rowIndex="1" />
+                              <TextField fx:id="tfCheckAmount" alignment="CENTER_RIGHT" promptText="0.0000" GridPane.columnIndex="7" GridPane.columnSpan="2" GridPane.rowIndex="2" />
+                                                      <CheckBox fx:id="cbReverse" mnemonicParsing="false" nodeOrientation="RIGHT_TO_LEFT" onAction="#cmdCheckBox_Click" prefHeight="10.0" prefWidth="62.0" text="Reverse" textAlignment="RIGHT" GridPane.columnIndex="7" GridPane.rowIndex="4" />
                                                   <Label text="Payee" GridPane.rowIndex="2">
                                                          <font>
                                                             <Font size="12.0" />
@@ -318,16 +326,11 @@
                                                           <Font name="System Bold" size="14.0" />
                                                       </font>
                                                   </Label>
-                                                  <TextField fx:id="tfPayee" maxHeight="25.0" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.rowIndex="2" />
-                                                  <TextField fx:id="tfBank" alignment="TOP_LEFT" maxHeight="1.7976931348623157E308" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.rowIndex="1" />
-                              <TextField fx:id="tfCheckAmount" alignment="CENTER_RIGHT" promptText="0.0000" GridPane.columnIndex="7" GridPane.columnSpan="2" GridPane.rowIndex="2" />
                                                       <Label text="Check Reference">
                                                          <font>
                                                             <Font size="12.0" />
                                                          </font>
                                                       </Label>
-                                                      <TextField fx:id="tfCheckTransNo" maxHeight="25.0" promptText="Press F3: Search" GridPane.columnIndex="2" GridPane.columnSpan="2" />
-                                                      <DatePicker fx:id="dpCheckDate" editable="false" GridPane.columnIndex="7" GridPane.columnSpan="2" GridPane.rowIndex="1" />
                                                       <Label alignment="CENTER_RIGHT" maxWidth="1.7976931348623157E308" text="Check Date" GridPane.columnIndex="5" GridPane.rowIndex="1">
                                                          <font>
                                                             <Font size="12.0" />
@@ -338,14 +341,11 @@
                                                             <Font size="12.0" />
                                                          </font>
                                                       </Label>
-                                                      <TextField fx:id="tfCheckNo" maxHeight="25.0" promptText="Press F3: Search" GridPane.columnIndex="7" GridPane.columnSpan="2" />
                                                       <Label text="Note" GridPane.rowIndex="3">
                                                          <font>
                                                             <Font size="12.0" />
                                                          </font>
                                                       </Label>
-                                                      <TextField fx:id="tfNote" maxHeight="25.0" GridPane.columnIndex="2" GridPane.columnSpan="7" GridPane.rowIndex="3" />
-                                                      <CheckBox fx:id="cbReverse" mnemonicParsing="false" nodeOrientation="RIGHT_TO_LEFT" onAction="#cmdCheckBox_Click" prefHeight="10.0" prefWidth="62.0" text="Reverse" textAlignment="RIGHT" GridPane.columnIndex="7" GridPane.rowIndex="4" />
                                               </children>
                                           </GridPane>
                                       </children>
@@ -430,12 +430,14 @@
                                                       <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
                                                    </columnResizePolicy>
                                               </TableView>
+                                                <TextField fx:id="tfFilterBank" maxHeight="25.0" promptText="Press F3: Search" GridPane.columnIndex="2" GridPane.columnSpan="4" GridPane.rowIndex="2" />
+                                                <DatePicker fx:id="dpFilterFrom" editable="false" GridPane.columnIndex="2" GridPane.rowIndex="3" />
+                                                <DatePicker fx:id="dpFilterThru" editable="false" GridPane.columnIndex="5" GridPane.rowIndex="3" />
                                                 <Label alignment="CENTER_RIGHT" maxWidth="1.7976931348623157E308" text="Date From" GridPane.rowIndex="3">
                                                    <font>
                                                       <Font name="System Bold" size="12.0" />
                                                    </font>
                                                 </Label>
-                                                <DatePicker fx:id="dpFilterThru" editable="false" GridPane.columnIndex="5" GridPane.rowIndex="3" />
                                                 <Label alignment="CENTER_RIGHT" maxWidth="1.7976931348623157E308" text="Date Thru" GridPane.columnIndex="3" GridPane.rowIndex="3">
                                                    <font>
                                                       <Font name="System Bold" size="12.0" />
@@ -446,8 +448,6 @@
                                                       <Font name="System Bold" size="12.0" />
                                                    </font>
                                                 </Label>
-                                                <TextField fx:id="tfFilterBank" maxHeight="25.0" promptText="Press F3: Search" GridPane.columnIndex="2" GridPane.columnSpan="4" GridPane.rowIndex="2" />
-                                                <DatePicker fx:id="dpFilterFrom" editable="false" GridPane.columnIndex="2" GridPane.rowIndex="3" />
                                           </children>
                                       </GridPane>
                                        </children>
@@ -470,7 +470,7 @@
         </StackPane>
     </children>
    <stylesheets>
-      <URL value="@000MNVProject/CAS%20IntegSys%20JavaMaven/gcas/src/main/resources/com/rmj/guanzongroup/sidebarmenus/css/Tables.css" />
       <URL value="@../css/StyleSheet.css" />
+      <URL value="@../css/Tables.css" />
    </stylesheets>
 </AnchorPane>
