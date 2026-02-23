@@ -921,7 +921,7 @@ public class SOATagging_EntryMCController implements Initializable, ScreenInterf
                                 case SOATaggingStatic.POReceiving:
                                     lsPayeeName = poSOATaggingController.SOATagging().CachePayableList(lnCtr).Client().getCompanyName();
                                     lsTransNo = poSOATaggingController.SOATagging().CachePayableList(lnCtr).getReferNo();
-                                    lsTransDate = String.valueOf(poSOATaggingController.SOATagging().CachePayableList(lnCtr).getTransactionDate());
+                                    lsTransDate = String.valueOf(poSOATaggingController.SOATagging().CachePayableList(lnCtr).getDueDate());
                                     lsTransNoBasis = poSOATaggingController.SOATagging().CachePayableList(lnCtr).getSourceNo()
                                             + poSOATaggingController.SOATagging().CachePayableList(lnCtr).Client().getCompanyName();
                                     ldblBalance = poSOATaggingController.SOATagging().CachePayableList(lnCtr).getNetTotal() - poSOATaggingController.SOATagging().CachePayableList(lnCtr).getAmountPaid();
