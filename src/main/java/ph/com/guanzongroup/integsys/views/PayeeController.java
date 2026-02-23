@@ -31,6 +31,7 @@ import org.guanzon.appdriver.base.GRiderCAS;
 import org.guanzon.appdriver.base.GuanzonException;
 import org.guanzon.appdriver.base.MiscUtil;
 import org.guanzon.appdriver.constant.RecordStatus;
+import org.guanzon.appdriver.constant.UserRight;
 import org.guanzon.cas.client.services.ClientControllers;
 import ph.com.guanzongroup.cas.cashflow.Payee;
 import ph.com.guanzongroup.cas.cashflow.services.CashflowControllers;
@@ -196,6 +197,10 @@ public class PayeeController implements Initializable, ScreenInterface {
                         }
                         break;
                     case "btnActivate":
+                        if (oApp.getUserLevel() < UserRight.SYSADMIN) {
+                            ShowMessageFX.Warning("User is not allowed to "+btnActivate.getText().toLowerCase()+" this paramater.", "Computerized Acounting System", pxeModuleName);
+                            return;
+                        }
                         String id = oParameters.Payee().getModel().getPayeeID();
                         if (ShowMessageFX.YesNo(null, pxeModuleName, "Do you want to "+btnActivate.getText().toLowerCase()+" this Parameter?") == true) {
                             if(RecordStatus.ACTIVE.equals(oParameters.Payee().getModel().getRecordStatus())){
