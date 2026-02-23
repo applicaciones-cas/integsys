@@ -33,6 +33,7 @@ import org.guanzon.appdriver.base.LogWrapper;
 import org.guanzon.appdriver.base.MiscUtil;
 import org.guanzon.appdriver.constant.EditMode;
 import org.guanzon.appdriver.constant.RecordStatus;
+import org.guanzon.appdriver.constant.UserRight;
 import org.guanzon.cas.parameter.Banks;
 import org.guanzon.cas.parameter.services.ParamControllers;
 import org.json.simple.JSONObject;
@@ -195,6 +196,10 @@ public class BanksController implements Initializable, ScreenInterface {
                         }
                         break;
                     case "btnActivate":
+                        if (oApp.getUserLevel() < UserRight.SYSADMIN) {
+                            ShowMessageFX.Warning("User is not allowed to "+btnActivate.getText().toLowerCase()+" this paramater.", "Computerized Acounting System", pxeModuleName);
+                            return;
+                        }
                         String id = oParameters.getModel().getBankID();
                         if (ShowMessageFX.YesNo(null, pxeModuleName, "Do you want to "+btnActivate.getText().toLowerCase()+" this Parameter?") == true) {
                             if(RecordStatus.ACTIVE.equals(oParameters.getModel().getRecordStatus())){
