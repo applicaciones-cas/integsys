@@ -39,12 +39,12 @@ import ph.com.guanzongroup.cas.cashflow.status.DisbursementStatic;
  * @author Team 1 & Team 2
  */
 public class CheckAssignmentController implements Initializable {
-    
+
     private GRiderCAS oApp;
     private JSONObject poJSON;
     private final String pxeModuleName = "Check Assignment";
     private DisbursementVoucher poController;
-    
+
     public int pnEditMode;
     private String psTransactionNo = "";
     private int currentTransactionIndex = 0;
@@ -66,21 +66,21 @@ public class CheckAssignmentController implements Initializable {
     private TextArea taRemarks;
     @FXML
     private CheckBox chbkApplyToAll;
-    
+
     private List<String> transactionNos;
-    
+
     public void setTransaction(List<String> transactionNos) {
         this.transactionNos = transactionNos;
     }
-    
+
     public void setGRider(GRiderCAS foValue) {
         oApp = foValue;
     }
-    
+
     public void setCheckPrinting(DisbursementVoucher foValue) {
         poController = foValue;
     }
-    
+
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         try {
@@ -102,7 +102,7 @@ public class CheckAssignmentController implements Initializable {
             ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
-    
+
     private void cmdButton_Click(ActionEvent event) {
         try {
             poJSON = new JSONObject();
@@ -169,7 +169,7 @@ public class CheckAssignmentController implements Initializable {
                     ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
                 }
             });
-    
+
     ChangeListener<Boolean> txtArea_Focus = JFXUtil.FocusListener(TextArea.class,
             (lsID, lsValue) -> {
                 switch (lsID) {
@@ -183,7 +183,7 @@ public class CheckAssignmentController implements Initializable {
                 }
             });
     boolean pbSuccess = true;
-    
+
     private void datepicker_Action(ActionEvent event) {
         poJSON = new JSONObject();
         JFXUtil.setJSONSuccess(poJSON, "success");
@@ -194,7 +194,7 @@ public class CheckAssignmentController implements Initializable {
             SimpleDateFormat sdfFormat = new SimpleDateFormat(SQLUtil.FORMAT_SHORT_DATE);
             LocalDate transactionDate = null, selectedDate = null;
             String lsTransDate = "", lsSelectedDate = "";
-            
+
             lsSelectedDate = sdfFormat.format(SQLUtil.toDate(JFXUtil.convertToIsoFormat(inputText), SQLUtil.FORMAT_SHORT_DATE));
             selectedDate = LocalDate.parse(lsSelectedDate, DateTimeFormatter.ofPattern(SQLUtil.FORMAT_SHORT_DATE));
             if (inputText == null || "".equals(inputText) || "01/01/1900".equals(inputText)) {
@@ -204,12 +204,12 @@ public class CheckAssignmentController implements Initializable {
                 case "dpCheckDate":
                     lsTransDate = sdfFormat.format(poController.Master().getTransactionDate());// get transaction date of dv
                     transactionDate = LocalDate.parse(lsTransDate, DateTimeFormatter.ofPattern(SQLUtil.FORMAT_SHORT_DATE));
-                    
+
                     if (selectedDate.isAfter(transactionDate)) {
                         JFXUtil.setJSONError(poJSON, "Check date cannot be later than the transaction date.");
                         pbSuccess = false;
                     }
-                    
+
                     if (pbSuccess) {
                         poJSON = poController.CheckPayments().getModel().setCheckDate((SQLUtil.toDate(lsSelectedDate, SQLUtil.FORMAT_SHORT_DATE)));
                     } else {
@@ -226,46 +226,45 @@ public class CheckAssignmentController implements Initializable {
             }
         }
     }
-    
+
     private void loadRecordMaster() {
-        boolean lbShow = poController.Master().getDisbursementType().equals(DisbursementStatic.DisbursementType.CHECK);
-        JFXUtil.setDisabled(lbShow, dpCheckDate);
-        
+        JFXUtil.setDisabled(true, dpCheckDate);
+
         tfDVNo.setText(poController.Master().getTransactionNo());
         tfCheckNo.setText(poController.CheckPayments().getModel().getCheckNo());
         dpCheckDate.setValue(CustomCommonUtil.parseDateStringToLocalDate(SQLUtil.dateFormat(poController.CheckPayments().getModel().getCheckDate(), SQLUtil.FORMAT_SHORT_DATE)));
         tfCheckAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Master().getNetTotal(), true));
         taRemarks.setText(poController.Master().getRemarks());
     }
-    
+
     private void initButtonsClickActions() {
         List<Button> buttons = Arrays.asList(btnAssign, btnPrintCheck, btnClose);
         buttons.forEach(button -> button.setOnAction(this::cmdButton_Click));
     }
-    
+
     private void initTextFields() {
         JFXUtil.setFocusListener(txtArea_Focus, taRemarks);
         JFXUtil.setFocusListener(txtMaster_Focus, tfDVNo, tfCheckNo);
-        
+
         JFXUtil.setCommaFormatter(tfCheckAmount);
         JFXUtil.inputIntegersOnly(tfCheckNo);
     }
-    
+
     private void initDatePicker() {
         JFXUtil.setDatePickerFormat("MM/dd/yyyy", dpCheckDate);
         JFXUtil.setActionListener(this::datepicker_Action, dpCheckDate);
     }
-    
+
     private void clearTextFields() {
         JFXUtil.clearTextFields(apMaster);
     }
-    
+
     private void initButton(int fnEditMode) {
         boolean lbShow = (fnEditMode == EditMode.UPDATE);
         JFXUtil.setDisabled(!lbShow, apMaster);
         JFXUtil.setButtonsVisibility(lbShow, btnAssign);
     }
-    
+
     private void assignAndProceed() {
         try {
             poJSON = poController.SaveTransaction();
@@ -297,7 +296,7 @@ public class CheckAssignmentController implements Initializable {
             isAutoProcessing = false;
         }
     }
-    
+
     private void loadTransaction(int index) {
         try {
             if (index >= transactionNos.size()) {
@@ -305,7 +304,7 @@ public class CheckAssignmentController implements Initializable {
                 CommonUtils.closeStage(btnClose);
                 return;
             }
-            
+
             psTransactionNo = transactionNos.get(index);
             poJSON = poController.OpenTransaction(psTransactionNo);
             if (!"success".equals((String) poJSON.get("result"))) {

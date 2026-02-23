@@ -2041,14 +2041,12 @@ public class DisbursementVoucher_VerificationController implements Initializable
 
     private void loadRecordMasterCheck() {
         try {
-            boolean lbShow = tabPanePaymentMode.getSelectionModel().getSelectedItem().equals("Check");
-            JFXUtil.setDisabled(lbShow, dpCheckDate);
 
             JFXUtil.setDisabled(true, tfCheckNo, tfCheckAmount);
             tfCheckNo.setText(poController.CheckPayments().getModel().getCheckNo());
-            if (JFXUtil.isObjectEqualTo(poController.CheckPayments().getModel().getCheckNo(), null, "")) {
-                poController.CheckPayments().getModel().setCheckDate(null);
-            }
+//            if (JFXUtil.isObjectEqualTo(poController.CheckPayments().getModel().getCheckNo(), null, "")) {
+//                poController.CheckPayments().getModel().setCheckDate(null);
+//            }
             dpCheckDate.setValue(poController.CheckPayments().getModel().getCheckDate() != null
                     ? CustomCommonUtil.parseDateStringToLocalDate(SQLUtil.dateFormat(poController.CheckPayments().getModel().getCheckDate(), SQLUtil.FORMAT_SHORT_DATE))
                     : null);
@@ -2080,6 +2078,12 @@ public class DisbursementVoucher_VerificationController implements Initializable
                     && poController.CheckPayments().getModel().getDesbursementMode().equals("1")
                     && poController.CheckPayments().getModel().getClaimant().equals("0");
             JFXUtil.setDisabled(!lbValidation03, tfAuthorizedPerson);
+
+            boolean lbShow = Logical.YES.equals(poController.Master().getBankPrint());
+            JFXUtil.setDisabled(lbShow, dpCheckDate);
+            if (lbShow) {
+                poController.CheckPayments().getModel().setCheckDate(null);
+            }
 
             JFXUtil.updateCaretPositions(apMasterDVCheck);
         } catch (SQLException | GuanzonException ex) {
@@ -2410,12 +2414,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
                             lsTransDate = sdfFormat.format(poController.Master().getTransactionDate());
                             transactionDate = LocalDate.parse(lsTransDate, DateTimeFormatter.ofPattern(SQLUtil.FORMAT_SHORT_DATE));
 
-                            if (selectedDate.isAfter(currentDate)) {
-                                JFXUtil.setJSONError(poJSON, "Future dates are not allowed.");
-                                pbSuccess = false;
-                            }
-
-                            if (pbSuccess && (selectedDate.isAfter(transactionDate))) {
+                            if (pbSuccess && (selectedDate.isBefore(transactionDate))) {
                                 JFXUtil.setJSONError(poJSON, "Check date cannot be later than the transaction date.");
                                 pbSuccess = false;
                             }
