@@ -74,7 +74,7 @@ public class RecurringExpenseController implements Initializable, ScreenInterfac
             initButton(pnEditMode);
 
             Platform.runLater(() -> {
-//                poController.getModel().setIndustryId(psIndustryId);
+                poController.getModel().setIndustryCode(psIndustryId);
 //                poController.getModel().setCompanyId(psCompanyId);
 //                poController.setIndustryId(psIndustryId);
 //                poController.setCompanyId(psCompanyId);
@@ -141,6 +141,8 @@ public class RecurringExpenseController implements Initializable, ScreenInterfac
                                 ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                 txtField.setText("");
                                 break;
+                            } else {
+                                JFXUtil.textFieldMoveNext(tfParticular);
                             }
                             break;
                         case "tfParticular":
@@ -149,6 +151,8 @@ public class RecurringExpenseController implements Initializable, ScreenInterfac
                                 ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                 txtField.setText("");
                                 break;
+                            } else {
+                                JFXUtil.textFieldMoveNext(cbFixAmount);
                             }
                             break;
 
@@ -166,25 +170,11 @@ public class RecurringExpenseController implements Initializable, ScreenInterfac
 
     ChangeListener<Boolean> txtBrowse_Focus = JFXUtil.FocusListener(TextField.class,
             (lsID, lsValue) -> {
-                try {
-                    switch (lsID) {
-                        case "tfSearchPayee":
-                            if (lsValue.isEmpty()) {
-                                if (!JFXUtil.isObjectEqualTo(pnEditMode, EditMode.ADDNEW, EditMode.UPDATE)) {
-//                                    poController.getModel().se("");
-                                    poController.initialize(); // Initialize transaction
-                                    poController.setRecordStatus("0123");
-                                }
-                            }
-                            break;
-                    }
-                    loadRecordSearch();
-                    loadRecordMaster();
-                    pnEditMode = poController.getEditMode();
-                    initButton(pnEditMode);
-                } catch (ExceptionInInitializerError | SQLException | GuanzonException ex) {
-                    Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
-                    ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
+                switch (lsID) {
+                    case "tfSearchPayee":
+                        if (lsValue.isEmpty()) {
+                        }
+                        break;
                 }
             });
 
@@ -319,12 +309,12 @@ public class RecurringExpenseController implements Initializable, ScreenInterfac
                         //Clear data
 //                        poController.resetMaster();
                         clearTextFields();
-
                         poJSON = poController.newRecord();
                         if ("error".equals((String) poJSON.get("result"))) {
                             ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                             return;
                         }
+                        poController.getModel().setIndustryCode(psIndustryId);
                         pnEditMode = poController.getEditMode();
                         break;
                     case "btnUpdate":
@@ -385,6 +375,7 @@ public class RecurringExpenseController implements Initializable, ScreenInterfac
                                 return;
                             } else {
                                 ShowMessageFX.Warning(null, pxeModuleName, "Record " + lsStat + "d successfully");
+                                clearTextFields();
                                 poController.initialize(); // Initialize transaction
                                 poController.setRecordStatus("0123");
                             }
