@@ -33,37 +33,37 @@
                      <children>
                         <HBox alignment="CENTER_LEFT" spacing="5.0" style="-fx-background-color: E9E9E9;" styleClass="button_process" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="5.0">
                            <children>
-                              <Button fx:id="btnBrowse" contentDisplay="TOP" graphicTextGap="3.0" layoutX="10.0" layoutY="10.0" maxHeight="70.0" mnemonicParsing="false" prefHeight="50.0" prefWidth="70.0" styleClass="button_process" stylesheets="@../css/StyleSheet.css" text="Browse">
+                              <Button fx:id="btnBrowse" contentDisplay="TOP" graphicTextGap="3.0" layoutX="10.0" layoutY="10.0" maxHeight="70.0" mnemonicParsing="false" onAction="#cmdButton_Click" prefHeight="50.0" prefWidth="70.0" styleClass="button_process" stylesheets="@../css/StyleSheet.css" text="Browse">
                                  <graphic>
                                     <FontAwesomeIconView glyphName="FOLDER_OPEN" size="20" styleClass="FontIcon" />
                                  </graphic>
                               </Button>
-                              <Button fx:id="btnNew" contentDisplay="TOP" graphicTextGap="3.0" maxHeight="70.0" mnemonicParsing="false" prefHeight="50.0" prefWidth="70.0" styleClass="button_process" stylesheets="@../css/StyleSheet.css" text="New">
+                              <Button fx:id="btnNew" contentDisplay="TOP" graphicTextGap="3.0" maxHeight="70.0" mnemonicParsing="false" onAction="#cmdButton_Click" prefHeight="50.0" prefWidth="70.0" styleClass="button_process" stylesheets="@../css/StyleSheet.css" text="New">
                                  <graphic>
                                     <FontAwesomeIconView glyphName="PLUS" size="20" styleClass="FontIcon" />
                                  </graphic>
                               </Button>
-                              <Button fx:id="btnSave" contentDisplay="TOP" graphicTextGap="3.0" maxHeight="70.0" mnemonicParsing="false" prefHeight="50.0" prefWidth="70.0" styleClass="button_process" stylesheets="@../css/StyleSheet.css" text="Save">
+                              <Button fx:id="btnSave" contentDisplay="TOP" graphicTextGap="3.0" maxHeight="70.0" mnemonicParsing="false" onAction="#cmdButton_Click" prefHeight="50.0" prefWidth="70.0" styleClass="button_process" stylesheets="@../css/StyleSheet.css" text="Save">
                                  <graphic>
                                     <FontAwesomeIconView glyphName="SAVE" size="20" styleClass="FontIcon" />
                                  </graphic>
                               </Button>
-                              <Button fx:id="btnUpdate" contentDisplay="TOP" graphicTextGap="3.0" maxHeight="70.0" mnemonicParsing="false" prefHeight="50.0" prefWidth="70.0" styleClass="button_process" stylesheets="@../css/StyleSheet.css" text="Update">
+                              <Button fx:id="btnUpdate" contentDisplay="TOP" graphicTextGap="3.0" maxHeight="70.0" mnemonicParsing="false" onAction="#cmdButton_Click" prefHeight="50.0" prefWidth="70.0" styleClass="button_process" stylesheets="@../css/StyleSheet.css" text="Update">
                                  <graphic>
                                     <FontAwesomeIconView glyphName="EDIT" size="20" styleClass="FontIcon" />
                                  </graphic>
                               </Button>
-                              <Button fx:id="btnCancel" contentDisplay="TOP" graphicTextGap="3.0" maxHeight="70.0" mnemonicParsing="false" prefHeight="50.0" prefWidth="70.0" styleClass="button_process" stylesheets="@../css/StyleSheet.css" text="Cancel">
+                              <Button fx:id="btnCancel" contentDisplay="TOP" graphicTextGap="3.0" maxHeight="70.0" mnemonicParsing="false" onAction="#cmdButton_Click" prefHeight="50.0" prefWidth="70.0" styleClass="button_process" stylesheets="@../css/StyleSheet.css" text="Cancel">
                                  <graphic>
                                     <FontAwesomeIconView glyphName="CLOSE" size="20" styleClass="FontIcon" />
                                  </graphic>
                               </Button>
-                              <Button fx:id="btnActivate" contentDisplay="TOP" graphicTextGap="3.0" maxHeight="70.0" mnemonicParsing="false" prefHeight="50.0" prefWidth="70.0" styleClass="button_process" stylesheets="@../css/StyleSheet.css" text="Activate">
+                              <Button fx:id="btnActivate" contentDisplay="TOP" graphicTextGap="3.0" maxHeight="70.0" mnemonicParsing="false" onAction="#cmdButton_Click" prefHeight="50.0" prefWidth="70.0" styleClass="button_process" stylesheets="@../css/StyleSheet.css" text="Activate">
                                  <graphic>
                                     <FontAwesomeIconView fx:id="faActivate" glyphName="CHECK" size="20" styleClass="FontIcon" />
                                  </graphic>
                               </Button>
-                              <Button fx:id="btnClose" contentDisplay="TOP" graphicTextGap="3.0" maxHeight="70.0" mnemonicParsing="false" prefHeight="50.0" prefWidth="70.0" styleClass="button_process" stylesheets="@../css/StyleSheet.css" text="Close">
+                              <Button fx:id="btnClose" contentDisplay="TOP" graphicTextGap="3.0" maxHeight="70.0" mnemonicParsing="false" onAction="#cmdButton_Click" prefHeight="50.0" prefWidth="70.0" styleClass="button_process" stylesheets="@../css/StyleSheet.css" text="Close">
                                  <graphic>
                                     <FontAwesomeIconView glyphName="POWER_OFF" size="20" styleClass="FontIcon" />
                                  </graphic>
@@ -77,7 +77,7 @@
                         </AnchorPane>
                     </bottom>
                     <center>
-                        <AnchorPane fx:id="AnchorInputs" maxWidth="550.0" prefWidth="650.0" BorderPane.alignment="CENTER_LEFT">
+                        <AnchorPane fx:id="apMaster" maxWidth="550.0" prefWidth="650.0" BorderPane.alignment="CENTER_LEFT">
                             <opaqueInsets>
                                 <Insets />
                             </opaqueInsets>
@@ -91,7 +91,7 @@
                                  <children>
                                     <GridPane AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                       <columnConstraints>
-                                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="155.0" minWidth="140.0" prefWidth="148.0" />
+                                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="140.0" minWidth="140.0" prefWidth="140.0" />
                                         <ColumnConstraints hgrow="SOMETIMES" minWidth="120.0" prefWidth="150.0" />
                                           <ColumnConstraints hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="200.0" />
                                           <ColumnConstraints hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="10.0" />
@@ -106,15 +106,7 @@
                                           <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="32.0" vgrow="SOMETIMES" />
                                       </rowConstraints>
                                        <children>
-                                                            <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Recurring ID">
-                                                                <GridPane.margin>
-                                                                    <Insets left="10.0" />
-                                                                </GridPane.margin>
-                                             <font>
-                                                <Font name="System Bold" size="12.0" />
-                                             </font>
-                                                            </Text>
-                                                            <Label contentDisplay="RIGHT" text="Payee" GridPane.rowIndex="1">
+                                       <Label contentDisplay="RIGHT" text="Payee" GridPane.rowIndex="1">
                                                                 <graphic>
                                                                     <Text fill="RED" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="Text2" text="*">
                                                                         <font>
@@ -126,18 +118,7 @@
                                                                     <Insets left="10.0" />
                                                                 </GridPane.margin>
                                                             </Label>
-                                                            <CheckBox fx:id="cbActive" disable="true" mnemonicParsing="false" selected="true" text="Active" GridPane.columnIndex="1" GridPane.rowIndex="6" GridPane.valignment="BOTTOM">
-                                                                <font>
-                                                                    <Font size="14.0" />
-                                                                </font>
-                                                                <GridPane.margin>
-                                                                    <Insets />
-                                                                </GridPane.margin>
-                                             <padding>
-                                                <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-                                             </padding>
-                                                            </CheckBox>
-                                          <Label contentDisplay="RIGHT" layoutX="20.0" layoutY="45.0" text="Particular" GridPane.rowIndex="2">
+                                                        <Label contentDisplay="RIGHT" layoutX="20.0" layoutY="45.0" text="Particular" GridPane.rowIndex="2">
                                              <graphic>
                                                 <Text fill="RED" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="Text2" text="*">
                                                    <font>
@@ -149,7 +130,7 @@
                                                 <Insets left="10.0" />
                                              </GridPane.margin>
                                           </Label>
-                                          <Label contentDisplay="RIGHT" text="Remarks" GridPane.rowIndex="4">
+                                                        <Label contentDisplay="RIGHT" text="Remarks" GridPane.rowIndex="4">
                                              <graphic>
                                                 <Text fill="RED" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="Text2">
                                                    <font>
@@ -161,13 +142,32 @@
                                                 <Insets left="10.0" />
                                              </GridPane.margin>
                                           </Label>
-                                          <TextArea fx:id="taRemarks" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="4" GridPane.rowSpan="2" />
-                                          <CheckBox fx:id="cbFixAmount" mnemonicParsing="false" text="Fix Amount" GridPane.columnIndex="1" GridPane.rowIndex="3" />
-                                          <CheckBox fx:id="cbAllBranches" layoutX="175.0" layoutY="107.0" mnemonicParsing="false" text="All Branches" GridPane.columnIndex="2" GridPane.rowIndex="3" />
-                                          <TextField fx:id="tfRecurringID" editable="false" GridPane.columnIndex="1" />
-                                          <TextField fx:id="tfPayee" promptText="Press F3: Search" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="1" />
-                                          <TextField fx:id="tfParticular" promptText="Press F3: Search" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="2" />
-                                       </children>
+                                                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Recurring ID">
+                                                                <GridPane.margin>
+                                                                    <Insets left="10.0" />
+                                                                </GridPane.margin>
+                                             <font>
+                                                <Font name="System Bold" size="12.0" />
+                                             </font>
+                                                            </Text>
+                                                        <TextField fx:id="tfRecurringID" editable="false" GridPane.columnIndex="1" />
+                                                        <TextField fx:id="tfPayee" promptText="Press F3: Search" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="1" />
+                                                        <TextField fx:id="tfParticular" promptText="Press F3: Search" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="2" />
+                                                        <CheckBox fx:id="cbFixAmount" mnemonicParsing="false" onAction="#cmdCheckBox_Click" text="Fix Amount" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                                                        <TextArea fx:id="taRemarks" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="4" GridPane.rowSpan="2" />
+                                                        <CheckBox fx:id="cbActive" disable="true" mnemonicParsing="false" selected="true" text="Active" GridPane.columnIndex="1" GridPane.rowIndex="6" GridPane.valignment="BOTTOM">
+                                                                <font>
+                                                                    <Font size="14.0" />
+                                                                </font>
+                                                                <GridPane.margin>
+                                                                    <Insets />
+                                                                </GridPane.margin>
+                                             <padding>
+                                                <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                             </padding>
+                                                            </CheckBox>
+                                                        <CheckBox fx:id="cbAllBranches" layoutX="175.0" layoutY="107.0" mnemonicParsing="false" onAction="#cmdCheckBox_Click" text="All Branches" GridPane.columnIndex="2" GridPane.rowIndex="3" />
+                                                    </children>
                                     </GridPane>
                                  </children>
                               </AnchorPane>
@@ -184,7 +184,7 @@
                      <children>
                         <VBox AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                            <children>
-                              <AnchorPane style="-fx-background-color: A0A0A0;">
+                              <AnchorPane fx:id="apBrowse" style="-fx-background-color: A0A0A0;">
                                  <children>
                                     <GridPane prefHeight="45.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                        <columnConstraints>
@@ -198,7 +198,12 @@
                                           <RowConstraints minHeight="10.0" prefHeight="26.0" vgrow="SOMETIMES" />
                                        </rowConstraints>
                                        <children>
-                                          <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Payee" GridPane.halignment="LEFT">
+                                       <Label fx:id="lblSource" text="Industry" GridPane.columnIndex="3">
+                                             <font>
+                                                <Font name="System Bold" size="14.0" />
+                                             </font>
+                                          </Label>
+                                                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Payee" GridPane.halignment="LEFT">
                                              <font>
                                                 <Font name="System Bold" size="14.0" />
                                              </font>
@@ -206,13 +211,8 @@
                                                 <Insets left="30.0" />
                                              </GridPane.margin>
                                           </Text>
-                                          <TextField fx:id="tfSearchPayee" promptText="Press F3: Search" GridPane.columnIndex="1" />
-                                          <Label fx:id="lblSource" text="Industry" GridPane.columnIndex="3">
-                                             <font>
-                                                <Font name="System Bold" size="14.0" />
-                                             </font>
-                                          </Label>
-                                       </children>
+                                                        <TextField fx:id="tfSearchPayee" promptText="Press F3: Search" GridPane.columnIndex="1" />
+                                                    </children>
                                     </GridPane>
                                     <Separator minHeight="5.0" style="-fx-background-color: FF8201;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" />
                                  </children>
