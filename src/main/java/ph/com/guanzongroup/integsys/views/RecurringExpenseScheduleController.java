@@ -249,7 +249,8 @@ public class RecurringExpenseScheduleController implements Initializable, Screen
 //                            pbEnteredDV = false;
                             details_data.clear();
                             if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
-                                poController.ReloadDetail();
+//                                poController.ReloadDetail();
+                                poJSON = poController.populateDetail();
 //                                poJSON = poController.computeDetailFields(true);
                                 if ("error".equals((String) poJSON.get("result"))) {
                                     ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
@@ -272,8 +273,6 @@ public class RecurringExpenseScheduleController implements Initializable, Screen
                                                 String.valueOf(poController.Detail(lnCtr).isActive())
                                         ));
                             }
-//                            JFXUtil.showRetainedHighlight(false, tblViewMainList, "#A7C7E7", plOrderNoPartial, plOrderNoFinal, highlightedRowsMain, true);
-//                            loadHighlightFromDetail();
 
                             int lnTempRow = JFXUtil.getDetailRow(details_data, pnDetail, 11); //this method is used only when Reverse is applied
                             if (lnTempRow < 0 || lnTempRow
@@ -394,6 +393,8 @@ public class RecurringExpenseScheduleController implements Initializable, Screen
                                 ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                 loadRecordMaster();
                                 break;
+                            } else {
+                                JFXUtil.textFieldMoveNext(tfParticular);
                             }
                             loadRecordMaster();
                             break;
@@ -417,14 +418,27 @@ public class RecurringExpenseScheduleController implements Initializable, Screen
                                 ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                 loadRecordMaster();
                                 break;
+                            } else {
+                                JFXUtil.textFieldMoveNext(tfBranchName);
                             }
                             loadRecordMaster();
+                            break;
+                        case "tfBranchName":
+                            poJSON = poController.SearchBranch(lsValue, false, pnDetail);
+                            if (!JFXUtil.isJSONSuccess(poJSON)) {
+                                ShowMessageFX.Warning(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
+                                txtField.setText("");
+                            } else {
+                                JFXUtil.textFieldMoveNext(tfAccountNo);
+                            }
                             break;
                         case "tfDeparment":
                             poJSON = poController.SearchDepartment(lsValue, false, pnDetail);
                             if (!JFXUtil.isJSONSuccess(poJSON)) {
                                 ShowMessageFX.Warning(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
                                 txtField.setText("");
+                            } else {
+                                JFXUtil.textFieldMoveNext(tfEmployee);
                             }
                             break;
                         case "tfEmployee":
@@ -432,16 +446,11 @@ public class RecurringExpenseScheduleController implements Initializable, Screen
                             if (!JFXUtil.isJSONSuccess(poJSON)) {
                                 ShowMessageFX.Warning(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
                                 txtField.setText("");
+                            } else {
+                                JFXUtil.textFieldMoveNext(cmbAccountable);
                             }
                             break;
-                        case "tfBranchName":
-                            poJSON = poController.SearchBranch(lsValue, false, pnDetail);
-                            if (!JFXUtil.isJSONSuccess(poJSON)) {
-                                ShowMessageFX.Warning(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
-                                txtField.setText("");
-                            }
 
-                            break;
                     }
                     JFXUtil.runWithDelay(.50, () -> {
                         loadTableDetail.reload();
@@ -674,6 +683,22 @@ public class RecurringExpenseScheduleController implements Initializable, Screen
 
                 switch (datePicker.getId()) {
                     case "dpDateFrom":
+                        if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
+//                            if (pbSuccess && (selectedDate.isBefore(transactionDate))) {
+//                                JFXUtil.setJSONError(poJSON, "Check date cannot be before the transaction date.");
+//                                pbSuccess = false;
+//                            }
+                            if (pbSuccess) {
+                                poController.Detail(pnDetail).setDateFrom((SQLUtil.toDate(lsSelectedDate, SQLUtil.FORMAT_SHORT_DATE)));
+                            } else {
+                                if ("error".equals((String) poJSON.get("result"))) {
+                                    ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                                }
+                            }
+                            pbSuccess = false; //Set to false to prevent multiple message box
+                            loadRecordMaster();
+                            pbSuccess = true; //Set to original value
+                        }
                         break;
                     default:
                         break;
