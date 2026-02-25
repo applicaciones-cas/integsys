@@ -126,7 +126,7 @@ public class RecurringExpenseController implements Initializable, ScreenInterfac
                     break;
                 case F3:
                     switch (lsID) {
-                        case "tfPayee":
+                        case "tfSearchPayee":
                             poJSON = poController.searchRecord(lsValue, false);
                             if ("error".equals(poJSON.get("result"))) {
                                 ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
@@ -135,22 +135,23 @@ public class RecurringExpenseController implements Initializable, ScreenInterfac
                             }
                             loadRecordSearch();
                             break;
+                        case "tfPayee":
+                            poJSON = poController.SearchPayee(lsValue, false);
+                            if ("error".equals(poJSON.get("result"))) {
+                                ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                                txtField.setText("");
+                                break;
+                            }
+                            break;
                         case "tfParticular":
-                            poJSON = poController.searchRecord(lsValue, false);
+                            poJSON = poController.SearchParticular(lsValue, false);
                             if ("error".equals(poJSON.get("result"))) {
                                 ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                 txtField.setText("");
                                 break;
                             }
                             break;
-                        case "tfSearchDescription":
-                            poJSON = poController.searchRecord(lsValue, false);
-                            if ("error".equals(poJSON.get("result"))) {
-                                ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-                                txtField.setText("");
-                                break;
-                            }
-                            break;
+
                     }
                     loadRecordMaster();
                     pnEditMode = poController.getEditMode();
@@ -159,7 +160,6 @@ public class RecurringExpenseController implements Initializable, ScreenInterfac
             }
         } catch (ExceptionInInitializerError | SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
-            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
             ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
@@ -184,7 +184,6 @@ public class RecurringExpenseController implements Initializable, ScreenInterfac
                     initButton(pnEditMode);
                 } catch (ExceptionInInitializerError | SQLException | GuanzonException ex) {
                     Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
-                    ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
                     ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
                 }
             });
@@ -275,7 +274,7 @@ public class RecurringExpenseController implements Initializable, ScreenInterfac
         try {
             tfRecurringID.setText(poController.getModel().getRecurringId());
             tfPayee.setText(poController.getModel().Payee().getPayeeName());
-            tfParticular.setText(poController.getModel().getRemarks());
+            tfParticular.setText(poController.getModel().Particular().getDescription());
             taRemarks.setText(poController.getModel().getRemarks());
 
             cbFixAmount.setSelected(poController.getModel().isFixAmount());
