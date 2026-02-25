@@ -89,7 +89,7 @@ public class RecurringExpenseScheduleController implements Initializable, Screen
         try {
             poJSON = new JSONObject();
             poController = new CashflowControllers(oApp, null).RecurringExpenseSchedule();
-            poController.InitTransaction(); // Initialize transaction
+            poController.initialize();// Initialize transaction
 //            poController.setRecordStatus("0123");
 
             initTextFields();
@@ -149,7 +149,7 @@ public class RecurringExpenseScheduleController implements Initializable, Screen
                 switch (lsButton) {
                     case "btnBrowse":
 //                        poController.setTransactionStatus(PurchaseOrderReceivingStatus.RETURNED + "" + PurchaseOrderReceivingStatus.OPEN);
-                        poJSON = poController.searchTransaction("", false);
+                        poJSON = poController.searchRecord("", false);
                         if ("error".equalsIgnoreCase((String) poJSON.get("result"))) {
                             ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
 //                            tfTransactionNo.requestFocus();
@@ -170,14 +170,12 @@ public class RecurringExpenseScheduleController implements Initializable, Screen
 //                        poController.resetOthers();
                         poController.Detail().clear();
                         clearTextFields();
-
+                        poController.initFields();
                         poJSON = poController.NewTransaction();
                         if ("error".equals((String) poJSON.get("result"))) {
                             ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                             return;
                         }
-
-                        poController.initFields();
                         pnEditMode = poController.getEditMode();
                         break;
                     case "btnUpdate":
@@ -246,10 +244,9 @@ public class RecurringExpenseScheduleController implements Initializable, Screen
                 () -> {
                     Platform.runLater(() -> {
                         try {
-//                            pbEnteredDV = false;
                             details_data.clear();
                             if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
-//                                poController.ReloadDetail();
+                                poController.ReloadDetail();
                                 poJSON = poController.populateDetail();
 //                                poJSON = poController.computeDetailFields(true);
                                 if ("error".equals((String) poJSON.get("result"))) {
@@ -274,21 +271,18 @@ public class RecurringExpenseScheduleController implements Initializable, Screen
                                         ));
                             }
 
-                            int lnTempRow = JFXUtil.getDetailRow(details_data, pnDetail, 11); //this method is used only when Reverse is applied
-                            if (lnTempRow < 0 || lnTempRow
+                            if (pnDetail < 0 || pnDetail
                                     >= details_data.size()) {
                                 if (!details_data.isEmpty()) {
                                     /* FOCUS ON FIRST ROW */
                                     JFXUtil.selectAndFocusRow(tblViewDetail, 0);
-                                    int lnRow = Integer.parseInt(details_data.get(0).getIndex11());
+                                    int lnRow = 0;
                                     pnDetail = lnRow;
                                     loadRecordDetail();
                                 }
                             } else {
                                 /* FOCUS ON THE ROW THAT pnDetailBIR POINTS TO */
-                                JFXUtil.selectAndFocusRow(tblViewDetail, lnTempRow);
-                                int lnRow = Integer.parseInt(details_data.get(tblViewDetail.getSelectionModel().getSelectedIndex()).getIndex11());
-                                pnDetail = lnRow;
+                                JFXUtil.selectAndFocusRow(tblViewDetail, pnDetail);
                                 loadRecordDetail();
                             }
                             loadRecordMaster();
@@ -363,7 +357,7 @@ public class RecurringExpenseScheduleController implements Initializable, Screen
                 case F3:
                     switch (lsID) {
                         case "tfSearchPayee":
-                            poJSON = poController.searchTransaction(lsValue, false);
+                            poJSON = poController.searchRecord(tfSearchPayee.getText(), false);
                             if (!JFXUtil.isJSONSuccess(poJSON)) {
                                 ShowMessageFX.Warning(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
                                 txtField.setText("");
@@ -740,6 +734,7 @@ public class RecurringExpenseScheduleController implements Initializable, Screen
         JFXUtil.setColumnLeft(tblDetailRow, tblDetailBranch, tblDetailExcluded, tblDetailStatus);
         JFXUtil.setColumnRight(tblDetailAmount);
         JFXUtil.setColumnsIndexAndDisableReordering(tblViewDetail);
+        tblViewDetail.setItems(details_data);
     }
 
     private void initTableOnClick() {

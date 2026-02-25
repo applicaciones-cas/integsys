@@ -276,8 +276,8 @@
                                        <children>
                                           <TableView fx:id="tblViewDetail" prefHeight="200.0" prefWidth="200.0">
                                             <columns>
-                                              <TableColumn fx:id="tblDetailRow" maxWidth="28.0" minWidth="28.0" prefWidth="28.0" text="No." />
-                                              <TableColumn fx:id="tblDetailBranch" maxWidth="232.0" minWidth="232.0" prefWidth="232.0" text="Branch" />
+                                              <TableColumn fx:id="tblDetailRow" maxWidth="30.0" minWidth="30.0" prefWidth="30.0" text="No." />
+                                              <TableColumn fx:id="tblDetailBranch" maxWidth="232.0" minWidth="-1.0" prefWidth="232.0" text="Branch" />
                                                 <TableColumn fx:id="tblDetailAccountNo" maxWidth="182.0" minWidth="182.0" prefWidth="182.0" text="Account No" />
                                                 <TableColumn fx:id="tblDetailAmount" maxWidth="142.0" minWidth="142.0" prefWidth="142.0" text="Amount" />
                                                 <TableColumn fx:id="tblDetailExcluded" maxWidth="77.0" minWidth="77.0" prefWidth="77.0" text="Excluded" />
@@ -342,7 +342,6 @@
     </children>
    <stylesheets>
       <URL value="@../css/StyleSheet.css" />
-      <URL value="@../css/MainPanelStyle.css" />
       <URL value="@../css/Tables.css" />
    </stylesheets>
 </AnchorPane>

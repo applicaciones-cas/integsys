@@ -228,7 +228,6 @@
     </children>
    <stylesheets>
       <URL value="@../css/StyleSheet.css" />
-      <URL value="@../css/MainPanelStyle.css" />
       <URL value="@../css/Tables.css" />
    </stylesheets>
 </AnchorPane>
