@@ -52,24 +52,24 @@
                                   <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="28.0" vgrow="SOMETIMES" />
                                 </rowConstraints>
                                  <children>
-                                    <Label text="Destination">
+                                    <Label text="Destination" visible="false">
                                        <font>
                                           <Font name="System Bold" size="14.0" />
                                        </font>
                                     </Label>
-                                    <Label text="Transaction No" GridPane.columnIndex="4">
+                                    <Label text="Transaction No" visible="false" GridPane.columnIndex="4">
                                        <font>
                                           <Font name="System Bold" size="14.0" />
                                        </font>
                                     </Label>
-                                    <TextField fx:id="tfSearchDestination" promptText="Press F3: Search" GridPane.columnIndex="2" />
-                                    <TextField fx:id="tfSearchTransNo" promptText="Press F3: Search" GridPane.columnIndex="6" />
-                                    <Label text="Date" GridPane.columnIndex="8">
+                                    <TextField fx:id="tfSearchDestination" promptText="Press F3: Search" visible="false" GridPane.columnIndex="2" />
+                                    <TextField fx:id="tfSearchTransNo" promptText="Press F3: Search" visible="false" GridPane.columnIndex="6" />
+                                    <Label text="Date" visible="false" GridPane.columnIndex="8">
                                        <font>
                                           <Font name="System Bold" size="14.0" />
                                        </font>
                                     </Label>
-                                    <DatePicker fx:id="dpSearchTransactionDate" editable="false" GridPane.columnIndex="10" />
+                                    <DatePicker fx:id="dpSearchTransactionDate" editable="false" visible="false" GridPane.columnIndex="10" />
                                  </children>
                               </GridPane>
                               <Label fx:id="lblSource" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" text="Industry" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="0.0">
@@ -430,7 +430,7 @@
                                                       <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
                                                    </columnResizePolicy>
                                               </TableView>
-                                                <TextField fx:id="tfFilterBank" maxHeight="25.0" promptText="Press F3: Search" GridPane.columnIndex="2" GridPane.columnSpan="4" GridPane.rowIndex="2" />
+                                                <TextField fx:id="tfFilterBank" maxHeight="25.0" GridPane.columnIndex="2" GridPane.columnSpan="4" GridPane.rowIndex="2" />
                                                 <DatePicker fx:id="dpFilterFrom" editable="false" GridPane.columnIndex="2" GridPane.rowIndex="3" />
                                                 <DatePicker fx:id="dpFilterThru" editable="false" GridPane.columnIndex="5" GridPane.rowIndex="3" />
                                                 <Label alignment="CENTER_RIGHT" maxWidth="1.7976931348623157E308" text="Date From" GridPane.rowIndex="3">

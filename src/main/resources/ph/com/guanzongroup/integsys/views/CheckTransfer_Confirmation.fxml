@@ -22,7 +22,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane fx:id="apMainAnchor" prefHeight="789.0" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane fx:id="AnchorMain" prefHeight="789.0" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1">
     <children>
     <StackPane AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
             <children>
@@ -83,11 +83,11 @@
                         </AnchorPane>
                     </top>
                     <bottom>
-                        <AnchorPane fx:id="apButton" BorderPane.alignment="CENTER">
+                        <AnchorPane fx:id="apButton" prefHeight="80.0" BorderPane.alignment="CENTER">
                             <children>
                                 <HBox alignment="CENTER_LEFT" spacing="5.0" style="-fx-background-color: E9E9E9;" styleClass="button_process" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                     <children>
-                              <Button fx:id="btnSearch" contentDisplay="TOP" ellipsisString="" layoutX="185.0" layoutY="15.0" mnemonicParsing="false" onAction="#cmdButton_Click" prefHeight="70.0" prefWidth="70.0" styleClass="button_process" text="Search">
+                              <Button fx:id="btnSearch" contentDisplay="TOP" ellipsisString="" layoutX="185.0" layoutY="15.0" mnemonicParsing="false" prefHeight="70.0" prefWidth="70.0" styleClass="button_process" text="Search">
                                  <effect>
                                     <Blend />
                                  </effect>
@@ -98,18 +98,18 @@
                                     <Font size="12.0" />
                                  </font>
                               </Button>
-                              <Button fx:id="btnBrowse" contentDisplay="TOP" ellipsisString="" layoutX="15.0" layoutY="15.0" mnemonicParsing="false" onAction="#cmdButton_Click" prefHeight="70.0" prefWidth="70.0" styleClass="button_process" text="Browse">
+                              <Button fx:id="btnBrowse" contentDisplay="TOP" ellipsisString="" layoutX="15.0" layoutY="15.0" mnemonicParsing="false" prefHeight="70.0" prefWidth="70.0" styleClass="button_process" text="Browse">
                                  <effect>
                                     <Blend />
                                  </effect>
                                  <graphic>
-                                    <FontAwesomeIconView glyphName="SEARCH" size="20" />
+                                    <FontAwesomeIconView glyphName="FOLDER_OPEN" size="20" />
                                  </graphic>
                                  <font>
                                     <Font size="12.0" />
                                  </font>
                               </Button>
-                              <Button fx:id="btnUpdate" contentDisplay="TOP" ellipsisString="" mnemonicParsing="false" onAction="#cmdButton_Click" prefHeight="70.0" prefWidth="70.0" styleClass="button_process" text="Update">
+                              <Button fx:id="btnUpdate" contentDisplay="TOP" ellipsisString="" mnemonicParsing="false" prefHeight="70.0" prefWidth="70.0" styleClass="button_process" text="Update">
                                  <effect>
                                     <Blend />
                                  </effect>
@@ -120,7 +120,7 @@
                                     <Font size="12.0" />
                                  </font>
                               </Button>
-                              <Button fx:id="btnSave" contentDisplay="TOP" ellipsisString="" layoutX="100.0" layoutY="15.0" mnemonicParsing="false" onAction="#cmdButton_Click" prefHeight="70.0" prefWidth="70.0" styleClass="button_process" text="Save">
+                              <Button fx:id="btnSave" contentDisplay="TOP" ellipsisString="" layoutX="100.0" layoutY="15.0" mnemonicParsing="false" prefHeight="70.0" prefWidth="70.0" styleClass="button_process" text="Save">
                                  <effect>
                                     <Blend />
                                  </effect>
@@ -131,7 +131,7 @@
                                     <Font size="12.0" />
                                  </font>
                               </Button>
-                              <Button fx:id="btnPrint" contentDisplay="TOP" ellipsisString="" mnemonicParsing="false" onAction="#cmdButton_Click" prefHeight="70.0" prefWidth="70.0" styleClass="button_process" stylesheets="@../css/StyleSheet.css" text="Print">
+                              <Button fx:id="btnPrint" contentDisplay="TOP" ellipsisString="" mnemonicParsing="false" prefHeight="70.0" prefWidth="70.0" styleClass="button_process" stylesheets="@../css/StyleSheet.css" text="Print">
                                  <effect>
                                     <Blend />
                                  </effect>
@@ -142,7 +142,7 @@
                                     <Font size="12.0" />
                                  </font>
                               </Button>
-                              <Button fx:id="btnApprove" contentDisplay="TOP" ellipsisString="" mnemonicParsing="false" onAction="#cmdButton_Click" prefHeight="70.0" prefWidth="70.0" styleClass="button_process" stylesheets="@../css/StyleSheet.css" text="Confirm">
+                              <Button fx:id="btnApprove" contentDisplay="TOP" ellipsisString="" mnemonicParsing="false" prefHeight="70.0" prefWidth="70.0" styleClass="button_process" stylesheets="@../css/StyleSheet.css" text="Confirm">
                                  <effect>
                                     <Blend />
                                  </effect>
@@ -153,7 +153,7 @@
                                     <Font size="12.0" />
                                  </font>
                               </Button>
-                              <Button fx:id="btnVoid" contentDisplay="TOP" ellipsisString="" mnemonicParsing="false" onAction="#cmdButton_Click" prefHeight="70.0" prefWidth="70.0" styleClass="button_process" stylesheets="@../css/StyleSheet.css" text="Void">
+                              <Button fx:id="btnVoid" contentDisplay="TOP" ellipsisString="" mnemonicParsing="false" prefHeight="70.0" prefWidth="70.0" styleClass="button_process" stylesheets="@../css/StyleSheet.css" text="Void">
                                  <effect>
                                     <Blend />
                                  </effect>
@@ -164,7 +164,7 @@
                                     <Font size="12.0" />
                                  </font>
                               </Button>
-                              <Button fx:id="btnCancel" contentDisplay="TOP" ellipsisString="" layoutX="185.0" layoutY="15.0" mnemonicParsing="false" onAction="#cmdButton_Click" prefHeight="70.0" prefWidth="70.0" styleClass="button_process" text="Cancel">
+                              <Button fx:id="btnCancel" contentDisplay="TOP" ellipsisString="" layoutX="185.0" layoutY="15.0" mnemonicParsing="false" prefHeight="70.0" prefWidth="70.0" styleClass="button_process" text="Cancel">
                                  <effect>
                                     <Blend />
                                  </effect>
@@ -175,7 +175,7 @@
                                     <Font size="12.0" />
                                  </font>
                               </Button>
-                              <Button fx:id="btnRetrieve" contentDisplay="TOP" ellipsisString="" layoutX="695.0" layoutY="15.0" mnemonicParsing="false" onAction="#cmdButton_Click" prefHeight="70.0" prefWidth="70.0" styleClass="button_process" text="Retrieve">
+                              <Button fx:id="btnRetrieve" contentDisplay="TOP" ellipsisString="" layoutX="695.0" layoutY="15.0" mnemonicParsing="false" prefHeight="70.0" prefWidth="70.0" styleClass="button_process" text="Retrieve">
                                  <graphic>
                                     <FontAwesomeIconView glyphName="LIST_ALT" size="20" />
                                  </graphic>
@@ -186,7 +186,7 @@
                                     <Font size="12.0" />
                                  </font>
                               </Button>
-                                        <Button fx:id="btnClose" contentDisplay="TOP" ellipsisString="" mnemonicParsing="false" onAction="#cmdButton_Click" prefHeight="70.0" prefWidth="70.0" styleClass="button_process" text="Close">
+                                        <Button fx:id="btnClose" contentDisplay="TOP" ellipsisString="" mnemonicParsing="false" prefHeight="70.0" prefWidth="70.0" styleClass="button_process" text="Close">
                                             <graphic>
                                                 <FontAwesomeIconView glyphName="POWER_OFF" size="20" />
                                             </graphic>
@@ -346,9 +346,9 @@
                                                             <Font name="System Bold" size="14.0" />
                                                          </font>
                                                       </Label>
-                                                      <TextField fx:id="tfPayee" maxHeight="25.0" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.rowIndex="2" />
-                                                      <TextField fx:id="tfBank" alignment="TOP_LEFT" maxHeight="1.7976931348623157E308" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.rowIndex="1" />
-                                                      <TextField fx:id="tfCheckAmount" alignment="CENTER_RIGHT" promptText="0.0000" GridPane.columnIndex="7" GridPane.columnSpan="2" GridPane.rowIndex="2" />
+                                                      <TextField fx:id="tfPayee" editable="false" maxHeight="25.0" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.rowIndex="2" />
+                                                      <TextField fx:id="tfBank" alignment="TOP_LEFT" editable="false" maxHeight="1.7976931348623157E308" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.rowIndex="1" />
+                                                      <TextField fx:id="tfCheckAmount" alignment="CENTER_RIGHT" editable="false" promptText="0.0000" GridPane.columnIndex="7" GridPane.columnSpan="2" GridPane.rowIndex="2" />
                                                       <Label text="Check Reference">
                                                          <font>
                                                             <Font size="12.0" />
@@ -372,15 +372,15 @@
                                                             <Font size="12.0" />
                                                          </font>
                                                       </Label>
-                                                      <TextField fx:id="tfNote" maxHeight="25.0" GridPane.columnIndex="2" GridPane.columnSpan="7" GridPane.rowIndex="3" />
-                                                      <CheckBox fx:id="cbReverse" mnemonicParsing="false" nodeOrientation="RIGHT_TO_LEFT" onAction="#cmdCheckBox_Click" prefHeight="10.0" prefWidth="62.0" text="Reverse" textAlignment="RIGHT" GridPane.columnIndex="7" GridPane.rowIndex="4" />
+                                                      <TextField fx:id="tfNote" editable="false" maxHeight="25.0" GridPane.columnIndex="2" GridPane.columnSpan="7" GridPane.rowIndex="3" />
+                                                      <CheckBox fx:id="cbReverse" mnemonicParsing="false" nodeOrientation="RIGHT_TO_LEFT" prefHeight="10.0" prefWidth="62.0" text="Reverse" textAlignment="RIGHT" GridPane.columnIndex="7" GridPane.rowIndex="4" />
                                                    </children>
                                                 </GridPane>
                                              </children>
                                   </AnchorPane>
                                           <AnchorPane maxWidth="1.7976931348623157E308" style="-fx-border-color: FF8201;" VBox.vgrow="ALWAYS">
                                              <children>
-                                                <TableView fx:id="tblViewDetails" layoutX="8.0" layoutY="8.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" onMouseClicked="#ontblDetailClicked" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="5.0">
+                                                <TableView fx:id="tblViewDetails" layoutX="8.0" layoutY="8.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="5.0">
                                                   <columns>
                                               <TableColumn fx:id="tblColDetailNo" editable="false" maxWidth="30.0" minWidth="30.0" prefWidth="-1.0" resizable="false" sortable="false" style="-fx-font-size: 12;" text="No." />
                                               <TableColumn fx:id="tblColDetailReference" editable="false" maxWidth="120.0" minWidth="120.0" prefWidth="120.0" resizable="false" sortable="false" style="-fx-font-size: 12;" text="Reference No." />
@@ -435,7 +435,7 @@
                                                       <Insets left="5.0" right="5.0" top="5.0" />
                                                   </GridPane.margin>
                                               </AnchorPane>
-                                              <TableView fx:id="tblViewMaster" onMouseClicked="#ontblMasterClicked" GridPane.columnSpan="2147483647" GridPane.rowIndex="2">
+                                              <TableView fx:id="tblViewMaster" GridPane.columnSpan="2147483647" GridPane.rowIndex="2">
                                                   <columns>
                                                       <TableColumn fx:id="tblColNo" editable="false" maxWidth="30.0" minWidth="30.0" prefWidth="30.0" resizable="false" sortable="false" style="-fx-font-size: 12;" text="No." />
                                                       <TableColumn fx:id="tblColTransNo" editable="false" maxWidth="120.0" minWidth="120.0" prefWidth="120.0" resizable="false" sortable="false" style="-fx-font-size: 12;" text="Transaction No." />
@@ -471,7 +471,7 @@
         </StackPane>
     </children>
    <stylesheets>
-      <URL value="@000MNVProject/CAS%20IntegSys%20JavaMaven/gcas/src/main/resources/com/rmj/guanzongroup/sidebarmenus/css/Tables.css" />
       <URL value="@../css/StyleSheet.css" />
+      <URL value="@../css/Tables.css" />
    </stylesheets>
 </AnchorPane>
