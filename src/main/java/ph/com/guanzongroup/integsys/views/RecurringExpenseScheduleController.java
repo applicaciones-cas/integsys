@@ -247,19 +247,9 @@ public class RecurringExpenseScheduleController implements Initializable, Screen
                             details_data.clear();
                             if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
                                 poController.ReloadDetail();
-                                poJSON = poController.populateDetail();
-//                                poJSON = poController.computeDetailFields(true);
-                                if ("error".equals((String) poJSON.get("result"))) {
-                                    ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-                                }
                             }
                             int lnRowCount = 0;
                             for (int lnCtr = 0; lnCtr < poController.getDetailCount(); lnCtr++) {
-//                                if (poController.Detail(lnCtr).getSourceNo() != null && !"".equals(poController.Detail(lnCtr).getSourceNo())) {
-//                                    if (poController.Detail(lnCtr).getAmountApplied() == 0.0000 && poController.Detail(lnCtr).getEditMode() != EditMode.ADDNEW) {
-//                                        continue;
-//                                    }
-//                                }
                                 lnRowCount += 1;
                                 details_data.add(
                                         new ModelRecurringExpenseSchedule_Detail(String.valueOf(lnRowCount),
@@ -369,10 +359,10 @@ public class RecurringExpenseScheduleController implements Initializable, Screen
                             break;
                         case "tfPayee":
                             if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
-                                if (poController.getDetailCount() > 1) {
+                                if (poController.getDetailCount() > 1 && !JFXUtil.isObjectEqualTo(poController.Detail(0).getBranchCode(), null, "")) {
                                     pbKeyPressed = true;
                                     if (ShowMessageFX.YesNo(null, pxeModuleName,
-                                            "Are you sure you want to change the payee?\nPlease note that this action will delete all Disbursement voucher details.\n\nDo you wish to proceed?") == true) {
+                                            "Are you sure you want to change the payee?\nPlease note that this action will delete all recurring expense schedule details.\n\nDo you wish to proceed?") == true) {
 //                                        poController.removeDetails();
                                         loadTableDetail.reload();
                                     } else {
@@ -394,10 +384,10 @@ public class RecurringExpenseScheduleController implements Initializable, Screen
                             break;
                         case "tfParticular":
                             if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
-                                if (poController.getDetailCount() > 1) {
+                                if (poController.getDetailCount() > 1 && !JFXUtil.isObjectEqualTo(poController.Detail(0).getBranchCode(), null, "")) {
                                     pbKeyPressed = true;
                                     if (ShowMessageFX.YesNo(null, pxeModuleName,
-                                            "Are you sure you want to change the particular?\nPlease note that this action will delete all Disbursement voucher details.\n\nDo you wish to proceed?") == true) {
+                                            "Are you sure you want to change the particular?\nPlease note that this action will delete all recurring expense schedule details.\n\nDo you wish to proceed?") == true) {
 //                                        poController.removeDetails();
                                         loadTableDetail.reload();
                                     } else {
@@ -487,7 +477,7 @@ public class RecurringExpenseScheduleController implements Initializable, Screen
                                     if (poController.getDetailCount() > 1) {
                                         if (!pbKeyPressed) {
                                             if (ShowMessageFX.YesNo(null, pxeModuleName,
-                                                    "Are you sure you want to change the supplier name?\nPlease note that this action will delete all Disbursement voucher details.\n\nDo you wish to proceed?") == true) {
+                                                    "Are you sure you want to change the supplier name?\nPlease note that this action will delete all recurring expense schedule details.\n\nDo you wish to proceed?") == true) {
 //                                                poController.removeDetails();
                                                 poController.Master().setPayeeId("");
                                                 loadTableDetail.reload();
@@ -514,7 +504,7 @@ public class RecurringExpenseScheduleController implements Initializable, Screen
                                     if (poController.getDetailCount() > 1) {
                                         if (!pbKeyPressed) {
                                             if (ShowMessageFX.YesNo(null, pxeModuleName,
-                                                    "Are you sure you want to change the supplier name?\nPlease note that this action will delete all Disbursement voucher details.\n\nDo you wish to proceed?") == true) {
+                                                    "Are you sure you want to change the supplier name?\nPlease note that this action will delete all recurring expense schedule details.\n\nDo you wish to proceed?") == true) {
 //                                                poController.removeDetails();
                                                 poController.Master().setParticularId("");
                                                 loadTableDetail.reload();
@@ -730,8 +720,8 @@ public class RecurringExpenseScheduleController implements Initializable, Screen
     }
 
     private void initDetailsGrid() {
-        JFXUtil.setColumnCenter(tblDetailAccountNo);
-        JFXUtil.setColumnLeft(tblDetailRow, tblDetailBranch, tblDetailExcluded, tblDetailStatus);
+        JFXUtil.setColumnCenter(tblDetailAccountNo, tblDetailRow);
+        JFXUtil.setColumnLeft(tblDetailBranch, tblDetailExcluded, tblDetailStatus);
         JFXUtil.setColumnRight(tblDetailAmount);
         JFXUtil.setColumnsIndexAndDisableReordering(tblViewDetail);
         tblViewDetail.setItems(details_data);

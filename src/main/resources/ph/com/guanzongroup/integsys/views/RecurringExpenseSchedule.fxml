@@ -276,7 +276,7 @@
                                        <children>
                                           <TableView fx:id="tblViewDetail" prefHeight="200.0" prefWidth="200.0">
                                             <columns>
-                                              <TableColumn fx:id="tblDetailRow" maxWidth="30.0" minWidth="30.0" prefWidth="30.0" text="No." />
+                                              <TableColumn fx:id="tblDetailRow" maxWidth="40.0" minWidth="40.0" prefWidth="40.0" text="No." />
                                               <TableColumn fx:id="tblDetailBranch" maxWidth="232.0" minWidth="-1.0" prefWidth="232.0" text="Branch" />
                                                 <TableColumn fx:id="tblDetailAccountNo" maxWidth="182.0" minWidth="182.0" prefWidth="182.0" text="Account No" />
                                                 <TableColumn fx:id="tblDetailAmount" maxWidth="142.0" minWidth="142.0" prefWidth="142.0" text="Amount" />

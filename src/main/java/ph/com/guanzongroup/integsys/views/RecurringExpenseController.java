@@ -346,7 +346,7 @@ public class RecurringExpenseController implements Initializable, ScreenInterfac
                                 ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                 return;
                             } else {
-                                ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                                ShowMessageFX.Information(null, pxeModuleName, (String) poJSON.get("message"));
                                 btnNew.fire();
                             }
                         } else {
@@ -374,7 +374,7 @@ public class RecurringExpenseController implements Initializable, ScreenInterfac
                                 ShowMessageFX.Warning(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
                                 return;
                             } else {
-                                ShowMessageFX.Warning(null, pxeModuleName, "Record " + lsStat + "d successfully");
+                                ShowMessageFX.Information(null, pxeModuleName, "Record " + lsStat + "d successfully");
                                 clearTextFields();
                                 poController.initialize(); // Initialize transaction
                                 poController.setRecordStatus("0123");
