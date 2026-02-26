@@ -240,7 +240,7 @@
                                                         <TextField fx:id="tfDueDay" alignment="CENTER_RIGHT" layoutX="175.0" layoutY="163.0" promptText="0" GridPane.columnIndex="6" GridPane.rowIndex="3" />
                                                         <ComboBox fx:id="cmbBillingFrequency" prefWidth="150.0" GridPane.columnIndex="6" GridPane.rowIndex="4" />
                                                         <TextField fx:id="tfAmount" alignment="CENTER_RIGHT" layoutX="625.0" layoutY="73.0" promptText="0.0000" GridPane.columnIndex="6" GridPane.rowIndex="5" />
-                                                        <CheckBox fx:id="cbExcluded" layoutX="655.0" layoutY="190.0" mnemonicParsing="false" GridPane.columnIndex="6" GridPane.rowIndex="6">
+                                                        <CheckBox fx:id="cbExcluded" layoutX="655.0" layoutY="190.0" mnemonicParsing="false" onAction="#cmdCheckBox_Click" GridPane.columnIndex="6" GridPane.rowIndex="6">
                                              <font>
                                                 <Font size="14.0" />
                                              </font>
@@ -248,7 +248,7 @@
                                                 <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                                              </padding>
                                           </CheckBox>
-                                                        <CheckBox fx:id="cbActive" mnemonicParsing="false" selected="true" GridPane.columnIndex="6" GridPane.rowIndex="7" GridPane.valignment="BOTTOM">
+                                                        <CheckBox fx:id="cbActive" mnemonicParsing="false" onAction="#cmdCheckBox_Click" selected="true" GridPane.columnIndex="6" GridPane.rowIndex="7" GridPane.valignment="BOTTOM">
                                              <font>
                                                 <Font size="14.0" />
                                              </font>

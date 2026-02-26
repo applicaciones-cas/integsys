@@ -313,12 +313,11 @@ public class RecurringExpenseScheduleController implements Initializable, Screen
             tfDeparment.setText(poController.Detail(pnDetail).Department().getDescription());
             tfEmployee.setText(poController.Detail(pnDetail).Employee().getCompanyName());
             taRemarks1.setText(poController.Detail(pnDetail).getRemarks());
-            JFXUtil.setCmbValue(cmbAccountable, poController.Detail(pnDetail).getAccountable()); //clarify
+            JFXUtil.setCmbValue(cmbAccountable, Integer.parseInt(poController.Detail(pnDetail).getAccountable())); //clarify
             dpDateFrom.setValue(CustomCommonUtil.parseDateStringToLocalDate(SQLUtil.dateFormat(poController.Detail(pnDetail).getDateFrom(), SQLUtil.FORMAT_SHORT_DATE)));
 
             tfBillDay.setText(String.valueOf(poController.Detail(pnDetail).getBillDay()));
             tfDueDay.setText(String.valueOf(poController.Detail(pnDetail).getDueDay()));
-            cmbBillingFrequency.getSelectionModel().clearSelection();
             tfAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(pnDetail).getAmount(), true));
 
             cbExcluded.setSelected(poController.Detail(pnDetail).isExcluded());
@@ -605,6 +604,7 @@ public class RecurringExpenseScheduleController implements Initializable, Screen
                 loadRecordMaster();
             });
 
+    @FXML
     private void cmdCheckBox_Click(ActionEvent event) {
         poJSON = new JSONObject();
         Object source = event.getSource();
@@ -624,6 +624,10 @@ public class RecurringExpenseScheduleController implements Initializable, Screen
                     }
                     break;
             }
+            JFXUtil.runWithDelay(.5, () -> {
+                loadTableDetail.reload();
+            });
+
         }
     }
 
@@ -650,13 +654,13 @@ public class RecurringExpenseScheduleController implements Initializable, Screen
                         }
                         break;
                     case "cmbAccountable":
+                        poJSON = poController.Detail(pnDetail).setAccountable(String.valueOf(selectedIndex));
                         if (!JFXUtil.isJSONSuccess(poJSON)) {
                             ShowMessageFX.Warning(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
                         }
                         break;
                 }
-                loadRecordDetail();
-//                loadTableDetail.reload();
+                loadTableDetail.reload();
             });
     boolean pbSuccess = true;
 
