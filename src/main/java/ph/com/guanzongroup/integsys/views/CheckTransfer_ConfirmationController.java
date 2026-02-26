@@ -50,6 +50,7 @@ import org.guanzon.appdriver.base.GuanzonException;
 import org.guanzon.appdriver.base.MiscUtil;
 import org.guanzon.appdriver.base.SQLUtil;
 import org.guanzon.appdriver.constant.UserRight;
+import org.guanzon.cas.purchasing.status.PurchaseOrderStaticData;
 import org.json.simple.JSONObject;
 import ph.com.guanzongroup.cas.cashflow.status.CheckTransferStatus;
 import ph.com.guanzongroup.cas.cashflow.services.CashflowControllers;
@@ -200,7 +201,7 @@ public class CheckTransfer_ConfirmationController implements Initializable, Scre
         psActiveField = "";
     }
     private void initButtonsClickActions() {
-        List<Button> buttons = Arrays.asList(btnBrowse, btnUpdate, btnSave, btnCancel, btnClose,btnRetrieve,btnSearch,btnApprove);
+        List<Button> buttons = Arrays.asList(btnBrowse, btnUpdate, btnSave, btnCancel, btnClose,btnRetrieve,btnPrint,btnSearch,btnApprove);
         buttons.forEach(button -> button.setOnAction(this::handleButtonAction));
     }
     
@@ -323,18 +324,16 @@ public class CheckTransfer_ConfirmationController implements Initializable, Scre
                     break;
 
                 case "btnVoid":
-//                    poJSON = poGLControllers.CheckTransfers().VoidTransaction("");
-//                    if (!"success".equals((String) poJSON.get("result"))) {
-//                        ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
-//                        return;
-//                    }
-//                    ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
-//                    ClearAll();
-//                    initializeObject();
-//                    pnEditMode = poGLControllers.CheckTransfers().getEditMode();
-//                     JFXUtil.disableAllHighlightByColor(tblViewMainList, "#A7C7E7", highlightedRowsMain);
-//                    JFXUtil.highlightByKey(tblViewMainList, String.valueOf(pnMain + 1), "#FAA0A0", highlightedRowsMain);
-//                    initButtons(pnEditMode);
+                    poJSON = poGLControllers.CheckTransfers().VoidTransaction("");
+                       if (!"success".equals((String) poJSON.get("result"))) {
+                           ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
+                           return;
+                       }
+                       ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
+                       ClearAll();
+                       initializeObject();
+                       pnEditMode = poGLControllers.CheckTransfers().getEditMode();
+                       initButtons(pnEditMode);
                 break;
                 case "btnApprove":
                        poJSON = poGLControllers.CheckTransfers().ConfirmTransaction("");
@@ -347,6 +346,14 @@ public class CheckTransfer_ConfirmationController implements Initializable, Scre
                        initializeObject();
                        pnEditMode = poGLControllers.CheckTransfers().getEditMode();
                        initButtons(pnEditMode);
+                break;
+                
+                case "btnPrint":
+                     poJSON = poGLControllers.CheckTransfers().printTransaction();
+                    if ("error".equals((String) poJSON.get("result"))) {
+                        ShowMessageFX.Error((String) poJSON.get("message"), psFormName, null);
+                    }
+                    ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
                 break;
 
                 default:
@@ -974,7 +981,7 @@ public class CheckTransfer_ConfirmationController implements Initializable, Scre
                                 if ("error".equals(poJSON.get("result"))) {
                                     ShowMessageFX.Warning((String) poJSON.get("message"), lsValue, lsValue);
                                 }
-                                tfDestination.setText(poGLControllers.CheckTransfers().Master().Branch().getBranchName());
+                                tfSearchDestination.setText(poGLControllers.CheckTransfers().Master().Branch().getBranchName());
                                 loadTableMaster();
                                 break;
                             case "tfDestination":

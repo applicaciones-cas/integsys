@@ -93,7 +93,7 @@ public class CheckTransfer_HistoryController implements Initializable, ScreenInt
     
     
     @FXML
-    private CheckBox cbReverse;
+    private CheckBox cbReverse,cbIsReceived;
     @FXML
     private AnchorPane AnchorMain, apBrowse, apMaster, apDetail, apButton, apTransaction;
 
@@ -200,7 +200,7 @@ public class CheckTransfer_HistoryController implements Initializable, ScreenInt
         taRemarks.clear();
     }
     private void initButtonsClickActions() {
-        List<Button> buttons = Arrays.asList(btnBrowse, btnPrint,btnSearch);
+        List<Button> buttons = Arrays.asList(btnBrowse, btnPrint,btnClose);
         buttons.forEach(button -> button.setOnAction(this::handleButtonAction));
     }
     
@@ -227,51 +227,7 @@ public class CheckTransfer_HistoryController implements Initializable, ScreenInt
                     LoadMaster();
                     LoadDetail();
                     break;
-                case "btnSearch":
-                    String lsValue = "";
-                    switch (psActiveField) {
-                        case "tfDestination":
-                            lsValue = tfDestination.getText();
-                            poJSON = poGLControllers.CheckTransfers().SearchDistination(lsValue, false);
-                            if ("error".equals(poJSON.get("result"))) {
-                                ShowMessageFX.Warning((String) poJSON.get("message"), lsValue, lsValue);
-                            }
-                            tfDestination.setText(poGLControllers.CheckTransfers().Master().Branch().getBranchName());
-                            break;
-//                                break;
-
-                        case "tfDepartment":
-                            lsValue = tfDestination.getText();
-                            poJSON = poGLControllers.CheckTransfers().SearchDepartment(lsValue, false);
-                            if ("error".equals(poJSON.get("result"))) {
-                                ShowMessageFX.Warning((String) poJSON.get("message"), lsValue, lsValue);
-                            }
-                            tfDepartment.setText(poGLControllers.CheckTransfers().Master().Department().getDescription());
-                            return;
-                        case "tfCheckTransNo":
-                            lsValue = tfDestination.getText();
-                            poJSON = poGLControllers.CheckTransfers().SearchChecks(lsValue, "", pnSelectedDetail, false);
-                            if ("error".equals(poJSON.get("result"))) {
-                                ShowMessageFX.Warning((String) poJSON.get("message"), lsValue, lsValue);
-                            }
-                            tfCheckTransNo.setText(poGLControllers.CheckTransfers().Detail(pnSelectedDetail).CheckPayment().getTransactionNo());
-                            loadTableDetail();
-                            return;
-                        case "tfCheckNo":
-                            lsValue = tfDestination.getText();
-                            poJSON = poGLControllers.CheckTransfers().SearchChecks("", lsValue, pnSelectedDetail, false);
-                            if ("error".equals(poJSON.get("result"))) {
-                                ShowMessageFX.Warning((String) poJSON.get("message"), lsValue, lsValue);
-                            }
-                            tfCheckNo.setText(poGLControllers.CheckTransfers().Detail(pnSelectedDetail).CheckPayment().getCheckNo());
-                            loadTableDetail();
-                            return;
-                        default:
-                            ShowMessageFX.Warning("Looks like no searchable field is selected. \nPlease choose one to continue.", psFormName, null);
-                            break;
-                    }
-                    
-                    break;
+                
 
                 default:
                     ShowMessageFX.Warning("Please contact admin to assist about no button available", psFormName, null);
@@ -312,7 +268,7 @@ public class CheckTransfer_HistoryController implements Initializable, ScreenInt
             apDetail.setDisable(false);
         }
         
-            List<TextField> loTxtField = Arrays.asList(tfDestination, tfDepartment, tfCheckTransNo, tfCheckNo,tfFilterBank);
+            List<TextField> loTxtField = Arrays.asList(tfDestination, tfDepartment, tfCheckTransNo, tfCheckNo);
             loTxtField.forEach(tf -> tf.setOnKeyPressed(event -> txtField_KeyPressed(event)));
 //
 //            JFXUtil.setFocusListener(txtArea_Focus, taRemarks);
@@ -595,16 +551,6 @@ public class CheckTransfer_HistoryController implements Initializable, ScreenInt
                     if (pnSelectedDetail >= 0) {
                         LoadDetail();
                         tfCheckTransNo.requestFocus();
-                        if(poGLControllers.CheckTransfers().Detail(pnSelectedDetail).getSourceNo().isEmpty()){
-                            tfCheckTransNo.setDisable(false);
-                            tfCheckNo.setDisable(false);
-                            cbReverse.setDisable(true);
-                        }else{
-                            tfCheckTransNo.setDisable(true);
-                            tfCheckNo.setDisable(true);
-                            cbReverse.setDisable(false);
-                        }
-                                
                     }
                 }
             }

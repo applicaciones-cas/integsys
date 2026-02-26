@@ -334,6 +334,13 @@ public class CheckTransfer_EntryController implements Initializable, ScreenInter
                             }
                             ShowMessageFX.Information((String) poJSON.get("message"), psFormName, null);
                         }
+                        if (ShowMessageFX.YesNo(null, psFormName, "Do you want to print this transaction?")) {
+                            poJSON = poGLControllers.CheckTransfers().printTransaction();
+                            if ("error".equals((String) poJSON.get("result"))) {
+                                ShowMessageFX.Error((String) poJSON.get("message"), psFormName, null);
+                            }
+                            ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
+                        }
                     }
 
                     ClearAll();
