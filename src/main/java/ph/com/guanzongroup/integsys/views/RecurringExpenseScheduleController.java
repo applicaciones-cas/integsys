@@ -331,6 +331,7 @@ public class RecurringExpenseScheduleController implements Initializable, Screen
             ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
+    boolean lbProceed = true;
 
     private void txtField_KeyPressed(KeyEvent event) {
         try {
@@ -398,18 +399,19 @@ public class RecurringExpenseScheduleController implements Initializable, Screen
                                     pbKeyPressed = false;
                                 }
                             }
-
+                            lbProceed = false;
                             poJSON = poController.SearchParticular(lsValue, false);
                             if ("error".equals(poJSON.get("result"))) {
                                 ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-                                loadRecordMaster();
-                                break;
+//                                loadRecordMaster();
+//                                lbProceed = true;
+//                                break;
                             } else {
-                                JFXUtil.textFieldMoveNext(tfBranchName);
+
                             }
-                            JFXUtil.runWithDelay(.50, () -> {
-                                loadTableDetail.reload();
-                            });
+                            JFXUtil.textFieldMoveNext(tfBranchName);
+                            lbProceed = true;
+                            loadTableDetail.reload();
                             break;
                         case "tfBranchName":
                             poJSON = poController.SearchBranch(lsValue, false, pnDetail);
@@ -511,7 +513,7 @@ public class RecurringExpenseScheduleController implements Initializable, Screen
                             if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
 //                                poController.setSearchClient("");
 //                                poController.setSearchPayee("");
-                                if (!JFXUtil.isObjectEqualTo(poController.Master().getPayeeId(), null, "")) {
+                                if (!JFXUtil.isObjectEqualTo(poController.Master().getParticularId(), null, "") && lbProceed) {
                                     if (poController.getDetailCount() > 1 && !JFXUtil.isObjectEqualTo(poController.Detail(0).getBranchCode(), null, "")) {
                                         if (!pbKeyPressed) {
                                             if (ShowMessageFX.YesNo(null, pxeModuleName,
@@ -530,7 +532,9 @@ public class RecurringExpenseScheduleController implements Initializable, Screen
                                     }
                                 }
                             }
-                            poController.Master().setParticularId("");
+                            if (lbProceed) {
+                                poController.Master().setParticularId("");
+                            }
                         }
                         break;
                 }
