@@ -602,6 +602,7 @@ public class RecurringExpenseScheduleController implements Initializable, Screen
     ChangeListener<Boolean> txtDetail_Focus = JFXUtil.FocusListener(TextField.class,
             (lsID, lsValue) -> {
                 if(pnDetail < 0 || poController.getDetailCount() <= 0){
+                    JFXUtil.clearTextFields(apDetail);
                     return;
                 }
                 switch (lsID) {
@@ -613,12 +614,6 @@ public class RecurringExpenseScheduleController implements Initializable, Screen
                         break;
                     case "tfAccountName":
                         poJSON = poController.Detail(pnDetail).setAccountName(lsValue);
-                        if (!JFXUtil.isJSONSuccess(poJSON)) {
-                            ShowMessageFX.Warning(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
-                        }
-                        break;
-                    case "tfDueDay":
-                        poJSON = poController.Detail(pnDetail).setDueDay(Integer.parseInt(lsValue));
                         if (!JFXUtil.isJSONSuccess(poJSON)) {
                             ShowMessageFX.Warning(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
                         }
@@ -648,7 +643,23 @@ public class RecurringExpenseScheduleController implements Initializable, Screen
                         }
                         break;
                     case "tfBillDay":
+                        if(Integer.parseInt(lsValue) > 31){
+                            ShowMessageFX.Warning(null, pxeModuleName, "Invalid bill day.");
+                            loadRecordDetail();
+                            return;
+                        }
                         poJSON = poController.Detail(pnDetail).setBillDay(Integer.parseInt(lsValue));
+                        if (!JFXUtil.isJSONSuccess(poJSON)) {
+                            ShowMessageFX.Warning(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
+                        }
+                        break;
+                    case "tfDueDay":
+                        if(Integer.parseInt(lsValue) > 31){
+                            ShowMessageFX.Warning(null, pxeModuleName, "Invalid due day.");
+                            loadRecordDetail();
+                            return;
+                        }
+                        poJSON = poController.Detail(pnDetail).setDueDay(Integer.parseInt(lsValue));
                         if (!JFXUtil.isJSONSuccess(poJSON)) {
                             ShowMessageFX.Warning(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
                         }
