@@ -1500,10 +1500,18 @@ public class JFXUtil {
     }
 
     public static boolean isJSONSuccess(JSONObject json) {
-        return ("success".equals((String) json.get("result"))) ? true : false;
+        if (json == null) {
+            return false;
+        }
+
+        Object result = json.get("result");
+        return "success".equals(result);
     }
 
     public static String getJSONMessage(JSONObject json) {
+        if (json == null) {
+            return "";
+        }
         return (String) json.get("message");
     }
 
