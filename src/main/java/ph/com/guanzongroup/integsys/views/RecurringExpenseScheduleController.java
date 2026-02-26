@@ -364,6 +364,8 @@ public class RecurringExpenseScheduleController implements Initializable, Screen
                                     if (ShowMessageFX.YesNo(null, pxeModuleName,
                                             "Are you sure you want to change the payee?\nPlease note that this action will delete all recurring expense schedule details.\n\nDo you wish to proceed?") == true) {
                                         poController.Detail().clear();
+                                        poController.Master().setParticularId("");
+                                        poController.Master().setPayeeId("");
                                         loadTableDetail.reload();
                                     } else {
                                         return;
@@ -371,7 +373,7 @@ public class RecurringExpenseScheduleController implements Initializable, Screen
                                     pbKeyPressed = false;
                                 }
                             }
-
+                            lbProceed = false;
                             poJSON = poController.SearchPayee(lsValue, false);
                             if ("error".equals(poJSON.get("result"))) {
                                 ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
@@ -380,7 +382,8 @@ public class RecurringExpenseScheduleController implements Initializable, Screen
                             } else {
                                 JFXUtil.textFieldMoveNext(tfParticular);
                             }
-                            loadRecordMaster();
+                            lbProceed = true;
+                            loadTableDetail.reload();
                             break;
                         case "tfParticular":
                             if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
@@ -389,6 +392,7 @@ public class RecurringExpenseScheduleController implements Initializable, Screen
                                     if (ShowMessageFX.YesNo(null, pxeModuleName,
                                             "Are you sure you want to change the particular?\nPlease note that this action will delete all recurring expense schedule details.\n\nDo you wish to proceed?") == true) {
                                         poController.Detail().clear();
+                                        poController.Master().setParticularId("");
                                         loadTableDetail.reload();
                                     } else {
                                         return;
@@ -406,7 +410,9 @@ public class RecurringExpenseScheduleController implements Initializable, Screen
                             } else {
 
                             }
-                            JFXUtil.textFieldMoveNext(tfBranchName);
+                            JFXUtil.runWithDelay(.5, () -> {
+                                JFXUtil.textFieldMoveNext(tfBranchName); // must be in the success
+                            });
                             lbProceed = true;
                             loadTableDetail.reload();
                             break;
@@ -473,17 +479,12 @@ public class RecurringExpenseScheduleController implements Initializable, Screen
     ChangeListener<Boolean> txtMaster_Focus = JFXUtil.FocusListener(TextField.class,
             (lsID, lsValue) -> {
                 switch (lsID) {
-                    case "tfRecurringID":
-                        if (!JFXUtil.isJSONSuccess(poJSON)) {
-                            ShowMessageFX.Warning(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
-                        }
-                        break;
                     case "tfPayee":
                         if (lsValue.isEmpty()) {
                             if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
 //                                poController.setSearchClient("");
 //                                poController.setSearchPayee("");
-                                if (!JFXUtil.isObjectEqualTo(poController.Master().getPayeeId(), null, "")) {
+                                if (!JFXUtil.isObjectEqualTo(poController.Master().getPayeeId(), null, "") && lbProceed) {
                                     if (poController.getDetailCount() > 1 && !JFXUtil.isObjectEqualTo(poController.Detail(0).getBranchCode(), null, "")) {
                                         if (!pbKeyPressed) {
                                             if (ShowMessageFX.YesNo(null, pxeModuleName,
@@ -502,7 +503,10 @@ public class RecurringExpenseScheduleController implements Initializable, Screen
                                     }
                                 }
                             }
-                            poController.Master().setPayeeId("");
+                            if (lbProceed) { // uniquely inserted due to retrieval delay
+                                poController.Master().setPayeeId("");
+                                loadRecordMaster();
+                            }
                         }
                         break;
                     case "tfParticular":
@@ -531,11 +535,11 @@ public class RecurringExpenseScheduleController implements Initializable, Screen
                             }
                             if (lbProceed) { // uniquely inserted due to retrieval delay
                                 poController.Master().setParticularId("");
+                                loadRecordMaster();
                             }
                         }
                         break;
                 }
-                loadRecordMaster();
             });
     ChangeListener<Boolean> txtDetail_Focus = JFXUtil.FocusListener(TextField.class,
             (lsID, lsValue) -> {
@@ -561,11 +565,13 @@ public class RecurringExpenseScheduleController implements Initializable, Screen
                     case "tfDeparment":
                         if (lsValue.isEmpty() && lbProceed) {
                             poController.Detail(pnDetail).setDepartmentId(lsValue);
+                            loadTableDetail.reload();
                         }
                         break;
                     case "tfEmployee":
                         if (lsValue.isEmpty() && lbProceed) {
                             poController.Detail(pnDetail).setEmployeeId(lsValue);
+                            loadTableDetail.reload();
                         }
                         break;
                     case "tfBranchName":
@@ -588,7 +594,9 @@ public class RecurringExpenseScheduleController implements Initializable, Screen
                         break;
                 }
                 JFXUtil.runWithDelay(0.3, () -> {
-                    loadTableDetail.reload();
+                    if (!JFXUtil.isObjectEqualTo(lsID, "tfDeparment", "tfEmployee")) {
+                        loadTableDetail.reload();
+                    }
                 });
             });
     ChangeListener<Boolean> txtArea_Focus = JFXUtil.FocusListener(TextArea.class,
