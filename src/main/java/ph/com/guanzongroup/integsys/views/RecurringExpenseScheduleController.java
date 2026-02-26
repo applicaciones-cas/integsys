@@ -482,8 +482,6 @@ public class RecurringExpenseScheduleController implements Initializable, Screen
                     case "tfPayee":
                         if (lsValue.isEmpty()) {
                             if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
-//                                poController.setSearchClient("");
-//                                poController.setSearchPayee("");
                                 if (!JFXUtil.isObjectEqualTo(poController.Master().getPayeeId(), null, "") && lbProceed) {
                                     if (poController.getDetailCount() > 1 && !JFXUtil.isObjectEqualTo(poController.Detail(0).getBranchCode(), null, "")) {
                                         if (!pbKeyPressed) {
@@ -491,6 +489,7 @@ public class RecurringExpenseScheduleController implements Initializable, Screen
                                                     "Are you sure you want to change the payee?\nPlease note that this action will delete all recurring expense schedule details.\n\nDo you wish to proceed?") == true) {
                                                 poController.Detail().clear();
                                                 poController.Master().setPayeeId("");
+                                                poController.Master().setParticularId("");
                                                 loadTableDetail.reload();
                                             } else {
                                                 loadRecordMaster();
@@ -505,6 +504,7 @@ public class RecurringExpenseScheduleController implements Initializable, Screen
                             }
                             if (lbProceed) { // uniquely inserted due to retrieval delay
                                 poController.Master().setPayeeId("");
+                                poController.Master().setParticularId("");
                                 loadRecordMaster();
                             }
                         }
