@@ -153,6 +153,23 @@ public class RecurringExpenseScheduleController implements Initializable, Screen
                             ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                             return;
                         }
+                        Platform.runLater(() -> {
+                            try {
+                                poJSON = poController.populateDetail();
+                                if (!"success".equals((String) poJSON.get("result"))){
+                                    ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                                    poController.initialize();
+                                    loadRecordMaster();
+                                    loadTableDetail.reload();
+                                    initButton(pnEditMode);
+                                }
+                            } catch (SQLException | GuanzonException | CloneNotSupportedException ex) {
+                                Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+                                ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
+                            }
+                        });
+                        details_data.clear();
+                        JFXUtil.clearTextFields(apDetail);
                         pnEditMode = poController.getEditMode();
                         break;
                     case "btnClose":
@@ -163,9 +180,6 @@ public class RecurringExpenseScheduleController implements Initializable, Screen
                         }
                         break;
                     case "btnNew":
-                        //Clear data
-//                        poController.resetMaster();
-//                        poController.resetOthers();
                         poController.Detail().clear();
                         clearTextFields();
                         poController.initFields();
@@ -177,7 +191,6 @@ public class RecurringExpenseScheduleController implements Initializable, Screen
                         pnEditMode = poController.getEditMode();
                         break;
                     case "btnUpdate":
-//                        poJSON = poController.OpenTransaction(poController.Master().getTransactionNo());
                         poJSON = poController.UpdateTransaction();
                         if ("error".equals((String) poJSON.get("result"))) {
                             ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
@@ -187,14 +200,10 @@ public class RecurringExpenseScheduleController implements Initializable, Screen
                         break;
                     case "btnCancel":
                         if (ShowMessageFX.OkayCancel(null, pxeModuleName, "Do you want to disregard changes?") == true) {
-//                            poController.resetMaster();
-//                            poController.resetOthers();
-                            poController.Detail().clear();
+                            poController.initialize();
                             clearTextFields();
 
                             poController.Master().setIndustryCode(psIndustryId);
-//                            poController.Master().setCompanyId(psCompanyId);
-//                            poController.Master().setSupplierId(psSupplierId);
                             pnEditMode = EditMode.UNKNOWN;
 
                             break;
@@ -208,7 +217,6 @@ public class RecurringExpenseScheduleController implements Initializable, Screen
                             poJSON = poController.SaveTransaction();
                             if (!"success".equals((String) poJSON.get("result"))) {
                                 ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-                                poController.AddDetail();
                                 loadTableDetail.reload();
                                 return;
                             } else {
@@ -295,7 +303,11 @@ public class RecurringExpenseScheduleController implements Initializable, Screen
 
     public void loadRecordMaster() {
         try {
-            tfRecurringID.setText(poController.Master().getRecurringId());
+            if(poController.Master().getParticularId() != null || "".equals(poController.Master().getParticularId())){
+                tfRecurringID.setText(poController.Master().getRecurringId());
+            } else {
+                tfRecurringID.setText("");
+            }
             tfPayee.setText(poController.Master().Payee().getPayeeName());
             tfParticular.setText(poController.Master().Particular().getDescription());
             JFXUtil.updateCaretPositions(apMaster);
@@ -306,6 +318,9 @@ public class RecurringExpenseScheduleController implements Initializable, Screen
     }
 
     public void loadRecordDetail() {
+        if(poController.Master().getParticularId() == null || "".equals(poController.Master().getParticularId())){
+            return;
+        }
         try {
             tfBranchName.setText(poController.Detail(pnDetail).Branch().getBranchName());
             tfAccountNo.setText(poController.Detail(pnDetail).getAccountNo());
@@ -352,21 +367,41 @@ public class RecurringExpenseScheduleController implements Initializable, Screen
                                 ShowMessageFX.Warning(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
                                 txtField.setText("");
                             }
-                            loadRecordSearch();
+                            Platform.runLater(() -> {
+                                try {
+                                    poJSON = poController.populateDetail();
+                                    if (!"success".equals((String) poJSON.get("result"))){
+                                        ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                                        poController.initialize();
+                                        loadRecordMaster();
+                                        loadTableDetail.reload();
+                                        initButton(pnEditMode);
+                                    }
+                                } catch (SQLException | GuanzonException | CloneNotSupportedException ex) {
+                                    Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+                                    ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
+                                }
+                            });
+                            details_data.clear();
+                            JFXUtil.clearTextFields(apDetail);
                             loadTableDetail.reload();
                             pnEditMode = poController.getEditMode();
                             initButton(pnEditMode);
+                            loadRecordSearch();
                             break;
                         case "tfPayee":
                             if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
                                 if (poController.getDetailCount() > 1 && !JFXUtil.isObjectEqualTo(poController.Detail(0).getBranchCode(), null, "")) {
                                     pbKeyPressed = true;
                                     if (ShowMessageFX.YesNo(null, pxeModuleName,
-                                            "Are you sure you want to change the payee?\nPlease note that this action will delete all recurring expense schedule details.\n\nDo you wish to proceed?") == true) {
+                                            "Are you sure you want to change the particular?\nPlease note that this action will delete all recurring expense schedule details.\n\nDo you wish to proceed?") == true) {
                                         poController.Detail().clear();
                                         poController.Master().setParticularId("");
                                         poController.Master().setPayeeId("");
+                                        poController.Master().setRecurringId("");
+                                        clearTextFields();
                                         loadTableDetail.reload();
+                                        loadRecordMaster();
                                     } else {
                                         return;
                                     }
@@ -393,7 +428,10 @@ public class RecurringExpenseScheduleController implements Initializable, Screen
                                             "Are you sure you want to change the particular?\nPlease note that this action will delete all recurring expense schedule details.\n\nDo you wish to proceed?") == true) {
                                         poController.Detail().clear();
                                         poController.Master().setParticularId("");
+                                        poController.Master().setRecurringId("");
+                                        JFXUtil.clearTextFields(apDetail);
                                         loadTableDetail.reload();
+                                        loadRecordMaster();
                                     } else {
                                         return;
                                     }
@@ -404,12 +442,28 @@ public class RecurringExpenseScheduleController implements Initializable, Screen
                             poJSON = poController.SearchParticular(lsValue, false);
                             if ("error".equals(poJSON.get("result"))) {
                                 ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-//                                loadRecordMaster();
-//                                lbProceed = true;
-//                                break;
-                            } else {
-
+                                return;
                             }
+                            
+                            Platform.runLater(() -> {
+                                try {
+                                    poJSON = poController.populateDetail();
+                                    if (!"success".equals((String) poJSON.get("result"))){
+                                        ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                                        poController.Detail().clear();
+                                        loadTableDetail.reload();
+                                    } else {
+                                        poJSON = poController.UpdateTransaction();
+                                        if (!"success".equals((String) poJSON.get("result"))){
+                                            ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                                        }  
+                                    }    
+                                } catch (SQLException | GuanzonException | CloneNotSupportedException ex) {
+                                    Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+                                    ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
+                                }
+                            });
+                            
                             JFXUtil.runWithDelay(.5, () -> {
                                 JFXUtil.textFieldMoveNext(tfBranchName); // must be in the success
                             });
@@ -490,7 +544,10 @@ public class RecurringExpenseScheduleController implements Initializable, Screen
                                                 poController.Detail().clear();
                                                 poController.Master().setPayeeId("");
                                                 poController.Master().setParticularId("");
+                                                poController.Master().setRecurringId("");
+                                                clearTextFields();
                                                 loadTableDetail.reload();
+                                                loadRecordMaster();
                                             } else {
                                                 loadRecordMaster();
                                                 return;
@@ -512,8 +569,6 @@ public class RecurringExpenseScheduleController implements Initializable, Screen
                     case "tfParticular":
                         if (lsValue.isEmpty()) {
                             if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
-//                                poController.setSearchClient("");
-//                                poController.setSearchPayee("");
                                 if (!JFXUtil.isObjectEqualTo(poController.Master().getParticularId(), null, "") && lbProceed) {
                                     if (poController.getDetailCount() > 1 && !JFXUtil.isObjectEqualTo(poController.Detail(0).getBranchCode(), null, "")) {
                                         if (!pbKeyPressed) {
@@ -521,7 +576,10 @@ public class RecurringExpenseScheduleController implements Initializable, Screen
                                                     "Are you sure you want to change the particular?\nPlease note that this action will delete all recurring expense schedule details.\n\nDo you wish to proceed?") == true) {
                                                 poController.Detail().clear();
                                                 poController.Master().setParticularId("");
+                                                poController.Master().setRecurringId("");
+                                                JFXUtil.clearTextFields(apDetail);
                                                 loadTableDetail.reload();
+                                                loadRecordMaster();
                                             } else {
                                                 loadRecordMaster();
                                                 return;
@@ -543,6 +601,9 @@ public class RecurringExpenseScheduleController implements Initializable, Screen
             });
     ChangeListener<Boolean> txtDetail_Focus = JFXUtil.FocusListener(TextField.class,
             (lsID, lsValue) -> {
+                if(pnDetail < 0 || poController.getDetailCount() <= 0){
+                    return;
+                }
                 switch (lsID) {
                     case "tfAccountNo":
                         poJSON = poController.Detail(pnDetail).setAccountNo(lsValue);
