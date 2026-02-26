@@ -148,11 +148,9 @@ public class RecurringExpenseScheduleController implements Initializable, Screen
                 String lsButton = clickedButton.getId();
                 switch (lsButton) {
                     case "btnBrowse":
-//                        poController.setTransactionStatus(PurchaseOrderReceivingStatus.RETURNED + "" + PurchaseOrderReceivingStatus.OPEN);
-                        poJSON = poController.searchRecord("", false);
+                        poJSON = poController.searchRecord(tfSearchPayee.getText(), false);
                         if ("error".equalsIgnoreCase((String) poJSON.get("result"))) {
                             ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-//                            tfTransactionNo.requestFocus();
                             return;
                         }
                         pnEditMode = poController.getEditMode();
@@ -366,7 +364,7 @@ public class RecurringExpenseScheduleController implements Initializable, Screen
                                     pbKeyPressed = true;
                                     if (ShowMessageFX.YesNo(null, pxeModuleName,
                                             "Are you sure you want to change the payee?\nPlease note that this action will delete all recurring expense schedule details.\n\nDo you wish to proceed?") == true) {
-//                                        poController.removeDetails();
+                                        poController.Detail().clear();
                                         loadTableDetail.reload();
                                     } else {
                                         return;
@@ -391,7 +389,7 @@ public class RecurringExpenseScheduleController implements Initializable, Screen
                                     pbKeyPressed = true;
                                     if (ShowMessageFX.YesNo(null, pxeModuleName,
                                             "Are you sure you want to change the particular?\nPlease note that this action will delete all recurring expense schedule details.\n\nDo you wish to proceed?") == true) {
-//                                        poController.removeDetails();
+                                        poController.Detail().clear();
                                         loadTableDetail.reload();
                                     } else {
                                         return;
@@ -414,6 +412,7 @@ public class RecurringExpenseScheduleController implements Initializable, Screen
                             loadTableDetail.reload();
                             break;
                         case "tfBranchName":
+                            lbProceed = false;
                             poJSON = poController.SearchBranch(lsValue, false, pnDetail);
                             if (!JFXUtil.isJSONSuccess(poJSON)) {
                                 ShowMessageFX.Warning(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
@@ -421,33 +420,32 @@ public class RecurringExpenseScheduleController implements Initializable, Screen
                             } else {
                                 JFXUtil.textFieldMoveNext(tfAccountNo);
                             }
-                            JFXUtil.runWithDelay(.50, () -> {
-                                loadTableDetail.reload();
-                            });
+                            loadTableDetail.reload();
+                            lbProceed = true;
                             break;
                         case "tfDeparment":
+                            lbProceed = false;
                             poJSON = poController.SearchDepartment(lsValue, false, pnDetail);
                             if (!JFXUtil.isJSONSuccess(poJSON)) {
                                 ShowMessageFX.Warning(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
                                 txtField.setText("");
                             } else {
+                                loadTableDetail.reload();
                                 JFXUtil.textFieldMoveNext(tfEmployee);
                             }
-                            JFXUtil.runWithDelay(.50, () -> {
-                                loadTableDetail.reload();
-                            });
+                            lbProceed = true;
                             break;
                         case "tfEmployee":
+                            lbProceed = false;
                             poJSON = poController.SearchEmployee(lsValue, false, pnDetail);
                             if (!JFXUtil.isJSONSuccess(poJSON)) {
                                 ShowMessageFX.Warning(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
                                 txtField.setText("");
                             } else {
+                                loadTableDetail.reload();
                                 JFXUtil.textFieldMoveNext(cmbAccountable);
                             }
-                            JFXUtil.runWithDelay(.50, () -> {
-                                loadTableDetail.reload();
-                            });
+                            lbProceed = true;
                             break;
 
                     }
@@ -491,7 +489,7 @@ public class RecurringExpenseScheduleController implements Initializable, Screen
                                         if (!pbKeyPressed) {
                                             if (ShowMessageFX.YesNo(null, pxeModuleName,
                                                     "Are you sure you want to change the payee?\nPlease note that this action will delete all recurring expense schedule details.\n\nDo you wish to proceed?") == true) {
-//                                                poController.removeDetails();
+                                                poController.Detail().clear();
                                                 poController.Master().setPayeeId("");
                                                 loadTableDetail.reload();
                                             } else {
@@ -518,7 +516,7 @@ public class RecurringExpenseScheduleController implements Initializable, Screen
                                         if (!pbKeyPressed) {
                                             if (ShowMessageFX.YesNo(null, pxeModuleName,
                                                     "Are you sure you want to change the particular?\nPlease note that this action will delete all recurring expense schedule details.\n\nDo you wish to proceed?") == true) {
-//                                                poController.removeDetails();
+                                                poController.Detail().clear();
                                                 poController.Master().setParticularId("");
                                                 loadTableDetail.reload();
                                             } else {
@@ -532,7 +530,7 @@ public class RecurringExpenseScheduleController implements Initializable, Screen
                                     }
                                 }
                             }
-                            if (lbProceed) {
+                            if (lbProceed) { // uniquely inserted due to retrieval delay
                                 poController.Master().setParticularId("");
                             }
                         }
@@ -562,12 +560,12 @@ public class RecurringExpenseScheduleController implements Initializable, Screen
                         }
                         break;
                     case "tfDeparment":
-                        if (lsValue.isEmpty()) {
+                        if (lsValue.isEmpty() && lbProceed) {
                             poController.Detail(pnDetail).setDepartmentId(lsValue);
                         }
                         break;
                     case "tfEmployee":
-                        if (lsValue.isEmpty()) {
+                        if (lsValue.isEmpty() && lbProceed) {
                             poController.Detail(pnDetail).setEmployeeId(lsValue);
                         }
                         break;
@@ -590,7 +588,7 @@ public class RecurringExpenseScheduleController implements Initializable, Screen
                         }
                         break;
                 }
-                JFXUtil.runWithDelay(0.5, () -> {
+                JFXUtil.runWithDelay(0.3, () -> {
                     loadTableDetail.reload();
                 });
             });
@@ -598,6 +596,7 @@ public class RecurringExpenseScheduleController implements Initializable, Screen
             (lsID, lsValue) -> {
                 switch (lsID) {
                     case "taRemarks1":
+                        poJSON = poController.Detail(pnDetail).setRemarks(lsValue);
                         if (!JFXUtil.isJSONSuccess(poJSON)) {
                             ShowMessageFX.Warning(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
                         }
@@ -613,11 +612,13 @@ public class RecurringExpenseScheduleController implements Initializable, Screen
             CheckBox checkedBox = (CheckBox) source;
             switch (checkedBox.getId()) {
                 case "cbActive": // this is the id
+                    poJSON = poController.Detail(pnDetail).isActive(checkedBox.isSelected());
                     if (!JFXUtil.isJSONSuccess(poJSON)) {
                         ShowMessageFX.Warning(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
                     }
                     break;
                 case "cbExcluded": // this is the id
+                    poJSON = poController.Detail(pnDetail).isExcluded(checkedBox.isSelected());
                     if (!JFXUtil.isJSONSuccess(poJSON)) {
                         ShowMessageFX.Warning(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
                     }
@@ -747,8 +748,7 @@ public class RecurringExpenseScheduleController implements Initializable, Screen
             if (!details_data.isEmpty() && event.getClickCount() == 1) {
                 ModelRecurringExpenseSchedule_Detail selected = (ModelRecurringExpenseSchedule_Detail) tblViewDetail.getSelectionModel().getSelectedItem();
                 if (selected != null) {
-                    int lnRow = Integer.parseInt(details_data.get(tblViewDetail.getSelectionModel().getSelectedIndex()).getIndex11());
-                    pnDetail = lnRow;
+                    pnDetail = Integer.parseInt(selected.getIndex01()) - 1;
                     loadRecordDetail();
                 }
             }
