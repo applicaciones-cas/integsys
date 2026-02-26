@@ -353,7 +353,7 @@ public class RecurringExpenseScheduleController implements Initializable, Screen
                                 txtField.setText("");
                             }
                             loadRecordSearch();
-                            loadRecordMaster();
+                            loadTableDetail.reload();
                             pnEditMode = poController.getEditMode();
                             initButton(pnEditMode);
                             break;
@@ -645,7 +645,7 @@ public class RecurringExpenseScheduleController implements Initializable, Screen
         JFXUtil.setFocusListener(txtMaster_Focus, tfRecurringID, tfPayee, tfParticular);
         JFXUtil.setFocusListener(txtDetail_Focus, tfAccountNo, tfAccountName, tfDueDay, tfDeparment, tfEmployee, tfBranchName, tfAmount, tfBillDay, tfSearchPayee);
 
-        JFXUtil.setKeyPressedListener(this::txtField_KeyPressed, apBrowse,apMaster, apDetail);
+        JFXUtil.setKeyPressedListener(this::txtField_KeyPressed, apBrowse, apMaster, apDetail);
         JFXUtil.setCommaFormatter(tfAmount);
 
         JFXUtil.setKeyEventFilter(tableKeyEvents, tblViewDetail);
