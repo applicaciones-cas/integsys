@@ -1813,6 +1813,11 @@ public class PaymentRequest_ConfirmationController implements Initializable, Scr
     }
 
     private void initTableDetail() {
+        JFXUtil.setColumnCenter(tblRowNoDetail);
+        JFXUtil.setColumnLeft(tblParticular, tblVATable);
+        JFXUtil.setColumnRight(tblAmount, tblDiscAmount, tblTaxAmount, tbTotalAmount);
+        JFXUtil.setColumnsIndexAndDisableReordering(tblVwPRDetail);
+        
         tblRowNoDetail.setCellValueFactory(new PropertyValueFactory<>("index01"));
         tblParticular.setCellValueFactory(new PropertyValueFactory<>("index03"));
         tblAmount.setCellValueFactory(new PropertyValueFactory<>("index04"));

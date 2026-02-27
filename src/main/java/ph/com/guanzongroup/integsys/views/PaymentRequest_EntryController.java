@@ -1723,6 +1723,11 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
     }
 
     private void initTableRecurringExpense() {
+        JFXUtil.setColumnCenter(tblRowNoDetail);
+        JFXUtil.setColumnLeft(tblParticular, tblVATable);
+        JFXUtil.setColumnRight(tblAmount, tblDiscAmount, tblTaxAmount, tbTotalAmount);
+        JFXUtil.setColumnsIndexAndDisableReordering(tblVwPRDetail);
+        
         if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
             tblVwRecurringExpense.setEditable(true);
         } else {
