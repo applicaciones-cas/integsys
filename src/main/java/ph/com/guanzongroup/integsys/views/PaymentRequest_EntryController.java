@@ -1213,7 +1213,7 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
                                         clearDetailFields();
                                         break;
                                     }
-                                    poJSON = poGLControllers.PaymentRequest().SearchParticular(lsValue, true, pnTblDetailRow);
+                                    poJSON = poGLControllers.PaymentRequest().SearchParticular(lsValue, false, pnTblDetailRow);
                                     if ("error".equals(poJSON.get("result"))) {
                                         ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
                                         tfParticular.setText("");
@@ -1227,7 +1227,6 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
                                     } else {
                                     }
                                     loadTableDetail();
-                                    loadRecordDetail();
                                     initDetailFocus();
 
                                 } else {
@@ -1255,7 +1254,6 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
                                     pnTblDetailRow = Integer.parseInt(detail_data.get(JFXUtil.moveToNextRow(tblVwPRDetail)).getIndex11());
                                 }
                                 loadTableDetail();
-                                loadRecordDetail();
                                 initDetailFocus();
                                 break;
                         }
@@ -1399,7 +1397,6 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
                     ShowMessageFX.Warning("Amount and Particular already exist in table at row: " + (lnCtr + 1), psFormName, null);
                     pnTblDetailRow = lnCtr;
                     loadTableDetail();
-                    loadRecordDetail();
                     initDetailFocus();
                     return;
                 }

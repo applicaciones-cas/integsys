@@ -373,7 +373,6 @@ public class PaymentRequest_HistoryController implements Initializable, ScreenIn
                         loadRecordMaster();
                         loadTableDetailFromMain();
                         pnEditMode = poGLControllers.PaymentRequest().getEditMode();
-                        loadRecordDetail();
                         loadTableDetail();
                     } else {
                         ShowMessageFX.Warning((String) poJSON.get("message"), "Search Information", null);

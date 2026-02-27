@@ -48,7 +48,6 @@ import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TableColumn;
-import javafx.scene.control.TablePosition;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
@@ -455,14 +454,12 @@ public class PaymentRequest_ConfirmationController implements Initializable, Scr
                             ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
                             pnTblDetailRow = (int) poJSON.get("tableRow");
                             loadTableDetail();
-                            loadRecordDetail();
                             initDetailFocus();
                             return;
                         } else {
                             if (!ShowMessageFX.YesNo((String) poJSON.get("message"), psFormName, null)) {
                                 pnTblDetailRow = (int) poJSON.get("tableRow");
                                 loadTableDetail();
-                                loadRecordDetail();
                                 initDetailFocus();
                                 return;
                             }
@@ -491,7 +488,6 @@ public class PaymentRequest_ConfirmationController implements Initializable, Scr
                     }
 
                     loadRecordMaster();
-                    loadRecordDetail();
                     loadTableDetail();
                     pnEditMode = poGLControllers.PaymentRequest().getEditMode();
                     pagination.toBack();
@@ -1172,7 +1168,7 @@ public class PaymentRequest_ConfirmationController implements Initializable, Scr
                                         clearDetailFields();
                                         break;
                                     }
-                                    poJSON = poGLControllers.PaymentRequest().SearchParticular(lsValue, true, pnTblDetailRow);
+                                    poJSON = poGLControllers.PaymentRequest().SearchParticular(lsValue, false, pnTblDetailRow);
                                     if ("error".equals(poJSON.get("result"))) {
                                         ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
                                         tfParticular.setText("");
@@ -1186,7 +1182,6 @@ public class PaymentRequest_ConfirmationController implements Initializable, Scr
                                     } else {
                                     }
                                     loadTableDetail();
-                                    loadRecordDetail();
                                     initDetailFocus();
 
                                 } else {
@@ -1214,7 +1209,6 @@ public class PaymentRequest_ConfirmationController implements Initializable, Scr
                                     pnTblDetailRow = Integer.parseInt(detail_data.get(JFXUtil.moveToNextRow(tblVwPRDetail)).getIndex11());
                                 }
                                 loadTableDetail();
-                                loadRecordDetail();
                                 initDetailFocus();
                                 break;
                         }
@@ -1358,7 +1352,6 @@ public class PaymentRequest_ConfirmationController implements Initializable, Scr
                     ShowMessageFX.Warning("Amount and Particular already exist in table at row: " + (lnCtr + 1), psFormName, null);
                     pnTblDetailRow = lnCtr;
                     loadTableDetail();
-                    loadRecordDetail();
                     initDetailFocus();
                     return;
                 }
