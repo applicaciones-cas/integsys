@@ -98,6 +98,7 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
     private GRiderCAS poApp;
     private CashflowControllers poGLControllers;
     private String psFormName = "Payment Request";
+    private String psRecurringMonitor = "";
     private LogWrapper logWrapper;
     private int pnEditMode;
     private JSONObject poJSON;
@@ -198,7 +199,29 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
     @Override
     public void setCategoryID(String fsValue) {
         psCategoryID = fsValue;
+    }    
+    
+    public void setReloadDetail(String fsValue) {
+        psRecurringMonitor = fsValue;
     }
+    
+    public void ReloadDetail() {
+        try {
+            //Load Recurring Detail
+            if(psRecurringMonitor != null && !"".equals(psRecurringMonitor)){
+                poJSON = poGLControllers.PaymentRequest().populateRecurringDetail(psRecurringMonitor);
+                if (!"success".equals((String) poJSON.get("result"))) {
+                    ShowMessageFX.Warning((String) poJSON.get("message"), "Warning", null);
+                }
+                
+                loadTableDetail();
+            }
+        } catch (SQLException | GuanzonException | CloneNotSupportedException ex) {
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(MiscUtil.getException(ex), "Warning", null);
+        } 
+    }
+
 
     /**
      * Initializes the controller class.
@@ -426,6 +449,15 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
                             tfDepartment.setText(poGLControllers.PaymentRequest().Master().Department().getDescription());
 
                         }
+                        
+                        //Load Recurring Detail
+                        if(psRecurringMonitor != null && !"".equals(psRecurringMonitor)){
+                            poJSON = poGLControllers.PaymentRequest().populateRecurringDetail(psRecurringMonitor);
+                            if (!"success".equals((String) poJSON.get("result"))) {
+                                ShowMessageFX.Warning((String) poJSON.get("message"), "Warning", null);
+                            }
+                        }
+                        
                         tfDepartment.setPromptText("");
                         CustomCommonUtil.switchToTab(tabDetails, ImTabPane);
                         loadRecordMaster();
