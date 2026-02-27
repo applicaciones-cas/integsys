@@ -385,11 +385,18 @@ public class CheckDeposit_EntryController implements Initializable, ScreenInterf
     private void initFields() {
         boolean isEditable = (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE);
         JFXUtil.setDisabled(!isEditable,
-                tfSearchTransNo, 
+                tfBankMaster,
+                tfBankAccountNo,
+                tfBankAccountName,
                 tfTransactionNo,
                 tfCheckTransNo,
                 tfCheckNo,
                 tfFilterBank,
+                dpTransactionDate,
+                taRemarks,
+                tfTransactionNo,
+                tfCheckTransNo,
+                tfCheckNo,
                 dpTransactionDate,
                 taRemarks
         );
@@ -429,7 +436,7 @@ public class CheckDeposit_EntryController implements Initializable, ScreenInterf
         try {
             tfTransactionNo.setText(poGLControllers.CheckDeposits().Master().getTransactionNo());
 
-            tfBank.setText(
+            tfBankMaster.setText(
                     poGLControllers.CheckDeposits().Master().Banks().getBankName() == null ? ""
                     : poGLControllers.CheckDeposits().Master().Banks().getBankName());
             tfBankAccountNo.setText(

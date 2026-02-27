@@ -160,7 +160,9 @@ public class CheckDeposit_ConfirmationController implements Initializable, Scree
         initTableDetail();
         initTableOnClick();
         initCheckBox();
-        initButtons(poGLControllers.CheckDeposits().getEditMode());
+        pnEditMode = poGLControllers.CheckDeposits().getEditMode();
+        initButtons(pnEditMode);
+
     }
     
     /**
@@ -370,11 +372,15 @@ public class CheckDeposit_ConfirmationController implements Initializable, Scree
     private void initFields() {
         boolean isEditable = (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE);
         JFXUtil.setDisabled(!isEditable,
+                tfBankMaster,
+                tfBankAccountNo,
+                tfBankAccountName,
                 tfTransactionNo,
                 tfCheckTransNo,
                 tfCheckNo,
-                dpTransactionDate,
-                taRemarks
+                taRemarks,
+                dpTransactionReferDate
+                
         );
         if (CheckTransferStatus.CONFIRMED.equals(poGLControllers.CheckDeposits().Master().getTransactionStatus())) {
             apMaster.setDisable(true);
@@ -412,9 +418,9 @@ public class CheckDeposit_ConfirmationController implements Initializable, Scree
         try {
             tfTransactionNo.setText(poGLControllers.CheckDeposits().Master().getTransactionNo());
 
-            tfBank.setText(
-                    poGLControllers.CheckDeposits().Master().Banks().getBankName() == null ? ""
-                    : poGLControllers.CheckDeposits().Master().Banks().getBankName());
+            tfBankMaster.setText(
+                    poGLControllers.CheckDeposits().Master().BankAccount().Banks().getBankName() == null ? ""
+                    : poGLControllers.CheckDeposits().Master().BankAccount().Banks().getBankName());
             tfBankAccountNo.setText(
                     poGLControllers.CheckDeposits().Master().BankAccount().getAccountNo() == null ? ""
                     : poGLControllers.CheckDeposits().Master().BankAccount().getAccountNo());
@@ -819,7 +825,7 @@ public class CheckDeposit_ConfirmationController implements Initializable, Scree
             protected Void call() throws Exception {
                 try {
                     main_data.clear();
-                    poJSON = poGLControllers.CheckDeposits().getCheckTransfer(poGLControllers.CheckDeposits().Master().getBankAccount(), 
+                    poJSON = poGLControllers.CheckDeposits().getCheckDeposit(poGLControllers.CheckDeposits().Master().getBankAccount(), 
                                                                    tfSearchTransNo.getText(),
                                                                   dpSearchTransactionDate.getValue());
                     
@@ -833,17 +839,16 @@ public class CheckDeposit_ConfirmationController implements Initializable, Scree
                                         poGLControllers.CheckDeposits().poCheckDepositMaster(lnCntr).getTransactionDate()== null ? ""
                                         : CustomCommonUtil.formatDateToShortString(
                                                 poGLControllers.CheckDeposits().poCheckDepositMaster(lnCntr).getTransactionDate()),                                      
-                                        poGLControllers.CheckDeposits().poCheckDepositMaster(lnCntr).Branch().getBranchName()== null ? ""
-                                        : poGLControllers.CheckDeposits().poCheckDepositMaster(lnCntr).Branch().getBranchName(),
-                                        "", "", "", "", "", ""
+                                        poGLControllers.CheckDeposits().poCheckDepositMaster(lnCntr).BankAccount().getAccountNo()== null ? ""
+                                        : poGLControllers.CheckDeposits().poCheckDepositMaster(lnCntr).BankAccount().getAccountNo(),
+                                        poGLControllers.CheckDeposits().poCheckDepositMaster(lnCntr).BankAccount().getAccountName()== null ? ""
+                                        : poGLControllers.CheckDeposits().poCheckDepositMaster(lnCntr).BankAccount().getAccountName(), "", "", "", "", ""
                                         ));
                             }
                         } else {
                             main_data.clear();
                         }
                     }
-                    
-
                     Platform.runLater(() -> {
                         if (main_data.isEmpty()) {
                             tblViewMaster.setPlaceholder(new Label("NO RECORD TO LOAD"));

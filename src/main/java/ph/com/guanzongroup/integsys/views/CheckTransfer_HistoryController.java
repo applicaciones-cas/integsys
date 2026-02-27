@@ -198,6 +198,7 @@ public class CheckTransfer_HistoryController implements Initializable, ScreenInt
         pnSelectedDetail = 0;
         psActiveField = "";
         taRemarks.clear();
+        lblStatus.setText( "UNKOWN");
     }
     private void initButtonsClickActions() {
         List<Button> buttons = Arrays.asList(btnBrowse, btnPrint,btnClose);
@@ -223,6 +224,7 @@ public class CheckTransfer_HistoryController implements Initializable, ScreenInt
                         ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
                         return;
                     }
+                    pnEditMode = poGLControllers.CheckDeposits().getEditMode();
                     loadTableDetail();
                     LoadMaster();
                     LoadDetail();
@@ -450,8 +452,6 @@ public class CheckTransfer_HistoryController implements Initializable, ScreenInt
                         tblViewDetails.getSelectionModel().clearAndSelect(pnSelectedDetail);
                         tblViewDetails.scrollTo(pnSelectedDetail);
                         LoadDetail();
-                        JFXUtil.showRetainedHighlight(false, tblViewMaster, "#A7C7E7", plOrderNoPartial, plOrderNoFinal, highlightedRowsMain, true);
-                        loadHighlightFromDetail();
 //                        poJSON = poGLControllers.CheckTransfers().computeMasterFields();
                     });
                     
@@ -477,34 +477,6 @@ public class CheckTransfer_HistoryController implements Initializable, ScreenInt
         new Thread(task).start();
     }
     
-    public void loadHighlightFromDetail() {
-        try {
-            for (int lnCtr = 0; lnCtr < poGLControllers.CheckTransfers().getDetailCount(); lnCtr++) {
-                String lsTransNo = !JFXUtil.isObjectEqualTo(poGLControllers.CheckTransfers().Detail(lnCtr).getSourceNo(), null, "") ? poGLControllers.CheckTransfers().Detail(lnCtr).getSourceNo() : "";
-                String lsTransType = !JFXUtil.isObjectEqualTo(poGLControllers.CheckTransfers().Detail(lnCtr).getSourceCode(), null, "") ? poGLControllers.CheckTransfers().Detail(lnCtr).getSourceCode() : "";
-                String lsHighlightbasis;
-
-                lsHighlightbasis = poGLControllers.CheckTransfers().Detail(lnCtr).getSourceNo();
-
-                if (!JFXUtil.isObjectEqualTo(poGLControllers.CheckTransfers().Detail(lnCtr).CheckPayment().getAmount(), null, "")) {
-                    if (poGLControllers.CheckTransfers().Detail(lnCtr).CheckPayment().getAmount() != 0.0000) {
-                        plOrderNoPartial.add(new Pair<>(lsHighlightbasis, "1"));
-                    } else {
-                        plOrderNoPartial.add(new Pair<>(lsHighlightbasis, "0"));
-                    }
-                }
-            }
-            for (Pair<String, String> pair : plOrderNoPartial) {
-                if (!"".equals(pair.getKey()) && pair.getKey() != null) {
-                    JFXUtil.highlightByKey(tblViewMaster, pair.getKey(), "#A7C7E7", highlightedRowsMain);
-                }
-            }
-            JFXUtil.showRetainedHighlight(false, tblViewMaster, "#A7C7E7", plOrderNoPartial, plOrderNoFinal, highlightedRowsMain, false);
-        } catch (GuanzonException | SQLException ex) {
-            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
-            ShowMessageFX.Error(null, psFormName, MiscUtil.getException(ex));
-        }
-    }
     
     public void initTableOnClick() {
         tblViewDetails.setOnMouseClicked(this::tblViewDetails_Clicked);
