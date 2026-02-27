@@ -16,21 +16,17 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
-import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 import javafx.animation.PauseTransition;
 import javafx.animation.TranslateTransition;
 import javafx.application.Platform;
@@ -50,13 +46,11 @@ import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
-import javafx.scene.control.ListCell;
 import javafx.scene.control.Pagination;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TableColumn;
-import javafx.scene.control.TablePosition;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
@@ -97,7 +91,7 @@ import ph.com.guanzongroup.integsys.utility.JFXUtil;
 /**
  * FXML Controller class
  *
- * @author User
+ * @author Team 2 & Team 1
  */
 public class PaymentRequest_EntryController implements Initializable, ScreenInterface {
 
@@ -135,14 +129,11 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
     double ldstackPaneWidth = 0;
     double ldstackPaneHeight = 0;
     Map<String, String> imageinfo_temp = new HashMap<>();
-    private final JFXUtil.ImageViewer imageviewerutil = new JFXUtil.ImageViewer();
 
     private ObservableList<ModelTableMain> main_data = FXCollections.observableArrayList();
     private ObservableList<ModelTableDetail> detail_data = FXCollections.observableArrayList();
     private ObservableList<ModelPRFAttachment> attachment_data = FXCollections.observableArrayList();
     ObservableList<String> documentType = ModelPRFAttachment.documentType;
-
-    JFXUtil.ReloadableTableTask loadTableAttachment;
 
     @FXML
     private TabPane ImTabPane;
@@ -226,21 +217,21 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
             if (!"success".equals(poJSON.get("result"))) {
                 ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
             }
-            tblVwPRDetail.addEventFilter(KeyEvent.KEY_PRESSED, this::tableKeyEvents);
+            JFXUtil.setKeyEventFilter(tableKeyEvents, tblVwPRDetail, tblAttachments);
             Platform.runLater((() -> {
                 try {
                     poGLControllers.PaymentRequest().Master().setIndustryID(psIndustryID);
                     poGLControllers.PaymentRequest().Master().setCompanyID(psCompanyID);
                     loadRecordSearch();
                 } catch (SQLException | GuanzonException ex) {
-                    Logger.getLogger(PaymentRequest_EntryController.class.getName()).log(Level.SEVERE, null, ex);
+                    Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
                 }
             }));
             Platform.runLater(() -> setBranchAndDepartment());
             Platform.runLater(() -> btnNew.fire());
             initAll();
         } catch (ExceptionInInitializerError | SQLException | GuanzonException ex) {
-            Logger.getLogger(PaymentRequest_EntryController.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
         }
     }
 
@@ -248,7 +239,7 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
         try {
             lblSource.setText(poGLControllers.PaymentRequest().Master().Company().getCompanyName() + " - " + poGLControllers.PaymentRequest().Master().Industry().getDescription());
         } catch (GuanzonException | SQLException ex) {
-            Logger.getLogger(PaymentRequest_EntryController.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
         }
 
     }
@@ -271,7 +262,7 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
             poGLControllers.PaymentRequest().Master().setBranchCode(poApp.getBranchCode());
             poGLControllers.PaymentRequest().Master().setDepartmentID(poApp.getDepartment());
         } catch (SQLException | GuanzonException ex) {
-            Logger.getLogger(PaymentRequest_EntryController.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
         }
     }
 
@@ -291,7 +282,6 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
         initStackPaneListener();
         initButtons(pnEditMode);
         initFields(pnEditMode);
-        initLoadTable();
         initComboBoxes();
     }
 
@@ -342,7 +332,7 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
             }
             lblStatus.setText(lsStatus);
         } catch (SQLException | GuanzonException | NullPointerException ex) {
-            Logger.getLogger(PaymentRequest_EntryController.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
         }
     }
 
@@ -369,7 +359,7 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
 
                 computePerDetailTaxAndTotal();
             } catch (SQLException | GuanzonException ex) {
-                Logger.getLogger(PaymentRequest_EntryController.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
             }
         }
     }
@@ -709,12 +699,12 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
                             pnAttachment = poGLControllers.PaymentRequest().addAttachment(imgPath2);
                             //Copy file to Attachment path
                             poGLControllers.PaymentRequest().copyFile(selectedFile.toString());
-                            loadTableAttachment.reload();
+                            loadTableAttachment();
                             tblAttachments.getFocusModel().focus(pnAttachment);
                             tblAttachments.getSelectionModel().select(pnAttachment);
 
                         } catch (IOException ex) {
-                            Logger.getLogger(PaymentRequest_EntryController.class.getName()).log(Level.SEVERE, null, ex);
+                            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
                         }
                     }
                     break;
@@ -741,7 +731,7 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
                     }
                     imageinfo_temp.clear();
                     loadRecordAttachment(false);
-                    loadTableAttachment.reload();
+                    loadTableAttachment();
                     if (attachment_data.size() <= 0) {
                         JFXUtil.clearTextFields(apAttachments);
                     }
@@ -767,7 +757,7 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
             initButtons(pnEditMode);
             initFields(pnEditMode);
         } catch (CloneNotSupportedException | SQLException | GuanzonException | ParseException ex) {
-            Logger.getLogger(PaymentRequest_EntryController.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
         }
     }
 
@@ -790,7 +780,7 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
             }
 
         } catch (SQLException | GuanzonException ex) {
-            Logger.getLogger(DeliveryAcceptance_ConfirmationController.class.getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
         }
     }
 
@@ -841,57 +831,6 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
         }
     }
 
-    public void initLoadTable() {
-        loadTableAttachment = new JFXUtil.ReloadableTableTask(
-                tblAttachments,
-                attachment_data,
-                () -> {
-                    imageviewerutil.scaleFactor = 1.0;
-                    JFXUtil.resetImageBounds(imageView, stackPane1);
-                    Platform.runLater(() -> {
-                        try {
-                            attachment_data.clear();
-                            int lnCtr;
-                            int lnCount = 0;
-                            for (lnCtr = 0; lnCtr < poGLControllers.PaymentRequest().getTransactionAttachmentCount(); lnCtr++) {
-                                if (RecordStatus.INACTIVE.equals(poGLControllers.PaymentRequest().TransactionAttachmentList(lnCtr).getModel().getRecordStatus())) {
-                                    continue;
-                                }
-                                lnCount += 1;
-                                attachment_data.add(
-                                        new ModelPRFAttachment(String.valueOf(lnCount),
-                                                String.valueOf(poGLControllers.PaymentRequest().TransactionAttachmentList(lnCtr).getModel().getFileName()),
-                                                String.valueOf(lnCtr)
-                                        ));
-                            }
-                            int lnTempRow = JFXUtil.getDetailRow(attachment_data, pnAttachment, 3); //this method is used only when Reverse is applied
-                            if (lnTempRow < 0 || lnTempRow
-                                    >= attachment_data.size()) {
-                                if (!attachment_data.isEmpty()) {
-                                    /* FOCUS ON FIRST ROW */
-                                    JFXUtil.selectAndFocusRow(tblAttachments, 0);
-                                    int lnRow = Integer.parseInt(attachment_data.get(0).getIndex03());
-                                    pnAttachment = lnRow;
-                                    loadRecordAttachment(true);
-                                }
-                            } else {
-                                /* FOCUS ON THE ROW THAT pnRowDetail POINTS TO */
-                                JFXUtil.selectAndFocusRow(tblAttachments, lnTempRow);
-                                int lnRow = Integer.parseInt(attachment_data.get(tblAttachments.getSelectionModel().getSelectedIndex()).getIndex03());
-                                pnAttachment = lnRow;
-                                loadRecordAttachment(true);
-                            }
-                            if (attachment_data.size() <= 0) {
-                                loadRecordAttachment(false);
-                            }
-                        } catch (Exception e) {
-                        }
-                    });
-                }
-        );
-
-    }
-
     private void loadTableAttachment() {
         // Setting data to table detail
         ProgressIndicator progressIndicator = new ProgressIndicator();
@@ -908,39 +847,46 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
         Task<Void> task = new Task<Void>() {
             @Override
             protected Void call() throws Exception {
+                scaleFactor = 1.0;
+                JFXUtil.resetImageBounds(imageView, stackPane1);
                 Platform.runLater(() -> {
                     try {
                         attachment_data.clear();
                         int lnCtr;
+                        int lnCount = 0;
                         for (lnCtr = 0; lnCtr < poGLControllers.PaymentRequest().getTransactionAttachmentCount(); lnCtr++) {
+                            if (RecordStatus.INACTIVE.equals(poGLControllers.PaymentRequest().TransactionAttachmentList(lnCtr).getModel().getRecordStatus())) {
+                                continue;
+                            }
+                            lnCount += 1;
                             attachment_data.add(
-                                    new ModelPRFAttachment(String.valueOf(lnCtr + 1),
-                                            String.valueOf(poGLControllers.PaymentRequest().TransactionAttachmentList(lnCtr).getModel().getFileName())
+                                    new ModelPRFAttachment(String.valueOf(lnCount),
+                                            String.valueOf(poGLControllers.PaymentRequest().TransactionAttachmentList(lnCtr).getModel().getFileName()),
+                                            String.valueOf(lnCtr)
                                     ));
                         }
-                        if (pnAttachment < 0 || pnAttachment
+                        int lnTempRow = JFXUtil.getDetailRow(attachment_data, pnAttachment, 3); //this method is used only when Reverse is applied
+                        if (lnTempRow < 0 || lnTempRow
                                 >= attachment_data.size()) {
                             if (!attachment_data.isEmpty()) {
                                 /* FOCUS ON FIRST ROW */
-                                tblAttachments.getSelectionModel().select(0);
-                                tblAttachments.getFocusModel().focus(0);
-                                pnAttachment = 0;
+                                JFXUtil.selectAndFocusRow(tblAttachments, 0);
+                                int lnRow = Integer.parseInt(attachment_data.get(0).getIndex03());
+                                pnAttachment = lnRow;
                                 loadRecordAttachment(true);
-                            } else {
-                                tfAttachmentNo.setText("");
-                                cmbAttachmentType.getSelectionModel().select(0);
-                                loadRecordAttachment(false);
                             }
                         } else {
                             /* FOCUS ON THE ROW THAT pnRowDetail POINTS TO */
-                            tblAttachments.getSelectionModel().select(pnAttachment);
-                            tblAttachments.getFocusModel().focus(pnAttachment);
+                            JFXUtil.selectAndFocusRow(tblAttachments, lnTempRow);
+                            int lnRow = Integer.parseInt(attachment_data.get(tblAttachments.getSelectionModel().getSelectedIndex()).getIndex03());
+                            pnAttachment = lnRow;
                             loadRecordAttachment(true);
                         }
+                        if (attachment_data.size() <= 0) {
+                            loadRecordAttachment(false);
+                        }
                     } catch (Exception e) {
-
                     }
-
                 });
 
                 return null;
@@ -1203,8 +1149,7 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
                 loTextArea.selectAll();
             }
         } catch (SQLException | GuanzonException ex) {
-            Logger.getLogger(PaymentRequest_EntryController.class
-                    .getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
         }
     };
 
@@ -1335,8 +1280,7 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
 
                 }
             } catch (SQLException | GuanzonException ex) {
-                Logger.getLogger(PaymentRequest_EntryController.class
-                        .getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
             }
         }
     }
@@ -1369,7 +1313,7 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
             tfDiscAmountDetail.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(lnDiscountAmount, true));
             computePerDetailTaxAndTotal();
         } catch (SQLException | GuanzonException ex) {
-            Logger.getLogger(PaymentRequest_EntryController.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
         }
     }
 
@@ -1404,7 +1348,7 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
             tfDiscAmountDetail.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(lnDiscountAmount, true));
             computePerDetailTaxAndTotal();
         } catch (SQLException | GuanzonException ex) {
-            Logger.getLogger(PaymentRequest_EntryController.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
         }
     }
 
@@ -1469,7 +1413,7 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
             tfAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(amount, true));
 
         } catch (SQLException | GuanzonException ex) {
-            Logger.getLogger(PaymentRequest_EntryController.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
         } catch (NumberFormatException ex) {
             ShowMessageFX.Warning("Invalid numeric input for amount.", psFormName, null);
             tfAmount.setText("0.0000");
@@ -1490,7 +1434,7 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
                     try {
                         poGLControllers.PaymentRequest().Master().setTransactionDate(SQLUtil.toDate(dpTransaction.getValue().toString(), SQLUtil.FORMAT_SHORT_DATE));
                     } catch (SQLException | GuanzonException ex) {
-                        Logger.getLogger(PaymentRequest_EntryController.class.getName()).log(Level.SEVERE, null, ex);
+                        Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
                     }
                 }
             }
@@ -1513,7 +1457,7 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
                     computePerDetailTaxAndTotal();
                     loadTableDetailAndSelectedRow();
                 } catch (SQLException | GuanzonException ex) {
-                    Logger.getLogger(PaymentRequest_EntryController.class.getName()).log(Level.SEVERE, null, ex);
+                    Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
                 }
                 initFields(pnEditMode);
             }
@@ -1536,7 +1480,7 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
                 }
                 loadTableDetail();
             } catch (SQLException | GuanzonException ex) {
-                Logger.getLogger(PaymentRequest_EntryController.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
             }
         });
     }
@@ -1590,8 +1534,7 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
 
                 }
             } catch (SQLException | GuanzonException ex) {
-                Logger.getLogger(PaymentRequest_EntryController.class
-                        .getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
             }
 
         }
@@ -1720,7 +1663,7 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
                     });
 
                 } catch (SQLException | GuanzonException ex) {
-                    Logger.getLogger(PaymentRequest_EntryController.class
+                    Logger.getLogger(getClass()
                             .getName()).log(Level.SEVERE, null, ex);
                 }
                 return null;
@@ -1923,7 +1866,7 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
 //                        loadRecordMaster();
 
                     } catch (SQLException | GuanzonException | CloneNotSupportedException ex) {
-                        Logger.getLogger(PaymentRequest_EntryController.class.getName()).log(Level.SEVERE, null, ex);
+                        Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
                     }
                 });
                 return null;
@@ -1964,33 +1907,31 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
 
     }
 
-    private void tableKeyEvents(KeyEvent event) {
-        TableView<?> currentTable = (TableView<?>) event.getSource();
-        TablePosition<?, ?> focusedCell = currentTable.getFocusModel().getFocusedCell();
-
-        if (focusedCell != null && "tblVwPRDetail".equals(currentTable.getId())) {
-            switch (event.getCode()) {
-                case TAB:
-                case DOWN:
-                    pnTblDetailRow = pnTblDetailRow;
-                    if (pnEditMode != EditMode.ADDNEW || pnEditMode != EditMode.UPDATE) {
-                        pnTblDetailRow = Integer.parseInt(detail_data.get(JFXUtil.moveToNextRow(currentTable)).getIndex11());
+    JFXUtil.TableKeyEvent tableKeyEvents = new JFXUtil.TableKeyEvent() {
+        @Override
+        protected void onRowMove(TableView<?> currentTable, String currentTableID, boolean isMovedDown) {
+            int newIndex = 0;
+            switch (currentTableID) {
+                case "tblVwPRDetail":
+                    newIndex = isMovedDown
+                            ? Integer.parseInt(detail_data.get(JFXUtil.moveToNextRow(currentTable)).getIndex11()) : Integer.parseInt(detail_data.get(JFXUtil.moveToPreviousRow(currentTable)).getIndex11());
+                    if (!detail_data.isEmpty()) {
+                        pnTblDetailRow = newIndex;
+                        loadRecordDetail();
+                        initDetailFocus();
                     }
                     break;
-                case UP:
-                    pnTblDetailRow = pnTblDetailRow;
-                    if (pnEditMode != EditMode.ADDNEW || pnEditMode != EditMode.UPDATE) {
-                        pnTblDetailRow = Integer.parseInt(detail_data.get(JFXUtil.moveToPreviousRow(currentTable)).getIndex11());
+                case "tblAttachments":
+                    if (!attachment_data.isEmpty()) {
+                        newIndex = isMovedDown
+                                ? Integer.parseInt(attachment_data.get(JFXUtil.moveToNextRow(currentTable)).getIndex03()) : Integer.parseInt(attachment_data.get(JFXUtil.moveToPreviousRow(currentTable)).getIndex03());
+                        pnAttachment = newIndex;
+                        loadRecordAttachment(true);
                     }
                     break;
-                default:
-                    return;
             }
-            loadRecordDetail();
-            initDetailFocus();
-            event.consume();
         }
-    }
+    };
 
     // Method to reselect the last clicked row
     private void reselectLastRow() {
@@ -2013,7 +1954,7 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
                         tfPayee.setText("");
                         loadTableMain();
                     } catch (SQLException | GuanzonException ex) {
-                        Logger.getLogger(PaymentRequest_EntryController.class
+                        Logger.getLogger(getClass()
                                 .getName()).log(Level.SEVERE, null, ex);
                     }
                 }
@@ -2060,14 +2001,14 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
                             return false;
 
                         } catch (ExceptionInInitializerError | SQLException | GuanzonException ex) {
-                            Logger.getLogger(PaymentRequest_EntryController.class
+                            Logger.getLogger(getClass()
                                     .getName()).log(Level.SEVERE, null, ex);
 
                         }
                     }
                 }
             } catch (SQLException | GuanzonException ex) {
-                Logger.getLogger(PaymentRequest_EntryController.class
+                Logger.getLogger(getClass()
                         .getName()).log(Level.SEVERE, null, ex);
 
             }
@@ -2104,7 +2045,7 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
                     }
                 }
             } catch (ExceptionInInitializerError | SQLException | GuanzonException ex) {
-                Logger.getLogger(PaymentRequest_EntryController.class
+                Logger.getLogger(getClass()
                         .getName()).log(Level.SEVERE, null, ex);
             }
         }
@@ -2147,7 +2088,7 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
                             }
                         }
                     } catch (CloneNotSupportedException | SQLException | GuanzonException ex) {
-                        Logger.getLogger(PaymentRequest_EntryController.class
+                        Logger.getLogger(getClass()
                                 .getName()).log(Level.SEVERE, null, ex);
                         ShowMessageFX.Warning("Error loading data: " + ex.getMessage(), psFormName, null);
                     }
@@ -2211,7 +2152,7 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
                         }
                     }
                 } catch (SQLException | GuanzonException ex) {
-                    Logger.getLogger(PaymentRequest_EntryController.class
+                    Logger.getLogger(getClass()
                             .getName()).log(Level.SEVERE, null, ex);
                 }
             }
@@ -2229,7 +2170,7 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
                     poGLControllers.PaymentRequest().TransactionAttachmentList(pnAttachment).getModel().setDocumentType("000" + String.valueOf(selectedIndex));
                     cmbAttachmentType.getSelectionModel().select(selectedIndex);
                 } catch (SQLException | GuanzonException ex) {
-                    Logger.getLogger(PaymentRequest_EntryController.class.getName()).log(Level.SEVERE, null, ex);
+                    Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
                 }
             }
         });
