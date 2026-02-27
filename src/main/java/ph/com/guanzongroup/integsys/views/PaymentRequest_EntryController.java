@@ -356,7 +356,6 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
                     chkbVatable.setSelected(false);
                 }
                 cbReverse.setSelected(poGLControllers.PaymentRequest().Detail(pnTblDetailRow).isReverse());
-
                 computePerDetailTaxAndTotal();
             } catch (SQLException | GuanzonException ex) {
                 Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
@@ -640,6 +639,7 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
                     loadTableMain();
                     break;
                 case "btnHistory":
+                    poGLControllers.PaymentRequest().ShowStatusHistory();
                     break;
                 case "btnClose":
                     if (ShowMessageFX.YesNo("Are you sure you want to close this form?", psFormName, null)) {
@@ -758,6 +758,8 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
             initFields(pnEditMode);
         } catch (CloneNotSupportedException | SQLException | GuanzonException | ParseException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+        } catch (Exception ex) {
+            Logger.getLogger(PaymentRequest_EntryController.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
@@ -1423,8 +1425,8 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
     private void initTextFieldPattern() {
         CustomCommonUtil.inputDecimalOnly(
                 tfTotalAmount, tfDiscountAmount, tfTotalVATableAmount, tfNetAmount,
-                tfAmount, tfDiscRate, tfDiscAmountDetail, tfTaxAmount, tfAmountDetail
-        );
+                tfAmount, tfDiscRate, tfDiscAmountDetail, tfTaxAmount);
+        JFXUtil.setCommaFormatter(tfAmountDetail);
     }
 
     private void initDatePickerActions() {

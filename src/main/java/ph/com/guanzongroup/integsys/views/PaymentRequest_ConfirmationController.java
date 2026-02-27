@@ -14,9 +14,7 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -94,7 +92,7 @@ import ph.com.guanzongroup.integsys.utility.JFXUtil;
 /**
  * FXML Controller class
  *
- * @author User
+ * @author Team 2 & Team 1
  */
 public class PaymentRequest_ConfirmationController implements Initializable, ScreenInterface {
 
@@ -133,9 +131,7 @@ public class PaymentRequest_ConfirmationController implements Initializable, Scr
     private ObservableList<ModelPRFAttachment> attachment_data = FXCollections.observableArrayList();
     ObservableList<String> documentType = ModelPRFAttachment.documentType;
     Map<String, String> imageinfo_temp = new HashMap<>();
-    JFXUtil.ReloadableTableTask loadTableAttachment;
-    private final JFXUtil.ImageViewer imageviewerutil = new JFXUtil.ImageViewer();
-    
+
     @FXML
     private TabPane ImTabPane;
     @FXML
@@ -160,7 +156,7 @@ public class PaymentRequest_ConfirmationController implements Initializable, Scr
     @FXML
     private TextField tfParticular, tfAmount, tfDiscRate, tfDiscAmountDetail, tfTaxAmount, tfAmountDetail;
     @FXML
-    private CheckBox chkbVatable;
+    private CheckBox chkbVatable, cbReverse;
     @FXML
     private TableView<ModelTableDetail> tblVwPRDetail;
     @FXML
@@ -220,21 +216,21 @@ public class PaymentRequest_ConfirmationController implements Initializable, Scr
             if (!"success".equals(poJSON.get("result"))) {
                 ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
             }
-            tblVwPRDetail.addEventFilter(KeyEvent.KEY_PRESSED, this::tableKeyEvents);
+            JFXUtil.setKeyEventFilter(tableKeyEvents, tblVwPRDetail, tblAttachments);
             Platform.runLater((() -> {
                 try {
                     poGLControllers.PaymentRequest().Master().setIndustryID(psIndustryID);
                     poGLControllers.PaymentRequest().Master().setCompanyID(psCompanyID);
                     loadRecordSearch();
                 } catch (SQLException | GuanzonException ex) {
-                    Logger.getLogger(PaymentRequest_ConfirmationController.class.getName()).log(Level.SEVERE, null, ex);
+                    Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
                 }
             }));
             Platform.runLater(() -> setBranchAndDepartment());
             initAll();
 
         } catch (ExceptionInInitializerError | SQLException | GuanzonException ex) {
-            Logger.getLogger(PaymentRequest_ConfirmationController.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
         }
     }
 
@@ -242,7 +238,7 @@ public class PaymentRequest_ConfirmationController implements Initializable, Scr
         try {
             lblSource.setText(poGLControllers.PaymentRequest().Master().Company().getCompanyName() + " - " + poGLControllers.PaymentRequest().Master().Industry().getDescription());
         } catch (GuanzonException | SQLException ex) {
-            Logger.getLogger(PaymentRequest_ConfirmationController.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
         }
 
     }
@@ -260,7 +256,7 @@ public class PaymentRequest_ConfirmationController implements Initializable, Scr
                 tfDepartment.setText(lsDepartment);
             }
         } catch (SQLException | GuanzonException ex) {
-            Logger.getLogger(PaymentRequest_ConfirmationController.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
         }
     }
 
@@ -271,8 +267,10 @@ public class PaymentRequest_ConfirmationController implements Initializable, Scr
             pnAttachment = tblAttachments.getSelectionModel().getSelectedIndex();
             if (pnAttachment >= 0) {
                 scaleFactor = 1.0;
+                int lnRow = Integer.parseInt(attachment_data.get(tblAttachments.getSelectionModel().getSelectedIndex()).getIndex03());
+                pnAttachment = lnRow;
                 loadRecordAttachment(true);
-                resetImageBounds();
+                JFXUtil.resetImageBounds(imageView, stackPane1);
             }
         });
     }
@@ -293,20 +291,8 @@ public class PaymentRequest_ConfirmationController implements Initializable, Scr
         initStackPaneListener();
         initButtons(pnEditMode);
         initFields(pnEditMode);
-        initLoadTable();
-        initComboBoxCellDesign(cmbAttachmentType);
-        cmbAttachmentType.setItems(documentType);
-        cmbAttachmentType.setOnAction(event -> {
-            if (attachment_data.size() > 0) {
-                try {
-                    int selectedIndex = cmbAttachmentType.getSelectionModel().getSelectedIndex();
-                    poGLControllers.PaymentRequest().TransactionAttachmentList(pnAttachment).getModel().setDocumentType("000" + String.valueOf(selectedIndex));
-                    cmbAttachmentType.getSelectionModel().select(selectedIndex);
-                } catch (SQLException | GuanzonException ex) {
-                    Logger.getLogger(PaymentRequest_ConfirmationController.class.getName()).log(Level.SEVERE, null, ex);
-                }
-            }
-        });
+        initComboBoxes();
+        loadTableAttachment();
     }
 
     private void loadRecordMaster() {
@@ -359,7 +345,7 @@ public class PaymentRequest_ConfirmationController implements Initializable, Scr
             }
             lblStatus.setText(lsStatus);
         } catch (SQLException | GuanzonException | NullPointerException ex) {
-            Logger.getLogger(PaymentRequest_ConfirmationController.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
         }
     }
 
@@ -382,9 +368,10 @@ public class PaymentRequest_ConfirmationController implements Initializable, Scr
                 } else {
                     chkbVatable.setSelected(false);
                 }
+                cbReverse.setSelected(poGLControllers.PaymentRequest().Detail(pnTblDetailRow).isReverse());
                 computePerDetailTaxAndTotal();
             } catch (SQLException | GuanzonException ex) {
-                Logger.getLogger(PaymentRequest_ConfirmationController.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
             }
         }
     }
@@ -559,6 +546,7 @@ public class PaymentRequest_ConfirmationController implements Initializable, Scr
                     loadTableMain();
                     break;
                 case "btnHistory":
+                    poGLControllers.PaymentRequest().ShowStatusHistory();
                     break;
                 case "btnClose":
                     if (ShowMessageFX.YesNo("Are you sure you want to close this form?", psFormName, null)) {
@@ -583,8 +571,7 @@ public class PaymentRequest_ConfirmationController implements Initializable, Scr
                             Path imgPath = selectedFile.toPath();
                             Image loimage = new Image(Files.newInputStream(imgPath));
                             imageView.setImage(loimage);
-                            
-                            
+
                             String imgPath2 = selectedFile.getName().toString();
                             for (int lnCtr = 0; lnCtr <= poGLControllers.PaymentRequest().getTransactionAttachmentCount() - 1; lnCtr++) {
                                 if (imgPath2.equals(poGLControllers.PaymentRequest().TransactionAttachmentList(lnCtr).getModel().getFileName())
@@ -595,7 +582,7 @@ public class PaymentRequest_ConfirmationController implements Initializable, Scr
                                     return;
                                 }
                             }
-                            
+
                             if (imageinfo_temp.containsKey(selectedFile.getName().toString())) {
                                 ShowMessageFX.Warning(null, psFormName, "File name already exists.");
                                 loadRecordAttachment(true);
@@ -603,7 +590,7 @@ public class PaymentRequest_ConfirmationController implements Initializable, Scr
                             } else {
                                 imageinfo_temp.put(selectedFile.getName().toString(), imgPath.toString());
                             }
-                            
+
                             //Limit maximum pages of pdf to add
                             if (imgPath2.toLowerCase().endsWith(".pdf")) {
                                 try (PDDocument document = PDDocument.load(selectedFile)) {
@@ -619,43 +606,43 @@ public class PaymentRequest_ConfirmationController implements Initializable, Scr
                             pnAttachment = poGLControllers.PaymentRequest().addAttachment(imgPath2);
                             //Copy file to Attachment path
                             poGLControllers.PaymentRequest().copyFile(selectedFile.toString());
-                            loadTableAttachment.reload();
+                            loadTableAttachment();
                             tblAttachments.getFocusModel().focus(pnAttachment);
                             tblAttachments.getSelectionModel().select(pnAttachment);
 
                         } catch (IOException ex) {
-                            Logger.getLogger(PaymentRequest_EntryController.class.getName()).log(Level.SEVERE, null, ex);
+                            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
                         }
                     }
                     break;
                 case "btnRemoveAttachment":
                     if (poGLControllers.PaymentRequest().getTransactionAttachmentCount() <= 0) {
-                            return;
-                        } else {
-                            for (int lnCtr = 0; lnCtr < poGLControllers.PaymentRequest().getTransactionAttachmentCount(); lnCtr++) {
-                                if (RecordStatus.INACTIVE.equals(poGLControllers.PaymentRequest().TransactionAttachmentList(lnCtr).getModel().getRecordStatus())) {
-                                    if (pnAttachment == lnCtr) {
-                                        return;
-                                    }
+                        return;
+                    } else {
+                        for (int lnCtr = 0; lnCtr < poGLControllers.PaymentRequest().getTransactionAttachmentCount(); lnCtr++) {
+                            if (RecordStatus.INACTIVE.equals(poGLControllers.PaymentRequest().TransactionAttachmentList(lnCtr).getModel().getRecordStatus())) {
+                                if (pnAttachment == lnCtr) {
+                                    return;
                                 }
                             }
                         }
-                        poJSON = poGLControllers.PaymentRequest().removeAttachment(pnAttachment);
-                        if ("error".equals((String) poJSON.get("result"))) {
-                            ShowMessageFX.Warning(null, psFormName, (String) poJSON.get("message"));
-                            return;
-                        }
-                        attachment_data.remove(tblAttachments.getSelectionModel().getSelectedIndex());
-                        if (pnAttachment != 0) {
-                            pnAttachment -= 1;
-                        }
-                        imageinfo_temp.clear();
-                        loadRecordAttachment(false);
-                        loadTableAttachment.reload();
-                        if (attachment_data.size() <= 0) {
-                            JFXUtil.clearTextFields(apAttachments);
-                        }
-                        initAttachmentsGrid();
+                    }
+                    poJSON = poGLControllers.PaymentRequest().removeAttachment(pnAttachment);
+                    if ("error".equals((String) poJSON.get("result"))) {
+                        ShowMessageFX.Warning(null, psFormName, (String) poJSON.get("message"));
+                        return;
+                    }
+                    attachment_data.remove(tblAttachments.getSelectionModel().getSelectedIndex());
+                    if (pnAttachment != 0) {
+                        pnAttachment -= 1;
+                    }
+                    imageinfo_temp.clear();
+                    loadRecordAttachment(false);
+                    loadTableAttachment();
+                    if (attachment_data.size() <= 0) {
+                        JFXUtil.clearTextFields(apAttachments);
+                    }
+                    initAttachmentsGrid();
                     break;
                 case "btnArrowLeft":
                     slideImage(-1);
@@ -719,8 +706,8 @@ public class PaymentRequest_ConfirmationController implements Initializable, Scr
                     ShowMessageFX.Warning("Please contact admin to assist about no button available", psFormName, null);
                     break;
             }
-            if (lsButton.equals("btnAddAttachment") || lsButton.equals("btnRemoveAttachment")
-                    || lsButton.equals("btnArrowRight") || lsButton.equals("btnArrowLeft") || lsButton.equals("btnRetrieve")) {
+            if (lsButton.equals("btnRetrieve") || lsButton.equals("btnAddAttachment") || lsButton.equals("btnRemoveAttachment")
+                    || lsButton.equals("btnArrowRight") || lsButton.equals("btnArrowLeft") || lsButton.equals("btnRetrieve") || lsButton.equals("btnHistory")) {
             } else {
                 loadRecordMaster();
                 loadTableDetail();
@@ -729,6 +716,8 @@ public class PaymentRequest_ConfirmationController implements Initializable, Scr
             initButtons(pnEditMode);
             initFields(pnEditMode);
         } catch (CloneNotSupportedException | SQLException | GuanzonException | ParseException ex) {
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+        } catch (Exception ex) {
             Logger.getLogger(PaymentRequest_ConfirmationController.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
@@ -752,12 +741,14 @@ public class PaymentRequest_ConfirmationController implements Initializable, Scr
             }
 
         } catch (SQLException | GuanzonException ex) {
-            Logger.getLogger(DeliveryAcceptance_ConfirmationController.class.getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
         }
     }
 
     public void loadRecordAttachment(boolean lbloadImage) {
         try {
+            boolean lbShow2 = pnEditMode == EditMode.UPDATE;
+            JFXUtil.setDisabled(!lbShow2, cmbAttachmentType, btnAddAttachment, btnRemoveAttachment);
             if (attachment_data.size() > 0) {
                 tfAttachmentNo.setText(String.valueOf(pnAttachment + 1));
                 String lsAttachmentType = poGLControllers.PaymentRequest().TransactionAttachmentList(pnAttachment).getModel().getDocumentType();
@@ -817,39 +808,46 @@ public class PaymentRequest_ConfirmationController implements Initializable, Scr
         Task<Void> task = new Task<Void>() {
             @Override
             protected Void call() throws Exception {
+                scaleFactor = 1.0;
+                JFXUtil.resetImageBounds(imageView, stackPane1);
                 Platform.runLater(() -> {
                     try {
                         attachment_data.clear();
                         int lnCtr;
+                        int lnCount = 0;
                         for (lnCtr = 0; lnCtr < poGLControllers.PaymentRequest().getTransactionAttachmentCount(); lnCtr++) {
+                            if (RecordStatus.INACTIVE.equals(poGLControllers.PaymentRequest().TransactionAttachmentList(lnCtr).getModel().getRecordStatus())) {
+                                continue;
+                            }
+                            lnCount += 1;
                             attachment_data.add(
-                                    new ModelPRFAttachment(String.valueOf(lnCtr + 1),
-                                            String.valueOf(poGLControllers.PaymentRequest().TransactionAttachmentList(lnCtr).getModel().getFileName())
+                                    new ModelPRFAttachment(String.valueOf(lnCount),
+                                            String.valueOf(poGLControllers.PaymentRequest().TransactionAttachmentList(lnCtr).getModel().getFileName()),
+                                            String.valueOf(lnCtr)
                                     ));
                         }
-                        if (pnAttachment < 0 || pnAttachment
+                        int lnTempRow = JFXUtil.getDetailRow(attachment_data, pnAttachment, 3); //this method is used only when Reverse is applied
+                        if (lnTempRow < 0 || lnTempRow
                                 >= attachment_data.size()) {
                             if (!attachment_data.isEmpty()) {
                                 /* FOCUS ON FIRST ROW */
-                                tblAttachments.getSelectionModel().select(0);
-                                tblAttachments.getFocusModel().focus(0);
-                                pnAttachment = 0;
+                                JFXUtil.selectAndFocusRow(tblAttachments, 0);
+                                int lnRow = Integer.parseInt(attachment_data.get(0).getIndex03());
+                                pnAttachment = lnRow;
                                 loadRecordAttachment(true);
-                            } else {
-                                tfAttachmentNo.setText("");
-                                cmbAttachmentType.getSelectionModel().select(0);
-                                loadRecordAttachment(false);
                             }
                         } else {
                             /* FOCUS ON THE ROW THAT pnRowDetail POINTS TO */
-                            tblAttachments.getSelectionModel().select(pnAttachment);
-                            tblAttachments.getFocusModel().focus(pnAttachment);
+                            JFXUtil.selectAndFocusRow(tblAttachments, lnTempRow);
+                            int lnRow = Integer.parseInt(attachment_data.get(tblAttachments.getSelectionModel().getSelectedIndex()).getIndex03());
+                            pnAttachment = lnRow;
                             loadRecordAttachment(true);
                         }
+                        if (attachment_data.size() <= 0) {
+                            loadRecordAttachment(false);
+                        }
                     } catch (Exception e) {
-
                     }
-
                 });
 
                 return null;
@@ -1113,8 +1111,7 @@ public class PaymentRequest_ConfirmationController implements Initializable, Scr
                 loTextArea.selectAll();
             }
         } catch (SQLException | GuanzonException ex) {
-            Logger.getLogger(PaymentRequest_ConfirmationController.class
-                    .getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
         }
     };
 
@@ -1143,6 +1140,7 @@ public class PaymentRequest_ConfirmationController implements Initializable, Scr
                     case F3:
                         switch (txtFieldID) {
                             case "tfSearchTransaction":
+                                loadTableMain();
                                 break;
                             case "tfSearchPayee":
                                 poJSON = poGLControllers.PaymentRequest().SearchPayee(lsValue, false);
@@ -1179,10 +1177,13 @@ public class PaymentRequest_ConfirmationController implements Initializable, Scr
                                         ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
                                         tfParticular.setText("");
                                         if (poJSON.get("tableRow") != null) {
-                                            pnTblDetailRow = (int) poJSON.get("tableRow");
+                                            Object obj = poJSON.get("tableRow");
+                                            int value = Integer.valueOf(String.valueOf(obj));
+                                            pnTblDetailRow = value;
                                         } else {
                                             break;
                                         }
+                                    } else {
                                     }
                                     loadTableDetail();
                                     loadRecordDetail();
@@ -1209,38 +1210,30 @@ public class PaymentRequest_ConfirmationController implements Initializable, Scr
                                 break;
                             case "tfAmount":
                                 setAmountToDetail(tfAmount.getText());
-                                if (!detail_data.isEmpty() && pnTblDetailRow < detail_data.size() - 1) {
-                                    pnTblDetailRow++;
+                                if (JFXUtil.isObjectEqualTo(lsTxtField.getId(), "tfParticular", "tfAmount")) {
+                                    pnTblDetailRow = Integer.parseInt(detail_data.get(JFXUtil.moveToNextRow(tblVwPRDetail)).getIndex11());
                                 }
-                                CommonUtils.SetNextFocus((TextField) event.getSource());
-                                loadTableDetailAndSelectedRow();
+                                loadTableDetail();
+                                loadRecordDetail();
+                                initDetailFocus();
                                 break;
                         }
                         event.consume();
                         break;
                     case UP:
                         setAmountToDetail(tfAmount.getText());
-                        if (!lsTxtField.equals("tfParticular")) {
-                            if (pnTblDetailRow > 0 && !detail_data.isEmpty()) {
-                                pnTblDetailRow--;
-                            }
+                        if (JFXUtil.isObjectEqualTo(lsTxtField.getId(), "tfParticular", "tfAmount")) {
+                            pnTblDetailRow = Integer.parseInt(detail_data.get(JFXUtil.moveToPreviousRow(tblVwPRDetail)).getIndex11());
                         }
-
-                        if (!lsTxtField.equals("tfParticular") && !lsTxtField.equals("tfAmount")) {
-                            CommonUtils.SetPreviousFocus((TextField) event.getSource());
-                        }
-                        loadTableDetailAndSelectedRow();
+                        loadRecordDetail();
                         event.consume();
                         break;
                     case DOWN:
                         setAmountToDetail(tfAmount.getText());
-                        if ("tfAmount".equals(lsTxtField.getId())) {
-                            if (!detail_data.isEmpty() && pnTblDetailRow < detail_data.size() - 1) {
-                                pnTblDetailRow++;
-                            }
+                        if (JFXUtil.isObjectEqualTo(lsTxtField.getId(), "tfParticular", "tfAmount")) {
+                            pnTblDetailRow = Integer.parseInt(detail_data.get(JFXUtil.moveToNextRow(tblVwPRDetail)).getIndex11());
                         }
-                        CommonUtils.SetNextFocus(lsTxtField);
-                        loadTableDetailAndSelectedRow();
+                        loadRecordDetail();
                         event.consume(); // Consume event after handling focus
                         break;
                     default:
@@ -1248,8 +1241,7 @@ public class PaymentRequest_ConfirmationController implements Initializable, Scr
 
                 }
             } catch (SQLException | GuanzonException ex) {
-                Logger.getLogger(PaymentRequest_ConfirmationController.class
-                        .getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
             }
         }
     }
@@ -1282,7 +1274,7 @@ public class PaymentRequest_ConfirmationController implements Initializable, Scr
             tfDiscAmountDetail.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poGLControllers.PaymentRequest().Detail(pnTblDetailRow).getAddDiscount(), true));
             computePerDetailTaxAndTotal();
         } catch (SQLException | GuanzonException ex) {
-            Logger.getLogger(PaymentRequest_ConfirmationController.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
         }
     }
 
@@ -1317,7 +1309,7 @@ public class PaymentRequest_ConfirmationController implements Initializable, Scr
             tfDiscAmountDetail.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poGLControllers.PaymentRequest().Detail(pnTblDetailRow).getAddDiscount(), true));
             computePerDetailTaxAndTotal();
         } catch (SQLException | GuanzonException ex) {
-            Logger.getLogger(PaymentRequest_ConfirmationController.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
         }
     }
 
@@ -1381,7 +1373,7 @@ public class PaymentRequest_ConfirmationController implements Initializable, Scr
             poGLControllers.PaymentRequest().Detail(pnTblDetailRow).setAmount(amount);
             tfAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poGLControllers.PaymentRequest().Detail(pnTblDetailRow).getAmount(), true));
         } catch (SQLException | GuanzonException ex) {
-            Logger.getLogger(PaymentRequest_EntryController.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
         } catch (NumberFormatException ex) {
             ShowMessageFX.Warning("Invalid numeric input for amount.", psFormName, null);
             tfAmount.setText("0.00");
@@ -1391,8 +1383,8 @@ public class PaymentRequest_ConfirmationController implements Initializable, Scr
     private void initTextFieldPattern() {
         CustomCommonUtil.inputDecimalOnly(
                 tfTotalAmount, tfDiscountAmount, tfTotalVATableAmount, tfNetAmount,
-                tfAmount, tfDiscRate, tfDiscAmountDetail, tfTaxAmount, tfAmountDetail
-        );
+                tfAmount, tfDiscRate, tfDiscAmountDetail, tfTaxAmount);
+        JFXUtil.setCommaFormatter(tfAmountDetail);
     }
 
     private void initDatePickerActions() {
@@ -1402,7 +1394,7 @@ public class PaymentRequest_ConfirmationController implements Initializable, Scr
                     try {
                         poGLControllers.PaymentRequest().Master().setTransactionDate(SQLUtil.toDate(dpTransaction.getValue().toString(), SQLUtil.FORMAT_SHORT_DATE));
                     } catch (SQLException | GuanzonException ex) {
-                        Logger.getLogger(PaymentRequest_ConfirmationController.class.getName()).log(Level.SEVERE, null, ex);
+                        Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
                     }
                 }
             }
@@ -1425,9 +1417,29 @@ public class PaymentRequest_ConfirmationController implements Initializable, Scr
                     computePerDetailTaxAndTotal();
                     loadTableDetailAndSelectedRow();
                 } catch (SQLException | GuanzonException ex) {
-                    Logger.getLogger(PaymentRequest_ConfirmationController.class.getName()).log(Level.SEVERE, null, ex);
+                    Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
                 }
                 initFields(pnEditMode);
+            }
+        });
+        cbReverse.setOnAction(event -> {
+            try {
+                if (poGLControllers.PaymentRequest().Detail(pnTblDetailRow).getEditMode() == EditMode.ADDNEW) {
+                    if (poGLControllers.PaymentRequest().Master().getSourceNo() != null && !"".equals(poGLControllers.PaymentRequest().Master().getSourceNo())) {
+                        if (!cbReverse.isSelected()) {
+                            poGLControllers.PaymentRequest().ReverseItem(pnTblDetailRow);
+                        } else {
+                            poGLControllers.PaymentRequest().Detail(pnTblDetailRow).isReverse(cbReverse.isSelected());
+                        }
+                    } else {
+                        poGLControllers.PaymentRequest().Detail().remove(pnTblDetailRow);
+                    }
+                } else {
+                    poGLControllers.PaymentRequest().Detail(pnTblDetailRow).isReverse(cbReverse.isSelected());
+                }
+                loadTableDetail();
+            } catch (SQLException | GuanzonException ex) {
+                Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
             }
         });
     }
@@ -1479,14 +1491,15 @@ public class PaymentRequest_ConfirmationController implements Initializable, Scr
                         CustomCommonUtil.setManaged(true, btnConfirm, btnVoid, btnUpdate);
                         break;
                     case PaymentRequestStatus.CONFIRMED:
-                        CustomCommonUtil.setVisible(true,  btnVoid, btnUpdate);
-                        CustomCommonUtil.setManaged(true,  btnVoid, btnUpdate);
+                        CustomCommonUtil.setVisible(true, btnVoid, btnUpdate);
+                        CustomCommonUtil.setManaged(true, btnVoid, btnUpdate);
                         break;
                 }
 
             }
+
         } catch (SQLException | GuanzonException ex) {
-            Logger.getLogger(PaymentRequest_ConfirmationController.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
         }
     }
 
@@ -1525,7 +1538,7 @@ public class PaymentRequest_ConfirmationController implements Initializable, Scr
             protected Void call() throws Exception {
                 try {
                     main_data.clear();
-                    poJSON = poGLControllers.PaymentRequest().getPaymentRequest(psTransactionNo, psPayeeID);
+                    poJSON = poGLControllers.PaymentRequest().getPaymentRequest(tfSearchTransaction.getText(), tfSearchPayee.getText());
                     if ("success".equals(poJSON.get("result"))) {
                         if (poGLControllers.PaymentRequest().getPRFMasterCount() > 0) {
                             for (int lnCntr = 0; lnCntr < poGLControllers.PaymentRequest().getPRFMasterCount(); lnCntr++) {
@@ -1550,7 +1563,7 @@ public class PaymentRequest_ConfirmationController implements Initializable, Scr
                     });
 
                 } catch (SQLException | GuanzonException ex) {
-                    Logger.getLogger(PurchaseOrder_ConfirmationController.class.getName()).log(Level.SEVERE, null, ex);
+                    Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
                 }
                 return null;
             }
@@ -1712,61 +1725,77 @@ public class PaymentRequest_ConfirmationController implements Initializable, Scr
         Task<List<ModelTableDetail>> task = new Task<List<ModelTableDetail>>() {
             @Override
             protected List<ModelTableDetail> call() throws Exception {
-                try {
-                    int detailCount = poGLControllers.PaymentRequest().getDetailCount();
-                    List<ModelTableDetail> detailsList = new ArrayList<>();
-                    for (int lnCtr = 0; lnCtr < detailCount; lnCtr++) {
+                Platform.runLater(() -> {
+                    try {
+                        detail_data.clear();
+                        int detailCount = poGLControllers.PaymentRequest().getDetailCount();
+
+                        int lnRowCount = 0;
+                        for (int lnCtr = 0; lnCtr < detailCount; lnCtr++) {
 //                        double totalNetDetailPayable = 0.00;
 //                        double totalTaxAmount = 0.00;
 //                        double lnAmount = poGLControllers.PaymentRequest().Detail(lnCtr).getAmount().doubleValue();
 //                        double lnDiscountAmount = poGLControllers.PaymentRequest().Detail(lnCtr).getAddDiscount().doubleValue();
-                        String lsIsVatable = "N";
-                        if (poGLControllers.PaymentRequest().Detail(lnCtr).getVatable().equals("1")) {
+                            String lsIsVatable = "N";
+                            if (poGLControllers.PaymentRequest().Detail(lnCtr).getVatable().equals("1")) {
 //                            poJSON = poGLControllers.PaymentRequest().computeNetPayableDetails(lnAmount - lnDiscountAmount, true, 0.12, 0.00);
-                            lsIsVatable = "Y";
-                        }
+                                lsIsVatable = "Y";
+                            }
 //                        } else {
 //                            poJSON = poGLControllers.PaymentRequest().computeNetPayableDetails(lnAmount - lnDiscountAmount, false, 0.12, 0.00);
 //                        }
 //                        totalTaxAmount = Double.parseDouble(poJSON.get("vat").toString());
 //                        totalNetDetailPayable = Double.parseDouble(poJSON.get("netPayable").toString());
-                        detailsList.add(new ModelTableDetail(
-                                String.valueOf(lnCtr + 1),
-                                poGLControllers.PaymentRequest().Detail(lnCtr).getParticularID(),
-                                poGLControllers.PaymentRequest().Detail(lnCtr).Particular().getDescription(),
-                                CustomCommonUtil.setIntegerValueToDecimalFormat(poGLControllers.PaymentRequest().Detail(lnCtr).getAmount(), true),
-                                CustomCommonUtil.setIntegerValueToDecimalFormat(poGLControllers.PaymentRequest().Detail(lnCtr).getDiscount()),
-                                CustomCommonUtil.setIntegerValueToDecimalFormat(poGLControllers.PaymentRequest().Detail(lnCtr).getAddDiscount(), true),
-                                lsIsVatable,
-                                "0.00",
-                                CustomCommonUtil.setIntegerValueToDecimalFormat(poGLControllers.PaymentRequest().Detail(lnCtr).getAmount(), true),
-                                ""
-                        ));
-                    }
-                    Platform.runLater(() -> {
-                        try {
-                            detail_data.setAll(detailsList); // Properly update list
-                            tblVwPRDetail.setItems(detail_data);
-                            poJSON = poGLControllers.PaymentRequest().computeMasterFields();
-                            tfTotalAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poGLControllers.PaymentRequest().Master().getTranTotal(), true));
-                            tfDiscountAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poGLControllers.PaymentRequest().Master().getDiscountAmount(), true));
-                            tfTotalVATableAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poGLControllers.PaymentRequest().Master().getTaxAmount(), true));
-                            tfNetAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poGLControllers.PaymentRequest().Master().getNetTotal(), true));
-                            reselectLastRow();
-                            initFields(pnEditMode);
-
-                        } catch (SQLException | GuanzonException ex) {
-                            Logger.getLogger(PaymentRequest_ConfirmationController.class
-                                    .getName()).log(Level.SEVERE, null, ex);
+                            if (!poGLControllers.PaymentRequest().Detail(lnCtr).isReverse()) {
+                                continue;
+                            }
+                            lnRowCount += 1;
+                            detail_data.add(new ModelTableDetail(
+                                    String.valueOf(lnRowCount),
+                                    poGLControllers.PaymentRequest().Detail(lnCtr).getParticularID(),
+                                    poGLControllers.PaymentRequest().Detail(lnCtr).Particular().getDescription(),
+                                    CustomCommonUtil.setIntegerValueToDecimalFormat(poGLControllers.PaymentRequest().Detail(lnCtr).getAmount(), true),
+                                    CustomCommonUtil.setIntegerValueToDecimalFormat(poGLControllers.PaymentRequest().Detail(lnCtr).getDiscount()),
+                                    CustomCommonUtil.setIntegerValueToDecimalFormat(poGLControllers.PaymentRequest().Detail(lnCtr).getAddDiscount(), true),
+                                    lsIsVatable,
+                                    "0.00",
+                                    CustomCommonUtil.setIntegerValueToDecimalFormat(poGLControllers.PaymentRequest().Detail(lnCtr).getAmount(), true),
+                                    "",
+                                    String.valueOf(lnCtr)
+                            ));
                         }
-                    });
-                    return detailsList;
+                        poJSON = poGLControllers.PaymentRequest().computeMasterFields();
+                        tfTotalAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poGLControllers.PaymentRequest().Master().getTranTotal(), true));
+                        tfDiscountAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poGLControllers.PaymentRequest().Master().getDiscountAmount(), true));
+                        tfTotalVATableAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poGLControllers.PaymentRequest().Master().getTaxAmount(), true));
+                        tfNetAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poGLControllers.PaymentRequest().Master().getNetTotal(), true));
+                        reselectLastRow();
+                        initFields(pnEditMode);
 
-                } catch (GuanzonException | SQLException ex) {
-                    Logger.getLogger(PaymentRequest_ConfirmationController.class
-                            .getName()).log(Level.SEVERE, null, ex);
-                    return null;
-                }
+                        int lnTempRow = JFXUtil.getDetailRow(detail_data, pnTblDetailRow, 11); //this method is used only when Reverse is applied
+                        if (lnTempRow < 0 || lnTempRow
+                                >= detail_data.size()) {
+                            if (!detail_data.isEmpty()) {
+                                /* FOCUS ON FIRST ROW */
+                                JFXUtil.selectAndFocusRow(tblVwPRDetail, 0);
+                                int lnRow = Integer.parseInt(detail_data.get(0).getIndex11());
+                                pnTblDetailRow = lnRow;
+                                loadRecordDetail();
+                            }
+                        } else {
+                            /* FOCUS ON THE ROW THAT pnRowDetail POINTS TO */
+                            JFXUtil.selectAndFocusRow(tblVwPRDetail, lnTempRow);
+                            int lnRow = Integer.parseInt(detail_data.get(tblVwPRDetail.getSelectionModel().getSelectedIndex()).getIndex11());
+                            pnTblDetailRow = lnRow;
+                            loadRecordDetail();
+                        }
+//                        loadRecordMaster();
+                    } catch (GuanzonException | SQLException ex) {
+                        Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+                    }
+                });
+
+                return null;
             }
 
             @Override
@@ -1800,55 +1829,34 @@ public class PaymentRequest_ConfirmationController implements Initializable, Scr
                 });
             }
         });
+        tblVwPRDetail.setItems(detail_data);
     }
 
-    private int moveToNextRow(TableView<?> table, TablePosition<?, ?> focusedCell) {
-        if (table.getItems().isEmpty()) {
-            return -1; // No movement possible
-        }
-        int nextRow = (focusedCell.getRow() + 1) % table.getItems().size();
-        table.getSelectionModel().select(nextRow);
-        return nextRow;
-    }
-
-    private int moveToPreviousRow(TableView<?> table, TablePosition<?, ?> focusedCell) {
-        if (table.getItems().isEmpty()) {
-            return -1; // No movement possible
-        }
-        int previousRow = (focusedCell.getRow() - 1 + table.getItems().size()) % table.getItems().size();
-        table.getSelectionModel().select(previousRow);
-        return previousRow;
-    }
-
-    private void tableKeyEvents(KeyEvent event) {
-        TableView<?> currentTable = (TableView<?>) event.getSource();
-        TablePosition<?, ?> focusedCell = currentTable.getFocusModel().getFocusedCell();
-
-        if (focusedCell != null && "tblVwPRDetail".equals(currentTable.getId())) {
-            switch (event.getCode()) {
-                case TAB:
-                case DOWN:
-                    pnTblDetailRow = pnTblDetailRow;
-                    if (pnEditMode != EditMode.ADDNEW || pnEditMode != EditMode.UPDATE) {
-                        pnTblDetailRow = moveToNextRow(currentTable, focusedCell);
+    JFXUtil.TableKeyEvent tableKeyEvents = new JFXUtil.TableKeyEvent() {
+        @Override
+        protected void onRowMove(TableView<?> currentTable, String currentTableID, boolean isMovedDown) {
+            int newIndex = 0;
+            switch (currentTableID) {
+                case "tblVwPRDetail":
+                    newIndex = isMovedDown
+                            ? Integer.parseInt(detail_data.get(JFXUtil.moveToNextRow(currentTable)).getIndex11()) : Integer.parseInt(detail_data.get(JFXUtil.moveToPreviousRow(currentTable)).getIndex11());
+                    if (!detail_data.isEmpty()) {
+                        pnTblDetailRow = newIndex;
+                        loadRecordDetail();
+                        initDetailFocus();
                     }
                     break;
-                case UP:
-                    pnTblDetailRow = pnTblDetailRow;
-                    if (pnEditMode != EditMode.ADDNEW || pnEditMode != EditMode.UPDATE) {
-                        pnTblDetailRow = moveToPreviousRow(currentTable, focusedCell);
+                case "tblAttachments":
+                    newIndex = isMovedDown
+                            ? Integer.parseInt(attachment_data.get(JFXUtil.moveToNextRow(currentTable)).getIndex03()) : Integer.parseInt(attachment_data.get(JFXUtil.moveToPreviousRow(currentTable)).getIndex03());
+                    if (!attachment_data.isEmpty()) {
+                        pnAttachment = newIndex;
+                        loadRecordAttachment(true);
                     }
                     break;
-                default:
-                    return;
             }
-            currentTable.getSelectionModel().select(pnTblDetailRow);
-            currentTable.getFocusModel().focus(pnTblDetailRow);
-            loadRecordDetail();
-            initDetailFocus();
-            event.consume();
         }
-    }
+    };
 
     // Method to reselect the last clicked row
     private void reselectLastRow() {
@@ -1868,8 +1876,7 @@ public class PaymentRequest_ConfirmationController implements Initializable, Scr
                         psPayeeID = "";
                         loadTableMain();
                     } catch (SQLException | GuanzonException ex) {
-                        Logger.getLogger(PaymentRequest_ConfirmationController.class
-                                .getName()).log(Level.SEVERE, null, ex);
+                        Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
                     }
                 }
             }
@@ -1919,8 +1926,7 @@ public class PaymentRequest_ConfirmationController implements Initializable, Scr
 
                     }
                 } catch (CloneNotSupportedException | SQLException | GuanzonException ex) {
-                    Logger.getLogger(PurchaseOrder_ConfirmationController.class
-                            .getName()).log(Level.SEVERE, null, ex);
+                    Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
                     ShowMessageFX.Warning("Error loading data: " + ex.getMessage(), psFormName, null);
                 }
             }
@@ -1947,7 +1953,8 @@ public class PaymentRequest_ConfirmationController implements Initializable, Scr
 
     private void tblVwDetail_Clicked(MouseEvent event) {
         if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE || pnEditMode == EditMode.READY) {
-            pnTblDetailRow = tblVwPRDetail.getSelectionModel().getSelectedIndex();
+            int lnRow = Integer.parseInt(detail_data.get(tblVwPRDetail.getSelectionModel().getSelectedIndex()).getIndex11());
+            pnTblDetailRow = lnRow;
             ModelTableDetail selectedItem = tblVwPRDetail.getSelectionModel().getSelectedItem();
             if (event.getClickCount() == 1) {
                 clearDetailFields();
@@ -1959,56 +1966,6 @@ public class PaymentRequest_ConfirmationController implements Initializable, Scr
                 }
             }
         }
-    }
-    public void initLoadTable() {
-        loadTableAttachment = new JFXUtil.ReloadableTableTask(
-                tblAttachments,
-                attachment_data,
-                () -> {
-                    imageviewerutil.scaleFactor = 1.0;
-                    JFXUtil.resetImageBounds(imageView, stackPane1);
-                    Platform.runLater(() -> {
-                        try {
-                            attachment_data.clear();
-                            int lnCtr;
-                            int lnCount = 0;
-                            for (lnCtr = 0; lnCtr < poGLControllers.PaymentRequest().getTransactionAttachmentCount(); lnCtr++) {
-                                if (RecordStatus.INACTIVE.equals(poGLControllers.PaymentRequest().TransactionAttachmentList(lnCtr).getModel().getRecordStatus())) {
-                                    continue;
-                                }
-                                lnCount += 1;
-                                attachment_data.add(
-                                        new ModelPRFAttachment(String.valueOf(lnCount),
-                                                String.valueOf(poGLControllers.PaymentRequest().TransactionAttachmentList(lnCtr).getModel().getFileName()),
-                                                String.valueOf(lnCtr)
-                                        ));
-                            }
-                            int lnTempRow = JFXUtil.getDetailRow(attachment_data, pnAttachment, 3); //this method is used only when Reverse is applied
-                            if (lnTempRow < 0 || lnTempRow
-                                    >= attachment_data.size()) {
-                                if (!attachment_data.isEmpty()) {
-                                    /* FOCUS ON FIRST ROW */
-                                    JFXUtil.selectAndFocusRow(tblAttachments, 0);
-                                    int lnRow = Integer.parseInt(attachment_data.get(0).getIndex03());
-                                    pnAttachment = lnRow;
-                                    loadRecordAttachment(true);
-                                }
-                            } else {
-                                /* FOCUS ON THE ROW THAT pnRowDetail POINTS TO */
-                                JFXUtil.selectAndFocusRow(tblAttachments, lnTempRow);
-                                int lnRow = Integer.parseInt(attachment_data.get(tblAttachments.getSelectionModel().getSelectedIndex()).getIndex03());
-                                pnAttachment = lnRow;
-                                loadRecordAttachment(true);
-                            }
-                            if (attachment_data.size() <= 0) {
-                                loadRecordAttachment(false);
-                            }
-                        } catch (Exception e) {
-                        }
-                    });
-                }
-        );
-
     }
 
     private void initDetailFocus() {
@@ -2027,12 +1984,26 @@ public class PaymentRequest_ConfirmationController implements Initializable, Scr
                         }
                     }
                 } catch (SQLException | GuanzonException ex) {
-                    Logger.getLogger(PaymentRequest_ConfirmationController.class
-                            .getName()).log(Level.SEVERE, null, ex);
+                    Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
                 }
             }
 
         }
     }
 
+    private void initComboBoxes() {
+        JFXUtil.initComboBoxCellDesignColor("#FF8201", cmbAttachmentType);
+        cmbAttachmentType.setItems(documentType);
+        cmbAttachmentType.setOnAction(event -> {
+            if (attachment_data.size() > 0) {
+                try {
+                    int selectedIndex = cmbAttachmentType.getSelectionModel().getSelectedIndex();
+                    poGLControllers.PaymentRequest().TransactionAttachmentList(pnAttachment).getModel().setDocumentType("000" + String.valueOf(selectedIndex));
+                    cmbAttachmentType.getSelectionModel().select(selectedIndex);
+                } catch (SQLException | GuanzonException ex) {
+                    Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        });
+    }
 }
