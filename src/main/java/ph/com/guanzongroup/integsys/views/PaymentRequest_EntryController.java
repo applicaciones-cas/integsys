@@ -140,22 +140,21 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
     @FXML
     private Tab tabDetails, tabAttachments;
     @FXML
-    private AnchorPane AnchorMain, apBrowse, apButton, apAttachments, apAttachmentButtons;
+    private AnchorPane AnchorMain, apBrowse, apButton, apAttachments, apAttachmentButtons, apMaster, apDetail;
     @FXML
     private HBox hbButtons;
     @FXML
     private Button btnBrowse, btnNew, btnUpdate,
             btnSearch, btnSave, btnCancel, btnHistory, btnRetrieve, btnClose;
     @FXML
-    private TextField tfTransactionNo, tfBranch, tfDepartment, tfPayee, tfSeriesNo, tfTotalAmount, tfDiscountAmount, tfTotalVATableAmount, tfNetAmount;
+    private TextField tfTransactionNo, tfBranch, tfDepartment, tfPayee, tfSeriesNo, tfTotalAmount, tfDiscountAmount, tfTotalVATableAmount, tfNetAmount,
+            tfRecurringNo, tfBranchDetail, tfAccountNo, tfEmployee, tfVatAmount, tfParticular, tfAmount, tfDiscRate, tfDiscAmountDetail, tfTaxAmount, tfAmountDetail, tfAttachmentNo;
     @FXML
     private TextArea taRemarks;
     @FXML
     private DatePicker dpTransaction;
     @FXML
     private Label lblStatus, lblSource;
-    @FXML
-    private TextField tfParticular, tfAmount, tfDiscRate, tfDiscAmountDetail, tfTaxAmount, tfAmountDetail;
     @FXML
     private CheckBox chkbVatable, cbReverse;
     @FXML
@@ -168,8 +167,6 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
     private TableColumn<ModelTableMain, String> tblRowNo, tblPayeeName, tblBillDate, tblDueDate, tblParticularMain;
     @FXML
     private Pagination pagination;
-    @FXML
-    private TextField tfAttachmentNo;
     @FXML
     private ComboBox<String> cmbAttachmentType;
     @FXML
@@ -356,6 +353,12 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
                     chkbVatable.setSelected(false);
                 }
                 cbReverse.setSelected(poGLControllers.PaymentRequest().Detail(pnTblDetailRow).isReverse());
+
+                tfRecurringNo.setText("");
+                tfBranchDetail.setText("");
+                tfAccountNo.setText("");
+                tfEmployee.setText("");
+                tfVatAmount.setText("");
                 computePerDetailTaxAndTotal();
             } catch (SQLException | GuanzonException ex) {
                 Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
@@ -1213,7 +1216,7 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
                                         clearDetailFields();
                                         break;
                                     }
-                                    poJSON = poGLControllers.PaymentRequest().SearchParticular(lsValue, true, pnTblDetailRow);
+                                    poJSON = poGLControllers.PaymentRequest().SearchParticular(lsValue, false, pnTblDetailRow);
                                     if ("error".equals(poJSON.get("result"))) {
                                         ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
                                         tfParticular.setText("");
@@ -1227,7 +1230,6 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
                                     } else {
                                     }
                                     loadTableDetail();
-                                    loadRecordDetail();
                                     initDetailFocus();
 
                                 } else {
@@ -1255,7 +1257,6 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
                                     pnTblDetailRow = Integer.parseInt(detail_data.get(JFXUtil.moveToNextRow(tblVwPRDetail)).getIndex11());
                                 }
                                 loadTableDetail();
-                                loadRecordDetail();
                                 initDetailFocus();
                                 break;
                         }
@@ -1399,7 +1400,6 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
                     ShowMessageFX.Warning("Amount and Particular already exist in table at row: " + (lnCtr + 1), psFormName, null);
                     pnTblDetailRow = lnCtr;
                     loadTableDetail();
-                    loadRecordDetail();
                     initDetailFocus();
                     return;
                 }

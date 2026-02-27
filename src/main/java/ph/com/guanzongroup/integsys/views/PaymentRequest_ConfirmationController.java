@@ -48,7 +48,6 @@ import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TableColumn;
-import javafx.scene.control.TablePosition;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
@@ -137,7 +136,7 @@ public class PaymentRequest_ConfirmationController implements Initializable, Scr
     @FXML
     private Tab tabDetails, tabAttachments;
     @FXML
-    private AnchorPane AnchorMain, apBrowse, apButton, apAttachments, apAttachmentButtons;
+    private AnchorPane AnchorMain, apBrowse, apButton, apAttachments, apAttachmentButtons, apMaster, apDetail;
     @FXML
     private HBox hbButtons;
     @FXML
@@ -146,7 +145,8 @@ public class PaymentRequest_ConfirmationController implements Initializable, Scr
             btnVoid, btnReturn,
             btnConfirm;
     @FXML
-    private TextField tfSearchTransaction, tfSearchPayee, tfTransactionNo, tfBranch, tfDepartment, tfPayee, tfSeriesNo, tfTotalAmount, tfDiscountAmount, tfTotalVATableAmount, tfNetAmount;
+    private TextField tfSearchTransaction, tfSearchPayee, tfTransactionNo, tfBranch, tfDepartment, tfPayee, tfSeriesNo, tfTotalAmount, tfDiscountAmount, tfTotalVATableAmount, tfNetAmount,
+            tfRecurringNo, tfBranchDetail, tfAccountNo, tfEmployee, tfVatAmount;
     @FXML
     private TextArea taRemarks;
     @FXML
@@ -369,6 +369,12 @@ public class PaymentRequest_ConfirmationController implements Initializable, Scr
                     chkbVatable.setSelected(false);
                 }
                 cbReverse.setSelected(poGLControllers.PaymentRequest().Detail(pnTblDetailRow).isReverse());
+
+                tfRecurringNo.setText("");
+                tfBranchDetail.setText("");
+                tfAccountNo.setText("");
+                tfEmployee.setText("");
+                tfVatAmount.setText("");
                 computePerDetailTaxAndTotal();
             } catch (SQLException | GuanzonException ex) {
                 Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
@@ -455,14 +461,12 @@ public class PaymentRequest_ConfirmationController implements Initializable, Scr
                             ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
                             pnTblDetailRow = (int) poJSON.get("tableRow");
                             loadTableDetail();
-                            loadRecordDetail();
                             initDetailFocus();
                             return;
                         } else {
                             if (!ShowMessageFX.YesNo((String) poJSON.get("message"), psFormName, null)) {
                                 pnTblDetailRow = (int) poJSON.get("tableRow");
                                 loadTableDetail();
-                                loadRecordDetail();
                                 initDetailFocus();
                                 return;
                             }
@@ -491,7 +495,6 @@ public class PaymentRequest_ConfirmationController implements Initializable, Scr
                     }
 
                     loadRecordMaster();
-                    loadRecordDetail();
                     loadTableDetail();
                     pnEditMode = poGLControllers.PaymentRequest().getEditMode();
                     pagination.toBack();
@@ -1172,7 +1175,7 @@ public class PaymentRequest_ConfirmationController implements Initializable, Scr
                                         clearDetailFields();
                                         break;
                                     }
-                                    poJSON = poGLControllers.PaymentRequest().SearchParticular(lsValue, true, pnTblDetailRow);
+                                    poJSON = poGLControllers.PaymentRequest().SearchParticular(lsValue, false, pnTblDetailRow);
                                     if ("error".equals(poJSON.get("result"))) {
                                         ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
                                         tfParticular.setText("");
@@ -1186,7 +1189,6 @@ public class PaymentRequest_ConfirmationController implements Initializable, Scr
                                     } else {
                                     }
                                     loadTableDetail();
-                                    loadRecordDetail();
                                     initDetailFocus();
 
                                 } else {
@@ -1214,7 +1216,6 @@ public class PaymentRequest_ConfirmationController implements Initializable, Scr
                                     pnTblDetailRow = Integer.parseInt(detail_data.get(JFXUtil.moveToNextRow(tblVwPRDetail)).getIndex11());
                                 }
                                 loadTableDetail();
-                                loadRecordDetail();
                                 initDetailFocus();
                                 break;
                         }
@@ -1358,7 +1359,6 @@ public class PaymentRequest_ConfirmationController implements Initializable, Scr
                     ShowMessageFX.Warning("Amount and Particular already exist in table at row: " + (lnCtr + 1), psFormName, null);
                     pnTblDetailRow = lnCtr;
                     loadTableDetail();
-                    loadRecordDetail();
                     initDetailFocus();
                     return;
                 }
