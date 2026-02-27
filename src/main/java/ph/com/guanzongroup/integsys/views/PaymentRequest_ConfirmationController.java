@@ -136,7 +136,7 @@ public class PaymentRequest_ConfirmationController implements Initializable, Scr
     @FXML
     private Tab tabDetails, tabAttachments;
     @FXML
-    private AnchorPane AnchorMain, apBrowse, apButton, apAttachments, apAttachmentButtons;
+    private AnchorPane AnchorMain, apBrowse, apButton, apAttachments, apAttachmentButtons, apMaster, apDetail;
     @FXML
     private HBox hbButtons;
     @FXML
@@ -145,7 +145,8 @@ public class PaymentRequest_ConfirmationController implements Initializable, Scr
             btnVoid, btnReturn,
             btnConfirm;
     @FXML
-    private TextField tfSearchTransaction, tfSearchPayee, tfTransactionNo, tfBranch, tfDepartment, tfPayee, tfSeriesNo, tfTotalAmount, tfDiscountAmount, tfTotalVATableAmount, tfNetAmount;
+    private TextField tfSearchTransaction, tfSearchPayee, tfTransactionNo, tfBranch, tfDepartment, tfPayee, tfSeriesNo, tfTotalAmount, tfDiscountAmount, tfTotalVATableAmount, tfNetAmount,
+            tfRecurringNo, tfBranchDetail, tfAccountNo, tfEmployee, tfVatAmount;
     @FXML
     private TextArea taRemarks;
     @FXML
@@ -368,6 +369,12 @@ public class PaymentRequest_ConfirmationController implements Initializable, Scr
                     chkbVatable.setSelected(false);
                 }
                 cbReverse.setSelected(poGLControllers.PaymentRequest().Detail(pnTblDetailRow).isReverse());
+
+                tfRecurringNo.setText("");
+                tfBranchDetail.setText("");
+                tfAccountNo.setText("");
+                tfEmployee.setText("");
+                tfVatAmount.setText("");
                 computePerDetailTaxAndTotal();
             } catch (SQLException | GuanzonException ex) {
                 Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);

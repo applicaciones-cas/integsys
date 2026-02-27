@@ -140,22 +140,21 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
     @FXML
     private Tab tabDetails, tabAttachments;
     @FXML
-    private AnchorPane AnchorMain, apBrowse, apButton, apAttachments, apAttachmentButtons;
+    private AnchorPane AnchorMain, apBrowse, apButton, apAttachments, apAttachmentButtons, apMaster, apDetail;
     @FXML
     private HBox hbButtons;
     @FXML
     private Button btnBrowse, btnNew, btnUpdate,
             btnSearch, btnSave, btnCancel, btnHistory, btnRetrieve, btnClose;
     @FXML
-    private TextField tfTransactionNo, tfBranch, tfDepartment, tfPayee, tfSeriesNo, tfTotalAmount, tfDiscountAmount, tfTotalVATableAmount, tfNetAmount;
+    private TextField tfTransactionNo, tfBranch, tfDepartment, tfPayee, tfSeriesNo, tfTotalAmount, tfDiscountAmount, tfTotalVATableAmount, tfNetAmount,
+            tfRecurringNo, tfBranchDetail, tfAccountNo, tfEmployee, tfVatAmount, tfParticular, tfAmount, tfDiscRate, tfDiscAmountDetail, tfTaxAmount, tfAmountDetail, tfAttachmentNo;
     @FXML
     private TextArea taRemarks;
     @FXML
     private DatePicker dpTransaction;
     @FXML
     private Label lblStatus, lblSource;
-    @FXML
-    private TextField tfParticular, tfAmount, tfDiscRate, tfDiscAmountDetail, tfTaxAmount, tfAmountDetail;
     @FXML
     private CheckBox chkbVatable, cbReverse;
     @FXML
@@ -168,8 +167,6 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
     private TableColumn<ModelTableMain, String> tblRowNo, tblPayeeName, tblBillDate, tblDueDate, tblParticularMain;
     @FXML
     private Pagination pagination;
-    @FXML
-    private TextField tfAttachmentNo;
     @FXML
     private ComboBox<String> cmbAttachmentType;
     @FXML
@@ -356,6 +353,12 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
                     chkbVatable.setSelected(false);
                 }
                 cbReverse.setSelected(poGLControllers.PaymentRequest().Detail(pnTblDetailRow).isReverse());
+
+                tfRecurringNo.setText("");
+                tfBranchDetail.setText("");
+                tfAccountNo.setText("");
+                tfEmployee.setText("");
+                tfVatAmount.setText("");
                 computePerDetailTaxAndTotal();
             } catch (SQLException | GuanzonException ex) {
                 Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);

@@ -116,13 +116,14 @@ public class PaymentRequest_HistoryController implements Initializable, ScreenIn
     @FXML
     private Tab tabDetails, tabAttachments;
     @FXML
-    private AnchorPane AnchorMain, apBrowse, apButton, apAttachments, apAttachmentButtons;
+    private AnchorPane AnchorMain, apBrowse, apButton, apAttachments, apAttachmentButtons, apMaster, apDetail;
     @FXML
     private HBox hbButtons;
     @FXML
     private Button btnBrowse, btnHistory, btnClose;
     @FXML
-    private TextField tfSearchPayee, tfTransactionNo, tfBranch, tfDepartment, tfPayee, tfSeriesNo, tfTotalAmount, tfDiscountAmount, tfTotalVATableAmount, tfNetAmount;
+    private TextField tfSearchPayee, tfTransactionNo, tfBranch, tfDepartment, tfPayee, tfSeriesNo, tfTotalAmount, tfDiscountAmount, tfTotalVATableAmount, tfNetAmount,
+            tfRecurringNo, tfBranchDetail, tfAccountNo, tfEmployee, tfVatAmount;
     @FXML
     private TextArea taRemarks;
     @FXML
@@ -332,6 +333,11 @@ public class PaymentRequest_HistoryController implements Initializable, ScreenIn
                 } else {
                     chkbVatable.setSelected(false);
                 }
+                tfRecurringNo.setText("");
+                tfBranchDetail.setText("");
+                tfAccountNo.setText("");
+                tfEmployee.setText("");
+                tfVatAmount.setText("");
                 computePerDetailTaxAndTotal();
             } catch (SQLException | GuanzonException ex) {
                 Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
