@@ -293,18 +293,6 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
         initFields(pnEditMode);
         initLoadTable();
         initComboBoxes();
-        cmbAttachmentType.setItems(documentType);
-        cmbAttachmentType.setOnAction(event -> {
-            if (attachment_data.size() > 0) {
-                try {
-                    int selectedIndex = cmbAttachmentType.getSelectionModel().getSelectedIndex();
-                    poGLControllers.PaymentRequest().TransactionAttachmentList(pnAttachment).getModel().setDocumentType("000" + String.valueOf(selectedIndex));
-                    cmbAttachmentType.getSelectionModel().select(selectedIndex);
-                } catch (SQLException | GuanzonException ex) {
-                    Logger.getLogger(PaymentRequest_EntryController.class.getName()).log(Level.SEVERE, null, ex);
-                }
-            }
-        });
     }
 
     private void loadRecordMaster() {
@@ -421,10 +409,7 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
                         loadRecordMaster();
                         loadTableDetailFromMain();
                         pnEditMode = poGLControllers.PaymentRequest().getEditMode();
-                        loadRecordDetail();
                         loadTableDetail();
-                        loadTableMain();
-                        loadRecordAttachment(true);
                     } else {
                         ShowMessageFX.Warning((String) poJSON.get("message"), "Search Information", null);
                     }
@@ -455,8 +440,6 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
                         pnTblDetailRow = 0;
                         pnEditMode = poGLControllers.PaymentRequest().getEditMode();
                         loadTableDetail();
-                        loadTableAttachment();
-                        loadTableMain();
                     } else {
                         ShowMessageFX.Warning((String) poJSON.get("message"), "Warning", null);
                     }
@@ -523,7 +506,6 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
                                         }
                                     }
                                     loadTableDetail();
-                                    loadRecordDetail();
                                     initDetailFocus();
                                 } else {
                                     ShowMessageFX.Warning("Please enter Payee field first.", psFormName, null);
@@ -580,14 +562,12 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
                             ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
                             pnTblDetailRow = (int) poJSON.get("tableRow");
                             loadTableDetail();
-                            loadRecordDetail();
                             initDetailFocus();
                             return;
                         } else {
                             if (!ShowMessageFX.YesNo((String) poJSON.get("message"), psFormName, null)) {
                                 pnTblDetailRow = (int) poJSON.get("tableRow");
                                 loadTableDetail();
-                                loadRecordDetail();
                                 initDetailFocus();
                                 return;
                             }
@@ -777,12 +757,12 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
                     ShowMessageFX.Warning("Please contact admin to assist about no button available", psFormName, null);
                     break;
             }
-            if (lsButton.equals("btnAddAttachment") || lsButton.equals("btnRemoveAttachment")
-                    || lsButton.equals("btnArrowRight") || lsButton.equals("btnArrowLeft") || lsButton.equals("btnRetrieve")) {
+            if (lsButton.equals("btnRetrieve") || lsButton.equals("btnAddAttachment") || lsButton.equals("btnRemoveAttachment")
+                    || lsButton.equals("btnArrowRight") || lsButton.equals("btnArrowLeft") || lsButton.equals("btnRetrieve") || lsButton.equals("btnHistory")) {
             } else {
                 loadRecordMaster();
                 loadTableDetail();
-//                loadTableAttachment();
+                loadTableAttachment();
             }
             initButtons(pnEditMode);
             initFields(pnEditMode);
@@ -816,9 +796,9 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
 
     public void loadRecordAttachment(boolean lbloadImage) {
         try {
+            boolean lbShow2 = pnEditMode == EditMode.UPDATE || pnEditMode == EditMode.ADDNEW;
+            JFXUtil.setDisabled(!lbShow2, cmbAttachmentType, btnAddAttachment, btnRemoveAttachment);
             if (attachment_data.size() > 0) {
-                boolean lbShow = pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE;
-                JFXUtil.setDisabled(lbShow, cmbAttachmentType);
                 tfAttachmentNo.setText(String.valueOf(pnAttachment + 1));
                 String lsAttachmentType = poGLControllers.PaymentRequest().TransactionAttachmentList(pnAttachment).getModel().getDocumentType();
                 if (lsAttachmentType.equals("")) {
@@ -1587,9 +1567,6 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
 
     private void initButtons(int fnEditMode) {
         boolean lbShow = (fnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE);
-
-        CustomCommonUtil.setVisible(lbShow, btnAddAttachment, btnRemoveAttachment);
-        CustomCommonUtil.setManaged(lbShow, btnAddAttachment, btnRemoveAttachment);
         CustomCommonUtil.setVisible(!lbShow, btnBrowse, btnClose, btnNew);
         CustomCommonUtil.setManaged(!lbShow, btnBrowse, btnClose, btnNew);
 
@@ -2244,5 +2221,17 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
 
     private void initComboBoxes() {
         JFXUtil.initComboBoxCellDesignColor("#FF8201", cmbAttachmentType);
+        cmbAttachmentType.setItems(documentType);
+        cmbAttachmentType.setOnAction(event -> {
+            if (attachment_data.size() > 0) {
+                try {
+                    int selectedIndex = cmbAttachmentType.getSelectionModel().getSelectedIndex();
+                    poGLControllers.PaymentRequest().TransactionAttachmentList(pnAttachment).getModel().setDocumentType("000" + String.valueOf(selectedIndex));
+                    cmbAttachmentType.getSelectionModel().select(selectedIndex);
+                } catch (SQLException | GuanzonException ex) {
+                    Logger.getLogger(PaymentRequest_EntryController.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        });
     }
 }
