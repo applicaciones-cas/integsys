@@ -1114,7 +1114,7 @@ public class DashboardController implements Initializable {
                     + "LEFT JOIN xxxsysmenuothers b ON b.sMenuCDxx = a.sMenuCDxx AND b.cRecdStat = " + SQLUtil.toSQL(RecordStatus.ACTIVE);
             lsSQL = MiscUtil.addCondition(lsSQL, " a.sMenuDesc LIKE " + SQLUtil.toSQL(fsFormName)
                     + " AND a.cRecdStat = " + SQLUtil.toSQL(RecordStatus.ACTIVE));
-            System.out.println("Executing SQL: " + lsSQL);
+//            System.out.println("Executing SQL: " + lsSQL);
             ResultSet loRS = oApp.executeQuery(lsSQL);
             try {
                 if (MiscUtil.RecordCount(loRS) > 0) {
@@ -2157,7 +2157,6 @@ public class DashboardController implements Initializable {
     private void loadSystemMonitor() {
         try {
             SystemMonitorMenu monitorMenu = new SystemMonitorMenu(oApp, "CAS");
-
             monitorMenu.setIndustryCode(psIndustryID);
             monitorMenu.setCategoryCode(oApp.getCategory());
             JSONObject loSysMontrData = monitorMenu.processMonitoring();
@@ -2169,7 +2168,7 @@ public class DashboardController implements Initializable {
             }
 
             JSONArray loSysMontrRecord = (JSONArray) loSysMontrData.get("data");
-
+            
             TreeItem<TreeMonitor> loTreeNode = loadSystemMonitoMenu(loSysMontrRecord);
             tvRightSideBar.setRoot(loTreeNode);
             tvRightSideBar.setShowRoot(false);
@@ -2183,7 +2182,7 @@ public class DashboardController implements Initializable {
     
     private TreeItem<TreeMonitor> loadSystemMonitoMenu(JSONArray jsonArray) {
         TreeItem<TreeMonitor> root = new TreeItem<>();
-        System.out.println("JSON Array : " + jsonArray.toJSONString());
+//        System.out.println("JSON Array : " + jsonArray.toJSONString());
         for (Object obj : jsonArray) {
             JSONObject json = (JSONObject) obj;
 
@@ -2436,7 +2435,7 @@ public class DashboardController implements Initializable {
                             + " AND b.sIndstCdx = " + SQLUtil.toSQL(fsIndustry)
                             + " AND b.sCategrCd = " + SQLUtil.toSQL(fsCategory)
                             + " AND a.cRecdStat = " + SQLUtil.toSQL(RecordStatus.ACTIVE));
-            System.out.println("Executing SQL: " + lsSQL);
+//            System.out.println("Executing SQL: " + lsSQL);
             ResultSet loRS = oApp.executeQuery(lsSQL);
             try {
                 if (MiscUtil.RecordCount(loRS) > 0) {
@@ -2479,7 +2478,7 @@ public class DashboardController implements Initializable {
             //Only load this for new tab
             PaymentRequest_EntryController fxObj = new PaymentRequest_EntryController();
             fxObj.setGRider(oApp);
-            fxObj.setIndustryID(node.getIndustry());
+            fxObj.setIndustryID(psIndustryID); //Mandatory Set to current logged in
             fxObj.setCompanyID(psCompanyID);
             fxObj.setCategoryID(node.getCategory());
             fxObj.setReloadDetail(node.getSystemId());

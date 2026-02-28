@@ -207,15 +207,27 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
     
     public void ReloadDetail() {
         try {
-            //Load Recurring Detail
-            if(psRecurringMonitor != null && !"".equals(psRecurringMonitor)){
-                poJSON = poGLControllers.PaymentRequest().populateRecurringDetail(psRecurringMonitor);
-                if (!"success".equals((String) poJSON.get("result"))) {
-                    ShowMessageFX.Warning((String) poJSON.get("message"), "Warning", null);
-                }
-                
-                loadTableDetail();
+            switch(pnEditMode){
+                case EditMode.READY:
+                    if (!ShowMessageFX.YesNo(null, psFormName, "PRF has currently retrieve transaction.\nDo you want to create new PRF for the selected recurring expenses?")) {
+                        return;
+                    }
+                case EditMode.UNKNOWN:
+                    btnNew.fire();
+                    return;
+                case EditMode.UPDATE:
+                default:
+                    //Load Recurring Detail
+                    if(psRecurringMonitor != null && !"".equals(psRecurringMonitor)){
+                        poJSON = poGLControllers.PaymentRequest().populateRecurringDetail(psRecurringMonitor);
+                        if (!"success".equals((String) poJSON.get("result"))) {
+                            ShowMessageFX.Warning((String) poJSON.get("message"), "Warning", null);
+                        }
+
+                        loadTableDetail();
+                    }
             }
+            
         } catch (SQLException | GuanzonException | CloneNotSupportedException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
             ShowMessageFX.Error(MiscUtil.getException(ex), "Warning", null);
@@ -603,6 +615,7 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
                         loadTableDetail();
                         return;
                     }
+                    psRecurringMonitor = ""; //Clear Recurring By Default
                     ShowMessageFX.Information((String) poJSON.get("message"), psFormName, null);
                     poJSON = poGLControllers.PaymentRequest().OpenTransaction(poGLControllers.PaymentRequest().Master().getTransactionNo());
                     // Confirmation Prompt
@@ -1613,10 +1626,22 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
             protected Void call() throws Exception {
                 try {
                     main_data.clear();
-                    poJSON = poGLControllers.PaymentRequest().loadRecurringIssuance();
+                    poJSON = poGLControllers.PaymentRequest().loadPayables();
                     if ("success".equals(poJSON.get("result"))) {
-                        if (poGLControllers.PaymentRequest().getRecurring_IssuanceCount() > 0) {
-                            for (int lnCntr = 0; lnCntr <= poGLControllers.PaymentRequest().getRecurring_IssuanceCount() - 1; lnCntr++) {
+                        main_data.clear();
+                        for (int lnCntr = 0; lnCntr <= poGLControllers.PaymentRequest().getPayableCount() - 1; lnCntr++) {
+                            main_data.add(new ModelTableMain(
+                                String.valueOf(lnCntr + 1),
+                                poGLControllers.PaymentRequest().Payable(lnCntr).Payee().getPayeeName(),
+                                SQLUtil.dateFormat(poGLControllers.PaymentRequest().Payable(lnCntr).getTransactionDate(), SQLUtil.FORMAT_SHORT_DATE), //TODO Bill Day
+                                SQLUtil.dateFormat(poGLControllers.PaymentRequest().Payable(lnCntr).getTransactionDate(), SQLUtil.FORMAT_SHORT_DATE), //TODO Due Day
+                                poGLControllers.PaymentRequest().Payable(lnCntr).getTransactionNo(),
+                                "",
+                                "",
+                                "",
+                                "",
+                                ""));
+                            
 //                                String lsDueDate = SQLUtil.dateFormat(poGLControllers.PaymentRequest().Recurring_Issuance(lnCntr).getDueDate(), SQLUtil.FORMAT_SHORT_DATE);
 //                                String lsLastRequestNo = poGLControllers.PaymentRequest().Recurring_Issuance(lnCntr).getLastPRFTrans();
 //                                String lsLastRequestPRFStatus = "";
@@ -1641,48 +1666,45 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
 //                                        System.err.println("Invalid due date format: " + lsDueDate);
 //                                    }
 //                                }
-                                String lsDueDate = SQLUtil.dateFormat(
-                                        poGLControllers.PaymentRequest().Recurring_Issuance(lnCntr).getDueDate(),
-                                        SQLUtil.FORMAT_SHORT_DATE
-                                );
+//                            String lsDueDate = SQLUtil.dateFormat(
+//                                    poGLControllers.PaymentRequest().Recurring_Issuance(lnCntr).getDueDate(),
+//                                    SQLUtil.FORMAT_SHORT_DATE
+//                            );
+//
+//                            String lsLastRequestNo = poGLControllers.PaymentRequest().Recurring_Issuance(lnCntr).getLastPRFTrans();
+//                            String lsLastRequestPRFStatus = poGLControllers.PaymentRequest().getPaymentStatusFromIssuanceLastPRFNo(lsLastRequestNo);
+//
+//                            String status = STATUS_NOT_CLICKED;
+//
+//                            try {
+//                                if (lsLastRequestPRFStatus != null && lsLastRequestPRFStatus.equals(PaymentRequestStatus.PAID)) {
+//                                    status = STATUS_PAID;
+//                                } else if (lsDueDate != null && !lsDueDate.isEmpty()) {
+//                                    LocalDate dueDate = CustomCommonUtil.parseDateStringToLocalDate(lsDueDate);
+//                                    long daysUntilDue = ChronoUnit.DAYS.between(LocalDate.now(), dueDate);
+//
+//                                    if (daysUntilDue <= 0) {
+//                                        status = STATUS_DUE_DATE;
+//                                    } else if (daysUntilDue <= 5) {
+//                                        status = STATUS_WARNING_DUE_DATE;
+//                                    }
+//                                }
+//                            } catch (DateTimeParseException e) {
+//                                System.err.println("Invalid due date format: " + lsDueDate);
+//                            }
 
-                                String lsLastRequestNo = poGLControllers.PaymentRequest().Recurring_Issuance(lnCntr).getLastPRFTrans();
-                                String lsLastRequestPRFStatus = poGLControllers.PaymentRequest().getPaymentStatusFromIssuanceLastPRFNo(lsLastRequestNo);
-
-                                String status = STATUS_NOT_CLICKED;
-
-                                try {
-                                    if (lsLastRequestPRFStatus != null && lsLastRequestPRFStatus.equals(PaymentRequestStatus.PAID)) {
-                                        status = STATUS_PAID;
-                                    } else if (lsDueDate != null && !lsDueDate.isEmpty()) {
-                                        LocalDate dueDate = CustomCommonUtil.parseDateStringToLocalDate(lsDueDate);
-                                        long daysUntilDue = ChronoUnit.DAYS.between(LocalDate.now(), dueDate);
-
-                                        if (daysUntilDue <= 0) {
-                                            status = STATUS_DUE_DATE;
-                                        } else if (daysUntilDue <= 5) {
-                                            status = STATUS_WARNING_DUE_DATE;
-                                        }
-                                    }
-                                } catch (DateTimeParseException e) {
-                                    System.err.println("Invalid due date format: " + lsDueDate);
-                                }
-
-                                main_data.add(new ModelTableMain(
-                                        String.valueOf(lnCntr + 1),
-                                        poGLControllers.PaymentRequest().Recurring_Issuance(lnCntr).Payee().getPayeeName(),
-                                        SQLUtil.dateFormat(poGLControllers.PaymentRequest().Recurring_Issuance(lnCntr).getBillingDate(), SQLUtil.FORMAT_SHORT_DATE),
-                                        SQLUtil.dateFormat(poGLControllers.PaymentRequest().Recurring_Issuance(lnCntr).getDueDate(), SQLUtil.FORMAT_SHORT_DATE),
-                                        //                                                                                CustomCommonUtil.setIntegerValueToDecimalFormat(poGLControllers.PaymentRequest().Recurring_Issuance(lnCntr).getAmount()),
-                                        poGLControllers.PaymentRequest().Recurring_Issuance(lnCntr).Particular().getDescription(),
-                                        poGLControllers.PaymentRequest().Recurring_Issuance(lnCntr).getParticularID(),
-                                        poGLControllers.PaymentRequest().Recurring_Issuance(lnCntr).getPayeeID(),
-                                        status,
-                                        poGLControllers.PaymentRequest().Recurring_Issuance(lnCntr).getAccountNo(),
-                                        ""));
-                            }
-                        } else {
-                            main_data.clear();
+//                            main_data.add(new ModelTableMain(
+//                                    String.valueOf(lnCntr + 1),
+//                                    poGLControllers.PaymentRequest().Recurring_Issuance(lnCntr).Payee().getPayeeName(),
+//                                    SQLUtil.dateFormat(poGLControllers.PaymentRequest().Recurring_Issuance(lnCntr).getBillingDate(), SQLUtil.FORMAT_SHORT_DATE),
+//                                    SQLUtil.dateFormat(poGLControllers.PaymentRequest().Recurring_Issuance(lnCntr).getDueDate(), SQLUtil.FORMAT_SHORT_DATE),
+//                                    //                                                                                CustomCommonUtil.setIntegerValueToDecimalFormat(poGLControllers.PaymentRequest().Recurring_Issuance(lnCntr).getAmount()),
+//                                    poGLControllers.PaymentRequest().Recurring_Issuance(lnCntr).Particular().getDescription(),
+//                                    poGLControllers.PaymentRequest().Recurring_Issuance(lnCntr).getParticularID(),
+//                                    poGLControllers.PaymentRequest().Recurring_Issuance(lnCntr).getPayeeID(),
+//                                    status,
+//                                    poGLControllers.PaymentRequest().Recurring_Issuance(lnCntr).getAccountNo(),
+//                                    ""));
                         }
                     }
 
@@ -2098,11 +2120,9 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
             if (event.getClickCount() == 2) {
                 ModelTableMain loSelectedRecurringExpense = (ModelTableMain) tblVwRecurringExpense.getSelectionModel().getSelectedItem();
                 if (loSelectedRecurringExpense != null) {
-                    String lsParticularID = loSelectedRecurringExpense.getIndex06();
-                    String lsPayeeID = loSelectedRecurringExpense.getIndex07();
-                    String lsAcctNo = loSelectedRecurringExpense.getIndex09();
+                    String lsTransNo = loSelectedRecurringExpense.getIndex05();
                     try {
-                        poJSON = poGLControllers.PaymentRequest().addRecurringIssuanceToPaymentRequestDetail(lsParticularID, lsPayeeID, lsAcctNo);
+                        poJSON = poGLControllers.PaymentRequest().populateDetail(lsTransNo);
                         if ("success".equals(poJSON.get("result"))) {
                             if (poGLControllers.PaymentRequest().getDetailCount() > 0) {
                                 pnTblDetailRow = poGLControllers.PaymentRequest().getDetailCount() - 1;

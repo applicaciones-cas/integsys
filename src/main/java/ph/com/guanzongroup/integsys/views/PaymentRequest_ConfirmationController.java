@@ -681,7 +681,11 @@ public class PaymentRequest_ConfirmationController implements Initializable, Scr
                     break;
                 case "btnVoid":
                     if (ShowMessageFX.YesNo(null, psFormName, "Are you sure you want to void transaction?")) {
-                        poJSON = poGLControllers.PaymentRequest().VoidTransaction("Voided");
+                        if(PaymentRequestStatus.CONFIRMED.equals(poGLControllers.PaymentRequest().Master().getTransactionStatus())){
+                            poJSON = poGLControllers.PaymentRequest().CancelTransaction("");
+                        } else {
+                            poJSON = poGLControllers.PaymentRequest().VoidTransaction("");
+                        }
                         if (!"success".equals((String) poJSON.get("result"))) {
                             ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
                             break;
