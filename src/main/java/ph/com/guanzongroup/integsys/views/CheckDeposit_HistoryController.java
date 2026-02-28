@@ -289,15 +289,7 @@ public class CheckDeposit_HistoryController implements Initializable, ScreenInte
         }
     }
     private void initFields() {
-        boolean isEditable = (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE);
-        JFXUtil.setDisabled(!isEditable,
-                tfSearchTransNo, 
-                tfTransactionNo,
-                tfCheckTransNo,
-                tfCheckNo,
-                dpTransactionDate,
-                taRemarks
-        );
+       
         if (CheckTransferStatus.CONFIRMED.equals(poGLControllers.CheckDeposits().Master().getTransactionStatus())) {
             apMaster.setDisable(true);
             apDetail.setDisable(false);

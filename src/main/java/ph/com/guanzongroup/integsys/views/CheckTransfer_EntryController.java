@@ -68,7 +68,7 @@ public class CheckTransfer_EntryController implements Initializable, ScreenInter
     
     private GRiderCAS poApp;
     private CashflowControllers poGLControllers;
-    private String psFormName = "Payment Request";
+    private String psFormName = "Check Transfer";
     private LogWrapper logWrapper;
     private int pnEditMode;
     private JSONObject poJSON;
