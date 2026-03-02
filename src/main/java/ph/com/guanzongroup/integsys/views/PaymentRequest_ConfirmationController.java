@@ -732,6 +732,8 @@ public class PaymentRequest_ConfirmationController implements Initializable, Scr
 
     public void loadTableDetailFromMain() {
         try {
+            clearMasterFields();
+            clearDetailFields();
             poJSON = new JSONObject();
             if (poGLControllers.PaymentRequest().getEditMode() == EditMode.READY || poGLControllers.PaymentRequest().getEditMode() == EditMode.UPDATE
                     || poGLControllers.PaymentRequest().getEditMode() == EditMode.UPDATE) {
@@ -739,8 +741,6 @@ public class PaymentRequest_ConfirmationController implements Initializable, Scr
                 Platform.runLater(() -> {
                     loadTableDetail();
                 });
-                tfAttachmentNo.clear();
-                cmbAttachmentType.setItems(documentType);
                 imageView.setImage(null);
                 stackPaneClip();
                 Platform.runLater(() -> {
@@ -1495,7 +1495,6 @@ public class PaymentRequest_ConfirmationController implements Initializable, Scr
     private void clearMasterFields() {
         pnTblDetailRow = -1;
         lblStatus.setText("");
-        cmbAttachmentType.setValue(null);
         imageView.setImage(null);
         JFXUtil.clearTextFields(apMaster, apAttachments);
     }

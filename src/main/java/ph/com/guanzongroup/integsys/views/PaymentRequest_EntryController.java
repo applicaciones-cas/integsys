@@ -1570,7 +1570,6 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
     private void clearMasterFields() {
         pnTblDetailRow = -1;
         lblStatus.setText("");
-        cmbAttachmentType.setValue(null);
         imageView.setImage(null);
         JFXUtil.clearTextFields(apMaster, apAttachments);
     }

@@ -280,7 +280,6 @@ public class PaymentRequest_HistoryController implements Initializable, ScreenIn
                 lsPayee = poGLControllers.PaymentRequest().Master().Payee().getPayeeName();
             }
             tfPayee.setText(lsPayee);
-            tfSearchPayee.setText(lsPayee);
             tfSeriesNo.setText(poGLControllers.PaymentRequest().Master().getSeriesNo());
             tfTotalAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poGLControllers.PaymentRequest().Master().getTranTotal(), true));
             tfDiscountAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poGLControllers.PaymentRequest().Master().getDiscountAmount(), true));
@@ -935,7 +934,6 @@ public class PaymentRequest_HistoryController implements Initializable, ScreenIn
     private void clearMasterFields() {
         pnTblDetailRow = -1;
         lblStatus.setText("");
-        cmbAttachmentType.setValue(null);
         imageView.setImage(null);
         JFXUtil.clearTextFields(apMaster, apAttachments);
     }
