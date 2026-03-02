@@ -110,7 +110,7 @@ public class CheckTransfer_ConfirmationController implements Initializable, Scre
 
     @FXML
     private Button btnSearch, btnBrowse, btnUpdate, btnSave, btnCancel, btnPrint, btnApprove, btnVoid,
-            btnRetrieve, btnClose;
+            btnRetrieve, btnClose,btnHistory;
 
     @FXML
     private TextArea taRemarks;
@@ -201,7 +201,7 @@ public class CheckTransfer_ConfirmationController implements Initializable, Scre
         psActiveField = "";
     }
     private void initButtonsClickActions() {
-        List<Button> buttons = Arrays.asList(btnBrowse, btnUpdate, btnSave, btnCancel, btnClose,btnRetrieve,btnPrint,btnSearch,btnApprove);
+        List<Button> buttons = Arrays.asList(btnBrowse, btnUpdate, btnHistory,btnSave, btnCancel, btnClose,btnRetrieve,btnPrint,btnSearch,btnApprove);
         buttons.forEach(button -> button.setOnAction(this::handleButtonAction));
     }
     
@@ -221,6 +221,23 @@ public class CheckTransfer_ConfirmationController implements Initializable, Scre
                 case "btnRetrieve":
                     loadTableMaster();
                     pnEditMode = EditMode.READY;
+                    break;
+                    
+                case "btnHistory":
+                    if (pnEditMode != EditMode.READY && pnEditMode != EditMode.UPDATE) {
+                        ShowMessageFX.Warning("No transaction status history to load!", psFormName, null);
+                        return;
+                    }
+
+                    try {
+                        poGLControllers.CheckTransfers().ShowStatusHistory();
+                    } catch (NullPointerException npe) {
+                        Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(npe), npe);
+                        ShowMessageFX.Error("No transaction status history to load!", psFormName, null);
+                    } catch (Exception ex) {
+                        Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+                        ShowMessageFX.Error(MiscUtil.getException(ex), psFormName, null);
+                    }
                     break;
                 case "btnBrowse":
                     poJSON = poGLControllers.CheckTransfers().SearchTransaction();

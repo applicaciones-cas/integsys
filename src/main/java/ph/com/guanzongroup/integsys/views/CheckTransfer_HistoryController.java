@@ -110,7 +110,7 @@ public class CheckTransfer_HistoryController implements Initializable, ScreenInt
     private Label lblSource, lblStatus;
 
     @FXML
-    private Button btnClose, btnBrowse, btnPrint;
+    private Button btnClose, btnBrowse, btnPrint,btnHistory;
 
     @FXML
     private TextArea taRemarks;
@@ -201,7 +201,7 @@ public class CheckTransfer_HistoryController implements Initializable, ScreenInt
         lblStatus.setText( "UNKOWN");
     }
     private void initButtonsClickActions() {
-        List<Button> buttons = Arrays.asList(btnBrowse, btnPrint,btnClose);
+        List<Button> buttons = Arrays.asList(btnBrowse, btnPrint,btnClose,btnHistory);
         buttons.forEach(button -> button.setOnAction(this::handleButtonAction));
     }
     
@@ -229,7 +229,17 @@ public class CheckTransfer_HistoryController implements Initializable, ScreenInt
                     LoadMaster();
                     LoadDetail();
                     break;
-                
+                case "btnHistory":
+                    try {
+                        poGLControllers.CheckTransfers().ShowStatusHistory();
+                    } catch (NullPointerException npe) {
+                        Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(npe), npe);
+                        ShowMessageFX.Error("No transaction status history to load!", psFormName, null);
+                    } catch (Exception ex) {
+                        Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+                        ShowMessageFX.Error(MiscUtil.getException(ex), psFormName, null);
+                    }
+                    break;
 
                 default:
                     ShowMessageFX.Warning("Please contact admin to assist about no button available", psFormName, null);

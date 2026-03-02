@@ -111,7 +111,7 @@ public class CheckRelease_EntryController implements Initializable, ScreenInterf
 
     @FXML
     private Button btnSearch, btnBrowse, btnNew, btnCancel, btnUpdate, btnSave,
-            btnRetrieve, btnClose;
+            btnRetrieve, btnClose,btnHistory;
 
     @FXML
     private TextArea taRemarks;
@@ -202,7 +202,7 @@ public class CheckRelease_EntryController implements Initializable, ScreenInterf
         taRemarks.clear();
     }
     private void initButtonsClickActions() {
-        List<Button> buttons = Arrays.asList(btnBrowse, btnNew, btnUpdate, btnSave, btnCancel, btnClose,btnRetrieve,btnSearch);
+        List<Button> buttons = Arrays.asList(btnBrowse, btnNew, btnUpdate, btnSave, btnCancel, btnClose,btnRetrieve,btnSearch,btnHistory);
         buttons.forEach(button -> button.setOnAction(this::handleButtonAction));
     }
     
@@ -221,6 +221,22 @@ public class CheckRelease_EntryController implements Initializable, ScreenInterf
                     break;
                 case "btnRetrieve":
                     loadTableMaster();
+                    break;
+                case "btnHistory":
+                    if (pnEditMode != EditMode.READY && pnEditMode != EditMode.UPDATE) {
+                        ShowMessageFX.Warning("No transaction status history to load!", psFormName, null);
+                        return;
+                    }
+
+                    try {
+                        poGLControllers.CheckReleases().ShowStatusHistory();
+                    } catch (NullPointerException npe) {
+                        Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(npe), npe);
+                        ShowMessageFX.Error("No transaction status history to load!", psFormName, null);
+                    } catch (Exception ex) {
+                        Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+                        ShowMessageFX.Error(MiscUtil.getException(ex), psFormName, null);
+                    }
                     break;
                 case "btnBrowse":
                     poJSON = poGLControllers.CheckReleases().SearchTransaction();

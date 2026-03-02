@@ -110,7 +110,7 @@ public class CheckDeposit_HistoryController implements Initializable, ScreenInte
     private Label lblSource, lblStatus;
 
     @FXML
-    private Button btnClose, btnBrowse, btnPrint,btnPost;
+    private Button btnClose, btnBrowse, btnPrint,btnPost,btnHistory;
 
     @FXML
     private TextArea taRemarks;
@@ -201,7 +201,7 @@ public class CheckDeposit_HistoryController implements Initializable, ScreenInte
         lblStatus.setText( "UNKOWN");
     }
     private void initButtonsClickActions() {
-        List<Button> buttons = Arrays.asList(btnBrowse, btnPrint,btnClose,btnPost);
+        List<Button> buttons = Arrays.asList(btnBrowse, btnPrint,btnHistory,btnClose,btnPost);
         buttons.forEach(button -> button.setOnAction(this::handleButtonAction));
     }
     
@@ -230,6 +230,17 @@ public class CheckDeposit_HistoryController implements Initializable, ScreenInte
                     loadTableDetail();
                     LoadMaster();
                     LoadDetail();
+                    break;
+                case "btnHistory":
+                    try {
+                        poGLControllers.CheckDeposits().ShowStatusHistory();
+                    } catch (NullPointerException npe) {
+                        Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(npe), npe);
+                        ShowMessageFX.Error("No transaction status history to load!", psFormName, null);
+                    } catch (Exception ex) {
+                        Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+                        ShowMessageFX.Error(MiscUtil.getException(ex), psFormName, null);
+                    }
                     break;
                 case "btnPrint":
                    if(poGLControllers.CheckDeposits().Master().getTransactionNo() != null ||

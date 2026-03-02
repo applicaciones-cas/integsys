@@ -110,7 +110,7 @@ public class CheckRelease_HistoryController implements Initializable, ScreenInte
     private Label lblSource, lblStatus;
 
     @FXML
-    private Button btnClose, btnBrowse, btnPrint;
+    private Button btnClose, btnBrowse, btnPrint,btnHistory;
 
     @FXML
     private TextArea taRemarks;
@@ -198,7 +198,7 @@ public class CheckRelease_HistoryController implements Initializable, ScreenInte
         taRemarks.clear();
     }
     private void initButtonsClickActions() {
-        List<Button> buttons = Arrays.asList(btnBrowse, btnPrint,btnClose);
+        List<Button> buttons = Arrays.asList(btnBrowse, btnPrint,btnClose,btnHistory);
         buttons.forEach(button -> button.setOnAction(this::handleButtonAction));
     }
     
@@ -225,6 +225,17 @@ public class CheckRelease_HistoryController implements Initializable, ScreenInte
                     loadTableDetail();
                     LoadMaster();
                     LoadDetail();
+                    break;
+                case "btnHistory":
+                    try {
+                        poGLControllers.CheckReleases().ShowStatusHistory();
+                    } catch (NullPointerException npe) {
+                        Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(npe), npe);
+                        ShowMessageFX.Error("No transaction status history to load!", psFormName, null);
+                    } catch (Exception ex) {
+                        Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+                        ShowMessageFX.Error(MiscUtil.getException(ex), psFormName, null);
+                    }
                     break;
                 case "btnPrint":
                    if(poGLControllers.CheckReleases().Master().getTransactionNo() != null ||
