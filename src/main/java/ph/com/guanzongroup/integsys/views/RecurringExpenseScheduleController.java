@@ -156,7 +156,7 @@ public class RecurringExpenseScheduleController implements Initializable, Screen
                         Platform.runLater(() -> {
                             try {
                                 poJSON = poController.populateDetail();
-                                if (!"success".equals((String) poJSON.get("result"))){
+                                if (!"success".equals((String) poJSON.get("result"))) {
                                     ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                     poController.initialize();
                                     loadRecordMaster();
@@ -292,7 +292,8 @@ public class RecurringExpenseScheduleController implements Initializable, Screen
 
     public void loadRecordSearch() {
         try {
-            lblSource.setText(poController.Master().Industry().getDescription());
+            lblSource.setVisible(false);
+//            lblSource.setText(poController.Master().Industry().getDescription());
             tfSearchPayee.setText(poController.Master().Payee().getPayeeName());
             JFXUtil.updateCaretPositions(apBrowse);
         } catch (SQLException | GuanzonException ex) {
@@ -303,7 +304,7 @@ public class RecurringExpenseScheduleController implements Initializable, Screen
 
     public void loadRecordMaster() {
         try {
-            if(poController.Master().getParticularId() != null || "".equals(poController.Master().getParticularId())){
+            if (poController.Master().getParticularId() != null && !"".equals(poController.Master().getParticularId())) {
                 tfRecurringID.setText(poController.Master().getRecurringId());
             } else {
                 tfRecurringID.setText("");
@@ -318,7 +319,7 @@ public class RecurringExpenseScheduleController implements Initializable, Screen
     }
 
     public void loadRecordDetail() {
-        if(poController.Master().getParticularId() == null || "".equals(poController.Master().getParticularId())){
+        if (poController.Master().getParticularId() == null || "".equals(poController.Master().getParticularId())) {
             return;
         }
         try {
@@ -370,7 +371,7 @@ public class RecurringExpenseScheduleController implements Initializable, Screen
                             Platform.runLater(() -> {
                                 try {
                                     poJSON = poController.populateDetail();
-                                    if (!"success".equals((String) poJSON.get("result"))){
+                                    if (!"success".equals((String) poJSON.get("result"))) {
                                         ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                         poController.initialize();
                                         loadRecordMaster();
@@ -444,26 +445,26 @@ public class RecurringExpenseScheduleController implements Initializable, Screen
                                 ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                 return;
                             }
-                            
+
                             Platform.runLater(() -> {
                                 try {
                                     poJSON = poController.populateDetail();
-                                    if (!"success".equals((String) poJSON.get("result"))){
+                                    if (!"success".equals((String) poJSON.get("result"))) {
                                         ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                         poController.Detail().clear();
                                         loadTableDetail.reload();
                                     } else {
                                         poJSON = poController.UpdateTransaction();
-                                        if (!"success".equals((String) poJSON.get("result"))){
+                                        if (!"success".equals((String) poJSON.get("result"))) {
                                             ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-                                        }  
-                                    }    
+                                        }
+                                    }
                                 } catch (SQLException | GuanzonException | CloneNotSupportedException ex) {
                                     Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
                                     ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
                                 }
                             });
-                            
+
                             JFXUtil.runWithDelay(.5, () -> {
                                 JFXUtil.textFieldMoveNext(tfBranchName); // must be in the success
                             });
@@ -601,7 +602,7 @@ public class RecurringExpenseScheduleController implements Initializable, Screen
             });
     ChangeListener<Boolean> txtDetail_Focus = JFXUtil.FocusListener(TextField.class,
             (lsID, lsValue) -> {
-                if(pnDetail < 0 || poController.getDetailCount() <= 0){
+                if (pnDetail < 0 || poController.getDetailCount() <= 0) {
                     JFXUtil.clearTextFields(apDetail);
                     return;
                 }
@@ -643,7 +644,8 @@ public class RecurringExpenseScheduleController implements Initializable, Screen
                         }
                         break;
                     case "tfBillDay":
-                        if(Integer.parseInt(lsValue) > 31){
+                        lsValue = JFXUtil.removeComma(lsValue);
+                        if (Integer.parseInt(lsValue) > 31) {
                             ShowMessageFX.Warning(null, pxeModuleName, "Invalid bill day.");
                             loadRecordDetail();
                             return;
@@ -654,7 +656,8 @@ public class RecurringExpenseScheduleController implements Initializable, Screen
                         }
                         break;
                     case "tfDueDay":
-                        if(Integer.parseInt(lsValue) > 31){
+                        lsValue = JFXUtil.removeComma(lsValue);
+                        if (Integer.parseInt(lsValue) > 31) {
                             ShowMessageFX.Warning(null, pxeModuleName, "Invalid due day.");
                             loadRecordDetail();
                             return;
