@@ -31,6 +31,7 @@ import org.guanzon.appdriver.base.SQLUtil;
 import org.guanzon.appdriver.constant.EditMode;
 import org.json.simple.JSONObject;
 import ph.com.guanzongroup.cas.cashflow.DisbursementVoucher;
+import ph.com.guanzongroup.cas.cashflow.status.DisbursementStatic;
 
 /**
  * FXML Controller class
@@ -227,7 +228,8 @@ public class CheckAssignmentController implements Initializable {
     }
 
     private void loadRecordMaster() {
-        JFXUtil.setDisabled(false, dpCheckDate);
+        JFXUtil.setDisabled(true, dpCheckDate);
+
         tfDVNo.setText(poController.Master().getTransactionNo());
         tfCheckNo.setText(poController.CheckPayments().getModel().getCheckNo());
         dpCheckDate.setValue(CustomCommonUtil.parseDateStringToLocalDate(SQLUtil.dateFormat(poController.CheckPayments().getModel().getCheckDate(), SQLUtil.FORMAT_SHORT_DATE)));

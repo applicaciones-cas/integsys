@@ -3005,23 +3005,23 @@ public class JFXUtil {
 
     /*Detect clicks in disabled Nodes and returns IDs in callback*/
  /*Requires parent Anchorpane of the Node and pnEditMode*/
-    public static void handleDisabledNodeClick(AnchorPane anchorPane, Object editMode, Consumer<String> callback) {
-        if (anchorPane == null || callback == null) {
+    public static void handleDisabledNodeClick(AnchorPane parent, Object editMode, Consumer<String> callback) {
+        if (parent == null || callback == null) {
             return;
         }
-        anchorPane.addEventFilter(MouseEvent.MOUSE_CLICKED, event -> {
+        parent.addEventFilter(MouseEvent.MOUSE_CLICKED, event -> {
             // Validate edit mode
             if (!JFXUtil.isObjectEqualTo(editMode, EditMode.ADDNEW, EditMode.UPDATE)) {
                 return;
             }
             // Collect nodes
             Set<Node> nodes = new HashSet<>();
-            nodes.addAll(anchorPane.lookupAll(".text-field"));
-            nodes.addAll(anchorPane.lookupAll(".combo-box"));
-            nodes.addAll(anchorPane.lookupAll(".check-box"));
-            nodes.addAll(anchorPane.lookupAll(".text-area"));
-            nodes.addAll(anchorPane.lookupAll(".date-picker"));
-            nodes.addAll(anchorPane.lookupAll(".button"));
+            nodes.addAll(parent.lookupAll(".text-field"));
+            nodes.addAll(parent.lookupAll(".combo-box"));
+            nodes.addAll(parent.lookupAll(".check-box"));
+            nodes.addAll(parent.lookupAll(".text-area"));
+            nodes.addAll(parent.lookupAll(".date-picker"));
+            nodes.addAll(parent.lookupAll(".button"));
             if (nodes.isEmpty()) {
                 return; // nothing to check
             }

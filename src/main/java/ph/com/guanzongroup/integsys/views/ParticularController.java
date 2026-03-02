@@ -28,6 +28,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.guanzon.appdriver.base.GRiderCAS;
 import org.guanzon.appdriver.base.GuanzonException;
+import org.guanzon.appdriver.constant.UserRight;
 import ph.com.guanzongroup.cas.cashflow.services.CashflowControllers;
 import ph.com.guanzongroup.integsys.utility.JFXUtil;
 
@@ -199,7 +200,10 @@ public class ParticularController implements Initializable, ScreenInterface {
                         String Status = oParameters.Particular().getModel().getRecordStatus();
                         String id = oParameters.Particular().getModel().getParticularID();
                         JSONObject poJsON;
-
+                        if (oApp.getUserLevel() < UserRight.SYSADMIN) {
+                            ShowMessageFX.Warning("User is not allowed to " + btnActivate.getText().toLowerCase() + " paramater.", "Computerized Acounting System", pxeModuleName);
+                            return;
+                        }
                         switch (Status) {
                             case "0":
                                 if (ShowMessageFX.YesNo(null, pxeModuleName, "Do you want to activate this record?") == true) {
