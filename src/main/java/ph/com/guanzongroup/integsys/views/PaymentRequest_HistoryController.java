@@ -430,6 +430,8 @@ public class PaymentRequest_HistoryController implements Initializable, ScreenIn
             }
             if (lsButton.equals("btnArrowRight") || lsButton.equals("btnArrowLeft")) {
             } else {
+                clearMasterFields();
+                clearDetailFields();
                 loadRecordMaster();
                 loadTableDetail();
                 loadTableAttachment();
@@ -928,6 +930,14 @@ public class PaymentRequest_HistoryController implements Initializable, ScreenIn
 
             }
         });
+    }
+
+    private void clearMasterFields() {
+        pnTblDetailRow = -1;
+        lblStatus.setText("");
+        cmbAttachmentType.setValue(null);
+        imageView.setImage(null);
+        JFXUtil.clearTextFields(apMaster, apAttachments);
     }
 
     private void clearDetailFields() {

@@ -1497,7 +1497,7 @@ public class PaymentRequest_ConfirmationController implements Initializable, Scr
         lblStatus.setText("");
         cmbAttachmentType.setValue(null);
         imageView.setImage(null);
-        JFXUtil.clearTextFields(apMaster);
+        JFXUtil.clearTextFields(apMaster, apAttachments);
     }
 
     private void clearDetailFields() {
@@ -1543,7 +1543,7 @@ public class PaymentRequest_ConfirmationController implements Initializable, Scr
         CustomCommonUtil.setDisable(!lbShow, tfPayee, tfAmount, taRemarks);
         CustomCommonUtil.setDisable(true, tfParticular, tfPayee, dpTransaction, tfTransactionNo, tfBranch,
                 tfSeriesNo, tfTotalAmount, tfDiscountAmount, tfTotalVATableAmount, tfNetAmount,
-                chkbVatable, tfDiscRate,
+                tfDiscRate,
                 tfDiscAmountDetail, tfDepartment);
         if (poApp.isMainOffice() || poApp.isWarehouse()) {
             tfDepartment.setDisable(!lbShow); //mag open siya pag add new or update sa editmode
@@ -1824,7 +1824,7 @@ public class PaymentRequest_ConfirmationController implements Initializable, Scr
                             pnTblDetailRow = lnRow;
                             loadRecordDetail();
                         }
-//                        loadRecordMaster();
+                        loadRecordMaster();
                     } catch (GuanzonException | SQLException ex) {
                         Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
                     }

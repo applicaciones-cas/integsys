@@ -1572,7 +1572,7 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
         lblStatus.setText("");
         cmbAttachmentType.setValue(null);
         imageView.setImage(null);
-        JFXUtil.clearTextFields(apMaster);
+        JFXUtil.clearTextFields(apMaster, apAttachments);
     }
 
     private void clearDetailFields() {
@@ -1621,7 +1621,7 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
                 || fnEditMode == EditMode.UNKNOWN);
         CustomCommonUtil.setDisable(true, tfDepartment, dpTransaction, tfTransactionNo, tfBranch,
                 tfSeriesNo, tfTotalAmount, tfDiscountAmount, tfTotalVATableAmount, tfNetAmount,
-                chkbVatable, tfDiscRate,
+                 tfDiscRate,
                 tfDiscAmountDetail);
         if (poApp.isMainOffice() || poApp.isWarehouse()) {
             tfDepartment.setDisable(!lbShow); //mag open siya pag add new or update sa editmode
@@ -1929,7 +1929,7 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
                             pnTblDetailRow = lnRow;
                             loadRecordDetail();
                         }
-//                        loadRecordMaster();
+                        loadRecordMaster();
 
                     } catch (SQLException | GuanzonException | CloneNotSupportedException ex) {
                         Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
