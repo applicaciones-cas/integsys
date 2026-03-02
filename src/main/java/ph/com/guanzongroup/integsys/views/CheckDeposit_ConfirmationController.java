@@ -297,11 +297,13 @@ public class CheckDeposit_ConfirmationController implements Initializable, Scree
                                 loadTableDetail();
                                 return; 
                             case "tfSearchTransNo":
+                                
                                 poJSON = poGLControllers.CheckDeposits().SearchTransaction(tfSearchTransNo.getText(),tfSearchBankAccountNo.getText(),dpSearchTransactionDate.getValue());
                                 if (!"success".equals((String) poJSON.get("result"))) {
                                     ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
                                     return;
                                 }
+                                ClearAll();
                                 loadTableDetail();
                                 LoadMaster();
                                 LoadDetail();
@@ -1090,6 +1092,30 @@ public class CheckDeposit_ConfirmationController implements Initializable, Scree
                                 tfCheckNo.setText(poGLControllers.CheckDeposits().Detail(pnSelectedDetail).CheckPayment().getCheckNo());
                                 loadTableDetail();
                                 return; 
+                            case "tfSearchTransNo":
+                                
+                                poJSON = poGLControllers.CheckDeposits().SearchTransaction(tfSearchTransNo.getText(),tfSearchBankAccountNo.getText(),dpSearchTransactionDate.getValue());
+                                if (!"success".equals((String) poJSON.get("result"))) {
+                                    ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
+                                    return;
+                                }
+                                ClearAll();
+                                loadTableDetail();
+                                LoadMaster();
+                                LoadDetail();
+                                initButtons(EditMode.READY);
+                                break;
+                            case "tfSearchBankAccountNo":
+                                poJSON = poGLControllers.CheckDeposits().SearchTransaction(tfSearchTransNo.getText(),tfSearchBankAccountNo.getText(),dpSearchTransactionDate.getValue());
+                                if (!"success".equals((String) poJSON.get("result"))) {
+                                    ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
+                                    return;
+                                }
+                                loadTableDetail();
+                                LoadMaster();
+                                LoadDetail();
+                                initButtons(EditMode.READY);
+                                break;
                         }
 
                         break;
@@ -1103,6 +1129,8 @@ public class CheckDeposit_ConfirmationController implements Initializable, Scree
                 }
             } catch (SQLException | GuanzonException | ExceptionInInitializerError ex) {
                 Logger.getLogger(TBJ_ParameterController.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (CloneNotSupportedException ex) {
+                Logger.getLogger(CheckDeposit_ConfirmationController.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
     }

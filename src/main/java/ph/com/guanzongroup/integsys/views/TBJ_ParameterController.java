@@ -1146,7 +1146,7 @@ public class TBJ_ParameterController implements Initializable, ScreenInterface {
                 tfTransactionNo,
                 tfFieldName,
                 tfAccountTitle,
-                tfTableName
+                tfTableName                
         ).forEach(TextField::clear);
         cbIsActive.setSelected(false);
         cbIsRequired.setSelected(false);
@@ -1154,6 +1154,7 @@ public class TBJ_ParameterController implements Initializable, ScreenInterface {
         detail_data.clear();
         pnSelectedDetail = 0;
         psActiveField = "";
+        taRemarks.clear();
     }
 
     /**

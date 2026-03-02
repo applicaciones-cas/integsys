@@ -678,8 +678,8 @@ public class CheckDeposit_EntryController implements Initializable, ScreenInterf
         CustomCommonUtil.setVisible(!lbShow, btnBrowse, btnClose, btnNew);
         CustomCommonUtil.setManaged(!lbShow, btnBrowse, btnClose, btnNew);
 
-        CustomCommonUtil.setVisible(lbShow, btnSave, btnCancel);
-        CustomCommonUtil.setManaged(lbShow, btnSave, btnCancel);
+        CustomCommonUtil.setVisible(lbShow, btnSave, btnCancel,btnSearch);
+        CustomCommonUtil.setManaged(lbShow, btnSave, btnCancel,btnSearch);
 
         // Default hide Update
         CustomCommonUtil.setVisible(false, btnUpdate);
@@ -1209,6 +1209,30 @@ public class CheckDeposit_EntryController implements Initializable, ScreenInterf
                                 tfCheckNo.setText(poGLControllers.CheckDeposits().Detail(pnSelectedDetail).CheckPayment().getCheckNo());
                                 loadTableDetail();
                                 return; 
+                            case "tfSearchTransNo":
+                                
+                                poJSON = poGLControllers.CheckDeposits().SearchTransaction(tfSearchTransNo.getText(),tfSearchBankAccountNo.getText(),dpSearchTransactionDate.getValue());
+                                if (!"success".equals((String) poJSON.get("result"))) {
+                                    ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
+                                    return;
+                                }
+                                ClearAll();
+                                loadTableDetail();
+                                LoadMaster();
+                                LoadDetail();
+                                initButtons(EditMode.READY);
+                                break;
+                            case "tfSearchBankAccountNo":
+                                poJSON = poGLControllers.CheckDeposits().SearchTransaction(tfSearchTransNo.getText(),tfSearchBankAccountNo.getText(),dpSearchTransactionDate.getValue());
+                                if (!"success".equals((String) poJSON.get("result"))) {
+                                    ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
+                                    return;
+                                }
+                                loadTableDetail();
+                                LoadMaster();
+                                LoadDetail();
+                                initButtons(EditMode.READY);
+                                break;
                         }
 
                         break;
@@ -1222,6 +1246,8 @@ public class CheckDeposit_EntryController implements Initializable, ScreenInterf
                 }
             } catch (SQLException | GuanzonException | ExceptionInInitializerError ex) {
                 Logger.getLogger(TBJ_ParameterController.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (CloneNotSupportedException ex) {
+                Logger.getLogger(CheckDeposit_EntryController.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
     }

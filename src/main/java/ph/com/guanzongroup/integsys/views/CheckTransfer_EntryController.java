@@ -535,8 +535,8 @@ public class CheckTransfer_EntryController implements Initializable, ScreenInter
         CustomCommonUtil.setVisible(!lbShow, btnBrowse, btnClose, btnNew);
         CustomCommonUtil.setManaged(!lbShow, btnBrowse, btnClose, btnNew);
 
-        CustomCommonUtil.setVisible(lbShow, btnSave, btnCancel);
-        CustomCommonUtil.setManaged(lbShow, btnSave, btnCancel);
+        CustomCommonUtil.setVisible(lbShow, btnSave, btnCancel,btnSearch);
+        CustomCommonUtil.setManaged(lbShow, btnSave, btnCancel,btnSearch);
 
         // Default hide Update
         CustomCommonUtil.setVisible(false, btnUpdate);

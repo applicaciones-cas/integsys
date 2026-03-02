@@ -510,8 +510,8 @@ public class CheckTransfer_ConfirmationController implements Initializable, Scre
         CustomCommonUtil.setVisible(!lbShow, btnClose);
         CustomCommonUtil.setManaged(!lbShow, btnClose );
 
-        CustomCommonUtil.setVisible(lbShow, btnSave, btnCancel);
-        CustomCommonUtil.setManaged(lbShow, btnSave, btnCancel);
+        CustomCommonUtil.setVisible(lbShow, btnSave, btnCancel,btnSearch);
+        CustomCommonUtil.setManaged(lbShow, btnSave, btnCancel,btnSearch);
 
         // Default hide Update
         CustomCommonUtil.setVisible(false, btnUpdate,btnVoid,btnApprove,btnPrint);
