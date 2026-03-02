@@ -80,6 +80,7 @@ import org.guanzon.appdriver.constant.DocumentType;
 import org.guanzon.appdriver.constant.EditMode;
 import org.guanzon.appdriver.constant.Logical;
 import org.guanzon.appdriver.constant.RecordStatus;
+import org.guanzon.cas.inv.InvTransCons;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.ParseException;
 import ph.com.guanzongroup.cas.cashflow.services.CashflowControllers;
@@ -1869,16 +1870,11 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
                 Platform.runLater(() -> {
                     try {
                         detail_data.clear();
-                        int detailCount = poGLControllers.PaymentRequest().getDetailCount();
                         if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
-                            if (poGLControllers.PaymentRequest().Detail(detailCount - 1).getParticularID() != null
-                                    && !poGLControllers.PaymentRequest().Detail(detailCount - 1).getParticularID().isEmpty()) {
-                                poGLControllers.PaymentRequest().AddDetail();
-                                detailCount++;
-                            }
+                            poGLControllers.PaymentRequest().ReloadDetail();
                         }
                         int lnRowCount = 0;
-                        for (int lnCtr = 0; lnCtr < detailCount; lnCtr++) {
+                        for (int lnCtr = 0; lnCtr < poGLControllers.PaymentRequest().getDetailCount() ; lnCtr++) {
                             //                        double totalNetDetailPayable = 0.00;
 //                        double totalTaxAmount = 0.00;
 //                        double lnAmount = poGLControllers.PaymentRequest().Detail(lnCtr).getAmount().doubleValue();
@@ -2135,6 +2131,14 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
                 if (loSelectedRecurringExpense != null) {
                     String lsTransNo = loSelectedRecurringExpense.getIndex02();
                     try {
+                        if (poGLControllers.PaymentRequest().Master().getSourceNo() != null && !"".equals(poGLControllers.PaymentRequest().Master().getSourceNo())) {
+                            if(InvTransCons.PURCHASE_ORDER.equals(poGLControllers.PaymentRequest().Master().getSourceCode()) && !poGLControllers.PaymentRequest().Master().getSourceNo().equals(lsTransNo)){
+                                if (!ShowMessageFX.YesNo(null, psFormName, "All prf info will reset. Do you want to change transaction source?")) {
+                                    return;
+                                }
+                            }
+                        }
+                        
                         poJSON = poGLControllers.PaymentRequest().populateDetail(lsTransNo);
                         if ("success".equals(poJSON.get("result"))) {
                             if (poGLControllers.PaymentRequest().getDetailCount() > 0) {
