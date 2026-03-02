@@ -857,6 +857,6 @@ public class RecurringExpenseScheduleController implements Initializable, Screen
         JFXUtil.setButtonsVisibility(lbShow2, btnUpdate);
         JFXUtil.setButtonsVisibility(lbShow3, btnBrowse, btnClose);
 
-        JFXUtil.setDisabled(lbShow3, apMaster);
+        JFXUtil.setDisabled(!lbShow, apMaster, apDetail);
     }
 }
