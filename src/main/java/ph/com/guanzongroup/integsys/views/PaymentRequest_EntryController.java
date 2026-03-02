@@ -17,9 +17,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.SQLException;
-import java.time.LocalDate;
-import java.time.format.DateTimeParseException;
-import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -40,6 +37,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Bounds;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
@@ -137,45 +135,33 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
     ObservableList<String> documentType = ModelPRFAttachment.documentType;
 
     @FXML
+    private AnchorPane AnchorMain, apBrowse, apButton, apMaster, apDetail, apAttachments, apAttachmentButtons;
+    @FXML
+    private Label lblSource, lblStatus;
+    @FXML
+    private HBox hbButtons;
+    @FXML
+    private Button btnBrowse, btnNew, btnUpdate, btnSearch, btnSave, btnCancel, btnHistory, btnRetrieve, btnClose, btnAddAttachment, btnRemoveAttachment, btnArrowLeft, btnArrowRight;
+    @FXML
     private TabPane ImTabPane;
     @FXML
     private Tab tabDetails, tabAttachments;
     @FXML
-    private AnchorPane AnchorMain, apBrowse, apButton, apAttachments, apAttachmentButtons, apMaster, apDetail;
-    @FXML
-    private HBox hbButtons;
-    @FXML
-    private Button btnBrowse, btnNew, btnUpdate,
-            btnSearch, btnSave, btnCancel, btnHistory, btnRetrieve, btnClose;
-    @FXML
-    private TextField tfTransactionNo, tfBranch, tfDepartment, tfPayee, tfSeriesNo, tfTotalAmount, tfDiscountAmount, tfTotalVATableAmount, tfNetAmount,
-            tfRecurringNo, tfBranchDetail, tfAccountNo, tfEmployee, tfVatAmount, tfParticular, tfAmount, tfDiscRate, tfDiscAmountDetail, tfTaxAmount, tfAmountDetail, tfAttachmentNo;
-    @FXML
-    private TextArea taRemarks;
+    private TextField tfTransactionNo, tfBranch, tfDepartment, tfPayee, tfSeriesNo, tfTotalAmount, tfDiscountAmount, tfTotalVATableAmount, tfNetAmount, tfSourceNo, tfRecurringNo, tfBranchDetail, tfAccountNo, tfEmployee, tfParticular, tfAmount, tfDiscRate, tfDiscAmountDetail, tfVatAmount, tfTaxAmount, tfAmountDetail, tfAttachmentNo;
     @FXML
     private DatePicker dpTransaction;
     @FXML
-    private Label lblStatus, lblSource;
+    private TextArea taRemarks;
     @FXML
-    private CheckBox chkbVatable, cbReverse;
+    private CheckBox cbReverse, chkbVatable;
     @FXML
-    private TableView<ModelTableDetail> tblVwPRDetail;
+    private TableView tblVwPRDetail, tblVwRecurringExpense, tblAttachments;
     @FXML
-    private TableColumn<ModelTableDetail, String> tblRowNoDetail, tblParticular, tblAmount, tblDiscAmount, tblVATable, tblTaxAmount, tbTotalAmount;
-    @FXML
-    private TableView<ModelTableMain> tblVwRecurringExpense;
-    @FXML
-    private TableColumn<ModelTableMain, String> tblRowNo, tblPayeeName, tblBillDate, tblDueDate, tblParticularMain;
+    private TableColumn tblRowNoDetail, tblParticular, tblAmount, tblDiscAmount, tblVATable, tblTaxAmount, tbTotalAmount, tblRowNo, tblTransNo, tblDate, tblSupplier, tblRowNoAttachment, tblFileNameAttachment;
     @FXML
     private Pagination pagination;
     @FXML
-    private ComboBox<String> cmbAttachmentType;
-    @FXML
-    private TableView<ModelPRFAttachment> tblAttachments;
-    @FXML
-    private TableColumn<ModelPRFAttachment, String> tblRowNoAttachment, tblFileNameAttachment;
-    @FXML
-    private Button btnAddAttachment, btnRemoveAttachment, btnArrowLeft, btnArrowRight;
+    private ComboBox cmbAttachmentType;
     @FXML
     private StackPane stackPane1;
     @FXML
@@ -199,15 +185,15 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
     @Override
     public void setCategoryID(String fsValue) {
         psCategoryID = fsValue;
-    }    
-    
+    }
+
     public void setReloadDetail(String fsValue) {
         psRecurringMonitor = fsValue;
     }
-    
+
     public void ReloadDetail() {
         try {
-            switch(pnEditMode){
+            switch (pnEditMode) {
                 case EditMode.READY:
                     if (!ShowMessageFX.YesNo(null, psFormName, "PRF has currently retrieve transaction.\nDo you want to create new PRF for the selected recurring expenses?")) {
                         return;
@@ -218,7 +204,7 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
                 case EditMode.UPDATE:
                 default:
                     //Load Recurring Detail
-                    if(psRecurringMonitor != null && !"".equals(psRecurringMonitor)){
+                    if (psRecurringMonitor != null && !"".equals(psRecurringMonitor)) {
                         poJSON = poGLControllers.PaymentRequest().populateRecurringDetail(psRecurringMonitor);
                         if (!"success".equals((String) poJSON.get("result"))) {
                             ShowMessageFX.Warning((String) poJSON.get("message"), "Warning", null);
@@ -227,13 +213,12 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
                         loadTableDetail();
                     }
             }
-            
+
         } catch (SQLException | GuanzonException | CloneNotSupportedException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
             ShowMessageFX.Error(MiscUtil.getException(ex), "Warning", null);
-        } 
+        }
     }
-
 
     /**
      * Initializes the controller class.
@@ -363,6 +348,7 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
                     break;
             }
             lblStatus.setText(lsStatus);
+            tfSourceNo.setText(poGLControllers.PaymentRequest().Master().getSourceNo());
         } catch (SQLException | GuanzonException | NullPointerException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
         }
@@ -389,11 +375,11 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
                 }
                 cbReverse.setSelected(poGLControllers.PaymentRequest().Detail(pnTblDetailRow).isReverse());
 
-                tfRecurringNo.setText("");
-                tfBranchDetail.setText("");
-                tfAccountNo.setText("");
-                tfEmployee.setText("");
-                tfVatAmount.setText("");
+                tfRecurringNo.setText(poGLControllers.PaymentRequest().Detail(pnTblDetailRow).RecurringExpensePaymentMonitor().RecurringExpenseSchedule().getRecurringNo());
+                tfBranchDetail.setText(poGLControllers.PaymentRequest().Detail(pnTblDetailRow).RecurringExpensePaymentMonitor().RecurringExpenseSchedule().Branch().getDescription());
+                tfAccountNo.setText(poGLControllers.PaymentRequest().Detail(pnTblDetailRow).RecurringExpensePaymentMonitor().RecurringExpenseSchedule().getAccountNo());
+                tfEmployee.setText(poGLControllers.PaymentRequest().Detail(pnTblDetailRow).RecurringExpensePaymentMonitor().RecurringExpenseSchedule().Employee().getCompanyName());
+                tfVatAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poGLControllers.PaymentRequest().Detail(pnTblDetailRow).RecurringExpensePaymentMonitor().RecurringExpenseSchedule().getAmount(), true));
                 computePerDetailTaxAndTotal();
             } catch (SQLException | GuanzonException ex) {
                 Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
@@ -461,15 +447,15 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
                             tfDepartment.setText(poGLControllers.PaymentRequest().Master().Department().getDescription());
 
                         }
-                        
+
                         //Load Recurring Detail
-                        if(psRecurringMonitor != null && !"".equals(psRecurringMonitor)){
+                        if (psRecurringMonitor != null && !"".equals(psRecurringMonitor)) {
                             poJSON = poGLControllers.PaymentRequest().populateRecurringDetail(psRecurringMonitor);
                             if (!"success".equals((String) poJSON.get("result"))) {
                                 ShowMessageFX.Warning((String) poJSON.get("message"), "Warning", null);
                             }
                         }
-                        
+
                         tfDepartment.setPromptText("");
                         CustomCommonUtil.switchToTab(tabDetails, ImTabPane);
                         loadRecordMaster();
@@ -836,10 +822,8 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
 
     public void loadRecordAttachment(boolean lbloadImage) {
         try {
-            boolean lbShow2 = pnEditMode == EditMode.UPDATE || pnEditMode == EditMode.ADDNEW;
-            JFXUtil.setDisabled(!lbShow2, cmbAttachmentType, btnAddAttachment, btnRemoveAttachment);
             if (attachment_data.size() > 0) {
-                tfAttachmentNo.setText(String.valueOf(pnAttachment + 1));
+                tfAttachmentNo.setText(attachment_data.get(tblAttachments.getSelectionModel().getSelectedIndex()).getIndex01());
                 String lsAttachmentType = poGLControllers.PaymentRequest().TransactionAttachmentList(pnAttachment).getModel().getDocumentType();
                 if (lsAttachmentType.equals("")) {
                     poGLControllers.PaymentRequest().TransactionAttachmentList(pnAttachment).getModel().setDocumentType(DocumentType.OTHER);
@@ -848,20 +832,58 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
                 int lnAttachmentType = 0;
                 lnAttachmentType = Integer.parseInt(lsAttachmentType);
                 cmbAttachmentType.getSelectionModel().select(lnAttachmentType);
-
                 if (lbloadImage) {
                     try {
-                        String filePath = (String) attachment_data.get(pnAttachment).getIndex02();
-                        String filePath2 = "D:\\GGC_Maven_Systems\\temp\\attachments\\" + (String) attachment_data.get(pnAttachment).getIndex02();
+                        String filePath = (String) attachment_data.get(tblAttachments.getSelectionModel().getSelectedIndex()).getIndex02();
+                        String filePath2 = "";
+                        if (imageinfo_temp.containsKey((String) attachment_data.get(tblAttachments.getSelectionModel().getSelectedIndex()).getIndex02())) {
+                            filePath2 = imageinfo_temp.get((String) attachment_data.get(tblAttachments.getSelectionModel().getSelectedIndex()).getIndex02());
+                        } else {
+                            // in server
+                            if (poGLControllers.PaymentRequest().TransactionAttachmentList(pnAttachment).getModel().getImagePath() != null && !"".equals(poGLControllers.PaymentRequest().TransactionAttachmentList(pnAttachment).getModel().getImagePath())) {
+                                filePath2 = poGLControllers.PaymentRequest().TransactionAttachmentList(pnAttachment).getModel().getImagePath() + "/" + (String) attachment_data.get(tblAttachments.getSelectionModel().getSelectedIndex()).getIndex02();
+                            } else {
+                                filePath2 = System.getProperty("sys.default.path.temp.attachments") + "/" + (String) attachment_data.get(tblAttachments.getSelectionModel().getSelectedIndex()).getIndex02();
+                            }
+                        }
+
                         if (filePath != null && !filePath.isEmpty()) {
                             Path imgPath = Paths.get(filePath2);
                             String convertedPath = imgPath.toUri().toString();
-                            Image loimage = new Image(convertedPath);
-                            imageView.setImage(loimage);
-                            adjustImageSize(loimage);
-                            stackPaneClip();
-                            stackPaneClip(); // dont remove duplicate
+                            boolean isPdf = filePath.toLowerCase().endsWith(".pdf");
 
+                            // Clear previous content
+                            stackPane1.getChildren().clear();
+                            if (!isPdf) {
+                                // ----- IMAGE VIEW -----
+                                Image loimage = new Image(convertedPath);
+                                imageView.setImage(loimage);
+                                JFXUtil.adjustImageSize(loimage, imageView, ldstackPaneWidth, ldstackPaneHeight);
+
+                                PauseTransition delay = new PauseTransition(Duration.seconds(2)); // 2-second delay
+                                delay.setOnFinished(event -> {
+                                    Platform.runLater(() -> {
+                                        JFXUtil.stackPaneClip(stackPane1);
+                                    });
+                                });
+                                delay.play();
+
+                                // Add ImageView directly to stackPane
+                                stackPane1.getChildren().add(imageView);
+                                stackPane1.getChildren().addAll(btnArrowLeft, btnArrowRight);
+
+                                // Align buttons on top
+                                StackPane.setAlignment(btnArrowLeft, Pos.CENTER_LEFT);
+                                StackPane.setAlignment(btnArrowRight, Pos.CENTER_RIGHT);
+
+                                // Optional: add some margin
+                                StackPane.setMargin(btnArrowLeft, new Insets(0, 0, 0, 10));
+                                StackPane.setMargin(btnArrowRight, new Insets(0, 10, 0, 0));
+
+                            } else {
+                                // ----- PDF VIEW -----
+                                JFXUtil.PDFViewConfig(filePath2, stackPane1, btnArrowLeft, btnArrowRight, ldstackPaneWidth, ldstackPaneHeight);
+                            }
                         } else {
                             imageView.setImage(null);
                         }
@@ -873,11 +895,16 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
             } else {
                 if (!lbloadImage) {
                     imageView.setImage(null);
-                    stackPaneClip();
+                    // Clear previous content
+                    stackPane1.getChildren().clear();
+                    // Add ImageView directly to stackPane
+                    stackPane1.getChildren().add(imageView);
+                    stackPane1.getChildren().addAll(btnArrowLeft, btnArrowRight);
+                    Platform.runLater(() -> JFXUtil.stackPaneClip(stackPane1));
                     pnAttachment = 0;
                 }
             }
-        } catch (Exception e) {
+        } catch (Exception ex) {
         }
     }
 
@@ -1631,17 +1658,17 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
                         main_data.clear();
                         for (int lnCntr = 0; lnCntr <= poGLControllers.PaymentRequest().getPayableCount() - 1; lnCntr++) {
                             main_data.add(new ModelTableMain(
-                                String.valueOf(lnCntr + 1),
-                                poGLControllers.PaymentRequest().Payable(lnCntr).Payee().getPayeeName(),
-                                SQLUtil.dateFormat(poGLControllers.PaymentRequest().Payable(lnCntr).getTransactionDate(), SQLUtil.FORMAT_SHORT_DATE), //TODO Bill Day
-                                SQLUtil.dateFormat(poGLControllers.PaymentRequest().Payable(lnCntr).getTransactionDate(), SQLUtil.FORMAT_SHORT_DATE), //TODO Due Day
-                                poGLControllers.PaymentRequest().Payable(lnCntr).getTransactionNo(),
-                                "",
-                                "",
-                                "",
-                                "",
-                                ""));
-                            
+                                    String.valueOf(lnCntr + 1),
+                                    poGLControllers.PaymentRequest().Payable(lnCntr).getTransactionNo(),
+                                    SQLUtil.dateFormat(poGLControllers.PaymentRequest().Payable(lnCntr).getTransactionDate(), SQLUtil.FORMAT_SHORT_DATE), //TODO Bill Day
+                                    poGLControllers.PaymentRequest().Payable(lnCntr).Supplier().getCompanyName(), //TODO Due Day
+                                    poGLControllers.PaymentRequest().Payable(lnCntr).getTransactionNo(),
+                                    "",
+                                    "",
+                                    "",
+                                    "",
+                                    ""));
+
 //                                String lsDueDate = SQLUtil.dateFormat(poGLControllers.PaymentRequest().Recurring_Issuance(lnCntr).getDueDate(), SQLUtil.FORMAT_SHORT_DATE);
 //                                String lsLastRequestNo = poGLControllers.PaymentRequest().Recurring_Issuance(lnCntr).getLastPRFTrans();
 //                                String lsLastRequestPRFStatus = "";
@@ -1692,7 +1719,6 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
 //                            } catch (DateTimeParseException e) {
 //                                System.err.println("Invalid due date format: " + lsDueDate);
 //                            }
-
 //                            main_data.add(new ModelTableMain(
 //                                    String.valueOf(lnCntr + 1),
 //                                    poGLControllers.PaymentRequest().Recurring_Issuance(lnCntr).Payee().getPayeeName(),
@@ -1777,28 +1803,15 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
     }
 
     private void initTableRecurringExpense() {
-        JFXUtil.setColumnCenter(tblRowNoDetail);
-        JFXUtil.setColumnLeft(tblParticular, tblVATable);
-        JFXUtil.setColumnRight(tblAmount, tblDiscAmount, tblTaxAmount, tbTotalAmount);
-        JFXUtil.setColumnsIndexAndDisableReordering(tblVwPRDetail);
-        
+        JFXUtil.setColumnCenter(tblRowNo, tblTransNo, tblDate);
+        JFXUtil.setColumnLeft(tblSupplier);
+        JFXUtil.setColumnsIndexAndDisableReordering(tblVwRecurringExpense);
+
         if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
             tblVwRecurringExpense.setEditable(true);
         } else {
             tblVwRecurringExpense.setEditable(false);
         }
-        // Set cell value factories
-        tblRowNo.setCellValueFactory(new PropertyValueFactory<>("index01"));
-        tblPayeeName.setCellValueFactory(new PropertyValueFactory<>("index02"));
-        tblBillDate.setCellValueFactory(new PropertyValueFactory<>("index03"));
-        tblDueDate.setCellValueFactory(new PropertyValueFactory<>("index04"));
-        tblParticularMain.setCellValueFactory(new PropertyValueFactory<>("index05"));
-        tblVwRecurringExpense.widthProperty().addListener((ObservableValue<? extends Number> source, Number oldWidth, Number newWidth) -> {
-            TableHeaderRow header = (TableHeaderRow) tblVwRecurringExpense.lookup("TableHeaderRow");
-            header.reorderingProperty().addListener((ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) -> {
-                header.setReordering(false);
-            });
-        });
         initTableHighlithers();
     }
 
@@ -2120,7 +2133,7 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
             if (event.getClickCount() == 2) {
                 ModelTableMain loSelectedRecurringExpense = (ModelTableMain) tblVwRecurringExpense.getSelectionModel().getSelectedItem();
                 if (loSelectedRecurringExpense != null) {
-                    String lsTransNo = loSelectedRecurringExpense.getIndex05();
+                    String lsTransNo = loSelectedRecurringExpense.getIndex02();
                     try {
                         poJSON = poGLControllers.PaymentRequest().populateDetail(lsTransNo);
                         if ("success".equals(poJSON.get("result"))) {
@@ -2179,7 +2192,7 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
         if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE || pnEditMode == EditMode.READY) {
             int lnRow = Integer.parseInt(detail_data.get(tblVwPRDetail.getSelectionModel().getSelectedIndex()).getIndex11());
             pnTblDetailRow = lnRow;
-            ModelTableDetail selectedItem = tblVwPRDetail.getSelectionModel().getSelectedItem();
+            ModelTableDetail selectedItem = (ModelTableDetail) tblVwPRDetail.getSelectionModel().getSelectedItem();
             if (event.getClickCount() == 1) {
                 clearDetailFields();
                 if (selectedItem != null) {
