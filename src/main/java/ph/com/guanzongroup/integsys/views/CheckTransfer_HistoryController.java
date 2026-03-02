@@ -1,60 +1,63 @@
 package ph.com.guanzongroup.integsys.views;
 
-import ph.com.guanzongroup.cas.cashflow.CheckTransfer;
-import java.lang.reflect.Field;
+
+import com.sun.javafx.scene.control.skin.TableHeaderRow;
 import java.net.URL;
 import java.sql.SQLException;
-import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.ResourceBundle;
-import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.application.Platform;
-import javafx.beans.property.ReadOnlyBooleanPropertyBase;
-import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.Node;
+import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.Control;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressIndicator;
+import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.control.cell.PropertyValueFactory;
+import static javafx.scene.input.KeyCode.DOWN;
 import static javafx.scene.input.KeyCode.ENTER;
 import static javafx.scene.input.KeyCode.F3;
 import static javafx.scene.input.KeyCode.TAB;
+import static javafx.scene.input.KeyCode.UP;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.StackPane;
-import net.sf.jasperreports.engine.JRException;
+import javafx.util.Pair;
 import org.guanzon.appdriver.agent.ShowMessageFX;
-import org.guanzon.appdriver.base.CommonUtils;
 import org.guanzon.appdriver.base.GRiderCAS;
 import org.guanzon.appdriver.base.LogWrapper;
 import org.guanzon.appdriver.constant.EditMode;
 import org.guanzon.appdriver.base.GuanzonException;
+import org.guanzon.appdriver.base.MiscUtil;
+import org.guanzon.appdriver.base.SQLUtil;
+import org.guanzon.appdriver.constant.UserRight;
 import org.json.simple.JSONObject;
 import ph.com.guanzongroup.cas.cashflow.status.CheckTransferStatus;
-import ph.com.guanzongroup.cas.cashflow.model.Model_Check_Transfer_Detail;
-import ph.com.guanzongroup.cas.cashflow.services.CheckController;
+import ph.com.guanzongroup.cas.cashflow.services.CashflowControllers;
+import ph.com.guanzongroup.integsys.model.ModelTableDetail;
+import ph.com.guanzongroup.integsys.model.ModelTableMain;
 import ph.com.guanzongroup.integsys.utility.CustomCommonUtil;
+import ph.com.guanzongroup.integsys.utility.JFXUtil;
 
 /**
  * FXML Controller class
@@ -62,23 +65,37 @@ import ph.com.guanzongroup.integsys.utility.CustomCommonUtil;
  * @author User
  */
 public class CheckTransfer_HistoryController implements Initializable, ScreenInterface {
-
+    
     private GRiderCAS poApp;
+    private CashflowControllers poGLControllers;
+    private String psFormName = "Payment Request";
+    private LogWrapper logWrapper;
+    private int pnEditMode;
     private JSONObject poJSON;
-    private LogWrapper poLogWrapper;
-    private String psFormName = "Check Transfer History";
-    private String psIndustryID;
-    private Control lastFocusedControl;
-    private CheckTransfer poAppController;
-    private ObservableList<Model_Check_Transfer_Detail> laTransactionDetail;
-    private int pnSelectMaster, pnEditMode, pnTransactionDetail = 0;
-
-    private unloadForm poUnload = new unloadForm();
-    @FXML
-    private CheckBox cbReverse;
+    unloadForm poUnload = new unloadForm();
+    private String psIndustryID = "";
+    private String psCompanyID = "";
+    private String psCategoryID = "";
+    
+    private int pnTblMainRow = -1;
+    private int pnTblMain_Page = 50;
+    private TextField activeField;
+    private String prevPayee = "";
+    private final Map<String, List<String>> highlightedRowsMain = new HashMap<>();
+    List<Pair<String, String>> plOrderNoPartial = new ArrayList<>();
+    List<Pair<String, String>> plOrderNoFinal = new ArrayList<>();
+    
+    private int pnSelectedDetail = 0;
+    private String psActiveField = "";
+    
+    private ObservableList<ModelTableMain> main_data = FXCollections.observableArrayList();
+    private ObservableList<ModelTableDetail> detail_data = FXCollections.observableArrayList();
+    
     
     @FXML
-    private AnchorPane apMainAnchor, apBrowse, apMaster, apDetail, apButton, apTransaction;
+    private CheckBox cbReverse,cbIsReceived;
+    @FXML
+    private AnchorPane AnchorMain, apBrowse, apMaster, apDetail, apButton, apTransaction;
 
     @FXML
     private TextField tfSearchDestination, tfSearchTransNo, tfTransactionNo,
@@ -93,21 +110,26 @@ public class CheckTransfer_HistoryController implements Initializable, ScreenInt
     private Label lblSource, lblStatus;
 
     @FXML
-    private Button btnBrowse, btnPrint, btnClose;
+    private Button btnClose, btnBrowse, btnPrint,btnHistory;
 
     @FXML
     private TextArea taRemarks;
-
+    
     @FXML
-    private CheckBox cbIsReceived;
-
+    private TableView<ModelTableDetail> tblViewDetails;
+    
     @FXML
-    private TableView<Model_Check_Transfer_Detail> tblViewDetails;
-
-    @FXML
-    private TableColumn<Model_Check_Transfer_Detail, String> tblColDetailNo, tblColDetailReference, tblColDetailPayee, tblColDetailBank,
+    private TableColumn<ModelTableDetail, String> tblColDetailNo, tblColDetailReference, tblColDetailPayee, tblColDetailBank,
             tblColDetailDate, tblColDetailCheckNo, tblColDetailCheckAmount;
 
+    @FXML
+    private TableView<ModelTableMain> tblViewMaster;
+
+    @FXML
+    private TableColumn<ModelTableMain, String> tblColNo, tblColTransNo,
+            tblColTransDate, tblColCheckNo, tblColCheckAmount;
+    
+   
     @Override
     public void setGRider(GRiderCAS foValue) {
         poApp = foValue;
@@ -120,12 +142,12 @@ public class CheckTransfer_HistoryController implements Initializable, ScreenInt
 
     @Override
     public void setCompanyID(String fsValue) {
-//        psCompanyID = fsValue;
+        psCompanyID = fsValue;
     }
 
     @Override
     public void setCategoryID(String fsValue) {
-//        psCategoryID = fsValue;
+        psCategoryID = fsValue;
     }
 
     /**
@@ -133,673 +155,540 @@ public class CheckTransfer_HistoryController implements Initializable, ScreenInt
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-
-        try {
-            poLogWrapper = new LogWrapper(psFormName, psFormName);
-            poAppController = new CheckController(poApp, poLogWrapper).CheckTransfer();
-
-            //initlalize and validate transaction objects from class controller
-            if (!isJSONSuccess(poAppController.initTransaction(), psFormName)) {
-                unloadForm appUnload = new unloadForm();
-                appUnload.unloadForm(apMainAnchor, poApp, psFormName);
-            }
-
-            //background thread
-            Platform.runLater(() -> {
-                poAppController.setTransactionStatus("12340");
-                //initialize logged in category
-                poAppController.setIndustryID(psIndustryID);
-                System.err.println("Initialize value : Industry >" + psIndustryID);
-
-            });
-            initializeTableDetail();
-            initControlEvents();
-        } catch (SQLException | GuanzonException e) {
-            Logger.getLogger(CheckTransfer_HistoryController.class.getName()).log(Level.SEVERE, null, e);
-            poLogWrapper.severe(psFormName + " :" + e.getMessage());
-        }
+        ClearAll();
+        initializeObject();
+        initButtonsClickActions();
+        initTableDetail();
+        initTableOnClick();
+        initCheckBox();
     }
     
-    @FXML
-    private void cmdCheckBox_Click(ActionEvent event) {
-        poJSON = new JSONObject();
-        Object source = event.getSource();
-        if (source instanceof CheckBox) {
-            try {
-                CheckBox checkedBox = (CheckBox) source;
-                switch (checkedBox.getId()) {
-                    case "cbReverse": // this is the id
-                        if (poAppController.getEditMode() == EditMode.ADDNEW
-                                || poAppController.getEditMode() == EditMode.UPDATE
-                                && poAppController.getMaster().getTransactionStatus().equals(CheckTransferStatus.OPEN)) {
-                            if (poAppController.Detail(pnTransactionDetail).getSourceNo() != null
-                                    || !poAppController.Detail(pnTransactionDetail).getSourceNo().isEmpty()) {
-                                if (!checkedBox.isSelected()) {
-                                    poAppController.Detail().remove(pnTransactionDetail);
-                                    pnTransactionDetail = pnTransactionDetail - 1;
-                                }
-                            }
-                        } else {
-                            poAppController.Detail(pnTransactionDetail).isReverse(checkedBox.isSelected());
-                        }
-                        reloadTableDetail();
-                        loadSelectedTransactionDetail(pnTransactionDetail);
-                        break;
-                }
-            } catch (SQLException | GuanzonException | CloneNotSupportedException ex) {
-                Logger.getLogger(CheckDeposit_EntryController.class.getName()).log(Level.SEVERE, null, ex);
-            }
+    /**
+     * Initializes the TBJ controller and transaction objects.
+     */
+    private void initializeObject() {
+        LogWrapper logwrapr = new LogWrapper("CAS", System.getProperty("sys.default.path.temp") + "cas-error.log");
+        poGLControllers = new CashflowControllers(poApp, logwrapr);
+        poGLControllers.CheckTransfers().setTransactionStatus("0123456");
+        poJSON = poGLControllers.CheckTransfers().InitTransaction();
+        if (!"success".equals(poJSON.get("result"))) {
+                ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
         }
+//            poGLControllers.CheckTransfers().Master().setIndustryId(psIndustryID);
+//            lblSource.setText(poGLControllers.CheckTransfers().Master().Company().getCompanyName() + " - " + poGLControllers.CheckTransfers().Master().Industry().getDescription());
     }
     
-    @FXML
-    void ontblDetailClicked(MouseEvent e) {
-        try {
-            pnTransactionDetail = tblViewDetails.getSelectionModel().getSelectedIndex();
-            if (pnTransactionDetail < 0) {
-                return;
-            }
-
-            loadSelectedTransactionDetail(pnTransactionDetail);
-        } catch (SQLException | GuanzonException | CloneNotSupportedException ex) {
-            poLogWrapper.severe(psFormName + " :" + ex.getMessage());
-        }
+    private void ClearAll() {
+        Arrays.asList(
+                tfSearchDestination, 
+                tfSearchTransNo, 
+                tfTransactionNo,
+                tfDestination, 
+                tfDepartment, 
+                tfTotal, 
+                tfPayee,
+                tfBank, 
+                tfCheckAmount, 
+                tfCheckTransNo,
+                tfCheckNo, 
+                tfNote
+        ).forEach(TextField::clear);
+        cbReverse.setSelected(false);
+        detail_data.clear();
+        pnSelectedDetail = 0;
+        psActiveField = "";
+        taRemarks.clear();
+        lblStatus.setText( "UNKOWN");
     }
-
-    @FXML
-    private void cmdButton_Click(ActionEvent event) {
+    private void initButtonsClickActions() {
+        List<Button> buttons = Arrays.asList(btnBrowse, btnPrint,btnClose,btnHistory);
+        buttons.forEach(button -> button.setOnAction(this::handleButtonAction));
+    }
+    
+    private void handleButtonAction(ActionEvent event) {
         try {
-            //get button id
-            String btnID = ((Button) event.getSource()).getId();
-            switch (btnID) {
-                case "btnBrowse":
-                    if (lastFocusedControl == null) {
-                        if (!tfTransactionNo.getText().isEmpty()) {
-                            if (ShowMessageFX.OkayCancel(null, "Search Transaction! by Trasaction", "Are you sure you want replace loaded Transaction?") == false) {
-                                return;
-                            }
-                        }
-                        if (!isJSONSuccess(poAppController.searchTransaction(tfSearchTransNo.getText(), true, true),
-                                "Initialize Search Source No! ")) {
-                            return;
-                        }
-
-                        getLoadedTransaction();
-                        initButtonDisplay(poAppController.getEditMode());
-                        return;
-                    }
-
-                    switch (lastFocusedControl.getId()) {
-                        case "tfSearchTransNo":
-                            if (!tfTransactionNo.getText().isEmpty()) {
-                                if (ShowMessageFX.OkayCancel(null, "Search Transaction! by Trasaction", "Are you sure you want replace loaded Transaction?") == false) {
-                                    return;
-                                }
-                            }
-                            if (!isJSONSuccess(poAppController.searchTransaction(tfSearchTransNo.getText(), true, true),
-                                    "Initialize Search Source No! ")) {
-                                return;
-                            }
-
-                            getLoadedTransaction();
-                            initButtonDisplay(poAppController.getEditMode());
-                            break;
-                        case "tfSearchDestination":
-                            if (!tfTransactionNo.getText().isEmpty()) {
-                                if (ShowMessageFX.OkayCancel(null, "Search Transaction! by Trasaction", "Are you sure you want replace loaded Transaction?") == false) {
-                                    return;
-                                }
-                            }
-                            if (!isJSONSuccess(poAppController.searchTransactionDestination(tfSearchDestination.getText(), false),
-                                    "Initialize Search Transaction! ")) {
-                                return;
-                            }
-
-                            getLoadedTransaction();
-                            initButtonDisplay(poAppController.getEditMode());
-                            break;
-                        case "dpSearchTransactionDate":
-                            if (!tfTransactionNo.getText().isEmpty()) {
-                                if (ShowMessageFX.OkayCancel(null, "Search Transaction! by Trasaction", "Are you sure you want replace loaded Transaction?") == false) {
-                                    return;
-                                }
-                            }
-                            if (!isJSONSuccess(poAppController.searchTransaction(String.valueOf(dpSearchTransactionDate.getValue()), false),
-                                    "Initialize Search Transaction! ")) {
-                                return;
-                            }
-
-                            getLoadedTransaction();
-                            initButtonDisplay(poAppController.getEditMode());
-                            break;
-                        default:
-                            if (!tfTransactionNo.getText().isEmpty()) {
-                                if (ShowMessageFX.OkayCancel(null, "Search Transaction! by Trasaction", "Are you sure you want replace loaded Transaction?") == false) {
-                                    return;
-                                }
-                            }
-                            if (!isJSONSuccess(poAppController.searchTransaction(tfSearchTransNo.getText(), true, true),
-                                    "Initialize Search Source No! ")) {
-                                return;
-                            }
-
-                            getLoadedTransaction();
-                            initButtonDisplay(poAppController.getEditMode());
-                            break;
-
-                    }
-                    break;
-
-                case "btnPrint":
-                    if (poAppController.getMaster().getTransactionNo() == null || poAppController.getMaster().getTransactionNo().isEmpty()) {
-                        ShowMessageFX.Information("Please load transaction before proceeding..", "Stock Request Approval", "");
-                        return;
-                    }
-                    if (poAppController.getMaster().getTransactionStatus().equalsIgnoreCase(CheckTransferStatus.OPEN)) {
-                        if (ShowMessageFX.OkayCancel(null, psFormName, "Do you want to close the transaction ?") == true) {
-                            if (!isJSONSuccess(poAppController.CloseTransaction(),
-                                    "Initialize Close Transaction")) {
-                                return;
-                            }
-                        }
-                    }
-                    if (ShowMessageFX.OkayCancel(null, psFormName, "Do you want to print the transaction ?") == true) {
-                        if (!isJSONSuccess(poAppController.printRecord(),
-                                "Initialize Print Transaction")) {
-                            return;
-                        }
-                    }
-                    getLoadedTransaction();
-
-                    pnEditMode = poAppController.getEditMode();
-                    break;
-
+            String lsButton = ((Button) event.getSource()).getId();
+            switch (lsButton) {
                 case "btnClose":
                     if (ShowMessageFX.YesNo("Are you sure you want to close this form?", psFormName, null)) {
                         if (poUnload != null) {
-                            poUnload.unloadForm(apMainAnchor, poApp, psFormName);
+                            poUnload.unloadForm(AnchorMain, poApp, psFormName);
                         } else {
                             ShowMessageFX.Warning("Please notify the system administrator to configure the null value at the close button.", "Warning", null);
                         }
                     }
+                    break;
+                case "btnBrowse":
+                    poJSON = poGLControllers.CheckTransfers().SearchTransaction();
+                    if (!"success".equals((String) poJSON.get("result"))) {
+                        ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
+                        return;
+                    }
+                    pnEditMode = poGLControllers.CheckDeposits().getEditMode();
+                    loadTableDetail();
+                    LoadMaster();
+                    LoadDetail();
+                    break;
+                case "btnHistory":
+                    try {
+                        poGLControllers.CheckTransfers().ShowStatusHistory();
+                    } catch (NullPointerException npe) {
+                        Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(npe), npe);
+                        ShowMessageFX.Error("No transaction status history to load!", psFormName, null);
+                    } catch (Exception ex) {
+                        Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+                        ShowMessageFX.Error(MiscUtil.getException(ex), psFormName, null);
+                    }
+                    break;
+
+                default:
+                    ShowMessageFX.Warning("Please contact admin to assist about no button available", psFormName, null);
+                    break;
             }
-
-            initButtonDisplay(poAppController.getEditMode());
-
-        } catch (CloneNotSupportedException | SQLException | JRException | GuanzonException e) {
-            e.printStackTrace();
-            poLogWrapper.severe(psFormName + " :" + e.getMessage());
+            initFields();
+//            initFields(pnEditMode);
+        } catch (CloneNotSupportedException | SQLException | GuanzonException ex) {
+            Logger.getLogger(TBJ_ParameterController.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-
-    private final ChangeListener<? super Boolean> txtField_Focus = (o, ov, nv) -> {
-        TextField loTextField = (TextField) ((ReadOnlyBooleanPropertyBase) o).getBean();
-        String lsTextFieldID = loTextField.getId();
-        String lsValue = loTextField.getText();
-//        try {
-        if (lsValue == null) {
-            return;
+    private void initFields() {
+        boolean isEditable = (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE);
+        JFXUtil.setDisabled(!isEditable,
+                tfSearchDestination,
+                tfSearchTransNo, 
+                tfTransactionNo,
+                tfDestination,
+                tfDepartment,
+                tfCheckTransNo,
+                tfCheckNo,
+                dpTransactionDate,
+                taRemarks
+        );
+        if (CheckTransferStatus.CONFIRMED.equals(poGLControllers.CheckTransfers().Master().getTransactionStatus())) {
+            apMaster.setDisable(true);
+            apDetail.setDisable(false);
+            JFXUtil.setDisabledExcept(true,
+                    apDetail
+                    
+            );
         }
+        tfTransactionNo.setDisable(true);
+        if (CheckTransferStatus.OPEN.equals(poGLControllers.CheckTransfers().Master().getTransactionStatus())
+                || pnEditMode == EditMode.READY) {
+            
+            apMaster.setDisable(false);
+            apDetail.setDisable(false);
+        }
+        
+            List<TextField> loTxtField = Arrays.asList(tfDestination, tfDepartment, tfCheckTransNo, tfCheckNo);
+            loTxtField.forEach(tf -> tf.setOnKeyPressed(event -> txtField_KeyPressed(event)));
+//
+//            JFXUtil.setFocusListener(txtArea_Focus, taRemarks);
+            JFXUtil.setFocusListener(txtField_Focus, tfDestination, tfDepartment,tfNote);
+            JFXUtil.setFocusListener(txtArea_Focus, taRemarks);
 
-        if (!nv) {
-            /*Lost Focus*/
-            switch (lsTextFieldID) {
+//            cmbAccountType.setItems(AccountType);
+//            cmbAccountType.setOnAction(comboBoxActionListener);
+//            JFXUtil.initComboBoxCellDesignColor("#FF8201", cmbAccountType);
+//
+//            tblDetails.setOnMouseClicked(this::tblDetails_Clicked);
+//            makeClearableReadOnly(tfFieldName);
 
+    }
+    
+    private void LoadMaster() {
+        try {
+            tfTransactionNo.setText(poGLControllers.CheckTransfers().Master().getTransactionNo());
+
+            tfDestination.setText(
+                    poGLControllers.CheckTransfers().Master().BranchDestination().getBranchName() == null ? ""
+                    : poGLControllers.CheckTransfers().Master().BranchDestination().getBranchName() );
+            tfDepartment.setText(
+                   poGLControllers.CheckTransfers().Master().Department().getDescription() == null ? ""
+                    : poGLControllers.CheckTransfers().Master().Department().getDescription());
+           
+            taRemarks.setText(poGLControllers.CheckTransfers().Master().getRemarks() == null ? ""
+                    : poGLControllers.CheckTransfers().Master().getRemarks());
+            
+            dpTransactionDate.setValue(CustomCommonUtil.parseDateStringToLocalDate(
+                    SQLUtil.dateFormat(poGLControllers.CheckTransfers().Master().getTransactionDate(), SQLUtil.FORMAT_SHORT_DATE)));
+            
+
+            String lsStatus = "";
+            switch (poGLControllers.CheckTransfers().Master().getTransactionStatus()) {
+                case CheckTransferStatus.VOID:
+                    lsStatus = "VOID";
+                    break;
+                case CheckTransferStatus.OPEN:
+                    lsStatus = "OPEN";
+                    break;
+                case CheckTransferStatus.CONFIRMED:
+                    lsStatus = "CONFIRMED";
+                    break;
             }
-        } else {
-            loTextField.selectAll();
+            lblStatus.setText(lsStatus);
+        } catch (SQLException | GuanzonException | NullPointerException ex) {
+            Logger.getLogger(PaymentRequest_EntryController.class.getName()).log(Level.SEVERE, null, ex);
         }
-//        } catch (SQLException | GuanzonException | CloneNotSupportedException ex) {
-//            poLogWrapper.severe(psFormName + " :" + ex.getMessage());
-//        }
-    };
+    }
+    
+    private void LoadDetail() {
+        try {
+            tfCheckTransNo.setText(poGLControllers.CheckTransfers().Detail(pnSelectedDetail).CheckPayment().getTransactionNo()== null ? ""
+                    : poGLControllers.CheckTransfers().Detail(pnSelectedDetail).CheckPayment().getTransactionNo());
+
+            tfBank.setText(poGLControllers.CheckTransfers().Detail(pnSelectedDetail).CheckPayment().Banks().getBankName() == null ? ""
+                    : poGLControllers.CheckTransfers().Detail(pnSelectedDetail).CheckPayment().Banks().getBankName());
+
+            tfPayee.setText(poGLControllers.CheckTransfers().Detail(pnSelectedDetail).CheckPayment().Payee().getPayeeName()== null ? ""
+                    : poGLControllers.CheckTransfers().Detail(pnSelectedDetail).CheckPayment().Payee().getPayeeName());
+            
+            tfNote.setText(poGLControllers.CheckTransfers().Detail(pnSelectedDetail).getRemarks() == null ? ""
+                    : poGLControllers.CheckTransfers().Detail(pnSelectedDetail).getRemarks());
+            
+            tfCheckNo.setText(poGLControllers.CheckTransfers().Detail(pnSelectedDetail).CheckPayment().getCheckNo() == null ? ""
+                    : poGLControllers.CheckTransfers().Detail(pnSelectedDetail).CheckPayment().getCheckNo());
+            
+            tfCheckAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(
+                    poGLControllers.CheckTransfers().Detail(pnSelectedDetail).CheckPayment().getAmount(), true));
+
+            
+            tfTotal.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(
+                    poGLControllers.CheckTransfers().Master().getTransactionTotal(), true));
+            
+            dpCheckDate.setValue(CustomCommonUtil.parseDateStringToLocalDate(
+                    SQLUtil.dateFormat(poGLControllers.CheckTransfers().Detail(pnSelectedDetail).CheckPayment().getCheckDate(), 
+                            SQLUtil.FORMAT_SHORT_DATE)));
+
+            cbReverse.setSelected(
+                poGLControllers.CheckTransfers().Detail(pnSelectedDetail) != null
+                && poGLControllers.CheckTransfers().Detail(pnSelectedDetail).isReverse()
+        );
+            
+
+        } catch (SQLException | GuanzonException | NullPointerException ex) {
+            Logger.getLogger(PaymentRequest_EntryController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
+
+    
+    private void initTableDetail() {
+        tblColDetailNo.setCellValueFactory(new PropertyValueFactory<>("index01"));
+        tblColDetailReference.setCellValueFactory(new PropertyValueFactory<>("index02"));
+        tblColDetailBank.setCellValueFactory(new PropertyValueFactory<>("index03"));
+        tblColDetailPayee.setCellValueFactory(new PropertyValueFactory<>("index04"));
+        tblColDetailDate.setCellValueFactory(new PropertyValueFactory<>("index05"));
+        tblColDetailCheckNo.setCellValueFactory(new PropertyValueFactory<>("index06"));
+        tblColDetailCheckAmount.setCellValueFactory(new PropertyValueFactory<>("index07"));
+
+        tblViewDetails.widthProperty().addListener((ObservableValue<? extends Number> source, Number oldWidth, Number newWidth) -> {
+            Platform.runLater(() -> {
+                TableHeaderRow header = (TableHeaderRow) tblViewDetails.lookup("TableHeaderRow");
+                if (header != null) {
+                    header.reorderingProperty().addListener((ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) -> {
+                        header.setReordering(false);
+                    });
+                }
+            });
+        });
+    }
+    
+    private void loadTableDetail() {
+        ProgressIndicator progressIndicator = new ProgressIndicator();
+        progressIndicator.setMaxSize(50, 50);
+        progressIndicator.setStyle("-fx-accent: #FF8201;");
+
+        StackPane loadingPane = new StackPane(progressIndicator);
+        loadingPane.setAlignment(Pos.CENTER);
+        loadingPane.setStyle("-fx-background-color: transparent;");
+
+        tblViewDetails.setPlaceholder(loadingPane);
+        progressIndicator.setVisible(true);
+
+        Task<List<ModelTableDetail>> task = new Task<List<ModelTableDetail>>() {
+            @Override
+            protected List<ModelTableDetail> call() throws Exception {
+                try {
+                    int detailCount = poGLControllers.CheckTransfers().getDetailCount();
+                                        
+                    if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
+                        if (poGLControllers.CheckTransfers().Detail(detailCount - 1).getSourceNo()!= null
+                                && !poGLControllers.CheckTransfers().Detail(detailCount - 1).getSourceNo().isEmpty()) {
+                            poGLControllers.CheckTransfers().AddDetail();
+                            detailCount++;
+                        }
+                    }
+                    List<ModelTableDetail> detailsList = new ArrayList<>();
+                    for (int lnCtr = 0; lnCtr < poGLControllers.CheckTransfers().getDetailCount(); lnCtr++) {
+                        detailsList.add(new ModelTableDetail(
+                                String.valueOf(lnCtr + 1),
+                                poGLControllers.CheckTransfers().Detail(lnCtr) != null
+                                && poGLControllers.CheckTransfers().Detail(lnCtr).CheckPayment() != null
+                                && poGLControllers.CheckTransfers().Detail(lnCtr).CheckPayment().getTransactionNo() != null
+                                ? poGLControllers.CheckTransfers().Detail(lnCtr).CheckPayment().getTransactionNo()
+                                : "",
+                                poGLControllers.CheckTransfers().Detail(lnCtr) != null
+                                && poGLControllers.CheckTransfers().Detail(lnCtr).CheckPayment() != null
+                                && poGLControllers.CheckTransfers().Detail(lnCtr).CheckPayment().Banks() != null
+                                && poGLControllers.CheckTransfers().Detail(lnCtr).CheckPayment().Banks().getBankName() != null
+                                ? poGLControllers.CheckTransfers().Detail(lnCtr).CheckPayment().Banks().getBankName()
+                                : "",
+                                poGLControllers.CheckTransfers().Detail(lnCtr) != null
+                                && poGLControllers.CheckTransfers().Detail(lnCtr).CheckPayment() != null
+                                && poGLControllers.CheckTransfers().Detail(lnCtr).CheckPayment().Payee() != null
+                                && poGLControllers.CheckTransfers().Detail(lnCtr).CheckPayment().Payee().getPayeeName() != null
+                                ? poGLControllers.CheckTransfers().Detail(lnCtr).CheckPayment().Payee().getPayeeName()
+                                : "",
+                                poGLControllers.CheckTransfers().Detail(lnCtr) != null
+                                && poGLControllers.CheckTransfers().Detail(lnCtr).CheckPayment() != null
+                                && poGLControllers.CheckTransfers().Detail(lnCtr).CheckPayment().getCheckDate() != null
+                                ? CustomCommonUtil.formatDateToMMDDYYYY(
+                                        poGLControllers.CheckTransfers().Detail(lnCtr).CheckPayment().getCheckDate()
+                                )
+                                : "",
+                                poGLControllers.CheckTransfers().Detail(lnCtr) != null
+                                && poGLControllers.CheckTransfers().Detail(lnCtr).CheckPayment() != null
+                                && poGLControllers.CheckTransfers().Detail(lnCtr).CheckPayment().getCheckNo() != null
+                                ? poGLControllers.CheckTransfers().Detail(lnCtr).CheckPayment().getCheckNo()
+                                : "",
+                                CustomCommonUtil.setIntegerValueToDecimalFormat(poGLControllers.CheckTransfers().Detail(lnCtr).CheckPayment().getAmount(),true),
+                                        "","",""));
+                    }
+                    Platform.runLater(() -> {
+                        detail_data.setAll(detailsList); // Properly update list
+                        tblViewDetails.setItems(detail_data);
+                        pnSelectedDetail = tblViewDetails.getItems().size() - 1;
+                        tblViewDetails.getSelectionModel().clearAndSelect(pnSelectedDetail);
+                        tblViewDetails.scrollTo(pnSelectedDetail);
+                        LoadDetail();
+//                        poJSON = poGLControllers.CheckTransfers().computeMasterFields();
+                    });
+                    
+                    return detailsList;
+                } catch (GuanzonException | SQLException ex) {
+                    Logger.getLogger(PaymentRequest_EntryController.class
+                            .getName()).log(Level.SEVERE, null, ex);
+                    return null;
+                }
+            }
+
+            @Override
+            protected void succeeded() {
+                progressIndicator.setVisible(false);
+            }
+
+            @Override
+            protected void failed() {
+                progressIndicator.setVisible(false);
+            }
+        };
+
+        new Thread(task).start();
+    }
+    
+    
+    public void initTableOnClick() {
+        tblViewDetails.setOnMouseClicked(this::tblViewDetails_Clicked);
+    }
+    
+    private void initCheckBox() {
+        cbReverse.setDisable(true);
+        if ((pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE)) {
+            
+            cbReverse.setOnAction(event -> {
+                if (poGLControllers.CheckTransfers().Master().getTransactionStatus().equals(CheckTransferStatus.OPEN)
+                        || poGLControllers.CheckTransfers().Master().getTransactionStatus().equals(CheckTransferStatus.CONFIRMED)) {
+                    if (poGLControllers.CheckTransfers().Detail(pnSelectedDetail).getSourceNo() != null
+                            || !poGLControllers.CheckTransfers().Detail(pnSelectedDetail).getSourceNo().isEmpty()) {
+                        if (!cbReverse.isSelected()) {
+                            poGLControllers.CheckTransfers().Detail().remove(pnSelectedDetail);
+                        }
+                    }
+                } else {
+                     poGLControllers.CheckTransfers().Detail(pnSelectedDetail).isReverse(cbReverse.isSelected());
+                }
+                
+                loadTableDetail();
+            });
+            
+        }
+        
+    }
+    private void tblViewDetails_Clicked(MouseEvent event) {
+        if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE || pnEditMode == EditMode.READY) {
+            pnSelectedDetail = tblViewDetails.getSelectionModel().getSelectedIndex();
+            ModelTableDetail selectedItem = tblViewDetails.getSelectionModel().getSelectedItem();
+            if (event.getClickCount() == 1) {
+                tfCheckTransNo.clear();
+                tfBank.clear();
+                tfPayee.clear();
+                tfNote.clear();
+                tfCheckNo.clear();
+                dpCheckDate.setValue(null);
+                cbReverse.setSelected(false);
+//                cmbAccountType.getSelectionModel().clearSelection();
+
+                if (selectedItem != null) {
+                    if (pnSelectedDetail >= 0) {
+                        LoadDetail();
+                        tfCheckTransNo.requestFocus();
+                    }
+                }
+            }
+        }
+    }
+    
+    ChangeListener<Boolean> txtField_Focus = JFXUtil.FocusListener(TextField.class,
+        (lsID, lsValue) -> {
+
+            try {
+                /* Lost Focus */
+                switch (lsID) {
+                    case "tfDestination":
+                        psActiveField = lsID;
+                        if (lsValue == null || lsValue.trim().isEmpty()) {
+                            tfDestination.clear();
+                            poGLControllers.CheckTransfers().Master().setDestination(null);
+                            break;
+                        }
+
+                        if (poGLControllers.CheckTransfers().Master().getDestination() != null) {
+                            tfDestination.setText(
+                                    poGLControllers.CheckTransfers().Master().Branch().getBranchName());
+                        } else {
+                            tfDestination.clear();
+                        }
+                        if(!poGLControllers.CheckTransfers().Master().Branch().isMainOffice()){
+                           tfDepartment.setDisable(true);
+                        }else{
+                            tfDepartment.setDisable(false);
+                        }
+                        break;
+
+                    case "tfDepartment":
+                        psActiveField = lsID;
+                        if (lsValue == null || lsValue.trim().isEmpty()) {
+                            tfDepartment.clear();
+                            poGLControllers.CheckTransfers().Master().setDepartment(null);
+                            break;
+                        }
+
+                        if (poGLControllers.CheckTransfers().Master().getDepartment() != null) {
+                            tfDepartment.setText(
+                                    poGLControllers.CheckTransfers().Master().Department().getDescription());
+                        } else {
+                            tfDepartment.clear();
+                        }
+                        break;
+                    case "taRemarks":
+                        poGLControllers.CheckTransfers().Master().setRemarks(lsValue.trim());
+                        break;
+                    case "tfNote":
+                        psActiveField = lsID;
+                        poGLControllers.CheckTransfers().Detail(pnSelectedDetail).setRemarks(lsValue.trim());
+                        break;
+                    case "tfCheckNo":
+                        psActiveField = lsID;
+                        JFXUtil.inputIntegersOnly(tfCheckNo);
+                        break;
+                }
+
+            } catch (SQLException | GuanzonException ex) {
+                Logger.getLogger(CheckTransfer_EntryController.class.getName())
+                        .log(Level.SEVERE, null, ex);
+
+                ShowMessageFX.Warning(
+                        "Error processing field: " + ex.getMessage(),
+                        psFormName,
+                        null
+                );
+            }
+        });
+    ChangeListener<Boolean> txtArea_Focus = JFXUtil.FocusListener(TextArea.class,
+        (lsID, lsValue) -> {
+
+            /* Lost Focus */
+            switch (lsID) {
+                
+                case "taRemarks":
+                    poGLControllers.CheckTransfers().Master().setRemarks(lsValue.trim());
+                    break;
+                    
+            }
+        });
 
     private void txtField_KeyPressed(KeyEvent event) {
-        TextField loTxtField = (TextField) event.getSource();
+        TextField lsTxtField = (TextField) event.getSource();
         String txtFieldID = ((TextField) event.getSource()).getId();
         String lsValue = "";
-        if (loTxtField.getText() == null) {
+        if (lsTxtField.getText() == null) {
             lsValue = "";
         } else {
-            lsValue = loTxtField.getText();
+            lsValue = lsTxtField.getText();
         }
-        try {
-            if (null != event.getCode()) {
+        if (null != event.getCode()) {
+            try {
                 switch (event.getCode()) {
                     case TAB:
                     case ENTER:
-                    case F3:
                         switch (txtFieldID) {
-                            case "tfSearchTransNo":
-                                if (!tfTransactionNo.getText().isEmpty()) {
-                                    if (ShowMessageFX.OkayCancel(null, "Search Transaction! by Trasaction", "Are you sure you want replace loaded Transaction?") == false) {
-                                        return;
-                                    }
-                                }
-                                if (!isJSONSuccess(poAppController.searchTransaction(tfSearchTransNo.getText(), true, true),
-                                        "Initialize Search Source No! ")) {
-                                    return;
-                                }
-
-                                getLoadedTransaction();
-                                initButtonDisplay(poAppController.getEditMode());
-                                break;
-                            case "tfSearchDestination":
-                                if (!tfTransactionNo.getText().isEmpty()) {
-                                    if (ShowMessageFX.OkayCancel(null, "Search Transaction! by Trasaction", "Are you sure you want replace loaded Transaction?") == false) {
-                                        return;
-                                    }
-                                }
-                                if (!isJSONSuccess(poAppController.searchTransaction(tfSearchDestination.getText(), true, false),
-                                        "Initialize Search Transaction! ")) {
-                                    return;
-                                }
-                                getLoadedTransaction();
-                                initButtonDisplay(poAppController.getEditMode());
-                                break;
-                            case "dpSearchTransactionDate":
-                                if (!tfTransactionNo.getText().isEmpty()) {
-                                    if (ShowMessageFX.OkayCancel(null, "Search Transaction! by Trasaction", "Are you sure you want replace loaded Transaction?") == false) {
-                                        return;
-                                    }
-                                }
-                                if (!isJSONSuccess(poAppController.searchTransaction(String.valueOf(dpSearchTransactionDate.getValue()), false, false),
-                                        "Initialize Search Transaction! ")) {
-                                    return;
-                                }
-                                getLoadedTransaction();
-                                initButtonDisplay(poAppController.getEditMode());
+                            case "tfFilterBank":
                                 break;
                         }
                         break;
-                }
-            }
-        } catch (CloneNotSupportedException | SQLException | GuanzonException ex) {
-            ex.printStackTrace();
-            poLogWrapper.severe(psFormName + " :" + ex.getMessage());
-        }
-    }
+                    case F3:
+                        switch (txtFieldID) {
+                            case "tfDestination":
+                                poJSON = poGLControllers.CheckTransfers().SearchDistination(lsValue, false);
+                                if ("error".equals(poJSON.get("result"))) {
+                                    ShowMessageFX.Warning((String) poJSON.get("message"), lsValue, lsValue);
+                                }
+                                tfDestination.setText(poGLControllers.CheckTransfers().Master().Branch().getBranchName());
+                                if(!poGLControllers.CheckTransfers().Master().Branch().isWarehouse() 
+                                        || !poGLControllers.CheckTransfers().Master().Branch().isMainOffice()){
+                                    poGLControllers.CheckTransfers().Master().setDepartment(null);
+                                     tfDepartment.clear();
+                                }
+                                break;
+                            case "tfDepartment":
+                                poJSON = poGLControllers.CheckTransfers().SearchDepartment(lsValue, false);
+                                if ("error".equals(poJSON.get("result"))) {
+                                    ShowMessageFX.Warning((String) poJSON.get("message"), lsValue, lsValue);
+                                }
+                                tfDepartment.setText(poGLControllers.CheckTransfers().Master().Department().getDescription());
+                                return;
+                            case "tfCheckTransNo":
+                                poJSON = poGLControllers.CheckTransfers().SearchChecks(lsValue, "",pnSelectedDetail,false);
+                                if ("error".equals(poJSON.get("result"))) {
+                                    ShowMessageFX.Warning((String) poJSON.get("message"), lsValue, lsValue);
+                                }
+                                tfCheckTransNo.setText(poGLControllers.CheckTransfers().Detail(pnSelectedDetail).CheckPayment().getTransactionNo());
+                                loadTableDetail();
+                                return;   
+                            case "tfCheckNo":
+                                poJSON = poGLControllers.CheckTransfers().SearchChecks("", lsValue,pnSelectedDetail,false);
+                                if ("error".equals(poJSON.get("result"))) {
+                                    ShowMessageFX.Warning((String) poJSON.get("message"), lsValue, lsValue);
+                                }
+                                tfCheckNo.setText(poGLControllers.CheckTransfers().Detail(pnSelectedDetail).CheckPayment().getCheckNo());
+                                loadTableDetail();
+                                return; 
+                             
+                        }
 
-    private void loadTransactionMaster() {
-        try {
-            lblSource.setText(poAppController.getMaster().Industry().getDescription() == null ? "" : poAppController.getMaster().Industry().getDescription());
-            lblStatus.setText(CheckTransferStatus.STATUS.get(Integer.parseInt(poAppController.getMaster().getTransactionStatus())) == null ? "STATUS"
-                    : CheckTransferStatus.STATUS.get(Integer.parseInt(poAppController.getMaster().getTransactionStatus())));
-
-            tfTransactionNo.setText(poAppController.getMaster().getTransactionNo());
-            dpTransactionDate.setValue(ParseDate(poAppController.getMaster().getTransactionDate()));
-            tfDestination.setText(poAppController.getMaster().BranchDestination().getBranchName());
-            tfDepartment.setText(poAppController.getMaster().Department().getDescription());
-            taRemarks.setText(String.valueOf(poAppController.getMaster().getRemarks()));
-            tfTotal.setText(CommonUtils.NumberFormat(poAppController.getMaster().getTransactionTotal(), "###,##0.0000"));
-
-        } catch (SQLException | GuanzonException e) {
-            poLogWrapper.severe(psFormName, e.getMessage());
-        }
-    }
-
-    private void loadSelectedTransactionDetail(int fnrow)
-            throws SQLException, GuanzonException, CloneNotSupportedException {
-
-        tfCheckTransNo.setText(poAppController.Detail(pnTransactionDetail).CheckPayment().getTransactionNo() != null
-                ? poAppController.Detail(pnTransactionDetail).CheckPayment().getTransactionNo()
-                : ""
-        );
-
-        tfBank.setText( poAppController.Detail(pnTransactionDetail).CheckPayment().Banks() != null
-                ? poAppController.Detail(pnTransactionDetail).CheckPayment().Banks().getBankName()
-                : ""
-        );
-
-        tfPayee.setText( poAppController.Detail(pnTransactionDetail).CheckPayment().Payee() != null
-                ? poAppController.Detail(pnTransactionDetail).CheckPayment().Payee().getPayeeName()
-                : ""
-        );
-
-        tfCheckNo.setText( poAppController.Detail(pnTransactionDetail).CheckPayment().getCheckNo() != null
-                ? poAppController.Detail(pnTransactionDetail).CheckPayment().getCheckNo()
-                : ""
-        );
-
-        tfCheckAmount.setText(
-                poAppController.Detail(pnTransactionDetail) != null
-                && poAppController.Detail(pnTransactionDetail).CheckPayment() != null
-                ? CustomCommonUtil.setIntegerValueToDecimalFormat(
-                        poAppController.Detail(pnTransactionDetail).CheckPayment().getAmount(), true)
-                : ""
-        );
-
-        tfNote.setText(poAppController.Detail(pnTransactionDetail).getRemarks() != null
-                ? poAppController.Detail(pnTransactionDetail).getRemarks()
-                : ""
-        );
-
-        dpCheckDate.setValue( poAppController.Detail(pnTransactionDetail).CheckPayment().getTransactionDate() != null
-                ? ParseDate(
-                        poAppController.Detail(pnTransactionDetail)
-                                .CheckPayment()
-                                .getTransactionDate())
-                : null
-        );
-
-        cbReverse.setSelected(
-                poAppController.Detail(pnTransactionDetail) != null
-                && poAppController.Detail(pnTransactionDetail).isReverse()
-        );
-
-    }
-
-    private void initControlEvents() {
-        List<Control> laControls = getAllSupportedControls();
-
-        for (Control loControl : laControls) {
-            //add more if required
-            if (loControl instanceof TextField) {
-                TextField loControlField = (TextField) loControl;
-                controllerFocusTracker(loControlField);
-                loControlField.setOnKeyPressed(this::txtField_KeyPressed);
-                loControlField.focusedProperty().addListener(txtField_Focus);
-            } else if (loControl instanceof TableView) {
-                TableView loControlField = (TableView) loControl;
-                controllerFocusTracker(loControlField);
-            } else if (loControl instanceof ComboBox) {
-                ComboBox loControlField = (ComboBox) loControl;
-                controllerFocusTracker(loControlField);
-            }else if (loControl instanceof CheckBox) {
-                CheckBox loControlField = (CheckBox) loControl;
-                controllerFocusTracker(loControlField);
-            }
-        }
-
-        clearAllInputs();
-    }
-
-    private void controllerFocusTracker(Control control) {
-        control.focusedProperty().addListener((obs, oldVal, newVal) -> {
-            if (newVal) {
-                lastFocusedControl = control;
-            }
-        });
-    }
-
-    private void clearAllInputs() {
-
-        List<Control> laControls = getAllSupportedControls();
-
-        for (Control loControl : laControls) {
-            if (loControl instanceof TextField) {
-                ((TextField) loControl).clear();
-            } else if (loControl instanceof TextArea) {
-                ((TextArea) loControl).clear();
-            } else if (loControl != null && loControl instanceof TableView) {
-                TableView<?> table = (TableView<?>) loControl;
-                if (table.getItems() != null) {
-                    table.getItems().clear();
-                }
-
-            } else if (loControl instanceof DatePicker) {
-                ((DatePicker) loControl).setValue(null);
-            } else if (loControl instanceof ComboBox) {
-                ((ComboBox) loControl).setItems(null);
-            }
-        }
-        pnEditMode = poAppController.getEditMode();
-        initButtonDisplay(poAppController.getEditMode());
-
-    }
-
-    private void initButtonDisplay(int fnEditMode) {
-        boolean lbShow = (fnEditMode == EditMode.ADDNEW || fnEditMode == EditMode.UPDATE);
-
-        // Always show these buttons
-        initButtonControls(true, "btnBrowse", "btnBrowse", "btnClose");
-
-        apMaster.setDisable(!lbShow);
-        apDetail.setDisable(!lbShow);
-    }
-
-    private void initButtonControls(boolean visible, String... buttonFxIdsToShow) {
-        Set<String> showOnly = new HashSet<>(Arrays.asList(buttonFxIdsToShow));
-
-        for (Field loField : getClass().getDeclaredFields()) {
-            loField.setAccessible(true);
-            String fieldName = loField.getName(); // fx:id
-
-            // Only touch the buttons listed
-            if (!showOnly.contains(fieldName)) {
-                continue;
-            }
-            try {
-                Object value = loField.get(this);
-                if (value instanceof Button) {
-                    Button loButton = (Button) value;
-                    loButton.setVisible(visible);
-                    loButton.setManaged(visible);
-                }
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
-                poLogWrapper.severe(psFormName + " :" + e.getMessage());
-            }
-        }
-    }
-
-    private void initializeTableDetail() {
-        if (laTransactionDetail == null) {
-            laTransactionDetail = FXCollections.observableArrayList();
-
-            tblViewDetails.setItems(laTransactionDetail);
-
-            tblColDetailCheckAmount.setStyle("-fx-alignment: CENTER-RIGHT; -fx-padding: 0 5 0 0;");
-
-            tblColDetailNo.setCellValueFactory((loModel) -> {
-                int index = tblViewDetails.getItems().indexOf(loModel.getValue()) + 1;
-                return new SimpleStringProperty(String.valueOf(index));
-            });
-
-            tblColDetailReference.setCellValueFactory((loModel) -> {
-                try {
-                    return new SimpleStringProperty(loModel.getValue().CheckPayment().getTransactionNo());
-                } catch (SQLException | GuanzonException e) {
-                    poLogWrapper.severe(psFormName, e.getMessage());
-                    return new SimpleStringProperty("");
-                }
-            });
-
-            tblColDetailPayee.setCellValueFactory((loModel) -> {
-                try {
-                    return new SimpleStringProperty(loModel.getValue().CheckPayment().Payee().getPayeeName());
-                } catch (SQLException | GuanzonException e) {
-                    poLogWrapper.severe(psFormName, e.getMessage());
-                    return new SimpleStringProperty("");
-                }
-            });
-
-            tblColDetailBank.setCellValueFactory((loModel) -> {
-                try {
-                    return new SimpleStringProperty(loModel.getValue().CheckPayment().Banks().getBankName());
-                } catch (SQLException | GuanzonException e) {
-                    poLogWrapper.severe(psFormName, e.getMessage());
-                    return new SimpleStringProperty("");
-                }
-            });
-            tblColDetailDate.setCellValueFactory((loModel) -> {
-                try {
-                    return new SimpleStringProperty(
-                            loModel.getValue().CheckPayment().getCheckDate() == null
-                            ? ""
-                            : loModel.getValue().CheckPayment().getCheckDate().toString()
-                    );
-                } catch (SQLException | GuanzonException e) {
-                    poLogWrapper.severe(psFormName, e.getMessage());
-                    return new SimpleStringProperty("");
-                }
-            });
-
-            tblColDetailCheckNo.setCellValueFactory((loModel) -> {
-                try {
-                    return new SimpleStringProperty(loModel.getValue().CheckPayment().getCheckNo());
-                } catch (SQLException | GuanzonException e) {
-                    poLogWrapper.severe(psFormName, e.getMessage());
-                    return new SimpleStringProperty("");
-                }
-            });
-
-            tblColDetailCheckAmount.setCellValueFactory((loModel) -> {
-                try {
-                    return new SimpleStringProperty(CommonUtils.NumberFormat(loModel.getValue().CheckPayment().getAmount(), "###,##0.0000"));
-                } catch (SQLException | GuanzonException e) {
-                    poLogWrapper.severe(psFormName, e.getMessage());
-                    return new SimpleStringProperty("");
-                }
-            });
-        }
-    }
-
-    private void reloadTableDetail() {
-        try {
-            List<Model_Check_Transfer_Detail> rawDetail = poAppController.getDetailList();
-            List<Model_Check_Transfer_Detail> displayList = new ArrayList<>();
-
-            boolean hasEmptyRow = false; // track if we already added a new empty row
-
-            for (Model_Check_Transfer_Detail detail : rawDetail) {
-                boolean isEmptyRow = (detail.getSourceNo() == null || detail.getSourceNo().trim().isEmpty());
-
-                if (isEmptyRow) {
-                    // Add only one empty row for new transaction
-                    if (!hasEmptyRow) {
-                        displayList.add(detail);
-                        hasEmptyRow = true;
-                    }
-                } else if (detail.isReverse()) {
-                    // Add existing rows where cReverse = "+"
-                    displayList.add(detail);
-                }
-            }
-            laTransactionDetail.setAll(displayList);
-            tblViewDetails.getSelectionModel().select(pnTransactionDetail);
-
-            tblViewDetails.refresh();
-            poJSON = poAppController.computeMasterFields();
-            if ("success".equals((String) poJSON.get("result"))) {
-                tfTotal.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poAppController.getMaster().getTransactionTotal(), true));
-            }
-
-        } catch (SQLException | GuanzonException ex) {
-            Logger.getLogger(CheckDeposit_EntryController.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }
-
-    private void getLoadedTransaction() throws SQLException, GuanzonException, CloneNotSupportedException {
-//        clearAllInputs();
-        loadTransactionMaster();
-        reloadTableDetail();
-        loadSelectedTransactionDetail(pnTransactionDetail);
-    }
-
-    private boolean isJSONSuccess(JSONObject loJSON, String fsModule) {
-        String result = (String) loJSON.get("result");
-        String message = (String) loJSON.get("message");
-
-        System.out.println("isJSONSuccess called. Thread: " + Thread.currentThread().getName());
-
-        if ("error".equalsIgnoreCase(result)) {
-            poLogWrapper.severe(psFormName + " : " + message);
-            if (message != null && !message.trim().isEmpty()) {
-                if (Platform.isFxApplicationThread()) {
-                    ShowMessageFX.Warning(null, psFormName, fsModule + ": " + message);
-                } else {
-                    Platform.runLater(() -> ShowMessageFX.Warning(null, psFormName, fsModule + ": " + message));
-                }
-            }
-            return false;
-        }
-
-        if ("success".equalsIgnoreCase(result)) {
-            if (message != null && !message.trim().isEmpty()) {
-                if (Platform.isFxApplicationThread()) {
-                    ShowMessageFX.Information(null, psFormName, fsModule + ": " + message);
-                } else {
-                    Platform.runLater(() -> ShowMessageFX.Information(null, psFormName, fsModule + ": " + message));
-                }
-            }
-            poLogWrapper.info(psFormName + " : Success on " + fsModule);
-            return true;
-        }
-
-        // Unknown or null result
-        poLogWrapper.warning(psFormName + " : Unrecognized result: " + result);
-        return false;
-    }
-
-    private LocalDate ParseDate(Date date) {
-        if (date == null) {
-            return null;
-        }
-        Date loDate = new java.util.Date(date.getTime());
-        return loDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-    }
-
-    private StackPane getOverlayProgress(AnchorPane foAnchorPane) {
-        ProgressIndicator localIndicator = null;
-        StackPane localOverlay = null;
-
-        // Check if overlay already exists
-        for (Node node : foAnchorPane.getChildren()) {
-            if (node instanceof StackPane) {
-                StackPane stack = (StackPane) node;
-                for (Node child : stack.getChildren()) {
-                    if (child instanceof ProgressIndicator) {
-                        localIndicator = (ProgressIndicator) child;
-                        localOverlay = stack;
                         break;
-                    }
+                    case UP:
+                        break;
+                    case DOWN:
+                        break;
+                    default:
+                        break;
+
                 }
+            } catch (SQLException | GuanzonException | ExceptionInInitializerError ex) {
+                Logger.getLogger(TBJ_ParameterController.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
-
-        if (localIndicator == null) {
-            localIndicator = new ProgressIndicator();
-            localIndicator.setMaxSize(50, 50);
-            localIndicator.setVisible(false);
-            localIndicator.setStyle("-fx-progress-color: orange;");
-        }
-
-        if (localOverlay == null) {
-            localOverlay = new StackPane();
-            localOverlay.setPickOnBounds(false); // Let clicks through
-            localOverlay.getChildren().add(localIndicator);
-
-            AnchorPane.setTopAnchor(localOverlay, 0.0);
-            AnchorPane.setBottomAnchor(localOverlay, 0.0);
-            AnchorPane.setLeftAnchor(localOverlay, 0.0);
-            AnchorPane.setRightAnchor(localOverlay, 0.0);
-
-            foAnchorPane.getChildren().add(localOverlay);
-        }
-
-        return localOverlay;
-    }
-
-    private List<Control> getAllSupportedControls() {
-        List<Control> controls = new ArrayList<>();
-        for (Field field : getClass().getDeclaredFields()) {
-            field.setAccessible(true);
-            try {
-                Object value = field.get(this);
-                if (value instanceof TextField
-                        || value instanceof TextArea
-                        || value instanceof Button
-                        || value instanceof TableView
-                        || value instanceof DatePicker
-                        || value instanceof ComboBox) {
-                    controls.add((Control) value);
-                }
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
-                poLogWrapper.severe(psFormName + " :" + e.getMessage());
-            }
-        }
-        return controls;
     }
 }

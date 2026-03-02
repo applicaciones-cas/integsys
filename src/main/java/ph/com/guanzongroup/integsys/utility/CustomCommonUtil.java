@@ -89,6 +89,11 @@ public class CustomCommonUtil {
         return sdf.format(foDateValue);
     }
 
+    
+    public static String formatDateToMMDDYYYY(Date foDateValue) {
+        SimpleDateFormat sdf = new SimpleDateFormat("MM-dd-YYYY");
+        return sdf.format(foDateValue);
+    }
     /**
      * Converts a {@link Date} object to a string in "yyyy-MM-dd" format.
      *
