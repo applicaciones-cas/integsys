@@ -358,6 +358,8 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
     private void loadRecordDetail() {
         if (pnTblDetailRow >= 0) {
             try {
+                boolean lbIsRecurring = !JFXUtil.isObjectEqualTo(poGLControllers.PaymentRequest().Detail(pnTblDetailRow).getRecurringNo(), null, "");
+                JFXUtil.setDisabled(lbIsRecurring, tfParticular);
                 String lsParticular = "";
                 if (poGLControllers.PaymentRequest().Detail(pnTblDetailRow).Particular().getDescription() != null) {
                     lsParticular = poGLControllers.PaymentRequest().Detail(pnTblDetailRow).Particular().getDescription();
@@ -622,7 +624,7 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
                     Platform.runLater(() -> btnNew.fire());
                     break;
                 case "btnCancel":
-                    if (ShowMessageFX.YesNo(null, "Cancel Confirmation", "Are you sure you want to cancel?")) {
+                    if (ShowMessageFX.YesNo(null, psFormName, "Are you sure you want to cancel?")) {
                         if (pnEditMode == EditMode.ADDNEW) {
                             poGLControllers.PaymentRequest().resetMaster();
                             poGLControllers.PaymentRequest().resetOthers();
@@ -1562,26 +1564,14 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
 
     private void clearMasterFields() {
         pnTblDetailRow = -1;
-        dpTransaction.setValue(null);
-        taRemarks.clear();
         lblStatus.setText("");
-        CustomCommonUtil.setText("", tfTransactionNo, tfSeriesNo, tfAttachmentNo
-        );
-
         cmbAttachmentType.setValue(null);
         imageView.setImage(null);
-        CustomCommonUtil.setText("0.0000", tfTotalAmount, tfDiscountAmount, tfTotalVATableAmount,
-                tfNetAmount
-        );
+        JFXUtil.clearTextFields(apMaster);
     }
 
     private void clearDetailFields() {
-        CustomCommonUtil.setText("", tfParticular);
-        CustomCommonUtil.setSelected(false, chkbVatable);
-        CustomCommonUtil.setText("0.0000", tfAmount, tfDiscAmountDetail,
-                tfTaxAmount, tfAmountDetail
-        );
-        CustomCommonUtil.setText("0.00", tfDiscRate);
+        JFXUtil.clearTextFields(apDetail);
     }
 
     private void initButtons(int fnEditMode) {
@@ -1874,7 +1864,7 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
                             poGLControllers.PaymentRequest().ReloadDetail();
                         }
                         int lnRowCount = 0;
-                        for (int lnCtr = 0; lnCtr < poGLControllers.PaymentRequest().getDetailCount() ; lnCtr++) {
+                        for (int lnCtr = 0; lnCtr < poGLControllers.PaymentRequest().getDetailCount(); lnCtr++) {
                             //                        double totalNetDetailPayable = 0.00;
 //                        double totalTaxAmount = 0.00;
 //                        double lnAmount = poGLControllers.PaymentRequest().Detail(lnCtr).getAmount().doubleValue();
@@ -2132,13 +2122,13 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
                     String lsTransNo = loSelectedRecurringExpense.getIndex02();
                     try {
                         if (poGLControllers.PaymentRequest().Master().getSourceNo() != null && !"".equals(poGLControllers.PaymentRequest().Master().getSourceNo())) {
-                            if(InvTransCons.PURCHASE_ORDER.equals(poGLControllers.PaymentRequest().Master().getSourceCode()) && !poGLControllers.PaymentRequest().Master().getSourceNo().equals(lsTransNo)){
+                            if (InvTransCons.PURCHASE_ORDER.equals(poGLControllers.PaymentRequest().Master().getSourceCode()) && !poGLControllers.PaymentRequest().Master().getSourceNo().equals(lsTransNo)) {
                                 if (!ShowMessageFX.YesNo(null, psFormName, "All prf info will reset. Do you want to change transaction source?")) {
                                     return;
                                 }
                             }
                         }
-                        
+
                         poJSON = poGLControllers.PaymentRequest().populateDetail(lsTransNo);
                         if ("success".equals(poJSON.get("result"))) {
                             if (poGLControllers.PaymentRequest().getDetailCount() > 0) {

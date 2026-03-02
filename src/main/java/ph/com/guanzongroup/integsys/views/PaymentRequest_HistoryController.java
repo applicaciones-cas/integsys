@@ -112,7 +112,7 @@ public class PaymentRequest_HistoryController implements Initializable, ScreenIn
     private ObservableList<ModelPRFAttachment> attachment_data = FXCollections.observableArrayList();
     ObservableList<String> documentType = ModelPRFAttachment.documentType;
     Map<String, String> imageinfo_temp = new HashMap<>();
-    
+
     @FXML
     private DatePicker dpTransaction;
     @FXML
@@ -926,12 +926,7 @@ public class PaymentRequest_HistoryController implements Initializable, ScreenIn
     }
 
     private void clearDetailFields() {
-        CustomCommonUtil.setText("", tfParticular);
-        CustomCommonUtil.setSelected(false, chkbVatable);
-        CustomCommonUtil.setText("0.0000", tfAmount, tfDiscAmountDetail,
-                tfTaxAmount, tfAmountDetail
-        );
-        CustomCommonUtil.setText("0.00", tfDiscRate);
+        JFXUtil.clearTextFields(apDetail);
     }
 
     private void initButtons(int fnEditMode) {

@@ -501,7 +501,7 @@ public class PaymentRequest_ConfirmationController implements Initializable, Scr
                     pagination.toBack();
                     break;
                 case "btnCancel":
-                    if (ShowMessageFX.YesNo(null, "Cancel Confirmation", "Are you sure you want to cancel?")) {
+                    if (ShowMessageFX.YesNo(null, psFormName, "Are you sure you want to cancel?")) {
                         clearMasterFields();
                         clearDetailFields();
                         detail_data.clear();
@@ -1492,26 +1492,14 @@ public class PaymentRequest_ConfirmationController implements Initializable, Scr
 
     private void clearMasterFields() {
         pnTblDetailRow = -1;
-        dpTransaction.setValue(null);
-        taRemarks.clear();
         lblStatus.setText("");
-        CustomCommonUtil.setText("", tfTransactionNo, tfSeriesNo, tfAttachmentNo
-        );
-
         cmbAttachmentType.setValue(null);
         imageView.setImage(null);
-        CustomCommonUtil.setText("0.0000", tfTotalAmount, tfDiscountAmount, tfTotalVATableAmount,
-                tfNetAmount
-        );
+        JFXUtil.clearTextFields(apMaster);
     }
 
     private void clearDetailFields() {
-        CustomCommonUtil.setText("", tfParticular);
-        CustomCommonUtil.setSelected(false, chkbVatable);
-        CustomCommonUtil.setText("0.0000", tfAmount, tfDiscAmountDetail,
-                tfTaxAmount, tfAmountDetail
-        );
-        CustomCommonUtil.setText("0.00", tfDiscRate);
+        JFXUtil.clearTextFields(apDetail);
     }
 
     private void initButtons(int fnEditMode) {
