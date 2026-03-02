@@ -1590,9 +1590,7 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
         CustomCommonUtil.setVisible(false, btnUpdate);
         CustomCommonUtil.setManaged(false, btnUpdate);
 
-        btnHistory.setVisible(fnEditMode != EditMode.ADDNEW && fnEditMode != EditMode.UNKNOWN);
-        btnHistory.setManaged(fnEditMode != EditMode.ADDNEW && fnEditMode != EditMode.UNKNOWN);
-
+        JFXUtil.setButtonsVisibility(fnEditMode == EditMode.READY, btnHistory);
         if (fnEditMode == EditMode.READY) {
             try {
                 switch (poGLControllers.PaymentRequest().Master().getTransactionStatus()) {

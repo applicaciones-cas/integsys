@@ -415,6 +415,9 @@ public class PaymentRequest_HistoryController implements Initializable, ScreenIn
                         }
                     }
                     break;
+                case "btnHistory":
+                    poGLControllers.PaymentRequest().ShowStatusHistory();
+                    break;
                 case "btnArrowLeft":
                     slideImage(-1);
                     break;
@@ -435,6 +438,8 @@ public class PaymentRequest_HistoryController implements Initializable, ScreenIn
 
         } catch (CloneNotSupportedException | SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+        } catch (Exception ex) {
+            Logger.getLogger(PaymentRequest_HistoryController.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
@@ -933,8 +938,7 @@ public class PaymentRequest_HistoryController implements Initializable, ScreenIn
         JFXUtil.setDisabled(true, apMaster, apDetail, apAttachments);
         CustomCommonUtil.setVisible(true, btnBrowse, btnClose);
         CustomCommonUtil.setManaged(true, btnBrowse, btnClose);
-        btnHistory.setVisible(false);
-        btnHistory.setManaged(false);
+        JFXUtil.setButtonsVisibility(fnEditMode == EditMode.READY, btnHistory);
     }
 
     private void loadTableDetail() {

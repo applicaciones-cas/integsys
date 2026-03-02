@@ -1517,8 +1517,7 @@ public class PaymentRequest_ConfirmationController implements Initializable, Scr
             CustomCommonUtil.setVisible(false, btnConfirm, btnReturn, btnVoid, btnUpdate, btnSearch);
             CustomCommonUtil.setManaged(false, btnConfirm, btnReturn, btnVoid, btnUpdate, btnSearch);
 
-            btnHistory.setVisible(fnEditMode == EditMode.READY);
-            btnHistory.setManaged(fnEditMode == EditMode.READY);
+            JFXUtil.setButtonsVisibility(fnEditMode == EditMode.READY, btnHistory);
             if (fnEditMode == EditMode.READY) {
 
                 switch (poGLControllers.PaymentRequest().Master().getTransactionStatus()) {
