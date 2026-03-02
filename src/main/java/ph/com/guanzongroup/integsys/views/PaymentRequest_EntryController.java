@@ -646,7 +646,7 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
                             tblAttachments.setPlaceholder(new Label("NO RECORD TO LOAD"));
                             main_data.clear();
                             CustomCommonUtil.switchToTab(tabDetails, ImTabPane);
-                            psRecurringMonitor = "";
+                            psRecurringMonitor = ""; //Clear Recurring By Default
                         } else {
                             clearMasterFields();
                             clearDetailFields();
@@ -1591,6 +1591,8 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
         CustomCommonUtil.setManaged(false, btnUpdate);
 
         JFXUtil.setButtonsVisibility(fnEditMode == EditMode.READY, btnHistory);
+
+        JFXUtil.setDisabled(!lbShow, apMaster, apDetail, apAttachments);
         if (fnEditMode == EditMode.READY) {
             try {
                 switch (poGLControllers.PaymentRequest().Master().getTransactionStatus()) {
@@ -2006,10 +2008,10 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
     }
 
     private void initTextFieldsProperty() {
-        tfPayee.textProperty().addListener((observable, oldValue, newValue) -> {
-            if (newValue != null) {
-                if (newValue.isEmpty()) {
-                    try {
+        tfPayee.focusedProperty().addListener((obs, wasFocused, isNowFocused) -> {
+            if (!isNowFocused) { // lost focus
+                try {
+                    if (tfPayee.getText() == null || tfPayee.getText().isEmpty()) {
                         if (!isExchangingPayee()) {
                             return;
                         }
@@ -2017,14 +2019,12 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
                         prevPayee = "";
                         tfPayee.setText("");
                         loadTableMain();
-                    } catch (SQLException | GuanzonException ex) {
-                        Logger.getLogger(getClass()
-                                .getName()).log(Level.SEVERE, null, ex);
                     }
+                } catch (SQLException | GuanzonException ex) {
+                    Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
                 }
             }
-        }
-        );
+        });
     }
 
     private boolean isExchangingPayee() {
@@ -2040,7 +2040,7 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
                     }
                 }
                 if (isHaveAmountAndStockId) {
-                    if (ShowMessageFX.YesNo("Payment Request Details have already items, are you sure you want to change payee?", psFormName, null)) {
+                    if (ShowMessageFX.YesNo("Payment Request Details already have items, are you sure you want to change payee?", psFormName, null)) {
                         int detailCount = poGLControllers.PaymentRequest().getDetailCount();
                         for (int lnCtr = detailCount - 1; lnCtr >= 0; lnCtr--) {
                             if (poGLControllers.PaymentRequest().Detail(lnCtr).getParticularID().isEmpty()
