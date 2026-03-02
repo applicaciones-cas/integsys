@@ -327,7 +327,7 @@ public class TBJ_ParameterController implements Initializable, ScreenInterface {
      * central dispatcher, making the code easier to maintain and debug.</p>
      */
     private void initButtonsClickActions() {
-        List<Button> buttons = Arrays.asList(btnBrowse, btnNew, btnUpdate, btnSave, btnCancel, btnClose);
+        List<Button> buttons = Arrays.asList(btnBrowse, btnNew, btnUpdate, btnSave, btnCancel, btnClose,btnConfirm,btnVoid);
         buttons.forEach(button -> button.setOnAction(this::handleButtonAction));
     }
 

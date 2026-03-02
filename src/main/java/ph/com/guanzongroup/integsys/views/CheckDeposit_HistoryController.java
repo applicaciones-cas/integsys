@@ -68,7 +68,7 @@ public class CheckDeposit_HistoryController implements Initializable, ScreenInte
     
     private GRiderCAS poApp;
     private CashflowControllers poGLControllers;
-    private String psFormName = "Payment Request";
+    private String psFormName = "Check Deposit History";
     private LogWrapper logWrapper;
     private int pnEditMode;
     private JSONObject poJSON;
@@ -219,7 +219,7 @@ public class CheckDeposit_HistoryController implements Initializable, ScreenInte
                     }
                     break;
                 case "btnBrowse":
-                    poJSON = poGLControllers.CheckDeposits().SearchTransaction();
+                    poJSON = poGLControllers.CheckDeposits().SearchTransaction( tfSearchTransNo.getText(),tfBankAccountNo.getText(),dpSearchTransactionDate.getValue());
                     if (!"success".equals((String) poJSON.get("result"))) {
                         ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
                         return;
@@ -317,7 +317,7 @@ public class CheckDeposit_HistoryController implements Initializable, ScreenInte
             apDetail.setDisable(false);
         }
         
-            List<TextField> loTxtField = Arrays.asList(tfCheckTransNo, tfCheckNo);
+            List<TextField> loTxtField = Arrays.asList(tfCheckTransNo, tfCheckNo,tfSearchBankAccountNo);
             loTxtField.forEach(tf -> tf.setOnKeyPressed(event -> txtField_KeyPressed(event)));
 //
 //            JFXUtil.setFocusListener(txtArea_Focus, taRemarks);
@@ -706,13 +706,12 @@ public class CheckDeposit_HistoryController implements Initializable, ScreenInte
                                 }
                                 tfBankMaster.setText(poGLControllers.CheckDeposits().Master().Banks().getBankName());
                                 break;
-                            case "tfBankAccountNo":
+                            case "tfSearchBankAccountNo":
                                 poJSON = poGLControllers.CheckDeposits().SearchBankAccounts(lsValue,false);
                                 if ("error".equals(poJSON.get("result"))) {
                                     ShowMessageFX.Warning((String) poJSON.get("message"), lsValue, lsValue);
-                                }
-                                tfBankAccountNo.setText(poGLControllers.CheckDeposits().Master().BankAccount().getAccountNo());
-                                tfBankAccountName.setText(poGLControllers.CheckDeposits().Master().BankAccount().getAccountName());
+                                }                             
+                                tfSearchBankAccountNo.setText(poGLControllers.CheckDeposits().Master().BankAccount().getAccountNo());
                                 return;   
                             case "tfBankAccountName":
                                 poJSON = poGLControllers.CheckDeposits().SearchBankAccounts(lsValue,false);

@@ -260,7 +260,7 @@
                                                       <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="28.0" vgrow="SOMETIMES" />
                                                    </rowConstraints>
                                                    <children>
-                                                      <TextField fx:id="tfAccountTitle" disable="true" editable="false" maxHeight="25.0" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.rowIndex="1" />
+                                                      <TextField fx:id="tfAccountTitle" disable="true" editable="false" maxHeight="25.0" promptText="Press F3: Search" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.rowIndex="1" />
                                                       <ComboBox fx:id="cmbAccountType" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="25.0" prefWidth="228.0" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.rowIndex="2" />
                                                       <TextField fx:id="tfTableName" disable="true" editable="false" maxHeight="25.0" promptText="Press F3 : Search" GridPane.columnIndex="7" GridPane.columnSpan="2" GridPane.rowIndex="1" />
                                                       <TextField fx:id="tfFieldName" disable="true" editable="false" maxHeight="25.0" promptText="Press F3 : Search" GridPane.columnIndex="7" GridPane.columnSpan="2" GridPane.rowIndex="2" />

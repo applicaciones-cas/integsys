@@ -71,7 +71,7 @@ public class CheckDeposit_EntryController implements Initializable, ScreenInterf
     
     private GRiderCAS poApp;
     private CashflowControllers poGLControllers;
-    private String psFormName = "Payment Request";
+    private String psFormName = "Check Deposit Entry";
     private LogWrapper logWrapper;
     private int pnEditMode;
     private JSONObject poJSON;
@@ -371,7 +371,7 @@ public class CheckDeposit_EntryController implements Initializable, ScreenInterf
                     }
                     break;
                 case "btnBrowse":
-                    poJSON = poGLControllers.CheckDeposits().SearchTransaction();
+                    poJSON = poGLControllers.CheckDeposits().SearchTransaction(null,null,null);
                     if (!"success".equals((String) poJSON.get("result"))) {
                         ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
                         return;
@@ -384,42 +384,45 @@ public class CheckDeposit_EntryController implements Initializable, ScreenInterf
                 case "btnSearch":
                     String lsValue = "";
                     switch (psActiveField) {
-//                        case "tfDestination":
-//                            lsValue = tfDestination.getText();
-//                            poJSON = poGLControllers.CheckDeposits().SearchDistination(lsValue, false);
-//                            if ("error".equals(poJSON.get("result"))) {
-//                                ShowMessageFX.Warning((String) poJSON.get("message"), lsValue, lsValue);
-//                            }
-//                            tfDestination.setText(poGLControllers.CheckDeposits().Master().Branch().getBranchName());
-//                            break;
-//                                break;
-
-//                        case "tfDepartment":
-//                            lsValue = tfDestination.getText();
-//                            poJSON = poGLControllers.CheckDeposits().SearchDepartment(lsValue, false);
-//                            if ("error".equals(poJSON.get("result"))) {
-//                                ShowMessageFX.Warning((String) poJSON.get("message"), lsValue, lsValue);
-//                            }
-//                            tfDepartment.setText(poGLControllers.CheckDeposits().Master().Department().getDescription());
-//                            return;
-//                        case "tfCheckTransNo":
-//                            lsValue = tfDestination.getText();
-//                            poJSON = poGLControllers.CheckDeposits().SearchChecks(lsValue, "", pnSelectedDetail, false);
-//                            if ("error".equals(poJSON.get("result"))) {
-//                                ShowMessageFX.Warning((String) poJSON.get("message"), lsValue, lsValue);
-//                            }
-//                            tfCheckTransNo.setText(poGLControllers.CheckDeposits().Detail(pnSelectedDetail).CheckPayment().getTransactionNo());
-//                            loadTableDetail();
-//                            return;
-//                        case "tfCheckNo":
-//                            lsValue = tfDestination.getText();
-//                            poJSON = poGLControllers.CheckDeposits().SearchChecks("", lsValue, pnSelectedDetail, false);
-//                            if ("error".equals(poJSON.get("result"))) {
-//                                ShowMessageFX.Warning((String) poJSON.get("message"), lsValue, lsValue);
-//                            }
-//                            tfCheckNo.setText(poGLControllers.CheckDeposits().Detail(pnSelectedDetail).CheckPayment().getCheckNo());
-//                            loadTableDetail();
-//                            return;
+                        case "tfBankMaster":
+                                poJSON = poGLControllers.CheckDeposits().SearchBanks(lsValue, false);
+                                if ("error".equals(poJSON.get("result"))) {
+                                    ShowMessageFX.Warning((String) poJSON.get("message"), lsValue, lsValue);
+                                }
+                                tfBankMaster.setText(poGLControllers.CheckDeposits().Master().Banks().getBankName());
+                                break;
+                            case "tfBankAccountNo":
+                                poJSON = poGLControllers.CheckDeposits().SearchBankAccounts(lsValue,false);
+                                if ("error".equals(poJSON.get("result"))) {
+                                    ShowMessageFX.Warning((String) poJSON.get("message"), lsValue, lsValue);
+                                }
+                                tfBankAccountNo.setText(poGLControllers.CheckDeposits().Master().BankAccount().getAccountNo());
+                                tfBankAccountName.setText(poGLControllers.CheckDeposits().Master().BankAccount().getAccountName());
+                                return;   
+                            case "tfBankAccountName":
+                                poJSON = poGLControllers.CheckDeposits().SearchBankAccounts(lsValue,false);
+                                if ("error".equals(poJSON.get("result"))) {
+                                    ShowMessageFX.Warning((String) poJSON.get("message"), lsValue, lsValue);
+                                }
+                                tfBankAccountNo.setText(poGLControllers.CheckDeposits().Master().BankAccount().getAccountNo());
+                                tfBankAccountName.setText(poGLControllers.CheckDeposits().Master().BankAccount().getAccountName());
+                                return; 
+                            case "tfCheckTransNo":
+                                poJSON = poGLControllers.CheckDeposits().SearchChecks(lsValue, "",pnSelectedDetail,false);
+                                if ("error".equals(poJSON.get("result"))) {
+                                    ShowMessageFX.Warning((String) poJSON.get("message"), lsValue, lsValue);
+                                }
+                                tfCheckTransNo.setText(poGLControllers.CheckDeposits().Detail(pnSelectedDetail).CheckPayment().getTransactionNo());
+                                loadTableDetail();
+                                return;   
+                            case "tfCheckNo":
+                                poJSON = poGLControllers.CheckDeposits().SearchChecks("", lsValue,pnSelectedDetail,false);
+                                if ("error".equals(poJSON.get("result"))) {
+                                    ShowMessageFX.Warning((String) poJSON.get("message"), lsValue, lsValue);
+                                }
+                                tfCheckNo.setText(poGLControllers.CheckDeposits().Detail(pnSelectedDetail).CheckPayment().getCheckNo());
+                                loadTableDetail();
+                                return; 
                         default:
                             ShowMessageFX.Warning("Looks like no searchable field is selected. \nPlease choose one to continue.", psFormName, null);
                             break;
@@ -449,7 +452,7 @@ public class CheckDeposit_EntryController implements Initializable, ScreenInterf
                     pnEditMode = poGLControllers.CheckDeposits().getEditMode();
                     LoadMaster();
                     LoadDetail();
-//                    loadTableDetail();
+                    loadTableDetail();
                     initButtons(pnEditMode);
 
                     break;
@@ -571,11 +574,11 @@ public class CheckDeposit_EntryController implements Initializable, ScreenInterf
             apDetail.setDisable(false);
         }
         
-            List<TextField> loTxtField = Arrays.asList( tfCheckTransNo, tfCheckNo,tfFilterBank,tfBankMaster,tfBankAccountNo,tfBankAccountName);
+            List<TextField> loTxtField = Arrays.asList( tfCheckTransNo, tfCheckNo,tfSearchTransNo,tfBankMaster,tfBankAccountName,tfBankAccountNo,tfSearchBankAccountNo);
             loTxtField.forEach(tf -> tf.setOnKeyPressed(event -> txtField_KeyPressed(event)));
 //
 //            JFXUtil.setFocusListener(txtArea_Focus, taRemarks);
-            JFXUtil.setFocusListener(txtField_Focus, tfNote);
+            JFXUtil.setFocusListener(txtField_Focus, tfNote,tfCheckNo,tfCheckTransNo,tfSearchTransNo,tfBankMaster,tfBankAccountName,tfBankAccountNo,tfSearchBankAccountNo);
             JFXUtil.setFocusListener(txtArea_Focus, taRemarks);
 
 //            cmbAccountType.setItems(AccountType);
@@ -1058,19 +1061,19 @@ public class CheckDeposit_EntryController implements Initializable, ScreenInterf
             try {
                 /* Lost Focus */
                 switch (lsID) {
-                    case "tfBank":
+                    case "tfBankMaster":
                         psActiveField = lsID;
                         if (lsValue == null || lsValue.trim().isEmpty()) {
-//                            tfDestination.clear();
+                            tfBankMaster.clear();
                             poGLControllers.CheckDeposits().Master().setBanks(null);
                             break;
                         }
 
                         if (poGLControllers.CheckDeposits().Master().Banks().getBankName()!= null) {
-                            tfBank.setText(
+                            tfBankMaster.setText(
                                     poGLControllers.CheckDeposits().Master().Banks().getBankName());
                         } else {
-                            tfBank.clear();
+                            tfBankMaster.clear();
                         }
                         break;
 
@@ -1115,6 +1118,9 @@ public class CheckDeposit_EntryController implements Initializable, ScreenInterf
                     case "tfCheckNo":
                         psActiveField = lsID;
                         JFXUtil.inputIntegersOnly(tfCheckNo);
+                        break;
+                    case "tfCheckTransNo":
+                        psActiveField = lsID;
                         break;
                 }
 

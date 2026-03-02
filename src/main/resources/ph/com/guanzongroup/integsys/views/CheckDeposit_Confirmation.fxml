@@ -63,7 +63,7 @@
                                        </font>
                                     </Label>
                                     <TextField fx:id="tfSearchBankAccountNo" promptText="Press F3: Search" GridPane.columnIndex="2" />
-                                    <TextField fx:id="tfSearchTransNo" promptText="Press F3: Search" GridPane.columnIndex="6" />
+                                    <TextField fx:id="tfSearchTransNo" GridPane.columnIndex="6" />
                                     <Label text="Date" GridPane.columnIndex="8">
                                        <font>
                                           <Font name="System Bold" size="14.0" />

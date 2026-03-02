@@ -68,7 +68,7 @@ public class CheckRelease_EntryController implements Initializable, ScreenInterf
     
     private GRiderCAS poApp;
     private CashflowControllers poGLControllers;
-    private String psFormName = "Check Transfer";
+    private String psFormName = "Check Release Entry";
     private LogWrapper logWrapper;
     private int pnEditMode;
     private JSONObject poJSON;
@@ -252,42 +252,22 @@ public class CheckRelease_EntryController implements Initializable, ScreenInterf
                 case "btnSearch":
                     String lsValue = "";
                     switch (psActiveField) {
-//                        case "tfDestination":
-//                            lsValue = tfDestination.getText();
-//                            poJSON = poGLControllers.CheckReleases().SearchDistination(lsValue, false);
-//                            if ("error".equals(poJSON.get("result"))) {
-//                                ShowMessageFX.Warning((String) poJSON.get("message"), lsValue, lsValue);
-//                            }
-//                            tfDestination.setText(poGLControllers.CheckReleases().Master().Branch().getBranchName());
-//                            break;
-////                                break;
-//
-//                        case "tfDepartment":
-//                            lsValue = tfDestination.getText();
-//                            poJSON = poGLControllers.CheckReleases().SearchDepartment(lsValue, false);
-//                            if ("error".equals(poJSON.get("result"))) {
-//                                ShowMessageFX.Warning((String) poJSON.get("message"), lsValue, lsValue);
-//                            }
-//                            tfDepartment.setText(poGLControllers.CheckReleases().Master().Department().getDescription());
-//                            return;
-//                        case "tfCheckTransNo":
-//                            lsValue = tf.getText();
-//                            poJSON = poGLControllers.CheckReleases().SearchChecks(lsValue, "", pnSelectedDetail, false);
-//                            if ("error".equals(poJSON.get("result"))) {
-//                                ShowMessageFX.Warning((String) poJSON.get("message"), lsValue, lsValue);
-//                            }
-//                            tfCheckTransNo.setText(poGLControllers.CheckReleases().Detail(pnSelectedDetail).CheckPayment().getTransactionNo());
-//                            loadTableDetail();
-//                            return;
-//                        case "tfCheckNo":
-//                            lsValue = tfDestination.getText();
-//                            poJSON = poGLControllers.CheckReleases().SearchChecks("", lsValue, pnSelectedDetail, false);
-//                            if ("error".equals(poJSON.get("result"))) {
-//                                ShowMessageFX.Warning((String) poJSON.get("message"), lsValue, lsValue);
-//                            }
-//                            tfCheckNo.setText(poGLControllers.CheckReleases().Detail(pnSelectedDetail).CheckPayment().getCheckNo());
-//                            loadTableDetail();
-//                            return;
+                        case "tfCheckTransNo":
+                                poJSON = poGLControllers.CheckReleases().SearchChecks(lsValue, "",pnSelectedDetail,false);
+                                if ("error".equals(poJSON.get("result"))) {
+                                    ShowMessageFX.Warning((String) poJSON.get("message"), lsValue, lsValue);
+                                }
+                                tfCheckTransNo.setText(poGLControllers.CheckReleases().Detail(pnSelectedDetail).CheckPayment().getTransactionNo());
+                                loadTableDetail();
+                                return;   
+                        case "tfCheckNo":
+                                poJSON = poGLControllers.CheckReleases().SearchChecks("", lsValue,pnSelectedDetail,false);
+                                if ("error".equals(poJSON.get("result"))) {
+                                    ShowMessageFX.Warning((String) poJSON.get("message"), lsValue, lsValue);
+                                }
+                                tfCheckNo.setText(poGLControllers.CheckReleases().Detail(pnSelectedDetail).CheckPayment().getCheckNo());
+                                loadTableDetail();
+                                return; 
                         default:
                             ShowMessageFX.Warning("Looks like no searchable field is selected. \nPlease choose one to continue.", psFormName, null);
                             break;
@@ -437,7 +417,7 @@ public class CheckRelease_EntryController implements Initializable, ScreenInterf
             loTxtField.forEach(tf -> tf.setOnKeyPressed(event -> txtField_KeyPressed(event)));
 //
             JFXUtil.setFocusListener(txtArea_Focus, taRemarks);
-            JFXUtil.setFocusListener(txtField_Focus, tfNote,tfReceivedBy);
+            JFXUtil.setFocusListener(txtField_Focus, tfNote,tfReceivedBy,tfCheckTransNo,tfCheckNo);
             JFXUtil.setFocusListener(txtArea_Focus, taRemarks);
 
 //            cmbAccountType.setItems(AccountType);
@@ -928,6 +908,9 @@ public class CheckRelease_EntryController implements Initializable, ScreenInterf
                         break;
                     case "tfReceivedBy":
                         poGLControllers.CheckReleases().Master().setReceivedBy(lsValue.trim());
+                        break;
+                     case "tfCheckTransNo":
+                        psActiveField = lsID;
                         break;
                 }
 
