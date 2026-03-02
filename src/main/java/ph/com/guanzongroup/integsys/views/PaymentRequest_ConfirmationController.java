@@ -755,6 +755,8 @@ public class PaymentRequest_ConfirmationController implements Initializable, Scr
 
     public void loadRecordAttachment(boolean lbloadImage) {
         try {
+            boolean lbShow2 = pnEditMode == EditMode.UPDATE;
+            JFXUtil.setDisabled(!lbShow2, cmbAttachmentType, btnAddAttachment, btnRemoveAttachment);
             if (attachment_data.size() > 0) {
                 tfAttachmentNo.setText(attachment_data.get(tblAttachments.getSelectionModel().getSelectedIndex()).getIndex01());
                 String lsAttachmentType = poGLControllers.PaymentRequest().TransactionAttachmentList(pnAttachment).getModel().getDocumentType();

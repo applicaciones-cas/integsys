@@ -930,6 +930,7 @@ public class PaymentRequest_HistoryController implements Initializable, ScreenIn
     }
 
     private void initButtons(int fnEditMode) {
+        JFXUtil.setDisabled(true, apMaster, apDetail, apAttachments);
         CustomCommonUtil.setVisible(true, btnBrowse, btnClose);
         CustomCommonUtil.setManaged(true, btnBrowse, btnClose);
         btnHistory.setVisible(false);

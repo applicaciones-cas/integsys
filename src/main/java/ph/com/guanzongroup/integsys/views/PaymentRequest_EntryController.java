@@ -417,6 +417,7 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
             String lsButton = ((Button) event.getSource()).getId();
             switch (lsButton) {
                 case "btnBrowse":
+                    poGLControllers.PaymentRequest().setTransactionStatus(PaymentRequestStatus.OPEN);
                     poJSON = poGLControllers.PaymentRequest().SearchTransaction("");
                     if (!"error".equals((String) poJSON.get("result"))) {
                         CustomCommonUtil.switchToTab(tabDetails, ImTabPane);
@@ -645,6 +646,7 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
                             tblAttachments.setPlaceholder(new Label("NO RECORD TO LOAD"));
                             main_data.clear();
                             CustomCommonUtil.switchToTab(tabDetails, ImTabPane);
+                            psRecurringMonitor = "";
                         } else {
                             clearMasterFields();
                             clearDetailFields();
@@ -784,6 +786,7 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
                     ShowMessageFX.Warning("Please contact admin to assist about no button available", psFormName, null);
                     break;
             }
+
             if (lsButton.equals("btnRetrieve") || lsButton.equals("btnAddAttachment") || lsButton.equals("btnRemoveAttachment")
                     || lsButton.equals("btnArrowRight") || lsButton.equals("btnArrowLeft") || lsButton.equals("btnRetrieve") || lsButton.equals("btnHistory")) {
             } else {
@@ -825,6 +828,8 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
 
     public void loadRecordAttachment(boolean lbloadImage) {
         try {
+            boolean lbShow2 = pnEditMode == EditMode.UPDATE || pnEditMode == EditMode.ADDNEW;
+            JFXUtil.setDisabled(!lbShow2, cmbAttachmentType, btnAddAttachment, btnRemoveAttachment);
             if (attachment_data.size() > 0) {
                 tfAttachmentNo.setText(attachment_data.get(tblAttachments.getSelectionModel().getSelectedIndex()).getIndex01());
                 String lsAttachmentType = poGLControllers.PaymentRequest().TransactionAttachmentList(pnAttachment).getModel().getDocumentType();
@@ -1587,6 +1592,7 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
 
         btnHistory.setVisible(fnEditMode != EditMode.ADDNEW && fnEditMode != EditMode.UNKNOWN);
         btnHistory.setManaged(fnEditMode != EditMode.ADDNEW && fnEditMode != EditMode.UNKNOWN);
+
         if (fnEditMode == EditMode.READY) {
             try {
                 switch (poGLControllers.PaymentRequest().Master().getTransactionStatus()) {
