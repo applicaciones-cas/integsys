@@ -727,6 +727,15 @@ public class RecurringExpenseScheduleController implements Initializable, Screen
 
         JFXUtil.adjustColumnForScrollbar(tblViewDetail);
         JFXUtil.inputIntegersOnly(tfDueDay, tfBillDay);
+
+        JFXUtil.handleDisabledNodeClick(apMaster, pnEditMode, nodeID -> {
+            switch (nodeID) {
+                case "tfRecurringID":
+                    ShowMessageFX.Warning(null, pxeModuleName,
+                            "Complete the required fields (Payee and Particular) to enable the Recurring ID.");
+                    break;
+            }
+        });
     }
     EventHandler<ActionEvent> comboBoxActionListener = JFXUtil.CmbActionListener(
             (cmbId, selectedIndex, selectedValue) -> {
