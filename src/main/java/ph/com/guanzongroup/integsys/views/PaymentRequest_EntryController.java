@@ -307,7 +307,7 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
 
     private void loadRecordMaster() {
         try {
-            JFXUtil.setStatusValue(lblStatus, PaymentRequestStatus.class, poGLControllers.PaymentRequest().Master().getTransactionStatus());
+            JFXUtil.setStatusValue(lblStatus, PaymentRequestStatus.class, pnEditMode == EditMode.UNKNOWN ? "-1" : poGLControllers.PaymentRequest().Master().getTransactionStatus());
 
             poGLControllers.PaymentRequest().computeFields();
             tfTransactionNo.setText(poGLControllers.PaymentRequest().Master().getTransactionNo());
@@ -341,7 +341,7 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
     private void loadRecordDetail() {
         try {
             boolean lbShow = poGLControllers.PaymentRequest().Master().getTransactionStatus() != PaymentRequestStatus.OPEN;
-            JFXUtil.setDisabled(!lbShow, cbReverse);
+            JFXUtil.setDisabled(lbShow, cbReverse);
             if (pnTblDetailRow >= 0) {
                 try {
                     boolean lbIsRecurring = !JFXUtil.isObjectEqualTo(poGLControllers.PaymentRequest().Detail(pnTblDetailRow).getRecurringNo(), null, "");

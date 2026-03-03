@@ -199,6 +199,8 @@ public class PaymentRequest_HistoryController implements Initializable, ScreenIn
             JFXUtil.setKeyEventFilter(tableKeyEvents, tblVwPRDetail, tblAttachments);
             Platform.runLater((() -> {
                 try {
+                    poGLControllers.PaymentRequest().setIndustryId(psIndustryID);
+                    poGLControllers.PaymentRequest().setCompanyId(psCompanyID);
                     poGLControllers.PaymentRequest().Master().setIndustryID(psIndustryID);
                     poGLControllers.PaymentRequest().Master().setCompanyID(psCompanyID);
                     loadRecordSearch();
@@ -265,7 +267,7 @@ public class PaymentRequest_HistoryController implements Initializable, ScreenIn
 
     private void loadRecordMaster() {
         try {
-            JFXUtil.setStatusValue(lblStatus, PaymentRequestStatus.class, poGLControllers.PaymentRequest().Master().getTransactionStatus());
+            JFXUtil.setStatusValue(lblStatus, PaymentRequestStatus.class, pnEditMode == EditMode.UNKNOWN ? "-1" : poGLControllers.PaymentRequest().Master().getTransactionStatus());
 
             poGLControllers.PaymentRequest().computeFields();
             tfTransactionNo.setText(poGLControllers.PaymentRequest().Master().getTransactionNo());

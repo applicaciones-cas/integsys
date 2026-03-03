@@ -218,6 +218,8 @@ public class PaymentRequest_ConfirmationController implements Initializable, Scr
             JFXUtil.setKeyEventFilter(tableKeyEvents, tblVwPRDetail, tblAttachments);
             Platform.runLater((() -> {
                 try {
+                    poGLControllers.PaymentRequest().setIndustryId(psIndustryID);
+                    poGLControllers.PaymentRequest().setCompanyId(psCompanyID);
                     poGLControllers.PaymentRequest().Master().setIndustryID(psIndustryID);
                     poGLControllers.PaymentRequest().Master().setCompanyID(psCompanyID);
                     loadRecordSearch();
@@ -296,7 +298,7 @@ public class PaymentRequest_ConfirmationController implements Initializable, Scr
 
     private void loadRecordMaster() {
         try {
-            JFXUtil.setStatusValue(lblStatus, PaymentRequestStatus.class, poGLControllers.PaymentRequest().Master().getTransactionStatus());
+            JFXUtil.setStatusValue(lblStatus, PaymentRequestStatus.class, pnEditMode == EditMode.UNKNOWN ? "-1" : poGLControllers.PaymentRequest().Master().getTransactionStatus());
 
             poGLControllers.PaymentRequest().computeFields();
             tfTransactionNo.setText(poGLControllers.PaymentRequest().Master().getTransactionNo());
@@ -330,7 +332,7 @@ public class PaymentRequest_ConfirmationController implements Initializable, Scr
     private void loadRecordDetail() {
         try {
             boolean lbShow = poGLControllers.PaymentRequest().Master().getTransactionStatus() != PaymentRequestStatus.OPEN;
-            JFXUtil.setDisabled(!lbShow, cbReverse);
+            JFXUtil.setDisabled(lbShow, cbReverse);
             if (pnTblDetailRow >= 0) {
                 try {
                     tfParticular.setText(poGLControllers.PaymentRequest().Detail(pnTblDetailRow).Particular().getDescription());
@@ -622,18 +624,6 @@ public class PaymentRequest_ConfirmationController implements Initializable, Scr
                             break;
                         }
                         ShowMessageFX.Information((String) poJSON.get("message"), psFormName, null);
-                        poGLControllers.PaymentRequest().resetMaster();
-                        poGLControllers.PaymentRequest().resetOthers();
-                        poGLControllers.PaymentRequest().Detail().clear();
-                        detail_data.clear();
-                        attachment_data.clear();
-                        tblVwPRDetail.getItems().clear();
-                        tblAttachments.getItems().clear();
-                        tblAttachments.setPlaceholder(new Label("NO RECORD TO LOAD"));
-                        clearMasterFields();
-                        clearDetailFields();
-                        CustomCommonUtil.switchToTab(tabDetails, ImTabPane);
-                        pnEditMode = EditMode.UNKNOWN;
                         tblVwPaymentRequest.refresh();
                         main_data.get(pnTblMainRow).setIndex05(PaymentRequestStatus.RETURNED);
                     } else {
@@ -652,18 +642,6 @@ public class PaymentRequest_ConfirmationController implements Initializable, Scr
                             break;
                         }
                         ShowMessageFX.Information((String) poJSON.get("message"), psFormName, null);
-                        poGLControllers.PaymentRequest().resetMaster();
-                        poGLControllers.PaymentRequest().resetOthers();
-                        poGLControllers.PaymentRequest().Detail().clear();
-                        detail_data.clear();
-                        attachment_data.clear();
-                        tblVwPRDetail.getItems().clear();
-                        tblAttachments.getItems().clear();
-                        tblAttachments.setPlaceholder(new Label("NO RECORD TO LOAD"));
-                        clearMasterFields();
-                        clearDetailFields();
-                        CustomCommonUtil.switchToTab(tabDetails, ImTabPane);
-                        pnEditMode = EditMode.UNKNOWN;
                         tblVwPaymentRequest.refresh();
                         main_data.get(pnTblMainRow).setIndex05(PaymentRequestStatus.VOID);
                     } else {
@@ -673,6 +651,19 @@ public class PaymentRequest_ConfirmationController implements Initializable, Scr
                 default:
                     ShowMessageFX.Warning("Please contact admin to assist about no button available", psFormName, null);
                     break;
+            }
+            if (JFXUtil.isObjectEqualTo(lsButton, "btnVoid", "btnReturn")) {
+                poGLControllers.PaymentRequest().resetMaster();
+                poGLControllers.PaymentRequest().resetOthers();
+                poGLControllers.PaymentRequest().Detail().clear();
+                poGLControllers.PaymentRequest().setIndustryId(psIndustryID);
+                poGLControllers.PaymentRequest().setCompanyId(psCompanyID);
+                poGLControllers.PaymentRequest().Master().setIndustryID(psIndustryID);
+                poGLControllers.PaymentRequest().Master().setCompanyID(psCompanyID);
+                clearMasterFields();
+                clearDetailFields();
+                CustomCommonUtil.switchToTab(tabDetails, ImTabPane);
+                pnEditMode = EditMode.UNKNOWN;
             }
             if (lsButton.equals("btnRetrieve") || lsButton.equals("btnAddAttachment") || lsButton.equals("btnRemoveAttachment")
                     || lsButton.equals("btnArrowRight") || lsButton.equals("btnArrowLeft") || lsButton.equals("btnRetrieve") || lsButton.equals("btnHistory")) {
