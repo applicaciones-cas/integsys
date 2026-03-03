@@ -130,56 +130,39 @@ public class PaymentRequest_ConfirmationController implements Initializable, Scr
     private ObservableList<ModelPRFAttachment> attachment_data = FXCollections.observableArrayList();
     ObservableList<String> documentType = ModelPRFAttachment.documentType;
     Map<String, String> imageinfo_temp = new HashMap<>();
+
+    @FXML
+    private AnchorPane AnchorMain, apBrowse, apButton, apMaster, apDetail, apAttachments, apAttachmentButtons;
+    @FXML
+    private Label lblSource, lblStatus;
+    @FXML
+    private TextField tfSearchTransaction, tfSearchPayee, tfTransactionNo, tfBranch, tfDepartment, tfPayee, tfSeriesNo, tfTotalAmount, tfDiscountAmount, tfNetAmount, tfSourceNo, tfRecurringNo, tfBranchDetail, tfAccountNo, tfEmployee, tfParticular, tfAmount, tfDiscRate, tfDiscAmountDetail, tfAmountDetail, tfAttachmentNo;
+    @FXML
+    private HBox hbButtons;
+    @FXML
+    private Button btnUpdate, btnSearch, btnSave, btnCancel, btnConfirm, btnReturn, btnVoid, btnRetrieve, btnHistory, btnClose, btnAddAttachment, btnRemoveAttachment, btnArrowLeft, btnArrowRight;
     @FXML
     private TabPane ImTabPane;
     @FXML
     private Tab tabDetails, tabAttachments;
     @FXML
-    private AnchorPane AnchorMain, apBrowse, apButton, apAttachments, apAttachmentButtons, apMaster, apDetail;
-    @FXML
-    private HBox hbButtons;
-    @FXML
-    private Button btnUpdate,
-            btnSearch, btnSave, btnCancel, btnHistory, btnRetrieve, btnClose,
-            btnVoid, btnReturn,
-            btnConfirm;
-    @FXML
-    private TextField tfSearchTransaction, tfSearchPayee, tfTransactionNo, tfBranch, tfDepartment, tfPayee, tfSeriesNo, tfTotalAmount, tfDiscountAmount, tfTotalVATableAmount, tfNetAmount, tfSourceNo,
-            tfRecurringNo, tfBranchDetail, tfAccountNo, tfEmployee, tfVatAmount;
+    private DatePicker dpTransaction;
     @FXML
     private TextArea taRemarks;
     @FXML
-    private DatePicker dpTransaction;
+    private CheckBox cbReverse;
     @FXML
-    private Label lblStatus, lblSource;
+    private TableView tblVwPRDetail, tblAttachments, tblVwPaymentRequest;
     @FXML
-    private TextField tfParticular, tfAmount, tfDiscRate, tfDiscAmountDetail, tfTaxAmount, tfAmountDetail;
+    private TableColumn tblRowNoDetail, tblParticular, tblAmount, tblDiscAmount, tbTotalAmount, tblRowNoAttachment, tblFileNameAttachment, tblRowNo, tblBranch, tblPayee, tblTransactionNo;
     @FXML
-    private CheckBox chkbVatable, cbReverse;
-    @FXML
-    private TableView<ModelTableDetail> tblVwPRDetail;
-    @FXML
-    private TableColumn<ModelTableDetail, String> tblRowNoDetail, tblParticular, tblAmount, tblDiscAmount, tblVATable, tbTotalAmount;
-    @FXML
-    private TableView<ModelTableMain> tblVwPaymentRequest;
-    @FXML
-    private TableColumn<ModelTableMain, String> tblRowNo, tblTransactionNo, tblBranch, tblPayee;
-    @FXML
-    private Pagination pagination;
-    @FXML
-    private TextField tfAttachmentNo;
-    @FXML
-    private ComboBox<String> cmbAttachmentType;
-    @FXML
-    private TableView<ModelPRFAttachment> tblAttachments;
-    @FXML
-    private TableColumn<ModelPRFAttachment, String> tblRowNoAttachment, tblFileNameAttachment;
-    @FXML
-    private Button btnAddAttachment, btnRemoveAttachment, btnArrowLeft, btnArrowRight;
+    private ComboBox cmbAttachmentType;
     @FXML
     private StackPane stackPane1;
     @FXML
     private ImageView imageView;
+    @FXML
+    private Pagination pagination;
 
     @Override
     public void setGRider(GRiderCAS foValue) {
@@ -319,7 +302,7 @@ public class PaymentRequest_ConfirmationController implements Initializable, Scr
             tfSeriesNo.setText(poGLControllers.PaymentRequest().Master().getSeriesNo());
             tfTotalAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poGLControllers.PaymentRequest().Master().getTranTotal(), true));
             tfDiscountAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poGLControllers.PaymentRequest().Master().getDiscountAmount(), true));
-            tfTotalVATableAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poGLControllers.PaymentRequest().Master().getVatAmount(), true));
+//            tfTotalVATableAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poGLControllers.PaymentRequest().Master().getVatAmount(), true));
             tfNetAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poGLControllers.PaymentRequest().Master().getNetTotal(), true));
             taRemarks.setText(poGLControllers.PaymentRequest().Master().getRemarks());
 
@@ -340,14 +323,14 @@ public class PaymentRequest_ConfirmationController implements Initializable, Scr
                             poGLControllers.PaymentRequest().Detail(pnTblDetailRow).getAmount(), true));
                     tfDiscRate.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poGLControllers.PaymentRequest().Detail(pnTblDetailRow).getDiscount())); // rate
                     tfDiscAmountDetail.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poGLControllers.PaymentRequest().Detail(pnTblDetailRow).getAddDiscount(), true)); // amount
-                    chkbVatable.setSelected(poGLControllers.PaymentRequest().Detail(pnTblDetailRow).isVatable());
+//                    chkbVatable.setSelected(poGLControllers.PaymentRequest().Detail(pnTblDetailRow).isVatable());
                     cbReverse.setSelected(poGLControllers.PaymentRequest().Detail(pnTblDetailRow).isReverse());
 
                     tfRecurringNo.setText(poGLControllers.PaymentRequest().Detail(pnTblDetailRow).RecurringExpensePaymentMonitor().RecurringExpenseSchedule().getRecurringNo());
                     tfBranchDetail.setText(poGLControllers.PaymentRequest().Detail(pnTblDetailRow).RecurringExpensePaymentMonitor().RecurringExpenseSchedule().Branch().getBranchName());
                     tfAccountNo.setText(poGLControllers.PaymentRequest().Detail(pnTblDetailRow).RecurringExpensePaymentMonitor().RecurringExpenseSchedule().getAccountNo());
                     tfEmployee.setText(poGLControllers.PaymentRequest().Detail(pnTblDetailRow).RecurringExpensePaymentMonitor().RecurringExpenseSchedule().Employee().getCompanyName());
-                    tfVatAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poGLControllers.PaymentRequest().Detail(pnTblDetailRow).getVatAmount(), true));
+//                    tfVatAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poGLControllers.PaymentRequest().Detail(pnTblDetailRow).getVatAmount(), true));
                     tfAmountDetail.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poGLControllers.PaymentRequest().Detail(pnTblDetailRow).getNetTotal(), true));
 //                tfTaxAmount.setText("0.00");
                 } catch (SQLException | GuanzonException ex) {
@@ -527,58 +510,55 @@ public class PaymentRequest_ConfirmationController implements Initializable, Scr
                     fileChooser = new FileChooser();
                     fileChooser.setTitle("Choose Image");
                     fileChooser.getExtensionFilters().addAll(
-                            new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg", "*.gif")
+                            new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg", "*.gif", "*.pdf")
                     );
                     java.io.File selectedFile = fileChooser.showOpenDialog((Stage) btnAddAttachment.getScene().getWindow());
 
                     if (selectedFile != null) {
-                        try {
-                            // Display image
-                            Path imgPath = selectedFile.toPath();
-                            Image loimage = new Image(Files.newInputStream(imgPath));
-                            imageView.setImage(loimage);
+                        // Read image from the selected file
+                        Path imgPath = selectedFile.toPath();
+                        Image loimage = new Image(Files.newInputStream(imgPath));
+                        imageView.setImage(loimage);
 
-                            String imgPath2 = selectedFile.getName().toString();
-                            for (int lnCtr = 0; lnCtr <= poGLControllers.PaymentRequest().getTransactionAttachmentCount() - 1; lnCtr++) {
-                                if (imgPath2.equals(poGLControllers.PaymentRequest().TransactionAttachmentList(lnCtr).getModel().getFileName())
-                                        && RecordStatus.ACTIVE.equals(poGLControllers.PaymentRequest().TransactionAttachmentList(lnCtr).getModel().getRecordStatus())) {
-                                    ShowMessageFX.Warning(null, psFormName, "File name already exists.");
-                                    pnAttachment = lnCtr;
-                                    loadRecordAttachment(true);
+                        //Validate attachment
+                        String imgPath2 = selectedFile.getName().toString();
+                        for (int lnCtr = 0; lnCtr <= poGLControllers.PaymentRequest().getTransactionAttachmentCount() - 1; lnCtr++) {
+                            if (imgPath2.equals(poGLControllers.PaymentRequest().TransactionAttachmentList(lnCtr).getModel().getFileName())
+                                    && RecordStatus.ACTIVE.equals(poGLControllers.PaymentRequest().TransactionAttachmentList(lnCtr).getModel().getRecordStatus())) {
+                                ShowMessageFX.Warning(null, psFormName, "File name already exists.");
+                                pnAttachment = lnCtr;
+                                loadRecordAttachment(true);
+                                return;
+                            }
+                        }
+                        if (imageinfo_temp.containsKey(selectedFile.getName().toString())) {
+                            ShowMessageFX.Warning(null, psFormName, "File name already exists.");
+                            loadRecordAttachment(true);
+                            return;
+                        } else {
+                            imageinfo_temp.put(selectedFile.getName().toString(), imgPath.toString());
+                        }
+
+                        //Limit maximum pages of pdf to add
+                        if (imgPath2.toLowerCase().endsWith(".pdf")) {
+                            try (PDDocument document = PDDocument.load(selectedFile)) {
+                                PDFRenderer pdfRenderer = new PDFRenderer(document);
+                                int pageCount = document.getNumberOfPages();
+                                if (pageCount > 5) {
+                                    ShowMessageFX.Warning(null, psFormName, "PDF exceeds maximum allowed pages.");
                                     return;
                                 }
                             }
-
-                            if (imageinfo_temp.containsKey(selectedFile.getName().toString())) {
-                                ShowMessageFX.Warning(null, psFormName, "File name already exists.");
-                                loadRecordAttachment(true);
-                                return;
-                            } else {
-                                imageinfo_temp.put(selectedFile.getName().toString(), imgPath.toString());
-                            }
-
-                            //Limit maximum pages of pdf to add
-                            if (imgPath2.toLowerCase().endsWith(".pdf")) {
-                                try (PDDocument document = PDDocument.load(selectedFile)) {
-                                    PDFRenderer pdfRenderer = new PDFRenderer(document);
-                                    int pageCount = document.getNumberOfPages();
-                                    if (pageCount > 5) {
-                                        ShowMessageFX.Warning(null, psFormName, "PDF exceeds maximum allowed pages.");
-                                        return;
-                                    }
-                                }
-                            }
-
-                            pnAttachment = poGLControllers.PaymentRequest().addAttachment(imgPath2);
-                            //Copy file to Attachment path
-                            poGLControllers.PaymentRequest().copyFile(selectedFile.toString());
-                            loadTableAttachment();
-                            tblAttachments.getFocusModel().focus(pnAttachment);
-                            tblAttachments.getSelectionModel().select(pnAttachment);
-
-                        } catch (IOException ex) {
-                            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
                         }
+
+//                            int lnTempRow = JFXUtil.getDetailTempRow(attachment_data,  poGLControllers.PaymentRequest().addAttachment(imgPath2), 3);
+//                            pnAttachment = lnTempRow;
+                        pnAttachment = poGLControllers.PaymentRequest().addAttachment(imgPath2);
+                        //Copy file to Attachment path
+                        poGLControllers.PaymentRequest().copyFile(selectedFile.toString());
+                        loadTableAttachment();
+                        tblAttachments.getFocusModel().focus(pnAttachment);
+                        tblAttachments.getSelectionModel().select(pnAttachment);
                     }
                     break;
                 case "btnRemoveAttachment":
@@ -1344,9 +1324,18 @@ public class PaymentRequest_ConfirmationController implements Initializable, Scr
 
     private void initTextFieldPattern() {
         CustomCommonUtil.inputDecimalOnly(
-                tfTotalAmount, tfDiscountAmount, tfTotalVATableAmount, tfNetAmount,
-                tfAmount, tfDiscRate, tfDiscAmountDetail, tfTaxAmount);
+                tfTotalAmount, tfDiscountAmount, tfNetAmount,
+                tfAmount, tfDiscRate, tfDiscAmountDetail);
         JFXUtil.setCommaFormatter(tfAmountDetail);
+
+        JFXUtil.handleDisabledNodeClick(apDetail, pnEditMode, nodeID -> {
+            switch (nodeID) {
+                case "cbReverse":
+                    ShowMessageFX.Warning(null, psFormName,
+                            "Reverse is disabled for non-open transactions.");
+                    break;
+            }
+        });
     }
 
     private void initDatePickerActions() {
@@ -1364,17 +1353,17 @@ public class PaymentRequest_ConfirmationController implements Initializable, Scr
     }
 
     private void initCheckBoxActions() {
-        chkbVatable.setOnAction(event -> {
-            if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
-                try {
-                    poGLControllers.PaymentRequest().Detail(pnTblDetailRow).isVatable(chkbVatable.isSelected());
-                    loadTableDetail();
-                    initFields(pnEditMode);
-                } catch (SQLException | GuanzonException ex) {
-                    Logger.getLogger(PaymentRequest_EntryController.class.getName()).log(Level.SEVERE, null, ex);
-                }
-            }
-        });
+//        chkbVatable.setOnAction(event -> {
+//            if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
+//                try {
+//                    poGLControllers.PaymentRequest().Detail(pnTblDetailRow).isVatable(chkbVatable.isSelected());
+//                    loadTableDetail();
+//                    initFields(pnEditMode);
+//                } catch (SQLException | GuanzonException ex) {
+//                    Logger.getLogger(PaymentRequest_EntryController.class.getName()).log(Level.SEVERE, null, ex);
+//                }
+//            }
+//        });
         cbReverse.setOnAction(event -> {
             try {
                 if (poGLControllers.PaymentRequest().Detail(pnTblDetailRow).getEditMode() == EditMode.ADDNEW) {
@@ -1439,7 +1428,7 @@ public class PaymentRequest_ConfirmationController implements Initializable, Scr
         boolean lbShow = (fnEditMode == EditMode.UPDATE);
         CustomCommonUtil.setDisable(!lbShow, tfPayee, tfAmount, taRemarks);
         CustomCommonUtil.setDisable(true, tfParticular, tfPayee, dpTransaction, tfTransactionNo, tfBranch,
-                tfSeriesNo, tfTotalAmount, tfDiscountAmount, tfTotalVATableAmount, tfNetAmount,
+                tfSeriesNo, tfTotalAmount, tfDiscountAmount, tfNetAmount,
                 tfDepartment);
         if (poApp.isMainOffice() || poApp.isWarehouse()) {
             tfDepartment.setDisable(!lbShow); //mag open siya pag add new or update sa editmode
@@ -1597,50 +1586,6 @@ public class PaymentRequest_ConfirmationController implements Initializable, Scr
         });
     }
 
-    private <T> void initComboBoxCellDesign(ComboBox<T> comboBox) {
-        comboBox.setCellFactory(param -> new ListCell<T>() {
-            @Override
-            protected void updateItem(T item, boolean empty) {
-                super.updateItem(item, empty);
-                setStyle("");  // Reset to default style for non-selected items
-
-                if (empty) {
-                    setText(null);
-                    setStyle("");  // Reset style if the item is empty
-                } else {
-                    setText(item.toString());  // Display the item text using its toString method
-
-                    // Check if this item is the selected value
-                    if (item.toString().equals(comboBox.getValue().toString())) {
-                        // Apply the custom background color for the selected item in the list
-                        setStyle("-fx-background-color: #FF8201; -fx-text-fill: white;");
-                    } else {
-                        setStyle("");  // Reset to default style for non-selected items
-                    }
-                }
-            }
-        });
-
-        comboBox.setOnShowing(event -> {
-            T selectedItem = comboBox.getValue();
-            if (selectedItem != null) {
-                // Loop through each item and apply style based on selection
-                for (int i = 0; i < comboBox.getItems().size(); i++) {
-                    T item = comboBox.getItems().get(i);
-
-                    if (item.equals(selectedItem)) {
-                        // Apply the custom background color for selected item in the list
-                        comboBox.getItems().set(i, item);
-                    } else {
-                        // Reset the style for non-selected items
-                        comboBox.getItems().set(i, item);
-                    }
-                }
-            }
-        });
-
-    }
-
     private void loadTableDetail() {
         ProgressIndicator progressIndicator = new ProgressIndicator();
         progressIndicator.setMaxSize(50, 50);
@@ -1697,7 +1642,7 @@ public class PaymentRequest_ConfirmationController implements Initializable, Scr
                         }
                         tfTotalAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poGLControllers.PaymentRequest().Master().getTranTotal(), true));
                         tfDiscountAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poGLControllers.PaymentRequest().Master().getDiscountAmount(), true));
-                        tfTotalVATableAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poGLControllers.PaymentRequest().Master().getTaxAmount(), true));
+//                        tfTotalVATableAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poGLControllers.PaymentRequest().Master().getTaxAmount(), true));
                         tfNetAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poGLControllers.PaymentRequest().Master().getNetTotal(), true));
                         reselectLastRow();
                         initFields(pnEditMode);
@@ -1744,7 +1689,7 @@ public class PaymentRequest_ConfirmationController implements Initializable, Scr
 
     private void initTableDetail() {
         JFXUtil.setColumnCenter(tblRowNoDetail);
-        JFXUtil.setColumnLeft(tblParticular, tblVATable);
+        JFXUtil.setColumnLeft(tblParticular);
         JFXUtil.setColumnRight(tblAmount, tblDiscAmount, tbTotalAmount);
         JFXUtil.setColumnsIndexAndDisableReordering(tblVwPRDetail);
 
@@ -1752,7 +1697,7 @@ public class PaymentRequest_ConfirmationController implements Initializable, Scr
         tblParticular.setCellValueFactory(new PropertyValueFactory<>("index03"));
         tblAmount.setCellValueFactory(new PropertyValueFactory<>("index04"));
         tblDiscAmount.setCellValueFactory(new PropertyValueFactory<>("index06"));
-        tblVATable.setCellValueFactory(new PropertyValueFactory<>("index07"));
+//        tblVATable.setCellValueFactory(new PropertyValueFactory<>("index07"));
         tbTotalAmount.setCellValueFactory(new PropertyValueFactory<>("index09"));
         // Prevent column reordering
         tblVwPRDetail.widthProperty().addListener((ObservableValue<? extends Number> source, Number oldWidth, Number newWidth) -> {
@@ -1890,7 +1835,7 @@ public class PaymentRequest_ConfirmationController implements Initializable, Scr
         if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE || pnEditMode == EditMode.READY) {
             int lnRow = Integer.parseInt(detail_data.get(tblVwPRDetail.getSelectionModel().getSelectedIndex()).getIndex11());
             pnTblDetailRow = lnRow;
-            ModelTableDetail selectedItem = tblVwPRDetail.getSelectionModel().getSelectedItem();
+            ModelTableDetail selectedItem = (ModelTableDetail) tblVwPRDetail.getSelectionModel().getSelectedItem();
             if (event.getClickCount() == 1) {
                 clearDetailFields();
                 if (selectedItem != null) {
