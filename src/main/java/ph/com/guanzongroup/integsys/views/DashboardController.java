@@ -2168,7 +2168,6 @@ public class DashboardController implements Initializable {
             }
 
             JSONArray loSysMontrRecord = (JSONArray) loSysMontrData.get("data");
-            
             TreeItem<TreeMonitor> loTreeNode = loadSystemMonitoMenu(loSysMontrRecord);
             tvRightSideBar.setRoot(loTreeNode);
             tvRightSideBar.setShowRoot(false);
@@ -2251,11 +2250,11 @@ public class DashboardController implements Initializable {
             try {
                 
                 
-                if (node.getFxmlPath() != null) {
+//                if (node.getFxmlPath() != null) {
                     openMonitorForm(node);
-                } else {
-                    runJavaCommand(node.getCommand());
-                }
+//                } else {
+//                    runJavaCommand(node.getCommand());
+//                }
 
 //                String menuCode = node.getMenuCode();
 //                String industry = node.getIndustry();
@@ -2296,22 +2295,43 @@ public class DashboardController implements Initializable {
             int tabIndex = checktabs(node.getDescription());
 
             if (tabIndex == -1) {
-                if (!node.getFxmlPath().isEmpty() && node.getFxmlPath().contains(".fxml")) {
-                    setScene2(loadAnimate(node));
-                    poController = tabpane.getUserData();
+                boolean lbError = false;
+                if(node.getFxmlPath() != null && !"".equals(node.getFxmlPath())){
+                    if(node.getFxmlPath().contains(".fxml")){
+                        setScene2(loadAnimate(node));
+                        poController = tabpane.getUserData();
+                    } else {
+                        lbError = true;
+                    }
                 } else {
+                    lbError = true;
+                }
+                
+                if(lbError){
                     if (Platform.isFxApplicationThread()) {
                         ShowMessageFX.Warning(null, psFormName, "Invalid FXML path detected. Please inform MIS to configure the correct path.");
                     } else {
                         Platform.runLater(() -> ShowMessageFX.Warning(null, psFormName, "Invalid FXML path detected. Please inform MIS to configure the correct path."));
                     }
-
                 }
+                
+                
+//                if (!node.getFxmlPath().isEmpty() && node.getFxmlPath().contains(".fxml")) {
+//                    setScene2(loadAnimate(node));
+//                    poController = tabpane.getUserData();
+//                } else {
+//                    if (Platform.isFxApplicationThread()) {
+//                        ShowMessageFX.Warning(null, psFormName, "Invalid FXML path detected. Please inform MIS to configure the correct path.");
+//                    } else {
+//                        Platform.runLater(() -> ShowMessageFX.Warning(null, psFormName, "Invalid FXML path detected. Please inform MIS to configure the correct path."));
+//                    }
+//                }
             } else {
                 tabpane.getSelectionModel().select(tabIndex);
                 poController = tabpane.getSelectionModel().getSelectedItem().getUserData();
                 switch(node.getMenuCode()){
-                    case "2500000088":
+                    case "2500000088": //PRM APM
+                    case "2500000039": //PRF PUR
                         loadPRFForm(node, false);
                     break;
                 }
@@ -2338,7 +2358,8 @@ public class DashboardController implements Initializable {
         
         try {
             switch(node.getMenuCode()){
-                case "2500000088": //MenuCode for PRF
+                case "2500000088": //PRM APM
+                case "2500000039": //PRF PUR
                     loadPRFForm(node, true);
                 break;
                 default:
@@ -2435,7 +2456,7 @@ public class DashboardController implements Initializable {
                             + " AND b.sIndstCdx = " + SQLUtil.toSQL(fsIndustry)
                             + " AND b.sCategrCd = " + SQLUtil.toSQL(fsCategory)
                             + " AND a.cRecdStat = " + SQLUtil.toSQL(RecordStatus.ACTIVE));
-//            System.out.println("Executing SQL: " + lsSQL);
+//            System.out.println(" getFxml Executing SQL: " + lsSQL);
             ResultSet loRS = oApp.executeQuery(lsSQL);
             try {
                 if (MiscUtil.RecordCount(loRS) > 0) {
