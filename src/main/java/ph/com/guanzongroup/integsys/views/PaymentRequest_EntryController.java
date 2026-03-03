@@ -342,10 +342,16 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
         try {
             boolean lbShow = !PaymentRequestStatus.OPEN.equals(poGLControllers.PaymentRequest().Master().getTransactionStatus());
             JFXUtil.setDisabled(lbShow, cbReverse);
+
+            boolean lbIsRecurring = !JFXUtil.isObjectEqualTo(poGLControllers.PaymentRequest().Detail(pnTblDetailRow).getRecurringNo(), null, "");
+            if (lbIsRecurring) {
+                JFXUtil.setDisabled(lbIsRecurring, tfParticular);
+            } else {
+                JFXUtil.setDisabled(poGLControllers.PaymentRequest().Detail(pnTblDetailRow).getEditMode() == EditMode.UPDATE, tfParticular);
+            }
+
             if (pnTblDetailRow >= 0) {
                 try {
-                    boolean lbIsRecurring = !JFXUtil.isObjectEqualTo(poGLControllers.PaymentRequest().Detail(pnTblDetailRow).getRecurringNo(), null, "");
-                    JFXUtil.setDisabled(lbIsRecurring, tfParticular);
 
                     tfParticular.setText(poGLControllers.PaymentRequest().Detail(pnTblDetailRow).Particular().getDescription());
                     tfAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(
@@ -2052,7 +2058,7 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
                                 }
                             }
                         } else {
-                            if (poGLControllers.PaymentRequest().getDetailCount() > 0 && !JFXUtil.isObjectEqualTo(poGLControllers.PaymentRequest().Detail(0).getParticularID(), null,"")) {
+                            if (poGLControllers.PaymentRequest().getDetailCount() > 0 && !JFXUtil.isObjectEqualTo(poGLControllers.PaymentRequest().Detail(0).getParticularID(), null, "")) {
                                 if (!ShowMessageFX.YesNo(null, psFormName, "PRF details will reset. Do you want to change transaction source?")) {
                                     return;
                                 }

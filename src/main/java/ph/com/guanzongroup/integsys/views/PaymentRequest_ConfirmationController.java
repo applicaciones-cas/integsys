@@ -317,6 +317,13 @@ public class PaymentRequest_ConfirmationController implements Initializable, Scr
         try {
             boolean lbShow = !PaymentRequestStatus.OPEN.equals(poGLControllers.PaymentRequest().Master().getTransactionStatus());
             JFXUtil.setDisabled(lbShow, cbReverse);
+
+            boolean lbIsRecurring = !JFXUtil.isObjectEqualTo(poGLControllers.PaymentRequest().Detail(pnTblDetailRow).getRecurringNo(), null, "");
+            if (lbIsRecurring) {
+                JFXUtil.setDisabled(lbIsRecurring, tfParticular);
+            } else {
+                JFXUtil.setDisabled(poGLControllers.PaymentRequest().Detail(pnTblDetailRow).getEditMode() == EditMode.UPDATE, tfParticular);
+            }
             if (pnTblDetailRow >= 0) {
                 try {
                     tfParticular.setText(poGLControllers.PaymentRequest().Detail(pnTblDetailRow).Particular().getDescription());
@@ -1433,7 +1440,7 @@ public class PaymentRequest_ConfirmationController implements Initializable, Scr
     private void initFields(int fnEditMode) {
         boolean lbShow = (fnEditMode == EditMode.UPDATE);
         CustomCommonUtil.setDisable(!lbShow, tfPayee, tfAmount, taRemarks);
-        CustomCommonUtil.setDisable(true, tfParticular, tfPayee, dpTransaction, tfTransactionNo, tfBranch,
+        CustomCommonUtil.setDisable(true, tfPayee, dpTransaction, tfTransactionNo, tfBranch,
                 tfSeriesNo, tfTotalAmount, tfDiscountAmount, tfNetAmount,
                 tfDepartment);
         if (poApp.isMainOffice() || poApp.isWarehouse()) {
@@ -1804,10 +1811,8 @@ public class PaymentRequest_ConfirmationController implements Initializable, Scr
                         poJSON = poGLControllers.PaymentRequest().OpenTransaction(lsTransactionNo);
                         if ("success".equals((String) poJSON.get("result"))) {
                             CustomCommonUtil.switchToTab(tabDetails, ImTabPane);
-                            loadRecordMaster();
                             loadTableDetailFromMain();
                             pnTblDetailRow = -1;
-                            clearDetailFields();
                             pnEditMode = poGLControllers.PaymentRequest().getEditMode();
                         } else {
                             ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
