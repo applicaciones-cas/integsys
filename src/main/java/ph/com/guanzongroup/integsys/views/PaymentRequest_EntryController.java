@@ -607,11 +607,11 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
                             poGLControllers.PaymentRequest().Master().setPayeeID(prevPayee);
                             tfPayee.setText(poGLControllers.PaymentRequest().Master().Payee().getPayeeName());
                             pnTblMainRow = -1;
-                            tblVwRecurringExpense.getItems().clear();
-                            tblVwRecurringExpense.setPlaceholder(new Label("NO RECORD TO LOAD"));
+//                            tblVwRecurringExpense.getItems().clear();
+//                            tblVwRecurringExpense.setPlaceholder(new Label("NO RECORD TO LOAD"));
                             tblAttachments.getItems().clear();
                             tblAttachments.setPlaceholder(new Label("NO RECORD TO LOAD"));
-                            main_data.clear();
+//                            main_data.clear();
                             CustomCommonUtil.switchToTab(tabDetails, ImTabPane);
                             psRecurringMonitor = ""; //Clear Recurring By Default
                             poGLControllers.PaymentRequest().loadAttachments();
@@ -2052,7 +2052,7 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
                                 }
                             }
                         } else {
-                            if (poGLControllers.PaymentRequest().getDetailCount() > 0) {
+                            if (poGLControllers.PaymentRequest().getDetailCount() > 0 && !JFXUtil.isObjectEqualTo(poGLControllers.PaymentRequest().Detail(0).getParticularID(), null,"")) {
                                 if (!ShowMessageFX.YesNo(null, psFormName, "PRF details will reset. Do you want to change transaction source?")) {
                                     return;
                                 }
@@ -2090,6 +2090,8 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
                     }
                 }
             }
+        } else {
+            ShowMessageFX.Warning(null, psFormName, "Data can only be linked when in ADD or UPDATE mode.");
         }
 
     }
