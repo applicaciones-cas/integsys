@@ -307,7 +307,7 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
         try {
             boolean lbShow = pnEditMode == EditMode.UPDATE;
             JFXUtil.setDisabled(lbShow, tfBranch, tfDepartment, tfPayee);
-            
+
             JFXUtil.setStatusValue(lblStatus, PaymentRequestStatus.class, pnEditMode == EditMode.UNKNOWN ? "-1" : poGLControllers.PaymentRequest().Master().getTransactionStatus());
             poGLControllers.PaymentRequest().computeFields();
             tfTransactionNo.setText(poGLControllers.PaymentRequest().Master().getTransactionNo());
@@ -340,7 +340,7 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
 
     private void loadRecordDetail() {
         try {
-            boolean lbShow = poGLControllers.PaymentRequest().Master().getTransactionStatus() != PaymentRequestStatus.OPEN;
+            boolean lbShow = !PaymentRequestStatus.OPEN.equals(poGLControllers.PaymentRequest().Master().getTransactionStatus());
             JFXUtil.setDisabled(lbShow, cbReverse);
             if (pnTblDetailRow >= 0) {
                 try {
@@ -1435,7 +1435,6 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
 //            tfAmount.setText("0.0000");
 //        }
 //    }
-
     private void initTextFieldPattern() {
         CustomCommonUtil.inputDecimalOnly(
                 tfTotalAmount, tfDiscountAmount, tfNetAmount,

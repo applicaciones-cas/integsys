@@ -315,7 +315,7 @@ public class PaymentRequest_ConfirmationController implements Initializable, Scr
 
     private void loadRecordDetail() {
         try {
-            boolean lbShow = poGLControllers.PaymentRequest().Master().getTransactionStatus() != PaymentRequestStatus.OPEN;
+            boolean lbShow = !PaymentRequestStatus.OPEN.equals(poGLControllers.PaymentRequest().Master().getTransactionStatus());
             JFXUtil.setDisabled(lbShow, cbReverse);
             if (pnTblDetailRow >= 0) {
                 try {
