@@ -1248,8 +1248,8 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
                                 CommonUtils.SetNextFocus((TextField) event.getSource());
                                 break;
                             case "tfDiscRate":
-//                                setDiscountRate(tfDiscRate.getText());
-                                poJSON = poGLControllers.PaymentRequest().Detail(pnTblDetailRow).setDiscount(Double.parseDouble(lsValue));
+                                lsValue = JFXUtil.removeComma(lsValue);
+                                poJSON = poGLControllers.PaymentRequest().setDiscountRate(Double.parseDouble(lsValue), pnTblDetailRow);
                                 if (!JFXUtil.isJSONSuccess(poJSON)) {
                                     ShowMessageFX.Information(null, psFormName, JFXUtil.getJSONMessage(poJSON));
                                 } else {
@@ -1258,13 +1258,12 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
                                 loadTableDetail();
                                 break;
                             case "tfDiscAmountDetail":
-//                                setDiscountAmount(tfDiscAmountDetail.getText());
                                 lsValue = JFXUtil.removeComma(lsValue);
-                                poJSON = poGLControllers.PaymentRequest().Detail(pnTblDetailRow).setAddDiscount(Double.parseDouble(lsValue));
+                                poJSON = poGLControllers.PaymentRequest().setDiscountAmount(Double.parseDouble(lsValue), pnTblDetailRow);
                                 if (!JFXUtil.isJSONSuccess(poJSON)) {
                                     ShowMessageFX.Information(null, psFormName, JFXUtil.getJSONMessage(poJSON));
                                 } else {
-                                    pnTblDetailRow = Integer.parseInt(detail_data.get(JFXUtil.moveToNextRow(tblVwPRDetail)).getIndex11());
+                                    CommonUtils.SetNextFocus((TextField) event.getSource());
                                 }
                                 loadTableDetail();
                                 initDetailFocus();
