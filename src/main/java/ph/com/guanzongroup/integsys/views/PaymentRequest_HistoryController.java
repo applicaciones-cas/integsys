@@ -133,13 +133,13 @@ public class PaymentRequest_HistoryController implements Initializable, ScreenIn
     @FXML
     private Label lblStatus, lblSource;
     @FXML
-    private TextField tfParticular, tfAmount, tfDiscRate, tfDiscAmountDetail, tfTaxAmount, tfAmountDetail;
+    private TextField tfParticular, tfAmount, tfDiscRate, tfDiscAmountDetail, tfAmountDetail;
     @FXML
     private CheckBox chkbVatable;
     @FXML
     private TableView<ModelTableDetail> tblVwPRDetail;
     @FXML
-    private TableColumn<ModelTableDetail, String> tblRowNoDetail, tblParticular, tblAmount, tblDiscAmount, tblVATable, tblTaxAmount, tbTotalAmount;
+    private TableColumn<ModelTableDetail, String> tblRowNoDetail, tblParticular, tblAmount, tblDiscAmount, tblVATable, tbTotalAmount;
     @FXML
     private Pagination pagination;
     @FXML
@@ -312,11 +312,12 @@ public class PaymentRequest_HistoryController implements Initializable, ScreenIn
                 tfEmployee.setText(poGLControllers.PaymentRequest().Detail(pnTblDetailRow).RecurringExpensePaymentMonitor().RecurringExpenseSchedule().Employee().getCompanyName());
                 tfVatAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poGLControllers.PaymentRequest().Detail(pnTblDetailRow).getVatAmount(), true));
                 tfAmountDetail.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poGLControllers.PaymentRequest().Detail(pnTblDetailRow).getNetTotal(), true));
-                tfTaxAmount.setText("0.00");
+//                tfTaxAmount.setText("0.00");
             } catch (SQLException | GuanzonException ex) {
                 Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
             }
         }
+
     }
 
     private void initButtonsClickActions() {
@@ -337,7 +338,6 @@ public class PaymentRequest_HistoryController implements Initializable, ScreenIn
                         loadRecordMaster();
                         loadTableDetailFromMain();
                         pnEditMode = poGLControllers.PaymentRequest().getEditMode();
-                        loadTableDetail();
                     } else {
                         ShowMessageFX.Warning((String) poJSON.get("message"), "Search Information", null);
                     }
@@ -834,7 +834,7 @@ public class PaymentRequest_HistoryController implements Initializable, ScreenIn
     private void initTextFieldPattern() {
         CustomCommonUtil.inputDecimalOnly(
                 tfTotalAmount, tfDiscountAmount, tfTotalVATableAmount, tfNetAmount,
-                tfAmount, tfDiscRate, tfDiscAmountDetail, tfTaxAmount, tfAmountDetail
+                tfAmount, tfDiscRate, tfDiscAmountDetail, tfAmountDetail
         );
     }
 
@@ -924,7 +924,7 @@ public class PaymentRequest_HistoryController implements Initializable, ScreenIn
                                     CustomCommonUtil.setIntegerValueToDecimalFormat(poGLControllers.PaymentRequest().Detail(lnCtr).getAddDiscount(), true),
                                     lsIsVatable,
                                     "0.0000",
-                                    CustomCommonUtil.setIntegerValueToDecimalFormat(poGLControllers.PaymentRequest().Detail(lnCtr).getAmount(), true),
+                                    CustomCommonUtil.setIntegerValueToDecimalFormat(poGLControllers.PaymentRequest().Detail(lnCtr).getNetTotal(), true),
                                     "",
                                     String.valueOf(lnCtr)
                             ));
@@ -971,7 +971,7 @@ public class PaymentRequest_HistoryController implements Initializable, ScreenIn
     private void initTableDetail() {
         JFXUtil.setColumnCenter(tblRowNoDetail);
         JFXUtil.setColumnLeft(tblParticular, tblVATable);
-        JFXUtil.setColumnRight(tblAmount, tblDiscAmount, tblTaxAmount, tbTotalAmount);
+        JFXUtil.setColumnRight(tblAmount, tblDiscAmount, tbTotalAmount);
         JFXUtil.setColumnsIndexAndDisableReordering(tblVwPRDetail);
 
         tblRowNoDetail.setCellValueFactory(new PropertyValueFactory<>("index01"));
@@ -979,7 +979,6 @@ public class PaymentRequest_HistoryController implements Initializable, ScreenIn
         tblAmount.setCellValueFactory(new PropertyValueFactory<>("index04"));
         tblDiscAmount.setCellValueFactory(new PropertyValueFactory<>("index06"));
         tblVATable.setCellValueFactory(new PropertyValueFactory<>("index07"));
-        tblTaxAmount.setCellValueFactory(new PropertyValueFactory<>("index08"));
         tbTotalAmount.setCellValueFactory(new PropertyValueFactory<>("index09"));
         // Prevent column reordering
         tblVwPRDetail.widthProperty().addListener((ObservableValue<? extends Number> source, Number oldWidth, Number newWidth) -> {

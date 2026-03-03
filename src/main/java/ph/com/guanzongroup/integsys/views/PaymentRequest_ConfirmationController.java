@@ -81,7 +81,6 @@ import org.guanzon.appdriver.base.MiscUtil;
 import org.guanzon.appdriver.base.SQLUtil;
 import org.guanzon.appdriver.constant.DocumentType;
 import org.guanzon.appdriver.constant.EditMode;
-import org.guanzon.appdriver.constant.Logical;
 import org.guanzon.appdriver.constant.RecordStatus;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.ParseException;
@@ -160,7 +159,7 @@ public class PaymentRequest_ConfirmationController implements Initializable, Scr
     @FXML
     private TableView<ModelTableDetail> tblVwPRDetail;
     @FXML
-    private TableColumn<ModelTableDetail, String> tblRowNoDetail, tblParticular, tblAmount, tblDiscAmount, tblVATable, tblTaxAmount, tbTotalAmount;
+    private TableColumn<ModelTableDetail, String> tblRowNoDetail, tblParticular, tblAmount, tblDiscAmount, tblVATable, tbTotalAmount;
     @FXML
     private TableView<ModelTableMain> tblVwPaymentRequest;
     @FXML
@@ -329,26 +328,32 @@ public class PaymentRequest_ConfirmationController implements Initializable, Scr
     }
 
     private void loadRecordDetail() {
-        if (pnTblDetailRow >= 0) {
-            try {
-                tfParticular.setText(poGLControllers.PaymentRequest().Detail(pnTblDetailRow).Particular().getDescription());
-                tfAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(
-                        poGLControllers.PaymentRequest().Detail(pnTblDetailRow).getAmount(), true));
-                tfDiscRate.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poGLControllers.PaymentRequest().Detail(pnTblDetailRow).getDiscount())); // rate
-                tfDiscAmountDetail.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poGLControllers.PaymentRequest().Detail(pnTblDetailRow).getAddDiscount(), true)); // amount
-                chkbVatable.setSelected(poGLControllers.PaymentRequest().Detail(pnTblDetailRow).isVatable());
-                cbReverse.setSelected(poGLControllers.PaymentRequest().Detail(pnTblDetailRow).isReverse());
+        try {
+            boolean lbShow = poGLControllers.PaymentRequest().Master().getTransactionStatus() != PaymentRequestStatus.OPEN;
+            JFXUtil.setDisabled(!lbShow, cbReverse);
+            if (pnTblDetailRow >= 0) {
+                try {
+                    tfParticular.setText(poGLControllers.PaymentRequest().Detail(pnTblDetailRow).Particular().getDescription());
+                    tfAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(
+                            poGLControllers.PaymentRequest().Detail(pnTblDetailRow).getAmount(), true));
+                    tfDiscRate.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poGLControllers.PaymentRequest().Detail(pnTblDetailRow).getDiscount())); // rate
+                    tfDiscAmountDetail.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poGLControllers.PaymentRequest().Detail(pnTblDetailRow).getAddDiscount(), true)); // amount
+                    chkbVatable.setSelected(poGLControllers.PaymentRequest().Detail(pnTblDetailRow).isVatable());
+                    cbReverse.setSelected(poGLControllers.PaymentRequest().Detail(pnTblDetailRow).isReverse());
 
-                tfRecurringNo.setText(poGLControllers.PaymentRequest().Detail(pnTblDetailRow).RecurringExpensePaymentMonitor().RecurringExpenseSchedule().getRecurringNo());
-                tfBranchDetail.setText(poGLControllers.PaymentRequest().Detail(pnTblDetailRow).RecurringExpensePaymentMonitor().RecurringExpenseSchedule().Branch().getBranchName());
-                tfAccountNo.setText(poGLControllers.PaymentRequest().Detail(pnTblDetailRow).RecurringExpensePaymentMonitor().RecurringExpenseSchedule().getAccountNo());
-                tfEmployee.setText(poGLControllers.PaymentRequest().Detail(pnTblDetailRow).RecurringExpensePaymentMonitor().RecurringExpenseSchedule().Employee().getCompanyName());
-                tfVatAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poGLControllers.PaymentRequest().Detail(pnTblDetailRow).getVatAmount(), true));
-                tfAmountDetail.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poGLControllers.PaymentRequest().Detail(pnTblDetailRow).getNetTotal(), true));
-                tfTaxAmount.setText("0.00");
-            } catch (SQLException | GuanzonException ex) {
-                Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+                    tfRecurringNo.setText(poGLControllers.PaymentRequest().Detail(pnTblDetailRow).RecurringExpensePaymentMonitor().RecurringExpenseSchedule().getRecurringNo());
+                    tfBranchDetail.setText(poGLControllers.PaymentRequest().Detail(pnTblDetailRow).RecurringExpensePaymentMonitor().RecurringExpenseSchedule().Branch().getBranchName());
+                    tfAccountNo.setText(poGLControllers.PaymentRequest().Detail(pnTblDetailRow).RecurringExpensePaymentMonitor().RecurringExpenseSchedule().getAccountNo());
+                    tfEmployee.setText(poGLControllers.PaymentRequest().Detail(pnTblDetailRow).RecurringExpensePaymentMonitor().RecurringExpenseSchedule().Employee().getCompanyName());
+                    tfVatAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poGLControllers.PaymentRequest().Detail(pnTblDetailRow).getVatAmount(), true));
+                    tfAmountDetail.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poGLControllers.PaymentRequest().Detail(pnTblDetailRow).getNetTotal(), true));
+//                tfTaxAmount.setText("0.00");
+                } catch (SQLException | GuanzonException ex) {
+                    Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+                }
             }
+        } catch (SQLException | GuanzonException ex) {
+            Logger.getLogger(PaymentRequest_ConfirmationController.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
@@ -1694,7 +1699,7 @@ public class PaymentRequest_ConfirmationController implements Initializable, Scr
                                     CustomCommonUtil.setIntegerValueToDecimalFormat(poGLControllers.PaymentRequest().Detail(lnCtr).getAddDiscount(), true),
                                     lsIsVatable,
                                     "0.00",
-                                    CustomCommonUtil.setIntegerValueToDecimalFormat(poGLControllers.PaymentRequest().Detail(lnCtr).getAmount(), true),
+                                    CustomCommonUtil.setIntegerValueToDecimalFormat(poGLControllers.PaymentRequest().Detail(lnCtr).getNetTotal(), true),
                                     "",
                                     String.valueOf(lnCtr)
                             ));
@@ -1749,7 +1754,7 @@ public class PaymentRequest_ConfirmationController implements Initializable, Scr
     private void initTableDetail() {
         JFXUtil.setColumnCenter(tblRowNoDetail);
         JFXUtil.setColumnLeft(tblParticular, tblVATable);
-        JFXUtil.setColumnRight(tblAmount, tblDiscAmount, tblTaxAmount, tbTotalAmount);
+        JFXUtil.setColumnRight(tblAmount, tblDiscAmount, tbTotalAmount);
         JFXUtil.setColumnsIndexAndDisableReordering(tblVwPRDetail);
 
         tblRowNoDetail.setCellValueFactory(new PropertyValueFactory<>("index01"));
@@ -1757,7 +1762,6 @@ public class PaymentRequest_ConfirmationController implements Initializable, Scr
         tblAmount.setCellValueFactory(new PropertyValueFactory<>("index04"));
         tblDiscAmount.setCellValueFactory(new PropertyValueFactory<>("index06"));
         tblVATable.setCellValueFactory(new PropertyValueFactory<>("index07"));
-        tblTaxAmount.setCellValueFactory(new PropertyValueFactory<>("index08"));
         tbTotalAmount.setCellValueFactory(new PropertyValueFactory<>("index09"));
         // Prevent column reordering
         tblVwPRDetail.widthProperty().addListener((ObservableValue<? extends Number> source, Number oldWidth, Number newWidth) -> {
