@@ -1610,8 +1610,11 @@ public class PaymentRequest_ConfirmationController implements Initializable, Scr
                 Platform.runLater(() -> {
                     try {
                         detail_data.clear();
-                        int detailCount = poGLControllers.PaymentRequest().getDetailCount();
+                        if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
+                            poGLControllers.PaymentRequest().ReloadDetail();
+                        }
 
+                        int detailCount = poGLControllers.PaymentRequest().getDetailCount();
                         int lnRowCount = 0;
                         for (int lnCtr = 0; lnCtr < detailCount; lnCtr++) {
 //                        double totalNetDetailPayable = 0.00;
@@ -1671,7 +1674,7 @@ public class PaymentRequest_ConfirmationController implements Initializable, Scr
                             loadRecordDetail();
                         }
                         loadRecordMaster();
-                    } catch (GuanzonException | SQLException ex) {
+                    } catch (GuanzonException | SQLException | CloneNotSupportedException ex) {
                         Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
                     }
                 });
