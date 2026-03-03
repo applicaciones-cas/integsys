@@ -265,6 +265,8 @@ public class PaymentRequest_HistoryController implements Initializable, ScreenIn
 
     private void loadRecordMaster() {
         try {
+            JFXUtil.setStatusValue(lblStatus, PaymentRequestStatus.class, poGLControllers.PaymentRequest().Master().getTransactionStatus());
+
             poGLControllers.PaymentRequest().computeFields();
             tfTransactionNo.setText(poGLControllers.PaymentRequest().Master().getTransactionNo());
             dpTransaction.setValue(CustomCommonUtil.parseDateStringToLocalDate(SQLUtil.dateFormat(poGLControllers.PaymentRequest().Master().getTransactionDate(), SQLUtil.FORMAT_SHORT_DATE)));
@@ -287,32 +289,7 @@ public class PaymentRequest_HistoryController implements Initializable, ScreenIn
             tfTotalVATableAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poGLControllers.PaymentRequest().Master().getVatAmount(), true));
             tfNetAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poGLControllers.PaymentRequest().Master().getNetTotal(), true));
             taRemarks.setText(poGLControllers.PaymentRequest().Master().getRemarks());
-            lblStatus.setText("");
-            String lsStatus = "";
-            switch (poGLControllers.PaymentRequest().Master().getTransactionStatus()) {
-                case PaymentRequestStatus.OPEN:
-                    lsStatus = "OPEN";
-                    break;
-                case PaymentRequestStatus.CONFIRMED:
-                    lsStatus = "CONFIRMED";
-                    break;
-                case PaymentRequestStatus.PAID:
-                    lsStatus = "PAID";
-                    break;
-                case PaymentRequestStatus.VOID:
-                    lsStatus = "VOID";
-                    break;
-                case PaymentRequestStatus.POSTED:
-                    lsStatus = "POSTED";
-                    break;
-                case PaymentRequestStatus.CANCELLED:
-                    lsStatus = "CANCELLED";
-                    break;
-                case PaymentRequestStatus.RETURNED:
-                    lsStatus = "RETURNED";
-                    break;
-            }
-            lblStatus.setText(lsStatus);
+
             tfSourceNo.setText(poGLControllers.PaymentRequest().Master().getSourceNo());
         } catch (SQLException | GuanzonException | NullPointerException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);

@@ -305,6 +305,8 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
 
     private void loadRecordMaster() {
         try {
+            JFXUtil.setStatusValue(lblStatus, PaymentRequestStatus.class, poGLControllers.PaymentRequest().Master().getTransactionStatus());
+            
             poGLControllers.PaymentRequest().computeFields();
             tfTransactionNo.setText(poGLControllers.PaymentRequest().Master().getTransactionNo());
             dpTransaction.setValue(CustomCommonUtil.parseDateStringToLocalDate(SQLUtil.dateFormat(poGLControllers.PaymentRequest().Master().getTransactionDate(), SQLUtil.FORMAT_SHORT_DATE)));
@@ -327,29 +329,7 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
             tfTotalVATableAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poGLControllers.PaymentRequest().Master().getVatAmount(), true));
             tfNetAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poGLControllers.PaymentRequest().Master().getNetTotal(), true));
             taRemarks.setText(poGLControllers.PaymentRequest().Master().getRemarks());
-            lblStatus.setText("");
-            String lsStatus = "";
-            switch (poGLControllers.PaymentRequest().Master().getTransactionStatus()) {
-                case PaymentRequestStatus.OPEN:
-                    lsStatus = "OPEN";
-                    break;
-                case PaymentRequestStatus.CONFIRMED:
-                    lsStatus = "CONFIRMED";
-                    break;
-                case PaymentRequestStatus.PAID:
-                    lsStatus = "PAID";
-                    break;
-                case PaymentRequestStatus.POSTED:
-                    lsStatus = "POSTED";
-                    break;
-                case PaymentRequestStatus.CANCELLED:
-                    lsStatus = "CANCELLED";
-                    break;
-                case PaymentRequestStatus.RETURNED:
-                    lsStatus = "RETURNED";
-                    break;
-            }
-            lblStatus.setText(lsStatus);
+
             tfSourceNo.setText(poGLControllers.PaymentRequest().Master().getSourceNo());
         } catch (SQLException | GuanzonException | NullPointerException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
@@ -1484,15 +1464,7 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
         cbReverse.setOnAction(event -> {
             try {
                 if (poGLControllers.PaymentRequest().Detail(pnTblDetailRow).getEditMode() == EditMode.ADDNEW) {
-                    if (poGLControllers.PaymentRequest().Master().getSourceNo() != null && !"".equals(poGLControllers.PaymentRequest().Master().getSourceNo())) {
-                        if (!cbReverse.isSelected()) {
-                            poGLControllers.PaymentRequest().ReverseItem(pnTblDetailRow);
-                        } else {
-                            poGLControllers.PaymentRequest().Detail(pnTblDetailRow).isReverse(cbReverse.isSelected());
-                        }
-                    } else {
-                        poGLControllers.PaymentRequest().Detail().remove(pnTblDetailRow);
-                    }
+                    poGLControllers.PaymentRequest().Detail().remove(pnTblDetailRow);
                 } else {
                     poGLControllers.PaymentRequest().Detail(pnTblDetailRow).isReverse(cbReverse.isSelected());
                 }
@@ -2060,7 +2032,13 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
                     try {
                         if (poGLControllers.PaymentRequest().Master().getSourceNo() != null && !"".equals(poGLControllers.PaymentRequest().Master().getSourceNo())) {
                             if (InvTransCons.PURCHASE_ORDER.equals(poGLControllers.PaymentRequest().Master().getSourceCode()) && !poGLControllers.PaymentRequest().Master().getSourceNo().equals(lsTransNo)) {
-                                if (!ShowMessageFX.YesNo(null, psFormName, "All prf info will reset. Do you want to change transaction source?")) {
+                                if (!ShowMessageFX.YesNo(null, psFormName, "PRF details will reset. Do you want to change transaction source?")) {
+                                    return;
+                                }
+                            }
+                        } else {
+                            if (poGLControllers.PaymentRequest().getDetailCount() > 0) {
+                                if (!ShowMessageFX.YesNo(null, psFormName, "PRF details will reset. Do you want to change transaction source?")) {
                                     return;
                                 }
                             }
