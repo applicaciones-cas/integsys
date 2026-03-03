@@ -767,7 +767,7 @@
                                                                                 <Label text="Period From" GridPane.rowIndex="4" />
                                                                                 <Label text="Period To" GridPane.rowIndex="5" />
                                                                                 <Label text="Tax Code" GridPane.rowIndex="6" />
-                                                                                <Label text="Particular" GridPane.rowIndex="7" />
+                                                                                <Label text="Account Title" GridPane.rowIndex="7" />
                                                                                 <Label text="Base Amount" GridPane.columnIndex="5" GridPane.rowIndex="5" />
                                                                                 <Label text="Tax Rate" GridPane.columnIndex="5" GridPane.rowIndex="6" />
                                                                                 <Label text="Total Tax Amount" GridPane.columnIndex="5" GridPane.rowIndex="7" />
