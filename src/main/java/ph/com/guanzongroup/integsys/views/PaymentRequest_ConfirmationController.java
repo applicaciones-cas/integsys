@@ -9,7 +9,6 @@ import ph.com.guanzongroup.integsys.model.ModelTableDetail;
 import ph.com.guanzongroup.integsys.model.ModelTableMain;
 import ph.com.guanzongroup.integsys.utility.CustomCommonUtil;
 import com.sun.javafx.scene.control.skin.TableHeaderRow;
-import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -43,7 +42,6 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
-import javafx.scene.control.ListCell;
 import javafx.scene.control.Pagination;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.Tab;
@@ -281,6 +279,9 @@ public class PaymentRequest_ConfirmationController implements Initializable, Scr
 
     private void loadRecordMaster() {
         try {
+            boolean lbShow = pnEditMode == EditMode.UPDATE;
+            JFXUtil.setDisabled(lbShow, tfBranch, tfDepartment, tfPayee);
+
             JFXUtil.setStatusValue(lblStatus, PaymentRequestStatus.class, pnEditMode == EditMode.UNKNOWN ? "-1" : poGLControllers.PaymentRequest().Master().getTransactionStatus());
 
             poGLControllers.PaymentRequest().computeFields();

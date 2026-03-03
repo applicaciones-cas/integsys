@@ -9,7 +9,6 @@ import ph.com.guanzongroup.integsys.model.ModelTableDetail;
 import ph.com.guanzongroup.integsys.model.ModelTableMain;
 import ph.com.guanzongroup.integsys.utility.CustomCommonUtil;
 import com.sun.javafx.scene.control.skin.TableHeaderRow;
-import java.io.IOException;
 import javafx.scene.control.ComboBox;
 import javafx.scene.image.ImageView;
 import java.net.URL;
@@ -78,7 +77,6 @@ import org.guanzon.appdriver.base.MiscUtil;
 import org.guanzon.appdriver.base.SQLUtil;
 import org.guanzon.appdriver.constant.DocumentType;
 import org.guanzon.appdriver.constant.EditMode;
-import org.guanzon.appdriver.constant.Logical;
 import org.guanzon.appdriver.constant.RecordStatus;
 import org.guanzon.cas.inv.InvTransCons;
 import org.json.simple.JSONObject;
@@ -307,8 +305,10 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
 
     private void loadRecordMaster() {
         try {
+            boolean lbShow = pnEditMode == EditMode.UPDATE;
+            JFXUtil.setDisabled(lbShow, tfBranch, tfDepartment, tfPayee);
+            
             JFXUtil.setStatusValue(lblStatus, PaymentRequestStatus.class, pnEditMode == EditMode.UNKNOWN ? "-1" : poGLControllers.PaymentRequest().Master().getTransactionStatus());
-
             poGLControllers.PaymentRequest().computeFields();
             tfTransactionNo.setText(poGLControllers.PaymentRequest().Master().getTransactionNo());
             dpTransaction.setValue(CustomCommonUtil.parseDateStringToLocalDate(SQLUtil.dateFormat(poGLControllers.PaymentRequest().Master().getTransactionDate(), SQLUtil.FORMAT_SHORT_DATE)));
@@ -1649,7 +1649,7 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
                     Platform.runLater(() -> {
                         if (main_data.isEmpty()) {
                             tblVwRecurringExpense.setPlaceholder(new Label("NO RECORD TO LOAD"));
-                            ShowMessageFX.Warning("No Record Recurring Expense to Load.", psFormName, null);
+//                            ShowMessageFX.Warning("No Record Recurring Expense to Load.", psFormName, null);
                             tblVwRecurringExpense.setItems(FXCollections.observableArrayList(main_data));
                         } else {
                             tblVwRecurringExpense.setItems(FXCollections.observableArrayList(main_data));
