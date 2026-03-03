@@ -366,7 +366,7 @@ public class PaymentRequest_ConfirmationController implements Initializable, Scr
                 tfBranchDetail.setText(poGLControllers.PaymentRequest().Detail(pnTblDetailRow).RecurringExpensePaymentMonitor().RecurringExpenseSchedule().Branch().getBranchName());
                 tfAccountNo.setText(poGLControllers.PaymentRequest().Detail(pnTblDetailRow).RecurringExpensePaymentMonitor().RecurringExpenseSchedule().getAccountNo());
                 tfEmployee.setText(poGLControllers.PaymentRequest().Detail(pnTblDetailRow).RecurringExpensePaymentMonitor().RecurringExpenseSchedule().Employee().getCompanyName());
-                tfVatAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poGLControllers.PaymentRequest().Detail(pnTblDetailRow).RecurringExpensePaymentMonitor().RecurringExpenseSchedule().getAmount(), true));
+                tfVatAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poGLControllers.PaymentRequest().Detail(pnTblDetailRow).getVatAmount(), true));
                 tfAmountDetail.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poGLControllers.PaymentRequest().Detail(pnTblDetailRow).getAmount(), true));
             } catch (SQLException | GuanzonException ex) {
                 Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
@@ -1224,11 +1224,20 @@ public class PaymentRequest_ConfirmationController implements Initializable, Scr
                                 CommonUtils.SetNextFocus((TextField) event.getSource());
                                 break;
                             case "tfDiscRate":
-                                setDiscountRate(tfDiscRate.getText());
+//                                setDiscountRate(tfDiscRate.getText());
+                                poJSON = poGLControllers.PaymentRequest().Detail(pnTblDetailRow).setDiscount(Double.parseDouble(lsValue));
+                                if (!JFXUtil.isJSONSuccess(poJSON)) {
+                                    ShowMessageFX.Information(null, psFormName, JFXUtil.getJSONMessage(poJSON));
+                                }
                                 loadTableDetailAndSelectedRow();
                                 break;
                             case "tfDiscAmountDetail":
-                                setDiscountAmount(tfDiscAmountDetail.getText());
+//                                setDiscountAmount(tfDiscAmountDetail.getText());
+                                lsValue = JFXUtil.removeComma(lsValue);
+                                poJSON = poGLControllers.PaymentRequest().Detail(pnTblDetailRow).setAddDiscount(Double.parseDouble(lsValue));
+                                if (!JFXUtil.isJSONSuccess(poJSON)) {
+                                    ShowMessageFX.Information(null, psFormName, JFXUtil.getJSONMessage(poJSON));
+                                }
                                 loadTableDetailAndSelectedRow();
                                 break;
                             case "tfAmount":
@@ -1504,8 +1513,7 @@ public class PaymentRequest_ConfirmationController implements Initializable, Scr
         CustomCommonUtil.setDisable(!lbShow, tfPayee, tfAmount, taRemarks);
         CustomCommonUtil.setDisable(true, tfParticular, tfPayee, dpTransaction, tfTransactionNo, tfBranch,
                 tfSeriesNo, tfTotalAmount, tfDiscountAmount, tfTotalVATableAmount, tfNetAmount,
-                tfDiscRate,
-                tfDiscAmountDetail, tfDepartment);
+                tfDepartment);
         if (poApp.isMainOffice() || poApp.isWarehouse()) {
             tfDepartment.setDisable(!lbShow); //mag open siya pag add new or update sa editmode
         }
