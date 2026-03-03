@@ -3,8 +3,12 @@ package ph.com.guanzongroup.integsys.views;
 import com.sun.javafx.scene.control.skin.TableHeaderRow;
 import java.net.URL;
 import java.sql.SQLException;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -111,7 +115,7 @@ public class CheckTransfer_PostingController implements Initializable, ScreenInt
                 tfNote;
 
     @FXML
-    private DatePicker dpSearchTransactionDate, dpTransactionDate, dpCheckDate;
+    private DatePicker dpSearchTransactionDate, dpTransactionDate, dpCheckDate,dpReceivedDate;
 
     @FXML
     private Label lblSource, lblStatus;
@@ -176,7 +180,7 @@ public class CheckTransfer_PostingController implements Initializable, ScreenInt
     private void initializeObject() {
         LogWrapper logwrapr = new LogWrapper("CAS", System.getProperty("sys.default.path.temp") + "cas-error.log");
         poGLControllers = new CashflowControllers(poApp, logwrapr);
-        poGLControllers.CheckTransfers().setTransactionStatus(CheckTransferStatus.POSTED);
+        poGLControllers.CheckTransfers().setTransactionStatus(CheckTransferStatus.CONFIRMED);
         poJSON = poGLControllers.CheckTransfers().InitTransaction();
 
         if (!"success".equals(poJSON.get("result"))) {
@@ -257,129 +261,55 @@ public class CheckTransfer_PostingController implements Initializable, ScreenInt
                     LoadDetail();
                     initButtons(EditMode.READY);
                     break;
-                case "btnSearch":
-                    String lsValue = "";
-                    switch (psActiveField) {
-//                        case "tfDestination":
-//                            lsValue = tfDestination.getText();
-//                            poJSON = poGLControllers.CheckTransfers().SearchDistination(lsValue, false);
-//                            if ("error".equals(poJSON.get("result"))) {
-//                                ShowMessageFX.Warning((String) poJSON.get("message"), lsValue, lsValue);
-//                            }
-//                            tfDestination.setText(poGLControllers.CheckTransfers().Master().Branch().getBranchName());
-//                            break;
-////                                break;
-//
-//                        case "tfDepartment":
-//                            lsValue = tfDestination.getText();
-//                            poJSON = poGLControllers.CheckTransfers().SearchDepartment(lsValue, false);
-//                            if ("error".equals(poJSON.get("result"))) {
-//                                ShowMessageFX.Warning((String) poJSON.get("message"), lsValue, lsValue);
-//                            }
-//                            tfDepartment.setText(poGLControllers.CheckTransfers().Master().Department().getDescription());
-//                            return;
-//                        case "tfCheckTransNo":
-//                            lsValue = tfDestination.getText();
-//                            poJSON = poGLControllers.CheckTransfers().SearchChecks(lsValue, "", pnSelectedDetail, false);
-//                            if ("error".equals(poJSON.get("result"))) {
-//                                ShowMessageFX.Warning((String) poJSON.get("message"), lsValue, lsValue);
-//                            }
-//                            tfCheckTransNo.setText(poGLControllers.CheckTransfers().Detail(pnSelectedDetail).CheckPayment().getTransactionNo());
-//                            loadTableDetail();
-//                            return;
-//                        case "tfCheckNo":
-//                            lsValue = tfDestination.getText();
-//                            poJSON = poGLControllers.CheckTransfers().SearchChecks("", lsValue, pnSelectedDetail, false);
-//                            if ("error".equals(poJSON.get("result"))) {
-//                                ShowMessageFX.Warning((String) poJSON.get("message"), lsValue, lsValue);
-//                            }
-//                            tfCheckNo.setText(poGLControllers.CheckTransfers().Detail(pnSelectedDetail).CheckPayment().getCheckNo());
-//                            loadTableDetail();
-//                            return;
-                        default:
-                            ShowMessageFX.Warning("Looks like no searchable field is selected. \nPlease choose one to continue.", psFormName, null);
-                            break;
-                    }
+                case "btnPost":
                     
-                    break;
-                case "btnUpdate":
-                    poJSON = poGLControllers.CheckTransfers().UpdateTransaction();
-                    if (!"success".equals((String) poJSON.get("result"))) {
-                        ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
-                        return;
-                    }
-                    pnEditMode = poGLControllers.CheckTransfers().getEditMode();
-                    LoadMaster();
-                    LoadDetail();
-//                    loadTableDetail();
-                    initButtons(pnEditMode);
+                       poJSON = poGLControllers.CheckTransfers().PostTransaction("");
+                       if (!"success".equals((String) poJSON.get("result"))) {
+                           ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
+                           return;
+                       }
+                       ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
+                       ClearAll();
+                       initializeObject();
+                       pnEditMode = poGLControllers.CheckTransfers().getEditMode();
+                       initButtons(pnEditMode);
+                break;
+                case "btnReceived":
+                    if (poGLControllers.CheckTransfers().Master().getTransactionNo() != null
+                            && !poGLControllers.CheckTransfers().Master().getTransactionNo().isEmpty()) {
 
-                    break;
-                case "btnCancel":
-                    if (ShowMessageFX.YesNo(null, "Cancel Confirmation", "Are you sure you want to cancel? \nAny data you have entered will not be saved.")) {
-                        ClearAll();
+                        int detailCount = poGLControllers.CheckTransfers().getDetailCount();
+                        boolean allReceived = true;
 
-                        initializeObject();
-                        pnEditMode = poGLControllers.CheckTransfers().getEditMode();
-                        initButtons(pnEditMode);
-                    }
-                    break;
-                case "btnSave":
-                    poJSON = poGLControllers.CheckTransfers().SaveTransaction();
-                    if (!"success".equals((String) poJSON.get("result"))) {
-                        ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
-                        return;
-                    }
-                    ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
-                    if (poApp.getUserLevel() > UserRight.ENCODER) {
-                        if (ShowMessageFX.YesNo(null, psFormName, "Do you want to confirm this transaction?")) {
-                                poJSON = poGLControllers.CheckTransfers().OpenTransaction(poGLControllers.CheckTransfers().Master().getTransactionNo());
-                                poJSON = poGLControllers.CheckTransfers().ConfirmTransaction("");
-                          
-                            if (!"success".equals((String) poJSON.get("result"))) {
-                                ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
-                                return;
+                        for (int lnCtr = 0; lnCtr < detailCount; lnCtr++) {
+                            if (!poGLControllers.CheckTransfers().Detail(lnCtr).isReceived()) {
+                                allReceived = false;
+                                break;
                             }
-                            ShowMessageFX.Information((String) poJSON.get("message"), psFormName, null);
                         }
-                    }
 
-                    ClearAll();
+                        if (allReceived) {
+                            // Clear all
+                            for (int lnCtr = 0; lnCtr < detailCount; lnCtr++) {
+                                poGLControllers.CheckTransfers().Detail(lnCtr).isReceived(false);
+                            }
+                            cbIsReceived.setSelected(false);
+                        } else {
+                            // Receive all
+                            for (int lnCtr = 0; lnCtr < detailCount; lnCtr++) {
+                                poGLControllers.CheckTransfers().Detail(lnCtr).isReceived(true);
+                            }
+                            cbIsReceived.setSelected(true);
+                        }
+
+                        loadTableDetail();
+                        LoadDetail();
+
+                        // Update button text after operation
+                        updateReceiveButtonText();
+                    }
                     break;
-
-                case "btnVoid":
-                    poJSON = poGLControllers.CheckTransfers().VoidTransaction("");
-                       if (!"success".equals((String) poJSON.get("result"))) {
-                           ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
-                           return;
-                       }
-                       ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
-                       ClearAll();
-                       initializeObject();
-                       pnEditMode = poGLControllers.CheckTransfers().getEditMode();
-                       initButtons(pnEditMode);
-                break;
-                case "btnApprove":
-                       poJSON = poGLControllers.CheckTransfers().ConfirmTransaction("");
-                       if (!"success".equals((String) poJSON.get("result"))) {
-                           ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
-                           return;
-                       }
-                       ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
-                       ClearAll();
-                       initializeObject();
-                       pnEditMode = poGLControllers.CheckTransfers().getEditMode();
-                       initButtons(pnEditMode);
-                break;
-                
-                case "btnPrint":
-                     poJSON = poGLControllers.CheckTransfers().printTransaction();
-                    if ("error".equals((String) poJSON.get("result"))) {
-                        ShowMessageFX.Error((String) poJSON.get("message"), psFormName, null);
-                    }
-                    ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
-                break;
-
+                    
                 default:
                     ShowMessageFX.Warning("Please contact admin to assist about no button available", psFormName, null);
                     break;
@@ -443,7 +373,9 @@ public class CheckTransfer_PostingController implements Initializable, ScreenInt
             dpTransactionDate.setValue(CustomCommonUtil.parseDateStringToLocalDate(
                     SQLUtil.dateFormat(poGLControllers.CheckTransfers().Master().getTransactionDate(), SQLUtil.FORMAT_SHORT_DATE)));
             
-
+             dpReceivedDate.setValue(CustomCommonUtil.parseDateStringToLocalDate(
+                    SQLUtil.dateFormat(poGLControllers.CheckTransfers().Master().getReceivedDate(), SQLUtil.FORMAT_SHORT_DATE)));
+             
             String lsStatus = "";
             switch (poGLControllers.CheckTransfers().Master().getTransactionStatus()) {
                 case CheckTransferStatus.VOID:
@@ -706,27 +638,54 @@ public class CheckTransfer_PostingController implements Initializable, ScreenInt
     
     private void initCheckBox() {
         cbIsReceived.setDisable(true);
-//        if ((pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE)) {
+
 //            
-//            cbIsReceived.setOnAction(event -> {
-//                if (poGLControllers.CheckTransfers().Master().getTransactionStatus().equals(CheckTransferStatus.OPEN)
-//                        || poGLControllers.CheckTransfers().Master().getTransactionStatus().equals(CheckTransferStatus.CONFIRMED)) {
-//                    if (poGLControllers.CheckTransfers().Detail(pnSelectedDetail).getSourceNo() != null
-//                            || !poGLControllers.CheckTransfers().Detail(pnSelectedDetail).getSourceNo().isEmpty()) {
-//                        if (!cbIsReceived.isSelected()) {
-//                            poGLControllers.CheckTransfers().Detail().remove(pnSelectedDetail);
-//                        }
-//                    }
-//                } else {
-//                     poGLControllers.CheckTransfers().Detail(pnSelectedDetail).isReverse(cbIsReceived.isSelected());
-//                }
-//                
-//                loadTableDetail();
-//            });
-//            
-//        }
+                    cbIsReceived.setOnAction(event -> {
+            poGLControllers.CheckTransfers().Detail(pnSelectedDetail)
+                    .isReceived(cbIsReceived.isSelected());
+
+            loadTableDetail();
+            LoadDetail();
+
+            // Update button text after manual change
+            updateReceiveButtonText();
+        });
+        dpReceivedDate.setOnAction(event -> {
+
+            LocalDate selectedDate = dpReceivedDate.getValue();
+
+            if (selectedDate != null) {
+
+                Date utilDate = Date.from(
+                        selectedDate
+                                .atStartOfDay(ZoneId.systemDefault())
+                                .toInstant()
+                );
+
+                poGLControllers.CheckTransfers()
+                        .Master()
+                        .setReceivedDate(utilDate);
+            }
+        });
         
     }
+    private void updateReceiveButtonText() {
+    int detailCount = poGLControllers.CheckTransfers().getDetailCount();
+    boolean allReceived = true;
+
+    for (int lnCtr = 0; lnCtr < detailCount; lnCtr++) {
+        if (!poGLControllers.CheckTransfers().Detail(lnCtr).isReceived()) {
+            allReceived = false;
+            break;
+        }
+    }
+
+    if (allReceived) {
+        btnReceived.setText("Clear Received");
+    } else {
+        btnReceived.setText("Receive All");
+    }
+}
     private void tblViewDetails_Clicked(MouseEvent event) {
         if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE || pnEditMode == EditMode.READY) {
             pnSelectedDetail = tblViewDetails.getSelectionModel().getSelectedIndex();
@@ -762,48 +721,73 @@ public class CheckTransfer_PostingController implements Initializable, ScreenInt
     }
     
     private void tblViewMaster_Clicked(MouseEvent event) {
-        if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE || pnEditMode == EditMode.READY) {
+
+        if (pnEditMode == EditMode.ADDNEW
+                || pnEditMode == EditMode.UPDATE
+                || pnEditMode == EditMode.READY) {
 
             // Get clicked row index
             pnTblMainRow = tblViewMaster.getSelectionModel().getSelectedIndex();
+
             if (pnTblMainRow >= 0) {
-                // Add this row to the selection without removing previous ones
-                if (!tblViewMaster.getSelectionModel().getSelectedIndices().contains(pnTblMainRow)) {
+                if (!tblViewMaster.getSelectionModel()
+                        .getSelectedIndices()
+                        .contains(pnTblMainRow)) {
                     tblViewMaster.getSelectionModel().select(pnTblMainRow);
                 }
             }
 
-            // Double-click logic
             if (event.getClickCount() == 2) {
-                ModelTableMain loCheckPaym = (ModelTableMain) tblViewMaster.getSelectionModel().getSelectedItem();
-                if (loCheckPaym != null) {
-                    String lsCheckTransfer = loCheckPaym.getIndex02();
-
-                    try {
-                        poJSON = poGLControllers.CheckTransfers().InitTransaction();
-                        if ("success".equals((String) poJSON.get("result"))) {
-                            poJSON = poGLControllers.CheckTransfers().OpenTransaction(lsCheckTransfer);
-                            if ("success".equals((String) poJSON.get("result"))) {
-                                ClearAll();
-                                loadTableDetail();
-                                LoadMaster();
-                                LoadDetail();
-                                pnEditMode = poGLControllers.CheckTransfers().getEditMode();
-                                initButtons(pnEditMode);
-                            } else {
-                                ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
-                                pnEditMode = EditMode.UNKNOWN;
-                            }
-                            initButtons(pnEditMode);
-
-
-                        }
-                        
-                    } catch (CloneNotSupportedException | SQLException | GuanzonException ex) {
-                        Logger.getLogger(PaymentRequest_EntryController.class.getName())
-                                .log(Level.SEVERE, null, ex);
-                        ShowMessageFX.Warning("Error loading data: " + ex.getMessage(), psFormName, null);
+                ModelTableMain loCheckPaym = tblViewMaster.getSelectionModel().getSelectedItem();
+                if (loCheckPaym == null) {
+                    return;
+                }
+                String lsCheckTransfer = loCheckPaym.getIndex02();
+                try {
+                    poJSON = poGLControllers.CheckTransfers().InitTransaction();
+                    if (!"success".equals(poJSON.get("result"))) {
+                        return;
                     }
+                    String lsTransNo= poGLControllers.CheckTransfers().Master().getTransactionNo();
+                    if (lsTransNo != null && !lsTransNo.isEmpty()) {
+                        if (!ShowMessageFX.YesNo(
+                                "Are you sure you want to load another transaction?",
+                                psFormName,
+                                null)) {
+                            return;
+                        }
+                    }
+
+                    poJSON = poGLControllers.CheckTransfers().OpenTransaction(lsCheckTransfer);
+                    if (!"success".equals(poJSON.get("result"))) {
+                        ShowMessageFX.Warning(
+                                (String) poJSON.get("message"),
+                                psFormName,
+                                null);
+                        pnEditMode = EditMode.UNKNOWN;
+                        initButtons(pnEditMode);
+                        return;
+                    }
+
+                    ClearAll();
+                    loadTableDetail();
+                    LoadMaster();
+                    LoadDetail();
+
+                    pnEditMode = poGLControllers.CheckTransfers().getEditMode();
+                    initButtons(pnEditMode);
+
+                } catch (CloneNotSupportedException
+                        | SQLException
+                        | GuanzonException ex) {
+
+                    Logger.getLogger(PaymentRequest_EntryController.class.getName())
+                            .log(Level.SEVERE, null, ex);
+
+                    ShowMessageFX.Warning(
+                            "Error loading data: " + ex.getMessage(),
+                            psFormName,
+                            null);
                 }
             }
         }

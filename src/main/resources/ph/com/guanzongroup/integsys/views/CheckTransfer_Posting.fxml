@@ -372,7 +372,7 @@
                                                                   <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                                                                </rowConstraints>
                                                                <children>
-                                                                  <Button fx:id="btnReceived" ellipsisString="" maxHeight="35.0" maxWidth="1.7976931348623157E308" mnemonicParsing="false"  prefHeight="30.0" prefWidth="80.0" styleClass="button_process" text="Received ALL" GridPane.columnIndex="1">
+                                                                  <Button fx:id="btnReceived" ellipsisString="" maxHeight="35.0" maxWidth="1.7976931348623157E308" mnemonicParsing="false" prefHeight="30.0" prefWidth="80.0" styleClass="button_process" text="Received ALL" GridPane.columnIndex="1">
                                                                      <effect>
                                                                         <Blend />
                                                                      </effect>
