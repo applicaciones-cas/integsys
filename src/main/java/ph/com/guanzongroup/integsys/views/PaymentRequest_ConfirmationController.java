@@ -1169,7 +1169,7 @@ public class PaymentRequest_ConfirmationController implements Initializable, Scr
                                 if (!JFXUtil.isJSONSuccess(poJSON)) {
                                     ShowMessageFX.Information(null, psFormName, JFXUtil.getJSONMessage(poJSON));
                                 } else {
-                                    CommonUtils.SetNextFocus((TextField) event.getSource());
+                                    pnTblDetailRow = Integer.parseInt(detail_data.get(JFXUtil.moveToNextRow(tblVwPRDetail)).getIndex11());
                                 }
                                 loadTableDetail();
                                 initDetailFocus();
