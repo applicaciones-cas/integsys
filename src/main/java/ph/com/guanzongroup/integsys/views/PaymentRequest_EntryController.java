@@ -1472,7 +1472,7 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
             if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
                 try {
                     poGLControllers.PaymentRequest().Detail(pnTblDetailRow).isVatable(chkbVatable.isSelected());
-                    loadTableDetailAndSelectedRow();
+                    loadTableDetail();
                     initFields(pnEditMode);
                 } catch (SQLException | GuanzonException ex) {
                     Logger.getLogger(PaymentRequest_EntryController.class.getName()).log(Level.SEVERE, null, ex);

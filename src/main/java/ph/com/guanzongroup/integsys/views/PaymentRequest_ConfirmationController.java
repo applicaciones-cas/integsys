@@ -1346,7 +1346,7 @@ public class PaymentRequest_ConfirmationController implements Initializable, Scr
                     ShowMessageFX.Warning("Amount and Particular already exist in table at row: " + (lnCtr + 1), psFormName, null);
                     pnTblDetailRow = lnCtr;
                     loadTableDetail();
-                    initDetailFocus();
+//                    initDetailFocus();
                     return;
                 }
             }
@@ -1393,7 +1393,7 @@ public class PaymentRequest_ConfirmationController implements Initializable, Scr
             if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
                 try {
                     poGLControllers.PaymentRequest().Detail(pnTblDetailRow).isVatable(chkbVatable.isSelected());
-                    loadTableDetailAndSelectedRow();
+                    loadTableDetail();
                     initFields(pnEditMode);
                 } catch (SQLException | GuanzonException ex) {
                     Logger.getLogger(PaymentRequest_EntryController.class.getName()).log(Level.SEVERE, null, ex);
