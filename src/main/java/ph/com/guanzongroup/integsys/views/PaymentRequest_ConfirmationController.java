@@ -361,6 +361,7 @@ public class PaymentRequest_ConfirmationController implements Initializable, Scr
                     if ("error".equals((String) poJSON.get("result"))) {
                         ShowMessageFX.Warning((String) poJSON.get("message"), "Warning", null);
                     }
+                    poGLControllers.PaymentRequest().loadAttachments();
                     clearDetailFields();
                     pnTblDetailRow = -1;
                     pagination.toFront();
@@ -463,6 +464,7 @@ public class PaymentRequest_ConfirmationController implements Initializable, Scr
                             loadTableDetail();
                             pagination.toBack();
                         }
+                        poGLControllers.PaymentRequest().loadAttachments();
                     }
                     break;
                 case "btnConfirm":
@@ -1787,8 +1789,11 @@ public class PaymentRequest_ConfirmationController implements Initializable, Scr
             }
             ModelTableMain loSelectedPaymentRequest = (ModelTableMain) tblVwPaymentRequest.getSelectionModel().getSelectedItem();
             if (loSelectedPaymentRequest != null) {
-                String lsTransactionNo = loSelectedPaymentRequest.getIndex02();
                 try {
+                    String lsTransactionNo = loSelectedPaymentRequest.getIndex02();
+                    if (!JFXUtil.loadValidation(pnEditMode, psFormName, poGLControllers.PaymentRequest().Master().getTransactionNo(), lsTransactionNo)) {
+                        return;
+                    }
                     poJSON = poGLControllers.PaymentRequest().InitTransaction();
                     if ("success".equals((String) poJSON.get("result"))) {
                         clearMasterFields();

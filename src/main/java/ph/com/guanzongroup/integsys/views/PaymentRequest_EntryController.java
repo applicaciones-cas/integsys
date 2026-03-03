@@ -442,6 +442,7 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
                         ShowMessageFX.Warning((String) poJSON.get("message"), "Warning", null);
                         break;
                     }
+                    poGLControllers.PaymentRequest().loadAttachments();
                     pnTblDetailRow = -1;
                     pnEditMode = poGLControllers.PaymentRequest().getEditMode();
                     break;
@@ -613,6 +614,7 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
                             main_data.clear();
                             CustomCommonUtil.switchToTab(tabDetails, ImTabPane);
                             psRecurringMonitor = ""; //Clear Recurring By Default
+                            poGLControllers.PaymentRequest().loadAttachments();
                         } else {
                             clearMasterFields();
                             clearDetailFields();
@@ -626,6 +628,7 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
                                 pnEditMode = poGLControllers.PaymentRequest().getEditMode();
                                 loadTableDetail();
                             }
+                            poGLControllers.PaymentRequest().loadAttachments();
                         }
                     }
                     tblVwPRDetail.getSelectionModel().clearSelection();
