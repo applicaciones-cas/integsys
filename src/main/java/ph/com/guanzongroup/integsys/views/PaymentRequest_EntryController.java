@@ -1243,9 +1243,14 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
                                 CommonUtils.SetNextFocus((TextField) event.getSource());
                                 break;
                             case "tfAmount":
-                                setAmountToDetail(tfAmount.getText());
+                                lsValue = JFXUtil.removeComma(lsValue);
+                                poJSON = poGLControllers.PaymentRequest().Detail(pnTblDetailRow).setAmount(Double.parseDouble(lsValue));
+                                if (!JFXUtil.isJSONSuccess(poJSON)) {
+                                    ShowMessageFX.Information(null, psFormName, JFXUtil.getJSONMessage(poJSON));
+                                } else {
+                                    CommonUtils.SetNextFocus((TextField) event.getSource());
+                                }
                                 loadTableDetail();
-                                CommonUtils.SetNextFocus((TextField) event.getSource());
                                 break;
                             case "tfDiscRate":
                                 lsValue = JFXUtil.removeComma(lsValue);
@@ -1364,72 +1369,72 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
         }
     }
 
-    private void setAmountToDetail(String fsValue) {
-        try {
-            if (fsValue == null || fsValue.isEmpty()) {
-                fsValue = "0.0000";
-            }
-
-            double amount = Double.parseDouble(fsValue.replace(",", ""));
-            if (amount < 0.0000) {
-                ShowMessageFX.Warning("Invalid Amount", psFormName, null);
-                amount = 0.0000;
-            }
-
-            if (tfAmount.isFocused() && tfParticular.getText().isEmpty()) {
-                ShowMessageFX.Warning("Invalid action, Please enter particular first.", psFormName, null);
-                tfParticular.requestFocus();
-                return;
-            }
-
-            if (pnTblDetailRow < 0) {
-                ShowMessageFX.Warning("Invalid row to update.", psFormName, null);
-                clearDetailFields();
-                int detailCount = poGLControllers.PaymentRequest().getDetailCount();
-                pnTblDetailRow = detailCount > 0 ? detailCount - 1 : 0;
-                return;
-            }
-
-            // Check for duplicate amount and particular
-            for (int lnCtr = 0; lnCtr < poGLControllers.PaymentRequest().getDetailCount(); lnCtr++) {
-                if (lnCtr == pnTblDetailRow) {
-                    continue; // Skip current row
-                }
-                boolean isSameParticular = poGLControllers.PaymentRequest().Detail(lnCtr).getParticularID()
-                        .equals(poGLControllers.PaymentRequest().Detail(pnTblDetailRow).getParticularID());
-
-                boolean isSameAmount = poGLControllers.PaymentRequest().Detail(lnCtr).getAmount() == amount;
-
-                if (isSameParticular && isSameAmount) {
-                    // Duplicate found
-                    amount = 0.0000;
-                    poGLControllers.PaymentRequest().Detail(pnTblDetailRow).setAmount(amount);
-                    tfAmount.setText("0.0000");
-
-                    ShowMessageFX.Warning("Amount and Particular already exist in table at row: " + (lnCtr + 1), psFormName, null);
-                    pnTblDetailRow = lnCtr;
-                    loadTableDetail();
-//                    initDetailFocus();
-                    return;
-                }
-            }
-
-            // If amount is zero, clear discount fields
-            if (amount == 0.00) {
-                poGLControllers.PaymentRequest().Detail(pnTblDetailRow).setDiscount(0.00);
-                poGLControllers.PaymentRequest().Detail(pnTblDetailRow).setAddDiscount(0.00);
-            }
-
-            poGLControllers.PaymentRequest().Detail(pnTblDetailRow).setAmount(amount);
-            tfAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(amount, true));
-
-        } catch (SQLException | GuanzonException ex) {
-            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
-        } catch (NumberFormatException ex) {
-            ShowMessageFX.Warning("Invalid numeric input for amount.", psFormName, null);
-            tfAmount.setText("0.0000");
-        }
-    }
+//    private void setAmountToDetail(String fsValue) {
+//        try {
+//            if (fsValue == null || fsValue.isEmpty()) {
+//                fsValue = "0.0000";
+//            }
+//
+//            double amount = Double.parseDouble(fsValue.replace(",", ""));
+//            if (amount < 0.0000) {
+//                ShowMessageFX.Warning("Invalid Amount", psFormName, null);
+//                amount = 0.0000;
+//            }
+//
+//            if (tfAmount.isFocused() && tfParticular.getText().isEmpty()) {
+//                ShowMessageFX.Warning("Invalid action, Please enter particular first.", psFormName, null);
+//                tfParticular.requestFocus();
+//                return;
+//            }
+//
+//            if (pnTblDetailRow < 0) {
+//                ShowMessageFX.Warning("Invalid row to update.", psFormName, null);
+//                clearDetailFields();
+//                int detailCount = poGLControllers.PaymentRequest().getDetailCount();
+//                pnTblDetailRow = detailCount > 0 ? detailCount - 1 : 0;
+//                return;
+//            }
+//
+//            // Check for duplicate amount and particular
+//            for (int lnCtr = 0; lnCtr < poGLControllers.PaymentRequest().getDetailCount(); lnCtr++) {
+//                if (lnCtr == pnTblDetailRow) {
+//                    continue; // Skip current row
+//                }
+//                boolean isSameParticular = poGLControllers.PaymentRequest().Detail(lnCtr).getParticularID()
+//                        .equals(poGLControllers.PaymentRequest().Detail(pnTblDetailRow).getParticularID());
+//
+//                boolean isSameAmount = poGLControllers.PaymentRequest().Detail(lnCtr).getAmount() == amount;
+//
+//                if (isSameParticular && isSameAmount) {
+//                    // Duplicate found
+//                    amount = 0.0000;
+//                    poGLControllers.PaymentRequest().Detail(pnTblDetailRow).setAmount(amount);
+//                    tfAmount.setText("0.0000");
+//
+//                    ShowMessageFX.Warning("Amount and Particular already exist in table at row: " + (lnCtr + 1), psFormName, null);
+//                    pnTblDetailRow = lnCtr;
+//                    loadTableDetail();
+////                    initDetailFocus();
+//                    return;
+//                }
+//            }
+//
+//            // If amount is zero, clear discount fields
+//            if (amount == 0.00) {
+//                poGLControllers.PaymentRequest().Detail(pnTblDetailRow).setDiscount(0.00);
+//                poGLControllers.PaymentRequest().Detail(pnTblDetailRow).setAddDiscount(0.00);
+//            }
+//
+//            poGLControllers.PaymentRequest().Detail(pnTblDetailRow).setAmount(amount);
+//            tfAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(amount, true));
+//
+//        } catch (SQLException | GuanzonException ex) {
+//            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+//        } catch (NumberFormatException ex) {
+//            ShowMessageFX.Warning("Invalid numeric input for amount.", psFormName, null);
+//            tfAmount.setText("0.0000");
+//        }
+//    }
 
     private void initTextFieldPattern() {
         CustomCommonUtil.inputDecimalOnly(
