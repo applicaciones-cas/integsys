@@ -1170,9 +1170,10 @@ public class PaymentRequest_ConfirmationController implements Initializable, Scr
                                     ShowMessageFX.Information(null, psFormName, JFXUtil.getJSONMessage(poJSON));
                                 } else {
                                     pnTblDetailRow = Integer.parseInt(detail_data.get(JFXUtil.moveToNextRow(tblVwPRDetail)).getIndex11());
+                                    initDetailFocus();
                                 }
                                 loadTableDetail();
-                                initDetailFocus();
+
                                 break;
                         }
                         event.consume();
@@ -1867,13 +1868,18 @@ public class PaymentRequest_ConfirmationController implements Initializable, Scr
 
     private void initDetailFocus() {
         if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
+
             if (pnTblDetailRow >= 0) {
                 try {
                     boolean isSourceNotEmpty = !poGLControllers.PaymentRequest().Detail(pnTblDetailRow).getParticularID().isEmpty();
+                    tfParticular.setDisable(isSourceNotEmpty && (pnEditMode == EditMode.UPDATE || pnEditMode == EditMode.UNKNOWN
+                            || pnEditMode == EditMode.READY));
                     if (isSourceNotEmpty && !tfParticular.getText().isEmpty()) {
                         tfAmount.requestFocus();
                     } else {
-                        if (!tfParticular.getText().isEmpty() && (pnEditMode == EditMode.UPDATE || pnEditMode == EditMode.ADDNEW)) {
+                        if ((poGLControllers.PaymentRequest().Detail(pnTblDetailRow).getParticularID() != null
+                                && !"".equals(poGLControllers.PaymentRequest().Detail(pnTblDetailRow).getParticularID()))
+                                && (pnEditMode == EditMode.UPDATE || pnEditMode == EditMode.ADDNEW)) {
                             tfAmount.requestFocus();
                         } else {
                             tfParticular.requestFocus();
@@ -1881,7 +1887,8 @@ public class PaymentRequest_ConfirmationController implements Initializable, Scr
                         }
                     }
                 } catch (SQLException | GuanzonException ex) {
-                    Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+                    Logger.getLogger(getClass()
+                            .getName()).log(Level.SEVERE, null, ex);
                 }
             }
 

@@ -1278,9 +1278,10 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
                                     ShowMessageFX.Information(null, psFormName, JFXUtil.getJSONMessage(poJSON));
                                 } else {
                                     pnTblDetailRow = Integer.parseInt(detail_data.get(JFXUtil.moveToNextRow(tblVwPRDetail)).getIndex11());
+                                    initDetailFocus();
                                 }
                                 loadTableDetail();
-                                initDetailFocus();
+
                                 break;
                         }
                         event.consume();
