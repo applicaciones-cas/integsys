@@ -1037,28 +1037,6 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
 
     }
 
-    private void adjustImageSize(Image image) {
-        double imageRatio = image.getWidth() / image.getHeight();
-        double containerRatio = ldstackPaneWidth / ldstackPaneHeight;
-
-        // Unbind before setting new values
-        imageView.fitWidthProperty().unbind();
-        imageView.fitHeightProperty().unbind();
-
-        if (imageRatio > containerRatio) {
-            // Image is wider than container → fit width
-            imageView.setFitWidth(ldstackPaneWidth);
-            imageView.setFitHeight(ldstackPaneWidth / imageRatio);
-        } else {
-            // Image is taller than container → fit height
-            imageView.setFitHeight(ldstackPaneHeight);
-            imageView.setFitWidth(ldstackPaneHeight * imageRatio);
-        }
-
-        imageView.setPreserveRatio(true);
-        imageView.setSmooth(true);
-    }
-
     private void initAttachmentsGrid() {
         /*FOCUS ON FIRST ROW*/
         tblRowNoAttachment.setStyle("-fx-alignment: CENTER;-fx-padding: 0 5 0 5;");
@@ -1159,8 +1137,8 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
     }
 
     private void initTextFieldFocus() {
-        List<TextField> loTxtField = Arrays.asList(tfAmount, tfDiscRate, tfDiscAmountDetail);
-        loTxtField.forEach(tf -> tf.focusedProperty().addListener(txtField_Focus));
+//        List<TextField> loTxtField = Arrays.asList(tfAmount, tfDiscRate, tfDiscAmountDetail);
+//        loTxtField.forEach(tf -> tf.focusedProperty().addListener(txtField_Focus));
         tfPayee.setOnMouseClicked(e -> activeField = tfPayee);
         tfDepartment.setOnMouseClicked(e -> activeField = tfDepartment);
         tfParticular.setOnMouseClicked(e -> activeField = tfParticular);
@@ -1169,29 +1147,7 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
     private void initTextAreaFocus() {
         taRemarks.focusedProperty().addListener(txtArea_Focus);
     }
-    final ChangeListener<? super Boolean> txtField_Focus = (o, ov, nv) -> {
-        TextField loTextField = (TextField) ((ReadOnlyBooleanPropertyBase) o).getBean();
-        String lsTextFieldID = loTextField.getId();
-        String lsValue = loTextField.getText();
 
-        if (lsValue == null) {
-            return;
-        }
-
-        if (!nv) {
-            /*Lost Focus*/
-                switch (lsTextFieldID) {
-                    case "tfDiscRate":
-                        break;
-                    case "tfDiscAmountDetail":
-                        break;
-                    case "tfAmount":
-                        break;
-                }
-        } else {
-            loTextField.selectAll();
-        }
-    };
     final ChangeListener<? super Boolean> txtArea_Focus = (o, ov, nv) -> {
         TextArea loTextArea = (TextArea) ((ReadOnlyBooleanPropertyBase) o).getBean();
         String lsTextAreaID = loTextArea.getId();
@@ -1300,13 +1256,20 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
                             case "tfDepartment":
                                 CommonUtils.SetNextFocus((TextField) event.getSource());
                                 break;
+                            case "tfAmount":
+                                setAmountToDetail(tfAmount.getText());
+                                loadTableDetail();
+                                CommonUtils.SetNextFocus((TextField) event.getSource());
+                                break;
                             case "tfDiscRate":
 //                                setDiscountRate(tfDiscRate.getText());
                                 poJSON = poGLControllers.PaymentRequest().Detail(pnTblDetailRow).setDiscount(Double.parseDouble(lsValue));
                                 if (!JFXUtil.isJSONSuccess(poJSON)) {
                                     ShowMessageFX.Information(null, psFormName, JFXUtil.getJSONMessage(poJSON));
+                                } else {
+                                    CommonUtils.SetNextFocus((TextField) event.getSource());
                                 }
-                                loadTableDetailAndSelectedRow();
+                                loadTableDetail();
                                 break;
                             case "tfDiscAmountDetail":
 //                                setDiscountAmount(tfDiscAmountDetail.getText());
@@ -1314,12 +1277,7 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
                                 poJSON = poGLControllers.PaymentRequest().Detail(pnTblDetailRow).setAddDiscount(Double.parseDouble(lsValue));
                                 if (!JFXUtil.isJSONSuccess(poJSON)) {
                                     ShowMessageFX.Information(null, psFormName, JFXUtil.getJSONMessage(poJSON));
-                                }
-                                loadTableDetailAndSelectedRow();
-                                break;
-                            case "tfAmount":
-                                setAmountToDetail(tfAmount.getText());
-                                if (JFXUtil.isObjectEqualTo(lsTxtField.getId(), "tfParticular", "tfAmount")) {
+                                } else {
                                     pnTblDetailRow = Integer.parseInt(detail_data.get(JFXUtil.moveToNextRow(tblVwPRDetail)).getIndex11());
                                 }
                                 loadTableDetail();
@@ -1329,19 +1287,21 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
                         event.consume();
                         break;
                     case UP:
-                        setAmountToDetail(tfAmount.getText());
-                        if (JFXUtil.isObjectEqualTo(lsTxtField.getId(), "tfParticular", "tfAmount")) {
+//                        setAmountToDetail(tfAmount.getText());
+                        if (JFXUtil.isObjectEqualTo(lsTxtField.getId(), "tfParticular", "tfAmount", "tfDiscRate", "tfDiscAmountDetail")) {
                             pnTblDetailRow = Integer.parseInt(detail_data.get(JFXUtil.moveToPreviousRow(tblVwPRDetail)).getIndex11());
                         }
                         loadRecordDetail();
+                        initDetailFocus();
                         event.consume();
                         break;
                     case DOWN:
-                        setAmountToDetail(tfAmount.getText());
-                        if (JFXUtil.isObjectEqualTo(lsTxtField.getId(), "tfParticular", "tfAmount")) {
+//                        setAmountToDetail(tfAmount.getText());
+                        if (JFXUtil.isObjectEqualTo(lsTxtField.getId(), "tfParticular", "tfAmount", "tfDiscRate", "tfDiscAmountDetail")) {
                             pnTblDetailRow = Integer.parseInt(detail_data.get(JFXUtil.moveToNextRow(tblVwPRDetail)).getIndex11());
                         }
                         loadRecordDetail();
+                        initDetailFocus();
                         event.consume(); // Consume event after handling focus
                         break;
                     default:
@@ -1464,7 +1424,7 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
                     ShowMessageFX.Warning("Amount and Particular already exist in table at row: " + (lnCtr + 1), psFormName, null);
                     pnTblDetailRow = lnCtr;
                     loadTableDetail();
-                    initDetailFocus();
+//                    initDetailFocus();
                     return;
                 }
             }
