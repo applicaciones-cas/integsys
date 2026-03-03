@@ -297,6 +297,8 @@ public class PaymentRequest_ConfirmationController implements Initializable, Scr
 
     private void loadRecordMaster() {
         try {
+            JFXUtil.setStatusValue(lblStatus, PaymentRequestStatus.class, poGLControllers.PaymentRequest().Master().getTransactionStatus());
+
             poGLControllers.PaymentRequest().computeFields();
             tfTransactionNo.setText(poGLControllers.PaymentRequest().Master().getTransactionNo());
             dpTransaction.setValue(CustomCommonUtil.parseDateStringToLocalDate(SQLUtil.dateFormat(poGLControllers.PaymentRequest().Master().getTransactionDate(), SQLUtil.FORMAT_SHORT_DATE)));
@@ -319,32 +321,7 @@ public class PaymentRequest_ConfirmationController implements Initializable, Scr
             tfTotalVATableAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poGLControllers.PaymentRequest().Master().getVatAmount(), true));
             tfNetAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poGLControllers.PaymentRequest().Master().getNetTotal(), true));
             taRemarks.setText(poGLControllers.PaymentRequest().Master().getRemarks());
-            lblStatus.setText("");
-            String lsStatus = "";
-            switch (poGLControllers.PaymentRequest().Master().getTransactionStatus()) {
-                case PaymentRequestStatus.OPEN:
-                    lsStatus = "OPEN";
-                    break;
-                case PaymentRequestStatus.CONFIRMED:
-                    lsStatus = "CONFIRMED";
-                    break;
-                case PaymentRequestStatus.PAID:
-                    lsStatus = "PAID";
-                    break;
-                case PaymentRequestStatus.VOID:
-                    lsStatus = "VOID";
-                    break;
-                case PaymentRequestStatus.POSTED:
-                    lsStatus = "POSTED";
-                    break;
-                case PaymentRequestStatus.CANCELLED:
-                    lsStatus = "CANCELLED";
-                    break;
-                case PaymentRequestStatus.RETURNED:
-                    lsStatus = "RETURNED";
-                    break;
-            }
-            lblStatus.setText(lsStatus);
+
             tfSourceNo.setText(poGLControllers.PaymentRequest().Master().getSourceNo());
         } catch (SQLException | GuanzonException | NullPointerException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
@@ -463,6 +440,10 @@ public class PaymentRequest_ConfirmationController implements Initializable, Scr
                             if (ShowMessageFX.YesNo(null, psFormName, "Do you want to confirm this transaction?")) {
                                 if ("success".equals((poJSON = poGLControllers.PaymentRequest().ConfirmTransaction("Confirmed")).get("result"))) {
                                     ShowMessageFX.Information((String) poJSON.get("message"), psFormName, null);
+                                    poGLControllers.PaymentRequest().OpenTransaction(poGLControllers.PaymentRequest().Master().getTransactionNo());
+                                    tblVwPaymentRequest.refresh();
+                                    main_data.get(pnTblMainRow).setIndex05(PaymentRequestStatus.CONFIRMED);
+                                    loadTableDetail();
                                 } else {
                                     ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
                                     return;
@@ -470,8 +451,6 @@ public class PaymentRequest_ConfirmationController implements Initializable, Scr
                             }
                         }
                     }
-
-                    loadRecordMaster();
                     loadTableDetail();
                     pnEditMode = poGLControllers.PaymentRequest().getEditMode();
                     pagination.toBack();
@@ -709,8 +688,7 @@ public class PaymentRequest_ConfirmationController implements Initializable, Scr
     public void loadTableDetailFromMain() {
         try {
             poJSON = new JSONObject();
-            if (poGLControllers.PaymentRequest().getEditMode() == EditMode.READY || poGLControllers.PaymentRequest().getEditMode() == EditMode.UPDATE
-                    || poGLControllers.PaymentRequest().getEditMode() == EditMode.UPDATE) {
+            if (poGLControllers.PaymentRequest().getEditMode() == EditMode.READY || poGLControllers.PaymentRequest().getEditMode() == EditMode.UPDATE) {
                 poGLControllers.PaymentRequest().loadAttachments();
                 Platform.runLater(() -> {
                     loadTableDetail();
@@ -1404,15 +1382,7 @@ public class PaymentRequest_ConfirmationController implements Initializable, Scr
         cbReverse.setOnAction(event -> {
             try {
                 if (poGLControllers.PaymentRequest().Detail(pnTblDetailRow).getEditMode() == EditMode.ADDNEW) {
-                    if (poGLControllers.PaymentRequest().Master().getSourceNo() != null && !"".equals(poGLControllers.PaymentRequest().Master().getSourceNo())) {
-                        if (!cbReverse.isSelected()) {
-                            poGLControllers.PaymentRequest().ReverseItem(pnTblDetailRow);
-                        } else {
-                            poGLControllers.PaymentRequest().Detail(pnTblDetailRow).isReverse(cbReverse.isSelected());
-                        }
-                    } else {
-                        poGLControllers.PaymentRequest().Detail().remove(pnTblDetailRow);
-                    }
+                    poGLControllers.PaymentRequest().Detail().remove(pnTblDetailRow);
                 } else {
                     poGLControllers.PaymentRequest().Detail(pnTblDetailRow).isReverse(cbReverse.isSelected());
                 }
@@ -1865,13 +1835,12 @@ public class PaymentRequest_ConfirmationController implements Initializable, Scr
 
     private void tblVwMain_Clicked(MouseEvent event) {
         poJSON = new JSONObject();
-        pnTblMainRow = tblVwPaymentRequest.getSelectionModel().getSelectedIndex();
-        if (pnTblMainRow < 0 || pnTblMainRow >= tblVwPaymentRequest.getItems().size()) {
-            ShowMessageFX.Warning("Please select valid payment request information.", "Warning", null);
-            return;
-        }
-
         if (event.getClickCount() == 2) {
+            pnTblMainRow = tblVwPaymentRequest.getSelectionModel().getSelectedIndex();
+            if (pnTblMainRow < 0 || pnTblMainRow >= tblVwPaymentRequest.getItems().size()) {
+                ShowMessageFX.Warning("Please select valid payment request information.", "Warning", null);
+                return;
+            }
             ModelTableMain loSelectedPaymentRequest = (ModelTableMain) tblVwPaymentRequest.getSelectionModel().getSelectedItem();
             if (loSelectedPaymentRequest != null) {
                 String lsTransactionNo = loSelectedPaymentRequest.getIndex02();
