@@ -268,15 +268,15 @@
                                                                                             <columnConstraints>
                                                                                                 <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="93.0" />
                                                                                                 <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="10.0" />
-                                                                                                <ColumnConstraints hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="150.0" />
-                                                                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="34.0" />
-                                                                        <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="100.0" />
+                                                                                                <ColumnConstraints hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="200.0" />
+                                                                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="10.0" />
+                                                                        <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="80.0" />
                                                                                                 <ColumnConstraints hgrow="SOMETIMES" maxWidth="10.0" minWidth="10.0" prefWidth="10.0" />
-                                                                                                <ColumnConstraints hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="150.0" />
-                                                                                                <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" prefWidth="30.0" />
+                                                                                                <ColumnConstraints hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="180.0" />
+                                                                                                <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="10.0" />
                                                                                                 <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="100.0" />
                                                                                                 <ColumnConstraints halignment="LEFT" hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="10.0" />
-                                                                                                <ColumnConstraints halignment="LEFT" hgrow="SOMETIMES" maxWidth="1.7976931348623157E308" prefWidth="150.0" />
+                                                                                                <ColumnConstraints halignment="LEFT" hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="150.0" />
                                                                                             </columnConstraints>
                                                                                             <rowConstraints>
                                                                                                 <RowConstraints />
@@ -284,7 +284,6 @@
                                                                                                 <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="28.0" vgrow="SOMETIMES" />
                                                                                                 <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="28.0" vgrow="SOMETIMES" />
                                                                         <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="28.0" vgrow="SOMETIMES" />
-                                                                                                <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="28.0" vgrow="SOMETIMES" />
                                                                                                 <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="28.0" vgrow="SOMETIMES" />
                                                                                             </rowConstraints>
                                                                                             <children>
@@ -298,8 +297,7 @@
                                                                                                 <Label text="Disc. Amt" GridPane.columnIndex="4" GridPane.rowIndex="5" />
                                                                                                 <Label text="Reverse" GridPane.columnIndex="8" GridPane.rowIndex="2" />
                                                                                                 <Label text="Add VAT" GridPane.columnIndex="8" GridPane.rowIndex="3" />
-                                                                                                <Label text="Tax Amount" GridPane.columnIndex="8" GridPane.rowIndex="5" />
-                                                                                                <Label text="Total Amount" GridPane.columnIndex="8" GridPane.rowIndex="6">
+                                                                                                <Label text="Total Amount" GridPane.columnIndex="8" GridPane.rowIndex="5">
                                                                                                     <font>
                                                                                                         <Font name="System Bold" size="15.0" />
                                                                                                     </font>
@@ -308,15 +306,14 @@
                                                                                                 <TextField fx:id="tfBranchDetail" editable="false" styleClass="DisabledTextField" GridPane.columnIndex="2" GridPane.rowIndex="3" />
                                                                                                 <TextField fx:id="tfAccountNo" editable="false" styleClass="DisabledTextField" GridPane.columnIndex="2" GridPane.rowIndex="4" />
                                                                                                 <TextField fx:id="tfEmployee" editable="false" styleClass="DisabledTextField" GridPane.columnIndex="2" GridPane.rowIndex="5" />
-                                                                                                <TextField fx:id="tfParticular" maxHeight="25.0" maxWidth="-Infinity" minWidth="-Infinity" prefHeight="25.0" prefWidth="149.0" promptText="Press F3: Search" GridPane.columnIndex="6" GridPane.columnSpan="3" GridPane.rowIndex="2" />
+                                                                                                <TextField fx:id="tfParticular" maxHeight="25.0" prefHeight="25.0" promptText="Press F3: Search" GridPane.columnIndex="6" GridPane.rowIndex="2" />
                                                                                                 <TextField fx:id="tfAmount" alignment="CENTER_RIGHT" maxHeight="25.0" promptText="0.00" GridPane.columnIndex="6" GridPane.rowIndex="3" />
                                                                                                 <TextField fx:id="tfDiscRate" alignment="CENTER_RIGHT" maxHeight="25.0" promptText="0.00" GridPane.columnIndex="6" GridPane.rowIndex="4" />
                                                                                                 <TextField fx:id="tfDiscAmountDetail" alignment="CENTER_RIGHT" maxHeight="25.0" promptText="0.00" GridPane.columnIndex="6" GridPane.rowIndex="5" />
                                                                                                 <CheckBox fx:id="cbReverse" mnemonicParsing="false" GridPane.columnIndex="10" GridPane.rowIndex="2" />
                                                                                                 <CheckBox fx:id="chkbVatable" mnemonicParsing="false" GridPane.columnIndex="10" GridPane.rowIndex="3" />
                                                                         <TextField id="DisabledTextField" fx:id="tfVatAmount" alignment="CENTER_RIGHT" editable="false" promptText="0.00" GridPane.columnIndex="10" GridPane.rowIndex="4" />
-                                                                                                <TextField fx:id="tfTaxAmount" alignment="CENTER_RIGHT" disable="true" editable="false" maxHeight="25.0" promptText="0.00" GridPane.columnIndex="10" GridPane.rowIndex="5" />
-                                                                                                <TextField fx:id="tfAmountDetail" alignment="CENTER_RIGHT" disable="true" editable="false" maxHeight="25.0" maxWidth="171.0" prefHeight="25.0" prefWidth="171.0" promptText="0.00" style="-fx-font-weight: bold;" GridPane.columnIndex="10" GridPane.rowIndex="6" />
+                                                                                                <TextField fx:id="tfAmountDetail" alignment="CENTER_RIGHT" disable="true" editable="false" maxHeight="25.0" maxWidth="171.0" prefHeight="25.0" prefWidth="171.0" promptText="0.00" style="-fx-font-weight: bold;" GridPane.columnIndex="10" GridPane.rowIndex="5" />
                                                                         <Label text="VAT Amount" GridPane.columnIndex="8" GridPane.rowIndex="4" />
                                                                                             </children>
                                                                                         </GridPane>
@@ -327,11 +324,10 @@
                                                                                 <TableView fx:id="tblVwPRDetail" maxWidth="1.7976931348623157E308" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="5.0">
                                                                                     <columns>
                                                                                         <TableColumn fx:id="tblRowNoDetail" editable="false" maxWidth="40.0" minWidth="40.0" prefWidth="40.0" resizable="false" sortable="false" text="No." />
-                                                                                        <TableColumn fx:id="tblParticular" editable="false" maxWidth="300.0" minWidth="300.0" prefWidth="300.0" resizable="false" sortable="false" text="Particular" />
+                                                                                        <TableColumn fx:id="tblParticular" editable="false" maxWidth="400.0" minWidth="400.0" prefWidth="400.0" resizable="false" sortable="false" text="Particular" />
                                                                                         <TableColumn fx:id="tblAmount" editable="false" maxWidth="100.0" minWidth="100.0" prefWidth="100.0" resizable="false" sortable="false" style="-fx-alignment: CENTER-RIGHT;" text="Amount" />
                                                                                         <TableColumn fx:id="tblDiscAmount" editable="false" maxWidth="100.0" minWidth="100.0" prefWidth="100.0" resizable="false" sortable="false" style="-fx-alignment: CENTER-RIGHT;" text="Disc. Amt" />
                                                                                         <TableColumn fx:id="tblVATable" editable="false" maxWidth="60.0" minWidth="60.0" prefWidth="60.0" resizable="false" sortable="false" style="-fx-alignment: CENTER;" text="VATable" />
-                                                                                        <TableColumn fx:id="tblTaxAmount" editable="false" maxWidth="100.0" minWidth="100.0" prefWidth="100.0" resizable="false" sortable="false" style="-fx-alignment: CENTER-RIGHT;" text="Tax Amount" />
                                                                                         <TableColumn fx:id="tbTotalAmount" editable="false" maxWidth="100.0" minWidth="100.0" prefWidth="100.0" resizable="false" sortable="false" style="-fx-alignment: CENTER-RIGHT;" text="Total Amount" />
                                                                                     </columns>
                                                                                     <columnResizePolicy>
