@@ -1228,15 +1228,21 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
                                     if ("error".equals(poJSON.get("result"))) {
                                         ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
                                         tfParticular.setText("");
-                                        if (poJSON.get("tableRow") != null) {
-                                            Object obj = poJSON.get("tableRow");
+                                        if (poJSON.get("row") != null) {
+                                            Object obj = poJSON.get("row");
                                             int value = Integer.valueOf(String.valueOf(obj));
                                             pnTblDetailRow = value;
                                         } else {
                                             break;
                                         }
                                     } else {
-                                        JFXUtil.textFieldMoveNext(tfAmountDetail);
+                                        if (poJSON.get("row") != null) {
+                                            Object obj = poJSON.get("row");
+                                            int value = Integer.valueOf(String.valueOf(obj));
+                                            pnTblDetailRow = value;
+                                        } else {
+                                            JFXUtil.textFieldMoveNext(tfAmountDetail);
+                                        }
                                     }
                                     loadTableDetail();
                                     initDetailFocus();
@@ -1450,6 +1456,24 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
                 tfTotalAmount, tfDiscountAmount, tfNetAmount,
                 tfAmount, tfDiscRate, tfDiscAmountDetail);
         JFXUtil.setCommaFormatter(tfAmountDetail);
+        JFXUtil.handleDisabledNodeClick(apDetail, pnEditMode, nodeID -> {
+            try {
+                switch (nodeID) {
+                    case "tfParticular":
+                        //define if recurring id exists if not define if the editmode of the item is update
+                        boolean lbIsRecurring;
+                        lbIsRecurring = !JFXUtil.isObjectEqualTo(poGLControllers.PaymentRequest().Detail(pnTblDetailRow).getRecurringNo(), null, "");
+                        if (lbIsRecurring) {
+                            ShowMessageFX.Warning(null, psFormName, "This field is disabled by default as it is linked to Recurring.");
+                        } else {
+                            ShowMessageFX.Warning(null, psFormName, "This field is disabled by default as the item has already been saved.");
+                        }
+                        break;
+                }
+            } catch (SQLException | GuanzonException ex) {
+                Logger.getLogger(PaymentRequest_ConfirmationController.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        });
     }
 
     private void initDatePickerActions() {
@@ -1541,7 +1565,7 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
 
         /*Master Fields */
         CustomCommonUtil.setDisable(!lbShow, tfPayee, tfAmount, taRemarks);
-        
+
         CustomCommonUtil.setDisable(true, tfDepartment, dpTransaction, tfTransactionNo, tfBranch,
                 tfSeriesNo, tfTotalAmount, tfDiscountAmount, tfNetAmount
         );
@@ -2145,7 +2169,7 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
                     if (isSourceNotEmpty && !JFXUtil.isObjectEqualTo(poGLControllers.PaymentRequest().Detail(pnTblDetailRow).getParticularID(), null, "")) {
                         tfAmount.requestFocus();
                     } else {
-                        if (JFXUtil.isObjectEqualTo(poGLControllers.PaymentRequest().Detail(pnTblDetailRow).getParticularID(), null, "")
+                        if (!JFXUtil.isObjectEqualTo(poGLControllers.PaymentRequest().Detail(pnTblDetailRow).getParticularID(), null, "")
                                 && (pnEditMode == EditMode.UPDATE || pnEditMode == EditMode.ADDNEW)) {
                             tfAmount.requestFocus();
                         } else {

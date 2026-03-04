@@ -1128,6 +1128,13 @@ public class PaymentRequest_ConfirmationController implements Initializable, Scr
                                             break;
                                         }
                                     } else {
+                                        if (poJSON.get("tableRow") != null) {
+                                            Object obj = poJSON.get("tableRow");
+                                            int value = Integer.valueOf(String.valueOf(obj));
+                                            pnTblDetailRow = value;
+                                        } else {
+                                            JFXUtil.textFieldMoveNext(tfAmountDetail);
+                                        }
                                     }
                                     loadTableDetail();
                                     initDetailFocus();
@@ -1343,11 +1350,25 @@ public class PaymentRequest_ConfirmationController implements Initializable, Scr
         JFXUtil.setCommaFormatter(tfAmountDetail);
 
         JFXUtil.handleDisabledNodeClick(apDetail, pnEditMode, nodeID -> {
-            switch (nodeID) {
-                case "cbReverse":
-                    ShowMessageFX.Warning(null, psFormName,
-                            "Reverse is disabled for non-open transactions.");
-                    break;
+            try {
+                switch (nodeID) {
+                    case "tfParticular":
+                        //define if recurring id exists if not define if the editmode of the item is update
+                        boolean lbIsRecurring;
+                        lbIsRecurring = !JFXUtil.isObjectEqualTo(poGLControllers.PaymentRequest().Detail(pnTblDetailRow).getRecurringNo(), null, "");
+                        if (lbIsRecurring) {
+                            ShowMessageFX.Warning(null, psFormName, "This field is disabled by default as it is linked to Recurring.");
+                        } else {
+                            ShowMessageFX.Warning(null, psFormName, "This field is disabled by default as the item has already been saved.");
+                        }
+                        break;
+                    case "cbReverse":
+                        ShowMessageFX.Warning(null, psFormName,
+                                "Reverse is disabled for non-open transactions.");
+                        break;
+                }
+            } catch (SQLException | GuanzonException ex) {
+                Logger.getLogger(PaymentRequest_ConfirmationController.class.getName()).log(Level.SEVERE, null, ex);
             }
         });
     }
@@ -1875,7 +1896,7 @@ public class PaymentRequest_ConfirmationController implements Initializable, Scr
                     if (isSourceNotEmpty && !JFXUtil.isObjectEqualTo(poGLControllers.PaymentRequest().Detail(pnTblDetailRow).getParticularID(), null, "")) {
                         tfAmount.requestFocus();
                     } else {
-                        if (JFXUtil.isObjectEqualTo(poGLControllers.PaymentRequest().Detail(pnTblDetailRow).getParticularID(), null, "")
+                        if (!JFXUtil.isObjectEqualTo(poGLControllers.PaymentRequest().Detail(pnTblDetailRow).getParticularID(), null, "")
                                 && (pnEditMode == EditMode.UPDATE || pnEditMode == EditMode.ADDNEW)) {
                             tfAmount.requestFocus();
                         } else {
