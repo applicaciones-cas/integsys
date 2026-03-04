@@ -74,7 +74,7 @@ public class RecurringExpenseController implements Initializable, ScreenInterfac
             initButton(pnEditMode);
 
             Platform.runLater(() -> {
-                poController.getModel().setIndustryCode(psIndustryId);
+                poController.getModel().setIndustryCode(oApp.getIndustry()); //Conflict on psIndustry when user is in main office; need to check menu for parameter because value is always returning to 01
 //                poController.getModel().setCompanyId(psCompanyId);
 //                poController.setIndustryId(psIndustryId);
 //                poController.setCompanyId(psCompanyId);
@@ -84,7 +84,6 @@ public class RecurringExpenseController implements Initializable, ScreenInterfac
             });
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
-            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
             ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
