@@ -784,7 +784,7 @@ public class PaymentRequest_HistoryController implements Initializable, ScreenIn
                     switch (txtFieldID) {
                         case "tfSearchPayee": {
                             try {
-                                poJSON = poGLControllers.PaymentRequest().SearchPayee(lsValue, false);
+                                poJSON = poGLControllers.PaymentRequest().SearchPayee(tfSearchPayee.getText(), false);
                                 if ("error".equals(poJSON.get("result"))) {
                                     ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
                                     tfPayee.setText("");
@@ -891,6 +891,7 @@ public class PaymentRequest_HistoryController implements Initializable, ScreenIn
                                 lsIsVatable = "Y";
                             }
 //                        } else {
+
 //                            poJSON = poGLControllers.PaymentRequest().computeNetPayableDetails(lnAmount - lnDiscountAmount, false, 0.12, 0.00);
 //                        }
 //                        totalTaxAmount = Double.parseDouble(poJSON.get("vat").toString());
@@ -1005,13 +1006,13 @@ public class PaymentRequest_HistoryController implements Initializable, ScreenIn
         tfSearchPayee.textProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue != null) {
                 if (newValue.isEmpty()) {
-                    try {
-                        poGLControllers.PaymentRequest().Master().setPayeeID("");
+//                    try {
+//                        poGLControllers.PaymentRequest().Master().setPayeeID("");
                         prevPayee = "";
                         tfSearchPayee.setText("");
-                    } catch (SQLException | GuanzonException ex) {
-                        Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
-                    }
+//                    } catch (SQLException | GuanzonException ex) {
+//                        Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+//                    }
                 }
             }
         }

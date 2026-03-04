@@ -1541,9 +1541,7 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
 
         /*Master Fields */
         CustomCommonUtil.setDisable(!lbShow, tfPayee, tfAmount, taRemarks);
-        tfParticular.setDisable(fnEditMode == EditMode.UPDATE
-                || fnEditMode == EditMode.READY
-                || fnEditMode == EditMode.UNKNOWN);
+        
         CustomCommonUtil.setDisable(true, tfDepartment, dpTransaction, tfTransactionNo, tfBranch,
                 tfSeriesNo, tfTotalAmount, tfDiscountAmount, tfNetAmount
         );
@@ -2143,24 +2141,19 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
 
             if (pnTblDetailRow >= 0) {
                 try {
-                    boolean isSourceNotEmpty = !poGLControllers.PaymentRequest().Detail(pnTblDetailRow).getParticularID().isEmpty();
-                    tfParticular.setDisable(isSourceNotEmpty && (pnEditMode == EditMode.UPDATE || pnEditMode == EditMode.UNKNOWN
-                            || pnEditMode == EditMode.READY));
-                    if (isSourceNotEmpty && !tfParticular.getText().isEmpty()) {
+                    boolean isSourceNotEmpty = !JFXUtil.isObjectEqualTo(poGLControllers.PaymentRequest().Detail(pnTblDetailRow).getParticularID(), null, "");
+                    if (isSourceNotEmpty && !JFXUtil.isObjectEqualTo(poGLControllers.PaymentRequest().Detail(pnTblDetailRow).getParticularID(), null, "")) {
                         tfAmount.requestFocus();
                     } else {
-                        if ((poGLControllers.PaymentRequest().Detail(pnTblDetailRow).getParticularID() != null
-                                && !"".equals(poGLControllers.PaymentRequest().Detail(pnTblDetailRow).getParticularID()))
+                        if (JFXUtil.isObjectEqualTo(poGLControllers.PaymentRequest().Detail(pnTblDetailRow).getParticularID(), null, "")
                                 && (pnEditMode == EditMode.UPDATE || pnEditMode == EditMode.ADDNEW)) {
                             tfAmount.requestFocus();
                         } else {
                             tfParticular.requestFocus();
-
                         }
                     }
                 } catch (SQLException | GuanzonException ex) {
-                    Logger.getLogger(getClass()
-                            .getName()).log(Level.SEVERE, null, ex);
+                    Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
                 }
             }
 
