@@ -728,6 +728,14 @@ public class RecurringExpenseScheduleController implements Initializable, Screen
         JFXUtil.adjustColumnForScrollbar(tblViewDetail);
         JFXUtil.inputIntegersOnly(tfDueDay, tfBillDay);
 
+        JFXUtil.setDisabled(true, cmbBillingFrequency);
+        JFXUtil.handleDisabledNodeClick(apDetail, pnEditMode, nodeID -> {
+            switch (nodeID) {
+                case "cmbBillingFrequency":
+                    ShowMessageFX.Warning(null, pxeModuleName, "This field is to-follow.");
+                    break;
+            }
+        });
         JFXUtil.handleDisabledNodeClick(apMaster, pnEditMode, nodeID -> {
             switch (nodeID) {
                 case "tfRecurringID":
