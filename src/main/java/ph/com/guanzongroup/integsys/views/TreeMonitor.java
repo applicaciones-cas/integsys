@@ -16,10 +16,14 @@ public class TreeMonitor {
     private String psMenuCode;
     private String psIndustry;
     private String psCategory;
+    private String psFxmlPath;
+    private String psControllerClass;
+    private String psCommand;
+    private String psCommandType;
     private Runnable prAction;
     
      public TreeMonitor(String id, String groupId, String name, String description,
-                       String menuCode,String industry,String category) {
+                       String menuCode,String industry,String category, String fxmlPath, String controllerClass, String command, String commandType) {
         this.sSysMnuCd = id;
         this.psMenuGrpx = groupId;
         this.psMenuName = name;
@@ -27,6 +31,10 @@ public class TreeMonitor {
         this.psMenuCode = menuCode;
         this.psIndustry = industry;
         this.psCategory = category;
+        this.psFxmlPath = fxmlPath;
+        this.psControllerClass = controllerClass;
+        this.psCommand = command;
+        this.psCommandType = commandType;
     }
 
     public String getSystemId() { return sSysMnuCd; }
@@ -36,6 +44,10 @@ public class TreeMonitor {
     public String getMenuCode() { return psMenuCode; }
     public String getIndustry() { return psIndustry; }
     public String getCategory() { return psCategory; }
+    public String getFxmlPath() { return psFxmlPath; }
+    public String getControllerClass() { return psControllerClass; }
+    public String getCommand() { return psCommand; }
+    public String getCommandType() { return psCommandType; }
     
      public Runnable getAction() {
         return prAction;

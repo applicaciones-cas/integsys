@@ -767,7 +767,7 @@
                                                                                 <Label text="Period From" GridPane.rowIndex="4" />
                                                                                 <Label text="Period To" GridPane.rowIndex="5" />
                                                                                 <Label text="Tax Code" GridPane.rowIndex="6" />
-                                                                                <Label text="Particular" GridPane.rowIndex="7" />
+                                                                                <Label text="Account Title" GridPane.rowIndex="7" />
                                                                                 <Label text="Base Amount" GridPane.columnIndex="5" GridPane.rowIndex="5" />
                                                                                 <Label text="Tax Rate" GridPane.columnIndex="5" GridPane.rowIndex="6" />
                                                                                 <Label text="Total Tax Amount" GridPane.columnIndex="5" GridPane.rowIndex="7" />
@@ -799,7 +799,7 @@
                                                                                 <TableView fx:id="tblVwBIRDetails" prefHeight="200.0" prefWidth="200.0">
                                                                                     <columns>
                                                                                         <TableColumn fx:id="tblBIRRowNo" maxWidth="40.0" minWidth="40.0" prefWidth="40.0" resizable="false" sortable="false" text="No." />
-                                                                                        <TableColumn fx:id="tblBIRParticular" maxWidth="350.0" minWidth="-1.0" prefWidth="350.0" resizable="false" sortable="false" text="Particular" />
+                                                                                        <TableColumn fx:id="tblBIRParticular" maxWidth="350.0" minWidth="-1.0" prefWidth="350.0" resizable="false" sortable="false" text="Account Title" />
                                                                                         <TableColumn fx:id="tblTaxCode" maxWidth="130.0" minWidth="130.0" prefWidth="130.0" resizable="false" sortable="false" style="-fx-alignment: CENTER-RIGHT;" text="Tax Code" />
                                                                   <TableColumn fx:id="tblBaseAmount" maxWidth="130.0" minWidth="130.0" prefWidth="130.0" resizable="false" sortable="false" style="-fx-alignment: CENTER-RIGHT;" text="Base Amount" />
                                                                   <TableColumn fx:id="tblTaxRate" maxWidth="130.0" minWidth="130.0" prefWidth="130.0" resizable="false" sortable="false" style="-fx-alignment: CENTER-RIGHT;" text="Tax Rate" />

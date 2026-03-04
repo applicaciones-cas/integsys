@@ -1114,7 +1114,7 @@ public class DashboardController implements Initializable {
                     + "LEFT JOIN xxxsysmenuothers b ON b.sMenuCDxx = a.sMenuCDxx AND b.cRecdStat = " + SQLUtil.toSQL(RecordStatus.ACTIVE);
             lsSQL = MiscUtil.addCondition(lsSQL, " a.sMenuDesc LIKE " + SQLUtil.toSQL(fsFormName)
                     + " AND a.cRecdStat = " + SQLUtil.toSQL(RecordStatus.ACTIVE));
-            System.out.println("Executing SQL: " + lsSQL);
+//            System.out.println("Executing SQL: " + lsSQL);
             ResultSet loRS = oApp.executeQuery(lsSQL);
             try {
                 if (MiscUtil.RecordCount(loRS) > 0) {
@@ -2157,7 +2157,6 @@ public class DashboardController implements Initializable {
     private void loadSystemMonitor() {
         try {
             SystemMonitorMenu monitorMenu = new SystemMonitorMenu(oApp, "CAS");
-
             monitorMenu.setIndustryCode(psIndustryID);
             monitorMenu.setCategoryCode(oApp.getCategory());
             JSONObject loSysMontrData = monitorMenu.processMonitoring();
@@ -2169,7 +2168,6 @@ public class DashboardController implements Initializable {
             }
 
             JSONArray loSysMontrRecord = (JSONArray) loSysMontrData.get("data");
-
             TreeItem<TreeMonitor> loTreeNode = loadSystemMonitoMenu(loSysMontrRecord);
             tvRightSideBar.setRoot(loTreeNode);
             tvRightSideBar.setShowRoot(false);
@@ -2180,10 +2178,10 @@ public class DashboardController implements Initializable {
             e.printStackTrace();
         }
     }
-
+    
     private TreeItem<TreeMonitor> loadSystemMonitoMenu(JSONArray jsonArray) {
         TreeItem<TreeMonitor> root = new TreeItem<>();
-
+//        System.out.println("JSON Array : " + jsonArray.toJSONString());
         for (Object obj : jsonArray) {
             JSONObject json = (JSONObject) obj;
 
@@ -2194,9 +2192,14 @@ public class DashboardController implements Initializable {
             String menuCode = (String) json.get("sMenuCDxx");
             String industry = (String) json.get("sIndstCdx");
             String category = (String) json.get("sCategrCd");
-
+            JSONObject loJSON = getFxml(menuCode,industry, category);
+            String fxmlPath = (String) loJSON.get("sFormName");
+            String controllerClass = (String) loJSON.get("sObjectNm");
+            String command = (String) loJSON.get("sCommandx");
+            String commandType = (String) loJSON.get("sCmdTypex");
+            
             TreeMonitor monitorNode = new TreeMonitor(
-                    id, group, name, desc, menuCode, industry, category
+                    id, group, name, desc, menuCode, industry, category,fxmlPath,controllerClass,command,commandType
             );
 
             TreeItem<TreeMonitor> treeNode = new TreeItem<>(monitorNode);
@@ -2221,7 +2224,7 @@ public class DashboardController implements Initializable {
 
                     TreeMonitor txNode = new TreeMonitor(
                             txId, id, txDisplayName != null ? txDisplayName : txId,
-                            txDescToolTip != null ? txDescToolTip : "Transaction", menuCode, txIndustry, txCategory != null ? txCategory : ""
+                            txDescToolTip != null ? txDescToolTip : "Transaction", menuCode, txIndustry, txCategory != null ? txCategory : "",fxmlPath,controllerClass,command,commandType
                     );
 
                     if (!txId.isEmpty() && !menuCode.isEmpty()) {
@@ -2245,37 +2248,322 @@ public class DashboardController implements Initializable {
     public Runnable createSysMonitorAction(TreeMonitor node) {
         return () -> {
             try {
-                String menuCode = node.getMenuCode();
-                String industry = node.getIndustry();
-                String category = node.getCategory();
+                
+                
+//                if (node.getFxmlPath() != null) {
+                    openMonitorForm(node);
+//                } else {
+//                    runJavaCommand(node.getCommand());
+//                }
 
-                if (menuCode.isEmpty()) {
-                    return;
-                }
-                String key = buildMenuKey(menuCode, industry, category);
-                //loadmenu if never clicked
-                if (leftSidebarLookup.size() <= 0) {
-                    loadMenu();
-                }
-                TreeNode sidebarNode = leftSidebarLookup.get(key);
-                if (sidebarNode != null) {
-                    System.out.println("Triggering left sidebar for: " + key);
-                    sidebarNode.runAction();
-
-                    System.out.println("Transaction no. " + node.getSystemId());
-                    if (poController != null) {
-                        Method retrieveMethod = poController.getClass().getMethod("retrieveBySystemMonitor", String.class);
-                        retrieveMethod.invoke(poController, node.getSystemId());
-                        System.out.println("Transaction no. " + node.getSystemId());
-                    } else {
-                        System.err.println("Controller not found for sidebar: " + key);
-                    }
-                } else {
-                    System.err.println("No sidebar entry found for: " + key);
-                }
+//                String menuCode = node.getMenuCode();
+//                String industry = node.getIndustry();
+//                String category = node.getCategory();
+//
+//                if (menuCode.isEmpty()) {
+//                    return;
+//                }
+//                String key = buildMenuKey(menuCode, industry, category);
+//                //loadmenu if never clicked
+//                if (leftSidebarLookup.size() <= 0) {
+//                    loadMenu();
+//                }
+//                TreeNode sidebarNode = leftSidebarLookup.get(key);
+//                if (sidebarNode != null) {
+//                    System.out.println("Triggering left sidebar for: " + key);
+//                    sidebarNode.runAction();
+//
+//                    System.out.println("Transaction no. " + node.getSystemId());
+//                    if (poController != null) {
+//                        Method retrieveMethod = poController.getClass().getMethod("retrieveBySystemMonitor", String.class);
+//                        retrieveMethod.invoke(poController, node.getSystemId());
+//                        System.out.println("Transaction no. " + node.getSystemId());
+//                    } else {
+//                        System.err.println("Controller not found for sidebar: " + key);
+//                    }
+//                } else {
+//                    System.err.println("No sidebar entry found for: " + key);
+//                }
             } catch (Exception e) {
                 e.printStackTrace();
             }
         };
+    }
+    
+    private void openMonitorForm(TreeMonitor node) {
+        try {
+            int tabIndex = checktabs(node.getDescription());
+
+            if (tabIndex == -1) {
+                boolean lbError = false;
+                if(node.getFxmlPath() != null && !"".equals(node.getFxmlPath())){
+                    if(node.getFxmlPath().contains(".fxml")){
+                        setScene2(loadAnimate(node));
+                        poController = tabpane.getUserData();
+                    } else {
+                        lbError = true;
+                    }
+                } else {
+                    lbError = true;
+                }
+                
+                if(lbError){
+                    if (Platform.isFxApplicationThread()) {
+                        ShowMessageFX.Warning(null, psFormName, "Invalid FXML path detected. Please inform MIS to configure the correct path.");
+                    } else {
+                        Platform.runLater(() -> ShowMessageFX.Warning(null, psFormName, "Invalid FXML path detected. Please inform MIS to configure the correct path."));
+                    }
+                }
+                
+                
+//                if (!node.getFxmlPath().isEmpty() && node.getFxmlPath().contains(".fxml")) {
+//                    setScene2(loadAnimate(node));
+//                    poController = tabpane.getUserData();
+//                } else {
+//                    if (Platform.isFxApplicationThread()) {
+//                        ShowMessageFX.Warning(null, psFormName, "Invalid FXML path detected. Please inform MIS to configure the correct path.");
+//                    } else {
+//                        Platform.runLater(() -> ShowMessageFX.Warning(null, psFormName, "Invalid FXML path detected. Please inform MIS to configure the correct path."));
+//                    }
+//                }
+            } else {
+                tabpane.getSelectionModel().select(tabIndex);
+                poController = tabpane.getSelectionModel().getSelectedItem().getUserData();
+                switch(node.getMenuCode()){
+                    case "2500000088": //PRM APM
+                    case "2500000039": //PRF PUR
+                        loadPRFForm(node, false);
+                    break;
+                }
+            }
+
+            setAnchorPaneVisibleManage(false, anchorLeftSideBarMenu);
+            for (ToggleButton navButton : toggleBtnLeftUpperSideBar) {
+                navButton.setSelected(false);
+            }
+            pane.requestFocus();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    
+    public TabPane loadAnimate(TreeMonitor node) {
+        //set fxml controller class
+        if (tabpane.getTabs().isEmpty()) {
+            tabpane = new TabPane();
+        }
+
+        setTabPane();
+        setPane();
+        
+        try {
+            switch(node.getMenuCode()){
+                case "2500000088": //PRM APM
+                case "2500000039": //PRF PUR
+                    loadPRFForm(node, true);
+                break;
+                default:
+                    Class<?> cls = Class.forName(node.getControllerClass());
+                    ScreenInterface fxObj = (ScreenInterface) cls.getDeclaredConstructor().newInstance();
+
+                    fxObj.setGRider(oApp);
+                    fxObj.setIndustryID(node.getIndustry());
+                    fxObj.setCompanyID(psCompanyID);
+                    fxObj.setCategoryID(node.getCategory());
+
+                    FXMLLoader fxmlLoader = new FXMLLoader();
+                    fxmlLoader.setLocation(fxObj.getClass().getResource(node.getFxmlPath()));
+                    fxmlLoader.setController(fxObj);
+
+                    Tab newTab = new Tab(node.getDescription());
+                    newTab.setContent(new javafx.scene.control.Label("Content of Tab " + node.getFxmlPath()));
+
+                    // ✅ Store controller reference in the tab
+                    newTab.setUserData(fxObj);
+
+                    newTab.setContextMenu(createContextMenu(tabpane, newTab, oApp));
+                    tabName.add(node.getDescription());
+
+                    Node content = fxmlLoader.load();
+                    newTab.setContent(content);
+                    tabpane.getTabs().add(newTab);
+                    tabpane.getSelectionModel().select(newTab);
+
+                    newTab.setOnCloseRequest(event -> {
+                        if (ShowMessageFX.YesNo(null, "Close Tab", "Close this tab?")) {
+                            tabName.remove(newTab.getText());
+                            SIPostingWindowKeyEvent(newTab, fxObj, true);
+                            Tabclose();
+                        } else {
+                            event.consume();
+                        }
+
+                    });
+
+                    newTab.setOnClosed(event -> {
+                        if (lbproceed) {
+                            SIPostingWindowKeyEvent(newTab, fxObj, true);
+                            lbproceed = false;
+                        }
+                    });
+
+                    newTab.setOnSelectionChanged(event -> {
+
+                        ObservableList<Tab> tabs = tabpane.getTabs();
+                        for (Tab tab : tabs) {
+                            if (tab.getText().equals(newTab.getText())) {
+                                tabName.remove(newTab.getText());
+                                tabName.add(newTab.getText());
+                                //applied for specific use//
+                                if (newTab.isSelected()) {
+                                    SIPostingWindowKeyEvent(newTab, fxObj, false);
+                                } else {
+                                    SIPostingWindowKeyEvent(newTab, fxObj, true);
+                                }
+
+                                break;
+                            }
+                        }
+                    });
+                break;
+            }
+            return (TabPane) tabpane;
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException | NoSuchMethodException | SecurityException | InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
+            ex.printStackTrace();
+        }
+
+        return null;
+    }
+    
+    private JSONObject getFxml(String fsMenuCode, String fsIndustry, String fsCategory){
+        JSONObject loJSON = new JSONObject();
+        try {
+            String lsSQL = "SELECT a.sMenuCDxx"
+                    + ", a.sMenuGrpx"
+                    + ", a.sMenuName"
+                    + ", a.sMenuDesc"
+                    + ", b.sCommandx"
+                    + ", b.sCmdTypex"
+                    + ", b.sFormName"
+                    + ", b.sObjectNm"
+                    + ", b.sIndstCdx"
+                    + ", b.sCategrCd from xxxsysmenu a "
+                    + "LEFT JOIN xxxsysmenuothers b ON b.sMenuCDxx = a.sMenuCDxx AND b.cRecdStat = " + SQLUtil.toSQL(RecordStatus.ACTIVE);
+            lsSQL = MiscUtil.addCondition(lsSQL,
+                    " a.sMenuCDxx = " + SQLUtil.toSQL(fsMenuCode)
+                            + " AND b.sIndstCdx = " + SQLUtil.toSQL(fsIndustry)
+                            + " AND b.sCategrCd = " + SQLUtil.toSQL(fsCategory)
+                            + " AND a.cRecdStat = " + SQLUtil.toSQL(RecordStatus.ACTIVE));
+//            System.out.println(" getFxml Executing SQL: " + lsSQL);
+            ResultSet loRS = oApp.executeQuery(lsSQL);
+            try {
+                if (MiscUtil.RecordCount(loRS) > 0) {
+                    if (loRS.next()) {
+                        loJSON.put("sMenuCDxx", loRS.getString("sMenuCDxx"));
+                        loJSON.put("sMenuGrpx", loRS.getString("sMenuGrpx"));
+                        loJSON.put("sMenuName", loRS.getString("sMenuName"));
+                        loJSON.put("sMenuDesc", loRS.getString("sMenuDesc"));
+                        loJSON.put("sCommandx", loRS.getString("sCommandx"));
+                        loJSON.put("sCmdTypex", loRS.getString("sCmdTypex"));
+                        loJSON.put("sFormName", loRS.getString("sFormName"));
+                        loJSON.put("sObjectNm", loRS.getString("sObjectNm"));
+                        loJSON.put("sIndstCdx", loRS.getString("sIndstCdx"));
+                        loJSON.put("sCategrCd", loRS.getString("sCategrCd"));
+                        return loJSON;
+                    }
+                }
+                MiscUtil.close(loRS);
+            } catch (SQLException e) {
+                System.out.println("No record loaded.");
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+        }
+        loJSON.put("result", "error");
+        return loJSON;
+    }
+    
+    private JSONObject loadPRFForm(TreeMonitor node, boolean fbNewTab){
+        JSONObject loJSON = new JSONObject();
+        try {
+            
+            if(!fbNewTab){
+                PaymentRequest_EntryController fxObj = (PaymentRequest_EntryController) poController;
+                fxObj.setReloadDetail(node.getSystemId());
+                fxObj.ReloadDetail();
+                return loJSON;
+            }
+            
+            //Only load this for new tab
+            PaymentRequest_EntryController fxObj = new PaymentRequest_EntryController();
+            fxObj.setGRider(oApp);
+            fxObj.setIndustryID(psIndustryID); //Mandatory Set to current logged in
+            fxObj.setCompanyID(psCompanyID);
+            fxObj.setCategoryID(node.getCategory());
+            fxObj.setReloadDetail(node.getSystemId());
+            
+            FXMLLoader fxmlLoader = new FXMLLoader();
+            fxmlLoader.setLocation(fxObj.getClass().getResource(node.getFxmlPath()));
+            fxmlLoader.setController(fxObj);
+            
+            Tab newTab = new Tab(node.getDescription());
+            newTab.setContent(new javafx.scene.control.Label("Content of Tab " + node.getFxmlPath()));
+            
+            // ✅ Store controller reference in the tab
+            newTab.setUserData(fxObj);
+            
+            newTab.setContextMenu(createContextMenu(tabpane, newTab, oApp));
+            tabName.add(node.getDescription());
+            
+            Node content = fxmlLoader.load();
+            newTab.setContent(content);
+            tabpane.getTabs().add(newTab);
+            tabpane.getSelectionModel().select(newTab);
+            
+            newTab.setOnCloseRequest(event -> {
+                if (ShowMessageFX.YesNo(null, "Close Tab", "Close this tab?")) {
+                    tabName.remove(newTab.getText());
+                    SIPostingWindowKeyEvent(newTab, fxObj, true);
+                    Tabclose();
+                } else {
+                    event.consume();
+                }
+                
+            });
+            
+            newTab.setOnClosed(event -> {
+                if (lbproceed) {
+                    SIPostingWindowKeyEvent(newTab, fxObj, true);
+                    lbproceed = false;
+                }
+            });
+            
+            newTab.setOnSelectionChanged(event -> {
+                
+                ObservableList<Tab> tabs = tabpane.getTabs();
+                for (Tab tab : tabs) {
+                    if (tab.getText().equals(newTab.getText())) {
+                        tabName.remove(newTab.getText());
+                        tabName.add(newTab.getText());
+                        //applied for specific use//
+                        if (newTab.isSelected()) {
+                            SIPostingWindowKeyEvent(newTab, fxObj, false);
+                        } else {
+                            SIPostingWindowKeyEvent(newTab, fxObj, true);
+                        }
+                        break;
+                    }
+                }
+            });
+            loJSON.put("result", "error");
+            return loJSON;
+        } catch (IOException | SecurityException | IllegalArgumentException  ex) {
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            loJSON.put("result", "error");
+            loJSON.put("message", MiscUtil.getException(ex));
+        }
+        return loJSON;
     }
 }
