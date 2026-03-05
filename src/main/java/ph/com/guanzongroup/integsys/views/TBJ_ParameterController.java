@@ -327,7 +327,7 @@ public class TBJ_ParameterController implements Initializable, ScreenInterface {
      * central dispatcher, making the code easier to maintain and debug.</p>
      */
     private void initButtonsClickActions() {
-        List<Button> buttons = Arrays.asList(btnBrowse, btnNew, btnUpdate, btnSave, btnCancel, btnClose);
+        List<Button> buttons = Arrays.asList(btnBrowse, btnNew, btnUpdate, btnSave, btnCancel, btnClose,btnConfirm,btnVoid);
         buttons.forEach(button -> button.setOnAction(this::handleButtonAction));
     }
 
@@ -1146,7 +1146,7 @@ public class TBJ_ParameterController implements Initializable, ScreenInterface {
                 tfTransactionNo,
                 tfFieldName,
                 tfAccountTitle,
-                tfTableName
+                tfTableName                
         ).forEach(TextField::clear);
         cbIsActive.setSelected(false);
         cbIsRequired.setSelected(false);
@@ -1154,6 +1154,7 @@ public class TBJ_ParameterController implements Initializable, ScreenInterface {
         detail_data.clear();
         pnSelectedDetail = 0;
         psActiveField = "";
+        taRemarks.clear();
     }
 
     /**
