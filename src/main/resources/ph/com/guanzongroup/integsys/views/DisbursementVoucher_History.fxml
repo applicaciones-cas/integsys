@@ -394,7 +394,7 @@
                                                                                                                                 <TextField fx:id="tfLessWHTax" alignment="CENTER_RIGHT" disable="true" editable="false" promptText="0.00" GridPane.columnIndex="2" GridPane.rowIndex="10" />
                                                                                                                                 <TextField fx:id="tfTotalNetAmount" alignment="CENTER_RIGHT" editable="false" promptText="0.00" style="-fx-font-weight: bold;" GridPane.columnIndex="2" GridPane.rowIndex="11" />
                                                                                                 <Label text="Advances" GridPane.rowIndex="5" />
-                                                                                                <TextField fx:id="tfAdvances" alignment="CENTER_RIGHT" disable="true" editable="false" promptText="0.00" style="-fx-font-weight: bold;" GridPane.columnIndex="2" GridPane.rowIndex="5" />
+                                                                                                <TextField fx:id="tfAdvances" alignment="CENTER_RIGHT" disable="true" editable="false" promptText="0.00" GridPane.columnIndex="2" GridPane.rowIndex="5" />
                                                                                                                             </children>
                                                                                                                 </GridPane>
                                                                                                             </children>
