@@ -472,7 +472,7 @@
                                                                   <Insets right="5.0" />
                                                                </padding>
                                                             </Label>
-                                                            <TextField fx:id="tlAdvancesDetail" disable="true" editable="false" maxWidth="1.7976931348623157E308" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                                                            <TextField fx:id="tfAdvancesDetail" disable="true" editable="false" maxWidth="1.7976931348623157E308" GridPane.columnIndex="1" GridPane.rowIndex="3" />
                                                                             </children>
                                                                         </GridPane>
                                                                     </children>

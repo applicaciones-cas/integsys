@@ -580,7 +580,7 @@
                                                                               </Button>
                                                                            </children>
                                                                         </HBox>
-                                                                        <TextField fx:id="tlAdvancesDetail" disable="true" editable="false" maxWidth="1.7976931348623157E308" GridPane.columnIndex="2" GridPane.rowIndex="3" />
+                                                                        <TextField fx:id="tfAdvancesDetail" disable="true" editable="false" maxWidth="1.7976931348623157E308" GridPane.columnIndex="2" GridPane.rowIndex="3" />
                                                                         <Label text="Advances" GridPane.rowIndex="3" />
                                                                                             </children>
                                                                   </GridPane>
