@@ -230,14 +230,19 @@ public class CheckTransfer_HistoryController implements Initializable, ScreenInt
                     LoadDetail();
                     break;
                 case "btnHistory":
-                    try {
-                        poGLControllers.CheckTransfers().ShowStatusHistory();
-                    } catch (NullPointerException npe) {
-                        Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(npe), npe);
-                        ShowMessageFX.Error("No transaction status history to load!", psFormName, null);
-                    } catch (Exception ex) {
-                        Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
-                        ShowMessageFX.Error(MiscUtil.getException(ex), psFormName, null);
+                    if( poGLControllers.CheckTransfers().Master().getTransactionNo() != null || ! poGLControllers.CheckTransfers().Master().getTransactionNo().isEmpty()){
+                        try {
+                            poGLControllers.CheckTransfers().ShowStatusHistory();
+                        } catch (NullPointerException npe) {
+                            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(npe), npe);
+                            ShowMessageFX.Error("No transaction status history to load!", psFormName, null);
+                        } catch (Exception ex) {
+                            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+                            ShowMessageFX.Error(MiscUtil.getException(ex), psFormName, null);
+                        }
+
+                    }else{
+                       ShowMessageFX.Error("Unable to proceed. No transaction is currently loaded.", psFormName, null);
                     }
                     break;
 

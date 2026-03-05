@@ -503,13 +503,13 @@ public class CheckPrintRequest_ConfirmationController implements Initializable, 
 //            tfTotalAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poCheckPrintingRequestController.Master().getTotalAmount(), true));
             taRemarks.setText(poCheckPrintingRequestController.Master().getRemarks() != null ? poCheckPrintingRequestController.Master().getRemarks() : "");
             chbkUploaded.setSelected(poCheckPrintingRequestController.Master().isUploaded());
-            int detailCount = poCheckPrintingRequestController.getDetailCount();
-            double totalNetAmount = 0.0;
-            for (int lnCtr = detailCount - 1; lnCtr >= 0; lnCtr--) {
-                double checkAmt = poCheckPrintingRequestController.Detail(lnCtr).DisbursementMaster().getNetTotal();
-                totalNetAmount += checkAmt;
-            }
-            tfTotalAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(totalNetAmount));
+//            int detailCount = poCheckPrintingRequestController.getDetailCount();
+//            double totalNetAmount = 0.0;
+//            for (int lnCtr = detailCount - 1; lnCtr >= 0; lnCtr--) {
+//                double checkAmt = poCheckPrintingRequestController.Detail(lnCtr).DisbursementMaster().getNetTotal();
+//                totalNetAmount += checkAmt;
+//            }
+//             tfTotalAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(CustomCommonUtil.setIntegerValueToDecimalFormat(totalNetAmount),true));
         } catch (GuanzonException | SQLException ex) {
             Logger.getLogger(CheckPrintRequest_EntryController.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -551,7 +551,8 @@ public class CheckPrintRequest_ConfirmationController implements Initializable, 
                 cmbPayeeType.getSelectionModel().select(!poCheckPrintingRequestController.Detail(pnDetail).DisbursementMaster().CheckPayments().getPayeeType().equals("")
                         ? Integer.valueOf(poCheckPrintingRequestController.Detail(pnDetail).DisbursementMaster().CheckPayments().getPayeeType()) : -1);
                 taRemarksDetails.setText(poCheckPrintingRequestController.Detail(pnDetail).getdetailRemarks()!= null ? poCheckPrintingRequestController.Detail(pnDetail).getdetailRemarks() : "");
-
+                poCheckPrintingRequestController.computeFields();
+                tfTotalAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poCheckPrintingRequestController.Master().getTotalAmount(),true)); 
             } catch (SQLException | GuanzonException ex) {
                 Logger.getLogger(CheckPrintRequest_EntryController.class.getName()).log(Level.SEVERE, null, ex);
             }

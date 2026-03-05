@@ -976,6 +976,7 @@ public class CheckDeposit_EntryController implements Initializable, ScreenInterf
             }
         }
     }
+    
     private void loadTableMaster() {
         btnRetrieve.setDisable(true);
 
@@ -1055,6 +1056,8 @@ public class CheckDeposit_EntryController implements Initializable, ScreenInterf
 
         new Thread(task).start();
     }
+    
+    
     ChangeListener<Boolean> txtField_Focus = JFXUtil.FocusListener(TextField.class,
         (lsID, lsValue) -> {
 
