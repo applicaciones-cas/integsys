@@ -2028,7 +2028,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
             tfVatableSales.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Master().getVATSale(), true));
             taDVRemarks.setText(poController.Master().getRemarks());
 
-            tfAdvances.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.getAdvancesAmount(), true));
+            tfAdvances.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Master().getAdvancesTotal(), true));
             JFXUtil.updateCaretPositions(apDVMaster1, apDVMaster2, apDVMaster3);
         } catch (GuanzonException | SQLException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
@@ -2608,7 +2608,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                             poController.Detail(pnDetail).setDetailVatExempt(0.0000);
                         }
                         if (!checkedBox.isSelected()) {
-                            poController.Detail(pnDetail).setDetailVatExempt(poController.Detail(pnDetail).getAmountApplied());
+                            poController.Detail(pnDetail).setDetailVatExempt(poController.Detail(pnDetail).getAmountApplied() + poController.Detail(pnDetail).getDetailAdvances());
                         }
                         poJSON = poController.computeFields(true);
                         if (!JFXUtil.isJSONSuccess(poJSON)) {

@@ -987,7 +987,7 @@ public class DisbursementVoucher_HistoryController implements Initializable, Scr
             tfVatZeroRatedSales.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Master().getZeroVATSales(), true));
             tfVatableSales.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Master().getVATSale(), true));
             taDVRemarks.setText(poController.Master().getRemarks());
-            tfAdvances.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.getAdvancesAmount(), true));
+            tfAdvances.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Master().getAdvancesTotal(), true));
             JFXUtil.updateCaretPositions(apDVMaster1, apDVMaster2, apDVMaster3);
         } catch (GuanzonException | SQLException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
