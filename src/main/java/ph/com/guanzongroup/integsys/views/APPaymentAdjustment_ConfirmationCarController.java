@@ -112,6 +112,7 @@ public class APPaymentAdjustment_ConfirmationCarController implements Initializa
         pgPagination.setPageCount(1);
         pnEditMode = EditMode.UNKNOWN;
         initButton(pnEditMode);
+        loadRecordMaster();
         Platform.runLater(() -> {
             poAPPaymentAdjustmentController.APPaymentAdjustment().getModel().setIndustryId(psIndustryId);
             poAPPaymentAdjustmentController.APPaymentAdjustment().getModel().setCompanyId(psSearchCompanyId);
@@ -135,7 +136,7 @@ public class APPaymentAdjustment_ConfirmationCarController implements Initializa
 
     @Override
     public void setCompanyID(String fsValue) {
-        //Company is not autoset
+        this.psCompanyId = fsValue;
     }
 
     @Override
