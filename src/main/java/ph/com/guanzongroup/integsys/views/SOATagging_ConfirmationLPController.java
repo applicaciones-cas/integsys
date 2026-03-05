@@ -146,6 +146,7 @@ public class SOATagging_ConfirmationLPController implements Initializable, Scree
         initTableOnClick();
         clearTextFields();
 
+        loadRecordMaster();
         Platform.runLater(() -> {
             poSOATaggingController.SOATagging().Master().setIndustryId(psIndustryId);
             poSOATaggingController.SOATagging().setIndustryId(psIndustryId);
