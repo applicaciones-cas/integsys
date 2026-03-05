@@ -402,8 +402,8 @@
                                                                                           <RowConstraints maxHeight="1.7976931348623157E308" minHeight="-Infinity" prefHeight="28.0" vgrow="SOMETIMES" />
                                                                                                 <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="30.0" vgrow="SOMETIMES" />
                                                                                           <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="28.0" vgrow="SOMETIMES" />
-                                                                                                                        <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="10.0" vgrow="SOMETIMES" />
                                                                                                                         <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="28.0" vgrow="SOMETIMES" />
+                                                                                                                        <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="10.0" vgrow="SOMETIMES" />
                                                                                                                         <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="28.0" vgrow="SOMETIMES" />
                                                                                                                         <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="28.0" vgrow="SOMETIMES" />
                                                                                                                         <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="28.0" vgrow="SOMETIMES" />
@@ -443,8 +443,8 @@
                                                                                                                                 <TextField fx:id="tfVatExemptSales" alignment="CENTER_RIGHT" disable="true" editable="false" promptText="0.00" GridPane.columnIndex="2" GridPane.rowIndex="9" />
                                                                                                                                 <TextField fx:id="tfLessWHTax" alignment="CENTER_RIGHT" disable="true" editable="false" promptText="0.00" GridPane.columnIndex="2" GridPane.rowIndex="10" />
                                                                                                                                 <TextField fx:id="tfTotalNetAmount" alignment="CENTER_RIGHT" editable="false" promptText="0.00" style="-fx-font-weight: bold;" GridPane.columnIndex="2" GridPane.rowIndex="11" />
-                                                                                                <Label text="Advances" GridPane.rowIndex="5" />
-                                                                                                <TextField fx:id="tfAdvances" alignment="CENTER_RIGHT" disable="true" editable="false" promptText="0.00" GridPane.columnIndex="2" GridPane.rowIndex="5" />
+                                                                                                <Label text="Advances" GridPane.rowIndex="4" />
+                                                                                                <TextField fx:id="tfAdvances" alignment="CENTER_RIGHT" disable="true" editable="false" promptText="0.00" GridPane.columnIndex="2" GridPane.rowIndex="4" />
                                                                                                                             </children>
                                                                                                                 </GridPane>
                                                                                                             </children>
@@ -559,6 +559,8 @@
                                                                                     </Button>
                                                                                  </children>
                                                                               </HBox>
+                                                                              <Label text="Advances" GridPane.rowIndex="3" />
+                                                                              <TextField fx:id="tlAdvancesDetail" disable="true" editable="false" maxWidth="1.7976931348623157E308" GridPane.columnIndex="2" GridPane.rowIndex="3" />
                                                                                             </children>
                                                                   </GridPane>
                                                                </children>
