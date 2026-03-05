@@ -126,20 +126,20 @@
                                                 <FontAwesomeIconView glyphName="DOWNLOAD" size="20" />
                                             </graphic>
                                         </Button>
-                                        <Button fx:id="btnRetrieve" contentDisplay="TOP" ellipsisString="" mnemonicParsing="false" prefHeight="70.0" prefWidth="70.0" styleClass="button_process" stylesheets="@../css/StyleSheet.css" text="Retrieve">
-                                            <effect>
-                                                <Blend />
-                                            </effect>
-                                            <graphic>
-                                                <FontAwesomeIconView glyphName="LIST_ALT" size="20" />
-                                            </graphic>
-                                        </Button>
                                         <Button fx:id="btnHistory" contentDisplay="TOP" ellipsisString="" mnemonicParsing="false" prefHeight="70.0" prefWidth="70.0" styleClass="button_process" stylesheets="@../css/StyleSheet.css" text="History">
                                             <effect>
                                                 <Blend />
                                             </effect>
                                             <graphic>
                                                 <FontAwesomeIconView glyphName="BOOK" size="20" />
+                                            </graphic>
+                                        </Button>
+                                        <Button fx:id="btnRetrieve" contentDisplay="TOP" ellipsisString="" mnemonicParsing="false" prefHeight="70.0" prefWidth="70.0" styleClass="button_process" stylesheets="@../css/StyleSheet.css" text="Retrieve">
+                                            <effect>
+                                                <Blend />
+                                            </effect>
+                                            <graphic>
+                                                <FontAwesomeIconView glyphName="LIST_ALT" size="20" />
                                             </graphic>
                                         </Button>
                                         <Button fx:id="btnClose" contentDisplay="TOP" ellipsisString="" mnemonicParsing="false" prefHeight="70.0" prefWidth="70.0" styleClass="button_process" stylesheets="@../css/StyleSheet.css" text="Close">

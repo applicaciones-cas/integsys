@@ -40,6 +40,7 @@ import javafx.scene.layout.AnchorPane;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.util.Pair;
+import javax.script.ScriptException;
 import static org.apache.poi.hssf.usermodel.HeaderFooter.file;
 import org.guanzon.appdriver.agent.ShowMessageFX;
 import org.guanzon.appdriver.base.CommonUtils;
@@ -147,12 +148,19 @@ public class CheckImportingController implements Initializable, ScreenInterface 
     }
 
     private void initAll() {
-        initButtonsClickActions();
-        initTextFields();
-        initTableMain();
-        pnEditMode = EditMode.UNKNOWN;
-        initButtons(pnEditMode);
-        initTextFieldsProperty();
+        try {
+            initButtonsClickActions();
+            initTextFields();
+            initTableMain();
+            pnEditMode = EditMode.UNKNOWN;
+            initButtons(pnEditMode);
+            initTextFieldsProperty();
+            lblSource.setText(oApp.getCompnyId() + " - " + poCheckImporting.getModel().Industry().getDescription());
+        } catch (SQLException ex) {
+            Logger.getLogger(CheckImportingController.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (GuanzonException ex) {
+            Logger.getLogger(CheckImportingController.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     private void loadRecordSearch() {
@@ -239,7 +247,7 @@ public class CheckImportingController implements Initializable, ScreenInterface 
 
             }
             initButtons(pnEditMode);
-        } catch (SQLException | GuanzonException | CloneNotSupportedException ex) {
+        } catch (SQLException | GuanzonException | CloneNotSupportedException | ScriptException ex) {
             Logger.getLogger(CheckImportingController.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
