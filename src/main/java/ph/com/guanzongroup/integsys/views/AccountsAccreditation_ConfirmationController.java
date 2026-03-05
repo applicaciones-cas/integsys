@@ -42,6 +42,7 @@ import org.guanzon.appdriver.base.GRiderCAS;
 import org.guanzon.appdriver.base.LogWrapper;
 import org.guanzon.appdriver.constant.EditMode;
 import org.guanzon.appdriver.base.GuanzonException;
+import org.guanzon.appdriver.constant.ClientType;
 import org.guanzon.appdriver.constant.TransactionStatus;
 import org.guanzon.cas.client.account.Account_Accreditation;
 import org.guanzon.cas.client.services.ClientControllers;
@@ -167,22 +168,22 @@ public class AccountsAccreditation_ConfirmationController implements Initializab
                             break;
 
                         case "tfCompany":
-                            if (!isJSONSuccess(poAppController.searchClient(tfCompany.getText(), false),
+                            if (!isJSONSuccess(poAppController.searchClient(tfCompany.getText(), ClientType.INSTITUTION ,false),
                                     "Initialize Search Client! ")) {
                                 return;
                             }
                             getLoadedClient();
                             initButtonDisplay(poAppController.getEditMode());
                             break;
- //disabled as its value should be autoset from attached supplier entry
-//                        case "tfContactPerson":
-//                            if (!isJSONSuccess(poAppController.searchClientContact(tfContactPerson.getText(), false),
-//                                    "Initialize Search Client Contact! ")) {
-//                                return;
-//                            }
-//                            getLoadedClient();
-//                            initButtonDisplay(poAppController.getEditMode());
-//                            break;
+                            
+                        case "tfContactPerson":
+                            if (!isJSONSuccess(poAppController.searchClient(tfContactPerson.getText(), ClientType.INDIVIDUAL ,false),
+                                    "Initialize Search Client! ")) {
+                                return;
+                            }
+                            getLoadedClient();
+                            initButtonDisplay(poAppController.getEditMode());
+                        break;
 
                     }
                     break;
@@ -375,14 +376,23 @@ public class AccountsAccreditation_ConfirmationController implements Initializab
                                 }
                                 loadClientMaster();
                                 break;
+                                
                             case "tfCompany":
-                                if (!isJSONSuccess(poAppController.searchClient(tfCompany.getText(), false),
+                                if (!isJSONSuccess(poAppController.searchClient(tfCompany.getText(), ClientType.INSTITUTION ,false),
                                         "Initialize Search Client! ")) {
                                     return;
                                 }
                                 getLoadedClient();
                                 initButtonDisplay(poAppController.getEditMode());
                                 break;
+                            case "tfContactPerson":
+                                if (!isJSONSuccess(poAppController.searchClient(tfContactPerson.getText(), ClientType.INDIVIDUAL ,false),
+                                        "Initialize Search Client! ")) {
+                                    return;
+                                }
+                                getLoadedClient();
+                                initButtonDisplay(poAppController.getEditMode());
+                            break;
                         }
                         break;
                 }

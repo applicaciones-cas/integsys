@@ -43,6 +43,7 @@ import org.guanzon.appdriver.base.GRiderCAS;
 import org.guanzon.appdriver.base.LogWrapper;
 import org.guanzon.appdriver.constant.EditMode;
 import org.guanzon.appdriver.base.GuanzonException;
+import org.guanzon.appdriver.constant.ClientType;
 import org.guanzon.cas.client.account.Account_Accreditation;
 import org.guanzon.cas.client.services.ClientControllers;
 import org.json.simple.JSONObject;
@@ -167,13 +168,21 @@ public class AccountsAccreditation_EntryController implements Initializable, Scr
                             break;
 
                         case "tfCompany":
-                            if (!isJSONSuccess(poAppController.searchClient(tfCompany.getText(), false),
+                            if (!isJSONSuccess(poAppController.searchClient(tfCompany.getText(), ClientType.INSTITUTION ,false),
                                     "Initialize Search Client! ")) {
                                 return;
                             }
                             getLoadedClient();
                             initButtonDisplay(poAppController.getEditMode());
                             break;
+                        case "tfContactPerson":
+                            if (!isJSONSuccess(poAppController.searchClient(tfContactPerson.getText(), ClientType.INDIVIDUAL ,false),
+                                    "Initialize Search Client! ")) {
+                                return;
+                            }
+                            getLoadedClient();
+                            initButtonDisplay(poAppController.getEditMode());
+                        break;
 
                     }
                     break;
@@ -336,8 +345,17 @@ public class AccountsAccreditation_EntryController implements Initializable, Scr
                                 loadClientMaster();
                                 break;
                             case "tfCompany":
-                                JSONObject loJSONObject = poAppController.searchClient(tfCompany.getText() , false);
-                                if (!isJSONSuccess(loJSONObject,
+                                if (!isJSONSuccess(
+                                        poAppController.searchClient(tfCompany.getText(), ClientType.INSTITUTION ,false),
+                                        "Initialize Search Client! ")) {
+                                    return;
+                                }
+                                getLoadedClient();
+                                initButtonDisplay(poAppController.getEditMode());
+                                break;
+                            case "tfContactPerson":
+                                if (!isJSONSuccess(
+                                        poAppController.searchClient(tfContactPerson.getText(), ClientType.INDIVIDUAL ,false),
                                         "Initialize Search Client! ")) {
                                     return;
                                 }
