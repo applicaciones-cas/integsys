@@ -472,11 +472,12 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                     JFXUtil.showRetainedHighlight(true, tblViewMainList, "#A7C7E7", plOrderNoPartial, plOrderNoFinal, highlightedRowsMain, true);
 
                     ShowMessageFX.Information(null, pxeModuleName, (String) poJSON.get("message"));
-
-                    poJSON = poController.updatePaymentsStatus();
-                    if ("error".equals(poJSON.get("result"))) {
-                        ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-                    }
+                    
+                    //Arsiela 03-05-2026 Moved to class save others
+//                    poJSON = poController.updatePaymentsStatus();
+//                    if ("error".equals(poJSON.get("result"))) {
+//                        ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+//                    }
 
                     poJSON = poController.OpenTransaction(poController.Master().getTransactionNo());
                     if ("success".equals(poJSON.get("result"))) {
@@ -2027,7 +2028,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
             tfVatableSales.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Master().getVATSale(), true));
             taDVRemarks.setText(poController.Master().getRemarks());
 
-            tfAdvances.setText(poController.getAdvancesAmount());
+            tfAdvances.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.getAdvancesAmount(), true));
             JFXUtil.updateCaretPositions(apDVMaster1, apDVMaster2, apDVMaster3);
         } catch (GuanzonException | SQLException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
