@@ -822,6 +822,7 @@ public class TBJ_ParameterController implements Initializable, ScreenInterface {
                                     ShowMessageFX.Warning((String) poJSON.get("message"), lsValue, lsValue);
                                 }
                                 tfSourceCode.setText(poTBJControllers.TBJParameter().Master().TransactionSource().getSourceName());
+                                tfTableName.clear();
                                 return;
 
                             case "tfAccountTitle":

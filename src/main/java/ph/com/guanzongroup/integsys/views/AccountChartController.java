@@ -324,10 +324,10 @@ public class AccountChartController implements Initializable, ScreenInterface {
                         break;
                     case 2:
                         oParameters.AccountChart().getModel().setDescription(lsValue);
-                    case 5:
-                        oParameters.AccountChart().getModel().setAccountGroup(lsValue);
-                    case 6:
-                        oParameters.AccountChart().getModel().setReportGroup(lsValue);
+//                    case 5:
+//                        oParameters.AccountChart().getModel().setAccountGroup(lsValue);
+//                    case 6:
+//                        oParameters.AccountChart().getModel().setReportGroup(lsValue);
                         break;
                     default:
                         break;
@@ -437,12 +437,12 @@ public class AccountChartController implements Initializable, ScreenInterface {
             txtField02.setText(oParameters.AccountChart().getModel().getDescription());
             txtField03.setText(oParameters.AccountChart().getModel().ParentAccountChart().getDescription());
             txtField04.setText(oParameters.AccountChart().getModel().General_Ledger().getDescription());
-            txtField05.setText(oParameters.AccountChart().getModel().getAccountGroup());
-            txtField06.setText(oParameters.AccountChart().getModel().getReportGroup());
+//            txtField05.setText(oParameters.AccountChart().getModel().getAccountGroup());
+//            txtField06.setText(oParameters.AccountChart().getModel().getReportGroup());
 
-            if (oParameters.AccountChart().getModel().getBaseAccount() != null && !oParameters.AccountChart().getModel().getBaseAccount().isEmpty()) {
-                cmbField01.getSelectionModel().select(Integer.parseInt(oParameters.AccountChart().getModel().getBaseAccount()));
-            }
+//            if (oParameters.AccountChart().getModel().getBaseAccount() != null && !oParameters.AccountChart().getModel().getBaseAccount().isEmpty()) {
+//                cmbField01.getSelectionModel().select(Integer.parseInt(oParameters.AccountChart().getModel().getBaseAccount()));
+//            }
             if (oParameters.AccountChart().getModel().getAccountType() != null && !oParameters.AccountChart().getModel().getAccountType().isEmpty()) {
                 String acctType = oParameters.AccountChart().getModel().getAccountType();
 
@@ -536,14 +536,14 @@ public class AccountChartController implements Initializable, ScreenInterface {
 
         cmbField01.getSelectionModel().selectedIndexProperty().addListener((obs, oldIndex, newIndex) -> {
             if (newIndex != null && newIndex.intValue() >= 0) {
-                try {
-                    int lnIndex = newIndex.intValue(); // the selected index
-                    oParameters.AccountChart().getModel().setBaseAccount(String.valueOf(lnIndex));
-                } catch (SQLException ex) {
-                    Logger.getLogger(AccountChartController.class.getName()).log(Level.SEVERE, null, ex);
-                } catch (GuanzonException ex) {
-                    Logger.getLogger(AccountChartController.class.getName()).log(Level.SEVERE, null, ex);
-                }
+//                try {
+//                    int lnIndex = newIndex.intValue(); // the selected index
+////                    oParameters.AccountChart().getModel().setBaseAccount(String.valueOf(lnIndex));
+//                } catch (SQLException ex) {
+//                    Logger.getLogger(AccountChartController.class.getName()).log(Level.SEVERE, null, ex);
+//                } catch (GuanzonException ex) {
+//                    Logger.getLogger(AccountChartController.class.getName()).log(Level.SEVERE, null, ex);
+//                }
             }
         });
 
