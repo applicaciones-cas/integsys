@@ -94,7 +94,7 @@ public class APPaymentAdjustment_HistoryMonarchController implements Initializab
 
     @Override
     public void setCompanyID(String fsValue) {
-//        psCompanyId = fsValue;
+        this.psCompanyId = fsValue;
     }
 
     @Override

@@ -94,7 +94,7 @@ public class APPaymentAdjustment_HistoryLPController implements Initializable, S
 
     @Override
     public void setCompanyID(String fsValue) {
-//        psCompanyId = fsValue;
+        this.psCompanyId = fsValue;
     }
 
     @Override

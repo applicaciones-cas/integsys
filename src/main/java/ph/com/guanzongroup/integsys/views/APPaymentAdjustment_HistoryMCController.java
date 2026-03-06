@@ -91,10 +91,10 @@ public class APPaymentAdjustment_HistoryMCController implements Initializable, S
     public void setIndustryID(String fsValue) {
         psIndustryId = fsValue;
     }
-
+    
     @Override
     public void setCompanyID(String fsValue) {
-//        psCompanyId = fsValue;
+        this.psCompanyId = fsValue;
     }
 
     @Override

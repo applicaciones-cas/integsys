@@ -77,6 +77,7 @@ public class APPaymentAdjustment_HistoryController implements Initializable, Scr
 
         Platform.runLater(() -> {
             poAPPaymentAdjustmentController.APPaymentAdjustment().getModel().setIndustryId(psIndustryId);
+            poAPPaymentAdjustmentController.APPaymentAdjustment().getModel().setCompanyId(psCompanyId);
             poAPPaymentAdjustmentController.APPaymentAdjustment().setIndustryId(psIndustryId);
             poAPPaymentAdjustmentController.APPaymentAdjustment().setWithUI(true);
             loadRecordSearch();
@@ -95,7 +96,7 @@ public class APPaymentAdjustment_HistoryController implements Initializable, Scr
 
     @Override
     public void setCompanyID(String fsValue) {
-//        psCompanyId = fsValue;
+        psCompanyId = fsValue;
     }
 
     @Override

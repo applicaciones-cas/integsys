@@ -94,7 +94,7 @@ public class APPaymentAdjustment_HistoryAppliancesController implements Initiali
 
     @Override
     public void setCompanyID(String fsValue) {
-//        psCompanyId = fsValue;
+        this.psCompanyId = fsValue;
     }
 
     @Override
