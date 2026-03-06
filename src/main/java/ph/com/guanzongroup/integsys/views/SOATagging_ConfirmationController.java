@@ -150,6 +150,7 @@ public class SOATagging_ConfirmationController implements Initializable, ScreenI
         loadRecordMaster();
         Platform.runLater(() -> {
             poSOATaggingController.SOATagging().Master().setIndustryId(psIndustryId);
+            poSOATaggingController.SOATagging().Master().setCompanyId(psCompanyId);
             poSOATaggingController.SOATagging().setIndustryId(psIndustryId);
             poSOATaggingController.SOATagging().setCompanyId(psCompanyId);
             poSOATaggingController.SOATagging().initFields();
