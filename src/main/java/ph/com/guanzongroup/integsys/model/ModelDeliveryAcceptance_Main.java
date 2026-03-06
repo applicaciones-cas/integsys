@@ -13,30 +13,29 @@ import javafx.collections.ObservableList;
  * @author User
  */
 public class ModelDeliveryAcceptance_Main {
+
     public SimpleStringProperty index01;
     public SimpleStringProperty index02;
     public SimpleStringProperty index03;
-    public SimpleStringProperty index04; 
+    public SimpleStringProperty index04;
     public SimpleStringProperty index05;
-    public SimpleStringProperty index06; 
+    public SimpleStringProperty index06;
     public SimpleStringProperty index07;
-    public SimpleStringProperty index08; 
+    public SimpleStringProperty index08;
     public SimpleStringProperty index09;
     public SimpleStringProperty index10;
-    
-    
 
     public ModelDeliveryAcceptance_Main(String index01,
-               String index02,
-               String index03,
-               String index04,
-               String index05,
-               String index06,
-               String index07,
-               String index08,
-               String index09,
-               String index10){
-        
+            String index02,
+            String index03,
+            String index04,
+            String index05,
+            String index06,
+            String index07,
+            String index08,
+            String index09,
+            String index10) {
+
         this.index01 = new SimpleStringProperty(index01);
         this.index02 = new SimpleStringProperty(index02);
         this.index03 = new SimpleStringProperty(index03);
@@ -48,24 +47,24 @@ public class ModelDeliveryAcceptance_Main {
         this.index09 = new SimpleStringProperty(index09);
         this.index10 = new SimpleStringProperty(index10);
     }
-    
+
     public ModelDeliveryAcceptance_Main(String index01,
-               String index02,
-               String index03,
-               String index04){
-        
+            String index02,
+            String index03,
+            String index04) {
+
         this.index01 = new SimpleStringProperty(index01);
         this.index02 = new SimpleStringProperty(index02);
         this.index03 = new SimpleStringProperty(index03);
         this.index04 = new SimpleStringProperty(index04);
     }
-    
+
     public ModelDeliveryAcceptance_Main(String index01,
-               String index02,
-               String index03,
-               String index04,
-                String index05){
-        
+            String index02,
+            String index03,
+            String index04,
+            String index05) {
+
         this.index01 = new SimpleStringProperty(index01);
         this.index02 = new SimpleStringProperty(index02);
         this.index03 = new SimpleStringProperty(index03);
@@ -73,19 +72,44 @@ public class ModelDeliveryAcceptance_Main {
         this.index05 = new SimpleStringProperty(index05);
     }
 
-    
+    public String getIndex01() {
+        return index01.get();
+    }
 
-    public String getIndex01(){return index01.get();}
-    public void setIndex01(String index01){this.index01.set(index01);}
-    
-    public String getIndex02(){return index02.get();}
-    public void setIndex02(String index02){this.index02.set(index02);}
-    
-    public String getIndex03(){return index03.get();}
-    public void setIndex03(String index03){this.index03.set(index03);}
-    
-    public String getIndex04(){return index04.get();}
-    public void setIndex04(String index04){this.index04.set(index04);}
+    public void setIndex01(String index01) {
+        this.index01.set(index01);
+    }
 
-    
+    public String getIndex02() {
+        return index02.get();
+    }
+
+    public void setIndex02(String index02) {
+        this.index02.set(index02);
+    }
+
+    public String getIndex03() {
+        return index03.get();
+    }
+
+    public void setIndex03(String index03) {
+        this.index03.set(index03);
+    }
+
+    public String getIndex04() {
+        return index04.get();
+    }
+
+    public void setIndex04(String index04) {
+        this.index04.set(index04);
+    }
+
+    public String getIndex05() {
+        return index05.get();
+    }
+
+    public void setIndex05(String index05) {
+        this.index05.set(index05);
+    }
+
 }
