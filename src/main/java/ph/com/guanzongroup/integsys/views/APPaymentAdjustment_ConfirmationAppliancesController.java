@@ -116,9 +116,9 @@ public class APPaymentAdjustment_ConfirmationAppliancesController implements Ini
         loadRecordMaster();
         Platform.runLater(() -> {
             poAPPaymentAdjustmentController.APPaymentAdjustment().getModel().setIndustryId(psIndustryId);
-            poAPPaymentAdjustmentController.APPaymentAdjustment().getModel().setCompanyId(psSearchCompanyId);
+            poAPPaymentAdjustmentController.APPaymentAdjustment().getModel().setCompanyId(psCompanyId);
             poAPPaymentAdjustmentController.APPaymentAdjustment().setIndustryId(psIndustryId);
-            poAPPaymentAdjustmentController.APPaymentAdjustment().setCompanyId(psSearchCompanyId);
+            poAPPaymentAdjustmentController.APPaymentAdjustment().setCompanyId(psCompanyId);
             poAPPaymentAdjustmentController.APPaymentAdjustment().setWithUI(true);
             loadRecordSearch();
         });

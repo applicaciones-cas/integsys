@@ -116,9 +116,9 @@ public class APPaymentAdjustment_ConfirmationController implements Initializable
         loadRecordMaster();
         Platform.runLater(() -> {
             poAPPaymentAdjustmentController.APPaymentAdjustment().getModel().setIndustryId(psIndustryId);
-            poAPPaymentAdjustmentController.APPaymentAdjustment().getModel().setCompanyId(psSearchCompanyId);
+            poAPPaymentAdjustmentController.APPaymentAdjustment().getModel().setCompanyId(psCompanyId);
             poAPPaymentAdjustmentController.APPaymentAdjustment().setIndustryId(psIndustryId);
-            poAPPaymentAdjustmentController.APPaymentAdjustment().setCompanyId(psSearchCompanyId);
+            poAPPaymentAdjustmentController.APPaymentAdjustment().setCompanyId(psCompanyId);
             poAPPaymentAdjustmentController.APPaymentAdjustment().setWithUI(true);
             loadRecordSearch();
         });
@@ -137,7 +137,7 @@ public class APPaymentAdjustment_ConfirmationController implements Initializable
 
     @Override
     public void setCompanyID(String fsValue) {
-        this.psCompanyId = fsValue;
+        psCompanyId = fsValue;
     }
 
     @Override
@@ -233,10 +233,8 @@ public class APPaymentAdjustment_ConfirmationController implements Initializable
                             if ("error".equals(poJSON.get("result"))) {
                                 ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                 tfCompany.setText("");
-                                psCompanyId = "";
                                 break;
                             }
-                            psCompanyId = poAPPaymentAdjustmentController.APPaymentAdjustment().getModel().getCompanyId();
                             loadRecordMaster();
                             break;
                         case "tfClient":
@@ -314,7 +312,6 @@ public class APPaymentAdjustment_ConfirmationController implements Initializable
                 case "tfCompany":
                     if (lsValue.isEmpty()) {
                         poJSON = poAPPaymentAdjustmentController.APPaymentAdjustment().getModel().setCompanyId("");
-                        psCompanyId = "";
                     }
                     break;
                 case "tfClient":
@@ -541,7 +538,6 @@ public class APPaymentAdjustment_ConfirmationController implements Initializable
 
     public void clearTextFields() {
         psSearchCompanyId = "";
-        psCompanyId = "";
         psSearchSupplierId = "";
         psSupplierId = "";
 
@@ -685,7 +681,6 @@ public class APPaymentAdjustment_ConfirmationController implements Initializable
                         }
 
                         psSupplierId = poAPPaymentAdjustmentController.APPaymentAdjustment().getModel().getClientId();
-                        psCompanyId = poAPPaymentAdjustmentController.APPaymentAdjustment().getModel().getCompanyId();
                         pnEditMode = poAPPaymentAdjustmentController.APPaymentAdjustment().getEditMode();
                         break;
                     case "btnSearch":
@@ -723,14 +718,14 @@ public class APPaymentAdjustment_ConfirmationController implements Initializable
                             return;
                         }
                     case "btnHistory":
-                        if(pnEditMode != EditMode.READY && pnEditMode != EditMode.UPDATE){
+                        if (pnEditMode != EditMode.READY && pnEditMode != EditMode.UPDATE) {
                             ShowMessageFX.Warning("No transaction status history to load!", pxeModuleName, null);
                             return;
-                        } 
-                        
+                        }
+
                         try {
                             poAPPaymentAdjustmentController.APPaymentAdjustment().ShowStatusHistory();
-                        }  catch (NullPointerException npe) {
+                        } catch (NullPointerException npe) {
                             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(npe), npe);
                             ShowMessageFX.Error("No transaction status history to load!", pxeModuleName, null);
                         } catch (Exception ex) {
