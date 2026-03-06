@@ -168,7 +168,7 @@ public class AccountsAccreditation_EntryController implements Initializable, Scr
                             break;
 
                         case "tfCompany":
-                            if (!isJSONSuccess(poAppController.searchClient(tfCompany.getText(), ClientType.INSTITUTION ,false),
+                            if (!isJSONSuccess(poAppController.searchClient(tfCompany.getText(), false),
                                     "Initialize Search Client! ")) {
                                 return;
                             }
@@ -176,7 +176,7 @@ public class AccountsAccreditation_EntryController implements Initializable, Scr
                             initButtonDisplay(poAppController.getEditMode());
                             break;
                         case "tfContactPerson":
-                            if (!isJSONSuccess(poAppController.searchClient(tfContactPerson.getText(), ClientType.INDIVIDUAL ,false),
+                            if (!isJSONSuccess(poAppController.searchClientContact(tfContactPerson.getText(), false),
                                     "Initialize Search Client! ")) {
                                 return;
                             }
@@ -346,7 +346,7 @@ public class AccountsAccreditation_EntryController implements Initializable, Scr
                                 break;
                             case "tfCompany":
                                 if (!isJSONSuccess(
-                                        poAppController.searchClient(tfCompany.getText(), ClientType.INSTITUTION ,false),
+                                        poAppController.searchClient(tfCompany.getText(), false),
                                         "Initialize Search Client! ")) {
                                     return;
                                 }
@@ -355,7 +355,7 @@ public class AccountsAccreditation_EntryController implements Initializable, Scr
                                 break;
                             case "tfContactPerson":
                                 if (!isJSONSuccess(
-                                        poAppController.searchClient(tfContactPerson.getText(), ClientType.INDIVIDUAL ,false),
+                                        poAppController.searchClientContact(tfContactPerson.getText(), false),
                                         "Initialize Search Client! ")) {
                                     return;
                                 }
