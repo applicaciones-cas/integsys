@@ -2178,6 +2178,7 @@ public class SIPosting_SPCarController implements Initializable, ScreenInterface
     public void initMainGrid() {
         JFXUtil.setColumnCenter(tblRowNo, tblDate, tblReferenceNo);
         JFXUtil.setColumnLeft(tblSupplier);
+        JFXUtil.setColumnRight(tblTranTotal);
         JFXUtil.setColumnsIndexAndDisableReordering(tblViewMainList);
 
         filteredData = new FilteredList<>(main_data, b -> true);
