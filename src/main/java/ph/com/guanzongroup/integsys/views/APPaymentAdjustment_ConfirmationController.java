@@ -86,7 +86,7 @@ public class APPaymentAdjustment_ConfirmationController implements Initializable
     @FXML
     private Button btnUpdate, btnSearch, btnSave, btnCancel, btnConfirm, btnVoid, btnReturn, btnHistory, btnRetrieve, btnClose;
     @FXML
-    private TextField tfSearchSupplier, tfSearchReferenceNo, tfSearchCompany, tfTransactionNo, tfClient, tfIssuedTo, tfCreditAmount, tfDebitAmount, tfReferenceNo, tfCompany;
+    private TextField tfSearchSupplier, tfSearchReferenceNo, tfTransactionNo, tfClient, tfIssuedTo, tfCreditAmount, tfDebitAmount, tfReferenceNo, tfCompany;
     @FXML
     private DatePicker dpTransactionDate;
     @FXML
@@ -137,7 +137,7 @@ public class APPaymentAdjustment_ConfirmationController implements Initializable
 
     @Override
     public void setCompanyID(String fsValue) {
-        psCompanyId = fsValue;
+        this.psCompanyId = fsValue;
     }
 
     @Override
@@ -201,18 +201,18 @@ public class APPaymentAdjustment_ConfirmationController implements Initializable
                     break;
                 case F3:
                     switch (lsID) {
-                        case "tfSearchCompany":
-                            poJSON = poAPPaymentAdjustmentController.APPaymentAdjustment().SearchCompany(lsValue, false);
-                            if ("error".equals(poJSON.get("result"))) {
-                                ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-                                tfSearchCompany.setText("");
-                                psSearchCompanyId = "";
-                                break;
-                            }
-                            psSearchCompanyId = poAPPaymentAdjustmentController.APPaymentAdjustment().getModel().getCompanyId();
-                            loadRecordSearch();
-                            retrieveAPAdjustment();
-                            return;
+//                        case "tfSearchCompany":
+//                            poJSON = poAPPaymentAdjustmentController.APPaymentAdjustment().SearchCompany(lsValue, false);
+//                            if ("error".equals(poJSON.get("result"))) {
+//                                ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+//                                tfSearchCompany.setText("");
+//                                psSearchCompanyId = "";
+//                                break;
+//                            }
+//                            psSearchCompanyId = poAPPaymentAdjustmentController.APPaymentAdjustment().getModel().getCompanyId();
+//                            loadRecordSearch();
+//                            retrieveAPAdjustment();
+//                            return;
                         case "tfSearchSupplier":
                             poJSON = poAPPaymentAdjustmentController.APPaymentAdjustment().SearchClient(lsValue, false);
                             if ("error".equals(poJSON.get("result"))) {
@@ -275,7 +275,7 @@ public class APPaymentAdjustment_ConfirmationController implements Initializable
                 lblSource.setText("General");
             }
             tfSearchSupplier.setText(psSearchSupplierId.equals("") ? "" : poAPPaymentAdjustmentController.APPaymentAdjustment().getModel().Supplier().getCompanyName());
-            tfSearchCompany.setText(psSearchCompanyId.equals("") ? "" : poAPPaymentAdjustmentController.APPaymentAdjustment().getModel().Company().getCompanyName());
+//            tfSearchCompany.setText(psSearchCompanyId.equals("") ? "" : poAPPaymentAdjustmentController.APPaymentAdjustment().getModel().Company().getCompanyName());
             JFXUtil.updateCaretPositions(apBrowse);
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
@@ -526,7 +526,7 @@ public class APPaymentAdjustment_ConfirmationController implements Initializable
         });
         JFXUtil.setCommaFormatter(tfDebitAmount, tfCreditAmount);
         JFXUtil.setFocusListener(txtMaster_Focus, tfReferenceNo, tfCompany, tfClient, tfIssuedTo, tfCreditAmount, tfDebitAmount,
-                tfSearchCompany, tfSearchSupplier);
+                tfSearchSupplier);
         JFXUtil.setFocusListener(txtArea_Focus, taRemarks);
         JFXUtil.setKeyPressedListener(this::txtField_KeyPressed, apMaster, apBrowse);
     }
@@ -857,7 +857,7 @@ public class APPaymentAdjustment_ConfirmationController implements Initializable
     public void retrieveAPAdjustment() {
         poJSON = new JSONObject();
         poAPPaymentAdjustmentController.APPaymentAdjustment().setRecordStatus(APPaymentAdjustmentStatus.OPEN + "" + APPaymentAdjustmentStatus.CONFIRMED);
-        poJSON = poAPPaymentAdjustmentController.APPaymentAdjustment().loadAPPaymentAdjustment(tfSearchCompany.getText(), tfSearchSupplier.getText(), tfSearchReferenceNo.getText());
+        poJSON =poAPPaymentAdjustmentController.APPaymentAdjustment().loadAPPaymentAdjustment("", tfSearchSupplier.getText(), tfSearchReferenceNo.getText());
         if (!"success".equals((String) poJSON.get("result"))) {
             ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
         } else {
