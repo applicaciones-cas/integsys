@@ -76,7 +76,9 @@ public class APPaymentAdjustment_HistoryAppliancesController implements Initiali
 
         Platform.runLater(() -> {
             poAPPaymentAdjustmentController.APPaymentAdjustment().getModel().setIndustryId(psIndustryId);
+            poAPPaymentAdjustmentController.APPaymentAdjustment().getModel().setCompanyId(psCompanyId);
             poAPPaymentAdjustmentController.APPaymentAdjustment().setIndustryId(psIndustryId);
+            poAPPaymentAdjustmentController.APPaymentAdjustment().setCompanyId(psCompanyId);
             poAPPaymentAdjustmentController.APPaymentAdjustment().setWithUI(true);
             loadRecordSearch();
         });

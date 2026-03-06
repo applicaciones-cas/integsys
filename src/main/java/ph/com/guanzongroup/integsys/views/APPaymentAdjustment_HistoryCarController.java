@@ -76,7 +76,9 @@ public class APPaymentAdjustment_HistoryCarController implements Initializable, 
 
         Platform.runLater(() -> {
             poAPPaymentAdjustmentController.APPaymentAdjustment().getModel().setIndustryId(psIndustryId);
+            poAPPaymentAdjustmentController.APPaymentAdjustment().getModel().setCompanyId(psCompanyId);
             poAPPaymentAdjustmentController.APPaymentAdjustment().setIndustryId(psIndustryId);
+            poAPPaymentAdjustmentController.APPaymentAdjustment().setCompanyId(psCompanyId);
             poAPPaymentAdjustmentController.APPaymentAdjustment().setWithUI(true);
             loadRecordSearch();
         });
