@@ -86,7 +86,7 @@ public class APPaymentAdjustment_EntryController implements Initializable, Scree
         clearTextFields();
         pnEditMode = EditMode.UNKNOWN;
         initButton(pnEditMode);
-
+        loadRecordMaster();
         Platform.runLater(() -> {
             poAPPaymentAdjustmentController.APPaymentAdjustment().getModel().setIndustryId(psIndustryId);
             poAPPaymentAdjustmentController.APPaymentAdjustment().getModel().setCompanyId(psCompanyId);
@@ -113,7 +113,7 @@ public class APPaymentAdjustment_EntryController implements Initializable, Scree
 
     @Override
     public void setCompanyID(String fsValue) {
-        //Company is not autoset
+        this.psCompanyId = fsValue;
     }
 
     @Override
@@ -541,14 +541,14 @@ public class APPaymentAdjustment_EntryController implements Initializable, Scree
                             return;
                         }
                     case "btnHistory":
-                        if(pnEditMode != EditMode.READY && pnEditMode != EditMode.UPDATE){
+                        if (pnEditMode != EditMode.READY && pnEditMode != EditMode.UPDATE) {
                             ShowMessageFX.Warning("No transaction status history to load!", pxeModuleName, null);
                             return;
-                        } 
-                        
+                        }
+
                         try {
                             poAPPaymentAdjustmentController.APPaymentAdjustment().ShowStatusHistory();
-                        }  catch (NullPointerException npe) {
+                        } catch (NullPointerException npe) {
                             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(npe), npe);
                             ShowMessageFX.Error("No transaction status history to load!", pxeModuleName, null);
                         } catch (Exception ex) {

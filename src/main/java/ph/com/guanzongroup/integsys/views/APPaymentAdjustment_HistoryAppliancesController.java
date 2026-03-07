@@ -57,7 +57,7 @@ public class APPaymentAdjustment_HistoryAppliancesController implements Initiali
     @FXML
     private Button btnBrowse, btnHistory, btnClose;
     @FXML
-    private TextField tfSearchSupplier, tfSearchReferenceNo, tfSearchCompany, tfTransactionNo, tfClient, tfIssuedTo, tfCreditAmount, tfDebitAmount, tfReferenceNo, tfCompany;
+    private TextField tfSearchSupplier, tfSearchReferenceNo, tfTransactionNo, tfClient, tfIssuedTo, tfCreditAmount, tfDebitAmount, tfReferenceNo, tfCompany;
     @FXML
     private DatePicker dpTransactionDate;
     @FXML
@@ -76,7 +76,9 @@ public class APPaymentAdjustment_HistoryAppliancesController implements Initiali
 
         Platform.runLater(() -> {
             poAPPaymentAdjustmentController.APPaymentAdjustment().getModel().setIndustryId(psIndustryId);
+            poAPPaymentAdjustmentController.APPaymentAdjustment().getModel().setCompanyId(psCompanyId);
             poAPPaymentAdjustmentController.APPaymentAdjustment().setIndustryId(psIndustryId);
+            poAPPaymentAdjustmentController.APPaymentAdjustment().setCompanyId(psCompanyId);
             poAPPaymentAdjustmentController.APPaymentAdjustment().setWithUI(true);
             loadRecordSearch();
         });
@@ -94,7 +96,7 @@ public class APPaymentAdjustment_HistoryAppliancesController implements Initiali
 
     @Override
     public void setCompanyID(String fsValue) {
-//        psCompanyId = fsValue;
+        this.psCompanyId = fsValue;
     }
 
     @Override
@@ -111,18 +113,18 @@ public class APPaymentAdjustment_HistoryAppliancesController implements Initiali
             switch (event.getCode()) {
                 case F3:
                     switch (lsID) {
-                        case "tfSearchCompany":
-                            poJSON = poAPPaymentAdjustmentController.APPaymentAdjustment().SearchCompany(lsValue, false);
-                            if ("error".equals(poJSON.get("result"))) {
-                                ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-                                tfSearchCompany.setText("");
-                                psCompanyId = "";
-                                break;
-                            } else {
-                                psCompanyId = poAPPaymentAdjustmentController.APPaymentAdjustment().getModel().getCompanyId();
-                            }
-                            loadRecordSearch();
-                            return;
+//                        case "tfSearchCompany":
+//                            poJSON = poAPPaymentAdjustmentController.APPaymentAdjustment().SearchCompany(lsValue, false);
+//                            if ("error".equals(poJSON.get("result"))) {
+//                                ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+//                                tfSearchCompany.setText("");
+//                                psCompanyId = "";
+//                                break;
+//                            } else {
+//                                psCompanyId = poAPPaymentAdjustmentController.APPaymentAdjustment().getModel().getCompanyId();
+//                            }
+//                            loadRecordSearch();
+//                            return;
                         case "tfSearchSupplier":
                             poJSON = poAPPaymentAdjustmentController.APPaymentAdjustment().SearchClient(lsValue, false);
                             if ("error".equals(poJSON.get("result"))) {
@@ -141,7 +143,7 @@ public class APPaymentAdjustment_HistoryAppliancesController implements Initiali
                                     + "" + APPaymentAdjustmentStatus.PAID
                                     + "" + APPaymentAdjustmentStatus.VOID
                                     + "" + APPaymentAdjustmentStatus.CANCELLED);
-                            poJSON = poAPPaymentAdjustmentController.APPaymentAdjustment().searchTransaction(psIndustryId, tfSearchCompany.getText(),
+                            poJSON = poAPPaymentAdjustmentController.APPaymentAdjustment().searchTransaction(psIndustryId, "",
                                     tfSearchSupplier.getText(), tfSearchReferenceNo.getText());
                             if ("error".equals(poJSON.get("result"))) {
                                 ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
@@ -184,7 +186,7 @@ public class APPaymentAdjustment_HistoryAppliancesController implements Initiali
                 lblSource.setText("General");
             }
             tfSearchSupplier.setText(psSupplierId.equals("") ? "" : poAPPaymentAdjustmentController.APPaymentAdjustment().getModel().Supplier().getCompanyName());
-            tfSearchCompany.setText(psCompanyId.equals("") ? "" : poAPPaymentAdjustmentController.APPaymentAdjustment().getModel().Company().getCompanyName());
+////            tfSearchCompany.setText(psCompanyId.equals("") ? "" : poAPPaymentAdjustmentController.APPaymentAdjustment().getModel().Company().getCompanyName());
             JFXUtil.updateCaretPositions(apBrowse);
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
@@ -225,7 +227,7 @@ public class APPaymentAdjustment_HistoryAppliancesController implements Initiali
 
     public void initTextFields() {
         JFXUtil.setCommaFormatter(tfDebitAmount, tfCreditAmount);
-        JFXUtil.setFocusListener(txtMaster_Focus, tfSearchCompany, tfSearchSupplier);
+        JFXUtil.setFocusListener(txtMaster_Focus, tfSearchSupplier);
         JFXUtil.setKeyPressedListener(this::txtField_KeyPressed, apBrowse);
     }
 
@@ -286,7 +288,7 @@ public class APPaymentAdjustment_HistoryAppliancesController implements Initiali
                                 + "" + APPaymentAdjustmentStatus.PAID
                                 + "" + APPaymentAdjustmentStatus.VOID
                                 + "" + APPaymentAdjustmentStatus.CANCELLED);
-                        poJSON = poAPPaymentAdjustmentController.APPaymentAdjustment().searchTransaction(psIndustryId, tfSearchCompany.getText(),
+                        poJSON = poAPPaymentAdjustmentController.APPaymentAdjustment().searchTransaction(psIndustryId, "",
                                 tfSearchSupplier.getText(), tfSearchReferenceNo.getText());
                         if ("error".equalsIgnoreCase((String) poJSON.get("result"))) {
                             ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
