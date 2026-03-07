@@ -146,21 +146,27 @@ public class CheckPrintRequest_HistoryController implements Initializable, Scree
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        poCheckPrintingRequestController = new CashflowControllers(oApp, null).CheckPrintingRequest();
-        poCheckPrintingRequestController.setTransactionStatus(CheckPrintRequestStatus.OPEN + CheckPrintRequestStatus.CONFIRMED + CheckPrintRequestStatus.VOID);
-        poJSON = new JSONObject();
-        poJSON = poCheckPrintingRequestController.InitTransaction(); // Initialize transaction
-        if (!"success".equals((String) poJSON.get("result"))) {
-            ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+        try {
+            poCheckPrintingRequestController = new CashflowControllers(oApp, null).CheckPrintingRequest();
+            poCheckPrintingRequestController.setTransactionStatus(CheckPrintRequestStatus.OPEN + CheckPrintRequestStatus.CONFIRMED + CheckPrintRequestStatus.VOID);
+            poJSON = new JSONObject();
+            poJSON = poCheckPrintingRequestController.InitTransaction(); // Initialize transaction
+            if (!"success".equals((String) poJSON.get("result"))) {
+                ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+            }
+            initAll();
+            Platform.runLater(() -> {
+                poCheckPrintingRequestController.Master().setIndustryID(psIndustryId);
+                poCheckPrintingRequestController.Master().setCompanyID(psCompanyId);
+                poCheckPrintingRequestController.setIndustryID(psIndustryId);
+                poCheckPrintingRequestController.setCompanyID(psCompanyId);
+                loadRecordSearch();
+            });
+        } catch (SQLException ex) {
+            Logger.getLogger(CheckPrintRequest_HistoryController.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (GuanzonException ex) {
+            Logger.getLogger(CheckPrintRequest_HistoryController.class.getName()).log(Level.SEVERE, null, ex);
         }
-        initAll();
-        Platform.runLater(() -> {
-            poCheckPrintingRequestController.Master().setIndustryID(psIndustryId);
-            poCheckPrintingRequestController.Master().setCompanyID(psCompanyId);
-            poCheckPrintingRequestController.setIndustryID(psIndustryId);
-            poCheckPrintingRequestController.setCompanyID(psCompanyId);
-            loadRecordSearch();
-        });
     }
 
     private void initAll() {
