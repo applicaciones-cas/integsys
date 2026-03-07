@@ -115,7 +115,7 @@ public class PaymentRequest_HistoryController implements Initializable, ScreenIn
     @FXML
     private Label lblSource, lblStatus;
     @FXML
-    private TextField tfSearchPayee, tfTransactionNo, tfBranch, tfDepartment, tfPayee, tfSeriesNo, tfTotalAmount, tfDiscountAmount, tfNetAmount, tfSourceNo, tfRecurringNo, tfBranchDetail, tfAccountNo, tfEmployee, tfParticular, tfAmount, tfDiscRate, tfDiscAmountDetail, tfAmountDetail, tfAttachmentNo;
+    private TextField  tfAdvances, tfSearchPayee, tfTransactionNo, tfBranch, tfDepartment, tfPayee, tfSeriesNo, tfTotalAmount, tfDiscountAmount, tfNetAmount, tfSourceNo, tfRecurringNo, tfBranchDetail, tfAccountNo, tfEmployee, tfParticular, tfAmount, tfDiscRate, tfDiscAmountDetail, tfAmountDetail, tfAttachmentNo;
     @FXML
     private HBox hbButtons;
     @FXML
@@ -273,7 +273,7 @@ public class PaymentRequest_HistoryController implements Initializable, ScreenIn
 //            tfTotalVATableAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poGLControllers.PaymentRequest().Master().getVatAmount(), true));
             tfNetAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poGLControllers.PaymentRequest().Master().getNetTotal(), true));
             taRemarks.setText(poGLControllers.PaymentRequest().Master().getRemarks());
-
+//            tfAdvances.setText(poGLControllers.PaymentRequest().Master().);
             tfSourceNo.setText(poGLControllers.PaymentRequest().Master().getSourceNo());
         } catch (SQLException | GuanzonException | NullPointerException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);

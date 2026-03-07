@@ -146,7 +146,7 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
     @FXML
     private Tab tabDetails, tabAttachments;
     @FXML
-    private TextField tfTransactionNo, tfBranch, tfDepartment, tfPayee, tfSeriesNo, tfTotalAmount, tfDiscountAmount, tfNetAmount, tfSourceNo, tfRecurringNo, tfBranchDetail, tfAccountNo, tfEmployee, tfParticular, tfAmount, tfDiscRate, tfDiscAmountDetail, tfAmountDetail, tfAttachmentNo;
+    private TextField tfAdvances, tfTransactionNo, tfBranch, tfDepartment, tfPayee, tfSeriesNo, tfTotalAmount, tfDiscountAmount, tfNetAmount, tfSourceNo, tfRecurringNo, tfBranchDetail, tfAccountNo, tfEmployee, tfParticular, tfAmount, tfDiscRate, tfDiscAmountDetail, tfAmountDetail, tfAttachmentNo;
     @FXML
     private DatePicker dpTransaction;
     @FXML
@@ -331,7 +331,7 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
 //            tfTotalVATableAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poGLControllers.PaymentRequest().Master().getVatAmount(), true));
             tfNetAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poGLControllers.PaymentRequest().Master().getNetTotal(), true));
             taRemarks.setText(poGLControllers.PaymentRequest().Master().getRemarks());
-
+//            tfAdvances.setText(poGLControllers.PaymentRequest().Master().);
             tfSourceNo.setText(poGLControllers.PaymentRequest().Master().getSourceNo());
         } catch (SQLException | GuanzonException | NullPointerException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);

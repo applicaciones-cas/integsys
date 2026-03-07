@@ -220,6 +220,7 @@
                                                                                                 <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="10.0" vgrow="SOMETIMES" />
                                                                                                 <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="28.0" vgrow="SOMETIMES" />
                                                                                                 <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="28.0" vgrow="SOMETIMES" />
+                                                                        <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="28.0" vgrow="SOMETIMES" />
                                                                                                 <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="28.0" vgrow="SOMETIMES" />
                                                                                                 <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="28.0" vgrow="SOMETIMES" />
                                                                                                 <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="28.0" vgrow="SOMETIMES" />
@@ -236,10 +237,10 @@
                                                                                                 <Label text="Department" GridPane.rowIndex="6" />
                                                                                                 <Label text="Payee" GridPane.rowIndex="7" />
                                                                                                 <Label text="Remarks" GridPane.rowIndex="8" />
-                                                                                                <Label text="Series No" GridPane.columnIndex="8" GridPane.rowIndex="5" />
-                                                                                                <Label text="Total Amount" GridPane.columnIndex="8" GridPane.rowIndex="6" />
-                                                                                                <Label text="Total Discount Amount" GridPane.columnIndex="8" GridPane.rowIndex="7" />
-                                                                                                <Label text="Net Amount" GridPane.columnIndex="8" GridPane.rowIndex="9">
+                                                                                                <Label text="Series No" GridPane.columnIndex="8" GridPane.rowIndex="4" />
+                                                                                                <Label text="Total Amount" GridPane.columnIndex="8" GridPane.rowIndex="7" />
+                                                                                                <Label text="Total Discount Amount" GridPane.columnIndex="8" GridPane.rowIndex="8" />
+                                                                                                <Label text="Net Amount" GridPane.columnIndex="8" GridPane.rowIndex="10">
                                                                                                     <font>
                                                                                                         <Font name="System Bold" size="15.0" />
                                                                                                     </font>
@@ -249,7 +250,7 @@
                                                                                                 <TextField fx:id="tfBranch" disable="true" editable="false" maxHeight="25.0" maxWidth="1.7976931348623157E308" minWidth="-Infinity" GridPane.columnIndex="2" GridPane.columnSpan="3" GridPane.rowIndex="5" />
                                                                                                 <TextField fx:id="tfDepartment" maxHeight="25.0" maxWidth="1.7976931348623157E308" minWidth="-Infinity" promptText="Press F3: Search" GridPane.columnIndex="2" GridPane.columnSpan="3" GridPane.rowIndex="6" />
                                                                                                 <TextField fx:id="tfPayee" maxHeight="25.0" promptText="Press F3: Search" GridPane.columnIndex="2" GridPane.columnSpan="3" GridPane.rowIndex="7" />
-                                                                                                <TextArea fx:id="taRemarks" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="54.0" prefWidth="358.0" GridPane.columnIndex="2" GridPane.columnSpan="3" GridPane.rowIndex="8" GridPane.rowSpan="2" />
+                                                                                                <TextArea fx:id="taRemarks" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="81.0" prefWidth="358.0" GridPane.columnIndex="2" GridPane.columnSpan="3" GridPane.rowIndex="8" GridPane.rowSpan="3" />
                                                                                                 <AnchorPane maxWidth="1.7976931348623157E308" minWidth="-Infinity" prefHeight="27.0" prefWidth="140.0" style="-fx-background-color: FF8201;" GridPane.columnIndex="10" GridPane.rowIndex="2">
                                                                            <children>
                                                                                                       <Label fx:id="lblStatus" alignment="CENTER" contentDisplay="CENTER" maxWidth="1.7976931348623157E308" prefHeight="27.0" text="STATUS" textAlignment="CENTER" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
@@ -259,12 +260,14 @@
                                                                                                       </Label>
                                                                            </children>
                                                                                                 </AnchorPane>
-                                                                                                <TextField fx:id="tfSeriesNo" disable="true" editable="false" maxHeight="25.0" GridPane.columnIndex="10" GridPane.rowIndex="5" />
-                                                                                                <TextField fx:id="tfTotalAmount" alignment="CENTER_RIGHT" disable="true" editable="false" maxHeight="25.0" promptText="0.00" GridPane.columnIndex="10" GridPane.rowIndex="6" />
-                                                                                                <TextField fx:id="tfDiscountAmount" alignment="CENTER_RIGHT" disable="true" editable="false" maxHeight="25.0" promptText="0.00" GridPane.columnIndex="10" GridPane.rowIndex="7" />
-                                                                                                <TextField fx:id="tfNetAmount" alignment="CENTER_RIGHT" disable="true" editable="false" maxHeight="26.0" promptText="0.00" style="-fx-font-weight: bold;" GridPane.columnIndex="10" GridPane.rowIndex="9" />
-                                                                        <Label text="Source No" GridPane.columnIndex="8" GridPane.rowIndex="4" />
-                                                                        <TextField fx:id="tfSourceNo" disable="true" editable="false" maxHeight="25.0" GridPane.columnIndex="10" GridPane.rowIndex="4" />
+                                                                                                <TextField fx:id="tfSeriesNo" disable="true" editable="false" maxHeight="25.0" GridPane.columnIndex="10" GridPane.rowIndex="4" />
+                                                                                                <TextField fx:id="tfTotalAmount" alignment="CENTER_RIGHT" disable="true" editable="false" maxHeight="25.0" promptText="0.00" GridPane.columnIndex="10" GridPane.rowIndex="7" />
+                                                                                                <TextField fx:id="tfDiscountAmount" alignment="CENTER_RIGHT" disable="true" editable="false" maxHeight="25.0" promptText="0.00" GridPane.columnIndex="10" GridPane.rowIndex="8" />
+                                                                                                <TextField fx:id="tfNetAmount" alignment="CENTER_RIGHT" disable="true" editable="false" maxHeight="26.0" promptText="0.00" style="-fx-font-weight: bold;" GridPane.columnIndex="10" GridPane.rowIndex="10" />
+                                                                        <Label text="Source No" GridPane.columnIndex="8" GridPane.rowIndex="5" />
+                                                                        <TextField fx:id="tfSourceNo" disable="true" editable="false" maxHeight="25.0" GridPane.columnIndex="10" GridPane.rowIndex="5" />
+                                                                        <Label text="Advances Amount" GridPane.columnIndex="8" GridPane.rowIndex="6" />
+                                                                        <TextField fx:id="tfAdvances" disable="true" editable="false" maxHeight="25.0" GridPane.columnIndex="10" GridPane.rowIndex="6" />
                                                                                             </children>
                                                                                         </GridPane>
                                                                                     </children>
