@@ -3,9 +3,11 @@ package ph.com.guanzongroup.integsys.views;
 import com.sun.javafx.scene.control.skin.TableHeaderRow;
 import java.net.URL;
 import java.sql.SQLException;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -651,21 +653,14 @@ public class CheckTransfer_PostingController implements Initializable, ScreenInt
             updateReceiveButtonText();
         });
         dpReceivedDate.setOnAction(event -> {
+           // Get LocalDateTime from the DatePicker
+            LocalDateTime receivedDateTime =  poGLControllers.CheckTransfers().getDateTime(dpReceivedDate.getValue());
 
-            LocalDate selectedDate = dpReceivedDate.getValue();
+            // Store it directly in your master (model expects LocalDateTime)
+            poGLControllers.CheckTransfers().Master().setReceivedDate(receivedDateTime);
 
-            if (selectedDate != null) {
-
-                Date utilDate = Date.from(
-                        selectedDate
-                                .atStartOfDay(ZoneId.systemDefault())
-                                .toInstant()
-                );
-
-                poGLControllers.CheckTransfers()
-                        .Master()
-                        .setReceivedDate(utilDate);
-            }
+            System.out.println(receivedDateTime); // prints 2026-03-06T09:30:29
+            poGLControllers.CheckTransfers().updateDateTime(dpReceivedDate.getValue());
         });
         
     }
