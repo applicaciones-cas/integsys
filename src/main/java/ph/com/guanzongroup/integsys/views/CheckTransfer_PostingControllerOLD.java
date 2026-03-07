@@ -537,8 +537,11 @@ public class CheckTransfer_PostingControllerOLD implements Initializable, Screen
             tfDepartment.setText(poAppController.getMaster().Department().getDescription());
             taRemarks.setText(String.valueOf(poAppController.getMaster().getRemarks()));
             tfTotal.setText(String.valueOf(poAppController.getMaster().getTransactionTotal()));
-            dpReceivedDate.setValue(
-                    poAppController.getMaster().getReceivedDate() != null ? ParseDate(poAppController.getMaster().getReceivedDate()) : LocalDate.now());
+//            dpReceivedDate.setValue(
+//                    poAppController.getMaster().getReceivedDate() != null
+//                    ? poAppController.getMaster().getReceivedDate().toLocalDate()
+//                    : LocalDate.now()
+//            );
 
             dpReceivedDate.requestFocus();
         } catch (SQLException | GuanzonException e) {
@@ -572,7 +575,7 @@ public class CheckTransfer_PostingControllerOLD implements Initializable, Screen
             if (poAppController.getDetail(lnCtr).isReceived()) {
                 continue;
             }
-            poAppController.getDetail(lnCtr).setReceived(true);
+//            poAppController.getDetail(lnCtr).setReceived(true);
         }
         if (!isAllReceived()) {
             btnReceived.setText("Received All");
@@ -587,7 +590,7 @@ public class CheckTransfer_PostingControllerOLD implements Initializable, Screen
             if (poAppController.getDetail(lnCtr).isReceived()) {
                 continue;
             }
-            poAppController.getDetail(lnCtr).setReceived(false);
+//            poAppController.getDetail(lnCtr).setReceived(false);
         }
 
         if (!isAllReceived()) {
@@ -636,7 +639,7 @@ public class CheckTransfer_PostingControllerOLD implements Initializable, Screen
 
         cbIsReceived.setOnAction(e
                 -> {
-            poAppController.getDetail(pnTransactionDetail).setReceived(cbIsReceived.isSelected());
+//            poAppController.getDetail(pnTransactionDetail).setReceived(cbIsReceived.isSelected());
         }
         );
 
@@ -868,7 +871,7 @@ public class CheckTransfer_PostingControllerOLD implements Initializable, Screen
             /*Lost Focus*/
             switch (lsDatePickerID) {
                 case "dpReceivedDate":
-                    poAppController.getMaster().setReceivedDate((ldDateTimeValue));
+//                    poAppController.getMaster().setReceivedDate((ldDateTimeValue));
                     return;
 
             }
