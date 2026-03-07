@@ -43,7 +43,7 @@ import org.guanzon.appdriver.base.GRiderCAS;
 import org.guanzon.appdriver.base.LogWrapper;
 import org.guanzon.appdriver.constant.EditMode;
 import org.guanzon.appdriver.base.GuanzonException;
-import org.guanzon.appdriver.constant.ClientType;
+import org.guanzon.cas.client.Client;
 import org.guanzon.cas.client.account.Account_Accreditation;
 import org.guanzon.cas.client.services.ClientControllers;
 import org.json.simple.JSONObject;
@@ -60,6 +60,7 @@ public class AccountsAccreditation_EntryController implements Initializable, Scr
     private String psFormName = "Accounts Accreditation Entry";
     private Control lastFocusedControl;
     private Account_Accreditation poAppController;
+    private Client poClientController;
 
     private unloadForm poUnload = new unloadForm();
 
@@ -114,6 +115,7 @@ public class AccountsAccreditation_EntryController implements Initializable, Scr
         try {
             poLogWrapper = new LogWrapper(psFormName, psFormName);
             poAppController = new ClientControllers(poApp, poLogWrapper).AccountAccreditation();
+            poClientController = new ClientControllers(poApp, poLogWrapper).Client();
 
             //initlalize and validate record objects from class controller
             //background thread
