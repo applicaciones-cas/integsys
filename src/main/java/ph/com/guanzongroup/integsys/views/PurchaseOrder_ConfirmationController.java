@@ -164,7 +164,8 @@ public class PurchaseOrder_ConfirmationController implements Initializable, Scre
         try {
             poPurchasingController = new PurchaseOrderControllers(poApp, logWrapper);
             
-            poPurchasingController.PurchaseOrder().setTransactionStatus(PurchaseOrderStatus.OPEN + PurchaseOrderStatus.RETURNED + PurchaseOrderStatus.CONFIRMED + PurchaseOrderStatus.APPROVED);
+            poPurchasingController.PurchaseOrder().setTransactionStatus(PurchaseOrderStatus.OPEN + PurchaseOrderStatus.RETURNED);
+            
             poJSON = new JSONObject();
             poPurchasingController.PurchaseOrder().setWithUI(true);
             poJSON = poPurchasingController.PurchaseOrder().InitTransaction();
