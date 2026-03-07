@@ -297,7 +297,7 @@ public class CheckRelease_EntryController implements Initializable, ScreenInterf
                     pnEditMode = poGLControllers.CheckReleases().getEditMode();
                     LoadMaster();
                     LoadDetail();
-//                    loadTableDetail();
+                    loadTableDetail();
                     initButtons(pnEditMode);
 
                     break;

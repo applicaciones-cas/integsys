@@ -66,7 +66,7 @@ import ph.com.guanzongroup.integsys.utility.CustomCommonUtil;
  *
  * @author User
  */
-public class CheckDeposit_EntryControllerOLD implements Initializable, ScreenInterface {
+public class CheckDeposit_EntryControllerold implements Initializable, ScreenInterface {
 
     private GRiderCAS poApp;
     private JSONObject poJSON;
@@ -167,7 +167,7 @@ public class CheckDeposit_EntryControllerOLD implements Initializable, ScreenInt
             initializeTableDetail();
             initControlEvents();
         } catch (SQLException | GuanzonException e) {
-            Logger.getLogger(CheckDeposit_EntryControllerOLD.class.getName()).log(Level.SEVERE, null, e);
+            Logger.getLogger(CheckDeposit_EntryControllerold.class.getName()).log(Level.SEVERE, null, e);
             poLogWrapper.severe(psFormName + " :" + e.getMessage());
         }
     }
@@ -241,7 +241,7 @@ public class CheckDeposit_EntryControllerOLD implements Initializable, ScreenInt
                         break;
                 }
             } catch (SQLException | GuanzonException | CloneNotSupportedException ex) {
-                Logger.getLogger(CheckDeposit_EntryControllerOLD.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(CheckDeposit_EntryControllerold.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
     }
@@ -942,7 +942,7 @@ public class CheckDeposit_EntryControllerOLD implements Initializable, ScreenInt
             dpFilterFrom.setValue((ParseDate((Date) poApp.getServerDate()).minusMonths(1)));
             dpFilterThru.setValue(ParseDate((Date) poApp.getServerDate()));
         } catch (SQLException ex) {
-            Logger.getLogger(CheckDeposit_EntryControllerOLD.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(CheckDeposit_EntryControllerold.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
@@ -1088,7 +1088,7 @@ public class CheckDeposit_EntryControllerOLD implements Initializable, ScreenInt
             }
 
         } catch (SQLException | GuanzonException ex) {
-            Logger.getLogger(CheckDeposit_EntryControllerOLD.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(CheckDeposit_EntryControllerold.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
