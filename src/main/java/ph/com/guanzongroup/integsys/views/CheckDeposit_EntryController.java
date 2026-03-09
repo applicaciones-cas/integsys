@@ -706,6 +706,7 @@ public class CheckDeposit_EntryController implements Initializable, ScreenInterf
             CustomCommonUtil.setVisible(false, btnUpdate);
             CustomCommonUtil.setManaged(false, btnUpdate);
         }
+        
     }
 
     
@@ -1184,6 +1185,7 @@ public class CheckDeposit_EntryController implements Initializable, ScreenInterf
                                     ShowMessageFX.Warning((String) poJSON.get("message"), lsValue, lsValue);
                                 }
                                 tfBankMaster.setText(poGLControllers.CheckDeposits().Master().Banks().getBankName());
+                                loadTableMaster();
                                 break;
                             case "tfBankAccountNo":
                                 poJSON = poGLControllers.CheckDeposits().SearchBankAccounts(lsValue,false);
@@ -1192,6 +1194,7 @@ public class CheckDeposit_EntryController implements Initializable, ScreenInterf
                                 }
                                 tfBankAccountNo.setText(poGLControllers.CheckDeposits().Master().BankAccount().getAccountNo());
                                 tfBankAccountName.setText(poGLControllers.CheckDeposits().Master().BankAccount().getAccountName());
+                                tfBankMaster.setText(poGLControllers.CheckDeposits().Master().Banks().getBankName());
                                 return;   
                             case "tfBankAccountName":
                                 poJSON = poGLControllers.CheckDeposits().SearchBankAccounts(lsValue,false);
@@ -1199,7 +1202,8 @@ public class CheckDeposit_EntryController implements Initializable, ScreenInterf
                                     ShowMessageFX.Warning((String) poJSON.get("message"), lsValue, lsValue);
                                 }
                                 tfBankAccountNo.setText(poGLControllers.CheckDeposits().Master().BankAccount().getAccountNo());
-                                tfBankAccountName.setText(poGLControllers.CheckDeposits().Master().BankAccount().getAccountName());
+                                tfBankAccountName.setText(poGLControllers.CheckDeposits().Master().BankAccount().getAccountName());                                
+                                tfBankMaster.setText(poGLControllers.CheckDeposits().Master().Banks().getBankName());
                                 return; 
                             case "tfCheckTransNo":
                                 poJSON = poGLControllers.CheckDeposits().SearchChecks(lsValue, "",pnSelectedDetail,false);
