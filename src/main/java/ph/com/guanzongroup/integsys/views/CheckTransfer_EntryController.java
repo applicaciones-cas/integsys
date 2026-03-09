@@ -319,7 +319,7 @@ public class CheckTransfer_EntryController implements Initializable, ScreenInter
                     pnEditMode = poGLControllers.CheckTransfers().getEditMode();
                     LoadMaster();
                     LoadDetail();
-//                    loadTableDetail();
+                    loadTableDetail();
                     initButtons(pnEditMode);
 
                     break;

@@ -9,6 +9,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -454,7 +455,6 @@ public class CheckDeposit_EntryController implements Initializable, ScreenInterf
                     LoadDetail();
                     loadTableDetail();
                     initButtons(pnEditMode);
-
                     break;
                 case "btnCancel":
                     if (ShowMessageFX.YesNo(null, "Cancel Confirmation", "Are you sure you want to cancel? \nAny data you have entered will not be saved.")) {
@@ -466,6 +466,7 @@ public class CheckDeposit_EntryController implements Initializable, ScreenInterf
                     }
                     break;
                 case "btnSave":
+                     poGLControllers.CheckDeposits().Master().setModifiedDate(poApp.getServerDate());
                     poJSON = poGLControllers.CheckDeposits().SaveTransaction();
                     if (!"success".equals((String) poJSON.get("result"))) {
                         ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
@@ -539,6 +540,10 @@ public class CheckDeposit_EntryController implements Initializable, ScreenInterf
         } catch (CloneNotSupportedException | SQLException | GuanzonException ex) {
             Logger.getLogger(TBJ_ParameterController.class.getName()).log(Level.SEVERE, null, ex);
         }
+    }
+     private static String xsDateShort(Date fdValue) {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        return sdf.format(fdValue);
     }
     private void initFields() {
         boolean isEditable = (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE);

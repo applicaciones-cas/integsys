@@ -117,6 +117,17 @@
                                                 <FontAwesomeIconView glyphName="DOWNLOAD" size="20" />
                                             </graphic>
                                         </Button>
+                              <Button fx:id="btnRemoveDetail" contentDisplay="TOP" ellipsisString="" mnemonicParsing="false" prefHeight="70.0" prefWidth="70.0" styleClass="button_process" stylesheets="@../css/StyleSheet.css" text="Remove Item" textAlignment="CENTER" wrapText="true">
+                                 <effect>
+                                    <Blend />
+                                 </effect>
+                                 <graphic>
+                                    <FontAwesomeIconView glyphName="TRASH" size="20" />
+                                 </graphic>
+                                 <font>
+                                    <Font size="11.0" />
+                                 </font>
+                              </Button>
                                         <Button fx:id="btnHistory" contentDisplay="TOP" ellipsisString="" mnemonicParsing="false" prefHeight="70.0" prefWidth="70.0" styleClass="button_process" stylesheets="@../css/StyleSheet.css" text="History">
                                             <effect>
                                                 <Blend />

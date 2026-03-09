@@ -124,7 +124,7 @@ public class CheckPrintRequest_ConfirmationController implements Initializable, 
     @FXML
     private HBox hbButtons;
     @FXML
-    private Button btnUpdate, btnSave, btnCancel, btnConfirm, btnVoid, btnExport, btnRetrieve, btnHistory, btnClose;
+    private Button btnUpdate, btnSave, btnCancel, btnConfirm, btnVoid, btnExport, btnRetrieve, btnHistory, btnClose,btnRemoveDetail;
     /*Master*/
     @FXML
     private AnchorPane apMaster;
@@ -185,22 +185,28 @@ public class CheckPrintRequest_ConfirmationController implements Initializable, 
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        poCheckPrintingRequestController = new CashflowControllers(oApp, null).CheckPrintingRequest();
-        poCheckPrintingRequestController.setTransactionStatus(CheckPrintRequestStatus.OPEN + CheckPrintRequestStatus.CONFIRMED);
-        poJSON = new JSONObject();
-        poCheckPrintingRequestController.setWithUI(true);
-        poJSON = poCheckPrintingRequestController.InitTransaction(); // Initialize transaction
-        if (!"success".equals((String) poJSON.get("result"))) {
-            ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+        try {
+            poCheckPrintingRequestController = new CashflowControllers(oApp, null).CheckPrintingRequest();
+            poCheckPrintingRequestController.setTransactionStatus(CheckPrintRequestStatus.OPEN + CheckPrintRequestStatus.CONFIRMED);
+            poJSON = new JSONObject();
+            poCheckPrintingRequestController.setWithUI(true);
+            poJSON = poCheckPrintingRequestController.InitTransaction(); // Initialize transaction
+            if (!"success".equals((String) poJSON.get("result"))) {
+                ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+            }
+            initAll();
+            Platform.runLater(() -> {
+                poCheckPrintingRequestController.Master().setIndustryID(psIndustryId);
+                poCheckPrintingRequestController.Master().setCompanyID(psCompanyId);
+                poCheckPrintingRequestController.setIndustryID(psIndustryId);
+                poCheckPrintingRequestController.setCompanyID(psCompanyId);
+                loadRecordSearch();
+            });
+        } catch (SQLException ex) {
+            Logger.getLogger(CheckPrintRequest_ConfirmationController.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (GuanzonException ex) {
+            Logger.getLogger(CheckPrintRequest_ConfirmationController.class.getName()).log(Level.SEVERE, null, ex);
         }
-        initAll();
-        Platform.runLater(() -> {
-            poCheckPrintingRequestController.Master().setIndustryID(psIndustryId);
-            poCheckPrintingRequestController.Master().setCompanyID(psCompanyId);
-            poCheckPrintingRequestController.setIndustryID(psIndustryId);
-            poCheckPrintingRequestController.setCompanyID(psCompanyId);
-            loadRecordSearch();
-        });
     }
 
     private void initAll() {
@@ -229,7 +235,7 @@ public class CheckPrintRequest_ConfirmationController implements Initializable, 
     }
 
     private void initButtonsClickActions() {
-        List<Button> buttons = Arrays.asList(btnUpdate, btnSave, btnCancel, btnConfirm, btnVoid, btnExport, btnRetrieve, btnHistory, btnClose);
+        List<Button> buttons = Arrays.asList(btnUpdate, btnSave, btnCancel, btnConfirm, btnVoid, btnExport, btnRetrieve, btnHistory, btnClose,btnRemoveDetail);
         buttons.forEach(button -> button.setOnAction(this::cmdButton_Click));
     }
 
@@ -306,6 +312,22 @@ public class CheckPrintRequest_ConfirmationController implements Initializable, 
                 case "btnRetrieve":
                     loadTableMain();
                     break;
+                case "btnRemoveDetail":
+                    if(poCheckPrintingRequestController.Master().getTransactionStatus() == CheckPrintRequestStatus.CONFIRMED){
+                        ShowMessageFX.Warning("Details cannot be removed.\n The record is already confirmed.", pxeModuleName, null);
+                        return;
+                    }
+                    if(poCheckPrintingRequestController.Master().isUploaded()){
+                        ShowMessageFX.Warning("Details cannot be removed.\n The record has already been uploaded.", pxeModuleName, null);
+                        return;
+                    }
+                     if(poCheckPrintingRequestController.Detail(pnDetail).getSourceNo() != null 
+                             || !poCheckPrintingRequestController.Detail(pnDetail).getSourceNo().isEmpty()){
+                            poCheckPrintingRequestController.addTransactionNoToRemove(poCheckPrintingRequestController.Detail(pnDetail).getSourceNo());
+                            poCheckPrintingRequestController.Detail().remove(pnDetail);
+                            loadTableDetail();
+                     }
+                    break;
                 case "btnConfirm":
                     if (ShowMessageFX.YesNo(null, pxeModuleName, "Are you sure you want to confirm transaction?")) {
                         poJSON = poCheckPrintingRequestController.ConfirmTransaction("");
@@ -346,6 +368,10 @@ public class CheckPrintRequest_ConfirmationController implements Initializable, 
                     }
                     break;
                 case "btnExport":
+                    if(poCheckPrintingRequestController.Master().getTransactionStatus() != CheckPrintRequestStatus.CONFIRMED){
+                        ShowMessageFX.Warning("Unable to export transaction.\n Please Confrim the transaction before proceeding.", pxeModuleName, null);
+                        return;
+                    }
                     if (ShowMessageFX.YesNo("Are you sure you want to export this transaction?", "Exporting", null)) {
                         poJSON = poCheckPrintingRequestController.ExportTransaction(poCheckPrintingRequestController.Master().getTransactionNo());
                         if ("error".equals((String) poJSON.get("result"))) {
