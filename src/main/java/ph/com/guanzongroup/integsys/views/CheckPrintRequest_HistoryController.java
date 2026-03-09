@@ -173,7 +173,6 @@ public class CheckPrintRequest_HistoryController implements Initializable, Scree
         initTextFieldsProperty();
         pnEditMode = EditMode.UNKNOWN;
         initFields(pnEditMode);
-        initButton(pnEditMode);
     }
 
     private void loadRecordSearch() {
@@ -206,19 +205,18 @@ public class CheckPrintRequest_HistoryController implements Initializable, Scree
                     loadTableDetail();
                     break;
                 case "btnHistory":
-                    if (pnEditMode != EditMode.READY && pnEditMode != EditMode.UPDATE) {
-                        ShowMessageFX.Warning("No transaction status history to load!", pxeModuleName, null);
-                        return;
-                    }
-
-                    try {
-                        poCheckPrintingRequestController.ShowStatusHistory();
-                    } catch (NullPointerException npe) {
-                        Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(npe), npe);
-                        ShowMessageFX.Error("No transaction status history to load!", pxeModuleName, null);
-                    } catch (Exception ex) {
-                        Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
-                        ShowMessageFX.Error(MiscUtil.getException(ex), pxeModuleName, null);
+                    if(poCheckPrintingRequestController.Master().getTransactionNo() != null || !poCheckPrintingRequestController.Master().getTransactionNo().isEmpty()){
+                        try {
+                            poCheckPrintingRequestController.ShowStatusHistory();
+                        } catch (NullPointerException npe) {
+                            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(npe), npe);
+                            ShowMessageFX.Error("No transaction status history to load!", pxeModuleName, null);
+                        } catch (Exception ex) {
+                            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+                            ShowMessageFX.Error(MiscUtil.getException(ex), pxeModuleName, null);
+                        }
+                    }else{
+                       ShowMessageFX.Error("Unable to proceed. No transaction is currently loaded.", pxeModuleName, null);
                     }
                     break;
                 case "btnClose":
@@ -241,7 +239,6 @@ public class CheckPrintRequest_HistoryController implements Initializable, Scree
                 pnEditMode = EditMode.UNKNOWN;
             }
             initFields(pnEditMode);
-            initButton(pnEditMode);
         } catch (CloneNotSupportedException | SQLException | GuanzonException ex) {
             Logger.getLogger(DisbursementVoucher_VerificationController.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -518,9 +515,7 @@ public class CheckPrintRequest_HistoryController implements Initializable, Scree
         }
     }
 
-    private void initButton(int fnEditMode) {
-        JFXUtil.setButtonsVisibility(false, btnHistory);
-    }
+
 
     private void initTextFieldsProperty() {
         tfSearchReferNo.textProperty().addListener((observable, oldValue, newValue) -> {

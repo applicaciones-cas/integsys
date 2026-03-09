@@ -161,7 +161,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
     @FXML
     private Tab tabDetails, tabCheck, tabBankTransfer, tabOnlinePayment, tabJournal, tabBIR, tabAttachments;
     @FXML
-    private TextField tfDVTransactionNo, tfSupplier, tfVoucherNo, tfBankNameCheck, tfBankAccountCheck, tfPayeeName, tfCheckNo, tfCheckAmount, tfAuthorizedPerson, tfBankNameBTransfer, tfBankAccountBTransfer, tfPaymentAmountBTransfer, tfSupplierBank, tfSupplierAccountNoBTransfer, tfBankTransReferNo, tfPaymentStatusBTransfer, tfBankNameOnlinePayment, tfBankAccountOnlinePayment, tfPaymentAmount, tfSupplierServiceName, tfSupplierAccountNo, tfPaymentReferenceNo, tfOnlinePaymentStatus, tfTotalAmount, tfVatableSales, tfVatAmountMaster, tfVatZeroRatedSales, tfVatExemptSales, tfLessWHTax, tfTotalNetAmount, tfRefNoDetail, tfVatableSalesDetail, tfVatExemptDetail, tfVatZeroRatedSalesDetail, tfVatRateDetail, tfVatAmountDetail, tfPurchasedAmountDetail, tfNetAmountDetail, tfSearchBranch, tfSearchPayee, tfJournalTransactionNo, tfTotalDebitAmount, tfTotalCreditAmount, tfAccountCode, tfAccountDescription, tfDebitAmount, tfCreditAmount, tfBIRTransactionNo, tfTaxCode, tfParticular, tfBaseAmount, tfTaxRate, tfTotalTaxAmount, tfAttachmentNo, tfAttachmentSource;
+    private TextField tfDVTransactionNo, tfSupplier, tfVoucherNo, tfBankNameCheck, tfBankAccountCheck, tfPayeeName, tfCheckNo, tfCheckAmount, tfAuthorizedPerson, tfBankNameBTransfer, tfBankAccountBTransfer, tfPaymentAmountBTransfer, tfSupplierBank, tfSupplierAccountNoBTransfer, tfBankTransReferNo, tfPaymentStatusBTransfer, tfBankNameOnlinePayment, tfBankAccountOnlinePayment, tfPaymentAmount, tfSupplierServiceName, tfSupplierAccountNo, tfPaymentReferenceNo, tfOnlinePaymentStatus, tfTotalAmount, tfVatableSales, tfVatAmountMaster, tfVatZeroRatedSales, tfVatExemptSales, tfLessWHTax, tfTotalNetAmount, tfAdvances, tfRefNoDetail, tfVatableSalesDetail, tfVatExemptDetail, tfVatZeroRatedSalesDetail, tfVatRateDetail, tfVatAmountDetail, tfPurchasedAmountDetail, tfNetAmountDetail, tfAdvancesDetail, tfSearchBranch, tfSearchPayee, tfJournalTransactionNo, tfTotalDebitAmount, tfTotalCreditAmount, tfAccountCode, tfAccountDescription, tfDebitAmount, tfCreditAmount, tfBIRTransactionNo, tfTaxCode, tfParticular, tfBaseAmount, tfTaxRate, tfTotalTaxAmount, tfAttachmentNo, tfAttachmentSource;
     @FXML
     private DatePicker dpDVTransactionDate, dpCheckDate, dpJournalTransactionDate, dpReportMonthYear, dpPeriodFrom, dpPeriodTo;
     @FXML
@@ -173,7 +173,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
     @FXML
     private TableView tblVwDetails, tblViewMainList, tblVwJournalDetails, tblVwBIRDetails, tblAttachments;
     @FXML
-    private TableColumn tblDVRowNo, tblReferenceNo, tblTransactionTypeDetail, tblPurchasedAmount, tblVatableSales, tblVatAmt, tblVatRate, tblVatZeroRatedSales, tblVatExemptSales, tblNetAmount, tblRowNo, tblTransactionType, tblRefNo, tblBranchName, tblPayee, tblDueDate, tblAmountMain, tblJournalRowNo, tblJournalReportMonthYear, tblJournalAccountCode, tblJournalAccountDescription, tblJournalDebitAmount, tblJournalCreditAmount, tblBIRRowNo, tblBIRParticular, tblTaxCode, tblBaseAmount, tblTaxRate, tblTaxAmount, tblRowNoAttachment, tblFileNameAttachment;
+    private TableColumn tblDVRowNo, tblReferenceNo, tblTransactionTypeDetail, tblPurchasedAmount, tblVatableSales, tblVatAmt, tblVatRate, tblVatZeroRatedSales, tblVatExemptSales, tblNetAmount, tblRowNo, tblTransactionType, tblRefNo, tblAmount, tblDueDate, tblJournalRowNo, tblJournalReportMonthYear, tblJournalAccountCode, tblJournalAccountDescription, tblJournalDebitAmount, tblJournalCreditAmount, tblBIRRowNo, tblBIRParticular, tblTaxCode, tblBaseAmount, tblTaxRate, tblTaxAmount, tblRowNoAttachment, tblFileNameAttachment;
     @FXML
     private Pagination pagination;
     @FXML
@@ -473,11 +473,11 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
 
                     ShowMessageFX.Information(null, pxeModuleName, (String) poJSON.get("message"));
 
-                    poJSON = poController.updatePaymentsStatus();
-                    if ("error".equals(poJSON.get("result"))) {
-                        ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-                    }
-
+                    //Arsiela 03-05-2026 Moved to class save others
+//                    poJSON = poController.updatePaymentsStatus();
+//                    if ("error".equals(poJSON.get("result"))) {
+//                        ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+//                    }
                     poJSON = poController.OpenTransaction(poController.Master().getTransactionNo());
                     if ("success".equals(poJSON.get("result"))) {
                         pnEditMode = poController.getEditMode();
@@ -750,18 +750,21 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                                         String lsTransBasis = (obj.get("SourceNo") != null ? obj.get("SourceNo").toString() : "")
                                                 + (obj.get("TransactionType") != null ? obj.get("TransactionType").toString() : "")
                                                 + (obj.get("Payee") != null ? obj.get("Payee").toString() : "");
+
                                         ModelDisbursementVoucher_Main loMain = new ModelDisbursementVoucher_Main(
                                                 String.valueOf(main_data.size() + 1),
                                                 obj.get("TransactionType") != null ? obj.get("TransactionType").toString() : "",
                                                 obj.get("Reference") != null ? obj.get("Reference").toString() : "",
-                                                obj.get("sBranchNme") != null ? obj.get("sBranchNme").toString() : "",
-                                                obj.get("Payee") != null ? obj.get("Payee").toString() : "",
-                                                obj.get("dTransact") != null ? obj.get("dTransact").toString() : "",
                                                 obj.get("Balance") != null ? CustomCommonUtil.setIntegerValueToDecimalFormat(obj.get("Balance"), true) : "",
+                                                obj.get("dTransact") != null ? obj.get("dTransact").toString() : "",
+                                                "",
+                                                "",
                                                 obj.get("sTransNox") != null ? obj.get("sTransNox").toString() : "",
                                                 obj.get("Payee") != null ? obj.get("Payee").toString() : "",
                                                 lsTransBasis,
                                                 obj.get("PayableType") != null ? obj.get("PayableType").toString() : ""
+                                        //                                                obj.get("sBranchNme") != null ? obj.get("sBranchNme").toString() : "",
+                                        //                                                obj.get("Payee") != null ? obj.get("Payee").toString() : "",
                                         );
 
                                         main_data.add(loMain);
@@ -1078,9 +1081,9 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
     }
 
     private void initMainGrid() {
-        JFXUtil.setColumnCenter(tblRowNo, tblDueDate, tblRefNo);
-        JFXUtil.setColumnLeft(tblTransactionType, tblBranchName, tblPayee);
-        JFXUtil.setColumnRight(tblAmountMain);
+        JFXUtil.setColumnCenter(tblRowNo, tblRefNo, tblDueDate);
+        JFXUtil.setColumnLeft(tblTransactionType);
+        JFXUtil.setColumnRight(tblAmount);
         JFXUtil.setColumnsIndexAndDisableReordering(tblViewMainList);
 
         filteredMain_Data = new FilteredList<>(main_data, b -> true);
@@ -2027,6 +2030,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
             tfVatableSales.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Master().getVATSale(), true));
             taDVRemarks.setText(poController.Master().getRemarks());
 
+            tfAdvances.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Master().getAdvancesTotal(), true));
             JFXUtil.updateCaretPositions(apDVMaster1, apDVMaster2, apDVMaster3);
         } catch (GuanzonException | SQLException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
@@ -2061,7 +2065,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
             tfVatRateDetail.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(pnDetail).getDetailVatRates(), false));
             tfPurchasedAmountDetail.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(pnDetail).getAmountApplied(), true));
             tfNetAmountDetail.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(pnDetail).getAmount(), true));
-
+            tfAdvancesDetail.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(pnDetail).getDetailAdvances(), true));
             JFXUtil.updateCaretPositions(apDVDetail);
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
@@ -2606,7 +2610,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                             poController.Detail(pnDetail).setDetailVatExempt(0.0000);
                         }
                         if (!checkedBox.isSelected()) {
-                            poController.Detail(pnDetail).setDetailVatExempt(poController.Detail(pnDetail).getAmountApplied());
+                            poController.Detail(pnDetail).setDetailVatExempt(poController.Detail(pnDetail).getAmountApplied() + poController.Detail(pnDetail).getDetailAdvances());
                         }
                         poJSON = poController.computeFields(true);
                         if (!JFXUtil.isJSONSuccess(poJSON)) {

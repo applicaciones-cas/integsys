@@ -85,7 +85,7 @@ public class SOATagging_HistoryMPController implements Initializable, ScreenInte
     @FXML
     private TextField tfTransactionNo, tfSOANo, tfClient, tfIssuedTo, tfTransactionTotal, tfVatAmount, tfNonVatSales, tfZeroVatSales, tfVatExemptSales,
             tfNetTotal, tfCompany, tfDiscountAmount, tfFreight, tfSourceNo, tfSourceCode, tfReferenceNo, tfCreditAmount, tfDebitAmount, tfAppliedAmtDetail,
-            tfSearchCompany, tfSearchSupplier, tfSearchReferenceNo;
+             tfSearchSupplier, tfSearchReferenceNo;
     @FXML
     private DatePicker dpTransactionDate, dpReferenceDate;
     @FXML
@@ -160,7 +160,7 @@ public class SOATagging_HistoryMPController implements Initializable, ScreenInte
                                 + SOATaggingStatus.CANCELLED
                                 + SOATaggingStatus.VOID
                                 + SOATaggingStatus.PAID);
-                        poJSON = poSOATaggingController.SOATagging().searchTransaction(psIndustryId, tfSearchCompany.getText(),
+                        poJSON = poSOATaggingController.SOATagging().searchTransaction(psIndustryId, "",
                                 tfSearchSupplier.getText(), tfSearchReferenceNo.getText());
                         if ("error".equalsIgnoreCase((String) poJSON.get("result"))) {
                             ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
@@ -217,18 +217,18 @@ public class SOATagging_HistoryMPController implements Initializable, ScreenInte
             switch (event.getCode()) {
                 case F3:
                     switch (lsID) {
-                        case "tfSearchCompany":
-                            poJSON = poSOATaggingController.SOATagging().SearchCompany(lsValue, false);
-                            if ("error".equals(poJSON.get("result"))) {
-                                ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-                                tfSearchCompany.setText("");
-                                psCompanyId = "";
-                                break;
-                            } else {
-                                psCompanyId = poSOATaggingController.SOATagging().Master().getCompanyId();
-                            }
-                            loadRecordSearch();
-                            return;
+//                        case "tfSearchCompany":
+//                            poJSON = poSOATaggingController.SOATagging().SearchCompany(lsValue, false);
+//                            if ("error".equals(poJSON.get("result"))) {
+//                                ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+//                                tfSearchCompany.setText("");
+//                                psCompanyId = "";
+//                                break;
+//                            } else {
+//        //                        psCompanyId = poSOATaggingController.SOATagging().Master().getCompanyId();
+//                            }
+//                            loadRecordSearch();
+//                            return;
                         case "tfSearchSupplier":
                             poJSON = poSOATaggingController.SOATagging().SearchSupplier(lsValue, false);
                             if ("error".equals(poJSON.get("result"))) {
@@ -247,7 +247,7 @@ public class SOATagging_HistoryMPController implements Initializable, ScreenInte
                                     + SOATaggingStatus.CANCELLED
                                     + SOATaggingStatus.VOID
                                     + SOATaggingStatus.PAID);
-                            poJSON = poSOATaggingController.SOATagging().searchTransaction(psIndustryId, tfSearchCompany.getText(),
+                            poJSON = poSOATaggingController.SOATagging().searchTransaction(psIndustryId, "",
                                     tfSearchSupplier.getText(), tfSearchReferenceNo.getText());
                             if ("error".equals(poJSON.get("result"))) {
                                 ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
@@ -311,7 +311,7 @@ public class SOATagging_HistoryMPController implements Initializable, ScreenInte
             }
 
             tfSearchSupplier.setText(psSupplierId.equals("") ? "" : poSOATaggingController.SOATagging().Master().Supplier().getCompanyName());
-            tfSearchCompany.setText(psCompanyId.equals("") ? "" : poSOATaggingController.SOATagging().Master().Company().getCompanyName());
+//            tfSearchCompany.setText(psCompanyId.equals("") ? "" : poSOATaggingController.SOATagging().Master().Company().getCompanyName());
             JFXUtil.updateCaretPositions(apBrowse);
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
@@ -500,7 +500,7 @@ public class SOATagging_HistoryMPController implements Initializable, ScreenInte
         Platform.runLater(() -> {
             JFXUtil.setVerticalScroll(taRemarks);
         });
-        JFXUtil.setFocusListener(txtMaster_Focus, tfSearchCompany, tfSearchSupplier);
+        JFXUtil.setFocusListener(txtMaster_Focus,  tfSearchSupplier);
         JFXUtil.setKeyPressedListener(this::txtField_KeyPressed, apBrowse, apMaster, apDetail);
     }
 

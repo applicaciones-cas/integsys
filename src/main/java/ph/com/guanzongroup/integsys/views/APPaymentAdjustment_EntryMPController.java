@@ -86,6 +86,7 @@ public class APPaymentAdjustment_EntryMPController implements Initializable, Scr
         pnEditMode = EditMode.UNKNOWN;
         initButton(pnEditMode);
 
+        loadRecordMaster();
         Platform.runLater(() -> {
             poAPPaymentAdjustmentController.APPaymentAdjustment().getModel().setIndustryId(psIndustryId);
             poAPPaymentAdjustmentController.APPaymentAdjustment().getModel().setCompanyId(psCompanyId);
@@ -112,7 +113,7 @@ public class APPaymentAdjustment_EntryMPController implements Initializable, Scr
 
     @Override
     public void setCompanyID(String fsValue) {
-        //Company is not autoset
+        this.psCompanyId = fsValue;
     }
 
     @Override

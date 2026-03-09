@@ -103,7 +103,7 @@ public class SOATagging_ConfirmationController implements Initializable, ScreenI
     @FXML
     private Label lblSource, lblStatus;
     @FXML
-    private TextField tfSearchCompany, tfSearchSupplier, tfSearchReferenceNo, tfTransactionNo, tfSOANo, tfCompany, tfClient, tfIssuedTo, tfTransactionTotal, tfDiscountAmount, tfFreight, tfVatAmount, tfNonVatSales, tfZeroVatSales, tfVatExemptSales, tfNetTotal, tfSourceNo, tfReferenceNo, tfCreditAmount, tfDebitAmount, tfAppliedAmtDetail;
+    private TextField  tfSearchSupplier, tfSearchReferenceNo, tfTransactionNo, tfSOANo, tfCompany, tfClient, tfIssuedTo, tfTransactionTotal, tfDiscountAmount, tfFreight, tfVatAmount, tfNonVatSales, tfZeroVatSales, tfVatExemptSales, tfNetTotal, tfSourceNo, tfReferenceNo, tfCreditAmount, tfDebitAmount, tfAppliedAmtDetail;
     @FXML
     private HBox hbButtons, hboxid;
     @FXML
@@ -147,8 +147,10 @@ public class SOATagging_ConfirmationController implements Initializable, ScreenI
         initTableOnClick();
         clearTextFields();
 
+        loadRecordMaster();
         Platform.runLater(() -> {
             poSOATaggingController.SOATagging().Master().setIndustryId(psIndustryId);
+            poSOATaggingController.SOATagging().Master().setCompanyId(psCompanyId);
             poSOATaggingController.SOATagging().setIndustryId(psIndustryId);
             poSOATaggingController.SOATagging().setCompanyId(psCompanyId);
             poSOATaggingController.SOATagging().initFields();
@@ -231,7 +233,7 @@ public class SOATagging_ConfirmationController implements Initializable, ScreenI
                         }
                         pnEditMode = poSOATaggingController.SOATagging().getEditMode();
                         psSupplierId = poSOATaggingController.SOATagging().Master().getClientId();
-                        psCompanyId = poSOATaggingController.SOATagging().Master().getCompanyId();
+//                        psCompanyId = poSOATaggingController.SOATagging().Master().getCompanyId();
                         break;
                     case "btnSearch":
                         JFXUtil.initiateBtnSearch(pxeModuleName, lastFocusedTextField, previousSearchedTextField, apBrowse, apMaster, apDetail);
@@ -390,7 +392,7 @@ public class SOATagging_ConfirmationController implements Initializable, ScreenI
         poJSON = new JSONObject();
         poSOATaggingController.SOATagging().setTransactionStatus(SOATaggingStatus.OPEN
                 + SOATaggingStatus.CONFIRMED);
-        poJSON = poSOATaggingController.SOATagging().loadSOATagging(psIndustryId, tfSearchCompany.getText(), tfSearchSupplier.getText(), tfSearchReferenceNo.getText());
+        poJSON = poSOATaggingController.SOATagging().loadSOATagging(psIndustryId, "", tfSearchSupplier.getText(), tfSearchReferenceNo.getText());
         if (!"success".equals((String) poJSON.get("result"))) {
             ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
         } else {
@@ -472,12 +474,12 @@ public class SOATagging_ConfirmationController implements Initializable, ScreenI
                             break;
                         }
                         break;
-                    case "tfCompany":
-                        if (lsValue.isEmpty()) {
-                            poJSON = poSOATaggingController.SOATagging().Master().setCompanyId("");
-                            psCompanyId = "";
-                        }
-                        break;
+//                    case "tfCompany":
+//                        if (lsValue.isEmpty()) {
+//                            poJSON = poSOATaggingController.SOATagging().Master().setCompanyId("");
+//                            psCompanyId = "";
+//                        }
+//                        break;
                     case "tfClient":
                         if (lsValue.isEmpty()) {
                             poJSON = poSOATaggingController.SOATagging().Master().setClientId("");
@@ -602,18 +604,18 @@ public class SOATagging_ConfirmationController implements Initializable, ScreenI
                     break;
                 case F3:
                     switch (lsID) {
-                        case "tfSearchCompany":
-                            poJSON = poSOATaggingController.SOATagging().SearchCompany(lsValue, false);
-                            if ("error".equals(poJSON.get("result"))) {
-                                ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-                                tfSearchCompany.setText("");
-                                psSearchCompanyId = "";
-                                break;
-                            }
-                            psSearchCompanyId = poSOATaggingController.SOATagging().Master().getCompanyId();
-                            loadRecordSearch();
-                            retrieveSOATagging();
-                            return;
+//                        case "tfSearchCompany":
+//                            poJSON = poSOATaggingController.SOATagging().SearchCompany(lsValue, false);
+//                            if ("error".equals(poJSON.get("result"))) {
+//                                ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+//                                tfSearchCompany.setText("");
+//                                psSearchCompanyId = "";
+//                                break;
+//                            }
+//                            psSearchCompanyId = poSOATaggingController.SOATagging().Master().getCompanyId();
+//                            loadRecordSearch();
+//                            retrieveSOATagging();
+//                            return;
                         case "tfSearchSupplier":
                             poJSON = poSOATaggingController.SOATagging().SearchSupplier(lsValue, false);
                             if ("error".equals(poJSON.get("result"))) {
@@ -645,7 +647,7 @@ public class SOATagging_ConfirmationController implements Initializable, ScreenI
                                 ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                 break;
                             }
-                            psCompanyId = poSOATaggingController.SOATagging().Master().getCompanyId();
+    //                        psCompanyId = poSOATaggingController.SOATagging().Master().getCompanyId();
                             loadRecordMaster();
                             return;
                         case "tfIssuedTo":
@@ -868,7 +870,7 @@ public class SOATagging_ConfirmationController implements Initializable, ScreenI
             }
 
             tfSearchSupplier.setText(psSearchSupplierId.equals("") ? "" : poSOATaggingController.SOATagging().Master().Supplier().getCompanyName());
-            tfSearchCompany.setText(psSearchCompanyId.equals("") ? "" : poSOATaggingController.SOATagging().Master().Company().getCompanyName());
+//            tfSearchCompany.setText(psSearchCompanyId.equals("") ? "" : poSOATaggingController.SOATagging().Master().Company().getCompanyName());
             JFXUtil.updateCaretPositions(apBrowse);
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
@@ -1141,7 +1143,7 @@ public class SOATagging_ConfirmationController implements Initializable, ScreenI
             JFXUtil.setVerticalScroll(taRemarks);
         });
         JFXUtil.setFocusListener(txtArea_Focus, taRemarks);
-        JFXUtil.setFocusListener(txtMaster_Focus, tfCompany, tfClient, tfIssuedTo, tfSOANo, tfDiscountAmount, tfSearchCompany, tfSearchSupplier);
+        JFXUtil.setFocusListener(txtMaster_Focus, tfCompany, tfClient, tfIssuedTo, tfSOANo, tfDiscountAmount,  tfSearchSupplier);
         JFXUtil.setFocusListener(txtDetail_Focus, tfSourceNo, tfReferenceNo, tfAppliedAmtDetail);
 
         JFXUtil.setKeyPressedListener(this::txtField_KeyPressed, apBrowse, apMaster, apDetail);
@@ -1275,7 +1277,6 @@ public class SOATagging_ConfirmationController implements Initializable, ScreenI
 
     public void clearTextFields() {
         psSearchCompanyId = "";
-        psCompanyId = "";
         psSearchSupplierId = "";
         psSupplierId = "";
         JFXUtil.setValueToNull(previousSearchedTextField, lastFocusedTextField, dpTransactionDate);

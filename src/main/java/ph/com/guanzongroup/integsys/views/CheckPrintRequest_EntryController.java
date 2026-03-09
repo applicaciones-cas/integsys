@@ -1,5 +1,6 @@
 package ph.com.guanzongroup.integsys.views;
 
+import com.sun.javafx.scene.control.skin.TableHeaderRow;
 import java.net.URL;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -31,12 +32,14 @@ import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.Pagination;
 import javafx.scene.control.ProgressIndicator;
+import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TablePosition;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.control.cell.PropertyValueFactory;
 import static javafx.scene.input.KeyCode.DOWN;
 import static javafx.scene.input.KeyCode.ENTER;
 import static javafx.scene.input.KeyCode.F3;
@@ -52,6 +55,7 @@ import org.guanzon.appdriver.agent.ShowMessageFX;
 import org.guanzon.appdriver.base.CommonUtils;
 import org.guanzon.appdriver.base.GRiderCAS;
 import org.guanzon.appdriver.base.GuanzonException;
+import org.guanzon.appdriver.base.MiscUtil;
 import org.guanzon.appdriver.base.SQLUtil;
 import org.guanzon.appdriver.constant.EditMode;
 import org.guanzon.appdriver.constant.UserRight;
@@ -63,6 +67,7 @@ import ph.com.guanzongroup.cas.cashflow.status.CheckPrintRequestStatus;
 import ph.com.guanzongroup.cas.cashflow.status.DisbursementStatic;
 import ph.com.guanzongroup.integsys.model.ModelDisbursementVoucher_Detail;
 import ph.com.guanzongroup.integsys.model.ModelDisbursementVoucher_Main;
+import ph.com.guanzongroup.integsys.model.ModelTableMain;
 import ph.com.guanzongroup.integsys.utility.CustomCommonUtil;
 import ph.com.guanzongroup.integsys.utility.JFXUtil;
 
@@ -93,8 +98,8 @@ public class CheckPrintRequest_EntryController implements Initializable, ScreenI
 
     private ObservableList<ModelDisbursementVoucher_Detail> details_data = FXCollections.observableArrayList();
     private FilteredList<ModelDisbursementVoucher_Detail> filteredDataDetailDV;
-
-    private ObservableList<ModelDisbursementVoucher_Main> main_data = FXCollections.observableArrayList();
+    private ObservableList<ModelTableMain> main_data = FXCollections.observableArrayList();
+//    private ObservableList<ModelDisbursementVoucher_Main> main_data = FXCollections.observableArrayList();
     private FilteredList<ModelDisbursementVoucher_Main> filteredMain_Data;
 
     private Object lastFocusedTextField = null;
@@ -106,7 +111,6 @@ public class CheckPrintRequest_EntryController implements Initializable, ScreenI
     List<Pair<String, String>> plOrderNoFinal = new ArrayList<>();
 
     private final Map<String, List<String>> highlightedRowsMain = new HashMap<>();
-    private final Map<Integer, List<String>> highlightedRowsDetail = new HashMap<>();
 
     private ChangeListener<String> detailSearchListener;
     private ChangeListener<String> mainSearchListener;
@@ -152,9 +156,9 @@ public class CheckPrintRequest_EntryController implements Initializable, ScreenI
     @FXML
     private TableColumn tblRowNoDetail, tblReferNoDetail, tblDVNo, tblDVDate, tblDVAmount, tblCheckNo, tblCheckDate, tblCheckAmount;
     @FXML
-    private TableView tblVwMain;
+    private TableView<ModelTableMain> tblVwMain;
     @FXML
-    private TableColumn tblRowNo,tblBranch, tblBankName, tblBankAccount, tblDate, tblReferenceNo;
+    private TableColumn <ModelTableMain, String>  tblRowNo,tblBranch, tblBankName, tblBankAccount, tblDate, tblReferenceNo;
     @FXML
     private Pagination pagination;
 
@@ -242,7 +246,6 @@ public class CheckPrintRequest_EntryController implements Initializable, ScreenI
                         ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                         return;
                     }
-                    showRetainedHighlight(false);
                     pnEditMode = poCheckPrintingRequestController.getEditMode();
                     loadTableDetail();
                     loadRecordDetail();
@@ -322,7 +325,20 @@ public class CheckPrintRequest_EntryController implements Initializable, ScreenI
                         return;
                     }
                 case "btnHistory":
-                    ShowMessageFX.Warning("Button History is Underdevelopment.", pxeModuleName, null);
+                    if (pnEditMode != EditMode.READY && pnEditMode != EditMode.UPDATE) {
+                        ShowMessageFX.Warning("No transaction status history to load!", pxeModuleName, null);
+                        return;
+                    }
+
+                    try {
+                        poCheckPrintingRequestController.ShowStatusHistory();
+                    } catch (NullPointerException npe) {
+                        Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(npe), npe);
+                        ShowMessageFX.Error("No transaction status history to load!", pxeModuleName, null);
+                    } catch (Exception ex) {
+                        Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+                        ShowMessageFX.Error(MiscUtil.getException(ex), pxeModuleName, null);
+                    }
                     break;
                 case "btnRetrieve":
                     loadTableMain();
@@ -393,81 +409,70 @@ public class CheckPrintRequest_EntryController implements Initializable, ScreenI
         }
         return true;
     }
-
-    private void showRetainedHighlight(boolean isRetained) {
-        if (isRetained) {
-            for (Pair<String, String> pair : plOrderNoPartial) {
-                if (!"0".equals(pair.getValue())) {
-                    plOrderNoFinal.add(new Pair<>(pair.getKey(), pair.getValue()));
-                }
-            }
-        }
-        JFXUtil.disableAllHighlightByColor(tblVwMain, "#A7C7E7", highlightedRowsMain);
-        plOrderNoPartial.clear();
-        for (Pair<String, String> pair : plOrderNoFinal) {
-            if (!"0".equals(pair.getValue())) {
-                JFXUtil.highlightByKey(tblVwMain, pair.getKey(), "#A7C7E7", highlightedRowsMain);
-            }
-        }
-    }
-
+    
     private void loadTableMain() {
+        btnRetrieve.setDisable(true);
+
         ProgressIndicator progressIndicator = new ProgressIndicator();
         progressIndicator.setMaxHeight(50);
         progressIndicator.setStyle("-fx-progress-color: #FF8201;");
         StackPane loadingPane = new StackPane(progressIndicator);
         loadingPane.setAlignment(Pos.CENTER);
+
         tblVwMain.setPlaceholder(loadingPane);
         progressIndicator.setVisible(true);
 
         poJSON = new JSONObject();
-        Label placeholderLabel = new Label("NO RECORD TO LOAD");
-        placeholderLabel.setStyle("-fx-font-size: 10px;");
 
         Task<Void> task = new Task<Void>() {
             @Override
             protected Void call() throws Exception {
-                Thread.sleep(100);
-                Platform.runLater(() -> {
-                    try {
-                        main_data.clear();
-                        plOrderNoFinal.clear();
-                        poJSON = poCheckPrintingRequestController.getDVwithAuthorizeCheckPayment(psSearchBankID, psSearchBankAccountID);
-                        if ("success".equals(poJSON.get("result"))) {
-                            for (int lnCntr = 0; lnCntr <= poCheckPrintingRequestController.getCheckPaymentCount() - 1; lnCntr++) {
-                                main_data.add(new ModelDisbursementVoucher_Main(
-                                        String.valueOf(lnCntr + 1),
-                                        poCheckPrintingRequestController.CheckPayments(lnCntr).Branch().getBranchName(),
-                                        poCheckPrintingRequestController.CheckPayments(lnCntr).Banks().getBankName(),
-                                        poCheckPrintingRequestController.CheckPayments(lnCntr).Bank_Account_Master().getAccountNo(),
-                                        CustomCommonUtil.formatDateToShortString(poCheckPrintingRequestController.CheckPayments(lnCntr).getTransactionDate()),
-                                        poCheckPrintingRequestController.CheckPayments(lnCntr).getSourceNo(),
-                                        ""
-                                ));
+                try {
+                     main_data.clear();
+                    poJSON = poCheckPrintingRequestController.getDVwithAuthorizeCheckPayment(psSearchBankID, psSearchBankAccountID);
+                    if ("success".equals(poJSON.get("result"))) {
+                        if (poCheckPrintingRequestController.getCheckCount()> 0) {
+                            for (int lnCntr = 0; lnCntr < poCheckPrintingRequestController.getCheckCount(); lnCntr++) {
+                                main_data.add(new ModelTableMain(
+                                            String.valueOf(lnCntr + 1),
+                                            poCheckPrintingRequestController.CheckPayments(lnCntr).Branch().getBranchName(),
+                                            poCheckPrintingRequestController.CheckPayments(lnCntr).Banks().getBankName(),
+                                            poCheckPrintingRequestController.CheckPayments(lnCntr).Bank_Account_Master().getAccountNo(),
+                                            CustomCommonUtil.formatDateToShortString(poCheckPrintingRequestController.CheckPayments(lnCntr).getTransactionDate()),
+                                            poCheckPrintingRequestController.CheckPayments(lnCntr).getSourceNo(),
+                                            "","","",""
+                                    ));
                             }
+                        } else {
+                            main_data.clear();
                         }
-                        showRetainedHighlight(true);
-                        if (main_data.isEmpty()) {
-                            tblVwMain.setPlaceholder(placeholderLabel);
-                        }
-                        JFXUtil.loadTab(pagination, main_data.size(), ROWS_PER_PAGE, tblVwMain, filteredMain_Data);
-                    } catch (SQLException | GuanzonException ex) {
-                        Logger.getLogger(CheckPrintRequest_EntryController.class.getName()).log(Level.SEVERE, null, ex);
                     }
+                    
 
-                });
+                    Platform.runLater(() -> {
+                        if (main_data.isEmpty()) {
+                            tblVwMain.setPlaceholder(new Label("NO RECORD TO LOAD"));
+                        }
+                        tblVwMain.setItems(FXCollections.observableArrayList(main_data));
+                        JFXUtil.loadTab(pagination, main_data.size(), ROWS_PER_PAGE, tblVwMain, filteredMain_Data);
+                    });
+
+                } catch (SQLException | GuanzonException ex) {
+                    Logger.getLogger(PurchaseOrder_ConfirmationController.class.getName()).log(Level.SEVERE, null, ex);
+                }
                 return null;
             }
 
             @Override
             protected void succeeded() {
-                btnRetrieve.setDisable(false);
-                placeholderLabel.setStyle("-fx-font-size: 10px;"); // Adjust the size as needed
+                progressIndicator.setVisible(false);
+                btnRetrieve.setDisable(false); // ✅ Re-enable the button
+
                 if (main_data == null || main_data.isEmpty()) {
-                    tblVwMain.setPlaceholder(placeholderLabel);
-                    pagination.setManaged(false);
-                    pagination.setVisible(false);
-                } else {
+                    tblVwMain.setPlaceholder(new Label("NO RECORD TO LOAD"));
+                    ShowMessageFX.Warning("NO RECORD TO LOAD.", pxeModuleName, null);
+                } 
+                else {
                     pagination.setPageCount(0);
                     pagination.setVisible(true);
                     pagination.setManaged(true);
@@ -479,26 +484,119 @@ public class CheckPrintRequest_EntryController implements Initializable, ScreenI
 
             @Override
             protected void failed() {
-                if (main_data == null || main_data.isEmpty()) {
-                    tblVwMain.setPlaceholder(placeholderLabel);
-                    pagination.setManaged(false);
-                    pagination.setVisible(false);
-                }
-                btnRetrieve.setDisable(false);
                 progressIndicator.setVisible(false);
-                progressIndicator.setManaged(false);
-                tblVwMain.toFront();
+                btnRetrieve.setDisable(false); // ✅ Re-enable the button even if failed
             }
         };
-        new Thread(task).start(); // Run task in background
+
+        new Thread(task).start();
     }
 
-    private void initTableMain() {
-        JFXUtil.setColumnCenter(tblRowNo, tblBankName,tblBranch, tblBankAccount, tblDate, tblReferenceNo);
-        JFXUtil.setColumnsIndexAndDisableReordering(tblVwMain);
+//    private void loadTableMain() {
+//        ProgressIndicator progressIndicator = new ProgressIndicator();
+//        progressIndicator.setMaxHeight(50);
+//        progressIndicator.setStyle("-fx-progress-color: #FF8201;");
+//        StackPane loadingPane = new StackPane(progressIndicator);
+//        loadingPane.setAlignment(Pos.CENTER);
+//        tblVwMain.setPlaceholder(loadingPane);
+//        progressIndicator.setVisible(true);
+//
+//        poJSON = new JSONObject();
+//
+//        Task<Void> task = new Task<Void>() {
+//            @Override
+//            protected Void call() throws Exception {
+//                Thread.sleep(100);
+//                Platform.runLater(() -> {
+//                    try {
+//                        main_data.clear();
+//                        poJSON = poCheckPrintingRequestController.getDVwithAuthorizeCheckPayment(psSearchBankID, psSearchBankAccountID);
+//                        if ("success".equals(poJSON.get("result"))) {
+//                            
+//                            for (int lnCntr = 0; lnCntr < poCheckPrintingRequestController.getCheckPaymentCount(); lnCntr++) {
+//                                if (poCheckPrintingRequestController.getCheckCount()> 0) {
+//                                    main_data.add(new ModelTableMain(
+//                                            String.valueOf(lnCntr + 1),
+//                                            poCheckPrintingRequestController.CheckPayments(lnCntr).Branch().getBranchName(),
+//                                            poCheckPrintingRequestController.CheckPayments(lnCntr).Banks().getBankName(),
+//                                            poCheckPrintingRequestController.CheckPayments(lnCntr).Bank_Account_Master().getAccountNo(),
+//                                            CustomCommonUtil.formatDateToShortString(poCheckPrintingRequestController.CheckPayments(lnCntr).getTransactionDate()),
+//                                            poCheckPrintingRequestController.CheckPayments(lnCntr).getSourceNo(),
+//                                            "","","",""
+//                                    ));
+//                                }
+//                            }
+//                        }
+//                        Platform.runLater(() -> {
+//                            if (main_data.isEmpty()) {
+//                                tblVwMain.setPlaceholder(new Label("NO RECORD TO LOAD"));
+//                            }
+//                           tblVwMain.setItems(FXCollections.observableArrayList(main_data));
+//                            JFXUtil.loadTab(pagination, main_data.size(), ROWS_PER_PAGE, tblVwMain, filteredMain_Data);
+//                        });
+//                    } catch (SQLException | GuanzonException ex) {
+//                        Logger.getLogger(CheckPrintRequest_EntryController.class.getName()).log(Level.SEVERE, null, ex);
+//                    }
+//
+//                });
+//                return null;
+//            }
+//
+//            @Override
+//            protected void succeeded() {
+//                progressIndicator.setVisible(false);
+//                btnRetrieve.setDisable(false);
+//               
+//                if (main_data == null || main_data.isEmpty()) {
+//                    tblVwMain.setPlaceholder(new Label("NO RECORD TO LOAD"));
+//                    pagination.setManaged(false);
+//                    pagination.setVisible(false);
+//                } else {
+//                    pagination.setPageCount(0);
+//                    pagination.setVisible(true);
+//                    pagination.setManaged(true);
+//                    progressIndicator.setVisible(false);
+//                    progressIndicator.setManaged(false);
+//                    tblVwMain.toFront();
+//                }
+//                
+//            }
+//
+//            @Override
+//            protected void failed() {
+//                progressIndicator.setVisible(false);
+//                btnRetrieve.setDisable(false);
+//                if (main_data == null || main_data.isEmpty()) {
+//                    tblVwMain.setPlaceholder(new Label("NO RECORD TO LOAD"));
+//                    pagination.setManaged(false);
+//                    pagination.setVisible(false);
+//                }
+//            }
+//        };
+//        new Thread(task).start(); // Run task in background
+//    }
 
-        filteredMain_Data = new FilteredList<>(main_data, b -> true);
-        tblVwMain.setItems(filteredMain_Data);
+    private void initTableMain() {
+        tblRowNo.setCellValueFactory(new PropertyValueFactory<>("index01"));
+        tblBranch.setCellValueFactory(new PropertyValueFactory<>("index02"));
+        tblBankName.setCellValueFactory(new PropertyValueFactory<>("index03"));
+        tblBankAccount.setCellValueFactory(new PropertyValueFactory<>("index04"));
+        tblDate.setCellValueFactory(new PropertyValueFactory<>("index05"));
+        tblReferenceNo.setCellValueFactory(new PropertyValueFactory<>("index06"));
+        
+        tblVwMain.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+
+        tblVwMain.widthProperty().addListener((ObservableValue<? extends Number> source, Number oldWidth, Number newWidth) -> {
+            Platform.runLater(() -> {
+                TableHeaderRow header = (TableHeaderRow) tblVwMain.lookup("TableHeaderRow");
+                if (header != null) {
+                    header.reorderingProperty().addListener((ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) -> {
+                        header.setReordering(false);
+                    });
+                }
+            });
+        });
+        JFXUtil.applyRowHighlighting(tblVwMain, item -> ((ModelTableMain) item).getIndex06(), highlightedRowsMain);
     }
 
     private void loadRecordMaster() {
@@ -510,13 +608,8 @@ public class CheckPrintRequest_EntryController implements Initializable, ScreenI
 //            tfTotalAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poCheckPrintingRequestController.Master().getTotalAmount(), true));
             taRemarks.setText(poCheckPrintingRequestController.Master().getRemarks() != null ? poCheckPrintingRequestController.Master().getRemarks() : "");
             chbkUploaded.setSelected(poCheckPrintingRequestController.Master().isUploaded());
-            int detailCount = poCheckPrintingRequestController.getDetailCount();
-            double totalNetAmount = 0.0;
-            for (int lnCtr = detailCount - 1; lnCtr >= 0; lnCtr--) {
-                double checkAmt = poCheckPrintingRequestController.Detail(lnCtr).DisbursementMaster().getNetTotal();
-                totalNetAmount += checkAmt;
-            }
-            tfTotalAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(totalNetAmount));
+            
+            
         } catch (GuanzonException | SQLException ex) {
             Logger.getLogger(CheckPrintRequest_EntryController.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -558,7 +651,8 @@ public class CheckPrintRequest_EntryController implements Initializable, ScreenI
                 cmbPayeeType.getSelectionModel().select(!poCheckPrintingRequestController.Detail(pnDetail).DisbursementMaster().CheckPayments().getPayeeType().equals("")
                         ? Integer.valueOf(poCheckPrintingRequestController.Detail(pnDetail).DisbursementMaster().CheckPayments().getPayeeType()) : -1);
                 taRemarksDetails.setText(poCheckPrintingRequestController.Detail(pnDetail).getdetailRemarks()!= null ? poCheckPrintingRequestController.Detail(pnDetail).getdetailRemarks() : "");
-
+                poCheckPrintingRequestController.computeFields();
+                tfTotalAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poCheckPrintingRequestController.Master().getTotalAmount(),true));  
                 
             } catch (SQLException | GuanzonException ex) {
                 Logger.getLogger(CheckPrintRequest_EntryController.class.getName()).log(Level.SEVERE, null, ex);
@@ -570,15 +664,13 @@ public class CheckPrintRequest_EntryController implements Initializable, ScreenI
         poJSON = new JSONObject();
         if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
             pnMain = tblVwMain.getSelectionModel().getSelectedIndex();
-            ModelDisbursementVoucher_Main selected = (ModelDisbursementVoucher_Main) tblVwMain.getSelectionModel().getSelectedItem();
-            if (selected != null) {
+            ModelTableMain loCheckPaym = (ModelTableMain) tblVwMain.getSelectionModel().getSelectedItem();
+            String lsTransactionNo = loCheckPaym.getIndex06();
                 try {
-                    int pnRowMain = Integer.parseInt(selected.getIndex01()) - 1;
-                    pnMain = pnRowMain;
-                    String lsTransactionNo = selected.getIndex06();
+
                     poJSON = poCheckPrintingRequestController.addCheckPaymentToCheckPrintRequest(lsTransactionNo);
                     if ("success".equals(poJSON.get("result"))) {
-                        JFXUtil.highlightByKey(tblVwMain, lsTransactionNo, "#A7C7E7", highlightedRowsMain);
+                       
                         
                     } else {
                         if (Boolean.parseBoolean(String.valueOf(poJSON.get("warning")))) {
@@ -601,9 +693,8 @@ public class CheckPrintRequest_EntryController implements Initializable, ScreenI
                                 poCheckPrintingRequestController.Detail(pnDetail).DisbursementMaster().setTransactionDate(null);
                                 tfBankName.setText("");
                                 dpDVDate.setValue(null);
-                                JFXUtil.disableAllHighlightByColor(tblVwMain, "#A7C7E7", highlightedRowsMain);
+                              
                             } else {
-                                JFXUtil.disableHighlightByKey(tblVwMain, lsTransactionNo, highlightedRowsMain);
                             }
                         } else {
                             ShowMessageFX.Warning((String) poJSON.get("message"), pxeModuleName, null);
@@ -620,10 +711,12 @@ public class CheckPrintRequest_EntryController implements Initializable, ScreenI
                         loadRecordDetail();
                         initFields(pnEditMode);
                     });
-                } catch (CloneNotSupportedException | SQLException | GuanzonException ex) {
+                } catch (SQLException | GuanzonException ex) {
                     Logger.getLogger(CheckPrintRequest_EntryController.class.getName()).log(Level.SEVERE, null, ex);
-                }
+                } catch (CloneNotSupportedException ex) {
+                Logger.getLogger(CheckPrintRequest_EntryController.class.getName()).log(Level.SEVERE, null, ex);
             }
+            
         }
     }
 
@@ -667,7 +760,7 @@ public class CheckPrintRequest_EntryController implements Initializable, ScreenI
                                 details_data.add(
                                         new ModelDisbursementVoucher_Detail(String.valueOf(lnCtr + 1),
                                                 poCheckPrintingRequestController.Detail(lnCtr).getSourceNo(),
-                                                poCheckPrintingRequestController.Detail(lnCtr).DisbursementMaster().getTransactionNo(),
+                                                poCheckPrintingRequestController.Detail(lnCtr).DisbursementMaster().getVoucherNo(),
                                                 CustomCommonUtil.formatDateToShortString(poCheckPrintingRequestController.Detail(lnCtr).DisbursementMaster().getTransactionDate()),
                                                 CustomCommonUtil.setIntegerValueToDecimalFormat(poCheckPrintingRequestController.Detail(lnCtr).DisbursementMaster().getNetTotal(), true),
                                                 poCheckPrintingRequestController.Detail(lnCtr).CheckPayments().getCheckNo(),
@@ -700,7 +793,10 @@ public class CheckPrintRequest_EntryController implements Initializable, ScreenI
                             ShowMessageFX.Warning((String) poJSON.get("message"), pxeModuleName, null);
                             return;
                         }
+                        
                         loadRecordMaster();
+                        JFXUtil.showRetainedHighlight(false, tblVwMain, "#A7C7E7", plOrderNoPartial, plOrderNoFinal, highlightedRowsMain, true);
+                        loadHighlightFromDetail();
                     } catch (SQLException | GuanzonException ex) {
                         Logger.getLogger(CheckPrintRequest_EntryController.class.getName()).log(Level.SEVERE, null, ex);
                     }
@@ -727,6 +823,34 @@ public class CheckPrintRequest_EntryController implements Initializable, ScreenI
         };
         new Thread(task).start();
 
+    }
+    public void loadHighlightFromDetail() {
+        try {
+            for (int lnCtr = 0; lnCtr < poCheckPrintingRequestController.getDetailCount(); lnCtr++) {
+                String lsTransNo = !JFXUtil.isObjectEqualTo( poCheckPrintingRequestController.Detail(lnCtr).getSourceNo(), null, "") ?  poCheckPrintingRequestController.Detail(lnCtr).getSourceNo() : "";
+//                String lsTransType = !JFXUtil.isObjectEqualTo( poCheckPrintingRequestController.Detail(lnCtr).gets(), null, "") ?  poCheckPrintingRequestController.Detail(lnCtr).getSourceCode() : "";
+                String lsHighlightbasis;
+
+                lsHighlightbasis =  poCheckPrintingRequestController.Detail(lnCtr).getSourceNo();
+
+                if (!JFXUtil.isObjectEqualTo( poCheckPrintingRequestController.Detail(lnCtr).CheckPayments().getAmount(), null, "")) {
+                    if ( poCheckPrintingRequestController.Detail(lnCtr).CheckPayments().getAmount() != 0.0000) {
+                        plOrderNoPartial.add(new Pair<>(lsHighlightbasis, "1"));
+                    } else {
+                        plOrderNoPartial.add(new Pair<>(lsHighlightbasis, "0"));
+                    }
+                }
+            }
+            for (Pair<String, String> pair : plOrderNoPartial) {
+                if (!"".equals(pair.getKey()) && pair.getKey() != null) {
+                    JFXUtil.highlightByKey(tblVwMain, pair.getKey(), "#A7C7E7", highlightedRowsMain);
+                }
+            }
+            JFXUtil.showRetainedHighlight(false, tblVwMain, "#A7C7E7", plOrderNoPartial, plOrderNoFinal, highlightedRowsMain, false);
+        } catch (GuanzonException | SQLException ex) {
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
+        }
     }
 
     private void initTableDetail() {
@@ -765,26 +889,26 @@ public class CheckPrintRequest_EntryController implements Initializable, ScreenI
             }
         });
 
-        tblVwMain.setRowFactory(tv -> new TableRow<ModelDisbursementVoucher_Main>() {
-            @Override
-            protected void updateItem(ModelDisbursementVoucher_Main item, boolean empty) {
-                super.updateItem(item, empty);
-                if (item == null || empty) {
-                    setStyle("");
-                } else {
-                    String key = item.getIndex05();
-                    if (highlightedRowsMain.containsKey(key)) {
-                        List<String> colors = highlightedRowsMain.get(key);
-                        if (!colors.isEmpty()) {
-                            setStyle("-fx-background-color: " + colors.get(colors.size() - 1) + ";"); // Apply latest color
-                        }
-                    } else {
-                        setStyle(""); // Default style
-                    }
-                }
-            }
-        }
-        );
+//        tblVwMain.setRowFactory(tv -> new TableRow<ModelDisbursementVoucher_Main>() {
+//            @Override
+//            protected void updateItem(ModelDisbursementVoucher_Main item, boolean empty) {
+//                super.updateItem(item, empty);
+//                if (item == null || empty) {
+//                    setStyle("");
+//                } else {
+//                    String key = item.getIndex05();
+//                    if (highlightedRowsMain.containsKey(key)) {
+//                        List<String> colors = highlightedRowsMain.get(key);
+//                        if (!colors.isEmpty()) {
+//                            setStyle("-fx-background-color: " + colors.get(colors.size() - 1) + ";"); // Apply latest color
+//                        }
+//                    } else {
+//                        setStyle(""); // Default style
+//                    }
+//                }
+//            }
+//        }
+//        );
 
         tblVwDetail.addEventFilter(KeyEvent.KEY_PRESSED, this::tableKeyEvents);
         JFXUtil.adjustColumnForScrollbar(tblVwMain, tblVwDetail);

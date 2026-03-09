@@ -149,7 +149,7 @@ public class SOATagging_EntryController implements Initializable, ScreenInterfac
         initDetailsGrid();
         initTableOnClick();
         clearTextFields();
-
+        loadRecordMaster();
         Platform.runLater(() -> {
             poSOATaggingController.SOATagging().Master().setIndustryId(psIndustryId);
 //            poSOATaggingController.SOATagging().Master().setCompanyID(psCompanyId);
@@ -1057,7 +1057,7 @@ public class SOATagging_EntryController implements Initializable, ScreenInterfac
     public void loadRecordMaster() {
         try {
             boolean lbDisable = pnEditMode == EditMode.UPDATE;
-            JFXUtil.setDisabled(lbDisable, tfCompany, tfClient, tfIssuedTo);
+            JFXUtil.setDisabled(lbDisable, tfClient, tfIssuedTo);
 
             String lsActive = pnEditMode == EditMode.UNKNOWN ? "-1" : poSOATaggingController.SOATagging().Master().getTransactionStatus();
             boolean lbPrintStat = pnEditMode == EditMode.READY && !SOATaggingStatus.VOID.equals(lsActive);
