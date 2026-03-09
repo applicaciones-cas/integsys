@@ -345,6 +345,14 @@ public class CheckPrintRequest_EntryController implements Initializable, ScreenI
                     }
                     break;
                  case "btnRemoveDetail":
+                     if(poCheckPrintingRequestController.Master().getTransactionStatus() == CheckPrintRequestStatus.CONFIRMED){
+                        ShowMessageFX.Warning("Details cannot be removed.\n The record is already confirmed.", pxeModuleName, null);
+                        return;
+                    }
+                    if(poCheckPrintingRequestController.Master().isUploaded()){
+                        ShowMessageFX.Warning("Details cannot be removed.\n The record has already been uploaded.", pxeModuleName, null);
+                        return;
+                    }
                      if(poCheckPrintingRequestController.Detail(pnDetail).getSourceNo() != null 
                              || !poCheckPrintingRequestController.Detail(pnDetail).getSourceNo().isEmpty()){
 //                            poCheckPrintingRequestController.Detail(pnDetail).CheckPayments().setProcessed(CheckPrintRequestStatus.OPEN);

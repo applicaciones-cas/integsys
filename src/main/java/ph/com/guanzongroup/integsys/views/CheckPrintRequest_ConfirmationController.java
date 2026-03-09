@@ -124,7 +124,7 @@ public class CheckPrintRequest_ConfirmationController implements Initializable, 
     @FXML
     private HBox hbButtons;
     @FXML
-    private Button btnUpdate, btnSave, btnCancel, btnConfirm, btnVoid, btnExport, btnRetrieve, btnHistory, btnClose;
+    private Button btnUpdate, btnSave, btnCancel, btnConfirm, btnVoid, btnExport, btnRetrieve, btnHistory, btnClose,btnRemoveDetail;
     /*Master*/
     @FXML
     private AnchorPane apMaster;
@@ -235,7 +235,7 @@ public class CheckPrintRequest_ConfirmationController implements Initializable, 
     }
 
     private void initButtonsClickActions() {
-        List<Button> buttons = Arrays.asList(btnUpdate, btnSave, btnCancel, btnConfirm, btnVoid, btnExport, btnRetrieve, btnHistory, btnClose);
+        List<Button> buttons = Arrays.asList(btnUpdate, btnSave, btnCancel, btnConfirm, btnVoid, btnExport, btnRetrieve, btnHistory, btnClose,btnRemoveDetail);
         buttons.forEach(button -> button.setOnAction(this::cmdButton_Click));
     }
 
@@ -312,6 +312,22 @@ public class CheckPrintRequest_ConfirmationController implements Initializable, 
                 case "btnRetrieve":
                     loadTableMain();
                     break;
+                case "btnRemoveDetail":
+                    if(poCheckPrintingRequestController.Master().getTransactionStatus() == CheckPrintRequestStatus.CONFIRMED){
+                        ShowMessageFX.Warning("Details cannot be removed.\n The record is already confirmed.", pxeModuleName, null);
+                        return;
+                    }
+                    if(poCheckPrintingRequestController.Master().isUploaded()){
+                        ShowMessageFX.Warning("Details cannot be removed.\n The record has already been uploaded.", pxeModuleName, null);
+                        return;
+                    }
+                     if(poCheckPrintingRequestController.Detail(pnDetail).getSourceNo() != null 
+                             || !poCheckPrintingRequestController.Detail(pnDetail).getSourceNo().isEmpty()){
+                            poCheckPrintingRequestController.addTransactionNoToRemove(poCheckPrintingRequestController.Detail(pnDetail).getSourceNo());
+                            poCheckPrintingRequestController.Detail().remove(pnDetail);
+                            loadTableDetail();
+                     }
+                    break;
                 case "btnConfirm":
                     if (ShowMessageFX.YesNo(null, pxeModuleName, "Are you sure you want to confirm transaction?")) {
                         poJSON = poCheckPrintingRequestController.ConfirmTransaction("");
@@ -352,6 +368,10 @@ public class CheckPrintRequest_ConfirmationController implements Initializable, 
                     }
                     break;
                 case "btnExport":
+                    if(poCheckPrintingRequestController.Master().getTransactionStatus() != CheckPrintRequestStatus.CONFIRMED){
+                        ShowMessageFX.Warning("Unable to export transaction.\n Please Confrim the transaction before proceeding.", pxeModuleName, null);
+                        return;
+                    }
                     if (ShowMessageFX.YesNo("Are you sure you want to export this transaction?", "Exporting", null)) {
                         poJSON = poCheckPrintingRequestController.ExportTransaction(poCheckPrintingRequestController.Master().getTransactionNo());
                         if ("error".equals((String) poJSON.get("result"))) {
