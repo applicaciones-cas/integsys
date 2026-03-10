@@ -134,7 +134,7 @@ public class PaymentRequest_ConfirmationController implements Initializable, Scr
     @FXML
     private Label lblSource, lblStatus;
     @FXML
-    private TextField  tfAdvances, tfSearchTransaction, tfSearchPayee, tfTransactionNo, tfBranch, tfDepartment, tfPayee, tfSeriesNo, tfTotalAmount, tfDiscountAmount, tfNetAmount, tfSourceNo, tfRecurringNo, tfBranchDetail, tfAccountNo, tfEmployee, tfParticular, tfAmount, tfDiscRate, tfDiscAmountDetail, tfAmountDetail, tfAttachmentNo;
+    private TextField tfSourceTranTotal, tfAdvances, tfSearchTransaction, tfSearchPayee, tfTransactionNo, tfBranch, tfDepartment, tfPayee, tfSeriesNo, tfTotalAmount, tfDiscountAmount, tfNetAmount, tfSourceNo, tfRecurringNo, tfBranchDetail, tfAccountNo, tfEmployee, tfParticular, tfAmount, tfDiscRate, tfDiscAmountDetail, tfAmountDetail, tfAttachmentNo;
     @FXML
     private HBox hbButtons;
     @FXML
@@ -269,6 +269,7 @@ public class PaymentRequest_ConfirmationController implements Initializable, Scr
         initTextFieldPattern();
         initTablePaymentRequest();
         initTableDetail();
+        initAttachmentsGrid();
         initAttachmentPreviewPane();
         initStackPaneListener();
         initButtons(pnEditMode);
@@ -308,6 +309,8 @@ public class PaymentRequest_ConfirmationController implements Initializable, Scr
             taRemarks.setText(poGLControllers.PaymentRequest().Master().getRemarks());
             tfAdvances.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poGLControllers.PaymentRequest().Master().PurchaseOrder().getAmountPaid(), true));
             tfSourceNo.setText(poGLControllers.PaymentRequest().Master().getSourceNo());
+
+            tfSourceTranTotal.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poGLControllers.PaymentRequest().Master().PurchaseOrder().getTranTotal(), true));
         } catch (SQLException | GuanzonException | NullPointerException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
         }
@@ -927,19 +930,9 @@ public class PaymentRequest_ConfirmationController implements Initializable, Scr
 
     private void initAttachmentsGrid() {
         /*FOCUS ON FIRST ROW*/
-        tblRowNoAttachment.setStyle("-fx-alignment: CENTER;-fx-padding: 0 5 0 5;");
-        tblFileNameAttachment.setStyle("-fx-alignment: CENTER;-fx-padding: 0 5 0 5;");
-
-        tblRowNoAttachment.setCellValueFactory(new PropertyValueFactory<>("index01"));
-        tblFileNameAttachment.setCellValueFactory(new PropertyValueFactory<>("index02"));
-
-        tblAttachments.widthProperty().addListener((ObservableValue<? extends Number> source, Number oldWidth, Number newWidth) -> {
-            TableHeaderRow header = (TableHeaderRow) tblAttachments.lookup("TableHeaderRow");
-            header.reorderingProperty().addListener((ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) -> {
-                header.setReordering(false);
-            });
-        });
-
+        JFXUtil.setColumnCenter(tblRowNoAttachment);
+        JFXUtil.setColumnLeft(tblFileNameAttachment);
+        JFXUtil.setColumnsIndexAndDisableReordering(tblAttachments);
         tblAttachments.setItems(attachment_data);
 
         if (pnAttachment < 0 || pnAttachment >= attachment_data.size()) {
@@ -1514,7 +1507,6 @@ public class PaymentRequest_ConfirmationController implements Initializable, Scr
                         if (main_data.isEmpty()) {
                             tblVwPaymentRequest.setPlaceholder(new Label("NO RECORD TO LOAD"));
                         }
-                        tblVwPaymentRequest.setItems(FXCollections.observableArrayList(main_data));
                     });
 
                 } catch (SQLException | GuanzonException ex) {
@@ -1576,17 +1568,11 @@ public class PaymentRequest_ConfirmationController implements Initializable, Scr
     }
 
     private void initTablePaymentRequest() {
-        tblRowNo.setCellValueFactory(new PropertyValueFactory<>("index01"));
-        tblTransactionNo.setCellValueFactory(new PropertyValueFactory<>("index02"));
-        tblBranch.setCellValueFactory(new PropertyValueFactory<>("index03"));
-        tblPayee.setCellValueFactory(new PropertyValueFactory<>("index04"));
+        JFXUtil.setColumnCenter(tblRowNo, tblTransactionNo);
+        JFXUtil.setColumnLeft(tblBranch, tblPayee);
+        JFXUtil.setColumnsIndexAndDisableReordering(tblVwPaymentRequest);
+        tblVwPaymentRequest.setItems(FXCollections.observableArrayList(main_data));
 
-        tblVwPaymentRequest.widthProperty().addListener((ObservableValue<? extends Number> source, Number oldWidth, Number newWidth) -> {
-            TableHeaderRow header = (TableHeaderRow) tblVwPaymentRequest.lookup("TableHeaderRow");
-            header.reorderingProperty().addListener((ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) -> {
-                header.setReordering(false);
-            });
-        });
         initTableHighlithers();
     }
 
