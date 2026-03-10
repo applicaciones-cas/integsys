@@ -81,7 +81,8 @@ public class CheckDeposit_ConfirmationController implements Initializable, Scree
     private int pnTblMain_Page = 50;
     private TextField activeField;
     private String prevPayee = "";
-    private final Map<String, List<String>> highlightedRowsMain = new HashMap<>();
+    private final Map<String, List<String>> highlightedRowsMain = new HashMap<>();    
+    private final Map<String, List<String>> highlightedRowsDetail = new HashMap<>();
     List<Pair<String, String>> plOrderNoPartial = new ArrayList<>();
     List<Pair<String, String>> plOrderNoFinal = new ArrayList<>();
     
@@ -365,6 +366,7 @@ public class CheckDeposit_ConfirmationController implements Initializable, Scree
                                 return;
                             }
                             ShowMessageFX.Information((String) poJSON.get("message"), psFormName, null);
+                            JFXUtil.disableAllHighlightByColor(tblViewMaster, "#A7C7E7", highlightedRowsMain);
                         }
                     }
 
@@ -397,12 +399,14 @@ public class CheckDeposit_ConfirmationController implements Initializable, Scree
                 break;
                 
                 case "btnPrint":
+                    
                     if (ShowMessageFX.YesNo(null, psFormName, "Do you want to print this transaction?")) {
                         poJSON = poGLControllers.CheckDeposits().printDepositSlip();
                         if ("error".equals((String) poJSON.get("result"))) {
                             ShowMessageFX.Error((String) poJSON.get("message"), psFormName, null);
                         }
                         ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
+                        JFXUtil.disableAllHighlightByColor(tblViewMaster, "#A7C7E7", highlightedRowsMain);
                     }
                 break;
 
@@ -836,6 +840,8 @@ public class CheckDeposit_ConfirmationController implements Initializable, Scree
                                 LoadDetail();
                                 pnEditMode = poGLControllers.CheckDeposits().getEditMode();
                                 initButtons(pnEditMode);
+                                JFXUtil.applyRowHighlighting(tblViewMaster, item -> ((ModelTableMain) item).getIndex02(), highlightedRowsMain);
+                                JFXUtil.applyRowHighlighting(tblViewDetails, item -> ((ModelTableDetail) item).getIndex02(), highlightedRowsDetail);
                             } else {
                                 ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
                                 pnEditMode = EditMode.UNKNOWN;
@@ -892,6 +898,10 @@ public class CheckDeposit_ConfirmationController implements Initializable, Scree
                                         poGLControllers.CheckDeposits().poCheckDepositMaster(lnCntr).BankAccount().getAccountName()== null ? ""
                                         : poGLControllers.CheckDeposits().poCheckDepositMaster(lnCntr).BankAccount().getAccountName(), "", "", "", "", ""
                                         ));
+                                
+                                if (poGLControllers.CheckDeposits().Master().getTransactionStatus().equals(CheckTransferStatus.CONFIRMED)) {
+                                    JFXUtil.highlightByKey(tblViewMaster, String.valueOf(lnCntr + 1), "#C1E1C1", highlightedRowsMain);
+                                }
                             }
                         } else {
                             main_data.clear();

@@ -264,19 +264,23 @@ public class CheckDeposit_HistoryController implements Initializable, ScreenInte
                 case "btnPost":
                     if (poGLControllers.CheckDeposits().Master().getTransactionNo() == null
                             || poGLControllers.CheckDeposits().Master().getTransactionNo().isEmpty()) {
-
                         ShowMessageFX.Warning("No transaction selected.", psFormName, null);
                         return;
                     }
-
-                    if (!poGLControllers.CheckDeposits().Master().getTransactionStatus().equals(CheckTransferStatus.CONFIRMED)
-                            || !poGLControllers.CheckDeposits().Master().getPrintStatus().equals(CheckTransferStatus.CONFIRMED)) {
-
-                        ShowMessageFX.Warning(
-                                "Posting is not allowed. Please confirm and print the transaction before proceeding.",
-                                psFormName, null
-                        );
-                        return;
+                    
+                    if (poGLControllers.CheckDeposits().Master().getTransactionStatus().equals(CheckTransferStatus.POSTED)){
+                         ShowMessageFX.Warning("Transaction is already posted",psFormName, null);
+                         return ;
+                    }
+                    
+                    if (!poGLControllers.CheckDeposits().Master().getTransactionStatus().equals(CheckTransferStatus.CONFIRMED) ||
+                            !poGLControllers.CheckDeposits().Master().getTransactionStatus().equals(CheckTransferStatus.OPEN)){
+                         ShowMessageFX.Warning("Posting is not allowed. Please confirm transaction before proceeding.",psFormName, null);
+                         return ;
+                    }
+                    if (!poGLControllers.CheckDeposits().Master().getPrintStatus().equals(CheckTransferStatus.CONFIRMED)){
+                         ShowMessageFX.Warning("Posting is not allowed. Please print transaction before proceeding.",psFormName, null);
+                         return ;
                     }
 
                     poJSON = poGLControllers.CheckDeposits().PostTransaction("");
