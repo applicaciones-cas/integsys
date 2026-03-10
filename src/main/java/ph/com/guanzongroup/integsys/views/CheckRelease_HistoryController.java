@@ -54,6 +54,7 @@ import org.guanzon.appdriver.constant.UserRight;
 import org.json.simple.JSONObject;
 import ph.com.guanzongroup.cas.cashflow.status.CheckTransferStatus;
 import ph.com.guanzongroup.cas.cashflow.services.CashflowControllers;
+import ph.com.guanzongroup.cas.cashflow.status.CheckReleaseStatus;
 import ph.com.guanzongroup.integsys.model.ModelTableDetail;
 import ph.com.guanzongroup.integsys.model.ModelTableMain;
 import ph.com.guanzongroup.integsys.utility.CustomCommonUtil;
@@ -110,7 +111,7 @@ public class CheckRelease_HistoryController implements Initializable, ScreenInte
     private Label lblSource, lblStatus;
 
     @FXML
-    private Button btnClose, btnBrowse, btnPrint,btnHistory;
+    private Button btnClose, btnBrowse, btnPrint,btnHistory,btnPost;
 
     @FXML
     private TextArea taRemarks;
@@ -198,7 +199,7 @@ public class CheckRelease_HistoryController implements Initializable, ScreenInte
         taRemarks.clear();
     }
     private void initButtonsClickActions() {
-        List<Button> buttons = Arrays.asList(btnBrowse, btnPrint,btnClose,btnHistory);
+        List<Button> buttons = Arrays.asList(btnBrowse, btnPrint,btnClose,btnHistory,btnPost);
         buttons.forEach(button -> button.setOnAction(this::handleButtonAction));
     }
     
@@ -251,23 +252,45 @@ public class CheckRelease_HistoryController implements Initializable, ScreenInte
                                 ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
                                 return;
                             }
-                            poGLControllers.CheckReleases().OpenTransaction(poGLControllers.CheckReleases().Master().getTransactionNo());
+                            
+                            
                    }
+                   
                     break;
                     
                 case "btnPost":
+                    
                     if (poGLControllers.CheckReleases().Master().getTransactionNo() == null
                             || poGLControllers.CheckReleases().Master().getTransactionNo().isEmpty()) {
 
                         ShowMessageFX.Warning("No transaction selected.", psFormName, null);
                         return;
                     }
+                    poJSON = poGLControllers.CheckReleases().OpenTransaction(poGLControllers.CheckReleases().Master().getTransactionNo());
+                            if (!"success".equals((String) poJSON.get("result"))) {
+                                ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
+                                return;
+                            }
+                            pnEditMode = poGLControllers.CheckReleases().getEditMode();
+                    if(poGLControllers.CheckReleases().Master().getTransactionStatus().equals(CheckTransferStatus.VOID)){
+                     ShowMessageFX.Warning(
+                                "Transaction already voided.\n Posting of this transaction is not allowed.",
+                                psFormName, null
+                        );
+                        
+                        return;
+                    }
+                    if(!poGLControllers.CheckReleases().Master().isPrintedStatus()){
+                     ShowMessageFX.Warning(
+                                "Posting is not allowed. Please print the transaction before proceeding.",
+                                psFormName, null
+                        );
+                        return;
+                    }
 
-                    if (!poGLControllers.CheckReleases().Master().getTransactionStatus().equals(CheckTransferStatus.CONFIRMED)
-                            || !poGLControllers.CheckReleases().Master().getPrintStatus().equals(CheckTransferStatus.CONFIRMED)) {
-
+                    if (!poGLControllers.CheckReleases().Master().getTransactionStatus().equals(CheckTransferStatus.CONFIRMED)) {
                         ShowMessageFX.Warning(
-                                "Posting is not allowed. Please confirm and print the transaction before proceeding.",
+                                "Posting is not allowed. Please confirm  the transaction before proceeding.",
                                 psFormName, null
                         );
                         return;
@@ -350,14 +373,20 @@ public class CheckRelease_HistoryController implements Initializable, ScreenInte
 
             String lsStatus = "";
             switch (poGLControllers.CheckReleases().Master().getTransactionStatus()) {
-                case CheckTransferStatus.VOID:
+                case CheckReleaseStatus.VOID:
                     lsStatus = "VOID";
                     break;
-                case CheckTransferStatus.OPEN:
+                case CheckReleaseStatus.OPEN:
                     lsStatus = "OPEN";
                     break;
-                case CheckTransferStatus.CONFIRMED:
+                case CheckReleaseStatus.CONFIRMED:
                     lsStatus = "CONFIRMED";
+                    break;
+                case CheckReleaseStatus.RELEASED:
+                    lsStatus = "RELEASED";
+                    break;
+                default:
+                    lsStatus = "UNKNOWN";
                     break;
             }
             lblStatus.setText(lsStatus);

@@ -33,6 +33,7 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.input.KeyCode;
 import static javafx.scene.input.KeyCode.DOWN;
 import static javafx.scene.input.KeyCode.ENTER;
 import static javafx.scene.input.KeyCode.F3;
@@ -164,6 +165,12 @@ public class CheckRelease_EntryController implements Initializable, ScreenInterf
         initTableOnClick();
         initCheckBox();
         Platform.runLater(() -> btnNew.fire());
+        tfReceivedBy.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
+            if (event.getCode() == KeyCode.TAB) {
+                event.consume();
+                taRemarks.requestFocus();
+            }
+        });
     }
     
     /**
@@ -317,7 +324,7 @@ public class CheckRelease_EntryController implements Initializable, ScreenInterf
                         return;
                     }
                     ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
-                    if (poApp.getUserLevel() > UserRight.ENCODER) {
+
                         if (ShowMessageFX.YesNo(null, psFormName, "Do you want to confirm this transaction?")) {
                                 poJSON = poGLControllers.CheckReleases().OpenTransaction(poGLControllers.CheckReleases().Master().getTransactionNo());
                                 poJSON = poGLControllers.CheckReleases().ConfirmTransaction("");
@@ -332,10 +339,10 @@ public class CheckRelease_EntryController implements Initializable, ScreenInterf
                             poJSON = poGLControllers.CheckReleases().printTransaction();
                             if ("error".equals((String) poJSON.get("result"))) {
                                 ShowMessageFX.Error((String) poJSON.get("message"), psFormName, null);
+                                return;
                             }
                             ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
                         }
-                    }
 
                     ClearAll();
                     btnNew.fire();
@@ -413,7 +420,7 @@ public class CheckRelease_EntryController implements Initializable, ScreenInterf
             apDetail.setDisable(false);
         }
         
-            List<TextField> loTxtField = Arrays.asList(tfCheckTransNo, tfCheckNo,tfFilterBank);
+            List<TextField> loTxtField = Arrays.asList(tfCheckTransNo, tfCheckNo,tfFilterBank,tfReceivedBy);
             loTxtField.forEach(tf -> tf.setOnKeyPressed(event -> txtField_KeyPressed(event)));
 //
             JFXUtil.setFocusListener(txtArea_Focus, taRemarks);
@@ -895,9 +902,7 @@ public class CheckRelease_EntryController implements Initializable, ScreenInterf
                 /* Lost Focus */
                 switch (lsID) {
 //                    
-                    case "taRemarks":
-                        poGLControllers.CheckReleases().Master().setRemarks(lsValue.trim());
-                        break;
+                   
                     case "tfNote":
                         psActiveField = lsID;
 //                        poGLControllers.CheckReleases().Detail(pnSelectedDetail).setRemarks(lsValue.trim());
@@ -908,6 +913,7 @@ public class CheckRelease_EntryController implements Initializable, ScreenInterf
                         break;
                     case "tfReceivedBy":
                         poGLControllers.CheckReleases().Master().setReceivedBy(lsValue.trim());
+                        taRemarks.requestFocus();
                         break;
                      case "tfCheckTransNo":
                         psActiveField = lsID;
@@ -951,10 +957,20 @@ public class CheckRelease_EntryController implements Initializable, ScreenInterf
             try {
                 switch (event.getCode()) {
                     case TAB:
+                        switch (txtFieldID) {
+                            case "tfFilterBank":
+                                loadTableMaster();
+                                break;
+                        }
+                        break;
                     case ENTER:
                         switch (txtFieldID) {
                             case "tfFilterBank":
                                 loadTableMaster();
+                                break;
+                            case "tfReceivedBy":
+                                taRemarks.requestFocus();
+                                
                                 break;
                         }
                         break;

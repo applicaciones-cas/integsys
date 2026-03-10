@@ -32,6 +32,7 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.input.KeyCode;
 import static javafx.scene.input.KeyCode.DOWN;
 import static javafx.scene.input.KeyCode.ENTER;
 import static javafx.scene.input.KeyCode.F3;
@@ -161,6 +162,13 @@ public class CheckRelease_ConfirmationController implements Initializable, Scree
         initCheckBox();
         pnEditMode = poGLControllers.CheckReleases().getEditMode();
         initButtons(pnEditMode);
+        
+        tfReceivedBy.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
+            if (event.getCode() == KeyCode.TAB) {
+                event.consume();         // Stop default focus traversal
+                taRemarks.requestFocus(); // Move focus to TextArea
+            }
+        });
 
     }
     
@@ -916,10 +924,20 @@ public class CheckRelease_ConfirmationController implements Initializable, Scree
             try {
                 switch (event.getCode()) {
                     case TAB:
+                        switch (txtFieldID) {
+                            case "tfFilterBank":
+                                loadTableMaster();
+                                break;
+                        }
+                        break;
                     case ENTER:
                         switch (txtFieldID) {
                             case "tfFilterBank":
                                 loadTableMaster();
+                                break;
+                            case "tfReceivedBy":
+                                taRemarks.requestFocus();
+                                
                                 break;
                         }
                         break;
@@ -958,4 +976,14 @@ public class CheckRelease_ConfirmationController implements Initializable, Scree
             }
         }
     }
+    
+//    tfReceivedBy. addEventFilter (KeyEvent.KEY_PRESSED, event  
+//        -> {
+//    if (event.getCode() == KeyCode.TAB) {
+//            event.consume();         // Stop default focus traversal
+//            taRemarks.requestFocus(); // Move focus to TextArea
+//        }
+//    }
+//);
+    
 }
