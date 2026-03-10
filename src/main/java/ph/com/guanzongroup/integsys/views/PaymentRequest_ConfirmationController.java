@@ -19,6 +19,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.animation.PauseTransition;
@@ -128,13 +129,14 @@ public class PaymentRequest_ConfirmationController implements Initializable, Scr
     private ObservableList<ModelPRFAttachment> attachment_data = FXCollections.observableArrayList();
     ObservableList<String> documentType = ModelPRFAttachment.documentType;
     Map<String, String> imageinfo_temp = new HashMap<>();
-
+    AtomicReference<Object> lastFocusedTextField = new AtomicReference<>();
+    AtomicReference<Object> previousSearchedTextField = new AtomicReference<>();
     @FXML
     private AnchorPane AnchorMain, apBrowse, apButton, apMaster, apDetail, apAttachments, apAttachmentButtons;
     @FXML
     private Label lblSource, lblStatus;
     @FXML
-    private TextField  tfAdvances, tfSearchTransaction, tfSearchPayee, tfTransactionNo, tfBranch, tfDepartment, tfPayee, tfSeriesNo, tfTotalAmount, tfDiscountAmount, tfNetAmount, tfSourceNo, tfRecurringNo, tfBranchDetail, tfAccountNo, tfEmployee, tfParticular, tfAmount, tfDiscRate, tfDiscAmountDetail, tfAmountDetail, tfAttachmentNo;
+    private TextField tfSourceTranTotal, tfAdvances, tfSearchTransaction, tfSearchPayee, tfTransactionNo, tfBranch, tfDepartment, tfPayee, tfSeriesNo, tfTotalAmount, tfDiscountAmount, tfNetAmount, tfSourceNo, tfRecurringNo, tfBranchDetail, tfAccountNo, tfEmployee, tfParticular, tfAmount, tfDiscRate, tfDiscAmountDetail, tfAmountDetail, tfAttachmentNo;
     @FXML
     private HBox hbButtons;
     @FXML
@@ -210,7 +212,7 @@ public class PaymentRequest_ConfirmationController implements Initializable, Scr
             }));
             Platform.runLater(() -> setBranchAndDepartment());
             initAll();
-
+            JFXUtil.initKeyClickObject(AnchorMain, lastFocusedTextField, previousSearchedTextField);
         } catch (ExceptionInInitializerError | SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
         }
@@ -269,6 +271,7 @@ public class PaymentRequest_ConfirmationController implements Initializable, Scr
         initTextFieldPattern();
         initTablePaymentRequest();
         initTableDetail();
+        initAttachmentsGrid();
         initAttachmentPreviewPane();
         initStackPaneListener();
         initButtons(pnEditMode);
@@ -308,6 +311,8 @@ public class PaymentRequest_ConfirmationController implements Initializable, Scr
             taRemarks.setText(poGLControllers.PaymentRequest().Master().getRemarks());
             tfAdvances.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poGLControllers.PaymentRequest().Master().PurchaseOrder().getAmountPaid(), true));
             tfSourceNo.setText(poGLControllers.PaymentRequest().Master().getSourceNo());
+
+            tfSourceTranTotal.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poGLControllers.PaymentRequest().Master().PurchaseOrder().getTranTotal(), true));
         } catch (SQLException | GuanzonException | NullPointerException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
         }
@@ -353,7 +358,7 @@ public class PaymentRequest_ConfirmationController implements Initializable, Scr
     private void initButtonsClickActions() {
         List<Button> buttons = Arrays.asList(btnUpdate, btnSave, btnCancel, btnVoid, btnReturn,
                 btnRetrieve, btnHistory, btnClose, btnConfirm,
-                btnAddAttachment, btnRemoveAttachment, btnArrowLeft, btnArrowRight);
+                btnAddAttachment, btnRemoveAttachment, btnArrowLeft, btnArrowRight, btnSearch);
         buttons.forEach(button -> button.setOnAction(this::handleButtonAction));
     }
 
@@ -374,27 +379,7 @@ public class PaymentRequest_ConfirmationController implements Initializable, Scr
                     pagination.toFront();
                     break;
                 case "btnSearch":
-                    if (activeField != null) {
-                        String loTextFieldId = activeField.getId();
-                        String lsValue = activeField.getText().trim();
-                        switch (loTextFieldId) {
-                            case "tfParticular":
-                                poJSON = poGLControllers.PaymentRequest().SearchParticular(lsValue, false, pnTblDetailRow);
-                                if ("error".equals(poJSON.get("result"))) {
-                                    ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
-                                    tfParticular.setText("");
-                                    break;
-                                }
-                                tfParticular.setText(poGLControllers.PaymentRequest().Detail(pnTblDetailRow).getParticularID());
-                                if (tfParticular.getText().isEmpty()) {
-                                    tfParticular.requestFocus();
-                                }
-
-                                break;
-                            default:
-                                System.out.println("Unknown TextField");
-                        }
-                    }
+                    JFXUtil.initiateBtnSearch(psFormName, lastFocusedTextField, previousSearchedTextField, apBrowse, apMaster, apDetail);
                     break;
                 case "btnSave":
                     if (!ShowMessageFX.YesNo(null, psFormName, "Are you sure you want to save?")) {
@@ -927,19 +912,9 @@ public class PaymentRequest_ConfirmationController implements Initializable, Scr
 
     private void initAttachmentsGrid() {
         /*FOCUS ON FIRST ROW*/
-        tblRowNoAttachment.setStyle("-fx-alignment: CENTER;-fx-padding: 0 5 0 5;");
-        tblFileNameAttachment.setStyle("-fx-alignment: CENTER;-fx-padding: 0 5 0 5;");
-
-        tblRowNoAttachment.setCellValueFactory(new PropertyValueFactory<>("index01"));
-        tblFileNameAttachment.setCellValueFactory(new PropertyValueFactory<>("index02"));
-
-        tblAttachments.widthProperty().addListener((ObservableValue<? extends Number> source, Number oldWidth, Number newWidth) -> {
-            TableHeaderRow header = (TableHeaderRow) tblAttachments.lookup("TableHeaderRow");
-            header.reorderingProperty().addListener((ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) -> {
-                header.setReordering(false);
-            });
-        });
-
+        JFXUtil.setColumnCenter(tblRowNoAttachment);
+        JFXUtil.setColumnLeft(tblFileNameAttachment);
+        JFXUtil.setColumnsIndexAndDisableReordering(tblAttachments);
         tblAttachments.setItems(attachment_data);
 
         if (pnAttachment < 0 || pnAttachment >= attachment_data.size()) {
@@ -1120,16 +1095,16 @@ public class PaymentRequest_ConfirmationController implements Initializable, Scr
                                     if ("error".equals(poJSON.get("result"))) {
                                         ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
                                         tfParticular.setText("");
-                                        if (poJSON.get("tableRow") != null) {
-                                            Object obj = poJSON.get("tableRow");
+                                        if (poJSON.get("row") != null) {
+                                            Object obj = poJSON.get("row");
                                             int value = Integer.valueOf(String.valueOf(obj));
                                             pnTblDetailRow = value;
                                         } else {
                                             break;
                                         }
                                     } else {
-                                        if (poJSON.get("tableRow") != null) {
-                                            Object obj = poJSON.get("tableRow");
+                                        if (poJSON.get("row") != null) {
+                                            Object obj = poJSON.get("row");
                                             int value = Integer.valueOf(String.valueOf(obj));
                                             pnTblDetailRow = value;
                                         } else {
@@ -1414,6 +1389,7 @@ public class PaymentRequest_ConfirmationController implements Initializable, Scr
     }
 
     private void clearMasterFields() {
+        JFXUtil.setValueToNull(previousSearchedTextField, lastFocusedTextField);
         pnTblDetailRow = -1;
         lblStatus.setText("");
         imageView.setImage(null);
@@ -1436,7 +1412,8 @@ public class PaymentRequest_ConfirmationController implements Initializable, Scr
 
             CustomCommonUtil.setVisible(false, btnConfirm, btnReturn, btnVoid, btnUpdate, btnSearch);
             CustomCommonUtil.setManaged(false, btnConfirm, btnReturn, btnVoid, btnUpdate, btnSearch);
-
+            CustomCommonUtil.setVisible(lbShow, btnSearch);
+            CustomCommonUtil.setManaged(lbShow, btnSearch);
             JFXUtil.setButtonsVisibility(fnEditMode == EditMode.READY, btnHistory);
             JFXUtil.setDisabled(!lbShow, apMaster, apDetail, apAttachments);
             if (fnEditMode == EditMode.READY) {
@@ -1514,7 +1491,6 @@ public class PaymentRequest_ConfirmationController implements Initializable, Scr
                         if (main_data.isEmpty()) {
                             tblVwPaymentRequest.setPlaceholder(new Label("NO RECORD TO LOAD"));
                         }
-                        tblVwPaymentRequest.setItems(FXCollections.observableArrayList(main_data));
                     });
 
                 } catch (SQLException | GuanzonException ex) {
@@ -1576,17 +1552,11 @@ public class PaymentRequest_ConfirmationController implements Initializable, Scr
     }
 
     private void initTablePaymentRequest() {
-        tblRowNo.setCellValueFactory(new PropertyValueFactory<>("index01"));
-        tblTransactionNo.setCellValueFactory(new PropertyValueFactory<>("index02"));
-        tblBranch.setCellValueFactory(new PropertyValueFactory<>("index03"));
-        tblPayee.setCellValueFactory(new PropertyValueFactory<>("index04"));
+        JFXUtil.setColumnCenter(tblRowNo, tblTransactionNo);
+        JFXUtil.setColumnLeft(tblBranch, tblPayee);
+        JFXUtil.setColumnsIndexAndDisableReordering(tblVwPaymentRequest);
+        tblVwPaymentRequest.setItems(FXCollections.observableArrayList(main_data));
 
-        tblVwPaymentRequest.widthProperty().addListener((ObservableValue<? extends Number> source, Number oldWidth, Number newWidth) -> {
-            TableHeaderRow header = (TableHeaderRow) tblVwPaymentRequest.lookup("TableHeaderRow");
-            header.reorderingProperty().addListener((ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) -> {
-                header.setReordering(false);
-            });
-        });
         initTableHighlithers();
     }
 
