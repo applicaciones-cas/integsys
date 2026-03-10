@@ -1095,16 +1095,16 @@ public class PaymentRequest_ConfirmationController implements Initializable, Scr
                                     if ("error".equals(poJSON.get("result"))) {
                                         ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
                                         tfParticular.setText("");
-                                        if (poJSON.get("tableRow") != null) {
-                                            Object obj = poJSON.get("tableRow");
+                                        if (poJSON.get("row") != null) {
+                                            Object obj = poJSON.get("row");
                                             int value = Integer.valueOf(String.valueOf(obj));
                                             pnTblDetailRow = value;
                                         } else {
                                             break;
                                         }
                                     } else {
-                                        if (poJSON.get("tableRow") != null) {
-                                            Object obj = poJSON.get("tableRow");
+                                        if (poJSON.get("row") != null) {
+                                            Object obj = poJSON.get("row");
                                             int value = Integer.valueOf(String.valueOf(obj));
                                             pnTblDetailRow = value;
                                         } else {
