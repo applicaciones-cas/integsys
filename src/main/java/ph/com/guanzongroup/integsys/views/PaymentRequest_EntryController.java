@@ -21,6 +21,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.animation.PauseTransition;
@@ -132,7 +133,8 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
     private ObservableList<ModelTableDetail> detail_data = FXCollections.observableArrayList();
     private ObservableList<ModelPRFAttachment> attachment_data = FXCollections.observableArrayList();
     ObservableList<String> documentType = ModelPRFAttachment.documentType;
-
+    AtomicReference<Object> lastFocusedTextField = new AtomicReference<>();
+    AtomicReference<Object> previousSearchedTextField = new AtomicReference<>();
     @FXML
     private AnchorPane AnchorMain, apBrowse, apButton, apMaster, apDetail, apAttachments, apAttachmentButtons;
     @FXML
@@ -248,6 +250,7 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
             Platform.runLater(() -> setBranchAndDepartment());
             Platform.runLater(() -> btnNew.fire());
             initAll();
+            JFXUtil.initKeyClickObject(AnchorMain, lastFocusedTextField, previousSearchedTextField);
         } catch (ExceptionInInitializerError | SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
         }
@@ -334,7 +337,7 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
             taRemarks.setText(poGLControllers.PaymentRequest().Master().getRemarks());
             tfAdvances.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poGLControllers.PaymentRequest().Master().PurchaseOrder().getAmountPaid(), true));
             tfSourceNo.setText(poGLControllers.PaymentRequest().Master().getSourceNo());
-            
+
             tfSourceTranTotal.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poGLControllers.PaymentRequest().Master().PurchaseOrder().getTranTotal(), true));
         } catch (SQLException | GuanzonException | NullPointerException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
@@ -435,7 +438,6 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
                             }
                         }
 
-                        tfDepartment.setPromptText("");
                         CustomCommonUtil.switchToTab(tabDetails, ImTabPane);
                         loadRecordMaster();
                         pnTblDetailRow = 0;
@@ -456,68 +458,7 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
                     pnEditMode = poGLControllers.PaymentRequest().getEditMode();
                     break;
                 case "btnSearch":
-                    if (activeField != null) {
-                        String loTextFieldId = activeField.getId();
-                        String lsValue = activeField.getText().trim();
-                        switch (loTextFieldId) {
-                            case "tfPayee":
-                                if (!isExchangingPayee()) {
-                                    return;
-                                }
-                                poJSON = poGLControllers.PaymentRequest().SearchPayee(lsValue, false);
-                                if ("error".equals(poJSON.get("result"))) {
-                                    ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
-                                    tfPayee.setText("");
-                                    break;
-                                }
-                                prevPayee = poGLControllers.PaymentRequest().Master().getPayeeID();
-                                tfPayee.setText(poGLControllers.PaymentRequest().Master().Payee().getPayeeName());
-                                if (tfPayee.getText().isEmpty()) {
-                                    tfPayee.requestFocus();
-                                }
-                                loadTableMain();
-                                break;
-                            case "tfDepartment":
-                                poJSON = poGLControllers.PaymentRequest().SearchDepartment(lsValue, false);
-                                if ("error".equals(poJSON.get("result"))) {
-                                    ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
-                                    tfDepartment.setText("");
-                                    break;
-                                }
-                                tfDepartment.setText(poGLControllers.PaymentRequest().Master().Department().getDescription());
-                                if (tfDepartment.getText().isEmpty()) {
-                                    tfDepartment.requestFocus();
-                                }
-
-                                break;
-                            case "tfParticular":
-                                if (!tfPayee.getText().isEmpty()) {
-                                    if (pnTblDetailRow < 0) {
-                                        ShowMessageFX.Warning("Invalid row to update.", psFormName, null);
-                                        clearDetailFields();
-                                        break;
-                                    }
-                                    poJSON = poGLControllers.PaymentRequest().SearchParticular(lsValue, true, pnTblDetailRow);
-                                    if ("error".equals(poJSON.get("result"))) {
-                                        ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
-                                        tfParticular.setText("");
-                                        if (poJSON.get("tableRow") != null) {
-                                            pnTblDetailRow = (int) poJSON.get("tableRow");
-                                        } else {
-                                            break;
-                                        }
-                                    }
-                                    loadTableDetail();
-                                    initDetailFocus();
-                                } else {
-                                    ShowMessageFX.Warning("Please enter Payee field first.", psFormName, null);
-                                    tfPayee.requestFocus();
-                                }
-                                break;
-                            default:
-                                System.out.println("Unknown TextField");
-                        }
-                    }
+                    JFXUtil.initiateBtnSearch(psFormName, lastFocusedTextField, previousSearchedTextField, apBrowse, apMaster, apDetail);
                     break;
                 case "btnSave":
                     if (!ShowMessageFX.YesNo(null, psFormName, "Are you sure you want to save?")) {
@@ -1511,6 +1452,7 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
     }
 
     private void clearMasterFields() {
+        JFXUtil.setValueToNull(previousSearchedTextField, lastFocusedTextField);
         pnTblDetailRow = -1;
         lblStatus.setText("");
         imageView.setImage(null);
