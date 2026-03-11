@@ -55,6 +55,7 @@ import org.guanzon.cas.purchasing.status.PurchaseOrderStaticData;
 import org.json.simple.JSONObject;
 import ph.com.guanzongroup.cas.cashflow.status.CheckTransferStatus;
 import ph.com.guanzongroup.cas.cashflow.services.CashflowControllers;
+import ph.com.guanzongroup.cas.cashflow.status.CheckReleaseStatus;
 import ph.com.guanzongroup.integsys.model.ModelTableDetail;
 import ph.com.guanzongroup.integsys.model.ModelTableMain;
 import ph.com.guanzongroup.integsys.utility.CustomCommonUtil;
@@ -205,7 +206,9 @@ public class CheckRelease_ConfirmationController implements Initializable, Scree
         taRemarks.clear();
         detail_data.clear();
         pnSelectedDetail = 0;
-        psActiveField = "";
+        dpTransactionDate.setValue(null);
+        psActiveField = "";        
+        lblStatus.setText("UNKNOWN");
     }
     private void initButtonsClickActions() {
         List<Button> buttons = Arrays.asList(btnBrowse, btnUpdate, btnSave, btnHistory,btnCancel, btnClose,btnRetrieve,btnPrint,btnSearch,btnApprove,btnVoid);
@@ -283,6 +286,11 @@ public class CheckRelease_ConfirmationController implements Initializable, Scree
                     }
                     break;
                 case "btnUpdate":
+                    if (CheckReleaseStatus.VOID.equals(poGLControllers.CheckReleases().Master().getTransactionStatus())) {
+                        ShowMessageFX.Warning("This transaction is void and cannot be updated.", psFormName, null);
+                        return;
+                    }
+                    
                     poJSON = poGLControllers.CheckReleases().UpdateTransaction();
                     if (!"success".equals((String) poJSON.get("result"))) {
                         ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
@@ -311,6 +319,7 @@ public class CheckRelease_ConfirmationController implements Initializable, Scree
                         return;
                     }
                     ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
+                    pnEditMode = poGLControllers.CheckReleases().getEditMode();
                     if (poApp.getUserLevel() > UserRight.ENCODER) {
                         if (ShowMessageFX.YesNo(null, psFormName, "Do you want to confirm this transaction?")) {
                                 poJSON = poGLControllers.CheckReleases().OpenTransaction(poGLControllers.CheckReleases().Master().getTransactionNo());
@@ -318,13 +327,16 @@ public class CheckRelease_ConfirmationController implements Initializable, Scree
                           
                             if (!"success".equals((String) poJSON.get("result"))) {
                                 ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
+                                ClearAll();
+                                initButtons(pnEditMode);
                                 return;
                             }
-                            ShowMessageFX.Information((String) poJSON.get("message"), psFormName, null);
+                            
                         }
                     }
 
                     ClearAll();
+                    initButtons(pnEditMode);
                     break;
 
                 case "btnVoid":
@@ -340,6 +352,10 @@ public class CheckRelease_ConfirmationController implements Initializable, Scree
                        initButtons(pnEditMode);
                 break;
                 case "btnApprove":
+                        if (CheckReleaseStatus.VOID.equals(poGLControllers.CheckReleases().Master().getTransactionStatus())) {
+                            ShowMessageFX.Warning("This transaction is void and cannot be updated.", psFormName, null);
+                            return;
+                        }
                        poJSON = poGLControllers.CheckReleases().ConfirmTransaction("");
                        if (!"success".equals((String) poJSON.get("result"))) {
                            ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
@@ -357,8 +373,8 @@ public class CheckRelease_ConfirmationController implements Initializable, Scree
                         poJSON = poGLControllers.CheckReleases().printTransaction();
                         if ("error".equals((String) poJSON.get("result"))) {
                             ShowMessageFX.Error((String) poJSON.get("message"), psFormName, null);
+                            return;
                         }
-                        ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
                     }
                 break;
 
@@ -764,20 +780,32 @@ public class CheckRelease_ConfirmationController implements Initializable, Scree
 
             // Double-click logic
             if (event.getClickCount() == 2) {
+                 if (pnEditMode == EditMode.UPDATE) {
+                    boolean lbProceed = ShowMessageFX.YesNo(
+                            "Loading another transaction will invalidate all current updates on the loaded transaction.\n\nDo you want to proceed?",
+                            psFormName,
+                            "Confirm Action"
+                    );
+
+                    if (!lbProceed) {
+                        return; // Stop loading another transaction
+                    }
+                }
+                ClearAll();
                 ModelTableMain loCheckPaym = (ModelTableMain) tblViewMaster.getSelectionModel().getSelectedItem();
                 if (loCheckPaym != null) {
                     String lsCheckTransfer = loCheckPaym.getIndex02();
-
+                    
                     try {
                         poJSON = poGLControllers.CheckReleases().InitTransaction();
                         if ("success".equals((String) poJSON.get("result"))) {
                             poJSON = poGLControllers.CheckReleases().OpenTransaction(lsCheckTransfer);
                             if ("success".equals((String) poJSON.get("result"))) {
                                 ClearAll();
+                                pnEditMode = poGLControllers.CheckReleases().getEditMode();
                                 loadTableDetail();
                                 LoadMaster();
                                 LoadDetail();
-                                pnEditMode = poGLControllers.CheckReleases().getEditMode();
                                 initButtons(pnEditMode);
                             } else {
                                 ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
@@ -795,6 +823,7 @@ public class CheckRelease_ConfirmationController implements Initializable, Scree
                     }
                 }
             }
+            
         }
     }
     private void loadTableMaster() {

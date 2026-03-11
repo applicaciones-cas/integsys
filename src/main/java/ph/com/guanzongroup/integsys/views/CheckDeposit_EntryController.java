@@ -473,13 +473,15 @@ public class CheckDeposit_EntryController implements Initializable, ScreenInterf
                         return;
                     }
                     ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
-                    if (poApp.getUserLevel() > UserRight.ENCODER) {
+                    
                         if (ShowMessageFX.YesNo(null, psFormName, "Do you want to confirm this transaction?")) {
                                 poJSON = poGLControllers.CheckDeposits().OpenTransaction(poGLControllers.CheckDeposits().Master().getTransactionNo());
                                 poJSON = poGLControllers.CheckDeposits().ConfirmTransaction("");
                           
                             if (!"success".equals((String) poJSON.get("result"))) {
                                 ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
+                                ClearAll();
+                                btnNew.fire();
                                 return;
                             }
                             ShowMessageFX.Information((String) poJSON.get("message"), psFormName, null);
@@ -488,10 +490,11 @@ public class CheckDeposit_EntryController implements Initializable, ScreenInterf
                             poJSON = poGLControllers.CheckDeposits().printTransaction();
                             if ("error".equals((String) poJSON.get("result"))) {
                                 ShowMessageFX.Error((String) poJSON.get("message"), psFormName, null);
+                                ClearAll();
+                                btnNew.fire();
                             }
                             ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
                         }
-                    }
 
                     ClearAll();
                     btnNew.fire();

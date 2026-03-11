@@ -296,6 +296,7 @@ public class CheckTransfer_ConfirmationController implements Initializable, Scre
                     
                     break;
                 case "btnUpdate":
+                   
                     poJSON = poGLControllers.CheckTransfers().UpdateTransaction();
                     if (!"success".equals((String) poJSON.get("result"))) {
                         ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
@@ -779,6 +780,18 @@ public class CheckTransfer_ConfirmationController implements Initializable, Scre
 
             // Double-click logic
             if (event.getClickCount() == 2) {
+                
+                if (pnEditMode == EditMode.UPDATE) {
+                    boolean lbProceed = ShowMessageFX.YesNo(
+                            "Loading another transaction will invalidate all current updates on the loaded transaction.\n\nDo you want to proceed?",
+                            psFormName,
+                            "Confirm Action"
+                    );
+
+                    if (!lbProceed) {
+                        return; // Stop loading another transaction
+                    }
+                }
                 ModelTableMain loCheckPaym = (ModelTableMain) tblViewMaster.getSelectionModel().getSelectedItem();
                 if (loCheckPaym != null) {
                     String lsCheckTransfer = loCheckPaym.getIndex02();
@@ -789,10 +802,11 @@ public class CheckTransfer_ConfirmationController implements Initializable, Scre
                             poJSON = poGLControllers.CheckTransfers().OpenTransaction(lsCheckTransfer);
                             if ("success".equals((String) poJSON.get("result"))) {
                                 ClearAll();
+                                pnEditMode = poGLControllers.CheckTransfers().getEditMode();
                                 loadTableDetail();
                                 LoadMaster();
                                 LoadDetail();
-                                pnEditMode = poGLControllers.CheckTransfers().getEditMode();
+                                
                                 initButtons(pnEditMode);
                             } else {
                                 ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);

@@ -825,6 +825,18 @@ public class CheckDeposit_ConfirmationController implements Initializable, Scree
 
             // Double-click logic
             if (event.getClickCount() == 2) {
+                
+                if (pnEditMode == EditMode.UPDATE) {
+                    boolean lbProceed = ShowMessageFX.YesNo(
+                            "Loading another transaction will invalidate all current updates on the loaded transaction.\n\nDo you want to proceed?",
+                            psFormName,
+                            "Confirm Action"
+                    );
+
+                    if (!lbProceed) {
+                        return; // Stop loading another transaction
+                    }
+                }
                 ModelTableMain loCheckPaym = (ModelTableMain) tblViewMaster.getSelectionModel().getSelectedItem();
                 if (loCheckPaym != null) {
                     String lsCheckTransfer = loCheckPaym.getIndex02();
@@ -835,10 +847,11 @@ public class CheckDeposit_ConfirmationController implements Initializable, Scree
                             poJSON = poGLControllers.CheckDeposits().OpenTransaction(lsCheckTransfer);
                             if ("success".equals((String) poJSON.get("result"))) {
                                 ClearAll();
+                                pnEditMode = poGLControllers.CheckDeposits().getEditMode();
                                 loadTableDetail();
                                 LoadMaster();
                                 LoadDetail();
-                                pnEditMode = poGLControllers.CheckDeposits().getEditMode();
+                                
                                 initButtons(pnEditMode);
                                 JFXUtil.applyRowHighlighting(tblViewMaster, item -> ((ModelTableMain) item).getIndex02(), highlightedRowsMain);
                                 JFXUtil.applyRowHighlighting(tblViewDetails, item -> ((ModelTableDetail) item).getIndex02(), highlightedRowsDetail);
