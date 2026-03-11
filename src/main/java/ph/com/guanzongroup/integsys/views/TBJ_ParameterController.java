@@ -247,7 +247,7 @@ public class TBJ_ParameterController implements Initializable, ScreenInterface {
             LogWrapper logwrapr = new LogWrapper("CAS", System.getProperty("sys.default.path.temp") + "cas-error.log");
             poTBJControllers = new TBJControllers(poApp, logWrapper);
             poJSON = poTBJControllers.TBJParameter().InitTransaction();
-            poTBJControllers.TBJParameter().setTransactionStatus("120");
+            poTBJControllers.TBJParameter().setTransactionStatus("130");
 //            poTBJControllers.TBJParameter().Master().setIndustryID(psIndustryID);
 //            lblSource.setText(poGLControllers.PaymentRequest().Master().Company().getCompanyName() + " - " + poGLControllers.PaymentRequest().Master().Industry().getDescription());
         } catch (SQLException | GuanzonException ex) {
@@ -304,6 +304,10 @@ public class TBJ_ParameterController implements Initializable, ScreenInterface {
                     CustomCommonUtil.setVisible(true, btnVoid);
                     CustomCommonUtil.setManaged(true, btnVoid);
                 }
+            }
+            if(poTBJControllers.TBJParameter().Master().getTransactionStatus().equals(TBJ_Constant.VOID)){
+                CustomCommonUtil.setVisible(false, btnUpdate);
+                CustomCommonUtil.setManaged(false, btnUpdate);
             }
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(TBJ_ParameterController.class.getName()).log(Level.SEVERE, null, ex);
@@ -550,7 +554,7 @@ public class TBJ_ParameterController implements Initializable, ScreenInterface {
      * initialization.
      */
     private void initFields() {
-        try {
+//        try {
             boolean isEditable = (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE);
             JFXUtil.setDisabled(!isEditable,
                     tfSourceCode,
@@ -564,24 +568,44 @@ public class TBJ_ParameterController implements Initializable, ScreenInterface {
                     cmbAccountType,
                     taRemarks
             );
-
-            if (TBJ_Constant.CONFIRMED.equals(poTBJControllers.TBJParameter().Master().getTransactionStatus()) ||
-                    TBJ_Constant.OPEN.equals(poTBJControllers.TBJParameter().Master().getTransactionStatus())) {
-                apMaster.setDisable(true);
-                apDetail.setDisable(false);
-                JFXUtil.setDisabledExcept(true,
-                        apDetail,
-                        cbIsActive
-                );
-            }
-            tfTransactionNo.setDisable(true);
-            if (TBJ_Constant.OPEN.equals(poTBJControllers.TBJParameter().Master().getTransactionStatus())
-                    || pnEditMode == EditMode.READY) {
-                
+            
+            
+            
+            if(pnEditMode==EditMode.ADDNEW){
                 apMaster.setDisable(false);
                 apDetail.setDisable(false);
-                cbIsActive.setDisable(true);
+                cbIsActive.setDisable(isEditable);
+            }else if(pnEditMode==EditMode.UPDATE){
+                try {
+                    if(TBJ_Constant.CONFIRMED.equals(poTBJControllers.TBJParameter().Master().getTransactionStatus()) 
+                            ||TBJ_Constant.OPEN.equals(poTBJControllers.TBJParameter().Master().getTransactionStatus())){
+                        apMaster.setDisable(true);
+                        JFXUtil.setDisabledExcept(true,
+                        apDetail,
+                        cbIsActive);
+                    }
+                } catch (SQLException | GuanzonException ex) {
+                    Logger.getLogger(TBJ_ParameterController.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
+
+//            if (TBJ_Constant.CONFIRMED.equals(poTBJControllers.TBJParameter().Master().getTransactionStatus()) ||
+//                    TBJ_Constant.OPEN.equals(poTBJControllers.TBJParameter().Master().getTransactionStatus())) {
+//                apMaster.setDisable(true);
+//                apDetail.setDisable(false);
+//                JFXUtil.setDisabledExcept(true,
+//                        apDetail,
+//                        cbIsActive
+//                );
+//            }
+//            tfTransactionNo.setDisable(true);
+//            if (TBJ_Constant.OPEN.equals(poTBJControllers.TBJParameter().Master().getTransactionStatus())
+//                    && pnEditMode == EditMode.READY) {
+//                
+//                apMaster.setDisable(false);
+//                apDetail.setDisable(false);
+//                cbIsActive.setDisable(true);
+//            }
             
             List<TextField> loTxtField = Arrays.asList(tfTableName, tfCategory, tfSourceCode, tfAccountTitle, tfFieldName);
             loTxtField.forEach(tf -> tf.setOnKeyPressed(event -> txtField_KeyPressed(event)));
@@ -595,9 +619,7 @@ public class TBJ_ParameterController implements Initializable, ScreenInterface {
 
             tblDetails.setOnMouseClicked(this::tblDetails_Clicked);
             makeClearableReadOnly(tfFieldName);
-        } catch (SQLException | GuanzonException ex) {
-            Logger.getLogger(TBJ_ParameterController.class.getName()).log(Level.SEVERE, null, ex);
-        }
+       
 
     }
 
@@ -1157,6 +1179,7 @@ public class TBJ_ParameterController implements Initializable, ScreenInterface {
         pnSelectedDetail = 0;
         psActiveField = "";
         taRemarks.clear();
+        lblStatus.setText("UNKNOWN");
     }
 
     /**
