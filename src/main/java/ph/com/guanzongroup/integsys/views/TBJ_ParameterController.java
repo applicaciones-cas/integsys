@@ -565,7 +565,8 @@ public class TBJ_ParameterController implements Initializable, ScreenInterface {
                     taRemarks
             );
 
-            if (TBJ_Constant.CONFIRMED.equals(poTBJControllers.TBJParameter().Master().getTransactionStatus())) {
+            if (TBJ_Constant.CONFIRMED.equals(poTBJControllers.TBJParameter().Master().getTransactionStatus()) ||
+                    TBJ_Constant.OPEN.equals(poTBJControllers.TBJParameter().Master().getTransactionStatus())) {
                 apMaster.setDisable(true);
                 apDetail.setDisable(false);
                 JFXUtil.setDisabledExcept(true,

@@ -203,10 +203,12 @@ public class CheckRelease_EntryController implements Initializable, ScreenInterf
                  tfFilterBank
         ).forEach(TextField::clear);
         cbReverse.setSelected(false);
+        dpTransactionDate.setValue(null);
         detail_data.clear();
         pnSelectedDetail = 0;
         psActiveField = "";
         taRemarks.clear();
+        lblStatus.setText("UNKNOWN");
     }
     private void initButtonsClickActions() {
         List<Button> buttons = Arrays.asList(btnBrowse, btnNew, btnUpdate, btnSave, btnCancel, btnClose,btnRetrieve,btnSearch,btnHistory);
@@ -324,13 +326,15 @@ public class CheckRelease_EntryController implements Initializable, ScreenInterf
                         return;
                     }
                     ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
-
+                     pnEditMode = poGLControllers.CheckReleases().getEditMode();
                         if (ShowMessageFX.YesNo(null, psFormName, "Do you want to confirm this transaction?")) {
                                 poJSON = poGLControllers.CheckReleases().OpenTransaction(poGLControllers.CheckReleases().Master().getTransactionNo());
                                 poJSON = poGLControllers.CheckReleases().ConfirmTransaction("");
                           
                             if (!"success".equals((String) poJSON.get("result"))) {
                                 ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
+                                ClearAll();
+                                initButtons(pnEditMode);
                                 return;
                             }
                             ShowMessageFX.Information((String) poJSON.get("message"), psFormName, null);
@@ -339,9 +343,11 @@ public class CheckRelease_EntryController implements Initializable, ScreenInterf
                             poJSON = poGLControllers.CheckReleases().printTransaction();
                             if ("error".equals((String) poJSON.get("result"))) {
                                 ShowMessageFX.Error((String) poJSON.get("message"), psFormName, null);
+                                ClearAll();
+                                initButtons(pnEditMode);
                                 return;
                             }
-                            ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
+                            
                         }
 
                     ClearAll();

@@ -190,13 +190,16 @@ public class CheckRelease_HistoryController implements Initializable, ScreenInte
                  tfCheckAmount, 
                  tfCheckTransNo,
                  tfCheckNo, 
-                 tfNote
+                 tfNote,
+                 tfTransNo
         ).forEach(TextField::clear);
         cbReverse.setSelected(false);
+        dpTransactionDate.setValue(null);
         detail_data.clear();
         pnSelectedDetail = 0;
         psActiveField = "";
         taRemarks.clear();
+        lblStatus.setText("UNKNOWN");
     }
     private void initButtonsClickActions() {
         List<Button> buttons = Arrays.asList(btnBrowse, btnPrint,btnClose,btnHistory,btnPost);
@@ -252,8 +255,6 @@ public class CheckRelease_HistoryController implements Initializable, ScreenInte
                                 ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
                                 return;
                             }
-                            
-                            
                    }
                    
                     break;
