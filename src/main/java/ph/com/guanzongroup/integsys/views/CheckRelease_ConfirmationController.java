@@ -334,7 +334,7 @@ public class CheckRelease_ConfirmationController implements Initializable, Scree
                             
                         }
                     }
-
+                    pnEditMode = EditMode.READY;
                     ClearAll();
                     initButtons(pnEditMode);
                     break;

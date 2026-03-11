@@ -54,6 +54,7 @@ import org.guanzon.appdriver.constant.UserRight;
 import org.json.simple.JSONObject;
 import ph.com.guanzongroup.cas.cashflow.status.CheckTransferStatus;
 import ph.com.guanzongroup.cas.cashflow.services.CashflowControllers;
+import ph.com.guanzongroup.cas.cashflow.status.CheckDepositStatus;
 import ph.com.guanzongroup.integsys.model.ModelTableDetail;
 import ph.com.guanzongroup.integsys.model.ModelTableMain;
 import ph.com.guanzongroup.integsys.utility.CustomCommonUtil;
@@ -268,17 +269,23 @@ public class CheckDeposit_HistoryController implements Initializable, ScreenInte
                         return;
                     }
                     
-                    if (poGLControllers.CheckDeposits().Master().getTransactionStatus().equals(CheckTransferStatus.POSTED)){
+                    if (poGLControllers.CheckDeposits().Master().getTransactionStatus().equals(CheckDepositStatus.POSTED)){
                          ShowMessageFX.Warning("Transaction is already posted",psFormName, null);
                          return ;
                     }
-                    
-                    if (!poGLControllers.CheckDeposits().Master().getTransactionStatus().equals(CheckTransferStatus.CONFIRMED) ||
-                            !poGLControllers.CheckDeposits().Master().getTransactionStatus().equals(CheckTransferStatus.OPEN)){
-                         ShowMessageFX.Warning("Posting is not allowed. Please confirm transaction before proceeding.",psFormName, null);
+                    if (!poGLControllers.CheckDeposits().Master().getTransactionStatus().equals(CheckDepositStatus.CONFIRMED)){
+                         ShowMessageFX.Warning("Posting is not allowed. Please confirm  the transaction before proceeding.",psFormName, null);
                          return ;
                     }
-                    if (!poGLControllers.CheckDeposits().Master().getPrintStatus().equals(CheckTransferStatus.CONFIRMED)){
+                    if(poGLControllers.CheckDeposits().Master().getTransactionStatus().equals(CheckDepositStatus.VOID)){
+                     ShowMessageFX.Warning(
+                                "Transaction already voided.\n Posting of this transaction is not allowed.",
+                                psFormName, null
+                        );
+                        
+                        return;
+                    }
+                    if (!poGLControllers.CheckDeposits().Master().getPrintStatus().equals(CheckDepositStatus.CONFIRMED)){
                          ShowMessageFX.Warning("Posting is not allowed. Please print transaction before proceeding.",psFormName, null);
                          return ;
                     }

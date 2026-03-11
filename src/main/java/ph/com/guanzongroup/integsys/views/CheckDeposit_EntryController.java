@@ -197,7 +197,7 @@ public class CheckDeposit_EntryController implements Initializable, ScreenInterf
         pnSelectedDetail = 0;
         psActiveField = "";
         taRemarks.clear();
-        poGLControllers.CheckDeposits().Master().setBanks("");
+//        poGLControllers.CheckDeposits().Master().setBanks("");
     }
     
     private void initDatePicker() {
@@ -604,9 +604,10 @@ public class CheckDeposit_EntryController implements Initializable, ScreenInterf
         try {
             tfTransactionNo.setText(poGLControllers.CheckDeposits().Master().getTransactionNo());
 
-            tfBankMaster.setText(
-                    poGLControllers.CheckDeposits().Master().Banks().getBankName() == null ? ""
-                    : poGLControllers.CheckDeposits().Master().Banks().getBankName());
+             tfBankMaster.setText(
+                    poGLControllers.CheckDeposits().Master().BankAccount().Banks().getBankName() == null ? ""
+                    : poGLControllers.CheckDeposits().Master().BankAccount().Banks().getBankName());
+            
             tfBankAccountNo.setText(
                     poGLControllers.CheckDeposits().Master().BankAccount().getAccountNo() == null ? ""
                     : poGLControllers.CheckDeposits().Master().BankAccount().getAccountNo());
@@ -960,17 +961,7 @@ public class CheckDeposit_EntryController implements Initializable, ScreenInterf
             // Double-click logic
             if (event.getClickCount() == 2) {
                 
-                if (pnEditMode == EditMode.UPDATE) {
-                    boolean lbProceed = ShowMessageFX.YesNo(
-                            "Loading another transaction will invalidate all current updates on the loaded transaction.\n\nDo you want to proceed?",
-                            psFormName,
-                            "Confirm Action"
-                    );
-
-                    if (!lbProceed) {
-                        return; // Stop loading another transaction
-                    }
-                }
+               
                 ModelTableMain loCheckPaym = (ModelTableMain) tblViewMaster.getSelectionModel().getSelectedItem();
                 if (loCheckPaym != null) {
                     String lsCheckTransNo = loCheckPaym.getIndex02();

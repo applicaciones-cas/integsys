@@ -203,6 +203,7 @@ public class CheckDeposit_ConfirmationController implements Initializable, Scree
         detail_data.clear();
         pnSelectedDetail = 0;
         psActiveField = "";
+        lblStatus.setText("UNKNOWN");
         dpTransactionReferDate.setValue(null);
     }
     private void initButtonsClickActions() {
