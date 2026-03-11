@@ -845,7 +845,7 @@ public class CheckRelease_ConfirmationController implements Initializable, Scree
             protected Void call() throws Exception {
                 try {
                     main_data.clear();
-                    poJSON = poGLControllers.CheckReleases().getCheckRelease(poGLControllers.CheckReleases().Master().getReceivedBy(), 
+                    poJSON = poGLControllers.CheckReleases().getCheckRelease(tfSearchReceived.getText(), 
                                                                    tfSearchTransNo.getText());
                     
                     if ("success".equals(poJSON.get("result"))) {

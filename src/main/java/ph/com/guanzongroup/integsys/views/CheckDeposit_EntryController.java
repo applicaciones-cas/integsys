@@ -5,8 +5,6 @@ import com.sun.javafx.scene.control.skin.TableHeaderRow;
 import java.net.URL;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -58,6 +56,7 @@ import org.guanzon.appdriver.constant.UserRight;
 import org.json.simple.JSONObject;
 import ph.com.guanzongroup.cas.cashflow.status.CheckTransferStatus;
 import ph.com.guanzongroup.cas.cashflow.services.CashflowControllers;
+import ph.com.guanzongroup.cas.cashflow.status.CheckDepositStatus;
 import ph.com.guanzongroup.integsys.model.ModelTableDetail;
 import ph.com.guanzongroup.integsys.model.ModelTableMain;
 import ph.com.guanzongroup.integsys.utility.CustomCommonUtil;
@@ -198,6 +197,7 @@ public class CheckDeposit_EntryController implements Initializable, ScreenInterf
         pnSelectedDetail = 0;
         psActiveField = "";
         taRemarks.clear();
+        poGLControllers.CheckDeposits().Master().setBanks("");
     }
     
     private void initDatePicker() {
@@ -473,11 +473,11 @@ public class CheckDeposit_EntryController implements Initializable, ScreenInterf
                         return;
                     }
                     ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
-                    
+                    if (poGLControllers.CheckDeposits().Master().getTransactionStatus().equals(CheckDepositStatus.OPEN)) {
                         if (ShowMessageFX.YesNo(null, psFormName, "Do you want to confirm this transaction?")) {
-                                poJSON = poGLControllers.CheckDeposits().OpenTransaction(poGLControllers.CheckDeposits().Master().getTransactionNo());
-                                poJSON = poGLControllers.CheckDeposits().ConfirmTransaction("");
-                          
+                            poJSON = poGLControllers.CheckDeposits().OpenTransaction(poGLControllers.CheckDeposits().Master().getTransactionNo());
+                            poJSON = poGLControllers.CheckDeposits().ConfirmTransaction("");
+
                             if (!"success".equals((String) poJSON.get("result"))) {
                                 ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
                                 ClearAll();
@@ -486,6 +486,7 @@ public class CheckDeposit_EntryController implements Initializable, ScreenInterf
                             }
                             ShowMessageFX.Information((String) poJSON.get("message"), psFormName, null);
                         }
+                    }
                         if (ShowMessageFX.YesNo(null, psFormName, "Do you want to print this transaction?")) {
                             poJSON = poGLControllers.CheckDeposits().printTransaction();
                             if ("error".equals((String) poJSON.get("result"))) {
@@ -495,6 +496,7 @@ public class CheckDeposit_EntryController implements Initializable, ScreenInterf
                             }
                             ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
                         }
+                    
 
                     ClearAll();
                     btnNew.fire();
@@ -957,6 +959,18 @@ public class CheckDeposit_EntryController implements Initializable, ScreenInterf
 
             // Double-click logic
             if (event.getClickCount() == 2) {
+                
+                if (pnEditMode == EditMode.UPDATE) {
+                    boolean lbProceed = ShowMessageFX.YesNo(
+                            "Loading another transaction will invalidate all current updates on the loaded transaction.\n\nDo you want to proceed?",
+                            psFormName,
+                            "Confirm Action"
+                    );
+
+                    if (!lbProceed) {
+                        return; // Stop loading another transaction
+                    }
+                }
                 ModelTableMain loCheckPaym = (ModelTableMain) tblViewMaster.getSelectionModel().getSelectedItem();
                 if (loCheckPaym != null) {
                     String lsCheckTransNo = loCheckPaym.getIndex02();
@@ -966,7 +980,6 @@ public class CheckDeposit_EntryController implements Initializable, ScreenInterf
                         if ("success".equals(poJSON.get("result"))) {
                             if (poGLControllers.CheckDeposits().getDetailCount() > 0) {
                                 pnSelectedDetail = poGLControllers.CheckDeposits().getDetailCount() - 1;
-
                                 tblViewMaster.refresh();
                                 loadTableDetail();
                                 poJSON = poGLControllers.CheckDeposits().computeMasterFields();

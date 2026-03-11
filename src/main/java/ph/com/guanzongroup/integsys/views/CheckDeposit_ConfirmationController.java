@@ -54,6 +54,7 @@ import org.guanzon.cas.purchasing.status.PurchaseOrderStaticData;
 import org.json.simple.JSONObject;
 import ph.com.guanzongroup.cas.cashflow.status.CheckTransferStatus;
 import ph.com.guanzongroup.cas.cashflow.services.CashflowControllers;
+import ph.com.guanzongroup.cas.cashflow.status.CheckDepositStatus;
 import ph.com.guanzongroup.integsys.model.ModelTableDetail;
 import ph.com.guanzongroup.integsys.model.ModelTableMain;
 import ph.com.guanzongroup.integsys.utility.CustomCommonUtil;
@@ -356,7 +357,7 @@ public class CheckDeposit_ConfirmationController implements Initializable, Scree
                         return;
                     }
                     ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
-                    if (poApp.getUserLevel() > UserRight.ENCODER) {
+                    if(poGLControllers.CheckDeposits().Master().getTransactionStatus().equals(CheckDepositStatus.OPEN)){
                         if (ShowMessageFX.YesNo(null, psFormName, "Do you want to confirm this transaction?")) {
                                 poJSON = poGLControllers.CheckDeposits().OpenTransaction(poGLControllers.CheckDeposits().Master().getTransactionNo());
                                 poJSON = poGLControllers.CheckDeposits().ConfirmTransaction("");
@@ -892,7 +893,7 @@ public class CheckDeposit_ConfirmationController implements Initializable, Scree
             protected Void call() throws Exception {
                 try {
                     main_data.clear();
-                    poJSON = poGLControllers.CheckDeposits().getCheckDeposit(poGLControllers.CheckDeposits().Master().getBankAccount(), 
+                    poJSON = poGLControllers.CheckDeposits().getCheckDeposit(tfSearchBankAccountNo.getText(), 
                                                                    tfSearchTransNo.getText(),
                                                                   dpSearchTransactionDate.getValue());
                     
