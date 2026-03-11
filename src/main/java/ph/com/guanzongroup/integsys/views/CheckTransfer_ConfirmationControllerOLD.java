@@ -65,7 +65,7 @@ import ph.com.guanzongroup.integsys.utility.CustomCommonUtil;
  *
  * @author User
  */
-public class CheckTransfer_ConfirmationControllerOLD implements Initializable, ScreenInterface {
+public class CheckTransfer_ConfirmationControllerold implements Initializable, ScreenInterface {
 
     private GRiderCAS poApp;
     private JSONObject poJSON;
@@ -163,7 +163,7 @@ public class CheckTransfer_ConfirmationControllerOLD implements Initializable, S
             initializeTableDetail();
             initControlEvents();
         } catch (SQLException | GuanzonException e) {
-            Logger.getLogger(CheckTransfer_ConfirmationControllerOLD.class.getName()).log(Level.SEVERE, null, e);
+            Logger.getLogger(CheckTransfer_ConfirmationControllerold.class.getName()).log(Level.SEVERE, null, e);
             poLogWrapper.severe(psFormName + " :" + e.getMessage());
         }
     }

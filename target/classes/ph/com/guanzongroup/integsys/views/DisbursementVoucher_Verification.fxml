@@ -400,9 +400,10 @@
                                                                                                                     <rowConstraints>
                                                                                                                         <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="28.0" vgrow="SOMETIMES" />
                                                                                           <RowConstraints maxHeight="1.7976931348623157E308" minHeight="-Infinity" prefHeight="28.0" vgrow="SOMETIMES" />
-                                                                                          <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                                                                <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                                                          <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="28.0" vgrow="SOMETIMES" />
                                                                                                                         <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="28.0" vgrow="SOMETIMES" />
-                                                                                                                        <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="28.0" vgrow="SOMETIMES" />
+                                                                                                                        <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="10.0" vgrow="SOMETIMES" />
                                                                                                                         <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="28.0" vgrow="SOMETIMES" />
                                                                                                                         <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="28.0" vgrow="SOMETIMES" />
                                                                                                                         <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="28.0" vgrow="SOMETIMES" />
@@ -411,17 +412,17 @@
                                                                                                                         <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="28.0" vgrow="SOMETIMES" />
                                                                                                                     </rowConstraints>
                                                                                                                     <children>
-                                                                                                                    <Label text="Total Amount" GridPane.rowIndex="4">
+                                                                                                                    <Label text="Total Amount" GridPane.rowIndex="3">
                                                                                                                             <font>
                                                                                                                                 <Font name="System Bold" size="14.0" />
                                                                                                                             </font>
                                                                                                                         </Label>
-                                                                                                                                <Label text="  Vatable Sales" GridPane.rowIndex="5" />
-                                                                                                                                <Label text="Vat Amount" GridPane.rowIndex="6" />
-                                                                                                                                <Label text="VAT-Zero Sales" GridPane.rowIndex="7" />
-                                                                                                                                <Label text="Vat-Exempt Sales" GridPane.rowIndex="8" />
-                                                                                                                                <Label text="Less W/H Tax" GridPane.rowIndex="9" />
-                                                                                                                                <Label text="Total Net Amt" textFill="RED" GridPane.rowIndex="10">
+                                                                                                                                <Label text="  Vatable Sales" GridPane.rowIndex="6" />
+                                                                                                                                <Label text="Vat Amount" GridPane.rowIndex="7" />
+                                                                                                                                <Label text="VAT-Zero Sales" GridPane.rowIndex="8" />
+                                                                                                                                <Label text="Vat-Exempt Sales" GridPane.rowIndex="9" />
+                                                                                                                                <Label text="Less W/H Tax" GridPane.rowIndex="10" />
+                                                                                                                                <Label text="Total Net Amt" textFill="RED" GridPane.rowIndex="11">
                                                                                                                             <font>
                                                                                                                                 <Font name="System Bold" size="14.0" />
                                                                                                                             </font>
@@ -435,13 +436,15 @@
                                                                                                                                 </Label>
                                                                                                                             </children>
                                                                                                                         </AnchorPane>
-                                                                                                                                <TextField fx:id="tfTotalAmount" alignment="CENTER_RIGHT" disable="true" editable="false" promptText="0.00" style="-fx-font-weight: bold;" GridPane.columnIndex="2" GridPane.rowIndex="4" />
-                                                                                                                                <TextField fx:id="tfVatableSales" alignment="CENTER_RIGHT" disable="true" editable="false" promptText="0.00" GridPane.columnIndex="2" GridPane.rowIndex="5" />
-                                                                                                                                <TextField fx:id="tfVatAmountMaster" alignment="CENTER_RIGHT" disable="true" editable="false" promptText="0.00" GridPane.columnIndex="2" GridPane.rowIndex="6" />
-                                                                                                                                <TextField fx:id="tfVatZeroRatedSales" alignment="CENTER_RIGHT" disable="true" editable="false" promptText="0.00" GridPane.columnIndex="2" GridPane.rowIndex="7" />
-                                                                                                                                <TextField fx:id="tfVatExemptSales" alignment="CENTER_RIGHT" disable="true" editable="false" promptText="0.00" GridPane.columnIndex="2" GridPane.rowIndex="8" />
-                                                                                                                                <TextField fx:id="tfLessWHTax" alignment="CENTER_RIGHT" disable="true" editable="false" promptText="0.00" GridPane.columnIndex="2" GridPane.rowIndex="9" />
-                                                                                                                                <TextField fx:id="tfTotalNetAmount" alignment="CENTER_RIGHT" editable="false" promptText="0.00" style="-fx-font-weight: bold;" GridPane.columnIndex="2" GridPane.rowIndex="10" />
+                                                                                                                                <TextField fx:id="tfTotalAmount" alignment="CENTER_RIGHT" disable="true" editable="false" promptText="0.00" style="-fx-font-weight: bold;" GridPane.columnIndex="2" GridPane.rowIndex="3" />
+                                                                                                                                <TextField fx:id="tfVatableSales" alignment="CENTER_RIGHT" disable="true" editable="false" promptText="0.00" GridPane.columnIndex="2" GridPane.rowIndex="6" />
+                                                                                                                                <TextField fx:id="tfVatAmountMaster" alignment="CENTER_RIGHT" disable="true" editable="false" promptText="0.00" GridPane.columnIndex="2" GridPane.rowIndex="7" />
+                                                                                                                                <TextField fx:id="tfVatZeroRatedSales" alignment="CENTER_RIGHT" disable="true" editable="false" promptText="0.00" GridPane.columnIndex="2" GridPane.rowIndex="8" />
+                                                                                                                                <TextField fx:id="tfVatExemptSales" alignment="CENTER_RIGHT" disable="true" editable="false" promptText="0.00" GridPane.columnIndex="2" GridPane.rowIndex="9" />
+                                                                                                                                <TextField fx:id="tfLessWHTax" alignment="CENTER_RIGHT" disable="true" editable="false" promptText="0.00" GridPane.columnIndex="2" GridPane.rowIndex="10" />
+                                                                                                                                <TextField fx:id="tfTotalNetAmount" alignment="CENTER_RIGHT" editable="false" promptText="0.00" style="-fx-font-weight: bold;" GridPane.columnIndex="2" GridPane.rowIndex="11" />
+                                                                                                <Label text="Advances" GridPane.rowIndex="4" />
+                                                                                                <TextField fx:id="tfAdvances" alignment="CENTER_RIGHT" disable="true" editable="false" promptText="0.00" GridPane.columnIndex="2" GridPane.rowIndex="4" />
                                                                                                                             </children>
                                                                                                                 </GridPane>
                                                                                                             </children>
@@ -556,6 +559,8 @@
                                                                                     </Button>
                                                                                  </children>
                                                                               </HBox>
+                                                                              <Label text="Advances" GridPane.rowIndex="3" />
+                                                                              <TextField fx:id="tfAdvancesDetail" disable="true" editable="false" maxWidth="1.7976931348623157E308" GridPane.columnIndex="2" GridPane.rowIndex="3" />
                                                                                             </children>
                                                                   </GridPane>
                                                                </children>
@@ -767,7 +772,7 @@
                                                                                 <Label text="Period From" GridPane.rowIndex="4" />
                                                                                 <Label text="Period To" GridPane.rowIndex="5" />
                                                                                 <Label text="Tax Code" GridPane.rowIndex="6" />
-                                                                                <Label text="Particular" GridPane.rowIndex="7" />
+                                                                                <Label text="Account Title" GridPane.rowIndex="7" />
                                                                                 <Label text="Base Amount" GridPane.columnIndex="5" GridPane.rowIndex="5" />
                                                                                 <Label text="Tax Rate" GridPane.columnIndex="5" GridPane.rowIndex="6" />
                                                                                 <Label text="Total Tax Amount" GridPane.columnIndex="5" GridPane.rowIndex="7" />
@@ -799,7 +804,7 @@
                                                                                 <TableView fx:id="tblVwBIRDetails" prefHeight="200.0" prefWidth="200.0">
                                                                                     <columns>
                                                                                         <TableColumn fx:id="tblBIRRowNo" maxWidth="40.0" minWidth="40.0" prefWidth="40.0" resizable="false" sortable="false" text="No." />
-                                                                                        <TableColumn fx:id="tblBIRParticular" maxWidth="350.0" minWidth="-1.0" prefWidth="350.0" resizable="false" sortable="false" text="Particular" />
+                                                                                        <TableColumn fx:id="tblBIRParticular" maxWidth="350.0" minWidth="-1.0" prefWidth="350.0" resizable="false" sortable="false" text="Account Title" />
                                                                                         <TableColumn fx:id="tblTaxCode" maxWidth="130.0" minWidth="130.0" prefWidth="130.0" resizable="false" sortable="false" style="-fx-alignment: CENTER-RIGHT;" text="Tax Code" />
                                                                   <TableColumn fx:id="tblBaseAmount" maxWidth="130.0" minWidth="130.0" prefWidth="130.0" resizable="false" sortable="false" style="-fx-alignment: CENTER-RIGHT;" text="Base Amount" />
                                                                   <TableColumn fx:id="tblTaxRate" maxWidth="130.0" minWidth="130.0" prefWidth="130.0" resizable="false" sortable="false" style="-fx-alignment: CENTER-RIGHT;" text="Tax Rate" />

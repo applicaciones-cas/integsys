@@ -281,7 +281,7 @@
                                                                         <Insets />
                                                                      </GridPane.margin>
                                                                   </TextField>
-                                                                  <TextField fx:id="tfContactPerson" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" promptText="Press F3: Search" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.rowIndex="10" />
+                                                                  <TextField fx:id="tfContactPerson" editable="false" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.rowIndex="10" />
                                                                   <TextField fx:id="tfAddress" editable="false" layoutX="85.0" layoutY="78.0" maxHeight="1.7976931348623157E308" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.rowIndex="12" />
                                                                   <TextField fx:id="tfTIN" editable="false" maxHeight="1.7976931348623157E308" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.rowIndex="14" />
                                                                   <TextArea fx:id="taRemarks" maxHeight="1.7976931348623157E308" wrapText="true" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.rowIndex="16" GridPane.rowSpan="2">
