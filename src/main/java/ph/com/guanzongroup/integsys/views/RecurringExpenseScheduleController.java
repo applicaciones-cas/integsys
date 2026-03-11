@@ -645,8 +645,16 @@ public class RecurringExpenseScheduleController implements Initializable, Screen
                         break;
                     case "tfBillDay":
                         lsValue = JFXUtil.removeComma(lsValue);
+                        int lnDueDay = poController.Detail(pnDetail).getDueDay();
+                        if (Integer.parseInt(lsValue) > lnDueDay) { //bill day cannot be greater than due day
+                            ShowMessageFX.Warning(null, pxeModuleName, "Bill day cannot be greater than Due day.");
+                            tfBillDay.requestFocus();
+                            loadRecordDetail();
+                            return;
+                        }
                         if (Integer.parseInt(lsValue) > 31) {
                             ShowMessageFX.Warning(null, pxeModuleName, "Invalid bill day.");
+                            tfBillDay.requestFocus();
                             loadRecordDetail();
                             return;
                         }
@@ -657,8 +665,16 @@ public class RecurringExpenseScheduleController implements Initializable, Screen
                         break;
                     case "tfDueDay":
                         lsValue = JFXUtil.removeComma(lsValue);
+                        int lnBillDay = poController.Detail(pnDetail).getBillDay();
+                        if (lnBillDay > Integer.parseInt(lsValue)) { //bill day cannot be greater than due day
+                            ShowMessageFX.Warning(null, pxeModuleName, "Bill day cannot be greater than Due day.");
+                            tfDueDay.requestFocus();
+                            loadRecordDetail();
+                            return;
+                        }
                         if (Integer.parseInt(lsValue) > 31) {
                             ShowMessageFX.Warning(null, pxeModuleName, "Invalid due day.");
+                            tfDueDay.requestFocus();
                             loadRecordDetail();
                             return;
                         }

@@ -75,8 +75,8 @@ public class RecurringExpenseController implements Initializable, ScreenInterfac
 
             Platform.runLater(() -> {
                 poController.getModel().setIndustryCode(oApp.getIndustry()); //Conflict on psIndustry when user is in main office; need to check menu for parameter because value is always returning to 01
+                poController.setIndustryID(oApp.getIndustry());
 //                poController.getModel().setCompanyId(psCompanyId);
-//                poController.setIndustryId(psIndustryId);
 //                poController.setCompanyId(psCompanyId);
                 poController.setWithUI(true);
                 loadRecordSearch();
