@@ -282,6 +282,11 @@ public class PaymentRequest_ConfirmationController implements Initializable, Scr
 
     private void loadRecordMaster() {
         try {
+            if (PaymentRequestStatus.CONFIRMED.equals(poGLControllers.PaymentRequest().Master().getTransactionStatus())) {
+                btnVoid.setText("Cancel");
+            } else {
+                btnVoid.setText("Void");
+            }
             boolean lbShow = pnEditMode == EditMode.UPDATE;
             JFXUtil.setDisabled(lbShow, tfBranch, tfDepartment, tfPayee);
 
@@ -606,7 +611,13 @@ public class PaymentRequest_ConfirmationController implements Initializable, Scr
                     }
                     break;
                 case "btnVoid":
-                    if (ShowMessageFX.YesNo(null, psFormName, "Are you sure you want to void transaction?")) {
+                    String lsStat = "";
+                    if (PaymentRequestStatus.CONFIRMED.equals(poGLControllers.PaymentRequest().Master().getTransactionStatus())) {
+                        lsStat = "cancel";
+                    } else {
+                        lsStat = "void";
+                    }
+                    if (ShowMessageFX.YesNo(null, psFormName, "Are you sure you want to " + lsStat + " the transaction?")) {
                         if (PaymentRequestStatus.CONFIRMED.equals(poGLControllers.PaymentRequest().Master().getTransactionStatus())) {
                             poJSON = poGLControllers.PaymentRequest().CancelTransaction("");
                         } else {
