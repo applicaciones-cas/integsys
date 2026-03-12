@@ -349,6 +349,8 @@ public class RecurringExpenseScheduleController implements Initializable, Screen
 
     public void loadRecordMaster() {
         try {
+            boolean lbShow = JFXUtil.isObjectEqualTo(pnEditMode, EditMode.ADDNEW, EditMode.UPDATE, EditMode.READY) & !details_data.isEmpty();
+            JFXUtil.setDisabled(!lbShow, tfSearchCompany);
             if (poController.Master().getParticularId() != null && !"".equals(poController.Master().getParticularId())) {
                 tfRecurringID.setText(poController.Master().getRecurringId());
             } else {
@@ -364,12 +366,10 @@ public class RecurringExpenseScheduleController implements Initializable, Screen
     }
 
     public void loadRecordDetail() {
+
         if (poController.Master().getParticularId() == null || "".equals(poController.Master().getParticularId())) {
             return;
         }
-        boolean lbShow = JFXUtil.isObjectEqualTo(pnEditMode, EditMode.ADDNEW, EditMode.UPDATE, EditMode.READY);
-        JFXUtil.setDisabled(!lbShow, tfSearchCompany);
-        
         try {
             tfBranchName.setText(poController.Detail(pnDetail).Branch().getBranchName());
             tfAccountNo.setText(poController.Detail(pnDetail).getAccountNo());
@@ -513,7 +513,7 @@ public class RecurringExpenseScheduleController implements Initializable, Screen
                                 }
                             });
 
-                            JFXUtil.runWithDelay(.5, () -> {
+                            JFXUtil.runWithDelay(.8, () -> {
                                 JFXUtil.textFieldMoveNext(tfBranchName); // must be in the success
                             });
                             lbProceed = true;
