@@ -4,8 +4,11 @@ package ph.com.guanzongroup.integsys.views;
 import com.sun.javafx.scene.control.skin.TableHeaderRow;
 import java.net.URL;
 import java.sql.SQLException;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -44,6 +47,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.StackPane;
 import javafx.util.Pair;
+import static org.apache.commons.lang3.time.DateUtils.isSameDay;
 import org.guanzon.appdriver.agent.ShowMessageFX;
 import org.guanzon.appdriver.base.GRiderCAS;
 import org.guanzon.appdriver.base.LogWrapper;
@@ -99,10 +103,10 @@ public class CheckRelease_EntryController implements Initializable, ScreenInterf
     private AnchorPane AnchorMain, apBrowse, apMaster, apDetail, apButton, apTransaction;
 
     @FXML
-    private TextField tfSearchReceived,
+    private TextField tfSearchReceived,tfFilterPayee,
             tfSearchTransNo,tfReceivedBy, tfTotal, tfPayee,
             tfBank, tfCheckAmount, tfCheckTransNo,
-            tfCheckNo, tfNote, tfFilterBank,tfTransNo;
+            tfCheckNo, tfNote, tfFilterCheckno,tfTransNo;
 
     @FXML
     private DatePicker dpSearchTransactionDate, dpTransactionDate, dpCheckDate, dpFilterFrom, dpFilterThru;
@@ -200,7 +204,9 @@ public class CheckRelease_EntryController implements Initializable, ScreenInterf
                  tfCheckTransNo,
                  tfCheckNo, 
                  tfNote, 
-                 tfFilterBank
+                 tfFilterCheckno,
+                 tfFilterPayee,
+                 tfTransNo
         ).forEach(TextField::clear);
         cbReverse.setSelected(false);
         dpTransactionDate.setValue(null);
@@ -426,7 +432,7 @@ public class CheckRelease_EntryController implements Initializable, ScreenInterf
             apDetail.setDisable(false);
         }
         
-            List<TextField> loTxtField = Arrays.asList(tfCheckTransNo, tfCheckNo,tfFilterBank,tfReceivedBy);
+            List<TextField> loTxtField = Arrays.asList(tfCheckTransNo, tfCheckNo,tfFilterCheckno,tfFilterPayee,tfReceivedBy);
             loTxtField.forEach(tf -> tf.setOnKeyPressed(event -> txtField_KeyPressed(event)));
 //
             JFXUtil.setFocusListener(txtArea_Focus, taRemarks);
@@ -520,7 +526,7 @@ public class CheckRelease_EntryController implements Initializable, ScreenInterf
 
         CustomCommonUtil.setVisible(!lbShow, btnBrowse, btnClose, btnNew);
         CustomCommonUtil.setManaged(!lbShow, btnBrowse, btnClose, btnNew);
-
+        cbReverse.setDisable(true);
         CustomCommonUtil.setVisible(lbShow, btnSave, btnCancel);
         CustomCommonUtil.setManaged(lbShow, btnSave, btnCancel);
 
@@ -543,6 +549,7 @@ public class CheckRelease_EntryController implements Initializable, ScreenInterf
         if (fnEditMode == EditMode.UPDATE || fnEditMode == EditMode.ADDNEW) {
             CustomCommonUtil.setVisible(false, btnUpdate);
             CustomCommonUtil.setManaged(false, btnUpdate);
+            cbReverse.setDisable(false);
         }
     }
 
@@ -618,7 +625,9 @@ public class CheckRelease_EntryController implements Initializable, ScreenInterf
                     List<ModelTableDetail> detailsList = new ArrayList<>();
                     for (int lnCtr = 0; lnCtr < poGLControllers.CheckReleases().getDetailCount(); lnCtr++) {
                         
-                        
+                        if (!poGLControllers.CheckReleases().Detail(lnCtr).isReverse()) {
+                            continue;
+                        }
                         
                         detailsList.add(new ModelTableDetail(
                                 String.valueOf(lnCtr + 1),
@@ -724,28 +733,62 @@ public class CheckRelease_EntryController implements Initializable, ScreenInterf
     }
     
     private void initCheckBox() {
-        cbReverse.setDisable(true);
         if ((pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE)) {
             
             cbReverse.setOnAction(event -> {
-                if (poGLControllers.CheckReleases().Master().getTransactionStatus().equals(CheckTransferStatus.OPEN)
-                        || poGLControllers.CheckReleases().Master().getTransactionStatus().equals(CheckTransferStatus.CONFIRMED)) {
-                    if (poGLControllers.CheckReleases().Detail(pnSelectedDetail).getSourceNo() != null
-                            || !poGLControllers.CheckReleases().Detail(pnSelectedDetail).getSourceNo().isEmpty()) {
-                        if (!cbReverse.isSelected()) {
-                            poGLControllers.CheckReleases().Detail().remove(pnSelectedDetail);
-                        }
-                    }
+                if (poGLControllers.CheckReleases().Detail(pnSelectedDetail).getEditMode() == EditMode.ADDNEW) {
+                    poGLControllers.CheckReleases().deleteDetail(pnSelectedDetail);
                 } else {
-                     poGLControllers.CheckReleases().Detail(pnSelectedDetail).isReverse(cbReverse.isSelected());
+                    poGLControllers.CheckReleases().Detail(pnSelectedDetail).isReverse(cbReverse.isSelected());
                 }
-                
                 loadTableDetail();
             });
-            
         }
+        dpTransactionDate.setOnAction((ActionEvent event) -> {
+            if ((pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE)) {
+            LocalDate selectedLocalDate = dpTransactionDate.getValue();
+            Date today = new Date();
+
+            if (selectedLocalDate == null) {
+                return;
+            }
+            Date selectedDate = Date.from(selectedLocalDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
+            if (!isSameDay(selectedDate, today)) {
+                boolean proceed = ShowMessageFX.YesNo(
+                        "Changing the transaction date requires user approval.\nDo you want to proceed?",
+                        psFormName,
+                        null
+                );
+
+                if (!proceed) {
+                    dpTransactionDate.setValue(LocalDate.now());
+                    return;
+                }
+
+                try {
+                    poJSON = poGLControllers.CheckReleases().seekApproval();
+                    if (!"success".equals((String) poJSON.get("result"))) {
+                        ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
+
+                        // reset both UI and master value
+                        dpTransactionDate.setValue(LocalDate.now());
+                        poGLControllers.CheckReleases().Master().setTransactionDate(today);
+                        return;
+                    }
+
+                    poGLControllers.CheckReleases().Master().setTransactionDate(selectedDate);
+
+                } catch (SQLException | GuanzonException ex) {
+                    Logger.getLogger(CheckRelease_EntryController.class.getName()).log(Level.SEVERE, null, ex);
+                    ShowMessageFX.Error(ex.getMessage(), psFormName, null);
+                }
+            }
+            }
+        });
         
     }
+    
+    
     private void tblViewDetails_Clicked(MouseEvent event) {
         if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE || pnEditMode == EditMode.READY) {
             pnSelectedDetail = tblViewDetails.getSelectionModel().getSelectedIndex();
@@ -767,11 +810,9 @@ public class CheckRelease_EntryController implements Initializable, ScreenInterf
                         if(poGLControllers.CheckReleases().Detail(pnSelectedDetail).getSourceNo().isEmpty()){
                             tfCheckTransNo.setDisable(false);
                             tfCheckNo.setDisable(false);
-                            cbReverse.setDisable(true);
                         }else{
                             tfCheckTransNo.setDisable(true);
                             tfCheckNo.setDisable(true);
-                            cbReverse.setDisable(false);
                         }
                                 
                     }
@@ -841,7 +882,7 @@ public class CheckRelease_EntryController implements Initializable, ScreenInterf
             protected Void call() throws Exception {
                 try {
                     main_data.clear();
-                    poJSON = poGLControllers.CheckReleases().loadCheckPayment(tfFilterBank.getText(), 
+                    poJSON = poGLControllers.CheckReleases().loadCheckPayment(tfFilterCheckno.getText(), tfFilterPayee.getText(), 
                                                                   dpFilterFrom.getValue(),
                                                                   dpFilterThru.getValue());
                     
@@ -964,14 +1005,16 @@ public class CheckRelease_EntryController implements Initializable, ScreenInterf
                 switch (event.getCode()) {
                     case TAB:
                         switch (txtFieldID) {
-                            case "tfFilterBank":
+                            case "tfFilterPayee":
+                            case "tfFilterCheckno":
                                 loadTableMaster();
                                 break;
                         }
                         break;
                     case ENTER:
                         switch (txtFieldID) {
-                            case "tfFilterBank":
+                            case "tfFilterPayee":
+                            case "tfFilterCheckno":
                                 loadTableMaster();
                                 break;
                             case "tfReceivedBy":

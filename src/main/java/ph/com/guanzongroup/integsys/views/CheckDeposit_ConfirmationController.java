@@ -365,6 +365,8 @@ public class CheckDeposit_ConfirmationController implements Initializable, Scree
                           
                             if (!"success".equals((String) poJSON.get("result"))) {
                                 ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
+                                ClearAll();
+                                initButtons(pnEditMode);
                                 return;
                             }
                             ShowMessageFX.Information((String) poJSON.get("message"), psFormName, null);
@@ -452,7 +454,7 @@ public class CheckDeposit_ConfirmationController implements Initializable, Scree
             apDetail.setDisable(false);
         }
         
-            List<TextField> loTxtField = Arrays.asList( tfCheckNo,tfCheckTransNo,tfSearchTransNo,tfBank,tfBankAccountName,tfBankAccountNo,tfSearchBankAccountNo);
+            List<TextField> loTxtField = Arrays.asList( tfCheckNo,tfCheckTransNo,tfSearchTransNo,tfBank,tfBankAccountName,tfBankAccountNo,tfSearchBankAccountNo,tfSearchTransNo);
             loTxtField.forEach(tf -> tf.setOnKeyPressed(event -> txtField_KeyPressed(event)));
 //
 //            JFXUtil.setFocusListener(txtArea_Focus, taRemarks);
@@ -761,18 +763,11 @@ public class CheckDeposit_ConfirmationController implements Initializable, Scree
         if ((pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE)) {
             
             cbReverse.setOnAction(event -> {
-                if (poGLControllers.CheckDeposits().Master().getTransactionStatus().equals(CheckTransferStatus.OPEN)
-                        || poGLControllers.CheckDeposits().Master().getTransactionStatus().equals(CheckTransferStatus.CONFIRMED)) {
-                    if (poGLControllers.CheckDeposits().Detail(pnSelectedDetail).getSourceNo() != null
-                            || !poGLControllers.CheckDeposits().Detail(pnSelectedDetail).getSourceNo().isEmpty()) {
-                        if (!cbReverse.isSelected()) {
-                            poGLControllers.CheckDeposits().Detail().remove(pnSelectedDetail);
-                        }
-                    }
+                if (poGLControllers.CheckDeposits().Detail(pnSelectedDetail).getEditMode() == EditMode.ADDNEW) {
+                    poGLControllers.CheckDeposits().deleteDetail(pnSelectedDetail);
                 } else {
-                     poGLControllers.CheckDeposits().Detail(pnSelectedDetail).isReverse(cbReverse.isSelected());
+                    poGLControllers.CheckDeposits().Detail(pnSelectedDetail).isReverse(cbReverse.isSelected());
                 }
-                
                 loadTableDetail();
             });
             

@@ -359,6 +359,7 @@ public class CheckPrintRequest_EntryController implements Initializable, ScreenI
 //                            poCheckPrintingRequestController.Detail().remove(pnDetail);
                             poCheckPrintingRequestController.addTransactionNoToRemove(poCheckPrintingRequestController.Detail(pnDetail).getSourceNo());
                             poCheckPrintingRequestController.Detail().remove(pnDetail);
+                             poCheckPrintingRequestController.deleteDetail(pnDetail);
                             loadTableDetail();
                      }
                     break;
