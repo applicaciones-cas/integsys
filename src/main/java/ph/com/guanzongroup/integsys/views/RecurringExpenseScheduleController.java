@@ -12,6 +12,8 @@ import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.collections.transformation.FilteredList;
+import javafx.collections.transformation.SortedList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -62,7 +64,7 @@ public class RecurringExpenseScheduleController implements Initializable, Screen
     @FXML
     private Button btnBrowse, btnNew, btnSave, btnUpdate, btnCancel, btnClose;
     @FXML
-    private TextField tfRecurringID, tfPayee, tfParticular, tfBranchName, tfAccountNo, tfAccountName, tfDeparment, tfEmployee, tfBillDay, tfDueDay, tfAmount, tfSearchPayee;
+    private TextField tfRecurringID, tfPayee, tfParticular, tfBranchName, tfAccountNo, tfAccountName, tfDeparment, tfEmployee, tfBillDay, tfDueDay, tfAmount, tfSearchPayee, tfSearchCompany;
     @FXML
     private ComboBox cmbAccountable, cmbBillingFrequency;
     @FXML
@@ -81,8 +83,12 @@ public class RecurringExpenseScheduleController implements Initializable, Screen
     ObservableList<String> accountable_list = FXCollections.observableArrayList("Main Office", "Branch", "Department", "Employee");
     ObservableList<String> billingfrequency_list = FXCollections.observableArrayList("Monthly", "Quarterly", "Yearly");
     private ObservableList<ModelRecurringExpenseSchedule_Detail> details_data = FXCollections.observableArrayList();
+    private FilteredList<ModelRecurringExpenseSchedule_Detail> filteredDataDetail;
+
     JFXUtil.ReloadableTableTask loadTableDetail;
     private int pnDetail = 0;
+    private ChangeListener<String> detailSearchListener;
+    boolean lbresetpredicate = false;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -263,10 +269,11 @@ public class RecurringExpenseScheduleController implements Initializable, Screen
                                                 poController.Detail(lnCtr).getAccountNo(),
                                                 CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(lnCtr).getAmount(), true),
                                                 poController.Detail(lnCtr).isExcluded() ? "Yes" : "No",
-                                                poController.Detail(lnCtr).isActive() ? "Active" : "Inactive"
+                                                poController.Detail(lnCtr).isActive() ? "Active" : "Inactive",
+                                                poController.Detail(lnCtr).Company().getCompanyName()
                                         ));
+                                System.out.println(poController.Detail(lnCtr).Company().getCompanyName());
                             }
-
                             if (pnDetail < 0 || pnDetail
                                     >= details_data.size()) {
                                 if (!details_data.isEmpty()) {
@@ -290,6 +297,44 @@ public class RecurringExpenseScheduleController implements Initializable, Screen
                 });
     }
 
+    private void autoSearch(TextField txtField) {
+        detailSearchListener = (observable, oldValue, newValue) -> {
+//            int totalPage = (int) (Math.ceil(main_data.size() * 1.0 / ROWS_PER_PAGE));
+//            pgPagination.setPageCount(totalPage);
+            filteredDataDetail.setPredicate(orders -> {
+                lbresetpredicate = true;
+                if (newValue == null || newValue.isEmpty()) {
+                    return true;
+                }
+//                if (mainSearchListener != null) {
+//                    JFXUtil.removeTextFieldListener(mainSearchListener, txtField);
+//                    mainSearchListener = null; // Clear reference to avoid memory leaks
+//                }
+                String lowerCaseFilter = newValue.toLowerCase();
+                return orders.getIndex07().toLowerCase().contains(lowerCaseFilter);
+            });
+            // If no results and autoSearchMain is enabled, remove listener and trigger autoSearchMain
+            if (filteredDataDetail.isEmpty()) {
+//                if (main_data.size() > 0) {
+//                    JFXUtil.removeTextFieldListener(detailSearchListener, txtField);
+//                    filteredData = new FilteredList<>(main_data, b -> true);
+//                    autoSearchMain(txtField); // Trigger autoSearchMain if no results
+//                    tblViewPuchaseOrder.setItems(filteredData);
+//
+//                    String currentText = txtField.getText();
+//                    txtField.setText(currentText + " "); // Add a space
+//                    txtField.setText(currentText);       // Set back to original
+//                }
+            } else {
+                if (filteredDataDetail.size() == details_data.size()) {
+                    tblViewDetail.getSelectionModel().select(pnDetail);
+                    tblViewDetail.getFocusModel().focus(pnDetail);
+                }
+            }
+        };
+        txtField.textProperty().addListener(detailSearchListener);
+    }
+
     public void loadRecordSearch() {
         try {
             lblSource.setVisible(false);
@@ -304,6 +349,8 @@ public class RecurringExpenseScheduleController implements Initializable, Screen
 
     public void loadRecordMaster() {
         try {
+            boolean lbShow = JFXUtil.isObjectEqualTo(pnEditMode, EditMode.ADDNEW, EditMode.UPDATE, EditMode.READY) & !details_data.isEmpty();
+            JFXUtil.setDisabled(!lbShow, tfSearchCompany);
             if (poController.Master().getParticularId() != null && !"".equals(poController.Master().getParticularId())) {
                 tfRecurringID.setText(poController.Master().getRecurringId());
             } else {
@@ -319,6 +366,7 @@ public class RecurringExpenseScheduleController implements Initializable, Screen
     }
 
     public void loadRecordDetail() {
+
         if (poController.Master().getParticularId() == null || "".equals(poController.Master().getParticularId())) {
             return;
         }
@@ -465,7 +513,7 @@ public class RecurringExpenseScheduleController implements Initializable, Screen
                                 }
                             });
 
-                            JFXUtil.runWithDelay(.5, () -> {
+                            JFXUtil.runWithDelay(.8, () -> {
                                 JFXUtil.textFieldMoveNext(tfBranchName); // must be in the success
                             });
                             lbProceed = true;
@@ -646,11 +694,13 @@ public class RecurringExpenseScheduleController implements Initializable, Screen
                     case "tfBillDay":
                         lsValue = JFXUtil.removeComma(lsValue);
                         int lnDueDay = poController.Detail(pnDetail).getDueDay();
-                        if (Integer.parseInt(lsValue) > lnDueDay) { //bill day cannot be greater than due day
-                            ShowMessageFX.Warning(null, pxeModuleName, "Bill day cannot be greater than Due day.");
-                            tfBillDay.requestFocus();
-                            loadRecordDetail();
-                            return;
+                        if (lnDueDay != 0) {
+                            if (Integer.parseInt(lsValue) > lnDueDay) { //bill day cannot be greater than due day
+                                ShowMessageFX.Warning(null, pxeModuleName, "Bill day cannot be greater than Due day.");
+                                tfBillDay.requestFocus();
+                                loadRecordDetail();
+                                return;
+                            }
                         }
                         if (Integer.parseInt(lsValue) > 31) {
                             ShowMessageFX.Warning(null, pxeModuleName, "Invalid bill day.");
@@ -666,11 +716,14 @@ public class RecurringExpenseScheduleController implements Initializable, Screen
                     case "tfDueDay":
                         lsValue = JFXUtil.removeComma(lsValue);
                         int lnBillDay = poController.Detail(pnDetail).getBillDay();
-                        if (lnBillDay > Integer.parseInt(lsValue)) { //bill day cannot be greater than due day
-                            ShowMessageFX.Warning(null, pxeModuleName, "Bill day cannot be greater than Due day.");
-                            tfDueDay.requestFocus();
-                            loadRecordDetail();
-                            return;
+
+                        if (lnBillDay != 0) {
+                            if (lnBillDay > Integer.parseInt(lsValue)) { //bill day cannot be greater than due day
+                                ShowMessageFX.Warning(null, pxeModuleName, "Bill day cannot be greater than Due day.");
+                                tfDueDay.requestFocus();
+                                loadRecordDetail();
+                                return;
+                            }
                         }
                         if (Integer.parseInt(lsValue) > 31) {
                             ShowMessageFX.Warning(null, pxeModuleName, "Invalid due day.");
@@ -861,6 +914,13 @@ public class RecurringExpenseScheduleController implements Initializable, Screen
         JFXUtil.setColumnRight(tblDetailAmount);
         JFXUtil.setColumnsIndexAndDisableReordering(tblViewDetail);
         tblViewDetail.setItems(details_data);
+
+        filteredDataDetail = new FilteredList<>(details_data, b -> true);
+        autoSearch(tfSearchCompany);
+
+        SortedList<ModelRecurringExpenseSchedule_Detail> sortedData = new SortedList<>(filteredDataDetail);
+        sortedData.comparatorProperty().bind(tblViewDetail.comparatorProperty());
+        tblViewDetail.setItems(sortedData);
     }
 
     private void initTableOnClick() {
@@ -876,6 +936,7 @@ public class RecurringExpenseScheduleController implements Initializable, Screen
     }
 
     public void clearTextFields() {
+        tfSearchCompany.setText("");
         JFXUtil.clearTextFields(apBrowse, apMaster, apDetail);
     }
 

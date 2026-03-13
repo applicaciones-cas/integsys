@@ -324,7 +324,7 @@ public class ParticularController implements Initializable, ScreenInterface {
                 case F3:
                     switch (lnIndex) {
                         case 03:
-                            poJson = oParameters.AccountChart().searchRecord(lsValue, false);
+                            poJson = oParameters.AccountChart().searchRecordByIndustry(lsValue, false);
                             if ("error".equalsIgnoreCase(poJson.get("result").toString())) {
                                 ShowMessageFX.Information((String) poJson.get("message"), "Computerized Acounting System", pxeModuleName);
                             }
