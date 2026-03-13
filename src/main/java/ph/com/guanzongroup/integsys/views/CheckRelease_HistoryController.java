@@ -162,11 +162,12 @@ public class CheckRelease_HistoryController implements Initializable, ScreenInte
         initTableDetail();
         initTableOnClick();
         initCheckBox();
+        initFields();
+        
+        initButton(EditMode.UNKNOWN);
     }
     
-    /**
-     * Initializes the TBJ controller and transaction objects.
-     */
+
     private void initializeObject() {
         LogWrapper logwrapr = new LogWrapper("CAS", System.getProperty("sys.default.path.temp") + "cas-error.log");
         poGLControllers = new CashflowControllers(poApp, logwrapr);
@@ -178,7 +179,19 @@ public class CheckRelease_HistoryController implements Initializable, ScreenInte
 //            poGLControllers.CheckReleases().Master().setIndustryId(psIndustryID);
 //            lblSource.setText(poGLControllers.CheckReleases().Master().Company().getCompanyName() + " - " + poGLControllers.CheckReleases().Master().Industry().getDescription());
     }
-    
+    private void initButton(int fnEditMode) {
+       if (fnEditMode == EditMode.UNKNOWN){
+        btnPrint.setVisible(false);
+        btnPrint.setManaged(false);
+        btnPost.setVisible(false);
+        btnPost.setManaged(false);
+       }else if(fnEditMode == EditMode.READY){
+           btnPrint.setVisible(true);
+           btnPrint.setManaged(true);
+           btnPost.setVisible(true);
+           btnPost.setManaged(true);
+       }
+    }
     private void ClearAll() {
         Arrays.asList(
                  tfSearchReceived,
@@ -223,28 +236,31 @@ public class CheckRelease_HistoryController implements Initializable, ScreenInte
                     poJSON = poGLControllers.CheckReleases().SearchTransaction();
                     if (!"success".equals((String) poJSON.get("result"))) {
                         ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
+                        ClearAll();
                         return;
                     }
-                    pnEditMode = poGLControllers.CheckDeposits().getEditMode();
+                    ClearAll();
                     loadTableDetail();
                     LoadMaster();
                     LoadDetail();
+                    initButton(EditMode.READY);
                     break;
                 case "btnHistory":
-                    if( poGLControllers.CheckReleases().Master().getTransactionNo() != null || ! poGLControllers.CheckReleases().Master().getTransactionNo().isEmpty()){
-                        try {
-                            poGLControllers.CheckReleases().ShowStatusHistory();
-                        } catch (NullPointerException npe) {
-                            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(npe), npe);
-                            ShowMessageFX.Error("No transaction status history to load!", psFormName, null);
-                        } catch (Exception ex) {
-                            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
-                            ShowMessageFX.Error(MiscUtil.getException(ex), psFormName, null);
-                        }
-
-                    }else{
-                       ShowMessageFX.Error("Unable to proceed. No transaction is currently loaded.", psFormName, null);
+                    if( poGLControllers.CheckReleases().Master().getTransactionNo() == null){
+                        ShowMessageFX.Error("Unable to proceed. No transaction is currently loaded.", psFormName, null);
+                        return;
                     }
+                    
+                    try {
+                        poGLControllers.CheckReleases().ShowStatusHistory();
+                    } catch (NullPointerException npe) {
+                        Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(npe), npe);
+                        ShowMessageFX.Error("No transaction status history to load!", psFormName, null);
+                    } catch (Exception ex) {
+                        Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+                        ShowMessageFX.Error(MiscUtil.getException(ex), psFormName, null);
+                    }
+
                     break;
                 case "btnPrint":
                    if(poGLControllers.CheckReleases().Master().getTransactionNo() != null ||
@@ -341,7 +357,7 @@ public class CheckRelease_HistoryController implements Initializable, ScreenInte
             apDetail.setDisable(false);
         }
         
-           List<TextField> loTxtField = Arrays.asList(tfCheckTransNo, tfCheckNo);
+           List<TextField> loTxtField = Arrays.asList(tfCheckTransNo, tfCheckNo,tfSearchTransNo,tfSearchReceived);
             loTxtField.forEach(tf -> tf.setOnKeyPressed(event -> txtField_KeyPressed(event)));
 //
             JFXUtil.setFocusListener(txtArea_Focus, taRemarks);
@@ -654,6 +670,7 @@ public class CheckRelease_HistoryController implements Initializable, ScreenInte
                                 poJSON = poGLControllers.CheckReleases().SearchChecks(lsValue, "",pnSelectedDetail,false);
                                 if ("error".equals(poJSON.get("result"))) {
                                     ShowMessageFX.Warning((String) poJSON.get("message"), lsValue, lsValue);
+                                    return; 
                                 }
                                 tfCheckTransNo.setText(poGLControllers.CheckReleases().Detail(pnSelectedDetail).CheckPayment().getTransactionNo());
                                 loadTableDetail();
@@ -662,11 +679,37 @@ public class CheckRelease_HistoryController implements Initializable, ScreenInte
                                 poJSON = poGLControllers.CheckReleases().SearchChecks("", lsValue,pnSelectedDetail,false);
                                 if ("error".equals(poJSON.get("result"))) {
                                     ShowMessageFX.Warning((String) poJSON.get("message"), lsValue, lsValue);
+                                    return; 
                                 }
                                 tfCheckNo.setText(poGLControllers.CheckReleases().Detail(pnSelectedDetail).CheckPayment().getCheckNo());
                                 loadTableDetail();
                                 return; 
-                             
+                            case "tfSearchTransNo":
+                                poJSON = poGLControllers.CheckReleases().SearchTransaction( lsValue,null);
+                                if ("error".equals(poJSON.get("result"))) {
+                                    ShowMessageFX.Warning((String) poJSON.get("message"), lsValue, lsValue);
+                                    return; 
+                                }
+                                tfCheckNo.setText(poGLControllers.CheckReleases().Detail(pnSelectedDetail).CheckPayment().getCheckNo());
+                                ClearAll();
+                                loadTableDetail();
+                                LoadMaster();
+                                LoadDetail();
+                                initButton(EditMode.READY);
+                                return; 
+                             case "tfSearchReceived": 
+                                  poJSON = poGLControllers.CheckReleases().SearchTransaction( null,lsValue);
+                                if ("error".equals(poJSON.get("result"))) {
+                                    ShowMessageFX.Warning((String) poJSON.get("message"), lsValue, lsValue);
+                                    return; 
+                                }
+                                tfCheckNo.setText(poGLControllers.CheckReleases().Detail(pnSelectedDetail).CheckPayment().getCheckNo());
+                                ClearAll();
+                                loadTableDetail();
+                                LoadMaster();
+                                LoadDetail();
+                                initButton(EditMode.READY);
+                                 return;
                         }
 
                         break;
@@ -680,6 +723,8 @@ public class CheckRelease_HistoryController implements Initializable, ScreenInte
                 }
             } catch (SQLException | GuanzonException | ExceptionInInitializerError ex) {
                 Logger.getLogger(TBJ_ParameterController.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (CloneNotSupportedException ex) {
+                Logger.getLogger(CheckRelease_HistoryController.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
     }

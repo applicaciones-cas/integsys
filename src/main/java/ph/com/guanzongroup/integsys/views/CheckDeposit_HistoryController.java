@@ -27,7 +27,6 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressIndicator;
-import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
@@ -313,6 +312,7 @@ public class CheckDeposit_HistoryController implements Initializable, ScreenInte
 //            initFields(pnEditMode);
         } catch (CloneNotSupportedException | SQLException | GuanzonException ex) {
             Logger.getLogger(TBJ_ParameterController.class.getName()).log(Level.SEVERE, null, ex);
+            ShowMessageFX.Error(ex.getMessage(), psFormName, null);
         }
     }
     private void initFields() {
@@ -387,10 +387,9 @@ public class CheckDeposit_HistoryController implements Initializable, ScreenInte
                     break;
             }
             lblStatus.setText(lsStatus);
-        } catch (GuanzonException ex) {
+        } catch (GuanzonException | SQLException ex) {
             Logger.getLogger(CheckDeposit_EntryController.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (SQLException ex) {
-            Logger.getLogger(CheckDeposit_EntryController.class.getName()).log(Level.SEVERE, null, ex);
+            ShowMessageFX.Error(ex.getMessage(), psFormName, null);
         }
     }
     
@@ -433,6 +432,7 @@ public class CheckDeposit_HistoryController implements Initializable, ScreenInte
 
         } catch (SQLException | GuanzonException | NullPointerException ex) {
             Logger.getLogger(PaymentRequest_EntryController.class.getName()).log(Level.SEVERE, null, ex);
+            ShowMessageFX.Error(ex.getMessage(), psFormName, null);
         }
     }
     
@@ -535,6 +535,7 @@ public class CheckDeposit_HistoryController implements Initializable, ScreenInte
                 } catch (GuanzonException | SQLException ex) {
                     Logger.getLogger(PaymentRequest_EntryController.class
                             .getName()).log(Level.SEVERE, null, ex);
+                    ShowMessageFX.Error(ex.getMessage(), psFormName, null);
                     return null;
                 }
             }
@@ -766,6 +767,7 @@ public class CheckDeposit_HistoryController implements Initializable, ScreenInte
                 }
             } catch (SQLException | GuanzonException | ExceptionInInitializerError ex) {
                 Logger.getLogger(TBJ_ParameterController.class.getName()).log(Level.SEVERE, null, ex);
+                ShowMessageFX.Error(ex.getMessage(), psFormName, null);
             }
         }
     }

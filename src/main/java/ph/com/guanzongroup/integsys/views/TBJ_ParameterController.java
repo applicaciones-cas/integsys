@@ -577,12 +577,18 @@ public class TBJ_ParameterController implements Initializable, ScreenInterface {
                 cbIsActive.setDisable(isEditable);
             }else if(pnEditMode==EditMode.UPDATE){
                 try {
-                    if(TBJ_Constant.CONFIRMED.equals(poTBJControllers.TBJParameter().Master().getTransactionStatus()) 
-                            ||TBJ_Constant.OPEN.equals(poTBJControllers.TBJParameter().Master().getTransactionStatus())){
-                        apMaster.setDisable(true);
+                    if(TBJ_Constant.CONFIRMED.equals(poTBJControllers.TBJParameter().Master().getTransactionStatus())){
+                        JFXUtil.setDisabledExcept(true,
+                        apMaster,
+                        taRemarks);
                         JFXUtil.setDisabledExcept(true,
                         apDetail,
                         cbIsActive);
+                    }else if (TBJ_Constant.OPEN.equals(poTBJControllers.TBJParameter().Master().getTransactionStatus())){
+                        JFXUtil.setDisabledExcept(true,
+                        apMaster,
+                        taRemarks);
+                        apDetail.setDisable(false);
                     }
                 } catch (SQLException | GuanzonException ex) {
                     Logger.getLogger(TBJ_ParameterController.class.getName()).log(Level.SEVERE, null, ex);
