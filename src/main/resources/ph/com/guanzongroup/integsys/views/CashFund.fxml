@@ -140,7 +140,7 @@
                                     <Font size="12.0" />
                                  </font>
                               </Button>
-                              <Button fx:id="btnVoid" contentDisplay="TOP" ellipsisString="" mnemonicParsing="false" onAction="#cmdButton_Click" prefHeight="70.0" prefWidth="70.0" styleClass="button_process" stylesheets="@../css/StyleSheet.css" text="Void">
+                              <Button fx:id="btnVoid" contentDisplay="TOP" ellipsisString="" mnemonicParsing="false" onAction="#cmdButton_Click" prefHeight="70.0" prefWidth="70.0" styleClass="button_process" stylesheets="@../css/StyleSheet.css" text="Deactivate">
                                  <effect>
                                     <Blend />
                                  </effect>
@@ -243,7 +243,7 @@
                                                                                  <font>
                                                                                     <Font size="12.0" />
                                                                                  </font></Label>
-                                                                  <Label layoutX="44.0" layoutY="82.0" text="Cash fund custodian" GridPane.rowIndex="4">
+                                                                  <Label layoutX="44.0" layoutY="82.0" text="Custodian" GridPane.rowIndex="4">
                                                                      <font>
                                                                         <Font size="12.0" />
                                                                      </font>
