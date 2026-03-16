@@ -175,15 +175,6 @@ public class AccountsAccreditation_ConfirmationController implements Initializab
                             getLoadedClient();
                             initButtonDisplay(poAppController.getEditMode());
                             break;
-                            
-                        case "tfContactPerson":
-                            if (!isJSONSuccess(poAppController.searchClientContact(tfContactPerson.getText(), false),
-                                    "Initialize Search Client! ")) {
-                                return;
-                            }
-                            getLoadedClient();
-                            initButtonDisplay(poAppController.getEditMode());
-                        break;
 
                     }
                     break;
@@ -385,14 +376,6 @@ public class AccountsAccreditation_ConfirmationController implements Initializab
                                 getLoadedClient();
                                 initButtonDisplay(poAppController.getEditMode());
                                 break;
-                            case "tfContactPerson":
-                                if (!isJSONSuccess(poAppController.searchClientContact(tfContactPerson.getText(), false),
-                                        "Initialize Search Client! ")) {
-                                    return;
-                                }
-                                getLoadedClient();
-                                initButtonDisplay(poAppController.getEditMode());
-                            break;
                         }
                         break;
                 }
