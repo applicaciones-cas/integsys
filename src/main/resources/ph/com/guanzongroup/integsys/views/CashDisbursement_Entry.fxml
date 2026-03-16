@@ -53,7 +53,7 @@
                                                 <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="28.0" vgrow="SOMETIMES" />
                                             </rowConstraints>
                                             <children>
-                                                <Label fx:id="lblSource" alignment="CENTER_RIGHT" layoutX="367.0" layoutY="14.0" maxWidth="1.7976931348623157E308" text="Company - Industry" GridPane.columnIndex="7">
+                                                <Label fx:id="lblSource" alignment="CENTER_RIGHT" layoutX="367.0" layoutY="14.0" maxWidth="1.7976931348623157E308" text="Company" GridPane.columnIndex="7">
                                                     <font>
                                                         <Font name="System Bold" size="14.0" />
                                                     </font>
@@ -393,6 +393,8 @@
                                                                         </TextField>
                                                                         <Label layoutX="53.0" layoutY="16.0" text="Particular" GridPane.rowIndex="3" />
                                                                         <TextField fx:id="tfORNoDetail1" disable="true" editable="false" layoutX="125.0" layoutY="12.0" maxWidth="1.7976931348623157E308" GridPane.columnIndex="2" GridPane.rowIndex="3" />
+                                                                        <CheckBox fx:id="cbReverse" mnemonicParsing="false" onAction="#cmdCheckBox_Click" GridPane.columnIndex="10" GridPane.rowIndex="4" />
+                                                                        <Label layoutX="404.0" layoutY="72.0" text="Reverse" GridPane.columnIndex="8" GridPane.rowIndex="4" />
                                                                                             </children>
                                                                   </GridPane>
                                                                </children>
