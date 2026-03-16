@@ -208,7 +208,7 @@
                                                                           <ColumnConstraints hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="139.0" />
                                                                           <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="200.0" />
                                                                           <ColumnConstraints halignment="LEFT" hgrow="SOMETIMES" maxWidth="1.7976931348623157E308" minWidth="-Infinity" prefWidth="10.0" />
-                                                      <ColumnConstraints halignment="LEFT" hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="50.0" />
+                                                      <ColumnConstraints halignment="LEFT" hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="20.0" />
                                                       <ColumnConstraints halignment="LEFT" hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="10.0" />
                                                       <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="150.0" />
                                                       <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="10.0" />
@@ -234,7 +234,7 @@
                                                                                   <Font name="System Bold" size="14.0" />
                                                                               </font>
                                                                           </Label>
-                                                                  <Label layoutX="404.0" layoutY="54.0" text="Beginning Balance" GridPane.columnIndex="7" GridPane.rowIndex="3">
+                                                                  <Label layoutX="404.0" layoutY="54.0" text="Beginning Balance" GridPane.columnIndex="7" GridPane.rowIndex="2">
                                                                      <font>
                                                                         <Font name="System Bold" size="12.0" />
                                                                      </font>
@@ -257,21 +257,27 @@
                                                                   <TextField fx:id="tfDepartment" layoutX="100.0" layoutY="107.0" maxHeight="25.0" promptText="Press F3: Search" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.rowIndex="3" />
                                                                           <TextField fx:id="tfCreditedTo" maxHeight="25.0" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.rowIndex="5" />
                                                                   <TextField fx:id="tfCustodian" layoutX="85.0" layoutY="78.0" maxHeight="25.0" promptText="Press F3: Search" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.rowIndex="4" />
-                                                                  <TextField fx:id="tfBeginningBalance" alignment="CENTER_RIGHT" layoutX="499.0" layoutY="50.0" maxHeight="25.0" promptText="0.0000" GridPane.columnIndex="9" GridPane.rowIndex="3" />
+                                                                  <TextField fx:id="tfBeginningBalance" alignment="CENTER_RIGHT" layoutX="499.0" layoutY="50.0" maxHeight="25.0" promptText="0.0000" GridPane.columnIndex="9" GridPane.rowIndex="2" />
                                                                   <Label text="Branch" GridPane.rowIndex="2" />
                                                                   <TextField fx:id="tfBranch" promptText="Press F3: Search" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.rowIndex="2" />
-                                                                  <DatePicker fx:id="dpBegBalAsOf" GridPane.columnIndex="9" GridPane.rowIndex="4" />
-                                                                  <Label layoutX="583.0" layoutY="138.0" text="Beginning Balance (as of)" GridPane.columnIndex="7" GridPane.rowIndex="4">
+                                                                  <DatePicker fx:id="dpBegBalAsOf" GridPane.columnIndex="9" GridPane.rowIndex="3" />
+                                                                  <Label layoutX="583.0" layoutY="138.0" text="Beginning Balance Date" GridPane.columnIndex="7" GridPane.rowIndex="3">
                                                                      <font>
                                                                         <Font name="System Bold" size="12.0" />
                                                                      </font>
                                                                   </Label>
-                                                                  <Label layoutX="574.0" layoutY="166.0" text="Current Balance" GridPane.columnIndex="7" GridPane.rowIndex="5">
+                                                                  <Label layoutX="574.0" layoutY="166.0" text="Current Balance" GridPane.columnIndex="7" GridPane.rowIndex="4">
                                                                      <font>
                                                                         <Font name="System Bold" size="12.0" />
                                                                      </font>
                                                                   </Label>
-                                                                  <TextField fx:id="tfCurrentBalance" alignment="CENTER_RIGHT" layoutX="728.0" layoutY="134.0" maxHeight="25.0" promptText="0.0000" GridPane.columnIndex="9" GridPane.rowIndex="5" />
+                                                                  <TextField fx:id="tfCurrentBalance" alignment="CENTER_RIGHT" layoutX="728.0" layoutY="134.0" maxHeight="25.0" promptText="0.0000" GridPane.columnIndex="9" GridPane.rowIndex="4" />
+                                                                  <Label layoutX="564.0" layoutY="82.0" text="Last Transaction Date" GridPane.columnIndex="7" GridPane.rowIndex="5">
+                                                                     <font>
+                                                                        <Font name="System Bold" size="12.0" />
+                                                                     </font>
+                                                                  </Label>
+                                                                  <DatePicker fx:id="dpLastTransDate" layoutX="709.0" layoutY="78.0" GridPane.columnIndex="9" GridPane.rowIndex="5" />
                                                                       </children>
                                                                   </GridPane>
                                                               </children>
