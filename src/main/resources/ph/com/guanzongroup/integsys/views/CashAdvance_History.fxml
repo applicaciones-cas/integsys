@@ -82,7 +82,7 @@
                                     </Label>
                                                 <TextField fx:id="tfSearchIndustry" promptText="Press F3: Search" GridPane.columnIndex="2" />
                                                 <TextField fx:id="tfSearchPayee" layoutX="120.0" layoutY="11.0" promptText="Press F3: Search" GridPane.columnIndex="6" />
-                                                <TextField fx:id="tfSearchTransNo" GridPane.columnIndex="10" />
+                                                <TextField fx:id="tfSearchTransNo" promptText="Press F3: Search" GridPane.columnIndex="10" />
                                             </children>
                               </GridPane>
                            </children>
@@ -95,50 +95,6 @@
                             <children>
                                 <HBox fx:id="hbButtons" alignment="CENTER_LEFT" spacing="5.0" style="-fx-background-color: E9E9E9;" styleClass="button_process" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                     <children>
-                                        <Button fx:id="btnUpdate" contentDisplay="TOP" ellipsisString="" layoutX="270.0" layoutY="15.0" mnemonicParsing="false" prefHeight="70.0" prefWidth="70.0" styleClass="button_process" stylesheets="@../css/StyleSheet.css" text="Update">
-                                            <effect>
-                                                <Blend />
-                                            </effect>
-                                            <graphic>
-                                                <FontAwesomeIconView glyphName="EDIT" size="20" />
-                                            </graphic>
-                                            <font>
-                                                <Font size="12.0" />
-                                            </font>
-                                        </Button>
-                                        <Button fx:id="btnSearch" contentDisplay="TOP" ellipsisString="" layoutX="185.0" layoutY="15.0" mnemonicParsing="false" prefHeight="70.0" prefWidth="70.0" styleClass="button_process" stylesheets="@../css/StyleSheet.css" text="Search">
-                                            <effect>
-                                                <Blend />
-                                            </effect>
-                                            <graphic>
-                                                <FontAwesomeIconView glyphName="SEARCH" size="20" />
-                                            </graphic>
-                                            <font>
-                                                <Font size="12.0" />
-                                            </font>
-                                        </Button>
-                                        <Button fx:id="btnSave" contentDisplay="TOP" ellipsisString="" layoutX="100.0" layoutY="15.0" mnemonicParsing="false" prefHeight="70.0" prefWidth="70.0" styleClass="button_process" stylesheets="@../css/StyleSheet.css" text="Save">
-                                            <effect>
-                                                <Blend />
-                                            </effect>
-                                            <graphic>
-                                                <FontAwesomeIconView glyphName="SAVE" size="20" />
-                                            </graphic>
-                                            <font>
-                                                <Font size="12.0" />
-                                            </font>
-                                        </Button>
-                                        <Button fx:id="btnCancel" contentDisplay="TOP" ellipsisString="" layoutX="185.0" layoutY="15.0" mnemonicParsing="false" prefHeight="70.0" prefWidth="70.0" styleClass="button_process" stylesheets="@../css/StyleSheet.css" text="Cancel">
-                                            <effect>
-                                                <Blend />
-                                            </effect>
-                                            <graphic>
-                                                <FontAwesomeIconView glyphName="TIMES" size="20" />
-                                            </graphic>
-                                            <font>
-                                                <Font size="12.0" />
-                                            </font>
-                                        </Button>
                                         <Button fx:id="btnHistory" contentDisplay="TOP" ellipsisString="" mnemonicParsing="false" prefHeight="70.0" prefWidth="70.0" styleClass="button_process" stylesheets="@../css/StyleSheet.css" text="History">
                                             <graphic>
                                                 <FontAwesomeIconView glyphName="BOOK" size="20" />
@@ -243,7 +199,6 @@
                                                                                                 <DatePicker fx:id="dpTransactionDate" disable="true" editable="false" prefHeight="26.0" prefWidth="150.0" promptText="mm/dd/yyyy" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.rowIndex="2" />
                                                                                                 <TextField fx:id="tfPayee" disable="true" maxHeight="25.0" GridPane.columnIndex="2" GridPane.columnSpan="3" GridPane.rowIndex="3" />
                                                                                                 <TextField fx:id="tfDepartment" disable="true" editable="false" maxHeight="25.0" maxWidth="1.7976931348623157E308" minWidth="-Infinity" GridPane.columnIndex="2" GridPane.columnSpan="3" GridPane.rowIndex="4" />
-                                                                                                <TextArea fx:id="taRemarks" disable="true" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="2" GridPane.columnSpan="3" GridPane.rowIndex="5" GridPane.rowSpan="2" />
                                                                                                 <AnchorPane maxWidth="1.7976931348623157E308" minWidth="-Infinity" prefHeight="27.0" prefWidth="140.0" style="-fx-background-color: FF8201;" GridPane.columnIndex="8">
                                                                            <children>
                                                                                                       <Label fx:id="lblStatus" alignment="CENTER" contentDisplay="CENTER" maxWidth="1.7976931348623157E308" prefHeight="27.0" text="STATUS" textAlignment="CENTER" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
@@ -257,6 +212,7 @@
                                                                                                 <TextField fx:id="tfCashAdvanceBalance" alignment="CENTER_RIGHT" disable="true" editable="false" promptText="0.00" GridPane.columnIndex="8" GridPane.rowIndex="6" />
                                                                                                 <TextField fx:id="tfAdvancesAmount" alignment="CENTER_RIGHT" disable="true" editable="false" promptText="0.00" GridPane.columnIndex="8" GridPane.rowIndex="4" />
                                                                                                 <TextField fx:id="tfLiquidationTotal" alignment="CENTER_RIGHT" editable="false" maxHeight="26.0" promptText="0.00" style="-fx-font-weight: bold;" GridPane.columnIndex="8" GridPane.rowIndex="5" />
+                                                                                                <TextArea fx:id="taRemarks" disable="true" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="2" GridPane.columnSpan="3" GridPane.rowIndex="5" GridPane.rowSpan="2" />
                                                                                             </children>
                                                                                         </GridPane>
                                                                                     </children>
@@ -281,19 +237,18 @@
                                                                         <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="28.0" vgrow="SOMETIMES" />
                                                                                                 <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="28.0" vgrow="SOMETIMES" />
                                                                                                 <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="28.0" vgrow="SOMETIMES" />
-                                                                                                <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="28.0" vgrow="SOMETIMES" />
                                                                                             </rowConstraints>
                                                                                             <children>
                                                                                             <Label text="Receipt No" />
                                                                                                 <Label layoutX="74.0" layoutY="57.0" text="Date" GridPane.rowIndex="1" />
                                                                                                 <Label text="Acc. Description" GridPane.rowIndex="2" />
-                                                                                                <Label text="Particular" GridPane.rowIndex="4" />
-                                                                                                <Label text="Transaction Amount" GridPane.columnIndex="7" GridPane.rowIndex="4" />
+                                                                                                <Label text="Particular" GridPane.rowIndex="3" />
+                                                                                                <Label text="Transaction Amount" GridPane.columnIndex="7" GridPane.rowIndex="3" />
                                                                                                 <TextField fx:id="tfORNo1" alignment="CENTER_RIGHT" maxHeight="25.0" GridPane.columnIndex="2" />
                                                                                                 <DatePicker fx:id="dpTransDateDetail" editable="false" prefHeight="26.0" prefWidth="150.0" promptText="mm/dd/yyyy" GridPane.columnIndex="2" GridPane.rowIndex="1" />
-                                                                                                <TextField fx:id="tfORNo" maxHeight="25.0" maxWidth="-Infinity" minWidth="-Infinity" prefHeight="25.0" prefWidth="369.0" promptText="Press F3: Search" GridPane.columnIndex="2" GridPane.rowIndex="2" />
-                                                                                                <TextField fx:id="tfParticular" maxHeight="25.0" maxWidth="1.7976931348623157E308" minWidth="-Infinity" promptText="Press F3: Search" GridPane.columnIndex="2" GridPane.columnSpan="4" GridPane.rowIndex="4" />
-                                                                                                <TextField fx:id="tfTransAmount" alignment="CENTER_RIGHT" maxHeight="25.0" promptText="0.00" GridPane.columnIndex="9" GridPane.rowIndex="4" />
+                                                                                                <TextField fx:id="tfORNo" maxHeight="25.0" maxWidth="-Infinity" minWidth="-Infinity" prefHeight="25.0" prefWidth="369.0" GridPane.columnIndex="2" GridPane.rowIndex="2" />
+                                                                                                <TextField fx:id="tfParticular" maxHeight="25.0" maxWidth="1.7976931348623157E308" minWidth="-Infinity" GridPane.columnIndex="2" GridPane.columnSpan="4" GridPane.rowIndex="3" />
+                                                                                                <TextField fx:id="tfTransAmount" alignment="CENTER_RIGHT" maxHeight="25.0" promptText="0.00" GridPane.columnIndex="9" GridPane.rowIndex="3" />
                                                                                             </children>
                                                                                         </GridPane>
                                                                                     </children>
@@ -305,7 +260,7 @@
                                                                                                 <TableColumn fx:id="tblRowNoDetail" editable="false" maxWidth="40.0" minWidth="40.0" prefWidth="40.0" resizable="false" sortable="false" text="No." />
                                                                                                 <TableColumn fx:id="tblORNo" editable="false" maxWidth="100.0" minWidth="100.0" prefWidth="100.0" resizable="false" sortable="false" style="-fx-alignment: CENTER-RIGHT;" text="Receipt No" />
                                                                                                 <TableColumn fx:id="tblTransDateDetail" editable="false" maxWidth="100.0" minWidth="100.0" prefWidth="100.0" resizable="false" sortable="false" style="-fx-alignment: CENTER-RIGHT;" text="Date" />
-                                                                                                <TableColumn fx:id="tblParticular" editable="false" maxWidth="300.0" minWidth="300.0" prefWidth="300.0" resizable="false" sortable="false" text="Particular" />
+                                                                                                <TableColumn fx:id="tblParticular" editable="false" maxWidth="400.0" minWidth="400.0" prefWidth="400.0" resizable="false" sortable="false" text="Particular" />
                                                                                                 <TableColumn fx:id="tblTransAmount" editable="false" maxWidth="181.0" minWidth="100.0" prefWidth="168.0" resizable="false" sortable="false" style="-fx-alignment: CENTER-RIGHT;" text="Transaction Amount" />
                                                                                             </columns>
                                                                                             <columnResizePolicy>
@@ -340,8 +295,8 @@
                                                                                 <ColumnConstraints hgrow="SOMETIMES" prefWidth="650.0" />
                                                                             </columnConstraints>
                                                                             <rowConstraints>
-                                                                                <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="28.0" vgrow="SOMETIMES" />
-                                                                                <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="28.0" vgrow="SOMETIMES" />
+                                                                                <RowConstraints maxHeight="60.0" minHeight="-Infinity" prefHeight="28.0" vgrow="SOMETIMES" />
+                                                                                <RowConstraints maxHeight="1.7976931348623157E308" minHeight="-Infinity" prefHeight="28.0" vgrow="SOMETIMES" />
                                                                                 <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="28.0" vgrow="SOMETIMES" />
                                                                             </rowConstraints>
                                                                             <children>
