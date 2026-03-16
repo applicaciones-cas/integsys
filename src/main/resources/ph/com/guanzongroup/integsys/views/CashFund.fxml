@@ -189,10 +189,8 @@
                      <children>
                         <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="5.0">
                             <children>
-                                
                                           <HBox fx:id="hboxid" prefHeight="100.0" prefWidth="200.0" spacing="5.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="0.0">
                                              <children>
-                                                
                                                 <VBox maxWidth="885.0" spacing="5.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="0.0">
                                     <children>
                                           <AnchorPane>
@@ -223,62 +221,65 @@
                                                                   <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="28.0" vgrow="SOMETIMES" />
                                                                       </rowConstraints>
                                                                       <children>
-                                                      <AnchorPane maxWidth="-Infinity" minWidth="-Infinity" prefHeight="27.0" prefWidth="140.0" style="-fx-background-color: FF8201;" GridPane.columnIndex="9" />
-                                                                            <Label fx:id="lblStatus" alignment="CENTER" contentDisplay="CENTER" prefHeight="27.0" prefWidth="142.0" text="STATUS" textAlignment="CENTER" GridPane.columnIndex="9">
-                                                                                <font>
-                                                                                    <Font name="System Bold" size="14.0" />
-                                                                                </font>
-                                                                            </Label>
-                                                                          <Label text="Cash Fund ID">
+                                                                      <Label text="Cash Fund ID">
                                                                               <font>
                                                                                   <Font name="System Bold" size="14.0" />
                                                                               </font>
                                                                           </Label>
-                                                                  <Label layoutX="404.0" layoutY="54.0" text="Beginning Balance" GridPane.columnIndex="7" GridPane.rowIndex="2">
+                                                                                        <Label text="Branch" GridPane.rowIndex="2" />
+                                                                                        <Label layoutX="46.0" layoutY="112.0" text="Department" GridPane.rowIndex="3">
                                                                      <font>
-                                                                        <Font name="System Bold" size="12.0" />
+                                                                        <Font size="12.0" />
                                                                      </font>
                                                                   </Label>
-                                                                          <Label text="Description" GridPane.rowIndex="5">
+                                                                                        <Label layoutX="44.0" layoutY="82.0" text="Custodian" GridPane.rowIndex="4">
+                                                                     <font>
+                                                                        <Font size="12.0" />
+                                                                     </font>
+                                                                  </Label>
+                                                                                        <Label text="Description" GridPane.rowIndex="5">
                                                                                  <font>
                                                                                     <Font size="12.0" />
-                                                                                 </font></Label>
-                                                                  <Label layoutX="44.0" layoutY="82.0" text="Custodian" GridPane.rowIndex="4">
-                                                                     <font>
-                                                                        <Font size="12.0" />
-                                                                     </font>
-                                                                  </Label>
-                                                                  <Label layoutX="46.0" layoutY="112.0" text="Department" GridPane.rowIndex="3">
-                                                                     <font>
-                                                                        <Font size="12.0" />
-                                                                     </font>
-                                                                  </Label>
-                                                                          <TextField fx:id="tfCashFundId" editable="false" maxHeight="25.0" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="139.0" style="-fx-font-weight: bold;" styleClass="DisabledTextField" GridPane.columnIndex="2" GridPane.columnSpan="2" />
-                                                                  <TextField fx:id="tfDepartment" layoutX="100.0" layoutY="107.0" maxHeight="25.0" promptText="Press F3: Search" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.rowIndex="3" />
-                                                                          <TextField fx:id="tfCreditedTo" maxHeight="25.0" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.rowIndex="5" />
-                                                                  <TextField fx:id="tfCustodian" layoutX="85.0" layoutY="78.0" maxHeight="25.0" promptText="Press F3: Search" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.rowIndex="4" />
-                                                                  <TextField fx:id="tfBeginningBalance" alignment="CENTER_RIGHT" layoutX="499.0" layoutY="50.0" maxHeight="25.0" promptText="0.0000" GridPane.columnIndex="9" GridPane.rowIndex="2" />
-                                                                  <Label text="Branch" GridPane.rowIndex="2" />
-                                                                  <TextField fx:id="tfBranch" promptText="Press F3: Search" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.rowIndex="2" />
-                                                                  <DatePicker fx:id="dpBegBalAsOf" GridPane.columnIndex="9" GridPane.rowIndex="3" />
-                                                                  <Label layoutX="583.0" layoutY="138.0" text="Beginning Balance Date" GridPane.columnIndex="7" GridPane.rowIndex="3">
+                                                                                 </font>
+                                                                                        </Label>
+                                                                                        <Label layoutX="404.0" layoutY="54.0" text="Beginning Balance" GridPane.columnIndex="7" GridPane.rowIndex="2">
                                                                      <font>
                                                                         <Font name="System Bold" size="12.0" />
                                                                      </font>
                                                                   </Label>
-                                                                  <Label layoutX="574.0" layoutY="166.0" text="Current Balance" GridPane.columnIndex="7" GridPane.rowIndex="4">
+                                                                                        <Label layoutX="583.0" layoutY="138.0" text="Beginning Balance Date" GridPane.columnIndex="7" GridPane.rowIndex="3">
                                                                      <font>
                                                                         <Font name="System Bold" size="12.0" />
                                                                      </font>
                                                                   </Label>
-                                                                  <TextField fx:id="tfCurrentBalance" alignment="CENTER_RIGHT" layoutX="728.0" layoutY="134.0" maxHeight="25.0" promptText="0.0000" GridPane.columnIndex="9" GridPane.rowIndex="4" />
-                                                                  <Label layoutX="564.0" layoutY="82.0" text="Last Transaction Date" GridPane.columnIndex="7" GridPane.rowIndex="5">
+                                                                                        <Label layoutX="574.0" layoutY="166.0" text="Current Balance" GridPane.columnIndex="7" GridPane.rowIndex="4">
                                                                      <font>
                                                                         <Font name="System Bold" size="12.0" />
                                                                      </font>
                                                                   </Label>
-                                                                  <DatePicker fx:id="dpLastTransDate" layoutX="709.0" layoutY="78.0" GridPane.columnIndex="9" GridPane.rowIndex="5" />
-                                                                      </children>
+                                                                                        <Label layoutX="564.0" layoutY="82.0" text="Last Transaction Date" GridPane.columnIndex="7" GridPane.rowIndex="5">
+                                                                     <font>
+                                                                        <Font name="System Bold" size="12.0" />
+                                                                     </font>
+                                                                  </Label>
+                                                                                        <TextField fx:id="tfCashFundId" editable="false" maxHeight="25.0" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="139.0" style="-fx-font-weight: bold;" styleClass="DisabledTextField" GridPane.columnIndex="2" GridPane.columnSpan="2" />
+                                                                                        <TextField fx:id="tfBranch" promptText="Press F3: Search" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.rowIndex="2" />
+                                                                                        <TextField fx:id="tfDepartment" layoutX="100.0" layoutY="107.0" maxHeight="25.0" promptText="Press F3: Search" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.rowIndex="3" />
+                                                                                        <TextField fx:id="tfCustodian" layoutX="85.0" layoutY="78.0" maxHeight="25.0" promptText="Press F3: Search" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.rowIndex="4" />
+                                                                                        <TextField fx:id="tfCreditedTo" maxHeight="25.0" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.rowIndex="5" />
+                                                                                        <AnchorPane maxWidth="-Infinity" minWidth="-Infinity" prefHeight="27.0" prefWidth="140.0" style="-fx-background-color: FF8201;" GridPane.columnIndex="9">
+                                                                     <children>
+                                                                                              <Label fx:id="lblStatus" alignment="CENTER" contentDisplay="CENTER" prefHeight="27.0" prefWidth="142.0" text="STATUS" textAlignment="CENTER" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                                                                      <font>
+                                                                                          <Font name="System Bold" size="14.0" />
+                                                                                      </font>
+                                                                                  </Label>
+                                                                     </children></AnchorPane>
+                                                                                        <TextField fx:id="tfBeginningBalance" alignment="CENTER_RIGHT" layoutX="499.0" layoutY="50.0" maxHeight="25.0" promptText="0.0000" GridPane.columnIndex="9" GridPane.rowIndex="2" />
+                                                                                        <DatePicker fx:id="dpBegBalAsOf" GridPane.columnIndex="9" GridPane.rowIndex="3" />
+                                                                                        <TextField fx:id="tfCurrentBalance" alignment="CENTER_RIGHT" layoutX="728.0" layoutY="134.0" maxHeight="25.0" promptText="0.0000" GridPane.columnIndex="9" GridPane.rowIndex="4" />
+                                                                                        <DatePicker fx:id="dpLastTransDate" layoutX="709.0" layoutY="78.0" GridPane.columnIndex="9" GridPane.rowIndex="5" />
+                                                                                    </children>
                                                                   </GridPane>
                                                               </children>
                                                           </AnchorPane>
@@ -288,7 +289,6 @@
                                           </AnchorPane>
                                     </children>
                                 </VBox>
-                                          
                                              </children>
                                           </HBox>
                             </children>
