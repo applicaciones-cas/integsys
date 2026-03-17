@@ -35,6 +35,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TablePosition;
+import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
@@ -46,23 +47,22 @@ import static javafx.scene.input.KeyCode.TAB;
 import static javafx.scene.input.KeyCode.UP;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
+import javafx.stage.Stage;
+import org.guanzon.appdriver.base.GRiderCAS;
+import org.guanzon.appdriver.base.LogWrapper;
+import org.guanzon.cas.inv.warehouse.services.InvWarehouseControllers;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.StackPane;
-import javafx.stage.Stage;
 import javafx.util.Duration;
 import org.guanzon.appdriver.agent.ShowDialogFX;
 import org.guanzon.appdriver.agent.ShowMessageFX;
 import org.guanzon.appdriver.base.CommonUtils;
-import org.guanzon.appdriver.base.GRiderCAS;
 import org.guanzon.appdriver.base.GuanzonException;
-import org.guanzon.appdriver.base.LogWrapper;
-import org.guanzon.appdriver.base.MiscUtil;
 import org.guanzon.appdriver.base.SQLUtil;
 import org.guanzon.appdriver.constant.EditMode;
 import org.guanzon.appdriver.constant.UserRight;
 import org.guanzon.cas.inv.warehouse.StockRequest;
 import org.guanzon.cas.inv.warehouse.model.Model_Inv_Stock_Request_Detail;
-import org.guanzon.cas.inv.warehouse.services.InvWarehouseControllers;
 import org.guanzon.cas.inv.warehouse.status.StockRequestStatus;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.ParseException;
@@ -71,10 +71,10 @@ import org.json.simple.parser.ParseException;
  *
  * @author User
  */
-public class InvRequest_ConfirmationController implements Initializable, ScreenInterface {
+public class InvRequest_ConfirmationControllerCar_SP implements Initializable, ScreenInterface {
 
     @FXML
-    private String psFormName = "Inv Stock Request Confirmation General";
+    private String psFormName = "Inv Stock Request Confirmation Car Sp";
     @FXML
     private AnchorPane AnchorMain, AnchorDetailMaster;
     unloadForm poUnload = new unloadForm();
@@ -171,9 +171,9 @@ public class InvRequest_ConfirmationController implements Initializable, ScreenI
                 try {
                     //set edit mode to new transaction temporily to assign industry and company
                     invRequestController.NewTransaction();
+                    invRequestController.Master().setIndustryId(psIndustryID);
                     invRequestController.Master().setCompanyID(psCompanyID);
                     invRequestController.Master().setCategoryId(psCategoryID);
-                    invRequestController.Master().setIndustryId(psIndustryID);
                     loadRecordSearch();
 
                     //reset the transaction
@@ -199,8 +199,7 @@ public class InvRequest_ConfirmationController implements Initializable, ScreenI
             initFields(EditMode.UNKNOWN);
 
         } catch (ExceptionInInitializerError ex) {
-            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
-            ShowMessageFX.Error(MiscUtil.getException(ex), psFormName, null);
+            Logger.getLogger(InvRequest_EntryControllerMC.class.getName()).log(Level.SEVERE, null, ex);
 
         }
     }
@@ -229,11 +228,11 @@ public class InvRequest_ConfirmationController implements Initializable, ScreenI
 
     private void loadRecordSearch() {
         try {
-            lblSource.setText(invRequestController.Master().Company().getCompanyName());
+            System.out.print("LBL SOURCE: " + invRequestController.Master().Company().getCompanyName() + " - " + invRequestController.Master().Industry().getDescription());
+            lblSource.setText(invRequestController.Master().Company().getCompanyName() + " - " + invRequestController.Master().Industry().getDescription());
 
         } catch (GuanzonException | SQLException ex) {
-            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
-            ShowMessageFX.Error(MiscUtil.getException(ex), psFormName, null);
+            Logger.getLogger(InvRequest_EntryControllerMC.class.getName()).log(Level.SEVERE, null, ex);
         }
 
     }
@@ -510,6 +509,7 @@ public class InvRequest_ConfirmationController implements Initializable, ScreenI
             switch (lsButton) {
 
                 case "btnBrowse":
+                    invRequestController.Master().setIndustryId(psIndustryID);
                     invRequestController.Master().setCompanyID(psCompanyID);
                     invRequestController.Master().setCategoryId(psCategoryID);
 
@@ -530,6 +530,7 @@ public class InvRequest_ConfirmationController implements Initializable, ScreenI
                     }
                     break;
                 case "btnRetrieve":
+                    invRequestController.Master().setIndustryId(psIndustryID);
                     invRequestController.Master().setCompanyID(psCompanyID);
                     invRequestController.Master().setCategoryId(psCategoryID);
                     invRequestController.setTransactionStatus("102");
@@ -650,7 +651,7 @@ public class InvRequest_ConfirmationController implements Initializable, ScreenI
                                 ShowMessageFX.Information((String) poJSON.get("message"), psFormName, null);
                             }
                         } catch (ParseException ex) {
-                            Logger.getLogger(InvRequest_ConfirmationController.class.getName()).log(Level.SEVERE, null, ex);
+                            Logger.getLogger(InvRequest_ConfirmationControllerCar_SP.class.getName()).log(Level.SEVERE, null, ex);
                         }
                     }
 
@@ -730,6 +731,7 @@ public class InvRequest_ConfirmationController implements Initializable, ScreenI
                         tableListInformation.refresh();
 
                         invRequestController.setTransactionStatus(StockRequestStatus.OPEN);
+                        invRequestController.Master().setIndustryId(psIndustryID);
                         invRequestController.Master().setCompanyID(psCompanyID);
                     }
                     break;
@@ -748,9 +750,8 @@ public class InvRequest_ConfirmationController implements Initializable, ScreenI
             initButtons(pnEditMode);
             initFields(pnEditMode);
         } catch (CloneNotSupportedException | ExceptionInInitializerError | SQLException | GuanzonException | NullPointerException e) {
-            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(e), e);
-            ShowMessageFX.Error(MiscUtil.getException(e), psFormName, null);
-
+            ShowMessageFX.Error(getStage(), e.getMessage(), "Error", psFormName);
+            System.exit(1);
         }
     }
 
@@ -795,8 +796,8 @@ public class InvRequest_ConfirmationController implements Initializable, ScreenI
                     });
 
                 } catch (SQLException | GuanzonException ex) {
-                    Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
-                    ShowMessageFX.Error(MiscUtil.getException(ex), psFormName, null);
+                    Logger.getLogger(InvRequest_ConfirmationControllerMC.class
+                            .getName()).log(Level.SEVERE, null, ex);
                 }
                 return null;
             }
@@ -899,8 +900,7 @@ public class InvRequest_ConfirmationController implements Initializable, ScreenI
                     return detailsList;
 
                 } catch (GuanzonException | SQLException ex) {
-                    Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
-                    ShowMessageFX.Error(MiscUtil.getException(ex), psFormName, null);
+                    Logger.getLogger(InvRequest_EntryControllerMC_SP.class.getName()).log(Level.SEVERE, null, ex);
                     return null;
                 }
             }
@@ -1021,6 +1021,8 @@ public class InvRequest_ConfirmationController implements Initializable, ScreenI
                 case F3:
                     switch (fieldId) {
                         case "tfSearchTransNo":
+                            System.out.print("Company ID" + psCompanyID);
+                            invRequestController.Master().setIndustryId(psIndustryID);
                             invRequestController.Master().setCompanyID(psCompanyID);
                             invRequestController.Master().setCategoryId(psCategoryID);
                             invRequestController.setTransactionStatus("102");
@@ -1038,6 +1040,8 @@ public class InvRequest_ConfirmationController implements Initializable, ScreenI
                             }
                             break;
                         case "tfSearchReferenceNo":
+                            System.out.print("Enter pressed");
+                            invRequestController.Master().setIndustryId(psIndustryID);
                             invRequestController.Master().setCompanyID(psCompanyID);
                             invRequestController.Master().setCategoryId(psCategoryID);
                             invRequestController.setTransactionStatus("102");
@@ -1103,8 +1107,8 @@ public class InvRequest_ConfirmationController implements Initializable, ScreenI
             }
 
         } catch (Exception e) {
-            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(e), e);
-            ShowMessageFX.Error(MiscUtil.getException(e), psFormName, null);
+            ShowMessageFX.Error(getStage(), e.getMessage(), "Error", psFormName);
+            System.exit(1);
         }
     }
 
@@ -1255,8 +1259,9 @@ public class InvRequest_ConfirmationController implements Initializable, ScreenI
 
                     }
                 } catch (CloneNotSupportedException | SQLException | GuanzonException ex) {
-                    Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
-                    ShowMessageFX.Error(MiscUtil.getException(ex), psFormName, null);
+                    Logger.getLogger(InvRequest_ConfirmationControllerMC.class
+                            .getName()).log(Level.SEVERE, null, ex);
+                    ShowMessageFX.Warning("Error loading data: " + ex.getMessage(), psFormName, null);
                 }
             }
         }
