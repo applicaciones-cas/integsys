@@ -141,7 +141,6 @@ public class CashFund_Controller implements Initializable, ScreenInterface {
                                 txtField.setText("");
                                 break;
                             }
-                            poController.getModel().getCompanyId();
                             lbProceed = true;
                             loadRecordMaster();
                             break;
@@ -153,7 +152,6 @@ public class CashFund_Controller implements Initializable, ScreenInterface {
                                 txtField.setText("");
                                 break;
                             }
-                            poController.getModel().getCompanyId();
                             lbProceed = true;
                             loadRecordMaster();
                             break;
@@ -165,7 +163,6 @@ public class CashFund_Controller implements Initializable, ScreenInterface {
                                 txtField.setText("");
                                 break;
                             }
-                            poController.getModel().getCompanyId();
                             lbProceed = true;
                             loadRecordMaster();
                             break;
@@ -248,11 +245,9 @@ public class CashFund_Controller implements Initializable, ScreenInterface {
         try {
             switch (poController.getModel().getTransactionStatus()) {
                 case CashFundStatus.OPEN:
-                    btnVoid.setText("Void");
                     btnConfirm.setText("Confirm");
                     break;
                 case CashFundStatus.ACTIVE:
-                    btnVoid.setText("Deactivate");
                     JFXUtil.setDisabled(true, apMaster);
                     break;
                 case CashFundStatus.DEACTIVE:
@@ -293,7 +288,7 @@ public class CashFund_Controller implements Initializable, ScreenInterface {
                         poJSON = poController.searchRecord(lsButton, false);
                         if ("error".equalsIgnoreCase((String) poJSON.get("result"))) {
                             ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-//                            tfTransactionNo.requestFocus();
+                            tfCashFundId.requestFocus();
                             return;
                         }
                         pnEditMode = poController.getEditMode();
