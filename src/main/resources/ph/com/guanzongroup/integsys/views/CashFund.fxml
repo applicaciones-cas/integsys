@@ -96,7 +96,7 @@
                                     <Font size="12.0" />
                                  </font>
                               </Button>
-                              <Button fx:id="btnConfirm" contentDisplay="TOP" ellipsisString="" mnemonicParsing="false" onAction="#cmdButton_Click" prefHeight="70.0" prefWidth="70.0" styleClass="button_process" stylesheets="@../css/StyleSheet.css" text="Confirm">
+                              <Button fx:id="btnConfirm" contentDisplay="TOP" ellipsisString="" mnemonicParsing="false" onAction="#cmdButton_Click" prefHeight="70.0" prefWidth="70.0" styleClass="button_process" stylesheets="@../css/StyleSheet.css" text="Activate">
                                  <effect>
                                     <Blend />
                                  </effect>
@@ -140,12 +140,12 @@
                                     <Font size="12.0" />
                                  </font>
                               </Button>
-                              <Button fx:id="btnVoid" contentDisplay="TOP" ellipsisString="" mnemonicParsing="false" onAction="#cmdButton_Click" prefHeight="70.0" prefWidth="70.0" styleClass="button_process" stylesheets="@../css/StyleSheet.css" text="Deactivate">
+                              <Button fx:id="btnVoid" contentDisplay="TOP" ellipsisString="" maxWidth="75.0" minWidth="75.0" mnemonicParsing="false" onAction="#cmdButton_Click" prefHeight="70.0" prefWidth="77.0" styleClass="button_process" stylesheets="@../css/StyleSheet.css" text="Deactivate">
                                  <effect>
                                     <Blend />
                                  </effect>
                                  <graphic>
-                                    <FontAwesomeIconView glyphName="TIMES" size="20" />
+                                    <FontAwesomeIconView fx:id="faActivate" glyphName="TIMES" size="20" />
                                  </graphic>
                                  <font>
                                     <Font size="12.0" />
@@ -277,8 +277,8 @@
                                                                      </children></AnchorPane>
                                                                                         <TextField fx:id="tfBeginningBalance" alignment="CENTER_RIGHT" layoutX="499.0" layoutY="50.0" maxHeight="25.0" promptText="0.0000" GridPane.columnIndex="9" GridPane.rowIndex="2" />
                                                                                         <DatePicker fx:id="dpBegBalAsOf" GridPane.columnIndex="9" GridPane.rowIndex="3" />
-                                                                                        <TextField fx:id="tfCurrentBalance" alignment="CENTER_RIGHT" layoutX="728.0" layoutY="134.0" maxHeight="25.0" promptText="0.0000" GridPane.columnIndex="9" GridPane.rowIndex="4" />
-                                                                                        <DatePicker fx:id="dpLastTransDate" layoutX="709.0" layoutY="78.0" GridPane.columnIndex="9" GridPane.rowIndex="5" />
+                                                                                        <TextField fx:id="tfCurrentBalance" alignment="CENTER_RIGHT" layoutX="728.0" layoutY="134.0" maxHeight="25.0" promptText="0.0000" styleClass="DisabledTextField" GridPane.columnIndex="9" GridPane.rowIndex="4" />
+                                                                                        <DatePicker fx:id="dpLastTransDate" disable="true" layoutX="709.0" layoutY="78.0" GridPane.columnIndex="9" GridPane.rowIndex="5" />
                                                                                     </children>
                                                                   </GridPane>
                                                               </children>
