@@ -367,15 +367,7 @@ public class CashFundController implements Initializable, ScreenInterface {
                                 break;
                         }
                         if (ShowMessageFX.YesNo(null, "Close Tab", "Are you sure you want to " + lsStat2 + " the transaction?") == true) {
-                            switch (poController.getModel().getTransactionStatus()) {
-                                case CashFundStatus.ACTIVE:
-                                    if (poController.getModel().getBalance() != 0) {
-                                        JFXUtil.setJSONError(poJSON, "Deactivation is only allowed if status is confirmed and balance is 0.00");
-                                    } else {
-                                        poJSON = poController.DeactivateRecord();
-                                    }
-                                    break;
-                            }
+                            poJSON = poController.DeactivateRecord();
                             if ("error".equals((String) poJSON.get("result"))) {
                                 ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                 return;
