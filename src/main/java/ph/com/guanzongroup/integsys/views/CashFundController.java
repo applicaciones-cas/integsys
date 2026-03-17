@@ -311,22 +311,6 @@ public class CashFundController implements Initializable, ScreenInterface {
                     case "btnConfirm":
                         String id = poController.getModel().getCashFundId();
                         if (ShowMessageFX.YesNo(null, pxeModuleName, "Are you sure you want to activate the transaction?") == true) {
-                            switch (poController.getModel().getTransactionStatus()) {
-                                case CashFundStatus.DEACTIVATED:
-                                    if (oApp.getUserLevel() <= UserRight.ENCODER) {
-                                        poJSON = ShowDialogFX.getUserApproval(oApp);
-                                        if (!"success".equals((String) poJSON.get("result"))) {
-                                            pbSuccess = false;
-                                        } else {
-                                            if (Integer.parseInt(poJSON.get("nUserLevl").toString()) <= UserRight.ENCODER) {
-                                                poJSON.put("result", "error");
-                                                poJSON.put("message", "User is not an authorized approving officer.");
-                                                pbSuccess = false;
-                                            }
-                                        }
-                                    }
-                                    break;
-                            }
                             poJSON = poController.ActivateRecord(); //Activate is Confirm
                             if ("error".equals((String) poJSON.get("result"))) {
                                 ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
