@@ -1,8 +1,3 @@
-
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package ph.com.guanzongroup.integsys.views;
 
 import ph.com.guanzongroup.integsys.model.ModelInvOrderDetail;
@@ -159,7 +154,6 @@ public class InvRequest_EntryControllerCar_SP implements Initializable, ScreenIn
         try {
 
             invRequestController = new InvWarehouseControllers(poApp, logWrapper).StockRequest();
-            invRequestController.setTransactionStatus(StockRequestStatus.OPEN);
 
             poJSON = invRequestController.InitTransaction();
             if (!"success".equals(poJSON.get("result"))) {
@@ -170,11 +164,12 @@ public class InvRequest_EntryControllerCar_SP implements Initializable, ScreenIn
                 //BOTH NULL
 
                 try {
+                    invRequestController.setTransactionStatus("102");
+                    invRequestController.setCompanyID(psCompanyID);
+                    invRequestController.setCategoryID(psCategoryID);
+                    invRequestController.setIndustryID(psIndustryID);
                     //set edit mode to new transaction temporily to assign industry and company
                     invRequestController.NewTransaction();
-                    invRequestController.Master().setIndustryId(psIndustryID);
-                    invRequestController.Master().setCompanyID(psCompanyID);
-                    invRequestController.Master().setCategoryId(psCategoryID);
                     loadRecordSearch();
 
                     //reset the transaction
@@ -545,11 +540,6 @@ public class InvRequest_EntryControllerCar_SP implements Initializable, ScreenIn
 
                     break;
                 case "btnBrowse":
-                    invRequestController.Master().setIndustryId(psIndustryID);
-                    invRequestController.Master().setCompanyID(psCompanyID);
-                    invRequestController.Master().setCategoryId(psCategoryID);
-
-                    invRequestController.setTransactionStatus("102");
                     loJSON = invRequestController.searchTransaction();
 
                     if (!"error".equals((String) loJSON.get("result"))) {
@@ -565,10 +555,6 @@ public class InvRequest_EntryControllerCar_SP implements Initializable, ScreenIn
                     }
                     break;
                 case "btnRetrieve":
-                    invRequestController.Master().setIndustryId(psIndustryID);
-                    invRequestController.Master().setCompanyID(psCompanyID);
-                    invRequestController.Master().setCategoryId(psCategoryID);
-                    invRequestController.setTransactionStatus("102");
                     loadTableList();
                     pnEditMode = EditMode.UNKNOWN;
                     initFields(pnEditMode); // This will disable all detail fields
@@ -714,10 +700,6 @@ public class InvRequest_EntryControllerCar_SP implements Initializable, ScreenIn
 
                         tblViewOrderDetails.refresh();
                         tableListInformation.refresh();
-
-                        invRequestController.setTransactionStatus(StockRequestStatus.OPEN);
-                        invRequestController.Master().setIndustryId(psIndustryID);
-                        invRequestController.Master().setCompanyID(psCompanyID);
                     }
                     break;
                 case "btnNew":
@@ -727,10 +709,6 @@ public class InvRequest_EntryControllerCar_SP implements Initializable, ScreenIn
                     invOrderDetail_data.clear();
                     loJSON = invRequestController.NewTransaction();
                     if ("success".equals((String) loJSON.get("result"))) {
-                        invRequestController.Master().setIndustryId(psIndustryID);
-                        invRequestController.Master().setCompanyID(psCompanyID);
-                        invRequestController.Master().setBranchCode(poApp.getBranchCode());
-                        invRequestController.Master().setCategoryId(psCategoryID);
 
                         loadMaster();
                         pnTblInvDetailRow = 0;
@@ -1049,10 +1027,6 @@ public class InvRequest_EntryControllerCar_SP implements Initializable, ScreenIn
                             break;
                         case "tfSearchTransNo":
                             System.out.print("Company ID" + psCompanyID);
-                            invRequestController.Master().setIndustryId(psIndustryID);
-                            invRequestController.Master().setCompanyID(psCompanyID);
-                            invRequestController.Master().setCategoryId(psCategoryID);
-                            invRequestController.setTransactionStatus("102");
                             poJSON = invRequestController.searchTransaction();
                             if (!"error".equals((String) poJSON.get("result"))) {
                                 pnTblInvDetailRow = -1;
@@ -1068,10 +1042,6 @@ public class InvRequest_EntryControllerCar_SP implements Initializable, ScreenIn
                             break;
                         case "tfSearchReferenceNo":
                             System.out.print("Enter pressed");
-                            invRequestController.Master().setIndustryId(psIndustryID);
-                            invRequestController.Master().setCompanyID(psCompanyID);
-                            invRequestController.Master().setCategoryId(psCategoryID);
-                            invRequestController.setTransactionStatus("102");
                             poJSON = invRequestController.searchTransaction(true);
                             if (!"error".equals((String) poJSON.get("result"))) {
                                 pnTblInvDetailRow = -1;

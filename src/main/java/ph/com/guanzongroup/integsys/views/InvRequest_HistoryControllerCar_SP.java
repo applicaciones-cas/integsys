@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package ph.com.guanzongroup.integsys.views;
 
 import ph.com.guanzongroup.integsys.model.ModelInvOrderDetail;
@@ -18,8 +14,6 @@ import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.application.Platform;
-import javafx.beans.property.ReadOnlyBooleanPropertyBase;
-import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -33,7 +27,6 @@ import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
@@ -60,7 +53,6 @@ import org.guanzon.cas.inv.warehouse.model.Model_Inv_Stock_Request_Detail;
 import org.guanzon.cas.inv.warehouse.services.InvWarehouseControllers;
 import org.guanzon.cas.inv.warehouse.status.StockRequestStatus;
 import org.json.simple.JSONObject;
-import org.json.simple.parser.ParseException;
 
 /**
  *
@@ -144,30 +136,22 @@ public class InvRequest_HistoryControllerCar_SP implements Initializable, Screen
 
         try {
             invRequestController = new InvWarehouseControllers(poApp, logWrapper).StockRequest();
-            invRequestController.setTransactionStatus(
-                    StockRequestStatus.OPEN
-            );
             poJSON = invRequestController.InitTransaction();
             if (!"success".equals(poJSON.get("result"))) {
                 ShowMessageFX.Warning((String) poJSON.get("message"), "Search Information", null);
             }
 
             Platform.runLater((() -> {
-                try {
-                    //set edit mode to new transaction temporily to assign industry and company
-                    invRequestController.NewTransaction();
-                    invRequestController.Master().setIndustryId(psIndustryID);
-                    invRequestController.Master().setCompanyID(psCompanyID);
-                    invRequestController.Master().setCategoryId(psCategoryID);
+                //set edit mode to new transaction temporily to assign industry and company
+                invRequestController.setTransactionStatus("1024");
+                invRequestController.setCompanyID(psCompanyID);
+                invRequestController.setCategoryID(psCategoryID);
+                invRequestController.setIndustryID(psIndustryID);
 
-                    initTableList();
-                    initTableInvDetail();
-                    loadRecordSearch();
-                    ;                    //reset the transaction
-                    invRequestController.InitTransaction();
-                } catch (CloneNotSupportedException e) {
-                    ShowMessageFX.Warning((String) e.getMessage(), "Search Information", null);
-                }
+                initTableList();
+                initTableInvDetail();
+                loadRecordSearch();
+                ;
 
             }));
             pnEditMode = EditMode.UNKNOWN;
@@ -237,7 +221,6 @@ public class InvRequest_HistoryControllerCar_SP implements Initializable, Screen
             if (loSelected != null) {
                 String lsTransactionNo = loSelected.getIndex01();
                 try {
-                    poJSON = invRequestController.InitTransaction();
                     if ("success".equals((String) poJSON.get("result"))) {
                         poJSON = invRequestController.OpenTransaction(lsTransactionNo);
                         if ("success".equals((String) poJSON.get("result"))) {
@@ -292,10 +275,6 @@ public class InvRequest_HistoryControllerCar_SP implements Initializable, Screen
                     switch (fieldId) {
                         case "tfSearchTransNo":
                             System.out.print("Enter pressed");
-                            invRequestController.Master().setIndustryId(psIndustryID);
-                            invRequestController.Master().setCompanyID(psCompanyID);
-                            invRequestController.Master().setCategoryId(psCategoryID);
-                            invRequestController.setTransactionStatus("1024");
                             poJSON = invRequestController.searchTransaction(true);
                             if (!"error".equals((String) poJSON.get("result"))) {
                                 pnTblInvDetailRow = -1;
@@ -311,10 +290,6 @@ public class InvRequest_HistoryControllerCar_SP implements Initializable, Screen
                             break;
                         case "tfSearchReferenceNo":
                             System.out.print("Enter pressed");
-                            invRequestController.Master().setIndustryId(psIndustryID);
-                            invRequestController.Master().setCompanyID(psCompanyID);
-                            invRequestController.Master().setCategoryId(psCategoryID);
-                            invRequestController.setTransactionStatus("1024");
                             poJSON = invRequestController.searchTransaction();
                             if (!"error".equals((String) poJSON.get("result"))) {
                                 pnTblInvDetailRow = -1;
@@ -352,17 +327,9 @@ public class InvRequest_HistoryControllerCar_SP implements Initializable, Screen
             switch (lsButton) {
                 case "btnRetrieve":
                     System.out.print("loaded table this is btnRetrieve");
-                    invRequestController.Master().setIndustryId(psIndustryID);
-                    invRequestController.Master().setCompanyID(psCompanyID);
-                    invRequestController.Master().setCategoryId(psCategoryID);
-                    invRequestController.setTransactionStatus("1024");
                     loadTableList();
                     break;
                 case "btnBrowse":
-                    invRequestController.Master().setIndustryId(psIndustryID);
-                    invRequestController.Master().setCompanyID(psCompanyID);
-                    invRequestController.Master().setCategoryId(psCategoryID);
-                    invRequestController.setTransactionStatus("1024");
                     loJSON = invRequestController.searchTransaction();
 
                     if (!"error".equals((String) loJSON.get("result"))) {

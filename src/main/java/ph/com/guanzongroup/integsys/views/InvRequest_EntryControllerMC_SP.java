@@ -159,8 +159,6 @@ public class InvRequest_EntryControllerMC_SP implements Initializable, ScreenInt
         try {
 
             invRequestController = new InvWarehouseControllers(poApp, logWrapper).StockRequest();
-            invRequestController.setTransactionStatus(StockRequestStatus.OPEN);
-
             poJSON = invRequestController.InitTransaction();
             if (!"success".equals(poJSON.get("result"))) {
                 ShowMessageFX.Warning((String) poJSON.get("message"), "Search Information", null);
@@ -170,11 +168,12 @@ public class InvRequest_EntryControllerMC_SP implements Initializable, ScreenInt
                 //BOTH NULL
 
                 try {
+                    invRequestController.setTransactionStatus("102");
+                    invRequestController.setCompanyID(psCompanyID);
+                    invRequestController.setCategoryID(psCategoryID);
+                    invRequestController.setIndustryID(psIndustryID);
                     //set edit mode to new transaction temporily to assign industry and company
                     invRequestController.NewTransaction();
-                    invRequestController.Master().setIndustryId(psIndustryID);
-                    invRequestController.Master().setCompanyID(psCompanyID);
-                    invRequestController.Master().setCategoryId(psCategoryID);
                     loadRecordSearch();
 
                     //reset the transaction
@@ -545,11 +544,6 @@ public class InvRequest_EntryControllerMC_SP implements Initializable, ScreenInt
 
                     break;
                 case "btnBrowse":
-                    invRequestController.Master().setIndustryId(psIndustryID);
-                    invRequestController.Master().setCompanyID(psCompanyID);
-                    invRequestController.Master().setCategoryId(psCategoryID);
-
-                    invRequestController.setTransactionStatus("102");
                     loJSON = invRequestController.searchTransaction();
 
                     if (!"error".equals((String) loJSON.get("result"))) {
@@ -565,10 +559,6 @@ public class InvRequest_EntryControllerMC_SP implements Initializable, ScreenInt
                     }
                     break;
                 case "btnRetrieve":
-                    invRequestController.Master().setIndustryId(psIndustryID);
-                    invRequestController.Master().setCompanyID(psCompanyID);
-                    invRequestController.Master().setCategoryId(psCategoryID);
-                    invRequestController.setTransactionStatus("102");
                     loadTableList();
                     pnEditMode = EditMode.UNKNOWN;
                     initFields(pnEditMode); // This will disable all detail fields
@@ -715,9 +705,6 @@ public class InvRequest_EntryControllerMC_SP implements Initializable, ScreenInt
                         tblViewOrderDetails.refresh();
                         tableListInformation.refresh();
 
-                        invRequestController.setTransactionStatus(StockRequestStatus.OPEN);
-                        invRequestController.Master().setIndustryId(psIndustryID);
-                        invRequestController.Master().setCompanyID(psCompanyID);
                     }
                     break;
                 case "btnNew":
@@ -972,7 +959,7 @@ public class InvRequest_EntryControllerMC_SP implements Initializable, ScreenInt
 
             CustomCommonUtil.setDisable(true,
                     tfInvType, tfReservationQTY,
-                     tfQOH, tfROQ, tfClassification, tfVariant, tfColor, tfBrand, tfModel, tfDescription, tfBarCode);
+                    tfQOH, tfROQ, tfClassification, tfVariant, tfColor, tfBrand, tfModel, tfDescription, tfBarCode);
             CustomCommonUtil.setDisable(!lbShow, tfOrderQuantity, taRemarks);
             CustomCommonUtil.setDisable(!lbNew, tfBrand, tfDescription, tfBarCode);
 
@@ -1048,11 +1035,6 @@ public class InvRequest_EntryControllerMC_SP implements Initializable, ScreenInt
                             event.consume();
                             break;
                         case "tfSearchTransNo":
-                            System.out.print("Company ID" + psCompanyID);
-                            invRequestController.Master().setIndustryId(psIndustryID);
-                            invRequestController.Master().setCompanyID(psCompanyID);
-                            invRequestController.Master().setCategoryId(psCategoryID);
-                            invRequestController.setTransactionStatus("102");
                             poJSON = invRequestController.searchTransaction();
                             if (!"error".equals((String) poJSON.get("result"))) {
                                 pnTblInvDetailRow = -1;
@@ -1068,10 +1050,6 @@ public class InvRequest_EntryControllerMC_SP implements Initializable, ScreenInt
                             break;
                         case "tfSearchReferenceNo":
                             System.out.print("Enter pressed");
-                            invRequestController.Master().setIndustryId(psIndustryID);
-                            invRequestController.Master().setCompanyID(psCompanyID);
-                            invRequestController.Master().setCategoryId(psCategoryID);
-                            invRequestController.setTransactionStatus("102");
                             poJSON = invRequestController.searchTransaction(true);
                             if (!"error".equals((String) poJSON.get("result"))) {
                                 pnTblInvDetailRow = -1;

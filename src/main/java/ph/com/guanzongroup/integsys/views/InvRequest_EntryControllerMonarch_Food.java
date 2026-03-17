@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package ph.com.guanzongroup.integsys.views;
 
 import ph.com.guanzongroup.integsys.model.ModelInvOrderDetail;
@@ -33,7 +29,6 @@ import org.guanzon.appdriver.base.LogWrapper;
 import org.guanzon.cas.inv.warehouse.services.InvWarehouseControllers;
 import javafx.scene.layout.AnchorPane;
 import org.json.simple.JSONObject;
-
 import javafx.fxml.Initializable;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
@@ -42,7 +37,6 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TablePosition;
-import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
@@ -177,7 +171,6 @@ public class InvRequest_EntryControllerMonarch_Food implements Initializable, Sc
                     loadRecordSearch();
 
                     //reset the transaction
-                    invRequestController.InitTransaction();
                 } catch (CloneNotSupportedException e) {
                     ShowMessageFX.Warning((String) e.getMessage(), "Search Information", null);
                 }
@@ -687,8 +680,6 @@ public class InvRequest_EntryControllerMonarch_Food implements Initializable, Sc
 
                         invOrderDetail_data.clear();
                         tableListInformation_data.clear();
-
-                        invRequestController.InitTransaction();
 
                         clearAllTables();
                         clearDetailFields();
@@ -1345,7 +1336,6 @@ public class InvRequest_EntryControllerMonarch_Food implements Initializable, Sc
             if (loSelectedInformation != null) {
                 String lsTransactionNo = loSelectedInformation.getIndex01();
                 try {
-                    poJSON = invRequestController.InitTransaction();
                     if ("success".equals((String) poJSON.get("result"))) {
                         poJSON = invRequestController.OpenTransaction(lsTransactionNo);
                         if ("success".equals((String) poJSON.get("result"))) {
