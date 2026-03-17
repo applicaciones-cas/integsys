@@ -39,7 +39,7 @@ import ph.com.guanzongroup.integsys.utility.JFXUtil;
  *
  * @author Team 1
  */
-public class CashFund_Controller implements Initializable, ScreenInterface {
+public class CashFundController implements Initializable, ScreenInterface {
 
     private GRiderCAS oApp;
     static CashFund poController;
