@@ -512,7 +512,7 @@ public class CashFundController implements Initializable, ScreenInterface {
                 JFXUtil.setButtonsVisibility(false, btnConfirm);
                 break;
             case CashFundStatus.DEACTIVATED:
-                JFXUtil.setButtonsVisibility(false, btnConfirm, btnUpdate);
+                JFXUtil.setButtonsVisibility(false, btnUpdate, btnVoid);
                 break;
         }
     }
