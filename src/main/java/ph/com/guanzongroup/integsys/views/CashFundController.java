@@ -85,6 +85,7 @@ public class CashFundController implements Initializable, ScreenInterface {
             initButton(pnEditMode);
             loadRecordMaster();
             Platform.runLater(() -> {
+                poController.setRecordStatus("0123");
                 poController.getModel().setIndustryId(psIndustryId);
                 poController.getModel().setCompanyId(psCompanyId);
 //            poController.setIndustryId(psIndustryId);
@@ -122,7 +123,6 @@ public class CashFundController implements Initializable, ScreenInterface {
     public void setCategoryID(String fsValue) {
         //No category
     }
-    boolean lbProceed = true;
 
     private void txtField_KeyPressed(KeyEvent event) {
         try {
@@ -141,7 +141,6 @@ public class CashFundController implements Initializable, ScreenInterface {
                 case F3:
                     switch (lsID) {
                         case "tfBranch":
-                            lbProceed = false;
                             poJSON = poController.SearchBranch(lsValue, false, false);
                             if (!JFXUtil.isJSONSuccess(poJSON)) {
                                 ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
@@ -149,11 +148,9 @@ public class CashFundController implements Initializable, ScreenInterface {
                             } else {
                                 JFXUtil.textFieldMoveNext(tfDepartment);
                             }
-                            lbProceed = true;
                             loadRecordMaster();
                             break;
                         case "tfDepartment":
-                            lbProceed = false;
                             poJSON = poController.SearchDepartment(lsValue, false);
                             if (!JFXUtil.isJSONSuccess(poJSON)) {
                                 ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
@@ -161,11 +158,9 @@ public class CashFundController implements Initializable, ScreenInterface {
                             } else {
                                 JFXUtil.textFieldMoveNext(tfCustodian);
                             }
-                            lbProceed = true;
                             loadRecordMaster();
                             break;
                         case "tfCustodian":
-                            lbProceed = false;
                             poJSON = poController.searchCustodian(lsValue, false);
                             if (!JFXUtil.isJSONSuccess(poJSON)) {
                                 ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
@@ -173,7 +168,6 @@ public class CashFundController implements Initializable, ScreenInterface {
                             } else {
                                 JFXUtil.textFieldMoveNext(tfDescription);
                             }
-                            lbProceed = true;
                             loadRecordMaster();
                             break;
                     }
@@ -189,17 +183,17 @@ public class CashFundController implements Initializable, ScreenInterface {
             (lsID, lsValue) -> {
                 switch (lsID) {
                     case "tfBranch":
-                        if (lsValue.isEmpty() && lbProceed) {
+                        if (lsValue.isEmpty()) {
                             poController.getModel().setBranchCode("");
                         }
                         break;
                     case "tfDepartment":
-                        if (lsValue.isEmpty() && lbProceed) {
+                        if (lsValue.isEmpty()) {
                             poController.getModel().setDepartment("");
                         }
                         break;
                     case "tfCustodian":
-                        if (lsValue.isEmpty() & lbProceed) {
+                        if (lsValue.isEmpty()) {
                             poController.getModel().setCashFundManager("");
                         }
                         break;
