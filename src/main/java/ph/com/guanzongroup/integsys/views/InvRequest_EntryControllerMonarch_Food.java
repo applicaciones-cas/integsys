@@ -152,8 +152,6 @@ public class InvRequest_EntryControllerMonarch_Food implements Initializable, Sc
         try {
 
             invRequestController = new InvWarehouseControllers(poApp, logWrapper).StockRequest();
-            invRequestController.setTransactionStatus(StockRequestStatus.OPEN);
-
             poJSON = invRequestController.InitTransaction();
             if (!"success".equals(poJSON.get("result"))) {
                 ShowMessageFX.Warning((String) poJSON.get("message"), "Search Information", null);
@@ -524,11 +522,6 @@ public class InvRequest_EntryControllerMonarch_Food implements Initializable, Sc
 
                     break;
                 case "btnBrowse":
-                    invRequestController.Master().setIndustryId(psIndustryID);
-                    invRequestController.Master().setCompanyID(psCompanyID);
-                    invRequestController.Master().setCategoryId(psCategoryID);
-
-                    invRequestController.setTransactionStatus("102");
                     loJSON = invRequestController.searchTransaction();
 
                     if (!"error".equals((String) loJSON.get("result"))) {
@@ -544,10 +537,6 @@ public class InvRequest_EntryControllerMonarch_Food implements Initializable, Sc
                     }
                     break;
                 case "btnRetrieve":
-                    invRequestController.Master().setIndustryId(psIndustryID);
-                    invRequestController.Master().setCompanyID(psCompanyID);
-                    invRequestController.Master().setCategoryId(psCategoryID);
-                    invRequestController.setTransactionStatus("102");
                     loadTableList();
                     pnEditMode = EditMode.UNKNOWN;
                     initFields(pnEditMode); // This will disable all detail fields
@@ -691,10 +680,6 @@ public class InvRequest_EntryControllerMonarch_Food implements Initializable, Sc
 
                         tblViewOrderDetails.refresh();
                         tableListInformation.refresh();
-
-                        invRequestController.setTransactionStatus(StockRequestStatus.OPEN);
-                        invRequestController.Master().setIndustryId(psIndustryID);
-                        invRequestController.Master().setCompanyID(psCompanyID);
                     }
                     break;
                 case "btnNew":
@@ -1027,10 +1012,6 @@ public class InvRequest_EntryControllerMonarch_Food implements Initializable, Sc
                             break;
                         case "tfSearchTransNo":
                             System.out.print("Company ID" + psCompanyID);
-                            invRequestController.Master().setIndustryId(psIndustryID);
-                            invRequestController.Master().setCompanyID(psCompanyID);
-                            invRequestController.Master().setCategoryId(psCategoryID);
-                            invRequestController.setTransactionStatus("102");
                             poJSON = invRequestController.searchTransaction();
                             if (!"error".equals((String) poJSON.get("result"))) {
                                 pnTblInvDetailRow = -1;
@@ -1046,10 +1027,6 @@ public class InvRequest_EntryControllerMonarch_Food implements Initializable, Sc
                             break;
                         case "tfSearchReferenceNo":
                             System.out.print("Enter pressed");
-                            invRequestController.Master().setIndustryId(psIndustryID);
-                            invRequestController.Master().setCompanyID(psCompanyID);
-                            invRequestController.Master().setCategoryId(psCategoryID);
-                            invRequestController.setTransactionStatus("102");
                             poJSON = invRequestController.searchTransaction(true);
                             if (!"error".equals((String) poJSON.get("result"))) {
                                 pnTblInvDetailRow = -1;

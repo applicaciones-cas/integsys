@@ -172,8 +172,6 @@ public class InvRequest_EntryControllerAppliances implements Initializable, Scre
                     invRequestController.NewTransaction();
                     loadRecordSearch();
 
-                    //reset the transaction
-                    invRequestController.InitTransaction();
                 } catch (CloneNotSupportedException e) {
                     ShowMessageFX.Warning((String) e.getMessage(), "Search Information", null);
                 }
@@ -688,8 +686,6 @@ public class InvRequest_EntryControllerAppliances implements Initializable, Scre
 
                         invOrderDetail_data.clear();
                         tableListInformation_data.clear();
-
-                        invRequestController.InitTransaction();
 
                         clearAllTables();
                         clearDetailFields();
@@ -1391,7 +1387,6 @@ public class InvRequest_EntryControllerAppliances implements Initializable, Scre
             if (loSelectedInformation != null) {
                 String lsTransactionNo = loSelectedInformation.getIndex01();
                 try {
-                    poJSON = invRequestController.InitTransaction();
                     if ("success".equals((String) poJSON.get("result"))) {
                         poJSON = invRequestController.OpenTransaction(lsTransactionNo);
                         if ("success".equals((String) poJSON.get("result"))) {

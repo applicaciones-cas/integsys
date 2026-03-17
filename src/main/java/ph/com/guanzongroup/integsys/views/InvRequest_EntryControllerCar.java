@@ -161,18 +161,15 @@ public class InvRequest_EntryControllerCar implements Initializable, ScreenInter
                 //BOTH NULL
 
                 try {
-                    
+
                     invRequestController.setTransactionStatus("102");
                     invRequestController.setCompanyID(psCompanyID);
                     invRequestController.setCategoryID(psCategoryID);
                     invRequestController.setIndustryID(psIndustryID);
-                    
+
                     //set edit mode to new transaction temporily to assign industry and company
                     invRequestController.NewTransaction();
                     loadRecordSearch();
-
-                    //reset the transaction
-                    invRequestController.InitTransaction();
                 } catch (CloneNotSupportedException e) {
                     ShowMessageFX.Warning((String) e.getMessage(), "Search Information", null);
                 }
@@ -675,8 +672,6 @@ public class InvRequest_EntryControllerCar implements Initializable, ScreenInter
                         invOrderDetail_data.clear();
                         tableListInformation_data.clear();
 
-                        invRequestController.InitTransaction();
-
                         clearAllTables();
                         clearDetailFields();
                         clearMasterFields();
@@ -935,7 +930,7 @@ public class InvRequest_EntryControllerCar implements Initializable, ScreenInter
 
             CustomCommonUtil.setDisable(true,
                     tfInvType, tfReservationQTY,
-                     tfQOH, tfROQ, tfClassification, tfVariant, tfColor, tfBrand, tfModel);
+                    tfQOH, tfROQ, tfClassification, tfVariant, tfColor, tfBrand, tfModel);
             CustomCommonUtil.setDisable(!lbShow, tfOrderQuantity, taRemarks);
             CustomCommonUtil.setDisable(!lbNew, tfBrand, tfModel);
 
@@ -1304,7 +1299,6 @@ public class InvRequest_EntryControllerCar implements Initializable, ScreenInter
             if (loSelectedInformation != null) {
                 String lsTransactionNo = loSelectedInformation.getIndex01();
                 try {
-                    poJSON = invRequestController.InitTransaction();
                     if ("success".equals((String) poJSON.get("result"))) {
                         poJSON = invRequestController.OpenTransaction(lsTransactionNo);
                         if ("success".equals((String) poJSON.get("result"))) {

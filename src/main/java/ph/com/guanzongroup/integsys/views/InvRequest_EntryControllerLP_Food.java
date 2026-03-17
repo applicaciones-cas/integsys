@@ -170,9 +170,7 @@ public class InvRequest_EntryControllerLP_Food implements Initializable, ScreenI
                     //set edit mode to new transaction temporily to assign industry and company
                     invRequestController.NewTransaction();
                     loadRecordSearch();
-
-                    //reset the transaction
-                    invRequestController.InitTransaction();
+                    
                 } catch (CloneNotSupportedException e) {
                     ShowMessageFX.Warning((String) e.getMessage(), "Search Information", null);
                 }
@@ -673,8 +671,6 @@ public class InvRequest_EntryControllerLP_Food implements Initializable, ScreenI
 
                         invOrderDetail_data.clear();
                         tableListInformation_data.clear();
-
-                        invRequestController.InitTransaction();
 
                         clearAllTables();
                         clearDetailFields();
@@ -1319,7 +1315,6 @@ public class InvRequest_EntryControllerLP_Food implements Initializable, ScreenI
             if (loSelectedInformation != null) {
                 String lsTransactionNo = loSelectedInformation.getIndex01();
                 try {
-                    poJSON = invRequestController.InitTransaction();
                     if ("success".equals((String) poJSON.get("result"))) {
                         poJSON = invRequestController.OpenTransaction(lsTransactionNo);
                         if ("success".equals((String) poJSON.get("result"))) {

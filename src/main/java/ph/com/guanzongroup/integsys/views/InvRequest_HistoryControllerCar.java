@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package ph.com.guanzongroup.integsys.views;
 
 import ph.com.guanzongroup.integsys.model.ModelInvOrderDetail;
@@ -33,7 +29,6 @@ import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
@@ -60,7 +55,6 @@ import org.guanzon.cas.inv.warehouse.model.Model_Inv_Stock_Request_Detail;
 import org.guanzon.cas.inv.warehouse.services.InvWarehouseControllers;
 import org.guanzon.cas.inv.warehouse.status.StockRequestStatus;
 import org.json.simple.JSONObject;
-import org.json.simple.parser.ParseException;
 
 /**
  *

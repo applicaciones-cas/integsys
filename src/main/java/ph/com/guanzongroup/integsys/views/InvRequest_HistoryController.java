@@ -143,7 +143,7 @@ public class InvRequest_HistoryController implements Initializable, ScreenInterf
 
             Platform.runLater((() -> {
                 //set edit mode to new transaction temporily to assign industry and company
-                invRequestController.setTransactionStatus("102");
+                invRequestController.setTransactionStatus("1024");
                 invRequestController.setCompanyID(psCompanyID);
                 invRequestController.setCategoryID(psCategoryID);
                 invRequestController.setIndustryID(psIndustryID);
@@ -221,7 +221,6 @@ public class InvRequest_HistoryController implements Initializable, ScreenInterf
             if (loSelected != null) {
                 String lsTransactionNo = loSelected.getIndex01();
                 try {
-                    poJSON = invRequestController.InitTransaction();
                     if ("success".equals((String) poJSON.get("result"))) {
                         poJSON = invRequestController.OpenTransaction(lsTransactionNo);
                         if ("success".equals((String) poJSON.get("result"))) {
@@ -276,10 +275,6 @@ public class InvRequest_HistoryController implements Initializable, ScreenInterf
                     switch (fieldId) {
                         case "tfSearchTransNo":
                             System.out.print("Enter pressed");
-
-                            invRequestController.Master().setCompanyID(psCompanyID);
-                            invRequestController.Master().setCategoryId(psCategoryID);
-                            invRequestController.setTransactionStatus("1024");
                             poJSON = invRequestController.searchTransaction();
                             if (!"error".equals((String) poJSON.get("result"))) {
                                 pnTblInvDetailRow = -1;
@@ -295,10 +290,6 @@ public class InvRequest_HistoryController implements Initializable, ScreenInterf
                             break;
                         case "tfSearchReferenceNo":
                             System.out.print("Enter pressed");
-
-                            invRequestController.Master().setCompanyID(psCompanyID);
-                            invRequestController.Master().setCategoryId(psCategoryID);
-                            invRequestController.setTransactionStatus("1024");
                             poJSON = invRequestController.searchTransaction(true);
                             if (!"error".equals((String) poJSON.get("result"))) {
                                 pnTblInvDetailRow = -1;
@@ -336,16 +327,9 @@ public class InvRequest_HistoryController implements Initializable, ScreenInterf
             switch (lsButton) {
                 case "btnRetrieve":
                     System.out.print("loaded table this is btnRetrieve");
-
-                    invRequestController.Master().setCompanyID(psCompanyID);
-                    invRequestController.Master().setCategoryId(psCategoryID);
-                    invRequestController.setTransactionStatus("1024");
                     loadTableList();
                     break;
                 case "btnBrowse":
-                    invRequestController.Master().setCompanyID(psCompanyID);
-                    invRequestController.Master().setCategoryId(psCategoryID);
-                    invRequestController.setTransactionStatus("1024");
                     loJSON = invRequestController.searchTransaction();
 
                     if (!"error".equals((String) loJSON.get("result"))) {

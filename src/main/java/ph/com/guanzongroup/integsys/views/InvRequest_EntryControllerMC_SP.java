@@ -1,8 +1,3 @@
-
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package ph.com.guanzongroup.integsys.views;
 
 import ph.com.guanzongroup.integsys.model.ModelInvOrderDetail;
@@ -176,8 +171,6 @@ public class InvRequest_EntryControllerMC_SP implements Initializable, ScreenInt
                     invRequestController.NewTransaction();
                     loadRecordSearch();
 
-                    //reset the transaction
-                    invRequestController.InitTransaction();
                 } catch (CloneNotSupportedException e) {
                     ShowMessageFX.Warning((String) e.getMessage(), "Search Information", null);
                 }
@@ -691,8 +684,6 @@ public class InvRequest_EntryControllerMC_SP implements Initializable, ScreenInt
 
                         invOrderDetail_data.clear();
                         tableListInformation_data.clear();
-
-                        invRequestController.InitTransaction();
 
                         clearAllTables();
                         clearDetailFields();
@@ -1360,7 +1351,6 @@ public class InvRequest_EntryControllerMC_SP implements Initializable, ScreenInt
             if (loSelectedInformation != null) {
                 String lsTransactionNo = loSelectedInformation.getIndex01();
                 try {
-                    poJSON = invRequestController.InitTransaction();
                     if ("success".equals((String) poJSON.get("result"))) {
                         poJSON = invRequestController.OpenTransaction(lsTransactionNo);
                         if ("success".equals((String) poJSON.get("result"))) {
