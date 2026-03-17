@@ -160,22 +160,29 @@ public class CheckTransfer_HistoryController implements Initializable, ScreenInt
         initButtonsClickActions();
         initTableDetail();
         initTableOnClick();
-        initCheckBox();
+        initCheckBox();        
+        initFields();
     }
     
     /**
      * Initializes the TBJ controller and transaction objects.
      */
     private void initializeObject() {
-        LogWrapper logwrapr = new LogWrapper("CAS", System.getProperty("sys.default.path.temp") + "cas-error.log");
-        poGLControllers = new CashflowControllers(poApp, logwrapr);
-        poGLControllers.CheckTransfers().setTransactionStatus("0123456");
-        poJSON = poGLControllers.CheckTransfers().InitTransaction();
-        if (!"success".equals(poJSON.get("result"))) {
+        try {
+            LogWrapper logwrapr = new LogWrapper("CAS", System.getProperty("sys.default.path.temp") + "cas-error.log");
+            poGLControllers = new CashflowControllers(poApp, logwrapr);
+            poGLControllers.CheckTransfers().setTransactionStatus("0123456");
+            poJSON = poGLControllers.CheckTransfers().InitTransaction();
+            if (!"success".equals(poJSON.get("result"))) {
                 ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
+            }
+            poGLControllers.CheckTransfers().Master().setIndustryId(psIndustryID);
+            poGLControllers.CheckTransfers().Master().setCompany(psCompanyID);
+            lblSource.setText(poGLControllers.CheckTransfers().Master().Company().getCompanyName() + " - " + poGLControllers.CheckTransfers().Master().Industry().getDescription());
+        } catch (SQLException | GuanzonException ex) {
+            Logger.getLogger(CheckTransfer_HistoryController.class.getName()).log(Level.SEVERE, null, ex);
+            ShowMessageFX.Error(ex.getMessage(), psFormName, null);
         }
-//            poGLControllers.CheckTransfers().Master().setIndustryId(psIndustryID);
-//            lblSource.setText(poGLControllers.CheckTransfers().Master().Company().getCompanyName() + " - " + poGLControllers.CheckTransfers().Master().Industry().getDescription());
     }
     
     private void ClearAll() {
@@ -230,22 +237,48 @@ public class CheckTransfer_HistoryController implements Initializable, ScreenInt
                     LoadDetail();
                     break;
                 case "btnHistory":
-                    if( poGLControllers.CheckTransfers().Master().getTransactionNo() != null || ! poGLControllers.CheckTransfers().Master().getTransactionNo().isEmpty()){
-                        try {
-                            poGLControllers.CheckTransfers().ShowStatusHistory();
-                        } catch (NullPointerException npe) {
-                            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(npe), npe);
-                            ShowMessageFX.Error("No transaction status history to load!", psFormName, null);
-                        } catch (Exception ex) {
-                            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
-                            ShowMessageFX.Error(MiscUtil.getException(ex), psFormName, null);
-                        }
-
-                    }else{
-                       ShowMessageFX.Error("Unable to proceed. No transaction is currently loaded.", psFormName, null);
+                    if( poGLControllers.CheckTransfers().Master().getTransactionNo() == null){
+                        ShowMessageFX.Error("Unable to proceed. No transaction is currently loaded.", psFormName, null);
+                        return;
+                    }
+                    
+                    try {
+                        poGLControllers.CheckTransfers().ShowStatusHistory();
+                    } catch (NullPointerException npe) {
+                        Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(npe), npe);
+                        ShowMessageFX.Error("No transaction status history to load!", psFormName, null);
+                    } catch (Exception ex) {
+                        Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+                        ShowMessageFX.Error(MiscUtil.getException(ex), psFormName, null);
                     }
                     break;
-
+                case "btnPrint":
+                    
+                   if(poGLControllers.CheckTransfers().Master().getTransactionNo() == null ||
+                            poGLControllers.CheckTransfers().Master().getTransactionNo().isEmpty()){
+                       ShowMessageFX.Warning(
+                                "Please load the transaction before printing.",
+                                psFormName,
+                                null);
+                        return;
+                   }
+                   
+                    if (poGLControllers.CheckTransfers().Master().getTransactionStatus().equals(CheckTransferStatus.POSTED)
+                            || poGLControllers.CheckTransfers().Master().getTransactionStatus().equals(CheckTransferStatus.VOID)) {
+                        ShowMessageFX.Warning(
+                                "This transaction has already been posted or voided. Printing is not allowed.",
+                                psFormName,
+                                null);
+                        return;
+                    }
+                       
+                    poJSON = poGLControllers.CheckTransfers().printTransaction();
+                    if (!"success".equals((String) poJSON.get("result"))) {
+                        ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
+                        return;
+                    }
+                   
+                   break;
                 default:
                     ShowMessageFX.Warning("Please contact admin to assist about no button available", psFormName, null);
                     break;
@@ -258,23 +291,12 @@ public class CheckTransfer_HistoryController implements Initializable, ScreenInt
     }
     private void initFields() {
         boolean isEditable = (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE);
-        JFXUtil.setDisabled(!isEditable,
-                tfSearchDestination,
-                tfSearchTransNo, 
-                tfTransactionNo,
-                tfDestination,
-                tfDepartment,
-                tfCheckTransNo,
-                tfCheckNo,
-                dpTransactionDate,
-                taRemarks
-        );
+
         if (CheckTransferStatus.CONFIRMED.equals(poGLControllers.CheckTransfers().Master().getTransactionStatus())) {
             apMaster.setDisable(true);
             apDetail.setDisable(false);
             JFXUtil.setDisabledExcept(true,
                     apDetail
-                    
             );
         }
         tfTransactionNo.setDisable(true);
@@ -285,7 +307,7 @@ public class CheckTransfer_HistoryController implements Initializable, ScreenInt
             apDetail.setDisable(false);
         }
         
-            List<TextField> loTxtField = Arrays.asList(tfDestination, tfDepartment, tfCheckTransNo, tfCheckNo);
+            List<TextField> loTxtField = Arrays.asList(tfDestination, tfDepartment, tfCheckTransNo, tfCheckNo,tfSearchDestination,tfSearchTransNo);
             loTxtField.forEach(tf -> tf.setOnKeyPressed(event -> txtField_KeyPressed(event)));
 //
 //            JFXUtil.setFocusListener(txtArea_Focus, taRemarks);
@@ -330,6 +352,9 @@ public class CheckTransfer_HistoryController implements Initializable, ScreenInt
                 case CheckTransferStatus.CONFIRMED:
                     lsStatus = "CONFIRMED";
                     break;
+                case CheckTransferStatus.POSTED:
+                    lsStatus = "POSTED";
+                    break;
             }
             lblStatus.setText(lsStatus);
         } catch (SQLException | GuanzonException | NullPointerException ex) {
@@ -369,7 +394,10 @@ public class CheckTransfer_HistoryController implements Initializable, ScreenInt
                 poGLControllers.CheckTransfers().Detail(pnSelectedDetail) != null
                 && poGLControllers.CheckTransfers().Detail(pnSelectedDetail).isReverse()
         );
-            
+            cbIsReceived.setSelected(
+                poGLControllers.CheckTransfers().Detail(pnSelectedDetail) != null
+                && poGLControllers.CheckTransfers().Detail(pnSelectedDetail).isReceived()
+        );
 
         } catch (SQLException | GuanzonException | NullPointerException ex) {
             Logger.getLogger(PaymentRequest_EntryController.class.getName()).log(Level.SEVERE, null, ex);
@@ -417,13 +445,13 @@ public class CheckTransfer_HistoryController implements Initializable, ScreenInt
                 try {
                     int detailCount = poGLControllers.CheckTransfers().getDetailCount();
                                         
-                    if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
-                        if (poGLControllers.CheckTransfers().Detail(detailCount - 1).getSourceNo()!= null
-                                && !poGLControllers.CheckTransfers().Detail(detailCount - 1).getSourceNo().isEmpty()) {
-                            poGLControllers.CheckTransfers().AddDetail();
-                            detailCount++;
-                        }
-                    }
+//                    if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
+//                        if (poGLControllers.CheckTransfers().Detail(detailCount - 1).getSourceNo()!= null
+//                                && !poGLControllers.CheckTransfers().Detail(detailCount - 1).getSourceNo().isEmpty()) {
+//                            poGLControllers.CheckTransfers().AddDetail();
+//                            detailCount++;
+//                        }
+//                    }
                     List<ModelTableDetail> detailsList = new ArrayList<>();
                     for (int lnCtr = 0; lnCtr < poGLControllers.CheckTransfers().getDetailCount(); lnCtr++) {
                         detailsList.add(new ModelTableDetail(
@@ -679,7 +707,28 @@ public class CheckTransfer_HistoryController implements Initializable, ScreenInt
                                 tfCheckNo.setText(poGLControllers.CheckTransfers().Detail(pnSelectedDetail).CheckPayment().getCheckNo());
                                 loadTableDetail();
                                 return; 
-                             
+                            case "tfSearchDestination":
+                                poJSON = poGLControllers.CheckTransfers().SearchTransaction(lsValue, true);
+                                if ("error".equals(poJSON.get("result"))) {
+                                    ShowMessageFX.Warning((String) poJSON.get("message"), lsValue, lsValue);
+                                }
+                                tfSearchDestination.setText(poGLControllers.CheckTransfers().Master().Branch().getBranchName());
+                                pnEditMode = poGLControllers.CheckDeposits().getEditMode();
+                                loadTableDetail();
+                                LoadMaster();
+                                LoadDetail();
+                                break;
+                            case "tfSearchTransNo":
+                                poJSON = poGLControllers.CheckTransfers().SearchTransaction(lsValue, false);
+                                if ("error".equals(poJSON.get("result"))) {
+                                    ShowMessageFX.Warning((String) poJSON.get("message"), lsValue, lsValue);
+                                }
+                                tfSearchTransNo.setText(poGLControllers.CheckTransfers().Master().getTransactionNo());
+                                pnEditMode = poGLControllers.CheckDeposits().getEditMode();
+                                loadTableDetail();
+                                LoadMaster();
+                                LoadDetail();
+                                break;
                         }
 
                         break;
@@ -693,6 +742,8 @@ public class CheckTransfer_HistoryController implements Initializable, ScreenInt
                 }
             } catch (SQLException | GuanzonException | ExceptionInInitializerError ex) {
                 Logger.getLogger(TBJ_ParameterController.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (CloneNotSupportedException ex) {
+                Logger.getLogger(CheckTransfer_HistoryController.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
     }

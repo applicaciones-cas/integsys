@@ -69,7 +69,7 @@
                                           <Font name="System Bold" size="14.0" />
                                        </font>
                                     </Label>
-                                    <DatePicker fx:id="dpSearchTransactionDate" editable="false" GridPane.columnIndex="10" />
+                                    <DatePicker fx:id="dpSearchTransactionDate" GridPane.columnIndex="10" />
                                  </children>
                               </GridPane>
                               <Label fx:id="lblSource" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" text="Industry" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="0.0">
