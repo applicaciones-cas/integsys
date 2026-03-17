@@ -89,6 +89,7 @@ public class CashFundController implements Initializable, ScreenInterface {
                 poController.getModel().setCompanyId(psCompanyId);
 //            poController.setIndustryId(psIndustryId);
 //            poController.setCompanyId(psCompanyId);
+                poController.setWithParentClass(false);
                 poController.setWithUI(true);
                 loadRecordSearch();
                 btnNew.fire();
