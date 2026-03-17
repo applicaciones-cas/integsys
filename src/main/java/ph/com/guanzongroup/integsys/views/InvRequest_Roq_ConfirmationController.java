@@ -200,7 +200,7 @@ public class InvRequest_Roq_ConfirmationController implements Initializable, Scr
                 
                         
                 }catch(ExceptionInInitializerError ex) {
-                Logger.getLogger(InvRequest_EntryMcController.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(InvRequest_EntryControllerMC.class.getName()).log(Level.SEVERE, null, ex);
 
             }
         }
@@ -231,7 +231,7 @@ public class InvRequest_Roq_ConfirmationController implements Initializable, Scr
                 lblSource.setText(invRequestController.StockRequest().Master().Company().getCompanyName() );
 
             } catch (GuanzonException | SQLException ex) {
-                Logger.getLogger(InvRequest_EntryMcController.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(InvRequest_EntryControllerMC.class.getName()).log(Level.SEVERE, null, ex);
             }
 
         }
@@ -651,7 +651,7 @@ case "btnSave":
                                 ShowMessageFX.Information((String) poJSON.get("message"), psFormName, null);
                             }
                         } catch (ParseException ex) {
-                            Logger.getLogger(InvRequest_EntryMPGeneralController.class.getName()).log(Level.SEVERE, null, ex);
+                            Logger.getLogger(InvRequest_Roq_ConfirmationControllerCar.class.getName()).log(Level.SEVERE, null, ex);
                         }
                             }
                           
@@ -668,7 +668,7 @@ case "btnSave":
                                         }
                                         ShowMessageFX.Information((String) loJSON.get("message"), psFormName, null);
                                     } catch (ParseException ex) {
-                                        Logger.getLogger(InvRequest_Roq_EntryMcController.class.getName()).log(Level.SEVERE, null, ex);
+                                        Logger.getLogger(InvRequest_Roq_EntryControllerMC.class.getName()).log(Level.SEVERE, null, ex);
                                     }
                                 }
                             
@@ -694,7 +694,7 @@ case "btnSave":
                         // Proceed to void the transaction
                         poJSON = invRequestController.StockRequest().VoidTransaction("Voided");
                     } catch (ParseException ex) {
-                        Logger.getLogger(InvRequest_ConfirmationMcController.class.getName()).log(Level.SEVERE, null, ex);
+                        Logger.getLogger(InvRequest_ConfirmationControllerMC.class.getName()).log(Level.SEVERE, null, ex);
                     }
                 }
 
@@ -800,7 +800,7 @@ case "btnSave":
                     });
 
                 } catch (SQLException | GuanzonException ex) {
-                    Logger.getLogger(InvRequest_ConfirmationMcController.class
+                    Logger.getLogger(InvRequest_ConfirmationControllerMC.class
                             .getName()).log(Level.SEVERE, null, ex);
                 }
                 return null;
@@ -904,7 +904,7 @@ case "btnSave":
                     return detailsList;
 
                 } catch (GuanzonException | SQLException ex) {
-                    Logger.getLogger(InvRequest_EntryMcSpController.class.getName()).log(Level.SEVERE, null, ex);
+                    Logger.getLogger(InvRequest_EntryControllerMC_SP.class.getName()).log(Level.SEVERE, null, ex);
                     return null;
                 }
             }
@@ -1257,7 +1257,7 @@ case "btnSave":
 
                     }
                 } catch (CloneNotSupportedException | SQLException | GuanzonException ex) {
-                    Logger.getLogger(InvRequest_ConfirmationMcController.class
+                    Logger.getLogger(InvRequest_ConfirmationControllerMC.class
                             .getName()).log(Level.SEVERE, null, ex);
                     ShowMessageFX.Warning("Error loading data: " + ex.getMessage(), psFormName, null);
                 }

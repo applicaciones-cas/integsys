@@ -69,9 +69,9 @@ import org.json.simple.parser.ParseException;
  *
  * @author User
  */
-public class InvRequest_Roq_EntryController implements Initializable, ScreenInterface{
+public class InvRequest_Roq_EntryControllerCar_SP implements Initializable, ScreenInterface{
     @FXML
-    private String psFormName = "Inv Stock Request ROQ Entry LP General";
+    private String psFormName = "Inv Stock Request ROQ Entry Car Sp";
      @FXML
         private AnchorPane AnchorMain,AnchorDetailMaster;
         unloadForm poUnload = new unloadForm();
@@ -171,6 +171,7 @@ public class InvRequest_Roq_EntryController implements Initializable, ScreenInte
                     try {
                         //set edit mode to new transaction temporily to assign industry and company
                         invRequestController.StockRequest().NewTransaction();
+                        invRequestController.StockRequest().Master().setIndustryId(psIndustryID);
                         invRequestController.StockRequest().Master().setCompanyID(psCompanyID);
                         invRequestController.StockRequest().Master().setCategoryId(psCategoryID);
                         loadRecordSearch();
@@ -228,7 +229,7 @@ public class InvRequest_Roq_EntryController implements Initializable, ScreenInte
         private void loadRecordSearch() {
             try {
               
-                lblSource.setText(invRequestController.StockRequest().Master().Company().getCompanyName());
+                lblSource.setText(invRequestController.StockRequest().Master().Company().getCompanyName() + " - " + invRequestController.StockRequest().Master().Industry().getDescription());
 
             } catch (GuanzonException | SQLException ex) {
                 Logger.getLogger(InvRequest_EntryControllerMC.class.getName()).log(Level.SEVERE, null, ex);
@@ -544,6 +545,7 @@ public class InvRequest_Roq_EntryController implements Initializable, ScreenInte
 
                             break;
                         case "btnBrowse":
+                            invRequestController.StockRequest().Master().setIndustryId(psIndustryID);
                             invRequestController.StockRequest().Master().setCompanyID(psCompanyID);
                             invRequestController.StockRequest().Master().setCategoryId(psCategoryID);
                             
@@ -565,6 +567,7 @@ public class InvRequest_Roq_EntryController implements Initializable, ScreenInte
                             }
                             break;
                         case "btnRetrieve":
+                            invRequestController.StockRequest().Master().setIndustryId(psIndustryID);
                             invRequestController.StockRequest().Master().setCompanyID(psCompanyID);
                             invRequestController.StockRequest().Master().setCategoryId(psCategoryID);
                             invRequestController.StockRequest().setTransactionStatus("102");
@@ -598,7 +601,8 @@ public class InvRequest_Roq_EntryController implements Initializable, ScreenInte
                         initFields(pnEditMode);
                         tableListInformation.toFront();
                         break;
-       case "btnSave":
+
+                          case "btnSave":
                             if (!ShowMessageFX.YesNo(null, psFormName, "Are you sure you want to save?")) {
                                 return;
                             }
@@ -720,6 +724,7 @@ public class InvRequest_Roq_EntryController implements Initializable, ScreenInte
                             tableListInformation.refresh();
                                     
                             invRequestController.StockRequest().setTransactionStatus(StockRequestStatus.OPEN);
+                            invRequestController.StockRequest().Master().setIndustryId(psIndustryID);
                             invRequestController.StockRequest().Master().setCompanyID(psCompanyID);
                         }
                         break;
@@ -730,6 +735,7 @@ public class InvRequest_Roq_EntryController implements Initializable, ScreenInte
                     invOrderDetail_data.clear();
                     loJSON = invRequestController.StockRequest().NewTransaction();
                     if ("success".equals((String) loJSON.get("result"))) {
+                        invRequestController.StockRequest().Master().setIndustryId(psIndustryID);
                         invRequestController.StockRequest().Master().setCompanyID(psCompanyID);
                         invRequestController.StockRequest().Master().setBranchCode(poApp.getBranchCode());
                         invRequestController.StockRequest().Master().setCategoryId(psCategoryID);
@@ -1038,6 +1044,7 @@ public class InvRequest_Roq_EntryController implements Initializable, ScreenInte
                         switch (fieldId) {
                             case "tfSearchTransNo":
                                     System.out.print("Company ID" + psCompanyID);
+                                    invRequestController.StockRequest().Master().setIndustryId(psIndustryID);
                                     invRequestController.StockRequest().Master().setCompanyID(psCompanyID);
                                     invRequestController.StockRequest().Master().setCategoryId(psCategoryID);
                                     invRequestController.StockRequest().setTransactionStatus("102");
@@ -1069,6 +1076,8 @@ public class InvRequest_Roq_EntryController implements Initializable, ScreenInte
                                           loadTableInvDetailAndSelectedRow();
                                           break;
                             case "tfSearchReferenceNo":
+                                System.out.print("Enter pressed");
+                                invRequestController.StockRequest().Master().setIndustryId(psIndustryID);
                                 invRequestController.StockRequest().Master().setCompanyID(psCompanyID);
                                 invRequestController.StockRequest().Master().setCategoryId(psCategoryID);
                                 invRequestController.StockRequest().setTransactionStatus("102");
@@ -1091,7 +1100,6 @@ public class InvRequest_Roq_EntryController implements Initializable, ScreenInte
                                     case "tfSearchTransNo":
                                         CommonUtils.SetNextFocus((TextField) event.getSource());
                                         break;
-                                    
                                 }
                                 event.consume();
                         break;
@@ -1292,6 +1300,7 @@ public class InvRequest_Roq_EntryController implements Initializable, ScreenInte
 
         
         if (fnEditMode == EditMode.READY) {
+            
             switch (invRequestController.StockRequest().Master().getTransactionStatus()) {
                 case StockRequestStatus.OPEN:
                     CustomCommonUtil.setVisible(true,  btnUpdate, btnVoid);
