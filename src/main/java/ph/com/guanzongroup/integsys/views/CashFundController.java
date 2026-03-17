@@ -325,6 +325,7 @@ public class CashFundController implements Initializable, ScreenInterface {
                         switch (poController.getModel().getTransactionStatus()) {
                             case CashFundStatus.OPEN:
                                 lsStat = "confirm";
+                                break;
                             case CashFundStatus.DEACTIVATED:
                                 lsStat = "activate";
                                 break;
