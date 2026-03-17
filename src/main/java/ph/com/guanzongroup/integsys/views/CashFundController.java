@@ -93,6 +93,7 @@ public class CashFundController implements Initializable, ScreenInterface {
             JFXUtil.initKeyClickObject(apMainAnchor, lastFocusedTextField, previousSearchedTextField);
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -140,7 +141,8 @@ public class CashFundController implements Initializable, ScreenInterface {
                             if (!JFXUtil.isJSONSuccess(poJSON)) {
                                 ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                 txtField.setText("");
-                                break;
+                            } else {
+                                JFXUtil.textFieldMoveNext(tfDepartment);
                             }
                             lbProceed = true;
                             loadRecordMaster();
@@ -151,7 +153,8 @@ public class CashFundController implements Initializable, ScreenInterface {
                             if (!JFXUtil.isJSONSuccess(poJSON)) {
                                 ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                 txtField.setText("");
-                                break;
+                            } else {
+                                JFXUtil.textFieldMoveNext(tfCustodian);
                             }
                             lbProceed = true;
                             loadRecordMaster();
@@ -162,7 +165,8 @@ public class CashFundController implements Initializable, ScreenInterface {
                             if (!JFXUtil.isJSONSuccess(poJSON)) {
                                 ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                 txtField.setText("");
-                                break;
+                            } else {
+                                JFXUtil.textFieldMoveNext(tfDescription);
                             }
                             lbProceed = true;
                             loadRecordMaster();
@@ -230,7 +234,7 @@ public class CashFundController implements Initializable, ScreenInterface {
     }
 
     public void initDatePickers() {
-        JFXUtil.setDatePickerFormat("MM/dd/yyyy", dpBegBalAsOf);
+        JFXUtil.setDatePickerFormat("MM/dd/yyyy", dpBegBalAsOf, dpLastTransDate);
 //        JFXUtil.setActionListener(this::datepicker_Action, dpBegBalAsOf);
     }
 
@@ -244,6 +248,7 @@ public class CashFundController implements Initializable, ScreenInterface {
             lblSource.setText(poController.getModel().Industry().getDescription());
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
