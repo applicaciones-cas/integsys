@@ -21,7 +21,7 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<AnchorPane fx:id="apMainAnchor" stylesheets="@../css/StyleSheet.css" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane fx:id="apMainAnchor" prefHeight="554.0" prefWidth="1175.0" stylesheets="@../css/StyleSheet.css" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1">
    <children>
       <BorderPane AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <bottom>
@@ -141,7 +141,10 @@
                                                 <Insets left="5.0" />
                                              </GridPane.margin>
                                           </TextField>
-                                          <TextField fx:id="tfSearchClient" promptText="Press F3: Search" GridPane.columnIndex="1" />
+                                          <TextField fx:id="tfSearchClient" promptText="Press F3: Search" GridPane.columnIndex="1">
+                                             <GridPane.margin>
+                                                <Insets left="10.0" />
+                                             </GridPane.margin></TextField>
                                        </children>
                                        <padding>
                                           <Insets left="10.0" right="10.0" />
@@ -157,20 +160,21 @@
             </AnchorPane>
          </top>
          <center>
-            <AnchorPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" BorderPane.alignment="TOP_LEFT">
+            <AnchorPane BorderPane.alignment="TOP_LEFT">
                <children>
-                  <SplitPane dividerPositions="0.5" maxWidth="1.7976931348623157E308" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0">
+                  <SplitPane AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0">
                      <items>
                         <AnchorPane fx:id="apRecord" style="-fx-border-color: FF8201;" SplitPane.resizableWithParent="false">
                            <padding>
                               <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                            </padding>
                            <children>
-                              <AnchorPane minWidth="-Infinity" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                              <AnchorPane layoutX="12.0" minWidth="-Infinity" prefWidth="1446.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                  <children>
-                                    <GridPane hgap="2.0" vgap="3.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="10.0">
+                                    <GridPane hgap="2.0" vgap="3.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="10.0">
                                        <columnConstraints>
                                           <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" minWidth="10.0" prefWidth="110.0" />
+                                          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="80.0" />
                                           <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="80.0" />
                                           <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="80.0" />
                                           <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="10.0" />
@@ -178,17 +182,19 @@
                                           <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="80.0" />
                                           <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="80.0" />
                                           <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="10.0" />
+                                          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
                                        </columnConstraints>
                                        <rowConstraints>
                                           <RowConstraints minHeight="10.0" prefHeight="25.0" vgrow="SOMETIMES" />
-                                          <RowConstraints minHeight="5.0" prefHeight="5.0" vgrow="SOMETIMES" />
-                                          <RowConstraints maxHeight="10.0" minHeight="10.0" prefHeight="10.0" vgrow="SOMETIMES" />
+                                          <RowConstraints maxHeight="-Infinity" prefHeight="30.0" vgrow="SOMETIMES" />
+                                          <RowConstraints maxHeight="-Infinity" prefHeight="5.0" vgrow="SOMETIMES" />
                                           <RowConstraints minHeight="10.0" prefHeight="25.0" vgrow="SOMETIMES" />
+                                          <RowConstraints maxHeight="-Infinity" prefHeight="30.0" vgrow="SOMETIMES" />
+                                          <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="5.0" vgrow="SOMETIMES" />
                                           <RowConstraints minHeight="10.0" prefHeight="25.0" vgrow="SOMETIMES" />
-                                          <RowConstraints minHeight="10.0" prefHeight="25.0" vgrow="SOMETIMES" />
-                                          <RowConstraints minHeight="10.0" prefHeight="25.0" vgrow="SOMETIMES" />
-                                          <RowConstraints minHeight="10.0" prefHeight="25.0" vgrow="SOMETIMES" />
-                                          <RowConstraints minHeight="10.0" prefHeight="25.0" vgrow="SOMETIMES" />
+                                          <RowConstraints maxHeight="-Infinity" prefHeight="30.0" vgrow="SOMETIMES" />
+                                          <RowConstraints maxHeight="-Infinity" prefHeight="5.0" vgrow="SOMETIMES" />
+                                          <RowConstraints maxHeight="-Infinity" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                                           <RowConstraints minHeight="10.0" prefHeight="20.0" vgrow="SOMETIMES" />
                                           <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                                           <RowConstraints minHeight="10.0" prefHeight="25.0" vgrow="SOMETIMES" />
@@ -198,10 +204,38 @@
                                           <RowConstraints minHeight="10.0" prefHeight="10.0" vgrow="SOMETIMES" />
                                        </rowConstraints>
                                        <children>
-                                          <Label disable="true" text="Client ID" GridPane.halignment="RIGHT" GridPane.valignment="CENTER">
+                                          <Label fx:id="lblStatus" alignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minWidth="142.0" prefHeight="27.0" prefWidth="142.0" style="-fx-background-color: FF8201;" text="Active" textAlignment="CENTER" textFill="#111111" GridPane.columnIndex="5" GridPane.columnSpan="3" GridPane.rowSpan="2">
                                              <font>
                                                 <Font name="System Bold" size="14.0" />
                                              </font>
+                                             <GridPane.margin>
+                                                <Insets />
+                                             </GridPane.margin>
+                                          </Label>
+                                          <Label disable="true" text="Client ID" GridPane.halignment="RIGHT" GridPane.valignment="CENTER">
+                                             <font>
+                                                <Font size="14.0" />
+                                             </font>
+                                             <GridPane.margin>
+                                                <Insets right="5.0" />
+                                             </GridPane.margin>
+                                          </Label>
+                                          <Label text="Category" GridPane.rowIndex="1">
+                                             <padding>
+                                                <Insets right="5.0" />
+                                             </padding>
+                                          </Label>
+                                          <Label text="Company Name" GridPane.halignment="RIGHT" GridPane.rowIndex="3" GridPane.valignment="CENTER">
+                                             <GridPane.margin>
+                                                <Insets right="5.0" />
+                                             </GridPane.margin>
+                                          </Label>
+                                          <Label text="Company Address" GridPane.halignment="RIGHT" GridPane.rowIndex="4" GridPane.valignment="CENTER">
+                                             <GridPane.margin>
+                                                <Insets right="5.0" />
+                                             </GridPane.margin>
+                                          </Label>
+                                          <Label text="Tax Identification No." GridPane.columnIndex="5" GridPane.halignment="RIGHT" GridPane.rowIndex="4" GridPane.valignment="CENTER">
                                              <GridPane.margin>
                                                 <Insets right="5.0" />
                                              </GridPane.margin>
@@ -211,185 +245,176 @@
                                                 <Insets right="5.0" />
                                              </GridPane.margin>
                                           </Label>
-                                          <Label text="Client Since" GridPane.halignment="RIGHT" GridPane.rowIndex="10" GridPane.valignment="CENTER">
-                                             <GridPane.margin>
-                                                <Insets right="5.0" />
-                                             </GridPane.margin>
-                                          </Label>
-                                          <Label text="Beginning Date" GridPane.columnIndex="4" GridPane.halignment="RIGHT" GridPane.rowIndex="10" GridPane.valignment="CENTER">
-                                             <GridPane.margin>
-                                                <Insets right="5.0" />
-                                             </GridPane.margin>
-                                          </Label>
-                                          <Label text="Term" GridPane.halignment="RIGHT" GridPane.rowIndex="13" GridPane.valignment="CENTER">
-                                             <GridPane.margin>
-                                                <Insets right="5.0" />
-                                             </GridPane.margin>
-                                          </Label>
-                                          <TextField fx:id="tfClientID" disable="true" editable="false" GridPane.columnIndex="1" GridPane.columnSpan="3">
-                                             <GridPane.margin>
-                                                <Insets left="5.0" />
-                                             </GridPane.margin>
-                                          </TextField>
-                                          <TextField fx:id="tfContactPerson" GridPane.columnIndex="1" GridPane.columnSpan="6" GridPane.rowIndex="6">
-                                             <GridPane.margin>
-                                                <Insets left="5.0" />
-                                             </GridPane.margin>
-                                          </TextField>
-                                          <Label text="Company Name" GridPane.halignment="RIGHT" GridPane.rowIndex="4" GridPane.valignment="CENTER">
-                                             <GridPane.margin>
-                                                <Insets right="5.0" />
-                                             </GridPane.margin>
-                                          </Label>
-                                          <TextField fx:id="tfCompanyName" GridPane.columnIndex="1" GridPane.columnSpan="6" GridPane.rowIndex="4">
-                                             <GridPane.margin>
-                                                <Insets left="5.0" />
-                                             </GridPane.margin>
-                                          </TextField>
-                                          <Label text="Discount" GridPane.halignment="RIGHT" GridPane.rowIndex="12" GridPane.valignment="CENTER">
-                                             <GridPane.margin>
-                                                <Insets right="5.0" />
-                                             </GridPane.margin>
-                                          </Label>
-                                          <Label text="Beginning Balance" GridPane.columnIndex="4" GridPane.halignment="RIGHT" GridPane.rowIndex="11" GridPane.valignment="CENTER">
-                                             <GridPane.margin>
-                                                <Insets right="5.0" />
-                                             </GridPane.margin>
-                                          </Label>
-                                          <Label text="Credit Limit" GridPane.halignment="RIGHT" GridPane.rowIndex="11" GridPane.valignment="CENTER">
-                                             <GridPane.margin>
-                                                <Insets right="5.0" />
-                                             </GridPane.margin>
-                                          </Label>
-                                          <Label text="Available Balance" GridPane.columnIndex="4" GridPane.halignment="RIGHT" GridPane.rowIndex="13" GridPane.valignment="CENTER">
-                                             <GridPane.margin>
-                                                <Insets right="5.0" />
-                                             </GridPane.margin>
-                                          </Label>
-                                          <Label text="Oustanding Balance" GridPane.columnIndex="4" GridPane.halignment="RIGHT" GridPane.rowIndex="14" GridPane.valignment="CENTER">
-                                             <GridPane.margin>
-                                                <Insets right="5.0" />
-                                             </GridPane.margin>
-                                          </Label>
-                                          <TextField fx:id="tfCreditLimit" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="11">
-                                             <GridPane.margin>
-                                                <Insets left="5.0" />
-                                             </GridPane.margin>
-                                          </TextField>
-                                          <TextField fx:id="tfBegBalanace" editable="false" GridPane.columnIndex="5" GridPane.columnSpan="2" GridPane.rowIndex="11">
-                                             <GridPane.margin>
-                                                <Insets left="5.0" />
-                                             </GridPane.margin>
-                                          </TextField>
-                                          <TextField fx:id="tfDiscount" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="12">
-                                             <GridPane.margin>
-                                                <Insets left="5.0" />
-                                             </GridPane.margin>
-                                          </TextField>
-                                          <TextField fx:id="tfTerm" promptText="Press F3: Search" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="13">
-                                             <GridPane.margin>
-                                                <Insets left="5.0" />
-                                             </GridPane.margin>
-                                          </TextField>
-                                          <TextField fx:id="tfAvailBalance" editable="false" GridPane.columnIndex="5" GridPane.columnSpan="2" GridPane.rowIndex="13">
-                                             <GridPane.margin>
-                                                <Insets left="5.0" />
-                                             </GridPane.margin>
-                                          </TextField>
-                                          <TextField fx:id="tfOutStandingBalance" editable="false" GridPane.columnIndex="5" GridPane.columnSpan="2" GridPane.rowIndex="14">
-                                             <GridPane.margin>
-                                                <Insets left="5.0" />
-                                             </GridPane.margin>
-                                          </TextField>
-                                          <Label fx:id="lblStatus" alignment="CENTER" minWidth="142.0" prefHeight="27.0" prefWidth="142.0" style="-fx-background-color: FF8201;" text="Active" textAlignment="CENTER" textFill="#111111" GridPane.columnIndex="4" GridPane.columnSpan="3" GridPane.halignment="RIGHT" GridPane.valignment="CENTER">
-                                             <font>
-                                                <Font name="System Bold" size="14.0" />
-                                             </font>
-                                             <padding>
-                                                <Insets bottom="5.0" left="10.0" right="10.0" top="5.0" />
-                                             </padding>
-                                             <GridPane.margin>
-                                                <Insets left="30.0" />
-                                             </GridPane.margin>
-                                          </Label>
-                                          <CheckBox fx:id="cbVatRegistered" mnemonicParsing="false" text="VAT Registerd" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="14">
-                                             <GridPane.margin>
-                                                <Insets left="5.0" />
-                                             </GridPane.margin>
-                                          </CheckBox>
-                                          <Label text="Company Address" GridPane.halignment="RIGHT" GridPane.rowIndex="5" GridPane.valignment="CENTER">
-                                             <GridPane.margin>
-                                                <Insets right="5.0" />
-                                             </GridPane.margin>
-                                          </Label>
-                                          <Label text="Tin No." GridPane.halignment="RIGHT" GridPane.rowIndex="8" GridPane.valignment="CENTER">
-                                             <GridPane.margin>
-                                                <Insets right="5.0" />
-                                             </GridPane.margin>
-                                          </Label>
                                           <Label text="Contact No." GridPane.halignment="RIGHT" GridPane.rowIndex="7" GridPane.valignment="CENTER">
                                              <GridPane.margin>
                                                 <Insets right="5.0" />
                                              </GridPane.margin>
                                           </Label>
-                                          <Separator prefWidth="200.0" GridPane.columnSpan="7" GridPane.rowIndex="9" />
-                                          <Separator prefWidth="200.0" GridPane.columnIndex="4" GridPane.columnSpan="3" GridPane.rowIndex="12" />
-                                          <TextField fx:id="tfAddress" disable="true" editable="false" GridPane.columnIndex="1" GridPane.columnSpan="6" GridPane.rowIndex="5">
+                                          <Label text="Contact Email Address" GridPane.columnIndex="5" GridPane.halignment="RIGHT" GridPane.rowIndex="7" />
+                                          <Label text="Client Since" GridPane.halignment="RIGHT" GridPane.rowIndex="11" GridPane.valignment="CENTER">
                                              <GridPane.margin>
-                                                <Insets left="5.0" />
-                                             </GridPane.margin>
-                                          </TextField>
-                                          <TextField fx:id="tfContactNo" disable="true" editable="false" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="7">
-                                             <GridPane.margin>
-                                                <Insets left="5.0" />
-                                             </GridPane.margin>
-                                          </TextField>
-                                          <TextField fx:id="tfTINNo" disable="true" editable="false" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="8">
-                                             <GridPane.margin>
-                                                <Insets left="5.0" />
-                                             </GridPane.margin>
-                                          </TextField>
-                                          <DatePicker fx:id="dpBegBalance" disable="true" prefHeight="28.0" prefWidth="227.0" promptText="YYYY-MM-DD" GridPane.columnIndex="5" GridPane.columnSpan="2" GridPane.rowIndex="10">
-                                             <GridPane.margin>
-                                                <Insets left="5.0" />
-                                             </GridPane.margin>
-                                          </DatePicker>
-                                          <DatePicker fx:id="dpClientSince" editable="false" prefHeight="28.0" prefWidth="227.0" promptText="YYYY-MM-DD" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="10">
-                                             <GridPane.margin>
-                                                <Insets left="5.0" />
-                                             </GridPane.margin>
-                                          </DatePicker>
-                                          <Label text="Category" GridPane.rowIndex="3">
-                                             <padding>
                                                 <Insets right="5.0" />
-                                             </padding>
+                                             </GridPane.margin>
                                           </Label>
-                                          <TextField fx:id="tfCategory" GridPane.columnIndex="1" GridPane.columnSpan="3" GridPane.rowIndex="3">
+                                          <Label text="Credit Limit" GridPane.halignment="RIGHT" GridPane.rowIndex="12" GridPane.valignment="CENTER">
+                                             <GridPane.margin>
+                                                <Insets right="5.0" />
+                                             </GridPane.margin>
+                                          </Label>
+                                          <Label text="Discount" GridPane.halignment="RIGHT" GridPane.rowIndex="13" GridPane.valignment="CENTER">
+                                             <GridPane.margin>
+                                                <Insets right="5.0" />
+                                             </GridPane.margin>
+                                          </Label>
+                                          <Label text="Term" GridPane.halignment="RIGHT" GridPane.rowIndex="14" GridPane.valignment="CENTER">
+                                             <GridPane.margin>
+                                                <Insets right="5.0" />
+                                             </GridPane.margin>
+                                          </Label>
+                                          <Label text="Beginning Date" GridPane.columnIndex="5" GridPane.halignment="RIGHT" GridPane.rowIndex="11" GridPane.valignment="CENTER">
+                                             <GridPane.margin>
+                                                <Insets right="5.0" />
+                                             </GridPane.margin>
+                                          </Label>
+                                          <Label text="Beginning Balance" GridPane.columnIndex="5" GridPane.halignment="RIGHT" GridPane.rowIndex="12" GridPane.valignment="CENTER">
+                                             <GridPane.margin>
+                                                <Insets right="5.0" />
+                                             </GridPane.margin>
+                                          </Label>
+                                          <Label text="Available Balance" GridPane.columnIndex="5" GridPane.halignment="RIGHT" GridPane.rowIndex="14" GridPane.valignment="CENTER">
+                                             <GridPane.margin>
+                                                <Insets right="5.0" />
+                                             </GridPane.margin>
+                                          </Label>
+                                          <Label text="Oustanding Balance" GridPane.columnIndex="5" GridPane.halignment="RIGHT" GridPane.rowIndex="15" GridPane.valignment="CENTER">
+                                             <GridPane.margin>
+                                                <Insets right="5.0" />
+                                             </GridPane.margin>
+                                          </Label>
+                                          <TextField fx:id="tfClientID" disable="true" editable="false" styleClass="DisabledTextField" GridPane.columnIndex="1" GridPane.columnSpan="3">
                                              <GridPane.margin>
                                                 <Insets left="5.0" />
                                              </GridPane.margin>
                                           </TextField>
+                                          <TextField fx:id="tfCategory" editable="false" styleClass="DisabledTextField" GridPane.columnIndex="1" GridPane.columnSpan="3" GridPane.rowIndex="1">
+                                             <GridPane.margin>
+                                                <Insets left="5.0" />
+                                             </GridPane.margin>
+                                          </TextField>
+                                          <TextField fx:id="tfCompanyName" editable="false" maxHeight="1.7976931348623157E308" styleClass="DisabledTextField" GridPane.columnIndex="1" GridPane.columnSpan="7" GridPane.rowIndex="3">
+                                             <GridPane.margin>
+                                                <Insets left="5.0" />
+                                             </GridPane.margin>
+                                          </TextField>
+                                          <TextField fx:id="tfAddress" disable="true" editable="false" styleClass="DisabledTextField" GridPane.columnIndex="1" GridPane.columnSpan="3" GridPane.rowIndex="4">
+                                             <GridPane.margin>
+                                                <Insets left="5.0" />
+                                             </GridPane.margin>
+                                          </TextField>
+                                          <TextField fx:id="tfTINNo" disable="true" editable="false" styleClass="DisabledTextField" GridPane.columnIndex="6" GridPane.columnSpan="2" GridPane.rowIndex="4">
+                                             <GridPane.margin>
+                                                <Insets left="5.0" />
+                                             </GridPane.margin>
+                                          </TextField>
+                                          <TextField fx:id="tfContactPerson" editable="false" styleClass="DisabledTextField" GridPane.columnIndex="1" GridPane.columnSpan="7" GridPane.rowIndex="6">
+                                             <GridPane.margin>
+                                                <Insets left="5.0" />
+                                             </GridPane.margin>
+                                          </TextField>
+                                          <TextField fx:id="tfContactNo" disable="true" editable="false" styleClass="DisabledTextField" GridPane.columnIndex="1" GridPane.columnSpan="3" GridPane.rowIndex="7">
+                                             <GridPane.margin>
+                                                <Insets left="5.0" />
+                                             </GridPane.margin>
+                                          </TextField>
+                                          <TextField fx:id="tfContactEmail" disable="true" editable="false" styleClass="DisabledTextField" GridPane.columnIndex="6" GridPane.columnSpan="2" GridPane.rowIndex="7">
+                                             <GridPane.margin>
+                                                <Insets left="5.0" />
+                                             </GridPane.margin>
+                                          </TextField>
+                                          <TextField fx:id="tfCreditLimit" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="12">
+                                             <GridPane.margin>
+                                                <Insets left="5.0" />
+                                             </GridPane.margin>
+                                          </TextField>
+                                          <TextField fx:id="tfBegBalanace" editable="false" GridPane.columnIndex="6" GridPane.columnSpan="2" GridPane.rowIndex="12">
+                                             <GridPane.margin>
+                                                <Insets left="5.0" />
+                                             </GridPane.margin>
+                                          </TextField>
+                                          <TextField fx:id="tfDiscount" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="13">
+                                             <GridPane.margin>
+                                                <Insets left="5.0" />
+                                             </GridPane.margin>
+                                          </TextField>
+                                          <TextField fx:id="tfTerm" promptText="Press F3: Search" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="14">
+                                             <GridPane.margin>
+                                                <Insets left="5.0" />
+                                             </GridPane.margin>
+                                          </TextField>
+                                          <TextField fx:id="tfAvailBalance" editable="false" GridPane.columnIndex="6" GridPane.columnSpan="2" GridPane.rowIndex="14">
+                                             <GridPane.margin>
+                                                <Insets left="5.0" />
+                                             </GridPane.margin>
+                                          </TextField>
+                                          <TextField fx:id="tfOutStandingBalance" editable="false" GridPane.columnIndex="6" GridPane.columnSpan="2" GridPane.rowIndex="15">
+                                             <GridPane.margin>
+                                                <Insets left="5.0" />
+                                             </GridPane.margin>
+                                          </TextField>
+                                          <Separator maxWidth="1.7976931348623157E308" prefWidth="200.0" styleClass="dash-order" GridPane.columnSpan="8" GridPane.rowIndex="10" />
+                                          <Separator prefWidth="200.0" GridPane.columnIndex="5" GridPane.columnSpan="3" GridPane.rowIndex="13" />
+                                          <CheckBox fx:id="cbVatRegistered" mnemonicParsing="false" text="VAT Registerd" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="15">
+                                             <GridPane.margin>
+                                                <Insets left="5.0" />
+                                             </GridPane.margin>
+                                          </CheckBox>
+                                          <DatePicker fx:id="dpClientSince" editable="false" prefHeight="28.0" prefWidth="227.0" promptText="YYYY-MM-DD" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="11">
+                                             <GridPane.margin>
+                                                <Insets left="5.0" />
+                                             </GridPane.margin>
+                                          </DatePicker>
+                                          <DatePicker fx:id="dpBegBalance" disable="true" prefHeight="28.0" prefWidth="227.0" promptText="YYYY-MM-DD" GridPane.columnIndex="6" GridPane.columnSpan="2" GridPane.rowIndex="11">
+                                             <GridPane.margin>
+                                                <Insets left="5.0" />
+                                             </GridPane.margin>
+                                          </DatePicker>
+                                          <TableView fx:id="tblLedger1" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" onMouseClicked="#tblLedger_Clicked" stylesheets="@../css/Tables.css" GridPane.columnIndex="9" GridPane.rowSpan="10">
+                                             <columns>
+                                                <TableColumn fx:id="tblColNo1" maxWidth="25.0" minWidth="25.0" prefWidth="25.0" resizable="false" text="No." />
+                                                <TableColumn fx:id="tblColDate1" maxWidth="1.7976931348623157E308" minWidth="-Infinity" prefWidth="618.0" resizable="false" text="Filename" />
+                                             </columns>
+                                             <columnResizePolicy>
+                                                <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                                             </columnResizePolicy>
+                                          </TableView>
+                                          <TableView fx:id="tblLedger" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" onMouseClicked="#tblLedger_Clicked" stylesheets="@../css/Tables.css" GridPane.columnIndex="9" GridPane.columnSpan="2" GridPane.rowIndex="11" GridPane.rowSpan="5">
+                                             <columns>
+                                                <TableColumn fx:id="tblColNo" maxWidth="25.0" minWidth="25.0" prefWidth="25.0" resizable="false" text="No." />
+                                                <TableColumn fx:id="tblColDate" maxWidth="150.0" minWidth="100.0" prefWidth="100.0" resizable="false" text="Date" />
+                                                <TableColumn fx:id="tblColSourceNo" maxWidth="1.7976931348623157E308" minWidth="-1.0" prefWidth="160.0" text="Source No" />
+                                                <TableColumn fx:id="tblColSourceCode" maxWidth="100.0" minWidth="100.0" prefWidth="100.0" resizable="false" text="Source Code" />
+                                                <TableColumn fx:id="tblColAmountIn" maxWidth="130.0" minWidth="130.0" prefWidth="130.0" resizable="false" text="Amount In" />
+                                                <TableColumn fx:id="tblColAmountOut" maxWidth="130.0" minWidth="130.0" prefWidth="130.0" resizable="false" text="Amount Out" />
+                                             </columns>
+                                             <columnResizePolicy>
+                                                <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                                             </columnResizePolicy>
+                                          </TableView>
+                                          <Label text="Attachment No" GridPane.rowIndex="9" />
+                                          <TextField fx:id="tfContactNo1" disable="true" editable="false" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" styleClass="DisabledTextField" GridPane.columnIndex="1" GridPane.columnSpan="5" GridPane.rowIndex="9">
+                                             <GridPane.margin>
+                                                <Insets left="5.0" />
+                                             </GridPane.margin>
+                                          </TextField>
+                                          <Button maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" styleClass="button_process" text="Add Attachment" GridPane.columnIndex="6" GridPane.columnSpan="2" GridPane.rowIndex="9">
+                                             <GridPane.margin>
+                                                <Insets left="10.0" />
+                                             </GridPane.margin>
+                                          </Button>
                                        </children>
                                     </GridPane>
                                  </children>
                               </AnchorPane>
-                           </children>
-                        </AnchorPane>
-                        <AnchorPane fx:id="apLedger" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" style="-fx-border-color: FF8201;">
-                           <children>
-                              <TableView fx:id="tblLedger" layoutX="7.0" layoutY="7.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" onMouseClicked="#tblLedger_Clicked" stylesheets="@../css/Tables.css" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="5.0">
-                                 <columns>
-                                    <TableColumn fx:id="tblColNo" maxWidth="25.0" minWidth="25.0" prefWidth="25.0" resizable="false" text="No." />
-                                    <TableColumn fx:id="tblColDate" maxWidth="150.0" minWidth="100.0" prefWidth="100.0" resizable="false" text="Date" />
-                                    <TableColumn fx:id="tblColSourceNo" maxWidth="1.7976931348623157E308" minWidth="-1.0" prefWidth="160.0" text="Source No" />
-                                    <TableColumn fx:id="tblColSourceCode" maxWidth="100.0" minWidth="100.0" prefWidth="100.0" resizable="false" text="Source Code" />
-                                    <TableColumn fx:id="tblColAmountIn" maxWidth="130.0" minWidth="130.0" prefWidth="130.0" resizable="false" text="Amount In" />
-                                    <TableColumn fx:id="tblColAmountOut" maxWidth="130.0" minWidth="130.0" prefWidth="130.0" resizable="false" text="Amount Out" />
-                                 </columns>
-                                 <columnResizePolicy>
-                                    <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
-                                 </columnResizePolicy>
-                              </TableView>
                            </children>
                         </AnchorPane>
                      </items>

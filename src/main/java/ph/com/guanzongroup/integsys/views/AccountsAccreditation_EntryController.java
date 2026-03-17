@@ -75,7 +75,9 @@ public class AccountsAccreditation_EntryController implements Initializable, Scr
 
     @FXML
     private TextField tfTransactionNo, tfCategory, tfCompany,
-            tfContactPerson, tfAddress, tfSearchCompany, tfTIN;
+            tfContactPerson, tfAddress, tfSearchCompany, tfTIN,
+            tfContactRole, tfContactNo, tfContactEmail,
+            tfContactDepartment, tfContactPosition;
 
     @FXML
     private DatePicker dpTransactionDate;
@@ -446,11 +448,22 @@ public class AccountsAccreditation_EntryController implements Initializable, Scr
             tfTransactionNo.setText(poAppController.getModel().getTransactionNo());
             dpTransactionDate.setValue(ParseDate(poAppController.getModel().getDateTransact()));
             
-            System.out.print(poAppController.getModel().Category().getDescription());
-            
             tfCategory.setText(poAppController.getModel().Category().getDescription());
             tfCompany.setText(poAppController.getModel().Client().getCompanyName());
+            
             tfContactPerson.setText(poAppController.getModel().ClientInstitutionContact().getContactPersonName());
+            tfContactRole.setText(poAppController.getModel().ClientInstitutionContact().ContactRole().getsRoleDesc());
+            
+            //set landline no (mobile no is empty), set fax no(landline no is empty), by default set mobile no
+            
+            String lsMobile = poAppController.getModel().ClientInstitutionContact().getMobileNo();
+            String lsLandline = poAppController.getModel().ClientInstitutionContact().getLandlineNo();
+            String lsFaxno = poAppController.getModel().ClientInstitutionContact().getFaxNo();
+            
+            tfContactNo.setText(lsMobile == null? (lsLandline == null? (lsFaxno == null ? "" : lsFaxno) : lsLandline) : lsMobile );
+            tfContactEmail.setText(poAppController.getModel().ClientInstitutionContact().getMailAddress());
+            tfContactDepartment.setText(poAppController.getModel().ClientInstitutionContact().getsDeprtmnt());
+            tfContactPosition.setText(poAppController.getModel().ClientInstitutionContact().getContactPersonPosition());
             
             String lshouseno = poAppController.getModel().ClientAddress().getHouseNo() == null || poAppController.getModel().ClientAddress().getHouseNo().isEmpty() ? "" : poAppController.getModel().ClientAddress().getHouseNo() + " ";
             String lsaddress = poAppController.getModel().ClientAddress().getAddress() == null || poAppController.getModel().ClientAddress().getAddress().isEmpty() ? "" : poAppController.getModel().ClientAddress().getAddress();
@@ -462,6 +475,7 @@ public class AccountsAccreditation_EntryController implements Initializable, Scr
             
             tfTIN.setText(poAppController.getModel().Client().getTaxIdNumber() == null ? " " : poAppController.getModel().Client().getTaxIdNumber());
             taRemarks.setText(poAppController.getModel().getRemarks());
+            
             cmbAccountType.getSelectionModel().select(Integer.parseInt(poAppController.getModel().getAccountType()));
             cmbTransType.getSelectionModel().select(Integer.parseInt(poAppController.getModel().getTransactionType()));
 

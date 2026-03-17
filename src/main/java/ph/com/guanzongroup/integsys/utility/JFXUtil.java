@@ -1701,6 +1701,8 @@ public class JFXUtil {
             }
         }
     }
+    
+
 
     /*Alternative version of inputDecimalOnly; restricts to 1 dot */
     public static void inputDecimalOnly(TextField... foTxtFields) {
