@@ -120,10 +120,10 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.util.Callback;
 import java.io.File;
-import java.util.Arrays;
+import java.sql.SQLException;
+import java.text.SimpleDateFormat;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.WeakHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
@@ -143,9 +143,11 @@ import ph.com.guanzongroup.integsys.views.ScreenInterface;
 import javafx.animation.*;
 import javafx.scene.Node;
 import javafx.util.Duration;
+import org.guanzon.appdriver.base.SQLUtil;
+import static ph.com.guanzongroup.integsys.GUI.oApp;
 
 /**
- * Date : 4/28/2025 Recent update: 01/26/2026
+ * Date : 4/28/2025 Recent update: 03/17/2026
  *
  * @author Aldrich
  */
@@ -2653,8 +2655,8 @@ public class JFXUtil {
 
     /*Sets value to a label, textField, textArea, or button from class various variable name w/ value*/
  /*Ideally used for set Status label of Transaction*/
- /*Compares class variables values from string value (the third parameter)*/
- /*Requires Node, class, and a string value*/
+ /*Compares Status Class variables Values (2nd parameter) to String value from (3rd parameter)*/
+ /*Requires Node, Status Class, and a String value*/
     public static String setStatusValue(Node node, Class<?> clazz, String value) {
         String text = getNameByValue(clazz, value);
 
@@ -3096,8 +3098,6 @@ public class JFXUtil {
         for (Node node : nodes) {
             if (node != null) {
                 Tooltip tooltip = new Tooltip(message);
-
-                tooltip.setShowDelay(Duration.ZERO);
                 tooltip.setStyle(
                         "-fx-font-size: 10px;"
                         + "-fx-padding: 6 10 6 10;"
@@ -3245,7 +3245,7 @@ public class JFXUtil {
         }
     }
 
-    /*Displays 5 secs tooltip to particular node*/
+    /*Displays 5 secs tooltip to a particular node*/
     public static void showTooltip(String message, Node... nodes) {
         if (message == null || message.trim().isEmpty() || nodes == null || nodes.length == 0) {
             return;
@@ -3340,4 +3340,68 @@ public class JFXUtil {
             animation.play();
         }
     }
+
+    @FunctionalInterface
+    public interface DatePickerCommand {
+
+        void run(
+                DatePicker DatePicker,
+                SimpleDateFormat sdfFormat,
+                String lsServerDate,
+                LocalDate ldCurrentDate,
+                String lsSelectedDate,
+                LocalDate ldSelectedDate
+        );
+    }
+
+    public static EventHandler<ActionEvent> DatePickerAction(DatePickerCommand command) {
+        return event -> {
+
+            JSONObject poJSON = new JSONObject();
+            JFXUtil.setJSONSuccess(poJSON, "success");
+
+            Object source = event.getSource();
+            if (source instanceof DatePicker) {
+
+                try {
+                    DatePicker datePicker = (DatePicker) source;
+                    String inputText = datePicker.getEditor().getText();
+                    SimpleDateFormat sdfFormat = new SimpleDateFormat(SQLUtil.FORMAT_SHORT_DATE);
+                    LocalDate ldCurrentDate = null, ldSelectedDate = null;
+                    String lsServerDate = "", lsTransDate = "", lsSelectedDate = "";
+                    if (inputText == null || "".equals(inputText) || "01/01/1900".equals(inputText)) {
+                        return;
+                    }
+                    lsServerDate = sdfFormat.format(oApp.getServerDate());
+                    ldCurrentDate = LocalDate.parse(
+                            lsServerDate,
+                            DateTimeFormatter.ofPattern(SQLUtil.FORMAT_SHORT_DATE)
+                    );
+                    lsSelectedDate = sdfFormat.format(
+                            SQLUtil.toDate(
+                                    JFXUtil.convertToIsoFormat(inputText),
+                                    SQLUtil.FORMAT_SHORT_DATE
+                            )
+                    );
+                    ldSelectedDate = LocalDate.parse(
+                            lsSelectedDate,
+                            DateTimeFormatter.ofPattern(SQLUtil.FORMAT_SHORT_DATE)
+                    );  // your custom command here
+                    if (command != null) {
+                        command.run(
+                                datePicker,
+                                sdfFormat,
+                                lsServerDate,
+                                ldCurrentDate,
+                                lsSelectedDate,
+                                ldSelectedDate
+                        );
+                    }
+                } catch (SQLException ex) {
+                    Logger.getLogger(JFXUtil.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        };
+    }
+
 }
