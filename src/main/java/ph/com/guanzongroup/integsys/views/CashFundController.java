@@ -254,14 +254,8 @@ public class CashFundController implements Initializable, ScreenInterface {
     public void loadRecordMaster() {
         try {
             switch (poController.getModel().getTransactionStatus()) {
-                case CashFundStatus.OPEN:
-                    btnConfirm.setText("Confirm");
-                    break;
                 case CashFundStatus.ACTIVE:
                     JFXUtil.setDisabled(true, apMaster);
-                    break;
-                case CashFundStatus.DEACTIVATED:
-                    btnConfirm.setText("Activate");
                     break;
             }
             JFXUtil.setStatusValue(lblStatus, CashFundStatus.class, pnEditMode == EditMode.UNKNOWN ? "-1" : poController.getModel().getTransactionStatus());
@@ -316,16 +310,7 @@ public class CashFundController implements Initializable, ScreenInterface {
                         break;
                     case "btnConfirm":
                         String id = poController.getModel().getCashFundId();
-                        String lsStat = "";
-                        switch (poController.getModel().getTransactionStatus()) {
-                            case CashFundStatus.OPEN:
-                                lsStat = "confirm";
-                                break;
-                            case CashFundStatus.DEACTIVATED:
-                                lsStat = "activate";
-                                break;
-                        }
-                        if (ShowMessageFX.YesNo(null, pxeModuleName, "Are you sure you want to " + lsStat + " the transaction?") == true) {
+                        if (ShowMessageFX.YesNo(null, pxeModuleName, "Are you sure you want to activate the transaction?") == true) {
                             switch (poController.getModel().getTransactionStatus()) {
                                 case CashFundStatus.DEACTIVATED:
                                     if (oApp.getUserLevel() <= UserRight.ENCODER) {
@@ -514,7 +499,7 @@ public class CashFundController implements Initializable, ScreenInterface {
                 JFXUtil.setButtonsVisibility(false, btnVoid);
                 break;
             case CashFundStatus.ACTIVE:
-                JFXUtil.setButtonsVisibility(false, btnConfirm);
+                JFXUtil.setButtonsVisibility(false, btnUpdate, btnConfirm);
                 break;
             case CashFundStatus.DEACTIVATED:
                 JFXUtil.setButtonsVisibility(false, btnUpdate, btnVoid);
