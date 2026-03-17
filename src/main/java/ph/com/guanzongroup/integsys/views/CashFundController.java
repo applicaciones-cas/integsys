@@ -315,6 +315,7 @@ public class CashFundController implements Initializable, ScreenInterface {
                         pnEditMode = poController.getEditMode();
                         break;
                     case "btnConfirm":
+                        String id = poController.getModel().getCashFundId();
                         String lsStat = "";
                         switch (poController.getModel().getTransactionStatus()) {
                             case CashFundStatus.OPEN:
@@ -348,11 +349,17 @@ public class CashFundController implements Initializable, ScreenInterface {
                             } else {
                                 ShowMessageFX.Information(null, pxeModuleName, (String) poJSON.get("message"));
                             }
+                            poJSON = poController.openRecord(id);
+                            if ("error".equals(poJSON.get("result"))) {
+                                ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                                break;
+                            }
                         } else {
                             return;
                         }
                         break;
                     case "btnVoid":
+                        String id2 = poController.getModel().getCashFundId();
                         if (ShowMessageFX.YesNo(null, "Close Tab", "Are you sure you want to deactivate the transaction?") == true) {
                             poJSON = poController.DeactivateRecord();
                             if ("error".equals((String) poJSON.get("result"))) {
@@ -360,6 +367,11 @@ public class CashFundController implements Initializable, ScreenInterface {
                                 return;
                             } else {
                                 ShowMessageFX.Information(null, pxeModuleName, (String) poJSON.get("message"));
+                            }
+                            poJSON = poController.openRecord(id2);
+                            if ("error".equals(poJSON.get("result"))) {
+                                ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                                break;
                             }
                         } else {
                             return;
