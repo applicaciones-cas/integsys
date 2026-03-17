@@ -206,6 +206,11 @@ public class CashFundController implements Initializable, ScreenInterface {
                         if (!JFXUtil.isJSONSuccess(poJSON)) {
                             ShowMessageFX.Information(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
                         }
+                        switch (poController.getModel().getTransactionStatus()) {
+                            case CashFundStatus.OPEN:
+                                poController.getModel().setBeginningBalance(poController.getModel().getBeginningBalance());
+                                break;
+                        }
                         break;
                     case "tfCurrentBalance":
                         lsValue = JFXUtil.removeComma(lsValue);
