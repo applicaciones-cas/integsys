@@ -672,7 +672,12 @@ public class CheckRelease_EntryController implements Initializable, ScreenInterf
                         LoadDetail();
                         JFXUtil.showRetainedHighlight(false, tblViewMaster, "#A7C7E7", plOrderNoPartial, plOrderNoFinal, highlightedRowsMain, true);
                         loadHighlightFromDetail();
-//                        poJSON = poGLControllers.CheckReleases().computeMasterFields();
+                        try {
+                            poJSON = poGLControllers.CheckReleases().computeMasterFields();
+                        } catch (SQLException | GuanzonException ex) {
+                            Logger.getLogger(CheckRelease_EntryController.class.getName()).log(Level.SEVERE, null, ex);
+                            ShowMessageFX.Error(ex.getMessage(), psFormName, null);
+                        }
                     });
                     
                     return detailsList;
@@ -736,12 +741,20 @@ public class CheckRelease_EntryController implements Initializable, ScreenInterf
         if ((pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE)) {
             
             cbReverse.setOnAction(event -> {
-                if (poGLControllers.CheckReleases().Detail(pnSelectedDetail).getEditMode() == EditMode.ADDNEW) {
-                    poGLControllers.CheckReleases().deleteDetail(pnSelectedDetail);
-                } else {
-                    poGLControllers.CheckReleases().Detail(pnSelectedDetail).isReverse(cbReverse.isSelected());
+                try {
+                    if (poGLControllers.CheckReleases().Detail(pnSelectedDetail).getEditMode() == EditMode.ADDNEW) {
+                        poGLControllers.CheckReleases().deleteDetail(pnSelectedDetail);
+                    } else {
+                        poGLControllers.CheckReleases().Detail(pnSelectedDetail).isReverse(cbReverse.isSelected());
+                    }
+                     
+                    loadTableDetail();
+                    poGLControllers.CheckTransfers().computeMasterFields();
+                   
+                } catch (SQLException | GuanzonException ex) {
+                    Logger.getLogger(CheckRelease_EntryController.class.getName()).log(Level.SEVERE, null, ex);
+                    ShowMessageFX.Error(ex.getMessage(), psFormName, null);
                 }
-                loadTableDetail();
             });
         }
         dpTransactionDate.setOnAction((ActionEvent event) -> {

@@ -325,19 +325,29 @@ public class CheckRelease_ConfirmationController implements Initializable, Scree
                     }
                     ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
                     pnEditMode = poGLControllers.CheckReleases().getEditMode();
-
+                    if( poGLControllers.CheckTransfers().Master().getTransactionStatus().equals(CheckTransferStatus.OPEN)){
                         if (ShowMessageFX.YesNo(null, psFormName, "Do you want to confirm this transaction?")) {
                                 poJSON = poGLControllers.CheckReleases().OpenTransaction(poGLControllers.CheckReleases().Master().getTransactionNo());
                                 poJSON = poGLControllers.CheckReleases().ConfirmTransaction("");
                           
                             if (!"success".equals((String) poJSON.get("result"))) {
                                 ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
-                                ClearAll();
-                                initButtons(pnEditMode);
                                 return;
                             }
                             
                         }
+                    }
+                    if (ShowMessageFX.YesNo(null, psFormName, "Do you want to print this transaction?")) {
+                        poJSON = poGLControllers.CheckTransfers().printTransaction();
+                        if ("error".equals((String) poJSON.get("result"))) {
+                            ShowMessageFX.Error((String) poJSON.get("message"), psFormName, null);
+                            ClearAll();
+                            initButtons(pnEditMode);
+                            return;
+                        }
+
+                    }
+                    
                     pnEditMode = EditMode.READY;
                     ClearAll();
                     initButtons(pnEditMode);
@@ -366,6 +376,7 @@ public class CheckRelease_ConfirmationController implements Initializable, Scree
                            return;
                        }
                        ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
+                       
                        ClearAll();
                        initializeObject();
                        pnEditMode = poGLControllers.CheckReleases().getEditMode();
@@ -492,7 +503,7 @@ public class CheckRelease_ConfirmationController implements Initializable, Scree
             dpCheckDate.setValue(CustomCommonUtil.parseDateStringToLocalDate(
                     SQLUtil.dateFormat(poGLControllers.CheckReleases().Detail(pnSelectedDetail).CheckPayment().getCheckDate(), 
                             SQLUtil.FORMAT_SHORT_DATE)));
-
+            
             cbReverse.setSelected(
                 poGLControllers.CheckReleases().Detail(pnSelectedDetail) != null
                 && poGLControllers.CheckReleases().Detail(pnSelectedDetail).isReverse()
@@ -530,11 +541,17 @@ public class CheckRelease_ConfirmationController implements Initializable, Scree
         CustomCommonUtil.setVisible(true, btnUpdate,btnVoid,btnApprove,btnPrint);
         CustomCommonUtil.setManaged(true, btnUpdate,btnVoid,btnApprove,btnPrint);
         }
+        
 
         if (fnEditMode == EditMode.UPDATE || fnEditMode == EditMode.ADDNEW) {
             CustomCommonUtil.setVisible(false, btnUpdate,btnVoid,btnApprove,btnPrint);
             CustomCommonUtil.setManaged(false, btnUpdate,btnVoid,btnApprove,btnPrint);
             cbReverse.setDisable(false);
+        }
+        if(poGLControllers.CheckReleases()
+                .Master().getTransactionStatus().equals(CheckReleaseStatus.CONFIRMED)){
+            CustomCommonUtil.setVisible(false, btnUpdate);
+            CustomCommonUtil.setManaged(false, btnUpdate);
         }
     }
 
@@ -718,12 +735,19 @@ public class CheckRelease_ConfirmationController implements Initializable, Scree
         if ((pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE)) {
 
             cbReverse.setOnAction(event -> {
-                if (poGLControllers.CheckReleases().Detail(pnSelectedDetail).getEditMode() == EditMode.ADDNEW) {
-                    poGLControllers.CheckReleases().deleteDetail(pnSelectedDetail);
-                } else {
-                    poGLControllers.CheckReleases().Detail(pnSelectedDetail).isReverse(cbReverse.isSelected());
+                try {
+                    if (poGLControllers.CheckReleases().Detail(pnSelectedDetail).getEditMode() == EditMode.ADDNEW) {
+                        poGLControllers.CheckReleases().deleteDetail(pnSelectedDetail);
+                    } else {
+                        poGLControllers.CheckReleases().Detail(pnSelectedDetail).isReverse(cbReverse.isSelected());
+                    }
+                    
+                    loadTableDetail();
+                    poGLControllers.CheckTransfers().computeMasterFields();
+                } catch (SQLException | GuanzonException ex) {
+                    Logger.getLogger(CheckRelease_ConfirmationController.class.getName()).log(Level.SEVERE, null, ex);                    
+                    ShowMessageFX.Error(ex.getMessage(), psFormName, null);
                 }
-                loadTableDetail();
             });
             
             dpTransactionDate.setOnAction((ActionEvent event) -> {

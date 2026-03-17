@@ -317,7 +317,7 @@
                                                       <TextField fx:id="tfCheckTransNo" maxHeight="25.0" promptText="Press F3: Search" GridPane.columnIndex="2" GridPane.columnSpan="2" />
                                                   <TextField fx:id="tfBank" alignment="TOP_LEFT" disable="true" editable="false" maxHeight="1.7976931348623157E308" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.rowIndex="1" />
                                                   <TextField fx:id="tfPayee" disable="true" editable="false" maxHeight="25.0" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.rowIndex="2" />
-                                                      <TextField fx:id="tfNote" disable="true" editable="false" maxHeight="25.0" GridPane.columnIndex="2" GridPane.columnSpan="7" GridPane.rowIndex="3" />
+                                                      <TextField fx:id="tfNote" maxHeight="25.0" GridPane.columnIndex="2" GridPane.columnSpan="7" GridPane.rowIndex="3" />
                                                       <TextField fx:id="tfCheckNo" editable="false" maxHeight="25.0" promptText="Press F3: Search" GridPane.columnIndex="7" GridPane.columnSpan="2" />
                                                       <DatePicker fx:id="dpCheckDate" disable="true" editable="false" GridPane.columnIndex="7" GridPane.columnSpan="2" GridPane.rowIndex="1" />
                               <TextField fx:id="tfCheckAmount" alignment="CENTER_RIGHT" disable="true" editable="false" promptText="0.0000" GridPane.columnIndex="7" GridPane.columnSpan="2" GridPane.rowIndex="2" />
