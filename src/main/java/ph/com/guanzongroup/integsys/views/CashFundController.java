@@ -10,6 +10,7 @@ import java.util.logging.Logger;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
@@ -26,6 +27,7 @@ import org.guanzon.appdriver.base.CommonUtils;
 import org.guanzon.appdriver.base.GRiderCAS;
 import org.guanzon.appdriver.base.GuanzonException;
 import org.guanzon.appdriver.base.MiscUtil;
+import org.guanzon.appdriver.base.SQLUtil;
 import org.guanzon.appdriver.constant.EditMode;
 import ph.com.guanzongroup.cas.cashflow.status.CashFundStatus;
 import org.json.simple.JSONObject;
@@ -235,7 +237,7 @@ public class CashFundController implements Initializable, ScreenInterface {
 
     public void initDatePickers() {
         JFXUtil.setDatePickerFormat("MM/dd/yyyy", dpBegBalAsOf, dpLastTransDate);
-//        JFXUtil.setActionListener(this::datepicker_Action, dpBegBalAsOf);
+        JFXUtil.setActionListener(datepicker_Action, dpBegBalAsOf);
     }
 
     public void clearTextFields() {
@@ -460,6 +462,32 @@ public class CashFundController implements Initializable, ScreenInterface {
             }
         }
     }
+    boolean pbSuccess = true;
+    EventHandler<ActionEvent> datepicker_Action = JFXUtil.DatePickerAction(
+            (datePicker, sdfFormat, lsServerDate, ldCurrentDate, lsSelectedDate, ldSelectedDate) -> {
+                poJSON = new JSONObject();
+                switch (datePicker.getId()) {
+                    case "dpBegBalAsOf":
+                        if (ldSelectedDate.isAfter(ldCurrentDate)) {
+                            poJSON.put("result", "error");
+                            poJSON.put("message", "Future dates are not allowed.");
+                            pbSuccess = false;
+                        }
+                        if (pbSuccess) {
+                            poController.getModel().setBeginningDate((SQLUtil.toDate(lsSelectedDate, SQLUtil.FORMAT_SHORT_DATE)));
+                        } else {
+                            if ("error".equals((String) poJSON.get("result"))) {
+                                ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                            }
+                        }
+                        pbSuccess = false; //Set to false to prevent multiple message box
+                        loadRecordMaster();
+                        pbSuccess = true; //Set to original value
+                        break;
+                    default:
+                        break;
+                }
+            });
 
     private void initButton(int fnValue) {
         boolean lbShow = (fnValue == EditMode.ADDNEW || fnValue == EditMode.UPDATE);
