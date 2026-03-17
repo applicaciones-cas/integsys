@@ -263,7 +263,7 @@ public class CashFundController implements Initializable, ScreenInterface {
                 case CashFundStatus.ACTIVE:
                     JFXUtil.setDisabled(true, apMaster);
                     break;
-                case CashFundStatus.DEACTIVE:
+                case CashFundStatus.DEACTIVATED:
                     btnConfirm.setText("Activate");
                     break;
             }
@@ -323,13 +323,13 @@ public class CashFundController implements Initializable, ScreenInterface {
                         switch (poController.getModel().getTransactionStatus()) {
                             case CashFundStatus.OPEN:
                                 lsStat = "confirm";
-                            case CashFundStatus.DEACTIVE:
+                            case CashFundStatus.DEACTIVATED:
                                 lsStat = "activate";
                                 break;
                         }
                         if (ShowMessageFX.YesNo(null, pxeModuleName, "Are you sure you want to " + lsStat + " the transaction?") == true) {
                             switch (poController.getModel().getTransactionStatus()) {
-                                case CashFundStatus.DEACTIVE:
+                                case CashFundStatus.DEACTIVATED:
                                     // requires approval?
                                     break;
                             }
@@ -511,7 +511,7 @@ public class CashFundController implements Initializable, ScreenInterface {
             case CashFundStatus.ACTIVE:
                 JFXUtil.setButtonsVisibility(false, btnConfirm);
                 break;
-            case CashFundStatus.DEACTIVE:
+            case CashFundStatus.DEACTIVATED:
                 JFXUtil.setButtonsVisibility(false, btnConfirm, btnUpdate);
                 break;
         }
