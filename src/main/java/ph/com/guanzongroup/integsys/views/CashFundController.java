@@ -247,7 +247,7 @@ public class CashFundController implements Initializable, ScreenInterface {
 
     public void loadRecordSearch() {
         try {
-            lblSource.setText(poController.getModel().Industry().getDescription());
+            lblSource.setText(poController.getModel().Company().getCompanyName() + " - " + poController.getModel().Industry().getDescription());
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
             ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
