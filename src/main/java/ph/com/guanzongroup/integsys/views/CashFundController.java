@@ -298,7 +298,7 @@ public class CashFundController implements Initializable, ScreenInterface {
                     case "btnBrowse":
 //                        poController.getModel().setTransactionStatus(CashFundStatus.RETURNED + "" + CashFundStatus.OPEN);
                         poController.setRecordStatus(CashFundStatus.OPEN);
-                        poJSON = poController.searchRecord(lsButton, false);
+                        poJSON = poController.searchRecord("", false);
                         if ("error".equalsIgnoreCase((String) poJSON.get("result"))) {
                             ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                             tfCashFundId.requestFocus();
