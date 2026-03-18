@@ -216,8 +216,6 @@ public class CashAdvance_ApprovalController implements Initializable, ScreenInte
                                 ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                 txtField.setText("");
                                 break;
-                            } else {
-                                JFXUtil.textFieldMoveNext(tfRequestingDepartment);
                             }
                             loadRecordSearch();
                             retrieveCashAdvance();
@@ -228,19 +226,20 @@ public class CashAdvance_ApprovalController implements Initializable, ScreenInte
                                 ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                 txtField.setText("");
                                 break;
-                            } else {
-                                JFXUtil.textFieldMoveNext(tfRequestingDepartment);
                             }
                             loadRecordSearch();
                             retrieveCashAdvance();
                             break;
                         case "tfSearchPayee":
-                            retrieveCashAdvance();
-                            if (!tooltipShown2) {
-                                JFXUtil.showTooltip("NOTE: Results appear directly in the table view, no pop-up dialog.", txtField);
-                                tooltipShown2 = true;
+                            poJSON = poController.SearchPayee(lsValue, false, true);
+                            if ("error".equals(poJSON.get("result"))) {
+                                ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                                txtField.setText("");
+                                break;
                             }
-                            return;
+                            loadRecordSearch();
+                            retrieveCashAdvance();
+                            break;
                         case "tfSearchTransNo":
                             retrieveCashAdvance();
                             if (!tooltipShown) {
@@ -312,6 +311,7 @@ public class CashAdvance_ApprovalController implements Initializable, ScreenInte
             }
             tfSearchIndustry.setText(poController.getSearchIndustry());
             tfSearchBranch.setText(poController.getSearchBranch());
+            tfSearchPayee.setText(poController.getSearchPayee());
             JFXUtil.updateCaretPositions(apBrowse);
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
@@ -328,6 +328,9 @@ public class CashAdvance_ApprovalController implements Initializable, ScreenInte
                         }
                         break;
                     case "tfSearchBranch":
+                        if (lsValue.isEmpty()) {
+                            poController.setSearchBranch("");
+                        }
                         break;
                     case "tfSearchPayee":
                         if (lsValue.isEmpty()) {
@@ -664,7 +667,7 @@ public class CashAdvance_ApprovalController implements Initializable, ScreenInte
                         break;
                     case "btnVoid":
                         poJSON = new JSONObject();
-                        if (ShowMessageFX.YesNo(null, pxeModuleName, "Are you sure you want to void transaction?") == true) {
+                        if (ShowMessageFX.YesNo(null, pxeModuleName, "Are you sure you want to disapprove transaction?") == true) {
                             switch (poController.getModel().getTransactionStatus()) {
                                 case CashAdvanceStatus.APPROVED:
                                 case CashAdvanceStatus.CONFIRMED:
@@ -710,7 +713,6 @@ public class CashAdvance_ApprovalController implements Initializable, ScreenInte
 
     public void retrieveCashAdvance() {
         poJSON = new JSONObject();
-        poController.getModel().setTransactionStatus(CashAdvanceStatus.OPEN + CashAdvanceStatus.CONFIRMED);
         poJSON = poController.loadTransactionList(tfSearchIndustry.getText(), tfSearchBranch.getText(), tfSearchPayee.getText(), tfSearchTransNo.getText());
         if (!"success".equals((String) poJSON.get("result"))) {
             ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
@@ -734,6 +736,9 @@ public class CashAdvance_ApprovalController implements Initializable, ScreenInte
         JFXUtil.setDisabled(!lbShow1, apMaster);
         JFXUtil.setButtonsVisibility(lbShow4, btnClose);
 
+        if (fnValue != EditMode.READY) {
+            return;
+        }
         switch (poController.getModel().getTransactionStatus()) {
             case CashAdvanceStatus.CONFIRMED:
                 JFXUtil.setButtonsVisibility(false, btnConfirm);
