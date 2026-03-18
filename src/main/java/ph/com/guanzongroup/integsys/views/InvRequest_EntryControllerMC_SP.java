@@ -496,7 +496,7 @@ public class InvRequest_EntryControllerMC_SP implements Initializable, ScreenInt
             }
         } catch (SQLException | GuanzonException e) {
             ShowMessageFX.Error(getStage(), e.getMessage(), "Error", psFormName);
-            System.exit(1);
+//            System.exit(1);
         }
     }
 
@@ -740,7 +740,7 @@ public class InvRequest_EntryControllerMC_SP implements Initializable, ScreenInt
             initFields(pnEditMode);
         } catch (CloneNotSupportedException | ExceptionInInitializerError | ParseException | SQLException | GuanzonException | NullPointerException e) {
             ShowMessageFX.Error(getStage(), e.getMessage(), "Error", psFormName);
-            System.exit(1);
+//            System.exit(1);
         }
     }
 
@@ -1219,7 +1219,7 @@ public class InvRequest_EntryControllerMC_SP implements Initializable, ScreenInt
 
         } catch (Exception e) {
             ShowMessageFX.Error(getStage(), e.getMessage(), "Error", psFormName);
-            System.exit(1);
+//            System.exit(1);
         }
     }
 

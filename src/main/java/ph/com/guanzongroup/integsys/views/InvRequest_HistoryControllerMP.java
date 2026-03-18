@@ -512,7 +512,7 @@ public class InvRequest_HistoryControllerMP implements Initializable, ScreenInte
 
         } catch (SQLException | GuanzonException e) {
             ShowMessageFX.Error(getStage(), e.getMessage(), "Error", psFormName);
-            System.exit(1);
+//            System.exit(1);
         }
     }
 
@@ -692,7 +692,7 @@ public class InvRequest_HistoryControllerMP implements Initializable, ScreenInte
             }
         } catch (SQLException | GuanzonException e) {
             ShowMessageFX.Error(getStage(), e.getMessage(), "Error", psFormName);
-            System.exit(1);
+//            System.exit(1);
         }
     }
 

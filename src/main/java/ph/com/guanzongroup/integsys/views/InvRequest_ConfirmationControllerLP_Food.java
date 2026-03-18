@@ -472,7 +472,7 @@ public class InvRequest_ConfirmationControllerLP_Food implements Initializable, 
             }
         } catch (SQLException | GuanzonException e) {
             ShowMessageFX.Error(getStage(), e.getMessage(), "Error", psFormName);
-            System.exit(1);
+//            System.exit(1);
         }
     }
 
@@ -709,7 +709,7 @@ public class InvRequest_ConfirmationControllerLP_Food implements Initializable, 
             initFields(pnEditMode);
         } catch (CloneNotSupportedException | ExceptionInInitializerError | SQLException | GuanzonException | NullPointerException e) {
             ShowMessageFX.Error(getStage(), e.getMessage(), "Error", psFormName);
-            System.exit(1);
+//            System.exit(1);
         }
     }
 
@@ -1058,7 +1058,7 @@ public class InvRequest_ConfirmationControllerLP_Food implements Initializable, 
 
         } catch (Exception e) {
             ShowMessageFX.Error(getStage(), e.getMessage(), "Error", psFormName);
-            System.exit(1);
+//            System.exit(1);
         }
     }
 

@@ -53,6 +53,7 @@ import org.guanzon.appdriver.agent.ShowDialogFX;
 import org.guanzon.appdriver.agent.ShowMessageFX;
 import org.guanzon.appdriver.base.CommonUtils;
 import org.guanzon.appdriver.base.GuanzonException;
+import org.guanzon.appdriver.base.MiscUtil;
 import org.guanzon.appdriver.base.SQLUtil;
 import org.guanzon.appdriver.constant.EditMode;
 import org.guanzon.appdriver.constant.UserRight;
@@ -179,9 +180,9 @@ public class InvRequest_ConfirmationControllerCar implements Initializable, Scre
             initFields(EditMode.UNKNOWN);
 
         } catch (ExceptionInInitializerError ex) {
-            Logger.getLogger(InvRequest_EntryControllerMC.class.getName()).log(Level.SEVERE, null, ex);
-
-        }
+           Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(MiscUtil.getException(ex), psFormName, null);
+      }
     }
 
     private void initTextFieldsProperty() {
@@ -212,8 +213,9 @@ public class InvRequest_ConfirmationControllerCar implements Initializable, Scre
             lblSource.setText(invRequestController.Master().Company().getCompanyName() + " - " + invRequestController.Master().Industry().getDescription());
 
         } catch (GuanzonException | SQLException ex) {
-            Logger.getLogger(InvRequest_EntryControllerMC.class.getName()).log(Level.SEVERE, null, ex);
-        }
+          Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(MiscUtil.getException(ex), psFormName, null);
+       }
 
     }
 
@@ -464,10 +466,10 @@ public class InvRequest_ConfirmationControllerCar implements Initializable, Scre
                 tfOrderQuantity.setText(lsOrderQuantity);
 
             }
-        } catch (SQLException | GuanzonException e) {
-            ShowMessageFX.Error(getStage(), e.getMessage(), "Error", psFormName);
-            System.exit(1);
-        }
+        } catch (SQLException | GuanzonException ex) {
+          Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(MiscUtil.getException(ex), psFormName, null);
+       }
     }
 
     private void handleButtonAction(ActionEvent event) {
@@ -610,8 +612,8 @@ public class InvRequest_ConfirmationControllerCar implements Initializable, Scre
                                 ShowMessageFX.Information((String) poJSON.get("message"), psFormName, null);
                             }
                         } catch (ParseException ex) {
-                            Logger.getLogger(InvRequest_ConfirmationControllerCar.class.getName()).log(Level.SEVERE, null, ex);
-                        }
+                          Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+        }
                     }
 
                     break;
@@ -730,7 +732,7 @@ public class InvRequest_ConfirmationControllerCar implements Initializable, Scre
             initFields(pnEditMode);
         } catch (CloneNotSupportedException | ExceptionInInitializerError | SQLException | GuanzonException | NullPointerException e) {
             ShowMessageFX.Error(getStage(), e.getMessage(), "Error", psFormName);
-            System.exit(1);
+//            System.exit(1);
         }
     }
 
@@ -1077,7 +1079,7 @@ public class InvRequest_ConfirmationControllerCar implements Initializable, Scre
 
         } catch (Exception e) {
             ShowMessageFX.Error(getStage(), e.getMessage(), "Error", psFormName);
-            System.exit(1);
+//            System.exit(1);
         }
     }
 

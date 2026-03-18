@@ -483,7 +483,7 @@ public class InvRequest_EntryControllerLP_Food implements Initializable, ScreenI
             }
         } catch (SQLException | GuanzonException e) {
             ShowMessageFX.Error(getStage(), e.getMessage(), "Error", psFormName);
-            System.exit(1);
+//            System.exit(1);
         }
     }
 
@@ -727,7 +727,7 @@ public class InvRequest_EntryControllerLP_Food implements Initializable, ScreenI
             initFields(pnEditMode);
         } catch (CloneNotSupportedException | ParseException | ExceptionInInitializerError | SQLException | GuanzonException | NullPointerException e) {
             ShowMessageFX.Error(getStage(), e.getMessage(), "Error", psFormName);
-            System.exit(1);
+//            System.exit(1);
         }
     }
 
@@ -1186,7 +1186,7 @@ public class InvRequest_EntryControllerLP_Food implements Initializable, ScreenI
 
         } catch (Exception e) {
             ShowMessageFX.Error(getStage(), e.getMessage(), "Error", psFormName);
-            System.exit(1);
+//            System.exit(1);
         }
     }
 

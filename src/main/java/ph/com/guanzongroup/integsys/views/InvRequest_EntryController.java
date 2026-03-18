@@ -53,6 +53,7 @@ import org.guanzon.appdriver.agent.ShowDialogFX;
 import org.guanzon.appdriver.agent.ShowMessageFX;
 import org.guanzon.appdriver.base.CommonUtils;
 import org.guanzon.appdriver.base.GuanzonException;
+import org.guanzon.appdriver.base.MiscUtil;
 import org.guanzon.appdriver.base.SQLUtil;
 import org.guanzon.appdriver.constant.EditMode;
 import org.guanzon.appdriver.constant.UserRight;
@@ -172,8 +173,9 @@ public class InvRequest_EntryController implements Initializable, ScreenInterfac
                     invRequestController.NewTransaction();
                     loadRecordSearch();
 
-                } catch (CloneNotSupportedException e) {
-                    ShowMessageFX.Warning((String) e.getMessage(), "Search Information", null);
+                } catch (CloneNotSupportedException ex) {
+                    Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+                    ShowMessageFX.Error(MiscUtil.getException(ex), psFormName, null);
                 }
             }));
             tblViewOrderDetails.addEventFilter(KeyEvent.KEY_PRESSED, this::tableKeyEvents);
@@ -194,7 +196,8 @@ public class InvRequest_EntryController implements Initializable, ScreenInterfac
             initFields(EditMode.UNKNOWN);
 
         } catch (ExceptionInInitializerError ex) {
-            Logger.getLogger(InvRequest_EntryControllerMC.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(MiscUtil.getException(ex), psFormName, null);
 
         }
     }
@@ -227,7 +230,8 @@ public class InvRequest_EntryController implements Initializable, ScreenInterfac
             lblSource.setText(invRequestController.Master().Company().getCompanyName());
 
         } catch (GuanzonException | SQLException ex) {
-            Logger.getLogger(InvRequest_EntryControllerMC.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(MiscUtil.getException(ex), psFormName, null);
         }
 
     }
@@ -495,9 +499,9 @@ public class InvRequest_EntryController implements Initializable, ScreenInterfac
                     }
                 });
             }
-        } catch (SQLException | GuanzonException e) {
-            ShowMessageFX.Error(getStage(), e.getMessage(), "Error", psFormName);
-            System.exit(1);
+        } catch (SQLException | GuanzonException ex) {
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(MiscUtil.getException(ex), psFormName, null);
         }
     }
 
@@ -676,7 +680,8 @@ public class InvRequest_EntryController implements Initializable, ScreenInterfac
                                 ShowMessageFX.Information((String) poJSON.get("message"), psFormName, null);
                             }
                         } catch (ParseException ex) {
-                            Logger.getLogger(InvRequest_EntryController.class.getName()).log(Level.SEVERE, null, ex);
+                            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+
                         }
                     }
                     Platform.runLater(() -> btnNew.fire());
@@ -737,9 +742,9 @@ public class InvRequest_EntryController implements Initializable, ScreenInterfac
             }
             initButtons(pnEditMode);
             initFields(pnEditMode);
-        } catch (CloneNotSupportedException | ExceptionInInitializerError | ParseException | SQLException | GuanzonException | NullPointerException e) {
-            ShowMessageFX.Error(getStage(), e.getMessage(), "Error", psFormName);
-            System.exit(1);
+        } catch (CloneNotSupportedException | ExceptionInInitializerError | ParseException | SQLException | GuanzonException | NullPointerException ex) {
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(MiscUtil.getException(ex), psFormName, null);
         }
     }
 
@@ -784,8 +789,8 @@ public class InvRequest_EntryController implements Initializable, ScreenInterfac
                     });
 
                 } catch (SQLException | GuanzonException ex) {
-                    Logger.getLogger(InvRequest_ConfirmationControllerMC.class
-                            .getName()).log(Level.SEVERE, null, ex);
+                    Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+                    ShowMessageFX.Error(MiscUtil.getException(ex), psFormName, null);
                 }
                 return null;
             }
@@ -890,7 +895,8 @@ public class InvRequest_EntryController implements Initializable, ScreenInterfac
                     return detailsList;
 
                 } catch (Exception ex) {
-                    Logger.getLogger(InvRequest_EntryControllerMC.class.getName()).log(Level.SEVERE, null, ex);
+                    Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+                    ShowMessageFX.Error(MiscUtil.getException(ex), psFormName, null);
                     return null;
                 }
             }
@@ -1216,9 +1222,9 @@ public class InvRequest_EntryController implements Initializable, ScreenInterfac
 
             }
 
-        } catch (Exception e) {
-            ShowMessageFX.Error(getStage(), e.getMessage(), "Error", psFormName);
-            System.exit(1);
+        } catch (Exception ex) {
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(MiscUtil.getException(ex), psFormName, null);
         }
     }
 

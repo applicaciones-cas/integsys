@@ -481,7 +481,7 @@ public class InvRequest_EntryControllerMonarch_Food implements Initializable, Sc
             }
         } catch (SQLException | GuanzonException e) {
             ShowMessageFX.Error(getStage(), e.getMessage(), "Error", psFormName);
-            System.exit(1);
+//            System.exit(1);
         }
     }
 
@@ -724,7 +724,7 @@ public class InvRequest_EntryControllerMonarch_Food implements Initializable, Sc
             initFields(pnEditMode);
         } catch (CloneNotSupportedException | ParseException | ExceptionInInitializerError | SQLException | GuanzonException | NullPointerException e) {
             ShowMessageFX.Error(getStage(), e.getMessage(), "Error", psFormName);
-            System.exit(1);
+//            System.exit(1);
         }
     }
 
@@ -1184,7 +1184,7 @@ public class InvRequest_EntryControllerMonarch_Food implements Initializable, Sc
 
         } catch (Exception e) {
             ShowMessageFX.Error(getStage(), e.getMessage(), "Error", psFormName);
-            System.exit(1);
+//            System.exit(1);
         }
     }
 

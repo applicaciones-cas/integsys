@@ -480,7 +480,7 @@ public class InvRequest_ConfirmationControllerCar_SP implements Initializable, S
             }
         } catch (SQLException | GuanzonException e) {
             ShowMessageFX.Error(getStage(), e.getMessage(), "Error", psFormName);
-            System.exit(1);
+//            System.exit(1);
         }
     }
 
@@ -718,7 +718,7 @@ public class InvRequest_ConfirmationControllerCar_SP implements Initializable, S
             initFields(pnEditMode);
         } catch (CloneNotSupportedException | ExceptionInInitializerError | SQLException | GuanzonException | NullPointerException e) {
             ShowMessageFX.Error(getStage(), e.getMessage(), "Error", psFormName);
-            System.exit(1);
+//            System.exit(1);
         }
     }
 
@@ -1067,7 +1067,7 @@ public class InvRequest_ConfirmationControllerCar_SP implements Initializable, S
 
         } catch (Exception e) {
             ShowMessageFX.Error(getStage(), e.getMessage(), "Error", psFormName);
-            System.exit(1);
+//            System.exit(1);
         }
     }
 

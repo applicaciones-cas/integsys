@@ -510,7 +510,7 @@ public class InvRequest_HistoryControllerMonarch_Food implements Initializable, 
 
         } catch (SQLException | GuanzonException e) {
             ShowMessageFX.Error(getStage(), e.getMessage(), "Error", psFormName);
-            System.exit(1);
+//            System.exit(1);
         }
     }
 
@@ -677,7 +677,7 @@ public class InvRequest_HistoryControllerMonarch_Food implements Initializable, 
             }
         } catch (SQLException | GuanzonException e) {
             ShowMessageFX.Error(getStage(), e.getMessage(), "Error", psFormName);
-            System.exit(1);
+//            System.exit(1);
         }
     }
 

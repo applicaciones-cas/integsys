@@ -497,7 +497,7 @@ public class InvRequest_EntryControllerAppliances implements Initializable, Scre
             }
         } catch (SQLException | GuanzonException e) {
             ShowMessageFX.Error(getStage(), e.getMessage(), "Error", psFormName);
-            System.exit(1);
+//            System.exit(1);
         }
     }
 
@@ -737,7 +737,7 @@ public class InvRequest_EntryControllerAppliances implements Initializable, Scre
             initFields(pnEditMode);
         } catch (CloneNotSupportedException | ExceptionInInitializerError | ParseException | SQLException | GuanzonException | NullPointerException e) {
             ShowMessageFX.Error(getStage(), e.getMessage(), "Error", psFormName);
-            System.exit(1);
+//            System.exit(1);
         }
     }
 
@@ -1255,7 +1255,7 @@ public class InvRequest_EntryControllerAppliances implements Initializable, Scre
 
         } catch (Exception e) {
             ShowMessageFX.Error(getStage(), e.getMessage(), "Error", psFormName);
-            System.exit(1);
+//            System.exit(1);
         }
     }
 

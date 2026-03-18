@@ -483,9 +483,9 @@ public class InvRequest_ConfirmationController implements Initializable, ScreenI
                 tfOrderQuantity.setText(lsOrderQuantity);
 
             }
-        } catch (SQLException | GuanzonException e) {
-            ShowMessageFX.Error(getStage(), e.getMessage(), "Error", psFormName);
-            System.exit(1);
+        } catch (SQLException | GuanzonException ex) {
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(MiscUtil.getException(ex), psFormName, null);
         }
     }
 
@@ -629,7 +629,7 @@ public class InvRequest_ConfirmationController implements Initializable, ScreenI
                                 ShowMessageFX.Information((String) poJSON.get("message"), psFormName, null);
                             }
                         } catch (ParseException ex) {
-                            Logger.getLogger(InvRequest_ConfirmationController.class.getName()).log(Level.SEVERE, null, ex);
+                            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
                         }
                     }
 
@@ -646,7 +646,7 @@ public class InvRequest_ConfirmationController implements Initializable, ScreenI
                             }
                             ShowMessageFX.Information((String) loJSON.get("message"), psFormName, null);
                         } catch (ParseException ex) {
-                            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+                            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
                         }
                     }
 
@@ -672,7 +672,7 @@ public class InvRequest_ConfirmationController implements Initializable, ScreenI
                             // Proceed to void the transaction
                             poJSON = invRequestController.VoidTransaction("Voided");
                         } catch (ParseException ex) {
-                            Logger.getLogger(InvRequest_ConfirmationControllerMC.class.getName()).log(Level.SEVERE, null, ex);
+                            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
                         }
                     }
 
