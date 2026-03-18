@@ -112,6 +112,7 @@ public class CashAdvance_ApprovalController implements Initializable, ScreenInte
             pnEditMode = EditMode.UNKNOWN;
             initButton(pnEditMode);
             Platform.runLater(() -> {
+                poController.setRecordStatus("1");
                 poController.getModel().setIndustryId(psIndustryId);
                 poController.getModel().setCompanyId(psCompanyId);
                 poController.setIndustryId(psIndustryId);

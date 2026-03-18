@@ -143,7 +143,6 @@ public class CashAdvance_EntryController implements Initializable, ScreenInterfa
                                 txtField.setText("");
                                 break;
                             } else {
-                                loadRecordMaster();
                                 JFXUtil.textFieldMoveNext(tfRequestingDepartment);
                             }
                             loadRecordMaster();
@@ -155,7 +154,6 @@ public class CashAdvance_EntryController implements Initializable, ScreenInterfa
                                 txtField.setText("");
                                 break;
                             } else {
-                                loadRecordMaster();
                                 JFXUtil.textFieldMoveNext(tfCashFund);
                             }
                             loadRecordMaster();
@@ -364,7 +362,7 @@ public class CashAdvance_EntryController implements Initializable, ScreenInterfa
                 String lsButton = clickedButton.getId();
                 switch (lsButton) {
                     case "btnBrowse":
-                        poController.getModel().setTransactionStatus(CashAdvanceStatus.OPEN);
+                        poController.setRecordStatus("0");
                         poJSON = poController.searchTransaction();
                         if ("error".equalsIgnoreCase((String) poJSON.get("result"))) {
                             ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));

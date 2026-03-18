@@ -112,6 +112,7 @@ public class CashAdvance_ConfirmationController implements Initializable, Screen
             pnEditMode = EditMode.UNKNOWN;
             initButton(pnEditMode);
             Platform.runLater(() -> {
+                poController.setRecordStatus("0");
                 poController.getModel().setIndustryId(psIndustryId);
                 poController.getModel().setCompanyId(psCompanyId);
                 poController.setIndustryId(psIndustryId);
