@@ -15,7 +15,6 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
-import javafx.scene.control.CheckBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
@@ -42,7 +41,7 @@ import ph.com.guanzongroup.integsys.utility.JFXUtil;
 
 /**
  *
- * @author Team 1 : Aldrich & Arsiela 02032026
+ * @author Team 1 : Aldrich & Arsiela 
  */
 public class CashAdvance_EntryController implements Initializable, ScreenInterface {
 
@@ -65,13 +64,11 @@ public class CashAdvance_EntryController implements Initializable, ScreenInterfa
     @FXML
     private Button btnBrowse, btnNew, btnUpdate, btnSearch, btnSave, btnCancel, btnVoid, btnHistory, btnClose;
     @FXML
-    private TextField tfTransactionNo, tfVoucherNo, tfPayee, tfCreditedTo, tfRequestingDepartment, tfAmountToAdvance, tfPettyCash;
+    private TextField tfTransactionNo, tfBranch, tfRequestingDepartment, tfCashFund, tfPayee, tfAmountToAdvance;
     @FXML
     private DatePicker dpAdvanceDate;
     @FXML
     private TextArea taRemarks;
-    @FXML
-    private CheckBox cbOtherPayee, cbOtherCreditedTo;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -140,11 +137,22 @@ public class CashAdvance_EntryController implements Initializable, ScreenInterfa
                     break;
                 case F3:
                     switch (lsID) {
+                        case "tfBranch":
+//                            poJSON = poController.searchBranch(lsValue, false);
+                            if ("error".equals(poJSON.get("result"))) {
+                                ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                                txtField.setText("");
+                                break;
+                            } else {
+                                JFXUtil.textFieldMoveNext(tfPayee);
+                            }
+                            loadRecordMaster();
+                            break;
                         case "tfPettyCash":
                             poJSON = poController.SearchPettyCash(lsValue, false);
                             if ("error".equals(poJSON.get("result"))) {
                                 ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-                                tfPettyCash.setText("");
+                                txtField.setText("");
                                 break;
                             } else {
                                 JFXUtil.textFieldMoveNext(tfPayee);
@@ -152,26 +160,26 @@ public class CashAdvance_EntryController implements Initializable, ScreenInterfa
                             loadRecordMaster();
                             break;
                         case "tfPayee":
-                            poJSON = poController.SearchPayee(lsValue, false, cbOtherPayee.isSelected());
+                            poJSON = poController.SearchPayee(lsValue, false, false);
                             if ("error".equals(poJSON.get("result"))) {
                                 ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                 tfPayee.setText("");
                                 break;
                             } else {
-                                JFXUtil.textFieldMoveNext(tfCreditedTo);
+                                JFXUtil.textFieldMoveNext(tfCashFund);
                             }
                             loadRecordMaster();
                             break;
-                        case "tfCreditedTo":
-                            poJSON = poController.SearchCreditedTo(lsValue, false, cbOtherCreditedTo.isSelected());
-                            if ("error".equals(poJSON.get("result"))) {
-                                ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-                                tfCreditedTo.setText("");
-                                break;
-                            } else {
-                                JFXUtil.textFieldMoveNext(tfRequestingDepartment);
-                            }
-                            loadRecordMaster();
+                        case "tfCashFund":
+//                            poJSON = poController.SearchCashFund(lsValue, false, cbOtherCreditedTo.isSelected());
+//                            if ("error".equals(poJSON.get("result"))) {
+//                                ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+//                                tfCreditedTo.setText("");
+//                                break;
+//                            } else {
+//                                JFXUtil.textFieldMoveNext(tfRequestingDepartment);
+//                            }
+//                            loadRecordMaster();
                             break;
                         case "tfRequestingDepartment":
                             poJSON = poController.SearchDepartment(lsValue, false);
@@ -198,6 +206,11 @@ public class CashAdvance_EntryController implements Initializable, ScreenInterfa
                 switch (lsID) {
                     case "tfVoucherNo":
                         poJSON = poController.Master().setVoucher(lsValue);
+                        break;
+                    case "tfBranch":
+                        if (lsValue.isEmpty()) {
+//                            poJSON = poController.Master().setClientId("");
+                        }
                         break;
                     case "tfPayee":
                         if (lsValue.isEmpty()) {
@@ -297,9 +310,10 @@ public class CashAdvance_EntryController implements Initializable, ScreenInterfa
             JFXUtil.setVerticalScroll(taRemarks);
         });
         JFXUtil.setFocusListener(txtArea_Focus, taRemarks);
-        JFXUtil.setFocusListener(txtMaster_Focus, tfVoucherNo, tfPayee, tfCreditedTo, tfRequestingDepartment, tfAmountToAdvance);
+        JFXUtil.setFocusListener(txtMaster_Focus, tfTransactionNo, tfBranch, tfRequestingDepartment, tfCashFund, tfPayee, tfAmountToAdvance);
 
         JFXUtil.setKeyPressedListener(this::txtField_KeyPressed, apMaster);
+
         JFXUtil.setCommaFormatter(tfAmountToAdvance);
     }
 
@@ -335,78 +349,19 @@ public class CashAdvance_EntryController implements Initializable, ScreenInterfa
             // Transaction Date
             String lsTransactionDate = CustomCommonUtil.formatDateToShortString(poController.Master().getTransactionDate());
             dpAdvanceDate.setValue(CustomCommonUtil.parseDateStringToLocalDate(lsTransactionDate, "yyyy-MM-dd"));
-
-            tfVoucherNo.setText(poController.Master().getVoucher());
-            tfPettyCash.setText(poController.Master().PettyCash().getPettyCashDescription());
-            tfPayee.setText(poController.Master().getPayeeName());
             tfRequestingDepartment.setText(poController.Master().Department().getDescription());
-            taRemarks.setText(poController.Master().getRemarks());
+
+            tfBranch.setText(poController.Master().Branch().getBranchName());
+//            tfCashFund.setText(poController.Master());
+
+            tfPayee.setText(poController.Master().getPayeeName());
             tfAmountToAdvance.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Master().getAdvanceAmount().doubleValue(), true));
-
-            boolean lbPayeeOthers = JFXUtil.isObjectEqualTo(poController.Master().getClientId(), null, "")
-                    && !JFXUtil.isObjectEqualTo(poController.Master().getPayeeName(), null, "") && pbContinue;
-            if (cbOtherPayee.isSelected() && JFXUtil.isObjectEqualTo(pnEditMode, EditMode.ADDNEW, EditMode.UPDATE)) {
-                if (lbPayeeOthers) {
-                    cbOtherPayee.setSelected(true);
-                }
-            } else {
-                cbOtherPayee.setSelected(lbPayeeOthers);
-            }
-
-            boolean lbCreditedTo = !JFXUtil.isObjectEqualTo(poController.Master().CreditedToOthers().getPayeeName(), null, "");
-            tfCreditedTo.setText(lbCreditedTo ? poController.Master().CreditedToOthers().getPayeeName() : poController.Master().Credited().getCompanyName());
-            if (cbOtherCreditedTo.isSelected() && JFXUtil.isObjectEqualTo(pnEditMode, EditMode.ADDNEW, EditMode.UPDATE)) {
-                if (lbCreditedTo && pbContinue) {
-                    cbOtherCreditedTo.setSelected(true);
-                }
-            } else {
-                if (pbContinue) {
-                    cbOtherCreditedTo.setSelected(lbCreditedTo);
-                }
-            }
+            taRemarks.setText(poController.Master().getRemarks());
 
             JFXUtil.updateCaretPositions(apMaster);
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
             ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
-        }
-    }
-    boolean pbContinue = true;
-
-    @FXML
-    private void cmdCheckBox_Click(ActionEvent event) {
-        poJSON = new JSONObject();
-        Object source = event.getSource();
-        if (source instanceof CheckBox) {
-            CheckBox checkedBox = (CheckBox) source;
-            switch (checkedBox.getId()) {
-                case "cbOtherPayee":
-                    if (!tfPayee.getText().isEmpty()) {
-                        String stat = checkedBox.isSelected() ? "check" : "uncheck";
-                        pbContinue = false; // inserted due to lost focus delay; edge case
-                        if (ShowMessageFX.YesNo(null, pxeModuleName, "Payee name is not empty, Are you sure you want to " + stat + " others?\n") == false) {
-                            checkedBox.setSelected(stat.equals("check") ? false : true);
-                            break;
-                        }
-                        poController.Master().setClientId("");
-                        poController.Master().setPayeeName("");
-                    }
-                    pbContinue = true;
-                    break;
-                case "cbOtherCreditedTo":
-                    if (!tfCreditedTo.getText().isEmpty()) {
-                        String stat = checkedBox.isSelected() ? "check" : "uncheck";
-                        pbContinue = false; // inserted due to lost focus delay; edge case
-                        if (ShowMessageFX.YesNo(null, pxeModuleName, "Credited To is not empty, Are you sure you want to " + stat + " others?\n") == false) {
-                            checkedBox.setSelected(stat.equals("check") ? false : true);
-                            break;
-                        }
-                        poController.Master().setCreditedTo("");
-                    }
-                    pbContinue = true;
-                    break;
-            }
-            loadRecordMaster();
         }
     }
 

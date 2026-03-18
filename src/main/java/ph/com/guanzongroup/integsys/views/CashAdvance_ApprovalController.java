@@ -21,7 +21,6 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
-import javafx.scene.control.CheckBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.Pagination;
@@ -52,9 +51,9 @@ import ph.com.guanzongroup.integsys.utility.JFXUtil;
 
 /**
  *
- * @author Team 1 : Aldrich & Arsiela 
+ * @author Team 1
  */
-public class CashAdvance_ConfirmationController implements Initializable, ScreenInterface {
+public class CashAdvance_ApprovalController implements Initializable, ScreenInterface {
 
     private GRiderCAS oApp;
     static CashAdvance poController;
@@ -81,11 +80,11 @@ public class CashAdvance_ConfirmationController implements Initializable, Screen
     @FXML
     private Label lblSource, lblStatus;
     @FXML
-    private TextField tfSearchPayee, tfSearchTransNo, tfTransactionNo, tfBranch, tfRequestingDepartment, tfCashFund, tfPayee, tfAmountToAdvance;
+    private TextField tfSearchIndustry, tfSearchBranch, tfSearchPayee, tfSearchTransNo, tfTransactionNo, tfBranch, tfRequestingDepartment, tfCashFund, tfPayee, tfAmountToAdvance;
     @FXML
     private HBox hbButtons, hboxid;
     @FXML
-    private Button btnUpdate, btnSearch, btnSave, btnCancel, btnConfirm, btnVoid, btnHistory, btnRetrieve, btnClose;
+    private Button btnConfirm, btnCancel, btnHistory, btnRetrieve, btnClose;
     @FXML
     private DatePicker dpAdvanceDate;
     @FXML
@@ -687,10 +686,10 @@ public class CashAdvance_ConfirmationController implements Initializable, Screen
         boolean lbShow4 = (fnValue == EditMode.UNKNOWN || fnValue == EditMode.READY);
         // Manage visibility and managed state of other buttons
         //Update 
-        JFXUtil.setButtonsVisibility(lbShow1, btnSearch, btnSave, btnCancel);
+        JFXUtil.setButtonsVisibility(lbShow1, btnCancel);
 
         //Ready
-        JFXUtil.setButtonsVisibility(lbShow3, btnUpdate, btnHistory, btnConfirm, btnVoid);
+        JFXUtil.setButtonsVisibility(lbShow3, btnHistory, btnConfirm);
 
         //Unkown || Ready
         JFXUtil.setDisabled(!lbShow1, apMaster);
@@ -703,7 +702,7 @@ public class CashAdvance_ConfirmationController implements Initializable, Screen
             case CashAdvanceStatus.RELEASED:
             case CashAdvanceStatus.VOID:
             case CashAdvanceStatus.CANCELLED:
-                JFXUtil.setButtonsVisibility(false, btnConfirm, btnUpdate, btnVoid);
+                JFXUtil.setButtonsVisibility(false, btnConfirm);
                 break;
         }
     }
