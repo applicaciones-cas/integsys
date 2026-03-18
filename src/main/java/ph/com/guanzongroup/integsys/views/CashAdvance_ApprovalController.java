@@ -665,10 +665,14 @@ public class CashAdvance_ApprovalController implements Initializable, ScreenInte
                     case "btnVoid":
                         poJSON = new JSONObject();
                         if (ShowMessageFX.YesNo(null, pxeModuleName, "Are you sure you want to void transaction?") == true) {
-                            if (CashAdvanceStatus.CONFIRMED.equals(poController.getModel().getTransactionStatus())) {
-                                poJSON = poController.CancelTransaction();
-                            } else {
-                                poJSON = poController.VoidTransaction();
+                            switch (poController.getModel().getTransactionStatus()) {
+                                case CashAdvanceStatus.APPROVED:
+                                case CashAdvanceStatus.CONFIRMED:
+                                    poJSON = poController.CancelTransaction();
+                                    break;
+                                default:
+                                    poJSON = poController.VoidTransaction();
+                                    break;
                             }
                             if ("error".equals((String) poJSON.get("result"))) {
                                 ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
