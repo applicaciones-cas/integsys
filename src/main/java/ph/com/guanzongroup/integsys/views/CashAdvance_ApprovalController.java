@@ -718,7 +718,7 @@ public class CashAdvance_ApprovalController implements Initializable, ScreenInte
         JFXUtil.setButtonsVisibility(lbShow3, btnHistory, btnApprove, btnDisapprove);
 
         //Unkown || Ready
-        JFXUtil.setDisabled(false, apMaster);
+        JFXUtil.setDisabled(true, apMaster);
         JFXUtil.setButtonsVisibility(lbShow4, btnClose);
 
         if (fnValue != EditMode.READY) {
