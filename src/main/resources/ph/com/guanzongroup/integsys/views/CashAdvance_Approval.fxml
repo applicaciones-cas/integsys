@@ -297,7 +297,7 @@
                                                       <TableColumn fx:id="tblTransNo" editable="false" maxWidth="120.0" minWidth="120.0" prefWidth="120.0" resizable="false" sortable="false" style="-fx-font-size: 12;" text="Trans No" />
                                                                   <TableColumn fx:id="tblDate" editable="false" maxWidth="117.0" minWidth="117.0" prefWidth="117.0" resizable="false" sortable="false" style="-fx-font-size: 12;" text="Date" />
                                                                   <TableColumn fx:id="tblPayee" editable="false" maxWidth="160.0" minWidth="160.0" prefWidth="160.0" resizable="false" sortable="false" style="-fx-font-size: 12;" text="Payee" />
-                                                      <TableColumn fx:id="tblRequestingDepartment" editable="false" maxWidth="180.0" minWidth="180.0" prefWidth="180.0" resizable="false" sortable="false" style="-fx-font-size: 12;" text="Req. Dept." />
+                                                      <TableColumn fx:id="tblRequestingDepartment" editable="false" maxWidth="230.0" minWidth="230.0" prefWidth="230.0" resizable="false" sortable="false" style="-fx-font-size: 12;" text="Req. Dept." />
                                                               </columns>
                                                               <GridPane.margin>
                                                                   <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
