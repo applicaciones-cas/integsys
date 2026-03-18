@@ -718,16 +718,18 @@ public class CashAdvance_ApprovalController implements Initializable, ScreenInte
         JFXUtil.setButtonsVisibility(lbShow3, btnHistory, btnApprove, btnDisapprove);
 
         //Unkown || Ready
-        JFXUtil.setDisabled(false, apMaster);
+        JFXUtil.setDisabled(true, apMaster);
         JFXUtil.setButtonsVisibility(lbShow4, btnClose);
 
         if (fnValue != EditMode.READY) {
             return;
         }
         switch (poController.getModel().getTransactionStatus()) {
+            case CashAdvanceStatus.APPROVED:
+                JFXUtil.setButtonsVisibility(false, btnApprove, btnDisapprove);
             case CashAdvanceStatus.VOID:
             case CashAdvanceStatus.CANCELLED:
-                JFXUtil.setButtonsVisibility(false, btnApprove);
+                JFXUtil.setButtonsVisibility(false, btnApprove, btnDisapprove);
                 break;
         }
     }
