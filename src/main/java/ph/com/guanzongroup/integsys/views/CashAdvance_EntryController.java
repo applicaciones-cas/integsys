@@ -143,6 +143,7 @@ public class CashAdvance_EntryController implements Initializable, ScreenInterfa
                                 txtField.setText("");
                                 break;
                             } else {
+                                loadRecordMaster();
                                 JFXUtil.textFieldMoveNext(tfRequestingDepartment);
                             }
                             loadRecordMaster();
@@ -154,6 +155,7 @@ public class CashAdvance_EntryController implements Initializable, ScreenInterfa
                                 txtField.setText("");
                                 break;
                             } else {
+                                loadRecordMaster();
                                 JFXUtil.textFieldMoveNext(tfCashFund);
                             }
                             loadRecordMaster();
