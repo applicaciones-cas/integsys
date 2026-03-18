@@ -124,7 +124,7 @@ public class CheckPrintRequest_ConfirmationController implements Initializable, 
     @FXML
     private HBox hbButtons;
     @FXML
-    private Button btnUpdate, btnSave, btnCancel, btnConfirm, btnVoid, btnExport, btnRetrieve, btnHistory, btnClose;
+    private Button btnUpdate, btnSave, btnCancel, btnConfirm, btnVoid, btnExport, btnRetrieve, btnHistory, btnClose,btnRemoveDetail;
     /*Master*/
     @FXML
     private AnchorPane apMaster;
@@ -185,22 +185,28 @@ public class CheckPrintRequest_ConfirmationController implements Initializable, 
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        poCheckPrintingRequestController = new CashflowControllers(oApp, null).CheckPrintingRequest();
-        poCheckPrintingRequestController.setTransactionStatus(CheckPrintRequestStatus.OPEN + CheckPrintRequestStatus.CONFIRMED);
-        poJSON = new JSONObject();
-        poCheckPrintingRequestController.setWithUI(true);
-        poJSON = poCheckPrintingRequestController.InitTransaction(); // Initialize transaction
-        if (!"success".equals((String) poJSON.get("result"))) {
-            ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+        try {
+            poCheckPrintingRequestController = new CashflowControllers(oApp, null).CheckPrintingRequest();
+            poCheckPrintingRequestController.setTransactionStatus(CheckPrintRequestStatus.OPEN + CheckPrintRequestStatus.CONFIRMED);
+            poJSON = new JSONObject();
+            poCheckPrintingRequestController.setWithUI(true);
+            poJSON = poCheckPrintingRequestController.InitTransaction(); // Initialize transaction
+            if (!"success".equals((String) poJSON.get("result"))) {
+                ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+            }
+            initAll();
+            Platform.runLater(() -> {
+                poCheckPrintingRequestController.Master().setIndustryID(psIndustryId);
+                poCheckPrintingRequestController.Master().setCompanyID(psCompanyId);
+                poCheckPrintingRequestController.setIndustryID(psIndustryId);
+                poCheckPrintingRequestController.setCompanyID(psCompanyId);
+                loadRecordSearch();
+            });
+        } catch (SQLException ex) {
+            Logger.getLogger(CheckPrintRequest_ConfirmationController.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (GuanzonException ex) {
+            Logger.getLogger(CheckPrintRequest_ConfirmationController.class.getName()).log(Level.SEVERE, null, ex);
         }
-        initAll();
-        Platform.runLater(() -> {
-            poCheckPrintingRequestController.Master().setIndustryID(psIndustryId);
-            poCheckPrintingRequestController.Master().setCompanyID(psCompanyId);
-            poCheckPrintingRequestController.setIndustryID(psIndustryId);
-            poCheckPrintingRequestController.setCompanyID(psCompanyId);
-            loadRecordSearch();
-        });
     }
 
     private void initAll() {
@@ -229,7 +235,7 @@ public class CheckPrintRequest_ConfirmationController implements Initializable, 
     }
 
     private void initButtonsClickActions() {
-        List<Button> buttons = Arrays.asList(btnUpdate, btnSave, btnCancel, btnConfirm, btnVoid, btnExport, btnRetrieve, btnHistory, btnClose);
+        List<Button> buttons = Arrays.asList(btnUpdate, btnSave, btnCancel, btnConfirm, btnVoid, btnExport, btnRetrieve, btnHistory, btnClose,btnRemoveDetail);
         buttons.forEach(button -> button.setOnAction(this::cmdButton_Click));
     }
 
@@ -306,6 +312,22 @@ public class CheckPrintRequest_ConfirmationController implements Initializable, 
                 case "btnRetrieve":
                     loadTableMain();
                     break;
+                case "btnRemoveDetail":
+                    if(poCheckPrintingRequestController.Master().getTransactionStatus() == CheckPrintRequestStatus.CONFIRMED){
+                        ShowMessageFX.Warning("Details cannot be removed.\n The record is already confirmed.", pxeModuleName, null);
+                        return;
+                    }
+                    if(poCheckPrintingRequestController.Master().isUploaded()){
+                        ShowMessageFX.Warning("Details cannot be removed.\n The record has already been uploaded.", pxeModuleName, null);
+                        return;
+                    }
+                     if(poCheckPrintingRequestController.Detail(pnDetail).getSourceNo() != null 
+                             || !poCheckPrintingRequestController.Detail(pnDetail).getSourceNo().isEmpty()){
+                            poCheckPrintingRequestController.addTransactionNoToRemove(poCheckPrintingRequestController.Detail(pnDetail).getSourceNo());
+                            poCheckPrintingRequestController.Detail().remove(pnDetail);
+                            loadTableDetail();
+                     }
+                    break;
                 case "btnConfirm":
                     if (ShowMessageFX.YesNo(null, pxeModuleName, "Are you sure you want to confirm transaction?")) {
                         poJSON = poCheckPrintingRequestController.ConfirmTransaction("");
@@ -313,10 +335,8 @@ public class CheckPrintRequest_ConfirmationController implements Initializable, 
                             ShowMessageFX.Warning((String) poJSON.get("message"), pxeModuleName, null);
                             return;
                         } else {
-                            ShowMessageFX.Information((String) poJSON.get("message"), pxeModuleName, null);
-                            JFXUtil.disableAllHighlightByColor(tblVwMain, "#A7C7E7", highlightedRowsMain);
-                            plOrderNoPartial.add(new Pair<>(poCheckPrintingRequestController.Master().getTransactionNo(), "1"));
-                            showRetainedHighlight(true);
+                            ShowMessageFX.Information(null, pxeModuleName, (String) poJSON.get("message"));
+                            JFXUtil.highlightByKey(tblVwMain, String.valueOf(pnMain + 1), "#C1E1C1", highlightedRowsMain);
                         }
                     } else {
                         return;
@@ -346,6 +366,10 @@ public class CheckPrintRequest_ConfirmationController implements Initializable, 
                     }
                     break;
                 case "btnExport":
+                    if(!poCheckPrintingRequestController.Master().getTransactionStatus().equals(CheckPrintRequestStatus.CONFIRMED)){
+                        ShowMessageFX.Warning("Unable to export transaction.\n Please Confrim the transaction before proceeding.", pxeModuleName, null);
+                        return;
+                    }
                     if (ShowMessageFX.YesNo("Are you sure you want to export this transaction?", "Exporting", null)) {
                         poJSON = poCheckPrintingRequestController.ExportTransaction(poCheckPrintingRequestController.Master().getTransactionNo());
                         if ("error".equals((String) poJSON.get("result"))) {
@@ -418,6 +442,7 @@ public class CheckPrintRequest_ConfirmationController implements Initializable, 
             protected Void call() throws Exception {
                 Thread.sleep(100);
                 Platform.runLater(() -> {
+                    JFXUtil.disableAllHighlight(tblVwMain, highlightedRowsMain);
                     try {
                         main_data.clear();
                         plOrderNoFinal.clear();
@@ -434,6 +459,10 @@ public class CheckPrintRequest_ConfirmationController implements Initializable, 
                                     ));
                                     if (poCheckPrintingRequestController.Master().getTransactionStatus().equals(CheckPrintRequestStatus.CONFIRMED)) {
                                         plOrderNoPartial.add(new Pair<>(poCheckPrintingRequestController.poCheckPrinting(lnCntr).getTransactionNo(), "1"));
+                                    }
+                                    
+                                    if (poCheckPrintingRequestController.Master().getTransactionStatus().equals(CheckPrintRequestStatus.CONFIRMED)) {
+                                        JFXUtil.highlightByKey(tblVwMain, String.valueOf(lnCntr + 1), "#C1E1C1", highlightedRowsMain);
                                     }
                                 }
                             }
@@ -569,13 +598,14 @@ public class CheckPrintRequest_ConfirmationController implements Initializable, 
                 pnMain = pnRowMain;
                 String lsTransactionNo = selected.getIndex04();
                 clearFields();
+                JFXUtil.disableAllHighlightByColor(tblVwMain, "#A7C7E7", highlightedRowsMain);
+                JFXUtil.highlightByKey(tblVwMain, String.valueOf(pnRowMain + 1), "#A7C7E7", highlightedRowsMain);
                 poJSON = poCheckPrintingRequestController.OpenTransaction(lsTransactionNo);
                 if ("error".equals(poJSON.get("result"))) {
                     ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                     return;
                 }
 //                JFXUtil.disableAllHighlightByColor(tblVwMain, "#A7C7E7", highlightedRowsMain);
-                JFXUtil.highlightByKey(tblVwMain, lsTransactionNo, "#A7C7E7", highlightedRowsMain);
                 pnEditMode = poCheckPrintingRequestController.getEditMode();
                 loadTableDetail();
                 loadRecordDetail();
@@ -706,19 +736,19 @@ public class CheckPrintRequest_ConfirmationController implements Initializable, 
                     setStyle("");
                 } else {
                     String key = item.getIndex04();
-                    if (highlightedRowsMain.containsKey(key)) {
-                        List<String> colors = highlightedRowsMain.get(key);
-                        if (!colors.isEmpty()) {
-                            setStyle("-fx-background-color: " + colors.get(colors.size() - 1) + ";"); // Apply latest color
-                        }
-                    } else {
-                        setStyle(""); // Default style
-                    }
+//                    if (highlightedRowsMain.containsKey(key)) {
+//                        List<String> colors = highlightedRowsMain.get(key);
+//                        if (!colors.isEmpty()) {
+//                            setStyle("-fx-background-color: " + colors.get(colors.size() - 1) + ";"); // Apply latest color
+//                        }
+//                    } else {
+//                        setStyle(""); // Default style
+//                    }
                 }
             }
         }
         );
-
+        JFXUtil.applyRowHighlighting(tblVwMain, item -> ((ModelDisbursementVoucher_Main) item).getIndex01(), highlightedRowsMain);
         tblVwDetail.addEventFilter(KeyEvent.KEY_PRESSED, this::tableKeyEvents);
         JFXUtil.adjustColumnForScrollbar(tblVwMain, tblVwDetail);
     }
@@ -874,7 +904,7 @@ public class CheckPrintRequest_ConfirmationController implements Initializable, 
     private void initButton(int fnEditMode) {
         boolean lbShow = (pnEditMode == EditMode.UPDATE);
         JFXUtil.setButtonsVisibility(!lbShow, btnClose);
-        JFXUtil.setButtonsVisibility(lbShow, btnSave, btnCancel);
+        JFXUtil.setButtonsVisibility(lbShow, btnSave, btnCancel,btnRemoveDetail);
         JFXUtil.setButtonsVisibility(false, btnUpdate, btnVoid, btnConfirm, btnExport);
         JFXUtil.setButtonsVisibility(fnEditMode != EditMode.ADDNEW && fnEditMode != EditMode.UNKNOWN, btnHistory);
         if (poCheckPrintingRequestController.Master().isUploaded()) {

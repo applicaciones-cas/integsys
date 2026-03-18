@@ -115,7 +115,7 @@ public class PaymentRequest_HistoryController implements Initializable, ScreenIn
     @FXML
     private Label lblSource, lblStatus;
     @FXML
-    private TextField  tfAdvances, tfSearchPayee, tfTransactionNo, tfBranch, tfDepartment, tfPayee, tfSeriesNo, tfTotalAmount, tfDiscountAmount, tfNetAmount, tfSourceNo, tfRecurringNo, tfBranchDetail, tfAccountNo, tfEmployee, tfParticular, tfAmount, tfDiscRate, tfDiscAmountDetail, tfAmountDetail, tfAttachmentNo;
+    private TextField tfSourceTranTotal, tfAdvances, tfSearchPayee, tfTransactionNo, tfBranch, tfDepartment, tfPayee, tfSeriesNo, tfTotalAmount, tfDiscountAmount, tfNetAmount, tfSourceNo, tfRecurringNo, tfBranchDetail, tfAccountNo, tfEmployee, tfParticular, tfAmount, tfDiscRate, tfDiscAmountDetail, tfAmountDetail, tfAttachmentNo;
     @FXML
     private HBox hbButtons;
     @FXML
@@ -240,6 +240,7 @@ public class PaymentRequest_HistoryController implements Initializable, ScreenIn
         initCheckBoxActions();
         initTextFieldPattern();
         initTableDetail();
+        initAttachmentsGrid();
         initAttachmentPreviewPane();
         initStackPaneListener();
         initComboBoxes();
@@ -275,6 +276,8 @@ public class PaymentRequest_HistoryController implements Initializable, ScreenIn
             taRemarks.setText(poGLControllers.PaymentRequest().Master().getRemarks());
             tfAdvances.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poGLControllers.PaymentRequest().Master().PurchaseOrder().getAmountPaid(), true));
             tfSourceNo.setText(poGLControllers.PaymentRequest().Master().getSourceNo());
+
+            tfSourceTranTotal.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poGLControllers.PaymentRequest().Master().PurchaseOrder().getTranTotal(), true));
         } catch (SQLException | GuanzonException | NullPointerException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
         }
@@ -637,19 +640,9 @@ public class PaymentRequest_HistoryController implements Initializable, ScreenIn
 
     public void initAttachmentsGrid() {
         /*FOCUS ON FIRST ROW*/
-        tblRowNoAttachment.setStyle("-fx-alignment: CENTER;-fx-padding: 0 5 0 5;");
-        tblFileNameAttachment.setStyle("-fx-alignment: CENTER;-fx-padding: 0 5 0 5;");
-
-        tblRowNoAttachment.setCellValueFactory(new PropertyValueFactory<>("index01"));
-        tblFileNameAttachment.setCellValueFactory(new PropertyValueFactory<>("index02"));
-
-        tblAttachments.widthProperty().addListener((ObservableValue<? extends Number> source, Number oldWidth, Number newWidth) -> {
-            TableHeaderRow header = (TableHeaderRow) tblAttachments.lookup("TableHeaderRow");
-            header.reorderingProperty().addListener((ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) -> {
-                header.setReordering(false);
-            });
-        });
-
+        JFXUtil.setColumnCenter(tblRowNoAttachment);
+        JFXUtil.setColumnLeft(tblFileNameAttachment);
+        JFXUtil.setColumnsIndexAndDisableReordering(tblAttachments);
         tblAttachments.setItems(attachment_data);
 
         if (pnAttachment < 0 || pnAttachment >= attachment_data.size()) {
@@ -966,7 +959,7 @@ public class PaymentRequest_HistoryController implements Initializable, ScreenIn
 //        tblVATable.setCellValueFactory(new PropertyValueFactory<>("index07"));
         tbTotalAmount.setCellValueFactory(new PropertyValueFactory<>("index09"));
         // Prevent column reordering
-        tblVwPRDetail.widthProperty().addListener((ObservableValue<? extends Number> source, Number oldWidth, Number newWidth) -> {
+        tblVwPRDetail.widthProperty().addListener((ObservableValue<? extends Number> msource, Number oldWidth, Number newWidth) -> {
             TableHeaderRow header = (TableHeaderRow) tblVwPRDetail.lookup("TableHeaderRow");
             if (header != null) {
                 header.reorderingProperty().addListener((ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) -> {
@@ -1008,8 +1001,8 @@ public class PaymentRequest_HistoryController implements Initializable, ScreenIn
                 if (newValue.isEmpty()) {
 //                    try {
 //                        poGLControllers.PaymentRequest().Master().setPayeeID("");
-                        prevPayee = "";
-                        tfSearchPayee.setText("");
+                    prevPayee = "";
+                    tfSearchPayee.setText("");
 //                    } catch (SQLException | GuanzonException ex) {
 //                        Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
 //                    }

@@ -126,7 +126,7 @@ public class CheckPrintRequest_EntryController implements Initializable, ScreenI
     @FXML
     private HBox hbButtons;
     @FXML
-    private Button btnBrowse, btnNew, btnUpdate, btnSave, btnCancel, btnExport, btnRetrieve, btnHistory, btnClose;
+    private Button btnBrowse, btnNew, btnUpdate, btnSave, btnCancel, btnExport, btnRetrieve, btnHistory, btnClose,btnRemoveDetail;
     /*Master*/
     @FXML
     private AnchorPane apMaster;
@@ -187,22 +187,26 @@ public class CheckPrintRequest_EntryController implements Initializable, ScreenI
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        poCheckPrintingRequestController = new CashflowControllers(oApp, null).CheckPrintingRequest();
-        poJSON = new JSONObject();
-        poJSON = poCheckPrintingRequestController.InitTransaction(); // Initialize transaction
-        if (!"success".equals((String) poJSON.get("result"))) {
-            ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+        try {
+            poCheckPrintingRequestController = new CashflowControllers(oApp, null).CheckPrintingRequest();
+            poJSON = new JSONObject();
+            poJSON = poCheckPrintingRequestController.InitTransaction(); // Initialize transaction
+            if (!"success".equals((String) poJSON.get("result"))) {
+                ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+            }
+            initAll();
+            Platform.runLater(() -> {
+                poCheckPrintingRequestController.Master().setIndustryID(psIndustryId);
+                poCheckPrintingRequestController.Master().setCompanyID(psCompanyId);
+                poCheckPrintingRequestController.setIndustryID(psIndustryId);
+                poCheckPrintingRequestController.setCompanyID(psCompanyId);
+                poCheckPrintingRequestController.Master().setBranchCode(oApp.getBranchCode());
+                loadRecordSearch();
+                btnNew.fire();
+            });
+        } catch (SQLException | GuanzonException ex) {
+            Logger.getLogger(CheckPrintRequest_EntryController.class.getName()).log(Level.SEVERE, null, ex);
         }
-        initAll();
-        Platform.runLater(() -> {
-            poCheckPrintingRequestController.Master().setIndustryID(psIndustryId);
-            poCheckPrintingRequestController.Master().setCompanyID(psCompanyId);
-            poCheckPrintingRequestController.setIndustryID(psIndustryId);
-            poCheckPrintingRequestController.setCompanyID(psCompanyId);
-            poCheckPrintingRequestController.Master().setBranchCode(oApp.getBranchCode());
-            loadRecordSearch();
-            btnNew.fire();
-        });
     }
 
     private void initAll() {
@@ -230,7 +234,7 @@ public class CheckPrintRequest_EntryController implements Initializable, ScreenI
     }
 
     private void initButtonsClickActions() {
-        List<Button> buttons = Arrays.asList(btnBrowse, btnNew, btnUpdate, btnSave, btnCancel, btnRetrieve, btnHistory, btnClose, btnExport);
+        List<Button> buttons = Arrays.asList(btnBrowse, btnNew, btnUpdate, btnSave, btnCancel, btnRetrieve, btnHistory, btnClose, btnExport,btnRemoveDetail);
         buttons.forEach(button -> button.setOnAction(this::cmdButton_Click));
     }
 
@@ -340,6 +344,25 @@ public class CheckPrintRequest_EntryController implements Initializable, ScreenI
                         ShowMessageFX.Error(MiscUtil.getException(ex), pxeModuleName, null);
                     }
                     break;
+                 case "btnRemoveDetail":
+                     if(poCheckPrintingRequestController.Master().getTransactionStatus() == CheckPrintRequestStatus.CONFIRMED){
+                        ShowMessageFX.Warning("Details cannot be removed.\n The record is already confirmed.", pxeModuleName, null);
+                        return;
+                    }
+                    if(poCheckPrintingRequestController.Master().isUploaded()){
+                        ShowMessageFX.Warning("Details cannot be removed.\n The record has already been uploaded.", pxeModuleName, null);
+                        return;
+                    }
+                     if(poCheckPrintingRequestController.Detail(pnDetail).getSourceNo() != null 
+                             || !poCheckPrintingRequestController.Detail(pnDetail).getSourceNo().isEmpty()){
+//                            poCheckPrintingRequestController.Detail(pnDetail).CheckPayments().setProcessed(CheckPrintRequestStatus.OPEN);
+//                            poCheckPrintingRequestController.Detail().remove(pnDetail);
+                            poCheckPrintingRequestController.addTransactionNoToRemove(poCheckPrintingRequestController.Detail(pnDetail).getSourceNo());
+//                            poCheckPrintingRequestController.Detail().remove(pnDetail);
+                             poCheckPrintingRequestController.deleteDetail(pnDetail);
+                            loadTableDetail();
+                     }
+                    break;
                 case "btnRetrieve":
                     loadTableMain();
                     break;
@@ -380,8 +403,10 @@ public class CheckPrintRequest_EntryController implements Initializable, ScreenI
             initButton(pnEditMode);
         } catch (CloneNotSupportedException | SQLException | GuanzonException ex) {
             Logger.getLogger(CheckPrintRequest_EntryController.class.getName()).log(Level.SEVERE, null, ex);
+            ShowMessageFX.Error(ex.getMessage(), psIndustryId, null);
         } catch (ParseException ex) {
-            Logger.getLogger(CheckPrintRequest_EntryController.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(CheckPrintRequest_EntryController.class.getName()).log(Level.SEVERE, null, ex);            
+            ShowMessageFX.Error(ex.getMessage(), psIndustryId, null);
         }
     }
 
@@ -492,89 +517,6 @@ public class CheckPrintRequest_EntryController implements Initializable, ScreenI
         new Thread(task).start();
     }
 
-//    private void loadTableMain() {
-//        ProgressIndicator progressIndicator = new ProgressIndicator();
-//        progressIndicator.setMaxHeight(50);
-//        progressIndicator.setStyle("-fx-progress-color: #FF8201;");
-//        StackPane loadingPane = new StackPane(progressIndicator);
-//        loadingPane.setAlignment(Pos.CENTER);
-//        tblVwMain.setPlaceholder(loadingPane);
-//        progressIndicator.setVisible(true);
-//
-//        poJSON = new JSONObject();
-//
-//        Task<Void> task = new Task<Void>() {
-//            @Override
-//            protected Void call() throws Exception {
-//                Thread.sleep(100);
-//                Platform.runLater(() -> {
-//                    try {
-//                        main_data.clear();
-//                        poJSON = poCheckPrintingRequestController.getDVwithAuthorizeCheckPayment(psSearchBankID, psSearchBankAccountID);
-//                        if ("success".equals(poJSON.get("result"))) {
-//                            
-//                            for (int lnCntr = 0; lnCntr < poCheckPrintingRequestController.getCheckPaymentCount(); lnCntr++) {
-//                                if (poCheckPrintingRequestController.getCheckCount()> 0) {
-//                                    main_data.add(new ModelTableMain(
-//                                            String.valueOf(lnCntr + 1),
-//                                            poCheckPrintingRequestController.CheckPayments(lnCntr).Branch().getBranchName(),
-//                                            poCheckPrintingRequestController.CheckPayments(lnCntr).Banks().getBankName(),
-//                                            poCheckPrintingRequestController.CheckPayments(lnCntr).Bank_Account_Master().getAccountNo(),
-//                                            CustomCommonUtil.formatDateToShortString(poCheckPrintingRequestController.CheckPayments(lnCntr).getTransactionDate()),
-//                                            poCheckPrintingRequestController.CheckPayments(lnCntr).getSourceNo(),
-//                                            "","","",""
-//                                    ));
-//                                }
-//                            }
-//                        }
-//                        Platform.runLater(() -> {
-//                            if (main_data.isEmpty()) {
-//                                tblVwMain.setPlaceholder(new Label("NO RECORD TO LOAD"));
-//                            }
-//                           tblVwMain.setItems(FXCollections.observableArrayList(main_data));
-//                            JFXUtil.loadTab(pagination, main_data.size(), ROWS_PER_PAGE, tblVwMain, filteredMain_Data);
-//                        });
-//                    } catch (SQLException | GuanzonException ex) {
-//                        Logger.getLogger(CheckPrintRequest_EntryController.class.getName()).log(Level.SEVERE, null, ex);
-//                    }
-//
-//                });
-//                return null;
-//            }
-//
-//            @Override
-//            protected void succeeded() {
-//                progressIndicator.setVisible(false);
-//                btnRetrieve.setDisable(false);
-//               
-//                if (main_data == null || main_data.isEmpty()) {
-//                    tblVwMain.setPlaceholder(new Label("NO RECORD TO LOAD"));
-//                    pagination.setManaged(false);
-//                    pagination.setVisible(false);
-//                } else {
-//                    pagination.setPageCount(0);
-//                    pagination.setVisible(true);
-//                    pagination.setManaged(true);
-//                    progressIndicator.setVisible(false);
-//                    progressIndicator.setManaged(false);
-//                    tblVwMain.toFront();
-//                }
-//                
-//            }
-//
-//            @Override
-//            protected void failed() {
-//                progressIndicator.setVisible(false);
-//                btnRetrieve.setDisable(false);
-//                if (main_data == null || main_data.isEmpty()) {
-//                    tblVwMain.setPlaceholder(new Label("NO RECORD TO LOAD"));
-//                    pagination.setManaged(false);
-//                    pagination.setVisible(false);
-//                }
-//            }
-//        };
-//        new Thread(task).start(); // Run task in background
-//    }
 
     private void initTableMain() {
         tblRowNo.setCellValueFactory(new PropertyValueFactory<>("index01"));
@@ -1133,7 +1075,7 @@ public class CheckPrintRequest_EntryController implements Initializable, ScreenI
     private void initButton(int fnEditMode) {
         boolean lbShow = (fnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE);
         JFXUtil.setButtonsVisibility(!lbShow, btnBrowse, btnClose, btnNew);
-        JFXUtil.setButtonsVisibility(lbShow, btnSave, btnCancel);
+        JFXUtil.setButtonsVisibility(lbShow, btnSave, btnCancel,btnRemoveDetail);
         JFXUtil.setButtonsVisibility(false, btnUpdate, btnExport);
         JFXUtil.setButtonsVisibility(fnEditMode != EditMode.ADDNEW && fnEditMode != EditMode.UNKNOWN, btnHistory);
         if (poCheckPrintingRequestController.Master().isUploaded()) {

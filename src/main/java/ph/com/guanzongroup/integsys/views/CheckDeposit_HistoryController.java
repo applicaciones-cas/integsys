@@ -27,7 +27,6 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressIndicator;
-import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
@@ -54,6 +53,7 @@ import org.guanzon.appdriver.constant.UserRight;
 import org.json.simple.JSONObject;
 import ph.com.guanzongroup.cas.cashflow.status.CheckTransferStatus;
 import ph.com.guanzongroup.cas.cashflow.services.CashflowControllers;
+import ph.com.guanzongroup.cas.cashflow.status.CheckDepositStatus;
 import ph.com.guanzongroup.integsys.model.ModelTableDetail;
 import ph.com.guanzongroup.integsys.model.ModelTableMain;
 import ph.com.guanzongroup.integsys.utility.CustomCommonUtil;
@@ -264,19 +264,29 @@ public class CheckDeposit_HistoryController implements Initializable, ScreenInte
                 case "btnPost":
                     if (poGLControllers.CheckDeposits().Master().getTransactionNo() == null
                             || poGLControllers.CheckDeposits().Master().getTransactionNo().isEmpty()) {
-
                         ShowMessageFX.Warning("No transaction selected.", psFormName, null);
                         return;
                     }
-
-                    if (!poGLControllers.CheckDeposits().Master().getTransactionStatus().equals(CheckTransferStatus.CONFIRMED)
-                            || !poGLControllers.CheckDeposits().Master().getPrintStatus().equals(CheckTransferStatus.CONFIRMED)) {
-
-                        ShowMessageFX.Warning(
-                                "Posting is not allowed. Please confirm and print the transaction before proceeding.",
+                    
+                    if (poGLControllers.CheckDeposits().Master().getTransactionStatus().equals(CheckDepositStatus.POSTED)){
+                         ShowMessageFX.Warning("Transaction is already posted",psFormName, null);
+                         return ;
+                    }
+                    if (!poGLControllers.CheckDeposits().Master().getTransactionStatus().equals(CheckDepositStatus.CONFIRMED)){
+                         ShowMessageFX.Warning("Posting is not allowed. Please confirm  the transaction before proceeding.",psFormName, null);
+                         return ;
+                    }
+                    if(poGLControllers.CheckDeposits().Master().getTransactionStatus().equals(CheckDepositStatus.VOID)){
+                     ShowMessageFX.Warning(
+                                "Transaction already voided.\n Posting of this transaction is not allowed.",
                                 psFormName, null
                         );
+                        
                         return;
+                    }
+                    if (!poGLControllers.CheckDeposits().Master().getPrintStatus().equals(CheckDepositStatus.CONFIRMED)){
+                         ShowMessageFX.Warning("Posting is not allowed. Please print transaction before proceeding.",psFormName, null);
+                         return ;
                     }
 
                     poJSON = poGLControllers.CheckDeposits().PostTransaction("");
@@ -302,6 +312,7 @@ public class CheckDeposit_HistoryController implements Initializable, ScreenInte
 //            initFields(pnEditMode);
         } catch (CloneNotSupportedException | SQLException | GuanzonException ex) {
             Logger.getLogger(TBJ_ParameterController.class.getName()).log(Level.SEVERE, null, ex);
+            ShowMessageFX.Error(ex.getMessage(), psFormName, null);
         }
     }
     private void initFields() {
@@ -376,10 +387,9 @@ public class CheckDeposit_HistoryController implements Initializable, ScreenInte
                     break;
             }
             lblStatus.setText(lsStatus);
-        } catch (GuanzonException ex) {
+        } catch (GuanzonException | SQLException ex) {
             Logger.getLogger(CheckDeposit_EntryController.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (SQLException ex) {
-            Logger.getLogger(CheckDeposit_EntryController.class.getName()).log(Level.SEVERE, null, ex);
+            ShowMessageFX.Error(ex.getMessage(), psFormName, null);
         }
     }
     
@@ -422,6 +432,7 @@ public class CheckDeposit_HistoryController implements Initializable, ScreenInte
 
         } catch (SQLException | GuanzonException | NullPointerException ex) {
             Logger.getLogger(PaymentRequest_EntryController.class.getName()).log(Level.SEVERE, null, ex);
+            ShowMessageFX.Error(ex.getMessage(), psFormName, null);
         }
     }
     
@@ -524,6 +535,7 @@ public class CheckDeposit_HistoryController implements Initializable, ScreenInte
                 } catch (GuanzonException | SQLException ex) {
                     Logger.getLogger(PaymentRequest_EntryController.class
                             .getName()).log(Level.SEVERE, null, ex);
+                    ShowMessageFX.Error(ex.getMessage(), psFormName, null);
                     return null;
                 }
             }
@@ -755,6 +767,7 @@ public class CheckDeposit_HistoryController implements Initializable, ScreenInte
                 }
             } catch (SQLException | GuanzonException | ExceptionInInitializerError ex) {
                 Logger.getLogger(TBJ_ParameterController.class.getName()).log(Level.SEVERE, null, ex);
+                ShowMessageFX.Error(ex.getMessage(), psFormName, null);
             }
         }
     }

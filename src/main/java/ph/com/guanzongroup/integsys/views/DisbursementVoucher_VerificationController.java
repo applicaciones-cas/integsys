@@ -414,6 +414,15 @@ public class DisbursementVoucher_VerificationController implements Initializable
                             return;
                         }
                     }
+                    
+                    if(!DisbursementStatic.OPEN.equals(poController.Master().getTransactionStatus())) {
+                        poJSON = poController.callApproval();
+                        if (!"success".equals((String) poJSON.get("result"))) {
+                            ShowMessageFX.Warning(null, pxeModuleName,  (String) poJSON.get("message")); // check this for encoder or and higher
+                            return;
+                        }
+                    }
+                    
                     poJSON = poController.SaveTransaction();
                     if (!"success".equals((String) poJSON.get("result"))) {
                         ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
@@ -798,6 +807,8 @@ public class DisbursementVoucher_VerificationController implements Initializable
                                     int lnRow = Integer.parseInt(details_data.get(0).getIndex11());
                                     pnDetail = lnRow;
                                     loadRecordDetail();
+                                }else{
+                                    JFXUtil.clearTextFields(apMasterDetail);
                                 }
                             } else {
                                 /* FOCUS ON THE ROW THAT pnDetailBIR POINTS TO */

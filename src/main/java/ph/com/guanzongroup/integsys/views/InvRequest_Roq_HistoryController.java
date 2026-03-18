@@ -181,7 +181,7 @@ public class InvRequest_Roq_HistoryController implements Initializable, ScreenIn
             tableListInformation.setOnMouseClicked(this::tableListInformation_Clicked);
             tblViewOrderDetails.setOnMouseClicked(this::tblViewOrderDetails_Clicked);
         } catch (ExceptionInInitializerError ex) {
-            Logger.getLogger(InvRequest_HistoryCarController.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(InvRequest_HistoryControllerCar.class.getName()).log(Level.SEVERE, null, ex);
         }
 
     }
@@ -252,7 +252,7 @@ public class InvRequest_Roq_HistoryController implements Initializable, ScreenIn
 
                     }
                 } catch (CloneNotSupportedException | SQLException | GuanzonException ex) {
-                    Logger.getLogger(InvRequest_ConfirmationMcController.class
+                    Logger.getLogger(InvRequest_ConfirmationControllerMC.class
                             .getName()).log(Level.SEVERE, null, ex);
                     ShowMessageFX.Warning("Error loading data: " + ex.getMessage(), psFormName, null);
                 }
@@ -266,7 +266,7 @@ public class InvRequest_Roq_HistoryController implements Initializable, ScreenIn
             lblSource.setText(invRequestController.StockRequest().Master().Company().getCompanyName());
 
         } catch (GuanzonException | SQLException ex) {
-            Logger.getLogger(InvRequest_EntryMcController.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(InvRequest_EntryControllerMC.class.getName()).log(Level.SEVERE, null, ex);
         }
 
     }
@@ -432,7 +432,7 @@ public class InvRequest_Roq_HistoryController implements Initializable, ScreenIn
                     });
 
                 } catch (SQLException | GuanzonException ex) {
-                    Logger.getLogger(InvRequest_ConfirmationMcController.class
+                    Logger.getLogger(InvRequest_ConfirmationControllerMC.class
                             .getName()).log(Level.SEVERE, null, ex);
                 }
                 return null;
@@ -600,7 +600,7 @@ public class InvRequest_Roq_HistoryController implements Initializable, ScreenIn
                     return detailsList;
 
                 } catch (GuanzonException | SQLException ex) {
-                    Logger.getLogger(InvRequest_EntryMcSpController.class.getName()).log(Level.SEVERE, null, ex);
+                    Logger.getLogger(InvRequest_EntryControllerMC_SP.class.getName()).log(Level.SEVERE, null, ex);
                     return null;
                 }
             }

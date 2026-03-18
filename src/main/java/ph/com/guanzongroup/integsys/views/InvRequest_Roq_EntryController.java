@@ -200,7 +200,7 @@ public class InvRequest_Roq_EntryController implements Initializable, ScreenInte
                 
                         
                 }catch(ExceptionInInitializerError ex) {
-                Logger.getLogger(InvRequest_EntryMcController.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(InvRequest_EntryControllerMC.class.getName()).log(Level.SEVERE, null, ex);
 
             }
         }
@@ -231,7 +231,7 @@ public class InvRequest_Roq_EntryController implements Initializable, ScreenInte
                 lblSource.setText(invRequestController.StockRequest().Master().Company().getCompanyName());
 
             } catch (GuanzonException | SQLException ex) {
-                Logger.getLogger(InvRequest_EntryMcController.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(InvRequest_EntryControllerMC.class.getName()).log(Level.SEVERE, null, ex);
             }
 
         }
@@ -690,7 +690,7 @@ public class InvRequest_Roq_EntryController implements Initializable, ScreenInte
                                 ShowMessageFX.Information((String) poJSON.get("message"), psFormName, null);
                             }
                         } catch (ParseException ex) {
-                            Logger.getLogger(InvRequest_EntryCarController.class.getName()).log(Level.SEVERE, null, ex);
+                            Logger.getLogger(InvRequest_EntryControllerCar.class.getName()).log(Level.SEVERE, null, ex);
                         }
                             }
                             Platform.runLater(() -> btnNew.fire());
@@ -809,7 +809,7 @@ public class InvRequest_Roq_EntryController implements Initializable, ScreenInte
                     });
 
                 } catch (SQLException | GuanzonException ex) {
-                    Logger.getLogger(InvRequest_ConfirmationMcController.class
+                    Logger.getLogger(InvRequest_ConfirmationControllerMC.class
                             .getName()).log(Level.SEVERE, null, ex);
                 }
                 return null;
@@ -914,7 +914,7 @@ public class InvRequest_Roq_EntryController implements Initializable, ScreenInte
                     return detailsList;
 
                 } catch (GuanzonException | SQLException ex) {
-                    Logger.getLogger(InvRequest_EntryMcSpController.class.getName()).log(Level.SEVERE, null, ex);
+                    Logger.getLogger(InvRequest_EntryControllerMC_SP.class.getName()).log(Level.SEVERE, null, ex);
                     return null;
                 }
             }
@@ -1270,7 +1270,7 @@ public class InvRequest_Roq_EntryController implements Initializable, ScreenInte
 
                     }
                 } catch (CloneNotSupportedException | SQLException | GuanzonException ex) {
-                    Logger.getLogger(InvRequest_ConfirmationMcController.class
+                    Logger.getLogger(InvRequest_ConfirmationControllerMC.class
                             .getName()).log(Level.SEVERE, null, ex);
                     ShowMessageFX.Warning("Error loading data: " + ex.getMessage(), psFormName, null);
                 }

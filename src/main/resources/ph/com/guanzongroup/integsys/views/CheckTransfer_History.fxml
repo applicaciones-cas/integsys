@@ -64,12 +64,12 @@
                                     </Label>
                                     <TextField fx:id="tfSearchDestination" promptText="Press F3: Search" GridPane.columnIndex="2" />
                                     <TextField fx:id="tfSearchTransNo" promptText="Press F3: Search" GridPane.columnIndex="6" />
-                                    <Label text="Date" GridPane.columnIndex="8">
+                                    <Label text="Date" visible="false" GridPane.columnIndex="8">
                                        <font>
                                           <Font name="System Bold" size="14.0" />
                                        </font>
                                     </Label>
-                                    <DatePicker fx:id="dpSearchTransactionDate" editable="false" GridPane.columnIndex="10" />
+                                    <DatePicker fx:id="dpSearchTransactionDate" editable="false" visible="false" GridPane.columnIndex="10" />
                                  </children>
                               </GridPane>
                               <Label fx:id="lblSource" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" text="Industry" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="0.0">
@@ -218,10 +218,10 @@
                                                       </Label>
                                                   <TextField fx:id="tfTransactionNo" disable="true" editable="false" maxHeight="25.0" prefWidth="139.0" style="-fx-font-weight: bold;" styleClass="DisabledTextField" GridPane.columnIndex="2" />
                                                       <DatePicker fx:id="dpTransactionDate" disable="true" editable="false" GridPane.columnIndex="2" GridPane.rowIndex="2" />
-                                                  <TextField fx:id="tfDestination" editable="false" maxHeight="25.0" GridPane.columnIndex="2" GridPane.columnSpan="5" GridPane.rowIndex="3" />
-                                                  <TextField fx:id="tfDepartment" editable="false" maxHeight="25.0" GridPane.columnIndex="2" GridPane.columnSpan="5" GridPane.rowIndex="4" />
+                                                  <TextField fx:id="tfDestination" disable="true" editable="false" maxHeight="25.0" GridPane.columnIndex="2" GridPane.columnSpan="5" GridPane.rowIndex="3" />
+                                                  <TextField fx:id="tfDepartment" disable="true" editable="false" maxHeight="25.0" GridPane.columnIndex="2" GridPane.columnSpan="5" GridPane.rowIndex="4" />
                                                       <TextField fx:id="tfTotal" alignment="CENTER_RIGHT" disable="true" editable="false" promptText="0.00" styleClass="DisabledTextField" GridPane.columnIndex="10" GridPane.rowIndex="6" />
-                              <TextArea fx:id="taRemarks" editable="false" prefHeight="27.0" GridPane.columnIndex="2" GridPane.columnSpan="5" GridPane.rowIndex="5" GridPane.rowSpan="2">
+                              <TextArea fx:id="taRemarks" disable="true" editable="false" prefHeight="27.0" GridPane.columnIndex="2" GridPane.columnSpan="5" GridPane.rowIndex="5" GridPane.rowSpan="2">
                                  <GridPane.margin>
                                     <Insets top="1.0" />
                                  </GridPane.margin>
@@ -280,15 +280,15 @@
                                                             <Font name="System Bold" size="14.0" />
                                                          </font>
                                                       </Label>
-                                                      <TextField fx:id="tfPayee" editable="false" maxHeight="25.0" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.rowIndex="2" />
-                                                      <TextField fx:id="tfBank" alignment="TOP_LEFT" editable="false" maxHeight="1.7976931348623157E308" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.rowIndex="1" />
-                                                      <TextField fx:id="tfCheckAmount" alignment="CENTER_RIGHT" editable="false" promptText="0.0000" GridPane.columnIndex="7" GridPane.columnSpan="2" GridPane.rowIndex="2" />
+                                                      <TextField fx:id="tfPayee" disable="true" editable="false" maxHeight="25.0" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.rowIndex="2" />
+                                                      <TextField fx:id="tfBank" alignment="TOP_LEFT" disable="true" editable="false" maxHeight="1.7976931348623157E308" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.rowIndex="1" />
+                                                      <TextField fx:id="tfCheckAmount" alignment="CENTER_RIGHT" disable="true" editable="false" promptText="0.0000" GridPane.columnIndex="7" GridPane.columnSpan="2" GridPane.rowIndex="2" />
                                                       <Label text="Check Reference">
                                                          <font>
                                                             <Font size="12.0" />
                                                          </font>
                                                       </Label>
-                                                      <TextField fx:id="tfCheckTransNo" editable="false" maxHeight="25.0" GridPane.columnIndex="2" GridPane.columnSpan="2" />
+                                                      <TextField fx:id="tfCheckTransNo" disable="true" editable="false" maxHeight="25.0" GridPane.columnIndex="2" GridPane.columnSpan="2" />
                                                       <DatePicker fx:id="dpCheckDate" disable="true" editable="false" GridPane.columnIndex="7" GridPane.columnSpan="2" GridPane.rowIndex="1" />
                                                       <Label alignment="CENTER_RIGHT" maxWidth="1.7976931348623157E308" text="Check Date" GridPane.columnIndex="5" GridPane.rowIndex="1">
                                                          <font>
@@ -306,13 +306,13 @@
                                                             <Font size="12.0" />
                                                          </font>
                                                       </Label>
-                                                      <TextField fx:id="tfNote" editable="false" maxHeight="25.0" GridPane.columnIndex="2" GridPane.columnSpan="7" GridPane.rowIndex="3" />
-                                                      <CheckBox fx:id="cbIsReceived" alignment="CENTER_RIGHT" maxWidth="1.7976931348623157E308" mnemonicParsing="false" nodeOrientation="RIGHT_TO_LEFT" text="is Received?" textOverrun="CLIP" GridPane.columnIndex="8" GridPane.rowIndex="4">
+                                                      <TextField fx:id="tfNote" disable="true" editable="false" maxHeight="25.0" GridPane.columnIndex="2" GridPane.columnSpan="7" GridPane.rowIndex="3" />
+                                                      <CheckBox fx:id="cbIsReceived" alignment="CENTER_RIGHT" disable="true" maxWidth="1.7976931348623157E308" mnemonicParsing="false" nodeOrientation="RIGHT_TO_LEFT" text="is Received?" textOverrun="CLIP" GridPane.columnIndex="8" GridPane.rowIndex="4">
                                                          <font>
                                                             <Font name="System Bold" size="12.0" />
                                                          </font>
                                                       </CheckBox>
-                                                      <CheckBox fx:id="cbReverse" mnemonicParsing="false" nodeOrientation="RIGHT_TO_LEFT" prefHeight="10.0" prefWidth="62.0" text="Reverse" textAlignment="RIGHT" GridPane.columnIndex="7" GridPane.rowIndex="4" />
+                                                      <CheckBox fx:id="cbReverse" disable="true" mnemonicParsing="false" nodeOrientation="RIGHT_TO_LEFT" prefHeight="10.0" prefWidth="62.0" text="Reverse" textAlignment="RIGHT" GridPane.columnIndex="7" GridPane.rowIndex="4" />
                                                    </children>
                                                 </GridPane>
                                              </children>
