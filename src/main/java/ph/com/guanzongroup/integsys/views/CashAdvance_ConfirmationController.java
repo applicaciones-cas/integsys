@@ -246,19 +246,19 @@ public class CashAdvance_ConfirmationController implements Initializable, Screen
                             }
                             loadRecordMaster();
                             break;
-                        case "tfCashFund":
-                            poJSON = poController.SearchCashFund(lsValue, false);
+                        case "tfPayee":
+                            poJSON = poController.SearchPayee(lsValue, false, false);
                             if ("error".equals(poJSON.get("result"))) {
                                 ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                 txtField.setText("");
                                 break;
                             } else {
-                                JFXUtil.textFieldMoveNext(tfPayee);
+                                JFXUtil.textFieldMoveNext(tfCashFund);
                             }
                             loadRecordMaster();
                             break;
-                        case "tfPayee":
-                            poJSON = poController.SearchPayee(lsValue, false, false);
+                        case "tfCashFund":
+                            poJSON = poController.SearchCashFund(lsValue, false);
                             if ("error".equals(poJSON.get("result"))) {
                                 ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                 txtField.setText("");
@@ -268,6 +268,7 @@ public class CashAdvance_ConfirmationController implements Initializable, Screen
                             }
                             loadRecordMaster();
                             break;
+
                     }
                     break;
             }

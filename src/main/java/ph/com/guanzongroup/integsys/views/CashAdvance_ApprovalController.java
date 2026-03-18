@@ -270,17 +270,6 @@ public class CashAdvance_ApprovalController implements Initializable, ScreenInte
                             }
                             loadRecordMaster();
                             break;
-                        case "tfCashFund":
-                            poJSON = poController.SearchCashFund(lsValue, false);
-                            if ("error".equals(poJSON.get("result"))) {
-                                ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-                                tfRequestingDepartment.setText("");
-                                break;
-                            } else {
-                                JFXUtil.textFieldMoveNext(tfPayee);
-                            }
-                            loadRecordMaster();
-                            break;
                         case "tfPayee":
                             poJSON = poController.SearchPayee(lsValue, false, false);
                             if ("error".equals(poJSON.get("result"))) {
@@ -288,10 +277,22 @@ public class CashAdvance_ApprovalController implements Initializable, ScreenInte
                                 tfPayee.setText("");
                                 break;
                             } else {
+                                JFXUtil.textFieldMoveNext(tfCashFund);
+                            }
+                            loadRecordMaster();
+                            break;
+                        case "tfCashFund":
+                            poJSON = poController.SearchCashFund(lsValue, false);
+                            if ("error".equals(poJSON.get("result"))) {
+                                ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                                tfRequestingDepartment.setText("");
+                                break;
+                            } else {
                                 JFXUtil.textFieldMoveNext(tfAmountToAdvance);
                             }
                             loadRecordMaster();
                             break;
+
                     }
                     break;
             }
