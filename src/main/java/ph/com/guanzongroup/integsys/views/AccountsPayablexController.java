@@ -45,6 +45,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.StackPane;
 import org.guanzon.appdriver.agent.ShowMessageFX;
+import org.guanzon.appdriver.agent.services.Model;
 import org.guanzon.appdriver.base.CommonUtils;
 import org.guanzon.appdriver.base.GRiderCAS;
 import org.guanzon.appdriver.base.LogWrapper;
@@ -91,7 +92,19 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
     private TextField tfSearchCompanyName, tfSearchClient, tfClientID, tfContactPerson,
             tfCompanyName, tfCreditLimit, tfBegBalanace, tfCategory,
             tfDiscount, tfTerm, tfAvailBalance, tfOutStandingBalance,
-            tfAddress, tfContactNo, tfTINNo;
+            tfAddress, tfContactNo, tfTINNo, tfContactEmail;
+    
+    @FXML
+    private TextField txtAttachmentNo;
+    
+    @FXML
+    private TableView<Model> tblAttachments;
+    
+    @FXML
+    private TableColumn<Model, String> tblColAttachIndex, tblColAttachFile;
+    
+    @FXML
+    private Button btnAttach, btnRemoveFile;
 
     @FXML
     private DatePicker dpBegBalance, dpClientSince;

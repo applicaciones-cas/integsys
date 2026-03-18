@@ -196,6 +196,7 @@
                                                                   <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="10.0" prefWidth="150.0" />
                                                                   <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="10.0" prefWidth="10.0" />
                                                                   <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="363.0" minWidth="10.0" prefWidth="354.0" />
+                                                                  <ColumnConstraints />
                                                                       </columnConstraints>
                                                                       <rowConstraints>
                                                                           <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="28.0" vgrow="SOMETIMES" />
@@ -220,11 +221,11 @@
                                                                   <RowConstraints maxHeight="-Infinity" prefHeight="10.0" vgrow="SOMETIMES" />
                                                                       </rowConstraints>
                                                                       <children>
-                                                      <AnchorPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minWidth="-Infinity" prefHeight="27.0" prefWidth="140.0" style="-fx-background-color: FF8201;" GridPane.columnIndex="4" GridPane.columnSpan="3" GridPane.rowSpan="3">
+                                                      <AnchorPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minWidth="-Infinity" prefHeight="27.0" prefWidth="140.0" style="-fx-background-color: FF8201;" GridPane.columnIndex="6" GridPane.columnSpan="3">
                                                                      <GridPane.margin>
                                                                         <Insets left="5.0" />
                                                                      </GridPane.margin></AnchorPane>
-                                                                            <Label fx:id="lblStatus" alignment="CENTER" contentDisplay="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="27.0" prefWidth="142.0" text="STATUS" textAlignment="CENTER" GridPane.columnIndex="4" GridPane.columnSpan="4" GridPane.rowSpan="3">
+                                                                            <Label fx:id="lblStatus" alignment="CENTER" contentDisplay="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="27.0" prefWidth="142.0" text="STATUS" textAlignment="CENTER" GridPane.columnIndex="6" GridPane.columnSpan="4">
                                                                                 <font>
                                                                                     <Font name="System Bold" size="14.0" />
                                                                                 </font>
