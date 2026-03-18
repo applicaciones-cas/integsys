@@ -152,7 +152,7 @@ public class CashAdvance_ConfirmationController implements Initializable, Screen
 
             ModelCashAdvance selected = (ModelCashAdvance) tblViewMainList.getSelectionModel().getSelectedItem();
             if (selected != null) {
-                String lsTransNo = selected.getIndex06();
+                String lsTransNo = selected.getIndex02();
 
                 if (!JFXUtil.loadValidation(pnEditMode, pxeModuleName, poController.Master().getTransactionNo(), lsTransNo)) {
                     return;
