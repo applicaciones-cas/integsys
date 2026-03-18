@@ -500,7 +500,7 @@ public class CashAdvance_ApprovalController implements Initializable, ScreenInte
                                             ""
                                     ));
 
-                                    if (poController.CashAdvanceList(lnCtr).getTransactionStatus().equals(CashAdvanceStatus.CONFIRMED)) {
+                                    if (poController.CashAdvanceList(lnCtr).getTransactionStatus().equals(CashAdvanceStatus.APPROVED)) {
                                         JFXUtil.highlightByKey(tblViewMainList, String.valueOf(lnCtr + 1), "#C1E1C1", highlightedRowsMain);
                                     }
                                 }
