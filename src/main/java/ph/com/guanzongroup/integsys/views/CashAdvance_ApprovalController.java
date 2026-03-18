@@ -489,7 +489,6 @@ public class CashAdvance_ApprovalController implements Initializable, ScreenInte
                             Thread.sleep(100);
                             main_data.clear();
                             JFXUtil.disableAllHighlight(tblViewMainList, highlightedRowsMain);
-
                             if (poController.getCashAdvanceCount() > 0) {
                                 //retreiving using column index
                                 for (int lnCtr = 0; lnCtr <= poController.getCashAdvanceCount() - 1; lnCtr++) {
@@ -717,9 +716,8 @@ public class CashAdvance_ApprovalController implements Initializable, ScreenInte
         if (!"success".equals((String) poJSON.get("result"))) {
             ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
         } else {
-            loadTableMain.reload();
         }
-
+        loadTableMain.reload();
     }
 
     private void initButton(int fnValue) {
