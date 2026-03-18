@@ -101,7 +101,7 @@ public class CashAdvance_ConfirmationController implements Initializable, Screen
         try {
             poJSON = new JSONObject();
             poController = new CashflowControllers(oApp, null).CashAdvance();
-            poController.InitTransaction(); // Initialize transaction
+            poController.initFields(); // Initialize transaction
             initLoadTable();
             initTextFields();
             initDatePickers();
@@ -112,8 +112,8 @@ public class CashAdvance_ConfirmationController implements Initializable, Screen
             pnEditMode = EditMode.UNKNOWN;
             initButton(pnEditMode);
             Platform.runLater(() -> {
-                poController.Master().setIndustryId(psIndustryId);
-                poController.Master().setCompanyId(psCompanyId);
+                poController.getModel().setIndustryId(psIndustryId);
+                poController.getModel().setCompanyId(psCompanyId);
                 poController.setIndustryId(psIndustryId);
                 poController.setCompanyId(psCompanyId);
                 poController.setWithUI(true);
@@ -154,7 +154,7 @@ public class CashAdvance_ConfirmationController implements Initializable, Screen
             if (selected != null) {
                 String lsTransNo = selected.getIndex02();
 
-                if (!JFXUtil.loadValidation(pnEditMode, pxeModuleName, poController.Master().getTransactionNo(), lsTransNo)) {
+                if (!JFXUtil.loadValidation(pnEditMode, pxeModuleName, poController.getModel().getTransactionNo(), lsTransNo)) {
                     return;
                 }
 
@@ -238,7 +238,7 @@ public class CashAdvance_ConfirmationController implements Initializable, Screen
                             poJSON = poController.SearchDepartment(lsValue, false);
                             if ("error".equals(poJSON.get("result"))) {
                                 ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-                                tfRequestingDepartment.setText("");
+                                txtField.setText("");
                                 break;
                             } else {
                                 JFXUtil.textFieldMoveNext(tfCashFund);
@@ -249,7 +249,7 @@ public class CashAdvance_ConfirmationController implements Initializable, Screen
 //                            poJSON = poController.SearchCashFund(lsValue, false);
                             if ("error".equals(poJSON.get("result"))) {
                                 ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-                                tfRequestingDepartment.setText("");
+                                txtField.setText("");
                                 break;
                             } else {
                                 JFXUtil.textFieldMoveNext(tfPayee);
@@ -257,10 +257,10 @@ public class CashAdvance_ConfirmationController implements Initializable, Screen
                             loadRecordMaster();
                             break;
                         case "tfPayee":
-                            poJSON = poController.SearchPayee(lsValue, false, false);
+//                            poJSON = poController.SearchPayee(lsValue, false, false);
                             if ("error".equals(poJSON.get("result"))) {
                                 ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-                                tfPayee.setText("");
+                                txtField.setText("");
                                 break;
                             } else {
                                 JFXUtil.textFieldMoveNext(tfAmountToAdvance);
@@ -278,9 +278,9 @@ public class CashAdvance_ConfirmationController implements Initializable, Screen
 
     public void loadRecordSearch() {
         try {
-            poController.Master().setCompanyId(psCompanyId);
-            if (poController.Master().Company().getCompanyName() != null && !"".equals(poController.Master().Company().getCompanyName())) {
-                lblSource.setText(poController.Master().Company().getCompanyName());
+            poController.getModel().setCompanyId(psCompanyId);
+            if (poController.getModel().Company().getCompanyName() != null && !"".equals(poController.getModel().Company().getCompanyName())) {
+                lblSource.setText(poController.getModel().Company().getCompanyName());
             } else {
                 lblSource.setText("");
             }
@@ -313,34 +313,28 @@ public class CashAdvance_ConfirmationController implements Initializable, Screen
                 switch (lsID) {
                     case "tfBranch":
                         if (lsValue.isEmpty()) {
-//                            poJSON = poController.Master().setClientId("");
+                            poJSON = poController.getModel().setBranchCode("");
                         }
                         break;
                     case "tfRequestingDepartment":
                         if (lsValue.isEmpty()) {
-                            poJSON = poController.Master().setDepartmentRequest("");
+                            poJSON = poController.getModel().setDepartmentRequest("");
                         }
                         break;
                     case "tfCashFund":
                         if (lsValue.isEmpty()) {
-                            poJSON = poController.Master().setDepartmentRequest("");
+                            poJSON = poController.getModel().setCashFundId("");
                         }
                         break;
                     case "tfPayee":
                         if (lsValue.isEmpty()) {
-                            poJSON = poController.Master().setClientId("");
-                            poJSON = poController.Master().setPayeeName("");
+                            poJSON = poController.getModel().setClientId("");
+//                            poJSON = poController.getModel().setPayeeName("");
                         }
                         break;
-                    case "tfCreditedTo":
-                        if (lsValue.isEmpty()) {
-                            poJSON = poController.Master().setCreditedTo("");
-                        }
-                        break;
-
                     case "tfAmountToAdvance":
                         lsValue = JFXUtil.removeComma(lsValue);
-                        poJSON = poController.Master().setAdvanceAmount(Double.valueOf(lsValue));
+                        poJSON = poController.getModel().setAdvanceAmount(Double.valueOf(lsValue));
                         break;
                 }
                 JFXUtil.runWithDelay(0.8, () -> {
@@ -352,7 +346,7 @@ public class CashAdvance_ConfirmationController implements Initializable, Screen
             (lsID, lsValue) -> {
                 switch (lsID) {
                     case "taRemarks":
-                        poJSON = poController.Master().setRemarks(lsValue);
+                        poJSON = poController.getModel().setRemarks(lsValue);
                         if ("error".equals((String) poJSON.get("result"))) {
                             System.err.println((String) poJSON.get("message"));
                             ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
@@ -396,7 +390,7 @@ public class CashAdvance_ConfirmationController implements Initializable, Screen
                         }
 
                         if (pbSuccess) {
-                            poController.Master().setTransactionDate((SQLUtil.toDate(lsSelectedDate, SQLUtil.FORMAT_SHORT_DATE)));
+                            poController.getModel().setTransactionDate((SQLUtil.toDate(lsSelectedDate, SQLUtil.FORMAT_SHORT_DATE)));
                         } else {
                             if ("error".equals((String) poJSON.get("result"))) {
                                 ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
@@ -467,7 +461,7 @@ public class CashAdvance_ConfirmationController implements Initializable, Screen
                                     main_data.add(new ModelCashAdvance(String.valueOf(lnCtr + 1),
                                             String.valueOf(poController.CashAdvanceList(lnCtr).getTransactionNo()),
                                             CustomCommonUtil.formatDateToShortString(poController.CashAdvanceList(lnCtr).getTransactionDate()),
-                                            String.valueOf(poController.CashAdvanceList(lnCtr).getPayeeName()),
+                                            String.valueOf(poController.CashAdvanceList(lnCtr).Payee().getCompanyName()),
                                             String.valueOf(poController.CashAdvanceList(lnCtr).Department().getDescription()),
                                             ""
                                     ));
@@ -502,20 +496,20 @@ public class CashAdvance_ConfirmationController implements Initializable, Screen
     public void loadRecordMaster() {
         try {
             JFXUtil.setDisabled(true, dpAdvanceDate);
-            lblStatus.setText(pnEditMode == EditMode.UNKNOWN ? "UNKNOWN" : poController.getStatus(poController.Master().getTransactionStatus()).toUpperCase());
-            tfTransactionNo.setText(poController.Master().getTransactionNo());
+            lblStatus.setText(pnEditMode == EditMode.UNKNOWN ? "UNKNOWN" : poController.getStatus(poController.getModel().getTransactionStatus()).toUpperCase());
+            tfTransactionNo.setText(poController.getModel().getTransactionNo());
 
             // Transaction Date
-            String lsTransactionDate = CustomCommonUtil.formatDateToShortString(poController.Master().getTransactionDate());
+            String lsTransactionDate = CustomCommonUtil.formatDateToShortString(poController.getModel().getTransactionDate());
             dpAdvanceDate.setValue(CustomCommonUtil.parseDateStringToLocalDate(lsTransactionDate, "yyyy-MM-dd"));
-            tfRequestingDepartment.setText(poController.Master().Department().getDescription());
+            tfRequestingDepartment.setText(poController.getModel().Department().getDescription());
 
-            tfBranch.setText(poController.Master().Branch().getBranchName());
+            tfBranch.setText(poController.getModel().Branch().getBranchName());
 //            tfCashFund.setText(poController.Master());
 
-            tfPayee.setText(poController.Master().getPayeeName());
-            tfAmountToAdvance.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Master().getAdvanceAmount().doubleValue(), true));
-            taRemarks.setText(poController.Master().getRemarks());
+            tfPayee.setText(poController.getModel().Payee().getCompanyName());
+            tfAmountToAdvance.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.getModel().getAdvanceAmount().doubleValue(), true));
+            taRemarks.setText(poController.getModel().getRemarks());
 
             JFXUtil.updateCaretPositions(apMaster);
         } catch (SQLException | GuanzonException ex) {
@@ -534,7 +528,7 @@ public class CashAdvance_ConfirmationController implements Initializable, Screen
                 String lsButton = clickedButton.getId();
                 switch (lsButton) {
                     case "btnUpdate":
-                        poJSON = poController.OpenTransaction(poController.Master().getTransactionNo());
+                        poJSON = poController.OpenTransaction(poController.getModel().getTransactionNo());
                         poJSON = poController.UpdateTransaction();
                         if ("error".equals((String) poJSON.get("result"))) {
                             ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
@@ -551,7 +545,7 @@ public class CashAdvance_ConfirmationController implements Initializable, Screen
                             JFXUtil.disableAllHighlightByColor(tblViewMainList, "#A7C7E7", highlightedRowsMain);
                             //Clear data
                             clearTextFields();
-                            poController.resetMaster();
+//                            poController.resetMaster();
                             poController.initFields();
                             pnEditMode = EditMode.UNKNOWN;
                             break;
@@ -590,11 +584,11 @@ public class CashAdvance_ConfirmationController implements Initializable, Screen
                                 ShowMessageFX.Information(null, pxeModuleName, (String) poJSON.get("message"));
 
                                 // Confirmation Prompt
-                                JSONObject loJSON = poController.OpenTransaction(poController.Master().getTransactionNo());
+                                JSONObject loJSON = poController.OpenTransaction(poController.getModel().getTransactionNo());
                                 if ("success".equals(loJSON.get("result"))) {
-                                    if (poController.Master().getTransactionStatus().equals(CashAdvanceStatus.OPEN)) {
+                                    if (poController.getModel().getTransactionStatus().equals(CashAdvanceStatus.OPEN)) {
                                         if (ShowMessageFX.YesNo(null, pxeModuleName, "Do you want to confirm this transaction?")) {
-                                            loJSON = poController.ConfirmTransaction("");
+                                            loJSON = poController.ConfirmTransaction();
                                             if ("success".equals((String) loJSON.get("result"))) {
                                                 ShowMessageFX.Information((String) loJSON.get("message"), pxeModuleName, null);
                                                 JFXUtil.disableAllHighlightByColor(tblViewMainList, "#A7C7E7", highlightedRowsMain);
@@ -623,7 +617,7 @@ public class CashAdvance_ConfirmationController implements Initializable, Screen
                     case "btnConfirm":
                         poJSON = new JSONObject();
                         if (ShowMessageFX.YesNo(null, pxeModuleName, "Are you sure you want to confirm transaction?") == true) {
-                            poJSON = poController.ConfirmTransaction("");
+                            poJSON = poController.ConfirmTransaction();
                             if ("error".equals((String) poJSON.get("result"))) {
                                 ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                 return;
@@ -639,10 +633,10 @@ public class CashAdvance_ConfirmationController implements Initializable, Screen
                     case "btnVoid":
                         poJSON = new JSONObject();
                         if (ShowMessageFX.YesNo(null, "Close Tab", "Are you sure you want to void transaction?") == true) {
-                            if (CashAdvanceStatus.CONFIRMED.equals(poController.Master().getTransactionStatus())) {
-                                poJSON = poController.CancelTransaction("");
+                            if (CashAdvanceStatus.CONFIRMED.equals(poController.getModel().getTransactionStatus())) {
+                                poJSON = poController.CancelTransaction();
                             } else {
-                                poJSON = poController.VoidTransaction("");
+                                poJSON = poController.VoidTransaction();
                             }
                             if ("error".equals((String) poJSON.get("result"))) {
                                 ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
@@ -662,7 +656,7 @@ public class CashAdvance_ConfirmationController implements Initializable, Screen
 
                 if (JFXUtil.isObjectEqualTo(lsButton, "btnSave", "btnConfirm", "btnVoid", "btnCancel")) {
                     clearTextFields();
-                    poController.resetMaster();
+//                    poController.resetMaster();
                     pnEditMode = EditMode.UNKNOWN;
                 }
 
@@ -679,14 +673,19 @@ public class CashAdvance_ConfirmationController implements Initializable, Screen
     }
 
     public void retrieveCashAdvance() {
-        poJSON = new JSONObject();
-        poController.setTransactionStatus(CashAdvanceStatus.OPEN + CashAdvanceStatus.CONFIRMED);
-        poJSON = poController.loadTransactionList("", tfSearchPayee.getText(), tfSearchTransNo.getText());
-        if (!"success".equals((String) poJSON.get("result"))) {
-            ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-        } else {
+        try {
+            poJSON = new JSONObject();
+            poController.getModel().setTransactionStatus(CashAdvanceStatus.OPEN + CashAdvanceStatus.CONFIRMED);
+            poJSON = poController.loadTransactionList(poController.getModel().Industry().getDescription(), poController.getModel().Branch().getDescription(), 
+                    tfSearchPayee.getText(), tfSearchTransNo.getText());
+            if (!"success".equals((String) poJSON.get("result"))) {
+                ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+            } else {
+            }
+            loadTableMain.reload();
+        } catch (SQLException | GuanzonException ex) {
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
         }
-        loadTableMain.reload();
     }
 
     private void initButton(int fnValue) {
@@ -704,11 +703,10 @@ public class CashAdvance_ConfirmationController implements Initializable, Screen
         JFXUtil.setDisabled(!lbShow1, apMaster);
         JFXUtil.setButtonsVisibility(lbShow4, btnClose);
 
-        switch (poController.Master().getTransactionStatus()) {
+        switch (poController.getModel().getTransactionStatus()) {
             case CashAdvanceStatus.CONFIRMED:
                 JFXUtil.setButtonsVisibility(false, btnConfirm);
                 break;
-            case CashAdvanceStatus.RELEASED:
             case CashAdvanceStatus.VOID:
             case CashAdvanceStatus.CANCELLED:
                 JFXUtil.setButtonsVisibility(false, btnConfirm, btnUpdate, btnVoid);
