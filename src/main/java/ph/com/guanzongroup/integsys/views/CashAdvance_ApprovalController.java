@@ -637,8 +637,8 @@ public class CashAdvance_ApprovalController implements Initializable, ScreenInte
                         break;
                     case "btnApprove":
                         poJSON = new JSONObject();
-                        if (ShowMessageFX.YesNo(null, pxeModuleName, "Are you sure you want to confirm transaction?") == true) {
-                            poJSON = poController.ConfirmTransaction();
+                        if (ShowMessageFX.YesNo(null, pxeModuleName, "Are you sure you want to approve transaction?") == true) {
+                            poJSON = poController.ApproveTransaction();
                             if ("error".equals((String) poJSON.get("result"))) {
                                 ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                 return;
