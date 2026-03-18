@@ -609,7 +609,7 @@ public class PurchaseOrder_ConfirmationMCController implements Initializable, Sc
         List<TextField> loTxtField = Arrays.asList(tfAdvancePAmount,
                 tfReferenceNo, tfDiscountRate, tfDiscountAmount,
                 tfAdvancePRate,
-                tfOrderQuantity, tfSearchSupplier, tfSearchReferenceNo, tfCost);
+                tfOrderQuantity, tfSearchSupplier, tfSearchReferenceNo, tfCost,tfTerm);
 
         loTxtField.forEach(tf -> tf.setOnKeyPressed(event -> txtField_KeyPressed(event)));
     }
