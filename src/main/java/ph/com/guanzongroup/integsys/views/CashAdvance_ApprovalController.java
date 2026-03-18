@@ -219,6 +219,7 @@ public class CashAdvance_ApprovalController implements Initializable, ScreenInte
                             } else {
                                 JFXUtil.textFieldMoveNext(tfRequestingDepartment);
                             }
+                            loadRecordSearch();
                             retrieveCashAdvance();
                             break;
                         case "tfSearchBranch":
@@ -230,6 +231,7 @@ public class CashAdvance_ApprovalController implements Initializable, ScreenInte
                             } else {
                                 JFXUtil.textFieldMoveNext(tfRequestingDepartment);
                             }
+                            loadRecordSearch();
                             retrieveCashAdvance();
                             break;
                         case "tfSearchPayee":
@@ -574,7 +576,7 @@ public class CashAdvance_ApprovalController implements Initializable, ScreenInte
                             JFXUtil.disableAllHighlightByColor(tblViewMainList, "#A7C7E7", highlightedRowsMain);
                             //Clear data
                             clearTextFields();
-//                            poController.resetMaster();
+                            poController.resetModel();
                             poController.initFields();
                             pnEditMode = EditMode.UNKNOWN;
                             break;
@@ -603,7 +605,7 @@ public class CashAdvance_ApprovalController implements Initializable, ScreenInte
                     case "btnSave":
                         //Validator
                         poJSON = new JSONObject();
-                        if (ShowMessageFX.YesNo(null, "Close Tab", "Are you sure you want to save the transaction?") == true) {
+                        if (ShowMessageFX.YesNo(null, pxeModuleName, "Are you sure you want to save the transaction?") == true) {
                             poJSON = poController.SaveTransaction();
                             if (!"success".equals((String) poJSON.get("result"))) {
                                 ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
@@ -685,7 +687,7 @@ public class CashAdvance_ApprovalController implements Initializable, ScreenInte
 
                 if (JFXUtil.isObjectEqualTo(lsButton, "btnSave", "btnConfirm", "btnVoid", "btnCancel")) {
                     clearTextFields();
-//                    poController.resetMaster();
+                    poController.resetModel();
                     pnEditMode = EditMode.UNKNOWN;
                 }
 

@@ -373,7 +373,7 @@ public class CashAdvance_EntryController implements Initializable, ScreenInterfa
                         break;
                     case "btnNew":
                         //Clear data
-//                        poController.resetMaster();
+                         poController.resetModel();
                         clearTextFields();
 
                         poJSON = poController.NewTransaction();
@@ -393,7 +393,7 @@ public class CashAdvance_EntryController implements Initializable, ScreenInterfa
                         pnEditMode = poController.getEditMode();
                         break;
                     case "btnVoid":
-                        if (ShowMessageFX.YesNo(null, "Close Tab", "Are you sure you want to void the transaction?") == false) {
+                        if (ShowMessageFX.YesNo(null, pxeModuleName, "Are you sure you want to void the transaction?") == false) {
                             return;
                         }
 
@@ -409,6 +409,9 @@ public class CashAdvance_EntryController implements Initializable, ScreenInterfa
                             ShowMessageFX.Information(null, pxeModuleName, (String) poJSON.get("message"));
                         }
                         pnEditMode = poController.getEditMode();
+                        JFXUtil.runWithDelay(0.3, () -> {
+                            btnNew.fire();
+                        });
                         break;
                     case "btnSearch":
                         JFXUtil.initiateBtnSearch(pxeModuleName, lastFocusedTextField, previousSearchedTextField, apMaster);
@@ -417,7 +420,7 @@ public class CashAdvance_EntryController implements Initializable, ScreenInterfa
                         if (ShowMessageFX.OkayCancel(null, pxeModuleName, "Do you want to disregard changes?") == true) {
                             //Clear data
                             clearTextFields();
-//                            poController.resetMaster();
+                             poController.resetModel();
                             pnEditMode = EditMode.UNKNOWN;
                             break;
                         } else {
@@ -442,7 +445,7 @@ public class CashAdvance_EntryController implements Initializable, ScreenInterfa
                     case "btnSave":
                         //Validator
                         poJSON = new JSONObject();
-                        if (ShowMessageFX.YesNo(null, "Close Tab", "Are you sure you want to save the transaction?") == true) {
+                        if (ShowMessageFX.YesNo(null, pxeModuleName, "Are you sure you want to save the transaction?") == true) {
                             poJSON = poController.SaveTransaction();
                             if (!"success".equals((String) poJSON.get("result"))) {
                                 ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
@@ -484,7 +487,7 @@ public class CashAdvance_EntryController implements Initializable, ScreenInterfa
                         break;
                 }
                 if (JFXUtil.isObjectEqualTo(lsButton, "btnSave", "btnCancel", "btnVoid")) {
-//                    poController.resetMaster();
+                     poController.resetModel();
                     clearTextFields();
                     pnEditMode = EditMode.UNKNOWN;
                 }
