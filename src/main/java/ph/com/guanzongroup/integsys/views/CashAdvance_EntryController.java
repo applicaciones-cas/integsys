@@ -41,7 +41,7 @@ import ph.com.guanzongroup.integsys.utility.JFXUtil;
 
 /**
  *
- * @author Team 1 : Aldrich & Arsiela 
+ * @author Team 1 : Aldrich & Arsiela
  */
 public class CashAdvance_EntryController implements Initializable, ScreenInterface {
 
@@ -144,11 +144,22 @@ public class CashAdvance_EntryController implements Initializable, ScreenInterfa
                                 txtField.setText("");
                                 break;
                             } else {
-                                JFXUtil.textFieldMoveNext(tfPayee);
+                                JFXUtil.textFieldMoveNext(tfRequestingDepartment);
                             }
                             loadRecordMaster();
                             break;
-                        case "tfPettyCash":
+                        case "tfRequestingDepartment":
+                            poJSON = poController.SearchDepartment(lsValue, false);
+                            if ("error".equals(poJSON.get("result"))) {
+                                ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                                txtField.setText("");
+                                break;
+                            } else {
+                                JFXUtil.textFieldMoveNext(tfCashFund);
+                            }
+                            loadRecordMaster();
+                            break;
+                        case "tfCashFund":
                             poJSON = poController.SearchPettyCash(lsValue, false);
                             if ("error".equals(poJSON.get("result"))) {
                                 ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
@@ -163,29 +174,7 @@ public class CashAdvance_EntryController implements Initializable, ScreenInterfa
                             poJSON = poController.SearchPayee(lsValue, false, false);
                             if ("error".equals(poJSON.get("result"))) {
                                 ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-                                tfPayee.setText("");
-                                break;
-                            } else {
-                                JFXUtil.textFieldMoveNext(tfCashFund);
-                            }
-                            loadRecordMaster();
-                            break;
-                        case "tfCashFund":
-//                            poJSON = poController.SearchCashFund(lsValue, false, cbOtherCreditedTo.isSelected());
-//                            if ("error".equals(poJSON.get("result"))) {
-//                                ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-//                                tfCreditedTo.setText("");
-//                                break;
-//                            } else {
-//                                JFXUtil.textFieldMoveNext(tfRequestingDepartment);
-//                            }
-//                            loadRecordMaster();
-                            break;
-                        case "tfRequestingDepartment":
-                            poJSON = poController.SearchDepartment(lsValue, false);
-                            if ("error".equals(poJSON.get("result"))) {
-                                ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-                                tfRequestingDepartment.setText("");
+                                txtField.setText("");
                                 break;
                             } else {
                                 JFXUtil.textFieldMoveNext(tfAmountToAdvance);
@@ -204,12 +193,19 @@ public class CashAdvance_EntryController implements Initializable, ScreenInterfa
     ChangeListener<Boolean> txtMaster_Focus = JFXUtil.FocusListener(TextField.class,
             (lsID, lsValue) -> {
                 switch (lsID) {
-                    case "tfVoucherNo":
-                        poJSON = poController.Master().setVoucher(lsValue);
-                        break;
                     case "tfBranch":
                         if (lsValue.isEmpty()) {
 //                            poJSON = poController.Master().setClientId("");
+                        }
+                        break;
+                    case "tfRequestingDepartment":
+                        if (lsValue.isEmpty()) {
+                            poJSON = poController.Master().setDepartmentRequest("");
+                        }
+                        break;
+                    case "tfCashFund":
+                        if (lsValue.isEmpty()) {
+                            poJSON = poController.Master().setDepartmentRequest("");
                         }
                         break;
                     case "tfPayee":
@@ -223,11 +219,7 @@ public class CashAdvance_EntryController implements Initializable, ScreenInterfa
                             poJSON = poController.Master().setCreditedTo("");
                         }
                         break;
-                    case "tfRequestingDepartment":
-                        if (lsValue.isEmpty()) {
-                            poJSON = poController.Master().setDepartmentRequest("");
-                        }
-                        break;
+
                     case "tfAmountToAdvance":
                         lsValue = JFXUtil.removeComma(lsValue);
                         poJSON = poController.Master().setAdvanceAmount(Double.valueOf(lsValue));

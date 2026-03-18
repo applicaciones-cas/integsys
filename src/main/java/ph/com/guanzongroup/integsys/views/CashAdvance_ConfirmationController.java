@@ -21,7 +21,6 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
-import javafx.scene.control.CheckBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.Pagination;
@@ -52,7 +51,7 @@ import ph.com.guanzongroup.integsys.utility.JFXUtil;
 
 /**
  *
- * @author Team 1 : Aldrich & Arsiela 
+ * @author Team 1 : Aldrich & Arsiela
  */
 public class CashAdvance_ConfirmationController implements Initializable, ScreenInterface {
 
@@ -312,8 +311,20 @@ public class CashAdvance_ConfirmationController implements Initializable, Screen
     ChangeListener<Boolean> txtMaster_Focus = JFXUtil.FocusListener(TextField.class,
             (lsID, lsValue) -> {
                 switch (lsID) {
-                    case "tfVoucherNo":
-                        poJSON = poController.Master().setVoucher(lsValue);
+                    case "tfBranch":
+                        if (lsValue.isEmpty()) {
+//                            poJSON = poController.Master().setClientId("");
+                        }
+                        break;
+                    case "tfRequestingDepartment":
+                        if (lsValue.isEmpty()) {
+                            poJSON = poController.Master().setDepartmentRequest("");
+                        }
+                        break;
+                    case "tfCashFund":
+                        if (lsValue.isEmpty()) {
+                            poJSON = poController.Master().setDepartmentRequest("");
+                        }
                         break;
                     case "tfPayee":
                         if (lsValue.isEmpty()) {
@@ -326,11 +337,7 @@ public class CashAdvance_ConfirmationController implements Initializable, Screen
                             poJSON = poController.Master().setCreditedTo("");
                         }
                         break;
-                    case "tfRequestingDepartment":
-                        if (lsValue.isEmpty()) {
-                            poJSON = poController.Master().setDepartmentRequest("");
-                        }
-                        break;
+
                     case "tfAmountToAdvance":
                         lsValue = JFXUtil.removeComma(lsValue);
                         poJSON = poController.Master().setAdvanceAmount(Double.valueOf(lsValue));
@@ -457,11 +464,11 @@ public class CashAdvance_ConfirmationController implements Initializable, Screen
                                 //retreiving using column index
                                 for (int lnCtr = 0; lnCtr <= poController.getCashAdvanceCount() - 1; lnCtr++) {
                                     main_data.add(new ModelCashAdvance(String.valueOf(lnCtr + 1),
-                                            String.valueOf(poController.CashAdvanceList(lnCtr).getVoucher()),
+                                            String.valueOf(poController.CashAdvanceList(lnCtr).getTransactionNo()),
                                             CustomCommonUtil.formatDateToShortString(poController.CashAdvanceList(lnCtr).getTransactionDate()),
                                             String.valueOf(poController.CashAdvanceList(lnCtr).getPayeeName()),
                                             String.valueOf(poController.CashAdvanceList(lnCtr).Department().getDescription()),
-                                            String.valueOf(poController.CashAdvanceList(lnCtr).getTransactionNo())
+                                            ""
                                     ));
 
                                     if (poController.CashAdvanceList(lnCtr).getTransactionStatus().equals(CashAdvanceStatus.CONFIRMED)) {
