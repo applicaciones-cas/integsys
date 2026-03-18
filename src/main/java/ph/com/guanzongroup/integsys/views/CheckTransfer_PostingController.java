@@ -1005,6 +1005,7 @@ public class CheckTransfer_PostingController implements Initializable, ScreenInt
                                 poJSON = poGLControllers.CheckTransfers().SearchDistination(lsValue, false);
                                 if ("error".equals(poJSON.get("result"))) {
                                     ShowMessageFX.Warning((String) poJSON.get("message"), lsValue, lsValue);
+                                    return;
                                 }
                                 tfSearchSource.setText(poGLControllers.CheckTransfers().Master().Branch().getBranchName());
                                 loadTableMaster();
@@ -1013,6 +1014,7 @@ public class CheckTransfer_PostingController implements Initializable, ScreenInt
                                 poJSON = poGLControllers.CheckTransfers().SearchDistination(lsValue, false);
                                 if ("error".equals(poJSON.get("result"))) {
                                     ShowMessageFX.Warning((String) poJSON.get("message"), lsValue, lsValue);
+                                    return;
                                 }
                                 tfSourceBranch.setText(poGLControllers.CheckTransfers().Master().Branch().getBranchName());
                                 if(!poGLControllers.CheckTransfers().Master().Branch().isWarehouse() 
@@ -1025,6 +1027,7 @@ public class CheckTransfer_PostingController implements Initializable, ScreenInt
                                 poJSON = poGLControllers.CheckTransfers().SearchDepartment(lsValue, false);
                                 if ("error".equals(poJSON.get("result"))) {
                                     ShowMessageFX.Warning((String) poJSON.get("message"), lsValue, lsValue);
+                                    return;
                                 }
                                 tfDepartment.setText(poGLControllers.CheckTransfers().Master().Department().getDescription());
                                 return;
@@ -1032,6 +1035,7 @@ public class CheckTransfer_PostingController implements Initializable, ScreenInt
                                 poJSON = poGLControllers.CheckTransfers().SearchChecks(lsValue, "",pnSelectedDetail,false);
                                 if ("error".equals(poJSON.get("result"))) {
                                     ShowMessageFX.Warning((String) poJSON.get("message"), lsValue, lsValue);
+                                    return;
                                 }
                                 tfCheckTransNo.setText(poGLControllers.CheckTransfers().Detail(pnSelectedDetail).CheckPayment().getTransactionNo());
                                 loadTableDetail();
@@ -1040,6 +1044,7 @@ public class CheckTransfer_PostingController implements Initializable, ScreenInt
                                 poJSON = poGLControllers.CheckTransfers().SearchChecks("", lsValue,pnSelectedDetail,false);
                                 if ("error".equals(poJSON.get("result"))) {
                                     ShowMessageFX.Warning((String) poJSON.get("message"), lsValue, lsValue);
+                                    return;
                                 }
                                 tfCheckNo.setText(poGLControllers.CheckTransfers().Detail(pnSelectedDetail).CheckPayment().getCheckNo());
                                 loadTableDetail();

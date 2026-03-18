@@ -178,7 +178,7 @@ public class CheckTransfer_EntryController implements Initializable, ScreenInter
         if (!"success".equals(poJSON.get("result"))) {
                 ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
         }
-        poGLControllers.CheckTransfers().Master().setIndustryId(psIndustryID);
+            poGLControllers.CheckTransfers().Master().setIndustryId(psIndustryID);
             poGLControllers.CheckTransfers().Master().setCompany(psCompanyID);
             lblSource.setText(poGLControllers.CheckTransfers().Master().Company().getCompanyName() + " - " + poGLControllers.CheckTransfers().Master().Industry().getDescription());
         } catch (SQLException | GuanzonException ex) {
@@ -524,7 +524,7 @@ public class CheckTransfer_EntryController implements Initializable, ScreenInter
             tfCheckAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(
                     poGLControllers.CheckTransfers().Detail(pnSelectedDetail).CheckPayment().getAmount(), true));
 
-            
+            poGLControllers.CheckTransfers().computeMasterFields();
             tfTotal.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(
                     poGLControllers.CheckTransfers().Master().getTransactionTotal(), true));
             
@@ -1047,6 +1047,7 @@ public class CheckTransfer_EntryController implements Initializable, ScreenInter
                                 poJSON = poGLControllers.CheckTransfers().SearchDepartment(lsValue, false);
                                 if ("error".equals(poJSON.get("result"))) {
                                     ShowMessageFX.Warning((String) poJSON.get("message"), lsValue, lsValue);
+                                    return;
                                 }
                                 tfDepartment.setText(poGLControllers.CheckTransfers().Master().Department().getDescription());
                                 return;
@@ -1054,6 +1055,7 @@ public class CheckTransfer_EntryController implements Initializable, ScreenInter
                                 poJSON = poGLControllers.CheckTransfers().SearchChecks(lsValue, "",pnSelectedDetail,false);
                                 if ("error".equals(poJSON.get("result"))) {
                                     ShowMessageFX.Warning((String) poJSON.get("message"), lsValue, lsValue);
+                                    return;
                                 }
                                 tfCheckTransNo.setText(poGLControllers.CheckTransfers().Detail(pnSelectedDetail).CheckPayment().getTransactionNo());
                                 loadTableDetail();
@@ -1062,6 +1064,7 @@ public class CheckTransfer_EntryController implements Initializable, ScreenInter
                                 poJSON = poGLControllers.CheckTransfers().SearchChecks("", lsValue,pnSelectedDetail,false);
                                 if ("error".equals(poJSON.get("result"))) {
                                     ShowMessageFX.Warning((String) poJSON.get("message"), lsValue, lsValue);
+                                    return;
                                 }
                                 tfCheckNo.setText(poGLControllers.CheckTransfers().Detail(pnSelectedDetail).CheckPayment().getCheckNo());
                                 loadTableDetail();
