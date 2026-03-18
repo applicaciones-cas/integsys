@@ -681,7 +681,7 @@ public class CashAdvance_ApprovalController implements Initializable, ScreenInte
                                 ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                 return;
                             } else {
-                                ShowMessageFX.Information(null, pxeModuleName, (String) poJSON.get("message"));
+                                ShowMessageFX.Information(null, pxeModuleName, "Transaction disapproved successfully");
                                 JFXUtil.disableAllHighlightByColor(tblViewMainList, "#A7C7E7", highlightedRowsMain);
                                 JFXUtil.highlightByKey(tblViewMainList, String.valueOf(pnMain + 1), "#FAA0A0", highlightedRowsMain);
                             }
