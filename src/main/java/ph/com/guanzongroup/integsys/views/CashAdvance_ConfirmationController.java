@@ -676,6 +676,7 @@ public class CashAdvance_ConfirmationController implements Initializable, Screen
     public void retrieveCashAdvance() {
         try {
             poJSON = new JSONObject();
+            poController.setRecordStatus("0");
             poController.getModel().setTransactionStatus(CashAdvanceStatus.OPEN + CashAdvanceStatus.CONFIRMED);
             poJSON = poController.loadTransactionList(poController.getModel().Industry().getDescription(), poController.getModel().Branch().getDescription(),
                     tfSearchPayee.getText(), tfSearchTransNo.getText());
