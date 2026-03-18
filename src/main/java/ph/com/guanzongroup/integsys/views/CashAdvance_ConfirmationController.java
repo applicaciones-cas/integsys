@@ -224,7 +224,7 @@ public class CashAdvance_ConfirmationController implements Initializable, Screen
                             }
                             return;
                         case "tfBranch":
-//                            poJSON = poController.SearchBranch(lsValue, false);
+                            poJSON = poController.SearchBranch(lsValue, false, false);
                             if ("error".equals(poJSON.get("result"))) {
                                 ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                 txtField.setText("");
@@ -246,7 +246,7 @@ public class CashAdvance_ConfirmationController implements Initializable, Screen
                             loadRecordMaster();
                             break;
                         case "tfCashFund":
-//                            poJSON = poController.SearchCashFund(lsValue, false);
+                            poJSON = poController.SearchCashFund(lsValue, false);
                             if ("error".equals(poJSON.get("result"))) {
                                 ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                 txtField.setText("");
@@ -257,7 +257,7 @@ public class CashAdvance_ConfirmationController implements Initializable, Screen
                             loadRecordMaster();
                             break;
                         case "tfPayee":
-//                            poJSON = poController.SearchPayee(lsValue, false, false);
+                            poJSON = poController.SearchPayee(lsValue, false, false);
                             if ("error".equals(poJSON.get("result"))) {
                                 ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                 txtField.setText("");
@@ -505,7 +505,7 @@ public class CashAdvance_ConfirmationController implements Initializable, Screen
             tfRequestingDepartment.setText(poController.getModel().Department().getDescription());
 
             tfBranch.setText(poController.getModel().Branch().getBranchName());
-//            tfCashFund.setText(poController.Master());
+            tfCashFund.setText(poController.getModel().CashFund().getDescription());
 
             tfPayee.setText(poController.getModel().Payee().getCompanyName());
             tfAmountToAdvance.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.getModel().getAdvanceAmount().doubleValue(), true));
@@ -676,7 +676,7 @@ public class CashAdvance_ConfirmationController implements Initializable, Screen
         try {
             poJSON = new JSONObject();
             poController.getModel().setTransactionStatus(CashAdvanceStatus.OPEN + CashAdvanceStatus.CONFIRMED);
-            poJSON = poController.loadTransactionList(poController.getModel().Industry().getDescription(), poController.getModel().Branch().getDescription(), 
+            poJSON = poController.loadTransactionList(poController.getModel().Industry().getDescription(), poController.getModel().Branch().getDescription(),
                     tfSearchPayee.getText(), tfSearchTransNo.getText());
             if (!"success".equals((String) poJSON.get("result"))) {
                 ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
