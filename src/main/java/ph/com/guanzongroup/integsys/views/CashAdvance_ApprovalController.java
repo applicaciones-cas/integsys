@@ -451,7 +451,7 @@ public class CashAdvance_ApprovalController implements Initializable, ScreenInte
             JFXUtil.setVerticalScroll(taRemarks);
         });
         JFXUtil.setFocusListener(txtArea_Focus, taRemarks);
-        JFXUtil.setFocusListener(txtBrowse_Focus, tfSearchPayee, tfSearchTransNo);
+        JFXUtil.setFocusListener(txtBrowse_Focus, tfSearchIndustry, tfSearchBranch, tfSearchPayee, tfSearchTransNo);
         JFXUtil.setFocusListener(txtMaster_Focus, tfTransactionNo, tfBranch, tfRequestingDepartment, tfCashFund, tfPayee, tfAmountToAdvance);
 
         JFXUtil.setKeyPressedListener(this::txtField_KeyPressed, apBrowse, apMaster);
