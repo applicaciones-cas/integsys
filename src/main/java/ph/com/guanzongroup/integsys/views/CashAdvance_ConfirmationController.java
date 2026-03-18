@@ -497,6 +497,15 @@ public class CashAdvance_ConfirmationController implements Initializable, Screen
 
     public void loadRecordMaster() {
         try {
+            switch (poController.getModel().getTransactionStatus()) {
+                case CashAdvanceStatus.APPROVED:
+                case CashAdvanceStatus.CONFIRMED:
+                    btnVoid.setText("Cancel");
+                    break;
+                default:
+                    btnVoid.setText("Void");
+                    break;
+            }
             JFXUtil.setDisabled(true, dpAdvanceDate);
             lblStatus.setText(pnEditMode == EditMode.UNKNOWN ? "UNKNOWN" : poController.getStatus(poController.getModel().getTransactionStatus()).toUpperCase());
             tfTransactionNo.setText(poController.getModel().getTransactionNo());
