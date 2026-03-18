@@ -154,29 +154,19 @@ public class InvRequest_ConfirmationController implements Initializable, ScreenI
         try {
             System.out.print("The company ID: " + psCompanyID);
             invRequestController = new InvWarehouseControllers(poApp, logWrapper).StockRequest();
-            invRequestController.setTransactionStatus(StockRequestStatus.OPEN);
-
             poJSON = invRequestController.InitTransaction();
             if (!"success".equals(poJSON.get("result"))) {
                 ShowMessageFX.Warning((String) poJSON.get("message"), "Search Information", null);
             }
 
             Platform.runLater((() -> {
-                //BOTH NULL
+                //set edit mode to new transaction temporily to assign industry and company
+                invRequestController.setTransactionStatus("102");
+                invRequestController.setCompanyID(psCompanyID);
+                invRequestController.setCategoryID(psCategoryID);
+                invRequestController.setIndustryID(psIndustryID);
+                loadRecordSearch();
 
-                try {
-                    //set edit mode to new transaction temporily to assign industry and company
-                    invRequestController.NewTransaction();
-                    invRequestController.Master().setCompanyID(psCompanyID);
-                    invRequestController.Master().setCategoryId(psCategoryID);
-                    invRequestController.Master().setIndustryId(psIndustryID);
-                    loadRecordSearch();
-
-                    //reset the transaction
-                    invRequestController.InitTransaction();
-                } catch (CloneNotSupportedException e) {
-                    ShowMessageFX.Warning((String) e.getMessage(), "Search Information", null);
-                }
             }));
             tblViewOrderDetails.addEventFilter(KeyEvent.KEY_PRESSED, this::tableKeyEvents);
             initTextFieldPattern();
@@ -506,10 +496,6 @@ public class InvRequest_ConfirmationController implements Initializable, ScreenI
             switch (lsButton) {
 
                 case "btnBrowse":
-                    invRequestController.Master().setCompanyID(psCompanyID);
-                    invRequestController.Master().setCategoryId(psCategoryID);
-
-                    invRequestController.setTransactionStatus("102");
                     loJSON = invRequestController.searchTransaction();
 
                     if (!"error".equals((String) loJSON.get("result"))) {
@@ -526,9 +512,6 @@ public class InvRequest_ConfirmationController implements Initializable, ScreenI
                     }
                     break;
                 case "btnRetrieve":
-                    invRequestController.Master().setCompanyID(psCompanyID);
-                    invRequestController.Master().setCategoryId(psCategoryID);
-                    invRequestController.setTransactionStatus("102");
                     loadTableList();
                     break;
                 case "btnUpdate":
@@ -712,8 +695,6 @@ public class InvRequest_ConfirmationController implements Initializable, ScreenI
                         invOrderDetail_data.clear();
                         tableListInformation_data.clear();
 
-                        invRequestController.InitTransaction();
-
                         clearAllTables();
                         clearDetailFields();
                         clearMasterFields();
@@ -725,7 +706,6 @@ public class InvRequest_ConfirmationController implements Initializable, ScreenI
                         tblViewOrderDetails.refresh();
                         tableListInformation.refresh();
 
-                        invRequestController.setTransactionStatus(StockRequestStatus.OPEN);
                         invRequestController.Master().setCompanyID(psCompanyID);
                     }
                     break;
@@ -1017,9 +997,6 @@ public class InvRequest_ConfirmationController implements Initializable, ScreenI
                 case F3:
                     switch (fieldId) {
                         case "tfSearchTransNo":
-                            invRequestController.Master().setCompanyID(psCompanyID);
-                            invRequestController.Master().setCategoryId(psCategoryID);
-                            invRequestController.setTransactionStatus("102");
                             poJSON = invRequestController.searchTransaction();
                             if (!"error".equals((String) poJSON.get("result"))) {
                                 pnTblInvDetailRow = -1;
@@ -1034,9 +1011,6 @@ public class InvRequest_ConfirmationController implements Initializable, ScreenI
                             }
                             break;
                         case "tfSearchReferenceNo":
-                            invRequestController.Master().setCompanyID(psCompanyID);
-                            invRequestController.Master().setCategoryId(psCategoryID);
-                            invRequestController.setTransactionStatus("102");
                             poJSON = invRequestController.searchTransaction(true);
                             if (!"error".equals((String) poJSON.get("result"))) {
                                 pnTblInvDetailRow = -1;
@@ -1232,7 +1206,6 @@ public class InvRequest_ConfirmationController implements Initializable, ScreenI
             if (loSelectedInformation != null) {
                 String lsTransactionNo = loSelectedInformation.getIndex01();
                 try {
-                    poJSON = invRequestController.InitTransaction();
                     if ("success".equals((String) poJSON.get("result"))) {
                         poJSON = invRequestController.OpenTransaction(lsTransactionNo);
                         if ("success".equals((String) poJSON.get("result"))) {
