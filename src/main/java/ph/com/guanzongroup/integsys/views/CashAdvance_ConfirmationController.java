@@ -216,7 +216,7 @@ public class CashAdvance_ConfirmationController implements Initializable, Screen
                                 ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                 txtField.setText("");
                                 break;
-                            } 
+                            }
                             loadRecordSearch();
                             retrieveCashAdvance();
                             break;
@@ -731,7 +731,7 @@ public class CashAdvance_ConfirmationController implements Initializable, Screen
         }
         switch (poController.getModel().getTransactionStatus()) {
             case CashAdvanceStatus.CONFIRMED:
-                JFXUtil.setButtonsVisibility(false, btnConfirm);
+                JFXUtil.setButtonsVisibility(false, btnConfirm, btnUpdate);
                 break;
             case CashAdvanceStatus.VOID:
             case CashAdvanceStatus.CANCELLED:
