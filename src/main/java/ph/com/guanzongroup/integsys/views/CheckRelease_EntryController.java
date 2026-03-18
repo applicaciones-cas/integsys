@@ -181,15 +181,22 @@ public class CheckRelease_EntryController implements Initializable, ScreenInterf
      * Initializes the TBJ controller and transaction objects.
      */
     private void initializeObject() {
-        LogWrapper logwrapr = new LogWrapper("CAS", System.getProperty("sys.default.path.temp") + "cas-error.log");
-        poGLControllers = new CashflowControllers(poApp, logwrapr);
-        poGLControllers.CheckReleases().setTransactionStatus("0");
-        poJSON = poGLControllers.CheckReleases().InitTransaction();
-        if (!"success".equals(poJSON.get("result"))) {
+        try {
+            LogWrapper logwrapr = new LogWrapper("CAS", System.getProperty("sys.default.path.temp") + "cas-error.log");
+            poGLControllers = new CashflowControllers(poApp, logwrapr);
+            poGLControllers.CheckReleases().setTransactionStatus("0");
+            poJSON = poGLControllers.CheckReleases().InitTransaction();
+
+            if (!"success".equals(poJSON.get("result"))) {
                 ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
+            }
+            poGLControllers.CheckReleases().Master().setIndustryId(psIndustryID);
+            poGLControllers.CheckReleases().Master().setCompany(psCompanyID);
+            lblSource.setText(poGLControllers.CheckReleases().Master().Company().getCompanyName() + " - " + poGLControllers.CheckReleases().Master().Industry().getDescription());
+        } catch (SQLException | GuanzonException ex) {
+            Logger.getLogger(CheckTransfer_EntryController.class.getName()).log(Level.SEVERE, null, ex);
+            ShowMessageFX.Error(ex.getMessage(), psFormName, null);
         }
-//            poGLControllers.CheckReleases().Master().setIndustryId(psIndustryID);
-//            lblSource.setText(poGLControllers.CheckReleases().Master().Company().getCompanyName() + " - " + poGLControllers.CheckReleases().Master().Industry().getDescription());
     }
     
     private void ClearAll() {
@@ -331,7 +338,7 @@ public class CheckRelease_EntryController implements Initializable, ScreenInterf
                         ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
                         return;
                     }
-                    ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
+                    ShowMessageFX.Information((String) poJSON.get("message"), psFormName, null);
                      pnEditMode = poGLControllers.CheckReleases().getEditMode();
                         if (ShowMessageFX.YesNo(null, psFormName, "Do you want to confirm this transaction?")) {
                                 poJSON = poGLControllers.CheckReleases().OpenTransaction(poGLControllers.CheckReleases().Master().getTransactionNo());
@@ -670,10 +677,13 @@ public class CheckRelease_EntryController implements Initializable, ScreenInterf
                         tblViewDetails.getSelectionModel().clearAndSelect(pnSelectedDetail);
                         tblViewDetails.scrollTo(pnSelectedDetail);
                         LoadDetail();
+                        
                         JFXUtil.showRetainedHighlight(false, tblViewMaster, "#A7C7E7", plOrderNoPartial, plOrderNoFinal, highlightedRowsMain, true);
                         loadHighlightFromDetail();
                         try {
                             poJSON = poGLControllers.CheckReleases().computeMasterFields();
+                            tfTotal.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(
+                            poGLControllers.CheckReleases().Master().getTransactionTotal(), true));
                         } catch (SQLException | GuanzonException ex) {
                             Logger.getLogger(CheckRelease_EntryController.class.getName()).log(Level.SEVERE, null, ex);
                             ShowMessageFX.Error(ex.getMessage(), psFormName, null);
@@ -749,7 +759,7 @@ public class CheckRelease_EntryController implements Initializable, ScreenInterf
                     }
                      
                     loadTableDetail();
-                    poGLControllers.CheckTransfers().computeMasterFields();
+                    poGLControllers.CheckReleases().computeMasterFields();
                    
                 } catch (SQLException | GuanzonException ex) {
                     Logger.getLogger(CheckRelease_EntryController.class.getName()).log(Level.SEVERE, null, ex);
@@ -1042,6 +1052,7 @@ public class CheckRelease_EntryController implements Initializable, ScreenInterf
                                 poJSON = poGLControllers.CheckReleases().SearchChecks(lsValue, "",pnSelectedDetail,false);
                                 if ("error".equals(poJSON.get("result"))) {
                                     ShowMessageFX.Warning((String) poJSON.get("message"), lsValue, lsValue);
+                                    return;
                                 }
                                 tfCheckTransNo.setText(poGLControllers.CheckReleases().Detail(pnSelectedDetail).CheckPayment().getTransactionNo());
                                 loadTableDetail();
@@ -1050,6 +1061,7 @@ public class CheckRelease_EntryController implements Initializable, ScreenInterf
                                 poJSON = poGLControllers.CheckReleases().SearchChecks("", lsValue,pnSelectedDetail,false);
                                 if ("error".equals(poJSON.get("result"))) {
                                     ShowMessageFX.Warning((String) poJSON.get("message"), lsValue, lsValue);
+                                    return;
                                 }
                                 tfCheckNo.setText(poGLControllers.CheckReleases().Detail(pnSelectedDetail).CheckPayment().getCheckNo());
                                 loadTableDetail();
