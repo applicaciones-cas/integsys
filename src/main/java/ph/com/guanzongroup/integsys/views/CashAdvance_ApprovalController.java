@@ -84,7 +84,7 @@ public class CashAdvance_ApprovalController implements Initializable, ScreenInte
     @FXML
     private HBox hbButtons, hboxid;
     @FXML
-    private Button btnConfirm, btnCancel, btnHistory, btnRetrieve, btnClose;
+    private Button btnApprove, btnDisapprove, btnHistory, btnRetrieve, btnClose;
     @FXML
     private DatePicker dpAdvanceDate;
     @FXML
@@ -573,19 +573,6 @@ public class CashAdvance_ApprovalController implements Initializable, ScreenInte
                     case "btnSearch":
                         JFXUtil.initiateBtnSearch(pxeModuleName, lastFocusedTextField, previousSearchedTextField, apBrowse, apMaster);
                         break;
-
-                    case "btnCancel":
-                        if (ShowMessageFX.OkayCancel(null, pxeModuleName, "Do you want to disregard changes?") == true) {
-                            JFXUtil.disableAllHighlightByColor(tblViewMainList, "#A7C7E7", highlightedRowsMain);
-                            //Clear data
-                            clearTextFields();
-                            poController.resetModel();
-                            poController.initFields();
-                            pnEditMode = EditMode.UNKNOWN;
-                            break;
-                        } else {
-                            return;
-                        }
                     case "btnHistory":
                         if (pnEditMode != EditMode.READY && pnEditMode != EditMode.UPDATE) {
                             ShowMessageFX.Warning("No transaction status history to load!", pxeModuleName, null);
@@ -648,7 +635,7 @@ public class CashAdvance_ApprovalController implements Initializable, ScreenInte
                             return;
                         }
                         break;
-                    case "btnConfirm":
+                    case "btnApprove":
                         poJSON = new JSONObject();
                         if (ShowMessageFX.YesNo(null, pxeModuleName, "Are you sure you want to confirm transaction?") == true) {
                             poJSON = poController.ConfirmTransaction();
@@ -664,7 +651,7 @@ public class CashAdvance_ApprovalController implements Initializable, ScreenInte
                             return;
                         }
                         break;
-                    case "btnVoid":
+                    case "btnDisapprove":
                         poJSON = new JSONObject();
                         if (ShowMessageFX.YesNo(null, pxeModuleName, "Are you sure you want to disapprove transaction?") == true) {
                             switch (poController.getModel().getTransactionStatus()) {
@@ -692,7 +679,7 @@ public class CashAdvance_ApprovalController implements Initializable, ScreenInte
                         break;
                 }
 
-                if (JFXUtil.isObjectEqualTo(lsButton, "btnSave", "btnConfirm", "btnVoid", "btnCancel")) {
+                if (JFXUtil.isObjectEqualTo(lsButton, "btnSave", "btnApprove", "btnDisapprove", "btnCancel")) {
                     clearTextFields();
                     poController.resetModel();
                     pnEditMode = EditMode.UNKNOWN;
@@ -726,25 +713,21 @@ public class CashAdvance_ApprovalController implements Initializable, ScreenInte
         boolean lbShow4 = (fnValue == EditMode.UNKNOWN || fnValue == EditMode.READY);
         // Manage visibility and managed state of other buttons
         //Update 
-        JFXUtil.setButtonsVisibility(lbShow1, btnCancel);
 
         //Ready
-        JFXUtil.setButtonsVisibility(lbShow3, btnHistory, btnConfirm);
+        JFXUtil.setButtonsVisibility(lbShow3, btnHistory, btnApprove, btnDisapprove);
 
         //Unkown || Ready
-        JFXUtil.setDisabled(!lbShow1, apMaster);
+        JFXUtil.setDisabled(false, apMaster);
         JFXUtil.setButtonsVisibility(lbShow4, btnClose);
 
         if (fnValue != EditMode.READY) {
             return;
         }
         switch (poController.getModel().getTransactionStatus()) {
-            case CashAdvanceStatus.CONFIRMED:
-                JFXUtil.setButtonsVisibility(false, btnConfirm);
-                break;
             case CashAdvanceStatus.VOID:
             case CashAdvanceStatus.CANCELLED:
-                JFXUtil.setButtonsVisibility(false, btnConfirm);
+                JFXUtil.setButtonsVisibility(false, btnApprove);
                 break;
         }
     }
