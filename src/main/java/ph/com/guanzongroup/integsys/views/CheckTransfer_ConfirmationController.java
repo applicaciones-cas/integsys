@@ -160,6 +160,7 @@ public class CheckTransfer_ConfirmationController implements Initializable, Scre
         initTableDetail();
         initTableOnClick();
         initCheckBox();
+        initFields();
         initButtons(poGLControllers.CheckTransfers().getEditMode());
     }
     
@@ -167,16 +168,22 @@ public class CheckTransfer_ConfirmationController implements Initializable, Scre
      * Initializes the TBJ controller and transaction objects.
      */
     private void initializeObject() {
-        LogWrapper logwrapr = new LogWrapper("CAS", System.getProperty("sys.default.path.temp") + "cas-error.log");
-        poGLControllers = new CashflowControllers(poApp, logwrapr);
-        poGLControllers.CheckTransfers().setTransactionStatus("01");
-        poJSON = poGLControllers.CheckTransfers().InitTransaction();
+        try {
+            LogWrapper logwrapr = new LogWrapper("CAS", System.getProperty("sys.default.path.temp") + "cas-error.log");
+            poGLControllers = new CashflowControllers(poApp, logwrapr);
+            poGLControllers.CheckTransfers().setTransactionStatus("01");
+            poJSON = poGLControllers.CheckTransfers().InitTransaction();
 
-        if (!"success".equals(poJSON.get("result"))) {
+            if (!"success".equals(poJSON.get("result"))) {
                 ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
+            }
+            poGLControllers.CheckTransfers().Master().setIndustryId(psIndustryID);
+            poGLControllers.CheckTransfers().Master().setCompany(psCompanyID);
+            lblSource.setText(poGLControllers.CheckTransfers().Master().Company().getCompanyName() + " - " + poGLControllers.CheckTransfers().Master().Industry().getDescription());
+        } catch (SQLException | GuanzonException ex) {
+            Logger.getLogger(CheckTransfer_ConfirmationController.class.getName()).log(Level.SEVERE, null, ex);
+            ShowMessageFX.Error(ex.getMessage(), psFormName, null);
         }
-//            poGLControllers.CheckTransfers().Master().setIndustryId(psIndustryID);
-//            lblSource.setText(poGLControllers.CheckTransfers().Master().Company().getCompanyName() + " - " + poGLControllers.CheckTransfers().Master().Industry().getDescription());
     }
     
     private void ClearAll() {
@@ -199,9 +206,10 @@ public class CheckTransfer_ConfirmationController implements Initializable, Scre
         detail_data.clear();
         pnSelectedDetail = 0;
         psActiveField = "";
+        lblStatus.setText("UNKNOWN");
     }
     private void initButtonsClickActions() {
-        List<Button> buttons = Arrays.asList(btnBrowse, btnUpdate, btnHistory,btnSave, btnCancel, btnClose,btnRetrieve,btnPrint,btnSearch,btnApprove);
+        List<Button> buttons = Arrays.asList(btnBrowse, btnUpdate, btnHistory,btnSave, btnVoid,btnCancel, btnClose,btnRetrieve,btnPrint,btnSearch,btnApprove);
         buttons.forEach(button -> button.setOnAction(this::handleButtonAction));
     }
     
@@ -324,8 +332,8 @@ public class CheckTransfer_ConfirmationController implements Initializable, Scre
                         ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
                         return;
                     }
-                    ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
-                    if (poApp.getUserLevel() > UserRight.ENCODER) {
+                    ShowMessageFX.Information((String) poJSON.get("message"), psFormName, null);
+                    if( poGLControllers.CheckTransfers().Master().getTransactionStatus().equals(CheckTransferStatus.OPEN)){
                         if (ShowMessageFX.YesNo(null, psFormName, "Do you want to confirm this transaction?")) {
                                 poJSON = poGLControllers.CheckTransfers().OpenTransaction(poGLControllers.CheckTransfers().Master().getTransactionNo());
                                 poJSON = poGLControllers.CheckTransfers().ConfirmTransaction("");
@@ -334,9 +342,18 @@ public class CheckTransfer_ConfirmationController implements Initializable, Scre
                                 ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
                                 return;
                             }
-                            ShowMessageFX.Information((String) poJSON.get("message"), psFormName, null);
                         }
                     }
+                        if (ShowMessageFX.YesNo(null, psFormName, "Do you want to print this transaction?")) {
+                            poJSON = poGLControllers.CheckTransfers().printTransaction();
+                            if ("error".equals((String) poJSON.get("result"))) {
+                                ShowMessageFX.Error((String) poJSON.get("message"), psFormName, null);
+                                ClearAll();
+                                initButtons(pnEditMode);
+                                return;
+                            }
+                            
+                        }
 
                     ClearAll();
                     break;
@@ -347,7 +364,7 @@ public class CheckTransfer_ConfirmationController implements Initializable, Scre
                            ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
                            return;
                        }
-                       ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
+                       ShowMessageFX.Information((String) poJSON.get("message"), psFormName, null);
                        ClearAll();
                        initializeObject();
                        pnEditMode = poGLControllers.CheckTransfers().getEditMode();
@@ -359,7 +376,8 @@ public class CheckTransfer_ConfirmationController implements Initializable, Scre
                            ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
                            return;
                        }
-                       ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
+                       ShowMessageFX.Information((String) poJSON.get("message"), psFormName, null);
+                       
                        ClearAll();
                        initializeObject();
                        pnEditMode = poGLControllers.CheckTransfers().getEditMode();
@@ -367,11 +385,15 @@ public class CheckTransfer_ConfirmationController implements Initializable, Scre
                 break;
                 
                 case "btnPrint":
+                    if(!poGLControllers.CheckTransfers().Master().getPrintStatus().equals(CheckTransferStatus.CONFIRMED)){
+                        ShowMessageFX.Error("Need to ", psFormName, null);
+                        return;
+                    }
                      poJSON = poGLControllers.CheckTransfers().printTransaction();
                     if ("error".equals((String) poJSON.get("result"))) {
                         ShowMessageFX.Error((String) poJSON.get("message"), psFormName, null);
+                        return;
                     }
-                    ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
                 break;
 
                 default:
@@ -412,7 +434,7 @@ public class CheckTransfer_ConfirmationController implements Initializable, Scre
             apDetail.setDisable(false);
         }
         
-            List<TextField> loTxtField = Arrays.asList(tfDestination, tfDepartment, tfCheckTransNo, tfCheckNo,tfSearchDestination);
+            List<TextField> loTxtField = Arrays.asList(tfDestination, tfDepartment, tfCheckTransNo, tfCheckNo,tfSearchDestination,tfSearchTransNo);
             loTxtField.forEach(tf -> tf.setOnKeyPressed(event -> txtField_KeyPressed(event)));
 //
 //            JFXUtil.setFocusListener(txtArea_Focus, taRemarks);
@@ -534,6 +556,16 @@ public class CheckTransfer_ConfirmationController implements Initializable, Scre
             CustomCommonUtil.setVisible(false, btnUpdate,btnVoid,btnApprove,btnPrint);
             CustomCommonUtil.setManaged(false, btnUpdate,btnVoid,btnApprove,btnPrint);
         }
+        if(poGLControllers.CheckTransfers()
+                .Master().getTransactionStatus().equals(CheckTransferStatus.CONFIRMED)){
+            CustomCommonUtil.setVisible(false, btnApprove);
+            CustomCommonUtil.setManaged(false, btnApprove);
+        }
+        if(poGLControllers.CheckTransfers()
+                .Master().getTransactionStatus().equals(CheckTransferStatus.VOID)){
+            CustomCommonUtil.setVisible(false, btnUpdate);
+            CustomCommonUtil.setManaged(false, btnUpdate);
+        }
     }
 
     
@@ -606,6 +638,9 @@ public class CheckTransfer_ConfirmationController implements Initializable, Scre
                     }
                     List<ModelTableDetail> detailsList = new ArrayList<>();
                     for (int lnCtr = 0; lnCtr < poGLControllers.CheckTransfers().getDetailCount(); lnCtr++) {
+                        if (!poGLControllers.CheckTransfers().Detail(lnCtr).isReverse()) {
+                            continue;
+                        }
                         detailsList.add(new ModelTableDetail(
                                 String.valueOf(lnCtr + 1),
                                 poGLControllers.CheckTransfers().Detail(lnCtr) != null
@@ -714,19 +749,18 @@ public class CheckTransfer_ConfirmationController implements Initializable, Scre
         if ((pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE)) {
             
             cbReverse.setOnAction(event -> {
-                if (poGLControllers.CheckTransfers().Master().getTransactionStatus().equals(CheckTransferStatus.OPEN)
-                        || poGLControllers.CheckTransfers().Master().getTransactionStatus().equals(CheckTransferStatus.CONFIRMED)) {
-                    if (poGLControllers.CheckTransfers().Detail(pnSelectedDetail).getSourceNo() != null
-                            || !poGLControllers.CheckTransfers().Detail(pnSelectedDetail).getSourceNo().isEmpty()) {
-                        if (!cbReverse.isSelected()) {
-                            poGLControllers.CheckTransfers().Detail().remove(pnSelectedDetail);
-                        }
+                try {
+                    if (poGLControllers.CheckTransfers().Detail(pnSelectedDetail).getEditMode() == EditMode.ADDNEW) {
+                        poGLControllers.CheckTransfers().deleteDetail(pnSelectedDetail);
+                    } else {
+                        poGLControllers.CheckTransfers().Detail(pnSelectedDetail).isReverse(cbReverse.isSelected());
                     }
-                } else {
-                     poGLControllers.CheckTransfers().Detail(pnSelectedDetail).isReverse(cbReverse.isSelected());
+                    loadTableDetail();
+                    poGLControllers.CheckTransfers().computeMasterFields();
+                } catch (SQLException | GuanzonException ex) {
+                    Logger.getLogger(CheckTransfer_ConfirmationController.class.getName()).log(Level.SEVERE, null, ex);
+                    ShowMessageFX.Error(ex.getMessage(), psFormName, null);
                 }
-                
-                loadTableDetail();
             });
             
         }
@@ -845,7 +879,7 @@ public class CheckTransfer_ConfirmationController implements Initializable, Scre
             protected Void call() throws Exception {
                 try {
                     main_data.clear();
-                    poJSON = poGLControllers.CheckTransfers().getCheckTransfer(poGLControllers.CheckTransfers().Master().getDestination(), 
+                    poJSON = poGLControllers.CheckTransfers().getCheckTransfer(tfSearchDestination.getText(), 
                                                                    tfSearchTransNo.getText(),
                                                                   dpSearchTransactionDate.getValue());
                     
@@ -1007,12 +1041,9 @@ public class CheckTransfer_ConfirmationController implements Initializable, Scre
                         break;
                     case F3:
                         switch (txtFieldID) {
+                            case "tfSearchTransNo":
                             case "tfSearchDestination":
-                                poJSON = poGLControllers.CheckTransfers().SearchDistination(lsValue, false);
-                                if ("error".equals(poJSON.get("result"))) {
-                                    ShowMessageFX.Warning((String) poJSON.get("message"), lsValue, lsValue);
-                                }
-                                tfSearchDestination.setText(poGLControllers.CheckTransfers().Master().Branch().getBranchName());
+                                main_data.clear();
                                 loadTableMaster();
                                 break;
                             case "tfDestination":
