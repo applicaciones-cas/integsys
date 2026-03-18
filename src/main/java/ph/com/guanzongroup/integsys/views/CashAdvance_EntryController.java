@@ -294,6 +294,7 @@ public class CashAdvance_EntryController implements Initializable, ScreenInterfa
             }
         } catch (SQLException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 

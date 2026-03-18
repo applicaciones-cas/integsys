@@ -413,6 +413,7 @@ public class CashAdvance_ConfirmationController implements Initializable, Screen
             }
         } catch (SQLException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
