@@ -440,9 +440,9 @@ public class CashFundController implements Initializable, ScreenInterface {
                 poJSON = new JSONObject();
                 switch (datePicker.getId()) {
                     case "dpBegBalAsOf":
-                        if (ldSelectedDate.isAfter(ldCurrentDate)) {
+                        if (ldSelectedDate.isBefore(ldCurrentDate)) {
                             poJSON.put("result", "error");
-                            poJSON.put("message", "Future dates are not allowed.");
+                            poJSON.put("message", "Back date is not allowed.");
                             pbSuccess = false;
                         }
                         if (pbSuccess) {

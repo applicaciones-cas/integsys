@@ -509,6 +509,9 @@ public class CashAdvance_ConfirmationController implements Initializable, Screen
                     btnVoid.setText("Void");
                     break;
             }
+            boolean lbShow = oApp.isMainOffice();
+            JFXUtil.setDisabled(!lbShow, tfBranch);
+
             JFXUtil.setDisabled(true, dpAdvanceDate);
             lblStatus.setText(pnEditMode == EditMode.UNKNOWN ? "UNKNOWN" : poController.getStatus(poController.getModel().getTransactionStatus()).toUpperCase());
             tfTransactionNo.setText(poController.getModel().getTransactionNo());
