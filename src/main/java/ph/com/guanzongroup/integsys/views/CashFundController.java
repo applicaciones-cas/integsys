@@ -327,7 +327,7 @@ public class CashFundController implements Initializable, ScreenInterface {
                         break;
                     case "btnVoid":
                         String id2 = poController.getModel().getCashFundId();
-                        if (ShowMessageFX.YesNo(null, "Close Tab", "Are you sure you want to deactivate the transaction?") == true) {
+                        if (ShowMessageFX.YesNo(null, pxeModuleName, "Are you sure you want to deactivate the transaction?") == true) {
                             poJSON = poController.DeactivateRecord();
                             if ("error".equals((String) poJSON.get("result"))) {
                                 ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
@@ -386,7 +386,7 @@ public class CashFundController implements Initializable, ScreenInterface {
                     case "btnSave":
                         //Validator
                         poJSON = new JSONObject();
-                        if (ShowMessageFX.YesNo(null, "Close Tab", "Are you sure you want to save the transaction?") == true) {
+                        if (ShowMessageFX.YesNo(null, pxeModuleName, "Are you sure you want to save the transaction?") == true) {
                             poJSON = poController.saveRecord();
                             if (!"success".equals((String) poJSON.get("result"))) {
                                 ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
