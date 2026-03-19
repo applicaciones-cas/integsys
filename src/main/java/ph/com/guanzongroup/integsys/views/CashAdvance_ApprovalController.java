@@ -181,9 +181,9 @@ public class CashAdvance_ApprovalController implements Initializable, ScreenInte
 
     public void initTableOnClick() {
         tblViewMainList.setOnMouseClicked(event -> {
-            pnMain = tblViewMainList.getSelectionModel().getSelectedIndex();
-            if (pnMain >= 0) {
-                if (event.getClickCount() == 2) {
+            if (event.getClickCount() == 2) {
+                pnMain = tblViewMainList.getSelectionModel().getSelectedIndex();
+                if (pnMain >= 0) {
                     loadTableDetailFromMain();
                     pnEditMode = poController.getEditMode();
                     initButton(pnEditMode);
