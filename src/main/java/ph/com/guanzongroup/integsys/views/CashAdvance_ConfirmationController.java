@@ -730,6 +730,7 @@ public class CashAdvance_ConfirmationController implements Initializable, Screen
         }
         switch (poController.getModel().getTransactionStatus()) {
             case CashAdvanceStatus.CONFIRMED:
+            case CashAdvanceStatus.APPROVED:
                 JFXUtil.setButtonsVisibility(false, btnConfirm, btnUpdate);
                 break;
             case CashAdvanceStatus.VOID:
