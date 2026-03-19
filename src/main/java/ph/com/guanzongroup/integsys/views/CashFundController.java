@@ -398,7 +398,7 @@ public class CashFundController implements Initializable, ScreenInterface {
                                 JSONObject loJSON = poController.openRecord(poController.getModel().getCashFundId());
                                 if ("success".equals(loJSON.get("result"))) {
                                     if (poController.getModel().getTransactionStatus().equals(CashFundStatus.OPEN)) {
-                                        if (ShowMessageFX.YesNo(null, pxeModuleName, "Do you want to confirm this transaction?")) {
+                                        if (ShowMessageFX.YesNo(null, pxeModuleName, "Do you want to activate this transaction?")) {
                                             loJSON = poController.ActivateRecord();
                                             if ("success".equals((String) loJSON.get("result"))) {
                                                 ShowMessageFX.Information((String) loJSON.get("message"), pxeModuleName, null);
@@ -438,9 +438,10 @@ public class CashFundController implements Initializable, ScreenInterface {
     EventHandler<ActionEvent> datepicker_Action = JFXUtil.DatePickerAction(
             (datePicker, sdfFormat, lsServerDate, ldCurrentDate, lsSelectedDate, ldSelectedDate) -> {
                 poJSON = new JSONObject();
+                JFXUtil.setJSONSuccess(poJSON, "success");
                 switch (datePicker.getId()) {
                     case "dpBegBalAsOf":
-                        if (ldSelectedDate.isBefore(ldCurrentDate)) {
+                        if (ldSelectedDate.isBefore(ldCurrentDate) && (pnEditMode == EditMode.UPDATE || pnEditMode == EditMode.ADDNEW)) {
                             poJSON.put("result", "error");
                             poJSON.put("message", "Back date is not allowed.");
                             pbSuccess = false;
