@@ -3,6 +3,8 @@ package ph.com.guanzongroup.integsys.views;
 import ph.com.guanzongroup.integsys.views.ScreenInterface;
 import java.lang.reflect.Field;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -37,6 +39,8 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import static javafx.scene.input.KeyCode.ENTER;
 import static javafx.scene.input.KeyCode.F3;
 import static javafx.scene.input.KeyCode.TAB;
@@ -44,8 +48,11 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.StackPane;
+import javafx.stage.FileChooser;
+import javafx.stage.Stage;
 import org.guanzon.appdriver.agent.ShowMessageFX;
 import org.guanzon.appdriver.agent.services.Model;
+import org.guanzon.appdriver.agent.systables.Model_Transaction_Attachment;
 import org.guanzon.appdriver.base.CommonUtils;
 import org.guanzon.appdriver.base.GRiderCAS;
 import org.guanzon.appdriver.base.LogWrapper;
@@ -65,16 +72,19 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
 
     private GRiderCAS poApp;
     private LogWrapper poLogWrapper;
-    private String psFormName = "Account Payable";
     private Control lastFocusedControl;
     private AP_Client_Master poAppController;
+     
+    private String psFormName = "Account Payable";
+    private int pnLedger, pnAttachments;
+    
     private ObservableList<Model_AP_Client_Ledger> laLedger;
-    private int pnLedger;
+    private ObservableList<Model_Transaction_Attachment> laAttachments;
 
     private unloadForm poUnload = new unloadForm();
 
     @FXML
-    private AnchorPane apMainAnchor, apRecord, apLedger;
+    private AnchorPane apMainAnchor, apRecord, apLedger, apAttachments;
     @FXML
     private Label lblStatus;
 
@@ -98,10 +108,13 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
     private TextField txtAttachmentNo;
     
     @FXML
-    private TableView<Model> tblAttachments;
+    private TableView<Model_Transaction_Attachment> tblAttachments;
     
     @FXML
-    private TableColumn<Model, String> tblColAttachIndex, tblColAttachFile;
+    private TableColumn<Model_Transaction_Attachment, String> tblColAttachIndex, tblColAttachFile;
+    
+    @FXML
+    private ImageView imgPreview;
     
     @FXML
     private Button btnAttach, btnRemoveFile;
@@ -147,8 +160,11 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
             Platform.runLater(() -> {
                 poAppController.setRecordStatus("10");
             });
+            
             initializeTableLedger();
+            initializeTableAttachments();
             initControlEvents();
+            
         } catch (SQLException | GuanzonException e) {
             Logger.getLogger(AccountsPayablexController.class.getName()).log(Level.SEVERE, null, e);
             poLogWrapper.severe(psFormName + " :" + e.getMessage());
@@ -157,15 +173,10 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
 
     @FXML
     void tblLedger_Clicked(MouseEvent e) {
-//        try {
         pnLedger = tblLedger.getSelectionModel().getSelectedIndex();
         if (pnLedger < 0) {
             return;
         }
-//show ui or something todo on ledger
-//        } catch (SQLException | GuanzonException | CloneNotSupportedException ex) {
-//                poLogWrapper.severe(psFormName + " :" + ex.getMessage());
-//        }
     }
 
     @FXML
@@ -302,6 +313,23 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
                     loadLedgerList();
                     reloadTableLedger();
                     break;
+                    
+                case "btnAttach":
+                    
+                    FileChooser fileChooser = new FileChooser();
+                    fileChooser.setTitle("Choose Image");
+                    fileChooser.getExtensionFilters().addAll(
+                            new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg", "*.gif", "*.pdf")
+                    );
+                    java.io.File selectedFile = fileChooser.showOpenDialog((Stage) btnAttach.getScene().getWindow());
+                    if (selectedFile != null) {
+                            // Read image from the selected file
+                            Path imgPath = selectedFile.toPath();
+                            Image loimage = new Image(Files.newInputStream(imgPath));
+                            imgPreview.setImage(loimage);
+                    }
+                    break;
+                    
                 case "btnClose":
                     if (ShowMessageFX.YesNo("Are you sure you want to close this form?", psFormName, null)) {
                         if (poUnload != null) {
@@ -468,9 +496,6 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
                 case "dpClientSince":
                     poAppController.getModel().setdateClientSince(ldDateValue);
                     return;
-//                case "dpBegBalance":
-//                    poAppController.getModel().setBeginningDate(ldDateValue);
-//                    return;
 
             }
         }
@@ -486,6 +511,7 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
             tfCompanyName.setText(poAppController.getModel().Client().getCompanyName());
             tfAddress.setText(poAppController.getModel().ClientAddress().getAddress());
             tfContactPerson.setText(poAppController.getModel().ClientInstitutionContact().getContactPersonName());
+            tfContactEmail.setText(poAppController.getModel().ClientInstitutionContact().getMailAddress());
             tfContactNo.setText(poAppController.getModel().ClientInstitutionContact().getMobileNo());
             tfTINNo.setText(poAppController.getModel().Client().getTaxIdNumber());
 
@@ -564,12 +590,6 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
             }
         }
         initButtonDisplay(poAppController.getEditMode());
-//        try {
-////            dpBegBalance.setValue((ParseDate((Date) poApp.getServerDate())));
-////            dpClientSince.setValue(ParseDate((Date) poApp.getServerDate()));
-//        } catch (SQLException ex) {
-//            Logger.getLogger(AccountsPayablexController.class.getName()).log(Level.SEVERE, null, ex);
-//        }
     }
 
     private void initButtonDisplay(int fnEditMode) {
@@ -647,12 +667,31 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
             });
         }
     }
+    
+    private void initializeTableAttachments(){
+        if (laAttachments == null) {
+           laAttachments = FXCollections.observableArrayList();
+           tblAttachments.setItems(laAttachments);
+           
+           tblColAttachIndex.setStyle("-fx-alignment: CENTER-RIGHT; -fx-padding: 0 5 0 0;"); 
+           tblColAttachFile.setStyle("-fx-alignment: CENTER-RIGHT; -fx-padding: 0 5 0 0;");
+           
+           tblColAttachIndex.setCellValueFactory((loModel) -> {
+                int index = tblAttachments.getItems().indexOf(loModel.getValue()) + 1;
+                return new SimpleStringProperty(String.valueOf(index));
+            });
+           
+           tblColAttachFile.setCellValueFactory((loModel) -> {
+                return new SimpleStringProperty(String.valueOf(loModel.getValue().getFileName()));
+            });
+        }
+    }
 
     private void reloadTableLedger() {
         List<Model_AP_Client_Ledger> rawDetail = poAppController.getLedgerList();
         laLedger.setAll(rawDetail);
 
-//         Restore or select last row
+        //Restore or select last row
         int indexToSelect = (pnLedger >= 1 && pnLedger < laLedger.size())
                 ? pnLedger - 1
                 : laLedger.size() - 1;
@@ -662,8 +701,24 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
         pnLedger = tblLedger.getSelectionModel().getSelectedIndex() + 1; // Not focusedIndex
         tblLedger.refresh();
     }
+    
+    private void reloadTableAttachement() throws SQLException, GuanzonException {
+        List<Model_Transaction_Attachment> rawDetail = poAppController.getAttachmentList();
+        laAttachments.setAll(rawDetail);
+
+        //Restore or select last row
+        int indexToSelect = (pnAttachments >= 1 && pnAttachments < laAttachments.size())
+                ? pnAttachments - 1
+                : laAttachments.size() - 1;
+
+        tblAttachments.getSelectionModel().select(indexToSelect);
+
+        pnAttachments = tblAttachments.getSelectionModel().getSelectedIndex() + 1; // Not focusedIndex
+        tblAttachments.refresh();
+    }
 
     private void loadLedgerList() {
+        
         StackPane overlay = getOverlayProgress(apLedger);
         ProgressIndicator pi = (ProgressIndicator) overlay.getChildren().get(0);
         overlay.setVisible(true);
@@ -709,11 +764,61 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
         thread.setDaemon(true);
         thread.start();
     }
+    
+    private void loadAttachmentList() {
+        
+        StackPane overlay = getOverlayProgress(apAttachments);
+        ProgressIndicator pi = (ProgressIndicator) overlay.getChildren().get(0);
+        overlay.setVisible(true);
+        pi.setVisible(true);
+
+        Task<ObservableList<Model_Transaction_Attachment>> loadAttahcments = new Task<ObservableList<Model_Transaction_Attachment>>() {
+            @Override
+            protected ObservableList<Model_Transaction_Attachment> call() throws Exception {
+                if (!isJSONSuccess(poAppController.loadAttachments(),
+                        "Initialize : Load of Attachement List")) {
+                    return null;
+                }
+
+                List<Model_Transaction_Attachment> rawList = poAppController.getAttachmentList();
+                System.out.print("The size of attachment list is " + rawList.size());
+                return FXCollections.observableArrayList(new ArrayList<>(rawList));
+            }
+
+            @Override
+            protected void succeeded() {
+                ObservableList<Model_Transaction_Attachment> laListLoader = getValue();
+                tblAttachments.setItems(laListLoader);
+
+                overlay.setVisible(false);
+                pi.setVisible(false);
+            }
+
+            @Override
+            protected void failed() {
+                overlay.setVisible(false);
+                pi.setVisible(false);
+                Throwable ex = getException();
+                poLogWrapper.severe(psFormName + " : " + ex.getMessage());
+            }
+
+            @Override
+            protected void cancelled() {
+                overlay.setVisible(false);
+                pi.setVisible(false);
+            }
+        };
+        Thread thread = new Thread(loadAttahcments);
+        thread.setDaemon(true);
+        thread.start();
+    }
 
     private void getLoadedClient() throws SQLException, GuanzonException, CloneNotSupportedException {
-//        clearAllInputs();
+        //clearAllInputs();
         loadClientMaster();
         reloadTableLedger();
+        reloadTableAttachement();
+        loadAttachmentList();
     }
 
     private boolean isJSONSuccess(JSONObject loJSON, String fsModule) {

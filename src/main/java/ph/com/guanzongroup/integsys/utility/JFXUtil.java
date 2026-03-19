@@ -3099,7 +3099,7 @@ public class JFXUtil {
             if (node != null) {
                 Tooltip tooltip = new Tooltip(message);
 
-                //tooltip.setShowDelay(Duration.ZERO);
+                tooltip.setShowDelay(Duration.ZERO);
                 tooltip.setStyle(
                         "-fx-font-size: 10px;"
                         + "-fx-padding: 6 10 6 10;"
