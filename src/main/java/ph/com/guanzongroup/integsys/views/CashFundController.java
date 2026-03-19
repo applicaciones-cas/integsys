@@ -22,7 +22,6 @@ import static javafx.scene.input.KeyCode.TAB;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
-import org.guanzon.appdriver.agent.ShowDialogFX;
 import org.guanzon.appdriver.agent.ShowMessageFX;
 import org.guanzon.appdriver.base.CommonUtils;
 import org.guanzon.appdriver.base.GRiderCAS;
@@ -30,7 +29,6 @@ import org.guanzon.appdriver.base.GuanzonException;
 import org.guanzon.appdriver.base.MiscUtil;
 import org.guanzon.appdriver.base.SQLUtil;
 import org.guanzon.appdriver.constant.EditMode;
-import org.guanzon.appdriver.constant.UserRight;
 import ph.com.guanzongroup.cas.cashflow.status.CashFundStatus;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.ParseException;
@@ -405,7 +403,7 @@ public class CashFundController implements Initializable, ScreenInterface {
                                             if ("success".equals((String) loJSON.get("result"))) {
                                                 ShowMessageFX.Information((String) loJSON.get("message"), pxeModuleName, null);
                                             } else {
-                                                ShowMessageFX.Information((String) loJSON.get("message"), pxeModuleName, null);
+                                                ShowMessageFX.Warning(null, pxeModuleName, (String) loJSON.get("message"));
                                             }
                                         }
                                     }
