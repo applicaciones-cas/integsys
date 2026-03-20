@@ -188,6 +188,7 @@ public class CashLiquidation_EntryController implements Initializable, ScreenInt
 
             pnEditMode = EditMode.UNKNOWN;
             initButton(pnEditMode);
+            JFXUtil.initKeyClickObject(apMainAnchor, lastFocusedTextField, previousSearchedTextField);
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(CashLiquidation_EntryController.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -709,6 +710,7 @@ public class CashLiquidation_EntryController implements Initializable, ScreenInt
             }
             tfSearchIndustry.setText(poController.getSearchIndustry());
             tfSearchPayee.setText(poController.getSearchPayee());
+            JFXUtil.updateCaretPositions(apBrowse);
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
             ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
