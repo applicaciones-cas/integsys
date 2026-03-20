@@ -214,27 +214,19 @@ public class CashLiquidation_EntryController implements Initializable, ScreenInt
         Object source = event.getSource();
         if (source instanceof CheckBox) {
             CheckBox checkedBox = (CheckBox) source;
-//            switch (checkedBox.getId()) {
-//                case "cbReverse":
-//                    if (poController.Detail(pnDetail).getEditMode() == EditMode.ADDNEW) {
-//                        if (poController.Master().getSourceNo() != null && !"".equals(poController.Master().getSourceNo())) {
-//                            if (!checkedBox.isSelected()) {
-//                                poController.ReverseItem(pnDetail);
-//                            } else {
-//                                poController.Detail(pnDetail).isReverse(checkedBox.isSelected());
-//                            }
-//                        } else {
-//                            poController.Detail().remove(pnDetail);
-//                        }
-//                    } else {
-//                        poController.Detail(pnDetail).isReverse(checkedBox.isSelected());
-//                    }
-//                    loadTableDetail.reload();
-//                    if (checkedBox.isSelected()) {
-//                        moveNext(false, false);
-//                    }
-//                    break;
-//            }
+            switch (checkedBox.getId()) {
+                case "cbReverse":
+                    if (poController.Detail(pnDetail).getEditMode() == EditMode.ADDNEW) {
+                        poController.Detail().remove(pnDetail);
+                    } else {
+                        poController.Detail(pnDetail).isReverse(cbReverse.isSelected());
+                    }
+                    loadTableDetail.reload();
+                    if (checkedBox.isSelected()) {
+                        moveNext(false, false);
+                    }
+                    break;
+            }
         }
     }
 
@@ -1139,7 +1131,7 @@ public class CashLiquidation_EntryController implements Initializable, ScreenInt
             }
         });
         JFXUtil.applyRowHighlighting(tblViewMainList, item -> ((ModelCashLiquidation_Main) item).getIndex06(), highlightedRowsMain);
-        JFXUtil.applyRowHighlighting(tblViewDetail, item -> ((ModelCashLiquidation_Detail) item).getIndex01(), highlightedRowsDetail);
+//        JFXUtil.applyRowHighlighting(tblViewDetail, item -> ((ModelCashLiquidation_Detail) item).getIndex01(), highlightedRowsDetail);
         JFXUtil.setKeyEventFilter(tableKeyEvents, tblViewDetail, tblAttachments);
         JFXUtil.adjustColumnForScrollbar(tblViewMainList, tblViewDetail, tblAttachments);
     }
