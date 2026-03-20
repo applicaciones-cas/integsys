@@ -966,7 +966,7 @@ public class CashLiquidation_EntryController implements Initializable, ScreenInt
                             int lnRowCount = 0;
                             for (lnCtr = 0; lnCtr < poController.getDetailCount(); lnCtr++) {
                                 if (!poController.Detail(lnCtr).isReverse()) {
-                                    JFXUtil.highlightByKey(tblViewDetail, String.valueOf(lnCtr + 1), "#FAA0A0", highlightedRowsDetail);
+                                    return;
                                 }
                                 lnRowCount += 1;
                                 details_data.add(
