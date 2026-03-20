@@ -646,6 +646,14 @@ public class CashLiquidation_EntryController implements Initializable, ScreenInt
                 case F3:
                     switch (lsID) {
                         case "tfSearchIndustry":
+                            poJSON = poController.SearchIndustry(lsValue, false);
+                            if ("error".equals(poJSON.get("result"))) {
+                                ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                                txtField.setText("");
+                                break;
+                            }
+                            loadRecordSearch();
+                            retrieveCashAdvance();
                             break;
                         case "tfSearchPayee":
                             poJSON = poController.SearchPayee(lsValue, false);
