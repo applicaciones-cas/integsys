@@ -73,9 +73,9 @@ import javax.script.ScriptException;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.rendering.PDFRenderer;
 import org.guanzon.appdriver.constant.RecordStatus;
-import org.guanzon.cas.purchasing.status.POQuotationStatus;
 import ph.com.guanzongroup.cas.cashflow.CashLiquidation;
 import ph.com.guanzongroup.cas.cashflow.services.CashflowControllers;
+import ph.com.guanzongroup.cas.cashflow.status.CashAdvanceStatus;
 import ph.com.guanzongroup.integsys.utility.CustomCommonUtil;
 import ph.com.guanzongroup.integsys.utility.JFXUtil;
 
@@ -106,7 +106,7 @@ public class CashLiquidation_EntryController implements Initializable, ScreenInt
     private FilteredList<ModelCashLiquidation_Main> filteredData;
     private FilteredList<ModelCashLiquidation_Detail> filteredDataDetail;
     Map<String, String> imageinfo_temp = new HashMap<>();
-
+    boolean tooltipShown = false;
     JFXUtil.ReloadableTableTask loadTableDetail, loadTableMain, loadTableAttachment;
 
     private FileChooser fileChooser;
@@ -130,7 +130,7 @@ public class CashLiquidation_EntryController implements Initializable, ScreenInt
     @FXML
     private HBox hbButtons;
     @FXML
-    private Button btnUpdate, btnSearch, btnSave, btnCancel, btnHistory, btnRetrieve, btnClose, btnAddAttachment, btnRemoveAttachment, btnArrowLeft, btnArrowRight;
+    private Button btnUpdate, btnSearch, btnSave, btnHistory, btnRetrieve, btnClose, btnAddAttachment, btnRemoveAttachment, btnArrowLeft, btnArrowRight;
     @FXML
     private TabPane ImTabPane;
     @FXML
@@ -156,36 +156,41 @@ public class CashLiquidation_EntryController implements Initializable, ScreenInt
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        poController = new CashflowControllers(oApp, null).CashLiquidation();
+        try {
+            poController = new CashflowControllers(oApp, null).CashLiquidation();
+            poController.InitTransaction();
+            initTextFields();
+            initDatePickers();
+            initMainGrid();
+            initDetailsGrid();
+            initAttachmentsGrid();
+            initTableOnClick();
+            clearTextFields();
+            initLoadTable();
 
-        initTextFields();
-        initDatePickers();
-        initMainGrid();
-        initDetailsGrid();
-        initAttachmentsGrid();
-        initTableOnClick();
-        clearTextFields();
-        initLoadTable();
+            Platform.runLater(() -> {
+                poController.setTransactionStatus("2");
 
-        Platform.runLater(() -> {
-//            poController.setTransactionStatus("2");
-            poController.Master().setIndustryId(psIndustryId);
-            poController.Master().setCompanyId(psCompanyId);
+                poController.Master().setIndustryId(psIndustryId);
+                poController.Master().setCompanyId(psCompanyId);
 //            poController.Master().setCategoryCode(psCategoryId);
-            poController.setIndustryId(psIndustryId);
-            poController.setCompanyId(psCompanyId);
+                poController.setIndustryId(psIndustryId);
+                poController.setCompanyId(psCompanyId);
 //            poController.setCategoryId(psCategoryId);
-            poController.initFields();
-            poController.setWithUI(true);
-            loadRecordSearch();
-        });
+                poController.initFields();
+                poController.setWithUI(true);
+                loadRecordSearch();
+            });
 
-        initAttachmentPreviewPane();
+            initAttachmentPreviewPane();
 
-        pgPagination.setPageCount(1);
+            pgPagination.setPageCount(1);
 
-        pnEditMode = EditMode.UNKNOWN;
-        initButton(pnEditMode);
+            pnEditMode = EditMode.UNKNOWN;
+            initButton(pnEditMode);
+        } catch (SQLException | GuanzonException ex) {
+            Logger.getLogger(CashLiquidation_EntryController.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     @Override
@@ -260,23 +265,6 @@ public class CashLiquidation_EntryController implements Initializable, ScreenInt
                     case "btnSearch":
                         JFXUtil.initiateBtnSearch(pxeModuleName, lastFocusedTextField, previousSearchedTextField, apBrowse, apMaster, apDetail);
                         break;
-                    case "btnCancel":
-                        if (ShowMessageFX.OkayCancel(null, pxeModuleName, "Do you want to disregard changes?") == true) {
-                            JFXUtil.showRetainedHighlight(false, tblViewMainList, "#A7C7E7", plOrderNoPartial, plOrderNoFinal, highlightedRowsMain, true);
-                            //Clear data
-                            poController.resetMaster();
-                            poController.Detail().clear();
-                            clearTextFields();
-
-                            poController.Master().setIndustryId(psIndustryId);
-                            poController.setCompanyId(psCompanyId);
-//                            poController.Master().setCategoryCode(psCategoryId);
-//                            poController.initFields();
-                            pnEditMode = EditMode.UNKNOWN;
-                            break;
-                        } else {
-                            return;
-                        }
                     case "btnHistory":
                         if (pnEditMode != EditMode.READY && pnEditMode != EditMode.UPDATE) {
                             ShowMessageFX.Warning("No transaction status history to load!", pxeModuleName, null);
@@ -314,7 +302,7 @@ public class CashLiquidation_EntryController implements Initializable, ScreenInt
                                 JSONObject loJSON = poController.OpenTransaction(poController.Master().getTransactionNo());
                                 poController.loadAttachments();
                                 if ("success".equals(loJSON.get("result"))) {
-                                    if (poController.Master().getTransactionStatus().equals(POQuotationStatus.OPEN)) {
+                                    if (poController.Master().getTransactionStatus().equals(CashAdvanceStatus.OPEN)) {
                                         if (ShowMessageFX.YesNo(null, pxeModuleName, "Do you want to confirm this transaction?")) {
                                             loJSON = poController.ConfirmTransaction("Confirmed");
                                             if ("success".equals((String) loJSON.get("result"))) {
@@ -335,7 +323,7 @@ public class CashLiquidation_EntryController implements Initializable, ScreenInt
                     case "btnVoid":
                         poJSON = new JSONObject();
                         if (ShowMessageFX.YesNo(null, pxeModuleName, "Are you sure you want to void transaction?") == true) {
-                            if (POQuotationStatus.CONFIRMED.equals(poController.Master().getTransactionStatus())) {
+                            if (CashAdvanceStatus.CONFIRMED.equals(poController.Master().getTransactionStatus())) {
 //                                poJSON = poController.CancelTransaction();
                             } else {
 //                                poJSON = poController.VoidTransaction();
@@ -522,14 +510,12 @@ public class CashLiquidation_EntryController implements Initializable, ScreenInt
                         if (lsValue.isEmpty()) {
                             poController.setSearchIndustry("");
                         }
-                        retrieveCashAdvance();
                         loadRecordSearch();
                         break;
                     case "tfSearchPayee":
                         if (lsValue.isEmpty()) {
                             poController.setSearchPayee("");
                         }
-                        retrieveCashAdvance();
                         loadRecordSearch();
                         break;
                     case "tfSearchTransNo":
@@ -604,8 +590,8 @@ public class CashLiquidation_EntryController implements Initializable, ScreenInt
             apDetail.requestFocus();
             boolean lbContinue = true;
             while (lbContinue) {
-                pnDetail = isUp ? Integer.parseInt(details_data.get(JFXUtil.moveToPreviousRow(tblViewDetail)).getIndex08())
-                        : Integer.parseInt(details_data.get(JFXUtil.moveToNextRow(tblViewDetail)).getIndex08());
+                pnDetail = isUp ? Integer.parseInt(details_data.get(JFXUtil.moveToPreviousRow(tblViewDetail)).getIndex06())
+                        : Integer.parseInt(details_data.get(JFXUtil.moveToNextRow(tblViewDetail)).getIndex06());
                 if (poController.Detail(pnDetail).isReverse()) {
                     lbContinue = false;
                 }
@@ -665,6 +651,13 @@ public class CashLiquidation_EntryController implements Initializable, ScreenInt
                             loadRecordSearch();
                             retrieveCashAdvance();
                             break;
+                        case "tfSearchTransNo":
+                            retrieveCashAdvance();
+                            if (!tooltipShown) {
+                                JFXUtil.showTooltip("NOTE: Results appear directly in the table view, no pop-up dialog.", txtField);
+                                tooltipShown = true;
+                            }
+                            break;
                         case "tfAccountDescription":
                             poJSON = poController.SearchAccount(lsValue, false, pnDetail);
                             if ("error".equals(poJSON.get("result"))) {
@@ -674,7 +667,9 @@ public class CashLiquidation_EntryController implements Initializable, ScreenInt
                             } else {
                                 JFXUtil.textFieldMoveNext(tfParticular);
                             }
-                            loadTableDetail.reload();
+                            JFXUtil.runWithDelay(0.5, () -> {
+                                loadTableDetail.reload();
+                            });
                             break;
                     }
                     break;
@@ -844,7 +839,7 @@ public class CashLiquidation_EntryController implements Initializable, ScreenInt
 
     public void loadRecordMaster() {
         try {
-            JFXUtil.setStatusValue(lblStatus, POQuotationStatus.class, pnEditMode == EditMode.UNKNOWN ? "-1" : poController.Master().getTransactionStatus());
+            JFXUtil.setStatusValue(lblStatus, CashAdvanceStatus.class, pnEditMode == EditMode.UNKNOWN ? "-1" : poController.Master().getTransactionStatus());
             poController.computeFields(true);
 
             tfTransactionNo.setText(poController.Master().getTransactionNo());
@@ -869,22 +864,17 @@ public class CashLiquidation_EntryController implements Initializable, ScreenInt
 
     public void loadTableDetailFromMain() {
         try {
-            if (pnEditMode != EditMode.ADDNEW) {
-                ShowMessageFX.Warning(null, pxeModuleName, "Data can only be viewed when in ADD mode.");
-                return;
-            }
-
             poJSON = new JSONObject();
             ModelCashLiquidation_Main selected = (ModelCashLiquidation_Main) tblViewMainList.getSelectionModel().getSelectedItem();
             if (selected != null) {
-                if (JFXUtil.loadValidation(pnEditMode, pxeModuleName, "", selected.getIndex02())) {
-                    return;
-                }
+                int pnRowMain = Integer.parseInt(selected.getIndex01()) - 1;
+                pnMain = pnRowMain;
+//                if (JFXUtil.loadValidation(pnEditMode, pxeModuleName, poController.Master().getTransactionNo(), selected.getIndex02())) {
+//                    return;
+//                }
                 poController.resetTransaction();
                 poController.loadAttachments();
 
-                int pnRowMain = Integer.parseInt(selected.getIndex01()) - 1;
-                pnMain = pnRowMain;
                 poJSON = poController.OpenTransaction(poController.CashAdvanceList(pnMain).getTransactionNo());
                 if ("error".equals((String) poJSON.get("result"))) {
                     ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
@@ -996,20 +986,20 @@ public class CashLiquidation_EntryController implements Initializable, ScreenInt
 
                             JFXUtil.showRetainedHighlight(false, tblViewMainList, "#A7C7E7", plOrderNoPartial, plOrderNoFinal, highlightedRowsMain, true);
                             loadHighlightFromDetail();
-                            int lnTempRow = JFXUtil.getDetailRow(details_data, pnDetail, 8); //this method is only used when Reverse is applied
+                            int lnTempRow = JFXUtil.getDetailRow(details_data, pnDetail, 6); //this method is only used when Reverse is applied
                             if (lnTempRow < 0 || lnTempRow
                                     >= details_data.size()) {
                                 if (!details_data.isEmpty()) {
                                     /* FOCUS ON FIRST ROW */
                                     JFXUtil.selectAndFocusRow(tblViewDetail, 0);
-                                    int lnRow = Integer.parseInt(details_data.get(0).getIndex08());
+                                    int lnRow = Integer.parseInt(details_data.get(0).getIndex06());
                                     pnDetail = lnRow;
                                     loadRecordDetail();
                                 }
                             } else {
                                 /* FOCUS ON THE ROW THAT pnRowDetail POINTS TO */
                                 JFXUtil.selectAndFocusRow(tblViewDetail, lnTempRow);
-                                int lnRow = Integer.parseInt(details_data.get(tblViewDetail.getSelectionModel().getSelectedIndex()).getIndex08());
+                                int lnRow = Integer.parseInt(details_data.get(tblViewDetail.getSelectionModel().getSelectedIndex()).getIndex06());
                                 pnDetail = lnRow;
                                 loadRecordDetail();
                             }
@@ -1121,7 +1111,7 @@ public class CashLiquidation_EntryController implements Initializable, ScreenInt
         tblViewDetail.setOnMouseClicked(event -> {
             if (details_data.size() > 0) {
                 if (event.getClickCount() == 1) {  // Detect single click (or use another condition for double click)
-                    int lnRow = Integer.parseInt(details_data.get(tblViewDetail.getSelectionModel().getSelectedIndex()).getIndex08());
+                    int lnRow = Integer.parseInt(details_data.get(tblViewDetail.getSelectionModel().getSelectedIndex()).getIndex06());
                     pnDetail = lnRow;
                     moveNext(false, false);
                 }
@@ -1133,8 +1123,8 @@ public class CashLiquidation_EntryController implements Initializable, ScreenInt
                 pnMain = tblViewMainList.getSelectionModel().getSelectedIndex();
                 if (pnMain >= 0) {
                     loadTableDetailFromMain();
-//                  pnEditMode = poController.getEditMode();
-//                  initButton(pnEditMode);
+                    pnEditMode = poController.getEditMode();
+                    initButton(pnEditMode);
                 }
             }
         });
@@ -1150,7 +1140,7 @@ public class CashLiquidation_EntryController implements Initializable, ScreenInt
         boolean lbShow3 = (fnValue == EditMode.READY || fnValue == EditMode.UNKNOWN);
 
         // Manage visibility and managed state of other buttons
-        JFXUtil.setButtonsVisibility(lbShow, btnSearch, btnSave, btnCancel);
+        JFXUtil.setButtonsVisibility(lbShow, btnSearch, btnSave);
         JFXUtil.setButtonsVisibility(lbShow2, btnUpdate, btnHistory);
         JFXUtil.setButtonsVisibility(lbShow3, btnClose);
 
@@ -1159,8 +1149,8 @@ public class CashLiquidation_EntryController implements Initializable, ScreenInt
             return;
         }
         switch (poController.Master().getTransactionStatus()) {
-            case POQuotationStatus.VOID:
-            case POQuotationStatus.CANCELLED:
+            case CashAdvanceStatus.VOID:
+            case CashAdvanceStatus.CANCELLED:
                 JFXUtil.setButtonsVisibility(false, btnUpdate);
                 break;
         }
@@ -1246,8 +1236,8 @@ public class CashLiquidation_EntryController implements Initializable, ScreenInt
             switch (currentTableID) {
                 case "tblViewDetail":
                     if (!details_data.isEmpty()) {
-                        newIndex = isMovedDown ? Integer.parseInt(details_data.get(JFXUtil.moveToNextRow(currentTable)).getIndex08())
-                                : Integer.parseInt(details_data.get(JFXUtil.moveToPreviousRow(currentTable)).getIndex08());
+                        newIndex = isMovedDown ? Integer.parseInt(details_data.get(JFXUtil.moveToNextRow(currentTable)).getIndex06())
+                                : Integer.parseInt(details_data.get(JFXUtil.moveToPreviousRow(currentTable)).getIndex06());
                         pnDetail = newIndex;
                         loadRecordDetail();
                     }

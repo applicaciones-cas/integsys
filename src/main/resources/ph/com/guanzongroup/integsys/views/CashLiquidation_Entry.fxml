@@ -97,7 +97,7 @@
                             <children>
                                 <HBox fx:id="hbButtons" alignment="CENTER_LEFT" spacing="5.0" style="-fx-background-color: E9E9E9;" styleClass="button_process" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                     <children>
-                                        <Button fx:id="btnUpdate" contentDisplay="TOP" ellipsisString="" layoutX="270.0" layoutY="15.0" mnemonicParsing="false" prefHeight="70.0" prefWidth="70.0" styleClass="button_process" stylesheets="@../css/StyleSheet.css" text="Update">
+                                        <Button fx:id="btnUpdate" contentDisplay="TOP" ellipsisString="" layoutX="270.0" layoutY="15.0" mnemonicParsing="false" onAction="#cmdButton_Click" prefHeight="70.0" prefWidth="70.0" styleClass="button_process" stylesheets="@../css/StyleSheet.css" text="Update">
                                             <effect>
                                                 <Blend />
                                             </effect>
@@ -108,7 +108,7 @@
                                                 <Font size="12.0" />
                                             </font>
                                         </Button>
-                                        <Button fx:id="btnSearch" contentDisplay="TOP" ellipsisString="" layoutX="185.0" layoutY="15.0" mnemonicParsing="false" prefHeight="70.0" prefWidth="70.0" styleClass="button_process" stylesheets="@../css/StyleSheet.css" text="Search">
+                                        <Button fx:id="btnSearch" contentDisplay="TOP" ellipsisString="" layoutX="185.0" layoutY="15.0" mnemonicParsing="false" onAction="#cmdButton_Click" prefHeight="70.0" prefWidth="70.0" styleClass="button_process" stylesheets="@../css/StyleSheet.css" text="Search">
                                             <effect>
                                                 <Blend />
                                             </effect>
@@ -119,7 +119,7 @@
                                                 <Font size="12.0" />
                                             </font>
                                         </Button>
-                                        <Button fx:id="btnSave" contentDisplay="TOP" ellipsisString="" layoutX="100.0" layoutY="15.0" mnemonicParsing="false" prefHeight="70.0" prefWidth="70.0" styleClass="button_process" stylesheets="@../css/StyleSheet.css" text="Save">
+                                        <Button fx:id="btnSave" contentDisplay="TOP" ellipsisString="" layoutX="100.0" layoutY="15.0" mnemonicParsing="false" onAction="#cmdButton_Click" prefHeight="70.0" prefWidth="70.0" styleClass="button_process" stylesheets="@../css/StyleSheet.css" text="Save">
                                             <effect>
                                                 <Blend />
                                             </effect>
@@ -130,18 +130,7 @@
                                                 <Font size="12.0" />
                                             </font>
                                         </Button>
-                                        <Button fx:id="btnCancel" contentDisplay="TOP" ellipsisString="" layoutX="185.0" layoutY="15.0" mnemonicParsing="false" prefHeight="70.0" prefWidth="70.0" styleClass="button_process" stylesheets="@../css/StyleSheet.css" text="Cancel">
-                                            <effect>
-                                                <Blend />
-                                            </effect>
-                                            <graphic>
-                                                <FontAwesomeIconView glyphName="TIMES" size="20" />
-                                            </graphic>
-                                            <font>
-                                                <Font size="12.0" />
-                                            </font>
-                                        </Button>
-                                        <Button fx:id="btnHistory" contentDisplay="TOP" ellipsisString="" mnemonicParsing="false" prefHeight="70.0" prefWidth="70.0" styleClass="button_process" stylesheets="@../css/StyleSheet.css" text="History">
+                                        <Button fx:id="btnHistory" contentDisplay="TOP" ellipsisString="" mnemonicParsing="false" onAction="#cmdButton_Click" prefHeight="70.0" prefWidth="70.0" styleClass="button_process" stylesheets="@../css/StyleSheet.css" text="History">
                                             <graphic>
                                                 <FontAwesomeIconView glyphName="BOOK" size="20" />
                                             </graphic>
@@ -152,7 +141,7 @@
                                                 <Font size="12.0" />
                                             </font>
                                         </Button>
-                                        <Button fx:id="btnRetrieve" contentDisplay="TOP" ellipsisString="" layoutX="695.0" layoutY="15.0" mnemonicParsing="false" prefHeight="70.0" prefWidth="70.0" styleClass="button_process" stylesheets="@../css/StyleSheet.css" text="Retrieve">
+                                        <Button fx:id="btnRetrieve" contentDisplay="TOP" ellipsisString="" layoutX="695.0" layoutY="15.0" mnemonicParsing="false" onAction="#cmdButton_Click" prefHeight="70.0" prefWidth="70.0" styleClass="button_process" stylesheets="@../css/StyleSheet.css" text="Retrieve">
                                             <graphic>
                                                 <FontAwesomeIconView glyphName="LIST_ALT" size="20" />
                                             </graphic>
@@ -163,7 +152,7 @@
                                                 <Font size="12.0" />
                                             </font>
                                         </Button>
-                                        <Button fx:id="btnClose" contentDisplay="TOP" ellipsisString="" mnemonicParsing="false" prefHeight="70.0" prefWidth="70.0" styleClass="button_process" stylesheets="@../css/StyleSheet.css" text="Close">
+                                        <Button fx:id="btnClose" contentDisplay="TOP" ellipsisString="" mnemonicParsing="false" onAction="#cmdButton_Click" prefHeight="70.0" prefWidth="70.0" styleClass="button_process" stylesheets="@../css/StyleSheet.css" text="Close">
                                             <graphic>
                                                 <FontAwesomeIconView glyphName="POWER_OFF" size="20" />
                                             </graphic>
@@ -290,7 +279,7 @@
                                                                                                 <Label text="Acc. Description" GridPane.rowIndex="2" />
                                                                                                 <Label text="Particular" GridPane.rowIndex="3" />
                                                                                                 <Label text="Transaction Amount" GridPane.columnIndex="7" GridPane.rowIndex="3" />
-                                                                                                <TextField fx:id="tfReceiptNo" alignment="CENTER_RIGHT" maxHeight="25.0" GridPane.columnIndex="2" />
+                                                                                                <TextField fx:id="tfReceiptNo" maxHeight="25.0" GridPane.columnIndex="2" />
                                                                                                 <DatePicker fx:id="dpTransDateDetail" editable="false" prefHeight="26.0" prefWidth="150.0" promptText="mm/dd/yyyy" GridPane.columnIndex="2" GridPane.rowIndex="1" />
                                                                                                 <TextField fx:id="tfAccountDescription" maxHeight="25.0" maxWidth="-Infinity" minWidth="-Infinity" prefHeight="25.0" prefWidth="369.0" promptText="Press F3: Search" GridPane.columnIndex="2" GridPane.rowIndex="2" />
                                                                                                 <TextField fx:id="tfParticular" maxHeight="25.0" maxWidth="1.7976931348623157E308" minWidth="-Infinity" GridPane.columnIndex="2" GridPane.columnSpan="4" GridPane.rowIndex="3" />
