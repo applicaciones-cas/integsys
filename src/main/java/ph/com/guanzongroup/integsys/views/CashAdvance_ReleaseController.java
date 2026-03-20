@@ -347,8 +347,9 @@ public class CashAdvance_ReleaseController implements Initializable, ScreenInter
                                             ""
                                     ));
 
-                                    if (!JFXUtil.isObjectEqualTo(poController.CashAdvanceList(lnCtr).getIssuedBy(), null, "")) {
-                                        JFXUtil.highlightByKey(tblViewMainList, String.valueOf(lnCtr), "#C1E1C1", highlightedRowsMain);
+                                    if (!JFXUtil.isObjectEqualTo(poController.CashAdvanceList(lnCtr).getIssuedBy(), null, "")
+                                            && !JFXUtil.isObjectEqualTo(poController.CashAdvanceList(lnCtr).getTransactionStatus(), CashAdvanceStatus.CANCELLED, CashAdvanceStatus.LIQUIDATED)) {
+                                        JFXUtil.highlightByKey(tblViewMainList, String.valueOf(lnCtr + 1), "#C1E1C1", highlightedRowsMain);
                                     }
                                 }
                             }
@@ -377,12 +378,15 @@ public class CashAdvance_ReleaseController implements Initializable, ScreenInter
     public void loadRecordMaster() {
         try {
             JFXUtil.setDisabled(true, dpAdvanceDate);
-            if (JFXUtil.isObjectEqualTo(poController.getModel().getIssuedBy(), null, "")
-                    && !JFXUtil.isObjectEqualTo(poController.getModel().getTransactionStatus(), CashAdvanceStatus.CANCELLED, CashAdvanceStatus.LIQUIDATED)) {
-                lblStatus.setText(pnEditMode == EditMode.UNKNOWN ? "UNKNOWN" : poController.getStatus(poController.getModel().getTransactionStatus()).toUpperCase());
-            } else {
-                lblStatus.setText(pnEditMode == EditMode.UNKNOWN ? "UNKNOWN" : "RELEASED");
-            }
+            Platform.runLater(() -> {
+                if (JFXUtil.isObjectEqualTo(poController.getModel().getIssuedBy(), null, "")
+                        && !JFXUtil.isObjectEqualTo(poController.getModel().getTransactionStatus(), CashAdvanceStatus.CANCELLED, CashAdvanceStatus.LIQUIDATED)) {
+                    lblStatus.setText(pnEditMode == EditMode.UNKNOWN ? "UNKNOWN" : poController.getStatus(poController.getModel().getTransactionStatus()).toUpperCase());
+                } else {
+                    lblStatus.setText(pnEditMode == EditMode.UNKNOWN ? "UNKNOWN" : "RELEASED");
+                }
+            });
+
             tfTransactionNo.setText(poController.getModel().getTransactionNo());
             // Transaction Date
             String lsTransactionDate = CustomCommonUtil.formatDateToShortString(poController.getModel().getTransactionDate());
