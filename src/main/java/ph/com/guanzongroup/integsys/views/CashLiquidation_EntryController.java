@@ -1147,7 +1147,9 @@ public class CashLiquidation_EntryController implements Initializable, ScreenInt
         JFXUtil.setButtonsVisibility(lbShow3, btnClose);
 
         JFXUtil.setDisabled(!lbShow, taRemarks, apMaster, apDetail, apAttachments, apAttachmentButtons);
-
+        if (pnEditMode != EditMode.READY) {
+            return;
+        }
         switch (poController.Master().getTransactionStatus()) {
             case POQuotationStatus.VOID:
             case POQuotationStatus.CANCELLED:
