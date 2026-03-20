@@ -9,6 +9,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.SQLException;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
@@ -96,6 +97,7 @@ public class CashLiquidation_EntryController implements Initializable, ScreenInt
     private String psIndustryId = "";
     private String psCompanyId = "";
     private String psCategoryId = "";
+    boolean pbEnteredDetail = false;
     private boolean pbEntered = false;
     List<Pair<String, String>> plOrderNoPartial = new ArrayList<>();
     List<Pair<String, String>> plOrderNoFinal = new ArrayList<>();
@@ -317,7 +319,7 @@ public class CashLiquidation_EntryController implements Initializable, ScreenInt
                                 poController.loadAttachments();
                                 if ("success".equals(loJSON.get("result"))) {
                                     if (poController.Master().getTransactionStatus().equals(CashAdvanceStatus.APPROVED)) {
-                                        if (ShowMessageFX.YesNo(null, pxeModuleName, "Do you want to confirm this transaction?")) {
+                                        if (ShowMessageFX.YesNo(null, pxeModuleName, "Do you want to approve this transaction?")) {
                                             loJSON = poController.ConfirmTransaction("Confirmed");
                                             if ("success".equals((String) loJSON.get("result"))) {
                                                 ShowMessageFX.Information((String) loJSON.get("message"), pxeModuleName, null);
@@ -532,6 +534,7 @@ public class CashLiquidation_EntryController implements Initializable, ScreenInt
                         if (!JFXUtil.isJSONSuccess(poJSON)) {
                             ShowMessageFX.Information(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
                         }
+                        poController.Detail(pnDetail).getORNo();
                         break;
                     case "tfAccountDescription":
                         if (lsValue.isEmpty()) {
@@ -549,6 +552,10 @@ public class CashLiquidation_EntryController implements Initializable, ScreenInt
                         poJSON = poController.Detail(pnDetail).setTransactionAmount(Double.parseDouble(lsValue));
                         if (!JFXUtil.isJSONSuccess(poJSON)) {
                             ShowMessageFX.Information(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
+                        }
+                        if (pbEnteredDetail) {
+                            moveNext(false, true);
+                            pbEnteredDetail = false;
                         }
                         break;
                 }
@@ -571,23 +578,23 @@ public class CashLiquidation_EntryController implements Initializable, ScreenInt
             });
 
     public void moveNext(boolean isUp, boolean continueNext) {
-//        if (continueNext) {
-//            apDetail.requestFocus();
-//            boolean lbContinue = true;
-//            while (lbContinue) {
-//                pnDetail = isUp ? Integer.parseInt(details_data.get(JFXUtil.moveToPreviousRow(tblViewDetail)).getIndex06())
-//                        : Integer.parseInt(details_data.get(JFXUtil.moveToNextRow(tblViewDetail)).getIndex06());
-//                if (poController.Detail(pnDetail).isReverse()) {
-//                    lbContinue = false;
-//                }
-//            }
-//        }
-//        loadRecordDetail();
-//        JFXUtil.requestFocusNullField(new Object[][]{ // alternative to if , else if
-//            {poController.Detail(pnDetail).getORNo(), tfReceiptNo},
-//            {poController.Detail(pnDetail).getAccountCode(), tfAccountDescription}, // if null or empty, then requesting focus to the txtfield
-//            {poController.Detail(pnDetail).getAccountCode(), tfParticular},
-//            {poController.Detail(pnDetail).getParticular(), tfTransAmount},}, tfTransAmount); // default
+        if (continueNext) {
+            apDetail.requestFocus();
+            boolean lbContinue = true;
+            while (lbContinue) {
+                pnDetail = isUp ? Integer.parseInt(details_data.get(JFXUtil.moveToPreviousRow(tblViewDetail)).getIndex06())
+                        : Integer.parseInt(details_data.get(JFXUtil.moveToNextRow(tblViewDetail)).getIndex06());
+                if (poController.Detail(pnDetail).isReverse()) {
+                    lbContinue = false;
+                }
+            }
+        }
+        loadRecordDetail();
+        JFXUtil.requestFocusNullField(new Object[][]{ // alternative to if , else if
+            {poController.Detail(pnDetail).getORNo(), tfReceiptNo},
+            {poController.Detail(pnDetail).getAccountCode(), tfAccountDescription}, // if null or empty, then requesting focus to the txtfield
+            {poController.Detail(pnDetail).getAccountCode(), tfParticular},
+            {poController.Detail(pnDetail).getParticular(), tfTransAmount},}, tfTransAmount); // default
     }
 
     private void txtField_KeyPressed(KeyEvent event) {
@@ -599,6 +606,9 @@ public class CashLiquidation_EntryController implements Initializable, ScreenInt
             switch (event.getCode()) {
                 case TAB:
                 case ENTER:
+                    if (tfTransAmount.isFocused()) {
+                        pbEnteredDetail = true;
+                    }
                     CommonUtils.SetNextFocus(txtField);
                     event.consume();
                     break;
@@ -968,12 +978,17 @@ public class CashLiquidation_EntryController implements Initializable, ScreenInt
                                 if (!poController.Detail(lnCtr).isReverse()) {
                                     return;
                                 }
+                                String date = "";
+                                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+                                if (!JFXUtil.isObjectEqualTo(poController.Detail(lnCtr).getTransactionDate(), null, "")) {
+                                    date = sdf.format(poController.Detail(lnCtr).getTransactionDate());
+                                }
                                 lnRowCount += 1;
                                 details_data.add(
                                         new ModelCashLiquidation_Detail(
                                                 String.valueOf(lnRowCount),
                                                 String.valueOf(poController.Detail(lnCtr).getORNo()),
-                                                String.valueOf(CustomCommonUtil.formatDateToShortString(poController.Detail(lnCtr).getTransactionDate())),
+                                                String.valueOf(date),
                                                 String.valueOf(poController.Detail(lnCtr).getParticular()),
                                                 String.valueOf(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(lnCtr).getTransactionAmount(), true)),
                                                 String.valueOf(lnCtr)
