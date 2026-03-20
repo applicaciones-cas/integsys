@@ -315,7 +315,7 @@ public class CashLiquidation_EntryController implements Initializable, ScreenInt
                                 JSONObject loJSON = poController.OpenTransaction(poController.Master().getTransactionNo());
                                 poController.loadAttachments();
                                 if ("success".equals(loJSON.get("result"))) {
-                                    if (poController.Master().getTransactionStatus().equals(CashAdvanceStatus.OPEN)) {
+                                    if (poController.Master().getTransactionStatus().equals(CashAdvanceStatus.APPROVED)) {
                                         if (ShowMessageFX.YesNo(null, pxeModuleName, "Do you want to confirm this transaction?")) {
                                             loJSON = poController.ConfirmTransaction("Confirmed");
                                             if ("success".equals((String) loJSON.get("result"))) {
@@ -808,8 +808,10 @@ public class CashLiquidation_EntryController implements Initializable, ScreenInt
                 return;
             }
             tfReceiptNo.setText(poController.Detail(pnDetail).getORNo());
-            String lsTransDateDetail = CustomCommonUtil.formatDateToShortString(poController.Detail(pnDetail).getTransactionDate());
-            dpTransDateDetail.setValue(CustomCommonUtil.parseDateStringToLocalDate(lsTransDateDetail, "yyyy-MM-dd"));
+            dpTransDateDetail.setValue(poController.Detail(pnDetail).getTransactionDate() != null
+                    ? CustomCommonUtil.parseDateStringToLocalDate(SQLUtil.dateFormat(poController.Detail(pnDetail).getTransactionDate(), SQLUtil.FORMAT_SHORT_DATE))
+                    : null);
+
             tfAccountDescription.setText(poController.Detail(pnDetail).Account().getDescription());
             tfParticular.setText(poController.Detail(pnDetail).getParticular());
             tfTransAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(pnDetail).getTransactionAmount().doubleValue(), true));
@@ -829,14 +831,19 @@ public class CashLiquidation_EntryController implements Initializable, ScreenInt
             poController.computeFields(true);
 
             tfTransactionNo.setText(poController.Master().getTransactionNo());
-            String lsTransactionDate = CustomCommonUtil.formatDateToShortString(poController.Master().getTransactionDate());
-            dpTransactionDate.setValue(CustomCommonUtil.parseDateStringToLocalDate(lsTransactionDate, "yyyy-MM-dd"));
+
+            dpTransactionDate.setValue(poController.Master().getTransactionDate() != null
+                    ? CustomCommonUtil.parseDateStringToLocalDate(SQLUtil.dateFormat(poController.Master().getTransactionDate(), SQLUtil.FORMAT_SHORT_DATE))
+                    : null);
 
             tfPayee.setText(poController.Master().Payee().getCompanyName());
             tfDepartment.setText(poController.Master().Department().getDescription());
             taRemarks.setText(poController.Master().getRemarks());
-            String lsLiquidationDate = CustomCommonUtil.formatDateToShortString(poController.Master().getLiquidatedDate());
-            dpLiquidationDate.setValue(CustomCommonUtil.parseDateStringToLocalDate(lsLiquidationDate, "yyyy-MM-dd"));
+
+            dpLiquidationDate.setValue(poController.Master().getLiquidatedDate() != null
+                    ? CustomCommonUtil.parseDateStringToLocalDate(SQLUtil.dateFormat(poController.Master().getLiquidatedDate(), SQLUtil.FORMAT_SHORT_DATE))
+                    : null);
+
             tfCashAdvanceBalance.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Master().CashFund().getBalance(), true));
             tfAdvancesAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Master().getAdvanceAmount(), true));
             tfLiquidationTotal.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Master().getLiquidationTotal().doubleValue(), true));
