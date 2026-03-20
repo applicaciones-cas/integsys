@@ -379,12 +379,7 @@ public class CashAdvance_ReleaseController implements Initializable, ScreenInter
         try {
             JFXUtil.setDisabled(true, dpAdvanceDate);
             Platform.runLater(() -> {
-                if (JFXUtil.isObjectEqualTo(poController.getModel().getIssuedBy(), null, "")
-                        && !JFXUtil.isObjectEqualTo(poController.getModel().getTransactionStatus(), CashAdvanceStatus.CANCELLED, CashAdvanceStatus.LIQUIDATED)) {
-                    lblStatus.setText(pnEditMode == EditMode.UNKNOWN ? "UNKNOWN" : poController.getStatus(poController.getModel().getTransactionStatus()).toUpperCase());
-                } else {
-                    lblStatus.setText(pnEditMode == EditMode.UNKNOWN ? "UNKNOWN" : "RELEASED");
-                }
+                lblStatus.setText(pnEditMode == EditMode.UNKNOWN ? "UNKNOWN" : poController.getStatus(poController.getModel().getTransactionStatus()).toUpperCase());
             });
 
             tfTransactionNo.setText(poController.getModel().getTransactionNo());
