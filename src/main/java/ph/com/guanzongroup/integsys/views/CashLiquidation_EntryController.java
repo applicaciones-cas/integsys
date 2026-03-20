@@ -534,7 +534,6 @@ public class CashLiquidation_EntryController implements Initializable, ScreenInt
                         if (!JFXUtil.isJSONSuccess(poJSON)) {
                             ShowMessageFX.Information(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
                         }
-                        poController.Detail(pnDetail).getORNo();
                         break;
                     case "tfAccountDescription":
                         if (lsValue.isEmpty()) {
@@ -1118,10 +1117,12 @@ public class CashLiquidation_EntryController implements Initializable, ScreenInt
         });
 
         tblViewDetail.setOnMouseClicked(event -> {
-            if (details_data.size() > 0) {
-                if (event.getClickCount() == 1) {  // Detect single click (or use another condition for double click)
+            if (!details_data.isEmpty() && event.getClickCount() == 1) {
+                ModelCashLiquidation_Detail selected = (ModelCashLiquidation_Detail) tblViewDetail.getSelectionModel().getSelectedItem();
+                if (selected != null) {
                     int lnRow = Integer.parseInt(details_data.get(tblViewDetail.getSelectionModel().getSelectedIndex()).getIndex06());
                     pnDetail = lnRow;
+                    loadRecordDetail();
                     moveNext(false, false);
                 }
             }
