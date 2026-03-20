@@ -327,7 +327,7 @@ public class CashLiquidation_EntryController implements Initializable, ScreenInt
                                     }
                                 }
                                 JFXUtil.disableAllHighlightByColor(tblViewMainList, "#A7C7E7", highlightedRowsMain);
-                                return;
+                                break;
                             }
                         } else {
                             return;
