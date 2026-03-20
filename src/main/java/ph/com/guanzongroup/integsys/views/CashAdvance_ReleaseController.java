@@ -377,7 +377,7 @@ public class CashAdvance_ReleaseController implements Initializable, ScreenInter
     public void loadRecordMaster() {
         try {
             JFXUtil.setDisabled(true, dpAdvanceDate);
-            if (!JFXUtil.isObjectEqualTo(poController.getModel().getIssuedBy(), null, "")) {
+            if (JFXUtil.isObjectEqualTo(poController.getModel().getIssuedBy(), null, "")) {
                 lblStatus.setText(pnEditMode == EditMode.UNKNOWN ? "UNKNOWN" : poController.getStatus(poController.getModel().getTransactionStatus()).toUpperCase());
             } else {
                 lblStatus.setText(pnEditMode == EditMode.UNKNOWN ? "UNKNOWN" : "RELEASED");
@@ -531,7 +531,7 @@ public class CashAdvance_ReleaseController implements Initializable, ScreenInter
             return;
         }
         
-        if (!JFXUtil.isObjectEqualTo(poController.getModel().getIssuedBy(), null, "")) {
+        if (JFXUtil.isObjectEqualTo(poController.getModel().getIssuedBy(), null, "")) {
         } else {
             JFXUtil.setButtonsVisibility(false, btnRelease);
         }
