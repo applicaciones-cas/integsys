@@ -167,7 +167,7 @@ public class CashLiquidation_EntryController implements Initializable, ScreenInt
             initTableOnClick();
             clearTextFields();
             initLoadTable();
-
+            initComboboxes();
             Platform.runLater(() -> {
                 poController.setTransactionStatus("2");
 
