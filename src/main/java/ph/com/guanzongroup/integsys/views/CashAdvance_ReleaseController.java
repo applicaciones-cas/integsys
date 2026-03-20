@@ -296,7 +296,6 @@ public class CashAdvance_ReleaseController implements Initializable, ScreenInter
                 loadRecordSearch();
             });
 
-
     public void initTextFields() {
         Platform.runLater(() -> {
             JFXUtil.setVerticalScroll(taRemarks);
@@ -348,8 +347,8 @@ public class CashAdvance_ReleaseController implements Initializable, ScreenInter
                                             ""
                                     ));
 
-                                    if (poController.CashAdvanceList(lnCtr).getTransactionStatus().equals(CashAdvanceStatus.APPROVED)) {
-                                        JFXUtil.highlightByKey(tblViewMainList, String.valueOf(lnCtr + 1), "#C1E1C1", highlightedRowsMain);
+                                    if (!JFXUtil.isObjectEqualTo(poController.CashAdvanceList(lnCtr).getIssuedBy(), null, "")) {
+                                        JFXUtil.highlightByKey(tblViewMainList, String.valueOf(lnCtr), "#C1E1C1", highlightedRowsMain);
                                     }
                                 }
                             }
@@ -378,7 +377,11 @@ public class CashAdvance_ReleaseController implements Initializable, ScreenInter
     public void loadRecordMaster() {
         try {
             JFXUtil.setDisabled(true, dpAdvanceDate);
-            lblStatus.setText(pnEditMode == EditMode.UNKNOWN ? "UNKNOWN" : poController.getStatus(poController.getModel().getTransactionStatus()).toUpperCase());
+            if (!JFXUtil.isObjectEqualTo(poController.getModel().getIssuedBy(), null, "")) {
+                lblStatus.setText(pnEditMode == EditMode.UNKNOWN ? "UNKNOWN" : poController.getStatus(poController.getModel().getTransactionStatus()).toUpperCase());
+            } else {
+                lblStatus.setText(pnEditMode == EditMode.UNKNOWN ? "UNKNOWN" : "RELEASED");
+            }
             tfTransactionNo.setText(poController.getModel().getTransactionNo());
             // Transaction Date
             String lsTransactionDate = CustomCommonUtil.formatDateToShortString(poController.getModel().getTransactionDate());
@@ -465,13 +468,13 @@ public class CashAdvance_ReleaseController implements Initializable, ScreenInter
                         break;
                     case "btnCancel":
                         poJSON = new JSONObject();
-                        if (ShowMessageFX.YesNo(null, pxeModuleName, "Are you sure you want to disapprove transaction?") == true) {
+                        if (ShowMessageFX.YesNo(null, pxeModuleName, "Are you sure you want to cancel transaction?") == true) {
                             poJSON = poController.CancelTransaction();
                             if ("error".equals((String) poJSON.get("result"))) {
                                 ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                 return;
                             } else {
-                                ShowMessageFX.Information(null, pxeModuleName, "Transaction disapproved successfully.");
+                                ShowMessageFX.Information(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
                                 JFXUtil.disableAllHighlightByColor(tblViewMainList, "#A7C7E7", highlightedRowsMain);
                                 JFXUtil.highlightByKey(tblViewMainList, String.valueOf(pnMain + 1), "#FAA0A0", highlightedRowsMain);
                             }
@@ -483,7 +486,7 @@ public class CashAdvance_ReleaseController implements Initializable, ScreenInter
                         break;
                 }
 
-                if (JFXUtil.isObjectEqualTo(lsButton, "btnSave", "btnApprove", "btnDisapprove", "btnCancel")) {
+                if (JFXUtil.isObjectEqualTo(lsButton, "btnSave", "btnRelease", "btnApprove", "btnDisapprove", "btnCancel")) {
                     clearTextFields();
                     poController.resetModel();
                     pnEditMode = EditMode.UNKNOWN;
@@ -518,7 +521,7 @@ public class CashAdvance_ReleaseController implements Initializable, ScreenInter
         //Update 
 
         //Ready
-        JFXUtil.setButtonsVisibility(lbShow3, btnHistory, btnRelease);
+        JFXUtil.setButtonsVisibility(lbShow3, btnCancel, btnHistory, btnRelease);
 
         //Unkown || Ready
         JFXUtil.setDisabled(true, apMaster);
@@ -527,12 +530,17 @@ public class CashAdvance_ReleaseController implements Initializable, ScreenInter
         if (fnValue != EditMode.READY) {
             return;
         }
+        
+        if (!JFXUtil.isObjectEqualTo(poController.getModel().getIssuedBy(), null, "")) {
+        } else {
+            JFXUtil.setButtonsVisibility(false, btnRelease);
+        }
         switch (poController.getModel().getTransactionStatus()) {
-            case CashAdvanceStatus.APPROVED: //released
+//            case CashAdvanceStatus.APPROVED: //released
 //                JFXUtil.setButtonsVisibility(false, btnRelease);
-                break;
+//                break;
             case CashAdvanceStatus.CANCELLED: //released
-                JFXUtil.setButtonsVisibility(false, btnRelease);
+                JFXUtil.setButtonsVisibility(false, btnRelease, btnCancel);
                 break;
         }
     }
