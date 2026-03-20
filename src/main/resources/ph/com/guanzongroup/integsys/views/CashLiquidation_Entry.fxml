@@ -130,7 +130,7 @@
                                                 <Font size="12.0" />
                                             </font>
                                         </Button>
-                              <Button fx:id="btnCancel" contentDisplay="TOP" ellipsisString="" mnemonicParsing="false" prefHeight="70.0" prefWidth="70.0" styleClass="button_process" stylesheets="@../css/StyleSheet.css" text="Cancel">
+                              <Button fx:id="btnCancel" contentDisplay="TOP" ellipsisString="" mnemonicParsing="false" onAction="#cmdButton_Click" prefHeight="70.0" prefWidth="70.0" styleClass="button_process" stylesheets="@../css/StyleSheet.css" text="Cancel">
                                  <effect>
                                     <Blend />
                                  </effect>

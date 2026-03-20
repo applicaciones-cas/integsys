@@ -271,6 +271,7 @@ public class CashLiquidation_EntryController implements Initializable, ScreenInt
                             //Clear data
                             clearTextFields();
                             poController.resetMaster();
+                            poController.Detail().clear();
                             poController.initFields();
                             pnEditMode = EditMode.UNKNOWN;
                             break;
@@ -1124,8 +1125,8 @@ public class CashLiquidation_EntryController implements Initializable, ScreenInt
         boolean lbShow3 = (fnValue == EditMode.READY || fnValue == EditMode.UNKNOWN);
 
         // Manage visibility and managed state of other buttons
-        JFXUtil.setButtonsVisibility(lbShow, btnSearch, btnSave);
-        JFXUtil.setButtonsVisibility(lbShow2, btnUpdate, btnHistory, btnCancel);
+        JFXUtil.setButtonsVisibility(lbShow, btnSearch, btnSave, btnHistory, btnCancel);
+        JFXUtil.setButtonsVisibility(lbShow2, btnUpdate);
         JFXUtil.setButtonsVisibility(lbShow3, btnClose);
 
         JFXUtil.setDisabled(!lbShow, taRemarks, apMaster, apDetail, apAttachments, apAttachmentButtons);
