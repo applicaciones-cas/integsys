@@ -85,7 +85,7 @@
                                                 <TextField fx:id="tfSearchIndustry" layoutX="512.0" layoutY="11.0" promptText="Press F3: Search" GridPane.columnIndex="2" />
                                                 <TextField fx:id="tfSearchBranch" promptText="Press F3: Search" GridPane.columnIndex="6" />
                                                 <TextField fx:id="tfSearchPayee" promptText="Press F3: Search" GridPane.columnIndex="10" />
-                                                <TextField fx:id="tfSearchVoucherNo" GridPane.columnIndex="14" />
+                                                <TextField fx:id="tfSearchTransNo" GridPane.columnIndex="14" />
                                             </children>
                               </GridPane>
                            </children>
@@ -98,7 +98,7 @@
                             <children>
                                 <HBox fx:id="hbButtons" alignment="CENTER_LEFT" spacing="5.0" style="-fx-background-color: E9E9E9;" styleClass="button_process" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                     <children>
-                                        <Button fx:id="btnConfirm" contentDisplay="TOP" ellipsisString="" mnemonicParsing="false" onAction="#cmdButton_Click" prefHeight="70.0" prefWidth="70.0" styleClass="button_process" stylesheets="@../css/StyleSheet.css" text="Release">
+                                        <Button fx:id="btnRelease" contentDisplay="TOP" ellipsisString="" mnemonicParsing="false" onAction="#cmdButton_Click" prefHeight="70.0" prefWidth="70.0" styleClass="button_process" stylesheets="@../css/StyleSheet.css" text="Release">
                                             <effect>
                                                 <Blend />
                                             </effect>
