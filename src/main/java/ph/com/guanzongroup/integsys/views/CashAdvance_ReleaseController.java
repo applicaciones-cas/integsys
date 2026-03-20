@@ -718,7 +718,7 @@ public class CashAdvance_ReleaseController implements Initializable, ScreenInter
         }
         switch (poController.getModel().getTransactionStatus()) {
             case CashAdvanceStatus.APPROVED: //released
-                JFXUtil.setButtonsVisibility(false, btnRelease);
+//                JFXUtil.setButtonsVisibility(false, btnRelease);
                 break;
             case CashAdvanceStatus.CANCELLED: //released
                 JFXUtil.setButtonsVisibility(false, btnRelease);
