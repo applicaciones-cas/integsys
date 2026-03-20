@@ -112,7 +112,7 @@ public class CashAdvance_ReleaseController implements Initializable, ScreenInter
             pnEditMode = EditMode.UNKNOWN;
             initButton(pnEditMode);
             Platform.runLater(() -> {
-                poController.setRecordStatus("1");
+                poController.setRecordStatus("2");
                 poController.getModel().setIndustryId(psIndustryId);
                 poController.getModel().setCompanyId(psCompanyId);
                 poController.setIndustryId(psIndustryId);
@@ -651,18 +651,10 @@ public class CashAdvance_ReleaseController implements Initializable, ScreenInter
                             return;
                         }
                         break;
-                    case "btnDisapprove":
+                    case "btnCancel":
                         poJSON = new JSONObject();
                         if (ShowMessageFX.YesNo(null, pxeModuleName, "Are you sure you want to disapprove transaction?") == true) {
-                            switch (poController.getModel().getTransactionStatus()) {
-                                case CashAdvanceStatus.APPROVED:
-                                case CashAdvanceStatus.CONFIRMED:
-                                    poJSON = poController.CancelTransaction();
-                                    break;
-                                default:
-                                    poJSON = poController.VoidTransaction();
-                                    break;
-                            }
+                            poJSON = poController.CancelTransaction();
                             if ("error".equals((String) poJSON.get("result"))) {
                                 ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                 return;
