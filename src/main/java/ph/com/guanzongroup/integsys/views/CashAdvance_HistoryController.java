@@ -4,12 +4,9 @@ import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.animation.PauseTransition;
@@ -24,7 +21,6 @@ import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
-import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
@@ -42,29 +38,24 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
-import javafx.stage.FileChooser;
 import javafx.util.Duration;
-import javafx.util.Pair;
 import javax.script.ScriptException;
 import org.guanzon.appdriver.agent.ShowMessageFX;
 import org.guanzon.appdriver.base.CommonUtils;
 import org.guanzon.appdriver.base.GRiderCAS;
 import org.guanzon.appdriver.base.GuanzonException;
 import org.guanzon.appdriver.base.MiscUtil;
+import org.guanzon.appdriver.base.SQLUtil;
 import org.guanzon.appdriver.constant.DocumentType;
 import org.guanzon.appdriver.constant.EditMode;
 import org.guanzon.appdriver.constant.RecordStatus;
 import org.json.simple.JSONObject;
-import ph.com.guanzongroup.cas.cashflow.CashAdvance;
 import ph.com.guanzongroup.cas.cashflow.CashLiquidation;
 import ph.com.guanzongroup.cas.cashflow.services.CashflowControllers;
-import ph.com.guanzongroup.cas.cashflow.status.CashAdvanceStatus;
 import ph.com.guanzongroup.integsys.model.ModelCashLiquidation_Detail;
-import ph.com.guanzongroup.integsys.model.ModelCashLiquidation_Main;
 import ph.com.guanzongroup.integsys.model.ModelDeliveryAcceptance_Attachment;
 import ph.com.guanzongroup.integsys.utility.CustomCommonUtil;
 import ph.com.guanzongroup.integsys.utility.JFXUtil;
-import static ph.com.guanzongroup.integsys.views.CashLiquidation_EntryController.poController;
 
 /**
  *
@@ -137,25 +128,24 @@ public class CashAdvance_HistoryController implements Initializable, ScreenInter
             pnEditMode = EditMode.UNKNOWN;
             initButton(pnEditMode);
             Platform.runLater(() -> {
-                poController.Master().setIndustryId(psIndustryId);
-                poController.Master().setCompanyId(psCompanyId);
-                poController.setIndustryId(psIndustryId);
-                poController.setCompanyId(psCompanyId);
-                
-                if(!oApp.isMainOffice()){
-                    try {
-                        poController.Master().setBranchCode(oApp.getBranchCode());
-                        poController.setSearchBranch(oApp.getBranchName());
-                        poController.setSearchIndustry(poController.Master().Industry().getDescription());
+                try {
+                    poController.setWithUI(true);
+                    poController.Master().setIndustryId(psIndustryId);
+                    poController.Master().setCompanyId(psCompanyId);
+                    poController.Master().setBranchCode(oApp.getBranchCode());
+                    poController.setIndustryId(psIndustryId);
+                    poController.setCompanyId(psCompanyId);
+                    poController.setSearchBranch(oApp.getBranchName());
+                    poController.setSearchIndustry(poController.Master().Industry().getDescription());
+                    if(!oApp.isMainOffice()){
                         tfSearchBranch.setDisable(true);
                         tfSearchIndustry.setDisable(true);
-                    } catch (SQLException | GuanzonException ex) {
-                        Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
-                        ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
                     }
+                    loadRecordSearch();
+                } catch (SQLException | GuanzonException ex) {
+                    Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+                    ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
                 }
-                poController.setWithUI(true);
-                loadRecordSearch();
             });
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
@@ -518,8 +508,9 @@ public class CashAdvance_HistoryController implements Initializable, ScreenInter
     public void loadRecordDetail() {
         try {
             tfReceiptNo.setText(poController.Detail(pnDetail).getORNo());
-            String lsTransDateDetail = CustomCommonUtil.formatDateToShortString(poController.Detail(pnDetail).getTransactionDate());
-            dpTransDateDetail.setValue(CustomCommonUtil.parseDateStringToLocalDate(lsTransDateDetail, "yyyy-MM-dd"));
+            dpTransDateDetail.setValue(poController.Detail(pnDetail).getTransactionDate() != null
+                    ? CustomCommonUtil.parseDateStringToLocalDate(SQLUtil.dateFormat(poController.Detail(pnDetail).getTransactionDate(), SQLUtil.FORMAT_SHORT_DATE))
+                    : null);
             tfAccountDescription.setText(poController.Detail(pnDetail).Account().getDescription());
             tfParticular.setText(poController.Detail(pnDetail).getParticular());
             tfTransAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(pnDetail).getTransactionAmount().doubleValue(), false));
@@ -531,7 +522,9 @@ public class CashAdvance_HistoryController implements Initializable, ScreenInter
     }
     public void loadRecordMaster() {
         try {
-            JFXUtil.setStatusValue(lblStatus, CashAdvanceStatus.class, pnEditMode == EditMode.UNKNOWN ? "-1" : poController.Master().getTransactionStatus());
+            Platform.runLater(() -> {
+                lblStatus.setText(pnEditMode == EditMode.UNKNOWN ? "UNKNOWN" : poController.getStatus(poController.Master().getTransactionStatus()).toUpperCase());
+            });
             poController.computeFields(true);
 
             tfTransactionNo.setText(poController.Master().getTransactionNo());
@@ -541,8 +534,10 @@ public class CashAdvance_HistoryController implements Initializable, ScreenInter
             tfPayee.setText(poController.Master().Payee().getCompanyName());
             tfDepartment.setText(poController.Master().Department().getDescription());
             taRemarks.setText(poController.Master().getRemarks());
-            String lsLiquidationDate = CustomCommonUtil.formatDateToShortString(poController.Master().getLiquidatedDate());
-            dpLiquidationDate.setValue(CustomCommonUtil.parseDateStringToLocalDate(lsLiquidationDate, "yyyy-MM-dd"));
+            dpLiquidationDate.setValue(poController.Master().getLiquidatedDate() != null
+                    ? CustomCommonUtil.parseDateStringToLocalDate(SQLUtil.dateFormat(poController.Master().getLiquidatedDate(), SQLUtil.FORMAT_SHORT_DATE))
+                    : null);
+            
             tfCashAdvanceBalance.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Master().CashFund().getBalance(), false));
             tfAdvancesAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Master().getAdvanceAmount(), false));
             tfLiquidationTotal.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Master().getLiquidationTotal().doubleValue(), false));
