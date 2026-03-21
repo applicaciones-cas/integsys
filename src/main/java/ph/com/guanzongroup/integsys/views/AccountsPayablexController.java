@@ -5,18 +5,21 @@ import java.lang.reflect.Field;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javafx.animation.PauseTransition;
 import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyBooleanPropertyBase;
 import javafx.beans.property.SimpleStringProperty;
@@ -27,6 +30,8 @@ import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
@@ -50,18 +55,23 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.StackPane;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import javafx.util.Duration;
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.rendering.PDFRenderer;
 import org.guanzon.appdriver.agent.ShowMessageFX;
-import org.guanzon.appdriver.agent.services.Model;
-import org.guanzon.appdriver.agent.systables.Model_Transaction_Attachment;
 import org.guanzon.appdriver.base.CommonUtils;
 import org.guanzon.appdriver.base.GRiderCAS;
 import org.guanzon.appdriver.base.LogWrapper;
 import org.guanzon.appdriver.constant.EditMode;
 import org.guanzon.appdriver.base.GuanzonException;
+import org.guanzon.appdriver.constant.DocumentType;
+import org.guanzon.appdriver.constant.RecordStatus;
 import org.guanzon.cas.client.account.AP_Client_Master;
 import org.guanzon.cas.client.model.Model_AP_Client_Ledger;
 import org.guanzon.cas.client.services.ClientControllers;
 import org.json.simple.JSONObject;
+import ph.com.guanzongroup.integsys.model.ModelDeliveryAcceptance_Attachment;
+import ph.com.guanzongroup.integsys.utility.JFXUtil;
 
 /**
  * FXML Controller class
@@ -69,6 +79,8 @@ import org.json.simple.JSONObject;
  * @author User
  */
 public class AccountsPayablexController implements Initializable, ScreenInterface {
+    
+    private final JFXUtil.ImageViewer imageviewerutil = new JFXUtil.ImageViewer();
 
     private GRiderCAS poApp;
     private LogWrapper poLogWrapper;
@@ -79,9 +91,13 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
     private int pnLedger, pnAttachments;
     
     private ObservableList<Model_AP_Client_Ledger> laLedger;
-    private ObservableList<Model_Transaction_Attachment> laAttachments;
-
+    private ObservableList<ModelDeliveryAcceptance_Attachment> laAttachments;
+    
+    private HashMap<String, String> imageinfo_temp;
+            
     private unloadForm poUnload = new unloadForm();
+    
+    private JFXUtil.ReloadableTableTask loadTableAttachment;
 
     @FXML
     private AnchorPane apMainAnchor, apRecord, apLedger, apAttachments;
@@ -105,19 +121,22 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
             tfAddress, tfContactNo, tfTINNo, tfContactEmail;
     
     @FXML
+    StackPane stackpane;
+    
+    @FXML
     private TextField txtAttachmentNo;
     
     @FXML
-    private TableView<Model_Transaction_Attachment> tblAttachments;
+    private TableView<ModelDeliveryAcceptance_Attachment> tblAttachments;
     
     @FXML
-    private TableColumn<Model_Transaction_Attachment, String> tblColAttachIndex, tblColAttachFile;
+    private TableColumn<ModelDeliveryAcceptance_Attachment, String> tblColAttachIndex, tblColAttachFile;
     
     @FXML
     private ImageView imgPreview;
     
     @FXML
-    private Button btnAttach, btnRemoveFile;
+    private Button btnAttach, btnRemoveFile, btnPrevious, btnNext;
 
     @FXML
     private DatePicker dpBegBalance, dpClientSince;
@@ -162,8 +181,9 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
             });
             
             initializeTableLedger();
-            initializeTableAttachments();
             initControlEvents();
+            initLoadTable();
+            initializeTableAttachments();
             
         } catch (SQLException | GuanzonException e) {
             Logger.getLogger(AccountsPayablexController.class.getName()).log(Level.SEVERE, null, e);
@@ -175,6 +195,14 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
     void tblLedger_Clicked(MouseEvent e) {
         pnLedger = tblLedger.getSelectionModel().getSelectedIndex();
         if (pnLedger < 0) {
+            return;
+        }
+    }
+    
+    @FXML
+    void tblAttachment_Clicked(MouseEvent e) {
+        pnAttachments = tblAttachments.getSelectionModel().getSelectedIndex();
+        if (pnAttachments < 0) {
             return;
         }
     }
@@ -326,7 +354,55 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
                             // Read image from the selected file
                             Path imgPath = selectedFile.toPath();
                             Image loimage = new Image(Files.newInputStream(imgPath));
+                            
                             imgPreview.setImage(loimage);
+
+                            //Validate attachment
+                            String imgPath2 = selectedFile.getName().toString();
+                            for (int lnCtr = 0; lnCtr <= poAppController.getTransactionAttachmentCount() - 1; lnCtr++) {
+                                
+                                if (imgPath2.equals(poAppController.getAttachmentList().get(lnCtr).getModel().getFileName())
+                                        
+                                        && RecordStatus.ACTIVE.equals(poAppController.getAttachmentList().get(lnCtr).getModel().getRecordStatus())) {
+                                    
+                                    ShowMessageFX.Warning(null, psFormName, "File name already exists.");
+                                    pnAttachments = lnCtr;
+                                    
+                                    loadRecordAttachment(true);
+                                    return;
+                                }
+                            }
+                            
+                            //map selected file details
+                            if (imageinfo_temp.containsKey(selectedFile.getName().toString())) {
+                                ShowMessageFX.Warning(null, psFormName, "File name already exists.");
+                                loadRecordAttachment(true);
+                                return;
+                            } else {
+                                imageinfo_temp.put(selectedFile.getName().toString(), imgPath.toString());
+                            }
+                            
+                            //Limit maximum pages of pdf to add
+                            if (imgPath2.toLowerCase().endsWith(".pdf")) {
+                                try (PDDocument document = PDDocument.load(selectedFile)) {
+                                    PDFRenderer pdfRenderer = new PDFRenderer(document);
+                                    int pageCount = document.getNumberOfPages();
+                                    if (pageCount > 5) {
+                                        ShowMessageFX.Warning(null, psFormName, "PDF exceeds maximum allowed pages.");
+                                        return;
+                                    }
+                                }
+                            }
+                            
+                            pnAttachments = poAppController.addAttachment(imgPath2);
+                            System.out.print("this is the index of added record " + pnAttachments);
+                            
+                            //Copy file to Attachment path
+                            poAppController.copyFile(selectedFile.toString());
+                            loadTableAttachment.reload();
+                            
+                            tblAttachments.getFocusModel().focus(pnAttachments);
+                            tblAttachments.getSelectionModel().select(pnAttachments);
                     }
                     break;
                     
@@ -338,8 +414,11 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
                             ShowMessageFX.Warning("Please notify the system administrator to configure the null value at the close button.", "Warning", null);
                         }
                     }
+                    break;
             }
 
+            poAppController.loadAttachments();
+            loadTableAttachment.reload();
             initButtonDisplay(poAppController.getEditMode());
 
         } catch (Exception e) {
@@ -669,6 +748,7 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
     }
     
     private void initializeTableAttachments(){
+        
         if (laAttachments == null) {
            laAttachments = FXCollections.observableArrayList();
            tblAttachments.setItems(laAttachments);
@@ -682,7 +762,7 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
             });
            
            tblColAttachFile.setCellValueFactory((loModel) -> {
-                return new SimpleStringProperty(String.valueOf(loModel.getValue().getFileName()));
+                return new SimpleStringProperty(String.valueOf(loModel.getValue().getIndex02()));
             });
         }
     }
@@ -700,21 +780,6 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
 
         pnLedger = tblLedger.getSelectionModel().getSelectedIndex() + 1; // Not focusedIndex
         tblLedger.refresh();
-    }
-    
-    private void reloadTableAttachement() throws SQLException, GuanzonException {
-        List<Model_Transaction_Attachment> rawDetail = poAppController.getAttachmentList();
-        laAttachments.setAll(rawDetail);
-
-        //Restore or select last row
-        int indexToSelect = (pnAttachments >= 1 && pnAttachments < laAttachments.size())
-                ? pnAttachments - 1
-                : laAttachments.size() - 1;
-
-        tblAttachments.getSelectionModel().select(indexToSelect);
-
-        pnAttachments = tblAttachments.getSelectionModel().getSelectedIndex() + 1; // Not focusedIndex
-        tblAttachments.refresh();
     }
 
     private void loadLedgerList() {
@@ -765,60 +830,142 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
         thread.start();
     }
     
-    private void loadAttachmentList() {
+    public void initLoadTable() {
         
-        StackPane overlay = getOverlayProgress(apAttachments);
-        ProgressIndicator pi = (ProgressIndicator) overlay.getChildren().get(0);
-        overlay.setVisible(true);
-        pi.setVisible(true);
-
-        Task<ObservableList<Model_Transaction_Attachment>> loadAttahcments = new Task<ObservableList<Model_Transaction_Attachment>>() {
-            @Override
-            protected ObservableList<Model_Transaction_Attachment> call() throws Exception {
-                if (!isJSONSuccess(poAppController.loadAttachments(),
-                        "Initialize : Load of Attachement List")) {
-                    return null;
+        loadTableAttachment = new JFXUtil.ReloadableTableTask(
+                tblAttachments,
+                laAttachments,
+                () -> {
+                    imageviewerutil.scaleFactor = 1.0;
+                    
+                    JFXUtil.resetImageBounds(imgPreview, stackpane);
+                    Platform.runLater(() -> {
+                        try {
+                            
+                            int lnCtr;
+                            int lnCount = 0;
+                            
+                            laAttachments.clear();
+                            for (lnCtr = 0; lnCtr < poAppController.getTransactionAttachmentCount(); lnCtr++) {
+                                
+                                if (RecordStatus.INACTIVE.equals(poAppController.getAttachmentList().get(lnCtr).getModel().getRecordStatus())) {
+                                    continue;
+                                }
+                                lnCount += 1;
+                                
+                                laAttachments.add(
+                                        new ModelDeliveryAcceptance_Attachment(String.valueOf(lnCount),
+                                                String.valueOf(poAppController.getAttachmentList().get(lnCtr).getModel().getFileName()),
+                                                String.valueOf(lnCtr)
+                                        ));
+                            }
+                            if (laAttachments.size() <= 0) {
+                                loadRecordAttachment(false);
+                            }
+                        } catch (Exception e) {
+                        }
+                    });
+                }
+        );
+    }
+    
+    public void loadRecordAttachment(boolean lbloadImage) {
+        try {
+            System.out.print("the size in load record is " + laAttachments.size());
+            if (laAttachments.size() > 0) {
+                
+                txtAttachmentNo.setText(laAttachments.get(tblAttachments.getSelectionModel().getSelectedIndex()).getIndex01());
+                
+                String lsAttachmentType = poAppController.getAttachmentList().get(pnAttachments).getModel().getDocumentType();
+                if (lsAttachmentType.equals("")) {
+                    poAppController.getAttachmentList().get(pnAttachments).getModel().setDocumentType(DocumentType.OTHER);
+                    lsAttachmentType = poAppController.getAttachmentList().get(pnAttachments).getModel().getDocumentType();
                 }
 
-                List<Model_Transaction_Attachment> rawList = poAppController.getAttachmentList();
-                System.out.print("The size of attachment list is " + rawList.size());
-                return FXCollections.observableArrayList(new ArrayList<>(rawList));
-            }
+                if (lbloadImage) {
+                    try {
+                        String filePath = (String) laAttachments.get(tblAttachments.getSelectionModel().getSelectedIndex()).getIndex02();
+                        String filePath2 = "";
+                        if (imageinfo_temp.containsKey((String) laAttachments.get(tblAttachments.getSelectionModel().getSelectedIndex()).getIndex02())) {
+                            filePath2 = imageinfo_temp.get((String) laAttachments.get(tblAttachments.getSelectionModel().getSelectedIndex()).getIndex02());
+                        } else {
+                            
+                            if (poAppController.getAttachmentList().get(pnAttachments).getModel().getImagePath() != null && !"".equals(poAppController.getAttachmentList().get(pnAttachments).getModel().getImagePath())) {
+                                filePath2 = poAppController.getAttachmentList().get(pnAttachments).getModel().getImagePath() + "/" + (String) laAttachments.get(tblAttachments.getSelectionModel().getSelectedIndex()).getIndex02();
+                            } else {
+                                filePath2 = System.getProperty("sys.default.path.temp.attachments") + "/" + (String) laAttachments.get(tblAttachments.getSelectionModel().getSelectedIndex()).getIndex02();
+                            }
+                        }
 
-            @Override
-            protected void succeeded() {
-                ObservableList<Model_Transaction_Attachment> laListLoader = getValue();
-                tblAttachments.setItems(laListLoader);
+                        if (filePath != null && !filePath.isEmpty()) {
+                            Path imgPath = Paths.get(filePath2);
+                            String convertedPath = imgPath.toUri().toString();
+                            boolean isPdf = filePath.toLowerCase().endsWith(".pdf");
 
-                overlay.setVisible(false);
-                pi.setVisible(false);
-            }
+                            // Clear previous content
+                            stackpane.getChildren().clear();
+                            if (!isPdf) {
+                                
+                                // ----- IMAGE VIEW -----
+                                Image loimage = new Image(convertedPath);
+                                imgPreview.setImage(loimage);
+                                JFXUtil.adjustImageSize(loimage, imgPreview, imageviewerutil.ldstackPaneWidth, imageviewerutil.ldstackPaneHeight);
 
-            @Override
-            protected void failed() {
-                overlay.setVisible(false);
-                pi.setVisible(false);
-                Throwable ex = getException();
-                poLogWrapper.severe(psFormName + " : " + ex.getMessage());
-            }
+                                PauseTransition delay = new PauseTransition(Duration.seconds(2)); // 2-second delay
+                                delay.setOnFinished(event -> {
+                                    Platform.runLater(() -> {
+                                        JFXUtil.stackPaneClip(stackpane);
+                                    });
+                                });
+                                delay.play();
 
-            @Override
-            protected void cancelled() {
-                overlay.setVisible(false);
-                pi.setVisible(false);
+                                // Add ImageView directly to stackPane
+                                stackpane.getChildren().add(imgPreview);
+                                stackpane.getChildren().addAll(btnPrevious, btnNext);
+
+                                // Align buttons on top
+                                StackPane.setAlignment(btnPrevious, Pos.CENTER_LEFT);
+                                StackPane.setAlignment(btnNext, Pos.CENTER_RIGHT);
+
+                                // Optional: add some margin
+                                StackPane.setMargin(btnPrevious, new Insets(0, 0, 0, 10));
+                                StackPane.setMargin(btnNext, new Insets(0, 10, 0, 0));
+                            } else {
+                                // ----- PDF VIEW -----
+                                JFXUtil.PDFViewConfig(filePath2, stackpane, btnPrevious, btnNext, imageviewerutil.ldstackPaneWidth, imageviewerutil.ldstackPaneHeight);
+                            }
+                        } else {
+                            imgPreview.setImage(null);
+                        }
+                    } catch (Exception e) {
+                        imgPreview.setImage(null);
+                    }
+                }
+            } else {
+                
+                if (!lbloadImage) {
+                    
+                    imgPreview.setImage(null);
+                    
+                    // Clear previous content
+                    stackpane.getChildren().clear();
+                    
+                    // Add ImageView directly to stackPane
+                    stackpane.getChildren().add(imgPreview);
+                    stackpane.getChildren().addAll(btnPrevious, btnNext);
+                    
+                    Platform.runLater(() -> JFXUtil.stackPaneClip(stackpane));
+                    pnAttachments = 0;
+                }
             }
-        };
-        Thread thread = new Thread(loadAttahcments);
-        thread.setDaemon(true);
-        thread.start();
+        } catch (Exception e) {
+        }
     }
 
     private void getLoadedClient() throws SQLException, GuanzonException, CloneNotSupportedException {
         //clearAllInputs();
         loadClientMaster();
         reloadTableLedger();
-        reloadTableAttachement();
-        loadAttachmentList();
     }
 
     private boolean isJSONSuccess(JSONObject loJSON, String fsModule) {

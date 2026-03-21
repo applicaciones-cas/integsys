@@ -446,7 +446,7 @@
                                                    <children>
                                                       <Label text="Attachment No" GridPane.halignment="CENTER" />
                                                       <TextField fx:id="txtAttachmentNo" GridPane.columnIndex="1" GridPane.columnSpan="4" />
-                                                      <TableView fx:id="tblAttachments" prefHeight="200.0" prefWidth="200.0" GridPane.columnSpan="5" GridPane.rowIndex="1" GridPane.rowSpan="2">
+                                                      <TableView fx:id="tblAttachments" onMouseClicked="#tblAttachment_Clicked" prefHeight="200.0" prefWidth="200.0" GridPane.columnSpan="5" GridPane.rowIndex="1" GridPane.rowSpan="2">
                                                         <columns>
                                                           <TableColumn fx:id="tblColAttachIndex" prefWidth="75.0" text="No" />
                                                           <TableColumn fx:id="tblColAttachFile" prefWidth="75.0" text="Filename" />
@@ -468,7 +468,7 @@
                                           </AnchorPane>
                                           <AnchorPane prefHeight="464.0" HBox.hgrow="ALWAYS">
                                              <children>
-                                                <StackPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" style="-fx-border-color: FF8201;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                                <StackPane fx:id="stackpane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" style="-fx-border-color: FF8201;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                                    <children>
                                                       <ImageView fx:id="imgPreview" fitHeight="150.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true" />
                                                       <Button fx:id="btnPrevious" mnemonicParsing="false" styleClass="button_process" StackPane.alignment="CENTER_LEFT">
