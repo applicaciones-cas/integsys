@@ -557,12 +557,28 @@ public class CashLiquidation_ApprovalController implements Initializable, Screen
                             poController.Detail(pnDetail).setAccountCode("");
                         }
                         break;
-                    case "tfParticular":
-                        poJSON = poController.Detail(pnDetail).setParticular(lsValue);
-                        if (!JFXUtil.isJSONSuccess(poJSON)) {
-                            ShowMessageFX.Information(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
+                     case "tfParticular":
+                        try {
+                            poJSON = poController.setParticular(pnDetail, lsValue);
+                            if (!JFXUtil.isJSONSuccess(poJSON)) {
+                                int lnReturned = Integer.parseInt(String.valueOf(poJSON.get("row")));
+                                JFXUtil.runWithDelay(0.70, () -> {
+                                    pnDetail = lnReturned;
+                                    loadTableDetail.reload();
+                                });
+                                ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                                break;
+                            } else {
+                                pnDetail = Integer.parseInt(String.valueOf(poJSON.get("row")));
+                                loadTableDetail.reload();
+                                JFXUtil.textFieldMoveNext(tfTransAmount);
+                            }
+                            loadRecordDetail();
+                            break;
+                        } catch (SQLException | GuanzonException ex) {
+                            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+                            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
                         }
-                        break;
                     case "tfTransAmount":
                         lsValue = JFXUtil.removeComma(lsValue);
                         poJSON = poController.Detail(pnDetail).setTransactionAmount(Double.parseDouble(lsValue));
