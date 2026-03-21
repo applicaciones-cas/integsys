@@ -50,6 +50,7 @@ import org.guanzon.appdriver.base.SQLUtil;
 import org.guanzon.appdriver.constant.DocumentType;
 import org.guanzon.appdriver.constant.EditMode;
 import org.guanzon.appdriver.constant.RecordStatus;
+import org.guanzon.appdriver.constant.UserRight;
 import org.json.simple.JSONObject;
 import ph.com.guanzongroup.cas.cashflow.CashLiquidation;
 import ph.com.guanzongroup.cas.cashflow.services.CashflowControllers;
@@ -146,6 +147,10 @@ public class CashAdvance_HistoryController implements Initializable, ScreenInter
                         poController.setDepartmentId(oApp.getDepartment());
                         tfSearchBranch.setDisable(true);
                         tfSearchIndustry.setDisable(true);
+                    } else {
+                        if (oApp.getUserLevel() <= UserRight.ENCODER) {
+                            poController.setDepartmentId(oApp.getDepartment());
+                        }
                     }
                     loadRecordSearch();
                 } catch (SQLException | GuanzonException ex) {
