@@ -3,6 +3,9 @@ package ph.com.guanzongroup.integsys.views;
 import com.sun.javafx.scene.control.skin.TableHeaderRow;
 import java.net.URL;
 import java.sql.SQLException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -49,8 +52,6 @@ import org.guanzon.appdriver.constant.EditMode;
 import org.guanzon.appdriver.base.GuanzonException;
 import org.guanzon.appdriver.base.MiscUtil;
 import org.guanzon.appdriver.base.SQLUtil;
-import org.guanzon.appdriver.constant.UserRight;
-import org.guanzon.cas.purchasing.status.PurchaseOrderStaticData;
 import org.json.simple.JSONObject;
 import ph.com.guanzongroup.cas.cashflow.status.CheckTransferStatus;
 import ph.com.guanzongroup.cas.cashflow.services.CashflowControllers;
@@ -162,8 +163,10 @@ public class CheckDeposit_ConfirmationController implements Initializable, Scree
         initTableDetail();
         initTableOnClick();
         initCheckBox();
-        pnEditMode = poGLControllers.CheckDeposits().getEditMode();
+        initDatePicker();
+        pnEditMode = EditMode.UNKNOWN;
         initButtons(pnEditMode);
+        initFields();
 
     }
     
@@ -181,6 +184,85 @@ public class CheckDeposit_ConfirmationController implements Initializable, Scree
         }
 //            poGLControllers.CheckDeposits().Master().setIndustryId(psIndustryID);
 //            lblSource.setText(poGLControllers.CheckDeposits().Master().Company().getCompanyName() + " - " + poGLControllers.CheckDeposits().Master().Industry().getDescription());
+    }
+    
+    private void initDatePicker() {
+        JFXUtil.setDatePickerFormat("MM/dd/yyyy", dpTransactionDate,dpTransactionReferDate);
+        JFXUtil.setActionListener(this::datepicker_Action, dpTransactionDate,dpTransactionReferDate);
+    }
+    boolean pbSuccess = true;
+    private void datepicker_Action(ActionEvent event) {
+        poJSON = new JSONObject();
+        JFXUtil.setJSONSuccess(poJSON, "success");
+        try {
+            Object source = event.getSource();
+            if (source instanceof DatePicker) {
+                DatePicker datePicker = (DatePicker) source;
+                String inputText = datePicker.getEditor().getText();
+                SimpleDateFormat sdfFormat = new SimpleDateFormat(SQLUtil.FORMAT_SHORT_DATE);
+                LocalDate currentDate = null, transactionDate = null, referenceDate = null, selectedDate = null, periodToDate = null, periodFromDate = null;
+                String lsServerDate = "", lsTransDate = "", lsSelectedDate = "";
+
+                if (inputText == null || "".equals(inputText) || "01/01/1900".equals(inputText)) {
+                    return;
+                }
+                lsServerDate = sdfFormat.format(poApp.getServerDate());
+                currentDate = LocalDate.parse(lsServerDate, DateTimeFormatter.ofPattern(SQLUtil.FORMAT_SHORT_DATE));
+                lsSelectedDate = sdfFormat.format(SQLUtil.toDate(JFXUtil.convertToIsoFormat(inputText), SQLUtil.FORMAT_SHORT_DATE));
+                selectedDate = LocalDate.parse(lsSelectedDate, DateTimeFormatter.ofPattern(SQLUtil.FORMAT_SHORT_DATE));
+                switch (datePicker.getId()) {
+                    case "dpTransactionDate":
+                            lsServerDate = sdfFormat.format(poApp.getServerDate());
+                            lsTransDate = sdfFormat.format(poGLControllers.CheckDeposits().Master().getTransactionDate());
+                            lsSelectedDate = sdfFormat.format(SQLUtil.toDate(JFXUtil.convertToIsoFormat(inputText), SQLUtil.FORMAT_SHORT_DATE));
+                            currentDate = LocalDate.parse(lsServerDate, DateTimeFormatter.ofPattern(SQLUtil.FORMAT_SHORT_DATE));
+                            selectedDate = LocalDate.parse(lsSelectedDate, DateTimeFormatter.ofPattern(SQLUtil.FORMAT_SHORT_DATE));
+                        //back date not allowed
+                        if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
+                            lsTransDate = sdfFormat.format(poGLControllers.CheckDeposits().Master().getTransactionDate());
+                            transactionDate = LocalDate.parse(lsTransDate, DateTimeFormatter.ofPattern(SQLUtil.FORMAT_SHORT_DATE));
+
+                            
+                            
+                            if (pbSuccess && ((!lsTransDate.equals(lsSelectedDate)) || !lsServerDate.equals(lsSelectedDate))) {
+                                if (ShowMessageFX.YesNo(
+                                        "Updating the transaction date requires approval. \nProceed with the change?",
+                                        psFormName,
+                                        null)) {
+                                    
+                                    poGLControllers.CheckDeposits().seekApproval();
+                                }else{
+                                    pbSuccess = false;
+                                }
+                            }
+
+                            if (pbSuccess) {
+                                poGLControllers.CheckDeposits().Master().setTransactionDate((SQLUtil.toDate(lsSelectedDate, SQLUtil.FORMAT_SHORT_DATE)));
+                            } else {
+                                 poGLControllers.CheckDeposits().Master().setTransactionDate((SQLUtil.toDate(lsServerDate, SQLUtil.FORMAT_SHORT_DATE)));
+                            }
+                            pbSuccess = false; //Set to false to prevent multiple message box: Conflict with server date vs transaction date validation
+                            LoadMaster();
+                            pbSuccess = true; //Set to original value
+                        }
+                        break;
+                    case "dpTransactionReferDate":
+                            lsServerDate = sdfFormat.format(poApp.getServerDate());
+                            lsTransDate = sdfFormat.format(poGLControllers.CheckDeposits().Master().getTransactionDate());
+                            lsSelectedDate = sdfFormat.format(SQLUtil.toDate(JFXUtil.convertToIsoFormat(inputText), SQLUtil.FORMAT_SHORT_DATE));
+                            currentDate = LocalDate.parse(lsServerDate, DateTimeFormatter.ofPattern(SQLUtil.FORMAT_SHORT_DATE));
+                            selectedDate = LocalDate.parse(lsSelectedDate, DateTimeFormatter.ofPattern(SQLUtil.FORMAT_SHORT_DATE));
+                         poGLControllers.CheckDeposits().Master().setTransactionReferDate((SQLUtil.toDate(lsSelectedDate, SQLUtil.FORMAT_SHORT_DATE)));
+                         break;
+                    default:
+                        break;
+                }
+                
+            }
+        } catch (SQLException | GuanzonException ex) {
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+            ShowMessageFX.Error(ex.getMessage(), psFormName, null);
+        } 
     }
     
     private void ClearAll() {
@@ -205,6 +287,7 @@ public class CheckDeposit_ConfirmationController implements Initializable, Scree
         psActiveField = "";
         lblStatus.setText("UNKNOWN");
         dpTransactionReferDate.setValue(null);
+        dpTransactionDate.setValue(null);
     }
     private void initButtonsClickActions() {
         List<Button> buttons = Arrays.asList(btnBrowse, btnUpdate, btnSave, btnHistory,btnCancel, btnClose,btnRetrieve,btnPrint,btnSearch,btnApprove,btnVoid);
@@ -357,7 +440,8 @@ public class CheckDeposit_ConfirmationController implements Initializable, Scree
                         ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
                         return;
                     }
-                    ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
+                    ShowMessageFX.Information((String) poJSON.get("message"), psFormName, null);
+                    pnEditMode = poGLControllers.CheckDeposits().getEditMode();
                     if(poGLControllers.CheckDeposits().Master().getTransactionStatus().equals(CheckDepositStatus.OPEN)){
                         if (ShowMessageFX.YesNo(null, psFormName, "Do you want to confirm this transaction?")) {
                                 poJSON = poGLControllers.CheckDeposits().OpenTransaction(poGLControllers.CheckDeposits().Master().getTransactionNo());
@@ -383,7 +467,7 @@ public class CheckDeposit_ConfirmationController implements Initializable, Scree
                            ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
                            return;
                        }
-                       ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
+                       ShowMessageFX.Information((String) poJSON.get("message"), psFormName, null);
                        ClearAll();
                        initializeObject();
                        pnEditMode = poGLControllers.CheckDeposits().getEditMode();
@@ -395,7 +479,7 @@ public class CheckDeposit_ConfirmationController implements Initializable, Scree
                            ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
                            return;
                        }
-                       ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
+                       ShowMessageFX.Information((String) poJSON.get("message"), psFormName, null);
                        ClearAll();
                        initializeObject();
                        pnEditMode = poGLControllers.CheckDeposits().getEditMode();
@@ -409,7 +493,7 @@ public class CheckDeposit_ConfirmationController implements Initializable, Scree
                         if ("error".equals((String) poJSON.get("result"))) {
                             ShowMessageFX.Error((String) poJSON.get("message"), psFormName, null);
                         }
-                        ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
+                        ShowMessageFX.Information((String) poJSON.get("message"), psFormName, null);
                         JFXUtil.disableAllHighlightByColor(tblViewMaster, "#A7C7E7", highlightedRowsMain);
                     }
                 break;
@@ -435,7 +519,8 @@ public class CheckDeposit_ConfirmationController implements Initializable, Scree
                 tfCheckTransNo,
                 tfCheckNo,
                 taRemarks,
-                dpTransactionReferDate
+                dpTransactionReferDate,
+                dpTransactionDate
                 
         );
         if (CheckTransferStatus.CONFIRMED.equals(poGLControllers.CheckDeposits().Master().getTransactionStatus())) {
@@ -655,6 +740,9 @@ public class CheckDeposit_ConfirmationController implements Initializable, Scree
                     }
                     List<ModelTableDetail> detailsList = new ArrayList<>();
                     for (int lnCtr = 0; lnCtr < poGLControllers.CheckDeposits().getDetailCount(); lnCtr++) {
+                        if (!poGLControllers.CheckDeposits().Detail(lnCtr).isReverse()) {
+                            continue;
+                        }
                         detailsList.add(new ModelTableDetail(
                                 String.valueOf(lnCtr + 1),
                                 poGLControllers.CheckDeposits().Detail(lnCtr) != null
@@ -763,12 +851,18 @@ public class CheckDeposit_ConfirmationController implements Initializable, Scree
         if ((pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE)) {
             
             cbReverse.setOnAction(event -> {
-                if (poGLControllers.CheckDeposits().Detail(pnSelectedDetail).getEditMode() == EditMode.ADDNEW) {
-                    poGLControllers.CheckDeposits().deleteDetail(pnSelectedDetail);
-                } else {
-                    poGLControllers.CheckDeposits().Detail(pnSelectedDetail).isReverse(cbReverse.isSelected());
+                try {
+                    if (poGLControllers.CheckDeposits().Detail(pnSelectedDetail).getEditMode() == EditMode.ADDNEW) {
+                        poGLControllers.CheckDeposits().deleteDetail(pnSelectedDetail);
+                    } else {
+                        poGLControllers.CheckDeposits().Detail(pnSelectedDetail).isReverse(cbReverse.isSelected());
+                    }
+                    loadTableDetail();
+                    poGLControllers.CheckDeposits().computeMasterFields();
+                } catch (SQLException | GuanzonException ex) {
+                    Logger.getLogger(CheckDeposit_ConfirmationController.class.getName()).log(Level.SEVERE, null, ex);
+                    ShowMessageFX.Error(ex.getMessage(), psFormName, null);
                 }
-                loadTableDetail();
             });
             
         }
