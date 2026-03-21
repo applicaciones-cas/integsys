@@ -225,6 +225,16 @@ public class CashFundController implements Initializable, ScreenInterface {
             });
 
     public void initTextFields() {
+        JFXUtil.handleDisabledNodeClick(apMaster, pnEditMode, nodeID -> {
+            switch (nodeID) {
+                case "dpLastTransDate":
+                    if (JFXUtil.isObjectEqualTo(poController.getModel().getLastTransactionDate(), null, "")) {
+                        ShowMessageFX.Warning(null, pxeModuleName, "Date is set once processed in cash disbursement.");
+                    }
+                    break;
+            }
+        });
+
         JFXUtil.setFocusListener(txtMaster_Focus, tfCashFundId, tfBranch, tfDepartment, tfCustodian, tfDescription, tfBeginningBalance, tfCurrentBalance);
         JFXUtil.setCommaFormatter(tfBeginningBalance, tfCurrentBalance);
         JFXUtil.setKeyPressedListener(this::txtField_KeyPressed, apMaster);
@@ -251,6 +261,7 @@ public class CashFundController implements Initializable, ScreenInterface {
 
     public void loadRecordMaster() {
         try {
+            JFXUtil.setDisabled(true, tfCurrentBalance);
             switch (poController.getModel().getTransactionStatus()) {
                 case CashFundStatus.ACTIVE:
                     JFXUtil.setDisabled(true, apMaster);
