@@ -361,7 +361,9 @@ public class CashAdvance_HistoryController implements Initializable, ScreenInter
                                         new ModelCashLiquidation_Detail(
                                                 String.valueOf(lnRowCount),
                                                 String.valueOf(poController.Detail(lnCtr).getORNo()),
-                                                String.valueOf(CustomCommonUtil.formatDateToShortString(poController.Detail(lnCtr).getTransactionDate())),
+                                                String.valueOf(poController.Detail(pnDetail).getTransactionDate() != null
+                                                    ? CustomCommonUtil.parseDateStringToLocalDate(SQLUtil.dateFormat(poController.Detail(pnDetail).getTransactionDate(), SQLUtil.FORMAT_SHORT_DATE))
+                                                    : ""),
                                                 String.valueOf(poController.Detail(lnCtr).getParticular()),
                                                 String.valueOf(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(lnCtr).getTransactionAmount(), true)),
                                                 String.valueOf(lnCtr)
