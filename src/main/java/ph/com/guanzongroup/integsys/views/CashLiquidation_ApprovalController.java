@@ -568,13 +568,15 @@ public class CashLiquidation_ApprovalController implements Initializable, Screen
                         if (!JFXUtil.isJSONSuccess(poJSON)) {
                             ShowMessageFX.Information(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
                         }
-                        if (pbEnteredDetail) {
-                            moveNext(false, true);
-                            pbEnteredDetail = false;
-                        }
+                        JFXUtil.runWithDelay(0.90, () -> {
+                            if (pbEnteredDetail) {
+                                moveNext(false, true);
+                                pbEnteredDetail = false;
+                            }
+                        });
                         break;
                 }
-                JFXUtil.runWithDelay(0.50, () -> {
+                JFXUtil.runWithDelay(0.80, () -> {
                     loadTableDetail.reload();
                 });
             });
@@ -671,11 +673,16 @@ public class CashLiquidation_ApprovalController implements Initializable, Screen
                         case "tfAccountDescription":
                             poJSON = poController.SearchAccount(lsValue, false, pnDetail);
                             if ("error".equals(poJSON.get("result"))) {
+                                int lnReturned = Integer.parseInt(String.valueOf(poJSON.get("row")));
+                                JFXUtil.runWithDelay(0.70, () -> {
+                                    pnDetail = lnReturned;
+                                    loadTableDetail.reload();
+                                });
                                 ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-                                txtField.setText("");
                                 break;
                             } else {
-                                loadRecordDetail();
+                                pnDetail = Integer.parseInt(String.valueOf(poJSON.get("row")));
+                                loadTableDetail.reload();
                                 JFXUtil.textFieldMoveNext(tfParticular);
                             }
                             loadRecordDetail();
@@ -1002,7 +1009,7 @@ public class CashLiquidation_ApprovalController implements Initializable, Screen
                             int lnRowCount = 0;
                             for (lnCtr = 0; lnCtr < poController.getDetailCount(); lnCtr++) {
                                 if (!poController.Detail(lnCtr).isReverse()) {
-                                    return;
+                                    continue;
                                 }
                                 String date = "";
                                 SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");

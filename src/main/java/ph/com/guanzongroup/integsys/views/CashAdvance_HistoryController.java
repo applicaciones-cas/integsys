@@ -4,6 +4,7 @@ import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.SQLException;
+import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.ResourceBundle;
@@ -60,9 +61,10 @@ import ph.com.guanzongroup.integsys.utility.JFXUtil;
 
 /**
  *
- * @author Team 1 : Aldrich & Arsiela 02032026
+ * @author Team 1 : Aldrich & Arsiela 
  */
 public class CashAdvance_HistoryController implements Initializable, ScreenInterface {
+
     private GRiderCAS oApp;
     static CashLiquidation poController;
     private JSONObject poJSON;
@@ -142,7 +144,7 @@ public class CashAdvance_HistoryController implements Initializable, ScreenInter
                     poController.setCompanyId(psCompanyId);
                     poController.setSearchBranch(oApp.getBranchName());
                     poController.setSearchIndustry(poController.Master().Industry().getDescription());
-                    if(!oApp.isMainOffice()){
+                    if (!oApp.isMainOffice()) {
                         poController.setDepartmentId(oApp.getDepartment());
                         tfSearchBranch.setDisable(true);
                         tfSearchIndustry.setDisable(true);
@@ -153,7 +155,7 @@ public class CashAdvance_HistoryController implements Initializable, ScreenInter
                     ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
                 }
             });
-            
+
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
             ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
@@ -217,7 +219,7 @@ public class CashAdvance_HistoryController implements Initializable, ScreenInter
                             loadRecordSearch();
                             return;
                         case "tfSearchTransNo":
-                            poJSON = poController.SearchTransaction(tfSearchIndustry.getText(), tfSearchBranch.getText(), tfSearchPayee.getText(),tfSearchTransNo.getText());
+                            poJSON = poController.SearchTransaction(tfSearchIndustry.getText(), tfSearchBranch.getText(), tfSearchPayee.getText(), tfSearchTransNo.getText());
                             if ("error".equals(poJSON.get("result"))) {
                                 ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                 tfSearchTransNo.setText("");
@@ -250,7 +252,7 @@ public class CashAdvance_HistoryController implements Initializable, ScreenInter
         } catch (GuanzonException | SQLException | CloneNotSupportedException | ScriptException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
             ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
-        } 
+        }
     }
 
     public void loadRecordSearch() {
@@ -291,8 +293,8 @@ public class CashAdvance_HistoryController implements Initializable, ScreenInter
                         break;
                 }
                 loadRecordSearch();
-    });
-    
+            });
+
     public void initLoadTable() {
         loadTableAttachment = new JFXUtil.ReloadableTableTask(
                 tblAttachments,
@@ -356,14 +358,20 @@ public class CashAdvance_HistoryController implements Initializable, ScreenInter
                             }
                             int lnRowCount = 0;
                             for (lnCtr = 0; lnCtr < poController.getDetailCount(); lnCtr++) {
+                                if (!poController.Detail(lnCtr).isReverse()) {
+                                    continue;
+                                }
+                                String date = "";
+                                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+                                if (!JFXUtil.isObjectEqualTo(poController.Detail(lnCtr).getTransactionDate(), null, "")) {
+                                    date = sdf.format(poController.Detail(lnCtr).getTransactionDate());
+                                }
                                 lnRowCount += 1;
                                 details_data.add(
                                         new ModelCashLiquidation_Detail(
                                                 String.valueOf(lnRowCount),
                                                 String.valueOf(poController.Detail(lnCtr).getORNo()),
-                                                String.valueOf(poController.Detail(pnDetail).getTransactionDate() != null
-                                                    ? CustomCommonUtil.parseDateStringToLocalDate(SQLUtil.dateFormat(poController.Detail(pnDetail).getTransactionDate(), SQLUtil.FORMAT_SHORT_DATE))
-                                                    : ""),
+                                                String.valueOf(date),
                                                 String.valueOf(poController.Detail(lnCtr).getParticular()),
                                                 String.valueOf(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(lnCtr).getTransactionAmount(), true)),
                                                 String.valueOf(lnCtr)
@@ -398,7 +406,7 @@ public class CashAdvance_HistoryController implements Initializable, ScreenInter
     }
 
     public void initTextFields() {
-        JFXUtil.setFocusListener(txtBrowse_Focus, tfSearchIndustry, tfSearchBranch,tfSearchPayee, tfSearchTransNo);
+        JFXUtil.setFocusListener(txtBrowse_Focus, tfSearchIndustry, tfSearchBranch, tfSearchPayee, tfSearchTransNo);
         JFXUtil.setKeyPressedListener(this::txtField_KeyPressed, apBrowse);
         JFXUtil.setKeyEventFilter(tableKeyEvents, tblViewDetail, tblAttachments);
     }
@@ -406,6 +414,7 @@ public class CashAdvance_HistoryController implements Initializable, ScreenInter
     public void initDatePickers() {
         JFXUtil.setDatePickerFormat("MM/dd/yyyy", dpTransactionDate, dpLiquidationDate, dpTransDateDetail);
     }
+
     public void initComboboxes() {
         // ComboBox setup
         cmbAttachmentType.setItems(documentType);
@@ -421,6 +430,7 @@ public class CashAdvance_HistoryController implements Initializable, ScreenInter
         });
         JFXUtil.initComboBoxCellDesignColor("#FF8201", cmbAttachmentType);
     }
+
     private void initAttachmentPreviewPane() {
         imageviewerutil.initAttachmentPreviewPane(stackPane1, imageView);
         stackPane1.heightProperty().addListener((observable, oldValue, newHeight) -> {
@@ -465,6 +475,7 @@ public class CashAdvance_HistoryController implements Initializable, ScreenInter
             JFXUtil.resetImageBounds(imageView, stackPane1);
         }
     }
+
     public void initAttachmentsGrid() {
         /*FOCUS ON FIRST ROW*/
         JFXUtil.setColumnCenter(tblRowNoAttachment);
@@ -483,7 +494,7 @@ public class CashAdvance_HistoryController implements Initializable, ScreenInter
         tblViewDetail.setItems(filteredDataDetail);
         tblViewDetail.autosize();
     }
-    
+
     public void initTableOnClick() {
         tblAttachments.setOnMouseClicked(event -> {
             pnAttachment = tblAttachments.getSelectionModel().getSelectedIndex();
@@ -509,7 +520,7 @@ public class CashAdvance_HistoryController implements Initializable, ScreenInter
         JFXUtil.setKeyEventFilter(tableKeyEvents, tblViewDetail, tblAttachments);
         JFXUtil.adjustColumnForScrollbar(tblViewDetail, tblAttachments);
     }
-    
+
     JFXUtil.TableKeyEvent tableKeyEvents = new JFXUtil.TableKeyEvent() {
         @Override
         protected void onRowMove(TableView<?> currentTable, String currentTableID, boolean isMovedDown) {
@@ -541,6 +552,7 @@ public class CashAdvance_HistoryController implements Initializable, ScreenInter
             JFXUtil.clearTextFields(apMaster, apDetail, apAttachments);
         });
     }
+
     public void loadRecordAttachment(boolean lbloadImage) {
         try {
             if (attachment_data.size() > 0) {
@@ -643,6 +655,7 @@ public class CashAdvance_HistoryController implements Initializable, ScreenInter
             ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
+
     public void loadRecordMaster() {
         try {
             Platform.runLater(() -> {
@@ -660,7 +673,7 @@ public class CashAdvance_HistoryController implements Initializable, ScreenInter
             dpLiquidationDate.setValue(poController.Master().getLiquidatedDate() != null
                     ? CustomCommonUtil.parseDateStringToLocalDate(SQLUtil.dateFormat(poController.Master().getLiquidatedDate(), SQLUtil.FORMAT_SHORT_DATE))
                     : null);
-            
+
             tfCashAdvanceBalance.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Master().CashFund().getBalance(), false));
             tfAdvancesAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Master().getAdvanceAmount(), false));
             tfLiquidationTotal.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Master().getLiquidationTotal().doubleValue(), false));
@@ -687,7 +700,7 @@ public class CashAdvance_HistoryController implements Initializable, ScreenInter
                 String lsButton = clickedButton.getId();
                 switch (lsButton) {
                     case "btnBrowse":
-                        poJSON = poController.SearchTransaction(tfSearchIndustry.getText(), tfSearchBranch.getText(),tfSearchPayee.getText(), tfSearchTransNo.getText());
+                        poJSON = poController.SearchTransaction(tfSearchIndustry.getText(), tfSearchBranch.getText(), tfSearchPayee.getText(), tfSearchTransNo.getText());
                         if ("error".equalsIgnoreCase((String) poJSON.get("result"))) {
                             ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                             tfTransactionNo.requestFocus();
@@ -740,7 +753,7 @@ public class CashAdvance_HistoryController implements Initializable, ScreenInter
         } catch (CloneNotSupportedException | SQLException | GuanzonException | ScriptException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
             ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
-        } 
+        }
     }
 
     private void initButton(int fnValue) {

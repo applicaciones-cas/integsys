@@ -328,6 +328,9 @@ public class CashLiquidation_EntryController implements Initializable, ScreenInt
                                             }
                                         }
                                     }
+                                    if (!JFXUtil.isObjectEqualTo(poController.Master().getLiquidatedBy(), null, "")) {
+                                        JFXUtil.highlightByKey(tblViewMainList, String.valueOf(pnMain + 1), "#C1E1C1", highlightedRowsMain);
+                                    }
                                 }
                                 JFXUtil.disableAllHighlightByColor(tblViewMainList, "#A7C7E7", highlightedRowsMain);
                                 break;
@@ -552,13 +555,15 @@ public class CashLiquidation_EntryController implements Initializable, ScreenInt
                         if (!JFXUtil.isJSONSuccess(poJSON)) {
                             ShowMessageFX.Information(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
                         }
-                        if (pbEnteredDetail) {
-                            moveNext(false, true);
-                            pbEnteredDetail = false;
-                        }
+                        JFXUtil.runWithDelay(0.90, () -> {
+                            if (pbEnteredDetail) {
+                                moveNext(false, true);
+                                pbEnteredDetail = false;
+                            }
+                        });
                         break;
                 }
-                JFXUtil.runWithDelay(0.50, () -> {
+                JFXUtil.runWithDelay(0.80, () -> {
                     loadTableDetail.reload();
                 });
             });
@@ -655,11 +660,16 @@ public class CashLiquidation_EntryController implements Initializable, ScreenInt
                         case "tfAccountDescription":
                             poJSON = poController.SearchAccount(lsValue, false, pnDetail);
                             if ("error".equals(poJSON.get("result"))) {
+                                int lnReturned = Integer.parseInt(String.valueOf(poJSON.get("row")));
+                                JFXUtil.runWithDelay(0.70, () -> {
+                                    pnDetail = lnReturned;
+                                    loadTableDetail.reload();
+                                });
                                 ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-                                txtField.setText("");
                                 break;
                             } else {
-                                loadRecordDetail();
+                                pnDetail = Integer.parseInt(String.valueOf(poJSON.get("row")));
+                                loadTableDetail.reload();
                                 JFXUtil.textFieldMoveNext(tfParticular);
                             }
                             loadRecordDetail();
@@ -988,7 +998,7 @@ public class CashLiquidation_EntryController implements Initializable, ScreenInt
                             int lnRowCount = 0;
                             for (lnCtr = 0; lnCtr < poController.getDetailCount(); lnCtr++) {
                                 if (!poController.Detail(lnCtr).isReverse()) {
-                                    return;
+                                    continue;
                                 }
                                 String date = "";
                                 SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
@@ -1055,6 +1065,9 @@ public class CashLiquidation_EntryController implements Initializable, ScreenInt
                                             String.valueOf(poController.CashAdvanceList(lnCtr).Department().getDescription()),
                                             lsHighlightbasis
                                     ));
+                                    if (!JFXUtil.isObjectEqualTo(poController.CashAdvanceList(lnCtr).getLiquidatedBy(), null, "")) {
+                                        JFXUtil.highlightByKey(tblViewMainList, String.valueOf(lnCtr + 1), "#C1E1C1", highlightedRowsMain);
+                                    }
                                 } catch (GuanzonException | SQLException ex) {
                                     Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
                                     ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
