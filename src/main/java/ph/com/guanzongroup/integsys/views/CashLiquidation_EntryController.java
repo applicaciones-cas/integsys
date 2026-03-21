@@ -693,6 +693,10 @@ public class CashLiquidation_EntryController implements Initializable, ScreenInt
                             JFXUtil.setJSONError(poJSON, "Date should not be before the released/issued date.");
                             pbSuccess = false;
                         }
+                        if (ldSelectedDate.isAfter(ldCurrentDate)) {
+                            JFXUtil.setJSONError(poJSON, "Future dates are not allowed.");
+                            pbSuccess = false;
+                        }
                         if (pbSuccess) {
                             poController.Detail(pnDetail).setTransactionDate((SQLUtil.toDate(lsSelectedDate, SQLUtil.FORMAT_SHORT_DATE)));
                         } else {
