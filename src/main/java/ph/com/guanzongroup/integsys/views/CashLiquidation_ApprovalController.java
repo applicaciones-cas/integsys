@@ -496,7 +496,7 @@ public class CashLiquidation_ApprovalController implements Initializable, Screen
     public void retrieveCashAdvance() {
         try {
             poJSON = new JSONObject();
-            poJSON = poController.loadTransactionList(tfSearchIndustry.getText(), tfSearchPayee.getText(), tfSearchTransNo.getText(), true);
+            poJSON = poController.loadTransactionList(tfSearchIndustry.getText(), tfSearchPayee.getText(), tfSearchTransNo.getText(), false);
             if (!"success".equals((String) poJSON.get("result"))) {
                 ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
             } else {
