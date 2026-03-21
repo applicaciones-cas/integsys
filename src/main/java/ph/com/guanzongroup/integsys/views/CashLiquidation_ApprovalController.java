@@ -699,7 +699,10 @@ public class CashLiquidation_ApprovalController implements Initializable, Screen
 //                try {
                 switch (datePicker.getId()) {
                     case "dpTransDateDetail":
-                        // Date should be >= Released date
+                        // Date should be >= Released 
+                        if (pnEditMode != EditMode.UPDATE) {
+                            return;
+                        }
                         String lsReleasedDate = sdfFormat.format(poController.Master().getIssuedDate());
                         LocalDate ldReleasedDate = LocalDate.parse(lsReleasedDate, DateTimeFormatter.ofPattern(SQLUtil.FORMAT_SHORT_DATE));
                         if (ldSelectedDate.isBefore(ldReleasedDate)) {
@@ -1052,18 +1055,17 @@ public class CashLiquidation_ApprovalController implements Initializable, Screen
                             //retreiving using column index
                             for (int lnCtr = 0; lnCtr <= poController.getCashAdvanceCount() - 1; lnCtr++) {
                                 try {
-                                    String lsTransNoBasis = poController.CashAdvanceList(lnCtr).getTransactionNo();
-//                                    String lsCompany = poController.CashAdvanceList(lnCtr).Company().getCompanyName();
-//                                    String lsSupplier = poController.CashAdvanceList(lnCtr).Supplier().getCompanyName();
 
-                                    String lsHighlightbasis = lsTransNoBasis;
                                     main_data.add(new ModelCashLiquidation_Main(String.valueOf(lnCtr + 1),
                                             String.valueOf(poController.CashAdvanceList(lnCtr).getTransactionNo()),
                                             String.valueOf(CustomCommonUtil.formatDateToShortString(poController.CashAdvanceList(lnCtr).getTransactionDate())),
                                             String.valueOf(poController.CashAdvanceList(lnCtr).Payee().getCompanyName()),
                                             String.valueOf(poController.CashAdvanceList(lnCtr).Department().getDescription()),
-                                            lsHighlightbasis
+                                            ""
                                     ));
+                                    if (JFXUtil.isObjectEqualTo(poController.CashAdvanceList(lnCtr).getTransactionStatus(), CashAdvanceStatus.LIQUIDATED)) {
+                                        JFXUtil.highlightByKey(tblViewMainList, String.valueOf(lnCtr + 1), "#C1E1C1", highlightedRowsMain);
+                                    }
                                 } catch (GuanzonException | SQLException ex) {
                                     Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
                                     ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
