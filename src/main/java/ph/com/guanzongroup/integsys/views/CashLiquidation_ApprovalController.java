@@ -706,7 +706,7 @@ public class CashLiquidation_ApprovalController implements Initializable, Screen
                         String lsReleasedDate = sdfFormat.format(poController.Master().getIssuedDate());
                         LocalDate ldReleasedDate = LocalDate.parse(lsReleasedDate, DateTimeFormatter.ofPattern(SQLUtil.FORMAT_SHORT_DATE));
                         if (ldSelectedDate.isBefore(ldReleasedDate)) {
-                            JFXUtil.setJSONError(poJSON, "Date should be similar or later than the released/issued date.");
+                            JFXUtil.setJSONError(poJSON, "Date should not be before the released/issued date.");
                             pbSuccess = false;
                         }
                         if (pbSuccess) {
