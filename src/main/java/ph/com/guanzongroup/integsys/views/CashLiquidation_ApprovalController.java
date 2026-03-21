@@ -10,6 +10,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -698,12 +700,12 @@ public class CashLiquidation_ApprovalController implements Initializable, Screen
                 switch (datePicker.getId()) {
                     case "dpTransDateDetail":
                         // Date should be >= Released date
-//                        String lsTransDate = sdfFormat.format(poController.Master().getIssuedDate());
-//                        LocalDate transactionDate = LocalDate.parse(lsTransDate, DateTimeFormatter.ofPattern(SQLUtil.FORMAT_SHORT_DATE));
-//                        if (ldSelectedDate.isBefore(transactionDate)) {
-//                            JFXUtil.setJSONError(poJSON, "Date should be similar or later than the released date.");
-//                            pbSuccess = false;
-//                        }
+                        String lsReleasedDate = sdfFormat.format(poController.Master().getIssuedDate());
+                        LocalDate ldReleasedDate = LocalDate.parse(lsReleasedDate, DateTimeFormatter.ofPattern(SQLUtil.FORMAT_SHORT_DATE));
+                        if (ldSelectedDate.isBefore(ldReleasedDate)) {
+                            JFXUtil.setJSONError(poJSON, "Date should be similar or later than the released date.");
+                            pbSuccess = false;
+                        }
                         if (pbSuccess) {
                             poController.Detail(pnDetail).setTransactionDate((SQLUtil.toDate(lsSelectedDate, SQLUtil.FORMAT_SHORT_DATE)));
                         } else {
@@ -726,10 +728,10 @@ public class CashLiquidation_ApprovalController implements Initializable, Screen
 
     public void loadRecordSearch() {
         try {
-            if (poController.Master().Industry().getDescription() != null && !"".equals(poController.Master().Industry().getDescription())) {
-                lblSource.setText(poController.Master().Industry().getDescription());
+            if (poController.Master().Company().getCompanyName() != null && !"".equals(poController.Master().Company().getCompanyName())) {
+                lblSource.setText(poController.Master().Company().getCompanyName());
             } else {
-                lblSource.setText("General");
+                lblSource.setText("");
             }
             tfSearchIndustry.setText(poController.getSearchIndustry());
             tfSearchPayee.setText(poController.getSearchPayee());
@@ -852,7 +854,9 @@ public class CashLiquidation_ApprovalController implements Initializable, Screen
 
     public void loadRecordMaster() {
         try {
-            JFXUtil.setStatusValue(lblStatus, CashAdvanceStatus.class, pnEditMode == EditMode.UNKNOWN ? "-1" : poController.Master().getTransactionStatus());
+            Platform.runLater(() -> {
+                lblStatus.setText(pnEditMode == EditMode.UNKNOWN ? "UNKNOWN" : poController.getStatus(poController.Master().getTransactionStatus()).toUpperCase());
+            });
             poController.computeFields(true);
 
             tfTransactionNo.setText(poController.Master().getTransactionNo());
@@ -887,9 +891,11 @@ public class CashLiquidation_ApprovalController implements Initializable, Screen
             if (selected != null) {
                 int pnRowMain = Integer.parseInt(selected.getIndex01()) - 1;
                 pnMain = pnRowMain;
-//                if (JFXUtil.loadValidation(pnEditMode, pxeModuleName, poController.Master().getTransactionNo(), selected.getIndex02())) {
-//                    return;
-//                }
+                if (null != poController.Master().getTransactionNo()) {
+                    if (!JFXUtil.loadValidation(pnEditMode, pxeModuleName, poController.Master().getTransactionNo(), selected.getIndex02())) {
+                        return;
+                    }
+                }
                 JFXUtil.disableAllHighlightByColor(tblViewMainList, "#A7C7E7", highlightedRowsMain);
                 JFXUtil.highlightByKey(tblViewMainList, String.valueOf(pnRowMain + 1), "#A7C7E7", highlightedRowsMain);
                 poController.resetTransaction();

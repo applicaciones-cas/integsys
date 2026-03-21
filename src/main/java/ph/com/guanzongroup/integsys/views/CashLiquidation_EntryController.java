@@ -715,10 +715,10 @@ public class CashLiquidation_EntryController implements Initializable, ScreenInt
 
     public void loadRecordSearch() {
         try {
-            if (poController.Master().Industry().getDescription() != null && !"".equals(poController.Master().Industry().getDescription())) {
-                lblSource.setText(poController.Master().Industry().getDescription());
+            if (poController.Master().Company().getCompanyName() != null && !"".equals(poController.Master().Company().getCompanyName())) {
+                lblSource.setText(poController.Master().Company().getCompanyName());
             } else {
-                lblSource.setText("General");
+                lblSource.setText("");
             }
             tfSearchIndustry.setText(poController.getSearchIndustry());
             tfSearchPayee.setText(poController.getSearchPayee());
@@ -841,7 +841,10 @@ public class CashLiquidation_EntryController implements Initializable, ScreenInt
 
     public void loadRecordMaster() {
         try {
-            JFXUtil.setStatusValue(lblStatus, CashAdvanceStatus.class, pnEditMode == EditMode.UNKNOWN ? "-1" : poController.Master().getTransactionStatus());
+            Platform.runLater(() -> {
+                lblStatus.setText(pnEditMode == EditMode.UNKNOWN ? "UNKNOWN" : poController.getStatus(poController.Master().getTransactionStatus()).toUpperCase());
+            });
+
             poController.computeFields(true);
 
             tfTransactionNo.setText(poController.Master().getTransactionNo());
@@ -876,9 +879,11 @@ public class CashLiquidation_EntryController implements Initializable, ScreenInt
             if (selected != null) {
                 int pnRowMain = Integer.parseInt(selected.getIndex01()) - 1;
                 pnMain = pnRowMain;
-//                if (JFXUtil.loadValidation(pnEditMode, pxeModuleName, poController.Master().getTransactionNo(), selected.getIndex02())) {
-//                    return;
-//                }
+                if (null != poController.Master().getTransactionNo()) {
+                    if (!JFXUtil.loadValidation(pnEditMode, pxeModuleName, poController.Master().getTransactionNo(), selected.getIndex02())) {
+                        return;
+                    }
+                }
                 JFXUtil.disableAllHighlightByColor(tblViewMainList, "#A7C7E7", highlightedRowsMain);
                 JFXUtil.highlightByKey(tblViewMainList, String.valueOf(pnRowMain + 1), "#A7C7E7", highlightedRowsMain);
                 poController.resetTransaction();

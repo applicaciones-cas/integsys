@@ -3238,7 +3238,7 @@ public class JFXUtil {
                 }
             } else {
                 if (!ShowMessageFX.YesNo(null, pxeModuleName, "Transaction is currently in update mode.\n"
-                        + "Are you sure you want to switch to another transaction?")) {
+                        + "Are you sure you want to select another transaction?")) {
                     return false;
                 }
             }
