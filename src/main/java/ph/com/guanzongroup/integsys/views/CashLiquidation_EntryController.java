@@ -1155,28 +1155,6 @@ public class CashLiquidation_EntryController implements Initializable, ScreenInt
         JFXUtil.adjustColumnForScrollbar(tblViewMainList, tblViewDetail, tblAttachments);
     }
 
-    private void initButton(int fnValue) {
-        boolean lbShow = (fnValue == EditMode.ADDNEW || fnValue == EditMode.UPDATE);
-        boolean lbShow2 = fnValue == EditMode.READY;
-        boolean lbShow3 = (fnValue == EditMode.READY || fnValue == EditMode.UNKNOWN);
-
-        // Manage visibility and managed state of other buttons
-        JFXUtil.setButtonsVisibility(lbShow, btnSearch, btnSave, btnHistory, btnCancel);
-        JFXUtil.setButtonsVisibility(lbShow2, btnUpdate);
-        JFXUtil.setButtonsVisibility(lbShow3, btnClose);
-
-        JFXUtil.setDisabled(!lbShow, taRemarks, apMaster, apDetail, apAttachments, apAttachmentButtons);
-        if (pnEditMode != EditMode.READY) {
-            return;
-        }
-        switch (poController.Master().getTransactionStatus()) {
-            case CashAdvanceStatus.VOID:
-            case CashAdvanceStatus.CANCELLED:
-                JFXUtil.setButtonsVisibility(false, btnUpdate);
-                break;
-        }
-    }
-
     private void initAttachmentPreviewPane() {
         imageviewerutil.initAttachmentPreviewPane(stackPane1, imageView);
         stackPane1.heightProperty().addListener((observable, oldValue, newHeight) -> {
@@ -1274,6 +1252,28 @@ public class CashLiquidation_EntryController implements Initializable, ScreenInt
             }
         }
     };
+
+    private void initButton(int fnValue) {
+        boolean lbShow = (fnValue == EditMode.ADDNEW || fnValue == EditMode.UPDATE);
+        boolean lbShow2 = fnValue == EditMode.READY;
+        boolean lbShow3 = (fnValue == EditMode.READY || fnValue == EditMode.UNKNOWN);
+
+        // Manage visibility and managed state of other buttons
+        JFXUtil.setButtonsVisibility(lbShow, btnSearch, btnSave, btnCancel);
+        JFXUtil.setButtonsVisibility(lbShow2, btnUpdate, btnHistory);
+        JFXUtil.setButtonsVisibility(lbShow3, btnClose);
+
+        JFXUtil.setDisabled(!lbShow, taRemarks, apMaster, apDetail, apAttachments, apAttachmentButtons);
+        if (pnEditMode != EditMode.READY) {
+            return;
+        }
+        switch (poController.Master().getTransactionStatus()) {
+            case CashAdvanceStatus.VOID:
+            case CashAdvanceStatus.CANCELLED:
+                JFXUtil.setButtonsVisibility(false, btnUpdate);
+                break;
+        }
+    }
 
     public void clearTextFields() {
         Platform.runLater(() -> {
