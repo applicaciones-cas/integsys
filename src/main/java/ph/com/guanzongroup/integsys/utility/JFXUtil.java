@@ -1112,7 +1112,7 @@ public class JFXUtil {
             }
             tf.focusedProperty().addListener(listener);
         } else if (node instanceof AnchorPane) {
-            
+
             for (Node child : ((AnchorPane) node).getChildren()) {
                 processNodeRecursive(child, listener);
             }
@@ -3229,6 +3229,9 @@ public class JFXUtil {
     }
 
     public static boolean loadValidation(int pnEditMode, String pxeModuleName, String lsCurrentTransNo, String lsTransactionNo) {
+        if (lsCurrentTransNo == null) {
+            return false;
+        }
         if (pnEditMode == EditMode.UPDATE) {
             if (lsCurrentTransNo.equals(lsTransactionNo)) {
                 if (!ShowMessageFX.YesNo(null, pxeModuleName, "Transaction is currently in update mode.\n"
