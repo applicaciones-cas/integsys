@@ -684,12 +684,15 @@ public class CashLiquidation_EntryController implements Initializable, ScreenInt
                 switch (datePicker.getId()) {
                     case "dpTransDateDetail":
                         // Date should be >= Released date
-//                        String lsTransDate = sdfFormat.format(poController.Master().getIssuedDate());
-//                        LocalDate transactionDate = LocalDate.parse(lsTransDate, DateTimeFormatter.ofPattern(SQLUtil.FORMAT_SHORT_DATE));
-//                        if (ldSelectedDate.isBefore(transactionDate)) {
-//                            JFXUtil.setJSONError(poJSON, "Date should be similar or later than the released date.");
-//                            pbSuccess = false;
-//                        }
+                        if (pnEditMode != EditMode.UPDATE) {
+                            return;
+                        }
+                        String lsReleasedDate = sdfFormat.format(poController.Master().getIssuedDate());
+                        LocalDate ldReleasedDate = LocalDate.parse(lsReleasedDate, DateTimeFormatter.ofPattern(SQLUtil.FORMAT_SHORT_DATE));
+                        if (ldSelectedDate.isBefore(ldReleasedDate)) {
+                            JFXUtil.setJSONError(poJSON, "Date should be similar or later than the released date.");
+                            pbSuccess = false;
+                        }
                         if (pbSuccess) {
                             poController.Detail(pnDetail).setTransactionDate((SQLUtil.toDate(lsSelectedDate, SQLUtil.FORMAT_SHORT_DATE)));
                         } else {
