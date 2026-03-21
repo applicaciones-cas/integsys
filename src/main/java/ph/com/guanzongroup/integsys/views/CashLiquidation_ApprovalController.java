@@ -465,7 +465,8 @@ public class CashLiquidation_ApprovalController implements Initializable, Screen
                         break;
                 }
 
-                if (JFXUtil.isObjectEqualTo(lsButton, "btnSave", "btnCancel")) {
+                if (JFXUtil.isObjectEqualTo(lsButton, "btnSave", "btnCancel", "btnApprove", "btnVoid")) {
+                    clearTextFields();
                     poController.resetMaster();
 //                    poController.resetOthers();
                     poController.Detail().clear();
@@ -495,7 +496,7 @@ public class CashLiquidation_ApprovalController implements Initializable, Screen
     public void retrieveCashAdvance() {
         try {
             poJSON = new JSONObject();
-            poJSON = poController.loadTransactionList(tfSearchIndustry.getText(), tfSearchPayee.getText(), tfSearchTransNo.getText());
+            poJSON = poController.loadTransactionList(tfSearchIndustry.getText(), tfSearchPayee.getText(), tfSearchTransNo.getText(), true);
             if (!"success".equals((String) poJSON.get("result"))) {
                 ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
             } else {
