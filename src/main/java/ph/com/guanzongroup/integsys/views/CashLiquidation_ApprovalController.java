@@ -270,7 +270,7 @@ public class CashLiquidation_ApprovalController implements Initializable, Screen
                         break;
                     case "btnApprove":
                         poJSON = new JSONObject();
-                        if (ShowMessageFX.YesNo(null, pxeModuleName, "Are you sure you want to confirm transaction?") == true) {
+                        if (ShowMessageFX.YesNo(null, pxeModuleName, "Are you sure you want to approve transaction?") == true) {
                             poJSON = poController.ConfirmTransaction("");
                             if ("error".equals((String) poJSON.get("result"))) {
                                 ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
@@ -706,7 +706,11 @@ public class CashLiquidation_ApprovalController implements Initializable, Screen
                         String lsReleasedDate = sdfFormat.format(poController.Master().getIssuedDate());
                         LocalDate ldReleasedDate = LocalDate.parse(lsReleasedDate, DateTimeFormatter.ofPattern(SQLUtil.FORMAT_SHORT_DATE));
                         if (ldSelectedDate.isBefore(ldReleasedDate)) {
-                            JFXUtil.setJSONError(poJSON, "Date should be similar or later than the released date.");
+                            JFXUtil.setJSONError(poJSON, "Date should not be before the released/issued date.");
+                            pbSuccess = false;
+                        }
+                        if (ldSelectedDate.isAfter(ldCurrentDate)) {
+                            JFXUtil.setJSONError(poJSON, "Future dates are not allowed.");
                             pbSuccess = false;
                         }
                         if (pbSuccess) {
