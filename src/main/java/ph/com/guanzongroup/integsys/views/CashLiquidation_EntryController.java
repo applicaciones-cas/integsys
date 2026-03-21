@@ -883,7 +883,7 @@ public class CashLiquidation_EntryController implements Initializable, ScreenInt
                 JFXUtil.highlightByKey(tblViewMainList, String.valueOf(pnRowMain + 1), "#A7C7E7", highlightedRowsMain);
                 poController.resetTransaction();
                 poController.loadAttachments();
-
+                clearTextFields();
                 poJSON = poController.OpenTransaction(poController.CashAdvanceList(pnMain).getTransactionNo());
                 if ("error".equals((String) poJSON.get("result"))) {
                     ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
