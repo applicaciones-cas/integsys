@@ -1065,9 +1065,6 @@ public class CashLiquidation_EntryController implements Initializable, ScreenInt
                                             String.valueOf(poController.CashAdvanceList(lnCtr).Department().getDescription()),
                                             lsHighlightbasis
                                     ));
-                                    if (!JFXUtil.isObjectEqualTo(poController.CashAdvanceList(lnCtr).getLiquidatedBy(), null, "")) {
-                                        JFXUtil.highlightByKey(tblViewMainList, String.valueOf(lnCtr + 1), "#C1E1C1", highlightedRowsMain);
-                                    }
                                 } catch (GuanzonException | SQLException ex) {
                                     Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
                                     ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
