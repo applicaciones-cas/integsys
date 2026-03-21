@@ -10,6 +10,7 @@ import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.animation.PauseTransition;
+import javafx.animation.TranslateTransition;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
@@ -68,6 +69,7 @@ public class CashAdvance_HistoryController implements Initializable, ScreenInter
     public int pnEditMode;
     private final String pxeModuleName = JFXUtil.getFormattedClassTitle(this.getClass());
     int pnDetail = 0;
+    private int currentIndex = 0;
     private String psIndustryId = "";
     private String psCompanyId = "";
     private boolean pbEntered = false;
@@ -101,7 +103,7 @@ public class CashAdvance_HistoryController implements Initializable, ScreenInter
     @FXML
     private TextArea taRemarks;
     @FXML
-    private TableView tblViewDetail, tblViewMainList, tblAttachments;
+    private TableView tblViewDetail, tblAttachments;
     @FXML
     private TableColumn tblRowNoDetail, tblORNo, tblTransDateDetail, tblParticular, tblTransAmount, tblRowNo, tblReqDepartment1, tblTransDate, tblPayeeName, tblReqDepartment, tblRowNoAttachment, tblFileNameAttachment;
     @FXML
@@ -123,6 +125,9 @@ public class CashAdvance_HistoryController implements Initializable, ScreenInter
             initDatePickers();
             initDetailsGrid();
             initAttachmentsGrid();
+            initComboboxes();
+            initTableOnClick();
+            initAttachmentPreviewPane();
             clearTextFields();
             initLoadTable();
             pnEditMode = EditMode.UNKNOWN;
@@ -147,6 +152,7 @@ public class CashAdvance_HistoryController implements Initializable, ScreenInter
                     ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
                 }
             });
+            
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
             ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
@@ -391,10 +397,70 @@ public class CashAdvance_HistoryController implements Initializable, ScreenInter
     public void initTextFields() {
         JFXUtil.setFocusListener(txtBrowse_Focus, tfSearchIndustry, tfSearchBranch,tfSearchPayee, tfSearchTransNo);
         JFXUtil.setKeyPressedListener(this::txtField_KeyPressed, apBrowse);
+        JFXUtil.setKeyEventFilter(tableKeyEvents, tblViewDetail, tblAttachments);
     }
 
     public void initDatePickers() {
         JFXUtil.setDatePickerFormat("MM/dd/yyyy", dpTransactionDate, dpLiquidationDate, dpTransDateDetail);
+    }
+    public void initComboboxes() {
+        // ComboBox setup
+        cmbAttachmentType.setItems(documentType);
+        cmbAttachmentType.setOnAction(event -> {
+            if (attachment_data.size() > 0) {
+                try {
+                    int selectedIndex = cmbAttachmentType.getSelectionModel().getSelectedIndex();
+                    poController.TransactionAttachmentList(pnAttachment).getModel().setDocumentType("000" + String.valueOf(selectedIndex));
+                    cmbAttachmentType.getSelectionModel().select(selectedIndex);
+                } catch (Exception e) {
+                }
+            }
+        });
+        JFXUtil.initComboBoxCellDesignColor("#FF8201", cmbAttachmentType);
+    }
+    private void initAttachmentPreviewPane() {
+        imageviewerutil.initAttachmentPreviewPane(stackPane1, imageView);
+        stackPane1.heightProperty().addListener((observable, oldValue, newHeight) -> {
+            double computedHeight = newHeight.doubleValue();
+            imageviewerutil.ldstackPaneHeight = computedHeight;
+            loadTableAttachment.reload();
+            loadRecordAttachment(true);
+        });
+    }
+
+    public void slideImage(int direction) {
+        if (attachment_data.size() <= 0) {
+            return;
+        }
+        int lnRow = Integer.valueOf(attachment_data.get(tblAttachments.getSelectionModel().getSelectedIndex()).getIndex01());
+        currentIndex = lnRow - 1;
+        int newIndex = currentIndex + direction;
+
+        if (newIndex != -1 && (newIndex <= attachment_data.size() - 1)) {
+            TranslateTransition slideOut = new TranslateTransition(Duration.millis(300), imageView);
+            slideOut.setByX(direction * -400); // Move left or right
+
+            JFXUtil.selectAndFocusRow(tblAttachments, newIndex);
+            int lnIndex = Integer.valueOf(attachment_data.get(newIndex).getIndex01());
+            int lnTempRow = JFXUtil.getDetailTempRow(attachment_data, lnIndex, 3);
+            pnAttachment = lnTempRow;
+            loadRecordAttachment(false);
+
+            // Create a transition animation
+            slideOut.setOnFinished(event -> {
+                imageView.setTranslateX(direction * 400);
+                TranslateTransition slideIn = new TranslateTransition(Duration.millis(300), imageView);
+                slideIn.setToX(0);
+                slideIn.play();
+
+                loadRecordAttachment(true);
+            });
+
+            slideOut.play();
+        }
+        if (JFXUtil.isImageViewOutOfBounds(imageView, stackPane1)) {
+            JFXUtil.resetImageBounds(imageView, stackPane1);
+        }
     }
     public void initAttachmentsGrid() {
         /*FOCUS ON FIRST ROW*/
@@ -414,9 +480,63 @@ public class CashAdvance_HistoryController implements Initializable, ScreenInter
         tblViewDetail.setItems(filteredDataDetail);
         tblViewDetail.autosize();
     }
+    
+    public void initTableOnClick() {
+        tblAttachments.setOnMouseClicked(event -> {
+            pnAttachment = tblAttachments.getSelectionModel().getSelectedIndex();
+            if (pnAttachment >= 0) {
+                imageviewerutil.scaleFactor = 1.0;
+                int lnRow = Integer.parseInt(attachment_data.get(tblAttachments.getSelectionModel().getSelectedIndex()).getIndex03());
+                pnAttachment = lnRow;
+                loadRecordAttachment(true);
+                JFXUtil.resetImageBounds(imageView, stackPane1);
+            }
+        });
+
+        tblViewDetail.setOnMouseClicked(event -> {
+            if (!details_data.isEmpty() && event.getClickCount() == 1) {
+                ModelCashLiquidation_Detail selected = (ModelCashLiquidation_Detail) tblViewDetail.getSelectionModel().getSelectedItem();
+                if (selected != null) {
+                    int lnRow = Integer.parseInt(details_data.get(tblViewDetail.getSelectionModel().getSelectedIndex()).getIndex06());
+                    pnDetail = lnRow;
+                    loadRecordDetail();
+                }
+            }
+        });
+        JFXUtil.setKeyEventFilter(tableKeyEvents, tblViewDetail, tblAttachments);
+        JFXUtil.adjustColumnForScrollbar(tblViewDetail, tblAttachments);
+    }
+    
+    JFXUtil.TableKeyEvent tableKeyEvents = new JFXUtil.TableKeyEvent() {
+        @Override
+        protected void onRowMove(TableView<?> currentTable, String currentTableID, boolean isMovedDown) {
+            int newIndex = 0;
+            switch (currentTableID) {
+                case "tblViewDetail":
+                    if (!details_data.isEmpty()) {
+                        newIndex = isMovedDown ? Integer.parseInt(details_data.get(JFXUtil.moveToNextRow(currentTable)).getIndex06())
+                                : Integer.parseInt(details_data.get(JFXUtil.moveToPreviousRow(currentTable)).getIndex06());
+                        pnDetail = newIndex;
+                        loadRecordDetail();
+                    }
+                    break;
+                case "tblAttachments":
+                    if (!attachment_data.isEmpty()) {
+                        newIndex = isMovedDown ? Integer.parseInt(attachment_data.get(JFXUtil.moveToNextRow(currentTable)).getIndex03())
+                                : Integer.parseInt(attachment_data.get(JFXUtil.moveToPreviousRow(currentTable)).getIndex03());
+                        pnAttachment = newIndex;
+                        loadRecordAttachment(true);
+                    }
+                    break;
+            }
+        }
+    };
 
     public void clearTextFields() {
-        JFXUtil.clearTextFields(apMaster);
+        Platform.runLater(() -> {
+            imageinfo_temp.clear();
+            JFXUtil.clearTextFields(apMaster, apDetail, apAttachments);
+        });
     }
     public void loadRecordAttachment(boolean lbloadImage) {
         try {
@@ -596,14 +716,22 @@ public class CashAdvance_HistoryController implements Initializable, ScreenInter
                             return;
                         }
                         break;
+                    case "btnArrowRight":
+                        slideImage(1);
+                        break;
+                    case "btnArrowLeft":
+                        slideImage(-1);
+                        break;
                     default:
                         break;
                 }
-
-                loadRecordMaster();
-                loadTableDetail.reload();
-                poController.loadAttachments();
-                loadTableAttachment.reload();
+                if (JFXUtil.isObjectEqualTo(lsButton, "btnArrowRight", "btnArrowLeft")) {
+                } else {
+                    loadRecordMaster();
+                    loadTableDetail.reload();
+                    poController.loadAttachments();
+                    loadTableAttachment.reload();
+                }
                 initButton(pnEditMode);
             }
         } catch (CloneNotSupportedException | SQLException | GuanzonException | ScriptException ex) {
