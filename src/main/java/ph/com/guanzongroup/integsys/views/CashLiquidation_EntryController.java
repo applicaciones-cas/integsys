@@ -320,7 +320,7 @@ public class CashLiquidation_EntryController implements Initializable, ScreenInt
                                 if ("success".equals(loJSON.get("result"))) {
                                     if (poController.Master().getTransactionStatus().equals(CashAdvanceStatus.APPROVED)) {
                                         if (ShowMessageFX.YesNo(null, pxeModuleName, "Do you want to approve this transaction?")) {
-                                            loJSON = poController.ConfirmTransaction("Confirmed");
+                                            loJSON = poController.ConfirmTransaction("");
                                             if ("success".equals((String) loJSON.get("result"))) {
                                                 ShowMessageFX.Information((String) loJSON.get("message"), pxeModuleName, null);
                                             } else {
@@ -690,7 +690,7 @@ public class CashLiquidation_EntryController implements Initializable, ScreenInt
                         String lsReleasedDate = sdfFormat.format(poController.Master().getIssuedDate());
                         LocalDate ldReleasedDate = LocalDate.parse(lsReleasedDate, DateTimeFormatter.ofPattern(SQLUtil.FORMAT_SHORT_DATE));
                         if (ldSelectedDate.isBefore(ldReleasedDate)) {
-                            JFXUtil.setJSONError(poJSON, "Date should be similar or later than the released date.");
+                            JFXUtil.setJSONError(poJSON, "Date should be similar or later than the released/issued date.");
                             pbSuccess = false;
                         }
                         if (pbSuccess) {
@@ -911,6 +911,7 @@ public class CashLiquidation_EntryController implements Initializable, ScreenInt
             Platform.runLater(() -> {
                 loadTableAttachment.reload();
             });
+
         } catch (SQLException | GuanzonException | CloneNotSupportedException | ScriptException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
             ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
@@ -1041,8 +1042,6 @@ public class CashLiquidation_EntryController implements Initializable, ScreenInt
                             for (int lnCtr = 0; lnCtr <= poController.getCashAdvanceCount() - 1; lnCtr++) {
                                 try {
                                     String lsTransNoBasis = poController.CashAdvanceList(lnCtr).getTransactionNo();
-//                                    String lsCompany = poController.CashAdvanceList(lnCtr).Company().getCompanyName();
-//                                    String lsSupplier = poController.CashAdvanceList(lnCtr).Supplier().getCompanyName();
 
                                     String lsHighlightbasis = lsTransNoBasis;
                                     main_data.add(new ModelCashLiquidation_Main(String.valueOf(lnCtr + 1),
