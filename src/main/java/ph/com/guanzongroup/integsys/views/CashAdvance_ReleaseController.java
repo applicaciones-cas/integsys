@@ -97,6 +97,7 @@ public class CashAdvance_ReleaseController implements Initializable, ScreenInter
         try {
             poJSON = new JSONObject();
             poController = new CashflowControllers(oApp, null).CashAdvance();
+            poController.InitTransaction();
             poController.initFields(); // Initialize transaction
             initLoadTable();
             initTextFields();
@@ -108,9 +109,9 @@ public class CashAdvance_ReleaseController implements Initializable, ScreenInter
             pnEditMode = EditMode.UNKNOWN;
             initButton(pnEditMode);
             Platform.runLater(() -> {
-                poController.setRecordStatus("2");
-                poController.getModel().setIndustryId(psIndustryId);
-                poController.getModel().setCompanyId(psCompanyId);
+                poController.setTransactionStatus(CashAdvanceStatus.APPROVED);
+                poController.Master().setIndustryId(psIndustryId);
+                poController.Master().setCompanyId(psCompanyId);
                 poController.setIndustryId(psIndustryId);
                 poController.setCompanyId(psCompanyId);
                 poController.setWithUI(true);
@@ -151,7 +152,7 @@ public class CashAdvance_ReleaseController implements Initializable, ScreenInter
             if (selected != null) {
                 String lsTransNo = selected.getIndex02();
 
-                if (!JFXUtil.loadValidation(pnEditMode, pxeModuleName, poController.getModel().getTransactionNo(), lsTransNo)) {
+                if (!JFXUtil.loadValidation(pnEditMode, pxeModuleName, poController.Master().getTransactionNo(), lsTransNo)) {
                     return;
                 }
 
@@ -255,9 +256,9 @@ public class CashAdvance_ReleaseController implements Initializable, ScreenInter
 
     public void loadRecordSearch() {
         try {
-            poController.getModel().setCompanyId(psCompanyId);
-            if (poController.getModel().Company().getCompanyName() != null && !"".equals(poController.getModel().Company().getCompanyName())) {
-                lblSource.setText(poController.getModel().Company().getCompanyName());
+            poController.Master().setCompanyId(psCompanyId);
+            if (poController.Master().Company().getCompanyName() != null && !"".equals(poController.Master().Company().getCompanyName())) {
+                lblSource.setText(poController.Master().Company().getCompanyName());
             } else {
                 lblSource.setText("");
             }
@@ -379,21 +380,21 @@ public class CashAdvance_ReleaseController implements Initializable, ScreenInter
         try {
             JFXUtil.setDisabled(true, dpAdvanceDate);
             Platform.runLater(() -> {
-                lblStatus.setText(pnEditMode == EditMode.UNKNOWN ? "UNKNOWN" : poController.getStatus(poController.getModel().getTransactionStatus()).toUpperCase());
+                lblStatus.setText(pnEditMode == EditMode.UNKNOWN ? "UNKNOWN" : poController.getStatus(poController.Master().getTransactionStatus()).toUpperCase());
             });
 
-            tfTransactionNo.setText(poController.getModel().getTransactionNo());
+            tfTransactionNo.setText(poController.Master().getTransactionNo());
             // Transaction Date
-            String lsTransactionDate = CustomCommonUtil.formatDateToShortString(poController.getModel().getTransactionDate());
+            String lsTransactionDate = CustomCommonUtil.formatDateToShortString(poController.Master().getTransactionDate());
             dpAdvanceDate.setValue(CustomCommonUtil.parseDateStringToLocalDate(lsTransactionDate, "yyyy-MM-dd"));
-            tfRequestingDepartment.setText(poController.getModel().Department().getDescription());
+            tfRequestingDepartment.setText(poController.Master().Department().getDescription());
 
-            tfBranch.setText(poController.getModel().Branch().getBranchName());
-            tfCashFund.setText(poController.getModel().CashFund().getDescription());
+            tfBranch.setText(poController.Master().Branch().getBranchName());
+            tfCashFund.setText(poController.Master().CashFund().getDescription());
 
-            tfPayee.setText(poController.getModel().Payee().getCompanyName());
-            tfAmountToAdvance.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.getModel().getAdvanceAmount().doubleValue(), true));
-            taRemarks.setText(poController.getModel().getRemarks());
+            tfPayee.setText(poController.Master().Payee().getCompanyName());
+            tfAmountToAdvance.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Master().getAdvanceAmount().doubleValue(), false));
+            taRemarks.setText(poController.Master().getRemarks());
 
             JFXUtil.updateCaretPositions(apMaster);
         } catch (SQLException | GuanzonException ex) {
@@ -412,7 +413,7 @@ public class CashAdvance_ReleaseController implements Initializable, ScreenInter
                 String lsButton = clickedButton.getId();
                 switch (lsButton) {
                     case "btnUpdate":
-                        poJSON = poController.OpenTransaction(poController.getModel().getTransactionNo());
+                        poJSON = poController.OpenTransaction(poController.Master().getTransactionNo());
                         poJSON = poController.UpdateTransaction();
                         if ("error".equals((String) poJSON.get("result"))) {
                             ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
@@ -488,7 +489,7 @@ public class CashAdvance_ReleaseController implements Initializable, ScreenInter
 
                 if (JFXUtil.isObjectEqualTo(lsButton, "btnSave", "btnRelease", "btnApprove", "btnDisapprove", "btnCancel")) {
                     clearTextFields();
-                    poController.resetModel();
+                    poController.resetMaster();
                     pnEditMode = EditMode.UNKNOWN;
                 }
 
@@ -531,11 +532,11 @@ public class CashAdvance_ReleaseController implements Initializable, ScreenInter
             return;
         }
 
-        if (JFXUtil.isObjectEqualTo(poController.getModel().getIssuedBy(), null, "")) {
+        if (JFXUtil.isObjectEqualTo(poController.Master().getIssuedBy(), null, "")) {
         } else {
             JFXUtil.setButtonsVisibility(false, btnRelease);
         }
-        switch (poController.getModel().getTransactionStatus()) {
+        switch (poController.Master().getTransactionStatus()) {
 //            case CashAdvanceStatus.APPROVED: //released
 //                JFXUtil.setButtonsVisibility(false, btnRelease);
 //                break;

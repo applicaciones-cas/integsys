@@ -143,6 +143,7 @@ public class CashAdvance_HistoryController implements Initializable, ScreenInter
                     poController.setSearchBranch(oApp.getBranchName());
                     poController.setSearchIndustry(poController.Master().Industry().getDescription());
                     if(!oApp.isMainOffice()){
+                        poController.setDepartmentId(oApp.getDepartment());
                         tfSearchBranch.setDisable(true);
                         tfSearchIndustry.setDisable(true);
                     }

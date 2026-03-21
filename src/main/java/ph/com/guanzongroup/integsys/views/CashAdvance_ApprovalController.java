@@ -101,6 +101,7 @@ public class CashAdvance_ApprovalController implements Initializable, ScreenInte
         try {
             poJSON = new JSONObject();
             poController = new CashflowControllers(oApp, null).CashAdvance();
+            poController.InitTransaction();
             poController.initFields(); // Initialize transaction
             initLoadTable();
             initTextFields();
@@ -112,9 +113,9 @@ public class CashAdvance_ApprovalController implements Initializable, ScreenInte
             pnEditMode = EditMode.UNKNOWN;
             initButton(pnEditMode);
             Platform.runLater(() -> {
-                poController.setRecordStatus("1");
-                poController.getModel().setIndustryId(psIndustryId);
-                poController.getModel().setCompanyId(psCompanyId);
+                poController.setTransactionStatus(CashAdvanceStatus.CONFIRMED);
+                poController.Master().setIndustryId(psIndustryId);
+                poController.Master().setCompanyId(psCompanyId);
                 poController.setIndustryId(psIndustryId);
                 poController.setCompanyId(psCompanyId);
                 poController.setWithUI(true);
@@ -155,7 +156,7 @@ public class CashAdvance_ApprovalController implements Initializable, ScreenInte
             if (selected != null) {
                 String lsTransNo = selected.getIndex02();
 
-                if (!JFXUtil.loadValidation(pnEditMode, pxeModuleName, poController.getModel().getTransactionNo(), lsTransNo)) {
+                if (!JFXUtil.loadValidation(pnEditMode, pxeModuleName, poController.Master().getTransactionNo(), lsTransNo)) {
                     return;
                 }
 
@@ -303,9 +304,9 @@ public class CashAdvance_ApprovalController implements Initializable, ScreenInte
 
     public void loadRecordSearch() {
         try {
-            poController.getModel().setCompanyId(psCompanyId);
-            if (poController.getModel().Company().getCompanyName() != null && !"".equals(poController.getModel().Company().getCompanyName())) {
-                lblSource.setText(poController.getModel().Company().getCompanyName());
+            poController.Master().setCompanyId(psCompanyId);
+            if (poController.Master().Company().getCompanyName() != null && !"".equals(poController.Master().Company().getCompanyName())) {
+                lblSource.setText(poController.Master().Company().getCompanyName());
             } else {
                 lblSource.setText("");
             }
@@ -348,28 +349,28 @@ public class CashAdvance_ApprovalController implements Initializable, ScreenInte
                 switch (lsID) {
                     case "tfBranch":
                         if (lsValue.isEmpty()) {
-                            poJSON = poController.getModel().setBranchCode("");
+                            poJSON = poController.Master().setBranchCode("");
                         }
                         break;
                     case "tfRequestingDepartment":
                         if (lsValue.isEmpty()) {
-                            poJSON = poController.getModel().setDepartmentRequest("");
+                            poJSON = poController.Master().setDepartmentRequest("");
                         }
                         break;
                     case "tfCashFund":
                         if (lsValue.isEmpty()) {
-                            poJSON = poController.getModel().setCashFundId("");
+                            poJSON = poController.Master().setCashFundId("");
                         }
                         break;
                     case "tfPayee":
                         if (lsValue.isEmpty()) {
-                            poJSON = poController.getModel().setClientId("");
-//                            poJSON = poController.getModel().setPayeeName("");
+                            poJSON = poController.Master().setClientId("");
+//                            poJSON = poController.Master().setPayeeName("");
                         }
                         break;
                     case "tfAmountToAdvance":
                         lsValue = JFXUtil.removeComma(lsValue);
-                        poJSON = poController.getModel().setAdvanceAmount(Double.valueOf(lsValue));
+                        poJSON = poController.Master().setAdvanceAmount(Double.valueOf(lsValue));
                         break;
                 }
                 JFXUtil.runWithDelay(0.8, () -> {
@@ -381,7 +382,7 @@ public class CashAdvance_ApprovalController implements Initializable, ScreenInte
             (lsID, lsValue) -> {
                 switch (lsID) {
                     case "taRemarks":
-                        poJSON = poController.getModel().setRemarks(lsValue);
+                        poJSON = poController.Master().setRemarks(lsValue);
                         if ("error".equals((String) poJSON.get("result"))) {
                             System.err.println((String) poJSON.get("message"));
                             ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
@@ -425,7 +426,7 @@ public class CashAdvance_ApprovalController implements Initializable, ScreenInte
                         }
 
                         if (pbSuccess) {
-                            poController.getModel().setTransactionDate((SQLUtil.toDate(lsSelectedDate, SQLUtil.FORMAT_SHORT_DATE)));
+                            poController.Master().setTransactionDate((SQLUtil.toDate(lsSelectedDate, SQLUtil.FORMAT_SHORT_DATE)));
                         } else {
                             if ("error".equals((String) poJSON.get("result"))) {
                                 ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
@@ -530,20 +531,20 @@ public class CashAdvance_ApprovalController implements Initializable, ScreenInte
     public void loadRecordMaster() {
         try {
             JFXUtil.setDisabled(true, dpAdvanceDate);
-            lblStatus.setText(pnEditMode == EditMode.UNKNOWN ? "UNKNOWN" : poController.getStatus(poController.getModel().getTransactionStatus()).toUpperCase());
-            tfTransactionNo.setText(poController.getModel().getTransactionNo());
+            lblStatus.setText(pnEditMode == EditMode.UNKNOWN ? "UNKNOWN" : poController.getStatus(poController.Master().getTransactionStatus()).toUpperCase());
+            tfTransactionNo.setText(poController.Master().getTransactionNo());
 
             // Transaction Date
-            String lsTransactionDate = CustomCommonUtil.formatDateToShortString(poController.getModel().getTransactionDate());
+            String lsTransactionDate = CustomCommonUtil.formatDateToShortString(poController.Master().getTransactionDate());
             dpAdvanceDate.setValue(CustomCommonUtil.parseDateStringToLocalDate(lsTransactionDate, "yyyy-MM-dd"));
-            tfRequestingDepartment.setText(poController.getModel().Department().getDescription());
+            tfRequestingDepartment.setText(poController.Master().Department().getDescription());
 
-            tfBranch.setText(poController.getModel().Branch().getBranchName());
-            tfCashFund.setText(poController.getModel().CashFund().getDescription());
+            tfBranch.setText(poController.Master().Branch().getBranchName());
+            tfCashFund.setText(poController.Master().CashFund().getDescription());
 
-            tfPayee.setText(poController.getModel().Payee().getCompanyName());
-            tfAmountToAdvance.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.getModel().getAdvanceAmount().doubleValue(), true));
-            taRemarks.setText(poController.getModel().getRemarks());
+            tfPayee.setText(poController.Master().Payee().getCompanyName());
+            tfAmountToAdvance.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Master().getAdvanceAmount().doubleValue(), false));
+            taRemarks.setText(poController.Master().getRemarks());
 
             JFXUtil.updateCaretPositions(apMaster);
         } catch (SQLException | GuanzonException ex) {
@@ -562,7 +563,7 @@ public class CashAdvance_ApprovalController implements Initializable, ScreenInte
                 String lsButton = clickedButton.getId();
                 switch (lsButton) {
                     case "btnUpdate":
-                        poJSON = poController.OpenTransaction(poController.getModel().getTransactionNo());
+                        poJSON = poController.OpenTransaction(poController.Master().getTransactionNo());
                         poJSON = poController.UpdateTransaction();
                         if ("error".equals((String) poJSON.get("result"))) {
                             ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
@@ -605,9 +606,9 @@ public class CashAdvance_ApprovalController implements Initializable, ScreenInte
                                 ShowMessageFX.Information(null, pxeModuleName, (String) poJSON.get("message"));
 
                                 // Confirmation Prompt
-                                JSONObject loJSON = poController.OpenTransaction(poController.getModel().getTransactionNo());
+                                JSONObject loJSON = poController.OpenTransaction(poController.Master().getTransactionNo());
                                 if ("success".equals(loJSON.get("result"))) {
-                                    if (poController.getModel().getTransactionStatus().equals(CashAdvanceStatus.OPEN)) {
+                                    if (poController.Master().getTransactionStatus().equals(CashAdvanceStatus.OPEN)) {
                                         if (ShowMessageFX.YesNo(null, pxeModuleName, "Do you want to confirm this transaction?")) {
                                             loJSON = poController.ConfirmTransaction();
                                             if ("success".equals((String) loJSON.get("result"))) {
@@ -654,7 +655,7 @@ public class CashAdvance_ApprovalController implements Initializable, ScreenInte
                     case "btnDisapprove":
                         poJSON = new JSONObject();
                         if (ShowMessageFX.YesNo(null, pxeModuleName, "Are you sure you want to disapprove transaction?") == true) {
-                            switch (poController.getModel().getTransactionStatus()) {
+                            switch (poController.Master().getTransactionStatus()) {
                                 case CashAdvanceStatus.APPROVED:
                                 case CashAdvanceStatus.CONFIRMED:
                                     poJSON = poController.CancelTransaction();
@@ -681,7 +682,7 @@ public class CashAdvance_ApprovalController implements Initializable, ScreenInte
 
                 if (JFXUtil.isObjectEqualTo(lsButton, "btnSave", "btnApprove", "btnDisapprove", "btnCancel")) {
                     clearTextFields();
-                    poController.resetModel();
+                    poController.resetMaster();
                     pnEditMode = EditMode.UNKNOWN;
                 }
 
@@ -724,7 +725,7 @@ public class CashAdvance_ApprovalController implements Initializable, ScreenInte
         if (fnValue != EditMode.READY) {
             return;
         }
-        switch (poController.getModel().getTransactionStatus()) {
+        switch (poController.Master().getTransactionStatus()) {
             case CashAdvanceStatus.APPROVED:
                 JFXUtil.setButtonsVisibility(false, btnApprove, btnDisapprove);
             case CashAdvanceStatus.VOID:
