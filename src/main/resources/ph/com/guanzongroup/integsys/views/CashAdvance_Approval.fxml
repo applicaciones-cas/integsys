@@ -251,7 +251,7 @@
                                                                                   </Label>
                                                                      </children>
                                                                                         </AnchorPane>
-                                                                                        <TextField fx:id="tfAmountToAdvance" alignment="CENTER_RIGHT" layoutX="499.0" layoutY="50.0" maxHeight="25.0" promptText="0.0000" GridPane.columnIndex="9" GridPane.rowIndex="8" />
+                                                                                        <TextField fx:id="tfAmountToAdvance" alignment="CENTER_RIGHT" layoutX="499.0" layoutY="50.0" maxHeight="25.0" promptText="0.00" GridPane.columnIndex="9" GridPane.rowIndex="8" />
                                                                                         <TextArea fx:id="taRemarks" wrapText="true" GridPane.columnIndex="2" GridPane.columnSpan="4" GridPane.rowIndex="7" GridPane.rowSpan="2">
                                                          <GridPane.margin>
                                                             <Insets top="1.0" />
