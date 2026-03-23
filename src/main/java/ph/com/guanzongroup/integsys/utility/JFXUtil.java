@@ -3229,7 +3229,7 @@ public class JFXUtil {
     }
 
     public static boolean loadValidation(int pnEditMode, String pxeModuleName, String lsCurrentTransNo, String lsTransactionNo) {
-  
+
         if (pnEditMode == EditMode.UPDATE) {
             if (lsCurrentTransNo.equals(lsTransactionNo)) {
                 if (!ShowMessageFX.YesNo(null, pxeModuleName, "Transaction is currently in update mode.\n"
@@ -3401,44 +3401,45 @@ public class JFXUtil {
 
             Object source = event.getSource();
             if (source instanceof DatePicker) {
-
-                try {
-                    DatePicker datePicker = (DatePicker) source;
-                    String inputText = datePicker.getEditor().getText();
-                    SimpleDateFormat sdfFormat = new SimpleDateFormat(SQLUtil.FORMAT_SHORT_DATE);
-                    LocalDate ldCurrentDate = null, ldSelectedDate = null;
-                    String lsServerDate = "", lsTransDate = "", lsSelectedDate = "";
-                    if (inputText == null || "".equals(inputText) || "01/01/1900".equals(inputText)) {
-                        return;
-                    }
-                    lsServerDate = sdfFormat.format(oApp.getServerDate());
-                    ldCurrentDate = LocalDate.parse(
-                            lsServerDate,
-                            DateTimeFormatter.ofPattern(SQLUtil.FORMAT_SHORT_DATE)
-                    );
-                    lsSelectedDate = sdfFormat.format(
-                            SQLUtil.toDate(
-                                    JFXUtil.convertToIsoFormat(inputText),
-                                    SQLUtil.FORMAT_SHORT_DATE
-                            )
-                    );
-                    ldSelectedDate = LocalDate.parse(
-                            lsSelectedDate,
-                            DateTimeFormatter.ofPattern(SQLUtil.FORMAT_SHORT_DATE)
-                    );  // your custom command here
-                    if (command != null) {
-                        command.run(
-                                datePicker,
-                                sdfFormat,
+                Platform.runLater(() -> {
+                    try {
+                        DatePicker datePicker = (DatePicker) source;
+                        String inputText = datePicker.getEditor().getText();
+                        SimpleDateFormat sdfFormat = new SimpleDateFormat(SQLUtil.FORMAT_SHORT_DATE);
+                        LocalDate ldCurrentDate = null, ldSelectedDate = null;
+                        String lsServerDate = "", lsTransDate = "", lsSelectedDate = "";
+                        if (inputText == null || "".equals(inputText) || "01/01/1900".equals(inputText)) {
+                            return;
+                        }
+                        lsServerDate = sdfFormat.format(oApp.getServerDate());
+                        ldCurrentDate = LocalDate.parse(
                                 lsServerDate,
-                                ldCurrentDate,
-                                lsSelectedDate,
-                                ldSelectedDate
+                                DateTimeFormatter.ofPattern(SQLUtil.FORMAT_SHORT_DATE)
                         );
+                        lsSelectedDate = sdfFormat.format(
+                                SQLUtil.toDate(
+                                        JFXUtil.convertToIsoFormat(inputText),
+                                        SQLUtil.FORMAT_SHORT_DATE
+                                )
+                        );
+                        ldSelectedDate = LocalDate.parse(
+                                lsSelectedDate,
+                                DateTimeFormatter.ofPattern(SQLUtil.FORMAT_SHORT_DATE)
+                        );  // your custom command here
+                        if (command != null) {
+                            command.run(
+                                    datePicker,
+                                    sdfFormat,
+                                    lsServerDate,
+                                    ldCurrentDate,
+                                    lsSelectedDate,
+                                    ldSelectedDate
+                            );
+                        }
+                    } catch (SQLException ex) {
+                        Logger.getLogger(JFXUtil.class.getName()).log(Level.SEVERE, null, ex);
                     }
-                } catch (SQLException ex) {
-                    Logger.getLogger(JFXUtil.class.getName()).log(Level.SEVERE, null, ex);
-                }
+                });
             }
         };
     }
