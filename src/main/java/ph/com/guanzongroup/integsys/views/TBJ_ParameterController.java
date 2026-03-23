@@ -840,7 +840,7 @@ public class TBJ_ParameterController implements Initializable, ScreenInterface {
                             case "tfCategory":
                                 poJSON = poTBJControllers.TBJParameter().SearchCategory(lsValue, false);
                                 if ("error".equals(poJSON.get("result"))) {
-                                    ShowMessageFX.Warning((String) poJSON.get("message"), lsValue, lsValue);
+                                    ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
                                 }
                                 tfCategory.setText(poTBJControllers.TBJParameter().Master().Category().getDescription());
                                 return;
@@ -848,7 +848,7 @@ public class TBJ_ParameterController implements Initializable, ScreenInterface {
                             case "tfSourceCode":
                                 poJSON = poTBJControllers.TBJParameter().SearchSourceCode(lsValue, false);
                                 if ("error".equals(poJSON.get("result"))) {
-                                    ShowMessageFX.Warning((String) poJSON.get("message"), lsValue, lsValue);
+                                    ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
                                 }
                                 tfSourceCode.setText(poTBJControllers.TBJParameter().Master().TransactionSource().getSourceName());
                                 tfTableName.clear();
@@ -857,7 +857,7 @@ public class TBJ_ParameterController implements Initializable, ScreenInterface {
                             case "tfAccountTitle":
                                 poJSON = poTBJControllers.TBJParameter().SearchAccountChart(lsValue, false, pnSelectedDetail);
                                 if ("error".equals(poJSON.get("result"))) {
-                                    ShowMessageFX.Warning((String) poJSON.get("message"), lsValue, lsValue);
+                                    ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
                                 }
                                 tfAccountTitle.setText(poTBJControllers.TBJParameter().Detail(pnSelectedDetail).AccountChart().getDescription());
                                 loadTableDetail();
@@ -866,7 +866,7 @@ public class TBJ_ParameterController implements Initializable, ScreenInterface {
                             case "tfTableName":
                                 poJSON = poTBJControllers.TBJParameter().SearchSourceCodeTable(lsValue, pnSelectedDetail);
                                 if ("error".equals(poJSON.get("result"))) {
-                                    ShowMessageFX.Warning((String) poJSON.get("message"), lsValue, lsValue);
+                                    ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
                                 }
                                 tfTableName.setText(poTBJControllers.TBJParameter().Detail(pnSelectedDetail).getTableNm().trim().replace("_", " "));
                                 loadTableDetail();
@@ -874,12 +874,21 @@ public class TBJ_ParameterController implements Initializable, ScreenInterface {
                             case "tfFieldName":
                                 if (poTBJControllers.TBJParameter().Detail(pnSelectedDetail).getTableNm() == null
                                         || poTBJControllers.TBJParameter().Detail(pnSelectedDetail).getTableNm().isEmpty()) {
-                                    ShowMessageFX.Warning("Table Name is not set!", lsValue, lsValue);
+                                    ShowMessageFX.Warning("Table Name is not set!", psFormName, null);
                                     return;
                                 }
+                                
                                 poTBJControllers.TBJParameter().show(poTBJControllers.TBJParameter().Detail(pnSelectedDetail).getTableNm().trim().replace(" ", "_"), pnSelectedDetail);
                                 tfFieldName.setText(poTBJControllers.TBJParameter().getFieldName(poTBJControllers.TBJParameter().Detail(pnSelectedDetail).getDerivedField(), pnSelectedDetail));
                                 loadTableDetail();
+                                 poJSON = poTBJControllers.TBJParameter().checkDuplicateDetail();
+                                 if("error".equals(poJSON.get("result"))){
+                                      ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
+                                      poTBJControllers.TBJParameter().Detail(pnSelectedDetail).setDerivedField(null);
+                                      loadTableDetail();
+                                      return;
+                                 }
+                                 
                                 break;
 
                         }
