@@ -132,6 +132,8 @@ public class CheckImportingController implements Initializable, ScreenInterface 
             poCheckImporting = new CashflowControllers(oApp, null).CheckPaymentImporting();
             poCheckImporting.setRecordStatus(DisbursementStatic.VERIFIED);
             poCheckImporting.getModel().setCompany(oApp.getCompnyId());
+            poCheckImporting.getModel().setIndustryID(psIndustryId);
+            
             poJSON = new JSONObject();
 //            poJSON = poCheckImporting.initialize();
 //            if (!"success".equals((String) poJSON.get("result"))) {
