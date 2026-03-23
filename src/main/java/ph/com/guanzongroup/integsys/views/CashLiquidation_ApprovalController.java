@@ -289,8 +289,7 @@ public class CashLiquidation_ApprovalController implements Initializable, Screen
                             JFXUtil.disableAllHighlightByColor(tblViewMainList, "#A7C7E7", highlightedRowsMain);
                             //Clear data
                             clearTextFields();
-                            poController.resetMaster();
-                            poController.Detail().clear();
+                            poController.resetTransaction();
                             poController.initFields();
                             pnEditMode = EditMode.UNKNOWN;
                             break;
@@ -467,9 +466,10 @@ public class CashLiquidation_ApprovalController implements Initializable, Screen
 
                 if (JFXUtil.isObjectEqualTo(lsButton, "btnSave", "btnCancel", "btnApprove", "btnVoid")) {
                     clearTextFields();
-                    poController.resetMaster();
+                    poController.resetTransaction();
+//                    poController.resetMaster();
 //                    poController.resetOthers();
-                    poController.Detail().clear();
+//                    poController.Detail().clear();
                     imageView.setImage(null);
                     pnEditMode = EditMode.UNKNOWN;
                     clearTextFields();
@@ -557,28 +557,28 @@ public class CashLiquidation_ApprovalController implements Initializable, Screen
                             poController.Detail(pnDetail).setAccountCode("");
                         }
                         break;
-                     case "tfParticular":
+                    case "tfParticular":
                         try {
-                            poJSON = poController.setParticular(pnDetail, lsValue);
-                            if (!JFXUtil.isJSONSuccess(poJSON)) {
-                                int lnReturned = Integer.parseInt(String.valueOf(poJSON.get("row")));
-                                JFXUtil.runWithDelay(0.70, () -> {
-                                    pnDetail = lnReturned;
-                                    loadTableDetail.reload();
-                                });
-                                ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-                                break;
-                            } else {
-                                pnDetail = Integer.parseInt(String.valueOf(poJSON.get("row")));
+                        poJSON = poController.setParticular(pnDetail, lsValue);
+                        if (!JFXUtil.isJSONSuccess(poJSON)) {
+                            int lnReturned = Integer.parseInt(String.valueOf(poJSON.get("row")));
+                            JFXUtil.runWithDelay(0.70, () -> {
+                                pnDetail = lnReturned;
                                 loadTableDetail.reload();
-                                JFXUtil.textFieldMoveNext(tfTransAmount);
-                            }
-                            loadRecordDetail();
+                            });
+                            ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                             break;
-                        } catch (SQLException | GuanzonException ex) {
-                            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
-                            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
+                        } else {
+                            pnDetail = Integer.parseInt(String.valueOf(poJSON.get("row")));
+                            loadTableDetail.reload();
+                            JFXUtil.textFieldMoveNext(tfTransAmount);
                         }
+                        loadRecordDetail();
+                        break;
+                    } catch (SQLException | GuanzonException ex) {
+                        Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+                        ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
+                    }
                     case "tfTransAmount":
                         lsValue = JFXUtil.removeComma(lsValue);
                         poJSON = poController.Detail(pnDetail).setTransactionAmount(Double.parseDouble(lsValue));
@@ -872,7 +872,7 @@ public class CashLiquidation_ApprovalController implements Initializable, Screen
 
             tfAccountDescription.setText(poController.Detail(pnDetail).Account().getDescription());
             tfParticular.setText(poController.Detail(pnDetail).getParticular());
-            tfTransAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(pnDetail).getTransactionAmount().doubleValue(), true));
+            tfTransAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(pnDetail).getTransactionAmount().doubleValue(), false));
 
             cbReverse.setSelected(poController.Detail(pnDetail).isReverse());
 
@@ -905,8 +905,8 @@ public class CashLiquidation_ApprovalController implements Initializable, Screen
                     : null);
 
             tfCashAdvanceBalance.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Master().CashFund().getBalance(), true));
-            tfAdvancesAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Master().getAdvanceAmount(), true));
-            tfLiquidationTotal.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Master().getLiquidationTotal().doubleValue(), true));
+            tfAdvancesAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Master().getAdvanceAmount(), false));
+            tfLiquidationTotal.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Master().getLiquidationTotal().doubleValue(), false));
 
             JFXUtil.updateCaretPositions(apMaster);
         } catch (SQLException | GuanzonException ex) {
