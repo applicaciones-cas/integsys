@@ -52,8 +52,8 @@
                                     <ColumnConstraints hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="139.0" />
                                     <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="10.0" />
                                     <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="100.0" />
-                                    <ColumnConstraints halignment="RIGHT" hgrow="ALWAYS" maxWidth="526.0" minWidth="526.0" prefWidth="526.0" />
-                                    <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="1.7976931348623157E308" minWidth="5.0" prefWidth="246.0" />
+                                    <ColumnConstraints halignment="RIGHT" hgrow="ALWAYS" maxWidth="511.0" minWidth="511.0" prefWidth="511.0" />
+                                    <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="1.7976931348623157E308" minWidth="5.0" prefWidth="261.0" />
                                  </columnConstraints>
                                  <rowConstraints>
                                     <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="28.0" vgrow="SOMETIMES" />
@@ -350,8 +350,8 @@
                                                                                         <TableColumn fx:id="tblRowNo" maxWidth="30.0" minWidth="30.0" prefWidth="30.0" resizable="false" sortable="false" text="No." />
                                                                   <TableColumn fx:id="tblReqDepartment1" maxWidth="120.0" minWidth="120.0" prefWidth="120.0" resizable="false" sortable="false" text="Trans No." />
                                                                                         <TableColumn fx:id="tblTransDate" maxWidth="159.0" minWidth="90.0" prefWidth="114.0" resizable="false" sortable="false" text="Date" />
-                                                                                        <TableColumn fx:id="tblPayeeName" maxWidth="250.0" minWidth="250.0" prefWidth="250.0" resizable="false" sortable="false" text="Payee" />
-                                                                  <TableColumn fx:id="tblReqDepartment" maxWidth="150.0" minWidth="150.0" prefWidth="150.0" resizable="false" sortable="false" text="Req. Department" />
+                                                                                        <TableColumn fx:id="tblPayeeName" maxWidth="160.0" minWidth="160.0" prefWidth="160.0" resizable="false" sortable="false" text="Payee" />
+                                                                  <TableColumn fx:id="tblReqDepartment" maxWidth="230.0" minWidth="230.0" prefWidth="230.0" resizable="false" sortable="false" text="Req. Department" />
                                                                                     </columns>
                                                                                     <GridPane.margin>
                                                                                         <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
