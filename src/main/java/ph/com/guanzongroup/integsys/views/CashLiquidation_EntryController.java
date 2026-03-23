@@ -470,7 +470,13 @@ public class CashLiquidation_EntryController implements Initializable, ScreenInt
                 }
                 initButton(pnEditMode);
                 if (lsButton.equals("btnUpdate")) {
-                    moveNext(false, false);
+                    JFXUtil.runWithDelay(0.5, () -> {
+                        if (poController.getDetailCount() <= 0) {
+                            return;
+                        }
+                        moveNext(false, false);
+                    });
+
                 }
             }
         } catch (CloneNotSupportedException | SQLException | GuanzonException | ParseException | IOException | ScriptException ex) {
