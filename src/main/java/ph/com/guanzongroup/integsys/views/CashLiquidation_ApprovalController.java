@@ -266,7 +266,7 @@ public class CashLiquidation_ApprovalController implements Initializable, Screen
                         pnEditMode = poController.getEditMode();
                         break;
                     case "btnSearch":
-                        JFXUtil.initiateBtnSearch(pxeModuleName, lastFocusedTextField, previousSearchedTextField, apBrowse, apMaster, apDetail, apDetail);
+                        JFXUtil.initiateBtnSearch(pxeModuleName, lastFocusedTextField, previousSearchedTextField, apBrowse, apMaster, apDetail);
                         break;
                     case "btnApprove":
                         poJSON = new JSONObject();
@@ -551,57 +551,64 @@ public class CashLiquidation_ApprovalController implements Initializable, Screen
 
     ChangeListener<Boolean> txtDetail_Focus = JFXUtil.FocusListener(TextField.class,
             (lsID, lsValue) -> {
-                switch (lsID) {
-                    case "tfReceiptNo":
-                        poJSON = poController.Detail(pnDetail).setORNo(lsValue);
-                        if (!JFXUtil.isJSONSuccess(poJSON)) {
-                            ShowMessageFX.Information(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
-                        }
-                        break;
-                    case "tfAccountDescription":
-                        if (lsValue.isEmpty()) {
-                            poController.Detail(pnDetail).setAccountCode("");
-                        }
-                        break;
-                    case "tfParticular":
-                        try {
-                        poJSON = poController.setParticular(pnDetail, lsValue);
-                        if (!JFXUtil.isJSONSuccess(poJSON)) {
-                            int lnReturned = Integer.parseInt(String.valueOf(poJSON.get("row")));
-                            JFXUtil.runWithDelay(0.70, () -> {
-                                pnDetail = lnReturned;
-                                loadTableDetail.reload();
-                            });
-                            ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-                            break;
-                        } else {
-                            pnDetail = Integer.parseInt(String.valueOf(poJSON.get("row")));
-                            loadTableDetail.reload();
-                            JFXUtil.textFieldMoveNext(tfTransAmount);
-                        }
-                        loadRecordDetail();
-                        break;
-                    } catch (SQLException | GuanzonException ex) {
-                        Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
-                        ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
-                    }
-                    case "tfTransAmount":
-                        lsValue = JFXUtil.removeComma(lsValue);
-                        poJSON = poController.Detail(pnDetail).setTransactionAmount(Double.parseDouble(lsValue));
-                        if (!JFXUtil.isJSONSuccess(poJSON)) {
-                            ShowMessageFX.Information(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
-                        }
-                        JFXUtil.runWithDelay(0.90, () -> {
-                            if (pbEnteredDetail) {
-                                moveNext(false, true);
-                                pbEnteredDetail = false;
+                try {
+                    switch (lsID) {
+                        case "tfReceiptNo":
+                            poJSON = poController.setDetail(pnDetail, poController.Detail(pnDetail).getParticular(), lsValue, poController.Detail(pnDetail).getAccountCode());
+                            if (!JFXUtil.isJSONSuccess(poJSON)) {
+                                int lnReturned = Integer.parseInt(String.valueOf(poJSON.get("row")));
+                                JFXUtil.runWithDelay(0.70, () -> {
+                                    pnDetail = lnReturned;
+                                    loadTableDetail.reload();
+                                });
+                                ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                                break;
+                            } else {
+                                pnDetail = Integer.parseInt(String.valueOf(poJSON.get("row")));
                             }
-                        });
-                        break;
+                            loadRecordDetail();
+                            break;
+                        case "tfAccountDescription":
+                            if (lsValue.isEmpty()) {
+                                poController.Detail(pnDetail).setAccountCode("");
+                            }
+                            break;
+                        case "tfParticular":
+                            poJSON = poController.setDetail(pnDetail, lsValue, poController.Detail(pnDetail).getORNo(), poController.Detail(pnDetail).getAccountCode());
+                            if (!JFXUtil.isJSONSuccess(poJSON)) {
+                                int lnReturned = Integer.parseInt(String.valueOf(poJSON.get("row")));
+                                JFXUtil.runWithDelay(0.70, () -> {
+                                    pnDetail = lnReturned;
+                                    loadTableDetail.reload();
+                                });
+                                ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                                break;
+                            } else {
+                                pnDetail = Integer.parseInt(String.valueOf(poJSON.get("row")));
+                            }
+                            loadRecordDetail();
+                            break;
+                        case "tfTransAmount":
+                            lsValue = JFXUtil.removeComma(lsValue);
+                            poJSON = poController.Detail(pnDetail).setTransactionAmount(Double.parseDouble(lsValue));
+                            if (!JFXUtil.isJSONSuccess(poJSON)) {
+                                ShowMessageFX.Information(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
+                            }
+                            JFXUtil.runWithDelay(0.90, () -> {
+                                if (pbEnteredDetail) {
+                                    moveNext(false, true);
+                                    pbEnteredDetail = false;
+                                }
+                            });
+                            break;
+                    }
+                    JFXUtil.runWithDelay(0.80, () -> {
+                        loadTableDetail.reload();
+                    });
+                } catch (SQLException | GuanzonException ex) {
+                    Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+                    ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
                 }
-                JFXUtil.runWithDelay(0.80, () -> {
-                    loadTableDetail.reload();
-                });
             });
 
     ChangeListener<Boolean> txtArea_Focus = JFXUtil.FocusListener(TextArea.class,
