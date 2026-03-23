@@ -20,6 +20,7 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.animation.PauseTransition;
+import javafx.animation.TranslateTransition;
 import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyBooleanPropertyBase;
 import javafx.beans.property.SimpleStringProperty;
@@ -28,6 +29,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
+import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
@@ -64,6 +66,7 @@ import org.guanzon.appdriver.base.GRiderCAS;
 import org.guanzon.appdriver.base.LogWrapper;
 import org.guanzon.appdriver.constant.EditMode;
 import org.guanzon.appdriver.base.GuanzonException;
+import org.guanzon.appdriver.base.MiscUtil;
 import org.guanzon.appdriver.constant.DocumentType;
 import org.guanzon.appdriver.constant.RecordStatus;
 import org.guanzon.cas.client.account.AP_Client_Master;
@@ -88,12 +91,12 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
     private AP_Client_Master poAppController;
      
     private String psFormName = "Account Payable";
-    private int pnLedger, pnAttachments;
+    private int pnLedger, pnAttachments, currentIndex;
     
     private ObservableList<Model_AP_Client_Ledger> laLedger;
-    private ObservableList<ModelDeliveryAcceptance_Attachment> laAttachments;
+    private ObservableList<ModelDeliveryAcceptance_Attachment> laAttachments  = FXCollections.observableArrayList();
     
-    private HashMap<String, String> imageinfo_temp;
+    private HashMap<String, String> imageinfo_temp  = new HashMap<>();
             
     private unloadForm poUnload = new unloadForm();
     
@@ -182,8 +185,9 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
             
             initializeTableLedger();
             initControlEvents();
-            initLoadTable();
-            initializeTableAttachments();
+            initAttachmentsGrid();
+            initTableAttachments();
+            initAttachmentPreviewPane();
             
         } catch (SQLException | GuanzonException e) {
             Logger.getLogger(AccountsPayablexController.class.getName()).log(Level.SEVERE, null, e);
@@ -202,8 +206,14 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
     @FXML
     void tblAttachment_Clicked(MouseEvent e) {
         pnAttachments = tblAttachments.getSelectionModel().getSelectedIndex();
-        if (pnAttachments < 0) {
-            return;
+        
+        if (pnAttachments >= 0) {
+            int lnRow = Integer.parseInt(laAttachments.get(tblAttachments.getSelectionModel().getSelectedIndex()).getIndex03());
+            pnAttachments = lnRow;
+            imageviewerutil.scaleFactor = 1.0;
+            
+            loadRecordAttachment(true);
+            JFXUtil.resetImageBounds(imgPreview, stackpane);
         }
     }
 
@@ -243,6 +253,7 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
                                 "")) {
                             return;
                         }
+                        poAppController.loadAttachments();
 
                         getLoadedClient();
                         initButtonDisplay(poAppController.getEditMode());
@@ -261,6 +272,7 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
                                     "Initialize Search Client! ")) {
                                 return;
                             }
+                            poAppController.loadAttachments();
 
                             getLoadedClient();
                             initButtonDisplay(poAppController.getEditMode());
@@ -275,6 +287,8 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
                                     "Initialize Search Client! ")) {
                                 return;
                             }
+                            poAppController.loadAttachments();
+                            
                             getLoadedClient();
                             initButtonDisplay(poAppController.getEditMode());
                             break;
@@ -289,6 +303,7 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
                                     "Initialize Search Client! ")) {
                                 return;
                             }
+                            poAppController.loadAttachments();
 
                             getLoadedClient();
                             initButtonDisplay(poAppController.getEditMode());
@@ -395,15 +410,54 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
                             }
                             
                             pnAttachments = poAppController.addAttachment(imgPath2);
-                            System.out.print("this is the index of added record " + pnAttachments);
                             
                             //Copy file to Attachment path
                             poAppController.copyFile(selectedFile.toString());
+                            
+                            //reload table
                             loadTableAttachment.reload();
                             
+                            //focus last row
                             tblAttachments.getFocusModel().focus(pnAttachments);
                             tblAttachments.getSelectionModel().select(pnAttachments);
                     }
+                    break;
+                case "btnRemoveFile":
+                    if (poAppController.getTransactionAttachmentCount() <= 0) {
+                        return;
+                    } else {
+                        for (int lnCtr = 0; lnCtr < poAppController.getTransactionAttachmentCount(); lnCtr++) {
+                            if (RecordStatus.INACTIVE.equals(poAppController.getAttachmentList().get(lnCtr).getModel().getRecordStatus())) {
+                                if (pnAttachments == lnCtr) {
+                                    return;
+                                }
+                            }
+                        }
+                    }
+                    
+                    JSONObject loJSON = poAppController.removeAttachment(pnAttachments);
+                    if ("error".equals((String) loJSON.get("result"))) {
+                        ShowMessageFX.Warning(null, psFormName, (String) loJSON.get("message"));
+                        return;
+                    }
+                    laAttachments.remove(tblAttachments.getSelectionModel().getSelectedIndex());
+                    if (pnAttachments != 0) {
+                        pnAttachments -= 1;
+                    }
+                    imageinfo_temp.clear();
+                    loadRecordAttachment(false);
+                    
+                    loadTableAttachment.reload();
+                    if (laAttachments.size() <= 0) {
+                        JFXUtil.clearTextFields(apAttachments);
+                    }
+                    initAttachmentsGrid();
+                    break;
+                case "btnNext":
+                    slideImage(1);
+                    break;
+                case "btnPrevious":
+                    slideImage(-1);
                     break;
                     
                 case "btnClose":
@@ -416,13 +470,11 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
                     }
                     break;
             }
-
-            poAppController.loadAttachments();
-            loadTableAttachment.reload();
             initButtonDisplay(poAppController.getEditMode());
 
         } catch (Exception e) {
             poLogWrapper.severe(psFormName + " :" + e.getMessage());
+            ShowMessageFX.Error(null, psFormName, MiscUtil.getException(e));
         }
     }
 
@@ -526,6 +578,7 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
                                         "")) {
                                     return;
                                 }
+                                poAppController.loadAttachments();
 
                                 getLoadedClient();
                                 initButtonDisplay(poAppController.getEditMode());
@@ -540,6 +593,8 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
                                         "")) {
                                     return;
                                 }
+                                poAppController.loadAttachments();
+                                
                                 getLoadedClient();
                                 initButtonDisplay(poAppController.getEditMode());
                                 break;
@@ -682,6 +737,10 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
         initButtonControls(!lbShow, "btnBrowse", "btnRetrieve", "btnUpdate");
 
         apRecord.setDisable(!lbShow);
+        
+        //initialize file buttons
+        btnAttach.setDisable(!lbShow);
+        btnRemoveFile.setDisable(!lbShow);
     }
 
     private void initButtonControls(boolean visible, String... buttonFxIdsToShow) {
@@ -747,24 +806,14 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
         }
     }
     
-    private void initializeTableAttachments(){
+    private void initAttachmentsGrid(){
         
-        if (laAttachments == null) {
-           laAttachments = FXCollections.observableArrayList();
-           tblAttachments.setItems(laAttachments);
-           
-           tblColAttachIndex.setStyle("-fx-alignment: CENTER-RIGHT; -fx-padding: 0 5 0 0;"); 
-           tblColAttachFile.setStyle("-fx-alignment: CENTER-RIGHT; -fx-padding: 0 5 0 0;");
-           
-           tblColAttachIndex.setCellValueFactory((loModel) -> {
-                int index = tblAttachments.getItems().indexOf(loModel.getValue()) + 1;
-                return new SimpleStringProperty(String.valueOf(index));
-            });
-           
-           tblColAttachFile.setCellValueFactory((loModel) -> {
-                return new SimpleStringProperty(String.valueOf(loModel.getValue().getIndex02()));
-            });
-        }
+        /*FOCUS ON FIRST ROW*/
+        JFXUtil.setColumnCenter(tblColAttachIndex);
+        JFXUtil.setColumnLeft(tblColAttachFile);
+        JFXUtil.setColumnsIndexAndDisableReordering(tblAttachments);
+        
+        tblAttachments.setItems(laAttachments);
     }
 
     private void reloadTableLedger() {
@@ -830,48 +879,93 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
         thread.start();
     }
     
-    public void initLoadTable() {
+    public void initTableAttachments() {
         
         loadTableAttachment = new JFXUtil.ReloadableTableTask(
                 tblAttachments,
                 laAttachments,
                 () -> {
-                    imageviewerutil.scaleFactor = 1.0;
                     
                     JFXUtil.resetImageBounds(imgPreview, stackpane);
                     Platform.runLater(() -> {
+                        
                         try {
                             
                             int lnCtr;
                             int lnCount = 0;
                             
+                            //set image to full scale
+                            imageviewerutil.scaleFactor = 1.0;
+                            
+                            //re initialize attachment list
                             laAttachments.clear();
                             for (lnCtr = 0; lnCtr < poAppController.getTransactionAttachmentCount(); lnCtr++) {
                                 
+                                //skip current iteration, if status is inactive
                                 if (RecordStatus.INACTIVE.equals(poAppController.getAttachmentList().get(lnCtr).getModel().getRecordStatus())) {
                                     continue;
                                 }
                                 lnCount += 1;
                                 
+                                //add to attachment list
                                 laAttachments.add(
                                         new ModelDeliveryAcceptance_Attachment(String.valueOf(lnCount),
                                                 String.valueOf(poAppController.getAttachmentList().get(lnCtr).getModel().getFileName()),
                                                 String.valueOf(lnCtr)
                                         ));
                             }
+                            
+                            //reset attachment records if empty
                             if (laAttachments.size() <= 0) {
                                 loadRecordAttachment(false);
                             }
+                            
+                            int lnTempRow = JFXUtil.getDetailRow(laAttachments, pnAttachments, 3); //this method is used only when Reverse is applied
+                            if (lnTempRow < 0 || lnTempRow >= laAttachments.size()) {
+                                
+                                if (!laAttachments.isEmpty()) {
+   
+                                    JFXUtil.selectAndFocusRow(tblAttachments, 0);
+                                    int lnRow = Integer.parseInt(laAttachments.get(0).getIndex03());
+                                    
+                                    pnAttachments = lnRow;
+                                    
+                                    loadRecordAttachment(true);
+                                }
+                            } else {
+                                
+                                JFXUtil.selectAndFocusRow(tblAttachments, lnTempRow);
+                                int lnRow = Integer.parseInt(laAttachments.get(tblAttachments.getSelectionModel().getSelectedIndex()).getIndex03());
+                                
+                                pnAttachments = lnRow;
+                                
+                                loadRecordAttachment(true);
+                            }
+                            
+                            if (laAttachments.size() <= 0) {
+                                loadRecordAttachment(false);
+                            }
+                            
                         } catch (Exception e) {
+                            poLogWrapper.severe(e.getMessage());
                         }
                     });
                 }
         );
     }
     
+     private void initAttachmentPreviewPane() {
+        imageviewerutil.initAttachmentPreviewPane(stackpane, imgPreview);
+        stackpane.heightProperty().addListener((observable, oldValue, newHeight) -> {
+            double computedHeight = newHeight.doubleValue();
+            imageviewerutil.ldstackPaneHeight = computedHeight;
+            loadTableAttachment.reload();
+            loadRecordAttachment(true);
+        });
+    }
+    
     public void loadRecordAttachment(boolean lbloadImage) {
         try {
-            System.out.print("the size in load record is " + laAttachments.size());
             if (laAttachments.size() > 0) {
                 
                 txtAttachmentNo.setText(laAttachments.get(tblAttachments.getSelectionModel().getSelectedIndex()).getIndex01());
@@ -961,11 +1055,59 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
         } catch (Exception e) {
         }
     }
+    
+    public void reloadTableAttachments(){
+        
+        //reset image objects
+        txtAttachmentNo.clear();
+        imageinfo_temp.clear();
+        imgPreview.setImage(null);
+        
+        //reload table attachment
+        loadTableAttachment.reload();
+        
+    }
+    
+    public void slideImage(int direction) {
+        if (laAttachments.size() <= 0) {
+            return;
+        }
+        int lnRow = Integer.valueOf(laAttachments.get(tblAttachments.getSelectionModel().getSelectedIndex()).getIndex01());
+        currentIndex = lnRow - 1;
+        int newIndex = currentIndex + direction;
+
+        if (newIndex != -1 && (newIndex <= laAttachments.size() - 1)) {
+            TranslateTransition slideOut = new TranslateTransition(Duration.millis(300), imgPreview);
+            slideOut.setByX(direction * -400); // Move left or right
+
+            JFXUtil.selectAndFocusRow(tblAttachments, newIndex);
+            int lnIndex = Integer.valueOf(laAttachments.get(newIndex).getIndex01());
+            int lnTempRow = JFXUtil.getDetailTempRow(laAttachments, lnIndex, 3);
+            pnAttachments = lnTempRow;
+            loadRecordAttachment(false);
+
+            // Create a transition animation
+            slideOut.setOnFinished(event -> {
+                imgPreview.setTranslateX(direction * 400);
+                TranslateTransition slideIn = new TranslateTransition(Duration.millis(300), imgPreview);
+                slideIn.setToX(0);
+                slideIn.play();
+
+                loadRecordAttachment(true);
+            });
+
+            slideOut.play();
+        }
+        if (JFXUtil.isImageViewOutOfBounds(imgPreview, stackpane)) {
+            JFXUtil.resetImageBounds(imgPreview, stackpane);
+        }
+    }
 
     private void getLoadedClient() throws SQLException, GuanzonException, CloneNotSupportedException {
         //clearAllInputs();
         loadClientMaster();
         reloadTableLedger();
+        reloadTableAttachments();
     }
 
     private boolean isJSONSuccess(JSONObject loJSON, String fsModule) {

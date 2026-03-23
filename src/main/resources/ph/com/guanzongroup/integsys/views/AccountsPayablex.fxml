@@ -170,11 +170,11 @@
                     <tabs>
                       <Tab text="Details">
                         <content>
-                          <AnchorPane fx:id="apRecord" maxHeight="-Infinity" minHeight="0.0" minWidth="0.0" prefHeight="446.0" prefWidth="1145.0">
+                          <AnchorPane fx:id="apRecord" maxHeight="1.7976931348623157E308" minHeight="0.0" minWidth="0.0" prefHeight="446.0" prefWidth="1145.0">
                                  <children>
-                                    <HBox maxHeight="-Infinity" prefHeight="448.0" prefWidth="1145.0" AnchorPane.bottomAnchor="-0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                    <HBox maxHeight="1.7976931348623157E308" prefWidth="1145.0" AnchorPane.bottomAnchor="-0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                        <children>
-                                          <AnchorPane fx:id="apRecord" prefHeight="464.0" prefWidth="670.0" style="-fx-border-color: orange;">
+                                          <AnchorPane fx:id="apRecord" maxHeight="-Infinity" prefHeight="464.0" prefWidth="670.0" style="-fx-border-color: orange;">
                                              <children>
                                                 <GridPane hgap="2.0" vgap="3.0" AnchorPane.bottomAnchor="-0.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="0.0">
                                                    <columnConstraints>
@@ -396,7 +396,7 @@
                                                 </GridPane>
                                              </children>
                                           </AnchorPane>
-                                          <AnchorPane maxWidth="1.7976931348623157E308" prefHeight="200.0" style="-fx-border-color: orange;" HBox.hgrow="ALWAYS">
+                                          <AnchorPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="200.0" style="-fx-border-color: orange;" HBox.hgrow="ALWAYS">
                                              <children>
                                                 <TableView fx:id="tblLedger" onMouseClicked="#tblLedger_Clicked" stylesheets="@../css/Tables.css" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                                    <columns>
@@ -445,7 +445,7 @@
                                                   </rowConstraints>
                                                    <children>
                                                       <Label text="Attachment No" GridPane.halignment="CENTER" />
-                                                      <TextField fx:id="txtAttachmentNo" GridPane.columnIndex="1" GridPane.columnSpan="4" />
+                                                      <TextField fx:id="txtAttachmentNo" editable="false" styleClass="DisabledTextField" GridPane.columnIndex="1" GridPane.columnSpan="4" />
                                                       <TableView fx:id="tblAttachments" onMouseClicked="#tblAttachment_Clicked" prefHeight="200.0" prefWidth="200.0" GridPane.columnSpan="5" GridPane.rowIndex="1" GridPane.rowSpan="2">
                                                         <columns>
                                                           <TableColumn fx:id="tblColAttachIndex" prefWidth="75.0" text="No" />
@@ -457,7 +457,7 @@
                                                             <FontAwesomeIconView glyphName="PLUS" styleClass="button_process" />
                                                          </graphic>
                                                       </Button>
-                                                      <Button fx:id="btnRemoveFile" mnemonicParsing="false" styleClass="button_process" GridPane.columnIndex="4" GridPane.rowIndex="4">
+                                                      <Button fx:id="btnRemoveFile" mnemonicParsing="false" onAction="#cmdButton_Click" styleClass="button_process" GridPane.columnIndex="4" GridPane.rowIndex="4">
                                                          <graphic>
                                                             <FontAwesomeIconView glyphName="TRASH" styleClass="button_process" />
                                                          </graphic>
@@ -471,7 +471,7 @@
                                                 <StackPane fx:id="stackpane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" style="-fx-border-color: FF8201;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                                    <children>
                                                       <ImageView fx:id="imgPreview" fitHeight="150.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true" />
-                                                      <Button fx:id="btnPrevious" mnemonicParsing="false" styleClass="button_process" StackPane.alignment="CENTER_LEFT">
+                                                      <Button fx:id="btnPrevious" mnemonicParsing="false" onAction="#cmdButton_Click" styleClass="button_process" StackPane.alignment="CENTER_LEFT">
                                                          <StackPane.margin>
                                                             <Insets left="10.0" />
                                                          </StackPane.margin>
@@ -479,7 +479,7 @@
                                                             <FontAwesomeIconView glyphName="ANGLE_LEFT" size="27" />
                                                          </graphic>
                                                       </Button>
-                                                      <Button fx:id="btnNext" mnemonicParsing="false" styleClass="button_process" StackPane.alignment="CENTER_RIGHT">
+                                                      <Button fx:id="btnNext" mnemonicParsing="false" onAction="#cmdButton_Click" styleClass="button_process" StackPane.alignment="CENTER_RIGHT">
                                                          <StackPane.margin>
                                                             <Insets right="10.0" />
                                                          </StackPane.margin>
