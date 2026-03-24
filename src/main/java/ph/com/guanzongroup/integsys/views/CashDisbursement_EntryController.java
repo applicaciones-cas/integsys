@@ -171,11 +171,14 @@ public class CashDisbursement_EntryController implements Initializable, ScreenIn
         oApp = foValue;
     }
 
-    public void setIndustryId(String fsValue) {
+    @Override
+    public void setIndustryID(String fsValue) {
         psIndustryId = fsValue;
     }
 
-    public void setCompanyId(String fsValue) {
+    @Override
+    public void setCompanyID(String fsValue) {
+
         psCompanyId = fsValue;
     }
 
@@ -588,7 +591,6 @@ public class CashDisbursement_EntryController implements Initializable, ScreenIn
 //            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
 //        }
 //    }
-
     private void loadTableDetailFromMain() {
         poJSON = new JSONObject();
         if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
@@ -1473,7 +1475,6 @@ public class CashDisbursement_EntryController implements Initializable, ScreenIn
 //                                    JFXUtil.textFieldMoveNext(tfDebitAmount);
 //                                }
 //                                break;
-
                             //apBIRDetail
 //                            case "tfTaxCode":
 //                                poJSON = poController.SearchTaxCode(lsValue, pnDetailBIR, true);
@@ -2000,13 +2001,4 @@ public class CashDisbursement_EntryController implements Initializable, ScreenIn
         JFXUtil.clearTextFields(apDVMaster1, apDVDetail, apDVMaster2, apJournalMaster, apJournalDetails, apBIRDetail, apAttachments);
     }
 
-    @Override
-    public void setIndustryID(String fsValue) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
-    }
-
-    @Override
-    public void setCompanyID(String fsValue) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
-    }
 }
