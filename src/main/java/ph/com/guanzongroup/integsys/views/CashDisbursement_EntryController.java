@@ -635,23 +635,37 @@ public class CashDisbursement_EntryController implements Initializable, ScreenIn
                         Platform.runLater(() -> {
                             try {
                                 main_data.clear();
-                                poJSON = poController.loadTransactionList(tfSearchIndustry.getText(), tfSearchPayee.getText(), tfSearchCashAdvanceNo.getText());
+                                poController.loadCashAdvanceList(tfSearchIndustry.getText(), tfSearchPayee.getText(), tfSearchCashAdvanceNo.getText());
                                 if ("success".equals(poJSON.get("result"))) {
                                     JSONArray unifiedPayments = (JSONArray) poJSON.get("data");
                                     if (unifiedPayments != null && !unifiedPayments.isEmpty()) {
                                         for (Object requestObj : unifiedPayments) {
                                             JSONObject obj = (JSONObject) requestObj;
-                                            String lsTransBasis = (obj.get("SourceNo") != null ? obj.get("SourceNo").toString() : "")
-                                                    + (obj.get("TransactionType") != null ? obj.get("TransactionType").toString() : "")
-                                                    + (obj.get("Payee") != null ? obj.get("Payee").toString() : "");
+//                                            String lsTransBasis = (obj.get("SourceNo") != null ? obj.get("SourceNo").toString() : "")
+//                                                    + (obj.get("TransactionType") != null ? obj.get("TransactionType").toString() : "")
+//                                                    + (obj.get("Payee") != null ? obj.get("Payee").toString() : "");
 
+//                                            for (int lnCtr = 0; lnCtr <= poController.getCashAdvancesCount() - 1; lnCtr++) {
+//                                                ModelCashDisbursement_Main loMain = new ModelCashDisbursement_Main(
+//                                                        String.valueOf(main_data.size() + 1),
+//                                                       poController.CashAdvancesList(lnCtr).get,
+//                                                        obj.get("sTransNox") != null ? obj.get("sTransNox").toString() : "",
+//                                                       poController.CashAdvancesList(lnCtr).Payee().getCompanyName(),
+//                                                        poController.CashAdvancesList(lnCtr).getAdvanceAmount(),
+//                                                        "");
+//                                            }
                                             ModelCashDisbursement_Main loMain = new ModelCashDisbursement_Main(
                                                     String.valueOf(main_data.size() + 1),
-                                                    obj.get("Reference") != null ? obj.get("Reference").toString() : "",
-                                                    obj.get("LiquidationDate") != null ? CustomCommonUtil.setIntegerValueToDecimalFormat(obj.get("Balance"), true) : "",
-                                                    obj.get("Payee") != null ? obj.get("Payee").toString() : "",
-                                                    obj.get("Amount") != null ? obj.get("dTransact").toString() : "",
-                                                    lsTransBasis);
+                                                    obj.get("sReferNox") != null ? obj.get("sReferNox").toString() : "",
+                                                    obj.get("sTransNox") != null ? obj.get("sTransNox").toString() : "",
+                                                    obj.get("sPayeeNme") != null ? obj.get("sPayeeNme").toString() : "",
+                                                    obj.get("nNetTotal"
+                                                            + ""
+                                                            + ""
+                                                            + "."
+                                                            + ""
+                                                            + "") != null ? obj.get("nNetTotal").toString() : "",
+                                                    "");
 
                                             main_data.add(loMain);
                                         }
