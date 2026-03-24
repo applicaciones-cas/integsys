@@ -213,15 +213,21 @@ public class CheckDeposit_EntryController implements Initializable, ScreenInterf
      * Initializes the TBJ controller and transaction objects.
      */
     private void initializeObject() {
-        LogWrapper logwrapr = new LogWrapper("CAS", System.getProperty("sys.default.path.temp") + "cas-error.log");
-        poGLControllers = new CashflowControllers(poApp, logwrapr);
-        poGLControllers.CheckDeposits().setTransactionStatus("0");
-        poJSON = poGLControllers.CheckDeposits().InitTransaction();
-        if (!"success".equals(poJSON.get("result"))) {
+        try {
+            LogWrapper logwrapr = new LogWrapper("CAS", System.getProperty("sys.default.path.temp") + "cas-error.log");
+            poGLControllers = new CashflowControllers(poApp, logwrapr);
+            poGLControllers.CheckDeposits().setTransactionStatus("0");
+            poJSON = poGLControllers.CheckDeposits().InitTransaction();
+            if (!"success".equals(poJSON.get("result"))) {
                 ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
+            }
+            poGLControllers.CheckDeposits().Master().setIndustryId(psIndustryID);
+            poGLControllers.CheckDeposits().Master().setCompany(psCompanyID);
+            lblSource.setText(poGLControllers.CheckDeposits().Master().Company().getCompanyName() + " - " + poGLControllers.CheckDeposits().Master().Industry().getDescription());
+        } catch (SQLException | GuanzonException ex) {
+            Logger.getLogger(CheckDeposit_EntryController.class.getName()).log(Level.SEVERE, null, ex);
+            ShowMessageFX.Error(ex.getMessage(), psFormName, null);
         }
-//            poGLControllers.CheckDeposits().Master().setIndustryId(psIndustryID);
-//            lblSource.setText(poGLControllers.CheckDeposits().Master().Company().getCompanyName() + " - " + poGLControllers.CheckDeposits().Master().Industry().getDescription());
     }
     
     private void ClearAll() {
@@ -473,20 +479,19 @@ public class CheckDeposit_EntryController implements Initializable, ScreenInterf
                                 return;
                             }
                             ShowMessageFX.Information((String) poJSON.get("message"), psFormName, null);
+                            if (ShowMessageFX.YesNo(null, psFormName, "Do you want to print this transaction?")) {
+                                poJSON = poGLControllers.CheckDeposits().printDepositSlip();
+                                if ("error".equals((String) poJSON.get("result"))) {
+                                    ShowMessageFX.Error((String) poJSON.get("message"), psFormName, null);
+                                    ClearAll();
+                                    btnNew.fire();
+                                    return;
+                                }
+                                ShowMessageFX.Information((String) poJSON.get("message"), psFormName, null);
+
+                            }
                         }
                     }
-                        if (ShowMessageFX.YesNo(null, psFormName, "Do you want to print this transaction?")) {
-                            poJSON = poGLControllers.CheckDeposits().printTransaction();
-                            if ("error".equals((String) poJSON.get("result"))) {
-                                ShowMessageFX.Error((String) poJSON.get("message"), psFormName, null);
-                                ClearAll();
-                                btnNew.fire();
-                                return;
-                            }
-                           
-                        }
-                    
-
                     ClearAll();
                     btnNew.fire();
                     break;
@@ -572,7 +577,7 @@ public class CheckDeposit_EntryController implements Initializable, ScreenInterf
             apDetail.setDisable(false);
         }
         
-            List<TextField> loTxtField = Arrays.asList( tfCheckTransNo, tfCheckNo,tfSearchTransNo,tfBankMaster,tfBankAccountName,tfBankAccountNo,tfSearchBankAccountNo);
+            List<TextField> loTxtField = Arrays.asList( tfCheckTransNo, tfCheckNo,tfSearchTransNo,tfFilterBank, tfBankMaster,tfBankAccountName,tfBankAccountNo,tfSearchBankAccountNo);
             loTxtField.forEach(tf -> tf.setOnKeyPressed(event -> txtField_KeyPressed(event)));
 //
 //            JFXUtil.setFocusListener(txtArea_Focus, taRemarks);
@@ -1087,18 +1092,18 @@ public class CheckDeposit_EntryController implements Initializable, ScreenInterf
                 switch (lsID) {
                     case "tfBankMaster":
                         psActiveField = lsID;
-                        if (lsValue == null || lsValue.trim().isEmpty()) {
+                         if (lsValue == null || lsValue.trim().isEmpty()) {
                             tfBankMaster.clear();
                             tfBankAccountName.clear();
                             tfBankAccountNo.clear();
                             poGLControllers.CheckDeposits().Master().setBanks(null);
                             poGLControllers.CheckDeposits().Master().setBankAccount(null);
-                            break;
+                            return;
                         }
 
-                        if (poGLControllers.CheckDeposits().Master().Banks().getBankName()!= null) {
+                        if (poGLControllers.CheckDeposits().Master().BankAccount().Banks().getBankName()!= null) {
                             tfBankMaster.setText(
-                                    poGLControllers.CheckDeposits().Master().Banks().getBankName());
+                                    poGLControllers.CheckDeposits().Master().BankAccount().Banks().getBankName());
                         } else {
                             tfBankMaster.clear();
                             tfBankAccountName.clear();
@@ -1112,12 +1117,13 @@ public class CheckDeposit_EntryController implements Initializable, ScreenInterf
                             tfBankAccountNo.clear();
                             tfBankAccountName.clear();
                             poGLControllers.CheckDeposits().Master().setBankAccount(null);
-                            break;
+                            return;
                         }
 
                         if (poGLControllers.CheckDeposits().Master().getBankAccount()!= null) {
+                            System.out.println("tfBankAccountNo : " + poGLControllers.CheckDeposits().Master().getBankAccount());
                             tfBankAccountNo.setText(
-                                    poGLControllers.CheckDeposits().Master().getBankAccount());
+                                    poGLControllers.CheckDeposits().Master().BankAccount().getAccountNo());
                         } else {
                             tfBankAccountNo.clear();
                             tfBankAccountName.clear();
@@ -1129,12 +1135,13 @@ public class CheckDeposit_EntryController implements Initializable, ScreenInterf
                             tfBankAccountName.clear();
                             tfBankAccountNo.clear();
                             poGLControllers.CheckDeposits().Master().setBankAccount(null);
-                            break;
+                            return;
                         }
 
                         if (poGLControllers.CheckDeposits().Master().getBankAccount() != null) {
+                            System.out.println("tfBankAccountNo : " + poGLControllers.CheckDeposits().Master().getBankAccount());
                             tfBankAccountName.setText(
-                                    poGLControllers.CheckDeposits().Master().getBankAccount());
+                                    poGLControllers.CheckDeposits().Master().BankAccount().getAccountName());
                         } else {
                             tfBankAccountName.clear();
                             tfBankAccountNo.clear();

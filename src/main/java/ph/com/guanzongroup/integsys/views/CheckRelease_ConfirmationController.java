@@ -146,7 +146,7 @@ public class CheckRelease_ConfirmationController implements Initializable, Scree
 
     @Override
     public void setCompanyID(String fsValue) {
-//        psCompanyID = fsValue;
+        psCompanyID = fsValue;
     }
 
     @Override
@@ -692,14 +692,14 @@ public class CheckRelease_ConfirmationController implements Initializable, Scree
                         JFXUtil.showRetainedHighlight(false, tblViewMaster, "#A7C7E7", plOrderNoPartial, plOrderNoFinal, highlightedRowsMain, true);
                         loadHighlightFromDetail();
 //                        poJSON = poGLControllers.CheckTransfers().computeMasterFields();
-                        try {
-                            poJSON = poGLControllers.CheckReleases().computeMasterFields();
-                            tfTotal.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(
-                            poGLControllers.CheckReleases().Master().getTransactionTotal(), true));
-                        } catch (SQLException | GuanzonException ex) {
-                            Logger.getLogger(CheckRelease_EntryController.class.getName()).log(Level.SEVERE, null, ex);
-                            ShowMessageFX.Error(ex.getMessage(), psFormName, null);
-                        }
+//                        try {
+////                            poJSON = poGLControllers.CheckReleases().computeMasterFields();
+////                            tfTotal.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(
+////                            poGLControllers.CheckReleases().Master().getTransactionTotal(), true));
+//                        } catch (SQLException | GuanzonException ex) {
+//                            Logger.getLogger(CheckRelease_EntryController.class.getName()).log(Level.SEVERE, null, ex);
+//                            ShowMessageFX.Error(ex.getMessage(), psFormName, null);
+//                        }
                     });   
                     
                     return detailsList;
@@ -1056,6 +1056,7 @@ public class CheckRelease_ConfirmationController implements Initializable, Scree
                         switch (txtFieldID) {
                             
                             case "tfFilterBank":
+                                main_data.clear();
                                 loadTableMaster();
                                 break;
                         }
@@ -1064,11 +1065,11 @@ public class CheckRelease_ConfirmationController implements Initializable, Scree
                         switch (txtFieldID) {
                             case "tfSearchReceived":
                             case "tfFilterBank":
+                                main_data.clear();
                                 loadTableMaster();
                                 break;
                             case "tfReceivedBy":
                                 taRemarks.requestFocus();
-                                
                                 break;
                         }
                         break;

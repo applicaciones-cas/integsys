@@ -144,7 +144,7 @@ public class CheckDeposit_ConfirmationController implements Initializable, Scree
 
     @Override
     public void setCompanyID(String fsValue) {
-//        psCompanyID = fsValue;
+        psCompanyID = fsValue;
     }
 
     @Override
@@ -174,16 +174,22 @@ public class CheckDeposit_ConfirmationController implements Initializable, Scree
      * Initializes the TBJ controller and transaction objects.
      */
     private void initializeObject() {
-        LogWrapper logwrapr = new LogWrapper("CAS", System.getProperty("sys.default.path.temp") + "cas-error.log");
-        poGLControllers = new CashflowControllers(poApp, logwrapr);
-        poGLControllers.CheckDeposits().setTransactionStatus("01");
-        poJSON = poGLControllers.CheckDeposits().InitTransaction();
+        try {
+            LogWrapper logwrapr = new LogWrapper("CAS", System.getProperty("sys.default.path.temp") + "cas-error.log");
+            poGLControllers = new CashflowControllers(poApp, logwrapr);
+            poGLControllers.CheckDeposits().setTransactionStatus("01");
+            poJSON = poGLControllers.CheckDeposits().InitTransaction();
 
-        if (!"success".equals(poJSON.get("result"))) {
+            if (!"success".equals(poJSON.get("result"))) {
                 ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
+            }
+            poGLControllers.CheckDeposits().Master().setIndustryId(psIndustryID);
+            poGLControllers.CheckDeposits().Master().setCompany(psCompanyID);
+            lblSource.setText(poGLControllers.CheckDeposits().Master().Company().getCompanyName() + " - " + poGLControllers.CheckDeposits().Master().Industry().getDescription());
+        } catch (SQLException | GuanzonException ex) {
+            Logger.getLogger(CheckDeposit_EntryController.class.getName()).log(Level.SEVERE, null, ex);
+            ShowMessageFX.Error(ex.getMessage(), psFormName, null);
         }
-//            poGLControllers.CheckDeposits().Master().setIndustryId(psIndustryID);
-//            lblSource.setText(poGLControllers.CheckDeposits().Master().Company().getCompanyName() + " - " + poGLControllers.CheckDeposits().Master().Industry().getDescription());
     }
     
     private void initDatePicker() {
@@ -475,6 +481,7 @@ public class CheckDeposit_ConfirmationController implements Initializable, Scree
                        ClearAll();
                        initializeObject();
                        pnEditMode = poGLControllers.CheckDeposits().getEditMode();
+                       loadTableMaster();
                        initButtons(pnEditMode);
                 break;
                 case "btnApprove":
@@ -496,6 +503,7 @@ public class CheckDeposit_ConfirmationController implements Initializable, Scree
                         poJSON = poGLControllers.CheckDeposits().printDepositSlip();
                         if ("error".equals((String) poJSON.get("result"))) {
                             ShowMessageFX.Error((String) poJSON.get("message"), psFormName, null);
+                            return;
                         }
                         ShowMessageFX.Information((String) poJSON.get("message"), psFormName, null);
                         JFXUtil.disableAllHighlightByColor(tblViewMaster, "#A7C7E7", highlightedRowsMain);
@@ -1078,7 +1086,7 @@ public class CheckDeposit_ConfirmationController implements Initializable, Scree
                         if (lsValue == null || lsValue.trim().isEmpty()) {
                             tfBankMaster.clear();
                             poGLControllers.CheckDeposits().Master().setBanks(null);
-                            break;
+                            return;
                         }
 
                         if (poGLControllers.CheckDeposits().Master().Banks().getBankName()!= null) {
@@ -1094,7 +1102,7 @@ public class CheckDeposit_ConfirmationController implements Initializable, Scree
                         if (lsValue == null || lsValue.trim().isEmpty()) {
                             tfBankAccountNo.clear();
                             poGLControllers.CheckDeposits().Master().setBankAccount(null);
-                            break;
+                            return;
                         }
 
                         if (poGLControllers.CheckDeposits().Master().getBankAccount()!= null) {
@@ -1109,7 +1117,7 @@ public class CheckDeposit_ConfirmationController implements Initializable, Scree
                         if (lsValue == null || lsValue.trim().isEmpty()) {
                             tfBankAccountName.clear();
                             poGLControllers.CheckDeposits().Master().setBankAccount(null);
-                            break;
+                            return;
                         }
 
                         if (poGLControllers.CheckDeposits().Master().getBankAccount() != null) {
