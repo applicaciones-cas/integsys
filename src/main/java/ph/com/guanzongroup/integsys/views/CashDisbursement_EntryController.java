@@ -1655,12 +1655,16 @@ public class CashDisbursement_EntryController implements Initializable, ScreenIn
             if (pnDetail < 0 || pnDetail > poController.getDetailCount() - 1) {
                 return;
             }
-//            boolean lbNotNull = !JFXUtil.isObjectEqualTo(poController.Detail(pnDetail).getDetailVatAmount(), null, "");
-//            boolean lbNotZero = poController.Detail(pnDetail).getAmountApplied() != 0;
-//            cbReverse.selectedProperty().set(lbNotNull && lbNotZero);
-
-//            tfORNoDetail.setText(poController.Detail(pnDetail).getDetailNo());
-            tfParticularDetail.setText(poController.Detail(pnDetail).Particular().getDescription());
+            String lsParticular = "", lsOrNo = "";
+            if (poController.Master().getSourceNo() != null && !"".equals(poController.Master().getSourceNo())) {
+                lsParticular = poController.Detail(pnDetail).CashAdvanceDetail(poController.Master().getSourceNo()).getParticular();
+                lsOrNo = poController.Detail(pnDetail).CashAdvanceDetail(poController.Master().getSourceNo()).getORNo();
+            } else {
+                lsParticular = poController.Detail(pnDetail).Particular().getDescription();
+                lsParticular = "";
+            }
+            tfORNoDetail.setText(lsParticular);
+            tfParticularDetail.setText(lsParticular);
             tfVatableSalesDetail.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(pnDetail).getDetailVatSales(), true));
             tfVatExemptDetail.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(pnDetail).getDetailVatExempt(), true));
             tfVatZeroRatedSalesDetail.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(pnDetail).getDetailZeroVat(), true));
