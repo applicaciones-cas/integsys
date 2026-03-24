@@ -347,6 +347,7 @@ public class CheckDeposit_ConfirmationController implements Initializable, Scree
                                 poJSON = poGLControllers.CheckDeposits().SearchBanks(lsValue, false);
                                 if ("error".equals(poJSON.get("result"))) {
                                     ShowMessageFX.Warning((String) poJSON.get("message"), lsValue, lsValue);
+                                    return;
                                 }
                                 tfBankMaster.setText(poGLControllers.CheckDeposits().Master().Banks().getBankName());
                                 break;
@@ -354,6 +355,7 @@ public class CheckDeposit_ConfirmationController implements Initializable, Scree
                                 poJSON = poGLControllers.CheckDeposits().SearchBankAccounts(lsValue,false);
                                 if ("error".equals(poJSON.get("result"))) {
                                     ShowMessageFX.Warning((String) poJSON.get("message"), lsValue, lsValue);
+                                    return;
                                 }
                                 tfBankAccountNo.setText(poGLControllers.CheckDeposits().Master().BankAccount().getAccountNo());
                                 tfBankAccountName.setText(poGLControllers.CheckDeposits().Master().BankAccount().getAccountName());
@@ -362,6 +364,7 @@ public class CheckDeposit_ConfirmationController implements Initializable, Scree
                                 poJSON = poGLControllers.CheckDeposits().SearchBankAccounts(lsValue,false);
                                 if ("error".equals(poJSON.get("result"))) {
                                     ShowMessageFX.Warning((String) poJSON.get("message"), lsValue, lsValue);
+                                    return;
                                 }
                                 tfBankAccountNo.setText(poGLControllers.CheckDeposits().Master().BankAccount().getAccountNo());
                                 tfBankAccountName.setText(poGLControllers.CheckDeposits().Master().BankAccount().getAccountName());
@@ -370,6 +373,7 @@ public class CheckDeposit_ConfirmationController implements Initializable, Scree
                                 poJSON = poGLControllers.CheckDeposits().SearchChecks(lsValue, "",pnSelectedDetail,false);
                                 if ("error".equals(poJSON.get("result"))) {
                                     ShowMessageFX.Warning((String) poJSON.get("message"), lsValue, lsValue);
+                                    return;
                                 }
                                 tfCheckTransNo.setText(poGLControllers.CheckDeposits().Detail(pnSelectedDetail).CheckPayment().getTransactionNo());
                                 loadTableDetail();
@@ -378,6 +382,7 @@ public class CheckDeposit_ConfirmationController implements Initializable, Scree
                                 poJSON = poGLControllers.CheckDeposits().SearchChecks("", lsValue,pnSelectedDetail,false);
                                 if ("error".equals(poJSON.get("result"))) {
                                     ShowMessageFX.Warning((String) poJSON.get("message"), lsValue, lsValue);
+                                    return;
                                 }
                                 tfCheckNo.setText(poGLControllers.CheckDeposits().Detail(pnSelectedDetail).CheckPayment().getCheckNo());
                                 loadTableDetail();
