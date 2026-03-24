@@ -231,6 +231,7 @@ public class CashAdvance_HistoryController implements Initializable, ScreenInter
                                 return;
                             } else {
                                 pnEditMode = poController.getEditMode();
+                                clearTextFields();
                                 loadRecordMaster();
                                 loadTableDetail.reload();
                                 poController.loadAttachments();
