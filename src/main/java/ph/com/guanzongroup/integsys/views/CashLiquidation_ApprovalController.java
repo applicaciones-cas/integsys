@@ -506,8 +506,10 @@ public class CashLiquidation_ApprovalController implements Initializable, Screen
             poJSON = new JSONObject();
             poJSON = poController.loadTransactionList(tfSearchIndustry.getText(), tfSearchPayee.getText(), tfSearchTransNo.getText(), false);
             if (!"success".equals((String) poJSON.get("result"))) {
-//                ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-            } else {
+                //show this only if the focus is on btnRetrieve or tfSearchIndustry or tfSearchPayee or tfTransNo
+                if (btnRetrieve.isFocused() || tfSearchIndustry.isFocused() || tfSearchIndustry.isFocused() || tfSearchPayee.isFocused() || tfSearchTransNo.isFocused()) {
+                    ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                }
             }
             loadTableMain.reload();
         } catch (SQLException | GuanzonException ex) {
