@@ -320,6 +320,8 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
                     if (!isJSONSuccess(poAppController.updateRecord(), "Initialize Update Record")) {
                         return;
                     }
+                    poAppController.loadAttachments();
+                    
                     getLoadedClient();
                     initButtonDisplay(poAppController.getEditMode());
                     break;
@@ -333,9 +335,8 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
                     if (!isJSONSuccess(poAppController.saveRecord(), "Initialize Save Record")) {
                         return;
                     }
-
                     getLoadedClient();
-                    initButtonDisplay(poAppController.getEditMode());
+                    
                     break;
 
                 case "btnCancel":
@@ -469,6 +470,12 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
                         }
                     }
                     break;
+            }
+            
+            //reset edit mode, upon save button
+            if (btnID.equalsIgnoreCase("btnSave")) {
+                initButtonDisplay(EditMode.UNKNOWN);
+                return;
             }
             initButtonDisplay(poAppController.getEditMode());
 
@@ -615,6 +622,7 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
             poLogWrapper.severe(psFormName + " :" + ex.getMessage());
         }
     }
+    
     final ChangeListener<? super Boolean> dPicker_Focus = (o, ov, nv) -> {
         DatePicker loDatePicker = (DatePicker) ((ReadOnlyBooleanPropertyBase) o).getBean();
         String lsDatePickerID = loDatePicker.getId();
@@ -1104,7 +1112,6 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
     }
 
     private void getLoadedClient() throws SQLException, GuanzonException, CloneNotSupportedException {
-        //clearAllInputs();
         loadClientMaster();
         reloadTableLedger();
         reloadTableAttachments();
