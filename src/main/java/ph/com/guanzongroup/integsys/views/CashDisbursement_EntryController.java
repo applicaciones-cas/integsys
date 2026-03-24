@@ -1133,6 +1133,10 @@ public class CashDisbursement_EntryController implements Initializable, ScreenIn
                 /*Lost Focus*/
                 switch (lsID) {
                     case "tfSearchIndustry":
+                        if (lsValue.isEmpty()) {
+                            poController.setSearchIndustry("");
+                            loadTableMain.reload();
+                        }
                         break;
                     case "tfSearchPayee":
                         if (lsValue.isEmpty()) {
@@ -1141,6 +1145,10 @@ public class CashDisbursement_EntryController implements Initializable, ScreenIn
                         }
                         break;
                     case "tfSearchCashAdvanceNo":
+                        if (lsValue.isEmpty()) {
+//                            poController.setSearchBranch(lsValue);
+                            loadTableMain.reload();
+                        }
                         break;
                 }
             });
@@ -1180,7 +1188,7 @@ public class CashDisbursement_EntryController implements Initializable, ScreenIn
                         break;
                     case "tfDepartment":
                         if (lsValue.isEmpty()) {
-//                            poController.Master().setDepartmentId();
+                            poController.Master().setDepartmentRequest("");
                         }
                         break;
                     case "tfPayee":
@@ -1647,7 +1655,7 @@ public class CashDisbursement_EntryController implements Initializable, ScreenIn
             if (pnDetail < 0 || pnDetail > poController.getDetailCount() - 1) {
                 return;
             }
-            boolean lbNotNull = !JFXUtil.isObjectEqualTo(poController.Detail(pnDetail).getDetailVatAmount(), null, "");
+//            boolean lbNotNull = !JFXUtil.isObjectEqualTo(poController.Detail(pnDetail).getDetailVatAmount(), null, "");
 //            boolean lbNotZero = poController.Detail(pnDetail).getAmountApplied() != 0;
 //            cbReverse.selectedProperty().set(lbNotNull && lbNotZero);
 
@@ -1659,7 +1667,7 @@ public class CashDisbursement_EntryController implements Initializable, ScreenIn
             tfVatRateDetail.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(pnDetail).getDetailVatRate(), false));
             tfVatAmountDetail.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(pnDetail).getDetailVatAmount(), true));
             cbReverse.setSelected(poController.Detail(pnDetail).isReverse());
-            tfAmountDetail.setText("");
+            tfAmountDetail.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(pnDetail).getAmount(), true));
 
             JFXUtil.updateCaretPositions(apDVDetail);
         } catch (SQLException | GuanzonException ex) {
