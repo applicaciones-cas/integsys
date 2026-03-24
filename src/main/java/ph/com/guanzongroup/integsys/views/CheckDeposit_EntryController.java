@@ -455,7 +455,7 @@ public class CheckDeposit_EntryController implements Initializable, ScreenInterf
                         ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
                         return;
                     }
-                    ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
+                    ShowMessageFX.Information((String) poJSON.get("message"), psFormName, null);
                     if (poGLControllers.CheckDeposits().Master().getTransactionStatus().equals(CheckDepositStatus.OPEN)) {
                         if (ShowMessageFX.YesNo(null, psFormName, "Do you want to confirm this transaction?")) {
                             poJSON = poGLControllers.CheckDeposits().OpenTransaction(poGLControllers.CheckDeposits().Master().getTransactionNo());
@@ -476,8 +476,9 @@ public class CheckDeposit_EntryController implements Initializable, ScreenInterf
                                 ShowMessageFX.Error((String) poJSON.get("message"), psFormName, null);
                                 ClearAll();
                                 btnNew.fire();
+                                return;
                             }
-                            ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
+                           
                         }
                     
 

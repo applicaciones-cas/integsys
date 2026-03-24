@@ -453,7 +453,6 @@ public class CheckDeposit_ConfirmationController implements Initializable, Scree
                                 initButtons(pnEditMode);
                                 return;
                             }
-                            ShowMessageFX.Information((String) poJSON.get("message"), psFormName, null);
                             JFXUtil.disableAllHighlightByColor(tblViewMaster, "#A7C7E7", highlightedRowsMain);
                         }
                     }
