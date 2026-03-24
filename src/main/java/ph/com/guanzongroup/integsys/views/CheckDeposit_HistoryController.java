@@ -219,7 +219,7 @@ public class CheckDeposit_HistoryController implements Initializable, ScreenInte
                     }
                     break;
                 case "btnBrowse":
-                    poJSON = poGLControllers.CheckDeposits().SearchTransaction( tfSearchTransNo.getText(),tfBankAccountNo.getText(),dpSearchTransactionDate.getValue());
+                    poJSON = poGLControllers.CheckDeposits().SearchTransaction( tfSearchTransNo.getText(),tfSearchBankAccountNo.getText(),dpSearchTransactionDate.getValue());
                     if (!"success".equals((String) poJSON.get("result"))) {
                         ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
                         return;
