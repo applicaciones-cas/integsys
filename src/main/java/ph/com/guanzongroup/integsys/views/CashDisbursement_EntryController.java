@@ -13,6 +13,7 @@ import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.SQLException;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -600,9 +601,7 @@ public class CashDisbursement_EntryController implements Initializable, ScreenIn
                 try {
                     int pnRowMain = Integer.parseInt(selected.getIndex01()) - 1;
                     pnMain = pnRowMain;
-                    String lsPayableType = selected.getIndex11();
-                    String lsTransactionNo = selected.getIndex08();
-                    String lsPayee = selected.getIndex09();
+                    String lsTransactionNo = selected.getIndex02();
                     poJSON = poController.populateDetail(lsTransactionNo);
                     if ("error".equals(poJSON.get("result"))) {
                         ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
@@ -634,44 +633,28 @@ public class CashDisbursement_EntryController implements Initializable, ScreenIn
                         Thread.sleep(100);
                         Platform.runLater(() -> {
                             try {
+                                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
                                 main_data.clear();
-                                poController.loadCashAdvanceList(tfSearchIndustry.getText(), tfSearchPayee.getText(), tfSearchCashAdvanceNo.getText());
+                                poJSON = poController.loadCashAdvanceList(tfSearchIndustry.getText(), tfSearchPayee.getText(), tfSearchCashAdvanceNo.getText());
                                 if ("success".equals(poJSON.get("result"))) {
-                                    JSONArray unifiedPayments = (JSONArray) poJSON.get("data");
-                                    if (unifiedPayments != null && !unifiedPayments.isEmpty()) {
-                                        for (Object requestObj : unifiedPayments) {
-                                            JSONObject obj = (JSONObject) requestObj;
-//                                            String lsTransBasis = (obj.get("SourceNo") != null ? obj.get("SourceNo").toString() : "")
-//                                                    + (obj.get("TransactionType") != null ? obj.get("TransactionType").toString() : "")
-//                                                    + (obj.get("Payee") != null ? obj.get("Payee").toString() : "");
+                                    String date = "";
 
-//                                            for (int lnCtr = 0; lnCtr <= poController.getCashAdvancesCount() - 1; lnCtr++) {
-//                                                ModelCashDisbursement_Main loMain = new ModelCashDisbursement_Main(
-//                                                        String.valueOf(main_data.size() + 1),
-//                                                       poController.CashAdvancesList(lnCtr).get,
-//                                                        obj.get("sTransNox") != null ? obj.get("sTransNox").toString() : "",
-//                                                       poController.CashAdvancesList(lnCtr).Payee().getCompanyName(),
-//                                                        poController.CashAdvancesList(lnCtr).getAdvanceAmount(),
-//                                                        "");
-//                                            }
-                                            ModelCashDisbursement_Main loMain = new ModelCashDisbursement_Main(
-                                                    String.valueOf(main_data.size() + 1),
-                                                    obj.get("sReferNox") != null ? obj.get("sReferNox").toString() : "",
-                                                    obj.get("sTransNox") != null ? obj.get("sTransNox").toString() : "",
-                                                    obj.get("sPayeeNme") != null ? obj.get("sPayeeNme").toString() : "",
-                                                    obj.get("nNetTotal"
-                                                            + ""
-                                                            + ""
-                                                            + "."
-                                                            + ""
-                                                            + "") != null ? obj.get("nNetTotal").toString() : "",
-                                                    "");
-
-                                            main_data.add(loMain);
+                                    for (int lnCtr = 0; lnCtr <= poController.getCashAdvancesCount() - 1; lnCtr++) {
+                                        if (!JFXUtil.isObjectEqualTo(poController.CashAdvancesList(lnCtr).getLiquidatedDate(), null, "")) {
+                                            date = sdf.format(poController.CashAdvancesList(lnCtr).getLiquidatedDate());
                                         }
-                                    } else {
-                                        main_data.clear();
+
+                                        main_data.add(new ModelCashDisbursement_Main(
+                                                String.valueOf(lnCtr + 1),
+                                                poController.CashAdvancesList(lnCtr).getTransactionNo(),
+                                                date,
+                                                poController.CashAdvancesList(lnCtr).Payee().getCompanyName(),
+                                                String.valueOf(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.CashAdvancesList(lnCtr).getAdvanceAmount(), true)),
+                                                ""));
                                     }
+//                                    } else {
+//                                        main_data.clear();
+//                                    }
                                 }
                                 if (pnMain < 0 || pnMain
                                         >= main_data.size()) {
@@ -1066,7 +1049,7 @@ public class CashDisbursement_EntryController implements Initializable, ScreenIn
                 moveNextBIR(false, false);
             }
         });
-        JFXUtil.applyRowHighlighting(tblViewMainList, item -> ((ModelCashDisbursement_Main) item).getIndex10(), highlightedRowsMain);
+        JFXUtil.applyRowHighlighting(tblViewMainList, item -> ((ModelCashDisbursement_Main) item).getIndex01(), highlightedRowsMain);
         JFXUtil.setKeyEventFilter(this::tableKeyEvents, tblVwDetails, tblVwJournalDetails, tblVwBIRDetails);
         JFXUtil.adjustColumnForScrollbar(tblViewMainList, tblVwDetails, tblVwJournalDetails, tblVwBIRDetails);
     }
