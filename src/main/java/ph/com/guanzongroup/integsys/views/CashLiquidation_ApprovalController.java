@@ -158,6 +158,7 @@ public class CashLiquidation_ApprovalController implements Initializable, Screen
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+
         try {
             poController = new CashflowControllers(oApp, null).CashLiquidation();
             poController.InitTransaction();
@@ -175,10 +176,10 @@ public class CashLiquidation_ApprovalController implements Initializable, Screen
 
                 poController.Master().setIndustryId(psIndustryId);
                 poController.Master().setCompanyId(psCompanyId);
-//            poController.Master().setCategoryCode(psCategoryId);
+//              poController.Master().setCategoryCode(psCategoryId);
                 poController.setIndustryId(psIndustryId);
                 poController.setCompanyId(psCompanyId);
-//            poController.setCategoryId(psCategoryId);
+//              poController.setCategoryId(psCategoryId);
                 poController.initFields();
                 poController.setWithUI(true);
                 loadRecordSearch();
@@ -193,6 +194,7 @@ public class CashLiquidation_ApprovalController implements Initializable, Screen
             JFXUtil.initKeyClickObject(apMainAnchor, lastFocusedTextField, previousSearchedTextField);
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(CashLiquidation_EntryController.class.getName()).log(Level.SEVERE, null, ex);
+            ShowMessageFX.Error(MiscUtil.getException(ex), pxeModuleName, null);
         }
     }
 
@@ -510,6 +512,7 @@ public class CashLiquidation_ApprovalController implements Initializable, Screen
             loadTableMain.reload();
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+            ShowMessageFX.Error(MiscUtil.getException(ex), pxeModuleName, null);
         }
     }
 

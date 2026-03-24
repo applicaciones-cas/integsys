@@ -496,6 +496,7 @@ public class CashLiquidation_EntryController implements Initializable, ScreenInt
             loadTableMain.reload();
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+            ShowMessageFX.Error(MiscUtil.getException(ex), pxeModuleName, null);
         }
     }
 

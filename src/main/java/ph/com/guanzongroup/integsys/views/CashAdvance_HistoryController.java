@@ -62,7 +62,7 @@ import ph.com.guanzongroup.integsys.utility.JFXUtil;
 
 /**
  *
- * @author Team 1 : Aldrich & Arsiela 
+ * @author Team 1 : Aldrich & Arsiela
  */
 public class CashAdvance_HistoryController implements Initializable, ScreenInterface {
 
@@ -748,6 +748,7 @@ public class CashAdvance_HistoryController implements Initializable, ScreenInter
                 }
                 if (JFXUtil.isObjectEqualTo(lsButton, "btnArrowRight", "btnArrowLeft")) {
                 } else {
+                    clearTextFields();
                     loadRecordMaster();
                     loadTableDetail.reload();
                     poController.loadAttachments();
