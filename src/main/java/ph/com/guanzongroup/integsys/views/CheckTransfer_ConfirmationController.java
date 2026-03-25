@@ -384,8 +384,8 @@ public class CheckTransfer_ConfirmationController implements Initializable, Scre
                 break;
                 
                 case "btnPrint":
-                    if(!poGLControllers.CheckTransfers().Master().getPrintStatus().equals(CheckTransferStatus.CONFIRMED)){
-                        ShowMessageFX.Error("Need to ", psFormName, null);
+                    if(!poGLControllers.CheckTransfers().Master().getTransactionStatus().equals(CheckTransferStatus.CONFIRMED)){
+                        ShowMessageFX.Error("Action not allowed. Transaction is not yet CONFIRMED.", psFormName, null);
                         return;
                     }
                      poJSON = poGLControllers.CheckTransfers().printTransaction();
