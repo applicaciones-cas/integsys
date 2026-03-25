@@ -469,20 +469,15 @@ public class CashDisbursement_EntryController implements Initializable, ScreenIn
                     if (ShowMessageFX.YesNo(null, pxeModuleName, "Are you sure you want to void transaction?")) {
                         pnEditMode = poController.getEditMode();
                         if (pnEditMode == EditMode.READY) {
-                            if (!poController.existJournal().equals("")) {
-                                poJSON = poController.VoidTransaction();
-                                if ("error".equals((String) poJSON.get("result"))) {
-                                    ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-                                    return;
-                                } else {
-                                    ShowMessageFX.Information(null, pxeModuleName, (String) poJSON.get("message"));
-                                    pnEditMode = poController.getEditMode();
-                                    JFXUtil.disableAllHighlightByColor(tblViewMainList, "#A7C7E7", highlightedRowsMain);
-                                    JFXUtil.highlightByKey(tblViewMainList, String.valueOf(pnMain + 1), "#FAA0A0", highlightedRowsMain);
-                                }
-                            } else {
-                                ShowMessageFX.Warning(null, pxeModuleName, "This transaction has no journal entry. Please add a journal entry by updating the transaction to enable void.");
+                            poJSON = poController.VoidTransaction();
+                            if ("error".equals((String) poJSON.get("result"))) {
+                                ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                 return;
+                            } else {
+                                ShowMessageFX.Information(null, pxeModuleName, (String) poJSON.get("message"));
+                                pnEditMode = poController.getEditMode();
+                                JFXUtil.disableAllHighlightByColor(tblViewMainList, "#A7C7E7", highlightedRowsMain);
+                                JFXUtil.highlightByKey(tblViewMainList, String.valueOf(pnMain + 1), "#FAA0A0", highlightedRowsMain);
                             }
                         }
                     } else {
@@ -1186,7 +1181,7 @@ public class CashDisbursement_EntryController implements Initializable, ScreenIn
                             if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
 
                                 if (!JFXUtil.isObjectEqualTo(poController.Master().getBranchCode(), null, "")) {
-                                    if (poController.getDetailCount() > 1) {
+                                    if (poController.getDetailCount() >= 1) {
                                         if (!pbKeyPressed) {
                                             if (ShowMessageFX.YesNo(null, pxeModuleName,
                                                     "Are you sure you want to change the Branch name?\nPlease note that this action will delete all Cash Disbursement details.\n\nDo you wish to proceed?") == true) {
@@ -1211,7 +1206,7 @@ public class CashDisbursement_EntryController implements Initializable, ScreenIn
                         if (lsValue.isEmpty()) {
                             if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
                                 if (!JFXUtil.isObjectEqualTo(poController.Master().getCashFundId(), null, "")) {
-                                    if (poController.getDetailCount() > 1) {
+                                    if (poController.getDetailCount() >= 1) {
                                         if (!pbKeyPressed) {
                                             if (ShowMessageFX.YesNo(null, pxeModuleName,
                                                     "Are you sure you want to change the Cash Fund?\nPlease note that this action will delete all Cash Disbursement details.\n\nDo you wish to proceed?") == true) {
@@ -1236,7 +1231,7 @@ public class CashDisbursement_EntryController implements Initializable, ScreenIn
                         if (lsValue.isEmpty()) {
                             if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
                                 if (!JFXUtil.isObjectEqualTo(poController.Master().getPayeeName(), null, "")) {
-                                    if (poController.getDetailCount() > 1) {
+                                    if (poController.getDetailCount() >= 1) {
                                         if (!pbKeyPressed) {
                                             if (ShowMessageFX.YesNo(null, pxeModuleName,
                                                     "Are you sure you want to change the Department name?\nPlease note that this action will delete all Cash Disbursement details.\n\nDo you wish to proceed?") == true) {
@@ -1261,7 +1256,7 @@ public class CashDisbursement_EntryController implements Initializable, ScreenIn
                         if (lsValue.isEmpty()) {
                             if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
                                 if (!JFXUtil.isObjectEqualTo(poController.Master().getPayeeName(), null, "")) {
-                                    if (poController.getDetailCount() > 1) {
+                                    if (poController.getDetailCount() >= 1) {
                                         if (!pbKeyPressed) {
                                             if (ShowMessageFX.YesNo(null, pxeModuleName,
                                                     "Are you sure you want to change the Payee name?\nPlease note that this action will delete all Cash Disbursement details.\n\nDo you wish to proceed?") == true) {
@@ -1507,7 +1502,7 @@ public class CashDisbursement_EntryController implements Initializable, ScreenIn
 
                             case "tfBranch":
                                 if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
-                                    if (poController.getDetailCount() > 1) {
+                                    if (poController.getDetailCount() >= 1) {
                                         pbKeyPressed = true;
                                         if (ShowMessageFX.YesNo(null, pxeModuleName,
                                                 "Are you sure you want to change the Branch name?\nPlease note that this action will delete all Cash Disbursement details.\n\nDo you wish to proceed?") == true) {
@@ -1536,7 +1531,7 @@ public class CashDisbursement_EntryController implements Initializable, ScreenIn
                                 break;
                             case "tfDepartment":
                                 if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
-                                    if (poController.getDetailCount() > 1) {
+                                    if (poController.getDetailCount() >= 1) {
                                         pbKeyPressed = true;
                                         if (ShowMessageFX.YesNo(null, pxeModuleName,
                                                 "Are you sure you want to change the Department name?\nPlease note that this action will delete all Cash Disbursement details.\n\nDo you wish to proceed?") == true) {
@@ -1564,7 +1559,7 @@ public class CashDisbursement_EntryController implements Initializable, ScreenIn
                                 break;
                             case "tfCashFund":
                                 if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
-                                    if (poController.getDetailCount() > 1) {
+                                    if (poController.getDetailCount() >= 1) {
                                         pbKeyPressed = true;
                                         if (ShowMessageFX.YesNo(null, pxeModuleName,
                                                 "Are you sure you want to change the Cash Fund?\nPlease note that this action will delete all Cash Disbursement details.\n\nDo you wish to proceed?") == true) {
@@ -1592,7 +1587,7 @@ public class CashDisbursement_EntryController implements Initializable, ScreenIn
                                 break;
                             case "tfPayee":
                                 if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
-                                    if (poController.getDetailCount() > 1) {
+                                    if (poController.getDetailCount() >= 1) {
                                         pbKeyPressed = true;
                                         if (ShowMessageFX.YesNo(null, pxeModuleName,
                                                 "Are you sure you want to change the Payee name?\nPlease note that this action will delete all Cash Disbursement details.\n\nDo you wish to proceed?") == true) {
