@@ -1837,7 +1837,7 @@ public class CashDisbursement_EntryController implements Initializable, ScreenIn
     private void loadRecordMaster() {
         try {
             boolean lbShow2 = pnEditMode == EditMode.UPDATE;
-            JFXUtil.setDisabled(lbShow2, tfBranch, tfDepartment, tfCashFund, tfPayee);
+            JFXUtil.setDisabled(lbShow2,  tfPayee);
 
             boolean lbShow = !JFXUtil.isObjectEqualTo(poController.Master().getSourceNo(), null, "");
             JFXUtil.setDisabled(lbShow, cbReverse);
