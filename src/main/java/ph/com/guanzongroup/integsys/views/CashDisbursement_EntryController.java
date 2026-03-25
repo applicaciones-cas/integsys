@@ -597,19 +597,22 @@ public class CashDisbursement_EntryController implements Initializable, ScreenIn
             if (selected != null) {
                 try {
                     int pnRowMain = Integer.parseInt(selected.getIndex01()) - 1;
-                    pnMain = pnRowMain;
                     String lsTransactionNo = selected.getIndex02();
                     if (!JFXUtil.loadValidation2(pnEditMode, pxeModuleName, poController.Master().getSourceNo(), lsTransactionNo)) {
                         return;
                     }
+                    pnMain = pnRowMain;
+                    clearTextFields();
                     poJSON = poController.populateDetail(lsTransactionNo);
                     if ("error".equals(poJSON.get("result"))) {
                         ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                        poController.resetTransaction();
                         return;
                     }
                     pnEditMode = poController.getEditMode();
                     loadTableDetail.reload();
                     moveNext(false, false);
+
                     JFXUtil.runWithDelay(0.50, () -> {
                         loadTableMain.reload();
 
