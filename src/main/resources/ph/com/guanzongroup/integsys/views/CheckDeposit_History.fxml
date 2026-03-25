@@ -64,12 +64,12 @@
                                     </Label>
                                     <TextField fx:id="tfSearchBankAccountNo" promptText="Press F3: Search" GridPane.columnIndex="2" />
                                     <TextField fx:id="tfSearchTransNo" GridPane.columnIndex="6" />
-                                    <Label text="Date" GridPane.columnIndex="8">
+                                    <Label text="Date" visible="false" GridPane.columnIndex="8">
                                        <font>
                                           <Font name="System Bold" size="14.0" />
                                        </font>
                                     </Label>
-                                    <DatePicker fx:id="dpSearchTransactionDate" editable="false" GridPane.columnIndex="10" />
+                                    <DatePicker fx:id="dpSearchTransactionDate" editable="false" visible="false" GridPane.columnIndex="10" />
                                  </children>
                               </GridPane>
                               <Label fx:id="lblSource" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" text="Industry" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="0.0">
