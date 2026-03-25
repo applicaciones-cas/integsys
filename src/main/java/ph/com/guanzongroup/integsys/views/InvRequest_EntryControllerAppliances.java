@@ -52,6 +52,7 @@ import org.guanzon.appdriver.base.CommonUtils;
 import org.guanzon.appdriver.base.GRiderCAS;
 import org.guanzon.appdriver.base.GuanzonException;
 import org.guanzon.appdriver.base.LogWrapper;
+import org.guanzon.appdriver.base.MiscUtil;
 import org.guanzon.appdriver.base.SQLUtil;
 import org.guanzon.appdriver.constant.EditMode;
 import org.guanzon.appdriver.constant.UserRight;
@@ -667,15 +668,26 @@ public class InvRequest_EntryControllerAppliances implements Initializable, Scre
                     }
                     ShowMessageFX.Information((String) poJSON.get("message"), psFormName, null);
                     poJSON = invRequestController.OpenTransaction(invRequestController.Master().getTransactionNo());
-                    // Confirmation Prompt
+                     // Confirmation Prompt
                     if ("success".equals(poJSON.get("result")) && invRequestController.Master().getTransactionStatus().equals(StockRequestStatus.OPEN)
                             && ShowMessageFX.YesNo(null, psFormName, "Do you want to confirm this transaction?")) {
                         try {
-                            if ("success".equals((poJSON = invRequestController.ConfirmTransaction("Confirmed")).get("result"))) {
+                            poJSON = invRequestController.ConfirmTransaction("Confirmed");
+
+                            if (!"success".equals(poJSON.get("result"))) {
+                                loadMaster();
+                                pnEditMode = invRequestController.getEditMode();
+                                loadTableInvDetail();
+                                loadDetail();
                                 ShowMessageFX.Information((String) poJSON.get("message"), psFormName, null);
+
+                                break;
                             }
+                            ShowMessageFX.Information((String) poJSON.get("message"), psFormName, null);
+
                         } catch (ParseException ex) {
-                            Logger.getLogger(InvRequest_EntryControllerAppliances.class.getName()).log(Level.SEVERE, null, ex);
+                            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+
                         }
                     }
                     Platform.runLater(() -> btnNew.fire());
