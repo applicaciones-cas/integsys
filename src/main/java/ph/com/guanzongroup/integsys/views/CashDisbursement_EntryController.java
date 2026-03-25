@@ -1380,23 +1380,46 @@ public class CashDisbursement_EntryController implements Initializable, ScreenIn
                         break;
                     case F3:
                         switch (lsID) {
+                            case "tfSearchIndustry":
+                                poController.SearchIndustry(lsValue, false);
+                                loadRecordSearch();
+                                loadTableMain.reload();
+                                break;
+                            case "tfSearchPayee":
+                                poJSON = poController.SearchPayee(lsValue, false, true);
+                                loadRecordSearch();
+                                loadTableMain.reload();
+                                break;
+                            case "tfSearchCashAdvanceNo":
+                                loadTableMain.reload();
+                                break;
+
                             case "tfBranch":
                                 poJSON = poController.SearchBranch(lsValue, false, false);
-                                if (JFXUtil.isJSONSuccess(poJSON)) {
+                                if (!JFXUtil.isJSONSuccess(poJSON)) {
                                     ShowMessageFX.Warning(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
+                                } else {
+                                    JFXUtil.textFieldMoveNext(tfCashFund);
                                 }
+                                loadRecordMaster();
                                 break;
                             case "tfCashFund":
                                 poJSON = poController.SearchCashFund(lsValue, false);
-                                if (JFXUtil.isJSONSuccess(poJSON)) {
+                                if (!JFXUtil.isJSONSuccess(poJSON)) {
                                     ShowMessageFX.Warning(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
+                                } else {
+                                    JFXUtil.textFieldMoveNext(tfDepartment);
                                 }
+                                loadRecordMaster();
                                 break;
                             case "tfDepartment":
-//                                poJSON = poController.SearchDepartment(lsValue, false, false);
-                                if (JFXUtil.isJSONSuccess(poJSON)) {
+                                poJSON = poController.SearchDepartment(lsValue, false);
+                                if (!JFXUtil.isJSONSuccess(poJSON)) {
                                     ShowMessageFX.Warning(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
+                                } else {
+                                    JFXUtil.textFieldMoveNext(tfPayee);
                                 }
+                                loadRecordMaster();
                                 break;
                             case "tfPayee":
                                 if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
@@ -1418,6 +1441,8 @@ public class CashDisbursement_EntryController implements Initializable, ScreenIn
                                     ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                     loadRecordMaster();
                                     break;
+                                } else {
+                                    JFXUtil.textFieldMoveNext(tfCreditTo);
                                 }
 //                                psSupplierPayeeId = poController.Master().getSupplierClientID();
                                 loadRecordMaster();
@@ -1427,24 +1452,10 @@ public class CashDisbursement_EntryController implements Initializable, ScreenIn
                                 break;
                             case "tfCreditTo":
                                 poJSON = poController.SearchCreditTo(lsValue, false);
-                                if (JFXUtil.isJSONSuccess(poJSON)) {
+                                if (!JFXUtil.isJSONSuccess(poJSON)) {
                                     ShowMessageFX.Warning(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
                                 }
-                                break;
-
-                            case "tfSearchIndustry":
-                                break;
-                            case "tfSearchPayee":
-                                poJSON = poController.SearchPayee(lsValue, false, true);
-                                if ("error".equals((String) poJSON.get("result"))) {
-                                    ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-                                    return;
-                                } else {
-                                    loadTableMain.reload();
-                                }
-                                loadRecordSearch();
-                                break;
-                            case "tfSearchCashAdvanceNo":
+                                loadRecordMaster();
                                 break;
 
                             //apJournalDetails
@@ -1607,9 +1618,8 @@ public class CashDisbursement_EntryController implements Initializable, ScreenIn
     private void loadRecordSearch() {
         try {
             lblSource.setText(poController.Master().Company().getCompanyName() + " - " + poController.Master().Industry().getDescription());
-            tfSearchIndustry.setText("");
+            tfSearchIndustry.setText(poController.getSearchIndustry());
             tfSearchPayee.setText(poController.getSearchPayee());
-            tfSearchCashAdvanceNo.setText("");
             JFXUtil.updateCaretPositions(apBrowse);
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
@@ -1628,6 +1638,7 @@ public class CashDisbursement_EntryController implements Initializable, ScreenIn
             tfCashFund.setText(poController.Master().CashFund().getDescription());
             tfDepartment.setText(poController.Master().Department().getDescription());
 //            tfPayee.setText(poController.Master().Payee().getPayeeName());
+
             tfCreditTo.setText(poController.Master().Credited().getCompanyName());
             tfVoucherNo.setText(poController.Master().getVoucherNo());
             tfCashAdvNo.setText(poController.Master().getCashFundId());
