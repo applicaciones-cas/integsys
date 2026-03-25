@@ -1295,6 +1295,7 @@ public class InvRequest_ConfirmationControllerMC implements Initializable, Scree
 
     private void clearAllTables() {
 
+        pnTblInvDetailRow = -1;
         invOrderDetail_data.clear();
         tableListInformation_data.clear();
 

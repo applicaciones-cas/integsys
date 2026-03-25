@@ -1299,6 +1299,7 @@ public class InvRequest_ConfirmationControllerCar implements Initializable, Scre
 
     private void clearAllTables() {
 
+        pnTblInvDetailRow = -1;
         invOrderDetail_data.clear();
         tableListInformation_data.clear();
 

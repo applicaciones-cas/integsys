@@ -1294,6 +1294,7 @@ public class InvRequest_ConfirmationController implements Initializable, ScreenI
 
     private void clearAllTables() {
 
+        pnTblInvDetailRow = -1;
         invOrderDetail_data.clear();
         tableListInformation_data.clear();
 

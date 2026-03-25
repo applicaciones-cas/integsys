@@ -1289,6 +1289,7 @@ public class InvRequest_ConfirmationControllerMC_SP implements Initializable, Sc
 
     private void clearAllTables() {
 
+        pnTblInvDetailRow = -1;
         invOrderDetail_data.clear();
         tableListInformation_data.clear();
 

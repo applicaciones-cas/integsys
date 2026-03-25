@@ -1271,6 +1271,7 @@ public class InvRequest_ConfirmationControllerLP_Food implements Initializable, 
 
     private void clearAllTables() {
 
+        pnTblInvDetailRow = -1;
         invOrderDetail_data.clear();
         tableListInformation_data.clear();
 
