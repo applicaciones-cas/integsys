@@ -591,6 +591,7 @@ public class CashDisbursement_EntryController implements Initializable, ScreenIn
     private void loadTableDetailFromMain() {
         poJSON = new JSONObject();
         if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
+
             pnMain = tblViewMainList.getSelectionModel().getSelectedIndex();
             ModelCashDisbursement_Main selected = (ModelCashDisbursement_Main) tblViewMainList.getSelectionModel().getSelectedItem();
             if (selected != null) {
@@ -598,6 +599,9 @@ public class CashDisbursement_EntryController implements Initializable, ScreenIn
                     int pnRowMain = Integer.parseInt(selected.getIndex01()) - 1;
                     pnMain = pnRowMain;
                     String lsTransactionNo = selected.getIndex02();
+                    if (!JFXUtil.loadValidation2(pnEditMode, pxeModuleName, poController.Master().getSourceNo(), lsTransactionNo)) {
+                        return;
+                    }
                     poJSON = poController.populateDetail(lsTransactionNo);
                     if ("error".equals(poJSON.get("result"))) {
                         ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
@@ -1176,21 +1180,102 @@ public class CashDisbursement_EntryController implements Initializable, ScreenIn
                 switch (lsID) {
                     case "tfBranch":
                         if (lsValue.isEmpty()) {
+                            if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
+
+                                if (!JFXUtil.isObjectEqualTo(poController.Master().getBranchCode(), null, "")) {
+                                    if (poController.getDetailCount() > 1) {
+                                        if (!pbKeyPressed) {
+                                            if (ShowMessageFX.YesNo(null, pxeModuleName,
+                                                    "Are you sure you want to change the Branch name?\nPlease note that this action will delete all Cash Disbursement details.\n\nDo you wish to proceed?") == true) {
+                                                poController.removeDetails();
+                                                poController.Master().setBranchCode("");
+                                                loadTableDetail.reload();
+                                            } else {
+                                                loadRecordMaster();
+                                                return;
+                                            }
+                                        } else {
+                                            loadRecordMaster();
+                                            return;
+                                        }
+                                    }
+                                }
+                            }
                             poController.Master().setBranchCode("");
                         }
                         break;
                     case "tfCashFund":
                         if (lsValue.isEmpty()) {
+                            if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
+                                if (!JFXUtil.isObjectEqualTo(poController.Master().getCashFundId(), null, "")) {
+                                    if (poController.getDetailCount() > 1) {
+                                        if (!pbKeyPressed) {
+                                            if (ShowMessageFX.YesNo(null, pxeModuleName,
+                                                    "Are you sure you want to change the Cash Fund?\nPlease note that this action will delete all Cash Disbursement details.\n\nDo you wish to proceed?") == true) {
+                                                poController.removeDetails();
+                                                poController.Master().setCashFundId("");
+                                                loadTableDetail.reload();
+                                            } else {
+                                                loadRecordMaster();
+                                                return;
+                                            }
+                                        } else {
+                                            loadRecordMaster();
+                                            return;
+                                        }
+                                    }
+                                }
+                            }
                             poController.Master().setCashFundId("");
                         }
                         break;
                     case "tfDepartment":
                         if (lsValue.isEmpty()) {
+                            if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
+                                if (!JFXUtil.isObjectEqualTo(poController.Master().getPayeeName(), null, "")) {
+                                    if (poController.getDetailCount() > 1) {
+                                        if (!pbKeyPressed) {
+                                            if (ShowMessageFX.YesNo(null, pxeModuleName,
+                                                    "Are you sure you want to change the Department name?\nPlease note that this action will delete all Cash Disbursement details.\n\nDo you wish to proceed?") == true) {
+                                                poController.removeDetails();
+                                                poController.Master().setDepartmentRequest("");
+                                                loadTableDetail.reload();
+                                            } else {
+                                                loadRecordMaster();
+                                                return;
+                                            }
+                                        } else {
+                                            loadRecordMaster();
+                                            return;
+                                        }
+                                    }
+                                }
+                            }
                             poController.Master().setDepartmentRequest("");
                         }
                         break;
                     case "tfPayee":
                         if (lsValue.isEmpty()) {
+                            if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
+                                if (!JFXUtil.isObjectEqualTo(poController.Master().getPayeeName(), null, "")) {
+                                    if (poController.getDetailCount() > 1) {
+                                        if (!pbKeyPressed) {
+                                            if (ShowMessageFX.YesNo(null, pxeModuleName,
+                                                    "Are you sure you want to change the Payee name?\nPlease note that this action will delete all Cash Disbursement details.\n\nDo you wish to proceed?") == true) {
+                                                poController.removeDetails();
+                                                poController.Master().setPayeeName("");
+                                                loadTableDetail.reload();
+                                            } else {
+                                                loadRecordMaster();
+                                                return;
+                                            }
+                                        } else {
+                                            loadRecordMaster();
+                                            return;
+                                        }
+                                    }
+                                }
+                            }
                             poController.Master().setPayeeName("");
                         }
                         break;
@@ -1388,8 +1473,9 @@ public class CashDisbursement_EntryController implements Initializable, ScreenIn
                 switch (event.getCode()) {
                     case TAB:
                     case ENTER:
-                        if (tfAmountDetail.isFocused()) {
+                        if (tfVatExemptDetail.isFocused()) {
                             pbEnteredDV = true;
+                            apDVDetail.requestFocus();
                         }
                         if (tfCreditAmount.isFocused()) {
                             pbEnteredJE = true;
@@ -1417,38 +1503,96 @@ public class CashDisbursement_EntryController implements Initializable, ScreenIn
                                 break;
 
                             case "tfBranch":
-                                poJSON = poController.SearchBranch(lsValue, false, false);
-                                if (!JFXUtil.isJSONSuccess(poJSON)) {
-                                    ShowMessageFX.Warning(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
-                                } else {
-                                    JFXUtil.textFieldMoveNext(tfCashFund);
+                                if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
+                                    if (poController.getDetailCount() > 1) {
+                                        pbKeyPressed = true;
+                                        if (ShowMessageFX.YesNo(null, pxeModuleName,
+                                                "Are you sure you want to change the Branch name?\nPlease note that this action will delete all Cash Disbursement details.\n\nDo you wish to proceed?") == true) {
+                                            poController.removeDetails();
+                                            loadTableDetail.reload();
+                                        } else {
+                                            return;
+                                        }
+                                        pbKeyPressed = false;
+                                    }
                                 }
+
+                                poJSON = poController.SearchBranch(lsValue, false, false);
+                                if ("error".equals(poJSON.get("result"))) {
+                                    ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                                    loadRecordMaster();
+                                    break;
+                                } else {
+                                    JFXUtil.textFieldMoveNext(tfDepartment);
+                                }
+//                                psSupplierPayeeId = poController.Master().getSupplierClientID();
                                 loadRecordMaster();
+                                JFXUtil.runWithDelay(0.50, () -> {
+                                    loadTableMain.reload();
+                                });
                                 break;
                             case "tfDepartment":
+                                if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
+                                    if (poController.getDetailCount() > 1) {
+                                        pbKeyPressed = true;
+                                        if (ShowMessageFX.YesNo(null, pxeModuleName,
+                                                "Are you sure you want to change the Department name?\nPlease note that this action will delete all Cash Disbursement details.\n\nDo you wish to proceed?") == true) {
+                                            poController.removeDetails();
+                                            loadTableDetail.reload();
+                                        } else {
+                                            return;
+                                        }
+                                        pbKeyPressed = false;
+                                    }
+                                }
+
                                 poJSON = poController.SearchDepartment(lsValue, false);
-                                if (!JFXUtil.isJSONSuccess(poJSON)) {
-                                    ShowMessageFX.Warning(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
+                                if ("error".equals(poJSON.get("result"))) {
+                                    ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                                    loadRecordMaster();
+                                    break;
                                 } else {
                                     JFXUtil.textFieldMoveNext(tfCashFund);
                                 }
                                 loadRecordMaster();
+                                JFXUtil.runWithDelay(0.50, () -> {
+                                    loadTableMain.reload();
+                                });
                                 break;
                             case "tfCashFund":
+                                if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
+                                    if (poController.getDetailCount() > 1) {
+                                        pbKeyPressed = true;
+                                        if (ShowMessageFX.YesNo(null, pxeModuleName,
+                                                "Are you sure you want to change the Cash Fund?\nPlease note that this action will delete all Cash Disbursement details.\n\nDo you wish to proceed?") == true) {
+                                            poController.removeDetails();
+                                            loadTableDetail.reload();
+                                        } else {
+                                            return;
+                                        }
+                                        pbKeyPressed = false;
+                                    }
+                                }
+
                                 poJSON = poController.SearchCashFund(lsValue, false);
-                                if (!JFXUtil.isJSONSuccess(poJSON)) {
-                                    ShowMessageFX.Warning(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
+                                if ("error".equals(poJSON.get("result"))) {
+                                    ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                                    loadRecordMaster();
+                                    break;
                                 } else {
                                     JFXUtil.textFieldMoveNext(tfPayee);
                                 }
                                 loadRecordMaster();
+                                JFXUtil.runWithDelay(0.50, () -> {
+                                    loadTableMain.reload();
+                                });
                                 break;
                             case "tfPayee":
                                 if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
                                     if (poController.getDetailCount() > 1) {
                                         pbKeyPressed = true;
                                         if (ShowMessageFX.YesNo(null, pxeModuleName,
-                                                "Are you sure you want to change the supplier name?\nPlease note that this action will delete all Disbursement voucher details.\n\nDo you wish to proceed?") == true) {
+                                                "Are you sure you want to change the Payee name?\nPlease note that this action will delete all Cash Disbursement details.\n\nDo you wish to proceed?") == true) {
                                             poController.removeDetails();
                                             loadTableDetail.reload();
                                         } else {
@@ -1466,7 +1610,6 @@ public class CashDisbursement_EntryController implements Initializable, ScreenIn
                                 } else {
                                     JFXUtil.textFieldMoveNext(tfCreditTo);
                                 }
-//                                psSupplierPayeeId = poController.Master().getSupplierClientID();
                                 loadRecordMaster();
                                 JFXUtil.runWithDelay(0.50, () -> {
                                     loadTableMain.reload();
@@ -1653,6 +1796,9 @@ public class CashDisbursement_EntryController implements Initializable, ScreenIn
 
     private void loadRecordMaster() {
         try {
+            boolean lbShow2 = pnEditMode == EditMode.UPDATE;
+            JFXUtil.setDisabled(lbShow2, tfBranch, tfDepartment, tfCashFund, tfPayee);
+
             boolean lbShow = !JFXUtil.isObjectEqualTo(poController.Master().getSourceNo(), null, "");
             JFXUtil.setDisabled(lbShow, cbReverse);
             JFXUtil.setDisabled(true, tfAmountDetail);

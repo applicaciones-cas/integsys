@@ -3246,6 +3246,26 @@ public class JFXUtil {
         return true;
     }
 
+    public static boolean loadValidation2(int pnEditMode, String pxeModuleName, String lsCurrentTransNo, String lsTransactionNo) {
+        if (pnEditMode == EditMode.UPDATE || pnEditMode == EditMode.ADDNEW) {
+            String lsTrans = pnEditMode == EditMode.UPDATE ? "update mode." : "edit mode.";
+            if (lsCurrentTransNo.equals(lsTransactionNo)) {
+                if (!ShowMessageFX.YesNo(null, pxeModuleName, "Transaction is currently in " + lsTrans + "\n"
+                        + "Reload the transaction?")) {
+                    return false;
+                }
+            } else {
+                if (!isObjectEqualTo(lsCurrentTransNo, null, "")) {
+                    if (!ShowMessageFX.YesNo(null, pxeModuleName, "Transaction is currently in " + lsTrans + "\n"
+                            + "Are you sure you want to select another transaction?")) {
+                        return false;
+                    }
+                }
+            }
+        }
+        return true;
+    }
+
     /*Creates fade in and moving up simultaneously animation*/
     public static void fadeInFromBottom(double seconds, Node... nodes) {
         for (Node node : nodes) {
