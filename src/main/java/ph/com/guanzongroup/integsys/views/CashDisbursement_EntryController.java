@@ -1119,7 +1119,7 @@ public class CashDisbursement_EntryController implements Initializable, ScreenIn
         JFXUtil.setFocusListener(txtDetailJE_Focus, apJournalDetails);
         JFXUtil.setFocusListener(txtBIRDetail_Focus, apBIRDetail);
 
-        JFXUtil.setKeyPressedListener(this::txtField_KeyPressed, apDVMaster1, apDVMaster2, apBrowse, apJournalMaster, apJournalDetails, apBIRDetail);
+        JFXUtil.setKeyPressedListener(this::txtField_KeyPressed, apDVMaster1, apDVMaster2, apDVDetail, apBrowse, apJournalMaster, apJournalDetails, apBIRDetail);
         JFXUtil.adjustColumnForScrollbar(tblVwDetails, tblViewMainList, tblVwJournalDetails, tblVwBIRDetails, tblAttachments);
 
         JFXUtil.setCommaFormatter(tfDebitAmount, tfCreditAmount, tfBaseAmount);
@@ -1192,6 +1192,7 @@ public class CashDisbursement_EntryController implements Initializable, ScreenIn
                                                 if (ShowMessageFX.YesNo(null, pxeModuleName,
                                                         "Are you sure you want to change the Branch name?\nPlease note that this action will delete all Cash Disbursement details.\n\nDo you wish to proceed?") == true) {
                                                     poController.removeDetails();
+                                                    poController.Master().setCashFundId("");
                                                     poController.Master().setBranchCode("");
                                                     loadTableDetail.reload();
                                                 } else {
@@ -1222,6 +1223,7 @@ public class CashDisbursement_EntryController implements Initializable, ScreenIn
                                                         "Are you sure you want to change the Cash Fund?\nPlease note that this action will delete all Cash Disbursement details.\n\nDo you wish to proceed?") == true) {
                                                     poController.removeDetails();
                                                     poController.Master().setCashFundId("");
+                                                    poController.Master().setCashFundId("");
                                                     loadTableDetail.reload();
                                                 } else {
                                                     loadRecordMaster();
@@ -1250,6 +1252,7 @@ public class CashDisbursement_EntryController implements Initializable, ScreenIn
                                                 if (ShowMessageFX.YesNo(null, pxeModuleName,
                                                         "Are you sure you want to change the Department name?\nPlease note that this action will delete all Cash Disbursement details.\n\nDo you wish to proceed?") == true) {
                                                     poController.removeDetails();
+                                                    poController.Master().setCashFundId("");
                                                     poController.Master().setDepartmentRequest("");
                                                     loadTableDetail.reload();
                                                 } else {
@@ -1279,6 +1282,7 @@ public class CashDisbursement_EntryController implements Initializable, ScreenIn
                                                 if (ShowMessageFX.YesNo(null, pxeModuleName,
                                                         "Are you sure you want to change the Payee name?\nPlease note that this action will delete all Cash Disbursement details.\n\nDo you wish to proceed?") == true) {
                                                     poController.removeDetails();
+                                                    poController.Master().setCashFundId("");
                                                     poController.Master().setPayeeName("");
                                                     loadTableDetail.reload();
                                                 } else {
@@ -1495,7 +1499,6 @@ public class CashDisbursement_EntryController implements Initializable, ScreenIn
                     case ENTER:
                         if (tfVatExemptDetail.isFocused()) {
                             pbEnteredDV = true;
-                            apDVDetail.requestFocus();
                         }
                         if (tfCreditAmount.isFocused()) {
                             pbEnteredJE = true;
@@ -1531,6 +1534,7 @@ public class CashDisbursement_EntryController implements Initializable, ScreenIn
                                         pbKeyPressed = true;
                                         if (ShowMessageFX.YesNo(null, pxeModuleName,
                                                 "Are you sure you want to change the Branch name?\nPlease note that this action will delete all Cash Disbursement details.\n\nDo you wish to proceed?") == true) {
+                                            poController.Master().setCashFundId("");
                                             poController.removeDetails();
                                             loadTableDetail.reload();
                                         } else {
@@ -1563,6 +1567,7 @@ public class CashDisbursement_EntryController implements Initializable, ScreenIn
                                         pbKeyPressed = true;
                                         if (ShowMessageFX.YesNo(null, pxeModuleName,
                                                 "Are you sure you want to change the Department name?\nPlease note that this action will delete all Cash Disbursement details.\n\nDo you wish to proceed?") == true) {
+                                            poController.Master().setCashFundId("");
                                             poController.removeDetails();
                                             loadTableDetail.reload();
                                         } else {
@@ -1594,6 +1599,7 @@ public class CashDisbursement_EntryController implements Initializable, ScreenIn
                                         pbKeyPressed = true;
                                         if (ShowMessageFX.YesNo(null, pxeModuleName,
                                                 "Are you sure you want to change the Cash Fund?\nPlease note that this action will delete all Cash Disbursement details.\n\nDo you wish to proceed?") == true) {
+                                            poController.Master().setCashFundId("");
                                             poController.removeDetails();
                                             loadTableDetail.reload();
                                         } else {
@@ -1626,6 +1632,7 @@ public class CashDisbursement_EntryController implements Initializable, ScreenIn
                                         pbKeyPressed = true;
                                         if (ShowMessageFX.YesNo(null, pxeModuleName,
                                                 "Are you sure you want to change the Payee name?\nPlease note that this action will delete all Cash Disbursement details.\n\nDo you wish to proceed?") == true) {
+                                            poController.Master().setCashFundId("");
                                             poController.removeDetails();
                                             loadTableDetail.reload();
                                         } else {
