@@ -24,6 +24,7 @@ import static javafx.scene.input.KeyCode.TAB;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
+import javax.script.ScriptException;
 import org.guanzon.appdriver.agent.ShowMessageFX;
 import org.guanzon.appdriver.base.CommonUtils;
 import org.guanzon.appdriver.base.GRiderCAS;
@@ -389,6 +390,13 @@ public class CashAdvance_EntryController implements Initializable, ScreenInterfa
                         pnEditMode = poController.getEditMode();
                         break;
                     case "btnUpdate":
+                        //Recheck transaction status
+                        poJSON = poController.checkUpdateTransaction(true);
+                        if (!"success".equals((String) poJSON.get("result"))) {
+                            ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                            return;
+                        }
+                        
                         poJSON = poController.UpdateTransaction();
                         if ("error".equals((String) poJSON.get("result"))) {
                             ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
@@ -449,6 +457,14 @@ public class CashAdvance_EntryController implements Initializable, ScreenInterfa
                     case "btnSave":
                         //Validator
                         poJSON = new JSONObject();
+                        //Recheck transaction status
+                        if (pnEditMode == EditMode.UPDATE) {
+                            poJSON = poController.checkUpdateTransaction(true);
+                            if (!"success".equals((String) poJSON.get("result"))) {
+                                ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                                return;
+                            }
+                        }
                         if (ShowMessageFX.YesNo(null, pxeModuleName, "Are you sure you want to save the transaction?") == true) {
                             poJSON = poController.SaveTransaction();
                             if (!"success".equals((String) poJSON.get("result"))) {
@@ -497,10 +513,10 @@ public class CashAdvance_EntryController implements Initializable, ScreenInterfa
                 }
                 loadRecordMaster();
                 initButton(pnEditMode);
-            } catch (CloneNotSupportedException | SQLException | GuanzonException | ParseException ex) {
+            } catch (CloneNotSupportedException | SQLException | GuanzonException | ParseException | ScriptException ex) {
                 Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
                 ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
-            }
+            } 
         }
     }
 

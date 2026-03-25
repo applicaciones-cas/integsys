@@ -257,6 +257,14 @@ public class CashLiquidation_EntryController implements Initializable, ScreenInt
                         break;
                     case "btnUpdate":
                         poJSON = poController.OpenTransaction(poController.Master().getTransactionNo());
+                        
+                        //Recheck transaction status
+                        poJSON = poController.checkUpdateTransaction(false);
+                        if (!"success".equals((String) poJSON.get("result"))) {
+                            ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                            return;
+                        }
+                        
                         poJSON = poController.UpdateTransaction();
                         if ("error".equals((String) poJSON.get("result"))) {
                             ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
@@ -301,6 +309,14 @@ public class CashLiquidation_EntryController implements Initializable, ScreenInt
                     case "btnSave":
                         //Validator
                         poJSON = new JSONObject();
+                        //Recheck transaction status
+                        if (pnEditMode == EditMode.UPDATE) {
+                            poJSON = poController.checkUpdateTransaction(false);
+                            if (!"success".equals((String) poJSON.get("result"))) {
+                                ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                                return;
+                            }
+                        }
                         if (ShowMessageFX.YesNo(null, pxeModuleName, "Are you sure you want to save the transaction?") == true) {
                             poJSON = poController.SaveTransaction();
                             if (!"success".equals((String) poJSON.get("result"))) {
