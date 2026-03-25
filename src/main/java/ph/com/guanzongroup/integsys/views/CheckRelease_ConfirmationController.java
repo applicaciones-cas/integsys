@@ -146,7 +146,7 @@ public class CheckRelease_ConfirmationController implements Initializable, Scree
 
     @Override
     public void setCompanyID(String fsValue) {
-//        psCompanyID = fsValue;
+        psCompanyID = fsValue;
     }
 
     @Override
@@ -627,13 +627,15 @@ public class CheckRelease_ConfirmationController implements Initializable, Scree
                             detailCount++;
                         }
                     }
+                    int OriginalRow = 0;
                     List<ModelTableDetail> detailsList = new ArrayList<>();
                     for (int lnCtr = 0; lnCtr < poGLControllers.CheckReleases().getDetailCount(); lnCtr++) {
                         if (!poGLControllers.CheckReleases().Detail(lnCtr).isReverse()) {
                             continue;
                         }
+                        OriginalRow += 1;
                         detailsList.add(new ModelTableDetail(
-                                String.valueOf(lnCtr + 1),
+                                String.valueOf(OriginalRow),
                                 poGLControllers.CheckReleases().Detail(lnCtr) != null
                                 && poGLControllers.CheckReleases().Detail(lnCtr).CheckPayment() != null
                                 && poGLControllers.CheckReleases().Detail(lnCtr).CheckPayment().getTransactionNo() != null
@@ -664,26 +666,41 @@ public class CheckRelease_ConfirmationController implements Initializable, Scree
                                 ? poGLControllers.CheckReleases().Detail(lnCtr).CheckPayment().getCheckNo()
                                 : "",
                                 CustomCommonUtil.setIntegerValueToDecimalFormat(poGLControllers.CheckReleases().Detail(lnCtr).CheckPayment().getAmount(),true),
-                                        "","",""));
+                                        String.valueOf(lnCtr),"",""));
                     }
                     Platform.runLater(() -> {
                         detail_data.setAll(detailsList); // Properly update list
                         tblViewDetails.setItems(detail_data);
-                        pnSelectedDetail = tblViewDetails.getItems().size() - 1;
-                        tblViewDetails.getSelectionModel().clearAndSelect(pnSelectedDetail);
-                        tblViewDetails.scrollTo(pnSelectedDetail);
+                         int lnTempRow = JFXUtil.getDetailRow(detail_data, pnSelectedDetail, 8); //this method is used only when Reverse is applied
+                        if (lnTempRow < 0 || lnTempRow
+                                >= detail_data.size()) {
+                            if (!detail_data.isEmpty()) {
+                                /* FOCUS ON FIRST ROW */
+                                JFXUtil.selectAndFocusRow(tblViewDetails, 0);
+                                int lnRow = Integer.parseInt(detail_data.get(0).getIndex08());
+                                pnSelectedDetail = lnRow;
+                                LoadDetail();
+                            }
+                        } else {
+                            /* FOCUS ON THE ROW THAT pnRowDetail POINTS TO */
+                            JFXUtil.selectAndFocusRow(tblViewDetails, lnTempRow);
+                            int lnRow = Integer.parseInt(detail_data.get(tblViewDetails.getSelectionModel().getSelectedIndex()).getIndex08());
+                            pnSelectedDetail = lnRow;
+                            LoadDetail();
+                        }
                         LoadDetail();
                         JFXUtil.showRetainedHighlight(false, tblViewMaster, "#A7C7E7", plOrderNoPartial, plOrderNoFinal, highlightedRowsMain, true);
                         loadHighlightFromDetail();
-                        try {
-                            poJSON = poGLControllers.CheckReleases().computeMasterFields();
-                            tfTotal.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(
-                            poGLControllers.CheckReleases().Master().getTransactionTotal(), true));
-                        } catch (SQLException | GuanzonException ex) {
-                            Logger.getLogger(CheckRelease_EntryController.class.getName()).log(Level.SEVERE, null, ex);
-                            ShowMessageFX.Error(ex.getMessage(), psFormName, null);
-                        }
-                    });
+//                        poJSON = poGLControllers.CheckTransfers().computeMasterFields();
+//                        try {
+////                            poJSON = poGLControllers.CheckReleases().computeMasterFields();
+////                            tfTotal.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(
+////                            poGLControllers.CheckReleases().Master().getTransactionTotal(), true));
+//                        } catch (SQLException | GuanzonException ex) {
+//                            Logger.getLogger(CheckRelease_EntryController.class.getName()).log(Level.SEVERE, null, ex);
+//                            ShowMessageFX.Error(ex.getMessage(), psFormName, null);
+//                        }
+                    });   
                     
                     return detailsList;
                 } catch (GuanzonException | SQLException ex) {
@@ -810,6 +827,8 @@ public class CheckRelease_ConfirmationController implements Initializable, Scree
     private void tblViewDetails_Clicked(MouseEvent event) {
         if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE || pnEditMode == EditMode.READY) {
             pnSelectedDetail = tblViewDetails.getSelectionModel().getSelectedIndex();
+            int lnRow = Integer.parseInt(detail_data.get(tblViewDetails.getSelectionModel().getSelectedIndex()).getIndex08());
+            pnSelectedDetail = lnRow;
             ModelTableDetail selectedItem = tblViewDetails.getSelectionModel().getSelectedItem();
             if (event.getClickCount() == 1) {
                 tfCheckTransNo.clear();
@@ -1037,6 +1056,7 @@ public class CheckRelease_ConfirmationController implements Initializable, Scree
                         switch (txtFieldID) {
                             
                             case "tfFilterBank":
+                                main_data.clear();
                                 loadTableMaster();
                                 break;
                         }
@@ -1045,11 +1065,11 @@ public class CheckRelease_ConfirmationController implements Initializable, Scree
                         switch (txtFieldID) {
                             case "tfSearchReceived":
                             case "tfFilterBank":
+                                main_data.clear();
                                 loadTableMaster();
                                 break;
                             case "tfReceivedBy":
                                 taRemarks.requestFocus();
-                                
                                 break;
                         }
                         break;

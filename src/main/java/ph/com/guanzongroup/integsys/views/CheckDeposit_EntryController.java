@@ -213,15 +213,21 @@ public class CheckDeposit_EntryController implements Initializable, ScreenInterf
      * Initializes the TBJ controller and transaction objects.
      */
     private void initializeObject() {
-        LogWrapper logwrapr = new LogWrapper("CAS", System.getProperty("sys.default.path.temp") + "cas-error.log");
-        poGLControllers = new CashflowControllers(poApp, logwrapr);
-        poGLControllers.CheckDeposits().setTransactionStatus("0");
-        poJSON = poGLControllers.CheckDeposits().InitTransaction();
-        if (!"success".equals(poJSON.get("result"))) {
+        try {
+            LogWrapper logwrapr = new LogWrapper("CAS", System.getProperty("sys.default.path.temp") + "cas-error.log");
+            poGLControllers = new CashflowControllers(poApp, logwrapr);
+            poGLControllers.CheckDeposits().setTransactionStatus("0");
+            poJSON = poGLControllers.CheckDeposits().InitTransaction();
+            if (!"success".equals(poJSON.get("result"))) {
                 ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
+            }
+            poGLControllers.CheckDeposits().Master().setIndustryId(psIndustryID);
+            poGLControllers.CheckDeposits().Master().setCompany(psCompanyID);
+            lblSource.setText(poGLControllers.CheckDeposits().Master().Company().getCompanyName() + " - " + poGLControllers.CheckDeposits().Master().Industry().getDescription());
+        } catch (SQLException | GuanzonException ex) {
+            Logger.getLogger(CheckDeposit_EntryController.class.getName()).log(Level.SEVERE, null, ex);
+            ShowMessageFX.Error(ex.getMessage(), psFormName, null);
         }
-//            poGLControllers.CheckDeposits().Master().setIndustryId(psIndustryID);
-//            lblSource.setText(poGLControllers.CheckDeposits().Master().Company().getCompanyName() + " - " + poGLControllers.CheckDeposits().Master().Industry().getDescription());
     }
     
     private void ClearAll() {
@@ -372,6 +378,7 @@ public class CheckDeposit_EntryController implements Initializable, ScreenInterf
                                 poJSON = poGLControllers.CheckDeposits().SearchBanks(lsValue, false);
                                 if ("error".equals(poJSON.get("result"))) {
                                     ShowMessageFX.Warning((String) poJSON.get("message"), lsValue, lsValue);
+                                    return;
                                 }
                                 tfBankMaster.setText(poGLControllers.CheckDeposits().Master().Banks().getBankName());
                                 break;
@@ -379,6 +386,7 @@ public class CheckDeposit_EntryController implements Initializable, ScreenInterf
                                 poJSON = poGLControllers.CheckDeposits().SearchBankAccounts(lsValue,false);
                                 if ("error".equals(poJSON.get("result"))) {
                                     ShowMessageFX.Warning((String) poJSON.get("message"), lsValue, lsValue);
+                                    return;
                                 }
                                 tfBankAccountNo.setText(poGLControllers.CheckDeposits().Master().BankAccount().getAccountNo());
                                 tfBankAccountName.setText(poGLControllers.CheckDeposits().Master().BankAccount().getAccountName());
@@ -387,6 +395,7 @@ public class CheckDeposit_EntryController implements Initializable, ScreenInterf
                                 poJSON = poGLControllers.CheckDeposits().SearchBankAccounts(lsValue,false);
                                 if ("error".equals(poJSON.get("result"))) {
                                     ShowMessageFX.Warning((String) poJSON.get("message"), lsValue, lsValue);
+                                    return;
                                 }
                                 tfBankAccountNo.setText(poGLControllers.CheckDeposits().Master().BankAccount().getAccountNo());
                                 tfBankAccountName.setText(poGLControllers.CheckDeposits().Master().BankAccount().getAccountName());
@@ -395,6 +404,7 @@ public class CheckDeposit_EntryController implements Initializable, ScreenInterf
                                 poJSON = poGLControllers.CheckDeposits().SearchChecks(lsValue, "",pnSelectedDetail,false);
                                 if ("error".equals(poJSON.get("result"))) {
                                     ShowMessageFX.Warning((String) poJSON.get("message"), lsValue, lsValue);
+                                    return;
                                 }
                                 tfCheckTransNo.setText(poGLControllers.CheckDeposits().Detail(pnSelectedDetail).CheckPayment().getTransactionNo());
                                 loadTableDetail();
@@ -403,6 +413,7 @@ public class CheckDeposit_EntryController implements Initializable, ScreenInterf
                                 poJSON = poGLControllers.CheckDeposits().SearchChecks("", lsValue,pnSelectedDetail,false);
                                 if ("error".equals(poJSON.get("result"))) {
                                     ShowMessageFX.Warning((String) poJSON.get("message"), lsValue, lsValue);
+                                    return;
                                 }
                                 tfCheckNo.setText(poGLControllers.CheckDeposits().Detail(pnSelectedDetail).CheckPayment().getCheckNo());
                                 loadTableDetail();
@@ -455,7 +466,7 @@ public class CheckDeposit_EntryController implements Initializable, ScreenInterf
                         ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
                         return;
                     }
-                    ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
+                    ShowMessageFX.Information((String) poJSON.get("message"), psFormName, null);
                     if (poGLControllers.CheckDeposits().Master().getTransactionStatus().equals(CheckDepositStatus.OPEN)) {
                         if (ShowMessageFX.YesNo(null, psFormName, "Do you want to confirm this transaction?")) {
                             poJSON = poGLControllers.CheckDeposits().OpenTransaction(poGLControllers.CheckDeposits().Master().getTransactionNo());
@@ -468,19 +479,19 @@ public class CheckDeposit_EntryController implements Initializable, ScreenInterf
                                 return;
                             }
                             ShowMessageFX.Information((String) poJSON.get("message"), psFormName, null);
+                            if (ShowMessageFX.YesNo(null, psFormName, "Do you want to print this transaction?")) {
+                                poJSON = poGLControllers.CheckDeposits().printDepositSlip();
+                                if ("error".equals((String) poJSON.get("result"))) {
+                                    ShowMessageFX.Error((String) poJSON.get("message"), psFormName, null);
+                                    ClearAll();
+                                    btnNew.fire();
+                                    return;
+                                }
+                                ShowMessageFX.Information((String) poJSON.get("message"), psFormName, null);
+
+                            }
                         }
                     }
-                        if (ShowMessageFX.YesNo(null, psFormName, "Do you want to print this transaction?")) {
-                            poJSON = poGLControllers.CheckDeposits().printTransaction();
-                            if ("error".equals((String) poJSON.get("result"))) {
-                                ShowMessageFX.Error((String) poJSON.get("message"), psFormName, null);
-                                ClearAll();
-                                btnNew.fire();
-                            }
-                            ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
-                        }
-                    
-
                     ClearAll();
                     btnNew.fire();
                     break;
@@ -566,7 +577,7 @@ public class CheckDeposit_EntryController implements Initializable, ScreenInterf
             apDetail.setDisable(false);
         }
         
-            List<TextField> loTxtField = Arrays.asList( tfCheckTransNo, tfCheckNo,tfSearchTransNo,tfBankMaster,tfBankAccountName,tfBankAccountNo,tfSearchBankAccountNo);
+            List<TextField> loTxtField = Arrays.asList( tfCheckTransNo, tfCheckNo,tfSearchTransNo,tfFilterBank, tfBankMaster,tfBankAccountName,tfBankAccountNo,tfSearchBankAccountNo);
             loTxtField.forEach(tf -> tf.setOnKeyPressed(event -> txtField_KeyPressed(event)));
 //
 //            JFXUtil.setFocusListener(txtArea_Focus, taRemarks);
@@ -766,13 +777,15 @@ public class CheckDeposit_EntryController implements Initializable, ScreenInterf
                             detailCount++;
                         }
                     }
+                    int OriginalRow = 0;
                     List<ModelTableDetail> detailsList = new ArrayList<>();
                     for (int lnCtr = 0; lnCtr < poGLControllers.CheckDeposits().getDetailCount(); lnCtr++) {
                         if (!poGLControllers.CheckDeposits().Detail(lnCtr).isReverse()) {
                             continue;
                         }
+                         OriginalRow += 1;
                         detailsList.add(new ModelTableDetail(
-                                String.valueOf(lnCtr + 1),
+                                String.valueOf(OriginalRow),
                                 poGLControllers.CheckDeposits().Detail(lnCtr) != null
                                 && poGLControllers.CheckDeposits().Detail(lnCtr).CheckPayment() != null
                                 && poGLControllers.CheckDeposits().Detail(lnCtr).CheckPayment().getTransactionNo() != null
@@ -803,18 +816,32 @@ public class CheckDeposit_EntryController implements Initializable, ScreenInterf
                                 ? poGLControllers.CheckDeposits().Detail(lnCtr).CheckPayment().getCheckNo()
                                 : "",
                                 CustomCommonUtil.setIntegerValueToDecimalFormat(poGLControllers.CheckDeposits().Detail(lnCtr).CheckPayment().getAmount(),true),
-                                        "","",""));
+                                        String.valueOf(lnCtr),"",""));
                     }
                     Platform.runLater(() -> {
                         detail_data.setAll(detailsList); // Properly update list
                         tblViewDetails.setItems(detail_data);
-                        pnSelectedDetail = tblViewDetails.getItems().size() - 1;
-                        tblViewDetails.getSelectionModel().clearAndSelect(pnSelectedDetail);
-                        tblViewDetails.scrollTo(pnSelectedDetail);
+                         int lnTempRow = JFXUtil.getDetailRow(detail_data, pnSelectedDetail, 8); //this method is used only when Reverse is applied
+                        if (lnTempRow < 0 || lnTempRow
+                                >= detail_data.size()) {
+                            if (!detail_data.isEmpty()) {
+                                /* FOCUS ON FIRST ROW */
+                                JFXUtil.selectAndFocusRow(tblViewDetails, 0);
+                                int lnRow = Integer.parseInt(detail_data.get(0).getIndex08());
+                                pnSelectedDetail = lnRow;
+                                LoadDetail();
+                            }
+                        } else {
+                            /* FOCUS ON THE ROW THAT pnRowDetail POINTS TO */
+                            JFXUtil.selectAndFocusRow(tblViewDetails, lnTempRow);
+                            int lnRow = Integer.parseInt(detail_data.get(tblViewDetails.getSelectionModel().getSelectedIndex()).getIndex08());
+                            pnSelectedDetail = lnRow;
+                            LoadDetail();
+                        }
                         LoadDetail();
                         JFXUtil.showRetainedHighlight(false, tblViewMaster, "#A7C7E7", plOrderNoPartial, plOrderNoFinal, highlightedRowsMain, true);
                         loadHighlightFromDetail();
-//                        poJSON = poGLControllers.CheckDeposits().computeMasterFields();
+//                        poJSON = poGLControllers.CheckTransfers().computeMasterFields();
                     });
                     
                     return detailsList;
@@ -899,6 +926,8 @@ public class CheckDeposit_EntryController implements Initializable, ScreenInterf
     private void tblViewDetails_Clicked(MouseEvent event) {
         if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE || pnEditMode == EditMode.READY) {
             pnSelectedDetail = tblViewDetails.getSelectionModel().getSelectedIndex();
+            int lnRow = Integer.parseInt(detail_data.get(tblViewDetails.getSelectionModel().getSelectedIndex()).getIndex08());
+            pnSelectedDetail = lnRow;
             ModelTableDetail selectedItem = tblViewDetails.getSelectionModel().getSelectedItem();
             if (event.getClickCount() == 1) {
                 tfCheckTransNo.clear();
@@ -1063,18 +1092,18 @@ public class CheckDeposit_EntryController implements Initializable, ScreenInterf
                 switch (lsID) {
                     case "tfBankMaster":
                         psActiveField = lsID;
-                        if (lsValue == null || lsValue.trim().isEmpty()) {
+                         if (lsValue == null || lsValue.trim().isEmpty()) {
                             tfBankMaster.clear();
                             tfBankAccountName.clear();
                             tfBankAccountNo.clear();
                             poGLControllers.CheckDeposits().Master().setBanks(null);
                             poGLControllers.CheckDeposits().Master().setBankAccount(null);
-                            break;
+                            return;
                         }
 
-                        if (poGLControllers.CheckDeposits().Master().Banks().getBankName()!= null) {
+                        if (poGLControllers.CheckDeposits().Master().BankAccount().Banks().getBankName()!= null) {
                             tfBankMaster.setText(
-                                    poGLControllers.CheckDeposits().Master().Banks().getBankName());
+                                    poGLControllers.CheckDeposits().Master().BankAccount().Banks().getBankName());
                         } else {
                             tfBankMaster.clear();
                             tfBankAccountName.clear();
@@ -1088,12 +1117,13 @@ public class CheckDeposit_EntryController implements Initializable, ScreenInterf
                             tfBankAccountNo.clear();
                             tfBankAccountName.clear();
                             poGLControllers.CheckDeposits().Master().setBankAccount(null);
-                            break;
+                            return;
                         }
 
                         if (poGLControllers.CheckDeposits().Master().getBankAccount()!= null) {
+                            System.out.println("tfBankAccountNo : " + poGLControllers.CheckDeposits().Master().getBankAccount());
                             tfBankAccountNo.setText(
-                                    poGLControllers.CheckDeposits().Master().getBankAccount());
+                                    poGLControllers.CheckDeposits().Master().BankAccount().getAccountNo());
                         } else {
                             tfBankAccountNo.clear();
                             tfBankAccountName.clear();
@@ -1105,12 +1135,13 @@ public class CheckDeposit_EntryController implements Initializable, ScreenInterf
                             tfBankAccountName.clear();
                             tfBankAccountNo.clear();
                             poGLControllers.CheckDeposits().Master().setBankAccount(null);
-                            break;
+                            return;
                         }
 
                         if (poGLControllers.CheckDeposits().Master().getBankAccount() != null) {
+                            System.out.println("tfBankAccountNo : " + poGLControllers.CheckDeposits().Master().getBankAccount());
                             tfBankAccountName.setText(
-                                    poGLControllers.CheckDeposits().Master().getBankAccount());
+                                    poGLControllers.CheckDeposits().Master().BankAccount().getAccountName());
                         } else {
                             tfBankAccountName.clear();
                             tfBankAccountNo.clear();
