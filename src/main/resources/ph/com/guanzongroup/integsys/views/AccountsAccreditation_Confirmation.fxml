@@ -190,7 +190,7 @@
                                              <children>
                                      <AnchorPane fx:id="apMaster">
                                        <children>
-                                          <GridPane>
+                                          <GridPane AnchorPane.topAnchor="5.0">
                                              <columnConstraints>
                                                 <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="124.0" />
                                                 <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="10.0" />
