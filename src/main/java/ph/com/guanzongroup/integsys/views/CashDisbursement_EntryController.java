@@ -1810,7 +1810,7 @@ public class CashDisbursement_EntryController implements Initializable, ScreenIn
             JFXUtil.setStatusValue(lblDVTransactionStatus, CashDisbursementStatus.class, pnEditMode == EditMode.UNKNOWN ? "-1" : poController.Master().getTransactionStatus());
             tfDVTransactionNo.setText(poController.Master().getTransactionNo() != null ? poController.Master().getTransactionNo() : "");
             dpDVTransactionDate.setValue(CustomCommonUtil.parseDateStringToLocalDate(SQLUtil.dateFormat(poController.Master().getTransactionDate(), SQLUtil.FORMAT_SHORT_DATE)));
-            tfBranch.setText(poController.Master().Branch().getDescription());
+            tfBranch.setText(poController.Master().Branch().getBranchName());
             tfCashFund.setText(poController.Master().CashFund().getDescription());
             tfDepartment.setText(poController.Master().Department().getDescription());
             tfPayee.setText(poController.Master().getPayeeName());
