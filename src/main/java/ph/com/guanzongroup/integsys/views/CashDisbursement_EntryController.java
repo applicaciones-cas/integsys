@@ -311,7 +311,8 @@ public class CashDisbursement_EntryController implements Initializable, ScreenIn
                     poController.Master().setCompanyId(psCompanyId);
                     poController.Master().setBranchCode(oApp.getBranchCode());
                     poController.setTransactionStatus(DisbursementStatic.OPEN);
-                    poJSON = poController.SearchTransaction("", "", "", "");
+                    poJSON = poController.SearchTransaction(poController.Master().Industry().getDescription(),
+                            poController.Master().Branch().getDescription(), "", "");
                     if ("error".equalsIgnoreCase((String) poJSON.get("result"))) {
                         ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                         return;
@@ -566,8 +567,8 @@ public class CashDisbursement_EntryController implements Initializable, ScreenIn
     public void loadHighlightFromDetail() {
         try {
             for (int lnCtr = 0; lnCtr < poController.getDetailCount(); lnCtr++) {
-                String lsTransNo = !JFXUtil.isObjectEqualTo(poController.Detail(lnCtr).CashAdvanceDetail(poController.Master().getTransactionNo()).getTransactionNo(), null, "") ?
-                        poController.Detail(lnCtr).CashAdvanceDetail(poController.Master().getTransactionNo()).getTransactionNo() : "";
+                String lsTransNo = !JFXUtil.isObjectEqualTo(poController.Detail(lnCtr).CashAdvanceDetail(poController.Master().getTransactionNo()).getTransactionNo(), null, "")
+                        ? poController.Detail(lnCtr).CashAdvanceDetail(poController.Master().getTransactionNo()).getTransactionNo() : "";
                 String lsHighlightbasis;
 
                 lsHighlightbasis = lsTransNo;
@@ -1410,17 +1411,17 @@ public class CashDisbursement_EntryController implements Initializable, ScreenIn
                                 }
                                 loadRecordMaster();
                                 break;
-                            case "tfCashFund":
-                                poJSON = poController.SearchCashFund(lsValue, false);
+                            case "tfDepartment":
+                                poJSON = poController.SearchDepartment(lsValue, false);
                                 if (!JFXUtil.isJSONSuccess(poJSON)) {
                                     ShowMessageFX.Warning(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
                                 } else {
-                                    JFXUtil.textFieldMoveNext(tfDepartment);
+                                    JFXUtil.textFieldMoveNext(tfCashFund);
                                 }
                                 loadRecordMaster();
                                 break;
-                            case "tfDepartment":
-                                poJSON = poController.SearchDepartment(lsValue, false);
+                            case "tfCashFund":
+                                poJSON = poController.SearchCashFund(lsValue, false);
                                 if (!JFXUtil.isJSONSuccess(poJSON)) {
                                     ShowMessageFX.Warning(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
                                 } else {
@@ -1646,7 +1647,7 @@ public class CashDisbursement_EntryController implements Initializable, ScreenIn
             tfBranch.setText(poController.Master().Branch().getDescription());
             tfCashFund.setText(poController.Master().CashFund().getDescription());
             tfDepartment.setText(poController.Master().Department().getDescription());
-//            tfPayee.setText(poController.Master().Payee().getPayeeName());
+            tfPayee.setText(poController.Master().getPayeeName());
 
             tfCreditTo.setText(poController.Master().Credited().getCompanyName());
             tfVoucherNo.setText(poController.Master().getVoucherNo());
