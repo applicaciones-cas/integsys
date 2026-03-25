@@ -1206,7 +1206,7 @@ public class CashDisbursement_EntryController implements Initializable, ScreenIn
             (lsID, lsValue) -> {
                 /*Lost Focus*/
                 switch (lsID) {
-                    case "tfVatExempt":
+                    case "tfVatExemptDetail":
                         lsValue = JFXUtil.removeComma(lsValue);
                         poJSON = poController.Detail(pnDetail).setDetailVatExempt(Double.valueOf(lsValue));
                         if (!JFXUtil.isJSONSuccess(poJSON)) {
