@@ -74,12 +74,11 @@ import org.guanzon.appdriver.base.SQLUtil;
 import org.guanzon.appdriver.constant.DocumentType;
 import org.guanzon.appdriver.constant.EditMode;
 import org.guanzon.appdriver.constant.RecordStatus;
-import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.ParseException;
 import ph.com.guanzongroup.cas.cashflow.CashDisbursement;
 import ph.com.guanzongroup.cas.cashflow.services.CashflowControllers;
-import ph.com.guanzongroup.cas.cashflow.status.DisbursementStatic;
+import ph.com.guanzongroup.cas.cashflow.status.CashDisbursementStatus;
 import ph.com.guanzongroup.cas.cashflow.status.JournalStatus;
 import ph.com.guanzongroup.integsys.model.ModelBIR_Detail;
 import ph.com.guanzongroup.integsys.model.ModelDeliveryAcceptance_Attachment;
@@ -228,7 +227,6 @@ public class CashDisbursement_EntryController implements Initializable, ScreenIn
 //                poController.setCategoryID(psCategoryId);
                 poController.Master().setBranchCode(oApp.getBranchCode());
                 loadRecordSearch();
-                psTransactionType = DisbursementStatic.SourceCode.LOAD_ALL;
                 btnNew.fire();
             });
             initAttachmentPreviewPane();
@@ -310,7 +308,7 @@ public class CashDisbursement_EntryController implements Initializable, ScreenIn
                     poController.Master().setIndustryId(psIndustryId);
                     poController.Master().setCompanyId(psCompanyId);
                     poController.Master().setBranchCode(oApp.getBranchCode());
-                    poController.setTransactionStatus(DisbursementStatic.OPEN);
+                    poController.setTransactionStatus(CashDisbursementStatus.OPEN);
                     poJSON = poController.SearchTransaction(poController.Master().Industry().getDescription(),
                             poController.Master().Branch().getDescription(), "", "");
                     if ("error".equalsIgnoreCase((String) poJSON.get("result"))) {
@@ -336,7 +334,7 @@ public class CashDisbursement_EntryController implements Initializable, ScreenIn
                         return;
                     }
 
-//                    poController.Master().setDisbursementType(DisbursementStatic.DisbursementType.CHECK);
+//                    poController.Master().setDisbursementType(CashDisbursementStatus.DisbursementType.CHECK);
 //                    poController.Master().setSupplierClientID(psSupplierPayeeId);
                     JFXUtil.clickTabByTitleText(tabPaneMain, "Cash Disbursement");
                     loadTableDetail.reload();
@@ -565,34 +563,30 @@ public class CashDisbursement_EntryController implements Initializable, ScreenIn
     }
 
     public void loadHighlightFromDetail() {
-        try {
-            for (int lnCtr = 0; lnCtr < poController.getDetailCount(); lnCtr++) {
-                String lsTransNo = !JFXUtil.isObjectEqualTo(poController.Detail(lnCtr).CashAdvanceDetail(poController.Master().getTransactionNo()).getTransactionNo(), null, "")
-                        ? poController.Detail(lnCtr).CashAdvanceDetail(poController.Master().getTransactionNo()).getTransactionNo() : "";
-                String lsHighlightbasis;
-
-                lsHighlightbasis = lsTransNo;
-//                        + poController.getSourceCodeDescription(poController.Detail(lnCtr).getSourceCode())
-//                        + poController.Master().Payee().getPayeeName();
-
-                if (!JFXUtil.isObjectEqualTo(poController.Detail(lnCtr).getAmount(), null, "")) {
-                    if (poController.Detail(lnCtr).getAmount() != 0.0000) {
-                        plOrderNoPartial.add(new Pair<>(lsHighlightbasis, "1"));
-                    } else {
-                        plOrderNoPartial.add(new Pair<>(lsHighlightbasis, "0"));
-                    }
+//        try {
+        for (int lnCtr = 0; lnCtr < poController.getDetailCount(); lnCtr++) {
+            String lsTransNo = !JFXUtil.isObjectEqualTo(poController.Master().getSourceNo(), null, "")
+                    ? poController.Master().getSourceNo() : "";
+            String lsHighlightbasis;
+            lsHighlightbasis = lsTransNo;
+            if (!JFXUtil.isObjectEqualTo(poController.Detail(lnCtr).getAmount(), null, "")) {
+                if (poController.Detail(lnCtr).getAmount() != 0.0000) {
+                    plOrderNoPartial.add(new Pair<>(lsHighlightbasis, "1"));
+                } else {
+                    plOrderNoPartial.add(new Pair<>(lsHighlightbasis, "0"));
                 }
             }
-            for (Pair<String, String> pair : plOrderNoPartial) {
-                if (!"".equals(pair.getKey()) && pair.getKey() != null) {
-                    JFXUtil.highlightByKey(tblViewMainList, pair.getKey(), "#A7C7E7", highlightedRowsMain);
-                }
-            }
-            JFXUtil.showRetainedHighlight(false, tblViewMainList, "#A7C7E7", plOrderNoPartial, plOrderNoFinal, highlightedRowsMain, false);
-        } catch (GuanzonException | SQLException ex) {
-            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
-            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
+        for (Pair<String, String> pair : plOrderNoPartial) {
+            if (!"".equals(pair.getKey()) && pair.getKey() != null) {
+                JFXUtil.highlightByKey(tblViewMainList, pair.getKey(), "#A7C7E7", highlightedRowsMain);
+            }
+        }
+        JFXUtil.showRetainedHighlight(false, tblViewMainList, "#A7C7E7", plOrderNoPartial, plOrderNoFinal, highlightedRowsMain, false);
+//        } catch (GuanzonException | SQLException ex) {
+//            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+//            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
+//        }
     }
 
     private void loadTableDetailFromMain() {
@@ -655,9 +649,6 @@ public class CashDisbursement_EntryController implements Initializable, ScreenIn
                                                 String.valueOf(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.CashAdvancesList(lnCtr).getAdvanceAmount(), true)),
                                                 ""));
                                     }
-//                                    } else {
-//                                        main_data.clear();
-//                                    }
                                 }
                                 if (pnMain < 0 || pnMain
                                         >= main_data.size()) {
@@ -1639,9 +1630,10 @@ public class CashDisbursement_EntryController implements Initializable, ScreenIn
 
     private void loadRecordMaster() {
         try {
+            JFXUtil.setDisabled(true, cbReverse, tfAmountDetail);
 //            initDVMasterTabs();
             poController.computeFields(false);
-            JFXUtil.setStatusValue(lblDVTransactionStatus, DisbursementStatic.class, pnEditMode == EditMode.UNKNOWN ? "-1" : poController.Master().getTransactionStatus());
+            JFXUtil.setStatusValue(lblDVTransactionStatus, CashDisbursementStatus.class, pnEditMode == EditMode.UNKNOWN ? "-1" : poController.Master().getTransactionStatus());
             tfDVTransactionNo.setText(poController.Master().getTransactionNo() != null ? poController.Master().getTransactionNo() : "");
             dpDVTransactionDate.setValue(CustomCommonUtil.parseDateStringToLocalDate(SQLUtil.dateFormat(poController.Master().getTransactionDate(), SQLUtil.FORMAT_SHORT_DATE)));
             tfBranch.setText(poController.Master().Branch().getDescription());
@@ -2007,24 +1999,24 @@ public class CashDisbursement_EntryController implements Initializable, ScreenIn
         JFXUtil.setButtonsVisibility(fnEditMode == EditMode.READY, btnHistory);
 
         JFXUtil.setDisabled(!lbShow, apDVMaster1, apDVMaster2, apDVDetail, apJournalMaster, apJournalDetails, apBIRDetail, apAttachments);
-
 //        JFXUtil.setButtonsVisibility(fnEditMode == EditMode.UPDATE, btnUndo);
         if (fnEditMode == EditMode.READY) {
             switch (poController.Master().getTransactionStatus()) {
-                case DisbursementStatic.OPEN:
+                case CashDisbursementStatus.OPEN:
                     JFXUtil.setButtonsVisibility(true, btnUpdate);
                     JFXUtil.setButtonsVisibility(true, btnVoid);
                     break;
-                case DisbursementStatic.VERIFIED:
-                    JFXUtil.setButtonsVisibility(true, btnUpdate);
-                    break;
+//                case CashDisbursementStatus.VERIFIED:
+//                    JFXUtil.setButtonsVisibility(true, btnUpdate);
+//                    break;
             }
         }
     }
 
     private void clearTextFields() {
         JFXUtil.setValueToNull(previousSearchedTextField, lastFocusedTextField);
-        JFXUtil.clearTextFields(apDVMaster1, apDVDetail, apDVMaster2, apJournalMaster, apJournalDetails, apBIRDetail, apAttachments);
+        JFXUtil.clearTextFields(apButton, apMasterDetail, apDVMaster1, apDVMaster2, apDVDetail,
+                apMainList, apBrowse, apJournalMaster, apJournalDetails, apBIRDetail, apAttachments);
     }
 
 }
