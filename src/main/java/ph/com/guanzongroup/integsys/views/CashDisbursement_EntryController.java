@@ -309,8 +309,7 @@ public class CashDisbursement_EntryController implements Initializable, ScreenIn
                     poController.Master().setCompanyId(psCompanyId);
                     poController.Master().setBranchCode(oApp.getBranchCode());
                     poController.setTransactionStatus(CashDisbursementStatus.OPEN);
-                    poJSON = poController.SearchTransaction(poController.Master().Industry().getDescription(),
-                            poController.Master().Branch().getDescription(), "", "");
+                    poJSON = poController.SearchTransaction();
                     if ("error".equalsIgnoreCase((String) poJSON.get("result"))) {
                         ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                         return;
@@ -1630,7 +1629,9 @@ public class CashDisbursement_EntryController implements Initializable, ScreenIn
 
     private void loadRecordMaster() {
         try {
-            JFXUtil.setDisabled(true, cbReverse, tfAmountDetail);
+            boolean lbShow = !JFXUtil.isObjectEqualTo(poController.Master().getSourceNo(), null, "");
+            JFXUtil.setDisabled(lbShow, cbReverse);
+            JFXUtil.setDisabled(true, tfAmountDetail);
 //            initDVMasterTabs();
             poController.computeFields(false);
             JFXUtil.setStatusValue(lblDVTransactionStatus, CashDisbursementStatus.class, pnEditMode == EditMode.UNKNOWN ? "-1" : poController.Master().getTransactionStatus());
