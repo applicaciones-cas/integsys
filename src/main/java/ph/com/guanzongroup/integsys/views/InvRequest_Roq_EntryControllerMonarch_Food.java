@@ -52,6 +52,7 @@ import org.guanzon.appdriver.base.CommonUtils;
 import org.guanzon.appdriver.base.GRiderCAS;
 import org.guanzon.appdriver.base.GuanzonException;
 import org.guanzon.appdriver.base.LogWrapper;
+import org.guanzon.appdriver.base.MiscUtil;
 import org.guanzon.appdriver.base.SQLUtil;
 import org.guanzon.appdriver.constant.EditMode;
 import org.guanzon.appdriver.constant.UserRight;
@@ -533,9 +534,6 @@ public class InvRequest_Roq_EntryControllerMonarch_Food implements Initializable
                     break;
                 case "btnRetrieve":
                     loadTableList();
-                    pnEditMode = EditMode.UNKNOWN;
-                    initFields(pnEditMode); // This will disable all detail fields
-                    initButtons(pnEditMode);
                     break;
                 case "btnUpdate":
                     poJSON = invRequestController.UpdateTransaction();
@@ -648,11 +646,22 @@ public class InvRequest_Roq_EntryControllerMonarch_Food implements Initializable
                     if ("success".equals(poJSON.get("result")) && invRequestController.Master().getTransactionStatus().equals(StockRequestStatus.OPEN)
                             && ShowMessageFX.YesNo(null, psFormName, "Do you want to confirm this transaction?")) {
                         try {
-                            if ("success".equals((poJSON = invRequestController.ConfirmTransaction("Confirmed")).get("result"))) {
+                            poJSON = invRequestController.ConfirmTransaction("Confirmed");
+
+                            if (!"success".equals(poJSON.get("result"))) {
+                                loadMaster();
+                                pnEditMode = invRequestController.getEditMode();
+                                loadTableInvDetail();
+                                loadDetail();
                                 ShowMessageFX.Information((String) poJSON.get("message"), psFormName, null);
+
+                                break;
                             }
+                            ShowMessageFX.Information((String) poJSON.get("message"), psFormName, null);
+
                         } catch (ParseException ex) {
-                            Logger.getLogger(InvRequest_EntryControllerCar.class.getName()).log(Level.SEVERE, null, ex);
+                            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+
                         }
                     }
                     Platform.runLater(() -> btnNew.fire());
@@ -1195,23 +1204,21 @@ public class InvRequest_Roq_EntryControllerMonarch_Food implements Initializable
             if (loSelectedInformation != null) {
                 String lsTransactionNo = loSelectedInformation.getIndex01();
                 try {
+                    poJSON = invRequestController.OpenTransaction(lsTransactionNo);
                     if ("success".equals((String) poJSON.get("result"))) {
-                        poJSON = invRequestController.OpenTransaction(lsTransactionNo);
-                        if ("success".equals((String) poJSON.get("result"))) {
-                            loadMaster();
-                            initTableInvDetail();
-                            loadTableInvDetail();
-                            pnTblInvDetailRow = -1;
-                            clearDetailFields();
-                            pnEditMode = invRequestController.getEditMode();
-                        } else {
-                            ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
-                            pnEditMode = EditMode.UNKNOWN;
-                        }
-                        initButtons(pnEditMode);
-                        initFields(pnEditMode);
-
+                        loadMaster();
+                        initTableInvDetail();
+                        loadTableInvDetail();
+                        pnTblInvDetailRow = -1;
+                        clearDetailFields();
+                        pnEditMode = invRequestController.getEditMode();
+                    } else {
+                        ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
+                        pnEditMode = EditMode.UNKNOWN;
                     }
+                    initButtons(pnEditMode);
+                    initFields(pnEditMode);
+
                 } catch (CloneNotSupportedException | SQLException | GuanzonException ex) {
                     Logger.getLogger(InvRequest_ConfirmationControllerMC.class
                             .getName()).log(Level.SEVERE, null, ex);
@@ -1268,6 +1275,7 @@ public class InvRequest_Roq_EntryControllerMonarch_Food implements Initializable
 
     private void clearAllTables() {
 
+        pnTblInvDetailRow = -1;
         invOrderDetail_data.clear();
         tableListInformation_data.clear();
 

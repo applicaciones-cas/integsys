@@ -210,37 +210,34 @@ public class InvRequest_HistoryControllerMC implements Initializable, ScreenInte
         }
     }
 
-    private void tableListInformation_Clicked(MouseEvent event) {
+     private void tableListInformation_Clicked(MouseEvent event) {
         poJSON = new JSONObject();
         pnTblInformationRow = tableListInformation.getSelectionModel().getSelectedIndex();
         if (pnTblInformationRow < 0 || pnTblInformationRow >= tableListInformation.getItems().size()) {
-            ShowMessageFX.Warning("Please select valid order information.", "Warning", null);
+            ShowMessageFX.Warning("Please select valid information List.", "Warning", null);
             return;
         }
 
         if (event.getClickCount() == 2) {
-            ModelInvTableListInformation loSelected = (ModelInvTableListInformation) tableListInformation.getSelectionModel().getSelectedItem();
-            if (loSelected != null) {
-                String lsTransactionNo = loSelected.getIndex01();
+            ModelInvTableListInformation loSelectedInformation = (ModelInvTableListInformation) tableListInformation.getSelectionModel().getSelectedItem();
+            if (loSelectedInformation != null) {
+                String lsTransactionNo = loSelectedInformation.getIndex01();
                 try {
-                    poJSON = invRequestController.InitTransaction();
+                    poJSON = invRequestController.OpenTransaction(lsTransactionNo);
                     if ("success".equals((String) poJSON.get("result"))) {
-                        poJSON = invRequestController.OpenTransaction(lsTransactionNo);
-                        if ("success".equals((String) poJSON.get("result"))) {
-                            loadMaster();
-                            initTableInvDetail();
-                            loadTableInvDetail();
-                            pnTblInvDetailRow = -1;
-                            clearDetailFields();
-                            pnEditMode = invRequestController.getEditMode();
-                        } else {
-                            ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
-                            pnEditMode = EditMode.UNKNOWN;
-                        }
-                        initButtons(pnEditMode);
-                        initFields(pnEditMode);
-
+                        loadMaster();
+                        initTableInvDetail();
+                        loadTableInvDetail();
+                        pnTblInvDetailRow = -1;
+                        clearDetailFields();
+                        pnEditMode = invRequestController.getEditMode();
+                    } else {
+                        ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
+                        pnEditMode = EditMode.UNKNOWN;
                     }
+                    initButtons(pnEditMode);
+                    initFields(pnEditMode);
+
                 } catch (CloneNotSupportedException | SQLException | GuanzonException ex) {
                     Logger.getLogger(InvRequest_ConfirmationControllerMC.class
                             .getName()).log(Level.SEVERE, null, ex);
@@ -249,6 +246,7 @@ public class InvRequest_HistoryControllerMC implements Initializable, ScreenInte
             }
         }
     }
+
 
     private void loadRecordSearch() {
         try {
