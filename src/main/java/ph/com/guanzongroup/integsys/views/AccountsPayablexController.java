@@ -29,7 +29,6 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
-import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
@@ -731,6 +730,11 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
                 ((ComboBox) loControl).setItems(null);
             }
         }
+        
+        //reset image objects
+        imageinfo_temp.clear();
+        imgPreview.setImage(null);
+        
         initButtonDisplay(poAppController.getEditMode());
     }
 
@@ -1011,7 +1015,9 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
                                 // ----- IMAGE VIEW -----
                                 Image loimage = new Image(convertedPath);
                                 imgPreview.setImage(loimage);
-                                JFXUtil.adjustImageSize(loimage, imgPreview, imageviewerutil.ldstackPaneWidth, imageviewerutil.ldstackPaneHeight);
+                                
+                                //no need to auto adjust the size, image can be scaled manually, besides, this method affects the margins and sizes of forms when maxed value
+                                //JFXUtil.adjustImageSize(loimage, imgPreview, imageviewerutil.ldstackPaneWidth, imageviewerutil.ldstackPaneHeight);
 
                                 PauseTransition delay = new PauseTransition(Duration.seconds(2)); // 2-second delay
                                 delay.setOnFinished(event -> {

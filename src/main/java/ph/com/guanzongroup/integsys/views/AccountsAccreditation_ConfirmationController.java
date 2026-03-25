@@ -42,7 +42,6 @@ import org.guanzon.appdriver.base.GRiderCAS;
 import org.guanzon.appdriver.base.LogWrapper;
 import org.guanzon.appdriver.constant.EditMode;
 import org.guanzon.appdriver.base.GuanzonException;
-import org.guanzon.appdriver.constant.ClientType;
 import org.guanzon.appdriver.constant.TransactionStatus;
 import org.guanzon.cas.client.account.Account_Accreditation;
 import org.guanzon.cas.client.services.ClientControllers;
@@ -209,29 +208,36 @@ public class AccountsAccreditation_ConfirmationController implements Initializab
                     initButtonDisplay(poAppController.getEditMode());
                     break;
                 case "btnSave":
+                    
+                    String lotransactioNo = tfTransactionNo.getText();
                     if (tfTransactionNo.getText().isEmpty()) {
                         ShowMessageFX.Information("Please load record before proceeding..", psFormName, "");
                         return;
                     }
-
+                    
                     if (ShowMessageFX.OkayCancel(null, psFormName, "Are you sure you want to save client??") == true) {
+                        
                         if (!isJSONSuccess(poAppController.saveRecord(), "Initialize Save Record")) {
                             return;
                         }
                         ShowMessageFX.Information("Client saved successfully!", "Initialize Save Record", null);
                         
                         if (poAppController.getModel().getRecordStatus().equals("0")) {
+                            
                             if (ShowMessageFX.OkayCancel(null, psFormName, "Do you want to Confirm transaction?") == true) {
-                                
+
+                                if (!isJSONSuccess(poAppController.openRecord(poAppController.getModel().getTransactionNo()), "Initialize Open Transaction")) {
+                                    return;
+                                }
+
                                 if (!isJSONSuccess(poAppController.CloseTransaction(), "Initialize Close Transaction")) {
                                     return;
                                 }
+                                ShowMessageFX.Information("Transaction confirmed successfully", null, psFormName);
                             }
                         }
-                        ShowMessageFX.Information("Transaction saved successfully", null, psFormName);
-
-                        getLoadedClient();
-                        initButtonDisplay(poAppController.getEditMode());
+                        //reset data to avoid transaction errors
+                        clearAllInputs();
                     }
                     break;
                 case "btnConfirm":
@@ -251,8 +257,8 @@ public class AccountsAccreditation_ConfirmationController implements Initializab
                         }
                         ShowMessageFX.Information("Transaction ocnfirmed successfully", null, psFormName);
                         
-                        getLoadedClient();
-                        initButtonDisplay(poAppController.getEditMode());
+                        //reset data to avoid transaction errors
+                        clearAllInputs();
                         break;
                     }
                     break;
@@ -274,7 +280,8 @@ public class AccountsAccreditation_ConfirmationController implements Initializab
                         }
                         ShowMessageFX.Information("Transaction voided successfully", null, psFormName);
 
-                        getLoadedClient();
+                        //reset data to avoid transaction errors
+                        clearAllInputs();
                         break;
                     }
                     break;
@@ -305,6 +312,11 @@ public class AccountsAccreditation_ConfirmationController implements Initializab
                     }
             }
 
+            //manually reset button, edit mode not initialized on model
+            if (btnID.equalsIgnoreCase("btnSave")) {
+                initButtonDisplay(EditMode.UNKNOWN);
+                return;
+            }
             initButtonDisplay(poAppController.getEditMode());
 
         } catch (Exception e) {

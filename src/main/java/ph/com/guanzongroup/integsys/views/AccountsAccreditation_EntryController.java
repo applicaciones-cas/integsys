@@ -219,18 +219,20 @@ public class AccountsAccreditation_EntryController implements Initializable, Scr
                     initButtonDisplay(poAppController.getEditMode());
                     break;
                 case "btnSave":
+                    String lotransactioNo = tfTransactionNo.getText();
                     if (tfTransactionNo.getText().isEmpty()) {
                         ShowMessageFX.Information("Please load record before proceeding..", psFormName, "");
                         return;
                     }
                     
                     if (ShowMessageFX.OkayCancel(null, psFormName, "Are you sure you want to save client??") == true) {
+                        
                         if (!isJSONSuccess(poAppController.saveRecord(), "Initialize Save Record")) {
                             return;
                         }
                         ShowMessageFX.Information("Client saved successfully!", "Initialize Save Record", null);
-                        
                         if (poAppController.getModel().getRecordStatus().equals("0")) {
+                            
                             if (ShowMessageFX.OkayCancel(null, psFormName, "Do you want to Confirm transaction?") == true) {
 
                                 if (!isJSONSuccess(poAppController.openRecord(poAppController.getModel().getTransactionNo()), "Initialize Open Transaction")) {
@@ -243,9 +245,8 @@ public class AccountsAccreditation_EntryController implements Initializable, Scr
                                 ShowMessageFX.Information("Transaction confirmed successfully", null, psFormName);
                             }
                         }
-
-                        getLoadedClient();
-                        initButtonDisplay(poAppController.getEditMode());
+                        //reset data to avoid transaction errors
+                        clearAllInputs();
                     }
                     break;
 
@@ -275,7 +276,12 @@ public class AccountsAccreditation_EntryController implements Initializable, Scr
                         }
                     }
             }
-
+            
+            //manually reset button, edit mode not initialized on model
+            if (btnID.equalsIgnoreCase("btnSave")) {
+                initButtonDisplay(EditMode.READY);
+                return;
+            }
             initButtonDisplay(poAppController.getEditMode());
 
         } catch (Exception e) {

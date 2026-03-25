@@ -335,6 +335,7 @@ public class AccountsAccreditation_HistoryController implements Initializable, S
             
             tfAddress.setText( lshouseno + lsaddress + lsbrgy + lscity + lsprovince);
             
+            tfTIN.setText(poAppController.getModel().Client().getTaxIdNumber() == null ? "" : poAppController.getModel().Client().getTaxIdNumber());
             taRemarks.setText(poAppController.getModel().getRemarks());
             cmbAccountType.getSelectionModel().select(Integer.parseInt(poAppController.getModel().getAccountType()));
             cmbTransType.getSelectionModel().select(Integer.parseInt(poAppController.getModel().getTransactionType()));
