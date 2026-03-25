@@ -167,7 +167,7 @@ public class InvRequest_EntryControllerAppliances implements Initializable, Scre
                     invRequestController.setCompanyID(psCompanyID);
                     invRequestController.setCategoryID(psCategoryID);
                     invRequestController.setIndustryID(psIndustryID);
-                    
+
                     //set edit mode to new transaction temporily to assign industry and company
                     invRequestController.NewTransaction();
                     loadRecordSearch();
@@ -946,7 +946,7 @@ public class InvRequest_EntryControllerAppliances implements Initializable, Scre
 
             CustomCommonUtil.setDisable(true,
                     tfInvType, tfReservationQTY,
-                     tfQOH, tfROQ, tfClassification, tfVariant, tfColor, tfBrand, tfModel, tfDescription, tfBarCode);
+                    tfQOH, tfROQ, tfClassification, tfVariant, tfColor, tfBrand, tfModel, tfDescription, tfBarCode);
             CustomCommonUtil.setDisable(!lbShow, tfOrderQuantity, taRemarks);
             CustomCommonUtil.setDisable(!lbNew, tfBrand, tfDescription, tfBarCode, tfModel);
 
@@ -1387,23 +1387,21 @@ public class InvRequest_EntryControllerAppliances implements Initializable, Scre
             if (loSelectedInformation != null) {
                 String lsTransactionNo = loSelectedInformation.getIndex01();
                 try {
+                    poJSON = invRequestController.OpenTransaction(lsTransactionNo);
                     if ("success".equals((String) poJSON.get("result"))) {
-                        poJSON = invRequestController.OpenTransaction(lsTransactionNo);
-                        if ("success".equals((String) poJSON.get("result"))) {
-                            loadMaster();
-                            initTableInvDetail();
-                            loadTableInvDetail();
-                            pnTblInvDetailRow = -1;
-                            clearDetailFields();
-                            pnEditMode = invRequestController.getEditMode();
-                        } else {
-                            ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
-                            pnEditMode = EditMode.UNKNOWN;
-                        }
-                        initButtons(pnEditMode);
-                        initFields(pnEditMode);
-
+                        loadMaster();
+                        initTableInvDetail();
+                        loadTableInvDetail();
+                        pnTblInvDetailRow = -1;
+                        clearDetailFields();
+                        pnEditMode = invRequestController.getEditMode();
+                    } else {
+                        ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
+                        pnEditMode = EditMode.UNKNOWN;
                     }
+                    initButtons(pnEditMode);
+                    initFields(pnEditMode);
+
                 } catch (CloneNotSupportedException | SQLException | GuanzonException ex) {
                     Logger.getLogger(InvRequest_ConfirmationControllerMC.class
                             .getName()).log(Level.SEVERE, null, ex);
@@ -1492,6 +1490,7 @@ public class InvRequest_EntryControllerAppliances implements Initializable, Scre
 
     private void clearAllTables() {
 
+        pnTblInvDetailRow = -1;
         invOrderDetail_data.clear();
         tableListInformation_data.clear();
 
