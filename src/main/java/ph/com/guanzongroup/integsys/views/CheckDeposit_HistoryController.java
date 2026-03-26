@@ -492,10 +492,15 @@ public class CheckDeposit_HistoryController implements Initializable, ScreenInte
                             detailCount++;
                         }
                     }
+                    int OriginalRow = 0;
                     List<ModelTableDetail> detailsList = new ArrayList<>();
                     for (int lnCtr = 0; lnCtr < poGLControllers.CheckDeposits().getDetailCount(); lnCtr++) {
-                        detailsList.add(new ModelTableDetail(
-                                String.valueOf(lnCtr + 1),
+                        if (!poGLControllers.CheckDeposits().Detail(lnCtr).isReverse()) {
+                            continue;
+                        }
+                                OriginalRow += 1;
+                                detailsList.add(new ModelTableDetail(
+                                String.valueOf(OriginalRow),
                                 poGLControllers.CheckDeposits().Detail(lnCtr) != null
                                 && poGLControllers.CheckDeposits().Detail(lnCtr).CheckPayment() != null
                                 && poGLControllers.CheckDeposits().Detail(lnCtr).CheckPayment().getTransactionNo() != null

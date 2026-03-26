@@ -501,11 +501,15 @@ public class CheckRelease_HistoryController implements Initializable, ScreenInte
             protected List<ModelTableDetail> call() throws Exception {
                 try {
                     int detailCount = poGLControllers.CheckReleases().getDetailCount();
-                          
+                    int OriginalRow = 0;
                     List<ModelTableDetail> detailsList = new ArrayList<>();
                     for (int lnCtr = 0; lnCtr < poGLControllers.CheckReleases().getDetailCount(); lnCtr++) {
+                        if (!poGLControllers.CheckReleases().Detail(lnCtr).isReverse()) {
+                            continue;
+                        }
+                        OriginalRow += 1;
                         detailsList.add(new ModelTableDetail(
-                                String.valueOf(lnCtr + 1),
+                                String.valueOf(OriginalRow),
                                 poGLControllers.CheckReleases().Detail(lnCtr) != null
                                 && poGLControllers.CheckReleases().Detail(lnCtr).CheckPayment() != null
                                 && poGLControllers.CheckReleases().Detail(lnCtr).CheckPayment().getTransactionNo() != null
@@ -536,7 +540,7 @@ public class CheckRelease_HistoryController implements Initializable, ScreenInte
                                 ? poGLControllers.CheckReleases().Detail(lnCtr).CheckPayment().getCheckNo()
                                 : "",
                                 CustomCommonUtil.setIntegerValueToDecimalFormat(poGLControllers.CheckReleases().Detail(lnCtr).CheckPayment().getAmount(),true),
-                                        "","",""));
+                                        String.valueOf(lnCtr),"",""));
                     }
                     Platform.runLater(() -> {
                         detail_data.setAll(detailsList); // Properly update list

@@ -202,19 +202,20 @@
                                                       <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="28.0" vgrow="SOMETIMES" />
                                                       <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="28.0" vgrow="SOMETIMES" />
                                                       <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="28.0" vgrow="SOMETIMES" />
+                                                      <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="28.0" vgrow="SOMETIMES" />
                                                    </rowConstraints>
                                                    <children>
                                                       <TextField fx:id="tfTransactionNo" disable="true" editable="false" maxHeight="25.0" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.rowIndex="2" />
-                                                      <TextField fx:id="tfSourceCode" disable="true" editable="false" maxHeight="25.0" promptText="Press F3: Search" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.rowIndex="4" />
-                                                      <TextField fx:id="tfCategory" disable="true" editable="false" maxHeight="25.0" promptText="Press F3: Search" GridPane.columnIndex="7" GridPane.columnSpan="2" GridPane.rowIndex="4" />
-                                                      <TextArea fx:id="taRemarks" disable="true" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="2" GridPane.columnSpan="7" GridPane.rowIndex="5" GridPane.rowSpan="2" />
+                                                      <TextField fx:id="tfSourceCode" disable="true" editable="false" maxHeight="25.0" promptText="Press F3: Search" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.rowIndex="5" />
+                                                      <TextField fx:id="tfCategory" disable="true" editable="false" maxHeight="25.0" promptText="Press F3: Search" GridPane.columnIndex="7" GridPane.columnSpan="2" GridPane.rowIndex="5" />
+                                                      <TextArea fx:id="taRemarks" disable="true" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="2" GridPane.columnSpan="7" GridPane.rowIndex="6" GridPane.rowSpan="2" />
                                                       <AnchorPane maxWidth="1.7976931348623157E308" minWidth="-Infinity" prefHeight="27.0" style="-fx-background-color: FF8201;" GridPane.columnIndex="8" GridPane.rowIndex="2" />
-                                                      <Label text="Source Code" GridPane.rowIndex="4">
+                                                      <Label text="Source Code" GridPane.rowIndex="5">
                                                          <GridPane.margin>
                                                             <Insets right="10.0" />
                                                          </GridPane.margin>
                                                       </Label>
-                                                      <Label text="Category" GridPane.columnIndex="5" GridPane.rowIndex="4">
+                                                      <Label text="Category" GridPane.columnIndex="5" GridPane.rowIndex="5">
                                                          <GridPane.margin>
                                                             <Insets right="10.0" />
                                                          </GridPane.margin></Label>
@@ -231,10 +232,16 @@
                                                             <Font name="System Bold" size="14.0" />
                                                          </font>
                                                       </Label>
-                                                      <Label text="Remarks" GridPane.rowIndex="5">
+                                                      <Label text="Remarks" GridPane.rowIndex="6">
                                                          <GridPane.margin>
                                                             <Insets right="10.0" />
                                                          </GridPane.margin></Label>
+                                                      <Label text="Industry" GridPane.rowIndex="4">
+                                                         <GridPane.margin>
+                                                            <Insets right="10.0" />
+                                                         </GridPane.margin>
+                                                      </Label>
+                                                      <TextField fx:id="tfIndustry" disable="true" editable="false" maxHeight="25.0" promptText="Press F3: Search" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.rowIndex="4" />
                                                    </children>
                                                 </GridPane>
                                              </children>

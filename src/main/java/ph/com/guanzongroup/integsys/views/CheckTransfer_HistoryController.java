@@ -452,10 +452,15 @@ public class CheckTransfer_HistoryController implements Initializable, ScreenInt
 //                            detailCount++;
 //                        }
 //                    }
+                    int OriginalRow = 0;
                     List<ModelTableDetail> detailsList = new ArrayList<>();
                     for (int lnCtr = 0; lnCtr < poGLControllers.CheckTransfers().getDetailCount(); lnCtr++) {
+                        if (!poGLControllers.CheckTransfers().Detail(lnCtr).isReverse()) {
+                            continue;
+                        }
+                        OriginalRow += 1;
                         detailsList.add(new ModelTableDetail(
-                                String.valueOf(lnCtr + 1),
+                                String.valueOf(OriginalRow),
                                 poGLControllers.CheckTransfers().Detail(lnCtr) != null
                                 && poGLControllers.CheckTransfers().Detail(lnCtr).CheckPayment() != null
                                 && poGLControllers.CheckTransfers().Detail(lnCtr).CheckPayment().getTransactionNo() != null
@@ -486,7 +491,7 @@ public class CheckTransfer_HistoryController implements Initializable, ScreenInt
                                 ? poGLControllers.CheckTransfers().Detail(lnCtr).CheckPayment().getCheckNo()
                                 : "",
                                 CustomCommonUtil.setIntegerValueToDecimalFormat(poGLControllers.CheckTransfers().Detail(lnCtr).CheckPayment().getAmount(),true),
-                                        "","",""));
+                                        String.valueOf(lnCtr),"",""));
                     }
                     Platform.runLater(() -> {
                         detail_data.setAll(detailsList); // Properly update list
