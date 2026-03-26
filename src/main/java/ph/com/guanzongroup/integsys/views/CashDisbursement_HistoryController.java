@@ -216,7 +216,6 @@ public class CashDisbursement_HistoryController implements Initializable, Screen
                 poController.setCompanyId(psCompanyId);
 //                poController.setCategoryID(psCategoryId);
                 poController.Master().setBranchCode(oApp.getBranchCode());
-                poController.setTransactionStatus(CashDisbursementStatus.CONFIRMED + CashDisbursementStatus.APPROVED);
                 loadRecordSearch();
             });
             initAttachmentPreviewPane();
@@ -864,7 +863,7 @@ public class CashDisbursement_HistoryController implements Initializable, Screen
                         break;
                     case "tfSearchCashAdvanceNo":
                         if (lsValue.isEmpty()) {
-                            loadTableMain.reload();
+//                            loadTableMain.reload();
                         }
                         break;
                 }
