@@ -666,14 +666,14 @@ public class InvRequest_Roq_ConfirmationControllerMC_SP implements Initializable
                         return;
                     }
 
-                    if (StockRequestStatus.CONFIRMED.equals(status) || StockRequestStatus.PROCESSED.equals(status)) {
-                        // Require user approval
-                        JSONObject approvalResult = ShowDialogFX.getUserApproval(poApp);
-                        if (!"success".equals(approvalResult.get("result"))) {
-                            ShowMessageFX.Warning((String) approvalResult.get("message"), psFormName, null);
-                            return;
-                        }
-                    }
+//                    if (StockRequestStatus.CONFIRMED.equals(status) || StockRequestStatus.PROCESSED.equals(status)) {
+////                        // Require user approval
+//                        JSONObject approvalResult = ShowDialogFX.getUserApproval(poApp);
+//                        if (!"success".equals(approvalResult.get("result"))) {
+//                            ShowMessageFX.Warning((String) approvalResult.get("message"), psFormName, null);
+//                            return;
+//                        }
+//                    }
 
                      {
                         try {

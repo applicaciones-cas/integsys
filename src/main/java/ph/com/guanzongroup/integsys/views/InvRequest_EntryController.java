@@ -517,14 +517,14 @@ public class InvRequest_EntryController implements Initializable, ScreenInterfac
                         return;
                     }
 
-                    if (StockRequestStatus.CONFIRMED.equals(status) || StockRequestStatus.PROCESSED.equals(status)) {
-                        // Require user approval
-                        JSONObject approvalResult = ShowDialogFX.getUserApproval(poApp);
-                        if (!"success".equals(approvalResult.get("result"))) {
-                            ShowMessageFX.Warning((String) approvalResult.get("message"), psFormName, null);
-                            return;
-                        }
-                    }
+//                    if (StockRequestStatus.CONFIRMED.equals(status) || StockRequestStatus.PROCESSED.equals(status)) {
+//                        // Require user approval
+//                        JSONObject approvalResult = ShowDialogFX.getUserApproval(poApp);
+//                        if (!"success".equals(approvalResult.get("result"))) {
+//                            ShowMessageFX.Warning((String) approvalResult.get("message"), psFormName, null);
+//                            return;
+//                        }
+//                    }
 
                     // Proceed to void the transaction
                     poJSON = invRequestController.VoidTransaction("Voided");

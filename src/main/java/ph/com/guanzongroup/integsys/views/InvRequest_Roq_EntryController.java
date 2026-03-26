@@ -509,15 +509,15 @@ public class InvRequest_Roq_EntryController implements Initializable, ScreenInte
                     if (!ShowMessageFX.YesNo(null, psFormName, "Are you sure you want to return this transaction?")) {
                         return;
                     }
-
-                    if (StockRequestStatus.CONFIRMED.equals(status) || StockRequestStatus.PROCESSED.equals(status)) {
-                        // Require user approval
-                        JSONObject approvalResult = ShowDialogFX.getUserApproval(poApp);
-                        if (!"success".equals(approvalResult.get("result"))) {
-                            ShowMessageFX.Warning((String) approvalResult.get("message"), psFormName, null);
-                            return;
-                        }
-                    }
+//
+//                    if (StockRequestStatus.CONFIRMED.equals(status) || StockRequestStatus.PROCESSED.equals(status)) {
+//                        // Require user approval
+//                        JSONObject approvalResult = ShowDialogFX.getUserApproval(poApp);
+//                        if (!"success".equals(approvalResult.get("result"))) {
+//                            ShowMessageFX.Warning((String) approvalResult.get("message"), psFormName, null);
+//                            return;
+//                        }
+//                    }
 
                     // Proceed to void the transaction
                     poJSON = invRequestController.VoidTransaction("Voided");
@@ -554,6 +554,7 @@ public class InvRequest_Roq_EntryController implements Initializable, ScreenInte
                     
                     break;
                 case "btnUpdate":
+                    
                     poJSON = invRequestController.UpdateTransaction();
                     pnEditMode = invRequestController.getEditMode();
 
