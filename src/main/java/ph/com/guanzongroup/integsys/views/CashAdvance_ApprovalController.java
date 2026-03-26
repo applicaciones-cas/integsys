@@ -739,7 +739,7 @@ public class CashAdvance_ApprovalController implements Initializable, ScreenInte
         }
         switch (poController.Master().getTransactionStatus()) {
             case CashAdvanceStatus.APPROVED:
-                JFXUtil.setButtonsVisibility(false, btnApprove, btnDisapprove);
+                JFXUtil.setButtonsVisibility(false, btnApprove);
             case CashAdvanceStatus.VOID:
             case CashAdvanceStatus.CANCELLED:
                 JFXUtil.setButtonsVisibility(false, btnApprove, btnDisapprove);
