@@ -534,9 +534,11 @@ public class CashAdvance_ApprovalController implements Initializable, ScreenInte
             switch (poController.Master().getTransactionStatus()) {
                 case CashAdvanceStatus.APPROVED:
                     lsStat = "Cancel";
+                    btnDisapprove.setMinWidth(70);
                     break;
                 default:
                     lsStat = "Disapprove";
+                    btnDisapprove.setMinWidth(80);
                     break;
             }
             btnDisapprove.setText(lsStat);
@@ -740,6 +742,7 @@ public class CashAdvance_ApprovalController implements Initializable, ScreenInte
         switch (poController.Master().getTransactionStatus()) {
             case CashAdvanceStatus.APPROVED:
                 JFXUtil.setButtonsVisibility(false, btnApprove);
+                break;
             case CashAdvanceStatus.VOID:
             case CashAdvanceStatus.CANCELLED:
                 JFXUtil.setButtonsVisibility(false, btnApprove, btnDisapprove);
