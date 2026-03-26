@@ -92,7 +92,7 @@
                                           <Insets />
                                        </GridPane.margin>
                                     </TextField>
-                                                <TextField fx:id="tfSearchCashAdvanceNo" maxWidth="1.7976931348623157E308" GridPane.columnIndex="10">
+                                                <TextField fx:id="tfSearchCashAdvanceNo" maxWidth="1.7976931348623157E308" promptText="Press F3: Search" GridPane.columnIndex="10">
                                        <GridPane.margin>
                                           <Insets />
                                        </GridPane.margin>
