@@ -571,7 +571,7 @@ public class CashDisbursement_ConfirmationController implements Initializable, S
                 JFXUtil.disableAllHighlightByColor(tblViewMainList, "#A7C7E7", highlightedRowsMain);
                 JFXUtil.highlightByKey(tblViewMainList, String.valueOf(pnRowMain + 1), "#A7C7E7", highlightedRowsMain);
                 clearTextFields();
-                JFXUtil.clickTabByTitleText(tabPaneMain, "Disbursement Voucher");
+                JFXUtil.clickTabByTitleText(tabPaneMain, "Cash Disbursement");
                 poJSON = poController.OpenTransaction(lsTransactionNo);
                 if ("error".equals(poJSON.get("result"))) {
                     ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
@@ -581,11 +581,6 @@ public class CashDisbursement_ConfirmationController implements Initializable, S
                 pnEditMode = poController.getEditMode();
                 loadTableDetail.reload();
                 moveNext(false, false);
-
-                JFXUtil.runWithDelay(0.50, () -> {
-                    loadTableMain.reload();
-
-                });
             } catch (CloneNotSupportedException | SQLException | GuanzonException | ScriptException ex) {
                 Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
                 ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
