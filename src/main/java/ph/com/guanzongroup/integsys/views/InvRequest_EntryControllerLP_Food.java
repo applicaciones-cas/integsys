@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package ph.com.guanzongroup.integsys.views;
 
 import ph.com.guanzongroup.integsys.model.ModelInvOrderDetail;
@@ -42,7 +38,6 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TablePosition;
-import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
@@ -60,6 +55,7 @@ import org.guanzon.appdriver.agent.ShowDialogFX;
 import org.guanzon.appdriver.agent.ShowMessageFX;
 import org.guanzon.appdriver.base.CommonUtils;
 import org.guanzon.appdriver.base.GuanzonException;
+import org.guanzon.appdriver.base.MiscUtil;
 import org.guanzon.appdriver.base.SQLUtil;
 import org.guanzon.appdriver.constant.EditMode;
 import org.guanzon.appdriver.constant.UserRight;
@@ -158,8 +154,6 @@ public class InvRequest_EntryControllerLP_Food implements Initializable, ScreenI
         try {
 
             invRequestController = new InvWarehouseControllers(poApp, logWrapper).StockRequest();
-            invRequestController.setTransactionStatus(StockRequestStatus.OPEN);
-
             poJSON = invRequestController.InitTransaction();
             if (!"success".equals(poJSON.get("result"))) {
                 ShowMessageFX.Warning((String) poJSON.get("message"), "Search Information", null);
@@ -169,15 +163,15 @@ public class InvRequest_EntryControllerLP_Food implements Initializable, ScreenI
                 //BOTH NULL
 
                 try {
+
+                    invRequestController.setTransactionStatus("102");
+                    invRequestController.setCompanyID(psCompanyID);
+                    invRequestController.setCategoryID(psCategoryID);
+                    invRequestController.setIndustryID(psIndustryID);
                     //set edit mode to new transaction temporily to assign industry and company
                     invRequestController.NewTransaction();
-                    invRequestController.Master().setIndustryId(psIndustryID);
-                    invRequestController.Master().setCompanyID(psCompanyID);
-                    invRequestController.Master().setCategoryId(psCategoryID);
                     loadRecordSearch();
 
-                    //reset the transaction
-                    invRequestController.InitTransaction();
                 } catch (CloneNotSupportedException e) {
                     ShowMessageFX.Warning((String) e.getMessage(), "Search Information", null);
                 }
@@ -490,7 +484,7 @@ public class InvRequest_EntryControllerLP_Food implements Initializable, ScreenI
             }
         } catch (SQLException | GuanzonException e) {
             ShowMessageFX.Error(getStage(), e.getMessage(), "Error", psFormName);
-            System.exit(1);
+//            System.exit(1);
         }
     }
 
@@ -506,14 +500,14 @@ public class InvRequest_EntryControllerLP_Food implements Initializable, ScreenI
                         return;
                     }
 
-                    if (StockRequestStatus.CONFIRMED.equals(status) || StockRequestStatus.PROCESSED.equals(status)) {
-                        // Require user approval
-                        JSONObject approvalResult = ShowDialogFX.getUserApproval(poApp);
-                        if (!"success".equals(approvalResult.get("result"))) {
-                            ShowMessageFX.Warning((String) approvalResult.get("message"), psFormName, null);
-                            return;
-                        }
-                    }
+//                    if (StockRequestStatus.CONFIRMED.equals(status) || StockRequestStatus.PROCESSED.equals(status)) {
+//                        // Require user approval
+//                        JSONObject approvalResult = ShowDialogFX.getUserApproval(poApp);
+//                        if (!"success".equals(approvalResult.get("result"))) {
+//                            ShowMessageFX.Warning((String) approvalResult.get("message"), psFormName, null);
+//                            return;
+//                        }
+//                    }
 
                     // Proceed to void the transaction
                     poJSON = invRequestController.VoidTransaction("Voided");
@@ -531,11 +525,6 @@ public class InvRequest_EntryControllerLP_Food implements Initializable, ScreenI
 
                     break;
                 case "btnBrowse":
-                    invRequestController.Master().setIndustryId(psIndustryID);
-                    invRequestController.Master().setCompanyID(psCompanyID);
-                    invRequestController.Master().setCategoryId(psCategoryID);
-
-                    invRequestController.setTransactionStatus("102");
                     loJSON = invRequestController.searchTransaction();
 
                     if (!"error".equals((String) loJSON.get("result"))) {
@@ -551,10 +540,6 @@ public class InvRequest_EntryControllerLP_Food implements Initializable, ScreenI
                     }
                     break;
                 case "btnRetrieve":
-                    invRequestController.Master().setIndustryId(psIndustryID);
-                    invRequestController.Master().setCompanyID(psCompanyID);
-                    invRequestController.Master().setCategoryId(psCategoryID);
-                    invRequestController.setTransactionStatus("102");
                     loadTableList();
                     pnEditMode = EditMode.UNKNOWN;
                     initFields(pnEditMode); // This will disable all detail fields
@@ -668,15 +653,26 @@ public class InvRequest_EntryControllerLP_Food implements Initializable, ScreenI
                     }
                     ShowMessageFX.Information((String) poJSON.get("message"), psFormName, null);
                     poJSON = invRequestController.OpenTransaction(invRequestController.Master().getTransactionNo());
-                    // Confirmation Prompt
+                     // Confirmation Prompt
                     if ("success".equals(poJSON.get("result")) && invRequestController.Master().getTransactionStatus().equals(StockRequestStatus.OPEN)
                             && ShowMessageFX.YesNo(null, psFormName, "Do you want to confirm this transaction?")) {
                         try {
-                            if ("success".equals((poJSON = invRequestController.ConfirmTransaction("Confirmed")).get("result"))) {
+                            poJSON = invRequestController.ConfirmTransaction("Confirmed");
+
+                            if (!"success".equals(poJSON.get("result"))) {
+                                loadMaster();
+                                pnEditMode = invRequestController.getEditMode();
+                                loadTableInvDetail();
+                                loadDetail();
                                 ShowMessageFX.Information((String) poJSON.get("message"), psFormName, null);
+
+                                break;
                             }
+                            ShowMessageFX.Information((String) poJSON.get("message"), psFormName, null);
+
                         } catch (ParseException ex) {
-                            Logger.getLogger(InvRequest_EntryControllerLP_Food.class.getName()).log(Level.SEVERE, null, ex);
+                            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+
                         }
                     }
                     Platform.runLater(() -> btnNew.fire());
@@ -687,8 +683,6 @@ public class InvRequest_EntryControllerLP_Food implements Initializable, ScreenI
 
                         invOrderDetail_data.clear();
                         tableListInformation_data.clear();
-
-                        invRequestController.InitTransaction();
 
                         clearAllTables();
                         clearDetailFields();
@@ -701,9 +695,6 @@ public class InvRequest_EntryControllerLP_Food implements Initializable, ScreenI
                         tblViewOrderDetails.refresh();
                         tableListInformation.refresh();
 
-                        invRequestController.setTransactionStatus(StockRequestStatus.OPEN);
-                        invRequestController.Master().setIndustryId(psIndustryID);
-                        invRequestController.Master().setCompanyID(psCompanyID);
                     }
                     break;
                 case "btnNew":
@@ -748,7 +739,7 @@ public class InvRequest_EntryControllerLP_Food implements Initializable, ScreenI
             initFields(pnEditMode);
         } catch (CloneNotSupportedException | ParseException | ExceptionInInitializerError | SQLException | GuanzonException | NullPointerException e) {
             ShowMessageFX.Error(getStage(), e.getMessage(), "Error", psFormName);
-            System.exit(1);
+//            System.exit(1);
         }
     }
 
@@ -959,7 +950,7 @@ public class InvRequest_EntryControllerLP_Food implements Initializable, ScreenI
 
             CustomCommonUtil.setDisable(true,
                     tfInvType, tfReservationQTY,
-                     tfQOH, tfROQ, tfClassification, tfBrand, tfDescription, tfBarCode, tfMeasure);
+                    tfQOH, tfROQ, tfClassification, tfBrand, tfDescription, tfBarCode, tfMeasure);
             CustomCommonUtil.setDisable(!lbShow, tfOrderQuantity, taRemarks);
             CustomCommonUtil.setDisable(!lbNew, tfDescription, tfBarCode);
 
@@ -1035,11 +1026,6 @@ public class InvRequest_EntryControllerLP_Food implements Initializable, ScreenI
                             event.consume();
                             break;
                         case "tfSearchTransNo":
-                            System.out.print("Company ID" + psCompanyID);
-                            invRequestController.Master().setIndustryId(psIndustryID);
-                            invRequestController.Master().setCompanyID(psCompanyID);
-                            invRequestController.Master().setCategoryId(psCategoryID);
-                            invRequestController.setTransactionStatus("102");
                             poJSON = invRequestController.searchTransaction();
                             if (!"error".equals((String) poJSON.get("result"))) {
                                 pnTblInvDetailRow = -1;
@@ -1055,10 +1041,6 @@ public class InvRequest_EntryControllerLP_Food implements Initializable, ScreenI
                             break;
                         case "tfSearchReferenceNo":
                             System.out.print("Enter pressed");
-                            invRequestController.Master().setIndustryId(psIndustryID);
-                            invRequestController.Master().setCompanyID(psCompanyID);
-                            invRequestController.Master().setCategoryId(psCategoryID);
-                            invRequestController.setTransactionStatus("102");
                             poJSON = invRequestController.searchTransaction(true);
                             if (!"error".equals((String) poJSON.get("result"))) {
                                 pnTblInvDetailRow = -1;
@@ -1216,7 +1198,7 @@ public class InvRequest_EntryControllerLP_Food implements Initializable, ScreenI
 
         } catch (Exception e) {
             ShowMessageFX.Error(getStage(), e.getMessage(), "Error", psFormName);
-            System.exit(1);
+//            System.exit(1);
         }
     }
 
@@ -1345,24 +1327,21 @@ public class InvRequest_EntryControllerLP_Food implements Initializable, ScreenI
             if (loSelectedInformation != null) {
                 String lsTransactionNo = loSelectedInformation.getIndex01();
                 try {
-                    poJSON = invRequestController.InitTransaction();
+                    poJSON = invRequestController.OpenTransaction(lsTransactionNo);
                     if ("success".equals((String) poJSON.get("result"))) {
-                        poJSON = invRequestController.OpenTransaction(lsTransactionNo);
-                        if ("success".equals((String) poJSON.get("result"))) {
-                            loadMaster();
-                            initTableInvDetail();
-                            loadTableInvDetail();
-                            pnTblInvDetailRow = -1;
-                            clearDetailFields();
-                            pnEditMode = invRequestController.getEditMode();
-                        } else {
-                            ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
-                            pnEditMode = EditMode.UNKNOWN;
-                        }
-                        initButtons(pnEditMode);
-                        initFields(pnEditMode);
-
+                        loadMaster();
+                        initTableInvDetail();
+                        loadTableInvDetail();
+                        pnTblInvDetailRow = -1;
+                        clearDetailFields();
+                        pnEditMode = invRequestController.getEditMode();
+                    } else {
+                        ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
+                        pnEditMode = EditMode.UNKNOWN;
                     }
+                    initButtons(pnEditMode);
+                    initFields(pnEditMode);
+
                 } catch (CloneNotSupportedException | SQLException | GuanzonException ex) {
                     Logger.getLogger(InvRequest_ConfirmationControllerMC.class
                             .getName()).log(Level.SEVERE, null, ex);
@@ -1444,6 +1423,7 @@ public class InvRequest_EntryControllerLP_Food implements Initializable, ScreenI
 
     private void clearAllTables() {
 
+        pnTblInvDetailRow = -1;
         invOrderDetail_data.clear();
         tableListInformation_data.clear();
 

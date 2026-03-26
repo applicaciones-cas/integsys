@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package ph.com.guanzongroup.integsys.views;
 
 import ph.com.guanzongroup.integsys.model.ModelInvOrderDetail;
@@ -35,7 +31,6 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TablePosition;
-import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
@@ -58,6 +53,7 @@ import org.guanzon.appdriver.agent.ShowDialogFX;
 import org.guanzon.appdriver.agent.ShowMessageFX;
 import org.guanzon.appdriver.base.CommonUtils;
 import org.guanzon.appdriver.base.GuanzonException;
+import org.guanzon.appdriver.base.MiscUtil;
 import org.guanzon.appdriver.base.SQLUtil;
 import org.guanzon.appdriver.constant.EditMode;
 import org.guanzon.appdriver.constant.UserRight;
@@ -156,29 +152,16 @@ public class InvRequest_ConfirmationControllerCar implements Initializable, Scre
         try {
             System.out.print("The company ID: " + psCompanyID);
             invRequestController = new InvWarehouseControllers(poApp, logWrapper).StockRequest();
-            invRequestController.setTransactionStatus(StockRequestStatus.OPEN);
-
             poJSON = invRequestController.InitTransaction();
             if (!"success".equals(poJSON.get("result"))) {
                 ShowMessageFX.Warning((String) poJSON.get("message"), "Search Information", null);
             }
 
             Platform.runLater((() -> {
-                //BOTH NULL
-
-                try {
-                    //set edit mode to new transaction temporily to assign industry and company
-                    invRequestController.NewTransaction();
-                    invRequestController.Master().setIndustryId(psIndustryID);
-                    invRequestController.Master().setCompanyID(psCompanyID);
-                    invRequestController.Master().setCategoryId(psCategoryID);
-                    loadRecordSearch();
-
-                    //reset the transaction
-                    invRequestController.InitTransaction();
-                } catch (CloneNotSupportedException e) {
-                    ShowMessageFX.Warning((String) e.getMessage(), "Search Information", null);
-                }
+                invRequestController.setTransactionStatus("102");
+                invRequestController.setCompanyID(psCompanyID);
+                invRequestController.setCategoryID(psCategoryID);
+                invRequestController.setIndustryID(psIndustryID);
             }));
             tblViewOrderDetails.addEventFilter(KeyEvent.KEY_PRESSED, this::tableKeyEvents);
             initTextFieldPattern();
@@ -197,8 +180,8 @@ public class InvRequest_ConfirmationControllerCar implements Initializable, Scre
             initFields(EditMode.UNKNOWN);
 
         } catch (ExceptionInInitializerError ex) {
-            Logger.getLogger(InvRequest_EntryControllerMC.class.getName()).log(Level.SEVERE, null, ex);
-
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(MiscUtil.getException(ex), psFormName, null);
         }
     }
 
@@ -230,7 +213,8 @@ public class InvRequest_ConfirmationControllerCar implements Initializable, Scre
             lblSource.setText(invRequestController.Master().Company().getCompanyName() + " - " + invRequestController.Master().Industry().getDescription());
 
         } catch (GuanzonException | SQLException ex) {
-            Logger.getLogger(InvRequest_EntryControllerMC.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(MiscUtil.getException(ex), psFormName, null);
         }
 
     }
@@ -482,9 +466,9 @@ public class InvRequest_ConfirmationControllerCar implements Initializable, Scre
                 tfOrderQuantity.setText(lsOrderQuantity);
 
             }
-        } catch (SQLException | GuanzonException e) {
-            ShowMessageFX.Error(getStage(), e.getMessage(), "Error", psFormName);
-            System.exit(1);
+        } catch (SQLException | GuanzonException ex) {
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(MiscUtil.getException(ex), psFormName, null);
         }
     }
 
@@ -495,11 +479,6 @@ public class InvRequest_ConfirmationControllerCar implements Initializable, Scre
             switch (lsButton) {
 
                 case "btnBrowse":
-                    invRequestController.Master().setIndustryId(psIndustryID);
-                    invRequestController.Master().setCompanyID(psCompanyID);
-                    invRequestController.Master().setCategoryId(psCategoryID);
-
-                    invRequestController.setTransactionStatus("102");
                     loJSON = invRequestController.searchTransaction();
 
                     if (!"error".equals((String) loJSON.get("result"))) {
@@ -516,10 +495,6 @@ public class InvRequest_ConfirmationControllerCar implements Initializable, Scre
                     }
                     break;
                 case "btnRetrieve":
-                    invRequestController.Master().setIndustryId(psIndustryID);
-                    invRequestController.Master().setCompanyID(psCompanyID);
-                    invRequestController.Master().setCategoryId(psCategoryID);
-                    invRequestController.setTransactionStatus("102");
                     loadTableList();
                     break;
                 case "btnUpdate":
@@ -633,14 +608,24 @@ public class InvRequest_ConfirmationControllerCar implements Initializable, Scre
                     if ("success".equals(poJSON.get("result")) && invRequestController.Master().getTransactionStatus().equals(StockRequestStatus.OPEN)
                             && ShowMessageFX.YesNo(null, psFormName, "Do you want to confirm this transaction?")) {
                         try {
-                            if ("success".equals((poJSON = invRequestController.ConfirmTransaction("Confirmed")).get("result"))) {
+                            poJSON = invRequestController.ConfirmTransaction("Confirmed");
+
+                            if (!"success".equals(poJSON.get("result"))) {
+                                loadMaster();
+                                pnEditMode = invRequestController.getEditMode();
+                                loadTableInvDetail();
+                                loadDetail();
                                 ShowMessageFX.Information((String) poJSON.get("message"), psFormName, null);
+
+                                break;
                             }
+                            ShowMessageFX.Information((String) poJSON.get("message"), psFormName, null);
+
                         } catch (ParseException ex) {
-                            Logger.getLogger(InvRequest_ConfirmationControllerCar.class.getName()).log(Level.SEVERE, null, ex);
+                            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+
                         }
                     }
-
                     break;
 
                 case "btnConfirm":
@@ -665,15 +650,15 @@ public class InvRequest_ConfirmationControllerCar implements Initializable, Scre
                     if (!ShowMessageFX.YesNo(null, psFormName, "Are you sure you want to return this transaction?")) {
                         return;
                     }
-
-                    if (StockRequestStatus.CONFIRMED.equals(status) || StockRequestStatus.PROCESSED.equals(status)) {
-                        // Require user approval
-                        JSONObject approvalResult = ShowDialogFX.getUserApproval(poApp);
-                        if (!"success".equals(approvalResult.get("result"))) {
-                            ShowMessageFX.Warning((String) approvalResult.get("message"), psFormName, null);
-                            return;
-                        }
-                    }
+//
+//                    if (StockRequestStatus.CONFIRMED.equals(status) || StockRequestStatus.PROCESSED.equals(status)) {
+//                        // Require user approval
+//                        JSONObject approvalResult = ShowDialogFX.getUserApproval(poApp);
+//                        if (!"success".equals(approvalResult.get("result"))) {
+//                            ShowMessageFX.Warning((String) approvalResult.get("message"), psFormName, null);
+//                            return;
+//                        }
+//                    }
 
                      {
                         try {
@@ -703,8 +688,6 @@ public class InvRequest_ConfirmationControllerCar implements Initializable, Scre
                         invOrderDetail_data.clear();
                         tableListInformation_data.clear();
 
-                        invRequestController.InitTransaction();
-
                         clearAllTables();
                         clearDetailFields();
                         clearMasterFields();
@@ -715,10 +698,6 @@ public class InvRequest_ConfirmationControllerCar implements Initializable, Scre
 
                         tblViewOrderDetails.refresh();
                         tableListInformation.refresh();
-
-                        invRequestController.setTransactionStatus(StockRequestStatus.OPEN);
-                        invRequestController.Master().setIndustryId(psIndustryID);
-                        invRequestController.Master().setCompanyID(psCompanyID);
                     }
                     break;
                 case "btnNew":
@@ -763,7 +742,7 @@ public class InvRequest_ConfirmationControllerCar implements Initializable, Scre
             initFields(pnEditMode);
         } catch (CloneNotSupportedException | ExceptionInInitializerError | SQLException | GuanzonException | NullPointerException e) {
             ShowMessageFX.Error(getStage(), e.getMessage(), "Error", psFormName);
-            System.exit(1);
+//            System.exit(1);
         }
     }
 
@@ -1032,10 +1011,6 @@ public class InvRequest_ConfirmationControllerCar implements Initializable, Scre
                     switch (fieldId) {
                         case "tfSearchTransNo":
                             System.out.print("Company ID" + psCompanyID);
-                            invRequestController.Master().setIndustryId(psIndustryID);
-                            invRequestController.Master().setCompanyID(psCompanyID);
-                            invRequestController.Master().setCategoryId(psCategoryID);
-                            invRequestController.setTransactionStatus("102");
                             poJSON = invRequestController.searchTransaction();
                             if (!"error".equals((String) poJSON.get("result"))) {
                                 pnTblInvDetailRow = -1;
@@ -1051,10 +1026,6 @@ public class InvRequest_ConfirmationControllerCar implements Initializable, Scre
                             break;
                         case "tfSearchReferenceNo":
                             System.out.print("Enter pressed");
-                            invRequestController.Master().setIndustryId(psIndustryID);
-                            invRequestController.Master().setCompanyID(psCompanyID);
-                            invRequestController.Master().setCategoryId(psCategoryID);
-                            invRequestController.setTransactionStatus("102");
                             poJSON = invRequestController.searchTransaction(true);
                             if (!"error".equals((String) poJSON.get("result"))) {
                                 pnTblInvDetailRow = -1;
@@ -1118,7 +1089,7 @@ public class InvRequest_ConfirmationControllerCar implements Initializable, Scre
 
         } catch (Exception e) {
             ShowMessageFX.Error(getStage(), e.getMessage(), "Error", psFormName);
-            System.exit(1);
+//            System.exit(1);
         }
     }
 
@@ -1251,24 +1222,21 @@ public class InvRequest_ConfirmationControllerCar implements Initializable, Scre
             if (loSelectedInformation != null) {
                 String lsTransactionNo = loSelectedInformation.getIndex01();
                 try {
-                    poJSON = invRequestController.InitTransaction();
+                    poJSON = invRequestController.OpenTransaction(lsTransactionNo);
                     if ("success".equals((String) poJSON.get("result"))) {
-                        poJSON = invRequestController.OpenTransaction(lsTransactionNo);
-                        if ("success".equals((String) poJSON.get("result"))) {
-                            loadMaster();
-                            initTableInvDetail();
-                            loadTableInvDetail();
-                            pnTblInvDetailRow = -1;
-                            clearDetailFields();
-                            pnEditMode = invRequestController.getEditMode();
-                        } else {
-                            ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
-                            pnEditMode = EditMode.UNKNOWN;
-                        }
-                        initButtons(pnEditMode);
-                        initFields(pnEditMode);
-
+                        loadMaster();
+                        initTableInvDetail();
+                        loadTableInvDetail();
+                        pnTblInvDetailRow = -1;
+                        clearDetailFields();
+                        pnEditMode = invRequestController.getEditMode();
+                    } else {
+                        ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
+                        pnEditMode = EditMode.UNKNOWN;
                     }
+                    initButtons(pnEditMode);
+                    initFields(pnEditMode);
+
                 } catch (CloneNotSupportedException | SQLException | GuanzonException ex) {
                     Logger.getLogger(InvRequest_ConfirmationControllerMC.class
                             .getName()).log(Level.SEVERE, null, ex);
@@ -1331,6 +1299,7 @@ public class InvRequest_ConfirmationControllerCar implements Initializable, Scre
 
     private void clearAllTables() {
 
+        pnTblInvDetailRow = -1;
         invOrderDetail_data.clear();
         tableListInformation_data.clear();
 

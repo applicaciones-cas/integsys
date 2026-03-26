@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package ph.com.guanzongroup.integsys.views;
 
 import ph.com.guanzongroup.integsys.model.ModelInvOrderDetail;
@@ -33,7 +29,6 @@ import org.guanzon.appdriver.base.LogWrapper;
 import org.guanzon.cas.inv.warehouse.services.InvWarehouseControllers;
 import javafx.scene.layout.AnchorPane;
 import org.json.simple.JSONObject;
-
 import javafx.fxml.Initializable;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
@@ -42,7 +37,6 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TablePosition;
-import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
@@ -60,6 +54,7 @@ import org.guanzon.appdriver.agent.ShowDialogFX;
 import org.guanzon.appdriver.agent.ShowMessageFX;
 import org.guanzon.appdriver.base.CommonUtils;
 import org.guanzon.appdriver.base.GuanzonException;
+import org.guanzon.appdriver.base.MiscUtil;
 import org.guanzon.appdriver.base.SQLUtil;
 import org.guanzon.appdriver.constant.EditMode;
 import org.guanzon.appdriver.constant.UserRight;
@@ -158,8 +153,6 @@ public class InvRequest_EntryControllerMonarch_Food implements Initializable, Sc
         try {
 
             invRequestController = new InvWarehouseControllers(poApp, logWrapper).StockRequest();
-            invRequestController.setTransactionStatus(StockRequestStatus.OPEN);
-
             poJSON = invRequestController.InitTransaction();
             if (!"success".equals(poJSON.get("result"))) {
                 ShowMessageFX.Warning((String) poJSON.get("message"), "Search Information", null);
@@ -177,7 +170,6 @@ public class InvRequest_EntryControllerMonarch_Food implements Initializable, Sc
                     loadRecordSearch();
 
                     //reset the transaction
-                    invRequestController.InitTransaction();
                 } catch (CloneNotSupportedException e) {
                     ShowMessageFX.Warning((String) e.getMessage(), "Search Information", null);
                 }
@@ -490,7 +482,7 @@ public class InvRequest_EntryControllerMonarch_Food implements Initializable, Sc
             }
         } catch (SQLException | GuanzonException e) {
             ShowMessageFX.Error(getStage(), e.getMessage(), "Error", psFormName);
-            System.exit(1);
+//            System.exit(1);
         }
     }
 
@@ -506,14 +498,14 @@ public class InvRequest_EntryControllerMonarch_Food implements Initializable, Sc
                         return;
                     }
 
-                    if (StockRequestStatus.CONFIRMED.equals(status) || StockRequestStatus.PROCESSED.equals(status)) {
-                        // Require user approval
-                        JSONObject approvalResult = ShowDialogFX.getUserApproval(poApp);
-                        if (!"success".equals(approvalResult.get("result"))) {
-                            ShowMessageFX.Warning((String) approvalResult.get("message"), psFormName, null);
-                            return;
-                        }
-                    }
+//                    if (StockRequestStatus.CONFIRMED.equals(status) || StockRequestStatus.PROCESSED.equals(status)) {
+//                        // Require user approval
+//                        JSONObject approvalResult = ShowDialogFX.getUserApproval(poApp);
+//                        if (!"success".equals(approvalResult.get("result"))) {
+//                            ShowMessageFX.Warning((String) approvalResult.get("message"), psFormName, null);
+//                            return;
+//                        }
+//                    }
 
                     // Proceed to void the transaction
                     poJSON = invRequestController.VoidTransaction("Voided");
@@ -531,11 +523,6 @@ public class InvRequest_EntryControllerMonarch_Food implements Initializable, Sc
 
                     break;
                 case "btnBrowse":
-                    invRequestController.Master().setIndustryId(psIndustryID);
-                    invRequestController.Master().setCompanyID(psCompanyID);
-                    invRequestController.Master().setCategoryId(psCategoryID);
-
-                    invRequestController.setTransactionStatus("102");
                     loJSON = invRequestController.searchTransaction();
 
                     if (!"error".equals((String) loJSON.get("result"))) {
@@ -551,10 +538,6 @@ public class InvRequest_EntryControllerMonarch_Food implements Initializable, Sc
                     }
                     break;
                 case "btnRetrieve":
-                    invRequestController.Master().setIndustryId(psIndustryID);
-                    invRequestController.Master().setCompanyID(psCompanyID);
-                    invRequestController.Master().setCategoryId(psCategoryID);
-                    invRequestController.setTransactionStatus("102");
                     loadTableList();
                     pnEditMode = EditMode.UNKNOWN;
                     initFields(pnEditMode); // This will disable all detail fields
@@ -672,11 +655,22 @@ public class InvRequest_EntryControllerMonarch_Food implements Initializable, Sc
                     if ("success".equals(poJSON.get("result")) && invRequestController.Master().getTransactionStatus().equals(StockRequestStatus.OPEN)
                             && ShowMessageFX.YesNo(null, psFormName, "Do you want to confirm this transaction?")) {
                         try {
-                            if ("success".equals((poJSON = invRequestController.ConfirmTransaction("Confirmed")).get("result"))) {
+                            poJSON = invRequestController.ConfirmTransaction("Confirmed");
+
+                            if (!"success".equals(poJSON.get("result"))) {
+                                loadMaster();
+                                pnEditMode = invRequestController.getEditMode();
+                                loadTableInvDetail();
+                                loadDetail();
                                 ShowMessageFX.Information((String) poJSON.get("message"), psFormName, null);
+
+                                break;
                             }
+                            ShowMessageFX.Information((String) poJSON.get("message"), psFormName, null);
+
                         } catch (ParseException ex) {
-                            Logger.getLogger(InvRequest_EntryControllerMonarch_Food.class.getName()).log(Level.SEVERE, null, ex);
+                            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+
                         }
                     }
                     Platform.runLater(() -> btnNew.fire());
@@ -688,8 +682,6 @@ public class InvRequest_EntryControllerMonarch_Food implements Initializable, Sc
                         invOrderDetail_data.clear();
                         tableListInformation_data.clear();
 
-                        invRequestController.InitTransaction();
-
                         clearAllTables();
                         clearDetailFields();
                         clearMasterFields();
@@ -700,10 +692,6 @@ public class InvRequest_EntryControllerMonarch_Food implements Initializable, Sc
 
                         tblViewOrderDetails.refresh();
                         tableListInformation.refresh();
-
-                        invRequestController.setTransactionStatus(StockRequestStatus.OPEN);
-                        invRequestController.Master().setIndustryId(psIndustryID);
-                        invRequestController.Master().setCompanyID(psCompanyID);
                     }
                     break;
                 case "btnNew":
@@ -748,7 +736,7 @@ public class InvRequest_EntryControllerMonarch_Food implements Initializable, Sc
             initFields(pnEditMode);
         } catch (CloneNotSupportedException | ParseException | ExceptionInInitializerError | SQLException | GuanzonException | NullPointerException e) {
             ShowMessageFX.Error(getStage(), e.getMessage(), "Error", psFormName);
-            System.exit(1);
+//            System.exit(1);
         }
     }
 
@@ -959,7 +947,7 @@ public class InvRequest_EntryControllerMonarch_Food implements Initializable, Sc
 
             CustomCommonUtil.setDisable(true,
                     tfInvType, tfReservationQTY,
-                     tfQOH, tfROQ, tfClassification, tfBrand, tfDescription, tfBarCode, tfMeasure);
+                    tfQOH, tfROQ, tfClassification, tfBrand, tfDescription, tfBarCode, tfMeasure);
             CustomCommonUtil.setDisable(!lbShow, tfOrderQuantity, taRemarks);
             CustomCommonUtil.setDisable(!lbNew, tfDescription, tfBarCode);
 
@@ -1036,10 +1024,6 @@ public class InvRequest_EntryControllerMonarch_Food implements Initializable, Sc
                             break;
                         case "tfSearchTransNo":
                             System.out.print("Company ID" + psCompanyID);
-                            invRequestController.Master().setIndustryId(psIndustryID);
-                            invRequestController.Master().setCompanyID(psCompanyID);
-                            invRequestController.Master().setCategoryId(psCategoryID);
-                            invRequestController.setTransactionStatus("102");
                             poJSON = invRequestController.searchTransaction();
                             if (!"error".equals((String) poJSON.get("result"))) {
                                 pnTblInvDetailRow = -1;
@@ -1055,10 +1039,6 @@ public class InvRequest_EntryControllerMonarch_Food implements Initializable, Sc
                             break;
                         case "tfSearchReferenceNo":
                             System.out.print("Enter pressed");
-                            invRequestController.Master().setIndustryId(psIndustryID);
-                            invRequestController.Master().setCompanyID(psCompanyID);
-                            invRequestController.Master().setCategoryId(psCategoryID);
-                            invRequestController.setTransactionStatus("102");
                             poJSON = invRequestController.searchTransaction(true);
                             if (!"error".equals((String) poJSON.get("result"))) {
                                 pnTblInvDetailRow = -1;
@@ -1216,7 +1196,7 @@ public class InvRequest_EntryControllerMonarch_Food implements Initializable, Sc
 
         } catch (Exception e) {
             ShowMessageFX.Error(getStage(), e.getMessage(), "Error", psFormName);
-            System.exit(1);
+//            System.exit(1);
         }
     }
 
@@ -1345,24 +1325,21 @@ public class InvRequest_EntryControllerMonarch_Food implements Initializable, Sc
             if (loSelectedInformation != null) {
                 String lsTransactionNo = loSelectedInformation.getIndex01();
                 try {
-                    poJSON = invRequestController.InitTransaction();
+                    poJSON = invRequestController.OpenTransaction(lsTransactionNo);
                     if ("success".equals((String) poJSON.get("result"))) {
-                        poJSON = invRequestController.OpenTransaction(lsTransactionNo);
-                        if ("success".equals((String) poJSON.get("result"))) {
-                            loadMaster();
-                            initTableInvDetail();
-                            loadTableInvDetail();
-                            pnTblInvDetailRow = -1;
-                            clearDetailFields();
-                            pnEditMode = invRequestController.getEditMode();
-                        } else {
-                            ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
-                            pnEditMode = EditMode.UNKNOWN;
-                        }
-                        initButtons(pnEditMode);
-                        initFields(pnEditMode);
-
+                        loadMaster();
+                        initTableInvDetail();
+                        loadTableInvDetail();
+                        pnTblInvDetailRow = -1;
+                        clearDetailFields();
+                        pnEditMode = invRequestController.getEditMode();
+                    } else {
+                        ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
+                        pnEditMode = EditMode.UNKNOWN;
                     }
+                    initButtons(pnEditMode);
+                    initFields(pnEditMode);
+
                 } catch (CloneNotSupportedException | SQLException | GuanzonException ex) {
                     Logger.getLogger(InvRequest_ConfirmationControllerMC.class
                             .getName()).log(Level.SEVERE, null, ex);
@@ -1444,6 +1421,7 @@ public class InvRequest_EntryControllerMonarch_Food implements Initializable, Sc
 
     private void clearAllTables() {
 
+        pnTblInvDetailRow = -1;
         invOrderDetail_data.clear();
         tableListInformation_data.clear();
 
