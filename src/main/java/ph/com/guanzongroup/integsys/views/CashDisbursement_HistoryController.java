@@ -1035,7 +1035,7 @@ public class CashDisbursement_HistoryController implements Initializable, Screen
 
             tfCreditTo.setText(poController.Master().Credited().getCompanyName());
             tfVoucherNo.setText(poController.Master().getVoucherNo());
-            tfCashAdvNo.setText(poController.Master().getCashFundId());
+            tfCashAdvNo.setText(poController.Master().getSourceNo());
             taDVRemarks.setText(poController.Master().getRemarks());
 
             tfTotalAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Master().getTransactionTotal(), true));

@@ -412,7 +412,7 @@ public class CashDisbursement_EntryController implements Initializable, ScreenIn
                                     ShowMessageFX.Warning(null, pxeModuleName, "Please check the Journal Entry before saving.");
                                     break;
                                 } else if (!pbIsCheckedBIRTab && poController.Master().getVatAmount() > 0.0000) {
-                                    ShowMessageFX.Warning(null, pxeModuleName, "Please check the BIR 2307 before verifying.");
+                                    ShowMessageFX.Warning(null, pxeModuleName, "Please check the BIR 2307 before confirming.");
                                     break;
                                 } else {
                                     poJSON = poController.ConfirmTransaction("");
@@ -424,7 +424,7 @@ public class CashDisbursement_EntryController implements Initializable, ScreenIn
                                     }
                                 }
                             } else {
-                                ShowMessageFX.Warning(null, pxeModuleName, "No journal entry found. Add a journal entry and save before verifying.");
+                                ShowMessageFX.Warning(null, pxeModuleName, "No journal entry found. Add a journal entry and save before confirming.");
                                 break;
                             }
                         }
@@ -600,6 +600,7 @@ public class CashDisbursement_EntryController implements Initializable, ScreenIn
                     clearTextFields();
                     poJSON = poController.populateDetail(lsTransactionNo);
                     if ("error".equals(poJSON.get("result"))) {
+                        loadTableDetail.reload();
                         ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                         return;
                     }
@@ -1855,7 +1856,7 @@ public class CashDisbursement_EntryController implements Initializable, ScreenIn
 
             tfCreditTo.setText(poController.Master().Credited().getCompanyName());
             tfVoucherNo.setText(poController.Master().getVoucherNo());
-            tfCashAdvNo.setText(poController.Master().getCashFundId());
+            tfCashAdvNo.setText(poController.Master().getSourceNo());
             taDVRemarks.setText(poController.Master().getRemarks());
 
             tfTotalAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Master().getTransactionTotal(), true));

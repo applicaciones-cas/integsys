@@ -330,15 +330,15 @@ public class CashDisbursement_ApprovalController implements Initializable, Scree
                         if (pnEditMode == EditMode.READY) {
                             if (!poController.existJournal().equals("")) {
                                 if (!pbIsCheckedJournalTab) {
-                                    ShowMessageFX.Warning(null, pxeModuleName, "Please check the Journal Entry before verifying.");
+                                    ShowMessageFX.Warning(null, pxeModuleName, "Please check the Journal Entry before confirming.");
                                     return;
                                 } else if (poController.Master().getTransactionStatus().equals(CashDisbursementStatus.APPROVED)) {
                                     if (oApp.getUserLevel() > UserRight.ENCODER && !pbIsCheckedBIRTab) {
-                                        ShowMessageFX.Warning(null, pxeModuleName, "Please check the BIR 2307 before verifying.");
+                                        ShowMessageFX.Warning(null, pxeModuleName, "Please check the BIR 2307 before confirming.");
                                         return;
                                     }
 //                                } else if (poController.Master().getVATAmount() > 0.0000 && !pbIsCheckedBIRTab) {
-//                                    ShowMessageFX.Warning(null, pxeModuleName, "Please check the BIR 2307 before verifying.");
+//                                    ShowMessageFX.Warning(null, pxeModuleName, "Please check the BIR 2307 before confirming.");
 //                                    return;
                                 } else {
                                     poJSON = poController.ApproveTransaction();
@@ -1732,7 +1732,7 @@ public class CashDisbursement_ApprovalController implements Initializable, Scree
 
             tfCreditTo.setText(poController.Master().Credited().getCompanyName());
             tfVoucherNo.setText(poController.Master().getVoucherNo());
-            tfCashAdvNo.setText(poController.Master().getCashFundId());
+            tfCashAdvNo.setText(poController.Master().getSourceNo());
             taDVRemarks.setText(poController.Master().getRemarks());
 
             tfTotalAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Master().getTransactionTotal(), true));
