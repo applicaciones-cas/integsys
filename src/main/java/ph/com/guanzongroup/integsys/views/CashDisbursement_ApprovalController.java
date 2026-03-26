@@ -89,8 +89,8 @@ import ph.com.guanzongroup.integsys.model.ModelDeliveryAcceptance_Attachment;
  *
  * @author Team 1
  */
-public class CashDisbursement_ConfirmationController implements Initializable, ScreenInterface {
-    
+public class CashDisbursement_ApprovalController implements Initializable, ScreenInterface {
+
     private GRiderCAS oApp;
     private JSONObject poJSON, poJSONVAT;
     private static final int ROWS_PER_PAGE = 50;
@@ -111,11 +111,11 @@ public class CashDisbursement_ConfirmationController implements Initializable, S
     private String psCategoryId = "";
     private String psSupplierPayeeId = "";
     private String psTransactionType = "";
-    
+
     private unloadForm poUnload = new unloadForm();
     private ObservableList<ModelCashDisbursement_Main> main_data = FXCollections.observableArrayList();
     private FilteredList<ModelCashDisbursement_Main> filteredMain_Data;
-    
+
     private ObservableList<ModelCashDisbursement_Detail> details_data = FXCollections.observableArrayList();
     private ObservableList<ModelJournalEntry_Detail> journal_data = FXCollections.observableArrayList();
     private ObservableList<ModelBIR_Detail> BIR_data = FXCollections.observableArrayList();
@@ -125,7 +125,7 @@ public class CashDisbursement_ConfirmationController implements Initializable, S
     private boolean pbEnteredDV = false;
     private boolean pbEnteredJE = false;
     private boolean pbEnteredBIR = false;
-    
+
     List<Pair<String, String>> plOrderNoPartial = new ArrayList<>();
     List<Pair<String, String>> plOrderNoFinal = new ArrayList<>();
     private int currentIndex = 0;
@@ -133,9 +133,9 @@ public class CashDisbursement_ConfirmationController implements Initializable, S
     Map<String, String> imageinfo_temp = new HashMap<>();
     JFXUtil.ReloadableTableTask loadTableMain, loadTableDetail, loadTableDetailJE, loadTableDetailBIR, loadTableAttachment;
     private final JFXUtil.ImageViewer imageviewerutil = new JFXUtil.ImageViewer();
-    
+
     ObservableList<String> documentType = ModelDeliveryAcceptance_Attachment.documentType;
-    
+
     @FXML
     private AnchorPane AnchorMain, apBrowse, apButton, apMasterDetail, apDVMaster1, apDVMaster2, apDVDetail, apMainList, apJournalMaster, apJournalDetails, apBIRDetail, apAttachments;
     @FXML
@@ -143,7 +143,7 @@ public class CashDisbursement_ConfirmationController implements Initializable, S
     @FXML
     private TextField tfSearchIndustry, tfSearchPayee, tfSearchCashAdvanceNo, tfDVTransactionNo, tfBranch, tfDepartment, tfCashFund, tfPayee, tfCreditTo, tfVoucherNo, tfCashAdvNo, tfTotalAmount, tfVatableSales, tfVatAmountMaster, tfVatZeroRatedSales, tfVatExemptSales, tfLessWHTax, tfTotalNetAmount, tfORNoDetail, tfParticularDetail, tfVatableSalesDetail, tfVatExemptDetail, tfVatZeroRatedSalesDetail, tfVatRateDetail, tfVatAmountDetail, tfAmountDetail, tfJournalTransactionNo, tfTotalDebitAmount, tfTotalCreditAmount, tfAccountCode, tfAccountDescription, tfDebitAmount, tfCreditAmount, tfBIRTransactionNo, tfTaxCode, tfParticular, tfBaseAmount, tfTaxRate, tfTotalTaxAmount, tfAttachmentNo, tfAttachmentSource;
     @FXML
-    private Button btnUpdate, btnSearch, btnSave, btnCancel, btnConfirm, btnVoid, btnHistory, btnRetrieve, btnClose, btnArrowLeft, btnArrowRight;
+    private Button btnApprove, btnDisapprove, btnPrint, btnHistory, btnRetrieve, btnClose, btnArrowLeft, btnArrowRight;
     @FXML
     private TabPane tabPaneMain;
     @FXML
@@ -166,23 +166,23 @@ public class CashDisbursement_ConfirmationController implements Initializable, S
     private StackPane stackPane1;
     @FXML
     private ImageView imageView;
-    
+
     @Override
     public void setGRider(GRiderCAS foValue) {
         oApp = foValue;
     }
-    
+
     @Override
     public void setIndustryID(String fsValue) {
         psIndustryId = fsValue;
     }
-    
+
     @Override
     public void setCompanyID(String fsValue) {
-        
+
         psCompanyId = fsValue;
     }
-    
+
     @Override
     public void setCategoryID(String fsValue) {
         psCategoryId = fsValue;
@@ -215,7 +215,7 @@ public class CashDisbursement_ConfirmationController implements Initializable, S
             initTabPane();
             clearTextFields();
             pnEditMode = EditMode.UNKNOWN;
-            
+
             initButton(pnEditMode);
             pagination.setPageCount(1);
             JFXUtil.initKeyClickObject(AnchorMain, lastFocusedTextField, previousSearchedTextField); // for btnSearch Reference
@@ -227,7 +227,7 @@ public class CashDisbursement_ConfirmationController implements Initializable, S
                 poController.setCompanyId(psCompanyId);
 //                poController.setCategoryID(psCategoryId);
                 poController.Master().setBranchCode(oApp.getBranchCode());
-                poController.setTransactionStatus(CashDisbursementStatus.OPEN + CashDisbursementStatus.CONFIRMED);
+                poController.setTransactionStatus(CashDisbursementStatus.CONFIRMED + CashDisbursementStatus.APPROVED);
                 loadRecordSearch();
             });
             initAttachmentPreviewPane();
@@ -236,7 +236,7 @@ public class CashDisbursement_ConfirmationController implements Initializable, S
             ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
-    
+
     public void initTabPane() {
         JFXUtil.onTabSelected(tabPaneMain, tabTitle -> {
             switch (tabTitle) {
@@ -292,123 +292,25 @@ public class CashDisbursement_ConfirmationController implements Initializable, S
                     break;
             }
         });
-        
+
     }
-    
+
     private void initButtonsClickActions() {
-        List<Button> buttons = Arrays.asList(btnConfirm, btnUpdate, btnSearch, btnSave, btnCancel, btnVoid, btnRetrieve, btnHistory, btnClose, btnArrowRight, btnArrowLeft);
+        List<Button> buttons = Arrays.asList(btnApprove, btnDisapprove, btnPrint, btnHistory, btnRetrieve, btnClose, btnArrowLeft, btnArrowRight);
         buttons.forEach(button -> button.setOnAction(this::cmdButton_Click));
     }
-    
+
     private void cmdButton_Click(ActionEvent event) {
         try {
             poJSON = new JSONObject();
             String lsButton = ((Button) event.getSource()).getId();
             switch (lsButton) {
-                case "btnUpdate":
-                    //Recheck transaction status
-                    poJSON = poController.checkUpdateTransaction(true);
-                    if (!"success".equals((String) poJSON.get("result"))) {
-                        ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-                        return;
-                    }
-                    
-                    poJSON = poController.UpdateTransaction();
-                    if ("error".equals((String) poJSON.get("result"))) {
-                        ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-                        return;
-                    }
-                    pbIsCheckedJournalTab = false;
-                    pbIsCheckedBIRTab = false;
-                    pnEditMode = poController.getEditMode();
-                    JFXUtil.clickTabByTitleText(tabPaneMain, "Cash Disbursement");
-                    loadTableDetail.reload();
-                    break;
-                case "btnSearch":
-                    JFXUtil.initiateBtnSearch(pxeModuleName, lastFocusedTextField, previousSearchedTextField, apBrowse, apDVMaster1, apDVDetail, apJournalDetails, apBIRDetail);
-                    break;
-                case "btnSave":
-                    //Recheck transaction status
-                    if (pnEditMode == EditMode.UPDATE) {
-                        poJSON = poController.checkUpdateTransaction(true);
-                        if (!"success".equals((String) poJSON.get("result"))) {
-                            ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-                            return;
-                        }
-                    }
-                    
-                    if (!ShowMessageFX.YesNo(null, pxeModuleName, "Are you sure you want to save the transaction?")) {
-                        return;
-                    }
-
-//                        if (oApp.getUserLevel() > UserRight.ENCODER) {
-//                            if (!pbIsCheckedJournalTab) {
-//                                ShowMessageFX.Warning(null, pxeModuleName, "Please check the Journal Entry before saving."); //only require check this only if higher than encoder
-//                                return;
-//                            }
-//                        }
-//                        if (!pbIsCheckedBIRTab && poController.Master().getVATAmount() > 0.0000) {
-//                            ShowMessageFX.Warning(null, pxeModuleName, "Please check the BIR 2307 before saving."); // check this for encoder or and higher
-//                            return;
-//                        }
-                    poJSON = poController.SaveTransaction();
-                    if (!"success".equals((String) poJSON.get("result"))) {
-                        ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-                        return;
-                    }
-                    
-                    ShowMessageFX.Information(null, pxeModuleName, (String) poJSON.get("message"));
-
-                    //Arsiela 03-05-2026 Moved to class save others
-//                    poJSON = poController.updatePaymentsStatus();
-//                    if ("error".equals(poJSON.get("result"))) {
-//                        ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-//                    }
-                    poJSON = poController.OpenTransaction(poController.Master().getTransactionNo());
-                    if ("success".equals(poJSON.get("result"))) {
-                        pnEditMode = poController.getEditMode();
-                        initButton(pnEditMode);
-                    }
-                    if (pnEditMode == EditMode.READY) {
-                        if (ShowMessageFX.YesNo(null, pxeModuleName, "Do you want to confirm this transaction?")) { //requires to review journal entry
-                            if (!poController.existJournal().equals("")) {
-                                if (!pbIsCheckedJournalTab) {
-                                    ShowMessageFX.Warning(null, pxeModuleName, "Please check the Journal Entry before saving.");
-                                    break;
-                                } else if (!pbIsCheckedBIRTab && poController.Master().getVatAmount() > 0.0000) {
-                                    ShowMessageFX.Warning(null, pxeModuleName, "Please check the BIR 2307 before verifying.");
-                                    break;
-                                } else {
-                                    poJSON = poController.ConfirmTransaction("");
-                                    if ("error".equals((String) poJSON.get("result"))) {
-                                        ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-                                        break;
-                                    } else {
-                                        ShowMessageFX.Information(null, pxeModuleName, (String) poJSON.get("message"));
-                                        JFXUtil.highlightByKey(tblViewMainList, String.valueOf(pnMain + 1), "#C1E1C1", highlightedRowsMain);
-                                    }
-                                }
-                            } else {
-                                ShowMessageFX.Warning(null, pxeModuleName, "No journal entry found. Add a journal entry and save before verifying.");
-                                break;
-                            }
-                        }
-                    }
-                    break;
-                case "btnCancel":
-                    if (ShowMessageFX.YesNo(null, pxeModuleName, "Do you want to disregard changes?")) {
-                        JFXUtil.disableAllHighlightByColor(tblViewMainList, "#A7C7E7", highlightedRowsMain);
-                        pnEditMode = EditMode.UNKNOWN;
-                        break;
-                    } else {
-                        return;
-                    }
                 case "btnHistory":
                     if (pnEditMode != EditMode.READY && pnEditMode != EditMode.UPDATE) {
                         ShowMessageFX.Warning("No transaction status history to load!", pxeModuleName, null);
                         return;
                     }
-                    
+
                     try {
                         poController.ShowStatusHistory();
                     } catch (NullPointerException npe) {
@@ -422,8 +324,8 @@ public class CashDisbursement_ConfirmationController implements Initializable, S
                 case "btnRetrieve":
                     loadTableMain.reload();
                     break;
-                case "btnVerify":
-                    if (ShowMessageFX.YesNo(null, pxeModuleName, "Are you sure you want to verify transaction?")) {
+                case "btnApprove":
+                    if (ShowMessageFX.YesNo(null, pxeModuleName, "Are you sure you want to approve transaction?")) {
                         pnEditMode = poController.getEditMode();
                         if (pnEditMode == EditMode.READY) {
                             if (!poController.existJournal().equals("")) {
@@ -439,7 +341,7 @@ public class CashDisbursement_ConfirmationController implements Initializable, S
 //                                    ShowMessageFX.Warning(null, pxeModuleName, "Please check the BIR 2307 before verifying.");
 //                                    return;
                                 } else {
-                                    poJSON = poController.ConfirmTransaction("");
+                                    poJSON = poController.ApproveTransaction();
                                     if ("error".equals((String) poJSON.get("result"))) {
                                         ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                         return;
@@ -458,18 +360,11 @@ public class CashDisbursement_ConfirmationController implements Initializable, S
                         return;
                     }
                     break;
-                case "btnClose":
-                    if (ShowMessageFX.YesNo(null, "Close Tab", "Are you sure you want to close this Tab?")) {
-                        poUnload.unloadForm(AnchorMain, oApp, pxeModuleName);
-                    } else {
-                        return;
-                    }
-                    break;
-                case "btnVoid":
-                    if (ShowMessageFX.YesNo(null, pxeModuleName, "Are you sure you want to void transaction?")) {
+                case "btnDisapprove":
+                    if (ShowMessageFX.YesNo(null, pxeModuleName, "Are you sure you want to disapprove transaction?")) {
                         pnEditMode = poController.getEditMode();
                         if (pnEditMode == EditMode.READY) {
-                            poJSON = poController.VoidTransaction();
+                            poJSON = poController.CancelTransaction();
                             if ("error".equals((String) poJSON.get("result"))) {
                                 ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                 return;
@@ -484,7 +379,14 @@ public class CashDisbursement_ConfirmationController implements Initializable, S
                         return;
                     }
                     break;
-                
+                case "btnClose":
+                    if (ShowMessageFX.YesNo(null, "Close Tab", "Are you sure you want to close this Tab?")) {
+                        poUnload.unloadForm(AnchorMain, oApp, pxeModuleName);
+                    } else {
+                        return;
+                    }
+                    break;
+
                 case "btnArrowRight":
                     slideImage(1);
                     break;
@@ -504,7 +406,7 @@ public class CashDisbursement_ConfirmationController implements Initializable, S
                 JFXUtil.clickTabByTitleText(tabPaneMain, "Cash Disbursement");
                 pnEditMode = EditMode.UNKNOWN;
             }
-            
+
             if (JFXUtil.isObjectEqualTo(lsButton, "btnRetrieve", "btnSearch", "btnUndo", "btnArrowRight", "btnArrowLeft", "btnHistory")) {
             } else {
                 loadRecordMaster();
@@ -522,7 +424,7 @@ public class CashDisbursement_ConfirmationController implements Initializable, S
             ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
-    
+
     private void populateBIR() {
 //        try {
 //            poJSON = new JSONObject();
@@ -538,7 +440,7 @@ public class CashDisbursement_ConfirmationController implements Initializable, S
 //            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
 //        }
     }
-    
+
     private void populateJE() {
         try {
             poJSON = new JSONObject();
@@ -555,10 +457,10 @@ public class CashDisbursement_ConfirmationController implements Initializable, S
             ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
-    
+
     private void loadTableDetailFromMain() {
         poJSON = new JSONObject();
-        
+
         pnMain = tblViewMainList.getSelectionModel().getSelectedIndex();
         ModelCashDisbursement_Main selected = (ModelCashDisbursement_Main) tblViewMainList.getSelectionModel().getSelectedItem();
         if (selected != null) {
@@ -587,9 +489,9 @@ public class CashDisbursement_ConfirmationController implements Initializable, S
                 ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
             }
         }
-        
+
     }
-    
+
     public void initLoadTable() {
         loadTableMain = new JFXUtil.ReloadableTableTask(
                 tblViewMainList,
@@ -605,12 +507,12 @@ public class CashDisbursement_ConfirmationController implements Initializable, S
                                 poJSON = poController.loadTransactionList(tfSearchIndustry.getText(), tfSearchPayee.getText(), tfSearchCashAdvanceNo.getText());
                                 if ("success".equals(poJSON.get("result"))) {
                                     String date = "";
-                                    
+
                                     for (int lnCtr = 0; lnCtr <= poController.getTransactionListCount() - 1; lnCtr++) {
                                         if (!JFXUtil.isObjectEqualTo(poController.TransactionList(lnCtr).getTransactionDate(), null, "")) {
                                             date = sdf.format(poController.TransactionList(lnCtr).getTransactionDate());
                                         }
-                                        
+
                                         main_data.add(new ModelCashDisbursement_Main(
                                                 String.valueOf(lnCtr + 1),
                                                 poController.TransactionList(lnCtr).getTransactionNo(),
@@ -639,7 +541,7 @@ public class CashDisbursement_ConfirmationController implements Initializable, S
                                 }
                                 JFXUtil.loadTab(pagination, main_data.size(), ROWS_PER_PAGE, tblViewMainList, filteredMain_Data);
                             } catch (SQLException | GuanzonException ex) {
-                                Logger.getLogger(CashDisbursement_ConfirmationController.class.getName()).log(Level.SEVERE, null, ex);
+                                Logger.getLogger(CashDisbursement_ApprovalController.class.getName()).log(Level.SEVERE, null, ex);
                             }
                         });
                     } catch (InterruptedException ex) {
@@ -647,7 +549,7 @@ public class CashDisbursement_ConfirmationController implements Initializable, S
                         ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
                     }
                 });
-        
+
         loadTableDetail = new JFXUtil.ReloadableTableTask(
                 tblVwDetails,
                 details_data,
@@ -656,7 +558,7 @@ public class CashDisbursement_ConfirmationController implements Initializable, S
                         try {
                             pbEnteredDV = false;
                             details_data.clear();
-                            
+
                             if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
                                 if (poController.Master().getSourceNo() == null || "".equals(poController.Master().getSourceNo())) {
                                     poController.ReloadDetail();
@@ -681,7 +583,7 @@ public class CashDisbursement_ConfirmationController implements Initializable, S
                                     lsParticular = poController.Detail(lnCtr).Particular().getDescription();
                                     lsOrNo = "";
                                 }
-                                
+
                                 lnRowCount += 1;
                                 details_data.add(
                                         new ModelCashDisbursement_Detail(String.valueOf(lnRowCount),
@@ -697,7 +599,7 @@ public class CashDisbursement_ConfirmationController implements Initializable, S
                                                 String.valueOf(lnCtr)
                                         ));
                             }
-                            
+
                             int lnTempRow = JFXUtil.getDetailRow(details_data, pnDetail, 11); //this method is used only when Reverse is applied
                             if (lnTempRow < 0 || lnTempRow
                                     >= details_data.size()) {
@@ -722,7 +624,7 @@ public class CashDisbursement_ConfirmationController implements Initializable, S
                         }
                     });
                 });
-        
+
         loadTableDetailJE = new JFXUtil.ReloadableTableTask(
                 tblVwJournalDetails,
                 journal_data,
@@ -765,7 +667,7 @@ public class CashDisbursement_ConfirmationController implements Initializable, S
                                                 String.valueOf(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Journal().Detail(lnCtr).getCreditAmount(), true)),
                                                 String.valueOf(lnCtr)
                                         ));
-                                
+
                                 lsReportMonthYear = "";
                                 lsAcctCode = "";
                                 lsAccDesc = "";
@@ -842,7 +744,7 @@ public class CashDisbursement_ConfirmationController implements Initializable, S
                         }
                     });
                 });
-        
+
         loadTableAttachment = new JFXUtil.ReloadableTableTask(
                 tblAttachments,
                 attachment_data,
@@ -891,7 +793,7 @@ public class CashDisbursement_ConfirmationController implements Initializable, S
                 }
         );
     }
-    
+
     private void initAttachmentPreviewPane() {
         imageviewerutil.initAttachmentPreviewPane(stackPane1, imageView);
         stackPane1.heightProperty().addListener((observable, oldValue, newHeight) -> {
@@ -900,17 +802,17 @@ public class CashDisbursement_ConfirmationController implements Initializable, S
             loadTableAttachment.reload();
             loadRecordAttachment(true);
         });
-        
+
     }
-    
+
     public void initAttachmentsGrid() {
         JFXUtil.setColumnCenter(tblRowNoAttachment);
         JFXUtil.setColumnLeft(tblFileNameAttachment);
         JFXUtil.setColumnsIndexAndDisableReordering(tblAttachments);
-        
+
         tblAttachments.setItems(attachment_data);
     }
-    
+
     public void slideImage(int direction) {
         if (attachment_data.size() <= 0) {
             return;
@@ -918,7 +820,7 @@ public class CashDisbursement_ConfirmationController implements Initializable, S
         int lnRow = Integer.valueOf(attachment_data.get(tblAttachments.getSelectionModel().getSelectedIndex()).getIndex01());
         currentIndex = lnRow - 1;
         int newIndex = currentIndex + direction;
-        
+
         if (newIndex != -1 && (newIndex <= attachment_data.size() - 1)) {
             TranslateTransition slideOut = new TranslateTransition(Duration.millis(300), imageView);
             slideOut.setByX(direction * -400); // Move left or right
@@ -935,27 +837,27 @@ public class CashDisbursement_ConfirmationController implements Initializable, S
                 TranslateTransition slideIn = new TranslateTransition(Duration.millis(300), imageView);
                 slideIn.setToX(0);
                 slideIn.play();
-                
+
                 loadRecordAttachment(true);
             });
-            
+
             slideOut.play();
         }
         if (JFXUtil.isImageViewOutOfBounds(imageView, stackPane1)) {
             JFXUtil.resetImageBounds(imageView, stackPane1);
         }
     }
-    
+
     private void initMainGrid() {
         JFXUtil.setColumnCenter(tblRowNo, tblRefNo, tblLiquidationDate);
         JFXUtil.setColumnLeft(tblPayee);
         JFXUtil.setColumnRight(tblAmount);
         JFXUtil.setColumnsIndexAndDisableReordering(tblViewMainList);
-        
+
         filteredMain_Data = new FilteredList<>(main_data, b -> true);
         tblViewMainList.setItems(filteredMain_Data);
     }
-    
+
     private void initDetailGrid() {
         JFXUtil.setColumnCenter(tblDVRowNo, tblReceiptNoDetail);
         JFXUtil.setColumnLeft(tblParticularDetail);
@@ -963,7 +865,7 @@ public class CashDisbursement_ConfirmationController implements Initializable, S
         JFXUtil.setColumnsIndexAndDisableReordering(tblVwDetails);
         tblVwDetails.setItems(details_data);
     }
-    
+
     private void initDetailJEGrid() {
         JFXUtil.setColumnCenter(tblJournalRowNo, tblJournalReportMonthYear);
         JFXUtil.setColumnLeft(tblJournalAccountCode, tblJournalAccountDescription);
@@ -971,7 +873,7 @@ public class CashDisbursement_ConfirmationController implements Initializable, S
         JFXUtil.setColumnsIndexAndDisableReordering(tblVwJournalDetails);
         tblVwJournalDetails.setItems(journal_data);
     }
-    
+
     private void initDetailBIRGrid() {
         JFXUtil.setColumnCenter(tblBIRRowNo);
         JFXUtil.setColumnLeft(tblBIRParticular, tblTaxCode);
@@ -979,7 +881,7 @@ public class CashDisbursement_ConfirmationController implements Initializable, S
         JFXUtil.setColumnsIndexAndDisableReordering(tblVwBIRDetails);
         tblVwBIRDetails.setItems(BIR_data);
     }
-    
+
     private void initTableOnClick() {
         tblAttachments.setOnMouseClicked(event -> {
             pnAttachment = tblAttachments.getSelectionModel().getSelectedIndex();
@@ -1002,7 +904,7 @@ public class CashDisbursement_ConfirmationController implements Initializable, S
                 }
             }
         });
-        
+
         tblViewMainList.setOnMouseClicked(event -> {
             pnMain = tblViewMainList.getSelectionModel().getSelectedIndex();
             if (pnMain >= 0 && event.getClickCount() == 2) {
@@ -1032,7 +934,7 @@ public class CashDisbursement_ConfirmationController implements Initializable, S
         JFXUtil.setKeyEventFilter(this::tableKeyEvents, tblVwDetails, tblVwJournalDetails, tblVwBIRDetails);
         JFXUtil.adjustColumnForScrollbar(tblViewMainList, tblVwDetails, tblVwJournalDetails, tblVwBIRDetails);
     }
-    
+
     private void tableKeyEvents(KeyEvent event) {
         TableView<?> currentTable = (TableView<?>) event.getSource();
         TablePosition<?, ?> focusedCell = currentTable.getFocusModel().getFocusedCell();
@@ -1042,7 +944,7 @@ public class CashDisbursement_ConfirmationController implements Initializable, S
         boolean moveDown = event.getCode() == KeyCode.TAB || event.getCode() == KeyCode.DOWN;
         boolean moveUp = event.getCode() == KeyCode.UP;
         int newIndex = 0;
-        
+
         if (moveDown || moveUp) {
             switch (currentTable.getId()) {
                 case "tblVwDetails":
@@ -1085,7 +987,7 @@ public class CashDisbursement_ConfirmationController implements Initializable, S
             event.consume();
         }
     }
-    
+
     private void initTextFields() {
         //Initialise  TextField Focus
         JFXUtil.setFocusListener(txtArea_Focus, taDVRemarks, taJournalRemarks);
@@ -1094,10 +996,10 @@ public class CashDisbursement_ConfirmationController implements Initializable, S
         JFXUtil.setFocusListener(txtDetail_Focus, apDVDetail);
         JFXUtil.setFocusListener(txtDetailJE_Focus, apJournalDetails);
         JFXUtil.setFocusListener(txtBIRDetail_Focus, apBIRDetail);
-        
+
         JFXUtil.setKeyPressedListener(this::txtField_KeyPressed, apDVMaster1, apDVMaster2, apDVDetail, apBrowse, apJournalMaster, apJournalDetails, apBIRDetail);
         JFXUtil.adjustColumnForScrollbar(tblVwDetails, tblViewMainList, tblVwJournalDetails, tblVwBIRDetails, tblAttachments);
-        
+
         JFXUtil.setCommaFormatter(tfDebitAmount, tfCreditAmount, tfBaseAmount);
         JFXUtil.setCommaFormatter2(tfVatExemptDetail);
         Platform.runLater(() -> {
@@ -1128,7 +1030,7 @@ public class CashDisbursement_ConfirmationController implements Initializable, S
                         break;
                 }
             });
-    
+
     ChangeListener<Boolean> txtArea_Focus = JFXUtil.FocusListener(TextArea.class,
             (lsID, lsValue) -> {
                 switch (lsID) {
@@ -1157,12 +1059,12 @@ public class CashDisbursement_ConfirmationController implements Initializable, S
                         case "tfBranch":
                             if (lsValue.isEmpty()) {
                                 if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
-                                    
+
                                     if (!JFXUtil.isObjectEqualTo(poController.Master().getBranchCode(), null, "")) {
                                         boolean lbproceed = !JFXUtil.isObjectEqualTo(poController.Detail(0).CashAdvanceDetail(poController.Master().getSourceNo()).getORNo(), null, "")
                                         || !JFXUtil.isObjectEqualTo(poController.Detail(0).CashAdvanceDetail(poController.Master().getSourceNo()).getParticular(), null, "")
                                         || !JFXUtil.isObjectEqualTo(poController.Detail(0).Particular().getDescription(), null, "");
-                                        
+
                                         if (poController.getDetailCount() >= 1 && lbproceed) {
                                             if (!pbKeyPressed) {
                                                 if (ShowMessageFX.YesNo(null, pxeModuleName,
@@ -1192,7 +1094,7 @@ public class CashDisbursement_ConfirmationController implements Initializable, S
                                         boolean lbproceed = !JFXUtil.isObjectEqualTo(poController.Detail(0).CashAdvanceDetail(poController.Master().getSourceNo()).getORNo(), null, "")
                                         || !JFXUtil.isObjectEqualTo(poController.Detail(0).CashAdvanceDetail(poController.Master().getSourceNo()).getParticular(), null, "")
                                         || !JFXUtil.isObjectEqualTo(poController.Detail(0).Particular().getDescription(), null, "");
-                                        
+
                                         if (poController.getDetailCount() >= 1 && lbproceed) {
                                             if (!pbKeyPressed) {
                                                 if (ShowMessageFX.YesNo(null, pxeModuleName,
@@ -1222,7 +1124,7 @@ public class CashDisbursement_ConfirmationController implements Initializable, S
                                         boolean lbproceed = !JFXUtil.isObjectEqualTo(poController.Detail(0).CashAdvanceDetail(poController.Master().getSourceNo()).getORNo(), null, "")
                                         || !JFXUtil.isObjectEqualTo(poController.Detail(0).CashAdvanceDetail(poController.Master().getSourceNo()).getParticular(), null, "")
                                         || !JFXUtil.isObjectEqualTo(poController.Detail(0).Particular().getDescription(), null, "");
-                                        
+
                                         if (poController.getDetailCount() >= 1 && lbproceed) {
                                             if (!pbKeyPressed) {
                                                 if (ShowMessageFX.YesNo(null, pxeModuleName,
@@ -1252,7 +1154,7 @@ public class CashDisbursement_ConfirmationController implements Initializable, S
                                         boolean lbproceed = !JFXUtil.isObjectEqualTo(poController.Detail(0).CashAdvanceDetail(poController.Master().getSourceNo()).getORNo(), null, "")
                                         || !JFXUtil.isObjectEqualTo(poController.Detail(0).CashAdvanceDetail(poController.Master().getSourceNo()).getParticular(), null, "")
                                         || !JFXUtil.isObjectEqualTo(poController.Detail(0).Particular().getDescription(), null, "");
-                                        
+
                                         if (poController.getDetailCount() >= 1 && lbproceed) {
                                             if (!pbKeyPressed) {
                                                 if (ShowMessageFX.YesNo(null, pxeModuleName,
@@ -1313,7 +1215,7 @@ public class CashDisbursement_ConfirmationController implements Initializable, S
                                     }
                                 }
                             }
-                            
+
                         }
                         break;
                     case "tfParticularDetail":
@@ -1338,7 +1240,7 @@ public class CashDisbursement_ConfirmationController implements Initializable, S
                     loadTableDetail.reload();
                 });
             });
-    
+
     ChangeListener<Boolean> txtDetailJE_Focus = JFXUtil.FocusListener(TextField.class,
             (lsID, lsValue) -> {
                 switch (lsID) {
@@ -1372,7 +1274,7 @@ public class CashDisbursement_ConfirmationController implements Initializable, S
                                 });
                                 return;
                             } else {
-                                
+
                             }
                         }
                         break;
@@ -1410,7 +1312,7 @@ public class CashDisbursement_ConfirmationController implements Initializable, S
                     loadTableDetailJE.reload();
                 });
             });
-    
+
     ChangeListener<Boolean> txtBIRDetail_Focus = JFXUtil.FocusListener(TextField.class,
             (lsID, lsValue) -> {
                 try {
@@ -1430,7 +1332,7 @@ public class CashDisbursement_ConfirmationController implements Initializable, S
                                 ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                 break;
                             }
-                            
+
                             poJSON = poController.computeTaxAmount();
                             if ("error".equals((String) poJSON.get("result"))) {
                                 poController.WTaxDeduction(pnDetailBIR).getModel().setBaseAmount(0.0);
@@ -1462,7 +1364,7 @@ public class CashDisbursement_ConfirmationController implements Initializable, S
                     ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
                 }
             });
-    
+
     private void txtField_KeyPressed(KeyEvent event) {
         TextField txtField = (TextField) event.getSource();
         String lsID = (((TextField) event.getSource()).getId());
@@ -1500,7 +1402,7 @@ public class CashDisbursement_ConfirmationController implements Initializable, S
                             case "tfSearchCashAdvanceNo":
                                 loadTableMain.reload();
                                 break;
-                            
+
                             case "tfBranch":
                                 if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
                                     boolean lbproceed = !JFXUtil.isObjectEqualTo(poController.Detail(0).CashAdvanceDetail(poController.Master().getSourceNo()).getORNo(), null, "")
@@ -1519,7 +1421,7 @@ public class CashDisbursement_ConfirmationController implements Initializable, S
                                         pbKeyPressed = false;
                                     }
                                 }
-                                
+
                                 poJSON = poController.SearchBranch(lsValue, false, false);
                                 if ("error".equals(poJSON.get("result"))) {
                                     ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
@@ -1552,7 +1454,7 @@ public class CashDisbursement_ConfirmationController implements Initializable, S
                                         pbKeyPressed = false;
                                     }
                                 }
-                                
+
                                 poJSON = poController.SearchDepartment(lsValue, false);
                                 if ("error".equals(poJSON.get("result"))) {
                                     ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
@@ -1584,7 +1486,7 @@ public class CashDisbursement_ConfirmationController implements Initializable, S
                                         pbKeyPressed = false;
                                     }
                                 }
-                                
+
                                 poJSON = poController.SearchCashFund(lsValue, false);
                                 if ("error".equals(poJSON.get("result"))) {
                                     ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
@@ -1603,7 +1505,7 @@ public class CashDisbursement_ConfirmationController implements Initializable, S
                                     boolean lbproceed = !JFXUtil.isObjectEqualTo(poController.Detail(0).CashAdvanceDetail(poController.Master().getSourceNo()).getORNo(), null, "")
                                             || !JFXUtil.isObjectEqualTo(poController.Detail(0).CashAdvanceDetail(poController.Master().getSourceNo()).getParticular(), null, "")
                                             || !JFXUtil.isObjectEqualTo(poController.Detail(0).Particular().getDescription(), null, "");
-                                    
+
                                     if (poController.getDetailCount() >= 1 && lbproceed) {
                                         pbKeyPressed = true;
                                         if (ShowMessageFX.YesNo(null, pxeModuleName,
@@ -1617,7 +1519,7 @@ public class CashDisbursement_ConfirmationController implements Initializable, S
                                         pbKeyPressed = false;
                                     }
                                 }
-                                
+
                                 poJSON = poController.SearchPayee(lsValue, false, false);
                                 if ("error".equals(poJSON.get("result"))) {
                                     ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
@@ -1714,7 +1616,7 @@ public class CashDisbursement_ConfirmationController implements Initializable, S
                         }
                         event.consume();
                         break;
-                    
+
                     case UP:
                         JFXUtil.altSwitch(lsID, new Object[][]{
                             {new String[]{"tfPurchasedAmountDetail", "tfTaxCodeDetail", "tfParticularDetail"}, (Runnable) () -> moveNext(true, true)},
@@ -1740,7 +1642,7 @@ public class CashDisbursement_ConfirmationController implements Initializable, S
             ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
-    
+
     public void moveNext(boolean isUp, boolean continueNext) {
         if (continueNext) {
             apDVDetail.requestFocus();
@@ -1754,7 +1656,7 @@ public class CashDisbursement_ConfirmationController implements Initializable, S
         JFXUtil.requestFocusNullField(new Object[][]{ // alternative to if , else if
             {poController.Detail(pnDetail).getAmount(), tfAmountDetail},}, tfAmountDetail); // default
     }
-    
+
     public void moveNextJE(boolean isUp, boolean continueNext) {
         try {
             if (continueNext) {
@@ -1776,7 +1678,7 @@ public class CashDisbursement_ConfirmationController implements Initializable, S
             ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
-    
+
     public void moveNextBIR(boolean isUp, boolean continueNext) {
         try {
             if (continueNext) {
@@ -1797,7 +1699,7 @@ public class CashDisbursement_ConfirmationController implements Initializable, S
             ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
-    
+
     private void loadRecordSearch() {
         try {
             lblSource.setText(poController.Master().Company().getCompanyName() + " - " + poController.Master().Industry().getDescription());
@@ -1809,12 +1711,12 @@ public class CashDisbursement_ConfirmationController implements Initializable, S
             ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
-    
+
     private void loadRecordMaster() {
         try {
             boolean lbShow2 = pnEditMode == EditMode.UPDATE;
             JFXUtil.setDisabled(true, tfBranch, tfDepartment, tfCashFund, tfPayee, tfCreditTo);
-            
+
             boolean lbShow = !JFXUtil.isObjectEqualTo(poController.Master().getSourceNo(), null, "");
             JFXUtil.setDisabled(lbShow, cbReverse);
             JFXUtil.setDisabled(true, tfAmountDetail);
@@ -1827,12 +1729,12 @@ public class CashDisbursement_ConfirmationController implements Initializable, S
             tfCashFund.setText(poController.Master().CashFund().getDescription());
             tfDepartment.setText(poController.Master().Department().getDescription());
             tfPayee.setText(poController.Master().getPayeeName());
-            
+
             tfCreditTo.setText(poController.Master().Credited().getCompanyName());
             tfVoucherNo.setText(poController.Master().getVoucherNo());
             tfCashAdvNo.setText(poController.Master().getCashFundId());
             taDVRemarks.setText(poController.Master().getRemarks());
-            
+
             tfTotalAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Master().getTransactionTotal(), true));
             tfVatableSales.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Master().getVatableSales(), true));
             tfVatAmountMaster.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Master().getVatAmount(), true));
@@ -1840,25 +1742,25 @@ public class CashDisbursement_ConfirmationController implements Initializable, S
             tfVatExemptSales.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Master().getVatExempt(), true));
             tfLessWHTax.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Master().getWithTaxTotal(), true));
             tfTotalNetAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Master().getNetTotal(), true));
-            
+
             taDVRemarks.setText(poController.Master().getRemarks());
-            
+
             JFXUtil.updateCaretPositions(apDVMaster1, apDVMaster2);
         } catch (GuanzonException | SQLException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
             ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
-    
+
     private void loadRecordDetail() {
         try {
             if (pnDetail < 0 || pnDetail > poController.getDetailCount() - 1) {
                 return;
             }
-            
+
             boolean lbShow = JFXUtil.isObjectEqualTo(poController.Master().getSourceNo(), null, "");
             JFXUtil.setDisabled(lbShow, tfVatExemptDetail);
-            
+
             String lsParticular = "", lsOrNo = "";
             if (poController.Master().getSourceNo() != null && !"".equals(poController.Master().getSourceNo())) {
                 lsParticular = poController.Detail(pnDetail).CashAdvanceDetail(poController.Master().getSourceNo()).getParticular();
@@ -1876,14 +1778,14 @@ public class CashDisbursement_ConfirmationController implements Initializable, S
             tfVatAmountDetail.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(pnDetail).getDetailVatAmount(), true));
             cbReverse.setSelected(poController.Detail(pnDetail).isReverse());
             tfAmountDetail.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(pnDetail).getAmount(), true));
-            
+
             JFXUtil.updateCaretPositions(apDVDetail);
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
             ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
-    
+
     private void loadRecordMasterJE() {
         JFXUtil.setStatusValue(lblJournalTransactionStatus, JournalStatus.class, pnEditMode == EditMode.UNKNOWN ? "-1" : poController.Journal().Master().getTransactionStatus());
         tfJournalTransactionNo.setText(poController.Journal().Master().getTransactionNo());
@@ -1897,10 +1799,10 @@ public class CashDisbursement_ConfirmationController implements Initializable, S
         tfTotalDebitAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(lnTotalDebit, true));
         tfTotalCreditAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(lnTotalCredit, true));
         taJournalRemarks.setText(poController.Journal().Master().getRemarks());
-        
+
         JFXUtil.updateCaretPositions(apJournalMaster);
     }
-    
+
     public void loadRecordDetailJE() {
         try {
             if (pnDetailJE < 0 || pnDetailJE > poController.Journal().getDetailCount() - 1) {
@@ -1908,24 +1810,24 @@ public class CashDisbursement_ConfirmationController implements Initializable, S
             }
             boolean lbShow = poController.Journal().Detail(pnDetailJE).getEditMode() == EditMode.UPDATE;
             JFXUtil.setDisabled(lbShow, tfAccountCode, tfAccountDescription);
-            
+
             boolean lbNotZero = poController.Journal().Detail(pnDetailJE).getDebitAmount() > 0 || poController.Journal().Detail(pnDetailJE).getCreditAmount() > 0;
             cbJEReverse.selectedProperty().set(lbNotZero);
-            
+
             tfAccountCode.setText(poController.Journal().Detail(pnDetailJE).getAccountCode());
             tfAccountDescription.setText(poController.Journal().Detail(pnDetailJE).Account_Chart().getDescription());
             String lsReportMonth = CustomCommonUtil.formatDateToShortString(poController.Journal().Detail(pnDetailJE).getForMonthOf());
             JFXUtil.setDateValue(dpReportMonthYear, CustomCommonUtil.parseDateStringToLocalDate(lsReportMonth, "yyyy-MM-dd"));
             tfDebitAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Journal().Detail(pnDetailJE).getDebitAmount(), true));
             tfCreditAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Journal().Detail(pnDetailJE).getCreditAmount(), true));
-            
+
             JFXUtil.updateCaretPositions(apJournalDetails);
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
             ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
-    
+
     public void loadRecordDetailBIR() {
         try {
             if (pnDetailBIR < 0 || pnDetailBIR > poController.getWTaxDeductionsCount() - 1) {
@@ -1933,7 +1835,7 @@ public class CashDisbursement_ConfirmationController implements Initializable, S
             }
             boolean lbShow = poController.WTaxDeduction(pnDetailBIR).getModel().getEditMode() == EditMode.UPDATE;
             JFXUtil.setDisabled(lbShow, tfTaxCode, tfParticular);
-            
+
             tfBIRTransactionNo.setText(poController.WTaxDeduction(pnDetailBIR).getModel().getTransactionNo());
             String lsPeriodFromDate = CustomCommonUtil.formatDateToShortString(poController.WTaxDeduction(pnDetailBIR).getModel().getPeriodFrom());
             dpPeriodFrom.setValue(CustomCommonUtil.parseDateStringToLocalDate(lsPeriodFromDate, "yyyy-MM-dd"));
@@ -1945,14 +1847,14 @@ public class CashDisbursement_ConfirmationController implements Initializable, S
             tfTaxRate.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.WTaxDeduction(pnDetailBIR).getModel().WithholdingTax().getTaxRate()));
             tfTotalTaxAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.WTaxDeduction(pnDetailBIR).getModel().getTaxAmount(), false));
             cbBIRReverse.setSelected(poController.WTaxDeduction(pnDetailBIR).getModel().isReverse());
-            
+
             JFXUtil.updateCaretPositions(apBIRDetail);
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
             ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
-    
+
     public void loadRecordAttachment(boolean lbloadImage) {
         try {
             if (attachment_data.size() > 0) {
@@ -1980,7 +1882,7 @@ public class CashDisbursement_ConfirmationController implements Initializable, S
                                 filePath2 = System.getProperty("sys.default.path.temp.attachments") + "/" + (String) attachment_data.get(tblAttachments.getSelectionModel().getSelectedIndex()).getIndex02();
                             }
                         }
-                        
+
                         if (filePath != null && !filePath.isEmpty()) {
                             Path imgPath = Paths.get(filePath2);
                             String convertedPath = imgPath.toUri().toString();
@@ -1993,7 +1895,7 @@ public class CashDisbursement_ConfirmationController implements Initializable, S
                                 Image loimage = new Image(convertedPath);
                                 imageView.setImage(loimage);
                                 JFXUtil.adjustImageSize(loimage, imageView, imageviewerutil.ldstackPaneWidth, imageviewerutil.ldstackPaneHeight);
-                                
+
                                 PauseTransition delay = new PauseTransition(Duration.seconds(2)); // 2-second delay
                                 delay.setOnFinished(event -> {
                                     Platform.runLater(() -> {
@@ -2013,7 +1915,7 @@ public class CashDisbursement_ConfirmationController implements Initializable, S
                                 // Optional: add some margin
                                 StackPane.setMargin(btnArrowLeft, new Insets(0, 0, 0, 10));
                                 StackPane.setMargin(btnArrowRight, new Insets(0, 10, 0, 0));
-                                
+
                             } else {
                                 // ----- PDF VIEW -----
                                 JFXUtil.PDFViewConfig(filePath2, stackPane1, btnArrowLeft, btnArrowRight, imageviewerutil.ldstackPaneWidth, imageviewerutil.ldstackPaneHeight);
@@ -2021,7 +1923,7 @@ public class CashDisbursement_ConfirmationController implements Initializable, S
                         } else {
                             imageView.setImage(null);
                         }
-                        
+
                     } catch (Exception e) {
                         imageView.setImage(null);
                     }
@@ -2041,11 +1943,11 @@ public class CashDisbursement_ConfirmationController implements Initializable, S
         } catch (Exception ex) {
         }
     }
-    
+
     private void initComboBoxes() {
         JFXUtil.setComboBoxItems(new JFXUtil.Pairs<>(documentType, cmbAttachmentType));
     }
-    
+
     boolean pbSuccess = true;
     EventHandler<ActionEvent> datepicker_Action = JFXUtil.DatePickerAction(
             (datePicker, sdfFormat, lsServerDate, ldCurrentDate, lsSelectedDate, ldSelectedDate) -> {
@@ -2057,17 +1959,17 @@ public class CashDisbursement_ConfirmationController implements Initializable, S
                         if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
                             lsTransDate = sdfFormat.format(poController.Master().getTransactionDate());
                             transactionDate = LocalDate.parse(lsTransDate, DateTimeFormatter.ofPattern(SQLUtil.FORMAT_SHORT_DATE));
-                            
+
                             if (ldSelectedDate.isAfter(ldCurrentDate)) {
                                 JFXUtil.setJSONError(poJSON, "Future dates are not allowed.");
                                 pbSuccess = false;
                             }
-                            
+
                             if (pbSuccess && (ldSelectedDate.isAfter(transactionDate))) {
                                 JFXUtil.setJSONError(poJSON, "Report date cannot be later than the transaction date.");
                                 pbSuccess = false;
                             }
-                            
+
                             if (pbSuccess) {
                                 poController.Journal().Detail(pnDetailJE).setForMonthOf((SQLUtil.toDate(lsSelectedDate, SQLUtil.FORMAT_SHORT_DATE)));
                             } else {
@@ -2084,12 +1986,12 @@ public class CashDisbursement_ConfirmationController implements Initializable, S
                         if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
                             lsPeriodToDate = sdfFormat.format(poController.WTaxDeduction(pnDetailBIR).getModel().getPeriodTo());
                             periodToDate = LocalDate.parse(lsPeriodToDate, DateTimeFormatter.ofPattern(SQLUtil.FORMAT_SHORT_DATE));
-                            
+
                             if (pbSuccess && (ldSelectedDate.isAfter(periodToDate))) {
                                 JFXUtil.setJSONError(poJSON, "Period From cannot be later than the \"Period To\" date.");
                                 pbSuccess = false;
                             }
-                            
+
                             if (pbSuccess) {
                                 poController.WTaxDeduction(pnDetailBIR).getModel().setPeriodFrom(SQLUtil.toDate(lsSelectedDate, SQLUtil.FORMAT_SHORT_DATE));
                             } else {
@@ -2106,12 +2008,12 @@ public class CashDisbursement_ConfirmationController implements Initializable, S
                         if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
                             lsPeriodFromDate = sdfFormat.format(poController.WTaxDeduction(pnDetailBIR).getModel().getPeriodFrom());
                             periodFromDate = LocalDate.parse(lsPeriodFromDate, DateTimeFormatter.ofPattern(SQLUtil.FORMAT_SHORT_DATE));
-                            
+
                             if (pbSuccess && (ldSelectedDate.isBefore(periodFromDate))) {
                                 JFXUtil.setJSONError(poJSON, "Period To cannot be before than the \"Period From\" date.");
                                 pbSuccess = false;
                             }
-                            
+
                             if (pbSuccess) {
                                 poController.WTaxDeduction(pnDetailBIR).getModel().setPeriodTo(SQLUtil.toDate(lsSelectedDate, SQLUtil.FORMAT_SHORT_DATE));
                             } else {
@@ -2128,12 +2030,12 @@ public class CashDisbursement_ConfirmationController implements Initializable, S
                         break;
                 }
             });
-    
+
     private void initDatePicker() {
         JFXUtil.setDatePickerFormat("MM/dd/yyyy", dpDVTransactionDate, dpJournalTransactionDate, dpReportMonthYear, dpPeriodFrom, dpPeriodTo);
         JFXUtil.setActionListener(datepicker_Action, dpDVTransactionDate, dpJournalTransactionDate, dpReportMonthYear, dpPeriodFrom, dpPeriodTo);
     }
-    
+
     @FXML
     private void cmdCheckBox_Click(ActionEvent event) {
         poJSON = new JSONObject();
@@ -2177,49 +2079,42 @@ public class CashDisbursement_ConfirmationController implements Initializable, S
                         moveNextBIR(false, false);
                     }
                     break;
-                
+
             }
         }
     }
-    
-    private void initButton(int fnEditMode) {
-        boolean lbShow = (fnEditMode == EditMode.ADDNEW || fnEditMode == EditMode.UPDATE);
-        boolean lbShow2 = (fnEditMode == EditMode.READY);
-        JFXUtil.setButtonsVisibility(!lbShow, btnClose);
-        JFXUtil.setButtonsVisibility(lbShow, btnSave, btnCancel, btnSearch);
-        JFXUtil.setButtonsVisibility(false, btnUpdate, btnVoid);
-        JFXUtil.setButtonsVisibility(lbShow2, btnConfirm);
-        JFXUtil.setButtonsVisibility(fnEditMode == EditMode.READY, btnHistory);
-        
-        JFXUtil.setDisabled(!lbShow, apDVMaster1, apDVMaster2, apDVDetail,
-                apJournalMaster, apJournalDetails, apBIRDetail, apAttachments);
-        
-        if (fnEditMode == EditMode.READY) {
-            switch (poController.Master().getTransactionStatus()) {
-                case CashDisbursementStatus.OPEN:
-                    JFXUtil.setButtonsVisibility(true, btnUpdate, btnVoid);
-                    break;
-                case CashDisbursementStatus.CONFIRMED:
-                    JFXUtil.setButtonsVisibility(true, btnUpdate);
-                    JFXUtil.setButtonsVisibility(false, btnConfirm);
-                    break;
-                case CashDisbursementStatus.VOID:
-                case CashDisbursementStatus.CANCELLED:
-                default:
-                    JFXUtil.setButtonsVisibility(false, btnConfirm, btnUpdate);
-                    break;
-            }
-            if (JFXUtil.isObjectEqualTo(poController.Master().getTransactionStatus(),
-                    CashDisbursementStatus.OPEN, CashDisbursementStatus.CONFIRMED)) {
-                JFXUtil.setButtonsVisibility(true, btnVoid);
-            }
+
+    private void initButton(int fnValue) {
+
+        boolean lbShow1 = (fnValue == EditMode.UPDATE);
+        boolean lbShow2 = (fnValue == EditMode.READY);
+        boolean lbShow3 = (fnValue == EditMode.UNKNOWN || fnValue == EditMode.READY);
+
+        JFXUtil.setButtonsVisibility(lbShow2, btnHistory, btnPrint, btnApprove, btnDisapprove);
+        JFXUtil.setButtonsVisibility(lbShow3, btnClose);
+
+        JFXUtil.setDisabled(true, apDVMaster1, apDVMaster2, apJournalMaster, apJournalDetails, apBIRDetail);
+
+        if (fnValue != EditMode.READY) {
+            return;
+        }
+        switch (poController.Master().getTransactionStatus()) {
+            case CashDisbursementStatus.APPROVED:
+                JFXUtil.setButtonsVisibility(false, btnApprove);
+                break;
+            case CashDisbursementStatus.VOID:
+            case CashDisbursementStatus.CANCELLED:
+            default:
+                JFXUtil.setButtonsVisibility(false, btnApprove, btnDisapprove);
+                break;
         }
     }
-    
+
+
     private void clearTextFields() {
         JFXUtil.setValueToNull(previousSearchedTextField, lastFocusedTextField);
         JFXUtil.clearTextFields(apButton, apMasterDetail, apDVMaster1, apDVMaster2, apDVDetail,
                 apMainList, apBrowse, apJournalMaster, apJournalDetails, apBIRDetail, apAttachments);
     }
-    
+
 }
