@@ -794,6 +794,7 @@ public class CheckPrintRequest_ConfirmationController implements Initializable, 
             switch (event.getCode()) {
                 case TAB:
                 case ENTER:
+                case F3:
                     switch (lsID) {
                         case "tfSearchReferNo":
                             psSearchReferNo = tfSearchReferNo.getText();
