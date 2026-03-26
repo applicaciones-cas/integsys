@@ -227,6 +227,7 @@ public class CashDisbursement_ConfirmationController implements Initializable, S
                 poController.setCompanyId(psCompanyId);
 //                poController.setCategoryID(psCategoryId);
                 poController.Master().setBranchCode(oApp.getBranchCode());
+                  poController.setTransactionStatus(CashDisbursementStatus.OPEN + CashDisbursementStatus.CONFIRMED );
                 loadRecordSearch();
             });
             initAttachmentPreviewPane();
@@ -655,8 +656,11 @@ public class CashDisbursement_ConfirmationController implements Initializable, S
                         try {
                             pbEnteredDV = false;
                             details_data.clear();
+
                             if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
-                                poController.ReloadDetail();
+                                if (poController.Master().getSourceNo() == null || "".equals(poController.Master().getSourceNo())) {
+                                    poController.ReloadDetail();
+                                }
                                 poJSON = poController.computeDetailFields(true);
                                 if ("error".equals((String) poJSON.get("result"))) {
                                     ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
@@ -671,10 +675,10 @@ public class CashDisbursement_ConfirmationController implements Initializable, S
 //                                    }
 //                                }
                                 if (poController.Master().getSourceNo() != null && !"".equals(poController.Master().getSourceNo())) {
-                                    lsParticular = poController.Detail(pnDetail).CashAdvanceDetail(poController.Master().getSourceNo()).getParticular();
-                                    lsOrNo = poController.Detail(pnDetail).CashAdvanceDetail(poController.Master().getSourceNo()).getORNo();
+                                    lsParticular = poController.Detail(lnCtr).CashAdvanceDetail(poController.Master().getSourceNo()).getParticular();
+                                    lsOrNo = poController.Detail(lnCtr).CashAdvanceDetail(poController.Master().getSourceNo()).getORNo();
                                 } else {
-                                    lsParticular = poController.Detail(pnDetail).Particular().getDescription();
+                                    lsParticular = poController.Detail(lnCtr).Particular().getDescription();
                                     lsOrNo = "";
                                 }
 
