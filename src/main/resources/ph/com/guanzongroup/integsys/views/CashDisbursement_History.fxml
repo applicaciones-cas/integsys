@@ -34,7 +34,7 @@
                     <top>
                         <AnchorPane prefWidth="1042.0" BorderPane.alignment="CENTER">
                             <children>
-                                <AnchorPane style="-fx-background-color: A0A0A0;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                <AnchorPane fx:id="apBrowse" style="-fx-background-color: A0A0A0;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                     <children>
                                         <GridPane prefHeight="28.0" prefWidth="1447.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0">
                                             <columnConstraints>
@@ -354,7 +354,7 @@
                                                                            </padding>
                                                                         </Label>
                                                                                                 <TextField fx:id="tfORNoDetail" disable="true" editable="false" maxWidth="-Infinity" prefWidth="150.0" GridPane.columnIndex="2" GridPane.rowIndex="2" />
-                                                                                                <TextField fx:id="tfORNoDetail1" disable="true" editable="false" layoutX="125.0" layoutY="12.0" maxWidth="1.7976931348623157E308" GridPane.columnIndex="2" GridPane.rowIndex="3" />
+                                                                                                <TextField fx:id="tfParticularDetail" disable="true" editable="false" layoutX="125.0" layoutY="12.0" maxWidth="1.7976931348623157E308" GridPane.columnIndex="2" GridPane.rowIndex="3" />
                                                                                                 <TextField fx:id="tfVatableSalesDetail" alignment="CENTER_RIGHT" disable="true" promptText="0.00" styleClass="DisabledTextField" GridPane.columnIndex="6" GridPane.rowIndex="2" />
                                                                                                 <TextField fx:id="tfVatExemptDetail" alignment="CENTER_RIGHT" disable="true" promptText="0.00" styleClass="DisabledTextField" GridPane.columnIndex="6" GridPane.rowIndex="3" />
                                                                                                 <TextField fx:id="tfVatZeroRatedSalesDetail" alignment="CENTER_RIGHT" disable="true" promptText="0.00" styleClass="DisabledTextField" GridPane.columnIndex="6" GridPane.rowIndex="4" />

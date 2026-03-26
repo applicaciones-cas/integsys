@@ -645,7 +645,7 @@ public class CashDisbursement_ConfirmationController implements Initializable, S
                                 SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
                                 main_data.clear();
                                 JFXUtil.disableAllHighlight(tblViewMainList, highlightedRowsMain);
-                                poJSON = poController.loadCashAdvanceList(tfSearchIndustry.getText(), tfSearchPayee.getText(), tfSearchCashAdvanceNo.getText());
+                                poJSON = poController.loadTransactionList(tfSearchIndustry.getText(), tfSearchPayee.getText(), tfSearchCashAdvanceNo.getText());
                                 if ("success".equals(poJSON.get("result"))) {
                                     String date = "";
 
