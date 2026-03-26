@@ -623,7 +623,7 @@ public class CheckImportingController implements Initializable, ScreenInterface 
                 // ✅ KEEPING YOUR ORIGINAL LOGIC (only index changed)
                 main_data.add(new ModelCheckImporting(
                         String.valueOf(lnCtr + 1),
-                        poCheckImporting.CheckPayments(0).getSourceNo(),
+                        row.getVoucherNo(),
                         CustomCommonUtil.formatDateToShortString(
                                 poCheckImporting.CheckPayments(0).getTransactionDate()),
                         poCheckImporting.CheckPayments(0).Banks().getBankName(),
