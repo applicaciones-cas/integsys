@@ -145,15 +145,14 @@ public class CashAdvance_HistoryController implements Initializable, ScreenInter
                     poController.setCompanyId(psCompanyId);
                     poController.setSearchBranch(oApp.getBranchName());
                     poController.setSearchIndustry(poController.Master().Industry().getDescription());
-                    if (!oApp.isMainOffice()) {
+                    
+                    //Kung accounting yung dept ni user makikita lahat else kung hindi mag base sa department ng user - ma'am grace 03/26/2026 3:51pm
+                    if(!oApp.getDepartment().equals(poController.getFinanceDepartment())){
                         poController.setDepartmentId(oApp.getDepartment());
                         tfSearchBranch.setDisable(true);
                         tfSearchIndustry.setDisable(true);
-                    } else {
-                        if (oApp.getUserLevel() <= UserRight.ENCODER) {
-                            poController.setDepartmentId(oApp.getDepartment());
-                        }
                     }
+                    
                     loadRecordSearch();
                 } catch (SQLException | GuanzonException ex) {
                     Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
@@ -680,7 +679,7 @@ public class CashAdvance_HistoryController implements Initializable, ScreenInter
                     ? CustomCommonUtil.parseDateStringToLocalDate(SQLUtil.dateFormat(poController.Master().getLiquidatedDate(), SQLUtil.FORMAT_SHORT_DATE))
                     : null);
 
-            tfCashAdvanceBalance.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Master().CashFund().getBalance(), false));
+            tfCashAdvanceBalance.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.getCashAdvanceBalance(), false));
             tfAdvancesAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Master().getAdvanceAmount(), false));
             tfLiquidationTotal.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Master().getLiquidationTotal().doubleValue(), false));
 

@@ -1856,9 +1856,6 @@ public class CashDisbursement_ConfirmationController implements Initializable, S
                 return;
             }
             
-            boolean lbShow = JFXUtil.isObjectEqualTo(poController.Master().getSourceNo(), null, "");
-            JFXUtil.setDisabled(lbShow, tfVatExemptDetail);
-            
             String lsParticular = "", lsOrNo = "";
             if (poController.Master().getSourceNo() != null && !"".equals(poController.Master().getSourceNo())) {
                 lsParticular = poController.Detail(pnDetail).CashAdvanceDetail(poController.Master().getSourceNo()).getParticular();
@@ -1867,7 +1864,11 @@ public class CashDisbursement_ConfirmationController implements Initializable, S
                 lsParticular = poController.Detail(pnDetail).Particular().getDescription();
                 lsOrNo = "";
             }
-            tfORNoDetail.setText(lsParticular);
+            
+            boolean lbShow = JFXUtil.isObjectEqualTo(poController.Master().getSourceNo(), null, "") || JFXUtil.isObjectEqualTo(lsOrNo, null, "");
+            JFXUtil.setDisabled(lbShow, tfVatExemptDetail);
+            
+            tfORNoDetail.setText(lsOrNo);
             tfParticularDetail.setText(lsParticular);
             tfVatableSalesDetail.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(pnDetail).getDetailVatSales(), true));
             tfVatExemptDetail.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(pnDetail).getDetailVatExempt(), true));

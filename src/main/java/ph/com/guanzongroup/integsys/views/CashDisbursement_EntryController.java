@@ -585,7 +585,7 @@ public class CashDisbursement_EntryController implements Initializable, ScreenIn
 
     private void loadTableDetailFromMain() {
         poJSON = new JSONObject();
-        if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
+        if (pnEditMode == EditMode.ADDNEW) {  //Do not allow to link cash advance when edit mode is not equal to add new
 
             pnMain = tblViewMainList.getSelectionModel().getSelectedIndex();
             ModelCashDisbursement_Main selected = (ModelCashDisbursement_Main) tblViewMainList.getSelectionModel().getSelectedItem();
@@ -617,7 +617,7 @@ public class CashDisbursement_EntryController implements Initializable, ScreenIn
                 }
             }
         } else {
-            ShowMessageFX.Warning(null, pxeModuleName, "Data can only be viewed when in ADD or UPDATE mode.");
+            ShowMessageFX.Warning(null, pxeModuleName, "Data can only be insert when in ADD mode.");
         }
     }
 
@@ -1881,9 +1881,6 @@ public class CashDisbursement_EntryController implements Initializable, ScreenIn
                 return;
             }
 
-            boolean lbShow = JFXUtil.isObjectEqualTo(poController.Master().getSourceNo(), null, "");
-            JFXUtil.setDisabled(lbShow, tfVatExemptDetail);
-
             String lsParticular = "", lsOrNo = "";
             if (poController.Master().getSourceNo() != null && !"".equals(poController.Master().getSourceNo())) {
                 lsParticular = poController.Detail(pnDetail).CashAdvanceDetail(poController.Master().getSourceNo()).getParticular();
@@ -1892,7 +1889,11 @@ public class CashDisbursement_EntryController implements Initializable, ScreenIn
                 lsParticular = poController.Detail(pnDetail).Particular().getDescription();
                 lsOrNo = "";
             }
-            tfORNoDetail.setText(lsParticular);
+            
+            boolean lbShow = JFXUtil.isObjectEqualTo(poController.Master().getSourceNo(), null, "") || JFXUtil.isObjectEqualTo(lsOrNo, null, "");
+            JFXUtil.setDisabled(lbShow, tfVatExemptDetail);
+            
+            tfORNoDetail.setText(lsOrNo);
             tfParticularDetail.setText(lsParticular);
             tfVatableSalesDetail.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(pnDetail).getDetailVatSales(), true));
             tfVatExemptDetail.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(pnDetail).getDetailVatExempt(), true));
