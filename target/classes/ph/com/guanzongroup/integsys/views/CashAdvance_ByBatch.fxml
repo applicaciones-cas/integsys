@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
+<?import java.net.URL?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Pagination?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.effect.Blend?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane fx:id="AnchorMain" minWidth="1455.0" prefHeight="1000.0" prefWidth="1761.0" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1">
+    <children>
+        <StackPane AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+            <children>
+                <BorderPane>
+                    <top>
+                        <AnchorPane prefWidth="1042.0" BorderPane.alignment="CENTER">
+                            <children>
+                                <AnchorPane fx:id="apBrowse" style="-fx-background-color: A0A0A0;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                    <children>
+                                        <GridPane prefHeight="28.0" prefWidth="1447.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0">
+                                            <columnConstraints>
+                                    <ColumnConstraints halignment="RIGHT" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="100.0" />
+                                    <ColumnConstraints halignment="RIGHT" maxWidth="10.0" minWidth="10.0" prefWidth="10.0" />
+                                    <ColumnConstraints halignment="RIGHT" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="200.0" />
+                                    <ColumnConstraints halignment="RIGHT" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="20.0" />
+                                                <ColumnConstraints halignment="RIGHT" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="80.0" />
+                                                <ColumnConstraints halignment="RIGHT" hgrow="ALWAYS" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="10.0" />
+                                                <ColumnConstraints halignment="RIGHT" hgrow="ALWAYS" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="200.0" />
+                                    <ColumnConstraints halignment="RIGHT" hgrow="ALWAYS" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="20.0" />
+                                                <ColumnConstraints halignment="RIGHT" hgrow="ALWAYS" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="100.0" />
+                                    <ColumnConstraints halignment="RIGHT" hgrow="ALWAYS" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="10.0" />
+                                                <ColumnConstraints halignment="RIGHT" hgrow="ALWAYS" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="200.0" />
+                                                <ColumnConstraints halignment="RIGHT" hgrow="ALWAYS" maxWidth="501.0" minWidth="501.0" prefWidth="501.0" />
+                                    <ColumnConstraints halignment="RIGHT" hgrow="ALWAYS" maxWidth="1.7976931348623157E308" minWidth="10.0" prefWidth="300.0" />
+                                            </columnConstraints>
+                                            <rowConstraints>
+                                                <RowConstraints />
+                                                <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="28.0" vgrow="SOMETIMES" />
+                                            </rowConstraints>
+                                            <children>
+                                                <Label fx:id="lblSource" text="Company - Industry" GridPane.columnIndex="11" GridPane.rowIndex="1">
+                                                    <font>
+                                                        <Font name="System Bold" size="14.0" />
+                                                    </font>
+                                                </Label>
+                                                <Label text="Payee" GridPane.columnIndex="4" GridPane.rowIndex="1">
+                                                    <font>
+                                                        <Font name="System Bold" size="14.0" />
+                                                    </font>
+                                                </Label>
+                                    <TextField fx:id="tfSearchIndustry" maxWidth="1.7976931348623157E308" promptText="Press F3: Search" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+                                                <TextField fx:id="tfSearchPayee" maxWidth="1.7976931348623157E308" promptText="Press F3: Search" GridPane.columnIndex="6" GridPane.rowIndex="1" />
+                                                <Label text="Voucher No" GridPane.columnIndex="8" GridPane.rowIndex="1">
+                                                    <font>
+                                                        <Font name="System Bold" size="14.0" />
+                                                    </font>
+                                                </Label>
+                                    <Label text="Industry" GridPane.rowIndex="1">
+                                       <font>
+                                          <Font name="System Bold" size="14.0" />
+                                       </font>
+                                    </Label>
+                                                <TextField fx:id="tfSearchVoucherNo" maxWidth="1.7976931348623157E308" promptText="Press F3: Search" GridPane.columnIndex="10" GridPane.rowIndex="1" />
+                                            </children>
+                                        </GridPane>
+                                    </children>
+                                </AnchorPane>
+                            </children>
+                        </AnchorPane>
+                    </top>
+                    <bottom>
+                        <AnchorPane fx:id="apButton" prefHeight="80.0" BorderPane.alignment="CENTER">
+                            <children>
+                                <HBox alignment="CENTER_LEFT" prefHeight="75.0" prefWidth="1482.0" spacing="5.0" style="-fx-background-color: E9E9E9;" styleClass="button_process" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                    <children>
+                              <Button fx:id="btnApproved" contentDisplay="TOP" ellipsisString="" maxWidth="120.0" minWidth="100.0" mnemonicParsing="false" prefHeight="70.0" prefWidth="83.0" styleClass="button_process" stylesheets="@../css/StyleSheet.css" text="Approve">
+                                 <graphic>
+                                    <FontAwesomeIconView glyphName="THUMBS_UP" size="20" />
+                                 </graphic>
+                                 <effect>
+                                    <Blend />
+                                 </effect>
+                              </Button>
+                                        <Button fx:id="btnDisapproved" contentDisplay="TOP" ellipsisString="" maxWidth="120.0" minWidth="100.0" mnemonicParsing="false" prefHeight="70.0" prefWidth="83.0" styleClass="button_process" stylesheets="@../css/StyleSheet.css" text="Disapprove">
+                                            <graphic>
+                                                <FontAwesomeIconView glyphName="THUMBS_DOWN" size="20" />
+                                            </graphic>
+                                            <effect>
+                                                <Blend />
+                                            </effect>
+                                        </Button>
+                                        <Button fx:id="btnRetrieve" contentDisplay="TOP" ellipsisString="" mnemonicParsing="false" prefHeight="70.0" prefWidth="70.0" styleClass="button_process" stylesheets="@../css/StyleSheet.css" text="Retrieve">
+                                            <graphic>
+                                                <FontAwesomeIconView glyphName="LIST_ALT" size="20" />
+                                            </graphic>
+                                            <effect>
+                                                <Blend />
+                                            </effect>
+                                        </Button>
+                                        <Button fx:id="btnClose" contentDisplay="TOP" ellipsisString="" mnemonicParsing="false" prefHeight="70.0" prefWidth="70.0" styleClass="button_process" stylesheets="@../css/StyleSheet.css" text="Close">
+                                            <graphic>
+                                                <FontAwesomeIconView glyphName="POWER_OFF" size="20" />
+                                            </graphic>
+                                            <effect>
+                                                <Blend />
+                                            </effect>
+                                        </Button>
+                                    </children>
+                                    <padding>
+                                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                    </padding>
+                                    <opaqueInsets>
+                                        <Insets />
+                                    </opaqueInsets>
+                                </HBox>
+                            </children>
+                        </AnchorPane>
+                    </bottom>
+                    <center>
+                        <AnchorPane maxWidth="900.0" BorderPane.alignment="CENTER_LEFT">
+                            <children>
+                                <AnchorPane style="-fx-border-color: FF8201;" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="5.0">
+                                    <children>
+                                        <GridPane AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                            <columnConstraints>
+                                                <ColumnConstraints hgrow="ALWAYS" maxWidth="1.7976931348623157E308" minWidth="1205.0" />
+                                            </columnConstraints>
+                                            <rowConstraints>
+                                                <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" vgrow="SOMETIMES" />
+                                                <RowConstraints maxHeight="1.7976931348623157E308" prefHeight="30.0" vgrow="ALWAYS" />
+                                                <RowConstraints vgrow="SOMETIMES" />
+                                            </rowConstraints>
+                                            <children>
+                                                <TableView fx:id="tblViewMainList" GridPane.rowIndex="1">
+                                                    <columns>
+                                                        <TableColumn fx:id="tblRowNo" maxWidth="30.0" minWidth="30.0" prefWidth="30.0" resizable="false" sortable="false" text="No." />
+                                                        <TableColumn fx:id="tblCheckBox" maxWidth="30.0" minWidth="30.0" prefWidth="30.0" resizable="false" sortable="false">
+                                                            <graphic>
+                                                                <CheckBox fx:id="chckSelectAll" mnemonicParsing="false" onAction="#cmdCheckBox_Click" />
+                                                            </graphic>
+                                                        </TableColumn>
+                                          <TableColumn fx:id="tblTransactionNo" maxWidth="100.0" minWidth="100.0" prefWidth="100.0" resizable="false" sortable="false" text="Transaction No" />
+                                                        <TableColumn fx:id="tblVoucherNo" maxWidth="150.0" minWidth="150.0" prefWidth="150.0" resizable="false" sortable="false" text="Voucher No" />
+                                                        <TableColumn fx:id="tblDate" maxWidth="130.0" minWidth="130.0" prefWidth="130.0" resizable="false" sortable="false" text="Date" />
+                                                        <TableColumn fx:id="tblPayeeName" maxWidth="250.0" minWidth="250.0" prefWidth="250.0" resizable="false" sortable="false" text="Payee Name" />
+                                                        <TableColumn fx:id="tblCreditedTo" maxWidth="150.0" minWidth="150.0" prefWidth="150.0" resizable="false" sortable="false" text="Credited To" />
+                                                        <TableColumn fx:id="tblRequestingDepartment" maxWidth="230.0" minWidth="230.0" prefWidth="230.0" resizable="false" sortable="false" text="Req. Department" />
+                                                        <TableColumn fx:id="tblAmountToAdvance" maxWidth="120.0" minWidth="120.0" prefWidth="120.0" resizable="false" sortable="false" text="Amt to Advance" />
+                                                    </columns>
+                                                    <GridPane.margin>
+                                                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                                    </GridPane.margin>
+                                                </TableView>
+                                                <Pagination fx:id="pagination" maxPageIndicatorCount="0" GridPane.rowIndex="2">
+                                                    <GridPane.margin>
+                                                        <Insets bottom="5.0" />
+                                                    </GridPane.margin>
+                                                </Pagination>
+                                            </children>
+                                        </GridPane>
+                                    </children>
+                                </AnchorPane>
+                            </children>
+                        </AnchorPane>
+                    </center>
+                </BorderPane>
+            </children>
+        </StackPane>
+    </children>
+    <stylesheets>
+        <URL value="@../css/StyleSheet.css" />
+        <URL value="@../css/Tables.css" />
+    </stylesheets>
+</AnchorPane>

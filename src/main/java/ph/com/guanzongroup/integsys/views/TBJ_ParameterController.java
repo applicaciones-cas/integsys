@@ -122,7 +122,8 @@ public class TBJ_ParameterController implements Initializable, ScreenInterface {
             tfTransactionNo,
             tfFieldName,
             tfAccountTitle,
-            tfTableName;
+            tfTableName,
+            tfIndustry;
 
     @FXML
     private TextArea taRemarks;
@@ -573,7 +574,8 @@ public class TBJ_ParameterController implements Initializable, ScreenInterface {
                     cbIsActive,
                     cbIsRequired,
                     cmbAccountType,
-                    taRemarks
+                    taRemarks,
+                    tfIndustry
             );
 
             if (pnEditMode == EditMode.ADDNEW) {
@@ -597,7 +599,7 @@ public class TBJ_ParameterController implements Initializable, ScreenInterface {
                 apDetail.setDisable(false);
             }
 
-            List<TextField> loTxtField = Arrays.asList(tfTableName, tfCategory, tfSourceCode, tfAccountTitle, tfFieldName);
+            List<TextField> loTxtField = Arrays.asList(tfTableName, tfIndustry,tfCategory, tfSourceCode, tfAccountTitle, tfFieldName);
             loTxtField.forEach(tf -> tf.setOnKeyPressed(event -> txtField_KeyPressed(event)));
 
             JFXUtil.setFocusListener(txtArea_Focus, taRemarks);
@@ -653,10 +655,15 @@ public class TBJ_ParameterController implements Initializable, ScreenInterface {
         cmbAccountType.setOnAction(event -> {
             try {
                 if (pnSelectedDetail >= 0) { // safety check
-                    poTBJControllers.TBJParameter()
-                            .Detail(pnSelectedDetail)
-                            .setAccountType(String.valueOf(cmbAccountType.getSelectionModel().getSelectedIndex()));
-
+                    if(cmbAccountType.getSelectionModel().getSelectedIndex() == 0){
+                            poTBJControllers.TBJParameter()
+                                .Detail(pnSelectedDetail)
+                                .setAccountType("D");
+                    }else if(cmbAccountType.getSelectionModel().getSelectedIndex() == 1){
+                            poTBJControllers.TBJParameter()
+                                .Detail(pnSelectedDetail)
+                                .setAccountType("C");
+                    }
                     loadTableDetail(); // refresh table after change
                 }
             } catch (SQLException | GuanzonException ex) {
@@ -837,6 +844,13 @@ public class TBJ_ParameterController implements Initializable, ScreenInterface {
                         
                     case F3:
                         switch (txtFieldID) {
+                            case "tfIndustry":
+                                poJSON = poTBJControllers.TBJParameter().SearchIndustry(lsValue, false);
+                                if ("error".equals(poJSON.get("result"))) {
+                                    ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
+                                }
+                                tfIndustry.setText(poTBJControllers.TBJParameter().Master().Industry().getDescription());
+                                return;
                             case "tfCategory":
                                 poJSON = poTBJControllers.TBJParameter().SearchCategory(lsValue, false);
                                 if ("error".equals(poJSON.get("result"))) {
@@ -940,7 +954,8 @@ public class TBJ_ParameterController implements Initializable, ScreenInterface {
     private void LoadMaster() {
         try {
             tfTransactionNo.setText(poTBJControllers.TBJParameter().Master().getTransactionNo());
-
+            tfIndustry.setText(poTBJControllers.TBJParameter().Master().Industry().getDescription() == null ? ""
+                    : poTBJControllers.TBJParameter().Master().Industry().getDescription());
             tfSourceCode.setText(
                     poTBJControllers.TBJParameter().Master().getSourceCode() == null ? ""
                     : poTBJControllers.TBJParameter().Master().getSourceCode());
@@ -1012,12 +1027,15 @@ public class TBJ_ParameterController implements Initializable, ScreenInterface {
             String accountTypeStr = poTBJControllers.TBJParameter().Detail(pnSelectedDetail).getAccountType();
 
             if (accountTypeStr != null && !accountTypeStr.trim().isEmpty()) {
-                try {
-                    int getAccountType = Integer.parseInt(accountTypeStr);
-                    cmbAccountType.getSelectionModel().select(getAccountType);
-                } catch (NumberFormatException e) {
-                    // Invalid number, do not select anything
-                }
+
+                    if(accountTypeStr.equals("D")){
+                        cmbAccountType.getSelectionModel().select(0);
+                    }else if(accountTypeStr.equals("C")){
+                        cmbAccountType.getSelectionModel().select(1);
+                    }
+//                    int getAccountType = Integer.parseInt(accountTypeStr);
+//                    cmbAccountType.getSelectionModel().select(getAccountType);
+
             }
             cbIsActive.setSelected(
                     poTBJControllers.TBJParameter().Detail(pnSelectedDetail) != null
@@ -1123,7 +1141,7 @@ public class TBJ_ParameterController implements Initializable, ScreenInterface {
                         String accountTypeText = (poTBJControllers.TBJParameter().Detail(lnCtr).getAccountType() == null
                                 || poTBJControllers.TBJParameter().Detail(lnCtr).getAccountType().trim().isEmpty())
                                 ? ""
-                                : poTBJControllers.TBJParameter().Detail(lnCtr).getAccountType().equals("0") ? "Debit" : "Credit";
+                                : poTBJControllers.TBJParameter().Detail(lnCtr).getAccountType().equals("D") ? "Debit" : "Credit";
 
                         detailsList.add(new ModelTableDetail(
                                 String.valueOf(lnCtr + 1),
@@ -1188,7 +1206,8 @@ public class TBJ_ParameterController implements Initializable, ScreenInterface {
                 tfTransactionNo,
                 tfFieldName,
                 tfAccountTitle,
-                tfTableName                
+                tfTableName ,
+                tfIndustry
         ).forEach(TextField::clear);
         cbIsActive.setSelected(false);
         cbIsRequired.setSelected(false);

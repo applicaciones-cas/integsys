@@ -3,18 +3,24 @@ package ph.com.guanzongroup.integsys.views;
 import ph.com.guanzongroup.integsys.views.ScreenInterface;
 import java.lang.reflect.Field;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javafx.animation.PauseTransition;
+import javafx.animation.TranslateTransition;
 import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyBooleanPropertyBase;
 import javafx.beans.property.SimpleStringProperty;
@@ -25,6 +31,8 @@ import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
@@ -37,6 +45,8 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import static javafx.scene.input.KeyCode.ENTER;
 import static javafx.scene.input.KeyCode.F3;
 import static javafx.scene.input.KeyCode.TAB;
@@ -44,16 +54,26 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.StackPane;
+import javafx.stage.FileChooser;
+import javafx.stage.Stage;
+import javafx.util.Duration;
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.rendering.PDFRenderer;
 import org.guanzon.appdriver.agent.ShowMessageFX;
 import org.guanzon.appdriver.base.CommonUtils;
 import org.guanzon.appdriver.base.GRiderCAS;
 import org.guanzon.appdriver.base.LogWrapper;
 import org.guanzon.appdriver.constant.EditMode;
 import org.guanzon.appdriver.base.GuanzonException;
+import org.guanzon.appdriver.base.MiscUtil;
+import org.guanzon.appdriver.constant.DocumentType;
+import org.guanzon.appdriver.constant.RecordStatus;
 import org.guanzon.cas.client.account.AP_Client_Master;
 import org.guanzon.cas.client.model.Model_AP_Client_Ledger;
 import org.guanzon.cas.client.services.ClientControllers;
 import org.json.simple.JSONObject;
+import ph.com.guanzongroup.integsys.model.ModelDeliveryAcceptance_Attachment;
+import ph.com.guanzongroup.integsys.utility.JFXUtil;
 
 /**
  * FXML Controller class
@@ -61,19 +81,28 @@ import org.json.simple.JSONObject;
  * @author User
  */
 public class AccountsPayablexController implements Initializable, ScreenInterface {
+    
+    private final JFXUtil.ImageViewer imageviewerutil = new JFXUtil.ImageViewer();
 
     private GRiderCAS poApp;
     private LogWrapper poLogWrapper;
-    private String psFormName = "Account Payable";
     private Control lastFocusedControl;
     private AP_Client_Master poAppController;
+     
+    private String psFormName = "Account Payable";
+    private int pnLedger, pnAttachments, currentIndex;
+    
     private ObservableList<Model_AP_Client_Ledger> laLedger;
-    private int pnLedger;
-
+    private ObservableList<ModelDeliveryAcceptance_Attachment> laAttachments  = FXCollections.observableArrayList();
+    
+    private HashMap<String, String> imageinfo_temp  = new HashMap<>();
+            
     private unloadForm poUnload = new unloadForm();
+    
+    private JFXUtil.ReloadableTableTask loadTableAttachment;
 
     @FXML
-    private AnchorPane apMainAnchor, apRecord, apLedger;
+    private AnchorPane apMainAnchor, apRecord, apLedger, apAttachments;
     @FXML
     private Label lblStatus;
 
@@ -91,7 +120,25 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
     private TextField tfSearchCompanyName, tfSearchClient, tfClientID, tfContactPerson,
             tfCompanyName, tfCreditLimit, tfBegBalanace, tfCategory,
             tfDiscount, tfTerm, tfAvailBalance, tfOutStandingBalance,
-            tfAddress, tfContactNo, tfTINNo;
+            tfAddress, tfContactNo, tfTINNo, tfContactEmail;
+    
+    @FXML
+    StackPane stackpane;
+    
+    @FXML
+    private TextField txtAttachmentNo;
+    
+    @FXML
+    private TableView<ModelDeliveryAcceptance_Attachment> tblAttachments;
+    
+    @FXML
+    private TableColumn<ModelDeliveryAcceptance_Attachment, String> tblColAttachIndex, tblColAttachFile;
+    
+    @FXML
+    private ImageView imgPreview;
+    
+    @FXML
+    private Button btnAttach, btnRemoveFile, btnPrevious, btnNext;
 
     @FXML
     private DatePicker dpBegBalance, dpClientSince;
@@ -134,8 +181,13 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
             Platform.runLater(() -> {
                 poAppController.setRecordStatus("10");
             });
+            
             initializeTableLedger();
             initControlEvents();
+            initAttachmentsGrid();
+            initTableAttachments();
+            initAttachmentPreviewPane();
+            
         } catch (SQLException | GuanzonException e) {
             Logger.getLogger(AccountsPayablexController.class.getName()).log(Level.SEVERE, null, e);
             poLogWrapper.severe(psFormName + " :" + e.getMessage());
@@ -144,15 +196,24 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
 
     @FXML
     void tblLedger_Clicked(MouseEvent e) {
-//        try {
         pnLedger = tblLedger.getSelectionModel().getSelectedIndex();
         if (pnLedger < 0) {
             return;
         }
-//show ui or something todo on ledger
-//        } catch (SQLException | GuanzonException | CloneNotSupportedException ex) {
-//                poLogWrapper.severe(psFormName + " :" + ex.getMessage());
-//        }
+    }
+    
+    @FXML
+    void tblAttachment_Clicked(MouseEvent e) {
+        pnAttachments = tblAttachments.getSelectionModel().getSelectedIndex();
+        
+        if (pnAttachments >= 0) {
+            int lnRow = Integer.parseInt(laAttachments.get(tblAttachments.getSelectionModel().getSelectedIndex()).getIndex03());
+            pnAttachments = lnRow;
+            imageviewerutil.scaleFactor = 1.0;
+            
+            loadRecordAttachment(true);
+            JFXUtil.resetImageBounds(imgPreview, stackpane);
+        }
     }
 
     @FXML
@@ -191,6 +252,7 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
                                 "")) {
                             return;
                         }
+                        poAppController.loadAttachments();
 
                         getLoadedClient();
                         initButtonDisplay(poAppController.getEditMode());
@@ -209,6 +271,7 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
                                     "Initialize Search Client! ")) {
                                 return;
                             }
+                            poAppController.loadAttachments();
 
                             getLoadedClient();
                             initButtonDisplay(poAppController.getEditMode());
@@ -223,6 +286,8 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
                                     "Initialize Search Client! ")) {
                                 return;
                             }
+                            poAppController.loadAttachments();
+                            
                             getLoadedClient();
                             initButtonDisplay(poAppController.getEditMode());
                             break;
@@ -237,6 +302,7 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
                                     "Initialize Search Client! ")) {
                                 return;
                             }
+                            poAppController.loadAttachments();
 
                             getLoadedClient();
                             initButtonDisplay(poAppController.getEditMode());
@@ -253,6 +319,8 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
                     if (!isJSONSuccess(poAppController.updateRecord(), "Initialize Update Record")) {
                         return;
                     }
+                    poAppController.loadAttachments();
+                    
                     getLoadedClient();
                     initButtonDisplay(poAppController.getEditMode());
                     break;
@@ -266,9 +334,8 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
                     if (!isJSONSuccess(poAppController.saveRecord(), "Initialize Save Record")) {
                         return;
                     }
-
                     getLoadedClient();
-                    initButtonDisplay(poAppController.getEditMode());
+                    
                     break;
 
                 case "btnCancel":
@@ -289,6 +356,110 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
                     loadLedgerList();
                     reloadTableLedger();
                     break;
+                    
+                case "btnAttach":
+                    
+                    FileChooser fileChooser = new FileChooser();
+                    fileChooser.setTitle("Choose Image");
+                    fileChooser.getExtensionFilters().addAll(
+                            new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg", "*.gif", "*.pdf")
+                    );
+                    java.io.File selectedFile = fileChooser.showOpenDialog((Stage) btnAttach.getScene().getWindow());
+                    if (selectedFile != null) {
+                            // Read image from the selected file
+                            Path imgPath = selectedFile.toPath();
+                            Image loimage = new Image(Files.newInputStream(imgPath));
+                            
+                            imgPreview.setImage(loimage);
+
+                            //Validate attachment
+                            String imgPath2 = selectedFile.getName().toString();
+                            for (int lnCtr = 0; lnCtr <= poAppController.getTransactionAttachmentCount() - 1; lnCtr++) {
+                                
+                                if (imgPath2.equals(poAppController.getAttachmentList().get(lnCtr).getModel().getFileName())
+                                        
+                                        && RecordStatus.ACTIVE.equals(poAppController.getAttachmentList().get(lnCtr).getModel().getRecordStatus())) {
+                                    
+                                    ShowMessageFX.Warning(null, psFormName, "File name already exists.");
+                                    pnAttachments = lnCtr;
+                                    
+                                    loadRecordAttachment(true);
+                                    return;
+                                }
+                            }
+                            
+                            //map selected file details
+                            if (imageinfo_temp.containsKey(selectedFile.getName().toString())) {
+                                ShowMessageFX.Warning(null, psFormName, "File name already exists.");
+                                loadRecordAttachment(true);
+                                return;
+                            } else {
+                                imageinfo_temp.put(selectedFile.getName().toString(), imgPath.toString());
+                            }
+                            
+                            //Limit maximum pages of pdf to add
+                            if (imgPath2.toLowerCase().endsWith(".pdf")) {
+                                try (PDDocument document = PDDocument.load(selectedFile)) {
+                                    PDFRenderer pdfRenderer = new PDFRenderer(document);
+                                    int pageCount = document.getNumberOfPages();
+                                    if (pageCount > 5) {
+                                        ShowMessageFX.Warning(null, psFormName, "PDF exceeds maximum allowed pages.");
+                                        return;
+                                    }
+                                }
+                            }
+                            
+                            pnAttachments = poAppController.addAttachment(imgPath2);
+                            
+                            //Copy file to Attachment path
+                            poAppController.copyFile(selectedFile.toString());
+                            
+                            //reload table
+                            loadTableAttachment.reload();
+                            
+                            //focus last row
+                            tblAttachments.getFocusModel().focus(pnAttachments);
+                            tblAttachments.getSelectionModel().select(pnAttachments);
+                    }
+                    break;
+                case "btnRemoveFile":
+                    if (poAppController.getTransactionAttachmentCount() <= 0) {
+                        return;
+                    } else {
+                        for (int lnCtr = 0; lnCtr < poAppController.getTransactionAttachmentCount(); lnCtr++) {
+                            if (RecordStatus.INACTIVE.equals(poAppController.getAttachmentList().get(lnCtr).getModel().getRecordStatus())) {
+                                if (pnAttachments == lnCtr) {
+                                    return;
+                                }
+                            }
+                        }
+                    }
+                    
+                    JSONObject loJSON = poAppController.removeAttachment(pnAttachments);
+                    if ("error".equals((String) loJSON.get("result"))) {
+                        ShowMessageFX.Warning(null, psFormName, (String) loJSON.get("message"));
+                        return;
+                    }
+                    laAttachments.remove(tblAttachments.getSelectionModel().getSelectedIndex());
+                    if (pnAttachments != 0) {
+                        pnAttachments -= 1;
+                    }
+                    imageinfo_temp.clear();
+                    loadRecordAttachment(false);
+                    
+                    loadTableAttachment.reload();
+                    if (laAttachments.size() <= 0) {
+                        JFXUtil.clearTextFields(apAttachments);
+                    }
+                    initAttachmentsGrid();
+                    break;
+                case "btnNext":
+                    slideImage(1);
+                    break;
+                case "btnPrevious":
+                    slideImage(-1);
+                    break;
+                    
                 case "btnClose":
                     if (ShowMessageFX.YesNo("Are you sure you want to close this form?", psFormName, null)) {
                         if (poUnload != null) {
@@ -297,12 +468,19 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
                             ShowMessageFX.Warning("Please notify the system administrator to configure the null value at the close button.", "Warning", null);
                         }
                     }
+                    break;
             }
-
+            
+            //reset edit mode, upon save button
+            if (btnID.equalsIgnoreCase("btnSave")) {
+                initButtonDisplay(EditMode.UNKNOWN);
+                return;
+            }
             initButtonDisplay(poAppController.getEditMode());
 
         } catch (Exception e) {
             poLogWrapper.severe(psFormName + " :" + e.getMessage());
+            ShowMessageFX.Error(null, psFormName, MiscUtil.getException(e));
         }
     }
 
@@ -406,6 +584,7 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
                                         "")) {
                                     return;
                                 }
+                                poAppController.loadAttachments();
 
                                 getLoadedClient();
                                 initButtonDisplay(poAppController.getEditMode());
@@ -420,6 +599,8 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
                                         "")) {
                                     return;
                                 }
+                                poAppController.loadAttachments();
+                                
                                 getLoadedClient();
                                 initButtonDisplay(poAppController.getEditMode());
                                 break;
@@ -440,6 +621,7 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
             poLogWrapper.severe(psFormName + " :" + ex.getMessage());
         }
     }
+    
     final ChangeListener<? super Boolean> dPicker_Focus = (o, ov, nv) -> {
         DatePicker loDatePicker = (DatePicker) ((ReadOnlyBooleanPropertyBase) o).getBean();
         String lsDatePickerID = loDatePicker.getId();
@@ -455,9 +637,6 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
                 case "dpClientSince":
                     poAppController.getModel().setdateClientSince(ldDateValue);
                     return;
-//                case "dpBegBalance":
-//                    poAppController.getModel().setBeginningDate(ldDateValue);
-//                    return;
 
             }
         }
@@ -473,6 +652,7 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
             tfCompanyName.setText(poAppController.getModel().Client().getCompanyName());
             tfAddress.setText(poAppController.getModel().ClientAddress().getAddress());
             tfContactPerson.setText(poAppController.getModel().ClientInstitutionContact().getContactPersonName());
+            tfContactEmail.setText(poAppController.getModel().ClientInstitutionContact().getMailAddress());
             tfContactNo.setText(poAppController.getModel().ClientInstitutionContact().getMobileNo());
             tfTINNo.setText(poAppController.getModel().Client().getTaxIdNumber());
 
@@ -550,13 +730,12 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
                 ((ComboBox) loControl).setItems(null);
             }
         }
+        
+        //reset image objects
+        imageinfo_temp.clear();
+        imgPreview.setImage(null);
+        
         initButtonDisplay(poAppController.getEditMode());
-//        try {
-////            dpBegBalance.setValue((ParseDate((Date) poApp.getServerDate())));
-////            dpClientSince.setValue(ParseDate((Date) poApp.getServerDate()));
-//        } catch (SQLException ex) {
-//            Logger.getLogger(AccountsPayablexController.class.getName()).log(Level.SEVERE, null, ex);
-//        }
     }
 
     private void initButtonDisplay(int fnEditMode) {
@@ -570,6 +749,10 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
         initButtonControls(!lbShow, "btnBrowse", "btnRetrieve", "btnUpdate");
 
         apRecord.setDisable(!lbShow);
+        
+        //initialize file buttons
+        btnAttach.setDisable(!lbShow);
+        btnRemoveFile.setDisable(!lbShow);
     }
 
     private void initButtonControls(boolean visible, String... buttonFxIdsToShow) {
@@ -634,12 +817,22 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
             });
         }
     }
+    
+    private void initAttachmentsGrid(){
+        
+        /*FOCUS ON FIRST ROW*/
+        JFXUtil.setColumnCenter(tblColAttachIndex);
+        JFXUtil.setColumnLeft(tblColAttachFile);
+        JFXUtil.setColumnsIndexAndDisableReordering(tblAttachments);
+        
+        tblAttachments.setItems(laAttachments);
+    }
 
     private void reloadTableLedger() {
         List<Model_AP_Client_Ledger> rawDetail = poAppController.getLedgerList();
         laLedger.setAll(rawDetail);
 
-//         Restore or select last row
+        //Restore or select last row
         int indexToSelect = (pnLedger >= 1 && pnLedger < laLedger.size())
                 ? pnLedger - 1
                 : laLedger.size() - 1;
@@ -651,6 +844,7 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
     }
 
     private void loadLedgerList() {
+        
         StackPane overlay = getOverlayProgress(apLedger);
         ProgressIndicator pi = (ProgressIndicator) overlay.getChildren().get(0);
         overlay.setVisible(true);
@@ -696,11 +890,237 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
         thread.setDaemon(true);
         thread.start();
     }
+    
+    public void initTableAttachments() {
+        
+        loadTableAttachment = new JFXUtil.ReloadableTableTask(
+                tblAttachments,
+                laAttachments,
+                () -> {
+                    
+                    JFXUtil.resetImageBounds(imgPreview, stackpane);
+                    Platform.runLater(() -> {
+                        
+                        try {
+                            
+                            int lnCtr;
+                            int lnCount = 0;
+                            
+                            //set image to full scale
+                            imageviewerutil.scaleFactor = 1.0;
+                            
+                            //re initialize attachment list
+                            laAttachments.clear();
+                            for (lnCtr = 0; lnCtr < poAppController.getTransactionAttachmentCount(); lnCtr++) {
+                                
+                                //skip current iteration, if status is inactive
+                                if (RecordStatus.INACTIVE.equals(poAppController.getAttachmentList().get(lnCtr).getModel().getRecordStatus())) {
+                                    continue;
+                                }
+                                lnCount += 1;
+                                
+                                //add to attachment list
+                                laAttachments.add(
+                                        new ModelDeliveryAcceptance_Attachment(String.valueOf(lnCount),
+                                                String.valueOf(poAppController.getAttachmentList().get(lnCtr).getModel().getFileName()),
+                                                String.valueOf(lnCtr)
+                                        ));
+                            }
+                            
+                            //reset attachment records if empty
+                            if (laAttachments.size() <= 0) {
+                                loadRecordAttachment(false);
+                            }
+                            
+                            int lnTempRow = JFXUtil.getDetailRow(laAttachments, pnAttachments, 3); //this method is used only when Reverse is applied
+                            if (lnTempRow < 0 || lnTempRow >= laAttachments.size()) {
+                                
+                                if (!laAttachments.isEmpty()) {
+   
+                                    JFXUtil.selectAndFocusRow(tblAttachments, 0);
+                                    int lnRow = Integer.parseInt(laAttachments.get(0).getIndex03());
+                                    
+                                    pnAttachments = lnRow;
+                                    
+                                    loadRecordAttachment(true);
+                                }
+                            } else {
+                                
+                                JFXUtil.selectAndFocusRow(tblAttachments, lnTempRow);
+                                int lnRow = Integer.parseInt(laAttachments.get(tblAttachments.getSelectionModel().getSelectedIndex()).getIndex03());
+                                
+                                pnAttachments = lnRow;
+                                
+                                loadRecordAttachment(true);
+                            }
+                            
+                            if (laAttachments.size() <= 0) {
+                                loadRecordAttachment(false);
+                            }
+                            
+                        } catch (Exception e) {
+                            poLogWrapper.severe(e.getMessage());
+                        }
+                    });
+                }
+        );
+    }
+    
+     private void initAttachmentPreviewPane() {
+        imageviewerutil.initAttachmentPreviewPane(stackpane, imgPreview);
+        stackpane.heightProperty().addListener((observable, oldValue, newHeight) -> {
+            double computedHeight = newHeight.doubleValue();
+            imageviewerutil.ldstackPaneHeight = computedHeight;
+            loadTableAttachment.reload();
+            loadRecordAttachment(true);
+        });
+    }
+    
+    public void loadRecordAttachment(boolean lbloadImage) {
+        try {
+            if (laAttachments.size() > 0) {
+                
+                txtAttachmentNo.setText(laAttachments.get(tblAttachments.getSelectionModel().getSelectedIndex()).getIndex01());
+                
+                String lsAttachmentType = poAppController.getAttachmentList().get(pnAttachments).getModel().getDocumentType();
+                if (lsAttachmentType.equals("")) {
+                    poAppController.getAttachmentList().get(pnAttachments).getModel().setDocumentType(DocumentType.OTHER);
+                    lsAttachmentType = poAppController.getAttachmentList().get(pnAttachments).getModel().getDocumentType();
+                }
+
+                if (lbloadImage) {
+                    try {
+                        String filePath = (String) laAttachments.get(tblAttachments.getSelectionModel().getSelectedIndex()).getIndex02();
+                        String filePath2 = "";
+                        if (imageinfo_temp.containsKey((String) laAttachments.get(tblAttachments.getSelectionModel().getSelectedIndex()).getIndex02())) {
+                            filePath2 = imageinfo_temp.get((String) laAttachments.get(tblAttachments.getSelectionModel().getSelectedIndex()).getIndex02());
+                        } else {
+                            
+                            if (poAppController.getAttachmentList().get(pnAttachments).getModel().getImagePath() != null && !"".equals(poAppController.getAttachmentList().get(pnAttachments).getModel().getImagePath())) {
+                                filePath2 = poAppController.getAttachmentList().get(pnAttachments).getModel().getImagePath() + "/" + (String) laAttachments.get(tblAttachments.getSelectionModel().getSelectedIndex()).getIndex02();
+                            } else {
+                                filePath2 = System.getProperty("sys.default.path.temp.attachments") + "/" + (String) laAttachments.get(tblAttachments.getSelectionModel().getSelectedIndex()).getIndex02();
+                            }
+                        }
+
+                        if (filePath != null && !filePath.isEmpty()) {
+                            Path imgPath = Paths.get(filePath2);
+                            String convertedPath = imgPath.toUri().toString();
+                            boolean isPdf = filePath.toLowerCase().endsWith(".pdf");
+
+                            // Clear previous content
+                            stackpane.getChildren().clear();
+                            if (!isPdf) {
+                                
+                                // ----- IMAGE VIEW -----
+                                Image loimage = new Image(convertedPath);
+                                imgPreview.setImage(loimage);
+                                
+                                //no need to auto adjust the size, image can be scaled manually, besides, this method affects the margins and sizes of forms when maxed value
+                                //JFXUtil.adjustImageSize(loimage, imgPreview, imageviewerutil.ldstackPaneWidth, imageviewerutil.ldstackPaneHeight);
+
+                                PauseTransition delay = new PauseTransition(Duration.seconds(2)); // 2-second delay
+                                delay.setOnFinished(event -> {
+                                    Platform.runLater(() -> {
+                                        JFXUtil.stackPaneClip(stackpane);
+                                    });
+                                });
+                                delay.play();
+
+                                // Add ImageView directly to stackPane
+                                stackpane.getChildren().add(imgPreview);
+                                stackpane.getChildren().addAll(btnPrevious, btnNext);
+
+                                // Align buttons on top
+                                StackPane.setAlignment(btnPrevious, Pos.CENTER_LEFT);
+                                StackPane.setAlignment(btnNext, Pos.CENTER_RIGHT);
+
+                                // Optional: add some margin
+                                StackPane.setMargin(btnPrevious, new Insets(0, 0, 0, 10));
+                                StackPane.setMargin(btnNext, new Insets(0, 10, 0, 0));
+                            } else {
+                                // ----- PDF VIEW -----
+                                JFXUtil.PDFViewConfig(filePath2, stackpane, btnPrevious, btnNext, imageviewerutil.ldstackPaneWidth, imageviewerutil.ldstackPaneHeight);
+                            }
+                        } else {
+                            imgPreview.setImage(null);
+                        }
+                    } catch (Exception e) {
+                        imgPreview.setImage(null);
+                    }
+                }
+            } else {
+                
+                if (!lbloadImage) {
+                    
+                    imgPreview.setImage(null);
+                    
+                    // Clear previous content
+                    stackpane.getChildren().clear();
+                    
+                    // Add ImageView directly to stackPane
+                    stackpane.getChildren().add(imgPreview);
+                    stackpane.getChildren().addAll(btnPrevious, btnNext);
+                    
+                    Platform.runLater(() -> JFXUtil.stackPaneClip(stackpane));
+                    pnAttachments = 0;
+                }
+            }
+        } catch (Exception e) {
+        }
+    }
+    
+    public void reloadTableAttachments(){
+        
+        //reset image objects
+        txtAttachmentNo.clear();
+        imageinfo_temp.clear();
+        imgPreview.setImage(null);
+        
+        //reload table attachment
+        loadTableAttachment.reload();
+        
+    }
+    
+    public void slideImage(int direction) {
+        if (laAttachments.size() <= 0) {
+            return;
+        }
+        int lnRow = Integer.valueOf(laAttachments.get(tblAttachments.getSelectionModel().getSelectedIndex()).getIndex01());
+        currentIndex = lnRow - 1;
+        int newIndex = currentIndex + direction;
+
+        if (newIndex != -1 && (newIndex <= laAttachments.size() - 1)) {
+            TranslateTransition slideOut = new TranslateTransition(Duration.millis(300), imgPreview);
+            slideOut.setByX(direction * -400); // Move left or right
+
+            JFXUtil.selectAndFocusRow(tblAttachments, newIndex);
+            int lnIndex = Integer.valueOf(laAttachments.get(newIndex).getIndex01());
+            int lnTempRow = JFXUtil.getDetailTempRow(laAttachments, lnIndex, 3);
+            pnAttachments = lnTempRow;
+            loadRecordAttachment(false);
+
+            // Create a transition animation
+            slideOut.setOnFinished(event -> {
+                imgPreview.setTranslateX(direction * 400);
+                TranslateTransition slideIn = new TranslateTransition(Duration.millis(300), imgPreview);
+                slideIn.setToX(0);
+                slideIn.play();
+
+                loadRecordAttachment(true);
+            });
+
+            slideOut.play();
+        }
+        if (JFXUtil.isImageViewOutOfBounds(imgPreview, stackpane)) {
+            JFXUtil.resetImageBounds(imgPreview, stackpane);
+        }
+    }
 
     private void getLoadedClient() throws SQLException, GuanzonException, CloneNotSupportedException {
-//        clearAllInputs();
         loadClientMaster();
         reloadTableLedger();
+        reloadTableAttachments();
     }
 
     private boolean isJSONSuccess(JSONObject loJSON, String fsModule) {

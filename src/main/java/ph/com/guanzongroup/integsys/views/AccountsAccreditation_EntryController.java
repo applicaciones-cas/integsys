@@ -43,6 +43,7 @@ import org.guanzon.appdriver.base.GRiderCAS;
 import org.guanzon.appdriver.base.LogWrapper;
 import org.guanzon.appdriver.constant.EditMode;
 import org.guanzon.appdriver.base.GuanzonException;
+import org.guanzon.cas.client.Client;
 import org.guanzon.cas.client.account.Account_Accreditation;
 import org.guanzon.cas.client.services.ClientControllers;
 import org.json.simple.JSONObject;
@@ -59,6 +60,7 @@ public class AccountsAccreditation_EntryController implements Initializable, Scr
     private String psFormName = "Accounts Accreditation Entry";
     private Control lastFocusedControl;
     private Account_Accreditation poAppController;
+    private Client poClientController;
 
     private unloadForm poUnload = new unloadForm();
 
@@ -73,7 +75,9 @@ public class AccountsAccreditation_EntryController implements Initializable, Scr
 
     @FXML
     private TextField tfTransactionNo, tfCategory, tfCompany,
-            tfContactPerson, tfAddress, tfSearchCompany, tfTIN;
+            tfContactPerson, tfAddress, tfSearchCompany, tfTIN,
+            tfContactRole, tfContactNo, tfContactEmail,
+            tfContactDepartment, tfContactPosition;
 
     @FXML
     private DatePicker dpTransactionDate;
@@ -113,6 +117,7 @@ public class AccountsAccreditation_EntryController implements Initializable, Scr
         try {
             poLogWrapper = new LogWrapper(psFormName, psFormName);
             poAppController = new ClientControllers(poApp, poLogWrapper).AccountAccreditation();
+            poClientController = new ClientControllers(poApp, poLogWrapper).Client();
 
             //initlalize and validate record objects from class controller
             //background thread
@@ -214,18 +219,20 @@ public class AccountsAccreditation_EntryController implements Initializable, Scr
                     initButtonDisplay(poAppController.getEditMode());
                     break;
                 case "btnSave":
+                    String lotransactioNo = tfTransactionNo.getText();
                     if (tfTransactionNo.getText().isEmpty()) {
                         ShowMessageFX.Information("Please load record before proceeding..", psFormName, "");
                         return;
                     }
                     
                     if (ShowMessageFX.OkayCancel(null, psFormName, "Are you sure you want to save client??") == true) {
+                        
                         if (!isJSONSuccess(poAppController.saveRecord(), "Initialize Save Record")) {
                             return;
                         }
                         ShowMessageFX.Information("Client saved successfully!", "Initialize Save Record", null);
-                        
                         if (poAppController.getModel().getRecordStatus().equals("0")) {
+                            
                             if (ShowMessageFX.OkayCancel(null, psFormName, "Do you want to Confirm transaction?") == true) {
 
                                 if (!isJSONSuccess(poAppController.openRecord(poAppController.getModel().getTransactionNo()), "Initialize Open Transaction")) {
@@ -238,9 +245,8 @@ public class AccountsAccreditation_EntryController implements Initializable, Scr
                                 ShowMessageFX.Information("Transaction confirmed successfully", null, psFormName);
                             }
                         }
-
-                        getLoadedClient();
-                        initButtonDisplay(poAppController.getEditMode());
+                        //reset data to avoid transaction errors
+                        clearAllInputs();
                     }
                     break;
 
@@ -270,7 +276,12 @@ public class AccountsAccreditation_EntryController implements Initializable, Scr
                         }
                     }
             }
-
+            
+            //manually reset button, edit mode not initialized on model
+            if (btnID.equalsIgnoreCase("btnSave")) {
+                initButtonDisplay(EditMode.READY);
+                return;
+            }
             initButtonDisplay(poAppController.getEditMode());
 
         } catch (Exception e) {
@@ -336,8 +347,8 @@ public class AccountsAccreditation_EntryController implements Initializable, Scr
                                 loadClientMaster();
                                 break;
                             case "tfCompany":
-                                JSONObject loJSONObject = poAppController.searchClient(tfCompany.getText() , false);
-                                if (!isJSONSuccess(loJSONObject,
+                                if (!isJSONSuccess(
+                                        poAppController.searchClient(tfCompany.getText(), false),
                                         "Initialize Search Client! ")) {
                                     return;
                                 }
@@ -443,11 +454,22 @@ public class AccountsAccreditation_EntryController implements Initializable, Scr
             tfTransactionNo.setText(poAppController.getModel().getTransactionNo());
             dpTransactionDate.setValue(ParseDate(poAppController.getModel().getDateTransact()));
             
-            System.out.print(poAppController.getModel().Category().getDescription());
-            
             tfCategory.setText(poAppController.getModel().Category().getDescription());
             tfCompany.setText(poAppController.getModel().Client().getCompanyName());
+            
             tfContactPerson.setText(poAppController.getModel().ClientInstitutionContact().getContactPersonName());
+            tfContactRole.setText(poAppController.getModel().ClientInstitutionContact().ContactRole().getsRoleDesc());
+            
+            //set landline no (mobile no is empty), set fax no(landline no is empty), by default set mobile no
+            
+            String lsMobile = poAppController.getModel().ClientInstitutionContact().getMobileNo();
+            String lsLandline = poAppController.getModel().ClientInstitutionContact().getLandlineNo();
+            String lsFaxno = poAppController.getModel().ClientInstitutionContact().getFaxNo();
+            
+            tfContactNo.setText(lsMobile == null? (lsLandline == null? (lsFaxno == null ? "" : lsFaxno) : lsLandline) : lsMobile );
+            tfContactEmail.setText(poAppController.getModel().ClientInstitutionContact().getMailAddress());
+            tfContactDepartment.setText(poAppController.getModel().ClientInstitutionContact().getsDeprtmnt());
+            tfContactPosition.setText(poAppController.getModel().ClientInstitutionContact().getContactPersonPosition());
             
             String lshouseno = poAppController.getModel().ClientAddress().getHouseNo() == null || poAppController.getModel().ClientAddress().getHouseNo().isEmpty() ? "" : poAppController.getModel().ClientAddress().getHouseNo() + " ";
             String lsaddress = poAppController.getModel().ClientAddress().getAddress() == null || poAppController.getModel().ClientAddress().getAddress().isEmpty() ? "" : poAppController.getModel().ClientAddress().getAddress();
@@ -459,6 +481,7 @@ public class AccountsAccreditation_EntryController implements Initializable, Scr
             
             tfTIN.setText(poAppController.getModel().Client().getTaxIdNumber() == null ? " " : poAppController.getModel().Client().getTaxIdNumber());
             taRemarks.setText(poAppController.getModel().getRemarks());
+            
             cmbAccountType.getSelectionModel().select(Integer.parseInt(poAppController.getModel().getAccountType()));
             cmbTransType.getSelectionModel().select(Integer.parseInt(poAppController.getModel().getTransactionType()));
 
