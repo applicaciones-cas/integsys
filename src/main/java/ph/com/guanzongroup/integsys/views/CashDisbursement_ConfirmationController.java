@@ -617,7 +617,10 @@ public class CashDisbursement_ConfirmationController implements Initializable, S
                                                 poController.TransactionList(lnCtr).getPayeeName(),
                                                 String.valueOf(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.TransactionList(lnCtr).getTransactionTotal(), true)),
                                                 ""));
-                                        if (poController.TransactionList(lnCtr).getTransactionStatus().equals(CashDisbursementStatus.APPROVED)) {
+                                        if (poController.TransactionList(lnCtr).getTransactionStatus().equals(CashDisbursementStatus.VOID)) {
+                                            JFXUtil.highlightByKey(tblViewMainList, String.valueOf(lnCtr + 1), "#FAA0A0", highlightedRowsMain);
+                                        }
+                                        if (poController.TransactionList(lnCtr).getTransactionStatus().equals(CashDisbursementStatus.CONFIRMED)) {
                                             JFXUtil.highlightByKey(tblViewMainList, String.valueOf(lnCtr + 1), "#C1E1C1", highlightedRowsMain);
                                         }
                                     }
@@ -2196,7 +2199,6 @@ public class CashDisbursement_ConfirmationController implements Initializable, S
 //            }
 //        }
 //    }
-
     private void initButton(int fnEditMode) {
         boolean lbShow = (fnEditMode == EditMode.ADDNEW || fnEditMode == EditMode.UPDATE);
         boolean lbShow2 = (fnEditMode == EditMode.READY);
