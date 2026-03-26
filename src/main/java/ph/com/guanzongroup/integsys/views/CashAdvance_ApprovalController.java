@@ -530,6 +530,16 @@ public class CashAdvance_ApprovalController implements Initializable, ScreenInte
 
     public void loadRecordMaster() {
         try {
+            String lsStat = "";
+            switch (poController.Master().getTransactionStatus()) {
+                case CashAdvanceStatus.APPROVED:
+                    lsStat = "Cancel";
+                    break;
+                default:
+                    lsStat = "Disapprove";
+                    break;
+            }
+            btnDisapprove.setText(lsStat);
             JFXUtil.setDisabled(true, dpAdvanceDate);
             lblStatus.setText(pnEditMode == EditMode.UNKNOWN ? "UNKNOWN" : poController.getStatus(poController.Master().getTransactionStatus()).toUpperCase());
             tfTransactionNo.setText(poController.Master().getTransactionNo());
@@ -654,7 +664,16 @@ public class CashAdvance_ApprovalController implements Initializable, ScreenInte
                         break;
                     case "btnDisapprove":
                         poJSON = new JSONObject();
-                        if (ShowMessageFX.YesNo(null, pxeModuleName, "Are you sure you want to disapprove transaction?") == true) {
+                        String lsStat = "";
+                        switch (poController.Master().getTransactionStatus()) {
+                            case CashAdvanceStatus.APPROVED:
+                                lsStat = "cancel";
+                                break;
+                            default:
+                                lsStat = "disapprove";
+                                break;
+                        }
+                        if (ShowMessageFX.YesNo(null, pxeModuleName, "Are you sure you want to " + lsStat + " the transaction?") == true) {
                             switch (poController.Master().getTransactionStatus()) {
                                 case CashAdvanceStatus.APPROVED:
                                 case CashAdvanceStatus.CONFIRMED:
