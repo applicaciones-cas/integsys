@@ -674,15 +674,8 @@ public class CashAdvance_ApprovalController implements Initializable, ScreenInte
                                 break;
                         }
                         if (ShowMessageFX.YesNo(null, pxeModuleName, "Are you sure you want to " + lsStat + " the transaction?") == true) {
-                            switch (poController.Master().getTransactionStatus()) {
-                                case CashAdvanceStatus.APPROVED:
-                                case CashAdvanceStatus.CONFIRMED:
-                                    poJSON = poController.CancelTransaction();
-                                    break;
-                                default:
-                                    poJSON = poController.VoidTransaction();
-                                    break;
-                            }
+                            poJSON = poController.CancelTransaction();
+
                             if ("error".equals((String) poJSON.get("result"))) {
                                 ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                 return;
