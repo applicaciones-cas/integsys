@@ -520,10 +520,10 @@ public class CashDisbursement_ApprovalController implements Initializable, Scree
                                                 poController.TransactionList(lnCtr).getPayeeName(),
                                                 String.valueOf(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.TransactionList(lnCtr).getTransactionTotal(), true)),
                                                 ""));
-                                        if (poController.TransactionList(lnCtr).getTransactionStatus().equals(CashDisbursementStatus.VOID)) {
+                                        if (poController.TransactionList(lnCtr).getTransactionStatus().equals(CashDisbursementStatus.CANCELLED)) {
                                             JFXUtil.highlightByKey(tblViewMainList, String.valueOf(lnCtr + 1), "#FAA0A0", highlightedRowsMain);
                                         }
-                                        if (poController.TransactionList(lnCtr).getTransactionStatus().equals(CashDisbursementStatus.CONFIRMED)) {
+                                        if (poController.TransactionList(lnCtr).getTransactionStatus().equals(CashDisbursementStatus.APPROVED)) {
                                             JFXUtil.highlightByKey(tblViewMainList, String.valueOf(lnCtr + 1), "#C1E1C1", highlightedRowsMain);
                                         }
                                     }
