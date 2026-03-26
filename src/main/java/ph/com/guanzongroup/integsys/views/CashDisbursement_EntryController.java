@@ -601,7 +601,6 @@ public class CashDisbursement_EntryController implements Initializable, ScreenIn
                     poJSON = poController.populateDetail(lsTransactionNo);
                     if ("error".equals(poJSON.get("result"))) {
                         ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-                        poController.resetTransaction();
                         return;
                     }
                     pnEditMode = poController.getEditMode();
