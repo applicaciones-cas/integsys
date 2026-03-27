@@ -4,6 +4,7 @@
  */
 package ph.com.guanzongroup.integsys.views;
 
+import java.io.IOException;
 import ph.com.guanzongroup.integsys.model.ModelCashDisbursement_Detail;
 import ph.com.guanzongroup.integsys.model.ModelCashDisbursement_Main;
 import ph.com.guanzongroup.integsys.model.ModelJournalEntry_Detail;
@@ -34,6 +35,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
@@ -57,6 +59,7 @@ import static javafx.scene.input.KeyCode.UP;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.StackPane;
+import javafx.stage.Stage;
 import javafx.util.Duration;
 import javafx.util.Pair;
 import javax.script.ScriptException;
@@ -126,7 +129,9 @@ public class CashDisbursement_HistoryController implements Initializable, Screen
     Map<String, String> imageinfo_temp = new HashMap<>();
     JFXUtil.ReloadableTableTask loadTableDetail, loadTableDetailJE, loadTableDetailBIR, loadTableAttachment;
     private final JFXUtil.ImageViewer imageviewerutil = new JFXUtil.ImageViewer();
-
+    JFXUtil.StageManager stageAttachment = new JFXUtil.StageManager();
+    AnchorPane root = null;
+    Scene scene = null;
     ObservableList<String> documentType = ModelDeliveryAcceptance_Attachment.documentType;
 
     @FXML
@@ -205,7 +210,6 @@ public class CashDisbursement_HistoryController implements Initializable, Screen
             clearTextFields();
             pnEditMode = EditMode.UNKNOWN;
             initButton(pnEditMode);
-            JFXUtil.initKeyClickObject(AnchorMain, lastFocusedTextField, previousSearchedTextField); // for btnSearch Reference
 
             Platform.runLater(() -> {
                 poController.Master().setIndustryId(psIndustryId);
@@ -213,9 +217,83 @@ public class CashDisbursement_HistoryController implements Initializable, Screen
                 poController.setIndustryId(psIndustryId);
                 poController.setCompanyId(psCompanyId);
                 loadRecordSearch();
+                TriggerWindowEvent();
             });
             initAttachmentPreviewPane();
         } catch (SQLException | GuanzonException ex) {
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
+        }
+    }
+    ChangeListener<Scene> WindowKeyEvent = (obs, oldScene, newScene) -> {
+        if (newScene != null) {
+            setKeyEvent(newScene);
+        }
+    };
+
+    public void TriggerWindowEvent() {
+        root = (AnchorPane) AnchorMain;
+        scene = root.getScene();
+        if (scene != null) {
+            setKeyEvent(scene);
+        } else {
+            root.sceneProperty().addListener(WindowKeyEvent);
+        }
+    }
+
+    public void RemoveWindowEvent() {
+        root.sceneProperty().removeListener(WindowKeyEvent);
+        scene.setOnKeyPressed(null);
+        stageAttachment.closeDialog();
+    }
+
+    private void setKeyEvent(Scene scene) {
+        scene.setOnKeyPressed(event -> {
+            if (event.getCode() == KeyCode.F5) {
+                if (JFXUtil.isObjectEqualTo(poController.getEditMode(), EditMode.ADDNEW, EditMode.READY, EditMode.UPDATE)) {
+                    showAttachmentDialog();
+                }
+            }
+            if (event.getCode() == KeyCode.F12) {
+                LoginControllerHolder.getMainController().eventf12(LoginControllerHolder.getMainController().getTab());
+            }
+        });
+        scene.focusOwnerProperty().addListener((obs, oldNode, newNode) -> {
+            if (newNode != null) {
+                if (newNode instanceof Button) {
+                } else {
+                    lastFocusedTextField.set(newNode);
+                    previousSearchedTextField.set(null);
+                }
+            }
+        });
+    }
+
+    public void showAttachmentDialog() {
+        poJSON = new JSONObject();
+        stageAttachment.closeDialog();
+        if (poController.getTransactionAttachmentCount() <= 0) {
+            ShowMessageFX.Warning(null, pxeModuleName, "No transaction attachment to load.");
+            return;
+        }
+        Map<String, Pair<String, String>> data = new HashMap<>();
+        data.clear();
+        int lnCount = 0;
+        for (int lnCtr = 0; lnCtr < poController.getTransactionAttachmentCount(); lnCtr++) {
+            if (RecordStatus.INACTIVE.equals(poController.TransactionAttachmentList(lnCtr).getModel().getRecordStatus())) {
+                continue;
+            }
+            lnCount += 1;
+            data.put(String.valueOf(lnCount), new Pair<>(String.valueOf(poController.TransactionAttachmentList(lnCtr).getModel().getFileName()),
+                    poController.TransactionAttachmentList(lnCtr).getModel().getDocumentType()));
+        }
+        AttachmentDialogController controller = new AttachmentDialogController();
+        controller.setOpenedImage(pnAttachment);
+        controller.addData(data);
+
+        try {
+            stageAttachment.showDialog((Stage) btnClose.getScene().getWindow(), getClass().getResource("/ph/com/guanzongroup/integsys/views/AttachmentDialog.fxml"), controller, "Attachment Dialog", false, false, true);
+        } catch (IOException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
             ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
@@ -290,10 +368,12 @@ public class CashDisbursement_HistoryController implements Initializable, Screen
             String lsButton = ((Button) event.getSource()).getId();
             switch (lsButton) {
                 case "btnBrowse":
-                    poJSON = poController.SearchTransaction(tfSearchIndustry.getText(),tfSearchPayee.getText(),tfSearchCashAdvanceNo.getText());
+                    poJSON = poController.SearchTransaction(tfSearchIndustry.getText(), tfSearchPayee.getText(), tfSearchCashAdvanceNo.getText());
                     if ("error".equalsIgnoreCase((String) poJSON.get("result"))) {
                         ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                         return;
+                    } else {
+                        stageAttachment.closeDialog();
                     }
                     JFXUtil.clickTabByTitleText(tabPaneMain, "Cash Disbursement");
                     pnEditMode = poController.getEditMode();
@@ -322,10 +402,11 @@ public class CashDisbursement_HistoryController implements Initializable, Screen
                     }
                     break;
                 case "btnRetrieve":
-                    
+
                     break;
                 case "btnClose":
                     if (ShowMessageFX.YesNo(null, "Close Tab", "Are you sure you want to close this Tab?")) {
+                        stageAttachment.closeDialog();
                         poUnload.unloadForm(AnchorMain, oApp, pxeModuleName);
                     } else {
                         return;
@@ -425,7 +506,7 @@ public class CashDisbursement_HistoryController implements Initializable, Screen
                             int lnRowCount = 0;
                             String lsParticular = "", lsOrNo = "";
                             for (int lnCtr = 0; lnCtr < poController.getDetailCount(); lnCtr++) {
-                                if (!poController.Detail(lnCtr).isReverse()){
+                                if (!poController.Detail(lnCtr).isReverse()) {
                                     continue;
                                 }
                                 if (poController.Master().getSourceNo() != null && !"".equals(poController.Master().getSourceNo())) {
@@ -841,13 +922,13 @@ public class CashDisbursement_HistoryController implements Initializable, Screen
                     case "tfSearchIndustry":
                         if (lsValue.isEmpty()) {
                             poController.setSearchIndustry("");
-                            
+
                         }
                         break;
                     case "tfSearchPayee":
                         if (lsValue.isEmpty()) {
                             poController.setSearchPayee("");
-                            
+
                         }
                         break;
                     case "tfSearchCashAdvanceNo":
@@ -885,12 +966,12 @@ public class CashDisbursement_HistoryController implements Initializable, Screen
                             case "tfSearchIndustry":
                                 poController.SearchIndustry(lsValue, false);
                                 loadRecordSearch();
-                                
+
                                 break;
                             case "tfSearchPayee":
                                 poJSON = poController.SearchPayee(lsValue, false, true);
                                 loadRecordSearch();
-                                
+
                                 break;
                             case "tfSearchCashAdvanceNo":
                                 poJSON = poController.SearchTransaction();
@@ -898,6 +979,7 @@ public class CashDisbursement_HistoryController implements Initializable, Screen
                                     ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                     return;
                                 } else {
+                                    stageAttachment.closeDialog();
                                     loadRecordSearch();
                                     JFXUtil.clickTabByTitleText(tabPaneMain, "Cash Disbursement");
                                     pnEditMode = poController.getEditMode();
@@ -1254,11 +1336,12 @@ public class CashDisbursement_HistoryController implements Initializable, Screen
         JFXUtil.setButtonsVisibility(lbShow2, btnHistory);
         JFXUtil.setButtonsVisibility(lbShow3, btnClose);
         JFXUtil.setButtonsVisibility(lbShow2 && CashDisbursementStatus.APPROVED.equals(poController.Master().getTransactionStatus()), btnPrint);
-        
+
         JFXUtil.setDisabled(true, apDVMaster1, apDVMaster2, apJournalMaster, apJournalDetails, apBIRDetail);
     }
 
     private void clearTextFields() {
+        stageAttachment.closeDialog();
         JFXUtil.setValueToNull(previousSearchedTextField, lastFocusedTextField);
         JFXUtil.clearTextFields(apButton, apMasterDetail, apDVMaster1, apDVMaster2, apDVDetail,
                 apBrowse, apJournalMaster, apJournalDetails, apBIRDetail, apAttachments);
