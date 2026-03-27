@@ -1748,75 +1748,75 @@ public class CashDisbursement_ConfirmationController implements Initializable, S
                                 break;
 
                             //apJournalDetails
-//                            case "tfAccountCode":
-//                                poJSON = poController.Journal().SearchAccountCode(pnDetailJE, lsValue, true, poController.Master().getIndustryID(), null);
-//                                if ("error".equals(poJSON.get("result"))) {
-//                                    int lnReturned = Integer.parseInt(String.valueOf(poJSON.get("row")));
-//                                    JFXUtil.runWithDelay(0.70, () -> {
-//                                        pnDetailJE = lnReturned;
-//                                        loadTableDetailJE.reload();
-//                                    });
-//                                    ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-//                                    break;
-//                                } else {
-//                                    pnDetailJE = Integer.parseInt(String.valueOf(poJSON.get("row")));
-//                                    loadTableDetailJE.reload();
-//                                    JFXUtil.textFieldMoveNext(tfDebitAmount);
-//                                }
-//                                break;
-//                            case "tfAccountDescription":
-//                                poJSON = poController.Journal().SearchAccountCode(pnDetailJE, lsValue, false, poController.Master().getIndustryID(), null);
-//                                if ("error".equals(poJSON.get("result"))) {
-//                                    int lnReturned = Integer.parseInt(String.valueOf(poJSON.get("row")));
-//                                    JFXUtil.runWithDelay(0.70, () -> {
-//                                        pnDetailJE = lnReturned;
-//                                        loadTableDetailJE.reload();
-//                                    });
-//                                    ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-//                                    break;
-//                                } else {
-//                                    pnDetailJE = Integer.parseInt(String.valueOf(poJSON.get("row")));
-//                                    loadTableDetailJE.reload();
-//                                    JFXUtil.textFieldMoveNext(tfDebitAmount);
-//                                }
-//                                break;
-                            //apBIRDetail
-//                            case "tfTaxCode":
-//                                poJSON = poController.SearchTaxCode(lsValue, pnDetailBIR, true);
-//                                if ("error".equals(poJSON.get("result"))) {
-////                                    int lnReturned = Integer.parseInt(String.valueOf(poJSON.get("row"))) + 1;
-//                                    JFXUtil.runWithDelay(0.50, () -> {
-//                                        loadTableDetailBIR.reload();
-//                                    });
-//                                    ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-//                                    break;
-//                                } else {
-//                                    int lnReturned = Integer.parseInt(String.valueOf(poJSON.get("row")));
-//                                    pnDetailBIR = lnReturned;
-//                                    loadTableDetailBIR.reload();
-//                                    JFXUtil.textFieldMoveNext(tfParticular);
-//                                }
-//                                break;
-//                            case "tfParticular":
-//                                poJSON = poController.SearchParticular(lsValue, pnDetailBIR, false);
-//                                if ("error".equals(poJSON.get("result"))) {
-//                                    if (poJSON.get("row") == null) {
-//                                        return;
-//                                    }
-//                                    int lnReturned = Integer.parseInt(String.valueOf(poJSON.get("row")));
-//                                    JFXUtil.runWithDelay(0.50, () -> {
-//                                        pnDetailBIR = lnReturned;
-//                                        loadTableDetailBIR.reload();
-//                                    });
-//                                    ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-//                                    break;
-//                                } else {
-//                                    int lnReturned = Integer.parseInt(String.valueOf(poJSON.get("row")));
-//                                    pnDetailBIR = lnReturned;
-//                                    loadTableDetailBIR.reload();
-//                                    JFXUtil.textFieldMoveNext(tfBaseAmount);
-//                                }
-//                                break;
+                            case "tfAccountCode":
+                                poJSON = poController.Journal().SearchAccountCode(pnDetailJE, lsValue, true, poController.Master().getIndustryId(), null);
+                                if ("error".equals(poJSON.get("result"))) {
+                                    int lnReturned = Integer.parseInt(String.valueOf(poJSON.get("row")));
+                                    JFXUtil.runWithDelay(0.70, () -> {
+                                        pnDetailJE = lnReturned;
+                                        loadTableDetailJE.reload();
+                                    });
+                                    ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                                    break;
+                                } else {
+                                    pnDetailJE = Integer.parseInt(String.valueOf(poJSON.get("row")));
+                                    loadTableDetailJE.reload();
+                                    JFXUtil.textFieldMoveNext(tfDebitAmount);
+                                }
+                                break;
+                            case "tfAccountDescription":
+                                poJSON = poController.Journal().SearchAccountCode(pnDetailJE, lsValue, false, poController.Master().getIndustryId(), null);
+                                if ("error".equals(poJSON.get("result"))) {
+                                    int lnReturned = Integer.parseInt(String.valueOf(poJSON.get("row")));
+                                    JFXUtil.runWithDelay(0.70, () -> {
+                                        pnDetailJE = lnReturned;
+                                        loadTableDetailJE.reload();
+                                    });
+                                    ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                                    break;
+                                } else {
+                                    pnDetailJE = Integer.parseInt(String.valueOf(poJSON.get("row")));
+                                    loadTableDetailJE.reload();
+                                    JFXUtil.textFieldMoveNext(tfDebitAmount);
+                                }
+                                break;
+//                                apBIRDetail
+                            case "tfTaxCode":
+                                poJSON = poController.SearchTaxCode(lsValue,  pnDetailBIR,true);
+                                if ("error".equals(poJSON.get("result"))) {
+//                                    int lnReturned = Integer.parseInt(String.valueOf(poJSON.get("row"))) + 1;
+                                    JFXUtil.runWithDelay(0.50, () -> {
+                                        loadTableDetailBIR.reload();
+                                    });
+                                    ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                                    break;
+                                } else {
+                                    int lnReturned = Integer.parseInt(String.valueOf(poJSON.get("row")));
+                                    pnDetailBIR = lnReturned;
+                                    loadTableDetailBIR.reload();
+                                    JFXUtil.textFieldMoveNext(tfParticular);
+                                }
+                                break;
+                            case "tfParticular":
+                                poJSON = poController.SearchWTParticular(lsValue,  pnDetailBIR,false);
+                                if ("error".equals(poJSON.get("result"))) {
+                                    if (poJSON.get("row") == null) {
+                                        return;
+                                    }
+                                    int lnReturned = Integer.parseInt(String.valueOf(poJSON.get("row")));
+                                    JFXUtil.runWithDelay(0.50, () -> {
+                                        pnDetailBIR = lnReturned;
+                                        loadTableDetailBIR.reload();
+                                    });
+                                    ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                                    break;
+                                } else {
+                                    int lnReturned = Integer.parseInt(String.valueOf(poJSON.get("row")));
+                                    pnDetailBIR = lnReturned;
+                                    loadTableDetailBIR.reload();
+                                    JFXUtil.textFieldMoveNext(tfBaseAmount);
+                                }
+                                break;
                         }
                         event.consume();
                         break;
