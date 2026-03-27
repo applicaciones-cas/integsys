@@ -124,7 +124,7 @@ public class CashDisbursement_HistoryController implements Initializable, Screen
     private int currentIndex = 0;
     private final Map<String, List<String>> highlightedRowsMain = new HashMap<>();
     Map<String, String> imageinfo_temp = new HashMap<>();
-    JFXUtil.ReloadableTableTask loadTableMain, loadTableDetail, loadTableDetailJE, loadTableDetailBIR, loadTableAttachment;
+    JFXUtil.ReloadableTableTask loadTableDetail, loadTableDetailJE, loadTableDetailBIR, loadTableAttachment;
     private final JFXUtil.ImageViewer imageviewerutil = new JFXUtil.ImageViewer();
 
     ObservableList<String> documentType = ModelDeliveryAcceptance_Attachment.documentType;
@@ -134,7 +134,7 @@ public class CashDisbursement_HistoryController implements Initializable, Screen
     @FXML
     private Label lblSource, lblDVTransactionStatus, lblJournalTransactionStatus;
     @FXML
-    private TextField tfSearchIndustry, tfSearchPayee, tfSearchCashAdvanceNo, tfDVTransactionNo, tfBranch, tfDepartment, tfCashFund, tfPayee, tfCreditTo, tfVoucherNo, tfCashAdvNo, tfTotalAmount, tfVatableSales, tfVatAmountMaster, tfVatZeroRatedSales, tfVatExemptSales, tfLessWHTax, tfTotalNetAmount, tfORNoDetail, tfParticularDetail, tfVatableSalesDetail, tfVatExemptDetail, tfVatZeroRatedSalesDetail, tfVatRateDetail, tfVatAmountDetail, tfAmountDetail, tfJournalTransactionNo, tfTotalDebitAmount, tfTotalCreditAmount, tfAccountCode, tfAccountDescription, tfDebitAmount, tfCreditAmount, tfBIRTransactionNo, tfTaxCode, tfParticular, tfBaseAmount, tfTaxRate, tfTotalTaxAmount, tfAttachmentNo, tfAttachmentSource;
+    private TextField tfSearchIndustry, tfSearchPayee, tfSearchCashAdvanceNo, tfDVTransactionNo, tfBranch, tfDepartment, tfCashFund, tfPayee, tfCreditTo, tfVoucherNo, tfCashAdvNo, tfTotalAmount, tfVatableSales, tfVatAmountMaster, tfVatZeroRatedSales, tfVatExemptSales, tfLessWHTax, tfTotalNetAmount, tfORNoDetail, tfParticularDetail, tfVatableSalesDetail, tfVatExemptDetail, tfVatZeroRatedSalesDetail, tfVatRateDetail, tfVatAmountDetail, tfAmountDetail, tfJournalTransactionNo, tfTotalDebitAmount, tfTotalCreditAmount, tfAccountCode, tfAccountDescription, tfDebitAmount, tfCreditAmount, tfBIRTransactionNo, tfTaxCode, tfParticular, tfBaseAmount, tfTaxRate, tfTotalTaxAmount, tfAttachmentNo;
     @FXML
     private Button btnBrowse, btnPrint, btnHistory, btnClose, btnArrowLeft, btnArrowRight;
     @FXML
@@ -170,7 +170,6 @@ public class CashDisbursement_HistoryController implements Initializable, Screen
 
     @Override
     public void setCompanyID(String fsValue) {
-
         psCompanyId = fsValue;
     }
 
@@ -205,7 +204,6 @@ public class CashDisbursement_HistoryController implements Initializable, Screen
             initTabPane();
             clearTextFields();
             pnEditMode = EditMode.UNKNOWN;
-
             initButton(pnEditMode);
             JFXUtil.initKeyClickObject(AnchorMain, lastFocusedTextField, previousSearchedTextField); // for btnSearch Reference
 
@@ -214,8 +212,6 @@ public class CashDisbursement_HistoryController implements Initializable, Screen
                 poController.Master().setCompanyId(psCompanyId);
                 poController.setIndustryId(psIndustryId);
                 poController.setCompanyId(psCompanyId);
-//                poController.setCategoryID(psCategoryId);
-                poController.Master().setBranchCode(oApp.getBranchCode());
                 loadRecordSearch();
             });
             initAttachmentPreviewPane();
@@ -239,7 +235,7 @@ public class CashDisbursement_HistoryController implements Initializable, Screen
                 case "Journal":
                     if (pnEditMode == EditMode.READY || pnEditMode == EditMode.UPDATE || pnEditMode == EditMode.ADDNEW) {
                         JFXUtil.clearTextFields(apJournalDetails, apJournalMaster);
-                        if (poController.Detail(0).getParticularId() != null && !poController.Detail(0).getParticularId().isEmpty()) {
+                        if (poController.Detail(0).getAmount() > 0.0000) {
                             pbIsCheckedJournalTab = true;
                             populateJE();
                         } else {
@@ -251,7 +247,7 @@ public class CashDisbursement_HistoryController implements Initializable, Screen
                 case "BIR 2307":
                     if (pnEditMode == EditMode.READY || pnEditMode == EditMode.UPDATE || pnEditMode == EditMode.ADDNEW) {
                         JFXUtil.clearTextFields(apBIRDetail);
-                        if (poController.Detail(0).getParticularId() != null && !poController.Detail(0).getParticularId().isEmpty()) {
+                        if (poController.Detail(0).getAmount() > 0.0000) {
                             pbIsCheckedBIRTab = true;
                             populateBIR();
                         } else {
@@ -263,7 +259,7 @@ public class CashDisbursement_HistoryController implements Initializable, Screen
                 case "Attachments":
                     if (pnEditMode == EditMode.READY || pnEditMode == EditMode.UPDATE || pnEditMode == EditMode.ADDNEW) {
                         JFXUtil.clearTextFields(apAttachments);
-                        if (poController.Detail(0).getParticularId() != null && !poController.Detail(0).getParticularId().isEmpty()) {
+                        if (poController.Detail(0).getAmount() > 0.0000) {
                             pbIsCheckedAttachmentTab = true;
                             try {
                                 poController.loadAttachments();
@@ -294,18 +290,14 @@ public class CashDisbursement_HistoryController implements Initializable, Screen
             String lsButton = ((Button) event.getSource()).getId();
             switch (lsButton) {
                 case "btnBrowse":
-//                    poController.Master().setIndustryID(psIndustryId);
-//                    poController.Master().setCompanyID(psCompanyId);
-//                    poController.Master().setBranchCode(oApp.getBranchCode());
-                    poJSON = poController.SearchTransaction();
+                    poJSON = poController.SearchTransaction(tfSearchIndustry.getText(),tfSearchPayee.getText(),tfSearchCashAdvanceNo.getText());
                     if ("error".equalsIgnoreCase((String) poJSON.get("result"))) {
                         ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                         return;
                     }
-                    JFXUtil.clickTabByTitleText(tabPaneMain, "Disbursement Voucher");
+                    JFXUtil.clickTabByTitleText(tabPaneMain, "Cash Disbursement");
                     pnEditMode = poController.getEditMode();
                     poController.populateJournal();
-                    loadTableDetail.reload();
                     break;
                 case "btnPrint":
                     poJSON = poController.printTransaction();
@@ -330,7 +322,7 @@ public class CashDisbursement_HistoryController implements Initializable, Screen
                     }
                     break;
                 case "btnRetrieve":
-                    loadTableMain.reload();
+                    
                     break;
                 case "btnClose":
                     if (ShowMessageFX.YesNo(null, "Close Tab", "Are you sure you want to close this Tab?")) {
@@ -354,7 +346,6 @@ public class CashDisbursement_HistoryController implements Initializable, Screen
                 pbIsCheckedJournalTab = false;
                 pbIsCheckedBIRTab = false;
                 poController.resetTransaction();
-//                poController.Master().setSupplierClientID(psSupplierPayeeId);
                 clearTextFields();
                 JFXUtil.clickTabByTitleText(tabPaneMain, "Cash Disbursement");
                 pnEditMode = EditMode.UNKNOWN;
@@ -434,11 +425,9 @@ public class CashDisbursement_HistoryController implements Initializable, Screen
                             int lnRowCount = 0;
                             String lsParticular = "", lsOrNo = "";
                             for (int lnCtr = 0; lnCtr < poController.getDetailCount(); lnCtr++) {
-//                                if (poController.Detail(lnCtr).getSourceNo() != null && !"".equals(poController.Detail(lnCtr).getSourceNo())) {
-//                                    if (poController.Detail(lnCtr).getAmountApplied() == 0.0000 && poController.Detail(lnCtr).getEditMode() != EditMode.ADDNEW) {
-//                                        continue;
-//                                    }
-//                                }
+                                if (!poController.Detail(lnCtr).isReverse()){
+                                    continue;
+                                }
                                 if (poController.Master().getSourceNo() != null && !"".equals(poController.Master().getSourceNo())) {
                                     lsParticular = poController.Detail(lnCtr).CashAdvanceDetail(poController.Master().getSourceNo()).getParticular();
                                     lsOrNo = poController.Detail(lnCtr).CashAdvanceDetail(poController.Master().getSourceNo()).getORNo();
@@ -852,18 +841,18 @@ public class CashDisbursement_HistoryController implements Initializable, Screen
                     case "tfSearchIndustry":
                         if (lsValue.isEmpty()) {
                             poController.setSearchIndustry("");
-                            loadTableMain.reload();
+                            
                         }
                         break;
                     case "tfSearchPayee":
                         if (lsValue.isEmpty()) {
                             poController.setSearchPayee("");
-                            loadTableMain.reload();
+                            
                         }
                         break;
                     case "tfSearchCashAdvanceNo":
                         if (lsValue.isEmpty()) {
-//                            loadTableMain.reload();
+//                            
                         }
                         break;
                 }
@@ -896,12 +885,12 @@ public class CashDisbursement_HistoryController implements Initializable, Screen
                             case "tfSearchIndustry":
                                 poController.SearchIndustry(lsValue, false);
                                 loadRecordSearch();
-                                loadTableMain.reload();
+                                
                                 break;
                             case "tfSearchPayee":
                                 poJSON = poController.SearchPayee(lsValue, false, true);
                                 loadRecordSearch();
-                                loadTableMain.reload();
+                                
                                 break;
                             case "tfSearchCashAdvanceNo":
                                 poJSON = poController.SearchTransaction();
@@ -910,7 +899,7 @@ public class CashDisbursement_HistoryController implements Initializable, Screen
                                     return;
                                 } else {
                                     loadRecordSearch();
-                                    JFXUtil.clickTabByTitleText(tabPaneMain, "Disbursement Voucher");
+                                    JFXUtil.clickTabByTitleText(tabPaneMain, "Cash Disbursement");
                                     pnEditMode = poController.getEditMode();
                                     poController.populateJournal();
                                     loadTableDetail.reload();
@@ -1170,7 +1159,6 @@ public class CashDisbursement_HistoryController implements Initializable, Screen
                 int lnAttachmentType = 0;
                 lnAttachmentType = Integer.parseInt(lsAttachmentType);
                 cmbAttachmentType.getSelectionModel().select(lnAttachmentType);
-//                tfAttachmentSource.setText(poController.TransactionAttachmentSource(pnAttachment));
                 if (lbloadImage) {
                     try {
                         String filePath = (String) attachment_data.get(tblAttachments.getSelectionModel().getSelectedIndex()).getIndex02();
@@ -1260,20 +1248,14 @@ public class CashDisbursement_HistoryController implements Initializable, Screen
     }
 
     private void initButton(int fnValue) {
-
-        boolean lbShow1 = (fnValue == EditMode.UPDATE);
         boolean lbShow2 = (fnValue == EditMode.READY);
         boolean lbShow3 = (fnValue == EditMode.UNKNOWN || fnValue == EditMode.READY);
 
-        JFXUtil.setButtonsVisibility(lbShow2, btnHistory, btnPrint);
+        JFXUtil.setButtonsVisibility(lbShow2, btnHistory);
         JFXUtil.setButtonsVisibility(lbShow3, btnClose);
-
+        JFXUtil.setButtonsVisibility(lbShow2 && CashDisbursementStatus.APPROVED.equals(poController.Master().getTransactionStatus()), btnPrint);
+        
         JFXUtil.setDisabled(true, apDVMaster1, apDVMaster2, apJournalMaster, apJournalDetails, apBIRDetail);
-
-        if (fnValue != EditMode.READY) {
-            return;
-        }
-
     }
 
     private void clearTextFields() {
