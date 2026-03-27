@@ -4,6 +4,7 @@
  */
 package ph.com.guanzongroup.integsys.views;
 
+import java.io.IOException;
 import ph.com.guanzongroup.integsys.model.ModelCashDisbursement_Detail;
 import ph.com.guanzongroup.integsys.model.ModelCashDisbursement_Main;
 import ph.com.guanzongroup.integsys.model.ModelJournalEntry_Detail;
@@ -38,6 +39,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
@@ -62,6 +64,7 @@ import static javafx.scene.input.KeyCode.UP;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.StackPane;
+import javafx.stage.Stage;
 import javafx.util.Duration;
 import javafx.util.Pair;
 import javax.script.ScriptException;
@@ -132,6 +135,9 @@ public class CashDisbursement_EntryController implements Initializable, ScreenIn
     Map<String, String> imageinfo_temp = new HashMap<>();
     JFXUtil.ReloadableTableTask loadTableMain, loadTableDetail, loadTableDetailJE, loadTableDetailBIR, loadTableAttachment;
     private final JFXUtil.ImageViewer imageviewerutil = new JFXUtil.ImageViewer();
+    JFXUtil.StageManager stageAttachment = new JFXUtil.StageManager();
+    AnchorPane root = null;
+    Scene scene = null;
 
     ObservableList<String> documentType = ModelDeliveryAcceptance_Attachment.documentType;
     /* DV  & Journal */
@@ -146,7 +152,7 @@ public class CashDisbursement_EntryController implements Initializable, ScreenIn
     @FXML
     private Tab tabDetails, tabJournal, tabBIR, tabAttachments;
     @FXML
-    private TextField tfDVTransactionNo, tfBranch, tfCashFund, tfDepartment, tfPayee, tfCreditTo, tfVoucherNo, tfCashAdvNo, tfTotalAmount, tfVatableSales, tfVatAmountMaster, tfVatZeroRatedSales, tfVatExemptSales, tfLessWHTax, tfTotalNetAmount, tfORNoDetail, tfParticularDetail, tfVatableSalesDetail, tfVatExemptDetail, tfVatZeroRatedSalesDetail, tfVatRateDetail, tfVatAmountDetail, tfAmountDetail, tfSearchIndustry, tfSearchPayee, tfSearchCashAdvanceNo, tfJournalTransactionNo, tfTotalDebitAmount, tfTotalCreditAmount, tfAccountCode, tfAccountDescription, tfDebitAmount, tfCreditAmount, tfBIRTransactionNo, tfTaxCode, tfParticular, tfBaseAmount, tfTaxRate, tfTotalTaxAmount, tfAttachmentNo, tfAttachmentSource;
+    private TextField tfDVTransactionNo, tfBranch, tfDepartment, tfCashFund, tfPayee, tfCreditTo, tfVoucherNo, tfCashAdvNo, tfTotalAmount, tfVatableSales, tfVatAmountMaster, tfVatZeroRatedSales, tfVatExemptSales, tfLessWHTax, tfTotalNetAmount, tfORNoDetail, tfParticularDetail, tfVatableSalesDetail, tfVatExemptDetail, tfVatZeroRatedSalesDetail, tfVatRateDetail, tfVatAmountDetail, tfAmountDetail, tfSearchIndustry, tfSearchPayee, tfSearchCashAdvanceNo, tfJournalTransactionNo, tfTotalDebitAmount, tfTotalCreditAmount, tfAccountCode, tfAccountDescription, tfDebitAmount, tfCreditAmount, tfBIRTransactionNo, tfTaxCode, tfParticular, tfBaseAmount, tfTaxRate, tfTotalTaxAmount, tfAttachmentNo;
     @FXML
     private DatePicker dpDVTransactionDate, dpJournalTransactionDate, dpReportMonthYear, dpPeriodFrom, dpPeriodTo;
     @FXML
@@ -217,7 +223,6 @@ public class CashDisbursement_EntryController implements Initializable, ScreenIn
 
             initButton(pnEditMode);
             pagination.setPageCount(1);
-            JFXUtil.initKeyClickObject(AnchorMain, lastFocusedTextField, previousSearchedTextField); // for btnSearch Reference
 
             Platform.runLater(() -> {
                 poController.Master().setIndustryId(psIndustryId);
@@ -228,12 +233,105 @@ public class CashDisbursement_EntryController implements Initializable, ScreenIn
                 poController.Master().setBranchCode(oApp.getBranchCode());
                 loadRecordSearch();
                 btnNew.fire();
+                TriggerWindowEvent();
             });
             initAttachmentPreviewPane();
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
             ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
+    }
+    ChangeListener<Scene> WindowKeyEvent = (obs, oldScene, newScene) -> {
+        if (newScene != null) {
+            setKeyEvent(newScene);
+        }
+    };
+
+    public void TriggerWindowEvent() {
+        root = (AnchorPane) AnchorMain;
+        scene = root.getScene();
+        if (scene != null) {
+            setKeyEvent(scene);
+        } else {
+            root.sceneProperty().addListener(WindowKeyEvent);
+        }
+    }
+
+    public void RemoveWindowEvent() {
+        root.sceneProperty().removeListener(WindowKeyEvent);
+        scene.setOnKeyPressed(null);
+        stageAttachment.closeDialog();
+    }
+
+    private void setKeyEvent(Scene scene) {
+        scene.setOnKeyPressed(event -> {
+            if (event.getCode() == KeyCode.F5) {
+                if (DoesContainValidDisbDetail()) {
+                } else {
+                    ShowMessageFX.Warning(null, pxeModuleName, "Please provide at least one valid disbursement detail to proceed.");
+                    return;
+                }
+                if (JFXUtil.isObjectEqualTo(poController.getEditMode(), EditMode.ADDNEW, EditMode.READY, EditMode.UPDATE)) {
+                    showAttachmentDialog();
+                }
+            }
+            if (event.getCode() == KeyCode.F12) {
+                LoginControllerHolder.getMainController().eventf12(LoginControllerHolder.getMainController().getTab());
+            }
+        });
+        scene.focusOwnerProperty().addListener((obs, oldNode, newNode) -> {
+            if (newNode != null) {
+                if (newNode instanceof Button) {
+                } else {
+                    lastFocusedTextField.set(newNode);
+                    previousSearchedTextField.set(null);
+                }
+            }
+        });
+    }
+
+    public void showAttachmentDialog() {
+        poJSON = new JSONObject();
+        stageAttachment.closeDialog();
+        if (poController.getTransactionAttachmentCount() <= 0) {
+            ShowMessageFX.Warning(null, pxeModuleName, "No transaction attachment to load.");
+            return;
+        }
+        Map<String, Pair<String, String>> data = new HashMap<>();
+        data.clear();
+        int lnCount = 0;
+        for (int lnCtr = 0; lnCtr < poController.getTransactionAttachmentCount(); lnCtr++) {
+            if (RecordStatus.INACTIVE.equals(poController.TransactionAttachmentList(lnCtr).getModel().getRecordStatus())) {
+                continue;
+            }
+            lnCount += 1;
+            data.put(String.valueOf(lnCount), new Pair<>(String.valueOf(poController.TransactionAttachmentList(lnCtr).getModel().getFileName()),
+                    poController.TransactionAttachmentList(lnCtr).getModel().getDocumentType()));
+        }
+        AttachmentDialogController controller = new AttachmentDialogController();
+        controller.setOpenedImage(pnAttachment);
+        controller.addData(data);
+
+        try {
+            stageAttachment.showDialog((Stage) btnClose.getScene().getWindow(), getClass().getResource("/ph/com/guanzongroup/integsys/views/AttachmentDialog.fxml"), controller, "Attachment Dialog", false, false, true);
+        } catch (IOException ex) {
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
+        }
+    }
+
+    private boolean DoesContainValidDisbDetail() {
+        String lsParticular = "";
+        try {
+            if (poController.Master().getSourceNo() != null && !"".equals(poController.Master().getSourceNo())) {
+                lsParticular = poController.Detail(0).CashAdvanceDetail(poController.Master().getSourceNo()).getParticular();
+            } else {
+                lsParticular = poController.Detail(0).Particular().getDescription();
+            }
+        } catch (SQLException | GuanzonException ex) {
+            Logger.getLogger(CashDisbursement_EntryController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return !JFXUtil.isObjectEqualTo(lsParticular, null, "");
     }
 
     public void initTabPane() {
@@ -250,7 +348,7 @@ public class CashDisbursement_EntryController implements Initializable, ScreenIn
                 case "Journal":
                     if (pnEditMode == EditMode.READY || pnEditMode == EditMode.UPDATE || pnEditMode == EditMode.ADDNEW) {
                         JFXUtil.clearTextFields(apJournalDetails, apJournalMaster);
-                        if (poController.Detail(0).getParticularId() != null && !poController.Detail(0).getParticularId().isEmpty()) {
+                        if (DoesContainValidDisbDetail()) {
                             pbIsCheckedJournalTab = true;
                             populateJE();
                         } else {
@@ -262,7 +360,7 @@ public class CashDisbursement_EntryController implements Initializable, ScreenIn
                 case "BIR 2307":
                     if (pnEditMode == EditMode.READY || pnEditMode == EditMode.UPDATE || pnEditMode == EditMode.ADDNEW) {
                         JFXUtil.clearTextFields(apBIRDetail);
-                        if (poController.Detail(0).getParticularId() != null && !poController.Detail(0).getParticularId().isEmpty()) {
+                        if (DoesContainValidDisbDetail()) {
                             pbIsCheckedBIRTab = true;
                             populateBIR();
                         } else {
@@ -274,7 +372,7 @@ public class CashDisbursement_EntryController implements Initializable, ScreenIn
                 case "Attachments":
                     if (pnEditMode == EditMode.READY || pnEditMode == EditMode.UPDATE || pnEditMode == EditMode.ADDNEW) {
                         JFXUtil.clearTextFields(apAttachments);
-                        if (poController.Detail(0).getParticularId() != null && !poController.Detail(0).getParticularId().isEmpty()) {
+                        if (DoesContainValidDisbDetail()) {
                             pbIsCheckedAttachmentTab = true;
                             try {
                                 poController.loadAttachments();
@@ -460,6 +558,7 @@ public class CashDisbursement_EntryController implements Initializable, ScreenIn
                     break;
                 case "btnClose":
                     if (ShowMessageFX.YesNo(null, "Close Tab", "Are you sure you want to close this Tab?")) {
+                        stageAttachment.closeDialog();
                         poUnload.unloadForm(AnchorMain, oApp, pxeModuleName);
                     } else {
                         return;
@@ -593,6 +692,7 @@ public class CashDisbursement_EntryController implements Initializable, ScreenIn
                 try {
                     int pnRowMain = Integer.parseInt(selected.getIndex01()) - 1;
                     String lsTransactionNo = selected.getIndex02();
+                    stageAttachment.closeDialog();
                     if (!JFXUtil.loadValidation2(pnEditMode, pxeModuleName, poController.Master().getSourceNo(), lsTransactionNo)) {
                         return;
                     }
@@ -1890,10 +1990,10 @@ public class CashDisbursement_EntryController implements Initializable, ScreenIn
                 lsParticular = poController.Detail(pnDetail).Particular().getDescription();
                 lsOrNo = "";
             }
-            
+
             boolean lbShow = JFXUtil.isObjectEqualTo(poController.Master().getSourceNo(), null, "") || JFXUtil.isObjectEqualTo(lsOrNo, null, "");
             JFXUtil.setDisabled(lbShow, tfVatExemptDetail);
-            
+
             tfORNoDetail.setText(lsOrNo);
             tfParticularDetail.setText(lsParticular);
             tfVatableSalesDetail.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(pnDetail).getDetailVatSales(), true));
@@ -2232,6 +2332,7 @@ public class CashDisbursement_EntryController implements Initializable, ScreenIn
     }
 
     private void clearTextFields() {
+        stageAttachment.closeDialog();
         JFXUtil.setValueToNull(previousSearchedTextField, lastFocusedTextField);
         JFXUtil.clearTextFields(apButton, apMasterDetail, apDVMaster1, apDVMaster2, apDVDetail,
                 apMainList, apBrowse, apJournalMaster, apJournalDetails, apBIRDetail, apAttachments);
