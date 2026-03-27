@@ -1128,8 +1128,8 @@ public class DashboardController implements Initializable {
                     + ", b.sFormName"
                     + ", b.sObjectNm"
                     + ", b.sIndstCdx"
-                    + ", b.sCategrCd from xxxsysmenu a "
-                    + "LEFT JOIN xxxsysmenuothers b ON b.sMenuCDxx = a.sMenuCDxx AND b.cRecdStat = " + SQLUtil.toSQL(RecordStatus.ACTIVE);
+                    + ", b.sCategrCd from xxxSysMenu a "
+                    + "LEFT JOIN xxxSysMenuOthers b ON b.sMenuCDxx = a.sMenuCDxx AND b.cRecdStat = " + SQLUtil.toSQL(RecordStatus.ACTIVE);
             lsSQL = MiscUtil.addCondition(lsSQL, " a.sMenuDesc LIKE " + SQLUtil.toSQL(fsFormName)
                     + " AND a.cRecdStat = " + SQLUtil.toSQL(RecordStatus.ACTIVE));
 //            System.out.println("Executing SQL: " + lsSQL);
@@ -2480,8 +2480,8 @@ public class DashboardController implements Initializable {
                     + ", b.sFormName"
                     + ", b.sObjectNm"
                     + ", b.sIndstCdx"
-                    + ", b.sCategrCd from xxxsysmenu a "
-                    + "LEFT JOIN xxxsysmenuothers b ON b.sMenuCDxx = a.sMenuCDxx AND b.cRecdStat = " + SQLUtil.toSQL(RecordStatus.ACTIVE);
+                    + ", b.sCategrCd from xxxSysMenu a "
+                    + "LEFT JOIN xxxSysMenuOthers b ON b.sMenuCDxx = a.sMenuCDxx AND b.cRecdStat = " + SQLUtil.toSQL(RecordStatus.ACTIVE);
             lsSQL = MiscUtil.addCondition(lsSQL,
                     " a.sMenuCDxx = " + SQLUtil.toSQL(fsMenuCode)
                     + " AND b.sIndstCdx = " + SQLUtil.toSQL(fsIndustry)

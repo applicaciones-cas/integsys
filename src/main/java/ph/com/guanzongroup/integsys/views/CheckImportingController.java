@@ -12,7 +12,6 @@ import java.net.URL;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -22,7 +21,6 @@ import java.util.logging.Logger;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.collections.transformation.FilteredList;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -39,20 +37,15 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-import javafx.util.Pair;
 import javax.script.ScriptException;
-import static org.apache.poi.hssf.usermodel.HeaderFooter.file;
 import org.guanzon.appdriver.agent.ShowMessageFX;
 import org.guanzon.appdriver.base.CommonUtils;
 import org.guanzon.appdriver.base.GRiderCAS;
 import org.guanzon.appdriver.base.GuanzonException;
-import org.guanzon.appdriver.base.MiscUtil;
 import org.guanzon.appdriver.constant.EditMode;
 import org.json.simple.JSONObject;
 import ph.com.guanzongroup.cas.cashflow.CheckImporting;
-import static ph.com.guanzongroup.cas.cashflow.CheckImporting.importToList;
 import ph.com.guanzongroup.cas.cashflow.CheckPaymentImporting;
-import ph.com.guanzongroup.cas.cashflow.Disbursement;
 import ph.com.guanzongroup.cas.cashflow.services.CashflowControllers;
 import ph.com.guanzongroup.cas.cashflow.status.DisbursementStatic;
 
@@ -131,6 +124,9 @@ public class CheckImportingController implements Initializable, ScreenInterface 
         try {
             poCheckImporting = new CashflowControllers(oApp, null).CheckPaymentImporting();
             poCheckImporting.setRecordStatus(DisbursementStatic.VERIFIED);
+            poCheckImporting.getModel().setCompany(oApp.getCompnyId());
+            poCheckImporting.getModel().setIndustryID(psIndustryId);
+            
             poJSON = new JSONObject();
 //            poJSON = poCheckImporting.initialize();
 //            if (!"success".equals((String) poJSON.get("result"))) {
@@ -155,7 +151,7 @@ public class CheckImportingController implements Initializable, ScreenInterface 
             pnEditMode = EditMode.UNKNOWN;
             initButtons(pnEditMode);
             initTextFieldsProperty();
-            lblSource.setText(oApp.getCompnyId() + " - " + poCheckImporting.getModel().Industry().getDescription());
+            lblSource.setText(poCheckImporting.getModel().Company().getCompanyName() + " - " + poCheckImporting.getModel().Industry().getDescription());
         } catch (SQLException ex) {
             Logger.getLogger(CheckImportingController.class.getName()).log(Level.SEVERE, null, ex);
         } catch (GuanzonException ex) {
@@ -212,8 +208,7 @@ public class CheckImportingController implements Initializable, ScreenInterface 
                                         String.valueOf(main_data.get(lnctr).getIndex10()).trim()
                                 );
                         
-//                        updateChecks(Transaction,lnctr);
-//                        poJSON = poCheckImporting.saveRecord();
+
                        poJSON =  poCheckImporting.updateChecks(Transaction,CheckNo,Checkdate,amt);
                         if (!"success".equals((String) poJSON.get("result"))) {
                             ShowMessageFX.Warning((String) poJSON.get("message"), pxeModuleName, null);
@@ -628,7 +623,7 @@ public class CheckImportingController implements Initializable, ScreenInterface 
                 // ✅ KEEPING YOUR ORIGINAL LOGIC (only index changed)
                 main_data.add(new ModelCheckImporting(
                         String.valueOf(lnCtr + 1),
-                        poCheckImporting.CheckPayments(0).getSourceNo(),
+                        row.getVoucherNo(),
                         CustomCommonUtil.formatDateToShortString(
                                 poCheckImporting.CheckPayments(0).getTransactionDate()),
                         poCheckImporting.CheckPayments(0).Banks().getBankName(),

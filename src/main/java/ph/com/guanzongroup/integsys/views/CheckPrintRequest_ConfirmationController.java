@@ -336,7 +336,8 @@ public class CheckPrintRequest_ConfirmationController implements Initializable, 
                             return;
                         } else {
                             ShowMessageFX.Information(null, pxeModuleName, (String) poJSON.get("message"));
-                            JFXUtil.highlightByKey(tblVwMain, String.valueOf(pnMain + 1), "#C1E1C1", highlightedRowsMain);
+                            JFXUtil.disableAllHighlightByColor(tblVwMain, "#A7C7E7", highlightedRowsMain);
+                            JFXUtil.highlightByKey(tblVwMain, String.valueOf(pnMain + 1), "#C1E1C1", highlightedRowsMain);;
                         }
                     } else {
                         return;
@@ -570,7 +571,7 @@ public class CheckPrintRequest_ConfirmationController implements Initializable, 
                 tfCheckNo.setText(poCheckPrintingRequestController.Detail(pnDetail).DisbursementMaster().CheckPayments().getCheckNo());
                 tfCheckAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poCheckPrintingRequestController.Detail(pnDetail).DisbursementMaster().getNetTotal(), true));
                 tfPayeeNAme.setText(poCheckPrintingRequestController.Detail(pnDetail).DisbursementMaster().CheckPayments().Payee().getPayeeName());
-                tfDVNo.setText(poCheckPrintingRequestController.Detail(pnDetail).DisbursementMaster().getTransactionNo());
+                tfDVNo.setText(poCheckPrintingRequestController.Detail(pnDetail).DisbursementMaster().getVoucherNo());
                 tfDVAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poCheckPrintingRequestController.Detail(pnDetail).DisbursementMaster().getNetTotal(), true));
                 dpDVDate.setValue(CustomCommonUtil.parseDateStringToLocalDate(SQLUtil.dateFormat(poCheckPrintingRequestController.Detail(pnDetail).DisbursementMaster().getTransactionDate(), SQLUtil.FORMAT_SHORT_DATE)));
                 dpCheckDate.setValue(poCheckPrintingRequestController.Detail(pnDetail).DisbursementMaster().CheckPayments().getCheckDate() != null
@@ -640,7 +641,7 @@ public class CheckPrintRequest_ConfirmationController implements Initializable, 
                             details_data.add(
                                         new ModelDisbursementVoucher_Detail(String.valueOf(lnCtr + 1),
                                                 poCheckPrintingRequestController.Detail(lnCtr).getSourceNo(),
-                                                poCheckPrintingRequestController.Detail(lnCtr).DisbursementMaster().getTransactionNo(),
+                                                poCheckPrintingRequestController.Detail(lnCtr).DisbursementMaster().getVoucherNo(),
                                                 CustomCommonUtil.formatDateToShortString(poCheckPrintingRequestController.Detail(lnCtr).DisbursementMaster().getTransactionDate()),
                                                 CustomCommonUtil.setIntegerValueToDecimalFormat(poCheckPrintingRequestController.Detail(lnCtr).DisbursementMaster().getNetTotal(), true),
                                                 poCheckPrintingRequestController.Detail(lnCtr).CheckPayments().getCheckNo(),
@@ -793,6 +794,7 @@ public class CheckPrintRequest_ConfirmationController implements Initializable, 
             switch (event.getCode()) {
                 case TAB:
                 case ENTER:
+                case F3:
                     switch (lsID) {
                         case "tfSearchReferNo":
                             psSearchReferNo = tfSearchReferNo.getText();

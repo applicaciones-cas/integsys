@@ -170,6 +170,7 @@ public class CheckTransfer_EntryController implements Initializable, ScreenInter
      * Initializes the TBJ controller and transaction objects.
      */
     private void initializeObject() {
+        try{
         LogWrapper logwrapr = new LogWrapper("CAS", System.getProperty("sys.default.path.temp") + "cas-error.log");
         poGLControllers = new CashflowControllers(poApp, logwrapr);
         poGLControllers.CheckTransfers().setTransactionStatus("0");
@@ -177,8 +178,13 @@ public class CheckTransfer_EntryController implements Initializable, ScreenInter
         if (!"success".equals(poJSON.get("result"))) {
                 ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
         }
-//            poGLControllers.CheckTransfers().Master().setIndustryId(psIndustryID);
-//            lblSource.setText(poGLControllers.CheckTransfers().Master().Company().getCompanyName() + " - " + poGLControllers.CheckTransfers().Master().Industry().getDescription());
+            poGLControllers.CheckTransfers().Master().setIndustryId(psIndustryID);
+            poGLControllers.CheckTransfers().Master().setCompany(psCompanyID);
+            lblSource.setText(poGLControllers.CheckTransfers().Master().Company().getCompanyName() + " - " + poGLControllers.CheckTransfers().Master().Industry().getDescription());
+        } catch (SQLException | GuanzonException ex) {
+            Logger.getLogger(CheckTransfer_EntryController.class.getName()).log(Level.SEVERE, null, ex);
+            ShowMessageFX.Error(ex.getMessage(), psFormName, null);
+        }
     }
     
     private void ClearAll() {
@@ -201,6 +207,7 @@ public class CheckTransfer_EntryController implements Initializable, ScreenInter
         detail_data.clear();
         pnSelectedDetail = 0;
         psActiveField = "";
+        lblStatus.setText("UNKNOWN");
         taRemarks.clear();
     }
     private void initButtonsClickActions() {
@@ -333,35 +340,43 @@ public class CheckTransfer_EntryController implements Initializable, ScreenInter
                     }
                     break;
                 case "btnSave":
+                    String lsTransNo = poGLControllers.CheckTransfers().Master().getTransactionNo();
                     poJSON = poGLControllers.CheckTransfers().SaveTransaction();
                     if (!"success".equals((String) poJSON.get("result"))) {
                         ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
                         return;
                     }
-                    ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
-                    if (poApp.getUserLevel() > UserRight.ENCODER) {
+                    ShowMessageFX.Information((String) poJSON.get("message"), psFormName, null);
+                     pnEditMode = poGLControllers.CheckTransfers().getEditMode();
+                     if (poGLControllers.CheckTransfers().Master().getTransactionStatus().equals(CheckTransferStatus.OPEN)) {
                         if (ShowMessageFX.YesNo(null, psFormName, "Do you want to confirm this transaction?")) {
-                                poJSON = poGLControllers.CheckTransfers().OpenTransaction(poGLControllers.CheckTransfers().Master().getTransactionNo());
-                                poJSON = poGLControllers.CheckTransfers().ConfirmTransaction("");
-                          
+                            poJSON = poGLControllers.CheckTransfers().OpenTransaction(lsTransNo);
+                            poJSON = poGLControllers.CheckTransfers().ConfirmTransaction("");
+
                             if (!"success".equals((String) poJSON.get("result"))) {
                                 ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
+                                ClearAll();
+                                initButtons(pnEditMode);
                                 return;
                             }
                             ShowMessageFX.Information((String) poJSON.get("message"), psFormName, null);
                         }
+                    }
                         if (ShowMessageFX.YesNo(null, psFormName, "Do you want to print this transaction?")) {
                             poJSON = poGLControllers.CheckTransfers().printTransaction();
                             if ("error".equals((String) poJSON.get("result"))) {
                                 ShowMessageFX.Error((String) poJSON.get("message"), psFormName, null);
+                                ClearAll();
+                                initButtons(pnEditMode);
+                                return;
                             }
-                            ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
+                            
                         }
-                    }
 
                     ClearAll();
                     btnNew.fire();
                     break;
+                    
 
                 case "btnVoid":
 //                    poJSON = poGLControllers.CheckTransfers().VoidTransaction("");
@@ -417,9 +432,9 @@ public class CheckTransfer_EntryController implements Initializable, ScreenInter
                 tfDepartment,
                 tfCheckTransNo,
                 tfCheckNo,
-                tfFilterBank,
                 dpTransactionDate,
-                taRemarks
+                taRemarks,
+                tfNote
         );
         if (CheckTransferStatus.CONFIRMED.equals(poGLControllers.CheckTransfers().Master().getTransactionStatus())) {
             apMaster.setDisable(true);
@@ -509,7 +524,7 @@ public class CheckTransfer_EntryController implements Initializable, ScreenInter
             tfCheckAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(
                     poGLControllers.CheckTransfers().Detail(pnSelectedDetail).CheckPayment().getAmount(), true));
 
-            
+            poGLControllers.CheckTransfers().computeMasterFields();
             tfTotal.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(
                     poGLControllers.CheckTransfers().Master().getTransactionTotal(), true));
             
@@ -629,10 +644,15 @@ public class CheckTransfer_EntryController implements Initializable, ScreenInter
                             detailCount++;
                         }
                     }
+                     int OriginalRow = 0;
                     List<ModelTableDetail> detailsList = new ArrayList<>();
                     for (int lnCtr = 0; lnCtr < poGLControllers.CheckTransfers().getDetailCount(); lnCtr++) {
+                        if (!poGLControllers.CheckTransfers().Detail(lnCtr).isReverse()) {
+                            continue;
+                        }
+                        OriginalRow += 1;
                         detailsList.add(new ModelTableDetail(
-                                String.valueOf(lnCtr + 1),
+                                String.valueOf(OriginalRow),
                                 poGLControllers.CheckTransfers().Detail(lnCtr) != null
                                 && poGLControllers.CheckTransfers().Detail(lnCtr).CheckPayment() != null
                                 && poGLControllers.CheckTransfers().Detail(lnCtr).CheckPayment().getTransactionNo() != null
@@ -663,14 +683,28 @@ public class CheckTransfer_EntryController implements Initializable, ScreenInter
                                 ? poGLControllers.CheckTransfers().Detail(lnCtr).CheckPayment().getCheckNo()
                                 : "",
                                 CustomCommonUtil.setIntegerValueToDecimalFormat(poGLControllers.CheckTransfers().Detail(lnCtr).CheckPayment().getAmount(),true),
-                                        "","",""));
+                                        String.valueOf(lnCtr),"",""));
                     }
                     Platform.runLater(() -> {
                         detail_data.setAll(detailsList); // Properly update list
                         tblViewDetails.setItems(detail_data);
-                        pnSelectedDetail = tblViewDetails.getItems().size() - 1;
-                        tblViewDetails.getSelectionModel().clearAndSelect(pnSelectedDetail);
-                        tblViewDetails.scrollTo(pnSelectedDetail);
+                         int lnTempRow = JFXUtil.getDetailRow(detail_data, pnSelectedDetail, 8); //this method is used only when Reverse is applied
+                        if (lnTempRow < 0 || lnTempRow
+                                >= detail_data.size()) {
+                            if (!detail_data.isEmpty()) {
+                                /* FOCUS ON FIRST ROW */
+                                JFXUtil.selectAndFocusRow(tblViewDetails, 0);
+                                int lnRow = Integer.parseInt(detail_data.get(0).getIndex08());
+                                pnSelectedDetail = lnRow;
+                                LoadDetail();
+                            }
+                        } else {
+                            /* FOCUS ON THE ROW THAT pnRowDetail POINTS TO */
+                            JFXUtil.selectAndFocusRow(tblViewDetails, lnTempRow);
+                            int lnRow = Integer.parseInt(detail_data.get(tblViewDetails.getSelectionModel().getSelectedIndex()).getIndex08());
+                            pnSelectedDetail = lnRow;
+                            LoadDetail();
+                        }
                         LoadDetail();
                         JFXUtil.showRetainedHighlight(false, tblViewMaster, "#A7C7E7", plOrderNoPartial, plOrderNoFinal, highlightedRowsMain, true);
                         loadHighlightFromDetail();
@@ -739,19 +773,18 @@ public class CheckTransfer_EntryController implements Initializable, ScreenInter
         if ((pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE)) {
             
             cbReverse.setOnAction(event -> {
-                if (poGLControllers.CheckTransfers().Master().getTransactionStatus().equals(CheckTransferStatus.OPEN)
-                        || poGLControllers.CheckTransfers().Master().getTransactionStatus().equals(CheckTransferStatus.CONFIRMED)) {
-                    if (poGLControllers.CheckTransfers().Detail(pnSelectedDetail).getSourceNo() != null
-                            || !poGLControllers.CheckTransfers().Detail(pnSelectedDetail).getSourceNo().isEmpty()) {
-                        if (!cbReverse.isSelected()) {
-                            poGLControllers.CheckTransfers().Detail().remove(pnSelectedDetail);
-                        }
+                try {
+                    if (poGLControllers.CheckTransfers().Detail(pnSelectedDetail).getEditMode() == EditMode.ADDNEW) {
+                        poGLControllers.CheckTransfers().deleteDetail(pnSelectedDetail);
+                    } else {
+                        poGLControllers.CheckTransfers().Detail(pnSelectedDetail).isReverse(cbReverse.isSelected());
                     }
-                } else {
-                     poGLControllers.CheckTransfers().Detail(pnSelectedDetail).isReverse(cbReverse.isSelected());
+                    
+                    loadTableDetail();
+                    poGLControllers.CheckTransfers().computeMasterFields();
+                } catch (SQLException | GuanzonException ex) {
+                    Logger.getLogger(CheckTransfer_EntryController.class.getName()).log(Level.SEVERE, null, ex);
                 }
-                
-                loadTableDetail();
             });
             
         }
@@ -760,6 +793,8 @@ public class CheckTransfer_EntryController implements Initializable, ScreenInter
     private void tblViewDetails_Clicked(MouseEvent event) {
         if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE || pnEditMode == EditMode.READY) {
             pnSelectedDetail = tblViewDetails.getSelectionModel().getSelectedIndex();
+            int lnRow = Integer.parseInt(detail_data.get(tblViewDetails.getSelectionModel().getSelectedIndex()).getIndex08());
+            pnSelectedDetail = lnRow;
             ModelTableDetail selectedItem = tblViewDetails.getSelectionModel().getSelectedItem();
             if (event.getClickCount() == 1) {
                 tfCheckTransNo.clear();
@@ -1029,6 +1064,7 @@ public class CheckTransfer_EntryController implements Initializable, ScreenInter
                                 poJSON = poGLControllers.CheckTransfers().SearchDepartment(lsValue, false);
                                 if ("error".equals(poJSON.get("result"))) {
                                     ShowMessageFX.Warning((String) poJSON.get("message"), lsValue, lsValue);
+                                    return;
                                 }
                                 tfDepartment.setText(poGLControllers.CheckTransfers().Master().Department().getDescription());
                                 return;
@@ -1036,6 +1072,7 @@ public class CheckTransfer_EntryController implements Initializable, ScreenInter
                                 poJSON = poGLControllers.CheckTransfers().SearchChecks(lsValue, "",pnSelectedDetail,false);
                                 if ("error".equals(poJSON.get("result"))) {
                                     ShowMessageFX.Warning((String) poJSON.get("message"), lsValue, lsValue);
+                                    return;
                                 }
                                 tfCheckTransNo.setText(poGLControllers.CheckTransfers().Detail(pnSelectedDetail).CheckPayment().getTransactionNo());
                                 loadTableDetail();
@@ -1044,6 +1081,7 @@ public class CheckTransfer_EntryController implements Initializable, ScreenInter
                                 poJSON = poGLControllers.CheckTransfers().SearchChecks("", lsValue,pnSelectedDetail,false);
                                 if ("error".equals(poJSON.get("result"))) {
                                     ShowMessageFX.Warning((String) poJSON.get("message"), lsValue, lsValue);
+                                    return;
                                 }
                                 tfCheckNo.setText(poGLControllers.CheckTransfers().Detail(pnSelectedDetail).CheckPayment().getCheckNo());
                                 loadTableDetail();

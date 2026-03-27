@@ -161,21 +161,28 @@ public class CheckDeposit_HistoryController implements Initializable, ScreenInte
         initTableDetail();
         initTableOnClick();
         initCheckBox();
+        initFields();
     }
     
     /**
      * Initializes the TBJ controller and transaction objects.
      */
     private void initializeObject() {
-        LogWrapper logwrapr = new LogWrapper("CAS", System.getProperty("sys.default.path.temp") + "cas-error.log");
-        poGLControllers = new CashflowControllers(poApp, logwrapr);
-        poGLControllers.CheckDeposits().setTransactionStatus("0123456");
-        poJSON = poGLControllers.CheckDeposits().InitTransaction();
-        if (!"success".equals(poJSON.get("result"))) {
+        try {
+            LogWrapper logwrapr = new LogWrapper("CAS", System.getProperty("sys.default.path.temp") + "cas-error.log");
+            poGLControllers = new CashflowControllers(poApp, logwrapr);
+            poGLControllers.CheckDeposits().setTransactionStatus("0123456");
+            poJSON = poGLControllers.CheckDeposits().InitTransaction();
+            if (!"success".equals(poJSON.get("result"))) {
                 ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
+            }
+            poGLControllers.CheckDeposits().Master().setIndustryId(psIndustryID);
+            poGLControllers.CheckDeposits().Master().setCompany(psCompanyID);
+            lblSource.setText(poGLControllers.CheckDeposits().Master().Company().getCompanyName() + " - " + poGLControllers.CheckDeposits().Master().Industry().getDescription());
+        } catch (SQLException | GuanzonException ex) {
+            Logger.getLogger(CheckDeposit_EntryController.class.getName()).log(Level.SEVERE, null, ex);
+            ShowMessageFX.Error(ex.getMessage(), psFormName, null);
         }
-//            poGLControllers.CheckDeposits().Master().setIndustryId(psIndustryID);
-//            lblSource.setText(poGLControllers.CheckDeposits().Master().Company().getCompanyName() + " - " + poGLControllers.CheckDeposits().Master().Industry().getDescription());
     }
     
     private void ClearAll() {
@@ -219,7 +226,7 @@ public class CheckDeposit_HistoryController implements Initializable, ScreenInte
                     }
                     break;
                 case "btnBrowse":
-                    poJSON = poGLControllers.CheckDeposits().SearchTransaction( tfSearchTransNo.getText(),tfBankAccountNo.getText(),dpSearchTransactionDate.getValue());
+                    poJSON = poGLControllers.CheckDeposits().SearchTransaction( tfSearchTransNo.getText(),tfSearchBankAccountNo.getText(),dpSearchTransactionDate.getValue());
                     if (!"success".equals((String) poJSON.get("result"))) {
                         ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
                         return;
@@ -333,7 +340,7 @@ public class CheckDeposit_HistoryController implements Initializable, ScreenInte
             apDetail.setDisable(false);
         }
         
-            List<TextField> loTxtField = Arrays.asList(tfCheckTransNo, tfCheckNo,tfSearchBankAccountNo);
+            List<TextField> loTxtField = Arrays.asList(tfCheckTransNo, tfCheckNo,tfSearchBankAccountNo,tfSearchTransNo);
             loTxtField.forEach(tf -> tf.setOnKeyPressed(event -> txtField_KeyPressed(event)));
 //
 //            JFXUtil.setFocusListener(txtArea_Focus, taRemarks);
@@ -485,10 +492,15 @@ public class CheckDeposit_HistoryController implements Initializable, ScreenInte
                             detailCount++;
                         }
                     }
+                    int OriginalRow = 0;
                     List<ModelTableDetail> detailsList = new ArrayList<>();
                     for (int lnCtr = 0; lnCtr < poGLControllers.CheckDeposits().getDetailCount(); lnCtr++) {
-                        detailsList.add(new ModelTableDetail(
-                                String.valueOf(lnCtr + 1),
+                        if (!poGLControllers.CheckDeposits().Detail(lnCtr).isReverse()) {
+                            continue;
+                        }
+                                OriginalRow += 1;
+                                detailsList.add(new ModelTableDetail(
+                                String.valueOf(OriginalRow),
                                 poGLControllers.CheckDeposits().Detail(lnCtr) != null
                                 && poGLControllers.CheckDeposits().Detail(lnCtr).CheckPayment() != null
                                 && poGLControllers.CheckDeposits().Detail(lnCtr).CheckPayment().getTransactionNo() != null
@@ -723,12 +735,20 @@ public class CheckDeposit_HistoryController implements Initializable, ScreenInte
                                 }
                                 tfBankMaster.setText(poGLControllers.CheckDeposits().Master().Banks().getBankName());
                                 break;
+                                
+                            case "tfSearchTransNo":
                             case "tfSearchBankAccountNo":
-                                poJSON = poGLControllers.CheckDeposits().SearchBankAccounts(lsValue,false);
-                                if ("error".equals(poJSON.get("result"))) {
-                                    ShowMessageFX.Warning((String) poJSON.get("message"), lsValue, lsValue);
-                                }                             
-                                tfSearchBankAccountNo.setText(poGLControllers.CheckDeposits().Master().BankAccount().getAccountNo());
+                                poJSON = poGLControllers.CheckDeposits().SearchTransaction(tfSearchTransNo.getText(), tfSearchBankAccountNo.getText(), dpSearchTransactionDate.getValue());
+                                if (!"success".equals((String) poJSON.get("result"))) {
+                                    ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
+                                    return;
+                                }
+
+                                System.out.println("EDIT MODE : " + poGLControllers.CheckDeposits().getEditMode());
+                                pnEditMode = poGLControllers.CheckDeposits().getEditMode();
+                                loadTableDetail();
+                                LoadMaster();
+                                LoadDetail();
                                 return;   
                             case "tfBankAccountName":
                                 poJSON = poGLControllers.CheckDeposits().SearchBankAccounts(lsValue,false);
@@ -768,6 +788,8 @@ public class CheckDeposit_HistoryController implements Initializable, ScreenInte
             } catch (SQLException | GuanzonException | ExceptionInInitializerError ex) {
                 Logger.getLogger(TBJ_ParameterController.class.getName()).log(Level.SEVERE, null, ex);
                 ShowMessageFX.Error(ex.getMessage(), psFormName, null);
+            } catch (CloneNotSupportedException ex) {
+                Logger.getLogger(CheckDeposit_HistoryController.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
     }

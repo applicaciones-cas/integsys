@@ -169,15 +169,22 @@ public class CheckRelease_HistoryController implements Initializable, ScreenInte
     
 
     private void initializeObject() {
-        LogWrapper logwrapr = new LogWrapper("CAS", System.getProperty("sys.default.path.temp") + "cas-error.log");
-        poGLControllers = new CashflowControllers(poApp, logwrapr);
-        poGLControllers.CheckReleases().setTransactionStatus("0123456");
-        poJSON = poGLControllers.CheckReleases().InitTransaction();
-        if (!"success".equals(poJSON.get("result"))) {
+        try {
+            LogWrapper logwrapr = new LogWrapper("CAS", System.getProperty("sys.default.path.temp") + "cas-error.log");
+            poGLControllers = new CashflowControllers(poApp, logwrapr);
+            poGLControllers.CheckReleases().setTransactionStatus("0123456");
+            poJSON = poGLControllers.CheckReleases().InitTransaction();
+
+            if (!"success".equals(poJSON.get("result"))) {
                 ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
+            }
+            poGLControllers.CheckReleases().Master().setIndustryId(psIndustryID);
+            poGLControllers.CheckReleases().Master().setCompany(psCompanyID);
+            lblSource.setText(poGLControllers.CheckReleases().Master().Company().getCompanyName() + " - " + poGLControllers.CheckReleases().Master().Industry().getDescription());
+        } catch (SQLException | GuanzonException ex) {
+            Logger.getLogger(CheckTransfer_EntryController.class.getName()).log(Level.SEVERE, null, ex);
+            ShowMessageFX.Error(ex.getMessage(), psFormName, null);
         }
-//            poGLControllers.CheckReleases().Master().setIndustryId(psIndustryID);
-//            lblSource.setText(poGLControllers.CheckReleases().Master().Company().getCompanyName() + " - " + poGLControllers.CheckReleases().Master().Industry().getDescription());
     }
     private void initButton(int fnEditMode) {
        if (fnEditMode == EditMode.UNKNOWN){
@@ -292,6 +299,14 @@ public class CheckRelease_HistoryController implements Initializable, ScreenInte
                     if(poGLControllers.CheckReleases().Master().getTransactionStatus().equals(CheckTransferStatus.VOID)){
                      ShowMessageFX.Warning(
                                 "Transaction already voided.\n Posting of this transaction is not allowed.",
+                                psFormName, null
+                        );
+                        
+                        return;
+                    }
+                     if(poGLControllers.CheckReleases().Master().getTransactionStatus().equals(CheckTransferStatus.POSTED)){
+                     ShowMessageFX.Warning(
+                                "Transaction already posted.\n Posting of this transaction is not allowed.",
                                 psFormName, null
                         );
                         
@@ -486,11 +501,15 @@ public class CheckRelease_HistoryController implements Initializable, ScreenInte
             protected List<ModelTableDetail> call() throws Exception {
                 try {
                     int detailCount = poGLControllers.CheckReleases().getDetailCount();
-                          
+                    int OriginalRow = 0;
                     List<ModelTableDetail> detailsList = new ArrayList<>();
                     for (int lnCtr = 0; lnCtr < poGLControllers.CheckReleases().getDetailCount(); lnCtr++) {
+                        if (!poGLControllers.CheckReleases().Detail(lnCtr).isReverse()) {
+                            continue;
+                        }
+                        OriginalRow += 1;
                         detailsList.add(new ModelTableDetail(
-                                String.valueOf(lnCtr + 1),
+                                String.valueOf(OriginalRow),
                                 poGLControllers.CheckReleases().Detail(lnCtr) != null
                                 && poGLControllers.CheckReleases().Detail(lnCtr).CheckPayment() != null
                                 && poGLControllers.CheckReleases().Detail(lnCtr).CheckPayment().getTransactionNo() != null
@@ -521,7 +540,7 @@ public class CheckRelease_HistoryController implements Initializable, ScreenInte
                                 ? poGLControllers.CheckReleases().Detail(lnCtr).CheckPayment().getCheckNo()
                                 : "",
                                 CustomCommonUtil.setIntegerValueToDecimalFormat(poGLControllers.CheckReleases().Detail(lnCtr).CheckPayment().getAmount(),true),
-                                        "","",""));
+                                        String.valueOf(lnCtr),"",""));
                     }
                     Platform.runLater(() -> {
                         detail_data.setAll(detailsList); // Properly update list

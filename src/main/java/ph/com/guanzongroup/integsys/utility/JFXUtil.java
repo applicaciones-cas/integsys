@@ -1741,6 +1741,8 @@ public class JFXUtil {
             }
         }
     }
+    
+
 
     /*Alternative version of inputDecimalOnly; restricts to 1 dot */
     public static void inputDecimalOnly(TextField... foTxtFields) {
@@ -3155,7 +3157,7 @@ public class JFXUtil {
             if (node != null) {
                 Tooltip tooltip = new Tooltip(message);
 
-                tooltip.setShowDelay(Duration.seconds(delay));
+                //tooltip.setShowDelay(Duration.seconds(delay));
                 tooltip.setStyle(
                         "-fx-font-size: 10px;"
                         + "-fx-padding: 6 10 6 10;"

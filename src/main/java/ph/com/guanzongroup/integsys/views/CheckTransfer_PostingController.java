@@ -180,16 +180,23 @@ public class CheckTransfer_PostingController implements Initializable, ScreenInt
      * Initializes the TBJ controller and transaction objects.
      */
     private void initializeObject() {
-        LogWrapper logwrapr = new LogWrapper("CAS", System.getProperty("sys.default.path.temp") + "cas-error.log");
-        poGLControllers = new CashflowControllers(poApp, logwrapr);
-        poGLControllers.CheckTransfers().setTransactionStatus(CheckTransferStatus.CONFIRMED);
-        poJSON = poGLControllers.CheckTransfers().InitTransaction();
+        try {
+            LogWrapper logwrapr = new LogWrapper("CAS", System.getProperty("sys.default.path.temp") + "cas-error.log");
+            poGLControllers = new CashflowControllers(poApp, logwrapr);
+            poGLControllers.CheckTransfers().setTransactionStatus(CheckTransferStatus.CONFIRMED);
+            poJSON = poGLControllers.CheckTransfers().InitTransaction();
 
-        if (!"success".equals(poJSON.get("result"))) {
+            if (!"success".equals(poJSON.get("result"))) {
                 ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
+            }
+
+            poGLControllers.CheckTransfers().Master().setIndustryId(psIndustryID);
+            poGLControllers.CheckTransfers().Master().setCompany(psCompanyID);
+            lblSource.setText(poGLControllers.CheckTransfers().Master().Company().getCompanyName() + " - " + poGLControllers.CheckTransfers().Master().Industry().getDescription());
+        } catch (SQLException | GuanzonException ex) {
+            Logger.getLogger(CheckTransfer_PostingController.class.getName()).log(Level.SEVERE, null, ex);
+            ShowMessageFX.Error(ex.getMessage(), psFormName, null);
         }
-//            poGLControllers.CheckTransfers().Master().setIndustryId(psIndustryID);
-//            lblSource.setText(poGLControllers.CheckTransfers().Master().Company().getCompanyName() + " - " + poGLControllers.CheckTransfers().Master().Industry().getDescription());
     }
     
     private void ClearAll() {
@@ -212,6 +219,8 @@ public class CheckTransfer_PostingController implements Initializable, ScreenInt
         detail_data.clear();
         pnSelectedDetail = 0;
         psActiveField = "";
+        lblStatus.setText("UNKNOWN");
+        btnReceived.setDisable(true);
     }
     private void initButtonsClickActions() {
         List<Button> buttons = Arrays.asList(btnBrowse, btnRetrieve , btnPost,btnClose, btnReceived);
@@ -264,21 +273,28 @@ public class CheckTransfer_PostingController implements Initializable, ScreenInt
                     initButtons(EditMode.READY);
                     break;
                 case "btnPost":
-                    
+                        if(dpReceivedDate.getValue()== null){
+                         ShowMessageFX.Error("No transaction loaded", psFormName, null);
+                         return;
+                        }
                        poJSON = poGLControllers.CheckTransfers().PostTransaction("");
                        if (!"success".equals((String) poJSON.get("result"))) {
                            ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
                            return;
                        }
-                       ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
+                       ShowMessageFX.Information((String) poJSON.get("message"), psFormName, null);
                        ClearAll();
                        initializeObject();
                        pnEditMode = poGLControllers.CheckTransfers().getEditMode();
                        initButtons(pnEditMode);
+                       loadTableMaster();
                 break;
                 case "btnReceived":
-                    if (poGLControllers.CheckTransfers().Master().getTransactionNo() != null
-                            && !poGLControllers.CheckTransfers().Master().getTransactionNo().isEmpty()) {
+                    if (poGLControllers.CheckTransfers().Master().getTransactionNo() == null
+                            || poGLControllers.CheckTransfers().Master().getTransactionNo().isEmpty()) {
+                        ShowMessageFX.Error("No transaction loaded", psFormName, null);
+                        return;
+                    }
 
                         int detailCount = poGLControllers.CheckTransfers().getDetailCount();
                         boolean allReceived = true;
@@ -309,7 +325,7 @@ public class CheckTransfer_PostingController implements Initializable, ScreenInt
 
                         // Update button text after operation
                         updateReceiveButtonText();
-                    }
+                    
                     break;
                     
                 default:
@@ -375,8 +391,16 @@ public class CheckTransfer_PostingController implements Initializable, ScreenInt
             dpTransactionDate.setValue(CustomCommonUtil.parseDateStringToLocalDate(
                     SQLUtil.dateFormat(poGLControllers.CheckTransfers().Master().getTransactionDate(), SQLUtil.FORMAT_SHORT_DATE)));
             
-             dpReceivedDate.setValue(CustomCommonUtil.parseDateStringToLocalDate(
-                    SQLUtil.dateFormat(poGLControllers.CheckTransfers().Master().getReceivedDate(), SQLUtil.FORMAT_SHORT_DATE)));
+             LocalDate ldValue = (poGLControllers.CheckTransfers().Master().getReceivedDate() == null)
+                    ? LocalDate.now()
+                    : CustomCommonUtil.parseDateStringToLocalDate(
+                            SQLUtil.dateFormat(
+                                    poGLControllers.CheckTransfers().Master().getReceivedDate(),
+                                    SQLUtil.FORMAT_SHORT_DATE
+                            )
+                    );
+
+            dpReceivedDate.setValue(ldValue);
              
             String lsStatus = "";
             switch (poGLControllers.CheckTransfers().Master().getTransactionStatus()) {
@@ -388,6 +412,9 @@ public class CheckTransfer_PostingController implements Initializable, ScreenInt
                     break;
                 case CheckTransferStatus.CONFIRMED:
                     lsStatus = "CONFIRMED";
+                    break;
+                case CheckTransferStatus.POSTED:
+                    lsStatus = "POSTED";
                     break;
             }
             lblStatus.setText(lsStatus);
@@ -427,6 +454,7 @@ public class CheckTransfer_PostingController implements Initializable, ScreenInt
             cbIsReceived.setSelected(
                 poGLControllers.CheckTransfers().Detail(pnSelectedDetail) != null
                 && poGLControllers.CheckTransfers().Detail(pnSelectedDetail).isReceived()
+            
         );
             
 
@@ -760,6 +788,8 @@ public class CheckTransfer_PostingController implements Initializable, ScreenInt
                                 psFormName,
                                 null);
                         pnEditMode = EditMode.UNKNOWN;
+                        
+                       
                         initButtons(pnEditMode);
                         return;
                     }
@@ -768,6 +798,7 @@ public class CheckTransfer_PostingController implements Initializable, ScreenInt
                     loadTableDetail();
                     LoadMaster();
                     LoadDetail();
+                     btnReceived.setDisable(false);
 
                     pnEditMode = poGLControllers.CheckTransfers().getEditMode();
                     initButtons(pnEditMode);
@@ -974,6 +1005,7 @@ public class CheckTransfer_PostingController implements Initializable, ScreenInt
                                 poJSON = poGLControllers.CheckTransfers().SearchDistination(lsValue, false);
                                 if ("error".equals(poJSON.get("result"))) {
                                     ShowMessageFX.Warning((String) poJSON.get("message"), lsValue, lsValue);
+                                    return;
                                 }
                                 tfSearchSource.setText(poGLControllers.CheckTransfers().Master().Branch().getBranchName());
                                 loadTableMaster();
@@ -982,6 +1014,7 @@ public class CheckTransfer_PostingController implements Initializable, ScreenInt
                                 poJSON = poGLControllers.CheckTransfers().SearchDistination(lsValue, false);
                                 if ("error".equals(poJSON.get("result"))) {
                                     ShowMessageFX.Warning((String) poJSON.get("message"), lsValue, lsValue);
+                                    return;
                                 }
                                 tfSourceBranch.setText(poGLControllers.CheckTransfers().Master().Branch().getBranchName());
                                 if(!poGLControllers.CheckTransfers().Master().Branch().isWarehouse() 
@@ -994,6 +1027,7 @@ public class CheckTransfer_PostingController implements Initializable, ScreenInt
                                 poJSON = poGLControllers.CheckTransfers().SearchDepartment(lsValue, false);
                                 if ("error".equals(poJSON.get("result"))) {
                                     ShowMessageFX.Warning((String) poJSON.get("message"), lsValue, lsValue);
+                                    return;
                                 }
                                 tfDepartment.setText(poGLControllers.CheckTransfers().Master().Department().getDescription());
                                 return;
@@ -1001,6 +1035,7 @@ public class CheckTransfer_PostingController implements Initializable, ScreenInt
                                 poJSON = poGLControllers.CheckTransfers().SearchChecks(lsValue, "",pnSelectedDetail,false);
                                 if ("error".equals(poJSON.get("result"))) {
                                     ShowMessageFX.Warning((String) poJSON.get("message"), lsValue, lsValue);
+                                    return;
                                 }
                                 tfCheckTransNo.setText(poGLControllers.CheckTransfers().Detail(pnSelectedDetail).CheckPayment().getTransactionNo());
                                 loadTableDetail();
@@ -1009,6 +1044,7 @@ public class CheckTransfer_PostingController implements Initializable, ScreenInt
                                 poJSON = poGLControllers.CheckTransfers().SearchChecks("", lsValue,pnSelectedDetail,false);
                                 if ("error".equals(poJSON.get("result"))) {
                                     ShowMessageFX.Warning((String) poJSON.get("message"), lsValue, lsValue);
+                                    return;
                                 }
                                 tfCheckNo.setText(poGLControllers.CheckTransfers().Detail(pnSelectedDetail).CheckPayment().getCheckNo());
                                 loadTableDetail();

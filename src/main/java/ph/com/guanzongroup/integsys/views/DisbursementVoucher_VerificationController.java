@@ -414,15 +414,15 @@ public class DisbursementVoucher_VerificationController implements Initializable
                             return;
                         }
                     }
-                    
-                    if(!DisbursementStatic.OPEN.equals(poController.Master().getTransactionStatus())) {
+
+                    if (!DisbursementStatic.OPEN.equals(poController.Master().getTransactionStatus())) {
                         poJSON = poController.callApproval();
                         if (!"success".equals((String) poJSON.get("result"))) {
-                            ShowMessageFX.Warning(null, pxeModuleName,  (String) poJSON.get("message")); // check this for encoder or and higher
+                            ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message")); // check this for encoder or and higher
                             return;
                         }
                     }
-                    
+
                     poJSON = poController.SaveTransaction();
                     if (!"success".equals((String) poJSON.get("result"))) {
                         ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
@@ -540,28 +540,23 @@ public class DisbursementVoucher_VerificationController implements Initializable
                     if (ShowMessageFX.YesNo(null, pxeModuleName, "Are you sure you want to " + lsTransaction + " transaction?")) {
                         pnEditMode = poController.getEditMode();
                         if (pnEditMode == EditMode.READY) {
-                            if (!poController.existJournal().equals("")) {
-                                switch (poController.Master().getTransactionStatus()) {
-                                    case DisbursementStatic.OPEN:
-                                        poJSON = poController.VoidTransaction("");
-                                        break;
-                                    case DisbursementStatic.VERIFIED:
-                                    default:
-                                        poJSON = poController.CancelTransaction("");
-                                        break;
-                                }
-                                if ("error".equals((String) poJSON.get("result"))) {
-                                    ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-                                    return;
-                                } else {
-                                    ShowMessageFX.Information(null, pxeModuleName, (String) poJSON.get("message"));
-                                    pnEditMode = poController.getEditMode();
-                                    JFXUtil.disableAllHighlightByColor(tblViewMainList, "#A7C7E7", highlightedRowsMain);
-                                    JFXUtil.highlightByKey(tblViewMainList, String.valueOf(pnMain + 1), "#FAA0A0", highlightedRowsMain);
-                                }
-                            } else {
-                                ShowMessageFX.Warning(null, pxeModuleName, "This transaction has no journal entry. Please add a journal entry by updating the transaction to enable void.");
+                            switch (poController.Master().getTransactionStatus()) {
+                                case DisbursementStatic.OPEN:
+                                    poJSON = poController.VoidTransaction("");
+                                    break;
+                                case DisbursementStatic.VERIFIED:
+                                default:
+                                    poJSON = poController.CancelTransaction("");
+                                    break;
+                            }
+                            if ("error".equals((String) poJSON.get("result"))) {
+                                ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                 return;
+                            } else {
+                                ShowMessageFX.Information(null, pxeModuleName, (String) poJSON.get("message"));
+                                pnEditMode = poController.getEditMode();
+                                JFXUtil.disableAllHighlightByColor(tblViewMainList, "#A7C7E7", highlightedRowsMain);
+                                JFXUtil.highlightByKey(tblViewMainList, String.valueOf(pnMain + 1), "#FAA0A0", highlightedRowsMain);
                             }
                         }
                     } else {
@@ -807,7 +802,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
                                     int lnRow = Integer.parseInt(details_data.get(0).getIndex11());
                                     pnDetail = lnRow;
                                     loadRecordDetail();
-                                }else{
+                                } else {
                                     JFXUtil.clearTextFields(apMasterDetail);
                                 }
                             } else {

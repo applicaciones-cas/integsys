@@ -122,7 +122,8 @@ public class TBJ_ParameterController implements Initializable, ScreenInterface {
             tfTransactionNo,
             tfFieldName,
             tfAccountTitle,
-            tfTableName;
+            tfTableName,
+            tfIndustry;
 
     @FXML
     private TextArea taRemarks;
@@ -230,13 +231,14 @@ public class TBJ_ParameterController implements Initializable, ScreenInterface {
     public void initialize(URL url, ResourceBundle rb) {
         // TODO
         ClearAll();
+        initComboBox();
         initializeObject();
         initButtonsClickActions();
         initFields();
         initTableDetail();
         initCheckBox();
-        Platform.runLater(() -> btnNew.fire());
         lblSource.setText("");
+        Platform.runLater(() -> btnNew.fire());
     }
 
     /**
@@ -396,6 +398,7 @@ public class TBJ_ParameterController implements Initializable, ScreenInterface {
                         ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
                         return;
                     }
+                    pnEditMode = poTBJControllers.TBJParameter().getEditMode();
                     loadTableDetail();
                     LoadMaster();
                     LoadDetail();
@@ -415,6 +418,12 @@ public class TBJ_ParameterController implements Initializable, ScreenInterface {
                     initButtons(pnEditMode);
                     break;
                 case "btnUpdate":
+                    if(poTBJControllers.TBJParameter().Master().getTransactionNo()== null ||
+                            poTBJControllers.TBJParameter().Master().getTransactionNo().isEmpty()){
+                        ShowMessageFX.Warning("No transaction was loaded. ", psFormName, null);
+                        return;
+                    }
+                    
                     poJSON = poTBJControllers.TBJParameter().UpdateTransaction();
                     if (!"success".equals((String) poJSON.get("result"))) {
                         ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
@@ -425,14 +434,11 @@ public class TBJ_ParameterController implements Initializable, ScreenInterface {
                     LoadDetail();
                     loadTableDetail();
                     initButtons(pnEditMode);
-
                     break;
                 case "btnCancel":
-                    if (ShowMessageFX.YesNo(null, "Cancel Confirmation", "Are you sure you want to cancel? \nAny data you have entered will not be saved.")) {
+                    if (ShowMessageFX.YesNo("Are you sure you want to cancel? \nAny data you have entered will not be saved.", psFormName,null )) {
                         ClearAll();
-
-                        initializeObject();
-                        pnEditMode = poTBJControllers.TBJParameter().getEditMode();
+                        pnEditMode = EditMode.UNKNOWN;
                         initButtons(pnEditMode);
                     }
                     break;
@@ -442,7 +448,7 @@ public class TBJ_ParameterController implements Initializable, ScreenInterface {
                         ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
                         return;
                     }
-                    ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
+                    ShowMessageFX.Information((String) poJSON.get("message"), psFormName, null);
                     if (poApp.getUserLevel() > UserRight.ENCODER) {
                         if (ShowMessageFX.YesNo(null, psFormName, "Do you want to confirm this transaction?")) {
                             try {
@@ -454,7 +460,7 @@ public class TBJ_ParameterController implements Initializable, ScreenInterface {
                                 ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
                                 return;
                             }
-                            ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
+                            ShowMessageFX.Information((String) poJSON.get("message"), psFormName, null);
                         }
                     }
 
@@ -470,7 +476,7 @@ public class TBJ_ParameterController implements Initializable, ScreenInterface {
                         ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
                         return;
                     }
-                    ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
+                    ShowMessageFX.Information((String) poJSON.get("message"), psFormName, null);
                     ClearAll();
 
                     initializeObject();
@@ -488,7 +494,7 @@ public class TBJ_ParameterController implements Initializable, ScreenInterface {
                         ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
                         return;
                     }
-                    ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
+                    ShowMessageFX.Information((String) poJSON.get("message"), psFormName, null);
                     ClearAll();
 
                     initializeObject();
@@ -496,6 +502,7 @@ public class TBJ_ParameterController implements Initializable, ScreenInterface {
                     initButtons(pnEditMode);
                 } catch (ParseException ex) {
                     Logger.getLogger(TBJ_ParameterController.class.getName()).log(Level.SEVERE, null, ex);
+                    ShowMessageFX.Error(ex.getMessage(), psFormName, null);
                 }
                 break;
 
@@ -505,9 +512,9 @@ public class TBJ_ParameterController implements Initializable, ScreenInterface {
             }
             initButtons(pnEditMode);
             initFields();
-//            initFields(pnEditMode);
         } catch (CloneNotSupportedException | SQLException | GuanzonException ex) {
             Logger.getLogger(TBJ_ParameterController.class.getName()).log(Level.SEVERE, null, ex);
+            ShowMessageFX.Error(ex.getMessage(), psFormName, psFormName);
         }
     }
 
@@ -554,7 +561,8 @@ public class TBJ_ParameterController implements Initializable, ScreenInterface {
      * initialization.
      */
     private void initFields() {
-//        try {
+        try {
+            //        try {
             boolean isEditable = (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE);
             JFXUtil.setDisabled(!isEditable,
                     tfSourceCode,
@@ -566,111 +574,108 @@ public class TBJ_ParameterController implements Initializable, ScreenInterface {
                     cbIsActive,
                     cbIsRequired,
                     cmbAccountType,
-                    taRemarks
+                    taRemarks,
+                    tfIndustry
             );
-            
-            
-            
-            if(pnEditMode==EditMode.ADDNEW){
+
+            if (pnEditMode == EditMode.ADDNEW) {
                 apMaster.setDisable(false);
                 apDetail.setDisable(false);
                 cbIsActive.setDisable(isEditable);
-            }else if(pnEditMode==EditMode.UPDATE){
-                try {
-                    if(TBJ_Constant.CONFIRMED.equals(poTBJControllers.TBJParameter().Master().getTransactionStatus())){
-                        JFXUtil.setDisabledExcept(true,
+            } else if (pnEditMode == EditMode.UPDATE && TBJ_Constant.CONFIRMED.equals(poTBJControllers.TBJParameter().Master().getTransactionStatus())) {
+                JFXUtil.setDisabledExcept(true,
                         apMaster,
                         taRemarks);
-                        JFXUtil.setDisabledExcept(true,
+                JFXUtil.setDisabledExcept(true,
                         apDetail,
                         cbIsActive);
-                    }else if (TBJ_Constant.OPEN.equals(poTBJControllers.TBJParameter().Master().getTransactionStatus())){
-                        JFXUtil.setDisabledExcept(true,
-                        apMaster,
-                        taRemarks);
-                        apDetail.setDisable(false);
-                    }
-                } catch (SQLException | GuanzonException ex) {
-                    Logger.getLogger(TBJ_ParameterController.class.getName()).log(Level.SEVERE, null, ex);
+
+                if (poTBJControllers.TBJParameter().Detail(pnSelectedDetail).getEditMode() == EditMode.ADDNEW) {
+                    JFXUtil.setDisabledExcept(false,
+                            apDetail);
                 }
+            } else if (pnEditMode == EditMode.UPDATE && TBJ_Constant.OPEN.equals(poTBJControllers.TBJParameter().Master().getTransactionStatus())) {
+                apMaster.setDisable(false);
+                apDetail.setDisable(false);
             }
 
-//            if (TBJ_Constant.CONFIRMED.equals(poTBJControllers.TBJParameter().Master().getTransactionStatus()) ||
-//                    TBJ_Constant.OPEN.equals(poTBJControllers.TBJParameter().Master().getTransactionStatus())) {
-//                apMaster.setDisable(true);
-//                apDetail.setDisable(false);
-//                JFXUtil.setDisabledExcept(true,
-//                        apDetail,
-//                        cbIsActive
-//                );
-//            }
-//            tfTransactionNo.setDisable(true);
-//            if (TBJ_Constant.OPEN.equals(poTBJControllers.TBJParameter().Master().getTransactionStatus())
-//                    && pnEditMode == EditMode.READY) {
-//                
-//                apMaster.setDisable(false);
-//                apDetail.setDisable(false);
-//                cbIsActive.setDisable(true);
-//            }
-            
-            List<TextField> loTxtField = Arrays.asList(tfTableName, tfCategory, tfSourceCode, tfAccountTitle, tfFieldName);
+            List<TextField> loTxtField = Arrays.asList(tfTableName, tfIndustry,tfCategory, tfSourceCode, tfAccountTitle, tfFieldName);
             loTxtField.forEach(tf -> tf.setOnKeyPressed(event -> txtField_KeyPressed(event)));
 
             JFXUtil.setFocusListener(txtArea_Focus, taRemarks);
             JFXUtil.setFocusListener(txtField_Focus, tfSearchSource, tfSearchTransaction);
 
-            cmbAccountType.setItems(AccountType);
-            cmbAccountType.setOnAction(comboBoxActionListener);
-            JFXUtil.initComboBoxCellDesignColor("#FF8201", cmbAccountType);
-
             tblDetails.setOnMouseClicked(this::tblDetails_Clicked);
             makeClearableReadOnly(tfFieldName);
-       
+        } catch (SQLException | GuanzonException ex) {
+            Logger.getLogger(TBJ_ParameterController.class.getName()).log(Level.SEVERE, null, ex);
+            ShowMessageFX.Error(ex.getMessage(), psFormName, null);
+        }
 
     }
 
     /**
-     * An action listener for {@link ComboBox} components that synchronizes
-     * selection changes with the underlying data model.
+     * Initializes the Account Type ComboBox and binds it to the detail model.
      * <p>
-     * Managed by {@code JFXUtil.CmbActionListener}, this handler processes the
-     * following:
+     * This method performs the following:
      * <ul>
-     * <li><b>Account Type (cmbAccountType):</b> When a user selects a type
-     * (e.g., Debit or Credit), the method retrieves the selected index and
-     * stores it as a {@link String} in the current detail record's
-     * {@code setAccountType} property.</li>
-     * <li><b>UI Refresh:</b> Triggers {@link #loadTableDetail()} upon a
-     * successful update to ensure the TableView reflects the new selection
-     * (converting the index back to a descriptive label like "Debit" or
-     * "Credit").</li>
-     * </ul>
-     * <p>
-     * <b>Error Handling:</b> Logs {@link SQLException} or
-     * {@link GuanzonException} if the model update fails, preventing the
-     * application from crashing on database or business logic errors.</p>
+     * <li><b>Data Binding:</b> Assigns the {@code AccountType} ObservableList
+     * (e.g., "Debit", "Credit") as the data source of
+     * {@code cmbAccountType}.</li>
      *
-     * * @param cmbId The FX ID of the ComboBox triggering the event.
-     * @param selectedIndex The 0-based index of the chosen item.
-     * @param selectedValue The object value of the chosen item.
+     * <li><b>UI Styling:</b> Applies custom styling using
+     * {@code JFXUtil.initComboBoxCellDesignColor}.</li>
+     *
+     * <li><b>Selection Handling:</b> Attaches an {@code setOnAction} listener
+     * that captures the selected index whenever the user changes the
+     * value.</li>
+     *
+     * <li><b>Model Update:</b> Updates the currently selected detail record by
+     * setting {@code setAccountType} using the selected index (stored as a
+     * {@link String}).</li>
+     *
+     * <li><b>UI Refresh:</b> Calls {@link #loadTableDetail()} to refresh the
+     * TableView and reflect the updated account type selection.</li>
+     * </ul>
+     *
+     * <p>
+     * <b>Safety Check:</b> Ensures that {@code pnSelectedDetail} is valid
+     * (greater than or equal to 0) before applying updates.</p>
+     *
+     * <p>
+     * <b>Error Handling:</b> Catches and logs {@link SQLException} and
+     * {@link GuanzonException} to prevent application crashes during data/model
+     * updates.</p>
      */
-    EventHandler<ActionEvent> comboBoxActionListener = JFXUtil.CmbActionListener((cmbId, selectedIndex, selectedValue) -> {
-        switch (cmbId) {
-            case "cmbAccountType":
-                    try {
-                String accountType = String.valueOf(selectedValue);
-                if (accountType != null) {
-                    poTBJControllers.TBJParameter().Detail(pnSelectedDetail).setAccountType(
-                            String.valueOf(cmbAccountType.getSelectionModel().getSelectedIndex()));
-                    loadTableDetail();
+    private void initComboBox(){
+        cmbAccountType.setItems(AccountType); // your ObservableList
+        JFXUtil.initComboBoxCellDesignColor("#FF8201", cmbAccountType);
+
+        // Attach combo box listener
+        cmbAccountType.setOnAction(event -> {
+            try {
+                if (pnSelectedDetail >= 0) { // safety check
+                    if(cmbAccountType.getSelectionModel().getSelectedIndex() == 0){
+                            poTBJControllers.TBJParameter()
+                                .Detail(pnSelectedDetail)
+                                .setAccountType("D");
+                    }else if(cmbAccountType.getSelectionModel().getSelectedIndex() == 1){
+                            poTBJControllers.TBJParameter()
+                                .Detail(pnSelectedDetail)
+                                .setAccountType("C");
+                    }
+                    loadTableDetail(); // refresh table after change
                 }
             } catch (SQLException | GuanzonException ex) {
-                Logger.getLogger(TBJ_ParameterController.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(TBJ_ParameterController.class.getName())
+                        .log(Level.SEVERE, null, ex);
+                ShowMessageFX.Error(ex.getMessage(), psFormName, null);
             }
-            break;
-        }
+        });
+        JFXUtil.initComboBoxCellDesignColor("#FF8201", cmbAccountType);
+    
     }
-    );
+
 
     /**
      * A focus change listener for {@link TextField} components that tracks the
@@ -729,6 +734,7 @@ public class TBJ_ParameterController implements Initializable, ScreenInterface {
      * @throws GuanzonException if a business logic error is encountered.
      */
     private void initCheckBox() {
+        
         if ((pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE)) {
             cbIsActive.setOnAction(event -> {
                 try {
@@ -835,12 +841,20 @@ public class TBJ_ParameterController implements Initializable, ScreenInterface {
                 switch (event.getCode()) {
                     case TAB:
                     case ENTER:
+                        
                     case F3:
                         switch (txtFieldID) {
+                            case "tfIndustry":
+                                poJSON = poTBJControllers.TBJParameter().SearchIndustry(lsValue, false);
+                                if ("error".equals(poJSON.get("result"))) {
+                                    ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
+                                }
+                                tfIndustry.setText(poTBJControllers.TBJParameter().Master().Industry().getDescription());
+                                return;
                             case "tfCategory":
                                 poJSON = poTBJControllers.TBJParameter().SearchCategory(lsValue, false);
                                 if ("error".equals(poJSON.get("result"))) {
-                                    ShowMessageFX.Warning((String) poJSON.get("message"), lsValue, lsValue);
+                                    ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
                                 }
                                 tfCategory.setText(poTBJControllers.TBJParameter().Master().Category().getDescription());
                                 return;
@@ -848,7 +862,7 @@ public class TBJ_ParameterController implements Initializable, ScreenInterface {
                             case "tfSourceCode":
                                 poJSON = poTBJControllers.TBJParameter().SearchSourceCode(lsValue, false);
                                 if ("error".equals(poJSON.get("result"))) {
-                                    ShowMessageFX.Warning((String) poJSON.get("message"), lsValue, lsValue);
+                                    ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
                                 }
                                 tfSourceCode.setText(poTBJControllers.TBJParameter().Master().TransactionSource().getSourceName());
                                 tfTableName.clear();
@@ -857,7 +871,7 @@ public class TBJ_ParameterController implements Initializable, ScreenInterface {
                             case "tfAccountTitle":
                                 poJSON = poTBJControllers.TBJParameter().SearchAccountChart(lsValue, false, pnSelectedDetail);
                                 if ("error".equals(poJSON.get("result"))) {
-                                    ShowMessageFX.Warning((String) poJSON.get("message"), lsValue, lsValue);
+                                    ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
                                 }
                                 tfAccountTitle.setText(poTBJControllers.TBJParameter().Detail(pnSelectedDetail).AccountChart().getDescription());
                                 loadTableDetail();
@@ -866,7 +880,7 @@ public class TBJ_ParameterController implements Initializable, ScreenInterface {
                             case "tfTableName":
                                 poJSON = poTBJControllers.TBJParameter().SearchSourceCodeTable(lsValue, pnSelectedDetail);
                                 if ("error".equals(poJSON.get("result"))) {
-                                    ShowMessageFX.Warning((String) poJSON.get("message"), lsValue, lsValue);
+                                    ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
                                 }
                                 tfTableName.setText(poTBJControllers.TBJParameter().Detail(pnSelectedDetail).getTableNm().trim().replace("_", " "));
                                 loadTableDetail();
@@ -874,12 +888,21 @@ public class TBJ_ParameterController implements Initializable, ScreenInterface {
                             case "tfFieldName":
                                 if (poTBJControllers.TBJParameter().Detail(pnSelectedDetail).getTableNm() == null
                                         || poTBJControllers.TBJParameter().Detail(pnSelectedDetail).getTableNm().isEmpty()) {
-                                    ShowMessageFX.Warning("Table Name is not set!", lsValue, lsValue);
+                                    ShowMessageFX.Warning("Table Name is not set!", psFormName, null);
                                     return;
                                 }
+                                
                                 poTBJControllers.TBJParameter().show(poTBJControllers.TBJParameter().Detail(pnSelectedDetail).getTableNm().trim().replace(" ", "_"), pnSelectedDetail);
                                 tfFieldName.setText(poTBJControllers.TBJParameter().getFieldName(poTBJControllers.TBJParameter().Detail(pnSelectedDetail).getDerivedField(), pnSelectedDetail));
                                 loadTableDetail();
+                                 poJSON = poTBJControllers.TBJParameter().checkDuplicateDetail();
+                                 if("error".equals(poJSON.get("result"))){
+                                      ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
+                                      poTBJControllers.TBJParameter().Detail(pnSelectedDetail).setDerivedField(null);
+                                      loadTableDetail();
+                                      return;
+                                 }
+                                 
                                 break;
 
                         }
@@ -895,6 +918,7 @@ public class TBJ_ParameterController implements Initializable, ScreenInterface {
                 }
             } catch (SQLException | GuanzonException | ExceptionInInitializerError ex) {
                 Logger.getLogger(TBJ_ParameterController.class.getName()).log(Level.SEVERE, null, ex);
+                ShowMessageFX.Error(ex.getMessage(), psFormName, null);
             }
         }
     }
@@ -930,7 +954,8 @@ public class TBJ_ParameterController implements Initializable, ScreenInterface {
     private void LoadMaster() {
         try {
             tfTransactionNo.setText(poTBJControllers.TBJParameter().Master().getTransactionNo());
-
+            tfIndustry.setText(poTBJControllers.TBJParameter().Master().Industry().getDescription() == null ? ""
+                    : poTBJControllers.TBJParameter().Master().Industry().getDescription());
             tfSourceCode.setText(
                     poTBJControllers.TBJParameter().Master().getSourceCode() == null ? ""
                     : poTBJControllers.TBJParameter().Master().getSourceCode());
@@ -959,6 +984,7 @@ public class TBJ_ParameterController implements Initializable, ScreenInterface {
             lblStatus.setText(lsStatus);
         } catch (SQLException | GuanzonException | NullPointerException ex) {
             Logger.getLogger(PaymentRequest_EntryController.class.getName()).log(Level.SEVERE, null, ex);
+            ShowMessageFX.Error(ex.getMessage(), psFormName, null);
         }
     }
 
@@ -1001,12 +1027,15 @@ public class TBJ_ParameterController implements Initializable, ScreenInterface {
             String accountTypeStr = poTBJControllers.TBJParameter().Detail(pnSelectedDetail).getAccountType();
 
             if (accountTypeStr != null && !accountTypeStr.trim().isEmpty()) {
-                try {
-                    int getAccountType = Integer.parseInt(accountTypeStr);
-                    cmbAccountType.getSelectionModel().select(getAccountType);
-                } catch (NumberFormatException e) {
-                    // Invalid number, do not select anything
-                }
+
+                    if(accountTypeStr.equals("D")){
+                        cmbAccountType.getSelectionModel().select(0);
+                    }else if(accountTypeStr.equals("C")){
+                        cmbAccountType.getSelectionModel().select(1);
+                    }
+//                    int getAccountType = Integer.parseInt(accountTypeStr);
+//                    cmbAccountType.getSelectionModel().select(getAccountType);
+
             }
             cbIsActive.setSelected(
                     poTBJControllers.TBJParameter().Detail(pnSelectedDetail) != null
@@ -1019,6 +1048,7 @@ public class TBJ_ParameterController implements Initializable, ScreenInterface {
 
         } catch (SQLException | GuanzonException | NullPointerException ex) {
             Logger.getLogger(PaymentRequest_EntryController.class.getName()).log(Level.SEVERE, null, ex);
+            ShowMessageFX.Error(ex.getMessage(), psFormName, null);
         }
     }
 
@@ -1111,7 +1141,7 @@ public class TBJ_ParameterController implements Initializable, ScreenInterface {
                         String accountTypeText = (poTBJControllers.TBJParameter().Detail(lnCtr).getAccountType() == null
                                 || poTBJControllers.TBJParameter().Detail(lnCtr).getAccountType().trim().isEmpty())
                                 ? ""
-                                : poTBJControllers.TBJParameter().Detail(lnCtr).getAccountType().equals("0") ? "Debit" : "Credit";
+                                : poTBJControllers.TBJParameter().Detail(lnCtr).getAccountType().equals("D") ? "Debit" : "Credit";
 
                         detailsList.add(new ModelTableDetail(
                                 String.valueOf(lnCtr + 1),
@@ -1176,11 +1206,12 @@ public class TBJ_ParameterController implements Initializable, ScreenInterface {
                 tfTransactionNo,
                 tfFieldName,
                 tfAccountTitle,
-                tfTableName                
+                tfTableName ,
+                tfIndustry
         ).forEach(TextField::clear);
         cbIsActive.setSelected(false);
         cbIsRequired.setSelected(false);
-        cmbAccountType.getSelectionModel().clearSelection();
+//        cmbAccountType.getSelectionModel().clearSelection();
         detail_data.clear();
         pnSelectedDetail = 0;
         psActiveField = "";
@@ -1219,7 +1250,8 @@ public class TBJ_ParameterController implements Initializable, ScreenInterface {
                 if (selectedItem != null) {
                     if (pnSelectedDetail >= 0) {
                         LoadDetail();
-                        tfAccountTitle.requestFocus();
+                        tfAccountTitle.requestFocus();                        
+                        initFields();
                     }
                 }
             }
