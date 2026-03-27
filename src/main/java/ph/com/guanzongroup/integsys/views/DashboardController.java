@@ -89,6 +89,7 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.shape.Rectangle;
 import org.guanzon.appdriver.constant.RecordStatus;
 import org.json.simple.JSONArray;
+import ph.com.guanzongroup.integsys.views.AnimationPreviewManager.AnimTitle;
 
 public class DashboardController implements Initializable {
 
@@ -175,7 +176,7 @@ public class DashboardController implements Initializable {
     @FXML
     private Label DateAndTime;
     @FXML
-    private AnchorPane anchorSpacex;
+    private AnchorPane anchorSpacex, apAnchorTitle;
     @FXML
     private AnchorPane anchorSpace;
     @FXML
@@ -206,6 +207,7 @@ public class DashboardController implements Initializable {
     boolean menu2 = false;
     AnchorPane root;
     Scene scene;
+    AnimationPreviewManager.AnimTitle animator = new AnimationPreviewManager.AnimTitle();
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -244,6 +246,8 @@ public class DashboardController implements Initializable {
 //                default:
 //                    setAnchorPaneVisibleManage(false, anchorRightSideBarMenu);
 //            }
+            animator.initialize(apAnchorTitle, 14); 
+
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -282,41 +286,42 @@ public class DashboardController implements Initializable {
     public void setUserCompany(String lsCompanyId) {
         psCompanyID = lsCompanyId;
     }
+    boolean lbIsTriggered = false;
 
-    private void animateMenu(AnchorPane pane, TreeView<?> tree,
+    private boolean animateMenu(AnchorPane pane, TreeView<?> tree,
             double targetWidth, double targetHeight, ToggleButton toggleButton,
             AnchorPane buttonParent, boolean isOpened) {
 
         ToggleButton lastBtn = lastOpenedButtonMap.get(pane);
-
         if (isOpened) {
             if (lastBtn == toggleButton) {
                 // Collapse current menu
-                animateDiagonalMenu(pane, tree, targetWidth, targetHeight, toggleButton, buttonParent, isOpened);
+                lbIsTriggered = animateDiagonalMenu(pane, tree, targetWidth, targetHeight, toggleButton, buttonParent, isOpened);
                 lastOpenedButtonMap.put(pane, null);
             } else {
                 // Collapse previous (opened by different button) first
                 if (lastBtn != null) {
-                    animateDiagonalMenu(pane, tree, targetWidth, targetHeight, lastBtn, buttonParent, isOpened);
+                    lbIsTriggered = animateDiagonalMenu(pane, tree, targetWidth, targetHeight, lastBtn, buttonParent, isOpened);
                 } else {
-                    animateDiagonalMenu(pane, tree, targetWidth, targetHeight, toggleButton, buttonParent, isOpened);
+                    lbIsTriggered = animateDiagonalMenu(pane, tree, targetWidth, targetHeight, toggleButton, buttonParent, isOpened);
                 }
 
                 PauseTransition pt = new PauseTransition(Duration.millis(220));
                 pt.setOnFinished(ev -> {
-                    animateDiagonalMenu(pane, tree, targetWidth, targetHeight, toggleButton, buttonParent, isOpened);
+                    lbIsTriggered = animateDiagonalMenu(pane, tree, targetWidth, targetHeight, toggleButton, buttonParent, isOpened);
                 });
                 pt.play();
 
                 lastOpenedButtonMap.put(pane, toggleButton);
             }
         } else {
-            animateDiagonalMenu(pane, tree, targetWidth, targetHeight, toggleButton, buttonParent, isOpened);
+            lbIsTriggered = animateDiagonalMenu(pane, tree, targetWidth, targetHeight, toggleButton, buttonParent, isOpened);
             lastOpenedButtonMap.put(pane, toggleButton);
         }
+        return lbIsTriggered;
     }
 
-    private void animateDiagonalMenu(
+    private boolean animateDiagonalMenu(
             AnchorPane pane,
             TreeView<?> tree,
             double targetWidth,
@@ -336,7 +341,14 @@ public class DashboardController implements Initializable {
         try {
             toggleButton.localToScene(toggleButton.getBoundsInLocal());
         } catch (Exception e) {
-            return;
+            return false;
+        }
+        try {
+            if (toggleButton.getBoundsInLocal() == null) {
+                return isOpened;
+            }
+        } catch (Exception e) {
+            return isOpened;
         }
         // Coordinates
         Bounds btnScene = toggleButton.localToScene(toggleButton.getBoundsInLocal());
@@ -418,7 +430,7 @@ public class DashboardController implements Initializable {
 
             expand.setOnFinished(e -> tree.setClip(null));
             expand.play();
-
+            return true;
         } else {
             if (pane.isVisible()) {
                 double currentWidth = pane.getPrefWidth();
@@ -454,7 +466,9 @@ public class DashboardController implements Initializable {
 
                 collapse.play();
             }
+
         }
+        return !isOpened;
     }
 
     private Pane loadAnimateAnchor(String fxml) {
@@ -515,6 +529,8 @@ public class DashboardController implements Initializable {
     private void setPane() {
         pane.setOnMouseClicked(event -> {
             setAnchorPaneVisibleManage(false, anchorLeftSideBarMenu);
+            animator.expandContract(true, () -> {
+            });
             for (int i = 0; i < toggleBtnLeftUpperSideBar.length; i++) {
                 toggleBtnLeftUpperSideBar[i].setSelected(false);
             }
@@ -1083,6 +1099,8 @@ public class DashboardController implements Initializable {
                         ShowMessageFX.Warning("This form is already active.", "Computerized Accounting System", MODULE);
                     }
                     setAnchorPaneVisibleManage(false, anchorLeftSideBarMenu);
+                    animator.expandContract(true, () -> {
+                    });
                     for (ToggleButton navButton : toggleBtnLeftUpperSideBar) {
                         navButton.setSelected(false);
                     }
@@ -1225,7 +1243,8 @@ public class DashboardController implements Initializable {
                     btnMenu,
                     aprootleft, true
             );
-
+            animator.expandContract(true, () -> {
+            });
             for (int i = 0; i < toggleBtnLeftUpperSideBar.length; i++) {
                 toggleBtnLeftUpperSideBar[i].setSelected(false);
             }
@@ -1595,7 +1614,11 @@ public class DashboardController implements Initializable {
         new ControllerBinding(POQuotation_EntryController.class),
         new ControllerBinding(POQuotation_ConfirmationController.class),
         new ControllerBinding(POQuotation_ApprovalController.class),
-        new ControllerBinding(POQuotation_HistoryController.class)
+        new ControllerBinding(POQuotation_HistoryController.class),
+        new ControllerBinding(CashDisbursement_EntryController.class),
+        new ControllerBinding(CashDisbursement_ConfirmationController.class),
+        new ControllerBinding(CashDisbursement_ApprovalController.class),
+        new ControllerBinding(CashDisbursement_HistoryController.class)
     };
 
     private void SIPostingWindowKeyEvent(Tab newTab, ScreenInterface fxObj, boolean isRemove) {
@@ -1676,7 +1699,7 @@ public class DashboardController implements Initializable {
                 if (!isSameButton) {
                     setAnchorPaneVisibleManage(!isSameButton, anchorLeftSideBarMenu);
                 }
-                animateMenu(
+                lbIsTriggered = animateMenu(
                         anchorLeftSideBarMenu, // AnchorPane pane
                         tvLeftSideBar, // TreeView<?> tree
                         300, // targetWidth,
@@ -1684,13 +1707,21 @@ public class DashboardController implements Initializable {
                         btnMenu,
                         aprootleft, isSameButton
                 );
+                animator.expandContract(!lbIsTriggered, () -> {
+                    animator.expandContract(!lbIsTriggered, () -> {
+                    });
+                });
             } else {
                 setAnchorPaneVisibleManage(false, anchorLeftSideBarMenu);
+                animator.expandContract(true, () -> {
+                });
                 ShowMessageFX.Warning(null, "Computerized Accounting System", "No menus available");
                 isNoMenu = true;
             }
         } else {
             setAnchorPaneVisibleManage(false, anchorLeftSideBarMenu);
+            animator.expandContract(true, () -> {
+            });
             ShowMessageFX.Warning(null, "Computerized Accounting System", "No menus available");
             isNoMenu = true;
         }
@@ -2116,6 +2147,8 @@ public class DashboardController implements Initializable {
             }
 
             setAnchorPaneVisibleManage(false, anchorLeftSideBarMenu);
+            animator.expandContract(true, () -> {
+            });
             for (ToggleButton navButton : toggleBtnLeftUpperSideBar) {
                 navButton.setSelected(false);
             }
@@ -2178,7 +2211,7 @@ public class DashboardController implements Initializable {
             e.printStackTrace();
         }
     }
-    
+
     private TreeItem<TreeMonitor> loadSystemMonitoMenu(JSONArray jsonArray) {
         TreeItem<TreeMonitor> root = new TreeItem<>();
 //        System.out.println("JSON Array : " + jsonArray.toJSONString());
@@ -2192,14 +2225,14 @@ public class DashboardController implements Initializable {
             String menuCode = (String) json.get("sMenuCDxx");
             String industry = (String) json.get("sIndstCdx");
             String category = (String) json.get("sCategrCd");
-            JSONObject loJSON = getFxml(menuCode,industry, category);
+            JSONObject loJSON = getFxml(menuCode, industry, category);
             String fxmlPath = (String) loJSON.get("sFormName");
             String controllerClass = (String) loJSON.get("sObjectNm");
             String command = (String) loJSON.get("sCommandx");
             String commandType = (String) loJSON.get("sCmdTypex");
-            
+
             TreeMonitor monitorNode = new TreeMonitor(
-                    id, group, name, desc, menuCode, industry, category,fxmlPath,controllerClass,command,commandType
+                    id, group, name, desc, menuCode, industry, category, fxmlPath, controllerClass, command, commandType
             );
 
             TreeItem<TreeMonitor> treeNode = new TreeItem<>(monitorNode);
@@ -2224,7 +2257,7 @@ public class DashboardController implements Initializable {
 
                     TreeMonitor txNode = new TreeMonitor(
                             txId, id, txDisplayName != null ? txDisplayName : txId,
-                            txDescToolTip != null ? txDescToolTip : "Transaction", menuCode, txIndustry, txCategory != null ? txCategory : "",fxmlPath,controllerClass,command,commandType
+                            txDescToolTip != null ? txDescToolTip : "Transaction", menuCode, txIndustry, txCategory != null ? txCategory : "", fxmlPath, controllerClass, command, commandType
                     );
 
                     if (!txId.isEmpty() && !menuCode.isEmpty()) {
@@ -2248,10 +2281,9 @@ public class DashboardController implements Initializable {
     public Runnable createSysMonitorAction(TreeMonitor node) {
         return () -> {
             try {
-                
-                
+
 //                if (node.getFxmlPath() != null) {
-                    openMonitorForm(node);
+                openMonitorForm(node);
 //                } else {
 //                    runJavaCommand(node.getCommand());
 //                }
@@ -2289,15 +2321,15 @@ public class DashboardController implements Initializable {
             }
         };
     }
-    
+
     private void openMonitorForm(TreeMonitor node) {
         try {
             int tabIndex = checktabs(node.getDescription());
 
             if (tabIndex == -1) {
                 boolean lbError = false;
-                if(node.getFxmlPath() != null && !"".equals(node.getFxmlPath())){
-                    if(node.getFxmlPath().contains(".fxml")){
+                if (node.getFxmlPath() != null && !"".equals(node.getFxmlPath())) {
+                    if (node.getFxmlPath().contains(".fxml")) {
                         setScene2(loadAnimate(node));
                         poController = tabpane.getUserData();
                     } else {
@@ -2306,16 +2338,15 @@ public class DashboardController implements Initializable {
                 } else {
                     lbError = true;
                 }
-                
-                if(lbError){
+
+                if (lbError) {
                     if (Platform.isFxApplicationThread()) {
                         ShowMessageFX.Warning(null, psFormName, "Invalid FXML path detected. Please inform MIS to configure the correct path.");
                     } else {
                         Platform.runLater(() -> ShowMessageFX.Warning(null, psFormName, "Invalid FXML path detected. Please inform MIS to configure the correct path."));
                     }
                 }
-                
-                
+
 //                if (!node.getFxmlPath().isEmpty() && node.getFxmlPath().contains(".fxml")) {
 //                    setScene2(loadAnimate(node));
 //                    poController = tabpane.getUserData();
@@ -2329,11 +2360,11 @@ public class DashboardController implements Initializable {
             } else {
                 tabpane.getSelectionModel().select(tabIndex);
                 poController = tabpane.getSelectionModel().getSelectedItem().getUserData();
-                switch(node.getMenuCode()){
+                switch (node.getMenuCode()) {
                     case "2500000088": //PRM APM
                     case "2500000039": //PRF PUR
                         loadPRFForm(node, false);
-                    break;
+                        break;
                 }
             }
 
@@ -2346,7 +2377,7 @@ public class DashboardController implements Initializable {
             e.printStackTrace();
         }
     }
-    
+
     public TabPane loadAnimate(TreeMonitor node) {
         //set fxml controller class
         if (tabpane.getTabs().isEmpty()) {
@@ -2355,13 +2386,13 @@ public class DashboardController implements Initializable {
 
         setTabPane();
         setPane();
-        
+
         try {
-            switch(node.getMenuCode()){
+            switch (node.getMenuCode()) {
                 case "2500000088": //PRM APM
                 case "2500000039": //PRF PUR
                     loadPRFForm(node, true);
-                break;
+                    break;
                 default:
                     Class<?> cls = Class.forName(node.getControllerClass());
                     ScreenInterface fxObj = (ScreenInterface) cls.getDeclaredConstructor().newInstance();
@@ -2425,7 +2456,7 @@ public class DashboardController implements Initializable {
                             }
                         }
                     });
-                break;
+                    break;
             }
             return (TabPane) tabpane;
         } catch (IOException e) {
@@ -2436,8 +2467,8 @@ public class DashboardController implements Initializable {
 
         return null;
     }
-    
-    private JSONObject getFxml(String fsMenuCode, String fsIndustry, String fsCategory){
+
+    private JSONObject getFxml(String fsMenuCode, String fsIndustry, String fsCategory) {
         JSONObject loJSON = new JSONObject();
         try {
             String lsSQL = "SELECT a.sMenuCDxx"
@@ -2453,9 +2484,9 @@ public class DashboardController implements Initializable {
                     + "LEFT JOIN xxxsysmenuothers b ON b.sMenuCDxx = a.sMenuCDxx AND b.cRecdStat = " + SQLUtil.toSQL(RecordStatus.ACTIVE);
             lsSQL = MiscUtil.addCondition(lsSQL,
                     " a.sMenuCDxx = " + SQLUtil.toSQL(fsMenuCode)
-                            + " AND b.sIndstCdx = " + SQLUtil.toSQL(fsIndustry)
-                            + " AND b.sCategrCd = " + SQLUtil.toSQL(fsCategory)
-                            + " AND a.cRecdStat = " + SQLUtil.toSQL(RecordStatus.ACTIVE));
+                    + " AND b.sIndstCdx = " + SQLUtil.toSQL(fsIndustry)
+                    + " AND b.sCategrCd = " + SQLUtil.toSQL(fsCategory)
+                    + " AND a.cRecdStat = " + SQLUtil.toSQL(RecordStatus.ACTIVE));
 //            System.out.println(" getFxml Executing SQL: " + lsSQL);
             ResultSet loRS = oApp.executeQuery(lsSQL);
             try {
@@ -2484,18 +2515,18 @@ public class DashboardController implements Initializable {
         loJSON.put("result", "error");
         return loJSON;
     }
-    
-    private JSONObject loadPRFForm(TreeMonitor node, boolean fbNewTab){
+
+    private JSONObject loadPRFForm(TreeMonitor node, boolean fbNewTab) {
         JSONObject loJSON = new JSONObject();
         try {
-            
-            if(!fbNewTab){
+
+            if (!fbNewTab) {
                 PaymentRequest_EntryController fxObj = (PaymentRequest_EntryController) poController;
                 fxObj.setReloadDetail(node.getSystemId());
                 fxObj.ReloadDetail();
                 return loJSON;
             }
-            
+
             //Only load this for new tab
             PaymentRequest_EntryController fxObj = new PaymentRequest_EntryController();
             fxObj.setGRider(oApp);
@@ -2503,25 +2534,25 @@ public class DashboardController implements Initializable {
             fxObj.setCompanyID(psCompanyID);
             fxObj.setCategoryID(node.getCategory());
             fxObj.setReloadDetail(node.getSystemId());
-            
+
             FXMLLoader fxmlLoader = new FXMLLoader();
             fxmlLoader.setLocation(fxObj.getClass().getResource(node.getFxmlPath()));
             fxmlLoader.setController(fxObj);
-            
+
             Tab newTab = new Tab(node.getDescription());
             newTab.setContent(new javafx.scene.control.Label("Content of Tab " + node.getFxmlPath()));
-            
+
             // ✅ Store controller reference in the tab
             newTab.setUserData(fxObj);
-            
+
             newTab.setContextMenu(createContextMenu(tabpane, newTab, oApp));
             tabName.add(node.getDescription());
-            
+
             Node content = fxmlLoader.load();
             newTab.setContent(content);
             tabpane.getTabs().add(newTab);
             tabpane.getSelectionModel().select(newTab);
-            
+
             newTab.setOnCloseRequest(event -> {
                 if (ShowMessageFX.YesNo(null, "Close Tab", "Close this tab?")) {
                     tabName.remove(newTab.getText());
@@ -2530,18 +2561,18 @@ public class DashboardController implements Initializable {
                 } else {
                     event.consume();
                 }
-                
+
             });
-            
+
             newTab.setOnClosed(event -> {
                 if (lbproceed) {
                     SIPostingWindowKeyEvent(newTab, fxObj, true);
                     lbproceed = false;
                 }
             });
-            
+
             newTab.setOnSelectionChanged(event -> {
-                
+
                 ObservableList<Tab> tabs = tabpane.getTabs();
                 for (Tab tab : tabs) {
                     if (tab.getText().equals(newTab.getText())) {
@@ -2559,7 +2590,7 @@ public class DashboardController implements Initializable {
             });
             loJSON.put("result", "error");
             return loJSON;
-        } catch (IOException | SecurityException | IllegalArgumentException  ex) {
+        } catch (IOException | SecurityException | IllegalArgumentException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
             loJSON.put("result", "error");
             loJSON.put("message", MiscUtil.getException(ex));
