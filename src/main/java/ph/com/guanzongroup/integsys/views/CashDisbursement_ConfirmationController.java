@@ -322,6 +322,9 @@ public class CashDisbursement_ConfirmationController implements Initializable, S
 
     private boolean DoesContainValidDisbDetail() {
         String lsParticular = "";
+        if (poController.getCashAdvancesCount() <= 0) {
+            return false;
+        }
         try {
             if (poController.Master().getSourceNo() != null && !"".equals(poController.Master().getSourceNo())) {
                 lsParticular = poController.Detail(0).CashAdvanceDetail(poController.Master().getSourceNo()).getParticular();
