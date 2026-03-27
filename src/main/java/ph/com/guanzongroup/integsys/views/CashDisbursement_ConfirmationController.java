@@ -322,7 +322,7 @@ public class CashDisbursement_ConfirmationController implements Initializable, S
 
     private boolean DoesContainValidDisbDetail() {
         String lsParticular = "";
-        if (poController.getCashAdvancesCount() <= 0) {
+        if (poController.getDetailCount() <= 0) {
             return false;
         }
         try {

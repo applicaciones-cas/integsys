@@ -323,7 +323,7 @@ public class CashDisbursement_ApprovalController implements Initializable, Scree
 
     private boolean DoesContainValidDisbDetail() {
         String lsParticular = "";
-        if (poController.getCashAdvancesCount() <= 0) {
+        if (poController.getDetailCount() <= 0) {
             return false;
         }
         try {
