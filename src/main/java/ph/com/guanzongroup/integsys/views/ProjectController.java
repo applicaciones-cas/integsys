@@ -14,14 +14,13 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
-import javafx.scene.control.CheckBox;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import static javafx.scene.input.KeyCode.DOWN;
 import static javafx.scene.input.KeyCode.ENTER;
 import static javafx.scene.input.KeyCode.F3;
 import static javafx.scene.input.KeyCode.UP;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import org.guanzon.appdriver.agent.ShowMessageFX;
@@ -32,12 +31,31 @@ import org.guanzon.appdriver.base.LogWrapper;
 import org.guanzon.appdriver.constant.EditMode;
 import org.guanzon.cas.parameter.services.ParamControllers;
 import org.json.simple.JSONObject;
+import org.json.simple.parser.ParseException;
 import ph.com.guanzongroup.integsys.model.ModelResultSet;
+import ph.com.guanzongroup.integsys.utility.CustomCommonUtil;
 
+/**
+ * Controller class for managing Project records in the UI.
+ * <p>
+ * This class implements {@link Initializable} and {@link ScreenInterface}, and
+ * provides functionality for creating, updating, saving, searching, confirming,
+ * voiding, and canceling Project records via the GUI.
+ * <p>
+ * It interacts with {@link ParamControllers} to perform business logic
+ * operations and uses {@link GRiderCAS} as the application context.
+ * <p>
+ * Each method handles specific user actions tied to buttons or text fields,
+ * ensuring proper validation, transaction management, and user feedback.
+ *
+ * @author Teejei De Celis
+ * @since 2026-03-27
+ */
 public class ProjectController implements Initializable, ScreenInterface {
 
     private GRiderCAS oApp;
     private final String pxeModuleName = "Project";
+    private JSONObject poJSON;
     private int pnEditMode;
     private ParamControllers oParameters;
     private boolean state = false;
@@ -50,14 +68,18 @@ public class ProjectController implements Initializable, ScreenInterface {
     private AnchorPane AnchorMain, AnchorInputs;
     @FXML
     private HBox hbButtons;
+    @FXML
+    private Label lblStatus;
 
     @FXML
     private Button btnBrowse,
             btnNew,
             btnSave,
             btnUpdate,
+            btnConfirm,
+            btnVoid,
             btnCancel,
-            btnActivate,
+            btnCancelRecord,
             btnClose;
 
     @FXML
@@ -68,26 +90,54 @@ public class ProjectController implements Initializable, ScreenInterface {
             txtField02,
             txtSeeks01;
 
-    @FXML
-    private CheckBox cbField01, cbField02;
-
+    /**
+     * Sets the GRider application instance.
+     *
+     * @param foValue the GRiderCAS instance
+     */
     @Override
     public void setGRider(GRiderCAS foValue) {
         oApp = foValue;
     }
 
+    /**
+     * Sets the current industry ID (unused in this controller).
+     *
+     * @param fsValue the industry ID
+     */
+
     @Override
     public void setIndustryID(String fsValue) {
     }
 
+    /**
+     * Sets the current company ID (unused in this controller).
+     *
+     * @param fsValue the company ID
+     */
     @Override
     public void setCompanyID(String fsValue) {
     }
 
+    /**
+     * Sets the current category ID (unused in this controller).
+     *
+     * @param fsValue the category ID
+     */
     @Override
     public void setCategoryID(String fsValue) {
     }
 
+    /**
+     * Initializes the controller after the FXML components are loaded.
+     * <p>
+     * This method initializes the parameter objects, sets the initial edit
+     * mode, configures buttons, text fields, and triggers the "New" button to
+     * start a new record.
+     *
+     * @param url the location used to resolve relative paths
+     * @param rb the resources used to localize the root object
+     */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         try {
@@ -96,38 +146,57 @@ public class ProjectController implements Initializable, ScreenInterface {
             initButton(pnEditMode);
             InitTextFields();
             ClickButton();
-            initTabAnchor();
             pbLoaded = true;
-
-            if (oParameters.Project().getEditMode() == EditMode.ADDNEW) {
-                initButton(pnEditMode);
-                loadRecord();
-            }
+            btnNew.fire();
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(ProjectController.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
+    /**
+     * Initializes the parameter objects for this controller.
+     * <p>
+     * Instantiates {@link ParamControllers} and sets the default record status.
+     *
+     * @throws SQLException if a database access error occurs
+     * @throws GuanzonException if initialization fails
+     */
     private void initializeObject() {
         try {
             LogWrapper logwrapr = new LogWrapper("CAS", System.getProperty("sys.default.path.temp") + "cas-error.log");
             oParameters = new ParamControllers(oApp, logwrapr);
-            oParameters.Project().setRecordStatus("0123");
+            oParameters.Project().setRecordStatus("0134");
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(ProjectController.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
+    /**
+     * Registers click handlers for all buttons in the form.
+     * <p>
+     * Each button click is handled by {@link #handleButtonAction(ActionEvent)}.
+     */
     private void ClickButton() {
         btnBrowse.setOnAction(this::handleButtonAction);
         btnNew.setOnAction(this::handleButtonAction);
         btnSave.setOnAction(this::handleButtonAction);
         btnUpdate.setOnAction(this::handleButtonAction);
         btnCancel.setOnAction(this::handleButtonAction);
-        btnActivate.setOnAction(this::handleButtonAction);
         btnClose.setOnAction(this::handleButtonAction);
+        btnCancelRecord.setOnAction(this::handleButtonAction);
+        btnConfirm.setOnAction(this::handleButtonAction);
+        btnVoid.setOnAction(this::handleButtonAction);
     }
 
+    /**
+     * Handles all button actions triggered by the user.
+     * <p>
+     * Executes actions such as New, Browse, Save, Update, Confirm, Void,
+     * Cancel, and CancelRecord, including validation, transaction handling, and
+     * feedback.
+     *
+     * @param event the {@link ActionEvent} triggered by a button click
+     */
     private void handleButtonAction(ActionEvent event) {
         Object source = event.getSource();
 
@@ -143,158 +212,206 @@ public class ProjectController implements Initializable, ScreenInterface {
                         break;
                     case "btnNew":
                         clearAllFields();
-                        txtField02.requestFocus();
-                        JSONObject poJSON = oParameters.Project().newRecord();
-                        pnEditMode = EditMode.READY;
-                        if ("success".equals((String) poJSON.get("result"))) {
-                            pnEditMode = EditMode.ADDNEW;
-                            initButton(pnEditMode);
-                            initTabAnchor();
-                            loadRecord();
-                        } else {
-                            ShowMessageFX.Information((String) poJSON.get("message"), "Computerized Acounting System", pxeModuleName);
-                            initTabAnchor();
+                        txtField01.requestFocus();
+                        poJSON = oParameters.Project().newRecord();
+                        if ("error".equals((String) poJSON.get("result"))) {
+                            ShowMessageFX.Error((String) poJSON.get("message"), pxeModuleName, null);
+                            return;
                         }
+                        pnEditMode = oParameters.Project().getEditMode();
+                        initButton(pnEditMode);
+                        loadRecord();
                         break;
                     case "btnBrowse":
                         String lsValue = (txtSeeks01.getText() == null) ? "" : txtSeeks01.getText();
                         poJSON = oParameters.Project().searchRecord(lsValue, false);
                         if ("error".equals((String) poJSON.get("result"))) {
-                            ShowMessageFX.Information((String) poJSON.get("message"), "Computerized Acounting System", pxeModuleName);
+                            ShowMessageFX.Error((String) poJSON.get("message"), pxeModuleName, null);
                             txtSeeks01.clear();
-                            break;
+                            return;
                         }
                         pnEditMode = EditMode.READY;
                         loadRecord();
-                        initTabAnchor(); 
                         initButton(pnEditMode);
                         break;
                     case "btnUpdate":
                         poJSON = oParameters.Project().updateRecord();
                         if ("error".equals((String) poJSON.get("result"))) {
-                            ShowMessageFX.Information((String) poJSON.get("message"), "Computerized Acounting System", pxeModuleName);
+                            ShowMessageFX.Error((String) poJSON.get("message"), pxeModuleName, null);
                             break;
                         }
                         pnEditMode = oParameters.Project().getEditMode();
                         initButton(pnEditMode);
-                        initTabAnchor();
                         break;
                     case "btnCancel":
-                        if (ShowMessageFX.YesNo("Do you really want to cancel this record? \nAny data collected will not be kept.", "Computerized Acounting System", pxeModuleName)) {
+                        if (ShowMessageFX.YesNo("Do you really want to cancel editing this record? \nAny data collected will not be kept.", "Computerized Acounting System", pxeModuleName)) {
                             clearAllFields();
                             initializeObject();
-                            pnEditMode = EditMode.UNKNOWN;
+                            pnEditMode = EditMode.READY;
                             initButton(pnEditMode);
-                            initTabAnchor();
                         }
                         break;
                     case "btnSave":
                         oParameters.Project().getModel().setModifyingId(oApp.getUserID());
                         oParameters.Project().getModel().setModifiedDate(oApp.getServerDate());
-                        JSONObject saveResult = oParameters.Project().saveRecord();
-                        if ("success".equals((String) saveResult.get("result"))) {
-                            ShowMessageFX.Information((String) saveResult.get("message"), "Computerized Acounting System", pxeModuleName);
-                            pnEditMode = EditMode.UNKNOWN;
-                            initButton(pnEditMode);
+                        poJSON = oParameters.Project().saveRecord();
+                        if ("error".equals((String) poJSON.get("result"))) {
+                            ShowMessageFX.Error((String) poJSON.get("message"), pxeModuleName, null);
+                            break;
+                        }
+                        ShowMessageFX.Information((String) poJSON.get("message"), pxeModuleName, null);
+                        btnNew.fire();
+                        break;
+                    case "btnVoid":
+                        if (ShowMessageFX.YesNo("Are you sure you want to void this record?", pxeModuleName, null)) {
+                            poJSON = oParameters.Project().VoidRecord("");
+                            if ("error".equals(poJSON.get("result"))) {
+                                ShowMessageFX.Error((String) poJSON.get("message"), "Computerized Accounting System", pxeModuleName);
+                                break;
+                            }
+                            ShowMessageFX.Information((String) poJSON.get("message"), "Computerized Accounting System", pxeModuleName);
+                            pnEditMode = oParameters.Project().getEditMode();
                             clearAllFields();
-                        } else {
-                            ShowMessageFX.Information((String) saveResult.get("message"), "Computerized Acounting System", pxeModuleName);
+                            initButton(pnEditMode);
                         }
                         break;
-                    case "btnActivate":
-                        String Status = oParameters.Project().getModel().getRecordStatus();
-                        String id = oParameters.Project().getModel().getProjectID();
-                        JSONObject poJsON;
-
-                        switch (Status) {
-                            case "0":
-                                if (ShowMessageFX.YesNo(null, pxeModuleName, "Do you want to Activate this Parameter?") == true) {
-
-                                    poJsON = oParameters.Project().activateRecord();
-                                    if ("error".equals(poJsON.get("result"))) {
-                                        ShowMessageFX.Information((String) poJsON.get("message"), "Computerized Accounting System", pxeModuleName);
-                                        break;
-                                    }
-                                    poJsON = oParameters.Project().openRecord(id);
-                                    if ("error".equals(poJsON.get("result"))) {
-                                        ShowMessageFX.Information((String) poJsON.get("message"), "Computerized Accounting System", pxeModuleName);
-                                        break;
-                                    }
-                                    clearAllFields();
-                                    loadRecord();
-                                    ShowMessageFX.Information((String) poJsON.get("message"), "Computerized Accounting System", pxeModuleName);
-                                }
+                    case "btnConfirm":
+                        if (ShowMessageFX.YesNo("Are you sure you want to confirm this record?", pxeModuleName, null)) {
+                            poJSON = oParameters.Project().ConfirmRecord("");
+                            if ("error".equals(poJSON.get("result"))) {
+                                ShowMessageFX.Error((String) poJSON.get("message"), "Computerized Accounting System", pxeModuleName);
                                 break;
-                            case "1":
-                                if (ShowMessageFX.YesNo(null, pxeModuleName, "Do you want to Deactivate this Parameter?") == true) {
-
-                                    poJsON = oParameters.Project().deactivateRecord();
-                                    if ("error".equals(poJsON.get("result"))) {
-                                        ShowMessageFX.Information((String) poJsON.get("message"), "Computerized Accounting System", pxeModuleName);
-                                        break;
-                                    }
-                                    poJsON = oParameters.Project().openRecord(id);
-                                    if ("error".equals(poJsON.get("result"))) {
-                                        ShowMessageFX.Information((String) poJsON.get("message"), "Computerized Accounting System", pxeModuleName);
-                                        break;
-                                    }
-                                    clearAllFields();
-                                    loadRecord();
-                                    ShowMessageFX.Information((String) poJsON.get("message"), "Computerized Accounting System", pxeModuleName);
-                                }
-                                break;
+                            }
+                            ShowMessageFX.Information((String) poJSON.get("message"), "Computerized Accounting System", pxeModuleName);
+                            pnEditMode = oParameters.Project().getEditMode();
+                            clearAllFields();
+                            initButton(pnEditMode);
+                        }
+                        break;
+                    case "btnCancelRecord":
+                        if (ShowMessageFX.YesNo("Are you sure you want to cancel this record?", pxeModuleName, null)) {
+                            poJSON = oParameters.Project().CancelRecord("");
+                            if ("error".equals(poJSON.get("result"))) {
+                                ShowMessageFX.Error((String) poJSON.get("message"), "Computerized Accounting System", pxeModuleName);
+                                return;
+                            }
+                            ShowMessageFX.Information((String) poJSON.get("message"), "Computerized Accounting System", pxeModuleName);
+                            pnEditMode = oParameters.Project().getEditMode();
+                            clearAllFields();
+                            initButton(pnEditMode);
                         }
                         break;
                 }
-            } catch (SQLException | GuanzonException | CloneNotSupportedException ex) {
+            } catch (SQLException | GuanzonException | CloneNotSupportedException | ParseException ex) {
                 Logger.getLogger(ProjectController.class.getName()).log(Level.SEVERE, null, ex);
+
             }
         }
     }
 
+    /**
+     * Clears all input fields and resets the status label.
+     */
     private void clearAllFields() {
         txtField01.clear();
         txtField02.clear();
         txtSeeks01.clear();
-        cbField01.setSelected(false);
+        lblStatus.setText("UNKNOWN");
     }
 
+    /**
+     * Initializes button visibility and state based on the current edit mode.
+     *
+     * @param fnValue the current edit mode
+     * @throws SQLException if a database error occurs
+     * @throws GuanzonException if parameter initialization fails
+     */
     private void initButton(int fnValue) {
-        boolean lbShow = (fnValue == EditMode.ADDNEW || fnValue == EditMode.UPDATE);
+        try {
+            // First, hide and unmanage all buttons
+            CustomCommonUtil.setVisible(false, btnSave, btnUpdate, btnVoid, btnCancelRecord, btnCancel, btnConfirm,
+                    btnBrowse, btnNew, btnClose);
+            CustomCommonUtil.setManaged(false, btnSave, btnUpdate, btnVoid, btnCancelRecord, btnCancel, btnConfirm,
+                    btnBrowse, btnNew, btnClose);
+            txtSeeks01.setDisable(false);
+            AnchorInputs.setDisable(true);
 
-        btnCancel.setVisible(lbShow);
-        btnCancel.setManaged(lbShow);
-        btnSave.setVisible(lbShow);
-        btnSave.setManaged(lbShow);
-        
+            switch (fnValue) {
+                case EditMode.ADDNEW:
+                case EditMode.UPDATE:
+                    // When adding or updating, only show Save and Cancel
+                    CustomCommonUtil.setVisible(true, btnSave, btnCancel);
+                    CustomCommonUtil.setManaged(true, btnSave, btnCancel);
+                    txtSeeks01.setDisable(true);
+                    AnchorInputs.setDisable(false);
+                    break;
 
-        btnBrowse.setVisible(!lbShow);
-        btnBrowse.setManaged(!lbShow);
-        btnNew.setVisible(!lbShow);
-        btnNew.setManaged(!lbShow);
+                case EditMode.READY:
+                    txtSeeks01.setDisable(false);
+                    AnchorInputs.setDisable(true);
+                    boolean projectExists = oParameters.Project().getModel().getProjectID() != null
+                            && !oParameters.Project().getModel().getProjectID().isEmpty();
 
-        btnClose.setVisible(true);
-        btnClose.setManaged(true);
-        
-        btnActivate.setVisible(false);
-        btnActivate.setManaged(false);
-        btnUpdate.setVisible(false);
-        btnUpdate.setManaged(false);
-        if(fnValue == EditMode.READY){
-            btnActivate.setVisible(true);
-            btnActivate.setManaged(true);
-            btnUpdate.setVisible(true);
-            btnUpdate.setManaged(true);
+                    if (!projectExists) {
+                        // If no project selected, only show Browse, New, Close
+                        CustomCommonUtil.setVisible(true, btnBrowse, btnNew, btnClose);
+                        CustomCommonUtil.setManaged(true, btnBrowse, btnNew, btnClose);
+
+                        CustomCommonUtil.setVisible(false, btnUpdate, btnConfirm, btnVoid, btnCancelRecord);
+                        CustomCommonUtil.setManaged(false, btnUpdate, btnConfirm, btnVoid, btnCancelRecord);
+                    } else {
+                        // Project exists, show buttons based on status
+                        String status = oParameters.Project().getModel().getRecordStatus();
+
+                        switch (status) {
+                            case "0": // OPEN
+                                CustomCommonUtil.setVisible(true, btnBrowse, btnNew, btnUpdate, btnConfirm, btnVoid, btnClose);
+                                CustomCommonUtil.setManaged(true, btnBrowse, btnNew, btnUpdate, btnConfirm, btnVoid, btnClose);
+                                break;
+                            case "1": // CONFIRM
+                                CustomCommonUtil.setVisible(true, btnBrowse, btnNew,  btnCancelRecord, btnClose);
+                                CustomCommonUtil.setManaged(true, btnBrowse, btnNew,  btnCancelRecord, btnClose);
+                                break;
+                            case "3": // VOID
+                            case "4": // CANCEL
+                                CustomCommonUtil.setVisible(true, btnBrowse, btnClose);
+                                CustomCommonUtil.setManaged(true, btnBrowse, btnClose);
+                                break;
+                            default:
+                                // Fallback: show Browse, New, Close
+                                CustomCommonUtil.setVisible(true, btnBrowse, btnNew, btnClose);
+                                CustomCommonUtil.setManaged(true, btnBrowse, btnNew, btnClose);
+                                break;
+                        }
+                    }
+                    break;
+
+                case EditMode.UNKNOWN:
+                default:
+                    // Default fallback: show only Browse and Close
+                    CustomCommonUtil.setVisible(true, btnBrowse, btnClose);
+                    CustomCommonUtil.setManaged(true, btnBrowse, btnClose);
+                    break;
+            }
+        } catch (SQLException | GuanzonException ex) {
+            Logger.getLogger(ProjectController.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
+    /**
+     * Configures focus listeners and key event handlers for text fields.
+     */
     private void InitTextFields() {
         txtField01.focusedProperty().addListener(txtField_Focus);
         txtField02.focusedProperty().addListener(txtField_Focus);
         txtSeeks01.setOnKeyPressed(this::txtSeeks_KeyPressed);
-
     }
 
+    /**
+     * Handles key pressed events for search and navigation in text fields.
+     *
+     * @param event the {@link KeyEvent} triggered by a key press
+     */
     private void txtSeeks_KeyPressed(KeyEvent event) {
         try {
             TextField txtField = (TextField) event.getSource();
@@ -332,7 +449,11 @@ public class ProjectController implements Initializable, ScreenInterface {
             Logger.getLogger(ProjectController.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-
+    /**
+     * Listener for text field focus changes.
+     * <p>
+     * When focus is lost, updates the Project model with the new value.
+     */
     final ChangeListener<? super Boolean> txtField_Focus = (o, ov, nv) -> {
         if (!pbLoaded) {
             return;
@@ -350,10 +471,18 @@ public class ProjectController implements Initializable, ScreenInterface {
             try {
                 switch (lnIndex) {
                     case 1:
-                        oParameters.Project().getModel().setProjectID(lsValue);
+                        poJSON = oParameters.Project().getModel().setProjectID(lsValue);
+                        if ("error".equals((String) poJSON.get("result"))) {
+                            ShowMessageFX.Information((String) poJSON.get("message"), "Computerized Acounting System", pxeModuleName);
+                            return;
+                        }
                         break;
                     case 2:
                         oParameters.Project().getModel().setProjectDescription(lsValue);
+                        if ("error".equals((String) poJSON.get("result"))) {
+                            ShowMessageFX.Information((String) poJSON.get("message"), "Computerized Acounting System", pxeModuleName);
+                            return;
+                        }
                         break;
                     default:
                         break;
@@ -366,6 +495,12 @@ public class ProjectController implements Initializable, ScreenInterface {
         }
     };
 
+    /**
+     * Loads the current Project model data into the form fields.
+     *
+     * @throws SQLException if a database error occurs
+     * @throws GuanzonException if model data retrieval fails
+     */
     private void loadRecord() {
         try {
             boolean lbActive = oParameters.Project().getModel().getRecordStatus() == "1";
@@ -374,43 +509,24 @@ public class ProjectController implements Initializable, ScreenInterface {
             txtField02.setText(oParameters.Project().getModel().getProjectDescription());
 
             switch (oParameters.Project().getModel().getRecordStatus()) {
-                case "1":
-                    btnActivate.setText("Deactivate");
-                    faActivate.setGlyphName("CLOSE");
-                    cbField01.setSelected(true);
-                    break;
                 case "0":
-                    btnActivate.setText("Activate");
-                    faActivate.setGlyphName("CHECK");
-                    cbField01.setSelected(false);
+                    lblStatus.setText("OPEN");
+                    break;
+                case "1":
+                    lblStatus.setText("CONFIRM");
+                    break;
+                case "3":
+                    lblStatus.setText("CANCEL");
+                    break;
+                case "4":
+                    lblStatus.setText("VOID");
+                    break;
+                default:
+                    lblStatus.setText("UNKNOWN");
                     break;
             }
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(ProjectController.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-
-    @FXML
-    void cbField01_Clicked(MouseEvent event) {
-        try {
-            if (cbField01.isSelected()) {
-                oParameters.Project().getModel().setRecordStatus("1");
-            } else {
-                oParameters.Project().getModel().setRecordStatus("0");
-            }
-        } catch (SQLException | GuanzonException ex) {
-            Logger.getLogger(ProjectController.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }
-
-    private void initTabAnchor() {
-        if (AnchorInputs == null) {
-            System.err.println("Error: AnchorInput is not initialized.");
-            return;
-        }
-
-        boolean isEditable = (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE);
-        AnchorInputs.setDisable(!isEditable);
-    }
-
 }
