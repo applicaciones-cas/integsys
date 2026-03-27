@@ -701,7 +701,7 @@ public class CashDisbursement_EntryController implements Initializable, ScreenIn
                         return;
                     }
                     pnMain = pnRowMain;
-                    clearTextFields();
+                    JFXUtil.clearTextFields(apDVMaster1, apDVMaster2, apDVDetail);
                     poJSON = poController.populateDetail(lsTransactionNo);
                     if ("error".equals(poJSON.get("result"))) {
                         loadTableDetail.reload();
