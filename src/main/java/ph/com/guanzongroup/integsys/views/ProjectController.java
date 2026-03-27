@@ -473,14 +473,14 @@ public class ProjectController implements Initializable, ScreenInterface {
                     case 1:
                         poJSON = oParameters.Project().getModel().setProjectID(lsValue);
                         if ("error".equals((String) poJSON.get("result"))) {
-                            ShowMessageFX.Information((String) poJSON.get("message"), "Computerized Acounting System", pxeModuleName);
+                            ShowMessageFX.Warning((String) poJSON.get("message"), "Computerized Acounting System", pxeModuleName);
                             return;
                         }
                         break;
                     case 2:
                         oParameters.Project().getModel().setProjectDescription(lsValue);
                         if ("error".equals((String) poJSON.get("result"))) {
-                            ShowMessageFX.Information((String) poJSON.get("message"), "Computerized Acounting System", pxeModuleName);
+                            ShowMessageFX.Warning((String) poJSON.get("message"), "Computerized Acounting System", pxeModuleName);
                             return;
                         }
                         break;
