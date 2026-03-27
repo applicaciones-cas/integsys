@@ -308,7 +308,7 @@ public class CashDisbursement_HistoryController implements Initializable, Screen
                     loadTableDetail.reload();
                     break;
                 case "btnPrint":
-//                    poJSON = poController.PrintRecord();
+                    poJSON = poController.printTransaction();
                     if ("error".equals((String) poJSON.get("result"))) {
                         ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                     }
@@ -360,7 +360,7 @@ public class CashDisbursement_HistoryController implements Initializable, Screen
                 pnEditMode = EditMode.UNKNOWN;
             }
 
-            if (JFXUtil.isObjectEqualTo(lsButton, "btnRetrieve", "btnSearch", "btnUndo", "btnArrowRight", "btnArrowLeft", "btnHistory")) {
+            if (JFXUtil.isObjectEqualTo(lsButton, "btnSave", "btnRetrieve", "btnSearch", "btnUndo", "btnArrowRight", "btnArrowLeft", "btnHistory")) {
             } else {
                 loadRecordMaster();
                 loadTableDetail.reload();

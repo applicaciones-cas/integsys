@@ -321,6 +321,12 @@ public class CashDisbursement_ApprovalController implements Initializable, Scree
                         ShowMessageFX.Error(MiscUtil.getException(ex), pxeModuleName, null);
                     }
                     break;
+                case "btnPrint":
+                    poJSON = poController.printTransaction();
+                    if ("error".equals((String) poJSON.get("result"))) {
+                        ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                    }
+                    break;
                 case "btnRetrieve":
                     loadTableMain.reload();
                     break;
@@ -407,7 +413,7 @@ public class CashDisbursement_ApprovalController implements Initializable, Scree
                 pnEditMode = EditMode.UNKNOWN;
             }
 
-            if (JFXUtil.isObjectEqualTo(lsButton, "btnRetrieve", "btnSearch", "btnUndo", "btnArrowRight", "btnArrowLeft", "btnHistory")) {
+            if (JFXUtil.isObjectEqualTo(lsButton, "btnPrint","btnRetrieve", "btnSearch", "btnUndo", "btnArrowRight", "btnArrowLeft", "btnHistory")) {
             } else {
                 loadRecordMaster();
                 loadTableDetail.reload();
@@ -1022,7 +1028,7 @@ public class CashDisbursement_ApprovalController implements Initializable, Scree
                     case "tfSearchPayee":
                         if (lsValue.isEmpty()) {
                             poController.setSearchPayee("");
-                             loadRecordSearch();
+                            loadRecordSearch();
                         }
                         break;
                     case "tfSearchCashAdvanceNo":
