@@ -133,7 +133,7 @@ public class CashDisbursement_ApprovalController implements Initializable, Scree
     Map<String, String> imageinfo_temp = new HashMap<>();
     JFXUtil.ReloadableTableTask loadTableMain, loadTableDetail, loadTableDetailJE, loadTableDetailBIR, loadTableAttachment;
     private final JFXUtil.ImageViewer imageviewerutil = new JFXUtil.ImageViewer();
-
+    private boolean tooltipShown = false;
     ObservableList<String> documentType = ModelDeliveryAcceptance_Attachment.documentType;
 
     @FXML
@@ -413,7 +413,7 @@ public class CashDisbursement_ApprovalController implements Initializable, Scree
                 pnEditMode = EditMode.UNKNOWN;
             }
 
-            if (JFXUtil.isObjectEqualTo(lsButton, "btnPrint","btnRetrieve", "btnSearch", "btnUndo", "btnArrowRight", "btnArrowLeft", "btnHistory")) {
+            if (JFXUtil.isObjectEqualTo(lsButton, "btnPrint", "btnRetrieve", "btnSearch", "btnUndo", "btnArrowRight", "btnArrowLeft", "btnHistory")) {
             } else {
                 loadRecordMaster();
                 loadTableDetail.reload();
@@ -1407,6 +1407,10 @@ public class CashDisbursement_ApprovalController implements Initializable, Scree
                                 loadTableMain.reload();
                                 break;
                             case "tfSearchCashAdvanceNo":
+                                if (!tooltipShown) {
+                                    JFXUtil.showTooltip("NOTE: Results appear directly in the table view, no pop-up dialog.", tfSearchCashAdvanceNo);
+                                    tooltipShown = true;
+                                }
                                 loadTableMain.reload();
                                 break;
 

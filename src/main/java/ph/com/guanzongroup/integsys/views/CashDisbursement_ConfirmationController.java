@@ -111,7 +111,7 @@ public class CashDisbursement_ConfirmationController implements Initializable, S
     private String psCategoryId = "";
     private String psSupplierPayeeId = "";
     private String psTransactionType = "";
-
+    private boolean tooltipShown = false;
     private unloadForm poUnload = new unloadForm();
     private ObservableList<ModelCashDisbursement_Main> main_data = FXCollections.observableArrayList();
     private FilteredList<ModelCashDisbursement_Main> filteredMain_Data;
@@ -1499,6 +1499,10 @@ public class CashDisbursement_ConfirmationController implements Initializable, S
                                 loadTableMain.reload();
                                 break;
                             case "tfSearchCashAdvanceNo":
+                                if (!tooltipShown) {
+                                    JFXUtil.showTooltip("NOTE: Results appear directly in the table view, no pop-up dialog.", tfSearchCashAdvanceNo);
+                                    tooltipShown = true;
+                                }
                                 loadTableMain.reload();
                                 break;
 
