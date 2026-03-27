@@ -2146,11 +2146,12 @@ public class CashDisbursement_ApprovalController implements Initializable, Scree
         switch (poController.Master().getTransactionStatus()) {
             case CashDisbursementStatus.APPROVED:
                 JFXUtil.setButtonsVisibility(false, btnApprove);
+                JFXUtil.setButtonsVisibility(true, btnPrint);
                 break;
             case CashDisbursementStatus.VOID:
             case CashDisbursementStatus.CANCELLED:
-            default:
                 JFXUtil.setButtonsVisibility(false, btnApprove, btnDisapprove);
+            default:
                 break;
         }
     }
