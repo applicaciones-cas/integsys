@@ -330,11 +330,11 @@ public class CashDisbursement_ApprovalController implements Initializable, Scree
                         if (pnEditMode == EditMode.READY) {
                             if (!poController.existJournal().equals("")) {
                                 if (!pbIsCheckedJournalTab) {
-                                    ShowMessageFX.Warning(null, pxeModuleName, "Please check the Journal Entry before confirming.");
+                                    ShowMessageFX.Warning(null, pxeModuleName, "Please check the Journal Entry before approving.");
                                     return;
                                 } else if (poController.Master().getTransactionStatus().equals(CashDisbursementStatus.APPROVED)) {
                                     if (oApp.getUserLevel() > UserRight.ENCODER && !pbIsCheckedBIRTab) {
-                                        ShowMessageFX.Warning(null, pxeModuleName, "Please check the BIR 2307 before confirming.");
+                                        ShowMessageFX.Warning(null, pxeModuleName, "Please check the BIR 2307 before approving.");
                                         return;
                                     }
 //                                } else if (poController.Master().getVATAmount() > 0.0000 && !pbIsCheckedBIRTab) {
@@ -352,7 +352,7 @@ public class CashDisbursement_ApprovalController implements Initializable, Scree
                                     }
                                 }
                             } else {
-                                ShowMessageFX.Warning(null, pxeModuleName, "This transaction has no journal entry. Please add a journal entry by updating the transaction to enable verification.");
+                                ShowMessageFX.Warning(null, pxeModuleName, "This transaction has no journal entry. Please add a journal entry by updating the transaction to enable approval.");
                                 return;
                             }
                         }
@@ -527,6 +527,8 @@ public class CashDisbursement_ApprovalController implements Initializable, Scree
                                             JFXUtil.highlightByKey(tblViewMainList, String.valueOf(lnCtr + 1), "#C1E1C1", highlightedRowsMain);
                                         }
                                     }
+                                } else {
+                                    ShowMessageFX.Warning(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
                                 }
                                 if (pnMain < 0 || pnMain
                                         >= main_data.size()) {
@@ -1014,18 +1016,17 @@ public class CashDisbursement_ApprovalController implements Initializable, Scree
                     case "tfSearchIndustry":
                         if (lsValue.isEmpty()) {
                             poController.setSearchIndustry("");
-                            loadTableMain.reload();
+                            loadRecordSearch();
                         }
                         break;
                     case "tfSearchPayee":
                         if (lsValue.isEmpty()) {
                             poController.setSearchPayee("");
-                            loadTableMain.reload();
+                             loadRecordSearch();
                         }
                         break;
                     case "tfSearchCashAdvanceNo":
                         if (lsValue.isEmpty()) {
-                            loadTableMain.reload();
                         }
                         break;
                 }
@@ -1757,7 +1758,7 @@ public class CashDisbursement_ApprovalController implements Initializable, Scree
             if (pnDetail < 0 || pnDetail > poController.getDetailCount() - 1) {
                 return;
             }
-            
+
             String lsParticular = "", lsOrNo = "";
             if (poController.Master().getSourceNo() != null && !"".equals(poController.Master().getSourceNo())) {
                 lsParticular = poController.Detail(pnDetail).CashAdvanceDetail(poController.Master().getSourceNo()).getParticular();
@@ -1766,10 +1767,10 @@ public class CashDisbursement_ApprovalController implements Initializable, Scree
                 lsParticular = poController.Detail(pnDetail).Particular().getDescription();
                 lsOrNo = "";
             }
-            
+
             boolean lbShow = JFXUtil.isObjectEqualTo(poController.Master().getSourceNo(), null, "") || JFXUtil.isObjectEqualTo(lsOrNo, null, "");
             JFXUtil.setDisabled(lbShow, tfVatExemptDetail);
-            
+
             tfORNoDetail.setText(lsOrNo);
             tfParticularDetail.setText(lsParticular);
             tfVatableSalesDetail.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(pnDetail).getDetailVatSales(), true));
@@ -2110,7 +2111,6 @@ public class CashDisbursement_ApprovalController implements Initializable, Scree
                 break;
         }
     }
-
 
     private void clearTextFields() {
         JFXUtil.setValueToNull(previousSearchedTextField, lastFocusedTextField);

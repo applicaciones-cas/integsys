@@ -618,7 +618,7 @@ public class CashDisbursement_EntryController implements Initializable, ScreenIn
                 }
             }
         } else {
-            ShowMessageFX.Warning(null, pxeModuleName, "Data can only be insert when in ADD mode.");
+            ShowMessageFX.Warning(null, pxeModuleName, "Data can only be inserted when in ADD mode.");
         }
     }
 
