@@ -246,7 +246,7 @@ public class DashboardController implements Initializable {
 //                default:
 //                    setAnchorPaneVisibleManage(false, anchorRightSideBarMenu);
 //            }
-            animator.initialize(apAnchorTitle, 14); 
+            animator.initialize(apAnchorTitle, 14);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -1622,32 +1622,48 @@ public class DashboardController implements Initializable {
     };
 
     private void SIPostingWindowKeyEvent(Tab newTab, ScreenInterface fxObj, boolean isRemove) {
-        for (ControllerBinding cb : controllerArray) {
-            Object userData = newTab.getUserData();
+        Platform.runLater(() -> {
+            for (ControllerBinding cb : controllerArray) {
+                Object userData = newTab.getUserData();
 
-            if (!(userData instanceof ScreenInterface)) {
-                continue;
-            }
-            ScreenInterface screen = (ScreenInterface) userData;
-            if (!cb.controllerClass.isInstance(screen)) {
-                continue;
-            }
-            Object casted = cb.controllerClass.cast(fxObj);
-            try {
-                String methodName = isRemove ? "RemoveWindowEvent" : "TriggerWindowEvent";
+                if (!(userData instanceof ScreenInterface)) {
+                    continue;
+                }
+                ScreenInterface screen = (ScreenInterface) userData;
+                if (!cb.controllerClass.isInstance(screen)) {
+                    continue;
+                }
+                Object casted = cb.controllerClass.cast(fxObj);
+                try {
+                    String methodName = isRemove ? "RemoveWindowEvent" : "TriggerWindowEvent";
 
-                Method method = cb.controllerClass.getMethod(methodName);
-                method.invoke(casted);
-            } catch (NoSuchMethodException e) {
-                initKeyEvent();
-            } catch (Exception e) {
-                e.printStackTrace();
+                    Method method = cb.controllerClass.getMethod(methodName);
+                    if (isRemove) {
+                        initKeyEvent();
+                    } else {
+                        removewindowEvent();
+                    }
+                    if (!isRemove) {
+                        JFXUtil.runWithDelay(.80, () -> {
+                            try {
+                                method.invoke(casted);
+                            } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
+                                Logger.getLogger(DashboardController.class.getName()).log(Level.SEVERE, null, ex);
+                            }
+                        });
+                    } else {
+                        method.invoke(casted);
+                    }
+
+                } catch (NoSuchMethodException e) {
+                    initKeyEvent();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+                break; // stop loop once matched
             }
-            if (isRemove) {
-                initKeyEvent();
-            }
-            break; // stop loop once matched
-        }
+        });
     }
 
     public void triggervbox() {
