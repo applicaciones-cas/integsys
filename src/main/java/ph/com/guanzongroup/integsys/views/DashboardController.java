@@ -1568,6 +1568,7 @@ public class DashboardController implements Initializable {
                     }
                 }
             });
+            SIPostingWindowKeyEvent(newTab, fxObj, false);
             return (TabPane) tabpane;
         } catch (IOException e) {
             e.printStackTrace();
@@ -1644,8 +1645,9 @@ public class DashboardController implements Initializable {
                         removewindowEvent();
                     }
                     if (!isRemove) {
-                        JFXUtil.runWithDelay(.80, () -> {
+                        JFXUtil.runWithDelay(.50, () -> {
                             try {
+                                removewindowEvent();
                                 method.invoke(casted);
                             } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
                                 Logger.getLogger(DashboardController.class.getName()).log(Level.SEVERE, null, ex);
@@ -2472,8 +2474,11 @@ public class DashboardController implements Initializable {
                             }
                         }
                     });
+                    SIPostingWindowKeyEvent(newTab, fxObj, false);
                     break;
+
             }
+
             return (TabPane) tabpane;
         } catch (IOException e) {
             e.printStackTrace();
@@ -2604,6 +2609,7 @@ public class DashboardController implements Initializable {
                     }
                 }
             });
+            SIPostingWindowKeyEvent(newTab, fxObj, false);
             loJSON.put("result", "error");
             return loJSON;
         } catch (IOException | SecurityException | IllegalArgumentException ex) {
