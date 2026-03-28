@@ -146,7 +146,7 @@ public class CashDisbursement_ConfirmationController implements Initializable, S
     @FXML
     private Label lblSource, lblDVTransactionStatus, lblJournalTransactionStatus;
     @FXML
-    private TextField tfSearchIndustry, tfSearchPayee, tfSearchCashAdvanceNo, tfDVTransactionNo, tfBranch, tfDepartment, tfCashFund, tfPayee, tfCreditTo, tfVoucherNo, tfCashAdvNo, tfTotalAmount, tfVatableSales, tfVatAmountMaster, tfVatZeroRatedSales, tfVatExemptSales, tfLessWHTax, tfTotalNetAmount, tfORNoDetail, tfParticularDetail, tfVatableSalesDetail, tfVatExemptDetail, tfVatZeroRatedSalesDetail, tfVatRateDetail, tfVatAmountDetail, tfAmountDetail, tfJournalTransactionNo, tfTotalDebitAmount, tfTotalCreditAmount, tfAccountCode, tfAccountDescription, tfDebitAmount, tfCreditAmount, tfBIRTransactionNo, tfTaxCode, tfParticular, tfBaseAmount, tfTaxRate, tfTotalTaxAmount, tfAttachmentNo;
+    private TextField tfCashAdvParticular, tfSearchIndustry, tfSearchPayee, tfSearchCashAdvanceNo, tfDVTransactionNo, tfBranch, tfDepartment, tfCashFund, tfPayee, tfCreditTo, tfVoucherNo, tfCashAdvNo, tfTotalAmount, tfVatableSales, tfVatAmountMaster, tfVatZeroRatedSales, tfVatExemptSales, tfLessWHTax, tfTotalNetAmount, tfORNoDetail, tfParticularDetail, tfVatableSalesDetail, tfVatExemptDetail, tfVatZeroRatedSalesDetail, tfVatRateDetail, tfVatAmountDetail, tfAmountDetail, tfJournalTransactionNo, tfTotalDebitAmount, tfTotalCreditAmount, tfAccountCode, tfAccountDescription, tfDebitAmount, tfCreditAmount, tfBIRTransactionNo, tfTaxCode, tfParticular, tfBaseAmount, tfTaxRate, tfTotalTaxAmount, tfAttachmentNo;
     @FXML
     private Button btnUpdate, btnSearch, btnSave, btnCancel, btnConfirm, btnVoid, btnHistory, btnRetrieve, btnClose, btnArrowLeft, btnArrowRight;
     @FXML
@@ -1439,9 +1439,8 @@ public class CashDisbursement_ConfirmationController implements Initializable, S
                         }
                         break;
                     case "tfParticularDetail":
-                        poJSON = poController.Detail(pnDetail).setParticularId(lsValue);
-                        if (!JFXUtil.isJSONSuccess(poJSON)) {
-                            ShowMessageFX.Warning(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
+                        if (lsValue.isEmpty()) {
+                            poController.Detail(pnDetail).setParticularId("");
                         }
                         break;
 //                    case "tfAmountDetail":
@@ -1767,6 +1766,15 @@ public class CashDisbursement_ConfirmationController implements Initializable, S
                                 loadRecordMaster();
                                 break;
 
+                            case "tfParticularDetail":
+                                poJSON = poController.SearchParticular(lsValue, false, pnDetail);
+                                if (!JFXUtil.isJSONSuccess(poJSON)) {
+                                    ShowMessageFX.Warning(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
+                                } else {
+                                    JFXUtil.textFieldMoveNext(tfVatableSales);
+                                }
+                                loadRecordMaster();
+                                break;
                             //apJournalDetails
                             case "tfAccountCode":
                                 poJSON = poController.Journal().SearchAccountCode(pnDetailJE, lsValue, true, poController.Master().getIndustryId(), null);
@@ -1878,6 +1886,7 @@ public class CashDisbursement_ConfirmationController implements Initializable, S
             return;
         }
         JFXUtil.requestFocusNullField(new Object[][]{ // alternative to if , else if
+            {poController.Detail(pnDetail).getParticularId(), tfParticularDetail},
             {poController.Detail(pnDetail).getAmount(), tfAmountDetail},}, tfAmountDetail); // default
     }
 
@@ -2003,6 +2012,11 @@ public class CashDisbursement_ConfirmationController implements Initializable, S
 
             boolean lbShow = JFXUtil.isObjectEqualTo(poController.Master().getSourceNo(), null, "") || JFXUtil.isObjectEqualTo(lsOrNo, null, "");
             JFXUtil.setDisabled(lbShow, tfVatExemptDetail);
+
+            boolean lbShow2 = poController.Detail(pnDetail).getEditMode() == EditMode.ADDNEW && (JFXUtil.isObjectEqualTo(pnEditMode, EditMode.ADDNEW, EditMode.UPDATE));
+            JFXUtil.setDisabled(!lbShow2, tfParticularDetail);
+            //add condition here
+            tfCashAdvParticular.setText("");
 
             tfORNoDetail.setText(lsOrNo);
             tfParticularDetail.setText(lsParticular);
