@@ -206,7 +206,7 @@ public class ProjectController implements Initializable, ScreenInterface {
                 unloadForm appUnload = new unloadForm();
                 switch (clickedButton.getId()) {
                     case "btnClose":
-                        if (ShowMessageFX.YesNo("Do you really want to cancel this record? \nAny data collected will not be kept.", "Computerized Acounting System", pxeModuleName)) {
+                        if (ShowMessageFX.YesNo("Do you really want to cancel this record? \nAny data collected will not be kept.", pxeModuleName, null)) {
                             appUnload.unloadForm(AnchorMain, oApp, pxeModuleName);
                         }
                         break;

@@ -28,14 +28,20 @@ import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextArea;
 import org.guanzon.appdriver.base.GRiderCAS;
 import org.guanzon.appdriver.base.GuanzonException;
+import org.guanzon.appdriver.base.MiscUtil;
 import org.guanzon.cas.client.services.ClientControllers;
+import org.json.simple.parser.ParseException;
 import ph.com.guanzongroup.cas.cashflow.services.CashflowControllers;
+import ph.com.guanzongroup.integsys.utility.CustomCommonUtil;
 
 public class AccountChartController implements Initializable, ScreenInterface {
 
     private GRiderCAS oApp;
+    private JSONObject poJSON;
     private final String pxeModuleName = "Account Chart";
     private int pnEditMode;
     private CashflowControllers oParameters;
@@ -52,11 +58,17 @@ public class AccountChartController implements Initializable, ScreenInterface {
             btnSave,
             btnUpdate,
             btnCancel,
-            btnActivate,
-            btnClose;
+            btnDeactivate,
+            btnClose,
+            btnConfirm,
+            btnHistory,
+            btnVoid;
 
     @FXML
     private FontAwesomeIconView faActivate;
+    
+    @FXML
+    private Label lblStatus;
 
     @FXML
     private TextField txtField01,
@@ -64,8 +76,9 @@ public class AccountChartController implements Initializable, ScreenInterface {
             txtField03,
             txtField04,
             txtField05,
-            txtField06,
             txtSeeks01;
+    @FXML
+    private TextArea txtArea01;
 
     @FXML
     private CheckBox cbField01;
@@ -98,15 +111,9 @@ public class AccountChartController implements Initializable, ScreenInterface {
             initButton(pnEditMode);
             InitTextFields();
             ClickButton();
-            initTabAnchor();
             initComboBoxField();
-
-            if (oParameters.AccountChart().getEditMode() == EditMode.ADDNEW) {
-                initButton(pnEditMode);
-                initTabAnchor();
-                loadRecord();
-            }
             pbLoaded = true;
+            btnNew.fire();
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(AccountChartController.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -128,8 +135,11 @@ public class AccountChartController implements Initializable, ScreenInterface {
         btnSave.setOnAction(this::handleButtonAction);
         btnUpdate.setOnAction(this::handleButtonAction);
         btnCancel.setOnAction(this::handleButtonAction);
-        btnActivate.setOnAction(this::handleButtonAction);
+        btnDeactivate.setOnAction(this::handleButtonAction);
+        btnVoid.setOnAction(this::handleButtonAction);
+        btnConfirm.setOnAction(this::handleButtonAction);
         btnClose.setOnAction(this::handleButtonAction);
+        btnHistory.setOnAction(this::handleButtonAction);
     }
 
     private void handleButtonAction(ActionEvent event) {
@@ -141,118 +151,119 @@ public class AccountChartController implements Initializable, ScreenInterface {
                 unloadForm appUnload = new unloadForm();
                 switch (clickedButton.getId()) {
                     case "btnClose":
-                        if (ShowMessageFX.YesNo("Do you really want to cancel this record? \nAny data collected will not be kept.", "Computerized Acounting System", pxeModuleName)) {
+                        if (ShowMessageFX.YesNo("Do you really want to cancel this record? \nAny data collected will not be kept.", pxeModuleName, null)) {
                             appUnload.unloadForm(AnchorMain, oApp, pxeModuleName);
                         }
                         break;
                     case "btnNew":
                         clearAllFields();
-                        txtField02.requestFocus();
-                        JSONObject poJSON = oParameters.AccountChart().newRecord();
-                        pnEditMode = oParameters.AccountChart().getEditMode();
-                        if ("success".equals((String) poJSON.get("result"))) {
-                            pnEditMode = oParameters.AccountChart().getEditMode();
-                            initButton(pnEditMode);
-                            initTabAnchor();
-                            loadRecord();
-                        } else {
-                            ShowMessageFX.Information((String) poJSON.get("message"), "Computerized Acounting System", pxeModuleName);
-                            initTabAnchor();
+                        txtField01.requestFocus();
+                        poJSON = oParameters.AccountChart().newRecord();
+                        if ("error".equals((String) poJSON.get("result"))) {
+                            ShowMessageFX.Error((String) poJSON.get("message"), pxeModuleName, null);
+                            return;
                         }
+                        pnEditMode = oParameters.AccountChart().getEditMode();
+                        initButton(pnEditMode);
+                        loadRecord();
                         break;
                     case "btnBrowse":
                         String lsValue = (txtSeeks01.getText() == null) ? "" : txtSeeks01.getText();
-                        poJSON = oParameters.AccountChart().searchRecordByIndustry(lsValue, false);
+                        poJSON = oParameters.AccountChart().searchRecord(lsValue, false);
                         if ("error".equals((String) poJSON.get("result"))) {
-                            ShowMessageFX.Information((String) poJSON.get("message"), "Computerized Acounting System", pxeModuleName);
+                            ShowMessageFX.Error((String) poJSON.get("message"), pxeModuleName, null);
                             txtSeeks01.clear();
-                            break;
+                            return;
                         }
-                        pnEditMode = EditMode.READY;
-
+                        pnEditMode = oParameters.AccountChart().getEditMode();
                         loadRecord();
-                        initTabAnchor();
+                        initButton(pnEditMode);
                         break;
                     case "btnUpdate":
                         poJSON = oParameters.AccountChart().updateRecord();
                         if ("error".equals((String) poJSON.get("result"))) {
-                            ShowMessageFX.Information((String) poJSON.get("message"), "Computerized Acounting System", pxeModuleName);
+                            ShowMessageFX.Error((String) poJSON.get("message"), pxeModuleName, null);
                             break;
                         }
                         pnEditMode = oParameters.AccountChart().getEditMode();
                         initButton(pnEditMode);
-                        initTabAnchor();
                         break;
                     case "btnCancel":
-                        if (ShowMessageFX.YesNo("Do you really want to cancel this record? \nAny data collected will not be kept.", "Computerized Acounting System", pxeModuleName)) {
+                        if (ShowMessageFX.YesNo("Do you really want to cancel editing this record? \nAny data collected will not be kept.", "Computerized Acounting System", pxeModuleName)) {
                             clearAllFields();
                             initializeObject();
-                            pnEditMode = EditMode.UNKNOWN;
+                            pnEditMode =  EditMode.READY;
                             initButton(pnEditMode);
-                            initTabAnchor();
                         }
                         break;
                     case "btnSave":
                         oParameters.AccountChart().getModel().setModifyingId(oApp.getUserID());
                         oParameters.AccountChart().getModel().setModifiedDate(oApp.getServerDate());
-                        JSONObject saveResult = oParameters.AccountChart().saveRecord();
-                        if ("success".equals((String) saveResult.get("result"))) {
-                            ShowMessageFX.Information((String) saveResult.get("message"), "Computerized Acounting System", pxeModuleName);
-                            pnEditMode = EditMode.UNKNOWN;
-                            initButton(pnEditMode);
+                        poJSON = oParameters.AccountChart().saveRecord();
+                        if ("error".equals((String) poJSON.get("result"))) {
+                            ShowMessageFX.Error((String) poJSON.get("message"), pxeModuleName, null);
+                            break;
+                        }
+                        ShowMessageFX.Information((String) poJSON.get("message"), pxeModuleName, null);
+                        btnNew.fire();
+                        break;
+                    case "btnVoid":
+                        if (ShowMessageFX.YesNo("Are you sure you want to void this record?", pxeModuleName, null)) {
+                            poJSON = oParameters.AccountChart().VoidRecord("");
+                            if ("error".equals(poJSON.get("result"))) {
+                                ShowMessageFX.Error((String) poJSON.get("message"), "Computerized Accounting System", pxeModuleName);
+                                break;
+                            }
+                            ShowMessageFX.Information((String) poJSON.get("message"), "Computerized Accounting System", pxeModuleName);
+                            pnEditMode = oParameters.AccountChart().getEditMode();
                             clearAllFields();
-                        } else {
-                            ShowMessageFX.Information((String) saveResult.get("message"), "Computerized Acounting System", pxeModuleName);
+                            initButton(pnEditMode);
                         }
                         break;
-                    case "btnActivate":
-                        String Status = oParameters.AccountChart().getModel().getRecordStatus();
-                        String id = oParameters.AccountChart().getModel().getAccountCode();
-                        JSONObject poJsON;
-
-                        switch (Status) {
-                            case "0":
-                                if (ShowMessageFX.YesNo(null, pxeModuleName, "Do you want to Activate this Parameter?") == true) {
-                                    oParameters.AccountChart().initialize();
-                                    poJsON = oParameters.AccountChart().activateRecord();
-                                    if ("error".equals(poJsON.get("result"))) {
-                                        ShowMessageFX.Information((String) poJsON.get("message"), "Computerized Accounting System", pxeModuleName);
-                                        break;
-                                    }
-                                    poJsON = oParameters.AccountChart().openRecord(id);
-                                    if ("error".equals(poJsON.get("result"))) {
-                                        ShowMessageFX.Information((String) poJsON.get("message"), "Computerized Accounting System", pxeModuleName);
-                                        break;
-                                    }
-                                    clearAllFields();
-                                    loadRecord();
-                                    ShowMessageFX.Information((String) poJsON.get("message"), "Computerized Accounting System", pxeModuleName);
-                                }
+                    case "btnConfirm":
+                        if (ShowMessageFX.YesNo("Are you sure you want to confirm this record?", pxeModuleName, null)) {
+                            poJSON = oParameters.AccountChart().ConfirmRecord("");
+                            if ("error".equals(poJSON.get("result"))) {
+                                ShowMessageFX.Error((String) poJSON.get("message"), "Computerized Accounting System", pxeModuleName);
                                 break;
-                            case "1":
-                                if (ShowMessageFX.YesNo(null, pxeModuleName, "Do you want to Deactivate this Parameter?") == true) {
-                                    ShowMessageFX.Information(String.valueOf(oParameters.AccountChart().getEditMode()), "Computerized Accounting System", pxeModuleName);
-
-                                    poJsON = oParameters.AccountChart().deactivateRecord();
-                                    if ("error".equals(poJsON.get("result"))) {
-                                        ShowMessageFX.Information((String) poJsON.get("message"), "Computerized Accounting System", pxeModuleName);
-                                        break;
-                                    }
-                                    poJsON = oParameters.AccountChart().openRecord(id);
-                                    if ("error".equals(poJsON.get("result"))) {
-                                        ShowMessageFX.Information((String) poJsON.get("message"), "Computerized Accounting System", pxeModuleName);
-                                        break;
-                                    }
-                                    clearAllFields();
-                                    loadRecord();
-                                    ShowMessageFX.Information((String) poJsON.get("message"), "Computerized Accounting System", pxeModuleName);
-                                }
-                                break;
+                            }
+                            ShowMessageFX.Information((String) poJSON.get("message"), "Computerized Accounting System", pxeModuleName);
+                            pnEditMode = oParameters.AccountChart().getEditMode();
+                            clearAllFields();
+                            initButton(pnEditMode);
                         }
-
+                        break;
+                        
+                    case "btnDeactivate":
+                        if (ShowMessageFX.YesNo("Are you sure you want to confirm this record?", pxeModuleName, null)) {
+                            poJSON = oParameters.AccountChart().DeactivateRecord("");
+                            if ("error".equals(poJSON.get("result"))) {
+                                ShowMessageFX.Error((String) poJSON.get("message"), pxeModuleName, null);
+                                break;
+                            }
+                            ShowMessageFX.Information((String) poJSON.get("message"), pxeModuleName, null);
+                            pnEditMode = oParameters.AccountChart().getEditMode();
+                            clearAllFields();
+                            initButton(pnEditMode);
+                        }
+                        break;
+                    case "btnHistory":
+                        if (oParameters.AccountChart().getModel().getAccountCode() == null) {
+                            ShowMessageFX.Error("Unable to proceed. No record is currently loaded.", pxeModuleName, null);
+                            return;
+                        }
+                            oParameters.AccountChart().ShowStatusHistory();
+                        break;
                 }
             } catch (SQLException | GuanzonException | CloneNotSupportedException ex) {
                 Logger.getLogger(AccountChartController.class.getName()).log(Level.SEVERE, null, ex);
+                ShowMessageFX.Error(ex.getMessage(), pxeModuleName, null);
+            } catch (ParseException ex) {
+                Logger.getLogger(AccountChartController.class.getName()).log(Level.SEVERE, null, ex);
+                ShowMessageFX.Error(ex.getMessage(), pxeModuleName, null);
+            } catch (Exception ex) {
+                Logger.getLogger(AccountChartController.class.getName()).log(Level.SEVERE, null, ex);
+                ShowMessageFX.Error(ex.getMessage(), pxeModuleName, null);
             }
         }
     }
@@ -263,7 +274,6 @@ public class AccountChartController implements Initializable, ScreenInterface {
         txtField03.clear();
         txtField04.clear();
         txtField05.clear();
-        txtField06.clear();
 
         cmbField01.getSelectionModel().clearSelection();
         cmbField02.getSelectionModel().clearSelection();
@@ -273,22 +283,77 @@ public class AccountChartController implements Initializable, ScreenInterface {
     }
 
     private void initButton(int fnValue) {
-        boolean lbShow = (fnValue == EditMode.ADDNEW || fnValue == EditMode.UPDATE);
+        try {
+            // First, hide and unmanage all buttons
+            CustomCommonUtil.setVisible(false, btnSave, btnUpdate, btnVoid, btnDeactivate, btnCancel, btnConfirm,
+                    btnBrowse, btnNew, btnClose,btnHistory);
+            CustomCommonUtil.setManaged(false, btnSave, btnUpdate, btnVoid, btnDeactivate, btnCancel, btnConfirm,
+                    btnBrowse, btnNew, btnClose,btnHistory);
+            txtSeeks01.setDisable(false);
+            AnchorInputs.setDisable(true);
 
-        btnCancel.setVisible(lbShow);
-        btnCancel.setManaged(lbShow);
-        btnSave.setVisible(lbShow);
-        btnSave.setManaged(lbShow);
-        btnUpdate.setVisible(!lbShow);
-        btnUpdate.setManaged(!lbShow);
+            switch (fnValue) {
+                case EditMode.ADDNEW:
+                case EditMode.UPDATE:
+                    // When adding or updating, only show Save and Cancel
+                    CustomCommonUtil.setVisible(true, btnSave, btnCancel);
+                    CustomCommonUtil.setManaged(true, btnSave, btnCancel);
+                    txtSeeks01.setDisable(true);
+                    AnchorInputs.setDisable(false);
+                    break;
 
-        btnBrowse.setVisible(!lbShow);
-        btnBrowse.setManaged(!lbShow);
-        btnNew.setVisible(!lbShow);
-        btnNew.setManaged(!lbShow);
+                case EditMode.READY:
+                    txtSeeks01.setDisable(false);
+                    AnchorInputs.setDisable(true);
+                    
+                    boolean projectExists = oParameters.AccountChart().getModel().getAccountCode()!= null
+                            && !oParameters.AccountChart().getModel().getAccountCode().isEmpty();
 
-        btnClose.setVisible(true);
-        btnClose.setManaged(true);
+                    if (!projectExists) {
+                        // If no project selected, only show Browse, New, Close
+                        CustomCommonUtil.setVisible(true, btnBrowse, btnNew, btnClose);
+                        CustomCommonUtil.setManaged(true, btnBrowse, btnNew, btnClose);
+
+                        CustomCommonUtil.setVisible(false, btnUpdate, btnConfirm, btnVoid, btnDeactivate);
+                        CustomCommonUtil.setManaged(false, btnUpdate, btnConfirm, btnVoid, btnDeactivate);
+                    } else {
+                        // Project exists, show buttons based on status
+                        String status = oParameters.AccountChart().getModel().getRecordStatus();
+                        CustomCommonUtil.setVisible(true, btnHistory);
+                        CustomCommonUtil.setManaged(true, btnHistory);
+                        switch (status) {
+                            case "0": // OPEN
+                                CustomCommonUtil.setVisible(true, btnBrowse, btnNew, btnUpdate, btnConfirm, btnVoid, btnClose);
+                                CustomCommonUtil.setManaged(true, btnBrowse, btnNew, btnUpdate, btnConfirm, btnVoid, btnClose);
+                                break;
+                            case "2": // CONFIRM
+                                CustomCommonUtil.setVisible(true, btnBrowse, btnNew,  btnDeactivate, btnClose);
+                                CustomCommonUtil.setManaged(true, btnBrowse, btnNew,  btnDeactivate, btnClose);
+                                break;
+                            case "3": // VOID
+                            case "1": // CANCEL
+                                CustomCommonUtil.setVisible(true, btnBrowse, btnClose);
+                                CustomCommonUtil.setManaged(true, btnBrowse, btnClose);
+                                break;
+                            default:
+                                // Fallback: show Browse, New, Close
+                                CustomCommonUtil.setVisible(true, btnBrowse, btnNew, btnClose);
+                                CustomCommonUtil.setManaged(true, btnBrowse, btnNew, btnClose);
+                                break;
+                        }
+                    }
+                    break;
+
+                case EditMode.UNKNOWN:
+                default:
+                    // Default fallback: show only Browse and Close
+                    CustomCommonUtil.setVisible(true, btnBrowse, btnClose);
+                    CustomCommonUtil.setManaged(true, btnBrowse, btnClose);
+                    break;
+            }
+        } catch (SQLException | GuanzonException ex) {
+            Logger.getLogger(ProjectController.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     private void InitTextFields() {
@@ -297,12 +362,44 @@ public class AccountChartController implements Initializable, ScreenInterface {
         txtField03.focusedProperty().addListener(txtField_Focus);
         txtField04.focusedProperty().addListener(txtField_Focus);
         txtField05.focusedProperty().addListener(txtField_Focus);
-        txtField06.focusedProperty().addListener(txtField_Focus);
+        txtArea01.focusedProperty().addListener(txtArea_Focus);
         txtField03.setOnKeyPressed(this::txtField_KeyPressed);
         txtField04.setOnKeyPressed(this::txtField_KeyPressed);
+        txtField05.setOnKeyPressed(this::txtField_KeyPressed);
         txtSeeks01.setOnKeyPressed(this::txtSeeks_KeyPressed);
     }
 
+    
+    final ChangeListener<? super Boolean> txtArea_Focus = (o, ov, nv) -> {
+        if (!pbLoaded) {
+            return;
+        }
+
+        TextArea txtArea = (TextArea) ((ReadOnlyBooleanPropertyBase) o).getBean();
+        int lnIndex = Integer.parseInt(txtArea.getId().substring(7, 9));
+        String lsValue = txtArea.getText();
+
+        if (lsValue == null) {
+            return;
+        }
+
+        if (!nv) {
+            try {
+                switch (lnIndex) {
+                    case 1:
+                        oParameters.AccountChart().getModel().setRemarks(lsValue);
+                        break;
+                    default:
+                        break;
+                }
+            } catch (Exception e) {
+                System.err.println("Error processing input: " + e.getMessage());
+            }
+        } else {
+            txtArea.selectAll();
+        }
+    };
+    
     final ChangeListener<? super Boolean> txtField_Focus = (o, ov, nv) -> {
         if (!pbLoaded) {
             return;
@@ -346,7 +443,7 @@ public class AccountChartController implements Initializable, ScreenInterface {
             int lnIndex = Integer.parseInt(((TextField) event.getSource()).getId().substring(8, 10));
             String lsValue = (txtField.getText() == null ? "" : txtField.getText());
             JSONObject poJson;
-            poJson = new JSONObject();
+            poJSON = new JSONObject();
             ClientControllers oAPClient;
             switch (event.getCode()) {
                 case F3:
@@ -354,22 +451,20 @@ public class AccountChartController implements Initializable, ScreenInterface {
                     switch (lnIndex) {
 
                         case 03:
-
-                            CashflowControllers poAccount = new CashflowControllers(oApp, null);
-                            poJson = poAccount.AccountChart().searchRecordByIndustry(lsValue, false);
-                            if ("error".equalsIgnoreCase(poJson.get("result").toString())) {
-                                ShowMessageFX.Information((String) poJson.get("message"), "Computerized Acounting System", pxeModuleName);
+                            poJSON = oParameters.AccountChart().searchIndustry(lsValue, false);
+                            if ("error".equalsIgnoreCase(poJSON.get("result").toString())) {
+                                ShowMessageFX.Information((String) poJSON.get("message"),  pxeModuleName,null);
+                                return;
                             }
-                            oParameters.AccountChart().getModel().setParentAccountCode(poAccount.AccountChart().getModel().getAccountCode());
-                            txtField03.setText((String) poAccount.AccountChart().getModel().getDescription());
+                            txtField03.setText(oParameters.AccountChart().getModel().Industry().getDescription());
                             break;
                         case 04:
-                            poJson = oParameters.TransactionAccountChart().searchRecord(lsValue, false);
-                            if ("error".equalsIgnoreCase(poJson.get("result").toString())) {
-                                ShowMessageFX.Information((String) poJson.get("message"), "Computerized Acounting System", pxeModuleName);
+                            poJSON = oParameters.AccountChart().searchRecordByIndustry(lsValue, false);
+                            if ("error".equalsIgnoreCase(poJSON.get("result").toString())) {
+                                ShowMessageFX.Information((String) poJSON.get("message"),  pxeModuleName,null);
+                                return;
                             }
-                            oParameters.AccountChart().getModel().setGLCode(oParameters.TransactionAccountChart().getModel().getGLCode());
-                            txtField04.setText((String) oParameters.TransactionAccountChart().getModel().getDescription());
+                            txtField04.setText(oParameters.AccountChart().getModel().ParentAccountChart().getDescription());
                             break;
 
                     }
@@ -435,50 +530,100 @@ public class AccountChartController implements Initializable, ScreenInterface {
 
             txtField01.setText(oParameters.AccountChart().getModel().getAccountCode());
             txtField02.setText(oParameters.AccountChart().getModel().getDescription());
-            txtField03.setText(oParameters.AccountChart().getModel().ParentAccountChart().getDescription());
-            txtField04.setText(oParameters.AccountChart().getModel().General_Ledger().getDescription());
-//            txtField05.setText(oParameters.AccountChart().getModel().getAccountGroup());
-//            txtField06.setText(oParameters.AccountChart().getModel().getReportGroup());
+            txtField03.setText(oParameters.AccountChart().getModel().Industry().getDescription());
+            txtField04.setText(oParameters.AccountChart().getModel().ParentAccountChart().getDescription());
+            txtField05.setText(oParameters.AccountChart().getModel().General_Ledger().getDescription());
 
-//            if (oParameters.AccountChart().getModel().getBaseAccount() != null && !oParameters.AccountChart().getModel().getBaseAccount().isEmpty()) {
-//                cmbField01.getSelectionModel().select(Integer.parseInt(oParameters.AccountChart().getModel().getBaseAccount()));
-//            }
             if (oParameters.AccountChart().getModel().getAccountType() != null && !oParameters.AccountChart().getModel().getAccountType().isEmpty()) {
                 String acctType = oParameters.AccountChart().getModel().getAccountType();
 
                 int lnIndex;
                 switch (acctType) {
-                    case "0":
-                        lnIndex = 0; // Equity
-                    case "1":
-                        lnIndex = 1; // Liabilities
-                    case "E":
-                        lnIndex = 2; // Expenses
+                    case "A":
+                        lnIndex = 0; // Asset
+                        break;
+                    case "L":
+                        lnIndex = 1; // Liability
+                        break;
+                    case "O":
+                        lnIndex = 2; // Owner's Equity	
+                        break;
                     case "R":
                         lnIndex = 3; // Revenue
-                    case "A":
-                        lnIndex = 4; // Assets
+                        break;
+                    case "E":
+                        lnIndex = 4; // Expenses
+                        break;
                     default:
-                        lnIndex = 1;
+                        lnIndex = -1; // unknown
+                        break;
+                };
+
+                if (lnIndex >= 0) {
+                    cmbField01.getSelectionModel().select(lnIndex);
+                }
+            }
+            
+            if (oParameters.AccountChart().getModel().getBalanceType() != null && !oParameters.AccountChart().getModel().getBalanceType().isEmpty()) {
+                String acctType = oParameters.AccountChart().getModel().getBalanceType();
+
+                int lnIndex;
+                switch (acctType) {
+                    case "D":
+                        lnIndex = 0; // Debit
+                        break;
+                    case "C":
+                        lnIndex = 1; // Credit
+                        break;
+                    default:
+                        lnIndex = -1;// unknown
+                        break;
                 };
 
                 if (lnIndex >= 0) {
                     cmbField02.getSelectionModel().select(lnIndex);
                 }
             }
-            if (oParameters.AccountChart().getModel().getBalanceType() != null && !oParameters.AccountChart().getModel().getBalanceType().isEmpty()) {
-                cmbField03.getSelectionModel().select(Integer.parseInt(oParameters.AccountChart().getModel().getBalanceType()));
+            
+            if (oParameters.AccountChart().getModel().getNature()!= null && !oParameters.AccountChart().getModel().getNature().isEmpty()) {
+                String acctType = oParameters.AccountChart().getModel().getNature();
+
+                int lnIndex;
+                switch (acctType) {
+                    case "P":
+                        lnIndex = 0; // Permanent
+                        break;
+                    case "T":
+                        lnIndex = 1; // Temporary
+                        break;
+                    case "A":
+                        lnIndex = 2; // Adjustment	
+                        break;
+                    default:
+                        lnIndex = -1;
+                        break;
+                };
+
+                if (lnIndex >= 0) {
+                    cmbField03.getSelectionModel().select(lnIndex);
+                }
             }
+            
             switch (oParameters.AccountChart().getModel().getRecordStatus()) {
-                case "1":
-                    btnActivate.setText("Deactivate");
-                    faActivate.setGlyphName("CLOSE");
-                    cbField01.setSelected(true);
-                    break;
                 case "0":
-                    btnActivate.setText("Activate");
-                    faActivate.setGlyphName("CHECK");
-                    cbField01.setSelected(false);
+                    lblStatus.setText("OPEN");
+                    break;
+                case "1":
+                    lblStatus.setText("DEACTIVATED");
+                    break;
+                case "2":
+                    lblStatus.setText("CONFIRM");
+                    break;
+                case "3":
+                    lblStatus.setText("VOID");
+                    break;
+                default:
+                    lblStatus.setText("UNKNOWN");
                     break;
             }
         } catch (SQLException | GuanzonException ex) {
@@ -488,88 +633,54 @@ public class AccountChartController implements Initializable, ScreenInterface {
 
     @FXML
     void cbField01_Clicked(MouseEvent event) {
-        if (cbField01.isSelected()) {
-            try {
-                oParameters.AccountChart().getModel().setRecordStatus("1");
-            } catch (SQLException ex) {
-                Logger.getLogger(AccountChartController.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (GuanzonException ex) {
-                Logger.getLogger(AccountChartController.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        } else {
-            try {
-                oParameters.AccountChart().getModel().setRecordStatus("0");
-            } catch (SQLException ex) {
-                Logger.getLogger(AccountChartController.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (GuanzonException ex) {
-                Logger.getLogger(AccountChartController.class.getName()).log(Level.SEVERE, null, ex);
-            }
+        try {
+            oParameters.AccountChart().getModel().isCash(cbField01.isSelected());
+        } catch (SQLException | GuanzonException ex) {
+            Logger.getLogger(AccountChartController.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-
-    private void initTabAnchor() {
-        if (AnchorInputs == null) {
-            System.err.println("Error: AnchorInput is not initialized.");
-            return;
-        }
-
-        boolean isEditable = (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE);
-        AnchorInputs.setDisable(!isEditable);
-    }
-
     private void initComboBoxField() {
+        
         cmbField01.setItems(FXCollections.observableArrayList(
-                "Cash",
-                "Accrual"
+                "Asset",
+                "Liability",
+                "Owner's Equity",
+                "Revenue",
+                "Expenses"
         ));
         cmbField02.setItems(FXCollections.observableArrayList(
-                "Equity",
-                "Liabilities",
-                "Expenses",
-                "Revenue",
-                "Assets"
+                "Debit",
+                "Credit"
         ));
         cmbField03.setItems(FXCollections.observableArrayList(
-                "Debit",
-                "Black Credit"
+                "Permanent",
+                "Temporary",
+                "Adjustment"
         ));
 
         cmbField01.getSelectionModel().selectedIndexProperty().addListener((obs, oldIndex, newIndex) -> {
-            if (newIndex != null && newIndex.intValue() >= 0) {
-//                try {
-//                    int lnIndex = newIndex.intValue(); // the selected index
-////                    oParameters.AccountChart().getModel().setBaseAccount(String.valueOf(lnIndex));
-//                } catch (SQLException ex) {
-//                    Logger.getLogger(AccountChartController.class.getName()).log(Level.SEVERE, null, ex);
-//                } catch (GuanzonException ex) {
-//                    Logger.getLogger(AccountChartController.class.getName()).log(Level.SEVERE, null, ex);
-//                }
-            }
-        });
-
-        cmbField02.getSelectionModel().selectedIndexProperty().addListener((obs, oldIndex, newIndex) -> {
             if (newIndex != null && newIndex.intValue() >= 0) {
                 try {
                     int lnIndex = newIndex.intValue(); // the selected index
                     String lsValue;
                     switch (lnIndex) {
                         case 0:
-                            lsValue = "0";
+                            lsValue = "A";
                             break;
                         case 1:
-                            lsValue = "1";
+                            lsValue = "L";
                             break;
                         case 2:
-                            lsValue = "E";
+                            lsValue = "O";
                             break;
                         case 3:
                             lsValue = "R";
                             break;
                         case 4:
-                            lsValue = "A";
+                            lsValue = "E";
                             break;
                         default:
-                            lsValue = "1";
+                            lsValue = "";
                             break;
 
                     }
@@ -581,17 +692,58 @@ public class AccountChartController implements Initializable, ScreenInterface {
                 }
             }
         });
-        cmbField03.getSelectionModel().selectedIndexProperty().addListener((obs, oldIndex, newIndex) -> {
+        cmbField02.getSelectionModel().selectedIndexProperty().addListener((obs, oldIndex, newIndex) -> {
             if (newIndex != null && newIndex.intValue() >= 0) {
                 try {
                     int lnIndex = newIndex.intValue(); // the selected index
-                    oParameters.AccountChart().getModel().setBalanceType(String.valueOf(lnIndex));
+                    String lsValue;
+                    switch (lnIndex) {
+                        case 0:
+                            lsValue = "D";
+                            break;
+                        case 1:
+                            lsValue = "C";
+                            break;
+                        default:
+                            lsValue = "";
+                            break;
+
+                    }
+                    oParameters.AccountChart().getModel().setBalanceType(lsValue);
                 } catch (SQLException ex) {
                     Logger.getLogger(AccountChartController.class.getName()).log(Level.SEVERE, null, ex);
                 } catch (GuanzonException ex) {
                     Logger.getLogger(AccountChartController.class.getName()).log(Level.SEVERE, null, ex);
                 }
+            }
+        });
+        
+        cmbField03.getSelectionModel().selectedIndexProperty().addListener((obs, oldIndex, newIndex) -> {
+            if (newIndex != null && newIndex.intValue() >= 0) {
+                try {
+                    int lnIndex = newIndex.intValue(); // the selected index
+                    String lsValue;
+                    switch (lnIndex) {
+                        case 0:
+                            lsValue = "P";
+                            break;
+                        case 1:
+                            lsValue = "T";
+                            break;
+                        case 2:
+                            lsValue = "A";
+                            break;
+                        default:
+                            lsValue = "";
+                            break;
 
+                    }
+                    oParameters.AccountChart().getModel().setNature(lsValue);
+                } catch (SQLException ex) {
+                    Logger.getLogger(AccountChartController.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (GuanzonException ex) {
+                    Logger.getLogger(AccountChartController.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
         });
     }
