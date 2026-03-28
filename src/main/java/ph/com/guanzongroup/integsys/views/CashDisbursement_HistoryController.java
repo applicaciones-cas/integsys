@@ -974,7 +974,7 @@ public class CashDisbursement_HistoryController implements Initializable, Screen
 
                                 break;
                             case "tfSearchCashAdvanceNo":
-                                poJSON = poController.SearchTransaction();
+                                 poJSON = poController.SearchTransaction(tfSearchIndustry.getText(), tfSearchPayee.getText(), tfSearchCashAdvanceNo.getText());
                                 if ("error".equals((String) poJSON.get("result"))) {
                                     ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                     return;
