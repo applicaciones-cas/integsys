@@ -1773,7 +1773,9 @@ public class CashDisbursement_ConfirmationController implements Initializable, S
                                 } else {
                                     JFXUtil.textFieldMoveNext(tfVatableSales);
                                 }
-                                loadRecordMaster();
+                                JFXUtil.runWithDelay(0.50, () -> {
+                                    loadTableDetail.reload();
+                                });
                                 break;
                             //apJournalDetails
                             case "tfAccountCode":

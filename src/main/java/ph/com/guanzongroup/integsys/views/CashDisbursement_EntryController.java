@@ -1777,7 +1777,9 @@ public class CashDisbursement_EntryController implements Initializable, ScreenIn
                                 } else {
                                     JFXUtil.textFieldMoveNext(tfVatableSales);
                                 }
-                                loadRecordMaster();
+                                JFXUtil.runWithDelay(0.50, () -> {
+                                    loadTableDetail.reload();
+                                });
                                 break;
 
                             //apJournalDetails
@@ -2014,7 +2016,7 @@ public class CashDisbursement_EntryController implements Initializable, ScreenIn
             JFXUtil.setDisabled(!lbShow2, tfParticularDetail);
             //add condition here
             tfCashAdvParticular.setText(lsParticular);
-            
+
             tfParticularDetail.setText(poController.Detail(pnDetail).Particular().getDescription());
 
             tfORNoDetail.setText(lsOrNo);
