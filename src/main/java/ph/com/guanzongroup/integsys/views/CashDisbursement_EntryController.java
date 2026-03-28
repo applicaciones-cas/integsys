@@ -2013,10 +2013,11 @@ public class CashDisbursement_EntryController implements Initializable, ScreenIn
             boolean lbShow2 = poController.Detail(pnDetail).getEditMode() == EditMode.ADDNEW && (JFXUtil.isObjectEqualTo(pnEditMode, EditMode.ADDNEW, EditMode.UPDATE));
             JFXUtil.setDisabled(!lbShow2, tfParticularDetail);
             //add condition here
-            tfCashAdvParticular.setText("");
+            tfCashAdvParticular.setText(lsParticular);
+            
+            tfParticularDetail.setText(poController.Detail(pnDetail).Particular().getDescription());
 
             tfORNoDetail.setText(lsOrNo);
-            tfParticularDetail.setText(lsParticular);
             tfVatableSalesDetail.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(pnDetail).getDetailVatSales(), true));
             tfVatExemptDetail.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(pnDetail).getDetailVatExempt(), true));
             tfVatZeroRatedSalesDetail.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(pnDetail).getDetailZeroVat(), true));

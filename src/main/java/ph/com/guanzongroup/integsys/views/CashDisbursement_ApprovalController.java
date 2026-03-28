@@ -147,7 +147,7 @@ public class CashDisbursement_ApprovalController implements Initializable, Scree
     @FXML
     private Label lblSource, lblDVTransactionStatus, lblJournalTransactionStatus;
     @FXML
-    private TextField tfSearchIndustry, tfSearchPayee, tfSearchCashAdvanceNo, tfDVTransactionNo, tfBranch, tfDepartment, tfCashFund, tfPayee, tfCreditTo, tfVoucherNo, tfCashAdvNo, tfTotalAmount, tfVatableSales, tfVatAmountMaster, tfVatZeroRatedSales, tfVatExemptSales, tfLessWHTax, tfTotalNetAmount, tfORNoDetail, tfParticularDetail, tfVatableSalesDetail, tfVatExemptDetail, tfVatZeroRatedSalesDetail, tfVatRateDetail, tfVatAmountDetail, tfAmountDetail, tfJournalTransactionNo, tfTotalDebitAmount, tfTotalCreditAmount, tfAccountCode, tfAccountDescription, tfDebitAmount, tfCreditAmount, tfBIRTransactionNo, tfTaxCode, tfParticular, tfBaseAmount, tfTaxRate, tfTotalTaxAmount, tfAttachmentNo;
+    private TextField tfCashAdvParticular, tfSearchIndustry, tfSearchPayee, tfSearchCashAdvanceNo, tfDVTransactionNo, tfBranch, tfDepartment, tfCashFund, tfPayee, tfCreditTo, tfVoucherNo, tfCashAdvNo, tfTotalAmount, tfVatableSales, tfVatAmountMaster, tfVatZeroRatedSales, tfVatExemptSales, tfLessWHTax, tfTotalNetAmount, tfORNoDetail, tfParticularDetail, tfVatableSalesDetail, tfVatExemptDetail, tfVatZeroRatedSalesDetail, tfVatRateDetail, tfVatAmountDetail, tfAmountDetail, tfJournalTransactionNo, tfTotalDebitAmount, tfTotalCreditAmount, tfAccountCode, tfAccountDescription, tfDebitAmount, tfCreditAmount, tfBIRTransactionNo, tfTaxCode, tfParticular, tfBaseAmount, tfTaxRate, tfTotalTaxAmount, tfAttachmentNo;
     @FXML
     private Button btnApprove, btnDisapprove, btnPrint, btnHistory, btnRetrieve, btnClose, btnArrowLeft, btnArrowRight;
     @FXML
@@ -1814,8 +1814,12 @@ public class CashDisbursement_ApprovalController implements Initializable, Scree
             boolean lbShow = JFXUtil.isObjectEqualTo(poController.Master().getSourceNo(), null, "") || JFXUtil.isObjectEqualTo(lsOrNo, null, "");
             JFXUtil.setDisabled(lbShow, tfVatExemptDetail);
 
+            //add condition here
+            tfCashAdvParticular.setText(lsParticular);
+
+            tfParticularDetail.setText(poController.Detail(pnDetail).Particular().getDescription());
+
             tfORNoDetail.setText(lsOrNo);
-            tfParticularDetail.setText(lsParticular);
             tfVatableSalesDetail.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(pnDetail).getDetailVatSales(), true));
             tfVatExemptDetail.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(pnDetail).getDetailVatExempt(), true));
             tfVatZeroRatedSalesDetail.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(pnDetail).getDetailZeroVat(), true));
