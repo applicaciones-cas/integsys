@@ -600,7 +600,7 @@ public class CashLiquidation_EntryController implements Initializable, ScreenInt
                             if (!JFXUtil.isJSONSuccess(poJSON)) {
                                 ShowMessageFX.Information(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
                             }
-                            JFXUtil.runWithDelay(0.90, () -> {
+                            JFXUtil.runWithDelay(0.40, () -> {
                                 if (pbEnteredDetail) {
                                     moveNext(false, true);
                                     pbEnteredDetail = false;
@@ -608,7 +608,7 @@ public class CashLiquidation_EntryController implements Initializable, ScreenInt
                             });
                             break;
                     }
-                    JFXUtil.runWithDelay(0.80, () -> {
+                    JFXUtil.runWithDelay(0.30, () -> {
                         loadTableDetail.reload();
                     });
                 } catch (SQLException | GuanzonException ex) {
