@@ -2323,6 +2323,7 @@ public class CashDisbursement_EntryController implements Initializable, ScreenIn
         JFXUtil.setDisabled(!lbShow, apDVMaster1, apDVMaster2, apDVDetail, apJournalMaster, apJournalDetails, apBIRDetail, apAttachments);
 //        JFXUtil.setButtonsVisibility(fnEditMode == EditMode.UPDATE, btnUndo);
         if (fnEditMode == EditMode.READY) {
+
             switch (poController.Master().getTransactionStatus()) {
                 case CashDisbursementStatus.OPEN:
                     JFXUtil.setButtonsVisibility(true, btnUpdate);
@@ -2331,6 +2332,9 @@ public class CashDisbursement_EntryController implements Initializable, ScreenIn
 //                case CashDisbursementStatus.VERIFIED:
 //                    JFXUtil.setButtonsVisibility(true, btnUpdate);
 //                    break;
+            }
+            if (!poController.Master().getTransactionStatus().equals(CashDisbursementStatus.OPEN)) {
+                JFXUtil.setButtonsVisibility(false, btnUpdate);
             }
         }
     }
