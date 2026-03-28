@@ -534,19 +534,19 @@ public class CashDisbursement_ApprovalController implements Initializable, Scree
     }
 
     private void populateBIR() {
-//        try {
-//            poJSON = new JSONObject();
-//            JFXUtil.clearTextFields(apBIRDetail);
-////            poJSON = poController.populateWithholdingTaxDeduction();
-//            if (JFXUtil.isJSONSuccess(poJSON)) {
-//                loadTableDetailBIR.reload();
-//            } else {
-//                BIR_data.clear();
-//            }
-//        } catch (SQLException | GuanzonException | CloneNotSupportedException | ScriptException ex) {
-//            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
-//            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
-//        }
+        try {
+            poJSON = new JSONObject();
+            JFXUtil.clearTextFields(apBIRDetail);
+            poJSON = poController.populateWithholdingTaxDeduction();
+            if (JFXUtil.isJSONSuccess(poJSON)) {
+                loadTableDetailBIR.reload();
+            } else {
+                BIR_data.clear();
+            }
+        } catch (SQLException | GuanzonException | CloneNotSupportedException | ScriptException ex) {
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
+        }
     }
 
     private void populateJE() {
@@ -574,7 +574,7 @@ public class CashDisbursement_ApprovalController implements Initializable, Scree
         if (selected != null) {
             try {
                 int pnRowMain = Integer.parseInt(selected.getIndex01()) - 1;
-                String lsTransactionNo = selected.getIndex02();
+                String lsTransactionNo = selected.getIndex06();
                 stageAttachment.closeDialog();
                 if (!JFXUtil.loadValidation(pnEditMode, pxeModuleName, poController.Master().getTransactionNo(), lsTransactionNo)) {
                     return;
@@ -624,11 +624,11 @@ public class CashDisbursement_ApprovalController implements Initializable, Scree
 
                                         main_data.add(new ModelCashDisbursement_Main(
                                                 String.valueOf(lnCtr + 1),
-                                                poController.TransactionList(lnCtr).getTransactionNo(),
+                                                poController.TransactionList(lnCtr).getVoucherNo(),
                                                 date,
                                                 poController.TransactionList(lnCtr).getPayeeName(),
                                                 String.valueOf(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.TransactionList(lnCtr).getTransactionTotal(), true)),
-                                                ""));
+                                                poController.TransactionList(lnCtr).getTransactionNo()));
                                         if (poController.TransactionList(lnCtr).getTransactionStatus().equals(CashDisbursementStatus.CANCELLED)) {
                                             JFXUtil.highlightByKey(tblViewMainList, String.valueOf(lnCtr + 1), "#FAA0A0", highlightedRowsMain);
                                         }
