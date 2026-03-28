@@ -385,7 +385,7 @@
                                                                      </rowConstraints>
                                                                      <children>
                                                                                             <Label text="Receipt No." GridPane.rowIndex="2" />
-                                                                                                <Label layoutX="53.0" layoutY="16.0" text="Particular" GridPane.rowIndex="3" />
+                                                                                                <Label layoutX="53.0" layoutY="16.0" text="Cash Adv. Particular" GridPane.rowIndex="3" />
                                                                                                 <Label text="  VATable Sales" GridPane.columnIndex="4" GridPane.rowIndex="2" />
                                                                                                 <Label text="Vat-Exempt Sales" GridPane.columnIndex="4" GridPane.rowIndex="3" />
                                                                                                 <Label text="VAT-Zero Sales" GridPane.columnIndex="4" GridPane.rowIndex="4" />
@@ -410,7 +410,7 @@
                                                                            </padding>
                                                                         </Label>
                                                                                                 <TextField fx:id="tfORNoDetail" disable="true" editable="false" maxWidth="-Infinity" prefWidth="150.0" GridPane.columnIndex="2" GridPane.rowIndex="2" />
-                                                                                                <TextField fx:id="tfParticularDetail" disable="true" editable="false" layoutX="125.0" layoutY="12.0" maxWidth="1.7976931348623157E308" GridPane.columnIndex="2" GridPane.rowIndex="3" />
+                                                                                                <TextField fx:id="tfParticularDetail" disable="true" editable="false" layoutX="125.0" layoutY="12.0" maxWidth="1.7976931348623157E308" promptText="Press F3: Search" GridPane.columnIndex="2" GridPane.rowIndex="4" />
                                                                                                 <TextField fx:id="tfVatableSalesDetail" alignment="CENTER_RIGHT" disable="true" promptText="0.00" styleClass="DisabledTextField" GridPane.columnIndex="6" GridPane.rowIndex="2" />
                                                                                                 <TextField fx:id="tfVatExemptDetail" alignment="CENTER_RIGHT" promptText="0.00" styleClass="DisabledTextField" GridPane.columnIndex="6" GridPane.rowIndex="3" />
                                                                                                 <TextField fx:id="tfVatZeroRatedSalesDetail" alignment="CENTER_RIGHT" disable="true" promptText="0.00" styleClass="DisabledTextField" GridPane.columnIndex="6" GridPane.rowIndex="4" />
@@ -422,6 +422,8 @@
                                                                               <Font name="System Bold" size="12.0" />
                                                                            </font>
                                                                         </TextField>
+                                                                        <Label text="Particular" GridPane.rowIndex="4" />
+                                                                        <TextField fx:id="tfCashAdvParticular" disable="true" editable="false" maxWidth="-Infinity" prefWidth="251.0" GridPane.columnIndex="2" GridPane.rowIndex="3" />
                                                                                             </children>
                                                                   </GridPane>
                                                                </children>
