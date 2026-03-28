@@ -266,12 +266,12 @@ public class CashDisbursement_EntryController implements Initializable, ScreenIn
     private void setKeyEvent(Scene scene) {
         scene.setOnKeyPressed(event -> {
             if (event.getCode() == KeyCode.F5) {
-                if (DoesContainValidDisbDetail()) {
-                } else {
-                    ShowMessageFX.Warning(null, pxeModuleName, "Please provide at least one valid disbursement detail to proceed.");
-                    return;
-                }
-                if (JFXUtil.isObjectEqualTo(poController.getEditMode(), EditMode.ADDNEW, EditMode.READY, EditMode.UPDATE)) {
+                if (JFXUtil.isObjectEqualTo(pnEditMode, EditMode.ADDNEW, EditMode.READY, EditMode.UPDATE)) {
+                    if (DoesContainValidDisbDetail()) {
+                    } else {
+                        ShowMessageFX.Warning(null, pxeModuleName, "Please provide at least one valid disbursement detail to proceed.");
+                        return;
+                    }
                     showAttachmentDialog();
                 }
             }
