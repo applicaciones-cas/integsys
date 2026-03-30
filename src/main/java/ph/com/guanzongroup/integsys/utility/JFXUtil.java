@@ -3270,7 +3270,7 @@ public class JFXUtil {
                             }
                         } else {
                             if (!ShowMessageFX.YesNo(null, pxeModuleName, "Transaction details are not empty.\n"
-                                    + "Proceeding will replace all existing details. Would you like to proceed?")) {
+                                    + "Proceeding will replace all existing details.\nWould you like to proceed?")) {
                                 return false;
                             }
                         }
