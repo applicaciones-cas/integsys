@@ -323,19 +323,21 @@ public class CashDisbursement_ApprovalController implements Initializable, Scree
 
     private boolean DoesContainValidDisbDetail() {
         String lsParticular = "";
+
         if (poController.getDetailCount() <= 0) {
             return false;
         }
-        try {
-            if (poController.Master().getSourceNo() != null && !"".equals(poController.Master().getSourceNo())) {
-                lsParticular = poController.Detail(0).CashAdvanceDetail(poController.Master().getSourceNo()).getParticular();
-            } else {
-                lsParticular = poController.Detail(0).Particular().getDescription();
-            }
-        } catch (SQLException | GuanzonException ex) {
-            Logger.getLogger(CashDisbursement_EntryController.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        return !JFXUtil.isObjectEqualTo(lsParticular, null, "");
+//        try {
+//            if (poController.Master().getSourceNo() != null && !"".equals(poController.Master().getSourceNo())) {
+//                lsParticular = poController.Detail(0).CashAdvanceDetail(poController.Master().getSourceNo()).getParticular();
+//            } else {
+//                lsParticular = poController.Detail(0).Particular().getDescription();
+//            }
+//        } catch (SQLException | GuanzonException ex) {
+//            Logger.getLogger(CashDisbursement_EntryController.class.getName()).log(Level.SEVERE, null, ex);
+//        }
+//        return !JFXUtil.isObjectEqualTo(lsParticular, null, "");
+        return true;
     }
 
     public void initTabPane() {
@@ -1805,21 +1807,23 @@ public class CashDisbursement_ApprovalController implements Initializable, Scree
             String lsParticular = "", lsOrNo = "";
             if (poController.Master().getSourceNo() != null && !"".equals(poController.Master().getSourceNo())) {
                 lsParticular = poController.Detail(pnDetail).CashAdvanceDetail(poController.Master().getSourceNo()).getParticular();
-                lsOrNo = poController.Detail(pnDetail).CashAdvanceDetail(poController.Master().getSourceNo()).getORNo();
+//                  lsOrNo = poController.Detail(pnDetail).CashAdvanceDetail(poController.Master().getSourceNo()).getORNo();
             } else {
                 lsParticular = poController.Detail(pnDetail).Particular().getDescription();
                 lsOrNo = "";
             }
 
             boolean lbShow = JFXUtil.isObjectEqualTo(poController.Master().getSourceNo(), null, "") || JFXUtil.isObjectEqualTo(lsOrNo, null, "");
-            JFXUtil.setDisabled(lbShow, tfVatExemptDetail);
+            JFXUtil.setDisabled(lbShow, tfVatExemptDetail, tfORNoDetail);
 
+            boolean lbShow2 = poController.Detail(pnDetail).getEditMode() == EditMode.ADDNEW && (JFXUtil.isObjectEqualTo(pnEditMode, EditMode.ADDNEW, EditMode.UPDATE));
+            JFXUtil.setDisabled(!lbShow2, tfParticularDetail);
             //add condition here
             tfCashAdvParticular.setText(lsParticular);
 
             tfParticularDetail.setText(poController.Detail(pnDetail).Particular().getDescription());
 
-            tfORNoDetail.setText(lsOrNo);
+            tfORNoDetail.setText(poController.Detail(pnDetail).getReferNo());
             tfVatableSalesDetail.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(pnDetail).getDetailVatSales(), true));
             tfVatExemptDetail.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(pnDetail).getDetailVatExempt(), true));
             tfVatZeroRatedSalesDetail.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(pnDetail).getDetailZeroVat(), true));

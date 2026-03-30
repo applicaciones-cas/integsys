@@ -1452,6 +1452,12 @@ public class CashDisbursement_EntryController implements Initializable, ScreenIn
                             poController.Detail(pnDetail).setParticularId("");
                         }
                         break;
+                    case "tfORNoDetail":
+                        poJSON = poController.Detail(pnDetail).setReferNo(lsValue);
+                        if (!JFXUtil.isJSONSuccess(poJSON)) {
+                            ShowMessageFX.Warning(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
+                        }
+                        break;
 //                    case "tfAmountDetail":
 //                        lsValue = JFXUtil.removeComma(lsValue);
 //                        poJSON = poController.Detail(pnDetail).setAmount(Double.valueOf(lsValue));
@@ -2004,7 +2010,6 @@ public class CashDisbursement_EntryController implements Initializable, ScreenIn
             String lsParticular = "", lsOrNo = "";
             if (poController.Master().getSourceNo() != null && !"".equals(poController.Master().getSourceNo())) {
                 lsParticular = poController.Detail(pnDetail).CashAdvanceDetail(poController.Master().getSourceNo()).getParticular();
-                lsOrNo = poController.Master().getReferNo();
 //                  lsOrNo = poController.Detail(pnDetail).CashAdvanceDetail(poController.Master().getSourceNo()).getORNo();
             } else {
                 lsParticular = poController.Detail(pnDetail).Particular().getDescription();
@@ -2021,7 +2026,7 @@ public class CashDisbursement_EntryController implements Initializable, ScreenIn
 
             tfParticularDetail.setText(poController.Detail(pnDetail).Particular().getDescription());
 
-            tfORNoDetail.setText(lsOrNo);
+            tfORNoDetail.setText(poController.Detail(pnDetail).getReferNo());
             tfVatableSalesDetail.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(pnDetail).getDetailVatSales(), true));
             tfVatExemptDetail.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(pnDetail).getDetailVatExempt(), true));
             tfVatZeroRatedSalesDetail.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(pnDetail).getDetailZeroVat(), true));
