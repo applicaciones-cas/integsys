@@ -1481,7 +1481,7 @@ public class CashDisbursement_ApprovalController implements Initializable, Scree
                 switch (event.getCode()) {
                     case TAB:
                     case ENTER:
-                        if (tfVatExemptDetail.isFocused()) {
+                        if (tfAmountDetail.isFocused()) {
                             pbEnteredDV = true;
                         }
                         if (tfCreditAmount.isFocused()) {
@@ -1808,12 +1808,11 @@ public class CashDisbursement_ApprovalController implements Initializable, Scree
 
             boolean lbShow2 = poController.Detail(pnDetail).getEditMode() == EditMode.ADDNEW && (JFXUtil.isObjectEqualTo(pnEditMode, EditMode.ADDNEW, EditMode.UPDATE));
             JFXUtil.setDisabled(!lbShow2, tfParticularDetail);
-            //add condition here
+           
+            tfORNoDetail.setText(poController.Detail(pnDetail).getReferNo());
             tfCashAdvParticular.setText(lsParticular);
-
             tfParticularDetail.setText(poController.Detail(pnDetail).Particular().getDescription());
 
-            tfORNoDetail.setText(poController.Detail(pnDetail).getReferNo());
             tfVatableSalesDetail.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(pnDetail).getDetailVatSales(), true));
             tfVatExemptDetail.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(pnDetail).getDetailVatExempt(), true));
             tfVatZeroRatedSalesDetail.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(pnDetail).getDetailZeroVat(), true));

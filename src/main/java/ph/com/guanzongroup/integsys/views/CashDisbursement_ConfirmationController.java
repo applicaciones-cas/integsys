@@ -1445,17 +1445,17 @@ public class CashDisbursement_ConfirmationController implements Initializable, S
                             ShowMessageFX.Warning(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
                         }
                         break;
-//                    case "tfAmountDetail":
-//                        lsValue = JFXUtil.removeComma(lsValue);
-//                        poJSON = poController.Detail(pnDetail).setAmount(Double.valueOf(lsValue));
-//                        if (!JFXUtil.isJSONSuccess(poJSON)) {
-//                            ShowMessageFX.Warning(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
-//                        }
-//                        if (pbEnteredDV) {
-//                            moveNext(false, true);
-//                            pbEnteredDV = false;
-//                        }
-//                        break;
+                    case "tfAmountDetail":
+                        lsValue = JFXUtil.removeComma(lsValue);
+                        poJSON = poController.Detail(pnDetail).setAmount(Double.valueOf(lsValue));
+                        if (!JFXUtil.isJSONSuccess(poJSON)) {
+                            ShowMessageFX.Warning(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
+                        }
+                        if (pbEnteredDV) {
+                            moveNext(false, true);
+                            pbEnteredDV = false;
+                        }
+                        break;
                 }
                 JFXUtil.runWithDelay(0.50, () -> {
                     loadTableDetail.reload();
@@ -1596,7 +1596,7 @@ public class CashDisbursement_ConfirmationController implements Initializable, S
                 switch (event.getCode()) {
                     case TAB:
                     case ENTER:
-                        if (tfVatExemptDetail.isFocused()) {
+                        if (tfAmountDetail.isFocused()) {
                             pbEnteredDV = true;
                         }
                         if (tfCreditAmount.isFocused()) {
@@ -2003,23 +2003,23 @@ public class CashDisbursement_ConfirmationController implements Initializable, S
             if (pnDetail < 0 || pnDetail > poController.getDetailCount() - 1) {
                 return;
             }
-
+            boolean lbShow3 = JFXUtil.isObjectEqualTo(poController.Master().getSourceNo(), null, "");
             String lsParticular = "";
-            if (!JFXUtil.isObjectEqualTo(poController.Master().getSourceNo(), null, "")) {
+            if (!lbShow3) {
                 lsParticular = poController.Detail(pnDetail).CashAdvanceDetail(poController.Master().getSourceNo()).getParticular();
             }
+            JFXUtil.setDisabled(!lbShow3, tfORNoDetail);
             boolean lbShow = !JFXUtil.isObjectEqualTo(poController.Detail(pnDetail).getReferNo(), null, "")
                     && poController.Detail(pnDetail).getAmount() > 0.0000;
             JFXUtil.setDisabled(!lbShow, tfVatExemptDetail);
 
             boolean lbShow2 = poController.Detail(pnDetail).getEditMode() == EditMode.ADDNEW && (JFXUtil.isObjectEqualTo(pnEditMode, EditMode.ADDNEW, EditMode.UPDATE));
             JFXUtil.setDisabled(!lbShow2, tfParticularDetail);
-            //add condition here
-            tfCashAdvParticular.setText(lsParticular);
-
-            tfParticularDetail.setText(poController.Detail(pnDetail).Particular().getDescription());
 
             tfORNoDetail.setText(poController.Detail(pnDetail).getReferNo());
+            tfCashAdvParticular.setText(lsParticular);
+            tfParticularDetail.setText(poController.Detail(pnDetail).Particular().getDescription());
+
             tfVatableSalesDetail.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(pnDetail).getDetailVatSales(), true));
             tfVatExemptDetail.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(pnDetail).getDetailVatExempt(), true));
             tfVatZeroRatedSalesDetail.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(pnDetail).getDetailZeroVat(), true));

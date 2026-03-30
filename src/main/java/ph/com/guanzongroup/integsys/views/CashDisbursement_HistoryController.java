@@ -949,7 +949,7 @@ public class CashDisbursement_HistoryController implements Initializable, Screen
                 switch (event.getCode()) {
                     case TAB:
                     case ENTER:
-                        if (tfVatExemptDetail.isFocused()) {
+                        if (tfAmountDetail.isFocused()) {
                             pbEnteredDV = true;
                         }
                         if (tfCreditAmount.isFocused()) {
@@ -1132,20 +1132,14 @@ public class CashDisbursement_HistoryController implements Initializable, Screen
                 return;
             }
 
-            boolean lbShow = JFXUtil.isObjectEqualTo(poController.Master().getSourceNo(), null, "");
-            JFXUtil.setDisabled(lbShow, tfVatExemptDetail);
-
             String lsParticular = "";
             if (!JFXUtil.isObjectEqualTo(poController.Master().getSourceNo(), null, "")) {
                 lsParticular = poController.Detail(pnDetail).CashAdvanceDetail(poController.Master().getSourceNo()).getParticular();
             }
-
-            //add condition here
-            tfCashAdvParticular.setText(lsParticular);
-
-            tfParticularDetail.setText(poController.Detail(pnDetail).Particular().getDescription());
-
             tfORNoDetail.setText(poController.Detail(pnDetail).getReferNo());
+            tfCashAdvParticular.setText(lsParticular);
+            tfParticularDetail.setText(poController.Detail(pnDetail).Particular().getDescription());
+            
             tfVatableSalesDetail.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(pnDetail).getDetailVatSales(), true));
             tfVatExemptDetail.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(pnDetail).getDetailVatExempt(), true));
             tfVatZeroRatedSalesDetail.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(pnDetail).getDetailZeroVat(), true));
