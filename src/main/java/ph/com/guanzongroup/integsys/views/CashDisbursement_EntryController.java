@@ -269,7 +269,7 @@ public class CashDisbursement_EntryController implements Initializable, ScreenIn
                 if (JFXUtil.isObjectEqualTo(pnEditMode, EditMode.ADDNEW, EditMode.READY, EditMode.UPDATE)) {
                     if (DoesContainValidDisbDetail()) {
                     } else {
-                        ShowMessageFX.Warning(null, pxeModuleName, "Please provide at least one valid disbursement detail to proceed.");
+                        ShowMessageFX.Warning(null, pxeModuleName, lsValidDisbMessage);
                         return;
                     }
                     showAttachmentDialog();
@@ -326,6 +326,9 @@ public class CashDisbursement_EntryController implements Initializable, ScreenIn
         if (poController.getDetailCount() <= 0) {
             return false;
         }
+        if (poController.Master().getTransactionTotal() <= 0.0000) {
+            return false;
+        }
 //        try {
 //            if (poController.Master().getSourceNo() != null && !"".equals(poController.Master().getSourceNo())) {
 //                lsParticular = poController.Detail(0).CashAdvanceDetail(poController.Master().getSourceNo()).getParticular();
@@ -338,6 +341,7 @@ public class CashDisbursement_EntryController implements Initializable, ScreenIn
 //        return !JFXUtil.isObjectEqualTo(lsParticular, null, "");
         return true;
     }
+    String lsValidDisbMessage = "Please provide an amount for at least one valid disbursement detail to proceed.";
 
     public void initTabPane() {
         JFXUtil.onTabSelected(tabPaneMain, tabTitle -> {
@@ -358,7 +362,7 @@ public class CashDisbursement_EntryController implements Initializable, ScreenIn
                             populateJE();
                         } else {
                             JFXUtil.clickTabByTitleText(tabPaneMain, "Cash Disbursement");
-                            ShowMessageFX.Warning(null, pxeModuleName, "Please provide at least one valid disbursement detail to proceed.");
+                            ShowMessageFX.Warning(null, pxeModuleName, lsValidDisbMessage);
                         }
                     }
                     break;
@@ -370,7 +374,7 @@ public class CashDisbursement_EntryController implements Initializable, ScreenIn
                             populateBIR();
                         } else {
                             JFXUtil.clickTabByTitleText(tabPaneMain, "Cash Disbursement");
-                            ShowMessageFX.Warning(null, pxeModuleName, "Please provide at least one valid disbursement detail to proceed.");
+                            ShowMessageFX.Warning(null, pxeModuleName, lsValidDisbMessage);
                         }
                     }
                     break;
@@ -388,7 +392,7 @@ public class CashDisbursement_EntryController implements Initializable, ScreenIn
                             loadTableAttachment.reload();
                         } else {
                             JFXUtil.clickTabByTitleText(tabPaneMain, "Cash Disbursement");
-                            ShowMessageFX.Warning(null, pxeModuleName, "Please provide at least one valid disbursement detail to proceed.");
+                            ShowMessageFX.Warning(null, pxeModuleName, lsValidDisbMessage);
                         }
                     }
                     break;
@@ -698,6 +702,7 @@ public class CashDisbursement_EntryController implements Initializable, ScreenIn
                     int pnRowMain = Integer.parseInt(selected.getIndex01()) - 1;
                     String lsTransactionNo = selected.getIndex02();
                     stageAttachment.closeDialog();
+
                     if (!JFXUtil.loadValidation2(pnEditMode, pxeModuleName, poController.Master().getSourceNo(), lsTransactionNo)) {
                         return;
                     }
@@ -1789,7 +1794,11 @@ public class CashDisbursement_EntryController implements Initializable, ScreenIn
                                 if (!JFXUtil.isJSONSuccess(poJSON)) {
                                     ShowMessageFX.Warning(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
                                 } else {
-                                    JFXUtil.textFieldMoveNext(tfVatableSales);
+                                    if (isSourceNoAvailable()) {
+                                        JFXUtil.textFieldMoveNext(tfVatExemptSales);
+                                    } else {
+                                        JFXUtil.textFieldMoveNext(tfAccountCode);
+                                    }
                                 }
                                 loadTableDetail.reload();
                                 break;
@@ -1910,13 +1919,13 @@ public class CashDisbursement_EntryController implements Initializable, ScreenIn
         }
         if (isSourceNoAvailable()) {
             JFXUtil.requestFocusNullField(new Object[][]{ // alternative to if , else if
+                {poController.Detail(pnDetail).getParticularId(), tfParticularDetail},
+                {poController.Detail(pnDetail).getDetailVatExempt(), tfVatExemptSales},}, tfVatExemptSales); // default
+        } else {
+            JFXUtil.requestFocusNullField(new Object[][]{ // alternative to if , else if
                 {poController.Detail(pnDetail).getReferNo(), tfORNoDetail},
                 {poController.Detail(pnDetail).getParticularId(), tfParticularDetail},
                 {poController.Detail(pnDetail).getAmount(), tfAmountDetail},}, tfAmountDetail); // default
-        } else {
-            JFXUtil.requestFocusNullField(new Object[][]{ // alternative to if , else if
-                {poController.Detail(pnDetail).getParticularId(), tfParticularDetail},
-                {poController.Detail(pnDetail).getDetailVatExempt(), tfVatExemptSales},}, tfVatExemptSales); // default
         }
     }
 

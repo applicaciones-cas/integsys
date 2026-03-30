@@ -270,7 +270,7 @@ public class CashDisbursement_ApprovalController implements Initializable, Scree
                 if (JFXUtil.isObjectEqualTo(pnEditMode, EditMode.ADDNEW, EditMode.READY, EditMode.UPDATE)) {
                     if (DoesContainValidDisbDetail()) {
                     } else {
-                        ShowMessageFX.Warning(null, pxeModuleName, "Please provide at least one valid disbursement detail to proceed.");
+                        ShowMessageFX.Warning(null, pxeModuleName, lsValidDisbMessage);
                         return;
                     }
                     showAttachmentDialog();
@@ -339,6 +339,7 @@ public class CashDisbursement_ApprovalController implements Initializable, Scree
 //        return !JFXUtil.isObjectEqualTo(lsParticular, null, "");
         return true;
     }
+    String lsValidDisbMessage = "Please provide an amount for at least one valid disbursement detail to proceed.";
 
     public void initTabPane() {
         JFXUtil.onTabSelected(tabPaneMain, tabTitle -> {
@@ -359,7 +360,7 @@ public class CashDisbursement_ApprovalController implements Initializable, Scree
                             populateJE();
                         } else {
                             JFXUtil.clickTabByTitleText(tabPaneMain, "Cash Disbursement");
-                            ShowMessageFX.Warning(null, pxeModuleName, "Please provide at least one valid disbursement detail to proceed.");
+                            ShowMessageFX.Warning(null, pxeModuleName, lsValidDisbMessage);
                         }
                     }
                     break;
@@ -371,7 +372,7 @@ public class CashDisbursement_ApprovalController implements Initializable, Scree
                             populateBIR();
                         } else {
                             JFXUtil.clickTabByTitleText(tabPaneMain, "Cash Disbursement");
-                            ShowMessageFX.Warning(null, pxeModuleName, "Please provide at least one valid disbursement detail to proceed.");
+                            ShowMessageFX.Warning(null, pxeModuleName, lsValidDisbMessage);
                         }
                     }
                     break;
@@ -389,7 +390,7 @@ public class CashDisbursement_ApprovalController implements Initializable, Scree
                             loadTableAttachment.reload();
                         } else {
                             JFXUtil.clickTabByTitleText(tabPaneMain, "Cash Disbursement");
-                            ShowMessageFX.Warning(null, pxeModuleName, "Please provide at least one valid disbursement detail to proceed.");
+                            ShowMessageFX.Warning(null, pxeModuleName, lsValidDisbMessage);
                         }
                     }
                     break;

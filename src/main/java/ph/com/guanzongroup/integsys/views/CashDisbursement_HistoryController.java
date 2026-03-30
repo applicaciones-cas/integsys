@@ -298,6 +298,7 @@ public class CashDisbursement_HistoryController implements Initializable, Screen
             ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
+    String lsValidDisbMessage = "Please provide an amount for at least one valid disbursement detail to proceed.";
 
     public void initTabPane() {
         JFXUtil.onTabSelected(tabPaneMain, tabTitle -> {
@@ -318,7 +319,7 @@ public class CashDisbursement_HistoryController implements Initializable, Screen
                             populateJE();
                         } else {
                             JFXUtil.clickTabByTitleText(tabPaneMain, "Cash Disbursement");
-                            ShowMessageFX.Warning(null, pxeModuleName, "Please provide at least one valid disbursement detail to proceed.");
+                            ShowMessageFX.Warning(null, pxeModuleName, lsValidDisbMessage);
                         }
                     }
                     break;
@@ -330,7 +331,7 @@ public class CashDisbursement_HistoryController implements Initializable, Screen
                             populateBIR();
                         } else {
                             JFXUtil.clickTabByTitleText(tabPaneMain, "Cash Disbursement");
-                            ShowMessageFX.Warning(null, pxeModuleName, "Please provide at least one valid disbursement detail to proceed.");
+                            ShowMessageFX.Warning(null, pxeModuleName, lsValidDisbMessage);
                         }
                     }
                     break;
@@ -348,7 +349,7 @@ public class CashDisbursement_HistoryController implements Initializable, Screen
                             loadTableAttachment.reload();
                         } else {
                             JFXUtil.clickTabByTitleText(tabPaneMain, "Cash Disbursement");
-                            ShowMessageFX.Warning(null, pxeModuleName, "Please provide at least one valid disbursement detail to proceed.");
+                            ShowMessageFX.Warning(null, pxeModuleName, lsValidDisbMessage);
                         }
                     }
                     break;
@@ -1139,7 +1140,7 @@ public class CashDisbursement_HistoryController implements Initializable, Screen
             tfORNoDetail.setText(poController.Detail(pnDetail).getReferNo());
             tfCashAdvParticular.setText(lsParticular);
             tfParticularDetail.setText(poController.Detail(pnDetail).Particular().getDescription());
-            
+
             tfVatableSalesDetail.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(pnDetail).getDetailVatSales(), true));
             tfVatExemptDetail.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(pnDetail).getDetailVatExempt(), true));
             tfVatZeroRatedSalesDetail.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(pnDetail).getDetailZeroVat(), true));
