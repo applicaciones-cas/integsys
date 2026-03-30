@@ -38,14 +38,6 @@
                               <GridPane prefHeight="28.0" prefWidth="1447.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="10.0">
                                  <columnConstraints>
                                     <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="100.0" />
-                                    <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="10.0" />
-                                    <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="180.0" />
-                                    <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="10.0" prefWidth="100.0" />
-                                    <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="100.0" />
-                                    <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="10.0" />
-                                    <ColumnConstraints hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="180.0" />
-                                    <ColumnConstraints hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="10.0" />
-                                    <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="100.0" />
                                     <ColumnConstraints hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="10.0" />
                                     <ColumnConstraints hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="230.0" />
                                     <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="10.0" />
@@ -61,35 +53,23 @@
                                     <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="28.0" vgrow="SOMETIMES" />
                                  </rowConstraints>
                                  <children>
-                                            <Label text="Industry" GridPane.rowIndex="1">
+                                                <Label layoutX="55.0" layoutY="14.0" text="Payee" GridPane.rowIndex="1">
                                        <font>
                                           <Font name="System Bold" size="14.0" />
                                        </font>
                                     </Label>
-                                                <Label layoutX="55.0" layoutY="14.0" text="Branch" GridPane.columnIndex="4" GridPane.rowIndex="1">
+                                                <Label text="Trans No" GridPane.columnIndex="4" GridPane.rowIndex="1">
                                        <font>
                                           <Font name="System Bold" size="14.0" />
                                        </font>
                                     </Label>
-                                                <Label layoutX="55.0" layoutY="14.0" text="Payee" GridPane.columnIndex="8" GridPane.rowIndex="1">
+                                                <Label fx:id="lblSource" layoutX="367.0" layoutY="14.0" text="Company" GridPane.columnIndex="8" GridPane.rowIndex="1">
                                        <font>
                                           <Font name="System Bold" size="14.0" />
                                        </font>
                                     </Label>
-                                                <Label text="Trans No" GridPane.columnIndex="12" GridPane.rowIndex="1">
-                                       <font>
-                                          <Font name="System Bold" size="14.0" />
-                                       </font>
-                                    </Label>
-                                                <Label fx:id="lblSource" layoutX="367.0" layoutY="14.0" text="Company" GridPane.columnIndex="16" GridPane.rowIndex="1">
-                                       <font>
-                                          <Font name="System Bold" size="14.0" />
-                                       </font>
-                                    </Label>
-                                                <TextField fx:id="tfSearchIndustry" promptText="Press F3: Search" GridPane.columnIndex="2" GridPane.rowIndex="1" />
-                                                <TextField fx:id="tfSearchBranch" layoutX="120.0" layoutY="11.0" promptText="Press F3: Search" GridPane.columnIndex="6" GridPane.rowIndex="1" />
-                                                <TextField fx:id="tfSearchPayee" layoutX="120.0" layoutY="11.0" promptText="Press F3: Search" GridPane.columnIndex="10" GridPane.rowIndex="1" />
-                                                <TextField fx:id="tfSearchTransNo" promptText="Press F3: Search" GridPane.columnIndex="14" GridPane.rowIndex="1" />
+                                                <TextField fx:id="tfSearchPayee" layoutX="120.0" layoutY="11.0" promptText="Press F3: Search" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+                                                <TextField fx:id="tfSearchTransNo" promptText="Press F3: Search" GridPane.columnIndex="6" GridPane.rowIndex="1" />
                                             </children>
                               </GridPane>
                            </children>

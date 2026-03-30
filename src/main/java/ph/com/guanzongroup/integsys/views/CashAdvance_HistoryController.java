@@ -91,8 +91,8 @@ public class CashAdvance_HistoryController implements Initializable, ScreenInter
     private AnchorPane AnchorMain, apBrowse, apButton, apMaster, apDetail, apMainAnchor, apAttachments, apAttachmentButtons;
     @FXML
     private Label lblSource, lblStatus;
-    @FXML
-    private TextField tfSearchIndustry, tfSearchPayee, tfSearchBranch, tfSearchTransNo, tfTransactionNo, tfPayee, tfDepartment, tfCashAdvanceBalance, tfAdvancesAmount, tfLiquidationTotal, tfReceiptNo, tfAccountDescription, tfParticular, tfTransAmount, tfAttachmentNo;
+    @FXML //fSearchIndustry, tfSearchBranch, 
+    private TextField tfSearchPayee, tfSearchTransNo, tfTransactionNo, tfPayee, tfDepartment, tfCashAdvanceBalance, tfAdvancesAmount, tfLiquidationTotal, tfReceiptNo, tfAccountDescription, tfParticular, tfTransAmount, tfAttachmentNo;
     @FXML
     private HBox hbButtons;
     @FXML
@@ -147,11 +147,11 @@ public class CashAdvance_HistoryController implements Initializable, ScreenInter
                     poController.setSearchIndustry(poController.Master().Industry().getDescription());
                     
                     //Kung accounting yung dept ni user makikita lahat else kung hindi mag base sa department ng user - ma'am grace 03/26/2026 3:51pm
-                    if(!oApp.getDepartment().equals(poController.getFinanceDepartment())){
-                        poController.setDepartmentId(oApp.getDepartment());
-                        tfSearchBranch.setDisable(true);
-                        tfSearchIndustry.setDisable(true);
-                    }
+//                    if(!oApp.getDepartment().equals(poController.getFinanceDepartment())){
+//                        poController.setDepartmentId(oApp.getDepartment());
+////                        tfSearchBranch.setDisable(true);
+////                        tfSearchIndustry.setDisable(true);
+//                    }
                     
                     loadRecordSearch();
                 } catch (SQLException | GuanzonException ex) {
@@ -195,24 +195,24 @@ public class CashAdvance_HistoryController implements Initializable, ScreenInter
             switch (event.getCode()) {
                 case F3:
                     switch (lsID) {
-                        case "tfSearchIndustry":
-                            poJSON = poController.SearchIndustry(lsValue, false);
-                            if ("error".equals(poJSON.get("result"))) {
-                                ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-                                tfSearchIndustry.setText("");
-                                break;
-                            }
-                            loadRecordSearch();
-                            return;
-                        case "tfSearchBranch":
-                            poJSON = poController.SearchBranch(lsValue, false);
-                            if ("error".equals(poJSON.get("result"))) {
-                                ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-                                tfSearchBranch.setText("");
-                                break;
-                            }
-                            loadRecordSearch();
-                            return;
+//                        case "tfSearchIndustry":
+//                            poJSON = poController.SearchIndustry(lsValue, false);
+//                            if ("error".equals(poJSON.get("result"))) {
+//                                ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+//                                tfSearchIndustry.setText("");
+//                                break;
+//                            }
+//                            loadRecordSearch();
+//                            return;
+//                        case "tfSearchBranch":
+//                            poJSON = poController.SearchBranch(lsValue, false);
+//                            if ("error".equals(poJSON.get("result"))) {
+//                                ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+//                                tfSearchBranch.setText("");
+//                                break;
+//                            }
+//                            loadRecordSearch();
+//                            return;
                         case "tfSearchPayee":
                             poJSON = poController.SearchPayee(lsValue, false);
                             if ("error".equals(poJSON.get("result"))) {
@@ -223,7 +223,7 @@ public class CashAdvance_HistoryController implements Initializable, ScreenInter
                             loadRecordSearch();
                             return;
                         case "tfSearchTransNo":
-                            poJSON = poController.SearchTransaction(tfSearchIndustry.getText(), tfSearchBranch.getText(), tfSearchPayee.getText(), tfSearchTransNo.getText());
+                            poJSON = poController.SearchTransaction(tfSearchPayee.getText(), tfSearchTransNo.getText());
                             if ("error".equals(poJSON.get("result"))) {
                                 ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                 tfSearchTransNo.setText("");
@@ -268,8 +268,8 @@ public class CashAdvance_HistoryController implements Initializable, ScreenInter
             } else {
                 lblSource.setText("");
             }
-            tfSearchIndustry.setText(poController.getSearchIndustry());
-            tfSearchBranch.setText(poController.getSearchBranch());
+//            tfSearchIndustry.setText(poController.getSearchIndustry());
+//            tfSearchBranch.setText(poController.getSearchBranch());
             tfSearchPayee.setText(poController.getSearchPayee());
             JFXUtil.updateCaretPositions(apBrowse);
         } catch (SQLException | GuanzonException ex) {
@@ -411,7 +411,7 @@ public class CashAdvance_HistoryController implements Initializable, ScreenInter
     }
 
     public void initTextFields() {
-        JFXUtil.setFocusListener(txtBrowse_Focus, tfSearchIndustry, tfSearchBranch, tfSearchPayee, tfSearchTransNo);
+        JFXUtil.setFocusListener(txtBrowse_Focus, tfSearchPayee, tfSearchTransNo); //tfSearchIndustry, tfSearchBranch, 
         JFXUtil.setKeyPressedListener(this::txtField_KeyPressed, apBrowse);
         JFXUtil.setKeyEventFilter(tableKeyEvents, tblViewDetail, tblAttachments);
     }
@@ -705,7 +705,7 @@ public class CashAdvance_HistoryController implements Initializable, ScreenInter
                 String lsButton = clickedButton.getId();
                 switch (lsButton) {
                     case "btnBrowse":
-                        poJSON = poController.SearchTransaction(tfSearchIndustry.getText(), tfSearchBranch.getText(), tfSearchPayee.getText(), tfSearchTransNo.getText());
+                        poJSON = poController.SearchTransaction(tfSearchPayee.getText(), tfSearchTransNo.getText()); //tfSearchIndustry.getText(), tfSearchBranch.getText(), 
                         if ("error".equalsIgnoreCase((String) poJSON.get("result"))) {
                             ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                             tfTransactionNo.requestFocus();
