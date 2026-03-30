@@ -1797,7 +1797,7 @@ public class CashDisbursement_EntryController implements Initializable, ScreenIn
                                     if (isSourceNoAvailable()) {
                                         JFXUtil.textFieldMoveNext(tfVatExemptSales);
                                     } else {
-                                        JFXUtil.textFieldMoveNext(tfAccountCode);
+                                        JFXUtil.textFieldMoveNext(tfAmountDetail);
                                     }
                                 }
                                 loadTableDetail.reload();

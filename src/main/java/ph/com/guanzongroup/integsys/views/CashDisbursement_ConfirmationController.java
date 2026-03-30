@@ -1790,7 +1790,7 @@ public class CashDisbursement_ConfirmationController implements Initializable, S
                                     if (isSourceNoAvailable()) {
                                         JFXUtil.textFieldMoveNext(tfVatExemptSales);
                                     } else {
-                                        JFXUtil.textFieldMoveNext(tfAccountCode);
+                                        JFXUtil.textFieldMoveNext(tfAmountDetail);
                                     }
                                 }
                                 loadTableDetail.reload();
