@@ -1440,6 +1440,12 @@ public class CashDisbursement_EntryController implements Initializable, ScreenIn
                             }
 
                         }
+                        if (isSourceNoAvailable()) {
+                            if (pbEnteredDV) {
+                                moveNext(false, true);
+                                pbEnteredDV = false;
+                            }
+                        }
                         break;
                     case "tfParticularDetail":
                         if (lsValue.isEmpty()) {
@@ -1603,9 +1609,16 @@ public class CashDisbursement_EntryController implements Initializable, ScreenIn
                 switch (event.getCode()) {
                     case TAB:
                     case ENTER:
-                        if (tfAmountDetail.isFocused()) {
-                            pbEnteredDV = true;
+                        if (isSourceNoAvailable()) {
+                            if (tfVatExemptSales.isFocused()) {
+                                pbEnteredDV = true;
+                            }
+                        } else {
+                            if (tfAmountDetail.isFocused()) {
+                                pbEnteredDV = true;
+                            }
                         }
+
                         if (tfCreditAmount.isFocused()) {
                             pbEnteredJE = true;
                         }
@@ -1881,6 +1894,10 @@ public class CashDisbursement_EntryController implements Initializable, ScreenIn
         }
     }
 
+    private boolean isSourceNoAvailable() {
+        return !JFXUtil.isObjectEqualTo(poController.Master().getSourceNo(), null, "");
+    }
+
     public void moveNext(boolean isUp, boolean continueNext) {
         if (continueNext) {
             apDVDetail.requestFocus();
@@ -1891,10 +1908,16 @@ public class CashDisbursement_EntryController implements Initializable, ScreenIn
         if (pnDetail < 0 || pnDetail > poController.getDetailCount() - 1) {
             return;
         }
-        JFXUtil.requestFocusNullField(new Object[][]{ // alternative to if , else if
-            {poController.Detail(pnDetail).getReferNo(), tfORNoDetail},
-            {poController.Detail(pnDetail).getParticularId(), tfParticularDetail},
-            {poController.Detail(pnDetail).getAmount(), tfAmountDetail},}, tfAmountDetail); // default
+        if (isSourceNoAvailable()) {
+            JFXUtil.requestFocusNullField(new Object[][]{ // alternative to if , else if
+                {poController.Detail(pnDetail).getReferNo(), tfORNoDetail},
+                {poController.Detail(pnDetail).getParticularId(), tfParticularDetail},
+                {poController.Detail(pnDetail).getAmount(), tfAmountDetail},}, tfAmountDetail); // default
+        } else {
+            JFXUtil.requestFocusNullField(new Object[][]{ // alternative to if , else if
+                {poController.Detail(pnDetail).getParticularId(), tfParticularDetail},
+                {poController.Detail(pnDetail).getDetailVatExempt(), tfVatExemptSales},}, tfVatExemptSales); // default
+        }
     }
 
     public void moveNextJE(boolean isUp, boolean continueNext) {
