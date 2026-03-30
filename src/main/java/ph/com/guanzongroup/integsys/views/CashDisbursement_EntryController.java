@@ -1961,7 +1961,6 @@ public class CashDisbursement_EntryController implements Initializable, ScreenIn
 
             boolean lbShow = !JFXUtil.isObjectEqualTo(poController.Master().getSourceNo(), null, "");
             JFXUtil.setDisabled(lbShow, cbReverse);
-            JFXUtil.setDisabled(true, tfAmountDetail);
 //            initDVMasterTabs();
             poController.computeFields(false);
             JFXUtil.setStatusValue(lblDVTransactionStatus, CashDisbursementStatus.class, pnEditMode == EditMode.UNKNOWN ? "-1" : poController.Master().getTransactionStatus());
