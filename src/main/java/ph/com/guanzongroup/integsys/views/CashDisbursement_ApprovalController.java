@@ -1801,8 +1801,6 @@ public class CashDisbursement_ApprovalController implements Initializable, Scree
             String lsParticular = "";
             if (!JFXUtil.isObjectEqualTo(poController.Master().getSourceNo(), null, "")) {
                 lsParticular = poController.Detail(pnDetail).CashAdvanceDetail(poController.Master().getSourceNo()).getParticular();
-            } else {
-                lsParticular = poController.Detail(pnDetail).Particular().getDescription();
             }
             boolean lbShow = !JFXUtil.isObjectEqualTo(poController.Detail(pnDetail).getReferNo(), null, "")
                     && poController.Detail(pnDetail).getAmount() > 0.0000;

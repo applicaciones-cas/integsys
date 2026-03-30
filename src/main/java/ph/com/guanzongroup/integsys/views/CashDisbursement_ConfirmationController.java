@@ -1775,9 +1775,7 @@ public class CashDisbursement_ConfirmationController implements Initializable, S
                                 } else {
                                     JFXUtil.textFieldMoveNext(tfVatableSales);
                                 }
-                                JFXUtil.runWithDelay(0.50, () -> {
-                                    loadTableDetail.reload();
-                                });
+                                loadTableDetail.reload();
                                 break;
                             //apJournalDetails
                             case "tfAccountCode":
@@ -2009,8 +2007,6 @@ public class CashDisbursement_ConfirmationController implements Initializable, S
             String lsParticular = "";
             if (!JFXUtil.isObjectEqualTo(poController.Master().getSourceNo(), null, "")) {
                 lsParticular = poController.Detail(pnDetail).CashAdvanceDetail(poController.Master().getSourceNo()).getParticular();
-            } else {
-                lsParticular = poController.Detail(pnDetail).Particular().getDescription();
             }
             boolean lbShow = !JFXUtil.isObjectEqualTo(poController.Detail(pnDetail).getReferNo(), null, "")
                     && poController.Detail(pnDetail).getAmount() > 0.0000;
