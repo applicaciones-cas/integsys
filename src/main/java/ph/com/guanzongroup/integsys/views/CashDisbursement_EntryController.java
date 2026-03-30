@@ -2002,14 +2002,16 @@ public class CashDisbursement_EntryController implements Initializable, ScreenIn
             String lsParticular = "";
             if (!lbShow3) {
                 lsParticular = poController.Detail(pnDetail).CashAdvanceDetail(poController.Master().getSourceNo()).getParticular();
+                JFXUtil.setDisabled(false, tfParticularDetail);
+            } else {
+                //sourceno is empty
+                boolean lbShow2 = poController.Detail(pnDetail).getEditMode() == EditMode.UPDATE;
+                JFXUtil.setDisabled(lbShow2, tfParticularDetail);
             }
             JFXUtil.setDisabled(!lbShow3, tfORNoDetail, tfAmountDetail);
             boolean lbShow = !JFXUtil.isObjectEqualTo(poController.Detail(pnDetail).getReferNo(), null, "")
                     && poController.Detail(pnDetail).getAmount() > 0.0000;
             JFXUtil.setDisabled(!lbShow, tfVatExemptDetail);
-
-            boolean lbShow2 = poController.Detail(pnDetail).getEditMode() == EditMode.ADDNEW && (JFXUtil.isObjectEqualTo(pnEditMode, EditMode.ADDNEW, EditMode.UPDATE));
-            JFXUtil.setDisabled(!lbShow2, tfParticularDetail);
 
             tfORNoDetail.setText(poController.Detail(pnDetail).getReferNo());
             tfCashAdvParticular.setText(lsParticular);
