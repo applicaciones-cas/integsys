@@ -2007,7 +2007,7 @@ public class CashDisbursement_ConfirmationController implements Initializable, S
             }
 
             String lsParticular = "";
-            if (JFXUtil.isObjectEqualTo(poController.Master().getSourceNo(), null, "")) {
+            if (!JFXUtil.isObjectEqualTo(poController.Master().getSourceNo(), null, "")) {
                 lsParticular = poController.Detail(pnDetail).CashAdvanceDetail(poController.Master().getSourceNo()).getParticular();
             } else {
                 lsParticular = poController.Detail(pnDetail).Particular().getDescription();
