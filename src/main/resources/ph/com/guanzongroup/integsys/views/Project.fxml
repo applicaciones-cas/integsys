@@ -78,6 +78,17 @@
                                     <FontAwesomeIconView glyphName="CLOSE" size="20" styleClass="FontIcon" />
                                  </graphic>
                               </Button>
+                              <Button fx:id="btnHistory" contentDisplay="TOP" ellipsisString="" mnemonicParsing="false" prefHeight="70.0" prefWidth="70.0" styleClass="button_process" stylesheets="@000MNVProject/CAS%20IntegSys%20JavaMaven/gcas/src/main/resources/com/rmj/guanzongroup/sidebarmenus/css/StyleSheet.css" text="History">
+                                 <graphic>
+                                    <FontAwesomeIconView glyphName="BOOK" size="20" />
+                                 </graphic>
+                                 <effect>
+                                    <Blend />
+                                 </effect>
+                                 <font>
+                                    <Font size="12.0" />
+                                 </font>
+                              </Button>
                               <Button fx:id="btnClose" contentDisplay="TOP" graphicTextGap="3.0" maxHeight="70.0" mnemonicParsing="false" prefHeight="50.0" prefWidth="70.0" styleClass="button_process" stylesheets="@../css/StyleSheet.css" text="Close">
                                  <graphic>
                                     <FontAwesomeIconView glyphName="POWER_OFF" size="20" styleClass="FontIcon" />

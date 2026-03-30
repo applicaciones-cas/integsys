@@ -8,7 +8,10 @@
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.Tooltip?>
+<?import javafx.scene.effect.Blend?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.ColumnConstraints?>
@@ -53,15 +56,45 @@
                                     <FontAwesomeIconView glyphName="EDIT" size="20" styleClass="FontIcon" />
                                  </graphic>
                               </Button>
+                              <Button fx:id="btnConfirm" contentDisplay="TOP" ellipsisString="" mnemonicParsing="false" prefHeight="70.0" prefWidth="70.0" styleClass="button_process" stylesheets="@../css/StyleSheet.css" text="Confirm">
+                                 <graphic>
+                                    <FontAwesomeIconView glyphName="CHECK" size="20" />
+                                 </graphic>
+                                 <effect>
+                                    <Blend />
+                                 </effect>
+                              </Button>
+                              <Button fx:id="btnVoid" contentDisplay="TOP" ellipsisString="" mnemonicParsing="false" prefHeight="70.0" prefWidth="70.0" styleClass="button_process" stylesheets="@../css/StyleSheet.css" text="Void">
+                                 <graphic>
+                                    <FontAwesomeIconView glyphName="TIMES" size="20" />
+                                 </graphic>
+                                 <effect>
+                                    <Blend />
+                                 </effect>
+                              </Button>
+                              <Button fx:id="btnDeactivate" contentDisplay="TOP" graphicTextGap="3.0" maxHeight="70.0" mnemonicParsing="false" prefHeight="50.0" prefWidth="70.0" styleClass="button_process" stylesheets="@../css/StyleSheet.css" text="Deactivate">
+                                 <graphic>
+                                    <FontAwesomeIconView glyphName="CLOSE" size="20" styleClass="FontIcon" />
+                                 </graphic>
+                                 <font>
+                                    <Font size="11.0" />
+                                 </font>
+                              </Button>
                               <Button fx:id="btnCancel" contentDisplay="TOP" graphicTextGap="3.0" maxHeight="70.0" mnemonicParsing="false" prefHeight="50.0" prefWidth="70.0" styleClass="button_process" stylesheets="@../css/StyleSheet.css" text="Cancel">
                                  <graphic>
                                     <FontAwesomeIconView glyphName="CLOSE" size="20" styleClass="FontIcon" />
                                  </graphic>
                               </Button>
-                              <Button fx:id="btnActivate" contentDisplay="TOP" graphicTextGap="3.0" maxHeight="70.0" mnemonicParsing="false" prefHeight="50.0" prefWidth="70.0" styleClass="button_process" stylesheets="@../css/StyleSheet.css" text="Activate">
+                              <Button fx:id="btnHistory" contentDisplay="TOP" ellipsisString="" mnemonicParsing="false" prefHeight="70.0" prefWidth="70.0" styleClass="button_process" stylesheets="@000MNVProject/CAS%20IntegSys%20JavaMaven/gcas/src/main/resources/com/rmj/guanzongroup/sidebarmenus/css/StyleSheet.css" text="History">
                                  <graphic>
-                                    <FontAwesomeIconView fx:id="faActivate" glyphName="CHECK" size="20" styleClass="FontIcon" />
+                                    <FontAwesomeIconView glyphName="BOOK" size="20" />
                                  </graphic>
+                                 <effect>
+                                    <Blend />
+                                 </effect>
+                                 <font>
+                                    <Font size="12.0" />
+                                 </font>
                               </Button>
                               <Button fx:id="btnClose" contentDisplay="TOP" graphicTextGap="3.0" maxHeight="70.0" mnemonicParsing="false" prefHeight="50.0" prefWidth="70.0" styleClass="button_process" stylesheets="@../css/StyleSheet.css" text="Close">
                                  <graphic>
@@ -91,26 +124,25 @@
                                  <children>
                                     <GridPane AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                       <columnConstraints>
-                                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="175.0" minWidth="165.0" prefWidth="165.0" />
-                                        <ColumnConstraints hgrow="SOMETIMES" minWidth="120.0" prefWidth="150.0" />
-                                          <ColumnConstraints hgrow="SOMETIMES" minWidth="150.0" prefWidth="150.0" />
-                                          <ColumnConstraints hgrow="SOMETIMES" minWidth="120.0" prefWidth="150.0" />
-                                          <ColumnConstraints hgrow="SOMETIMES" minWidth="20.0" prefWidth="150.0" />
+                                        <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="130.0" />
+                                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="100.0" />
+                                          <ColumnConstraints hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="100.0" />
+                                          <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="130.0" />
+                                          <ColumnConstraints halignment="LEFT" hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="70.0" />
+                                          <ColumnConstraints halignment="LEFT" hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="130.0" />
                                       </columnConstraints>
                                       <rowConstraints>
                                         <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                                           <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                                         <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                                           <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                                           <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                                           <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                                           <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                          <RowConstraints minHeight="10.0" prefHeight="32.0" vgrow="SOMETIMES" />
                                       </rowConstraints>
                                        <children>
-                                                            <TextField fx:id="txtField01" editable="false" GridPane.columnIndex="1">
+                                                            <TextField fx:id="txtField01" GridPane.columnIndex="1" GridPane.columnSpan="2">
                                                                 <GridPane.margin>
                                                                     <Insets />
                                                                 </GridPane.margin>
@@ -121,7 +153,7 @@
                                                 <Insets left="5.0" />
                                              </padding>
                                                             </TextField>
-                                                            <TextField fx:id="txtField02" GridPane.columnIndex="1" GridPane.columnSpan="3" GridPane.rowIndex="1">
+                                                            <TextField fx:id="txtField02" GridPane.columnIndex="1" GridPane.columnSpan="5" GridPane.rowIndex="1">
                                                                 <GridPane.margin>
                                                                     <Insets />
                                                                 </GridPane.margin>
@@ -132,15 +164,22 @@
                                                 <Insets left="5.0" />
                                              </padding>
                                                             </TextField>
-                                                            <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Account Code">
-                                                                <GridPane.margin>
-                                                                    <Insets left="10.0" />
-                                                                </GridPane.margin>
+                                          <Label contentDisplay="RIGHT" nodeOrientation="LEFT_TO_RIGHT" text="Account Code" textAlignment="JUSTIFY">
+                                             <graphic>
+                                                <Text fill="RED" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="Text2" text="*">
+                                                   <font>
+                                                      <Font name="Rockwell" size="14.0" />
+                                                   </font>
+                                                </Text>
+                                             </graphic>
+                                             <GridPane.margin>
+                                                <Insets right="10.0" />
+                                             </GridPane.margin>
                                              <font>
                                                 <Font name="System Bold" size="12.0" />
                                              </font>
-                                                            </Text>
-                                                            <Label contentDisplay="RIGHT" text="Description" GridPane.rowIndex="1">
+                                          </Label>
+                                                            <Label contentDisplay="RIGHT" nodeOrientation="LEFT_TO_RIGHT" text="Description" textAlignment="JUSTIFY" GridPane.rowIndex="1">
                                                                 <graphic>
                                                                     <Text fill="RED" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="Text2" text="*">
                                                                         <font>
@@ -149,10 +188,10 @@
                                                                     </Text>
                                                                 </graphic>
                                                                 <GridPane.margin>
-                                                                    <Insets left="10.0" />
+                                                                    <Insets right="10.0" />
                                                                 </GridPane.margin>
                                                             </Label>
-                                                            <CheckBox fx:id="cbField01" disable="true" mnemonicParsing="false" selected="true" text="Active" GridPane.columnIndex="1" GridPane.rowIndex="9" GridPane.valignment="BOTTOM">
+                                                            <CheckBox fx:id="cbField01" disable="true" mnemonicParsing="false" selected="true" text="Cash" GridPane.columnIndex="4" GridPane.rowIndex="7" GridPane.valignment="BOTTOM">
                                                                 <font>
                                                                     <Font size="14.0" />
                                                                 </font>
@@ -163,46 +202,18 @@
                                                 <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                                              </padding>
                                                             </CheckBox>
-                                          <TextField fx:id="txtField03" layoutX="171.0" layoutY="42.0" promptText="Press F3: Search" GridPane.columnIndex="1" GridPane.columnSpan="3" GridPane.rowIndex="2">
+                                          <TextField fx:id="txtField04" layoutX="171.0" layoutY="42.0" promptText="Press F3: Search" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="3">
                                              <font>
                                                 <Font size="14.0" />
                                              </font>
                                              <padding>
                                                 <Insets left="5.0" />
                                              </padding>
+                                             <tooltip>
+                                                <Tooltip text="Set as empty if parent" />
+                                             </tooltip>
                                           </TextField>
-                                          <Label contentDisplay="RIGHT" layoutX="20.0" layoutY="45.0" text="Parent Code" GridPane.rowIndex="2">
-                                             <GridPane.margin>
-                                                <Insets left="10.0" />
-                                             </GridPane.margin>
-                                          </Label>
-                                          <Label contentDisplay="RIGHT" text="Account Group" GridPane.rowIndex="4">
-                                             <GridPane.margin>
-                                                <Insets left="10.0" />
-                                             </GridPane.margin>
-                                          </Label>
-                                          <Label contentDisplay="RIGHT" text="Report Group" GridPane.rowIndex="5">
-                                             <GridPane.margin>
-                                                <Insets left="10.0" />
-                                             </GridPane.margin>
-                                          </Label>
-                                          <TextField fx:id="txtField05" GridPane.columnIndex="1" GridPane.columnSpan="3" GridPane.rowIndex="4">
-                                             <font>
-                                                <Font size="14.0" />
-                                             </font>
-                                             <padding>
-                                                <Insets left="5.0" />
-                                             </padding>
-                                          </TextField>
-                                          <TextField fx:id="txtField06" GridPane.columnIndex="1" GridPane.columnSpan="3" GridPane.rowIndex="5">
-                                             <font>
-                                                <Font size="14.0" />
-                                             </font>
-                                             <padding>
-                                                <Insets left="5.0" />
-                                             </padding>
-                                          </TextField>
-                                          <Label contentDisplay="RIGHT" text="Account Type" GridPane.rowIndex="7">
+                                          <Label contentDisplay="RIGHT" text="Balance Type" GridPane.columnIndex="3" GridPane.rowIndex="3">
                                              <graphic>
                                                 <Text fill="RED" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="Text2" text="*">
                                                    <font>
@@ -211,13 +222,13 @@
                                                 </Text>
                                              </graphic>
                                              <GridPane.margin>
-                                                <Insets left="10.0" />
+                                                <Insets left="10.0" right="10.0" />
                                              </GridPane.margin>
                                           </Label>
-                                          <ComboBox fx:id="cmbField01" prefWidth="150.0" GridPane.columnIndex="1" GridPane.rowIndex="6" />
-                                          <ComboBox fx:id="cmbField02" prefWidth="150.0" GridPane.columnIndex="1" GridPane.rowIndex="7" />
-                                          <ComboBox fx:id="cmbField03" prefWidth="150.0" GridPane.columnIndex="1" GridPane.rowIndex="8" />
-                                          <Label contentDisplay="RIGHT" text="Balance Type" GridPane.rowIndex="8">
+                                          <ComboBox fx:id="cmbField01" prefWidth="200.0" GridPane.columnIndex="4" GridPane.columnSpan="2" GridPane.rowIndex="2" />
+                                          <ComboBox fx:id="cmbField02" prefWidth="200.0" GridPane.columnIndex="4" GridPane.columnSpan="2" GridPane.rowIndex="3" />
+                                          <ComboBox fx:id="cmbField03" prefWidth="200.0" GridPane.columnIndex="4" GridPane.columnSpan="2" GridPane.rowIndex="4" />
+                                          <Label contentDisplay="RIGHT" text="Account Nature" GridPane.columnIndex="3" GridPane.rowIndex="4">
                                              <graphic>
                                                 <Text fill="RED" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="Text2" text="*">
                                                    <font>
@@ -226,15 +237,10 @@
                                                 </Text>
                                              </graphic>
                                              <GridPane.margin>
-                                                <Insets left="10.0" />
+                                                <Insets left="10.0" right="10.0" />
                                              </GridPane.margin>
                                           </Label>
-                                          <Label contentDisplay="RIGHT" text="General Ledger Code" GridPane.rowIndex="3">
-                                             <GridPane.margin>
-                                                <Insets left="10.0" />
-                                             </GridPane.margin>
-                                          </Label>
-                                          <TextField fx:id="txtField04" promptText="Press F3: Search" GridPane.columnIndex="1" GridPane.columnSpan="3" GridPane.rowIndex="3">
+                                          <TextField fx:id="txtField05" promptText="Press F3: Search" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="4">
                                              <font>
                                                 <Font size="14.0" />
                                              </font>
@@ -242,7 +248,7 @@
                                                 <Insets left="5.0" />
                                              </padding>
                                           </TextField>
-                                          <Label contentDisplay="RIGHT" text="Based Account" GridPane.rowIndex="6">
+                                          <Label contentDisplay="RIGHT" text="Account Type" GridPane.columnIndex="3" GridPane.rowIndex="2">
                                              <graphic>
                                                 <Text fill="RED" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="Text2" text="*">
                                                    <font>
@@ -251,8 +257,70 @@
                                                 </Text>
                                              </graphic>
                                              <GridPane.margin>
-                                                <Insets left="10.0" />
+                                                <Insets left="10.0" right="10.0" />
                                              </GridPane.margin>
+                                          </Label>
+                                          <Label contentDisplay="RIGHT" nodeOrientation="LEFT_TO_RIGHT" text="Industry" textAlignment="JUSTIFY" GridPane.rowIndex="2">
+                                             <graphic>
+                                                <Text fill="RED" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="Text2" text="*">
+                                                   <font>
+                                                      <Font name="Rockwell" size="14.0" />
+                                                   </font>
+                                                </Text>
+                                             </graphic>
+                                             <GridPane.margin>
+                                                <Insets right="10.0" />
+                                             </GridPane.margin>
+                                          </Label>
+                                          <TextField fx:id="txtField03" promptText="Press F3: Search" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="2">
+                                             <font>
+                                                <Font size="14.0" />
+                                             </font>
+                                             <padding>
+                                                <Insets left="5.0" />
+                                             </padding>
+                                          </TextField>
+                                          <Label contentDisplay="RIGHT" nodeOrientation="LEFT_TO_RIGHT" text="Parent Code" textAlignment="JUSTIFY" GridPane.rowIndex="3">
+                                             <graphic>
+                                                <Text fill="RED" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="Text2" text="*">
+                                                   <font>
+                                                      <Font name="Rockwell" size="14.0" />
+                                                   </font>
+                                                </Text>
+                                             </graphic>
+                                             <GridPane.margin>
+                                                <Insets right="10.0" />
+                                             </GridPane.margin>
+                                          </Label>
+                                          <Label contentDisplay="RIGHT" nodeOrientation="LEFT_TO_RIGHT" text="GL Code" textAlignment="JUSTIFY" GridPane.rowIndex="4">
+                                             <graphic>
+                                                <Text fill="RED" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="Text2" text="*">
+                                                   <font>
+                                                      <Font name="Rockwell" size="14.0" />
+                                                   </font>
+                                                </Text>
+                                             </graphic>
+                                             <GridPane.margin>
+                                                <Insets right="10.0" />
+                                             </GridPane.margin>
+                                          </Label>
+                                          <Label contentDisplay="RIGHT" nodeOrientation="LEFT_TO_RIGHT" text="Remarks" textAlignment="JUSTIFY" GridPane.rowIndex="5">
+                                             <graphic>
+                                                <Text fill="RED" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="Text2" text="*">
+                                                   <font>
+                                                      <Font name="Rockwell" size="14.0" />
+                                                   </font>
+                                                </Text>
+                                             </graphic>
+                                             <GridPane.margin>
+                                                <Insets right="10.0" />
+                                             </GridPane.margin>
+                                          </Label>
+                                          <TextArea fx:id="txtArea01" prefHeight="30.0" prefWidth="526.0" GridPane.columnIndex="1" GridPane.columnSpan="5" GridPane.rowIndex="5" GridPane.rowSpan="2" />
+                                          <Label fx:id="lblStatus" alignment="CENTER" contentDisplay="CENTER" prefHeight="27.0" prefWidth="142.0" style="-fx-background-color: FF8201;" text="STATUS" textAlignment="CENTER" GridPane.columnIndex="5">
+                                             <font>
+                                                <Font name="System Bold" size="14.0" />
+                                             </font>
                                           </Label>
                                        </children>
                                     </GridPane>
