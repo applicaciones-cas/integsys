@@ -32,7 +32,6 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import org.guanzon.appdriver.base.GRiderCAS;
 import org.guanzon.appdriver.base.GuanzonException;
-import org.guanzon.appdriver.base.MiscUtil;
 import org.guanzon.cas.client.services.ClientControllers;
 import org.json.simple.parser.ParseException;
 import ph.com.guanzongroup.cas.cashflow.services.CashflowControllers;
@@ -215,7 +214,8 @@ public class AccountChartController implements Initializable, ScreenInterface {
                                 break;
                             }
                             ShowMessageFX.Information((String) poJSON.get("message"), "Computerized Accounting System", pxeModuleName);
-                            pnEditMode = oParameters.AccountChart().getEditMode();
+                            initializeObject();
+                            pnEditMode = EditMode.READY;
                             clearAllFields();
                             initButton(pnEditMode);
                         }
@@ -225,10 +225,12 @@ public class AccountChartController implements Initializable, ScreenInterface {
                             poJSON = oParameters.AccountChart().ConfirmRecord("");
                             if ("error".equals(poJSON.get("result"))) {
                                 ShowMessageFX.Error((String) poJSON.get("message"), "Computerized Accounting System", pxeModuleName);
+                                clearAllFields();
                                 break;
                             }
                             ShowMessageFX.Information((String) poJSON.get("message"), "Computerized Accounting System", pxeModuleName);
-                            pnEditMode = oParameters.AccountChart().getEditMode();
+                            initializeObject();
+                            pnEditMode = EditMode.READY;
                             clearAllFields();
                             initButton(pnEditMode);
                         }
@@ -242,7 +244,8 @@ public class AccountChartController implements Initializable, ScreenInterface {
                                 break;
                             }
                             ShowMessageFX.Information((String) poJSON.get("message"), pxeModuleName, null);
-                            pnEditMode = oParameters.AccountChart().getEditMode();
+                            initializeObject();
+                            pnEditMode = EditMode.READY;
                             clearAllFields();
                             initButton(pnEditMode);
                         }
@@ -274,12 +277,14 @@ public class AccountChartController implements Initializable, ScreenInterface {
         txtField03.clear();
         txtField04.clear();
         txtField05.clear();
+        txtArea01.clear();
 
         cmbField01.getSelectionModel().clearSelection();
         cmbField02.getSelectionModel().clearSelection();
         cmbField03.getSelectionModel().clearSelection();
         cbField01.setSelected(false);
         txtSeeks01.clear();
+        lblStatus.setText("UNKNOWN");
     }
 
     private void initButton(int fnValue) {
@@ -386,7 +391,7 @@ public class AccountChartController implements Initializable, ScreenInterface {
         if (!nv) {
             try {
                 switch (lnIndex) {
-                    case 1:
+                    case 01:
                         oParameters.AccountChart().getModel().setRemarks(lsValue);
                         break;
                     default:
@@ -459,12 +464,20 @@ public class AccountChartController implements Initializable, ScreenInterface {
                             txtField03.setText(oParameters.AccountChart().getModel().Industry().getDescription());
                             break;
                         case 04:
-                            poJSON = oParameters.AccountChart().searchRecordByIndustry(lsValue, false);
+                            poJSON = oParameters.AccountChart().searchParent(lsValue, false);
                             if ("error".equalsIgnoreCase(poJSON.get("result").toString())) {
                                 ShowMessageFX.Information((String) poJSON.get("message"),  pxeModuleName,null);
                                 return;
                             }
-                            txtField04.setText(oParameters.AccountChart().getModel().ParentAccountChart().getDescription());
+                            txtField04.setText(oParameters.AccountChart().getModel().getParentAccountCode());
+                            break;
+                        case 05:
+                            poJSON = oParameters.AccountChart().searchGLCode(lsValue, false);
+                            if ("error".equalsIgnoreCase(poJSON.get("result").toString())) {
+                                ShowMessageFX.Information((String) poJSON.get("message"),  pxeModuleName,null);
+                                return;
+                            }
+                            txtField05.setText(oParameters.AccountChart().getModel().General_Ledger().getDescription());
                             break;
 
                     }
@@ -495,7 +508,7 @@ public class AccountChartController implements Initializable, ScreenInterface {
                 case F3:
                     switch (lnIndex) {
                         case 01:
-                            poJson = oParameters.AccountChart().searchRecordByIndustry(lsValue, false);
+                            poJson = oParameters.AccountChart().searchRecord(lsValue, false);
                             if ("error".equals((String) poJson.get("result"))) {
                                 ShowMessageFX.Information((String) poJson.get("message"), "Computerized Acounting System", pxeModuleName);
                                 txtSeeks01.clear();
@@ -531,9 +544,10 @@ public class AccountChartController implements Initializable, ScreenInterface {
             txtField01.setText(oParameters.AccountChart().getModel().getAccountCode());
             txtField02.setText(oParameters.AccountChart().getModel().getDescription());
             txtField03.setText(oParameters.AccountChart().getModel().Industry().getDescription());
-            txtField04.setText(oParameters.AccountChart().getModel().ParentAccountChart().getDescription());
-            txtField05.setText(oParameters.AccountChart().getModel().General_Ledger().getDescription());
-
+            txtField04.setText(oParameters.AccountChart().getModel().getParentAccountCode() == null ? ""
+                            : oParameters.AccountChart().getModel().getParentAccountCode());
+            txtField05.setText(oParameters.AccountChart().getModel().General_Ledger().getGLCode());
+            txtArea01.setText(oParameters.AccountChart().getModel().getRemarks());
             if (oParameters.AccountChart().getModel().getAccountType() != null && !oParameters.AccountChart().getModel().getAccountType().isEmpty()) {
                 String acctType = oParameters.AccountChart().getModel().getAccountType();
 

@@ -80,7 +80,8 @@ public class ProjectController implements Initializable, ScreenInterface {
             btnVoid,
             btnCancel,
             btnCancelRecord,
-            btnClose;
+            btnClose,
+            btnHistory;
 
     @FXML
     private FontAwesomeIconView faActivate;
@@ -186,6 +187,7 @@ public class ProjectController implements Initializable, ScreenInterface {
         btnCancelRecord.setOnAction(this::handleButtonAction);
         btnConfirm.setOnAction(this::handleButtonAction);
         btnVoid.setOnAction(this::handleButtonAction);
+        btnHistory.setOnAction(this::handleButtonAction);
     }
 
     /**
@@ -270,7 +272,8 @@ public class ProjectController implements Initializable, ScreenInterface {
                                 break;
                             }
                             ShowMessageFX.Information((String) poJSON.get("message"), "Computerized Accounting System", pxeModuleName);
-                            pnEditMode = oParameters.Project().getEditMode();
+                            initializeObject();
+                            pnEditMode = EditMode.READY;
                             clearAllFields();
                             initButton(pnEditMode);
                         }
@@ -283,7 +286,8 @@ public class ProjectController implements Initializable, ScreenInterface {
                                 break;
                             }
                             ShowMessageFX.Information((String) poJSON.get("message"), "Computerized Accounting System", pxeModuleName);
-                            pnEditMode = oParameters.Project().getEditMode();
+                            initializeObject();
+                            pnEditMode = EditMode.READY;
                             clearAllFields();
                             initButton(pnEditMode);
                         }
@@ -296,15 +300,26 @@ public class ProjectController implements Initializable, ScreenInterface {
                                 return;
                             }
                             ShowMessageFX.Information((String) poJSON.get("message"), "Computerized Accounting System", pxeModuleName);
-                            pnEditMode = oParameters.Project().getEditMode();
+                            initializeObject();
+                            pnEditMode = EditMode.READY;
                             clearAllFields();
                             initButton(pnEditMode);
                         }
                         break;
+                     case "btnHistory":
+                        if (oParameters.Project().getModel().getProjectID()== null) {
+                            ShowMessageFX.Error("Unable to proceed. No record is currently loaded.", pxeModuleName, null);
+                            return;
+                        }
+                            oParameters.Project().ShowStatusHistory();
+                        break;
                 }
             } catch (SQLException | GuanzonException | CloneNotSupportedException | ParseException ex) {
                 Logger.getLogger(ProjectController.class.getName()).log(Level.SEVERE, null, ex);
-
+                ShowMessageFX.Error(ex.getMessage(), pxeModuleName, null);
+            } catch (Exception ex) {
+                Logger.getLogger(ProjectController.class.getName()).log(Level.SEVERE, null, ex);
+                ShowMessageFX.Error(ex.getMessage(), pxeModuleName, null);
             }
         }
     }
@@ -330,9 +345,9 @@ public class ProjectController implements Initializable, ScreenInterface {
         try {
             // First, hide and unmanage all buttons
             CustomCommonUtil.setVisible(false, btnSave, btnUpdate, btnVoid, btnCancelRecord, btnCancel, btnConfirm,
-                    btnBrowse, btnNew, btnClose);
+                    btnBrowse, btnNew, btnClose,btnHistory);
             CustomCommonUtil.setManaged(false, btnSave, btnUpdate, btnVoid, btnCancelRecord, btnCancel, btnConfirm,
-                    btnBrowse, btnNew, btnClose);
+                    btnBrowse, btnNew, btnClose,btnHistory);
             txtSeeks01.setDisable(false);
             AnchorInputs.setDisable(true);
 
@@ -363,6 +378,8 @@ public class ProjectController implements Initializable, ScreenInterface {
                         // Project exists, show buttons based on status
                         String status = oParameters.Project().getModel().getRecordStatus();
 
+                        CustomCommonUtil.setVisible(true, btnHistory);
+                        CustomCommonUtil.setManaged(true, btnHistory);
                         switch (status) {
                             case "0": // OPEN
                                 CustomCommonUtil.setVisible(true, btnBrowse, btnNew, btnUpdate, btnConfirm, btnVoid, btnClose);
