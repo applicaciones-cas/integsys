@@ -512,11 +512,10 @@ public class CashDisbursement_HistoryController implements Initializable, Screen
                                 }
                                 if (poController.Master().getSourceNo() != null && !"".equals(poController.Master().getSourceNo())) {
                                     lsParticular = poController.Detail(lnCtr).CashAdvanceDetail(poController.Master().getSourceNo()).getParticular();
-                                    lsOrNo = poController.Detail(lnCtr).CashAdvanceDetail(poController.Master().getSourceNo()).getORNo();
                                 } else {
                                     lsParticular = poController.Detail(lnCtr).Particular().getDescription();
-                                    lsOrNo = "";
                                 }
+                                lsOrNo = poController.Detail(lnCtr).getReferNo();
 
                                 lnRowCount += 1;
                                 details_data.add(
@@ -1139,17 +1138,16 @@ public class CashDisbursement_HistoryController implements Initializable, Screen
             String lsParticular = "", lsOrNo = "";
             if (poController.Master().getSourceNo() != null && !"".equals(poController.Master().getSourceNo())) {
                 lsParticular = poController.Detail(pnDetail).CashAdvanceDetail(poController.Master().getSourceNo()).getParticular();
-                lsOrNo = poController.Detail(pnDetail).CashAdvanceDetail(poController.Master().getSourceNo()).getORNo();
             } else {
                 lsParticular = poController.Detail(pnDetail).Particular().getDescription();
-                lsOrNo = "";
             }
+
             //add condition here
             tfCashAdvParticular.setText(lsParticular);
 
             tfParticularDetail.setText(poController.Detail(pnDetail).Particular().getDescription());
 
-            tfORNoDetail.setText(lsParticular);
+            tfORNoDetail.setText(poController.Detail(pnDetail).getReferNo());
             tfVatableSalesDetail.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(pnDetail).getDetailVatSales(), true));
             tfVatExemptDetail.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(pnDetail).getDetailVatExempt(), true));
             tfVatZeroRatedSalesDetail.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(pnDetail).getDetailZeroVat(), true));

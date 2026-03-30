@@ -684,18 +684,12 @@ public class CashDisbursement_ApprovalController implements Initializable, Scree
                             int lnRowCount = 0;
                             String lsParticular = "", lsOrNo = "";
                             for (int lnCtr = 0; lnCtr < poController.getDetailCount(); lnCtr++) {
-//                                if (poController.Detail(lnCtr).getSourceNo() != null && !"".equals(poController.Detail(lnCtr).getSourceNo())) {
-//                                    if (poController.Detail(lnCtr).getAmountApplied() == 0.0000 && poController.Detail(lnCtr).getEditMode() != EditMode.ADDNEW) {
-//                                        continue;
-//                                    }
-//                                }
                                 if (poController.Master().getSourceNo() != null && !"".equals(poController.Master().getSourceNo())) {
                                     lsParticular = poController.Detail(lnCtr).CashAdvanceDetail(poController.Master().getSourceNo()).getParticular();
-                                    lsOrNo = poController.Detail(lnCtr).CashAdvanceDetail(poController.Master().getSourceNo()).getORNo();
                                 } else {
                                     lsParticular = poController.Detail(lnCtr).Particular().getDescription();
-                                    lsOrNo = "";
                                 }
+                                lsOrNo = poController.Detail(lnCtr).getReferNo();
 
                                 lnRowCount += 1;
                                 details_data.add(
@@ -1807,14 +1801,12 @@ public class CashDisbursement_ApprovalController implements Initializable, Scree
             String lsParticular = "", lsOrNo = "";
             if (poController.Master().getSourceNo() != null && !"".equals(poController.Master().getSourceNo())) {
                 lsParticular = poController.Detail(pnDetail).CashAdvanceDetail(poController.Master().getSourceNo()).getParticular();
-//                  lsOrNo = poController.Detail(pnDetail).CashAdvanceDetail(poController.Master().getSourceNo()).getORNo();
             } else {
                 lsParticular = poController.Detail(pnDetail).Particular().getDescription();
-                lsOrNo = "";
             }
-
-            boolean lbShow = JFXUtil.isObjectEqualTo(poController.Master().getSourceNo(), null, "") || JFXUtil.isObjectEqualTo(lsOrNo, null, "");
-            JFXUtil.setDisabled(lbShow, tfVatExemptDetail, tfORNoDetail);
+            boolean lbShow = !JFXUtil.isObjectEqualTo(poController.Detail(pnDetail).getReferNo(), null, "")
+                    && poController.Detail(pnDetail).getAmount() > 0.0000;
+            JFXUtil.setDisabled(!lbShow, tfVatExemptDetail);
 
             boolean lbShow2 = poController.Detail(pnDetail).getEditMode() == EditMode.ADDNEW && (JFXUtil.isObjectEqualTo(pnEditMode, EditMode.ADDNEW, EditMode.UPDATE));
             JFXUtil.setDisabled(!lbShow2, tfParticularDetail);
