@@ -1894,6 +1894,7 @@ public class CashDisbursement_EntryController implements Initializable, ScreenIn
             return;
         }
         JFXUtil.requestFocusNullField(new Object[][]{ // alternative to if , else if
+            {poController.Detail(pnDetail).getReferNo(), tfORNoDetail},
             {poController.Detail(pnDetail).getParticularId(), tfParticularDetail},
             {poController.Detail(pnDetail).getAmount(), tfAmountDetail},}, tfAmountDetail); // default
     }
