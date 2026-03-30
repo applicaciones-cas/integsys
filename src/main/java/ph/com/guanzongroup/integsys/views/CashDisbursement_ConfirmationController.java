@@ -1217,7 +1217,7 @@ public class CashDisbursement_ConfirmationController implements Initializable, S
         JFXUtil.setKeyPressedListener(this::txtField_KeyPressed, apDVMaster1, apDVMaster2, apDVDetail, apBrowse, apJournalMaster, apJournalDetails, apBIRDetail);
         JFXUtil.adjustColumnForScrollbar(tblVwDetails, tblViewMainList, tblVwJournalDetails, tblVwBIRDetails, tblAttachments);
 
-        JFXUtil.setCommaFormatter(tfDebitAmount, tfCreditAmount, tfBaseAmount);
+        JFXUtil.setCommaFormatter(tfDebitAmount, tfCreditAmount, tfBaseAmount, tfAmountDetail);
         JFXUtil.setCommaFormatter2(tfVatExemptDetail);
         Platform.runLater(() -> {
             JFXUtil.setVerticalScroll(taDVRemarks);
