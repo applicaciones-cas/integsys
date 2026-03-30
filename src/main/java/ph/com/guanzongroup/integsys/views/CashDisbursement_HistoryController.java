@@ -493,7 +493,6 @@ public class CashDisbursement_HistoryController implements Initializable, Screen
                 () -> {
                     Platform.runLater(() -> {
                         try {
-                            pbEnteredDV = false;
                             details_data.clear();
 
                             if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
@@ -564,7 +563,6 @@ public class CashDisbursement_HistoryController implements Initializable, Screen
                 journal_data,
                 () -> {
                     Platform.runLater(() -> {
-                        pbEnteredJE = false;
                         journal_data.clear();
                         try {
                             if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
@@ -635,7 +633,6 @@ public class CashDisbursement_HistoryController implements Initializable, Screen
                 BIR_data,
                 () -> {
                     Platform.runLater(() -> {
-                        pbEnteredBIR = false;
                         BIR_data.clear();
                         try {
                             if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {

@@ -670,7 +670,6 @@ public class CashDisbursement_ApprovalController implements Initializable, Scree
                 () -> {
                     Platform.runLater(() -> {
                         try {
-                            pbEnteredDV = false;
                             details_data.clear();
 
                             if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
@@ -738,7 +737,6 @@ public class CashDisbursement_ApprovalController implements Initializable, Scree
                 journal_data,
                 () -> {
                     Platform.runLater(() -> {
-                        pbEnteredJE = false;
                         journal_data.clear();
                         try {
                             if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
@@ -809,7 +807,6 @@ public class CashDisbursement_ApprovalController implements Initializable, Scree
                 BIR_data,
                 () -> {
                     Platform.runLater(() -> {
-                        pbEnteredBIR = false;
                         BIR_data.clear();
                         try {
                             if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {

@@ -780,7 +780,6 @@ public class CashDisbursement_ConfirmationController implements Initializable, S
                 () -> {
                     Platform.runLater(() -> {
                         try {
-                            pbEnteredDV = false;
                             details_data.clear();
 
                             if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
@@ -848,7 +847,6 @@ public class CashDisbursement_ConfirmationController implements Initializable, S
                 journal_data,
                 () -> {
                     Platform.runLater(() -> {
-                        pbEnteredJE = false;
                         journal_data.clear();
                         try {
                             if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
@@ -919,7 +917,6 @@ public class CashDisbursement_ConfirmationController implements Initializable, S
                 BIR_data,
                 () -> {
                     Platform.runLater(() -> {
-                        pbEnteredBIR = false;
                         BIR_data.clear();
                         try {
                             if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
@@ -1458,10 +1455,12 @@ public class CashDisbursement_ConfirmationController implements Initializable, S
                         if (!JFXUtil.isJSONSuccess(poJSON)) {
                             ShowMessageFX.Warning(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
                         }
-                        if (pbEnteredDV) {
-                            moveNext(false, true);
-                            pbEnteredDV = false;
-                        }
+                        JFXUtil.runWithDelay(0.60, () -> {
+                            if (pbEnteredDV) {
+                                moveNext(false, true);
+                                pbEnteredDV = false;
+                            }
+                        });
                         break;
                 }
                 JFXUtil.runWithDelay(0.50, () -> {
