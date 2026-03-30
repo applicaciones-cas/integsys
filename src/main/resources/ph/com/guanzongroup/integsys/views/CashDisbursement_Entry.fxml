@@ -394,7 +394,7 @@
                                                                            </font>
                                                                         </TextField>
                                                                         <Label text="Cash Adv. Particular" GridPane.rowIndex="3" />
-                                                                        <TextField fx:id="tfCashAdvParticular" disable="true" editable="false" maxWidth="-Infinity" prefWidth="250.0" GridPane.columnIndex="2" GridPane.rowIndex="3" />
+                                                                        <TextField fx:id="tfCashAdvParticular" disable="true" editable="false" maxWidth="-Infinity" prefWidth="250.0" styleClass="DisabledTextField" GridPane.columnIndex="2" GridPane.rowIndex="3" />
                                                                                             </children>
                                                                   </GridPane>
                                                                </children>

@@ -423,7 +423,7 @@
                                                                            </font>
                                                                         </TextField>
                                                                         <Label text="Particular" GridPane.rowIndex="4" />
-                                                                        <TextField fx:id="tfCashAdvParticular" disable="true" editable="false" maxWidth="-Infinity" prefWidth="251.0" GridPane.columnIndex="2" GridPane.rowIndex="3" />
+                                                                        <TextField fx:id="tfCashAdvParticular" disable="true" editable="false" maxWidth="-Infinity" prefWidth="251.0" styleClass="DisabledTextField" GridPane.columnIndex="2" GridPane.rowIndex="3" />
                                                                                             </children>
                                                                   </GridPane>
                                                                </children>
