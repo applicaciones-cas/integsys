@@ -150,7 +150,7 @@ import org.guanzon.appdriver.base.SQLUtil;
 import static ph.com.guanzongroup.integsys.GUI.oApp;
 
 /**
- * Date : 4/28/2025 Recent update: 03/17/2026
+ * Date : 4/28/2025 Recent update: 03/30/2026
  *
  * @author Aldrich
  */
@@ -1741,8 +1741,6 @@ public class JFXUtil {
             }
         }
     }
-    
-
 
     /*Alternative version of inputDecimalOnly; restricts to 1 dot */
     public static void inputDecimalOnly(TextField... foTxtFields) {
@@ -3248,7 +3246,7 @@ public class JFXUtil {
         return true;
     }
 
-    public static boolean loadValidation2(int pnEditMode, String pxeModuleName, String lsCurrentTransNo, String lsTransactionNo) {
+    public static boolean loadValidation2(int pnEditMode, String pxeModuleName, String lsCurrentTransNo, String lsTransactionNo, double lnTotal) {
         if (pnEditMode == EditMode.UPDATE || pnEditMode == EditMode.ADDNEW) {
             String lsTrans = pnEditMode == EditMode.UPDATE ? "update mode." : "edit mode.";
             if (lsCurrentTransNo.equals(lsTransactionNo)) {
@@ -3261,6 +3259,21 @@ public class JFXUtil {
                     if (!ShowMessageFX.YesNo(null, pxeModuleName, "Transaction is currently in " + lsTrans + "\n"
                             + "Are you sure you want to select another transaction?")) {
                         return false;
+                    }
+                } else {
+                    //if has No SourceNo
+                    if (lnTotal > 0) {
+                        if (pnEditMode == EditMode.UPDATE) {
+                            if (!ShowMessageFX.YesNo(null, pxeModuleName, "Transaction is currently in " + lsTrans + "\n"
+                                    + "Are you sure you want to select another transaction?")) {
+                                return false;
+                            }
+                        } else {
+                            if (!ShowMessageFX.YesNo(null, pxeModuleName, "Transaction details are not empty.\n"
+                                    + "Proceeding will replace all existing details. Would you like to proceed?")) {
+                                return false;
+                            }
+                        }
                     }
                 }
             }
@@ -3518,5 +3531,5 @@ public class JFXUtil {
         radialTimeline.setCycleCount(Timeline.INDEFINITE);
         radialTimeline.playFromStart();
     }
-
+    public String[] buttonPackArray = {"btnSave", "btnCancel", "btnApprove", "btnDisapprove", "btnVoid"};
 }
