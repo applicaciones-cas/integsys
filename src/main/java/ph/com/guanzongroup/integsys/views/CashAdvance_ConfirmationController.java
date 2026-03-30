@@ -114,7 +114,7 @@ public class CashAdvance_ConfirmationController implements Initializable, Screen
             pnEditMode = EditMode.UNKNOWN;
             initButton(pnEditMode);
             Platform.runLater(() -> {
-                poController.setTransactionStatus(CashAdvanceStatus.OPEN);
+                poController.setTransactionStatus(CashAdvanceStatus.OPEN+CashAdvanceStatus.CONFIRMED);
                 poController.Master().setIndustryId(psIndustryId);
                 poController.Master().setCompanyId(psCompanyId);
                 poController.setIndustryId(psIndustryId);
