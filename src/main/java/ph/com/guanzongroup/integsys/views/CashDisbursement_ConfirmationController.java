@@ -1221,6 +1221,23 @@ public class CashDisbursement_ConfirmationController implements Initializable, S
             JFXUtil.setVerticalScroll(taDVRemarks);
             JFXUtil.setVerticalScroll(taJournalRemarks);
         });
+
+        JFXUtil.handleDisabledNodeClick(apDVDetail, pnEditMode, nodeID -> {
+            switch (nodeID) {
+                case "cbReverse":
+                    ShowMessageFX.Warning(null, pxeModuleName,
+                            "Reverse is disabled for transactions linked to a cash advance.");
+                    break;
+                case "tfVatExemptDetail":
+                    ShowMessageFX.Warning(null, pxeModuleName,
+                            "VAT Exempt requires a Receipt No and an amount greater than 0.00 to be editable.");
+                    break;
+                case "tfAmountDetail":
+                    ShowMessageFX.Warning(null, pxeModuleName,
+                            "Amount is editable only in manual entry of details.");
+                    break;
+            }
+        });
     }
     ChangeListener<Boolean> txtSearch_Focus = JFXUtil.FocusListener(TextField.class,
             (lsID, lsValue) -> {
