@@ -1603,7 +1603,7 @@ public class CashDisbursement_ConfirmationController implements Initializable, S
                     case TAB:
                     case ENTER:
                         if (isSourceNoAvailable()) {
-                            if (tfVatExemptSales.isFocused()) {
+                            if (tfVatExemptDetail.isFocused()) {
                                 pbEnteredDV = true;
                             }
                         } else {
@@ -1787,7 +1787,7 @@ public class CashDisbursement_ConfirmationController implements Initializable, S
                                     ShowMessageFX.Warning(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
                                 } else {
                                     if (isSourceNoAvailable()) {
-                                        JFXUtil.textFieldMoveNext(tfVatExemptSales);
+                                        JFXUtil.textFieldMoveNext(tfVatExemptDetail);
                                     } else {
                                         JFXUtil.textFieldMoveNext(tfAmountDetail);
                                     }
@@ -1911,7 +1911,7 @@ public class CashDisbursement_ConfirmationController implements Initializable, S
         if (isSourceNoAvailable()) {
             JFXUtil.requestFocusNullField(new Object[][]{ // alternative to if , else if
                 {poController.Detail(pnDetail).getParticularId(), tfParticularDetail},
-                {poController.Detail(pnDetail).getDetailVatExempt(), tfVatExemptSales},}, tfVatExemptSales); // default
+                {poController.Detail(pnDetail).getDetailVatExempt(), tfVatExemptDetail},}, tfVatExemptDetail); // default
         } else {
             JFXUtil.requestFocusNullField(new Object[][]{ // alternative to if , else if
                 {poController.Detail(pnDetail).getReferNo(), tfORNoDetail},

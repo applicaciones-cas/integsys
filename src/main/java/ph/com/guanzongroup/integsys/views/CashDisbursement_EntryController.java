@@ -702,8 +702,8 @@ public class CashDisbursement_EntryController implements Initializable, ScreenIn
                     int pnRowMain = Integer.parseInt(selected.getIndex01()) - 1;
                     String lsTransactionNo = selected.getIndex02();
                     stageAttachment.closeDialog();
-
-                    if (!JFXUtil.loadValidation2(pnEditMode, pxeModuleName, poController.Master().getSourceNo(), lsTransactionNo)) {
+                 
+                    if (!JFXUtil.loadValidation2(pnEditMode, pxeModuleName, poController.Master().getSourceNo(), lsTransactionNo, poController.Master().getTransactionTotal())) {
                         return;
                     }
                     pnMain = pnRowMain;
@@ -1614,7 +1614,7 @@ public class CashDisbursement_EntryController implements Initializable, ScreenIn
                     case TAB:
                     case ENTER:
                         if (isSourceNoAvailable()) {
-                            if (tfVatExemptSales.isFocused()) {
+                            if (tfVatExemptDetail.isFocused()) {
                                 pbEnteredDV = true;
                             }
                         } else {
@@ -1794,7 +1794,7 @@ public class CashDisbursement_EntryController implements Initializable, ScreenIn
                                     ShowMessageFX.Warning(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
                                 } else {
                                     if (isSourceNoAvailable()) {
-                                        JFXUtil.textFieldMoveNext(tfVatExemptSales);
+                                        JFXUtil.textFieldMoveNext(tfVatExemptDetail);
                                     } else {
                                         JFXUtil.textFieldMoveNext(tfAmountDetail);
                                     }
@@ -1919,7 +1919,7 @@ public class CashDisbursement_EntryController implements Initializable, ScreenIn
         if (isSourceNoAvailable()) {
             JFXUtil.requestFocusNullField(new Object[][]{ // alternative to if , else if
                 {poController.Detail(pnDetail).getParticularId(), tfParticularDetail},
-                {poController.Detail(pnDetail).getDetailVatExempt(), tfVatExemptSales},}, tfVatExemptSales); // default
+                {poController.Detail(pnDetail).getDetailVatExempt(), tfVatExemptDetail},}, tfVatExemptDetail); // default
         } else {
             JFXUtil.requestFocusNullField(new Object[][]{ // alternative to if , else if
                 {poController.Detail(pnDetail).getReferNo(), tfORNoDetail},
