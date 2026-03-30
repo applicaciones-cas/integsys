@@ -1988,7 +1988,7 @@ public class CashDisbursement_EntryController implements Initializable, ScreenIn
             boolean lbShow2 = pnEditMode == EditMode.UPDATE;
             JFXUtil.setDisabled(lbShow2, tfPayee);
             boolean lbShow3 = pnEditMode == EditMode.ADDNEW;
-            JFXUtil.setDisabled(!lbShow3, tfBranch, tfDepartment, tfCashFund);
+            JFXUtil.setDisabled(!lbShow3, tfDepartment, tfCashFund);
 
             boolean lbShow = !JFXUtil.isObjectEqualTo(poController.Master().getSourceNo(), null, "");
             JFXUtil.setDisabled(lbShow, cbReverse);
