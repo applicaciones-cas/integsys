@@ -1167,7 +1167,7 @@ public class CashDisbursement_ApprovalController implements Initializable, Scree
                                 if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
 
                                     if (!JFXUtil.isObjectEqualTo(poController.Master().getBranchCode(), null, "")) {
-                                        boolean lbproceed = !JFXUtil.isObjectEqualTo(poController.Detail(0).CashAdvanceDetail(poController.Master().getSourceNo()).getORNo(), null, "")
+                                        boolean lbproceed = !JFXUtil.isObjectEqualTo(poController.Detail(0).getReferNo(), null, "")
                                         || !JFXUtil.isObjectEqualTo(poController.Detail(0).CashAdvanceDetail(poController.Master().getSourceNo()).getParticular(), null, "")
                                         || !JFXUtil.isObjectEqualTo(poController.Detail(0).Particular().getDescription(), null, "");
 
@@ -1197,7 +1197,7 @@ public class CashDisbursement_ApprovalController implements Initializable, Scree
                             if (lsValue.isEmpty()) {
                                 if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
                                     if (!JFXUtil.isObjectEqualTo(poController.Master().getCashFundId(), null, "")) {
-                                        boolean lbproceed = !JFXUtil.isObjectEqualTo(poController.Detail(0).CashAdvanceDetail(poController.Master().getSourceNo()).getORNo(), null, "")
+                                        boolean lbproceed = !JFXUtil.isObjectEqualTo(poController.Detail(0).getReferNo(), null, "")
                                         || !JFXUtil.isObjectEqualTo(poController.Detail(0).CashAdvanceDetail(poController.Master().getSourceNo()).getParticular(), null, "")
                                         || !JFXUtil.isObjectEqualTo(poController.Detail(0).Particular().getDescription(), null, "");
 
@@ -1227,7 +1227,7 @@ public class CashDisbursement_ApprovalController implements Initializable, Scree
                             if (lsValue.isEmpty()) {
                                 if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
                                     if (!JFXUtil.isObjectEqualTo(poController.Master().getPayeeName(), null, "")) {
-                                        boolean lbproceed = !JFXUtil.isObjectEqualTo(poController.Detail(0).CashAdvanceDetail(poController.Master().getSourceNo()).getORNo(), null, "")
+                                        boolean lbproceed = !JFXUtil.isObjectEqualTo(poController.Detail(0).getReferNo(), null, "")
                                         || !JFXUtil.isObjectEqualTo(poController.Detail(0).CashAdvanceDetail(poController.Master().getSourceNo()).getParticular(), null, "")
                                         || !JFXUtil.isObjectEqualTo(poController.Detail(0).Particular().getDescription(), null, "");
 
@@ -1257,7 +1257,7 @@ public class CashDisbursement_ApprovalController implements Initializable, Scree
                             if (lsValue.isEmpty()) {
                                 if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
                                     if (!JFXUtil.isObjectEqualTo(poController.Master().getPayeeName(), null, "")) {
-                                        boolean lbproceed = !JFXUtil.isObjectEqualTo(poController.Detail(0).CashAdvanceDetail(poController.Master().getSourceNo()).getORNo(), null, "")
+                                        boolean lbproceed = !JFXUtil.isObjectEqualTo(poController.Detail(0).getReferNo(), null, "")
                                         || !JFXUtil.isObjectEqualTo(poController.Detail(0).CashAdvanceDetail(poController.Master().getSourceNo()).getParticular(), null, "")
                                         || !JFXUtil.isObjectEqualTo(poController.Detail(0).Particular().getDescription(), null, "");
 
@@ -1515,7 +1515,7 @@ public class CashDisbursement_ApprovalController implements Initializable, Scree
 
                             case "tfBranch":
                                 if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
-                                    boolean lbproceed = !JFXUtil.isObjectEqualTo(poController.Detail(0).CashAdvanceDetail(poController.Master().getSourceNo()).getORNo(), null, "")
+                                    boolean lbproceed = !JFXUtil.isObjectEqualTo(poController.Detail(0).getReferNo(), null, "")
                                             || !JFXUtil.isObjectEqualTo(poController.Detail(0).CashAdvanceDetail(poController.Master().getSourceNo()).getParticular(), null, "")
                                             || !JFXUtil.isObjectEqualTo(poController.Detail(0).Particular().getDescription(), null, "");
                                     if (poController.getDetailCount() >= 1 && lbproceed) {
@@ -1548,7 +1548,7 @@ public class CashDisbursement_ApprovalController implements Initializable, Scree
                                 break;
                             case "tfDepartment":
                                 if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
-                                    boolean lbproceed = !JFXUtil.isObjectEqualTo(poController.Detail(0).CashAdvanceDetail(poController.Master().getSourceNo()).getORNo(), null, "")
+                                    boolean lbproceed = !JFXUtil.isObjectEqualTo(poController.Detail(0).getReferNo(), null, "")
                                             || !JFXUtil.isObjectEqualTo(poController.Detail(0).CashAdvanceDetail(poController.Master().getSourceNo()).getParticular(), null, "")
                                             || !JFXUtil.isObjectEqualTo(poController.Detail(0).Particular().getDescription(), null, "");
                                     if (poController.getDetailCount() >= 1 && lbproceed) {
@@ -1580,7 +1580,7 @@ public class CashDisbursement_ApprovalController implements Initializable, Scree
                                 break;
                             case "tfCashFund":
                                 if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
-                                    boolean lbproceed = !JFXUtil.isObjectEqualTo(poController.Detail(0).CashAdvanceDetail(poController.Master().getSourceNo()).getORNo(), null, "")
+                                    boolean lbproceed = !JFXUtil.isObjectEqualTo(poController.Detail(0).getReferNo(), null, "")
                                             || !JFXUtil.isObjectEqualTo(poController.Detail(0).CashAdvanceDetail(poController.Master().getSourceNo()).getParticular(), null, "")
                                             || !JFXUtil.isObjectEqualTo(poController.Detail(0).Particular().getDescription(), null, "");
                                     if (poController.getDetailCount() >= 1 && lbproceed) {
@@ -1612,7 +1612,7 @@ public class CashDisbursement_ApprovalController implements Initializable, Scree
                                 break;
                             case "tfPayee":
                                 if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
-                                    boolean lbproceed = !JFXUtil.isObjectEqualTo(poController.Detail(0).CashAdvanceDetail(poController.Master().getSourceNo()).getORNo(), null, "")
+                                    boolean lbproceed = !JFXUtil.isObjectEqualTo(poController.Detail(0).getReferNo(), null, "")
                                             || !JFXUtil.isObjectEqualTo(poController.Detail(0).CashAdvanceDetail(poController.Master().getSourceNo()).getParticular(), null, "")
                                             || !JFXUtil.isObjectEqualTo(poController.Detail(0).Particular().getDescription(), null, "");
 
@@ -1798,8 +1798,8 @@ public class CashDisbursement_ApprovalController implements Initializable, Scree
                 return;
             }
 
-            String lsParticular = "", lsOrNo = "";
-            if (poController.Master().getSourceNo() != null && !"".equals(poController.Master().getSourceNo())) {
+            String lsParticular = "";
+            if (JFXUtil.isObjectEqualTo(poController.Master().getSourceNo(), null, "")) {
                 lsParticular = poController.Detail(pnDetail).CashAdvanceDetail(poController.Master().getSourceNo()).getParticular();
             } else {
                 lsParticular = poController.Detail(pnDetail).Particular().getDescription();

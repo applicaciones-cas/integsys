@@ -1135,8 +1135,8 @@ public class CashDisbursement_HistoryController implements Initializable, Screen
             boolean lbShow = JFXUtil.isObjectEqualTo(poController.Master().getSourceNo(), null, "");
             JFXUtil.setDisabled(lbShow, tfVatExemptDetail);
 
-            String lsParticular = "", lsOrNo = "";
-            if (poController.Master().getSourceNo() != null && !"".equals(poController.Master().getSourceNo())) {
+            String lsParticular = "";
+            if (JFXUtil.isObjectEqualTo(poController.Master().getSourceNo(), null, "")) {
                 lsParticular = poController.Detail(pnDetail).CashAdvanceDetail(poController.Master().getSourceNo()).getParticular();
             } else {
                 lsParticular = poController.Detail(pnDetail).Particular().getDescription();
