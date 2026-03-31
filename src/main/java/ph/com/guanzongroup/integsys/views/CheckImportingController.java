@@ -199,7 +199,7 @@ public class CheckImportingController implements Initializable, ScreenInterface 
                         return;
                     }
                     for (int lnctr = 0; lnctr < main_data.size(); lnctr++) {
-                        String Transaction = poCheckImporting.getCheckTransaction(String.valueOf(main_data.get(lnctr).getIndex02()), "DISb");
+                        String Transaction = poCheckImporting.getCheckTransaction(String.valueOf(main_data.get(lnctr).getIndex11()), "DISb");
                         String CheckNo = String.valueOf(main_data.get(lnctr).getIndex07());
                         String Checkdate = String.valueOf(main_data.get(lnctr).getIndex06());
                         double amt = main_data.get(lnctr).getIndex10() == null
@@ -633,7 +633,8 @@ public class CheckImportingController implements Initializable, ScreenInterface 
                         row.getCheckNo(),
                         row.getCheckDate(),
                             "",
-                        String.valueOf(row.getAmount())
+                        String.valueOf(row.getAmount()),
+                         poCheckImporting.CheckPayments(0).getSourceNo()
                 ));
             }
 
