@@ -733,9 +733,9 @@ public class PurchaseOrder_EntryController implements Initializable, ScreenInter
         if (!nv) {
             /*Lost Focus*/
             switch (lsTextFieldID) {
-                case "tfReferenceNo":
-                    poPurchasingController.PurchaseOrder().Master().setReference(lsValue);
-                    break;
+//                case "tfReferenceNo":
+//                    poPurchasingController.PurchaseOrder().Master().setReference(lsValue);
+//                    break;
                 case "tfDiscountRate":
                     lsValue = JFXUtil.removeComma(lsValue);
                     poJSON = poPurchasingController.PurchaseOrder().setDiscountRate(lsValue);
@@ -839,6 +839,16 @@ public class PurchaseOrder_EntryController implements Initializable, ScreenInter
                     case ENTER:
                     case F3:
                         switch (txtFieldID) {
+                            
+                            case "tfReferenceNo":
+                                poJSON = poPurchasingController.PurchaseOrder().SearchProject(lsValue);
+                                if ("error".equals(poJSON.get("result"))) {
+                                    ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
+                                    tfReferenceNo.setText("");
+                                    break;
+                                }
+                                tfReferenceNo.setText(poPurchasingController.PurchaseOrder().Master().getReference());
+                                break;
                             case "tfSupplier":
                                 if (!isExchangingSupplier()) {
                                     return;
@@ -924,6 +934,7 @@ public class PurchaseOrder_EntryController implements Initializable, ScreenInter
                             case "tfCompany":
                             case "tfSupplier":
                             case "tfDestination":
+                            case "tfReferenceNo":
                             case "tfTerm":
                             case "tfAdvancePAmount":
                             case "tfAdvancePRate":
