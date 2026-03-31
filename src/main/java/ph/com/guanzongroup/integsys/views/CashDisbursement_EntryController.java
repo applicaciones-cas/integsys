@@ -89,6 +89,7 @@ import ph.com.guanzongroup.cas.cashflow.status.CashDisbursementStatus;
 import ph.com.guanzongroup.cas.cashflow.status.JournalStatus;
 import ph.com.guanzongroup.integsys.model.ModelBIR_Detail;
 import ph.com.guanzongroup.integsys.model.ModelDeliveryAcceptance_Attachment;
+import static ph.com.guanzongroup.integsys.views.CashLiquidation_EntryController.poController;
 
 /**
  * FXML Controller class
@@ -385,19 +386,21 @@ public class CashDisbursement_EntryController implements Initializable, ScreenIn
                     break;
                 case "Attachments":
                     if (pnEditMode == EditMode.READY || pnEditMode == EditMode.UPDATE || pnEditMode == EditMode.ADDNEW) {
-                        JFXUtil.clearTextFields(apAttachments);
-                        if (DoesContainValidDisbDetail()) {
-                            pbIsCheckedAttachmentTab = true;
-                            try {
-                                poController.loadAttachments();
-                            } catch (GuanzonException | SQLException ex) {
-                                Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
-                                ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
+                        if (poController.Master().getSourceNo() != null && !"".equals(poController.Master().getSourceNo())) {
+                            JFXUtil.clearTextFields(apAttachments);
+                            if (DoesContainValidDisbDetail()) {
+                                pbIsCheckedAttachmentTab = true;
+                                try {
+                                    poController.loadAttachments();
+                                } catch (GuanzonException | SQLException ex) {
+                                    Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+                                    ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
+                                }
+                                loadTableAttachment.reload();
+                            } else {
+                                JFXUtil.clickTabByTitleText(tabPaneMain, "Cash Disbursement");
+                                ShowMessageFX.Warning(null, pxeModuleName, lsValidDisbMessage);
                             }
-                            loadTableAttachment.reload();
-                        } else {
-                            JFXUtil.clickTabByTitleText(tabPaneMain, "Cash Disbursement");
-                            ShowMessageFX.Warning(null, pxeModuleName, lsValidDisbMessage);
                         }
                     }
                     break;
@@ -2514,7 +2517,7 @@ public class CashDisbursement_EntryController implements Initializable, ScreenIn
         }
         boolean lbShow4 = !isSourceNoAvailable() && lbShow;
         JFXUtil.setDisabled(!lbShow4, apAttachmentButtons, cmbAttachmentType);
-        JFXUtil.setButtonsVisibility(lbShow4, btnAddAttachment, btnRemoveAttachment);
+        JFXUtil.setButtonsVisibility(!isSourceNoAvailable(), btnAddAttachment, btnRemoveAttachment);
     }
 
     private void clearTextFields() {
