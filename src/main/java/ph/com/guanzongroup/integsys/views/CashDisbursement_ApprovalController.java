@@ -1759,8 +1759,6 @@ public class CashDisbursement_ApprovalController implements Initializable, Scree
             boolean lbShow2 = pnEditMode == EditMode.UPDATE;
             JFXUtil.setDisabled(true, tfBranch, tfDepartment, tfCashFund, tfPayee, tfCreditTo);
 
-            boolean lbShow = !JFXUtil.isObjectEqualTo(poController.Master().getSourceNo(), null, "");
-            JFXUtil.setDisabled(lbShow, cbReverse);
             JFXUtil.setDisabled(true, tfAmountDetail);
 //            initDVMasterTabs();
             poController.computeFields(false);
