@@ -401,20 +401,11 @@
                                                                               <Font name="System Bold" size="14.0" />
                                                                            </font>
                                                                         </Label>
-                                                                                                <Label text="Less: Adv. Paym." visible="false" GridPane.columnIndex="8" GridPane.rowIndex="5">
-                                                                           <GridPane.margin>
-                                                                              <Insets right="5.0" />
-                                                                           </GridPane.margin>
-                                                                           <padding>
-                                                                              <Insets right="5.0" />
-                                                                           </padding>
-                                                                        </Label>
                                                                                                 <TextField fx:id="tfORNoDetail" maxWidth="-Infinity" prefWidth="150.0" GridPane.columnIndex="2" GridPane.rowIndex="2" />
                                                                                                 <TextField fx:id="tfParticularDetail" disable="true" layoutX="125.0" layoutY="12.0" maxWidth="1.7976931348623157E308" promptText="Press F3: Search" GridPane.columnIndex="2" GridPane.rowIndex="4" />
                                                                                                 <TextField fx:id="tfVatableSalesDetail" alignment="CENTER_RIGHT" disable="true" promptText="0.00" styleClass="DisabledTextField" GridPane.columnIndex="6" GridPane.rowIndex="2" />
                                                                                                 <TextField fx:id="tfVatExemptDetail" alignment="CENTER_RIGHT" promptText="0.00" styleClass="DisabledTextField" GridPane.columnIndex="6" GridPane.rowIndex="3" />
                                                                                                 <TextField fx:id="tfVatZeroRatedSalesDetail" alignment="CENTER_RIGHT" disable="true" promptText="0.00" styleClass="DisabledTextField" GridPane.columnIndex="6" GridPane.rowIndex="4" />
-                                                                                                <TextField fx:id="tfVatRateDetail" alignment="CENTER_RIGHT" disable="true" promptText="0.00" visible="false" GridPane.columnIndex="6" GridPane.rowIndex="4" />
                                                                                                 <TextField fx:id="tfVatAmountDetail" alignment="CENTER_RIGHT" disable="true" promptText="0.00" styleClass="DisabledTextField" GridPane.columnIndex="6" GridPane.rowIndex="5" />
                                                                                                 <CheckBox fx:id="cbReverse" mnemonicParsing="false" onAction="#cmdCheckBox_Click" GridPane.columnIndex="10" GridPane.rowIndex="4" />
                                                                                                 <TextField fx:id="tfAmountDetail" alignment="CENTER_RIGHT" promptText="0.00" style="-fx-font-weight: normal;" GridPane.columnIndex="10" GridPane.rowIndex="5">
