@@ -338,7 +338,7 @@ public class CashDisbursement_ConfirmationController implements Initializable, S
 //        return !JFXUtil.isObjectEqualTo(lsParticular, null, "");
         return true;
     }
-    String lsValidDisbMessage = "Please provide an amount for at least one valid disbursement detail to proceed.";
+    String lsValidDisbMessage = "Please provide at least one valid disbursement detail with amount to proceed.";
 
     public void initTabPane() {
         JFXUtil.onTabSelected(tabPaneMain, tabTitle -> {
