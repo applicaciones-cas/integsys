@@ -983,6 +983,7 @@ public class CashDisbursement_HistoryController implements Initializable, Screen
                                     pnEditMode = poController.getEditMode();
                                     poController.populateJournal();
                                     loadTableDetail.reload();
+                                    initButton(pnEditMode);
                                 }
                                 break;
                         }
