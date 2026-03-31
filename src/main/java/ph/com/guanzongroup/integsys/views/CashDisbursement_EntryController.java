@@ -1695,9 +1695,6 @@ public class CashDisbursement_EntryController implements Initializable, ScreenIn
                                 }
 //                                psSupplierPayeeId = poController.Master().getSupplierClientID();
                                 loadRecordMaster();
-                                JFXUtil.runWithDelay(0.50, () -> {
-                                    loadTableMain.reload();
-                                });
                                 break;
                             case "tfDepartment":
                                 if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
@@ -1727,9 +1724,6 @@ public class CashDisbursement_EntryController implements Initializable, ScreenIn
                                     JFXUtil.textFieldMoveNext(tfCashFund);
                                 }
                                 loadRecordMaster();
-                                JFXUtil.runWithDelay(0.50, () -> {
-                                    loadTableMain.reload();
-                                });
                                 break;
                             case "tfCashFund":
                                 if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
@@ -1759,9 +1753,6 @@ public class CashDisbursement_EntryController implements Initializable, ScreenIn
                                     JFXUtil.textFieldMoveNext(tfPayee);
                                 }
                                 loadRecordMaster();
-                                JFXUtil.runWithDelay(0.50, () -> {
-                                    loadTableMain.reload();
-                                });
                                 break;
                             case "tfPayee":
                                 if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
@@ -1792,9 +1783,6 @@ public class CashDisbursement_EntryController implements Initializable, ScreenIn
                                     JFXUtil.textFieldMoveNext(tfCreditTo);
                                 }
                                 loadRecordMaster();
-                                JFXUtil.runWithDelay(0.50, () -> {
-                                    loadTableMain.reload();
-                                });
                                 break;
                             case "tfCreditTo":
                                 poJSON = poController.SearchCreditTo(lsValue, false);
