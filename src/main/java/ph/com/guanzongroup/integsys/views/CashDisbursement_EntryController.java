@@ -802,7 +802,9 @@ public class CashDisbursement_EntryController implements Initializable, ScreenIn
                             int lnRowCount = 0;
                             String lsParticular = "", lsOrNo = "";
                             for (int lnCtr = 0; lnCtr < poController.getDetailCount(); lnCtr++) {
-
+                                if (!poController.Detail(lnCtr).isReverse()) {
+                                    continue;
+                                }
                                 if (poController.Master().getSourceNo() != null && !"".equals(poController.Master().getSourceNo())) {
                                     lsParticular = poController.Detail(lnCtr).CashAdvanceDetail(poController.Master().getSourceNo()).getParticular();
                                 } else {
