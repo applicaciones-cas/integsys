@@ -403,7 +403,7 @@ public class CashDisbursement_ConfirmationController implements Initializable, S
     }
 
     private void initButtonsClickActions() {
-        List<Button> buttons = Arrays.asList(btnConfirm, btnUpdate, btnSearch, btnSave, btnCancel, btnVoid, btnRetrieve, btnHistory, btnClose, btnArrowRight, btnArrowLeft);
+        List<Button> buttons = Arrays.asList(btnRemoveAttachment,btnAddAttachment,btnConfirm, btnUpdate, btnSearch, btnSave, btnCancel, btnVoid, btnRetrieve, btnHistory, btnClose, btnArrowRight, btnArrowLeft);
         buttons.forEach(button -> button.setOnAction(this::cmdButton_Click));
     }
 
