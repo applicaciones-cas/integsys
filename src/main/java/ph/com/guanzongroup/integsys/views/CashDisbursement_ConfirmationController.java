@@ -222,6 +222,7 @@ public class CashDisbursement_ConfirmationController implements Initializable, S
             initAttachmentsGrid();
             initTableOnClick();
             initTabPane();
+            initComboboxes();
             clearTextFields();
             pnEditMode = EditMode.UNKNOWN;
 
@@ -402,8 +403,24 @@ public class CashDisbursement_ConfirmationController implements Initializable, S
 
     }
 
+    public void initComboboxes() {
+        // ComboBox setup
+        cmbAttachmentType.setItems(documentType);
+        cmbAttachmentType.setOnAction(event -> {
+            if (attachment_data.size() > 0) {
+                try {
+                    int selectedIndex = cmbAttachmentType.getSelectionModel().getSelectedIndex();
+                    poController.TransactionAttachmentList(pnAttachment).getModel().setDocumentType("000" + String.valueOf(selectedIndex));
+                    cmbAttachmentType.getSelectionModel().select(selectedIndex);
+                } catch (Exception e) {
+                }
+            }
+        });
+        JFXUtil.initComboBoxCellDesignColor("#FF8201", cmbAttachmentType);
+    }
+
     private void initButtonsClickActions() {
-        List<Button> buttons = Arrays.asList(btnRemoveAttachment,btnAddAttachment,btnConfirm, btnUpdate, btnSearch, btnSave, btnCancel, btnVoid, btnRetrieve, btnHistory, btnClose, btnArrowRight, btnArrowLeft);
+        List<Button> buttons = Arrays.asList(btnRemoveAttachment, btnAddAttachment, btnConfirm, btnUpdate, btnSearch, btnSave, btnCancel, btnVoid, btnRetrieve, btnHistory, btnClose, btnArrowRight, btnArrowLeft);
         buttons.forEach(button -> button.setOnAction(this::cmdButton_Click));
     }
 
