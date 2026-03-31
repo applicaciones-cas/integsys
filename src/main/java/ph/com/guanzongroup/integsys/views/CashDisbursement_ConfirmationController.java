@@ -2523,6 +2523,7 @@ public class CashDisbursement_ConfirmationController implements Initializable, S
         }
         boolean lbShow4 = !isSourceNoAvailable() && lbShow;
         JFXUtil.setDisabled(!lbShow4, apAttachmentButtons, cmbAttachmentType);
+        JFXUtil.setButtonsVisibility(lbShow4, btnAddAttachment, btnRemoveAttachment);
     }
 
     private void clearTextFields() {

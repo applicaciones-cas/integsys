@@ -1356,7 +1356,6 @@ public class CashDisbursement_EntryController implements Initializable, ScreenIn
                     break;
             }
         });
-
     }
     ChangeListener<Boolean> txtSearch_Focus = JFXUtil.FocusListener(TextField.class,
             (lsID, lsValue) -> {
@@ -2515,6 +2514,7 @@ public class CashDisbursement_EntryController implements Initializable, ScreenIn
         }
         boolean lbShow4 = !isSourceNoAvailable() && lbShow;
         JFXUtil.setDisabled(!lbShow4, apAttachmentButtons, cmbAttachmentType);
+        JFXUtil.setButtonsVisibility(lbShow4, btnAddAttachment, btnRemoveAttachment);
     }
 
     private void clearTextFields() {
