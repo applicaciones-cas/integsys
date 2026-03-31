@@ -1543,9 +1543,6 @@ public class CashDisbursement_ConfirmationController implements Initializable, S
                 /*Lost Focus*/
                 switch (lsID) {
                     case "tfVatExemptDetail":
-                        if (!IsRequirementComplete(lsValue, false)) {
-                            break;
-                        }
                         double lnOldVal = poController.Detail(pnDetail).getDetailVatExempt();
                         lsValue = JFXUtil.removeComma(lsValue);
                         poJSON = poController.Detail(pnDetail).setDetailVatExempt(Double.valueOf(lsValue));
@@ -1582,18 +1579,12 @@ public class CashDisbursement_ConfirmationController implements Initializable, S
                         }
                         break;
                     case "tfORNoDetail":
-                        if (!IsRequirementComplete(lsValue, false)) {
-                            break;
-                        }
                         poJSON = poController.Detail(pnDetail).setReferNo(lsValue);
                         if (!JFXUtil.isJSONSuccess(poJSON)) {
                             ShowMessageFX.Warning(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
                         }
                         break;
                     case "tfAmountDetail":
-                        if (!IsRequirementComplete(lsValue, false)) {
-                            break;
-                        }
                         lsValue = JFXUtil.removeComma(lsValue);
                         poJSON = poController.Detail(pnDetail).setAmount(Double.valueOf(lsValue));
                         if (!JFXUtil.isJSONSuccess(poJSON)) {
@@ -2096,25 +2087,6 @@ public class CashDisbursement_ConfirmationController implements Initializable, S
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
             ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
-    }
-
-    private boolean IsRequirementComplete(String lsValue, boolean isSearch) {
-        try {
-            boolean lbProceed = !isSearch;
-            if (lbProceed && lsValue.isEmpty()) {
-                return true;
-            }
-            if (!JFXUtil.isObjectEqualTo(poController.Master().CashFund().getDescription(), null, "")
-                    && !JFXUtil.isObjectEqualTo(poController.Master().Department().getDescription(), null, "")
-                    && !JFXUtil.isObjectEqualTo(poController.Master().getPayeeName(), null, "")) {
-                return true;
-            }
-            ShowMessageFX.Warning(null, pxeModuleName, "Please complete the master information before proceeding to the detail entry.");
-        } catch (SQLException | GuanzonException ex) {
-            Logger.getLogger(CashDisbursement_ConfirmationController.class.getName()).log(Level.SEVERE, null, ex);
-            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
-        }
-        return false;
     }
 
     private void loadRecordSearch() {
