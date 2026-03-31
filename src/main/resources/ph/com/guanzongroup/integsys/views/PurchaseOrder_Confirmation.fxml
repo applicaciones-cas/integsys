@@ -233,7 +233,7 @@
                                                                         <Insets top="1.0" />
                                                                     </GridPane.margin>
                                                                 </TextArea>
-                                                                <TextField fx:id="tfReferenceNo" maxHeight="25.0" GridPane.columnIndex="8" GridPane.rowIndex="5" />
+                                                                <TextField fx:id="tfReferenceNo" maxHeight="25.0" promptText="Press F3: Search" GridPane.columnIndex="8" GridPane.rowIndex="5" />
                                                                 <TextField fx:id="tfTerm" maxHeight="25.0" promptText="Press F3: Search" GridPane.columnIndex="8" GridPane.rowIndex="6" />
                                                                 <TextField fx:id="tfDiscountRate" alignment="CENTER_RIGHT" maxHeight="25.0" maxWidth="1.7976931348623157E308" GridPane.columnIndex="12" GridPane.rowIndex="5" />
                                                                 <TextField fx:id="tfDiscountAmount" alignment="CENTER_RIGHT" maxHeight="25.0" maxWidth="1.7976931348623157E308" GridPane.columnIndex="12" GridPane.rowIndex="6" />
