@@ -1399,28 +1399,30 @@ public class CashDisbursement_ConfirmationController implements Initializable, S
                     switch (lsID) {
                         case "tfBranch":
                             if (lsValue.isEmpty()) {
-                                if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
+                                if (isSourceNoAvailable()) {
+                                    if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
 
-                                    if (!JFXUtil.isObjectEqualTo(poController.Master().getBranchCode(), null, "")) {
-                                        boolean lbproceed = !JFXUtil.isObjectEqualTo(poController.Detail(0).getReferNo(), null, "")
-                                        || !JFXUtil.isObjectEqualTo(poController.Detail(0).CashAdvanceDetail(poController.Master().getSourceNo()).getParticular(), null, "")
-                                        || !JFXUtil.isObjectEqualTo(poController.Detail(0).Particular().getDescription(), null, "");
+                                        if (!JFXUtil.isObjectEqualTo(poController.Master().getBranchCode(), null, "")) {
+                                            boolean lbproceed = !JFXUtil.isObjectEqualTo(poController.Detail(0).getReferNo(), null, "")
+                                            || !JFXUtil.isObjectEqualTo(poController.Detail(0).CashAdvanceDetail(poController.Master().getSourceNo()).getParticular(), null, "")
+                                            || !JFXUtil.isObjectEqualTo(poController.Detail(0).Particular().getDescription(), null, "");
 
-                                        if (poController.getDetailCount() >= 1 && lbproceed) {
-                                            if (!pbKeyPressed) {
-                                                if (ShowMessageFX.YesNo(null, pxeModuleName,
-                                                        "Are you sure you want to change the Branch name?\nPlease note that this action will delete all Cash Disbursement details.\n\nDo you wish to proceed?") == true) {
-                                                    poController.removeDetails();
-                                                    poController.Master().setCashFundId("");
-                                                    poController.Master().setBranchCode("");
-                                                    loadTableDetail.reload();
+                                            if (poController.getDetailCount() >= 1 && lbproceed) {
+                                                if (!pbKeyPressed) {
+                                                    if (ShowMessageFX.YesNo(null, pxeModuleName,
+                                                            "Are you sure you want to change the Branch name?\nPlease note that this action will delete all Cash Disbursement details.\n\nDo you wish to proceed?") == true) {
+                                                        poController.removeDetails();
+                                                        poController.Master().setCashFundId("");
+                                                        poController.Master().setBranchCode("");
+                                                        loadTableDetail.reload();
+                                                    } else {
+                                                        loadRecordMaster();
+                                                        return;
+                                                    }
                                                 } else {
                                                     loadRecordMaster();
                                                     return;
                                                 }
-                                            } else {
-                                                loadRecordMaster();
-                                                return;
                                             }
                                         }
                                     }
@@ -1430,27 +1432,29 @@ public class CashDisbursement_ConfirmationController implements Initializable, S
                             break;
                         case "tfCashFund":
                             if (lsValue.isEmpty()) {
-                                if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
-                                    if (!JFXUtil.isObjectEqualTo(poController.Master().getCashFundId(), null, "")) {
-                                        boolean lbproceed = !JFXUtil.isObjectEqualTo(poController.Detail(0).getReferNo(), null, "")
-                                        || !JFXUtil.isObjectEqualTo(poController.Detail(0).CashAdvanceDetail(poController.Master().getSourceNo()).getParticular(), null, "")
-                                        || !JFXUtil.isObjectEqualTo(poController.Detail(0).Particular().getDescription(), null, "");
+                                if (isSourceNoAvailable()) {
+                                    if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
+                                        if (!JFXUtil.isObjectEqualTo(poController.Master().getCashFundId(), null, "")) {
+                                            boolean lbproceed = !JFXUtil.isObjectEqualTo(poController.Detail(0).getReferNo(), null, "")
+                                            || !JFXUtil.isObjectEqualTo(poController.Detail(0).CashAdvanceDetail(poController.Master().getSourceNo()).getParticular(), null, "")
+                                            || !JFXUtil.isObjectEqualTo(poController.Detail(0).Particular().getDescription(), null, "");
 
-                                        if (poController.getDetailCount() >= 1 && lbproceed) {
-                                            if (!pbKeyPressed) {
-                                                if (ShowMessageFX.YesNo(null, pxeModuleName,
-                                                        "Are you sure you want to change the Cash Fund?\nPlease note that this action will delete all Cash Disbursement details.\n\nDo you wish to proceed?") == true) {
-                                                    poController.removeDetails();
-                                                    poController.Master().setCashFundId("");
-                                                    poController.Master().setCashFundId("");
-                                                    loadTableDetail.reload();
+                                            if (poController.getDetailCount() >= 1 && lbproceed) {
+                                                if (!pbKeyPressed) {
+                                                    if (ShowMessageFX.YesNo(null, pxeModuleName,
+                                                            "Are you sure you want to change the Cash Fund?\nPlease note that this action will delete all Cash Disbursement details.\n\nDo you wish to proceed?") == true) {
+                                                        poController.removeDetails();
+                                                        poController.Master().setCashFundId("");
+                                                        poController.Master().setCashFundId("");
+                                                        loadTableDetail.reload();
+                                                    } else {
+                                                        loadRecordMaster();
+                                                        return;
+                                                    }
                                                 } else {
                                                     loadRecordMaster();
                                                     return;
                                                 }
-                                            } else {
-                                                loadRecordMaster();
-                                                return;
                                             }
                                         }
                                     }
@@ -1460,27 +1464,29 @@ public class CashDisbursement_ConfirmationController implements Initializable, S
                             break;
                         case "tfDepartment":
                             if (lsValue.isEmpty()) {
-                                if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
-                                    if (!JFXUtil.isObjectEqualTo(poController.Master().getPayeeName(), null, "")) {
-                                        boolean lbproceed = !JFXUtil.isObjectEqualTo(poController.Detail(0).getReferNo(), null, "")
-                                        || !JFXUtil.isObjectEqualTo(poController.Detail(0).CashAdvanceDetail(poController.Master().getSourceNo()).getParticular(), null, "")
-                                        || !JFXUtil.isObjectEqualTo(poController.Detail(0).Particular().getDescription(), null, "");
+                                if (isSourceNoAvailable()) {
+                                    if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
+                                        if (!JFXUtil.isObjectEqualTo(poController.Master().getPayeeName(), null, "")) {
+                                            boolean lbproceed = !JFXUtil.isObjectEqualTo(poController.Detail(0).getReferNo(), null, "")
+                                            || !JFXUtil.isObjectEqualTo(poController.Detail(0).CashAdvanceDetail(poController.Master().getSourceNo()).getParticular(), null, "")
+                                            || !JFXUtil.isObjectEqualTo(poController.Detail(0).Particular().getDescription(), null, "");
 
-                                        if (poController.getDetailCount() >= 1 && lbproceed) {
-                                            if (!pbKeyPressed) {
-                                                if (ShowMessageFX.YesNo(null, pxeModuleName,
-                                                        "Are you sure you want to change the Department name?\nPlease note that this action will delete all Cash Disbursement details.\n\nDo you wish to proceed?") == true) {
-                                                    poController.removeDetails();
-                                                    poController.Master().setCashFundId("");
-                                                    poController.Master().setDepartmentRequest("");
-                                                    loadTableDetail.reload();
+                                            if (poController.getDetailCount() >= 1 && lbproceed) {
+                                                if (!pbKeyPressed) {
+                                                    if (ShowMessageFX.YesNo(null, pxeModuleName,
+                                                            "Are you sure you want to change the Department name?\nPlease note that this action will delete all Cash Disbursement details.\n\nDo you wish to proceed?") == true) {
+                                                        poController.removeDetails();
+                                                        poController.Master().setCashFundId("");
+                                                        poController.Master().setDepartmentRequest("");
+                                                        loadTableDetail.reload();
+                                                    } else {
+                                                        loadRecordMaster();
+                                                        return;
+                                                    }
                                                 } else {
                                                     loadRecordMaster();
                                                     return;
                                                 }
-                                            } else {
-                                                loadRecordMaster();
-                                                return;
                                             }
                                         }
                                     }
@@ -1490,27 +1496,29 @@ public class CashDisbursement_ConfirmationController implements Initializable, S
                             break;
                         case "tfPayee":
                             if (lsValue.isEmpty()) {
-                                if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
-                                    if (!JFXUtil.isObjectEqualTo(poController.Master().getPayeeName(), null, "")) {
-                                        boolean lbproceed = !JFXUtil.isObjectEqualTo(poController.Detail(0).getReferNo(), null, "")
-                                        || !JFXUtil.isObjectEqualTo(poController.Detail(0).CashAdvanceDetail(poController.Master().getSourceNo()).getParticular(), null, "")
-                                        || !JFXUtil.isObjectEqualTo(poController.Detail(0).Particular().getDescription(), null, "");
+                                if (isSourceNoAvailable()) {
+                                    if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
+                                        if (!JFXUtil.isObjectEqualTo(poController.Master().getPayeeName(), null, "")) {
+                                            boolean lbproceed = !JFXUtil.isObjectEqualTo(poController.Detail(0).getReferNo(), null, "")
+                                            || !JFXUtil.isObjectEqualTo(poController.Detail(0).CashAdvanceDetail(poController.Master().getSourceNo()).getParticular(), null, "")
+                                            || !JFXUtil.isObjectEqualTo(poController.Detail(0).Particular().getDescription(), null, "");
 
-                                        if (poController.getDetailCount() >= 1 && lbproceed) {
-                                            if (!pbKeyPressed) {
-                                                if (ShowMessageFX.YesNo(null, pxeModuleName,
-                                                        "Are you sure you want to change the Payee name?\nPlease note that this action will delete all Cash Disbursement details.\n\nDo you wish to proceed?") == true) {
-                                                    poController.removeDetails();
-                                                    poController.Master().setCashFundId("");
-                                                    poController.Master().setPayeeName("");
-                                                    loadTableDetail.reload();
+                                            if (poController.getDetailCount() >= 1 && lbproceed) {
+                                                if (!pbKeyPressed) {
+                                                    if (ShowMessageFX.YesNo(null, pxeModuleName,
+                                                            "Are you sure you want to change the Payee name?\nPlease note that this action will delete all Cash Disbursement details.\n\nDo you wish to proceed?") == true) {
+                                                        poController.removeDetails();
+                                                        poController.Master().setCashFundId("");
+                                                        poController.Master().setPayeeName("");
+                                                        loadTableDetail.reload();
+                                                    } else {
+                                                        loadRecordMaster();
+                                                        return;
+                                                    }
                                                 } else {
                                                     loadRecordMaster();
                                                     return;
                                                 }
-                                            } else {
-                                                loadRecordMaster();
-                                                return;
                                             }
                                         }
                                     }
@@ -1535,6 +1543,9 @@ public class CashDisbursement_ConfirmationController implements Initializable, S
                 /*Lost Focus*/
                 switch (lsID) {
                     case "tfVatExemptDetail":
+                        if (!IsRequirementComplete(lsValue, false)) {
+                            break;
+                        }
                         double lnOldVal = poController.Detail(pnDetail).getDetailVatExempt();
                         lsValue = JFXUtil.removeComma(lsValue);
                         poJSON = poController.Detail(pnDetail).setDetailVatExempt(Double.valueOf(lsValue));
@@ -1571,12 +1582,18 @@ public class CashDisbursement_ConfirmationController implements Initializable, S
                         }
                         break;
                     case "tfORNoDetail":
+                        if (!IsRequirementComplete(lsValue, false)) {
+                            break;
+                        }
                         poJSON = poController.Detail(pnDetail).setReferNo(lsValue);
                         if (!JFXUtil.isJSONSuccess(poJSON)) {
                             ShowMessageFX.Warning(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
                         }
                         break;
                     case "tfAmountDetail":
+                        if (!IsRequirementComplete(lsValue, false)) {
+                            break;
+                        }
                         lsValue = JFXUtil.removeComma(lsValue);
                         poJSON = poController.Detail(pnDetail).setAmount(Double.valueOf(lsValue));
                         if (!JFXUtil.isJSONSuccess(poJSON)) {
@@ -1769,24 +1786,25 @@ public class CashDisbursement_ConfirmationController implements Initializable, S
                                 break;
 
                             case "tfBranch":
-                                if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
-                                    boolean lbproceed = !JFXUtil.isObjectEqualTo(poController.Detail(0).CashAdvanceDetail(poController.Master().getSourceNo()).getORNo(), null, "")
-                                            || !JFXUtil.isObjectEqualTo(poController.Detail(0).CashAdvanceDetail(poController.Master().getSourceNo()).getParticular(), null, "")
-                                            || !JFXUtil.isObjectEqualTo(poController.Detail(0).Particular().getDescription(), null, "");
-                                    if (poController.getDetailCount() >= 1 && lbproceed) {
-                                        pbKeyPressed = true;
-                                        if (ShowMessageFX.YesNo(null, pxeModuleName,
-                                                "Are you sure you want to change the Branch name?\nPlease note that this action will delete all Cash Disbursement details.\n\nDo you wish to proceed?") == true) {
-                                            poController.Master().setCashFundId("");
-                                            poController.removeDetails();
-                                            loadTableDetail.reload();
-                                        } else {
-                                            return;
+                                if (isSourceNoAvailable()) {
+                                    if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
+                                        boolean lbproceed = !JFXUtil.isObjectEqualTo(poController.Detail(0).CashAdvanceDetail(poController.Master().getSourceNo()).getORNo(), null, "")
+                                                || !JFXUtil.isObjectEqualTo(poController.Detail(0).CashAdvanceDetail(poController.Master().getSourceNo()).getParticular(), null, "")
+                                                || !JFXUtil.isObjectEqualTo(poController.Detail(0).Particular().getDescription(), null, "");
+                                        if (poController.getDetailCount() >= 1 && lbproceed) {
+                                            pbKeyPressed = true;
+                                            if (ShowMessageFX.YesNo(null, pxeModuleName,
+                                                    "Are you sure you want to change the Branch name?\nPlease note that this action will delete all Cash Disbursement details.\n\nDo you wish to proceed?") == true) {
+                                                poController.Master().setCashFundId("");
+                                                poController.removeDetails();
+                                                loadTableDetail.reload();
+                                            } else {
+                                                return;
+                                            }
+                                            pbKeyPressed = false;
                                         }
-                                        pbKeyPressed = false;
                                     }
                                 }
-
                                 poJSON = poController.SearchBranch(lsValue, false, false);
                                 if ("error".equals(poJSON.get("result"))) {
                                     ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
@@ -1799,24 +1817,25 @@ public class CashDisbursement_ConfirmationController implements Initializable, S
                                 loadRecordMaster();
                                 break;
                             case "tfDepartment":
-                                if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
-                                    boolean lbproceed = !JFXUtil.isObjectEqualTo(poController.Detail(0).CashAdvanceDetail(poController.Master().getSourceNo()).getORNo(), null, "")
-                                            || !JFXUtil.isObjectEqualTo(poController.Detail(0).CashAdvanceDetail(poController.Master().getSourceNo()).getParticular(), null, "")
-                                            || !JFXUtil.isObjectEqualTo(poController.Detail(0).Particular().getDescription(), null, "");
-                                    if (poController.getDetailCount() >= 1 && lbproceed) {
-                                        pbKeyPressed = true;
-                                        if (ShowMessageFX.YesNo(null, pxeModuleName,
-                                                "Are you sure you want to change the Department name?\nPlease note that this action will delete all Cash Disbursement details.\n\nDo you wish to proceed?") == true) {
-                                            poController.Master().setCashFundId("");
-                                            poController.removeDetails();
-                                            loadTableDetail.reload();
-                                        } else {
-                                            return;
+                                if (isSourceNoAvailable()) {
+                                    if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
+                                        boolean lbproceed = !JFXUtil.isObjectEqualTo(poController.Detail(0).CashAdvanceDetail(poController.Master().getSourceNo()).getORNo(), null, "")
+                                                || !JFXUtil.isObjectEqualTo(poController.Detail(0).CashAdvanceDetail(poController.Master().getSourceNo()).getParticular(), null, "")
+                                                || !JFXUtil.isObjectEqualTo(poController.Detail(0).Particular().getDescription(), null, "");
+                                        if (poController.getDetailCount() >= 1 && lbproceed) {
+                                            pbKeyPressed = true;
+                                            if (ShowMessageFX.YesNo(null, pxeModuleName,
+                                                    "Are you sure you want to change the Department name?\nPlease note that this action will delete all Cash Disbursement details.\n\nDo you wish to proceed?") == true) {
+                                                poController.Master().setCashFundId("");
+                                                poController.removeDetails();
+                                                loadTableDetail.reload();
+                                            } else {
+                                                return;
+                                            }
+                                            pbKeyPressed = false;
                                         }
-                                        pbKeyPressed = false;
                                     }
                                 }
-
                                 poJSON = poController.SearchDepartment(lsValue, false);
                                 if ("error".equals(poJSON.get("result"))) {
                                     ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
@@ -1828,24 +1847,25 @@ public class CashDisbursement_ConfirmationController implements Initializable, S
                                 loadRecordMaster();
                                 break;
                             case "tfCashFund":
-                                if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
-                                    boolean lbproceed = !JFXUtil.isObjectEqualTo(poController.Detail(0).CashAdvanceDetail(poController.Master().getSourceNo()).getORNo(), null, "")
-                                            || !JFXUtil.isObjectEqualTo(poController.Detail(0).CashAdvanceDetail(poController.Master().getSourceNo()).getParticular(), null, "")
-                                            || !JFXUtil.isObjectEqualTo(poController.Detail(0).Particular().getDescription(), null, "");
-                                    if (poController.getDetailCount() >= 1 && lbproceed) {
-                                        pbKeyPressed = true;
-                                        if (ShowMessageFX.YesNo(null, pxeModuleName,
-                                                "Are you sure you want to change the Cash Fund?\nPlease note that this action will delete all Cash Disbursement details.\n\nDo you wish to proceed?") == true) {
-                                            poController.Master().setCashFundId("");
-                                            poController.removeDetails();
-                                            loadTableDetail.reload();
-                                        } else {
-                                            return;
+                                if (isSourceNoAvailable()) {
+                                    if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
+                                        boolean lbproceed = !JFXUtil.isObjectEqualTo(poController.Detail(0).CashAdvanceDetail(poController.Master().getSourceNo()).getORNo(), null, "")
+                                                || !JFXUtil.isObjectEqualTo(poController.Detail(0).CashAdvanceDetail(poController.Master().getSourceNo()).getParticular(), null, "")
+                                                || !JFXUtil.isObjectEqualTo(poController.Detail(0).Particular().getDescription(), null, "");
+                                        if (poController.getDetailCount() >= 1 && lbproceed) {
+                                            pbKeyPressed = true;
+                                            if (ShowMessageFX.YesNo(null, pxeModuleName,
+                                                    "Are you sure you want to change the Cash Fund?\nPlease note that this action will delete all Cash Disbursement details.\n\nDo you wish to proceed?") == true) {
+                                                poController.Master().setCashFundId("");
+                                                poController.removeDetails();
+                                                loadTableDetail.reload();
+                                            } else {
+                                                return;
+                                            }
+                                            pbKeyPressed = false;
                                         }
-                                        pbKeyPressed = false;
                                     }
                                 }
-
                                 poJSON = poController.SearchCashFund(lsValue, false);
                                 if ("error".equals(poJSON.get("result"))) {
                                     ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
@@ -1857,25 +1877,26 @@ public class CashDisbursement_ConfirmationController implements Initializable, S
                                 loadRecordMaster();
                                 break;
                             case "tfPayee":
-                                if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
-                                    boolean lbproceed = !JFXUtil.isObjectEqualTo(poController.Detail(0).CashAdvanceDetail(poController.Master().getSourceNo()).getORNo(), null, "")
-                                            || !JFXUtil.isObjectEqualTo(poController.Detail(0).CashAdvanceDetail(poController.Master().getSourceNo()).getParticular(), null, "")
-                                            || !JFXUtil.isObjectEqualTo(poController.Detail(0).Particular().getDescription(), null, "");
+                                if (isSourceNoAvailable()) {
+                                    if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
+                                        boolean lbproceed = !JFXUtil.isObjectEqualTo(poController.Detail(0).CashAdvanceDetail(poController.Master().getSourceNo()).getORNo(), null, "")
+                                                || !JFXUtil.isObjectEqualTo(poController.Detail(0).CashAdvanceDetail(poController.Master().getSourceNo()).getParticular(), null, "")
+                                                || !JFXUtil.isObjectEqualTo(poController.Detail(0).Particular().getDescription(), null, "");
 
-                                    if (poController.getDetailCount() >= 1 && lbproceed) {
-                                        pbKeyPressed = true;
-                                        if (ShowMessageFX.YesNo(null, pxeModuleName,
-                                                "Are you sure you want to change the Payee name?\nPlease note that this action will delete all Cash Disbursement details.\n\nDo you wish to proceed?") == true) {
-                                            poController.Master().setCashFundId("");
-                                            poController.removeDetails();
-                                            loadTableDetail.reload();
-                                        } else {
-                                            return;
+                                        if (poController.getDetailCount() >= 1 && lbproceed) {
+                                            pbKeyPressed = true;
+                                            if (ShowMessageFX.YesNo(null, pxeModuleName,
+                                                    "Are you sure you want to change the Payee name?\nPlease note that this action will delete all Cash Disbursement details.\n\nDo you wish to proceed?") == true) {
+                                                poController.Master().setCashFundId("");
+                                                poController.removeDetails();
+                                                loadTableDetail.reload();
+                                            } else {
+                                                return;
+                                            }
+                                            pbKeyPressed = false;
                                         }
-                                        pbKeyPressed = false;
                                     }
                                 }
-
                                 poJSON = poController.SearchPayee(lsValue, false, false);
                                 if ("error".equals(poJSON.get("result"))) {
                                     ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
@@ -2075,6 +2096,25 @@ public class CashDisbursement_ConfirmationController implements Initializable, S
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
             ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
+    }
+
+    private boolean IsRequirementComplete(String lsValue, boolean isSearch) {
+        try {
+            boolean lbProceed = !isSearch;
+            if (lbProceed && lsValue.isEmpty()) {
+                return true;
+            }
+            if (!JFXUtil.isObjectEqualTo(poController.Master().CashFund().getDescription(), null, "")
+                    && !JFXUtil.isObjectEqualTo(poController.Master().Department().getDescription(), null, "")
+                    && !JFXUtil.isObjectEqualTo(poController.Master().getPayeeName(), null, "")) {
+                return true;
+            }
+            ShowMessageFX.Warning(null, pxeModuleName, "Please complete the master information before proceeding to the detail entry.");
+        } catch (SQLException | GuanzonException ex) {
+            Logger.getLogger(CashDisbursement_ConfirmationController.class.getName()).log(Level.SEVERE, null, ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
+        }
+        return false;
     }
 
     private void loadRecordSearch() {
@@ -2510,7 +2550,7 @@ public class CashDisbursement_ConfirmationController implements Initializable, S
             }
         }
         boolean lbShow4 = !isSourceNoAvailable() && lbShow;
-        JFXUtil.setDisabled(!lbShow4, apAttachmentButtons);
+        JFXUtil.setDisabled(!lbShow4, apAttachmentButtons, cmbAttachmentType);
     }
 
     private void clearTextFields() {

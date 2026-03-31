@@ -3532,4 +3532,16 @@ public class JFXUtil {
         radialTimeline.playFromStart();
     }
     public String[] buttonPackArray = {"btnSave", "btnCancel", "btnApprove", "btnDisapprove", "btnVoid"};
+
+    public static boolean isNumeric(String str) {
+        if (str == null || str.trim().isEmpty()) {
+            return false;
+        }
+        try {
+            Double.parseDouble(str);
+            return true;
+        } catch (NumberFormatException e) {
+            return false;
+        }
+    }
 }
