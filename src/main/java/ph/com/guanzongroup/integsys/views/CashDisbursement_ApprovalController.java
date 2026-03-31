@@ -2139,7 +2139,7 @@ public class CashDisbursement_ApprovalController implements Initializable, Scree
         JFXUtil.setButtonsVisibility(lbShow2, btnHistory, btnPrint, btnApprove, btnDisapprove);
         JFXUtil.setButtonsVisibility(lbShow3, btnClose);
 
-        JFXUtil.setDisabled(true, apDVMaster1, apDVMaster2, apJournalMaster, apJournalDetails, apBIRDetail);
+        JFXUtil.setDisabled(true, apDVMaster1, apDVMaster2, apDVDetail, apJournalMaster, apJournalDetails, apBIRDetail);
         JFXUtil.setButtonsVisibility(false, btnPrint);
         if (fnValue != EditMode.READY) {
             return;

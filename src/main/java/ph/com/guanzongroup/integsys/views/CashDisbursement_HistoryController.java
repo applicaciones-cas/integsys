@@ -1327,7 +1327,7 @@ public class CashDisbursement_HistoryController implements Initializable, Screen
         JFXUtil.setButtonsVisibility(lbShow3, btnClose);
         JFXUtil.setButtonsVisibility(lbShow2 && CashDisbursementStatus.APPROVED.equals(poController.Master().getTransactionStatus()), btnPrint);
 
-        JFXUtil.setDisabled(true, apDVMaster1, apDVMaster2, apJournalMaster, apJournalDetails, apBIRDetail);
+        JFXUtil.setDisabled(true, apDVMaster1, apDVMaster2, apDVDetail, apJournalMaster, apJournalDetails, apBIRDetail);
     }
 
     private void clearTextFields() {
