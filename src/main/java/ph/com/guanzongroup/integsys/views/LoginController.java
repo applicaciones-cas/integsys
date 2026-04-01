@@ -81,7 +81,7 @@ public class LoginController implements Initializable, ScreenInterface {
     @FXML
     private ComboBox cmbIndustry, cmbCompany;
     @FXML
-    private AnchorPane rootPane, loadingPane, spinnerPane, apRoot1, apRoot2, apRoot3;
+    private AnchorPane rootPane, loadingPane, spinnerPane, apRoot1, apRoot2, apRoot3, apSign;
     @FXML
     private VBox vboxmain;
 
@@ -108,6 +108,16 @@ public class LoginController implements Initializable, ScreenInterface {
     public void initialize(URL url, ResourceBundle rb) {
         JFXUtil.fadeIn(1, vboxmain);
         JFXUtil.fadeIn(2, apRoot3);
+
+//        JFXUtil.fadeInFromBottom(1.5, rootPane, apRoot1, apRoot2,vboxmain);
+        btnSignIn.setVisible(false);
+//        fadeInFromBottom(2, rootPane, rootpane2, rootpane3, vbox1);
+        JFXUtil.runWithDelay(0.2, () -> {
+            JFXUtil.applyClockwiseFillAnimation(apSign, 4);
+            JFXUtil.runWithDelay(1.5, () -> {
+                JFXUtil.fadeIn(1, btnSignIn);
+            });
+        });
 
         DashboardController mainController = LoginControllerHolder.getMainController();
         mainController.triggervbox();
