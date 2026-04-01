@@ -874,7 +874,15 @@ public class TBJ_ParameterController implements Initializable, ScreenInterface {
                                     ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
                                 }
                                 tfAccountTitle.setText(poTBJControllers.TBJParameter().Detail(pnSelectedDetail).AccountChart().getDescription());
-                                loadTableDetail();
+                                
+                                poJSON = poTBJControllers.TBJParameter().checkDuplicateDetail();
+                                 if("error".equals(poJSON.get("result"))){
+                                      ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
+                                      tfAccountTitle.requestFocus();
+                                      tfAccountTitle.selectAll();
+                                      return;
+                                 }
+                                 loadTableDetail();
                                 return;
 
                             case "tfTableName":
@@ -895,14 +903,6 @@ public class TBJ_ParameterController implements Initializable, ScreenInterface {
                                 poTBJControllers.TBJParameter().show(poTBJControllers.TBJParameter().Detail(pnSelectedDetail).getTableNm().trim().replace(" ", "_"), pnSelectedDetail);
                                 tfFieldName.setText(poTBJControllers.TBJParameter().getFieldName(poTBJControllers.TBJParameter().Detail(pnSelectedDetail).getDerivedField(), pnSelectedDetail));
                                 loadTableDetail();
-                                 poJSON = poTBJControllers.TBJParameter().checkDuplicateDetail();
-                                 if("error".equals(poJSON.get("result"))){
-                                      ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
-                                      poTBJControllers.TBJParameter().Detail(pnSelectedDetail).setDerivedField(null);
-                                      loadTableDetail();
-                                      return;
-                                 }
-                                 
                                 break;
 
                         }
