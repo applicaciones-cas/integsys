@@ -79,6 +79,8 @@ public class Login extends Application {
             
             System.setProperty("sys.default.path.temp.attachments", po_props.getProperty("sys.default.path.temp.attachments"));
             
+            System.setProperty("allowed.department", po_props.getProperty("allowed.department"));
+            
             return true;
         } catch (FileNotFoundException ex) {
             ex.printStackTrace();

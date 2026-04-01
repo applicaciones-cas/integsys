@@ -263,7 +263,7 @@ public class CheckDeposit_HistoryController implements Initializable, ScreenInte
                                 ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
                                 return;
                             }
-                            ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
+                            ShowMessageFX.Information((String) poJSON.get("message"), psFormName, null);
                             poGLControllers.CheckDeposits().OpenTransaction(poGLControllers.CheckDeposits().Master().getTransactionNo());
                    }
                     break;

@@ -537,9 +537,9 @@ public class PurchaseOrder_ConfirmationController implements Initializable, Scre
         if (!nv) {
             /*Lost Focus*/
             switch (lsTextFieldID) {
-                case "tfReferenceNo":
-                    poPurchasingController.PurchaseOrder().Master().setReference(lsValue);
-                    break;
+//                case "tfReferenceNo":
+//                    poPurchasingController.PurchaseOrder().Master().setReference(lsValue);
+//                    break;
                 case "tfDiscountRate":
                     lsValue = JFXUtil.removeComma(lsValue);
                     poJSON = poPurchasingController.PurchaseOrder().setDiscountRate(lsValue);
@@ -639,6 +639,15 @@ public class PurchaseOrder_ConfirmationController implements Initializable, Scre
                     case ENTER:
                     case F3:
                         switch (txtFieldID) {
+                             case "tfReferenceNo":
+                                poJSON = poPurchasingController.PurchaseOrder().SearchProject(lsValue);
+                                if ("error".equals(poJSON.get("result"))) {
+                                    ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
+                                    tfReferenceNo.setText("");
+                                    break;
+                                }
+                                tfReferenceNo.setText(poPurchasingController.PurchaseOrder().Master().getReference());
+                                break;
                             case "tfDestination":
                                 poJSON = poPurchasingController.PurchaseOrder().SearchDestination(lsValue, false);
                                 if ("error".equals(poJSON.get("result"))) {
@@ -673,6 +682,7 @@ public class PurchaseOrder_ConfirmationController implements Initializable, Scre
                         event.consume();
                         switch (txtFieldID) {
                             case "tfDestination":
+                            case "tfReferenceNo":
                             case "tfTerm":
                             case "tfAdvancePAmount":
                             case "tfAdvancePRate":
