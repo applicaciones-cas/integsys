@@ -51,3 +51,19 @@
     -fx-background-color: #F4F4F4;
     -fx-prompt-text-fill: #B2B2B2;
 }
+
+.button_process2 {
+    -fx-background-color: #FF8201;
+    -fx-text-fill: white;
+    -fx-cursor: hand;
+}
+.button_process2:hover
+{
+    -fx-background-color: #CC6900;
+}
+
+.rounded-anchorpane {
+    -fx-background-color: #F4F4F4;   /* background color */
+    -fx-background-radius: 20;       /* rounded corners radius */
+    -fx-border-radius: 20;           /* match border radius */
+}
