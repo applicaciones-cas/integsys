@@ -386,9 +386,9 @@ public class CashDisbursement_EntryController implements Initializable, ScreenIn
                     break;
                 case "Attachments":
                     if (pnEditMode == EditMode.READY || pnEditMode == EditMode.UPDATE || pnEditMode == EditMode.ADDNEW) {
-                        if (poController.Master().getSourceNo() != null && !"".equals(poController.Master().getSourceNo())) {
-                            JFXUtil.clearTextFields(apAttachments);
-                            if (DoesContainValidDisbDetail()) {
+                        JFXUtil.clearTextFields(apAttachments);
+                        if (DoesContainValidDisbDetail()) {
+                            if (isSourceNoAvailable()) {
                                 pbIsCheckedAttachmentTab = true;
                                 try {
                                     poController.loadAttachments();
@@ -397,10 +397,10 @@ public class CashDisbursement_EntryController implements Initializable, ScreenIn
                                     ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
                                 }
                                 loadTableAttachment.reload();
-                            } else {
-                                JFXUtil.clickTabByTitleText(tabPaneMain, "Cash Disbursement");
-                                ShowMessageFX.Warning(null, pxeModuleName, lsValidDisbMessage);
                             }
+                        } else {
+                            JFXUtil.clickTabByTitleText(tabPaneMain, "Cash Disbursement");
+                            ShowMessageFX.Warning(null, pxeModuleName, lsValidDisbMessage);
                         }
                     }
                     break;
