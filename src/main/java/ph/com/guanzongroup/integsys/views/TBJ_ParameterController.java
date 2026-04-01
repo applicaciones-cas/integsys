@@ -891,6 +891,13 @@ public class TBJ_ParameterController implements Initializable, ScreenInterface {
                                     ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
                                 }
                                 tfTableName.setText(poTBJControllers.TBJParameter().Detail(pnSelectedDetail).getTableNm().trim().replace("_", " "));
+                                poJSON = poTBJControllers.TBJParameter().checkDuplicateDetail();
+                                 if("error".equals(poJSON.get("result"))){
+                                      ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
+                                      tfAccountTitle.requestFocus();
+                                      tfAccountTitle.selectAll();
+                                      return;
+                                 }
                                 loadTableDetail();
                                 return;
                             case "tfFieldName":
@@ -902,6 +909,13 @@ public class TBJ_ParameterController implements Initializable, ScreenInterface {
                                 
                                 poTBJControllers.TBJParameter().show(poTBJControllers.TBJParameter().Detail(pnSelectedDetail).getTableNm().trim().replace(" ", "_"), pnSelectedDetail);
                                 tfFieldName.setText(poTBJControllers.TBJParameter().getFieldName(poTBJControllers.TBJParameter().Detail(pnSelectedDetail).getDerivedField(), pnSelectedDetail));
+                                poJSON = poTBJControllers.TBJParameter().checkDuplicateDetail();
+                                 if("error".equals(poJSON.get("result"))){
+                                      ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
+                                      tfAccountTitle.requestFocus();
+                                      tfAccountTitle.selectAll();
+                                      return;
+                                 }
                                 loadTableDetail();
                                 break;
 
