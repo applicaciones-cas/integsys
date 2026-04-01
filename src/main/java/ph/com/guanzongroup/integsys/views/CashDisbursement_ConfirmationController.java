@@ -392,8 +392,8 @@ public class CashDisbursement_ConfirmationController implements Initializable, S
                                     Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
                                     ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
                                 }
-                                loadTableAttachment.reload();
                             }
+                            loadTableAttachment.reload();
                         } else {
                             JFXUtil.clickTabByTitleText(tabPaneMain, "Cash Disbursement");
                             ShowMessageFX.Warning(null, pxeModuleName, lsValidDisbMessage);
