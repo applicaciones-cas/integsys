@@ -29,10 +29,10 @@ import org.guanzon.appdriver.base.GuanzonException;
 import org.guanzon.appdriver.base.MiscUtil;
 import org.guanzon.appdriver.base.SQLUtil;
 import org.guanzon.appdriver.constant.EditMode;
-import ph.com.guanzongroup.cas.cashflow.status.CashFundStatus;
+import ph.com.guanzongroup.cas.cashflow.status.PettyCashStatus;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.ParseException;
-import ph.com.guanzongroup.cas.cashflow.CashFund;
+import ph.com.guanzongroup.cas.cashflow.PettyCash;
 import ph.com.guanzongroup.cas.cashflow.services.CashflowControllers;
 import ph.com.guanzongroup.integsys.utility.CustomCommonUtil;
 import ph.com.guanzongroup.integsys.utility.JFXUtil;
@@ -44,7 +44,7 @@ import ph.com.guanzongroup.integsys.utility.JFXUtil;
 public class PettyCashFundController implements Initializable, ScreenInterface {
 
     private GRiderCAS oApp;
-    static CashFund poController;
+    static PettyCash poController;
     private JSONObject poJSON;
     public int pnEditMode;
     private String pxeModuleName = JFXUtil.getFormattedClassTitle(this.getClass());
@@ -73,7 +73,7 @@ public class PettyCashFundController implements Initializable, ScreenInterface {
     public void initialize(URL location, ResourceBundle resources) {
         try {
             poJSON = new JSONObject();
-            poController = new CashflowControllers(oApp, null).CashFund();
+            poController = new CashflowControllers(oApp, null).PettyCash();
             poController.initialize(); // Initialize transaction
             poController.initFields();
             initTextFields();
@@ -192,7 +192,7 @@ public class PettyCashFundController implements Initializable, ScreenInterface {
                         break;
                     case "tfCustodian":
                         if (lsValue.isEmpty()) {
-                            poController.getModel().setCashFundManager("");
+                            poController.getModel().setPettyManager("");
                         }
                         break;
                     case "tfDescription":
@@ -208,7 +208,7 @@ public class PettyCashFundController implements Initializable, ScreenInterface {
                             ShowMessageFX.Information(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
                         }
                         switch (poController.getModel().getTransactionStatus()) {
-                            case CashFundStatus.OPEN:
+                            case PettyCashStatus.OPEN:
                                 poController.getModel().setBalance(poController.getModel().getBeginningBalance());
                                 break;
                         }
@@ -265,12 +265,12 @@ public class PettyCashFundController implements Initializable, ScreenInterface {
         try {
             JFXUtil.setDisabled(true, tfCurrentBalance);
             switch (poController.getModel().getTransactionStatus()) {
-                case CashFundStatus.ACTIVE:
+                case PettyCashStatus.ACTIVE:
                     JFXUtil.setDisabled(true, apMaster);
                     break;
             }
-            JFXUtil.setStatusValue(lblStatus, CashFundStatus.class, pnEditMode == EditMode.UNKNOWN ? "-1" : poController.getModel().getTransactionStatus());
-            tfCashFundId.setText(poController.getModel().getCashFundId());
+            JFXUtil.setStatusValue(lblStatus, PettyCashStatus.class, pnEditMode == EditMode.UNKNOWN ? "-1" : poController.getModel().getTransactionStatus());
+            tfCashFundId.setText(poController.getModel().getPettyId());
             tfBranch.setText(poController.getModel().Branch().getBranchName());
             tfDepartment.setText(poController.getModel().Department().getDescription());
             tfCustodian.setText(poController.getModel().Custodian().getCompanyName());
@@ -320,7 +320,7 @@ public class PettyCashFundController implements Initializable, ScreenInterface {
                         pnEditMode = poController.getEditMode();
                         break;
                     case "btnConfirm":
-                        String id = poController.getModel().getCashFundId();
+                        String id = poController.getModel().getPettyId();
                         if (ShowMessageFX.YesNo(null, pxeModuleName, "Are you sure you want to activate this record?") == true) {
                             poJSON = poController.ActivateRecord(); //Activate is Confirm
                             if ("error".equals((String) poJSON.get("result"))) {
@@ -339,7 +339,7 @@ public class PettyCashFundController implements Initializable, ScreenInterface {
                         }
                         break;
                     case "btnVoid":
-                        String id2 = poController.getModel().getCashFundId();
+                        String id2 = poController.getModel().getPettyId();
                         if (ShowMessageFX.YesNo(null, pxeModuleName, "Are you sure you want to deactivate this record?") == true) {
                             poJSON = poController.DeactivateRecord();
                             if ("error".equals((String) poJSON.get("result"))) {
@@ -408,9 +408,9 @@ public class PettyCashFundController implements Initializable, ScreenInterface {
                                 ShowMessageFX.Information(null, pxeModuleName, (String) poJSON.get("message"));
 
                                 // Confirmation Prompt
-                                JSONObject loJSON = poController.openRecord(poController.getModel().getCashFundId());
+                                JSONObject loJSON = poController.openRecord(poController.getModel().getPettyId());
                                 if ("success".equals(loJSON.get("result"))) {
-                                    if (poController.getModel().getTransactionStatus().equals(CashFundStatus.OPEN)) {
+                                    if (poController.getModel().getTransactionStatus().equals(PettyCashStatus.OPEN)) {
                                         if (ShowMessageFX.YesNo(null, pxeModuleName, "Do you want to activate this record?")) {
                                             loJSON = poController.ActivateRecord();
                                             if ("success".equals((String) loJSON.get("result"))) {
@@ -491,13 +491,13 @@ public class PettyCashFundController implements Initializable, ScreenInterface {
         JFXUtil.setDisabled(lbShow3, apMaster);
 
         switch (poController.getModel().getTransactionStatus()) {
-            case CashFundStatus.OPEN:
+            case PettyCashStatus.OPEN:
                 JFXUtil.setButtonsVisibility(false, btnVoid);
                 break;
-            case CashFundStatus.ACTIVE:
+            case PettyCashStatus.ACTIVE:
                 JFXUtil.setButtonsVisibility(false, btnUpdate, btnConfirm);
                 break;
-            case CashFundStatus.DEACTIVATED:
+            case PettyCashStatus.DEACTIVATED:
                 JFXUtil.setButtonsVisibility(false, btnUpdate, btnVoid);
                 break;
         }
