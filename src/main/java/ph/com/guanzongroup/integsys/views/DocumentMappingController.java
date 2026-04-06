@@ -8,7 +8,6 @@ import com.sun.javafx.scene.control.skin.TableHeaderRow;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import java.net.URL;
 import java.sql.SQLException;
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -19,7 +18,6 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
-import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
@@ -28,7 +26,6 @@ import javafx.scene.layout.AnchorPane;
 import org.guanzon.appdriver.base.GRiderCAS;
 import org.guanzon.appdriver.base.GuanzonException;
 import org.guanzon.appdriver.base.LogWrapper;
-import org.guanzon.cas.tbjhandler.Services.TBJControllers;
 import org.json.simple.JSONObject;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -53,10 +50,11 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.StackPane;
 import org.guanzon.appdriver.agent.ShowMessageFX;
-import org.guanzon.appdriver.base.CommonUtils;
 import org.guanzon.appdriver.constant.EditMode;
-import org.guanzon.appdriver.constant.UserRight;
 import org.guanzon.cas.tbjhandler.constant.TBJ_Constant;
+import org.json.simple.parser.ParseException;
+import ph.com.guanzongroup.cas.cashflow.model.Model_Document_Mapping_Detail;
+import ph.com.guanzongroup.cas.cashflow.services.CashflowControllers;
 import ph.com.guanzongroup.integsys.model.ModelTableDetail;
 import ph.com.guanzongroup.integsys.utility.CustomCommonUtil;
 import ph.com.guanzongroup.integsys.utility.JFXUtil;
@@ -87,10 +85,10 @@ import ph.com.guanzongroup.integsys.utility.JFXUtil;
  * @see Initializable
  * @see ph.com.guanzongroup.integsys.views.ScreenInterface
  */
-public class TBJ_ParameterController implements Initializable, ScreenInterface {
+public class DocumentMappingController implements Initializable, ScreenInterface {
 
     private GRiderCAS poApp;
-    private TBJControllers poTBJControllers;
+    private CashflowControllers poCashflowController;
     private String psFormName = "TBJ Parameter";
     private LogWrapper logWrapper;
     private int pnEditMode;
@@ -102,68 +100,56 @@ public class TBJ_ParameterController implements Initializable, ScreenInterface {
     private String psActiveField = "";
     private ObservableList<ModelTableDetail> detail_data = FXCollections.observableArrayList();
     unloadForm poUnload = new unloadForm();
-
-    ObservableList<String> AccountType = FXCollections.observableArrayList(
-            "Debit",
-            "Credit");
-
     @FXML
     private AnchorPane AnchorMain,
-            apBrowse,
-            apButton,
-            apMaster,
-            apDetail,
-            apTableDetail;
-
-    @FXML
-    private TextField tfSearchTransaction,
-            tfSearchSource,
-            tfSourceCode,
-            tfCategory,
-            tfTransactionNo,
-            tfFieldName,
-            tfAccountTitle,
-            tfTableName,
-            tfIndustry;
-
-    @FXML
-    private TextArea taRemarks;
-
-    @FXML
-    private Label lblSource,
-            lblStatus;
+            apDetail, apMaster;
 
     @FXML
     private Button btnBrowse,
             btnNew,
-            btnUpdate,
             btnSave,
+            btnUpdate,
             btnCancel,
-            btnClose,
-            btnVoid,
-            btnConfirm;
+            btnActivate,
+            btnDeactivate,
+            btnClose;
 
     @FXML
-    private FontAwesomeIconView btnStatusGlyph;
+    private FontAwesomeIconView faActivate;
 
     @FXML
-    private CheckBox cbIsRequired,
-            cbIsActive;
+    private TextField txtField01,
+            txtField02,
+            txtField03,
+            txtField04,
+            txtField05,
+            txtField06,
+            txtField07,
+            txtField08,
+            txtField09,
+            txtField10,
+            txtField11,
+            txtField12;
 
     @FXML
-    private ComboBox cmbAccountType;
+    private TextField txtSeeks01,
+            txtSeeks02;
+
+    @FXML
+    private CheckBox cbField01,
+            cbField02,
+            cbField03;
+
+
 
     @FXML
     private TableView<ModelTableDetail> tblDetails;
 
     @FXML
     private TableColumn<ModelTableDetail, String> index00,
-            index01,
-            index02,
-            index03,
-            index04,
-            index05,
-            index06;
+        index01,
+        index02,
+        index03;
 
     /**
      * Sets the GRider application driver instance.
@@ -238,8 +224,7 @@ public class TBJ_ParameterController implements Initializable, ScreenInterface {
         initFields();
         initTableDetail();
         initCheckBox();
-        lblSource.setText("");
-        Platform.runLater(() -> btnNew.fire());
+        btnNew.fire();
     }
 
     /**
@@ -248,10 +233,10 @@ public class TBJ_ParameterController implements Initializable, ScreenInterface {
     private void initializeObject() {
         try {
             LogWrapper logwrapr = new LogWrapper("CAS", System.getProperty("sys.default.path.temp") + "cas-error.log");
-            poTBJControllers = new TBJControllers(poApp, logWrapper);
-            poJSON = poTBJControllers.TBJParameter().InitTransaction();
-            poTBJControllers.TBJParameter().setTransactionStatus("130");
-//            poTBJControllers.TBJParameter().Master().setIndustryID(psIndustryID);
+            poCashflowController = new CashflowControllers(poApp, logWrapper);
+            poJSON = poCashflowController.DocumentMapping().InitTransaction();
+            poCashflowController.DocumentMapping().setTransactionStatus("10");
+//            poCashflowController.DocumentMapping().Master().setIndustryID(psIndustryID);
 //            lblSource.setText(poGLControllers.PaymentRequest().Master().Company().getCompanyName() + " - " + poGLControllers.PaymentRequest().Master().Industry().getDescription());
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(BrandController.class.getName()).log(Level.SEVERE, null, ex);
@@ -292,28 +277,47 @@ public class TBJ_ParameterController implements Initializable, ScreenInterface {
             CustomCommonUtil.setVisible(!lbShow, btnBrowse, btnClose, btnNew);
             CustomCommonUtil.setManaged(!lbShow, btnBrowse, btnClose, btnNew);
 
-            CustomCommonUtil.setVisible(lbShow, btnSave, btnCancel, btnVoid, btnConfirm);
-            CustomCommonUtil.setManaged(lbShow, btnSave, btnCancel, btnVoid, btnConfirm);
+            CustomCommonUtil.setVisible(lbShow, btnSave, btnCancel, btnActivate,btnDeactivate);
+            CustomCommonUtil.setManaged(lbShow, btnSave, btnCancel, btnActivate,btnDeactivate);
 
-            CustomCommonUtil.setVisible(false, btnUpdate, btnVoid, btnConfirm);
-            CustomCommonUtil.setManaged(false, btnUpdate, btnVoid, btnConfirm);
+            CustomCommonUtil.setVisible(false, btnUpdate, btnActivate,btnDeactivate);
+            CustomCommonUtil.setManaged(false, btnUpdate, btnActivate,btnDeactivate);
             if (fnEditMode == EditMode.READY) {
                 CustomCommonUtil.setVisible(true, btnUpdate);
                 CustomCommonUtil.setManaged(true, btnUpdate);
-                if (poTBJControllers.TBJParameter().Master().getTransactionStatus().equals(TBJ_Constant.OPEN)) {
-                    CustomCommonUtil.setVisible(true, btnVoid, btnConfirm);
-                    CustomCommonUtil.setManaged(true, btnVoid, btnConfirm);
-                } else if (poTBJControllers.TBJParameter().Master().getTransactionStatus().equals(TBJ_Constant.CONFIRMED)) {
-                    CustomCommonUtil.setVisible(true, btnVoid);
-                    CustomCommonUtil.setManaged(true, btnVoid);
+                if (poCashflowController.DocumentMapping().Master().getTransactionStatus().equals("0")) {
+                    CustomCommonUtil.setVisible(true, btnActivate);
+                    CustomCommonUtil.setManaged(true, btnActivate);
+                    CustomCommonUtil.setVisible(false, btnDeactivate);
+                    CustomCommonUtil.setManaged(false, btnDeactivate);
+                } else if(poCashflowController.DocumentMapping().Master().getTransactionStatus().equals("1")) {
+                    CustomCommonUtil.setVisible(true, btnDeactivate);
+                    CustomCommonUtil.setManaged(true, btnDeactivate);
+                    CustomCommonUtil.setVisible(false, btnActivate);
+                    CustomCommonUtil.setManaged(false, btnActivate);
                 }
             }
-            if(poTBJControllers.TBJParameter().Master().getTransactionStatus().equals(TBJ_Constant.VOID)){
+            if(poCashflowController.DocumentMapping().Master().getTransactionStatus().equals(TBJ_Constant.VOID)){
                 CustomCommonUtil.setVisible(false, btnUpdate);
                 CustomCommonUtil.setManaged(false, btnUpdate);
             }
+            
+            if (pnEditMode == EditMode.ADDNEW) {
+                apMaster.setDisable(false);
+                apDetail.setDisable(false);
+                cbField01.setDisable(lbShow);
+            } else if (pnEditMode == EditMode.READY || pnEditMode == EditMode.UNKNOWN) {
+                JFXUtil.setDisabledExcept(true,
+                        apMaster);
+                JFXUtil.setDisabledExcept(true,
+                        apDetail);
+                
+            } else if (pnEditMode == EditMode.UPDATE) {
+                apMaster.setDisable(false);
+                apDetail.setDisable(false);
+            }
         } catch (SQLException | GuanzonException ex) {
-            Logger.getLogger(TBJ_ParameterController.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(DocumentMappingController.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
@@ -334,7 +338,7 @@ public class TBJ_ParameterController implements Initializable, ScreenInterface {
      * central dispatcher, making the code easier to maintain and debug.</p>
      */
     private void initButtonsClickActions() {
-        List<Button> buttons = Arrays.asList(btnBrowse, btnNew, btnUpdate, btnSave, btnCancel, btnClose,btnConfirm,btnVoid);
+        List<Button> buttons = Arrays.asList(btnBrowse, btnNew, btnUpdate, btnSave, btnCancel, btnClose,btnActivate,btnDeactivate);
         buttons.forEach(button -> button.setOnAction(this::handleButtonAction));
     }
 
@@ -387,50 +391,67 @@ public class TBJ_ParameterController implements Initializable, ScreenInterface {
                     break;
                 case "btnBrowse":
                     switch (psActiveField) {
-                        case "tfSearchTransaction":
+                        case "txtSeeks01":
                         case "":
-                            poJSON = poTBJControllers.TBJParameter().SearchTransaction(tfSearchTransaction.getText(), psActiveField);
+                            poJSON = poCashflowController.DocumentMapping().SearchTransaction(txtSeeks01.getText(), psActiveField);
                             break;
-                        case "tfSearchSource":
-                            poJSON = poTBJControllers.TBJParameter().SearchTransaction(tfSearchSource.getText(), psActiveField);
+                        case "txtSeeks02":
+                            poJSON = poCashflowController.DocumentMapping().SearchTransaction(txtSeeks02.getText(), psActiveField);
+                            break;
+                        default:
+                            poJSON = poCashflowController.DocumentMapping().SearchTransaction(txtSeeks01.getText(), psActiveField);
                             break;
                     }
                     if (!"success".equals((String) poJSON.get("result"))) {
                         ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
                         return;
                     }
-                    pnEditMode = poTBJControllers.TBJParameter().getEditMode();
+                    pnEditMode = poCashflowController.DocumentMapping().getEditMode();
                     loadTableDetail();
                     LoadMaster();
                     LoadDetail();
+                    Platform.runLater(() -> {
+                        if (!tblDetails.getItems().isEmpty()) {
+                            tblDetails.getSelectionModel().selectFirst();
+                            tblDetails.getFocusModel().focus(0);
+                            tblDetails.scrollTo(0);
+                        }
+                    });
                     break;
                 case "btnNew":
                     ClearAll();
-                    poJSON = poTBJControllers.TBJParameter().NewTransaction();
+                    poJSON = poCashflowController.DocumentMapping().NewTransaction();
                     if (!"success".equals((String) poJSON.get("result"))) {
                         ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
                         return;
                     }
-                    pnEditMode = poTBJControllers.TBJParameter().getEditMode();
+                    pnEditMode = poCashflowController.DocumentMapping().getEditMode();
 
                     loadTableDetail();
                     LoadMaster();
                     LoadDetail();
                     initButtons(pnEditMode);
+                     Platform.runLater(() -> {
+                        if (!tblDetails.getItems().isEmpty()) {
+                            tblDetails.getSelectionModel().selectFirst();
+                            tblDetails.getFocusModel().focus(0);
+                            tblDetails.scrollTo(0);
+                        }
+                    });
                     break;
                 case "btnUpdate":
-                    if(poTBJControllers.TBJParameter().Master().getTransactionNo()== null ||
-                            poTBJControllers.TBJParameter().Master().getTransactionNo().isEmpty()){
+                    if(poCashflowController.DocumentMapping().Master().getDocumentCode()== null ||
+                            poCashflowController.DocumentMapping().Master().getDocumentCode().isEmpty()){
                         ShowMessageFX.Warning("No transaction was loaded. ", psFormName, null);
                         return;
                     }
                     
-                    poJSON = poTBJControllers.TBJParameter().UpdateTransaction();
+                    poJSON = poCashflowController.DocumentMapping().UpdateTransaction();
                     if (!"success".equals((String) poJSON.get("result"))) {
                         ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
                         return;
                     }
-                    pnEditMode = poTBJControllers.TBJParameter().getEditMode();
+                    pnEditMode = poCashflowController.DocumentMapping().getEditMode();
                     LoadMaster();
                     LoadDetail();
                     loadTableDetail();
@@ -439,72 +460,54 @@ public class TBJ_ParameterController implements Initializable, ScreenInterface {
                 case "btnCancel":
                     if (ShowMessageFX.YesNo("Are you sure you want to cancel? \nAny data you have entered will not be saved.", psFormName,null )) {
                         ClearAll();
+                        initializeObject();
                         pnEditMode = EditMode.UNKNOWN;
                         initButtons(pnEditMode);
                     }
                     break;
                 case "btnSave":
-                    poJSON = poTBJControllers.TBJParameter().SaveTransaction();
+                    poJSON = poCashflowController.DocumentMapping().SaveTransaction();
                     if (!"success".equals((String) poJSON.get("result"))) {
                         ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
                         return;
                     }
                     ShowMessageFX.Information((String) poJSON.get("message"), psFormName, null);
-                    if (poApp.getUserLevel() > UserRight.ENCODER) {
-                        if (ShowMessageFX.YesNo(null, psFormName, "Do you want to confirm this transaction?")) {
-                            try {
-                                poJSON = poTBJControllers.TBJParameter().ConfirmTransaction("");
-                            } catch (ParseException ex) {
-                                Logger.getLogger(TBJ_ParameterController.class.getName()).log(Level.SEVERE, null, ex);
-                            }
-                            if (!"success".equals((String) poJSON.get("result"))) {
-                                ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
-                                return;
-                            }
-                            ShowMessageFX.Information((String) poJSON.get("message"), psFormName, null);
-                        }
-                    }
-
                     ClearAll();
+                    detail_data.clear();
                     btnNew.fire();
                     break;
 
-                case "btnVoid":
-                    try {
-                    poJSON = poTBJControllers.TBJParameter().VoidTransaction("");
-
+                case "btnActivate":
+                    if (!ShowMessageFX.YesNo("Are you sure you want to activate this parameter?", psFormName,null )) {
+                        return;
+                    }
+                    poJSON = poCashflowController.DocumentMapping().ActivateTransaction();
                     if (!"success".equals((String) poJSON.get("result"))) {
                         ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
                         return;
                     }
                     ShowMessageFX.Information((String) poJSON.get("message"), psFormName, null);
                     ClearAll();
-
+                    detail_data.clear();
                     initializeObject();
-                    pnEditMode = poTBJControllers.TBJParameter().getEditMode();
+                    pnEditMode = EditMode.UNKNOWN;
                     initButtons(pnEditMode);
-                } catch (ParseException ex) {
-                    Logger.getLogger(TBJ_ParameterController.class.getName()).log(Level.SEVERE, null, ex);
-                }
                 break;
-                case "btnConfirm":
-                    try {
-                    poJSON = poTBJControllers.TBJParameter().ConfirmTransaction("");
-
+                case "btnDeactivate":
+                    if (!ShowMessageFX.YesNo("Are you sure you want to deactivate this parameter?", psFormName,null )) {
+                        return;
+                    }
+                     poJSON = poCashflowController.DocumentMapping().DeactivateTransaction();
                     if (!"success".equals((String) poJSON.get("result"))) {
                         ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
                         return;
                     }
                     ShowMessageFX.Information((String) poJSON.get("message"), psFormName, null);
                     ClearAll();
-
+                    detail_data.clear();
                     initializeObject();
-                    pnEditMode = poTBJControllers.TBJParameter().getEditMode();
+                    pnEditMode = EditMode.UNKNOWN;
                     initButtons(pnEditMode);
-                } catch (ParseException ex) {
-                    Logger.getLogger(TBJ_ParameterController.class.getName()).log(Level.SEVERE, null, ex);
-                    ShowMessageFX.Error(ex.getMessage(), psFormName, null);
-                }
                 break;
 
                 default:
@@ -512,10 +515,11 @@ public class TBJ_ParameterController implements Initializable, ScreenInterface {
                     break;
             }
             initButtons(pnEditMode);
-            initFields();
         } catch (CloneNotSupportedException | SQLException | GuanzonException ex) {
-            Logger.getLogger(TBJ_ParameterController.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(DocumentMappingController.class.getName()).log(Level.SEVERE, null, ex);
             ShowMessageFX.Error(ex.getMessage(), psFormName, psFormName);
+        } catch (ParseException ex) {
+            Logger.getLogger(DocumentMappingController.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
@@ -562,58 +566,65 @@ public class TBJ_ParameterController implements Initializable, ScreenInterface {
      * initialization.
      */
     private void initFields() {
-        try {
-            //        try {
-            boolean isEditable = (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE);
-            JFXUtil.setDisabled(!isEditable,
-                    tfSourceCode,
-                    tfCategory,
-                    tfTransactionNo,
-                    tfFieldName,
-                    tfAccountTitle,
-                    tfTableName,
-                    cbIsActive,
-                    cbIsRequired,
-                    cmbAccountType,
-                    taRemarks,
-                    tfIndustry
-            );
-
-            if (pnEditMode == EditMode.ADDNEW) {
-                apMaster.setDisable(false);
-                apDetail.setDisable(false);
-                cbIsActive.setDisable(isEditable);
-            } else if (pnEditMode == EditMode.UPDATE && TBJ_Constant.CONFIRMED.equals(poTBJControllers.TBJParameter().Master().getTransactionStatus())) {
-                JFXUtil.setDisabledExcept(true,
-                        apMaster,
-                        taRemarks);
-                JFXUtil.setDisabledExcept(true,
-                        apDetail,
-                        cbIsActive);
-
-                if (poTBJControllers.TBJParameter().Detail(pnSelectedDetail).getEditMode() == EditMode.ADDNEW) {
-                    JFXUtil.setDisabledExcept(false,
-                            apDetail);
-                }
-            } else if (pnEditMode == EditMode.UPDATE && TBJ_Constant.OPEN.equals(poTBJControllers.TBJParameter().Master().getTransactionStatus())) {
-                apMaster.setDisable(false);
-                apDetail.setDisable(false);
-            }
-
-            List<TextField> loTxtField = Arrays.asList(tfTableName, tfIndustry,tfCategory, tfSourceCode, tfAccountTitle, tfFieldName);
-            loTxtField.forEach(tf -> tf.setOnKeyPressed(event -> txtField_KeyPressed(event)));
-
-            JFXUtil.setFocusListener(txtArea_Focus, taRemarks);
-            JFXUtil.setFocusListener(txtField_Focus, tfSearchSource, tfSearchTransaction);
-
-            tblDetails.setOnMouseClicked(this::tblDetails_Clicked);
-            makeClearableReadOnly(tfFieldName);
-        } catch (SQLException | GuanzonException ex) {
-            Logger.getLogger(TBJ_ParameterController.class.getName()).log(Level.SEVERE, null, ex);
-            ShowMessageFX.Error(ex.getMessage(), psFormName, null);
-        }
+        //        try {
+        boolean isEditable = (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE);
+        JFXUtil.setDisabled(!isEditable,
+                txtField01,
+                txtField02,
+                txtField03,
+                txtField04,
+                txtField05,
+                txtField06,
+                txtField07,
+                txtField08,
+                txtField09,
+                txtField10,
+                txtField11,
+                txtField12
+        );
+        List<TextField> loTxtField = Arrays.asList(txtField01,
+                txtField02,
+                txtField03,
+                txtField04,
+                txtField05,
+                txtField06,
+                txtField07,
+                txtField08,
+                txtField09,
+                txtField10,
+                txtField11,
+                txtField12);
+        loTxtField.forEach(tf -> tf.setOnKeyPressed(event -> txtField_KeyPressed(event)));
+        JFXUtil.setFocusListener(txtField_Focus, txtField01,
+                txtField02,
+                txtField03,
+                txtField04,
+                txtField05,
+                txtField06,
+                txtField07,
+                txtField08,
+                txtField09,
+                txtField10,
+                txtField11,
+                txtField12);
+        JFXUtil.setFocusListener(txSeeks_Focus, txtSeeks01,
+                txtSeeks02);
+        tblDetails.setOnMouseClicked(this::tblDetails_Clicked);
 
     }
+    
+     ChangeListener<Boolean> txSeeks_Focus = JFXUtil.FocusListener(TextField.class,
+            (lsID, lsValue) -> {
+                /* Lost Focus */
+                switch (lsID) {
+                    case "txtSeeks01":
+                        psActiveField = lsID;
+                        break;
+                    case "txtSeeks02":
+                        psActiveField = lsID;
+                        break;
+                }
+            });
 
     /**
      * Initializes the Account Type ComboBox and binds it to the detail model.
@@ -649,31 +660,31 @@ public class TBJ_ParameterController implements Initializable, ScreenInterface {
      * updates.</p>
      */
     private void initComboBox(){
-        cmbAccountType.setItems(AccountType); // your ObservableList
-        JFXUtil.initComboBoxCellDesignColor("#FF8201", cmbAccountType);
-
-        // Attach combo box listener
-        cmbAccountType.setOnAction(event -> {
-            try {
-                if (pnSelectedDetail >= 0) { // safety check
-                    if(cmbAccountType.getSelectionModel().getSelectedIndex() == 0){
-                            poTBJControllers.TBJParameter()
-                                .Detail(pnSelectedDetail)
-                                .setAccountType("D");
-                    }else if(cmbAccountType.getSelectionModel().getSelectedIndex() == 1){
-                            poTBJControllers.TBJParameter()
-                                .Detail(pnSelectedDetail)
-                                .setAccountType("C");
-                    }
-                    loadTableDetail(); // refresh table after change
-                }
-            } catch (SQLException | GuanzonException ex) {
-                Logger.getLogger(TBJ_ParameterController.class.getName())
-                        .log(Level.SEVERE, null, ex);
-                ShowMessageFX.Error(ex.getMessage(), psFormName, null);
-            }
-        });
-        JFXUtil.initComboBoxCellDesignColor("#FF8201", cmbAccountType);
+//        cmbAccountType.setItems(AccountType); // your ObservableList
+//        JFXUtil.initComboBoxCellDesignColor("#FF8201", cmbAccountType);
+//
+//        // Attach combo box listener
+//        cmbAccountType.setOnAction(event -> {
+//            try {
+//                if (pnSelectedDetail >= 0) { // safety check
+//                    if(cmbAccountType.getSelectionModel().getSelectedIndex() == 0){
+//                            poCashflowController.DocumentMapping()
+//                                .Detail(pnSelectedDetail)
+//                                .setAccountType("D");
+//                    }else if(cmbAccountType.getSelectionModel().getSelectedIndex() == 1){
+//                            poCashflowController.DocumentMapping()
+//                                .Detail(pnSelectedDetail)
+//                                .setAccountType("C");
+//                    }
+//                    loadTableDetail(); // refresh table after change
+//                }
+//            } catch (SQLException | GuanzonException ex) {
+//                Logger.getLogger(DocumentMappingController.class.getName())
+//                        .log(Level.SEVERE, null, ex);
+//                ShowMessageFX.Error(ex.getMessage(), psFormName, null);
+//            }
+//        });
+//        JFXUtil.initComboBoxCellDesignColor("#FF8201", cmbAccountType);
     
     }
 
@@ -702,13 +713,161 @@ public class TBJ_ParameterController implements Initializable, ScreenInterface {
     ChangeListener<Boolean> txtField_Focus = JFXUtil.FocusListener(TextField.class,
             (lsID, lsValue) -> {
                 /* Lost Focus */
-                switch (lsID) {
-                    case "tfSearchTransaction":
-                        psActiveField = lsID;
-                        break;
-                    case "tfSearchSource":
-                        psActiveField = lsID;
-                        break;
+                try {
+                    switch (lsID) {
+                        case "txtField01":
+                            poJSON = poCashflowController.DocumentMapping().Master().setDocumentCode(lsValue);
+                            if ("error".equals(poJSON.get("result"))) {
+                                ShowMessageFX.Error((String) poJSON.get("message"), psFormName, null);
+                                txtField01.requestFocus();
+                                txtField01.selectAll();
+                                return;
+                            }
+                            break;
+                        case "txtField02":
+                            poJSON = poCashflowController.DocumentMapping().Master().setDesciption(lsValue);
+                            if ("error".equals(poJSON.get("result"))) {
+                                ShowMessageFX.Error((String) poJSON.get("message"), psFormName, null);
+                                txtField02.requestFocus();
+                                txtField02.selectAll();
+                                return;
+                            }
+                            break;
+                        case "txtField03":
+                            poJSON = poCashflowController.DocumentMapping().Detail(pnSelectedDetail).setFieldCode(lsValue);
+                            if ("error".equals(poJSON.get("result"))) {
+                                ShowMessageFX.Error((String) poJSON.get("message"), psFormName, null);
+                                txtField03.requestFocus();
+                                txtField03.selectAll();
+                                return;
+                            }
+                            break;
+                        case "txtField04":
+                            poJSON = poCashflowController.DocumentMapping().Detail(pnSelectedDetail).setFontName(lsValue);
+                            if ("error".equals(poJSON.get("result"))) {
+                                ShowMessageFX.Error((String) poJSON.get("message"), psFormName, null);
+                                txtField04.requestFocus();
+                                txtField04.selectAll();
+                                return;
+                            }
+                            break;  
+                        case "txtField05":
+                            if(lsValue == null || lsValue.isEmpty()){
+                                lsValue = "0";
+                            }
+                            JFXUtil.inputIntegersOnly(txtField05);
+                            poJSON = poCashflowController.DocumentMapping().Detail(pnSelectedDetail).setFontSize(Integer.parseInt(lsValue));
+                            if ("error".equals(poJSON.get("result"))) {
+                                ShowMessageFX.Error((String) poJSON.get("message"), psFormName, null);
+                                txtField05.requestFocus();
+                                txtField05.selectAll();
+                                return;
+                            }
+                            txtField05.setText(String.valueOf(poCashflowController.DocumentMapping().Detail(pnSelectedDetail).getFontSize()));
+                            break;  
+                        case "txtField06":
+                            if(lsValue == null || lsValue.isEmpty()){
+                                lsValue = "0.00";
+                            }
+                            JFXUtil.inputDecimalOnly(txtField06);
+                            poJSON = poCashflowController.DocumentMapping().Detail(pnSelectedDetail).setTopRow(Double.parseDouble(lsValue));
+                            if ("error".equals(poJSON.get("result"))) {
+                                ShowMessageFX.Error((String) poJSON.get("message"), psFormName, null);
+                                txtField06.requestFocus();
+                                txtField06.selectAll();
+                                return;
+                            }
+                            txtField06.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poCashflowController.DocumentMapping().Detail(pnSelectedDetail).getTopRow(), false));
+                            break; 
+                        case "txtField07":
+                            if(lsValue == null || lsValue.isEmpty()){
+                                lsValue = "0.00";
+                            }
+                            JFXUtil.inputDecimalOnly(txtField07);
+                            poJSON = poCashflowController.DocumentMapping().Detail(pnSelectedDetail).setRowSpace(Double.parseDouble(lsValue));
+                            if ("error".equals(poJSON.get("result"))) {
+                                ShowMessageFX.Error((String) poJSON.get("message"), psFormName, null);
+                                txtField07.requestFocus();
+                                txtField07.selectAll();
+                                return;
+                            }
+                            txtField07.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poCashflowController.DocumentMapping().Detail(pnSelectedDetail).getRowSpace(), false));
+                            break;     
+                        case "txtField08":
+                            if(lsValue == null || lsValue.isEmpty()){
+                                lsValue = "0.00";
+                            }
+                            JFXUtil.inputDecimalOnly(txtField08);
+                            poJSON = poCashflowController.DocumentMapping().Detail(pnSelectedDetail).setLeftColumn(Double.parseDouble(lsValue));
+                            if ("error".equals(poJSON.get("result"))) {
+                                ShowMessageFX.Error((String) poJSON.get("message"), psFormName, null);
+                                txtField08.requestFocus();
+                                txtField08.selectAll();
+                                return;
+                            }
+                            txtField08.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poCashflowController.DocumentMapping().Detail(pnSelectedDetail).getLeftColumn(), false));
+                            break;     
+                        case "txtField09":
+                            if(lsValue == null || lsValue.isEmpty()){
+                                lsValue = "0.00";
+                            }
+                            JFXUtil.inputDecimalOnly(txtField09);
+                            poJSON = poCashflowController.DocumentMapping().Detail(pnSelectedDetail).setColumnSpace(Double.parseDouble(lsValue));
+                            if ("error".equals(poJSON.get("result"))) {
+                                ShowMessageFX.Error((String) poJSON.get("message"), psFormName, null);
+                                txtField09.requestFocus();
+                                txtField09.selectAll();
+                                return;
+                            }
+                            txtField09.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poCashflowController.DocumentMapping().Detail(pnSelectedDetail).getColumnSpace(), false));
+                            break;      
+                        case "txtField10":
+                            if(lsValue == null || lsValue.isEmpty()){
+                                lsValue = "0";
+                            }
+                            JFXUtil.inputIntegersOnly(txtField10);
+                            poJSON = poCashflowController.DocumentMapping().Detail(pnSelectedDetail).setPageLocation(Integer.parseInt(lsValue));
+                            if ("error".equals(poJSON.get("result"))) {
+                                ShowMessageFX.Error((String) poJSON.get("message"), psFormName, null);
+                                txtField10.requestFocus();
+                                txtField10.selectAll();
+                                return;
+                            }
+                            txtField10.setText(String.valueOf(poCashflowController.DocumentMapping().Detail(pnSelectedDetail).getPageLocation()));
+                            break;     
+                        case "txtField11":
+                            if(lsValue == null || lsValue.isEmpty()){
+                                lsValue = "0";
+                            }
+                            JFXUtil.inputIntegersOnly(txtField11);
+                            poJSON = poCashflowController.DocumentMapping().Detail(pnSelectedDetail).setMaxLength(Integer.parseInt(lsValue));
+                            if ("error".equals(poJSON.get("result"))) {
+                                ShowMessageFX.Error((String) poJSON.get("message"), psFormName, null);
+                                txtField11.requestFocus();
+                                txtField11.selectAll();
+                                return;
+                            }
+                            txtField11.setText(String.valueOf(poCashflowController.DocumentMapping().Detail(pnSelectedDetail).getMaxLength()));
+                            break;      
+                        case "txtField12":
+                            if(lsValue == null || lsValue.isEmpty()){
+                                lsValue = "0";
+                            }
+                            JFXUtil.inputIntegersOnly(txtField12);
+                            poJSON = poCashflowController.DocumentMapping().Detail(pnSelectedDetail).setMaxRow(Integer.parseInt(lsValue));
+                            if ("error".equals(poJSON.get("result"))) {
+                                ShowMessageFX.Error((String) poJSON.get("message"), psFormName, null);
+                                txtField12.requestFocus();
+                                txtField12.selectAll();
+                                return;
+                            }
+                            txtField12.setText(String.valueOf(poCashflowController.DocumentMapping().Detail(pnSelectedDetail).getMaxRow()));
+                            break;    
+                    }
+                    loadTableDetail();
+                } catch (SQLException | GuanzonException | ExceptionInInitializerError ex) {
+                    Logger.getLogger(TBJ_ParameterController.class.getName()).log(Level.SEVERE, null, ex);
+                    ShowMessageFX.Error(ex.getMessage(), psFormName, null);
                 }
             });
 
@@ -737,20 +896,18 @@ public class TBJ_ParameterController implements Initializable, ScreenInterface {
     private void initCheckBox() {
         
         if ((pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE)) {
-            cbIsActive.setOnAction(event -> {
+            cbField02.setOnAction(event -> {
                 try {
-                    poTBJControllers.TBJParameter().Detail(pnSelectedDetail).isActive(cbIsActive.isSelected());
-                    loadTableDetail();
+                    poCashflowController.DocumentMapping().Detail(pnSelectedDetail).isFixValue(cbField02.isSelected());
                 } catch (SQLException | GuanzonException ex) {
-                    Logger.getLogger(TBJ_ParameterController.class.getName()).log(Level.SEVERE, null, ex);
+                    Logger.getLogger(DocumentMappingController.class.getName()).log(Level.SEVERE, null, ex);
                 }
             });
-            cbIsRequired.setOnAction(event -> {
+            cbField03.setOnAction(event -> {
                 try {
-                    poTBJControllers.TBJParameter().Detail(pnSelectedDetail).isRequired(cbIsRequired.isSelected());
-                    loadTableDetail();
+                    poCashflowController.DocumentMapping().Detail(pnSelectedDetail).isMultiple(cbField03.isSelected());
                 } catch (SQLException | GuanzonException ex) {
-                    Logger.getLogger(TBJ_ParameterController.class.getName()).log(Level.SEVERE, null, ex);
+                    Logger.getLogger(DocumentMappingController.class.getName()).log(Level.SEVERE, null, ex);
                 }
             });
         }
@@ -784,21 +941,21 @@ public class TBJ_ParameterController implements Initializable, ScreenInterface {
         if (lsValue == null) {
             return;
         }
-        try {
-            if (!nv) {
-                /*Lost Focus*/
-                switch (lsTextAreaID) {
-                    case "taRemarks":
-                        poTBJControllers.TBJParameter().Master().setRemarks(lsValue);
-                        break;
-                }
-            } else {
-                loTextArea.selectAll();
-            }
-        } catch (SQLException | GuanzonException ex) {
-            Logger.getLogger(PaymentRequest_EntryController.class
-                    .getName()).log(Level.SEVERE, null, ex);
-        }
+//        try {
+//            if (!nv) {
+//                /*Lost Focus*/
+//                switch (lsTextAreaID) {
+//                    case "taRemarks":
+////                        poCashflowController.DocumentMapping().Master().setRemarks(lsValue);
+//                        break;
+//                }
+//            } else {
+//                loTextArea.selectAll();
+//            }
+//        } catch (SQLException | GuanzonException ex) {
+//            Logger.getLogger(PaymentRequest_EntryController.class
+//                    .getName()).log(Level.SEVERE, null, ex);
+//        }
     };
 
     /**
@@ -838,7 +995,7 @@ public class TBJ_ParameterController implements Initializable, ScreenInterface {
             lsValue = lsTxtField.getText();
         }
         if (null != event.getCode()) {
-            try {
+//            try {
                 switch (event.getCode()) {
                     case TAB:
                     case ENTER:
@@ -846,78 +1003,78 @@ public class TBJ_ParameterController implements Initializable, ScreenInterface {
                     case F3:
                         switch (txtFieldID) {
                             case "tfIndustry":
-                                poJSON = poTBJControllers.TBJParameter().SearchIndustry(lsValue, false);
-                                if ("error".equals(poJSON.get("result"))) {
-                                    ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
-                                }
-                                tfIndustry.setText(poTBJControllers.TBJParameter().Master().Industry().getDescription());
+//                                poJSON = poCashflowController.DocumentMapping().SearchIndustry(lsValue, false);
+//                                if ("error".equals(poJSON.get("result"))) {
+//                                    ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
+//                                }
+//                                tfIndustry.setText(poCashflowController.DocumentMapping().Master().Industry().getDescription());
                                 return;
                             case "tfCategory":
-                                poJSON = poTBJControllers.TBJParameter().SearchCategory(lsValue, false);
-                                if ("error".equals(poJSON.get("result"))) {
-                                    ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
-                                }
-                                tfCategory.setText(poTBJControllers.TBJParameter().Master().Category().getDescription());
+//                                poJSON = poCashflowController.DocumentMapping().SearchCategory(lsValue, false);
+//                                if ("error".equals(poJSON.get("result"))) {
+//                                    ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
+//                                }
+//                                tfCategory.setText(poCashflowController.DocumentMapping().Master().Category().getDescription());
                                 return;
 
                             case "tfSourceCode":
-                                poJSON = poTBJControllers.TBJParameter().SearchSourceCode(lsValue, false);
-                                if ("error".equals(poJSON.get("result"))) {
-                                    ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
-                                }
-                                tfSourceCode.setText(poTBJControllers.TBJParameter().Master().TransactionSource().getSourceName());
-                                tfTableName.clear();
+//                                poJSON = poCashflowController.DocumentMapping().SearchSourceCode(lsValue, false);
+//                                if ("error".equals(poJSON.get("result"))) {
+//                                    ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
+//                                }
+//                                tfSourceCode.setText(poCashflowController.DocumentMapping().Master().TransactionSource().getSourceName());
+//                                tfTableName.clear();
                                 return;
 
                             case "tfAccountTitle":
-                                poJSON = poTBJControllers.TBJParameter().SearchAccountChart(lsValue, false, pnSelectedDetail);
-                                if ("error".equals(poJSON.get("result"))) {
-                                    ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
-                                }
-                                tfAccountTitle.setText(poTBJControllers.TBJParameter().Detail(pnSelectedDetail).AccountChart().getDescription());
-                                
-                                poJSON = poTBJControllers.TBJParameter().checkDuplicateDetail();
-                                 if("error".equals(poJSON.get("result"))){
-                                      ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
-                                      tfAccountTitle.requestFocus();
-                                      tfAccountTitle.selectAll();
-                                      return;
-                                 }
-                                 loadTableDetail();
+//                                poJSON = poCashflowController.DocumentMapping().SearchAccountChart(lsValue, false, pnSelectedDetail);
+//                                if ("error".equals(poJSON.get("result"))) {
+//                                    ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
+//                                }
+//                                tfAccountTitle.setText(poCashflowController.DocumentMapping().Detail(pnSelectedDetail).AccountChart().getDescription());
+//                                
+//                                poJSON = poCashflowController.DocumentMapping().checkDuplicateDetail();
+//                                 if("error".equals(poJSON.get("result"))){
+//                                      ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
+//                                      tfAccountTitle.requestFocus();
+//                                      tfAccountTitle.selectAll();
+//                                      return;
+//                                 }
+//                                 loadTableDetail();
                                 return;
 
                             case "tfTableName":
-                                poJSON = poTBJControllers.TBJParameter().SearchSourceCodeTable(lsValue, pnSelectedDetail);
-                                if ("error".equals(poJSON.get("result"))) {
-                                    ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
-                                }
-                                tfTableName.setText(poTBJControllers.TBJParameter().Detail(pnSelectedDetail).getTableNm().trim().replace("_", " "));
-                                poJSON = poTBJControllers.TBJParameter().checkDuplicateDetail();
-                                 if("error".equals(poJSON.get("result"))){
-                                      ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
-                                      tfAccountTitle.requestFocus();
-                                      tfAccountTitle.selectAll();
-                                      return;
-                                 }
-                                loadTableDetail();
+//                                poJSON = poCashflowController.DocumentMapping().SearchSourceCodeTable(lsValue, pnSelectedDetail);
+//                                if ("error".equals(poJSON.get("result"))) {
+//                                    ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
+//                                }
+//                                tfTableName.setText(poCashflowController.DocumentMapping().Detail(pnSelectedDetail).getTableNm().trim().replace("_", " "));
+//                                poJSON = poCashflowController.DocumentMapping().checkDuplicateDetail();
+//                                 if("error".equals(poJSON.get("result"))){
+//                                      ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
+//                                      tfAccountTitle.requestFocus();
+//                                      tfAccountTitle.selectAll();
+//                                      return;
+//                                 }
+//                                loadTableDetail();
                                 return;
                             case "tfFieldName":
-                                if (poTBJControllers.TBJParameter().Detail(pnSelectedDetail).getTableNm() == null
-                                        || poTBJControllers.TBJParameter().Detail(pnSelectedDetail).getTableNm().isEmpty()) {
-                                    ShowMessageFX.Warning("Table Name is not set!", psFormName, null);
-                                    return;
-                                }
-                                
-                                poTBJControllers.TBJParameter().show(poTBJControllers.TBJParameter().Detail(pnSelectedDetail).getTableNm().trim().replace(" ", "_"), pnSelectedDetail);
-                                tfFieldName.setText(poTBJControllers.TBJParameter().getFieldName(poTBJControllers.TBJParameter().Detail(pnSelectedDetail).getDerivedField(), pnSelectedDetail));
-                                poJSON = poTBJControllers.TBJParameter().checkDuplicateDetail();
-                                 if("error".equals(poJSON.get("result"))){
-                                      ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
-                                      tfAccountTitle.requestFocus();
-                                      tfAccountTitle.selectAll();
-                                      return;
-                                 }
-                                loadTableDetail();
+//                                if (poCashflowController.DocumentMapping().Detail(pnSelectedDetail).getTableNm() == null
+//                                        || poCashflowController.DocumentMapping().Detail(pnSelectedDetail).getTableNm().isEmpty()) {
+//                                    ShowMessageFX.Warning("Table Name is not set!", psFormName, null);
+//                                    return;
+//                                }
+//                                
+//                                poCashflowController.DocumentMapping().show(poCashflowController.DocumentMapping().Detail(pnSelectedDetail).getTableNm().trim().replace(" ", "_"), pnSelectedDetail);
+//                                tfFieldName.setText(poCashflowController.DocumentMapping().getFieldName(poCashflowController.DocumentMapping().Detail(pnSelectedDetail).getDerivedField(), pnSelectedDetail));
+//                                poJSON = poCashflowController.DocumentMapping().checkDuplicateDetail();
+//                                 if("error".equals(poJSON.get("result"))){
+//                                      ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
+//                                      tfAccountTitle.requestFocus();
+//                                      tfAccountTitle.selectAll();
+//                                      return;
+//                                 }
+//                                loadTableDetail();
                                 break;
 
                         }
@@ -931,10 +1088,10 @@ public class TBJ_ParameterController implements Initializable, ScreenInterface {
                         break;
 
                 }
-            } catch (SQLException | GuanzonException | ExceptionInInitializerError ex) {
-                Logger.getLogger(TBJ_ParameterController.class.getName()).log(Level.SEVERE, null, ex);
-                ShowMessageFX.Error(ex.getMessage(), psFormName, null);
-            }
+//            } catch (SQLException | GuanzonException | ExceptionInInitializerError ex) {
+//                Logger.getLogger(DocumentMappingController.class.getName()).log(Level.SEVERE, null, ex);
+//                ShowMessageFX.Error(ex.getMessage(), psFormName, null);
+//            }
         }
     }
 
@@ -968,35 +1125,12 @@ public class TBJ_ParameterController implements Initializable, ScreenInterface {
      */
     private void LoadMaster() {
         try {
-            tfTransactionNo.setText(poTBJControllers.TBJParameter().Master().getTransactionNo());
-            tfIndustry.setText(poTBJControllers.TBJParameter().Master().Industry().getDescription() == null ? ""
-                    : poTBJControllers.TBJParameter().Master().Industry().getDescription());
-            tfSourceCode.setText(
-                    poTBJControllers.TBJParameter().Master().getSourceCode() == null ? ""
-                    : poTBJControllers.TBJParameter().Master().getSourceCode());
-            tfCategory.setText(
-                    poTBJControllers.TBJParameter().Master().Category().getDescription() == null ? ""
-                    : poTBJControllers.TBJParameter().Master().Category().getDescription());
-            tfSourceCode.setText(
-                    poTBJControllers.TBJParameter().Master().getSourceCode() == null ? ""
-                    : poTBJControllers.TBJParameter().Master().getSourceCode());
-
-            taRemarks.setText(poTBJControllers.TBJParameter().Master().getRemarks() == null ? ""
-                    : poTBJControllers.TBJParameter().Master().getRemarks());
-
-            String lsStatus = "";
-            switch (poTBJControllers.TBJParameter().Master().getTransactionStatus()) {
-                case TBJ_Constant.VOID:
-                    lsStatus = "VOID";
-                    break;
-                case TBJ_Constant.OPEN:
-                    lsStatus = "OPEN";
-                    break;
-                case TBJ_Constant.CONFIRMED:
-                    lsStatus = "CONFIRMED";
-                    break;
-            }
-            lblStatus.setText(lsStatus);
+            txtField01.setText(poCashflowController.DocumentMapping().Master().getDocumentCode());
+            txtField02.setText(poCashflowController.DocumentMapping().Master().getDesciption());
+            cbField01.setSelected("1".equals(
+                    poCashflowController.DocumentMapping().Master().getTransactionStatus()
+            ));
+            
         } catch (SQLException | GuanzonException | NullPointerException ex) {
             Logger.getLogger(PaymentRequest_EntryController.class.getName()).log(Level.SEVERE, null, ex);
             ShowMessageFX.Error(ex.getMessage(), psFormName, null);
@@ -1031,35 +1165,23 @@ public class TBJ_ParameterController implements Initializable, ScreenInterface {
      */
     private void LoadDetail() {
         try {
-            tfAccountTitle.setText(poTBJControllers.TBJParameter().Detail(pnSelectedDetail).AccountChart().getDescription() == null ? ""
-                    : poTBJControllers.TBJParameter().Detail(pnSelectedDetail).AccountChart().getDescription());
+            txtField03.setText(poCashflowController.DocumentMapping().Detail(pnSelectedDetail).getFieldCode()== null ? ""
+                    : poCashflowController.DocumentMapping().Detail(pnSelectedDetail).getFieldCode());
 
-            tfTableName.setText(poTBJControllers.TBJParameter().Detail(pnSelectedDetail).getTableNm() == null ? ""
-                    : poTBJControllers.TBJParameter().Detail(pnSelectedDetail).getTableNm().trim().replace("_", " "));
+            txtField04.setText(poCashflowController.DocumentMapping().Detail(pnSelectedDetail).getFontName()== null ? ""
+                    : poCashflowController.DocumentMapping().Detail(pnSelectedDetail).getFontName());
 
-            tfFieldName.setText(poTBJControllers.TBJParameter().getFieldName(poTBJControllers.TBJParameter().Detail(pnSelectedDetail).getDerivedField(), pnSelectedDetail));
-
-            String accountTypeStr = poTBJControllers.TBJParameter().Detail(pnSelectedDetail).getAccountType();
-
-            if (accountTypeStr != null && !accountTypeStr.trim().isEmpty()) {
-
-                    if(accountTypeStr.equals("D")){
-                        cmbAccountType.getSelectionModel().select(0);
-                    }else if(accountTypeStr.equals("C")){
-                        cmbAccountType.getSelectionModel().select(1);
-                    }
-//                    int getAccountType = Integer.parseInt(accountTypeStr);
-//                    cmbAccountType.getSelectionModel().select(getAccountType);
-
-            }
-            cbIsActive.setSelected(
-                    poTBJControllers.TBJParameter().Detail(pnSelectedDetail) != null
-                    && poTBJControllers.TBJParameter().Detail(pnSelectedDetail).isActive()
-            );
-            cbIsRequired.setSelected(
-                    poTBJControllers.TBJParameter().Detail(pnSelectedDetail) != null
-                    && poTBJControllers.TBJParameter().Detail(pnSelectedDetail).isRequired()
-            );
+            txtField05.setText(String.valueOf(poCashflowController.DocumentMapping().Detail(pnSelectedDetail).getFontSize()));
+            txtField06.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poCashflowController.DocumentMapping().Detail(pnSelectedDetail).getTopRow()));
+            txtField07.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poCashflowController.DocumentMapping().Detail(pnSelectedDetail).getRowSpace()));
+            txtField08.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poCashflowController.DocumentMapping().Detail(pnSelectedDetail).getLeftColumn()));
+            txtField09.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poCashflowController.DocumentMapping().Detail(pnSelectedDetail).getColumnSpace()));
+            txtField10.setText(String.valueOf(poCashflowController.DocumentMapping().Detail(pnSelectedDetail).getPageLocation()));
+            txtField11.setText(String.valueOf(poCashflowController.DocumentMapping().Detail(pnSelectedDetail).getMaxLength()));
+            txtField12.setText(String.valueOf(poCashflowController.DocumentMapping().Detail(pnSelectedDetail).getMaxRow()));
+            
+            cbField02.setSelected( poCashflowController.DocumentMapping().Detail(pnSelectedDetail).isFixValue());
+            cbField03.setSelected(poCashflowController.DocumentMapping().Detail(pnSelectedDetail).isMultiple());
 
         } catch (SQLException | GuanzonException | NullPointerException ex) {
             Logger.getLogger(PaymentRequest_EntryController.class.getName()).log(Level.SEVERE, null, ex);
@@ -1090,39 +1212,6 @@ public class TBJ_ParameterController implements Initializable, ScreenInterface {
         index01.setCellValueFactory(new PropertyValueFactory<>("index02"));
         index02.setCellValueFactory(new PropertyValueFactory<>("index03"));
         index03.setCellValueFactory(new PropertyValueFactory<>("index04"));
-        index04.setCellValueFactory(new PropertyValueFactory<>("index05"));
-        index05.setCellValueFactory(new PropertyValueFactory<>("index06"));
-        index06.setCellValueFactory(new PropertyValueFactory<>("index07"));
-
-//        tblDetails.widthProperty().addListener((ObservableValue<? extends Number> source, Number oldWidth, Number newWidth) -> {
-//            Platform.runLater(() -> {
-//                TableHeaderRow header = (TableHeaderRow) tblDetails.lookup("TableHeaderRow");
-//                if (header != null) {
-//                    header.reorderingProperty().addListener((ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) -> {
-//                        header.setReordering(false);
-//                    });
-//                }
-//            });
-//        });
-        // ✅ Add color for Active column
-        index06.setCellFactory(col -> new TableCell<ModelTableDetail, String>() {
-            @Override
-            protected void updateItem(String item, boolean empty) {
-                super.updateItem(item, empty);
-
-                if (empty || item == null) {
-                    setText(null);
-                    setStyle("");
-                } else {
-                    setText(item);
-                    if ("✔".equals(item)) {
-                        setStyle("-fx-text-fill: green;");
-                    } else {
-                        setStyle("-fx-text-fill: red;");
-                    }
-                }
-            }
-        });
 
         tblDetails.widthProperty().addListener((ObservableValue<? extends Number> source, Number oldWidth, Number newWidth) -> {
             Platform.runLater(() -> {
@@ -1134,7 +1223,6 @@ public class TBJ_ParameterController implements Initializable, ScreenInterface {
                 }
             });
         });
-        
     }
 
     /**
@@ -1173,37 +1261,31 @@ public class TBJ_ParameterController implements Initializable, ScreenInterface {
             @Override
             protected List<ModelTableDetail> call() throws Exception {
                 try {
-                    int detailCount = poTBJControllers.TBJParameter().getDetailCount();
+                    int detailCount = poCashflowController.DocumentMapping().getDetailCount();
                     if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
-                        if (poTBJControllers.TBJParameter().Detail(detailCount - 1).getAccountNo() != null
-                                && !poTBJControllers.TBJParameter().Detail(detailCount - 1).getAccountNo().isEmpty()) {
-                            poTBJControllers.TBJParameter().AddDetail();
+                        if ((poCashflowController.DocumentMapping().Detail(detailCount - 1).getFieldCode() != null
+                                && !poCashflowController.DocumentMapping().Detail(detailCount - 1).getFieldCode().isEmpty()
+                                && poCashflowController.DocumentMapping().Detail(detailCount - 1).getFontName() != null
+                                && !poCashflowController.DocumentMapping().Detail(detailCount - 1).getFontName().isEmpty()
+                                && poCashflowController.DocumentMapping().Detail(detailCount - 1).getFontSize() > 0.0)) {
+
+                            poCashflowController.DocumentMapping().AddDetail();
                             detailCount++;
                         }
                     }
 
                     List<ModelTableDetail> detailsList = new ArrayList<>();
-                    for (int lnCtr = 0; lnCtr < poTBJControllers.TBJParameter().getDetailCount(); lnCtr++) {
-                        String accountTypeText = (poTBJControllers.TBJParameter().Detail(lnCtr).getAccountType() == null
-                                || poTBJControllers.TBJParameter().Detail(lnCtr).getAccountType().trim().isEmpty())
-                                ? ""
-                                : poTBJControllers.TBJParameter().Detail(lnCtr).getAccountType().equals("D") ? "Debit" : "Credit";
-
+                    for (int lnCtr = 0; lnCtr < poCashflowController.DocumentMapping().getDetailCount(); lnCtr++) {
                         detailsList.add(new ModelTableDetail(
                                 String.valueOf(lnCtr + 1),
-                                poTBJControllers.TBJParameter().Detail(lnCtr).AccountChart().getDescription(),
-                                accountTypeText,
-                                poTBJControllers.TBJParameter().Detail(lnCtr).getTableNm(),
-                                poTBJControllers.TBJParameter().getFieldName(poTBJControllers.TBJParameter().Detail(lnCtr).getDerivedField(), lnCtr),
-                                poTBJControllers.TBJParameter().Detail(lnCtr).isRequired() ? "✔" : "✗",
-                                poTBJControllers.TBJParameter().Detail(lnCtr).isActive() ? "✔" : "✗",
-                                "", "", ""
+                                poCashflowController.DocumentMapping().Detail(lnCtr).getFieldCode(),
+                                poCashflowController.DocumentMapping().Detail(lnCtr).getFontName(),
+                                CustomCommonUtil.setIntegerValueToDecimalFormat(poCashflowController.DocumentMapping().Detail(lnCtr).getFontSize())
                         ));
                     }
                     Platform.runLater(() -> {
                         detail_data.setAll(detailsList); // Properly update list
                         tblDetails.setItems(detail_data);
-                        initFields();
                     });
                     return detailsList;
                 } catch (GuanzonException | SQLException ex) {
@@ -1245,24 +1327,27 @@ public class TBJ_ParameterController implements Initializable, ScreenInterface {
      */
     private void ClearAll() {
         Arrays.asList(
-                tfSearchTransaction,
-                tfSearchSource,
-                tfSourceCode,
-                tfCategory,
-                tfTransactionNo,
-                tfFieldName,
-                tfAccountTitle,
-                tfTableName ,
-                tfIndustry
+                txtField01,
+                txtField02,
+                txtField03,
+                txtField04,
+                txtField05,
+                txtField06,
+                txtField07,
+                txtField08,
+                txtField09,
+                txtField10,
+                txtField11,
+                txtField12
         ).forEach(TextField::clear);
-        cbIsActive.setSelected(false);
-        cbIsRequired.setSelected(false);
+//        cbIsActive.setSelected(false);
+//        cbIsRequired.setSelected(false);
 //        cmbAccountType.getSelectionModel().clearSelection();
         detail_data.clear();
         pnSelectedDetail = 0;
         psActiveField = "";
-        taRemarks.clear();
-        lblStatus.setText("UNKNOWN");
+//        taRemarks.clear();
+//        lblStatus.setText("UNKNOWN");
     }
 
     /**
@@ -1286,81 +1371,13 @@ public class TBJ_ParameterController implements Initializable, ScreenInterface {
             pnSelectedDetail = tblDetails.getSelectionModel().getSelectedIndex();
             ModelTableDetail selectedItem = tblDetails.getSelectionModel().getSelectedItem();
             if (event.getClickCount() == 1) {
-                tfAccountTitle.clear();
-                tfTableName.clear();
-                tfFieldName.clear();
-                cbIsActive.setSelected(false);
-                cbIsRequired.setSelected(false);
-                cmbAccountType.getSelectionModel().clearSelection();
-
                 if (selectedItem != null) {
                     if (pnSelectedDetail >= 0) {
-                        LoadDetail();
-                        tfAccountTitle.requestFocus();                        
-                        initFields();
+                        LoadDetail();      
                     }
                 }
             }
         }
-    }
-
-    /**
-     * Configures a {@link TextField} to behave as a "Clearable Read-Only"
-     * field.
-     * <p>
-     * This utility restricts direct manual input while maintaining the ability
-     * for the user to remove existing values. It implements the following
-     * behaviors:
-     * <ul>
-     * <li><b>Input Blocking:</b> Consumes {@code KEY_TYPED} events to prevent
-     * alphanumeric characters from being entered manually.</li>
-     * <li><b>Auto-Selection:</b> Automatically selects all text when the field
-     * gains focus, allowing for immediate clearing or visual emphasis.</li>
-     * <li><b>Deletion Support:</b> Explicitly allows the {@code BACK_SPACE} and
-     * {@code DELETE} keys to clear the field's content, which is useful for
-     * resetting lookup-based selections.</li>
-     * </ul>
-     * <p>
-     * This is ideal for fields where data must be selected via a search/browse
-     * dialog rather than direct typing.</p>
-     *
-     * * @param tf The {@link TextField} to be modified with read-only
-     * clearable behavior.
-     */
-    private void makeClearableReadOnly(final TextField tf) {
-        // 1️⃣ Block typing (letters/numbers)
-        tf.addEventFilter(KeyEvent.KEY_TYPED, new EventHandler<KeyEvent>() {
-            @Override
-            public void handle(KeyEvent event) {
-                event.consume();
-            }
-        });
-
-        // 2️⃣ Select all text when focused
-        tf.focusedProperty().addListener(new ChangeListener<Boolean>() {
-            @Override
-            public void changed(ObservableValue<? extends Boolean> obs, Boolean oldVal, Boolean newVal) {
-                if (newVal) { // gained focus
-                    tf.selectAll();
-                }
-            }
-        });
-
-        // 3️⃣ Clear value if Backspace or Delete is pressed
-        tf.addEventFilter(KeyEvent.KEY_PRESSED, new EventHandler<KeyEvent>() {
-            @Override
-            public void handle(KeyEvent event) {
-                switch (event.getCode()) {
-                    case BACK_SPACE:
-                    case DELETE:
-                        tf.clear();
-                        event.consume();
-                        break;
-                    default:
-                        break;
-                }
-            }
-        });
     }
 
 }
