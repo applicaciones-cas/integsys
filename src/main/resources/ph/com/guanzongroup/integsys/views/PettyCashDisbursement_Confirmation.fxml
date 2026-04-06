@@ -93,7 +93,7 @@
                                           <Insets />
                                        </GridPane.margin>
                                     </TextField>
-                                                <TextField fx:id="tfSearchCashAdvanceNo" maxWidth="1.7976931348623157E308" GridPane.columnIndex="10">
+                                                <TextField fx:id="tfSearchVoucherNo" maxWidth="1.7976931348623157E308" GridPane.columnIndex="10">
                                        <GridPane.margin>
                                           <Insets />
                                        </GridPane.margin>
@@ -231,7 +231,7 @@
                                                     <children>
                                                         <HBox prefHeight="100.0" prefWidth="200.0" spacing="5.0" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="5.0">
                                                             <children>
-                                                <AnchorPane fx:id="apMasterDetail1" prefHeight="833.0" prefWidth="782.0">
+                                                <AnchorPane fx:id="apMasterDetail" prefHeight="833.0" prefWidth="782.0">
                                                    <children>
                                                       <VBox spacing="5.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                                          <children>
@@ -281,7 +281,7 @@
                                                                                           <DatePicker fx:id="dpDVTransactionDate" disable="true" editable="false" maxWidth="150.0" GridPane.columnIndex="2" GridPane.rowIndex="2" />
                                                                                           <TextField fx:id="tfBranch" disable="true" layoutX="125.0" layoutY="109.0" maxWidth="1.7976931348623157E308" styleClass="DisabledTextField" GridPane.columnIndex="2" GridPane.rowIndex="3" />
                                                                                           <TextField fx:id="tfDepartment" maxWidth="1.7976931348623157E308" promptText="Press F3: Search" GridPane.columnIndex="2" GridPane.rowIndex="4" />
-                                                                                          <TextField fx:id="tfCashFund" layoutX="125.0" layoutY="78.0" maxWidth="1.7976931348623157E308" promptText="Press F3: Search" GridPane.columnIndex="2" GridPane.rowIndex="5" />
+                                                                                          <TextField fx:id="tfPettyCash" layoutX="125.0" layoutY="78.0" maxWidth="1.7976931348623157E308" promptText="Press F3: Search" GridPane.columnIndex="2" GridPane.rowIndex="5" />
                                                                                           <TextField fx:id="tfPayee" layoutX="125.0" layoutY="78.0" maxWidth="1.7976931348623157E308" promptText="Press F3: Search" GridPane.columnIndex="2" GridPane.rowIndex="6" />
                                                                                           <TextField fx:id="tfCreditTo" layoutX="125.0" layoutY="107.0" maxWidth="1.7976931348623157E308" promptText="Press F3: Search" GridPane.columnIndex="2" GridPane.rowIndex="7" />
                                                                                           <TextArea fx:id="taDVRemarks" GridPane.columnIndex="2" GridPane.columnSpan="3" GridPane.rowIndex="8" GridPane.rowSpan="2" />
@@ -550,7 +550,7 @@
                                                          <children>
                                                             <AnchorPane prefWidth="739.0">
                                                                <children>
-                                                                  <StackPane fx:id="stackPane1" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="5.0">
+                                                                  <StackPane fx:id="stackPane" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="5.0">
                                                                      <children>
                                                                         <ImageView fx:id="imageView" fitHeight="150.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true" />
                                                                         <Button fx:id="btnArrowLeft" mnemonicParsing="false" onAction="#cmdButton_Click" prefHeight="33.0" prefWidth="38.0" styleClass="button_process" stylesheets="@../css/StyleSheet.css" StackPane.alignment="CENTER_LEFT">
