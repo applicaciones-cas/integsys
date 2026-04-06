@@ -33,7 +33,6 @@ import static javafx.scene.input.KeyCode.TAB;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
-import javax.script.ScriptException;
 import org.guanzon.appdriver.agent.ShowMessageFX;
 import org.guanzon.appdriver.base.CommonUtils;
 import org.guanzon.appdriver.base.GRiderCAS;
@@ -52,9 +51,9 @@ import ph.com.guanzongroup.integsys.utility.JFXUtil;
 
 /**
  *
- * @author Team 1 : Aldrich & Arsiela
+ * @author Team 1
  */
-public class CashAdvance_ConfirmationController implements Initializable, ScreenInterface {
+public class CashAdvance_ApprovalController implements Initializable, ScreenInterface {
 
     private GRiderCAS oApp;
     static CashAdvance poController;
@@ -81,11 +80,11 @@ public class CashAdvance_ConfirmationController implements Initializable, Screen
     @FXML
     private Label lblSource, lblStatus;
     @FXML
-    private TextField tfSearchPayee, tfSearchTransNo, tfTransactionNo, tfBranch, tfRequestingDepartment, tfCashFund, tfPayee, tfAmountToAdvance;
+    private TextField tfSearchIndustry, tfSearchBranch, tfSearchPayee, tfSearchTransNo, tfTransactionNo, tfBranch, tfRequestingDepartment, tfCashFund, tfPayee, tfAmountToAdvance;
     @FXML
     private HBox hbButtons, hboxid;
     @FXML
-    private Button btnUpdate, btnSearch, btnSave, btnCancel, btnConfirm, btnVoid, btnHistory, btnRetrieve, btnClose;
+    private Button btnApprove, btnDisapprove, btnHistory, btnRetrieve, btnClose;
     @FXML
     private DatePicker dpAdvanceDate;
     @FXML
@@ -114,7 +113,7 @@ public class CashAdvance_ConfirmationController implements Initializable, Screen
             pnEditMode = EditMode.UNKNOWN;
             initButton(pnEditMode);
             Platform.runLater(() -> {
-                poController.setTransactionStatus(CashAdvanceStatus.OPEN+CashAdvanceStatus.CONFIRMED);
+                poController.setTransactionStatus(CashAdvanceStatus.CONFIRMED);
                 poController.Master().setIndustryId(psIndustryId);
                 poController.Master().setCompanyId(psCompanyId);
                 poController.setIndustryId(psIndustryId);
@@ -212,6 +211,26 @@ public class CashAdvance_ConfirmationController implements Initializable, Screen
                     break;
                 case F3:
                     switch (lsID) {
+                        case "tfSearchIndustry":
+                            poJSON = poController.SearchIndustry(lsValue, false);
+                            if ("error".equals(poJSON.get("result"))) {
+                                ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                                txtField.setText("");
+                                break;
+                            }
+                            loadRecordSearch();
+                            retrieveCashAdvance();
+                            break;
+                        case "tfSearchBranch":
+                            poJSON = poController.SearchBranch(lsValue, false, true);
+                            if ("error".equals(poJSON.get("result"))) {
+                                ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                                txtField.setText("");
+                                break;
+                            }
+                            loadRecordSearch();
+                            retrieveCashAdvance();
+                            break;
                         case "tfSearchPayee":
                             poJSON = poController.SearchPayee(lsValue, false, true);
                             if ("error".equals(poJSON.get("result"))) {
@@ -244,7 +263,7 @@ public class CashAdvance_ConfirmationController implements Initializable, Screen
                             poJSON = poController.SearchDepartment(lsValue, false);
                             if ("error".equals(poJSON.get("result"))) {
                                 ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-                                txtField.setText("");
+                                tfRequestingDepartment.setText("");
                                 break;
                             } else {
                                 JFXUtil.textFieldMoveNext(tfCashFund);
@@ -255,7 +274,7 @@ public class CashAdvance_ConfirmationController implements Initializable, Screen
                             poJSON = poController.SearchPayee(lsValue, false, false);
                             if ("error".equals(poJSON.get("result"))) {
                                 ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-                                txtField.setText("");
+                                tfPayee.setText("");
                                 break;
                             } else {
                                 JFXUtil.textFieldMoveNext(tfCashFund);
@@ -266,7 +285,7 @@ public class CashAdvance_ConfirmationController implements Initializable, Screen
                             poJSON = poController.SearchCashFund(lsValue, false);
                             if ("error".equals(poJSON.get("result"))) {
                                 ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-                                txtField.setText("");
+                                tfRequestingDepartment.setText("");
                                 break;
                             } else {
                                 JFXUtil.textFieldMoveNext(tfAmountToAdvance);
@@ -291,6 +310,8 @@ public class CashAdvance_ConfirmationController implements Initializable, Screen
             } else {
                 lblSource.setText("");
             }
+            tfSearchIndustry.setText(poController.getSearchIndustry());
+            tfSearchBranch.setText(poController.getSearchBranch());
             tfSearchPayee.setText(poController.getSearchPayee());
             JFXUtil.updateCaretPositions(apBrowse);
         } catch (SQLException | GuanzonException ex) {
@@ -307,10 +328,17 @@ public class CashAdvance_ConfirmationController implements Initializable, Screen
                             poController.setSearchIndustry("");
                         }
                         break;
+                    case "tfSearchBranch":
+                        if (lsValue.isEmpty()) {
+                            poController.setSearchBranch("");
+                        }
+                        break;
                     case "tfSearchPayee":
                         if (lsValue.isEmpty()) {
                             poController.setSearchPayee("");
                         }
+                        break;
+                    case "tfSearchTransNo":
                         break;
                 }
                 loadTableMain.reload();
@@ -424,7 +452,7 @@ public class CashAdvance_ConfirmationController implements Initializable, Screen
             JFXUtil.setVerticalScroll(taRemarks);
         });
         JFXUtil.setFocusListener(txtArea_Focus, taRemarks);
-        JFXUtil.setFocusListener(txtBrowse_Focus, tfSearchPayee, tfSearchTransNo);
+        JFXUtil.setFocusListener(txtBrowse_Focus, tfSearchIndustry, tfSearchBranch, tfSearchPayee, tfSearchTransNo);
         JFXUtil.setFocusListener(txtMaster_Focus, tfTransactionNo, tfBranch, tfRequestingDepartment, tfCashFund, tfPayee, tfAmountToAdvance);
 
         JFXUtil.setKeyPressedListener(this::txtField_KeyPressed, apBrowse, apMaster);
@@ -473,7 +501,7 @@ public class CashAdvance_ConfirmationController implements Initializable, Screen
                                             ""
                                     ));
 
-                                    if (poController.CashAdvanceList(lnCtr).getTransactionStatus().equals(CashAdvanceStatus.CONFIRMED)) {
+                                    if (poController.CashAdvanceList(lnCtr).getTransactionStatus().equals(CashAdvanceStatus.APPROVED)) {
                                         JFXUtil.highlightByKey(tblViewMainList, String.valueOf(lnCtr + 1), "#C1E1C1", highlightedRowsMain);
                                     }
                                 }
@@ -502,18 +530,18 @@ public class CashAdvance_ConfirmationController implements Initializable, Screen
 
     public void loadRecordMaster() {
         try {
+            String lsStat = "";
             switch (poController.Master().getTransactionStatus()) {
                 case CashAdvanceStatus.APPROVED:
-                case CashAdvanceStatus.CONFIRMED:
-                    btnVoid.setText("Cancel");
+                    lsStat = "Cancel";
+                    btnDisapprove.setMinWidth(70);
                     break;
                 default:
-                    btnVoid.setText("Void");
+                    lsStat = "Disapprove";
+                    btnDisapprove.setMinWidth(80);
                     break;
             }
-            boolean lbShow = oApp.isMainOffice();
-            JFXUtil.setDisabled(!lbShow, tfBranch);
-
+            btnDisapprove.setText(lsStat);
             JFXUtil.setDisabled(true, dpAdvanceDate);
             lblStatus.setText(pnEditMode == EditMode.UNKNOWN ? "UNKNOWN" : poController.getStatus(poController.Master().getTransactionStatus()).toUpperCase());
             tfTransactionNo.setText(poController.Master().getTransactionNo());
@@ -548,12 +576,6 @@ public class CashAdvance_ConfirmationController implements Initializable, Screen
                 switch (lsButton) {
                     case "btnUpdate":
                         poJSON = poController.OpenTransaction(poController.Master().getTransactionNo());
-                        //Recheck transaction status
-                        poJSON = poController.checkUpdateTransaction(false);
-                        if (!"success".equals((String) poJSON.get("result"))) {
-                            ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-                            return;
-                        }
                         poJSON = poController.UpdateTransaction();
                         if ("error".equals((String) poJSON.get("result"))) {
                             ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
@@ -564,19 +586,6 @@ public class CashAdvance_ConfirmationController implements Initializable, Screen
                     case "btnSearch":
                         JFXUtil.initiateBtnSearch(pxeModuleName, lastFocusedTextField, previousSearchedTextField, apBrowse, apMaster);
                         break;
-
-                    case "btnCancel":
-                        if (ShowMessageFX.OkayCancel(null, pxeModuleName, "Do you want to disregard changes?") == true) {
-                            JFXUtil.disableAllHighlightByColor(tblViewMainList, "#A7C7E7", highlightedRowsMain);
-                            //Clear data
-                            clearTextFields();
-                            poController.resetMaster();
-                            poController.initFields();
-                            pnEditMode = EditMode.UNKNOWN;
-                            break;
-                        } else {
-                            return;
-                        }
                     case "btnHistory":
                         if (pnEditMode != EditMode.READY && pnEditMode != EditMode.UPDATE) {
                             ShowMessageFX.Warning("No transaction status history to load!", pxeModuleName, null);
@@ -599,12 +608,6 @@ public class CashAdvance_ConfirmationController implements Initializable, Screen
                     case "btnSave":
                         //Validator
                         poJSON = new JSONObject();
-                        //Recheck transaction status
-                        poJSON = poController.checkUpdateTransaction(false);
-                        if (!"success".equals((String) poJSON.get("result"))) {
-                            ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-                            return;
-                        }
                         if (ShowMessageFX.YesNo(null, pxeModuleName, "Are you sure you want to save the transaction?") == true) {
                             poJSON = poController.SaveTransaction();
                             if (!"success".equals((String) poJSON.get("result"))) {
@@ -645,10 +648,10 @@ public class CashAdvance_ConfirmationController implements Initializable, Screen
                             return;
                         }
                         break;
-                    case "btnConfirm":
+                    case "btnApprove":
                         poJSON = new JSONObject();
-                        if (ShowMessageFX.YesNo(null, pxeModuleName, "Are you sure you want to confirm transaction?") == true) {
-                            poJSON = poController.ConfirmTransaction();
+                        if (ShowMessageFX.YesNo(null, pxeModuleName, "Are you sure you want to approve transaction?") == true) {
+                            poJSON = poController.ApproveTransaction();
                             if ("error".equals((String) poJSON.get("result"))) {
                                 ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                 return;
@@ -661,33 +664,25 @@ public class CashAdvance_ConfirmationController implements Initializable, Screen
                             return;
                         }
                         break;
-                    case "btnVoid":
+                    case "btnDisapprove":
                         poJSON = new JSONObject();
                         String lsStat = "";
                         switch (poController.Master().getTransactionStatus()) {
                             case CashAdvanceStatus.APPROVED:
-                            case CashAdvanceStatus.CONFIRMED:
                                 lsStat = "cancel";
                                 break;
                             default:
-                                lsStat = "void";
+                                lsStat = "disapprove";
                                 break;
                         }
-                        if (ShowMessageFX.YesNo(null, pxeModuleName, "Are you sure you want to " + lsStat + " transaction?") == true) {
-                            switch (poController.Master().getTransactionStatus()) {
-                                case CashAdvanceStatus.APPROVED:
-                                case CashAdvanceStatus.CONFIRMED:
-                                    poJSON = poController.CancelTransaction();
-                                    break;
-                                default:
-                                    poJSON = poController.VoidTransaction();
-                                    break;
-                            }
+                        if (ShowMessageFX.YesNo(null, pxeModuleName, "Are you sure you want to " + lsStat + " the transaction?") == true) {
+                            poJSON = poController.CancelTransaction();
+
                             if ("error".equals((String) poJSON.get("result"))) {
                                 ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                 return;
                             } else {
-                                ShowMessageFX.Information(null, pxeModuleName, (String) poJSON.get("message"));
+                                ShowMessageFX.Information(null, pxeModuleName, "Transaction disapproved successfully.");
                                 JFXUtil.disableAllHighlightByColor(tblViewMainList, "#A7C7E7", highlightedRowsMain);
                                 JFXUtil.highlightByKey(tblViewMainList, String.valueOf(pnMain + 1), "#FAA0A0", highlightedRowsMain);
                             }
@@ -699,7 +694,7 @@ public class CashAdvance_ConfirmationController implements Initializable, Screen
                         break;
                 }
 
-                if (JFXUtil.isObjectEqualTo(lsButton, "btnSave", "btnConfirm", "btnVoid", "btnCancel")) {
+                if (JFXUtil.isObjectEqualTo(lsButton, "btnSave", "btnApprove", "btnDisapprove", "btnCancel")) {
                     clearTextFields();
                     poController.resetMaster();
                     pnEditMode = EditMode.UNKNOWN;
@@ -711,7 +706,7 @@ public class CashAdvance_ConfirmationController implements Initializable, Screen
                 }
                 initButton(pnEditMode);
             }
-        } catch (ParseException | SQLException | GuanzonException | CloneNotSupportedException | ScriptException ex) {
+        } catch (ParseException | SQLException | GuanzonException | CloneNotSupportedException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
             ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
@@ -719,7 +714,7 @@ public class CashAdvance_ConfirmationController implements Initializable, Screen
 
     public void retrieveCashAdvance() {
         poJSON = new JSONObject();
-        poJSON = poController.loadTransactionList(tfSearchPayee.getText(), tfSearchTransNo.getText());
+        poJSON = poController.loadTransactionList(tfSearchIndustry.getText(), tfSearchBranch.getText(), tfSearchPayee.getText(), tfSearchTransNo.getText());
         if (!"success".equals((String) poJSON.get("result"))) {
             ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
         } else {
@@ -733,26 +728,24 @@ public class CashAdvance_ConfirmationController implements Initializable, Screen
         boolean lbShow4 = (fnValue == EditMode.UNKNOWN || fnValue == EditMode.READY);
         // Manage visibility and managed state of other buttons
         //Update 
-        JFXUtil.setButtonsVisibility(lbShow1, btnSearch, btnSave, btnCancel);
 
         //Ready
-        JFXUtil.setButtonsVisibility(lbShow3, btnUpdate, btnHistory, btnConfirm, btnVoid);
+        JFXUtil.setButtonsVisibility(lbShow3, btnHistory, btnApprove, btnDisapprove);
 
         //Unkown || Ready
-        JFXUtil.setDisabled(!lbShow1, apMaster);
+        JFXUtil.setDisabled(true, apMaster);
         JFXUtil.setButtonsVisibility(lbShow4, btnClose);
 
         if (fnValue != EditMode.READY) {
             return;
         }
         switch (poController.Master().getTransactionStatus()) {
-            case CashAdvanceStatus.CONFIRMED:
             case CashAdvanceStatus.APPROVED:
-                JFXUtil.setButtonsVisibility(false, btnConfirm, btnUpdate);
+                JFXUtil.setButtonsVisibility(false, btnApprove);
                 break;
             case CashAdvanceStatus.VOID:
             case CashAdvanceStatus.CANCELLED:
-                JFXUtil.setButtonsVisibility(false, btnConfirm, btnUpdate, btnVoid);
+                JFXUtil.setButtonsVisibility(false, btnApprove, btnDisapprove);
                 break;
         }
     }

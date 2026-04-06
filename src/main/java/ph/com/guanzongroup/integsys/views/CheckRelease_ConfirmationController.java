@@ -165,9 +165,9 @@ public class CheckRelease_ConfirmationController implements Initializable, Scree
         initTableDetail();
         initTableOnClick();
         initCheckBox();
-        initFields();
-        pnEditMode = poGLControllers.CheckReleases().getEditMode();
+        pnEditMode = EditMode.UNKNOWN;
         initButtons(pnEditMode);
+        initFields();
         
         tfReceivedBy.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
             if (event.getCode() == KeyCode.TAB) {
@@ -391,6 +391,7 @@ public class CheckRelease_ConfirmationController implements Initializable, Scree
                 
                 case "btnPrint":
                     if (ShowMessageFX.YesNo(null, psFormName, "Do you want to print this transaction?")) {
+                        
                         poJSON = poGLControllers.CheckReleases().printTransaction();
                         if ("error".equals((String) poJSON.get("result"))) {
                             ShowMessageFX.Error((String) poJSON.get("message"), psFormName, null);
@@ -415,8 +416,8 @@ public class CheckRelease_ConfirmationController implements Initializable, Scree
         JFXUtil.setDisabled(!isEditable,
                  tfReceivedBy, 
                  tfTotal, 
-                 tfCheckTransNo,
-                 tfCheckNo, 
+                tfCheckTransNo,
+                tfCheckNo,
                  tfNote,
                 taRemarks,
                 dpTransactionDate
@@ -431,6 +432,7 @@ public class CheckRelease_ConfirmationController implements Initializable, Scree
             JFXUtil.setDisabledExcept(true,
                     apDetail    
             );
+            
         }
         tfTransNo.setDisable(true);
         if (CheckTransferStatus.OPEN.equals(poGLControllers.CheckReleases().Master().getTransactionStatus())
@@ -532,8 +534,8 @@ public class CheckRelease_ConfirmationController implements Initializable, Scree
         CustomCommonUtil.setVisible(!lbShow, btnClose);
         CustomCommonUtil.setManaged(!lbShow, btnClose );
 
-        CustomCommonUtil.setVisible(lbShow, btnSave, btnCancel);
-        CustomCommonUtil.setManaged(lbShow, btnSave, btnCancel);
+        CustomCommonUtil.setVisible(lbShow, btnSave, btnCancel,btnSearch);
+        CustomCommonUtil.setManaged(lbShow, btnSave, btnCancel,btnSearch);
 
         // Default hide Update
         CustomCommonUtil.setVisible(false, btnUpdate,btnVoid,btnApprove,btnPrint);

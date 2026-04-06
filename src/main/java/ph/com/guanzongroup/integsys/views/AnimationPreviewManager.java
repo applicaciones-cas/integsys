@@ -16,6 +16,12 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
 import javafx.geometry.Pos;
+import javafx.scene.Cursor;
+import javafx.scene.control.Label;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
+import javafx.scene.text.Text;
 
 public class AnimationPreviewManager {
 
@@ -31,7 +37,7 @@ public class AnimationPreviewManager {
     private final List<ParallelTransition> transitions = new ArrayList<>();
     private final List<ImageView> animatedImages = new ArrayList<>();
     private final List<FrameDataPair> framePairs = new ArrayList<>();
-    String GLOBAL_PATH =System.getProperty("sys.default.path.config") + "/Images/Assets/";
+    String GLOBAL_PATH = System.getProperty("sys.default.path.config") + "/Images/Assets/";
     private String displayAlternativePath;
 
     // ----------------------  Set file path ----------------------
@@ -409,5 +415,177 @@ public class AnimationPreviewManager {
 
         FrameData from;
         FrameData to;
+    }
+
+    public static class AnimTitle {
+        private double duration = 0.25;
+        private Label g1, g2, c, t1, t2, tOf, t3;
+        private double g1W, g2W, cW, t1W, t2W, tOfW, t3W;
+        private double finalG2X, finalCX, finalOfX;
+        private boolean expanded = false;
+        private boolean animating = false;
+        private double spacing;
+
+        private AnchorPane logoPane;
+
+        public void expandContract(boolean expand, Runnable onFinished) {
+            if (animating || expanded == expand) {
+                return;
+            }
+            animating = true;
+
+            if (expand) {
+                Timeline movePhase = new Timeline(
+                        new KeyFrame(Duration.ZERO,
+                                new KeyValue(g2.layoutXProperty(), g2.getLayoutX()),
+                                new KeyValue(c.layoutXProperty(), c.getLayoutX())
+                        ),
+                        new KeyFrame(Duration.seconds(duration + 0.2),
+                                new KeyValue(g2.layoutXProperty(), finalG2X, Interpolator.EASE_BOTH),
+                                new KeyValue(c.layoutXProperty(), finalCX, Interpolator.EASE_BOTH)
+                        )
+                );
+
+                FadeTransition fade1 = new FadeTransition(Duration.seconds(duration), t1);
+                fade1.setToValue(1);
+                FadeTransition fade2 = new FadeTransition(Duration.seconds(duration), t2);
+                fade2.setToValue(1);
+                FadeTransition fadeOf = new FadeTransition(Duration.seconds(duration), tOf);
+                fadeOf.setToValue(1);
+                FadeTransition fade3 = new FadeTransition(Duration.seconds(duration), t3);
+                fade3.setToValue(1);
+
+                ParallelTransition fadePhase = new ParallelTransition(fade1, fade2, fadeOf, fade3);
+                SequentialTransition expandAnim = new SequentialTransition(movePhase, fadePhase);
+
+                expandAnim.setOnFinished(ev -> {
+                    expanded = true;
+                    animating = false;
+                    if (onFinished != null) {
+                        onFinished.run(); // trigger callback once
+                    }
+                });
+
+                expandAnim.play();
+
+            } else {
+                FadeTransition fade1 = new FadeTransition(Duration.seconds(duration), t1);
+                fade1.setToValue(0);
+                FadeTransition fade2 = new FadeTransition(Duration.seconds(duration), t2);
+                fade2.setToValue(0);
+                FadeTransition fadeOf = new FadeTransition(Duration.seconds(duration), tOf);
+                fadeOf.setToValue(0);
+                FadeTransition fade3 = new FadeTransition(Duration.seconds(duration), t3);
+                fade3.setToValue(0);
+
+                ParallelTransition fadeOut = new ParallelTransition(fade1, fade2, fadeOf, fade3);
+
+                Timeline moveBack = new Timeline(
+                        new KeyFrame(Duration.ZERO,
+                                new KeyValue(g2.layoutXProperty(), g2.getLayoutX()),
+                                new KeyValue(c.layoutXProperty(), c.getLayoutX())
+                        ),
+                        new KeyFrame(Duration.seconds(duration + 0.2),
+                                new KeyValue(g2.layoutXProperty(), g1W, Interpolator.EASE_BOTH),
+                                new KeyValue(c.layoutXProperty(), g1W + g2W, Interpolator.EASE_BOTH)
+                        )
+                );
+
+                SequentialTransition collapseAnim = new SequentialTransition(fadeOut, moveBack);
+                collapseAnim.setOnFinished(ev -> {
+                    expanded = false;
+                    animating = false;
+                    if (onFinished != null) {
+                        onFinished.run(); // trigger callback once
+                    }
+                });
+
+                collapseAnim.play();
+            }
+        }
+
+        public void initialize(AnchorPane logoPane, double fontSize) {
+
+            logoPane.setStyle("-fx-background-color: transparent;");
+
+            Font font = Font.font("System", FontWeight.BOLD, fontSize);
+
+            g1 = new Label("G");
+            g2 = new Label("G");
+            c = new Label("C");
+
+            t1 = new Label("UANZON");
+            t2 = new Label("ROUP");
+            tOf = new Label("OF");
+            t3 = new Label("OMPANIES");
+
+            Label[] all = {g1, g2, c, t1, t2, tOf, t3};
+
+            for (Label t : all) {
+                t.setFont(font);
+                t.setTextFill(Color.WHITE);
+            }
+
+            t1.setOpacity(0);
+            t2.setOpacity(0);
+            tOf.setOpacity(0);
+            t3.setOpacity(0);
+
+            logoPane.getChildren().clear();
+            logoPane.getChildren().addAll(all);
+
+            Platform.runLater(() -> {
+
+                double paneHeight = logoPane.getHeight();
+                double labelHeight = g1.prefHeight(-1);
+
+                double centerY = (paneHeight - labelHeight) / 2;
+
+                for (Label t : all) {
+                    t.setLayoutY(centerY);
+                }
+
+                spacing = new Text(" ").getLayoutBounds().getWidth() * 1.0;
+
+                g1W = g1.getLayoutBounds().getWidth();
+                g2W = g2.getLayoutBounds().getWidth();
+                cW = c.getLayoutBounds().getWidth();
+
+                t1W = t1.getLayoutBounds().getWidth();
+                t2W = t2.getLayoutBounds().getWidth();
+                tOfW = tOf.getLayoutBounds().getWidth();
+                t3W = t3.getLayoutBounds().getWidth();
+
+                // Initial compact GGC
+                g1.setLayoutX(0);
+                g2.setLayoutX(g1W);
+                c.setLayoutX(g1W + g2W);
+
+                // Final expanded positions
+                finalG2X = g1W + t1W + spacing;
+                finalOfX = finalG2X + g2W + t2W + spacing;
+                finalCX = finalOfX + tOfW + spacing;
+
+                t1.setLayoutX(g1W);
+                t2.setLayoutX(finalG2X + g2W);
+                tOf.setLayoutX(finalOfX);
+                t3.setLayoutX(finalCX + cW);
+
+                logoPane.setPrefWidth(finalCX + cW + t3W);
+
+                expanded = true;
+
+// Move letters to expanded position
+                g2.setLayoutX(finalG2X);
+                c.setLayoutX(finalCX);
+
+// Show full words
+                t1.setOpacity(1);
+                t2.setOpacity(1);
+                tOf.setOpacity(1);
+                t3.setOpacity(1);
+            });
+        }
+
     }
 }

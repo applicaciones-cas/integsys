@@ -120,10 +120,10 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.util.Callback;
 import java.io.File;
-import java.util.Arrays;
+import java.sql.SQLException;
+import java.text.SimpleDateFormat;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.WeakHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
@@ -142,10 +142,15 @@ import org.guanzon.appdriver.constant.EditMode;
 import ph.com.guanzongroup.integsys.views.ScreenInterface;
 import javafx.animation.*;
 import javafx.scene.Node;
+import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.shape.Rectangle;
 import javafx.util.Duration;
+import org.guanzon.appdriver.base.SQLUtil;
+import static ph.com.guanzongroup.integsys.GUI.oApp;
 
 /**
- * Date : 4/28/2025 Recent update: 01/26/2026
+ * Date : 4/28/2025 Recent update: 03/30/2026
  *
  * @author Aldrich
  */
@@ -1093,8 +1098,43 @@ public class JFXUtil {
     /*Sets a listener to any node*/
     public static void setFocusListener(ChangeListener<? super Boolean> listener, Node... nodes) {
         for (Node node : nodes) {
+            processNode(node, listener);
+        }
+    }
+
+    private static void processNode(Node node, ChangeListener<? super Boolean> listener) {
+
+        if (node instanceof TextField) {
+            TextField tf = (TextField) node;
+            //Skip disabled/non-editable TextFields
+            if (tf.isDisabled() || !tf.isEditable()) {
+                return;
+            }
+            tf.focusedProperty().addListener(listener);
+        } else if (node instanceof AnchorPane) {
+
+            for (Node child : ((AnchorPane) node).getChildren()) {
+                processNodeRecursive(child, listener);
+            }
+        } else {
             if (node instanceof Control) {
                 ((Control) node).focusedProperty().addListener(listener);
+            }
+        }
+    }
+
+    private static void processNodeRecursive(Node node, ChangeListener<? super Boolean> listener) {
+
+        if (node instanceof TextField) {
+            TextField tf = (TextField) node;
+
+            if (!tf.isDisabled() && tf.isEditable()) {
+                tf.focusedProperty().addListener(listener);
+            }
+
+        } else if (node instanceof Parent) {
+            for (Node child : ((Parent) node).getChildrenUnmodifiable()) {
+                processNodeRecursive(child, listener);
             }
         }
     }
@@ -1701,8 +1741,6 @@ public class JFXUtil {
             }
         }
     }
-    
-
 
     /*Alternative version of inputDecimalOnly; restricts to 1 dot */
     public static void inputDecimalOnly(TextField... foTxtFields) {
@@ -2655,8 +2693,8 @@ public class JFXUtil {
 
     /*Sets value to a label, textField, textArea, or button from class various variable name w/ value*/
  /*Ideally used for set Status label of Transaction*/
- /*Compares class variables values from string value (the third parameter)*/
- /*Requires Node, class, and a string value*/
+ /*Compares Status Class variables Values (2nd parameter) to String value from (3rd parameter)*/
+ /*Requires Node, Status Class, and a String value*/
     public static String setStatusValue(Node node, Class<?> clazz, String value) {
         String text = getNameByValue(clazz, value);
 
@@ -3098,8 +3136,6 @@ public class JFXUtil {
         for (Node node : nodes) {
             if (node != null) {
                 Tooltip tooltip = new Tooltip(message);
-
-                tooltip.setShowDelay(Duration.ZERO);
                 tooltip.setStyle(
                         "-fx-font-size: 10px;"
                         + "-fx-padding: 6 10 6 10;"
@@ -3193,6 +3229,7 @@ public class JFXUtil {
     }
 
     public static boolean loadValidation(int pnEditMode, String pxeModuleName, String lsCurrentTransNo, String lsTransactionNo) {
+
         if (pnEditMode == EditMode.UPDATE) {
             if (lsCurrentTransNo.equals(lsTransactionNo)) {
                 if (!ShowMessageFX.YesNo(null, pxeModuleName, "Transaction is currently in update mode.\n"
@@ -3201,8 +3238,43 @@ public class JFXUtil {
                 }
             } else {
                 if (!ShowMessageFX.YesNo(null, pxeModuleName, "Transaction is currently in update mode.\n"
-                        + "Are you sure you want to switch to another transaction?")) {
+                        + "Are you sure you want to select another transaction?")) {
                     return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    public static boolean loadValidation2(int pnEditMode, String pxeModuleName, String lsCurrentTransNo, String lsTransactionNo, double lnTotal) {
+        if (pnEditMode == EditMode.UPDATE || pnEditMode == EditMode.ADDNEW) {
+            String lsTrans = pnEditMode == EditMode.UPDATE ? "update mode." : "edit mode.";
+            if (lsCurrentTransNo.equals(lsTransactionNo)) {
+                if (!ShowMessageFX.YesNo(null, pxeModuleName, "Transaction is currently in " + lsTrans + "\n"
+                        + "Reload the transaction?")) {
+                    return false;
+                }
+            } else {
+                if (!isObjectEqualTo(lsCurrentTransNo, null, "")) {
+                    if (!ShowMessageFX.YesNo(null, pxeModuleName, "Transaction is currently in " + lsTrans + "\n"
+                            + "Are you sure you want to select another transaction?")) {
+                        return false;
+                    }
+                } else {
+                    //if has No SourceNo
+                    if (lnTotal > 0) {
+                        if (pnEditMode == EditMode.UPDATE) {
+                            if (!ShowMessageFX.YesNo(null, pxeModuleName, "Transaction is currently in " + lsTrans + "\n"
+                                    + "Are you sure you want to select another transaction?")) {
+                                return false;
+                            }
+                        } else {
+                            if (!ShowMessageFX.YesNo(null, pxeModuleName, "Transaction details are not empty.\n"
+                                    + "Proceeding will replace all existing details.\nWould you like to proceed?")) {
+                                return false;
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -3247,7 +3319,7 @@ public class JFXUtil {
         }
     }
 
-    /*Displays 5 secs tooltip to particular node*/
+    /*Displays 5 secs tooltip to a particular node*/
     public static void showTooltip(String message, Node... nodes) {
         if (message == null || message.trim().isEmpty() || nodes == null || nodes.length == 0) {
             return;
@@ -3340,6 +3412,136 @@ public class JFXUtil {
                     = new ParallelTransition(node, fade, moveUp);
             animation.setDelay(Duration.seconds(delaySeconds));
             animation.play();
+        }
+    }
+
+    @FunctionalInterface
+    public interface DatePickerCommand {
+
+        void run(
+                DatePicker DatePicker,
+                SimpleDateFormat sdfFormat,
+                String lsServerDate,
+                LocalDate ldCurrentDate,
+                String lsSelectedDate,
+                LocalDate ldSelectedDate
+        );
+    }
+
+    public static EventHandler<ActionEvent> DatePickerAction(DatePickerCommand command) {
+        return event -> {
+
+            JSONObject poJSON = new JSONObject();
+            JFXUtil.setJSONSuccess(poJSON, "success");
+
+            Object source = event.getSource();
+            if (source instanceof DatePicker) {
+                Platform.runLater(() -> {
+                    try {
+                        DatePicker datePicker = (DatePicker) source;
+                        String inputText = datePicker.getEditor().getText();
+                        SimpleDateFormat sdfFormat = new SimpleDateFormat(SQLUtil.FORMAT_SHORT_DATE);
+                        LocalDate ldCurrentDate = null, ldSelectedDate = null;
+                        String lsServerDate = "", lsTransDate = "", lsSelectedDate = "";
+                        if (inputText == null || "".equals(inputText) || "01/01/1900".equals(inputText)) {
+                            return;
+                        }
+                        lsServerDate = sdfFormat.format(oApp.getServerDate());
+                        ldCurrentDate = LocalDate.parse(
+                                lsServerDate,
+                                DateTimeFormatter.ofPattern(SQLUtil.FORMAT_SHORT_DATE)
+                        );
+                        lsSelectedDate = sdfFormat.format(
+                                SQLUtil.toDate(
+                                        JFXUtil.convertToIsoFormat(inputText),
+                                        SQLUtil.FORMAT_SHORT_DATE
+                                )
+                        );
+                        ldSelectedDate = LocalDate.parse(
+                                lsSelectedDate,
+                                DateTimeFormatter.ofPattern(SQLUtil.FORMAT_SHORT_DATE)
+                        );  // your custom command here
+                        if (command != null) {
+                            command.run(
+                                    datePicker,
+                                    sdfFormat,
+                                    lsServerDate,
+                                    ldCurrentDate,
+                                    lsSelectedDate,
+                                    ldSelectedDate
+                            );
+                        }
+                    } catch (SQLException ex) {
+                        Logger.getLogger(JFXUtil.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                });
+            }
+        };
+    }
+
+    private static Timeline radialTimeline;
+
+    public static void applyClockwiseFillAnimation(AnchorPane targetPane, double speed) {
+        double width = targetPane.getPrefWidth();
+        double height = targetPane.getPrefHeight();
+
+        // Stop previous animation if exists
+        if (radialTimeline != null) {
+            radialTimeline.stop();
+        }
+
+        // Clip for rounded rectangle
+        Rectangle clip = new Rectangle(width, height);
+        clip.setArcWidth(40);
+        clip.setArcHeight(40);
+        targetPane.setClip(clip);
+
+        // Check if canvas already exists (avoid stacking)
+        Canvas canvas;
+        if (!targetPane.getChildren().isEmpty() && targetPane.getChildren().get(0) instanceof Canvas) {
+            canvas = (Canvas) targetPane.getChildren().get(0);
+        } else {
+            canvas = new Canvas(width, height);
+            targetPane.getChildren().add(0, canvas);
+        }
+
+        GraphicsContext gc = canvas.getGraphicsContext2D();
+
+        // Reset angle
+        final double[] angle = {0};
+
+        radialTimeline = new Timeline(new KeyFrame(Duration.millis(15), event -> {
+
+            angle[0] += speed; // 🔥 speed now controls rotation increment
+
+            if (angle[0] > 360) {
+                angle[0] = 360;
+                radialTimeline.stop(); // stop when fully filled (optional)
+            }
+
+            // redraw background
+            gc.setFill(Color.web("#F4F4F4"));
+            gc.fillRoundRect(0, 0, width, height, 40, 40);
+
+            // draw arc
+            gc.setFill(Color.web("#FF8201"));
+            gc.fillArc(-100, -100, width + 200, height + 200, 90, -angle[0], javafx.scene.shape.ArcType.ROUND);
+        }));
+
+        radialTimeline.setCycleCount(Timeline.INDEFINITE);
+        radialTimeline.playFromStart();
+    }
+    public String[] buttonPackArray = {"btnSave", "btnCancel", "btnApprove", "btnDisapprove", "btnVoid"};
+
+    public static boolean isNumeric(String str) {
+        if (str == null || str.trim().isEmpty()) {
+            return false;
+        }
+        try {
+            Double.parseDouble(str);
+            return true;
+        } catch (NumberFormatException e) {
+            return false;
         }
     }
 }
