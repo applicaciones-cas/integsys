@@ -418,9 +418,7 @@ public class PettyCashDisbursement_HistoryController implements Initializable, S
                         try {
                             details_data.clear();
                             if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
-                                if (poController.Master().getReferNo() == null || "".equals(poController.Master().getReferNo())) {
-                                    poController.ReloadDetail();
-                                }
+                                poController.ReloadDetail();
 //                                poJSON = poController.computeDetailFields(true);
 //                                if ("error".equals((String) poJSON.get("result"))) {
 //                                    ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
@@ -776,8 +774,6 @@ public class PettyCashDisbursement_HistoryController implements Initializable, S
             boolean lbShow3 = pnEditMode == EditMode.ADDNEW;
             JFXUtil.setDisabled(!lbShow3, tfDepartment, tfPettyCashFund);
 
-            boolean lbShow = !JFXUtil.isObjectEqualTo(poController.Master().getReferNo(), null, "");
-            JFXUtil.setDisabled(lbShow, cbReverse);
             poController.computeFields(false);
             JFXUtil
                     .setStatusValue(lblDVTransactionStatus, PettyCashDisbursementStatus.class,
@@ -809,16 +805,9 @@ public class PettyCashDisbursement_HistoryController implements Initializable, S
             if (pnDetail < 0 || pnDetail > poController.getDetailCount() - 1) {
                 return;
             }
-            boolean lbShow3 = JFXUtil.isObjectEqualTo(poController.Master().getReferNo(), null, "");
-            String lsParticular = "";
-            if (!lbShow3) {
-//                lsParticular = poController.Detail(pnDetail).CashAdvanceDetail(poController.Master().getReferNo()).getParticular();
-                JFXUtil.setDisabled(false, tfParticularDetail);
-            } else {
-                //sourceno is empty
-                boolean lbShow2 = poController.Detail(pnDetail).getEditMode() == EditMode.UPDATE;
-                JFXUtil.setDisabled(lbShow2, tfParticularDetail);
-            }
+
+            boolean lbShow2 = poController.Detail(pnDetail).getEditMode() == EditMode.UPDATE;
+            JFXUtil.setDisabled(lbShow2, tfParticularDetail);
 
             tfParticularDetail.setText(poController.Detail(pnDetail).Particular().getDescription());
             cbReverse.setSelected(poController.Detail(pnDetail).isReverse());

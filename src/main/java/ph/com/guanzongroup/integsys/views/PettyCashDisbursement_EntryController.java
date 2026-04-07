@@ -330,16 +330,14 @@ public class PettyCashDisbursement_EntryController implements Initializable, Scr
                     if (pnEditMode == EditMode.READY || pnEditMode == EditMode.UPDATE || pnEditMode == EditMode.ADDNEW) {
                         JFXUtil.clearTextFields(apAttachments);
                         if (DoesContainValidDisbDetail()) {
-                            if (isSourceNoAvailable()) {
-                                pbIsCheckedAttachmentTab = true;
-                                try {
-                                    poController.loadAttachments();
-                                } catch (GuanzonException | SQLException ex) {
-                                    Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
-                                    ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
-                                }
-
+                            pbIsCheckedAttachmentTab = true;
+                            try {
+                                poController.loadAttachments();
+                            } catch (GuanzonException | SQLException ex) {
+                                Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+                                ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
                             }
+
                             loadTableAttachment.reload();
                         } else {
                             JFXUtil.clickTabByTitleText(tabPaneMain, "Petty Cash Disbursement");
@@ -653,9 +651,7 @@ public class PettyCashDisbursement_EntryController implements Initializable, Scr
                         try {
                             details_data.clear();
                             if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
-                                if (poController.Master().getReferNo() == null || "".equals(poController.Master().getReferNo())) {
-                                    poController.ReloadDetail();
-                                }
+                                poController.ReloadDetail();
 //                                poJSON = poController.computeDetailFields(true);
 //                                if ("error".equals((String) poJSON.get("result"))) {
 //                                    ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
@@ -1035,23 +1031,6 @@ public class PettyCashDisbursement_EntryController implements Initializable, Scr
                                 loadRecordMaster();
                                 break;
                             case "tfDepartment":
-                                if (isSourceNoAvailable()) {
-                                    if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
-                                        boolean lbproceed = !JFXUtil.isObjectEqualTo(poController.Detail(0).Particular().getDescription(), null, "");
-                                        if (poController.getDetailCount() >= 1 && lbproceed) {
-                                            pbKeyPressed = true;
-                                            if (ShowMessageFX.YesNo(null, pxeModuleName,
-                                                    "Are you sure you want to change the Department name?\nPlease note that this action will delete all Petty Petty Cash Disbursement details.\n\nDo you wish to proceed?") == true) {
-                                                poController.Master().setPettyId("");
-                                                poController.removeDetails();
-                                                loadTableDetail.reload();
-                                            } else {
-                                                return;
-                                            }
-                                            pbKeyPressed = false;
-                                        }
-                                    }
-                                }
                                 poJSON = poController.SearchDepartment(lsValue, false);
                                 if ("error".equals(poJSON.get("result"))) {
                                     ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
@@ -1139,10 +1118,6 @@ public class PettyCashDisbursement_EntryController implements Initializable, Scr
         }
     }
 
-    private boolean isSourceNoAvailable() {
-        return !JFXUtil.isObjectEqualTo(poController.Master().getReferNo(), null, "");
-    }
-
     public void moveNext(boolean isUp, boolean continueNext) {
         if (continueNext) {
             apDVDetail.requestFocus();
@@ -1175,9 +1150,6 @@ public class PettyCashDisbursement_EntryController implements Initializable, Scr
             boolean lbShow3 = pnEditMode == EditMode.ADDNEW;
             JFXUtil.setDisabled(!lbShow3, tfDepartment, tfPettyCashFund);
 
-            boolean lbShow = !JFXUtil.isObjectEqualTo(poController.Master().getReferNo(), null, "");
-            JFXUtil.setDisabled(lbShow, cbReverse);
-//            initDVMasterTabs();
             poController.computeFields(false);
             JFXUtil
                     .setStatusValue(lblDVTransactionStatus, PettyCashDisbursementStatus.class,
@@ -1209,16 +1181,9 @@ public class PettyCashDisbursement_EntryController implements Initializable, Scr
             if (pnDetail < 0 || pnDetail > poController.getDetailCount() - 1) {
                 return;
             }
-            boolean lbShow3 = JFXUtil.isObjectEqualTo(poController.Master().getReferNo(), null, "");
-            String lsParticular = "";
-            if (!lbShow3) {
-//                lsParticular = poController.Detail(pnDetail).CashAdvanceDetail(poController.Master().getReferNo()).getParticular();
-                JFXUtil.setDisabled(false, tfParticularDetail);
-            } else {
-                //sourceno is empty
-                boolean lbShow2 = poController.Detail(pnDetail).getEditMode() == EditMode.UPDATE;
-                JFXUtil.setDisabled(lbShow2, tfParticularDetail);
-            }
+
+            boolean lbShow2 = poController.Detail(pnDetail).getEditMode() == EditMode.UPDATE;
+            JFXUtil.setDisabled(lbShow2, tfParticularDetail);
 
             tfParticularDetail.setText(poController.Detail(pnDetail).Particular().getDescription());
             cbReverse.setSelected(poController.Detail(pnDetail).isReverse());
