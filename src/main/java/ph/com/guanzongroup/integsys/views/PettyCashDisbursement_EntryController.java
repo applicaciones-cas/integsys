@@ -667,6 +667,7 @@ public class PettyCashDisbursement_EntryController implements Initializable, Scr
                                 if (!poController.Detail(lnCtr).isReverse()) {
                                     continue;
                                 }
+
                                 lsParticular = poController.Detail(lnCtr).Particular().getDescription();
                                 lnRowCount += 1;
                                 details_data.add(
@@ -1249,15 +1250,24 @@ public class PettyCashDisbursement_EntryController implements Initializable, Scr
                                 }
                                 loadRecordMaster();
                                 break;
-
                             case "tfParticularDetail":
                                 poJSON = poController.SearchParticular(lsValue, false, pnDetail);
                                 if (!JFXUtil.isJSONSuccess(poJSON)) {
-                                    ShowMessageFX.Warning(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
+
+                                    int lnReturned = Integer.parseInt(!JFXUtil.isObjectEqualTo(poJSON.get("row"), null, "")
+                                            ? String.valueOf(poJSON.get("row"))
+                                            : String.valueOf(pnDetail));
+                                    JFXUtil.runWithDelay(0.70, () -> {
+                                        pnDetail = lnReturned;
+                                        loadTableDetail.reload();
+                                    });
+                                    ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                                    break;
                                 } else {
+                                    pnDetail = Integer.parseInt(String.valueOf(poJSON.get("row")));
+                                    loadTableDetail.reload();
                                     JFXUtil.textFieldMoveNext(tfAmountDetail);
                                 }
-                                loadTableDetail.reload();
                                 break;
 
                         }

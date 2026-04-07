@@ -1464,7 +1464,7 @@ public class PettyCashDisbursement_ApprovalController implements Initializable, 
         stageAttachment.closeDialog();
         JFXUtil.setValueToNull(previousSearchedTextField, lastFocusedTextField);
         JFXUtil.clearTextFields(apButton, apMasterDetail, apDVMaster1, apDVMaster2, apDVDetail,
-                apMainList, apBrowse, apAttachments);
+                apMainList, apAttachments);
     }
 
 }

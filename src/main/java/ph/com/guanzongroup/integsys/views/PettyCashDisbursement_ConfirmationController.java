@@ -1206,11 +1206,21 @@ public class PettyCashDisbursement_ConfirmationController implements Initializab
                             case "tfParticularDetail":
                                 poJSON = poController.SearchParticular(lsValue, false, pnDetail);
                                 if (!JFXUtil.isJSONSuccess(poJSON)) {
-                                    ShowMessageFX.Warning(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
+
+                                    int lnReturned = Integer.parseInt(!JFXUtil.isObjectEqualTo(poJSON.get("row"), null, "")
+                                            ? String.valueOf(poJSON.get("row"))
+                                            : String.valueOf(pnDetail));
+                                    JFXUtil.runWithDelay(0.70, () -> {
+                                        pnDetail = lnReturned;
+                                        loadTableDetail.reload();
+                                    });
+                                    ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                                    break;
                                 } else {
+                                    pnDetail = Integer.parseInt(String.valueOf(poJSON.get("row")));
+                                    loadTableDetail.reload();
                                     JFXUtil.textFieldMoveNext(tfAmountDetail);
                                 }
-                                loadTableDetail.reload();
                                 break;
                         }
                         event.consume();
@@ -1464,7 +1474,7 @@ public class PettyCashDisbursement_ConfirmationController implements Initializab
         JFXUtil.setButtonsVisibility(lbShow2, btnConfirm);
         JFXUtil.setButtonsVisibility(fnEditMode == EditMode.READY, btnHistory);
 
-        JFXUtil.setDisabled(!lbShow, apDVMaster1, apDVMaster2, apDVDetail, apAttachments);
+        JFXUtil.setDisabled(!lbShow, apDVMaster1, apDVMaster2, apDVDetail, apAttachments, apAttachmentButtons);
 
         if (fnEditMode == EditMode.READY) {
             switch (poController.Master().getTransactionStatus()) {
@@ -1489,14 +1499,13 @@ public class PettyCashDisbursement_ConfirmationController implements Initializab
                 JFXUtil.setButtonsVisibility(false, btnUpdate);
             }
         }
-        JFXUtil.setDisabled(lbShow, apAttachmentButtons, cmbAttachmentType);
-        JFXUtil.setButtonsVisibility(lbShow, btnAddAttachment, btnRemoveAttachment);
+      
     }
 
     private void clearTextFields() {
         JFXUtil.setValueToNull(previousSearchedTextField, lastFocusedTextField);
         JFXUtil.clearTextFields(apButton, apMasterDetail, apDVMaster1, apDVMaster2, apDVDetail,
-                apMainList, apBrowse, apAttachments);
+                apMainList, apAttachments);
     }
 
 }
