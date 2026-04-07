@@ -938,7 +938,7 @@ public class PettyCashDisbursement_EntryController implements Initializable, Scr
                                             if (poController.getDetailCount() >= 1 && lbproceed) {
                                                 if (!pbKeyPressed) {
                                                     if (ShowMessageFX.YesNo(null, pxeModuleName,
-                                                            "Are you sure you want to change the Branch name?\nPlease note that this action will delete all Cash Disbursement details.\n\nDo you wish to proceed?") == true) {
+                                                            "Are you sure you want to change the Branch name?\nPlease note that this action will delete all Petty Cash Disbursement details.\n\nDo you wish to proceed?") == true) {
                                                         poController.removeDetails();
                                                         poController.Master().setPettyId("");
                                                         poController.Master().setBranchCode("");
@@ -968,7 +968,7 @@ public class PettyCashDisbursement_EntryController implements Initializable, Scr
                                             if (poController.getDetailCount() >= 1 && lbproceed) {
                                                 if (!pbKeyPressed) {
                                                     if (ShowMessageFX.YesNo(null, pxeModuleName,
-                                                            "Are you sure you want to change the Cash Fund?\nPlease note that this action will delete all Cash Disbursement details.\n\nDo you wish to proceed?") == true) {
+                                                            "Are you sure you want to change the Cash Fund?\nPlease note that this action will delete all Petty Cash Disbursement details.\n\nDo you wish to proceed?") == true) {
                                                         poController.removeDetails();
                                                         poController.Master().setPettyId("");
                                                         poController.Master().setPettyId("");
@@ -998,7 +998,7 @@ public class PettyCashDisbursement_EntryController implements Initializable, Scr
                                             if (poController.getDetailCount() >= 1 && lbproceed) {
                                                 if (!pbKeyPressed) {
                                                     if (ShowMessageFX.YesNo(null, pxeModuleName,
-                                                            "Are you sure you want to change the Department name?\nPlease note that this action will delete all Cash Disbursement details.\n\nDo you wish to proceed?") == true) {
+                                                            "Are you sure you want to change the Department name?\nPlease note that this action will delete all Petty Cash Disbursement details.\n\nDo you wish to proceed?") == true) {
                                                         poController.removeDetails();
                                                         poController.Master().setPettyId("");
                                                         poController.Master().setDepartmentRequest("");
@@ -1028,7 +1028,7 @@ public class PettyCashDisbursement_EntryController implements Initializable, Scr
                                             if (poController.getDetailCount() >= 1 && lbproceed) {
                                                 if (!pbKeyPressed) {
                                                     if (ShowMessageFX.YesNo(null, pxeModuleName,
-                                                            "Are you sure you want to change the Payee name?\nPlease note that this action will delete all Cash Disbursement details.\n\nDo you wish to proceed?") == true) {
+                                                            "Are you sure you want to change the Payee name?\nPlease note that this action will delete all Petty Cash Disbursement details.\n\nDo you wish to proceed?") == true) {
                                                         poController.removeDetails();
                                                         poController.Master().setPettyId("");
                                                         poController.Master().setPayeeName("");
@@ -1051,6 +1051,12 @@ public class PettyCashDisbursement_EntryController implements Initializable, Scr
                         case "tfCreditTo":
                             if (lsValue.isEmpty()) {
                                 poController.Master().setCreditedTo("");
+                            }
+                            break;
+                        case "tfReferNo":
+                            poJSON = poController.Master().setReferNo(lsValue);
+                            if (!JFXUtil.isJSONSuccess(poJSON)) {
+                                ShowMessageFX.Information(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
                             }
                             break;
                     }
@@ -1130,7 +1136,7 @@ public class PettyCashDisbursement_EntryController implements Initializable, Scr
                                         if (poController.getDetailCount() >= 1 && lbproceed) {
                                             pbKeyPressed = true;
                                             if (ShowMessageFX.YesNo(null, pxeModuleName,
-                                                    "Are you sure you want to change the Branch name?\nPlease note that this action will delete all Petty Cash Disbursement details.\n\nDo you wish to proceed?") == true) {
+                                                    "Are you sure you want to change the Branch name?\nPlease note that this action will delete all Petty Petty Cash Disbursement details.\n\nDo you wish to proceed?") == true) {
                                                 poController.Master().setPettyId("");
                                                 poController.removeDetails();
                                                 loadTableDetail.reload();
@@ -1160,7 +1166,7 @@ public class PettyCashDisbursement_EntryController implements Initializable, Scr
                                         if (poController.getDetailCount() >= 1 && lbproceed) {
                                             pbKeyPressed = true;
                                             if (ShowMessageFX.YesNo(null, pxeModuleName,
-                                                    "Are you sure you want to change the Department name?\nPlease note that this action will delete all Petty Cash Disbursement details.\n\nDo you wish to proceed?") == true) {
+                                                    "Are you sure you want to change the Department name?\nPlease note that this action will delete all Petty Petty Cash Disbursement details.\n\nDo you wish to proceed?") == true) {
                                                 poController.Master().setPettyId("");
                                                 poController.removeDetails();
                                                 loadTableDetail.reload();
@@ -1188,7 +1194,7 @@ public class PettyCashDisbursement_EntryController implements Initializable, Scr
                                         if (poController.getDetailCount() >= 1 && lbproceed) {
                                             pbKeyPressed = true;
                                             if (ShowMessageFX.YesNo(null, pxeModuleName,
-                                                    "Are you sure you want to change the Cash Fund?\nPlease note that this action will delete all Petty Cash Disbursement details.\n\nDo you wish to proceed?") == true) {
+                                                    "Are you sure you want to change the Cash Fund?\nPlease note that this action will delete all Petty Petty Cash Disbursement details.\n\nDo you wish to proceed?") == true) {
                                                 poController.Master().setPettyId("");
                                                 poController.removeDetails();
                                                 loadTableDetail.reload();
@@ -1217,7 +1223,7 @@ public class PettyCashDisbursement_EntryController implements Initializable, Scr
                                         if (poController.getDetailCount() >= 1 && lbproceed) {
                                             pbKeyPressed = true;
                                             if (ShowMessageFX.YesNo(null, pxeModuleName,
-                                                    "Are you sure you want to change the Payee name?\nPlease note that this action will delete all Petty Cash Disbursement details.\n\nDo you wish to proceed?") == true) {
+                                                    "Are you sure you want to change the Payee name?\nPlease note that this action will delete all Petty Petty Cash Disbursement details.\n\nDo you wish to proceed?") == true) {
                                                 poController.Master().setPettyId("");
                                                 poController.removeDetails();
                                                 loadTableDetail.reload();

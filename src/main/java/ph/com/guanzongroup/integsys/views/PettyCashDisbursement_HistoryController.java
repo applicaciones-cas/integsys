@@ -123,7 +123,7 @@ public class PettyCashDisbursement_HistoryController implements Initializable, S
     ObservableList<String> documentType = ModelDeliveryAcceptance_Attachment.documentType;
 
     @FXML
-    private AnchorPane AnchorMain, apBrowse, apButton, apDVMaster1, apDVMaster12, apDVDetail, apAttachments;
+    private AnchorPane AnchorMain, apBrowse, apButton, apDVMaster1, apDVMaster2, apDVDetail, apAttachments;
     @FXML
     private Label lblSource, lblDVTransactionStatus;
     @FXML
@@ -801,7 +801,7 @@ public class PettyCashDisbursement_HistoryController implements Initializable, S
 
             taDVRemarks.setText(poController.Master().getRemarks());
 
-            JFXUtil.updateCaretPositions(apDVMaster1, apDVMaster12);
+            JFXUtil.updateCaretPositions(apDVMaster1, apDVMaster1);
         } catch (GuanzonException | SQLException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
             ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
@@ -942,13 +942,13 @@ public class PettyCashDisbursement_HistoryController implements Initializable, S
         JFXUtil.setButtonsVisibility(lbShow3, btnClose);
         JFXUtil.setButtonsVisibility(lbShow2 && PettyCashDisbursementStatus.APPROVED.equals(poController.Master().getTransactionStatus()), btnPrint);
 
-        JFXUtil.setDisabled(true, apDVMaster1, apDVMaster12, apDVDetail);
+        JFXUtil.setDisabled(true, apDVMaster1, apDVMaster1, apDVDetail);
     }
 
     private void clearTextFields() {
         stageAttachment.closeDialog();
         JFXUtil.setValueToNull(previousSearchedTextField, lastFocusedTextField);
-        JFXUtil.clearTextFields(apButton, apDVMaster1, apDVMaster12, apDVDetail,
+        JFXUtil.clearTextFields(apButton, apDVMaster1, apDVMaster1, apDVDetail,
                 apBrowse, apAttachments);
     }
 

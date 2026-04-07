@@ -5,7 +5,7 @@
 package ph.com.guanzongroup.integsys.views;
 
 import java.io.IOException;
-import ph.com.guanzongroup.integsys.model.ModelCashDisbursement_Main;
+import ph.com.guanzongroup.integsys.model.ModelPettyCashDisbursement_Main;
 import ph.com.guanzongroup.integsys.utility.CustomCommonUtil;
 import ph.com.guanzongroup.integsys.utility.JFXUtil;
 import java.net.URL;
@@ -111,8 +111,8 @@ public class PettyCashDisbursement_ConfirmationController implements Initializab
     private String psTransactionType = "";
     private boolean tooltipShown = false;
     private unloadForm poUnload = new unloadForm();
-    private ObservableList<ModelCashDisbursement_Main> main_data = FXCollections.observableArrayList();
-    private FilteredList<ModelCashDisbursement_Main> filteredMain_Data;
+    private ObservableList<ModelPettyCashDisbursement_Main> main_data = FXCollections.observableArrayList();
+    private FilteredList<ModelPettyCashDisbursement_Main> filteredMain_Data;
 
     private ObservableList<ModelPettyCashDisbursement_Detail> details_data = FXCollections.observableArrayList();
     private final ObservableList<ModelDeliveryAcceptance_Attachment> attachment_data = FXCollections.observableArrayList();
@@ -139,7 +139,7 @@ public class PettyCashDisbursement_ConfirmationController implements Initializab
     @FXML
     private Label lblSource, lblDVTransactionStatus;
     @FXML
-    private TextField tfSearchIndustry, tfSearchPayee, tfSearchVoucherNo, tfDVTransactionNo, tfBranch, tfDepartment, tfPettyCash, tfPayee, tfCreditTo, tfVoucherNo, tfReferNo, tfTotalAmount, tfParticularDetail, tfAmountDetail, tfAttachmentNo;
+    private TextField tfSearchIndustry, tfSearchPayee, tfSearchVoucherNo, tfDVTransactionNo, tfBranch, tfDepartment, tfPettyCash, tfPayee, tfCreditTo, tfTotalAmount, tfVoucherNo, tfReferNo, tfParticularDetail, tfAmountDetail, tfAttachmentNo;
     @FXML
     private Button btnUpdate, btnSearch, btnSave, btnCancel, btnConfirm, btnVoid, btnHistory, btnRetrieve, btnClose, btnAddAttachment, btnRemoveAttachment, btnArrowLeft, btnArrowRight;
     @FXML
@@ -155,7 +155,7 @@ public class PettyCashDisbursement_ConfirmationController implements Initializab
     @FXML
     private TableView tblVwDetails, tblViewMainList, tblAttachments;
     @FXML
-    private TableColumn tblDVRowNo, tblParticularDetail, tblAmountDetail, tblNetAmount, tblRowNo, tblRefNo, tblLiquidationDate, tblPayee, tblAmount, tblRowNoAttachment, tblFileNameAttachment;
+    private TableColumn tblDVRowNo, tblParticularDetail, tblAmountDetail, tblRowNo, tblRefNo, tblLiquidationDate, tblPayee, tblAmount, tblRowNoAttachment, tblFileNameAttachment;
     @FXML
     private Pagination pagination;
     @FXML
@@ -318,16 +318,6 @@ public class PettyCashDisbursement_ConfirmationController implements Initializab
         if (poController.getDetailCount() <= 0) {
             return false;
         }
-//        try {
-//            if (poController.Master().getSourceNo() != null && !"".equals(poController.Master().getSourceNo())) {
-//                lsParticular = poController.Detail(0).CashAdvanceDetail(poController.Master().getSourceNo()).getParticular();
-//            } else {
-//                lsParticular = poController.Detail(0).Particular().getDescription();
-//            }
-//        } catch (SQLException | GuanzonException ex) {
-//            Logger.getLogger(CashDisbursement_EntryController.class.getName()).log(Level.SEVERE, null, ex);
-//        }
-//        return !JFXUtil.isObjectEqualTo(lsParticular, null, "");
         return true;
     }
     String lsValidDisbMessage = "Please provide at least one valid disbursement detail with amount to proceed.";
@@ -415,7 +405,7 @@ public class PettyCashDisbursement_ConfirmationController implements Initializab
                     if (!ShowMessageFX.YesNo(null, pxeModuleName, "Are you sure you want to save the transaction?")) {
                         return;
                     }
-                    
+
                     poJSON = poController.SaveTransaction();
                     if (!"success".equals((String) poJSON.get("result"))) {
                         ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
@@ -656,7 +646,7 @@ public class PettyCashDisbursement_ConfirmationController implements Initializab
         poJSON = new JSONObject();
 
         pnMain = tblViewMainList.getSelectionModel().getSelectedIndex();
-        ModelCashDisbursement_Main selected = (ModelCashDisbursement_Main) tblViewMainList.getSelectionModel().getSelectedItem();
+        ModelPettyCashDisbursement_Main selected = (ModelPettyCashDisbursement_Main) tblViewMainList.getSelectionModel().getSelectedItem();
         if (selected != null) {
             try {
                 int pnRowMain = Integer.parseInt(selected.getIndex01()) - 1;
@@ -708,7 +698,7 @@ public class PettyCashDisbursement_ConfirmationController implements Initializab
                                             date = sdf.format(poController.TransactionList(lnCtr).getTransactionDate());
                                         }
 
-                                        main_data.add(new ModelCashDisbursement_Main(
+                                        main_data.add(new ModelPettyCashDisbursement_Main(
                                                 String.valueOf(lnCtr + 1),
                                                 poController.TransactionList(lnCtr).getVoucherNo(),
                                                 date,
@@ -776,7 +766,7 @@ public class PettyCashDisbursement_ConfirmationController implements Initializab
                                         ));
                             }
 
-                            int lnTempRow = JFXUtil.getDetailRow(details_data, pnDetail, 11); //this method is used only when Reverse is applied
+                            int lnTempRow = JFXUtil.getDetailRow(details_data, pnDetail, 4); //this method is used only when Reverse is applied
                             if (lnTempRow < 0 || lnTempRow
                                     >= details_data.size()) {
                                 if (!details_data.isEmpty()) {
@@ -800,7 +790,7 @@ public class PettyCashDisbursement_ConfirmationController implements Initializab
                         }
                     });
                 });
-        
+
         loadTableAttachment = new JFXUtil.ReloadableTableTask(
                 tblAttachments,
                 attachment_data,
@@ -917,7 +907,7 @@ public class PettyCashDisbursement_ConfirmationController implements Initializab
     private void initDetailGrid() {
         JFXUtil.setColumnCenter(tblDVRowNo);
         JFXUtil.setColumnLeft(tblParticularDetail);
-        JFXUtil.setColumnRight(tblAmountDetail, tblNetAmount);
+        JFXUtil.setColumnRight(tblAmountDetail);
         JFXUtil.setColumnsIndexAndDisableReordering(tblVwDetails);
         tblVwDetails.setItems(details_data);
     }
@@ -953,7 +943,7 @@ public class PettyCashDisbursement_ConfirmationController implements Initializab
             }
         }
         );
-        JFXUtil.applyRowHighlighting(tblViewMainList, item -> ((ModelCashDisbursement_Main) item).getIndex01(), highlightedRowsMain);
+        JFXUtil.applyRowHighlighting(tblViewMainList, item -> ((ModelPettyCashDisbursement_Main) item).getIndex01(), highlightedRowsMain);
         JFXUtil.setKeyEventFilter(this::tableKeyEvents, tblVwDetails);
         JFXUtil.adjustColumnForScrollbar(tblViewMainList, tblVwDetails);
     }
@@ -1228,13 +1218,13 @@ public class PettyCashDisbursement_ConfirmationController implements Initializab
 
                     case UP:
                         JFXUtil.altSwitch(lsID, new Object[][]{
-                            {new String[]{ "tfAmountDetail", "tfParticularDetail"}, (Runnable) () -> moveNext(true, true)}
+                            {new String[]{"tfAmountDetail", "tfParticularDetail"}, (Runnable) () -> moveNext(true, true)}
                         });
                         event.consume();
                         break;
                     case DOWN:
                         JFXUtil.altSwitch(lsID, new Object[][]{
-                            {new String[]{ "tfAmountDetail", "tfParticularDetail"}, (Runnable) () -> moveNext(false, true)}
+                            {new String[]{"tfAmountDetail", "tfParticularDetail"}, (Runnable) () -> moveNext(false, true)}
                         });
                         event.consume();
                         break;
@@ -1474,7 +1464,7 @@ public class PettyCashDisbursement_ConfirmationController implements Initializab
         JFXUtil.setButtonsVisibility(lbShow2, btnConfirm);
         JFXUtil.setButtonsVisibility(fnEditMode == EditMode.READY, btnHistory);
 
-        JFXUtil.setDisabled(!lbShow, apDVMaster1, apDVMaster2, apDVDetail,apAttachments);
+        JFXUtil.setDisabled(!lbShow, apDVMaster1, apDVMaster2, apDVDetail, apAttachments);
 
         if (fnEditMode == EditMode.READY) {
             switch (poController.Master().getTransactionStatus()) {
@@ -1506,7 +1496,7 @@ public class PettyCashDisbursement_ConfirmationController implements Initializab
     private void clearTextFields() {
         JFXUtil.setValueToNull(previousSearchedTextField, lastFocusedTextField);
         JFXUtil.clearTextFields(apButton, apMasterDetail, apDVMaster1, apDVMaster2, apDVDetail,
-                apMainList, apBrowse,apAttachments);
+                apMainList, apBrowse, apAttachments);
     }
 
 }
