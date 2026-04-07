@@ -218,6 +218,16 @@ public class CashDisbursement_HistoryController implements Initializable, Screen
                 poController.setCompanyId(psCompanyId);
                 loadRecordSearch();
                 TriggerWindowEvent();
+                
+                try {
+                    if(!psIndustryId.equals(System.getProperty("sys.main.industry"))){
+                        tfSearchIndustry.setText(poController.Master().Industry().getDescription());
+                        JFXUtil.setDisabled(true, tfSearchIndustry);
+                    }
+                } catch (SQLException | GuanzonException ex) {
+                    Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+                    ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
+                }
             });
             initAttachmentPreviewPane();
         } catch (SQLException | GuanzonException ex) {

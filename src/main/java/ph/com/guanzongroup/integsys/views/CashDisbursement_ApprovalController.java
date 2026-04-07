@@ -235,6 +235,15 @@ public class CashDisbursement_ApprovalController implements Initializable, Scree
                 poController.setTransactionStatus(CashDisbursementStatus.CONFIRMED);
                 loadRecordSearch();
                 TriggerWindowEvent();
+                try {
+                    if(!psIndustryId.equals(System.getProperty("sys.main.industry"))){
+                        tfSearchIndustry.setText(poController.Master().Industry().getDescription());
+                        JFXUtil.setDisabled(true, tfSearchIndustry);
+                    }
+                } catch (SQLException | GuanzonException ex) {
+                    Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+                    ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
+                }
             });
             initAttachmentPreviewPane();
         } catch (SQLException | GuanzonException ex) {
