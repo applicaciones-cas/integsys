@@ -1288,7 +1288,7 @@ public class PettyCashDisbursement_ConfirmationController implements Initializab
             }
             btnVoid.setText(lsStat);
             boolean lbShow2 = pnEditMode == EditMode.UPDATE;
-            JFXUtil.setDisabled(true, tfBranch, tfDepartment, tfPettyCash, tfPayee, tfCreditTo);
+            JFXUtil.setDisabled(true, tfBranch, tfDepartment, tfPettyCash, tfPayee);
 
             poController.computeFields(false);
             JFXUtil.setStatusValue(lblDVTransactionStatus, PettyCashDisbursementStatus.class, pnEditMode == EditMode.UNKNOWN ? "-1" : poController.Master().getTransactionStatus());
