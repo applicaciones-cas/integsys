@@ -307,6 +307,9 @@ public class PettyCashFundController implements Initializable, ScreenInterface {
                         }
                         pnEditMode = poController.getEditMode();
                         break;
+                    case "btnLedger":
+                        
+                        break;
                     case "btnNew":
                         //Clear data
 //                        poController.resetMaster();
@@ -483,7 +486,7 @@ public class PettyCashFundController implements Initializable, ScreenInterface {
         // Manage visibility and managed state of other buttons
         JFXUtil.setButtonsVisibility(!lbShow, btnNew);
         JFXUtil.setButtonsVisibility(lbShow, btnSearch, btnSave, btnCancel);
-        JFXUtil.setButtonsVisibility(lbShow2, btnUpdate, btnHistory);
+        JFXUtil.setButtonsVisibility(lbShow2, btnUpdate, btnHistory, btnLedger);
         JFXUtil.setButtonsVisibility(lbShow3, btnBrowse, btnClose);
 
         JFXUtil.setButtonsVisibility(lbShow2, btnVoid, btnConfirm);
