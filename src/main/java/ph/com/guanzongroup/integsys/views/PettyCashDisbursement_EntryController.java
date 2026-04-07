@@ -1546,9 +1546,7 @@ public class PettyCashDisbursement_EntryController implements Initializable, Scr
             }
 
         }
-//        boolean lbShow4 = !isSourceNoAvailable() && lbShow;
-//        JFXUtil.setDisabled(!lbShow4, apAttachmentButtons, cmbAttachmentType);
-//        JFXUtil.setButtonsVisibility(!isSourceNoAvailable(), btnAddAttachment, btnRemoveAttachment);
+
     }
 
     private void clearTextFields() {
