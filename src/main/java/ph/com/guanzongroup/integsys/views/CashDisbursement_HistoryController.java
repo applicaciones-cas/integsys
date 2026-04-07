@@ -218,6 +218,7 @@ public class CashDisbursement_HistoryController implements Initializable, Screen
                 poController.setCompanyId(psCompanyId);
                 loadRecordSearch();
                 TriggerWindowEvent();
+                filterIndustry();
             });
             initAttachmentPreviewPane();
         } catch (SQLException | GuanzonException ex) {

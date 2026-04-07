@@ -239,6 +239,7 @@ public class CashDisbursement_ConfirmationController implements Initializable, S
                 poController.setTransactionStatus(CashDisbursementStatus.OPEN + CashDisbursementStatus.CONFIRMED);
                 loadRecordSearch();
                 TriggerWindowEvent();
+                filterIndustry();
             });
             initAttachmentPreviewPane();
         } catch (SQLException | GuanzonException ex) {

@@ -235,6 +235,7 @@ public class CashDisbursement_ApprovalController implements Initializable, Scree
                 poController.setTransactionStatus(CashDisbursementStatus.CONFIRMED);
                 loadRecordSearch();
                 TriggerWindowEvent();
+                filterIndustry();
             });
             initAttachmentPreviewPane();
         } catch (SQLException | GuanzonException ex) {

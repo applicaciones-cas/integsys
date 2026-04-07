@@ -205,6 +205,7 @@ public class PettyCashDisbursement_HistoryController implements Initializable, S
                 poController.setCompanyId(psCompanyId);
                 loadRecordSearch();
                 TriggerWindowEvent();
+                filterIndustry();
             });
             initAttachmentPreviewPane();
         } catch (SQLException | GuanzonException ex) {

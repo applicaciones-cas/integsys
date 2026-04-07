@@ -221,6 +221,7 @@ public class PettyCashDisbursement_ApprovalController implements Initializable, 
                 poController.setTransactionStatus(PettyCashDisbursementStatus.CONFIRMED);
                 loadRecordSearch();
                 TriggerWindowEvent();
+                filterIndustry();
             });
             initAttachmentPreviewPane();
         } catch (SQLException | GuanzonException ex) {

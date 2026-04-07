@@ -240,6 +240,7 @@ public class CashDisbursement_EntryController implements Initializable, ScreenIn
                 loadRecordSearch();
                 btnNew.fire();
                 TriggerWindowEvent();
+                filterIndustry();
             });
             initAttachmentPreviewPane();
         } catch (SQLException | GuanzonException ex) {
