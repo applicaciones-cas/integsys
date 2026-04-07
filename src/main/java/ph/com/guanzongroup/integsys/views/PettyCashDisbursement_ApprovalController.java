@@ -581,11 +581,7 @@ public class PettyCashDisbursement_ApprovalController implements Initializable, 
                                 if (!poController.Detail(lnCtr).isReverse()) {
                                     continue;
                                 }
-                                if (poController.Master().getReferNo() != null && !"".equals(poController.Master().getReferNo())) {
-//                                    lsParticular = poController.Detail(lnCtr).CashAdvanceDetail(poController.Master().getReferNo()).getParticular();
-                                } else {
-                                    lsParticular = poController.Detail(lnCtr).Particular().getDescription();
-                                }
+                                lsParticular = poController.Detail(lnCtr).Particular().getDescription();
                                 lnRowCount += 1;
                                 details_data.add(
                                         new ModelPettyCashDisbursement_Detail(String.valueOf(lnRowCount),
