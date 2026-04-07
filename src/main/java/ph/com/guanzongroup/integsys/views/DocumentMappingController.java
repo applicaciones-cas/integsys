@@ -17,7 +17,6 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
-import javafx.scene.control.ComboBox;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
@@ -30,16 +29,13 @@ import org.json.simple.JSONObject;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.application.Platform;
-import javafx.beans.property.ReadOnlyBooleanPropertyBase;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
-import javafx.event.EventHandler;
 import javafx.geometry.Pos;
 import javafx.scene.control.ProgressIndicator;
-import javafx.scene.control.TableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
 import static javafx.scene.input.KeyCode.DOWN;
 import static javafx.scene.input.KeyCode.ENTER;
@@ -53,43 +49,48 @@ import org.guanzon.appdriver.agent.ShowMessageFX;
 import org.guanzon.appdriver.constant.EditMode;
 import org.guanzon.cas.tbjhandler.constant.TBJ_Constant;
 import org.json.simple.parser.ParseException;
-import ph.com.guanzongroup.cas.cashflow.model.Model_Document_Mapping_Detail;
 import ph.com.guanzongroup.cas.cashflow.services.CashflowControllers;
 import ph.com.guanzongroup.integsys.model.ModelTableDetail;
 import ph.com.guanzongroup.integsys.utility.CustomCommonUtil;
 import ph.com.guanzongroup.integsys.utility.JFXUtil;
 
 /**
- * FXML Controller class for the TBJ (Transaction Book Journal) Parameter settings.
- * * <p>This controller manages the user interface and business logic integration for 
- * configuring system parameters. It facilitates the mapping of transaction sources, 
- * database tables, and account titles (Debit/Credit) to specific journal entries.</p>
- * * <h3>Key Responsibilities:</h3>
+ * Controller class for the Document Mapping UI in the Integsys application.
+ * <p>
+ * This class manages the interaction between the JavaFX UI elements and the
+ * underlying business logic implemented in {@link CashflowControllers}.
+ * It handles CRUD operations (Create, Read, Update, Delete) for document
+ * mapping parameters and their details, including activation and deactivation
+ * of records.
+ * </p>
+ * <p>
+ * The controller implements {@link Initializable} to initialize the UI components
+ * and {@link ScreenInterface} to receive application context such as GRider instance,
+ * Industry ID, Company ID, and Category ID.
+ * </p>
+ * <p>
+ * UI Elements managed include:
  * <ul>
- * <li><b>State Management:</b> Orchestrates transitions between Edit Modes (Add New, Update, Ready).</li>
- * <li><b>Data Synchronization:</b> Coordinates data flow between the FXML view components 
- * and the underlying {@link org.guanzon.cas.tbjhandler.Services.TBJControllers} business logic.</li>
- * <li><b>Search & Lookup:</b> Implements contextual search functionality for Industry, 
- * Company, Category, and Chart of Accounts.</li>
- * <li><b>Validation:</b> Ensures data integrity for required fields and status-based 
- * record locking (Open vs. Confirmed status).</li>
+ *   <li>TextFields for master and detail input</li>
+ *   <li>CheckBoxes for flags such as active, fixed value, multiple</li>
+ *   <li>Buttons for CRUD actions and form navigation</li>
+ *   <li>TableView for displaying details</li>
  * </ul>
- * * <p>This class implements {@link ScreenInterface} to allow the parent application 
- * to inject global application drivers (GRider) and context IDs (Industry/Company).</p>
- * 
- * @author Teejei De Celis (mdot223)
- * @since 2026-02-05
- * @startDate 2026-02-05
- * @endDate   2026-02-06
+ * </p>
+ * <p>
+ * The controller also provides focus listeners, key event handlers, and table
+ * click handling to synchronize UI changes with the model.
+ * </p>
+ *
+ * @author Teejei
  * @version 1.0
- * @see Initializable
- * @see ph.com.guanzongroup.integsys.views.ScreenInterface
+ * @since 2026-04-07
  */
 public class DocumentMappingController implements Initializable, ScreenInterface {
 
     private GRiderCAS poApp;
     private CashflowControllers poCashflowController;
-    private String psFormName = "TBJ Parameter";
+    private String psFormName = "Documment Mapping";
     private LogWrapper logWrapper;
     private int pnEditMode;
     private JSONObject poJSON;
@@ -191,34 +192,18 @@ public class DocumentMappingController implements Initializable, ScreenInterface
         psCategoryID = fsValue;
     }
 
-    /**
-     * Initializes the controller class after its root element has been
-     * completely processed.
-     * <p>
-     * This method sets up the initial UI state and internal data structures by:
-     * <ul>
-     * <li><b>UI Cleanup:</b> Invoking {@link #ClearAll()} to reset all text
-     * fields and variables.</li>
-     * <li><b>Object Lifecycle:</b> Initializing core controller objects via
-     * {@link #initializeObject()}.</li>
-     * <li><b>Event Wiring:</b> Binding action listeners to buttons, checkboxes,
-     * and table interactions.</li>
-     * <li><b>Component Setup:</b> Configuring the TableView columns and focus
-     * listeners.</li>
-     * <li><b>Default State:</b> Using {@link Platform#runLater} to
-     * programmatically trigger the 'New' button action, ensuring the form
-     * starts in "Add New" mode once the layout is ready.</li>
-     * </ul>
+        /**
+     * Initializes the controller after the root element has been completely
+     * processed. This method sets up all UI elements, buttons, fields,
+     * and table details.
      *
-     * * @param url The location used to resolve relative paths for the root
-     * object.
-     * @param rb The resources used to localize the root object.
+     * @param url            the location used to resolve relative paths
+     * @param rb             the resources used to localize the root object
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         // TODO
         ClearAll();
-        initComboBox();
         initializeObject();
         initButtonsClickActions();
         initFields();
@@ -227,8 +212,9 @@ public class DocumentMappingController implements Initializable, ScreenInterface
         btnNew.fire();
     }
 
-    /**
-     * Initializes the TBJ controller and transaction objects.
+        /**
+     * Initializes the business logic objects and prepares a new transaction.
+     * Loads the Cashflow controller and sets default transaction status.
      */
     private void initializeObject() {
         try {
@@ -243,32 +229,11 @@ public class DocumentMappingController implements Initializable, ScreenInterface
         }
     }
 
-    /**
-     * Dynamically adjusts the visibility and layout management of toolbar
-     * buttons based on the current edit mode and transaction status.
-     * <p>
-     * This method implements a state-driven UI pattern:
-     * <ul>
-     * <li><b>Edit Modes (ADDNEW/UPDATE):</b> Hides navigation buttons (Browse,
-     * New, Close) and displays action buttons (Save, Cancel).</li>
-     * <li><b>Ready Mode:</b> Displays the "Update" button to allow transitions
-     * into edit mode.</li>
-     * <li><b>Status-Based Controls:</b>
-     * <ul>
-     * <li>If the transaction is {@code OPEN}, it reveals "Void" and "Confirm"
-     * buttons.</li>
-     * <li>If the transaction is {@code CONFIRMED}, it only reveals the "Void"
-     * button, as confirmation has already occurred.</li>
-     * </ul>
-     * </li>
-     * </ul>
-     * <p>
-     * <b>Technical Note:</b> Uses {@code CustomCommonUtil} to sync both the
-     * {@code visible} property (visual presence) and the {@code managed}
-     * property (space reservation in the layout container).</p>
+       /**
+     * Initializes the button visibility, state, and edit mode
+     * depending on the current {@link EditMode}.
      *
-     * * @param fnEditMode The current state of the form as defined in
-     * {@link EditMode}.
+     * @param fnEditMode the current edit mode
      */
     private void initButtons(int fnEditMode) {
         try {
@@ -303,78 +268,48 @@ public class DocumentMappingController implements Initializable, ScreenInterface
             }
             
             if (pnEditMode == EditMode.ADDNEW) {
-                apMaster.setDisable(false);
-                apDetail.setDisable(false);
-                cbField01.setDisable(lbShow);
+                JFXUtil.setDisabledExcept(false,
+                        apMaster);
+                JFXUtil.setDisabledExcept(false,
+                        apDetail);
+                txtSeeks01.setDisable(true);
+                txtSeeks02.setDisable(true);
             } else if (pnEditMode == EditMode.READY || pnEditMode == EditMode.UNKNOWN) {
                 JFXUtil.setDisabledExcept(true,
                         apMaster);
                 JFXUtil.setDisabledExcept(true,
                         apDetail);
                 
+                txtSeeks01.setDisable(false);
+                txtSeeks02.setDisable(false);
             } else if (pnEditMode == EditMode.UPDATE) {
-                apMaster.setDisable(false);
-                apDetail.setDisable(false);
+                JFXUtil.setDisabledExcept(false,
+                        apMaster);
+                JFXUtil.setDisabledExcept(false,
+                        apDetail);
+                txtSeeks01.setDisable(true);
+                txtSeeks02.setDisable(true);
             }
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(DocumentMappingController.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-
     /**
-     * Aggregates and assigns action event handlers to the form's primary
-     * command buttons.
-     * <p>
-     * This method streamlines the initialization process by:
-     * <ul>
-     * <li>Collecting all toolbar buttons (Browse, New, Update, Save, Cancel,
-     * and Close) into a unified {@link List}.</li>
-     * <li>Iteratively applying the {@link #handleButtonAction(ActionEvent)}
-     * reference to each button's {@code setOnAction} property.</li>
-     * </ul>
-     * <p>
-     * <b>Design Note:</b> Using a list-based assignment ensures that all
-     * primary interactions follow a consistent execution path through the
-     * central dispatcher, making the code easier to maintain and debug.</p>
+     * Handles button click actions including CRUD operations,
+     * activation/deactivation, and form closure.
+     *
+     * @param event the {@link ActionEvent} triggered by a button
      */
     private void initButtonsClickActions() {
         List<Button> buttons = Arrays.asList(btnBrowse, btnNew, btnUpdate, btnSave, btnCancel, btnClose,btnActivate,btnDeactivate);
         buttons.forEach(button -> button.setOnAction(this::handleButtonAction));
     }
 
-    /**
-     * Central event handler for all button-driven actions in the interface.
-     * <p>
-     * This method manages the high-level workflow of the transaction parameter
-     * form, including lifecycle transitions and data persistence. Key
-     * functionalities include:
-     * <ul>
-     * <li><b>Navigation & Cleanup:</b> Handles form closure with confirmation
-     * and clearing of UI states during cancellations.</li>
-     * <li><b>Transaction Lifecycle:</b> Manages "New", "Update", "Save",
-     * "Confirm", and "Void" operations by communicating with the business logic
-     * controller.</li>
-     * <li><b>Search (Browse):</b> Executes context-sensitive searches based on
-     * {@code psActiveField} (e.g., searching by Transaction vs. Source).</li>
-     * <li><b>User Permissions:</b> Implements logic to prompt for immediate
-     * confirmation after saving if the user has sufficient access levels (above
-     * {@code ENCODER}).</li>
-     * <li><b>State Synchronization:</b> Automatically refreshes button
-     * visibility and field editability by invoking {@link #initButtons} and
-     * {@link #initFields} after every successful action.</li>
-     * </ul>
-     * <p>
-     * <b>Implementation Note:</b> Uses {@code poJSON} results from the
-     * controller to determine success or failure, displaying visual feedback
-     * via {@link ShowMessageFX}.</p>
+        /**
+     * Handles button click actions including CRUD operations,
+     * activation/deactivation, and form closure.
      *
-     * * @param event The {@link ActionEvent} triggered by the user
-     * interaction.
-     * @throws SQLException If database communication fails during transaction
-     * updates.
-     * @throws GuanzonException If business rule violations occur.
-     * @throws CloneNotSupportedException If object cloning fails during state
-     * transitions.
+     * @param event the {@link ActionEvent} triggered by a button
      */
     private void handleButtonAction(ActionEvent event) {
         try {
@@ -514,7 +449,6 @@ public class DocumentMappingController implements Initializable, ScreenInterface
                     ShowMessageFX.Warning("Please contact admin to assist about no button available", psFormName, null);
                     break;
             }
-            initButtons(pnEditMode);
         } catch (CloneNotSupportedException | SQLException | GuanzonException ex) {
             Logger.getLogger(DocumentMappingController.class.getName()).log(Level.SEVERE, null, ex);
             ShowMessageFX.Error(ex.getMessage(), psFormName, psFormName);
@@ -522,48 +456,9 @@ public class DocumentMappingController implements Initializable, ScreenInterface
             Logger.getLogger(DocumentMappingController.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-
-    /**
-     * Orchestrates the initialization of UI component states, event listeners,
-     * and styling.
-     * <p>
-     * This method is responsible for the dynamic behavior of the form based on
-     * the current {@code pnEditMode} and the transaction's status. It performs
-     * the following:
-     * <ul>
-     * <li><b>State Management:</b> Enables or disables input fields
-     * (TextFields, CheckBoxes, ComboBoxes) based on whether the form is in an
-     * editable mode (ADDNEW or UPDATE).</li>
-     * <li><b>Conditional Logic:</b>
-     * <ul>
-     * <li>If the transaction is {@code CONFIRMED}, it locks the master panel
-     * and limits interaction to specific detail fields like the 'Active'
-     * checkbox.</li>
-     * <li>If the transaction is {@code OPEN} or the mode is {@code READY},
-     * specific controls like the 'Active' checkbox are further restricted.</li>
-     * </ul>
-     * </li>
-     * <li><b>Event Binding:</b>
-     * <ul>
-     * <li>Attaches {@link #txtField_KeyPressed(KeyEvent)} to all primary input
-     * fields.</li>
-     * <li>Applies {@code txtArea_Focus} and {@code txtField_Focus} listeners
-     * via {@link JFXUtil}.</li>
-     * <li>Assigns the {@link #comboBoxActionListener} and configures the
-     * ComboBox cell styling.</li>
-     * <li>Sets the mouse click handler for the {@code tblDetails}
-     * {@link TableView}.</li>
-     * </ul>
-     * </li>
-     * <li><b>Utility Integration:</b> Utilizes {@code makeClearableReadOnly} to
-     * ensure the Field Name cannot be typed into manually while still allowing
-     * clearance.</li>
-     * </ul>
-     *
-     * * @throws SQLException If a database error occurs while checking
-     * transaction status.
-     * @throws GuanzonException If a business logic error occurs during
-     * initialization.
+        /**
+     * Initializes the TextFields, Seek fields, focus listeners, and key events.
+     * Handles navigation and searching on key press.
      */
     private void initFields() {
         //        try {
@@ -582,18 +477,8 @@ public class DocumentMappingController implements Initializable, ScreenInterface
                 txtField11,
                 txtField12
         );
-        List<TextField> loTxtField = Arrays.asList(txtField01,
-                txtField02,
-                txtField03,
-                txtField04,
-                txtField05,
-                txtField06,
-                txtField07,
-                txtField08,
-                txtField09,
-                txtField10,
-                txtField11,
-                txtField12);
+        List<TextField> loTxtField = Arrays.asList(txtSeeks01,
+                txtSeeks02);
         loTxtField.forEach(tf -> tf.setOnKeyPressed(event -> txtField_KeyPressed(event)));
         JFXUtil.setFocusListener(txtField_Focus, txtField01,
                 txtField02,
@@ -612,7 +497,69 @@ public class DocumentMappingController implements Initializable, ScreenInterface
         tblDetails.setOnMouseClicked(this::tblDetails_Clicked);
 
     }
-    
+        /**
+     * Handles key pressed events for TextFields to perform search
+     * or navigation depending on the key code.
+     *
+     * @param event the {@link KeyEvent} triggered by a TextField
+     */
+    private void txtField_KeyPressed(KeyEvent event) {
+        TextField lsTxtField = (TextField) event.getSource();
+        String txtFieldID = ((TextField) event.getSource()).getId();
+        String lsValue = "";
+        if (lsTxtField.getText() == null) {
+            lsValue = "";
+        } else {
+            lsValue = lsTxtField.getText();
+        }
+        if (null != event.getCode()) {
+            try {
+                switch (event.getCode()) {
+                    case TAB:
+                    case ENTER:
+                        
+                    case F3:
+                        switch (txtFieldID) {
+                            case "txtSeeks01":
+                                poJSON = poCashflowController.DocumentMapping().SearchTransaction(txtSeeks01.getText(), "txtSeeks01");
+                                break;
+                            case "txtSeeks02":
+                                poJSON = poCashflowController.DocumentMapping().SearchTransaction(txtSeeks02.getText(), "txtSeeks02");
+                                break;
+                        }
+                        if (!"success".equals((String) poJSON.get("result"))) {
+                            ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
+                            return;
+                        }
+                        pnEditMode = poCashflowController.DocumentMapping().getEditMode();
+                        loadTableDetail();
+                        LoadMaster();
+                        LoadDetail();
+                        Platform.runLater(() -> {
+                            if (!tblDetails.getItems().isEmpty()) {
+                                tblDetails.getSelectionModel().selectFirst();
+                                tblDetails.getFocusModel().focus(0);
+                                tblDetails.scrollTo(0);
+                            }
+                        });
+                        break;
+                    case UP:
+                        break;
+                    case DOWN:
+                        break;
+                    default:
+                        break;
+
+                }
+            } catch (SQLException | GuanzonException | ExceptionInInitializerError ex) {
+                Logger.getLogger(TBJ_ParameterController.class.getName()).log(Level.SEVERE, null, ex);
+                ShowMessageFX.Error(ex.getMessage(), psFormName, null);
+            } catch (CloneNotSupportedException ex) {
+                Logger.getLogger(DocumentMappingController.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+    }
+        
      ChangeListener<Boolean> txSeeks_Focus = JFXUtil.FocusListener(TextField.class,
             (lsID, lsValue) -> {
                 /* Lost Focus */
@@ -626,90 +573,6 @@ public class DocumentMappingController implements Initializable, ScreenInterface
                 }
             });
 
-    /**
-     * Initializes the Account Type ComboBox and binds it to the detail model.
-     * <p>
-     * This method performs the following:
-     * <ul>
-     * <li><b>Data Binding:</b> Assigns the {@code AccountType} ObservableList
-     * (e.g., "Debit", "Credit") as the data source of
-     * {@code cmbAccountType}.</li>
-     *
-     * <li><b>UI Styling:</b> Applies custom styling using
-     * {@code JFXUtil.initComboBoxCellDesignColor}.</li>
-     *
-     * <li><b>Selection Handling:</b> Attaches an {@code setOnAction} listener
-     * that captures the selected index whenever the user changes the
-     * value.</li>
-     *
-     * <li><b>Model Update:</b> Updates the currently selected detail record by
-     * setting {@code setAccountType} using the selected index (stored as a
-     * {@link String}).</li>
-     *
-     * <li><b>UI Refresh:</b> Calls {@link #loadTableDetail()} to refresh the
-     * TableView and reflect the updated account type selection.</li>
-     * </ul>
-     *
-     * <p>
-     * <b>Safety Check:</b> Ensures that {@code pnSelectedDetail} is valid
-     * (greater than or equal to 0) before applying updates.</p>
-     *
-     * <p>
-     * <b>Error Handling:</b> Catches and logs {@link SQLException} and
-     * {@link GuanzonException} to prevent application crashes during data/model
-     * updates.</p>
-     */
-    private void initComboBox(){
-//        cmbAccountType.setItems(AccountType); // your ObservableList
-//        JFXUtil.initComboBoxCellDesignColor("#FF8201", cmbAccountType);
-//
-//        // Attach combo box listener
-//        cmbAccountType.setOnAction(event -> {
-//            try {
-//                if (pnSelectedDetail >= 0) { // safety check
-//                    if(cmbAccountType.getSelectionModel().getSelectedIndex() == 0){
-//                            poCashflowController.DocumentMapping()
-//                                .Detail(pnSelectedDetail)
-//                                .setAccountType("D");
-//                    }else if(cmbAccountType.getSelectionModel().getSelectedIndex() == 1){
-//                            poCashflowController.DocumentMapping()
-//                                .Detail(pnSelectedDetail)
-//                                .setAccountType("C");
-//                    }
-//                    loadTableDetail(); // refresh table after change
-//                }
-//            } catch (SQLException | GuanzonException ex) {
-//                Logger.getLogger(DocumentMappingController.class.getName())
-//                        .log(Level.SEVERE, null, ex);
-//                ShowMessageFX.Error(ex.getMessage(), psFormName, null);
-//            }
-//        });
-//        JFXUtil.initComboBoxCellDesignColor("#FF8201", cmbAccountType);
-    
-    }
-
-
-    /**
-     * A focus change listener for {@link TextField} components that tracks the
-     * currently active search field.
-     * <p>
-     * Utilizing {@code JFXUtil.FocusListener}, this handler specifically
-     * targets "Lost Focus" events to update the {@code psActiveField} state
-     * variable. This tracking is essential for:
-     * <ul>
-     * <li>Identifying which search criteria (Transaction vs. Source) should be
-     * prioritized during global search executions.</li>
-     * <li>Maintaining state for context-sensitive keyboard shortcuts.</li>
-     * </ul>
-     * <p>
-     * <b>Managed Fields:</b></p>
-     * <ul>
-     * <li>{@code tfSearchTransaction}: Sets active field for transaction-based
-     * lookups.</li>
-     * <li>{@code tfSearchSource}: Sets active field for source-based
-     * lookups.</li>
-     * </ul>
-     */
     ChangeListener<Boolean> txtField_Focus = JFXUtil.FocusListener(TextField.class,
             (lsID, lsValue) -> {
                 /* Lost Focus */
@@ -870,28 +733,9 @@ public class DocumentMappingController implements Initializable, ScreenInterface
                     ShowMessageFX.Error(ex.getMessage(), psFormName, null);
                 }
             });
-
     /**
-     * Initializes action listeners for the detail-level checkboxes.
-     * <p>
-     * This method binds the 'Active' and 'Required' {@link CheckBox} components
-     * to the underlying data model, but only when the application is in
-     * {@code ADDNEW} or {@code UPDATE} mode.
-     * <p>
-     * When a checkbox state changes:
-     * <ul>
-     * <li>The corresponding boolean property in the current
-     * {@code pnSelectedDetail} record is updated via the controller.</li>
-     * <li>{@link #LoadDetail()} is called to synchronize the UI and ensure any
-     * dependent logic is refreshed.</li>
-     * </ul>
-     * <p>
-     * <b>Side Effects:</b> If an error occurs during model update, the
-     * exception is logged and the UI state might become desynchronized from the
-     * model.</p>
-     *
-     * * @throws SQLException if a database access error occurs.
-     * @throws GuanzonException if a business logic error is encountered.
+     * Initializes the CheckBox listeners to synchronize flags
+     * with the model detail data.
      */
     private void initCheckBox() {
         
@@ -914,214 +758,7 @@ public class DocumentMappingController implements Initializable, ScreenInterface
     }
 
     /**
-     * A focus change listener for {@link TextArea} components that manages data
-     * persistence and user selection behavior.
-     * <p>
-     * When the focus state changes, this listener performs the following:
-     * <ul>
-     * <li><b>Gained Focus (nv = true):</b> Automatically selects all text
-     * within the TextArea to facilitate quick replacement or editing.</li>
-     * <li><b>Lost Focus (nv = false):</b> Captures the current text and updates
-     * the corresponding "Master" record in the controller. Specifically, it
-     * maps {@code taRemarks} to the Remarks property of the transaction.</li>
-     * </ul>
-     * <p>
-     * <b>Technical Note:</b> It uses
-     * {@code ((ReadOnlyBooleanPropertyBase) o).getBean()} to dynamically
-     * identify the source control, allowing a single listener to be reused
-     * across multiple TextAreas.</p>
-     *
-     * * @throws SQLException If a database error occurs during the update.
-     * @throws GuanzonException If a business logic violation occurs.
-     */
-    final ChangeListener<? super Boolean> txtArea_Focus = (o, ov, nv) -> {
-        TextArea loTextArea = (TextArea) ((ReadOnlyBooleanPropertyBase) o).getBean();
-        String lsTextAreaID = loTextArea.getId();
-        String lsValue = loTextArea.getText();
-        if (lsValue == null) {
-            return;
-        }
-//        try {
-//            if (!nv) {
-//                /*Lost Focus*/
-//                switch (lsTextAreaID) {
-//                    case "taRemarks":
-////                        poCashflowController.DocumentMapping().Master().setRemarks(lsValue);
-//                        break;
-//                }
-//            } else {
-//                loTextArea.selectAll();
-//            }
-//        } catch (SQLException | GuanzonException ex) {
-//            Logger.getLogger(PaymentRequest_EntryController.class
-//                    .getName()).log(Level.SEVERE, null, ex);
-//        }
-    };
-
-    /**
-     * Handles keyboard events for various text input fields to trigger search
-     * and lookup actions.
-     * <p>
-     * This method listens for specific keys ({@code TAB}, {@code ENTER}, and
-     * {@code F3}) to initiate asynchronous searches via the controller.
-     * Depending on the focused field, it performs:
-     * <ul>
-     * <li><b>Category Search:</b> Lookups based on {@code tfCategory} and
-     * updates the master record.</li>
-     * <li><b>Source Code Search:</b> Lookups based on
-     * {@code tfSourceCode}.</li>
-     * <li><b>Account Chart Search:</b> Filters account titles for the specific
-     * detail row.</li>
-     * <li><b>Table & Field Search:</b> Dynamically retrieves available database
-     * tables and fields, ensuring that a Table Name is selected before allowing
-     * a Field Name lookup.</li>
-     * </ul>
-     * <p>
-     * Errors during search (e.g., no records found) are caught from the
-     * {@code poJSON} result and displayed to the user via
-     * {@link ShowMessageFX}.
-     * </p>
-     *
-     * * @param event The {@link KeyEvent} containing the key code and source
-     * field information.
-     */
-    private void txtField_KeyPressed(KeyEvent event) {
-        TextField lsTxtField = (TextField) event.getSource();
-        String txtFieldID = ((TextField) event.getSource()).getId();
-        String lsValue = "";
-        if (lsTxtField.getText() == null) {
-            lsValue = "";
-        } else {
-            lsValue = lsTxtField.getText();
-        }
-        if (null != event.getCode()) {
-//            try {
-                switch (event.getCode()) {
-                    case TAB:
-                    case ENTER:
-                        
-                    case F3:
-                        switch (txtFieldID) {
-                            case "tfIndustry":
-//                                poJSON = poCashflowController.DocumentMapping().SearchIndustry(lsValue, false);
-//                                if ("error".equals(poJSON.get("result"))) {
-//                                    ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
-//                                }
-//                                tfIndustry.setText(poCashflowController.DocumentMapping().Master().Industry().getDescription());
-                                return;
-                            case "tfCategory":
-//                                poJSON = poCashflowController.DocumentMapping().SearchCategory(lsValue, false);
-//                                if ("error".equals(poJSON.get("result"))) {
-//                                    ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
-//                                }
-//                                tfCategory.setText(poCashflowController.DocumentMapping().Master().Category().getDescription());
-                                return;
-
-                            case "tfSourceCode":
-//                                poJSON = poCashflowController.DocumentMapping().SearchSourceCode(lsValue, false);
-//                                if ("error".equals(poJSON.get("result"))) {
-//                                    ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
-//                                }
-//                                tfSourceCode.setText(poCashflowController.DocumentMapping().Master().TransactionSource().getSourceName());
-//                                tfTableName.clear();
-                                return;
-
-                            case "tfAccountTitle":
-//                                poJSON = poCashflowController.DocumentMapping().SearchAccountChart(lsValue, false, pnSelectedDetail);
-//                                if ("error".equals(poJSON.get("result"))) {
-//                                    ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
-//                                }
-//                                tfAccountTitle.setText(poCashflowController.DocumentMapping().Detail(pnSelectedDetail).AccountChart().getDescription());
-//                                
-//                                poJSON = poCashflowController.DocumentMapping().checkDuplicateDetail();
-//                                 if("error".equals(poJSON.get("result"))){
-//                                      ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
-//                                      tfAccountTitle.requestFocus();
-//                                      tfAccountTitle.selectAll();
-//                                      return;
-//                                 }
-//                                 loadTableDetail();
-                                return;
-
-                            case "tfTableName":
-//                                poJSON = poCashflowController.DocumentMapping().SearchSourceCodeTable(lsValue, pnSelectedDetail);
-//                                if ("error".equals(poJSON.get("result"))) {
-//                                    ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
-//                                }
-//                                tfTableName.setText(poCashflowController.DocumentMapping().Detail(pnSelectedDetail).getTableNm().trim().replace("_", " "));
-//                                poJSON = poCashflowController.DocumentMapping().checkDuplicateDetail();
-//                                 if("error".equals(poJSON.get("result"))){
-//                                      ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
-//                                      tfAccountTitle.requestFocus();
-//                                      tfAccountTitle.selectAll();
-//                                      return;
-//                                 }
-//                                loadTableDetail();
-                                return;
-                            case "tfFieldName":
-//                                if (poCashflowController.DocumentMapping().Detail(pnSelectedDetail).getTableNm() == null
-//                                        || poCashflowController.DocumentMapping().Detail(pnSelectedDetail).getTableNm().isEmpty()) {
-//                                    ShowMessageFX.Warning("Table Name is not set!", psFormName, null);
-//                                    return;
-//                                }
-//                                
-//                                poCashflowController.DocumentMapping().show(poCashflowController.DocumentMapping().Detail(pnSelectedDetail).getTableNm().trim().replace(" ", "_"), pnSelectedDetail);
-//                                tfFieldName.setText(poCashflowController.DocumentMapping().getFieldName(poCashflowController.DocumentMapping().Detail(pnSelectedDetail).getDerivedField(), pnSelectedDetail));
-//                                poJSON = poCashflowController.DocumentMapping().checkDuplicateDetail();
-//                                 if("error".equals(poJSON.get("result"))){
-//                                      ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
-//                                      tfAccountTitle.requestFocus();
-//                                      tfAccountTitle.selectAll();
-//                                      return;
-//                                 }
-//                                loadTableDetail();
-                                break;
-
-                        }
-
-                        break;
-                    case UP:
-                        break;
-                    case DOWN:
-                        break;
-                    default:
-                        break;
-
-                }
-//            } catch (SQLException | GuanzonException | ExceptionInInitializerError ex) {
-//                Logger.getLogger(DocumentMappingController.class.getName()).log(Level.SEVERE, null, ex);
-//                ShowMessageFX.Error(ex.getMessage(), psFormName, null);
-//            }
-        }
-    }
-
-    /**
-     * Populates the primary header (Master) fields with data from the current
-     * transaction.
-     * <p>
-     * This method retrieves high-level transaction data from the controller and
-     * updates the following UI elements:
-     * <ul>
-     * <li><b>Transaction Identifiers:</b> Sets the Transaction Number and
-     * Source Code.</li>
-     * <li><b>Classification:</b> Loads the Category description, defaulting to
-     * empty if null.</li>
-     * <li><b>Notes:</b> populates the Remarks {@link TextArea}.</li>
-     * <li><b>Visual Status:</b> Translates the numeric transaction status into
-     * a human-readable string (e.g., "VOID", "OPEN", "CONFIRMED") and updates
-     * the status label.</li>
-     * </ul>
-     * <p>
-     * <b>Implementation Note:</b> Uses a {@code switch} expression based on
-     * {@link TBJ_Constant} to ensure status labels remain consistent with
-     * business logic constants.</p>
-     *
-     * * @throws SQLException If a database access error occurs during record
-     * retrieval.
-     * @throws GuanzonException If an error occurs within the core business
-     * logic.
-     * @throws NullPointerException If the Master object or its sub-properties
-     * are uninitialized.
+     * Loads the master record values into the form fields.
      */
     private void LoadMaster() {
         try {
@@ -1138,30 +775,7 @@ public class DocumentMappingController implements Initializable, ScreenInterface
     }
 
     /**
-     * Populates the detail input fields with data from the currently selected
-     * record.
-     * <p>
-     * This method retrieves data from the underlying controller based on
-     * {@code pnSelectedDetail} and performs the following UI updates:
-     * <ul>
-     * <li><b>Account Title:</b> Sets text from the account chart description,
-     * defaulting to empty if null.</li>
-     * <li><b>Table Name:</b> Formats the table name by trimming whitespace and
-     * replacing underscores with spaces for better readability (e.g.,
-     * "sys_user" becomes "sys user").</li>
-     * <li><b>Field Name:</b> Fetches the derived field name using the
-     * controller's helper method.</li>
-     * <li><b>Account Type:</b> Parses the account type string to an integer to
-     * set the {@link ComboBox} selection index.</li>
-     * <li><b>Checkboxes:</b> Updates the 'Active' and 'Required' states based
-     * on the boolean flags in the detail model.</li>
-     * </ul>
-     *
-     * * @throws SQLException If a database access error occurs.
-     * @throws GuanzonException If an error occurs within the business logic
-     * layer.
-     * @throws NullPointerException If certain detail components are
-     * uninitialized.
+     * Loads the selected detail record values into the form fields.
      */
     private void LoadDetail() {
         try {
@@ -1189,23 +803,8 @@ public class DocumentMappingController implements Initializable, ScreenInterface
         }
     }
 
-    /**
-     * Initializes the configuration and data mapping for the transaction
-     * details table.
-     * <p>
-     * This method handles the structural setup of the {@link TableView}:
-     * <ul>
-     * <li>Maps {@link TableColumn} instances (index00 through index06) to the
-     * corresponding properties in the {@link ModelTableDetail} class using
-     * {@link PropertyValueFactory}.</li>
-     * <li>Configures a listener on the table's width property to access the
-     * skin's {@code TableHeaderRow} once it is rendered.</li>
-     * <li>Disables column reordering (drag-and-drop moving of columns) by
-     * forcing the reordering property to remains {@code false}.</li>
-     * </ul>
-     * * <p>
-     * <b>Note:</b> The use of {@link Platform#runLater} ensures that the table
-     * header lookup occurs after the UI has finished its layout pass.</p>
+   /**
+     * Initializes the TableView columns and prevents column reordering.
      */
     private void initTableDetail() {
         index00.setCellValueFactory(new PropertyValueFactory<>("index01"));
@@ -1224,26 +823,9 @@ public class DocumentMappingController implements Initializable, ScreenInterface
             });
         });
     }
-
-    /**
-     * Asynchronously loads the transaction detail data into the TableView.
-     * <p>
-     * This method improves UI responsiveness by performing data retrieval on a
-     * background thread. It performs the following steps:
-     * <ul>
-     * <li>Displays a custom {@link ProgressIndicator} within the table
-     * placeholder during loading.</li>
-     * <li>Checks the current {@code pnEditMode}; if in ADDNEW or UPDATE mode
-     * and the last row is valid, it automatically appends a new blank detail
-     * row.</li>
-     * <li>Maps raw data from the controller to a {@link List} of
-     * {@link ModelTableDetail} objects, converting numeric types (e.g., "0" to
-     * "Debit") and boolean states to visual icons (✔/✗).</li>
-     * <li>Updates the UI's {@code detail_data} observable list and refreshes
-     * table items via {@link Platform#runLater}.</li>
-     * <li>Cleans up the loading indicator upon task completion (success or
-     * failure).</li>
-     * </ul>
+     /**
+     * Populates the TableView with detail records asynchronously.
+     * Shows a progress indicator while loading.
      */
     private void loadTableDetail() {
         ProgressIndicator progressIndicator = new ProgressIndicator();
@@ -1309,21 +891,8 @@ public class DocumentMappingController implements Initializable, ScreenInterface
         new Thread(task).start();
     }
 
-    /**
-     * Resets all user interface controls and class variables to their default
-     * states.
-     * <p>
-     * This method performs the following cleanup:
-     * <ul>
-     * <li>Clears the text content of all transaction and search
-     * {@link TextField}s.</li>
-     * <li>Unchecks the 'Active' and 'Required' {@link CheckBox}es.</li>
-     * <li>Clears the selection in the 'Account Type' {@link ComboBox}.</li>
-     * <li>Empties the {@link TableView} underlying data list
-     * (detail_data).</li>
-     * <li>Resets internal indices and trackers (pnSelectedDetail,
-     * psActiveField).</li>
-     * </ul>
+     /**
+     * Clears all form fields and resets state variables.
      */
     private void ClearAll() {
         Arrays.asList(
@@ -1346,25 +915,13 @@ public class DocumentMappingController implements Initializable, ScreenInterface
         detail_data.clear();
         pnSelectedDetail = 0;
         psActiveField = "";
-//        taRemarks.clear();
-//        lblStatus.setText("UNKNOWN");
     }
 
     /**
-     * Handles mouse click events on the transaction details table.
-     * <p>
-     * When a row is clicked during Add, Update, or Ready modes, this method:
-     * <ul>
-     * <li>Identifies the selected index and item from the TableView.</li>
-     * <li>Clears the detail input fields (Account Title, Table Name, Field
-     * Name, etc.) to prepare for fresh data loading.</li>
-     * <li>Invokes {@link #LoadDetail()} to populate the input fields with the
-     * data corresponding to the selected row.</li>
-     * <li>Sets the input focus to the Account Title field for easier
-     * editing.</li>
-     * </ul>
+     * Handles mouse click events on the TableView to load
+     * the selected detail record into the form.
      *
-     * * @param event The {@link MouseEvent} triggered by clicking the table.
+     * @param event the {@link MouseEvent} triggered on the table
      */
     private void tblDetails_Clicked(MouseEvent event) {
         if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE || pnEditMode == EditMode.READY) {
