@@ -5,14 +5,17 @@
 package ph.com.guanzongroup.integsys.views;
 
 import java.io.IOException;
+import ph.com.guanzongroup.integsys.model.ModelPettyCashDisbursement_Detail;
 import ph.com.guanzongroup.integsys.model.ModelCashDisbursement_Main;
 import ph.com.guanzongroup.integsys.model.ModelJournalEntry_Detail;
 import ph.com.guanzongroup.integsys.utility.CustomCommonUtil;
 import ph.com.guanzongroup.integsys.utility.JFXUtil;
 import java.net.URL;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.SQLException;
+import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -29,6 +32,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
@@ -57,10 +61,13 @@ import static javafx.scene.input.KeyCode.UP;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.StackPane;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import javafx.util.Pair;
 import javax.script.ScriptException;
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.rendering.PDFRenderer;
 import org.guanzon.appdriver.agent.ShowMessageFX;
 import org.guanzon.appdriver.base.CommonUtils;
 import org.guanzon.appdriver.base.GRiderCAS;
@@ -71,19 +78,19 @@ import org.guanzon.appdriver.constant.DocumentType;
 import org.guanzon.appdriver.constant.EditMode;
 import org.guanzon.appdriver.constant.RecordStatus;
 import org.json.simple.JSONObject;
+import org.json.simple.parser.ParseException;
 import ph.com.guanzongroup.cas.cashflow.PettyCashDisbursement;
 import ph.com.guanzongroup.cas.cashflow.services.CashflowControllers;
 import ph.com.guanzongroup.cas.cashflow.status.PettyCashDisbursementStatus;
 import ph.com.guanzongroup.integsys.model.ModelBIR_Detail;
 import ph.com.guanzongroup.integsys.model.ModelDeliveryAcceptance_Attachment;
-import ph.com.guanzongroup.integsys.model.ModelPettyCashDisbursement_Detail;
 
 /**
  * FXML Controller class
  *
  * @author Team 1
  */
-public class PettyCashDisbursement_HistoryController implements Initializable, ScreenInterface {
+public class PettyCashDisbursement_EntryController implements Initializable, ScreenInterface {
 
     private GRiderCAS oApp;
     private JSONObject poJSON;
@@ -115,25 +122,26 @@ public class PettyCashDisbursement_HistoryController implements Initializable, S
 
     private int currentIndex = 0;
     Map<String, String> imageinfo_temp = new HashMap<>();
-    JFXUtil.ReloadableTableTask loadTableDetail, loadTableAttachment;
+    JFXUtil.ReloadableTableTask loadTableMain, loadTableDetail, loadTableAttachment;
     private final JFXUtil.ImageViewer imageviewerutil = new JFXUtil.ImageViewer();
     JFXUtil.StageManager stageAttachment = new JFXUtil.StageManager();
     AnchorPane root = null;
     Scene scene = null;
+    private FileChooser fileChooser;
     ObservableList<String> documentType = ModelDeliveryAcceptance_Attachment.documentType;
 
     @FXML
-    private AnchorPane AnchorMain, apBrowse, apButton, apDVMaster1, apDVMaster12, apDVDetail, apAttachments;
+    private AnchorPane AnchorMain, apButton, apMasterDetail, apDVMaster1, apDVMaster2, apDVDetail, apAttachments, apAttachmentButtons;
     @FXML
     private Label lblSource, lblDVTransactionStatus;
     @FXML
-    private TextField tfSearchIndustry, tfSearchPayee, tfSearchCashAdvanceNo, tfDVTransactionNo, tfBranch, tfDepartment, tfPettyCashFund, tfPayee, tfCreditTo, tfTotalAmount, tfVoucherNo, tfReferNo, tfParticularDetail, tfAmountDetail, tfAttachmentNo;
-    @FXML
-    private Button btnBrowse, btnPrint, btnHistory, btnClose, btnArrowLeft, btnArrowRight;
+    private Button btnBrowse, btnNew, btnUpdate, btnSearch, btnSave, btnCancel, btnVoid, btnHistory, btnRetrieve, btnClose, btnAddAttachment, btnRemoveAttachment, btnArrowLeft, btnArrowRight;
     @FXML
     private TabPane tabPaneMain;
     @FXML
     private Tab tabDetails, tabAttachments;
+    @FXML
+    private TextField tfDVTransactionNo, tfBranch, tfDepartment, tfPettyCashFund, tfPayee, tfCreditTo, tfTotalAmount, tfVoucherNo, tfReferNo, tfParticularDetail, tfAmountDetail, tfAttachmentNo;
     @FXML
     private DatePicker dpDVTransactionDate;
     @FXML
@@ -163,6 +171,7 @@ public class PettyCashDisbursement_HistoryController implements Initializable, S
 
     @Override
     public void setCompanyID(String fsValue) {
+
         psCompanyId = fsValue;
     }
 
@@ -190,12 +199,13 @@ public class PettyCashDisbursement_HistoryController implements Initializable, S
             initComboBoxes();
             initDatePicker();
             initDetailGrid();
-
             initAttachmentsGrid();
             initTableOnClick();
             initTabPane();
+            initComboboxes();
             clearTextFields();
             pnEditMode = EditMode.UNKNOWN;
+
             initButton(pnEditMode);
 
             Platform.runLater(() -> {
@@ -203,7 +213,10 @@ public class PettyCashDisbursement_HistoryController implements Initializable, S
                 poController.Master().setCompanyId(psCompanyId);
                 poController.setIndustryId(psIndustryId);
                 poController.setCompanyId(psCompanyId);
+//                poController.setCategoryID(psCategoryId);
+                poController.Master().setBranchCode(oApp.getBranchCode());
                 loadRecordSearch();
+                btnNew.fire();
                 TriggerWindowEvent();
             });
             initAttachmentPreviewPane();
@@ -238,6 +251,11 @@ public class PettyCashDisbursement_HistoryController implements Initializable, S
         scene.setOnKeyPressed(event -> {
             if (event.getCode() == KeyCode.F5) {
                 if (JFXUtil.isObjectEqualTo(pnEditMode, EditMode.ADDNEW, EditMode.READY, EditMode.UPDATE)) {
+                    if (DoesContainValidDisbDetail()) {
+                    } else {
+                        ShowMessageFX.Warning(null, pxeModuleName, lsValidDisbMessage);
+                        return;
+                    }
                     showAttachmentDialog();
                 }
             }
@@ -285,7 +303,19 @@ public class PettyCashDisbursement_HistoryController implements Initializable, S
             ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
-    String lsValidDisbMessage = "Please provide an amount for at least one valid disbursement detail to proceed.";
+
+    private boolean DoesContainValidDisbDetail() {
+        String lsParticular = "";
+
+        if (poController.getDetailCount() <= 0) {
+            return false;
+        }
+        if (poController.Master().getTransactionTotal() <= 0.0000) {
+            return false;
+        }
+        return true;
+    }
+    String lsValidDisbMessage = "Please provide at least one valid disbursement detail with amount to proceed.";
 
     public void initTabPane() {
         JFXUtil.onTabSelected(tabPaneMain, tabTitle -> {
@@ -299,13 +329,16 @@ public class PettyCashDisbursement_HistoryController implements Initializable, S
                 case "Attachments":
                     if (pnEditMode == EditMode.READY || pnEditMode == EditMode.UPDATE || pnEditMode == EditMode.ADDNEW) {
                         JFXUtil.clearTextFields(apAttachments);
-                        if (poController.Detail(0).getAmount() > 0.0000) {
-                            pbIsCheckedAttachmentTab = true;
-                            try {
-                                poController.loadAttachments();
-                            } catch (GuanzonException | SQLException ex) {
-                                Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
-                                ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
+                        if (DoesContainValidDisbDetail()) {
+                            if (isSourceNoAvailable()) {
+                                pbIsCheckedAttachmentTab = true;
+                                try {
+                                    poController.loadAttachments();
+                                } catch (GuanzonException | SQLException ex) {
+                                    Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+                                    ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
+                                }
+
                             }
                             loadTableAttachment.reload();
                         } else {
@@ -319,8 +352,24 @@ public class PettyCashDisbursement_HistoryController implements Initializable, S
 
     }
 
+    public void initComboboxes() {
+        // ComboBox setup
+        cmbAttachmentType.setItems(documentType);
+        cmbAttachmentType.setOnAction(event -> {
+            if (attachment_data.size() > 0) {
+                try {
+                    int selectedIndex = cmbAttachmentType.getSelectionModel().getSelectedIndex();
+                    poController.TransactionAttachmentList(pnAttachment).getModel().setDocumentType("000" + String.valueOf(selectedIndex));
+                    cmbAttachmentType.getSelectionModel().select(selectedIndex);
+                } catch (Exception e) {
+                }
+            }
+        });
+        JFXUtil.initComboBoxCellDesignColor("#FF8201", cmbAttachmentType);
+    }
+
     private void initButtonsClickActions() {
-        List<Button> buttons = Arrays.asList(btnBrowse, btnPrint, btnHistory, btnClose, btnArrowLeft, btnArrowRight);
+        List<Button> buttons = Arrays.asList(btnRemoveAttachment, btnAddAttachment, btnBrowse, btnNew, btnUpdate, btnSearch, btnSave, btnCancel, btnVoid, btnRetrieve, btnHistory, btnClose, btnArrowRight, btnArrowLeft);
         buttons.forEach(button -> button.setOnAction(this::cmdButton_Click));
     }
 
@@ -330,22 +379,107 @@ public class PettyCashDisbursement_HistoryController implements Initializable, S
             String lsButton = ((Button) event.getSource()).getId();
             switch (lsButton) {
                 case "btnBrowse":
-                    poJSON = poController.SearchTransaction(tfSearchIndustry.getText(), tfSearchPayee.getText(), tfSearchCashAdvanceNo.getText());
+                    poController.Master().setIndustryId(psIndustryId);
+                    poController.Master().setCompanyId(psCompanyId);
+                    poController.Master().setBranchCode(oApp.getBranchCode());
+                    poController.setTransactionStatus(PettyCashDisbursementStatus.OPEN);
+                    poJSON = poController.SearchTransaction();
                     if ("error".equalsIgnoreCase((String) poJSON.get("result"))) {
                         ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                         return;
-                    } else {
-                        stageAttachment.closeDialog();
                     }
+                    pnEditMode = poController.getEditMode();
                     JFXUtil.clickTabByTitleText(tabPaneMain, "Petty Cash Disbursement");
                     pnEditMode = poController.getEditMode();
+//                    psSupplierPayeeId = poController.Master().Payee().getClientID();
+                    loadTableDetail.reload();
                     break;
-                case "btnPrint":
-                    poJSON = poController.printTransaction();
+                case "btnNew":
+                    clearTextFields();
+                    poController.initFields();
+                    poJSON = poController.NewTransaction();
                     if ("error".equals((String) poJSON.get("result"))) {
                         ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                        return;
                     }
+
+//                    poController.Master().setDisbursementType(PettyCashDisbursementStatus.DisbursementType.CHECK);
+//                    poController.Master().setSupplierClientID(psSupplierPayeeId);
+                    JFXUtil.clickTabByTitleText(tabPaneMain, "Petty Cash Disbursement");
+                    loadTableDetail.reload();
+                    pnEditMode = poController.getEditMode();
                     break;
+                case "btnUpdate":
+                    //Recheck transaction status
+                    poJSON = poController.checkUpdateTransaction(true);
+                    if (!"success".equals((String) poJSON.get("result"))) {
+                        ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                        return;
+                    }
+
+                    poJSON = poController.UpdateTransaction();
+                    if ("error".equals((String) poJSON.get("result"))) {
+                        ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                        return;
+                    }
+                    pnEditMode = poController.getEditMode();
+                    JFXUtil.clickTabByTitleText(tabPaneMain, "Petty Cash Disbursement");
+                    loadTableDetail.reload();
+                    break;
+                case "btnSearch":
+                    JFXUtil.initiateBtnSearch(pxeModuleName, lastFocusedTextField, previousSearchedTextField, apDVMaster1, apDVDetail);
+                    break;
+                case "btnSave":
+                    //Recheck transaction status
+                    if (pnEditMode == EditMode.UPDATE) {
+                        poJSON = poController.checkUpdateTransaction(true);
+                        if (!"success".equals((String) poJSON.get("result"))) {
+                            ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                            return;
+                        }
+                    }
+
+                    if (!ShowMessageFX.YesNo(null, pxeModuleName, "Are you sure you want to save the transaction?")) {
+                        return;
+                    }
+                    poJSON = poController.SaveTransaction();
+                    if (!"success".equals((String) poJSON.get("result"))) {
+                        ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                        return;
+                    }
+
+                    ShowMessageFX.Information(null, pxeModuleName, (String) poJSON.get("message"));
+
+                    //Arsiela 03-05-2026 Moved to class save others
+//                    poJSON = poController.updatePaymentsStatus();
+//                    if ("error".equals(poJSON.get("result"))) {
+//                        ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+//                    }
+                    poJSON = poController.OpenTransaction(poController.Master().getTransactionNo());
+                    if ("success".equals(poJSON.get("result"))) {
+                        pnEditMode = poController.getEditMode();
+                        initButton(pnEditMode);
+                    }
+                    if (pnEditMode == EditMode.READY) {
+                        if (ShowMessageFX.YesNo(null, pxeModuleName, "Do you want to confirm this transaction?")) { //requires to review journal entry
+                            poJSON = poController.ConfirmTransaction("");
+                            if ("error".equals((String) poJSON.get("result"))) {
+                                ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                                break;
+                            } else {
+                                ShowMessageFX.Information(null, pxeModuleName, (String) poJSON.get("message"));
+                            }
+                        }
+                    }
+                    Platform.runLater(() -> btnNew.fire());
+                    break;
+                case "btnCancel":
+                    if (ShowMessageFX.YesNo(null, pxeModuleName, "Do you want to disregard changes?")) {
+                        pnEditMode = EditMode.UNKNOWN;
+                        break;
+                    } else {
+                        return;
+                    }
                 case "btnHistory":
                     if (pnEditMode != EditMode.READY && pnEditMode != EditMode.UPDATE) {
                         ShowMessageFX.Warning("No transaction status history to load!", pxeModuleName, null);
@@ -363,7 +497,7 @@ public class PettyCashDisbursement_HistoryController implements Initializable, S
                     }
                     break;
                 case "btnRetrieve":
-
+                    loadTableMain.reload();
                     break;
                 case "btnClose":
                     if (ShowMessageFX.YesNo(null, "Close Tab", "Are you sure you want to close this Tab?")) {
@@ -373,7 +507,107 @@ public class PettyCashDisbursement_HistoryController implements Initializable, S
                         return;
                     }
                     break;
+                case "btnVoid":
+                    if (ShowMessageFX.YesNo(null, pxeModuleName, "Are you sure you want to void transaction?")) {
+                        pnEditMode = poController.getEditMode();
+                        if (pnEditMode == EditMode.READY) {
+                            poJSON = poController.VoidTransaction();
+                            if ("error".equals((String) poJSON.get("result"))) {
+                                ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                                return;
+                            } else {
+                                ShowMessageFX.Information(null, pxeModuleName, (String) poJSON.get("message"));
+                                pnEditMode = poController.getEditMode();
+                            }
+                        }
+                    } else {
+                        return;
+                    }
+                    break;
+                case "btnAddAttachment":
+                    fileChooser = new FileChooser();
+                    fileChooser.setTitle("Choose Image");
+                    fileChooser.getExtensionFilters().addAll(
+                            new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg", "*.gif", "*.pdf")
+                    );
+                    java.io.File selectedFile = fileChooser.showOpenDialog((Stage) btnAddAttachment.getScene().getWindow());
 
+                    if (selectedFile != null) {
+                        // Read image from the selected file
+                        Path imgPath = selectedFile.toPath();
+                        Image loimage = new Image(Files.newInputStream(imgPath));
+                        imageView.setImage(loimage);
+
+                        //Validate attachment
+                        String imgPath2 = selectedFile.getName().toString();
+                        for (int lnCtr = 0; lnCtr <= poController.getTransactionAttachmentCount() - 1; lnCtr++) {
+                            if (imgPath2.equals(poController.TransactionAttachmentList(lnCtr).getModel().getFileName())
+                                    && RecordStatus.ACTIVE.equals(poController.TransactionAttachmentList(lnCtr).getModel().getRecordStatus())) {
+                                ShowMessageFX.Warning(null, pxeModuleName, "File name already exists.");
+                                pnAttachment = lnCtr;
+                                loadRecordAttachment(true);
+                                return;
+                            }
+                        }
+                        if (imageinfo_temp.containsKey(selectedFile.getName().toString())) {
+                            ShowMessageFX.Warning(null, pxeModuleName, "File name already exists.");
+                            loadRecordAttachment(true);
+                            return;
+                        } else {
+                            imageinfo_temp.put(selectedFile.getName().toString(), imgPath.toString());
+                        }
+
+                        //Limit maximum pages of pdf to add
+                        if (imgPath2.toLowerCase().endsWith(".pdf")) {
+                            try (PDDocument document = PDDocument.load(selectedFile)) {
+                                PDFRenderer pdfRenderer = new PDFRenderer(document);
+                                int pageCount = document.getNumberOfPages();
+                                if (pageCount > 5) {
+                                    ShowMessageFX.Warning(null, pxeModuleName, "PDF exceeds maximum allowed pages.");
+                                    return;
+                                }
+                            } catch (IOException ex) {
+                                Logger.getLogger(PettyCashDisbursement_EntryController.class.getName()).log(Level.SEVERE, null, ex);
+                            }
+                        }
+
+                        pnAttachment = poController.addAttachment(imgPath2);
+                        //Copy file to Attachment path
+                        poController.copyFile(selectedFile.toString());
+                        loadTableAttachment.reload();
+                        tblAttachments.getFocusModel().focus(pnAttachment);
+                        tblAttachments.getSelectionModel().select(pnAttachment);
+                    }
+                    break;
+                case "btnRemoveAttachment":
+                    if (poController.getTransactionAttachmentCount() <= 0) {
+                        return;
+                    } else {
+                        for (int lnCtr = 0; lnCtr < poController.getTransactionAttachmentCount(); lnCtr++) {
+                            if (RecordStatus.INACTIVE.equals(poController.TransactionAttachmentList(lnCtr).getModel().getRecordStatus())) {
+                                if (pnAttachment == lnCtr) {
+                                    return;
+                                }
+                            }
+                        }
+                    }
+                    poJSON = poController.removeAttachment(pnAttachment);
+                    if ("error".equals((String) poJSON.get("result"))) {
+                        ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                        return;
+                    }
+                    attachment_data.remove(tblAttachments.getSelectionModel().getSelectedIndex());
+                    if (pnAttachment != 0) {
+                        pnAttachment -= 1;
+                    }
+                    imageinfo_temp.clear();
+                    loadRecordAttachment(false);
+                    loadTableAttachment.reload();
+                    if (attachment_data.size() <= 0) {
+                        JFXUtil.clearTextFields(apAttachments);
+                    }
+                    initAttachmentsGrid();
+                    break;
                 case "btnArrowRight":
                     slideImage(1);
                     break;
@@ -386,12 +620,13 @@ public class PettyCashDisbursement_HistoryController implements Initializable, S
             }
             if (JFXUtil.isObjectEqualTo(lsButton, "btnSave", "btnCancel", "btnVoid")) {
                 poController.resetTransaction();
+//                poController.Master().setSupplierClientID(psSupplierPayeeId);
                 clearTextFields();
                 JFXUtil.clickTabByTitleText(tabPaneMain, "Petty Cash Disbursement");
                 pnEditMode = EditMode.UNKNOWN;
             }
 
-            if (JFXUtil.isObjectEqualTo(lsButton, "btnSave", "btnRetrieve", "btnSearch", "btnUndo", "btnArrowRight", "btnArrowLeft", "btnHistory")) {
+            if (JFXUtil.isObjectEqualTo(lsButton, "btnRetrieve", "btnSearch", "btnUndo", "btnArrowRight", "btnArrowLeft", "btnHistory")) {
             } else {
                 loadRecordMaster();
                 loadTableDetail.reload();
@@ -401,15 +636,15 @@ public class PettyCashDisbursement_HistoryController implements Initializable, S
             if (lsButton.equals("btnUpdate")) {
                 moveNext(false, false);
             }
-        } catch (CloneNotSupportedException | SQLException | GuanzonException | ScriptException ex) {
+        } catch (CloneNotSupportedException | SQLException | GuanzonException | ParseException | ScriptException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
             ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
-
+        } catch (IOException ex) {
+            Logger.getLogger(PettyCashDisbursement_EntryController.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
     public void initLoadTable() {
-
         loadTableDetail = new JFXUtil.ReloadableTableTask(
                 tblVwDetails,
                 details_data,
@@ -606,6 +841,7 @@ public class PettyCashDisbursement_HistoryController implements Initializable, S
         });
 
         JFXUtil.setKeyEventFilter(this::tableKeyEvents, tblVwDetails);
+        JFXUtil.adjustColumnForScrollbar(tblVwDetails);
     }
 
     private void tableKeyEvents(KeyEvent event) {
@@ -645,38 +881,213 @@ public class PettyCashDisbursement_HistoryController implements Initializable, S
 
     private void initTextFields() {
         //Initialise  TextField Focus
+        JFXUtil.setFocusListener(txtArea_Focus, taDVRemarks);
+        JFXUtil.setFocusListener(txtMaster_Focus, apDVMaster1, apDVMaster2);
+        JFXUtil.setFocusListener(txtDetail_Focus, apDVDetail);
 
-        JFXUtil.setFocusListener(txtSearch_Focus, apBrowse);
-
-        JFXUtil.setKeyPressedListener(this::txtField_KeyPressed, apDVDetail, apBrowse);
+        JFXUtil.setKeyPressedListener(this::txtField_KeyPressed, apDVMaster1, apDVMaster2, apDVDetail);
         JFXUtil.adjustColumnForScrollbar(tblVwDetails, tblAttachments);
 
+        JFXUtil.setCommaFormatter(tfAmountDetail);
         Platform.runLater(() -> {
             JFXUtil.setVerticalScroll(taDVRemarks);
         });
+
+        JFXUtil.handleDisabledNodeClick(apDVDetail, pnEditMode, nodeID -> {
+            switch (nodeID) {
+                case "cbReverse":
+                    ShowMessageFX.Warning(null, pxeModuleName,
+                            "Reverse is disabled for transactions linked to a cash advance.");
+                    break;
+                case "tfVatExemptDetail":
+                    ShowMessageFX.Warning(null, pxeModuleName,
+                            "VAT Exempt requires a Receipt No and an amount greater than 0.00 to be editable.");
+                    break;
+                case "tfAmountDetail":
+                    ShowMessageFX.Warning(null, pxeModuleName,
+                            "Amount is editable only in manual entry of details.");
+                    break;
+            }
+        });
     }
-    ChangeListener<Boolean> txtSearch_Focus = JFXUtil.FocusListener(TextField.class,
+
+    ChangeListener<Boolean> txtArea_Focus = JFXUtil.FocusListener(TextArea.class,
+            (lsID, lsValue) -> {
+                switch (lsID) {
+                    case "taDVRemarks":
+                        poJSON = poController.Master().setRemarks(lsValue);
+                        if (!JFXUtil.isJSONSuccess(poJSON)) {
+                            ShowMessageFX.Warning(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
+                        }
+                        loadRecordMaster();
+                        break;
+                }
+            });
+    ChangeListener<Boolean> txtMaster_Focus = JFXUtil.FocusListener(TextField.class,
+            (lsID, lsValue) -> {
+                try {
+                    /*Lost Focus*/
+                    switch (lsID) {
+                        case "tfBranch":
+                            if (lsValue.isEmpty()) {
+                                if (isSourceNoAvailable()) {
+                                    if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
+                                        if (!JFXUtil.isObjectEqualTo(poController.Master().getBranchCode(), null, "")) {
+                                            boolean lbproceed = !JFXUtil.isObjectEqualTo(poController.Detail(0).Particular().getDescription(), null, "");
+
+                                            if (poController.getDetailCount() >= 1 && lbproceed) {
+                                                if (!pbKeyPressed) {
+                                                    if (ShowMessageFX.YesNo(null, pxeModuleName,
+                                                            "Are you sure you want to change the Branch name?\nPlease note that this action will delete all Cash Disbursement details.\n\nDo you wish to proceed?") == true) {
+                                                        poController.removeDetails();
+                                                        poController.Master().setPettyId("");
+                                                        poController.Master().setBranchCode("");
+                                                        loadTableDetail.reload();
+                                                    } else {
+                                                        loadRecordMaster();
+                                                        return;
+                                                    }
+                                                } else {
+                                                    loadRecordMaster();
+                                                    return;
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                                poController.Master().setBranchCode("");
+                            }
+                            break;
+                        case "tfPettyCashFund":
+                            if (lsValue.isEmpty()) {
+                                if (isSourceNoAvailable()) {
+                                    if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
+                                        if (!JFXUtil.isObjectEqualTo(poController.Master().getPettyId(), null, "")) {
+                                            boolean lbproceed = !JFXUtil.isObjectEqualTo(poController.Detail(0).Particular().getDescription(), null, "");
+
+                                            if (poController.getDetailCount() >= 1 && lbproceed) {
+                                                if (!pbKeyPressed) {
+                                                    if (ShowMessageFX.YesNo(null, pxeModuleName,
+                                                            "Are you sure you want to change the Cash Fund?\nPlease note that this action will delete all Cash Disbursement details.\n\nDo you wish to proceed?") == true) {
+                                                        poController.removeDetails();
+                                                        poController.Master().setPettyId("");
+                                                        poController.Master().setPettyId("");
+                                                        loadTableDetail.reload();
+                                                    } else {
+                                                        loadRecordMaster();
+                                                        return;
+                                                    }
+                                                } else {
+                                                    loadRecordMaster();
+                                                    return;
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                                poController.Master().setPettyId("");
+                            }
+                            break;
+                        case "tfDepartment":
+                            if (lsValue.isEmpty()) {
+                                if (isSourceNoAvailable()) {
+                                    if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
+                                        if (!JFXUtil.isObjectEqualTo(poController.Master().getPayeeName(), null, "")) {
+                                            boolean lbproceed = !JFXUtil.isObjectEqualTo(poController.Detail(0).Particular().getDescription(), null, "");
+
+                                            if (poController.getDetailCount() >= 1 && lbproceed) {
+                                                if (!pbKeyPressed) {
+                                                    if (ShowMessageFX.YesNo(null, pxeModuleName,
+                                                            "Are you sure you want to change the Department name?\nPlease note that this action will delete all Cash Disbursement details.\n\nDo you wish to proceed?") == true) {
+                                                        poController.removeDetails();
+                                                        poController.Master().setPettyId("");
+                                                        poController.Master().setDepartmentRequest("");
+                                                        loadTableDetail.reload();
+                                                    } else {
+                                                        loadRecordMaster();
+                                                        return;
+                                                    }
+                                                } else {
+                                                    loadRecordMaster();
+                                                    return;
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                                poController.Master().setDepartmentRequest("");
+                            }
+                            break;
+                        case "tfPayee":
+                            if (lsValue.isEmpty()) {
+                                if (isSourceNoAvailable()) {
+                                    if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
+                                        if (!JFXUtil.isObjectEqualTo(poController.Master().getPayeeName(), null, "")) {
+                                            boolean lbproceed = !JFXUtil.isObjectEqualTo(poController.Detail(0).Particular().getDescription(), null, "");
+
+                                            if (poController.getDetailCount() >= 1 && lbproceed) {
+                                                if (!pbKeyPressed) {
+                                                    if (ShowMessageFX.YesNo(null, pxeModuleName,
+                                                            "Are you sure you want to change the Payee name?\nPlease note that this action will delete all Cash Disbursement details.\n\nDo you wish to proceed?") == true) {
+                                                        poController.removeDetails();
+                                                        poController.Master().setPettyId("");
+                                                        poController.Master().setPayeeName("");
+                                                        loadTableDetail.reload();
+                                                    } else {
+                                                        loadRecordMaster();
+                                                        return;
+                                                    }
+                                                } else {
+                                                    loadRecordMaster();
+                                                    return;
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                                poController.Master().setPayeeName("");
+                            }
+                            break;
+                        case "tfCreditTo":
+                            if (lsValue.isEmpty()) {
+                                poController.Master().setCreditedTo("");
+                            }
+                            break;
+                    }
+                    loadRecordMaster();
+                } catch (SQLException | GuanzonException ex) {
+                    Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+                    ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
+                }
+            });
+    ChangeListener<Boolean> txtDetail_Focus = JFXUtil.FocusListener(TextField.class,
             (lsID, lsValue) -> {
                 /*Lost Focus*/
                 switch (lsID) {
-                    case "tfSearchIndustry":
+                    case "tfParticularDetail":
                         if (lsValue.isEmpty()) {
-                            poController.setSearchIndustry("");
-
+                            poController.Detail(pnDetail).setParticularId("");
                         }
                         break;
-                    case "tfSearchPayee":
-                        if (lsValue.isEmpty()) {
-                            poController.setSearchPayee("");
-
+                    case "tfAmountDetail":
+                        lsValue = JFXUtil.removeComma(lsValue);
+                        poJSON = poController.Detail(pnDetail).setAmount(Double.valueOf(lsValue));
+                        if (!JFXUtil.isJSONSuccess(poJSON)) {
+                            ShowMessageFX.Warning(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
                         }
-                        break;
-                    case "tfSearchCashAdvanceNo":
-                        if (lsValue.isEmpty()) {
-//                            
-                        }
+                        JFXUtil.runWithDelay(0.60, () -> {
+                            if (pbEnteredDV) {
+                                moveNext(false, true);
+                                pbEnteredDV = false;
+                            }
+                        });
                         break;
                 }
+                JFXUtil.runWithDelay(
+                        0.50, () -> {
+                            loadTableDetail.reload();
+                        }
+                );
             });
 
     private void txtField_KeyPressed(KeyEvent event) {
@@ -689,6 +1100,7 @@ public class PettyCashDisbursement_HistoryController implements Initializable, S
                 switch (event.getCode()) {
                     case TAB:
                     case ENTER:
+
                         if (tfAmountDetail.isFocused()) {
                             pbEnteredDV = true;
                         }
@@ -700,27 +1112,152 @@ public class PettyCashDisbursement_HistoryController implements Initializable, S
                             case "tfSearchIndustry":
                                 poController.SearchIndustry(lsValue, false);
                                 loadRecordSearch();
-
+                                loadTableMain.reload();
                                 break;
                             case "tfSearchPayee":
                                 poJSON = poController.SearchPayee(lsValue, false, true);
                                 loadRecordSearch();
-
+                                loadTableMain.reload();
                                 break;
                             case "tfSearchCashAdvanceNo":
-                                poJSON = poController.SearchTransaction(tfSearchIndustry.getText(), tfSearchPayee.getText(), tfSearchCashAdvanceNo.getText());
-                                if ("error".equals((String) poJSON.get("result"))) {
-                                    ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-                                    return;
-                                } else {
-                                    stageAttachment.closeDialog();
-                                    loadRecordSearch();
-                                    JFXUtil.clickTabByTitleText(tabPaneMain, "Petty Cash Disbursement");
-                                    pnEditMode = poController.getEditMode();
-                                    loadTableDetail.reload();
-                                    initButton(pnEditMode);
-                                }
+                                loadTableMain.reload();
                                 break;
+
+                            case "tfBranch":
+                                if (isSourceNoAvailable()) {
+                                    if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
+                                        boolean lbproceed = !JFXUtil.isObjectEqualTo(poController.Detail(0).Particular().getDescription(), null, "");
+                                        if (poController.getDetailCount() >= 1 && lbproceed) {
+                                            pbKeyPressed = true;
+                                            if (ShowMessageFX.YesNo(null, pxeModuleName,
+                                                    "Are you sure you want to change the Branch name?\nPlease note that this action will delete all Petty Cash Disbursement details.\n\nDo you wish to proceed?") == true) {
+                                                poController.Master().setPettyId("");
+                                                poController.removeDetails();
+                                                loadTableDetail.reload();
+                                            } else {
+                                                return;
+                                            }
+                                            pbKeyPressed = false;
+                                        }
+                                    }
+                                }
+
+                                poJSON = poController.SearchBranch(lsValue, false, false);
+                                if ("error".equals(poJSON.get("result"))) {
+                                    ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                                    loadRecordMaster();
+                                    break;
+                                } else {
+                                    JFXUtil.textFieldMoveNext(tfDepartment);
+                                }
+//                                psSupplierPayeeId = poController.Master().getSupplierClientID();
+                                loadRecordMaster();
+                                break;
+                            case "tfDepartment":
+                                if (isSourceNoAvailable()) {
+                                    if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
+                                        boolean lbproceed = !JFXUtil.isObjectEqualTo(poController.Detail(0).Particular().getDescription(), null, "");
+                                        if (poController.getDetailCount() >= 1 && lbproceed) {
+                                            pbKeyPressed = true;
+                                            if (ShowMessageFX.YesNo(null, pxeModuleName,
+                                                    "Are you sure you want to change the Department name?\nPlease note that this action will delete all Petty Cash Disbursement details.\n\nDo you wish to proceed?") == true) {
+                                                poController.Master().setPettyId("");
+                                                poController.removeDetails();
+                                                loadTableDetail.reload();
+                                            } else {
+                                                return;
+                                            }
+                                            pbKeyPressed = false;
+                                        }
+                                    }
+                                }
+                                poJSON = poController.SearchDepartment(lsValue, false);
+                                if ("error".equals(poJSON.get("result"))) {
+                                    ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                                    loadRecordMaster();
+                                    break;
+                                } else {
+                                    JFXUtil.textFieldMoveNext(tfPettyCashFund);
+                                }
+                                loadRecordMaster();
+                                break;
+                            case "tfPettyCashFund":
+                                if (isSourceNoAvailable()) {
+                                    if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
+                                        boolean lbproceed = !JFXUtil.isObjectEqualTo(poController.Detail(0).Particular().getDescription(), null, "");
+                                        if (poController.getDetailCount() >= 1 && lbproceed) {
+                                            pbKeyPressed = true;
+                                            if (ShowMessageFX.YesNo(null, pxeModuleName,
+                                                    "Are you sure you want to change the Cash Fund?\nPlease note that this action will delete all Petty Cash Disbursement details.\n\nDo you wish to proceed?") == true) {
+                                                poController.Master().setPettyId("");
+                                                poController.removeDetails();
+                                                loadTableDetail.reload();
+                                            } else {
+                                                return;
+                                            }
+                                            pbKeyPressed = false;
+                                        }
+                                    }
+                                }
+                                poJSON = poController.SearchPettyCash(lsValue, false);
+                                if ("error".equals(poJSON.get("result"))) {
+                                    ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                                    loadRecordMaster();
+                                    break;
+                                } else {
+                                    JFXUtil.textFieldMoveNext(tfPayee);
+                                }
+                                loadRecordMaster();
+                                break;
+                            case "tfPayee":
+                                if (isSourceNoAvailable()) {
+                                    if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
+                                        boolean lbproceed = !JFXUtil.isObjectEqualTo(poController.Detail(0).Particular().getDescription(), null, "");
+
+                                        if (poController.getDetailCount() >= 1 && lbproceed) {
+                                            pbKeyPressed = true;
+                                            if (ShowMessageFX.YesNo(null, pxeModuleName,
+                                                    "Are you sure you want to change the Payee name?\nPlease note that this action will delete all Petty Cash Disbursement details.\n\nDo you wish to proceed?") == true) {
+                                                poController.Master().setPettyId("");
+                                                poController.removeDetails();
+                                                loadTableDetail.reload();
+                                            } else {
+                                                return;
+                                            }
+                                            pbKeyPressed = false;
+                                        }
+                                    }
+                                }
+                                poJSON = poController.SearchPayee(lsValue, false, false);
+                                if ("error".equals(poJSON.get("result"))) {
+                                    ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                                    loadRecordMaster();
+                                    break;
+                                } else {
+                                    JFXUtil.textFieldMoveNext(tfCreditTo);
+                                }
+                                loadRecordMaster();
+                                break;
+                            case "tfCreditTo":
+                                poJSON = poController.SearchCreditTo(lsValue, false);
+                                if (!JFXUtil.isJSONSuccess(poJSON)) {
+                                    ShowMessageFX.Warning(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
+                                } else {
+                                    JFXUtil.textFieldMoveNext(taDVRemarks);
+                                }
+                                loadRecordMaster();
+                                break;
+
+                            case "tfParticularDetail":
+                                poJSON = poController.SearchParticular(lsValue, false, pnDetail);
+                                if (!JFXUtil.isJSONSuccess(poJSON)) {
+                                    ShowMessageFX.Warning(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
+                                } else {
+                                    JFXUtil.textFieldMoveNext(tfAmountDetail);
+                                }
+                                loadTableDetail.reload();
+                                break;
+
                         }
                         event.consume();
                         break;
@@ -741,10 +1278,14 @@ public class PettyCashDisbursement_HistoryController implements Initializable, S
                         break;
                 }
             }
-        } catch (SQLException | GuanzonException | CloneNotSupportedException | ScriptException ex) {
+        } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
             ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
+    }
+
+    private boolean isSourceNoAvailable() {
+        return !JFXUtil.isObjectEqualTo(poController.Master().getReferNo(), null, "");
     }
 
     public void moveNext(boolean isUp, boolean continueNext) {
@@ -758,15 +1299,14 @@ public class PettyCashDisbursement_HistoryController implements Initializable, S
             return;
         }
         JFXUtil.requestFocusNullField(new Object[][]{ // alternative to if , else if
+            {poController.Detail(pnDetail).getParticularId(), tfParticularDetail},
             {poController.Detail(pnDetail).getAmount(), tfAmountDetail},}, tfAmountDetail); // default
     }
 
     private void loadRecordSearch() {
         try {
             lblSource.setText(poController.Master().Company().getCompanyName() + " - " + poController.Master().Industry().getDescription());
-            tfSearchIndustry.setText(poController.getSearchIndustry());
-            tfSearchPayee.setText(poController.getSearchPayee());
-            JFXUtil.updateCaretPositions(apBrowse);
+
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
             ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
@@ -782,6 +1322,7 @@ public class PettyCashDisbursement_HistoryController implements Initializable, S
 
             boolean lbShow = !JFXUtil.isObjectEqualTo(poController.Master().getReferNo(), null, "");
             JFXUtil.setDisabled(lbShow, cbReverse);
+//            initDVMasterTabs();
             poController.computeFields(false);
             JFXUtil
                     .setStatusValue(lblDVTransactionStatus, PettyCashDisbursementStatus.class,
@@ -801,7 +1342,7 @@ public class PettyCashDisbursement_HistoryController implements Initializable, S
 
             taDVRemarks.setText(poController.Master().getRemarks());
 
-            JFXUtil.updateCaretPositions(apDVMaster1, apDVMaster12);
+            JFXUtil.updateCaretPositions(apDVMaster1, apDVMaster2);
         } catch (GuanzonException | SQLException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
             ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
@@ -826,6 +1367,7 @@ public class PettyCashDisbursement_HistoryController implements Initializable, S
 
             tfParticularDetail.setText(poController.Detail(pnDetail).Particular().getDescription());
             cbReverse.setSelected(poController.Detail(pnDetail).isReverse());
+            cbReverse.setSelected(poController.Detail(pnDetail).isReverse());
             tfAmountDetail.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(pnDetail).getAmount(), true));
             JFXUtil.updateCaretPositions(apDVDetail);
         } catch (SQLException | GuanzonException ex) {
@@ -846,6 +1388,7 @@ public class PettyCashDisbursement_HistoryController implements Initializable, S
                 int lnAttachmentType = 0;
                 lnAttachmentType = Integer.parseInt(lsAttachmentType);
                 cmbAttachmentType.getSelectionModel().select(lnAttachmentType);
+//                tfAttachmentSource.setText(poController.TransactionAttachmentSource(pnAttachment));
                 if (lbloadImage) {
                     try {
                         String filePath = (String) attachment_data.get(tblAttachments.getSelectionModel().getSelectedIndex()).getIndex02();
@@ -926,30 +1469,80 @@ public class PettyCashDisbursement_HistoryController implements Initializable, S
         JFXUtil.setComboBoxItems(new JFXUtil.Pairs<>(documentType, cmbAttachmentType));
     }
 
+    boolean pbSuccess = true;
+    EventHandler<ActionEvent> datepicker_Action = JFXUtil.DatePickerAction(
+            (datePicker, sdfFormat, lsServerDate, ldCurrentDate, lsSelectedDate, ldSelectedDate) -> {
+                LocalDate transactionDate = null, periodToDate = null, periodFromDate = null;
+                String lsTransDate = "", lsPeriodToDate = "", lsPeriodFromDate = "";
+                poJSON = new JSONObject();
+                switch (datePicker.getId()) {
+
+                    default:
+                        break;
+                }
+            });
+
     private void initDatePicker() {
         JFXUtil.setDatePickerFormat("MM/dd/yyyy", dpDVTransactionDate);
+        JFXUtil.setActionListener(datepicker_Action, dpDVTransactionDate);
     }
 
     @FXML
     private void cmdCheckBox_Click(ActionEvent event) {
+        poJSON = new JSONObject();
+        Object source = event.getSource();
+        if (source instanceof CheckBox) {
+            CheckBox checkedBox = (CheckBox) source;
+            switch (checkedBox.getId()) {
+                case "cbReverse":
+                    if (poController.Detail(pnDetail).getEditMode() == EditMode.ADDNEW) {
+                        poController.Detail().remove(pnDetail);
+                    } else {
+                        poController.Detail(pnDetail).isReverse(cbReverse.isSelected());
+                    }
+                    loadTableDetail.reload();
+                    if (checkedBox.isSelected()) {
+                        moveNext(false, false);
+                    }
+                    break;
+            }
+        }
     }
 
-    private void initButton(int fnValue) {
-        boolean lbShow2 = (fnValue == EditMode.READY);
-        boolean lbShow3 = (fnValue == EditMode.UNKNOWN || fnValue == EditMode.READY);
+    private void initButton(int fnEditMode) {
+        boolean lbShow = (fnEditMode == EditMode.ADDNEW || fnEditMode == EditMode.UPDATE);
+        JFXUtil.setButtonsVisibility(!lbShow, btnBrowse, btnClose, btnNew);
+        JFXUtil.setButtonsVisibility(lbShow, btnSearch, btnSave, btnCancel);
+        JFXUtil.setButtonsVisibility(false, btnUpdate, btnVoid);
+        JFXUtil.setButtonsVisibility(fnEditMode == EditMode.READY, btnHistory);
 
-        JFXUtil.setButtonsVisibility(lbShow2, btnHistory);
-        JFXUtil.setButtonsVisibility(lbShow3, btnClose);
-        JFXUtil.setButtonsVisibility(lbShow2 && PettyCashDisbursementStatus.APPROVED.equals(poController.Master().getTransactionStatus()), btnPrint);
+        JFXUtil.setDisabled(!lbShow, apDVMaster1, apDVMaster2, apDVDetail, apAttachments, apAttachmentButtons);
+//        JFXUtil.setButtonsVisibility(fnEditMode == EditMode.UPDATE, btnUndo);
+        if (fnEditMode == EditMode.READY) {
 
-        JFXUtil.setDisabled(true, apDVMaster1, apDVMaster12, apDVDetail);
+            switch (poController.Master().getTransactionStatus()) {
+                case PettyCashDisbursementStatus.OPEN:
+                    JFXUtil.setButtonsVisibility(true, btnUpdate);
+                    JFXUtil.setButtonsVisibility(true, btnVoid);
+                    break;
+//                case PettyCashDisbursementStatus.VERIFIED:
+//                    JFXUtil.setButtonsVisibility(true, btnUpdate);
+//                    break;
+            }
+            if (!poController.Master().getTransactionStatus().equals(PettyCashDisbursementStatus.OPEN)) {
+                JFXUtil.setButtonsVisibility(false, btnUpdate);
+            }
+
+        }
+//        boolean lbShow4 = !isSourceNoAvailable() && lbShow;
+//        JFXUtil.setDisabled(!lbShow4, apAttachmentButtons, cmbAttachmentType);
+//        JFXUtil.setButtonsVisibility(!isSourceNoAvailable(), btnAddAttachment, btnRemoveAttachment);
     }
 
     private void clearTextFields() {
         stageAttachment.closeDialog();
         JFXUtil.setValueToNull(previousSearchedTextField, lastFocusedTextField);
-        JFXUtil.clearTextFields(apButton, apDVMaster1, apDVMaster12, apDVDetail,
-                apBrowse, apAttachments);
+        JFXUtil.clearTextFields(apButton, apMasterDetail, apDVMaster1, apDVMaster2, apDVDetail, apAttachments);
     }
 
 }
