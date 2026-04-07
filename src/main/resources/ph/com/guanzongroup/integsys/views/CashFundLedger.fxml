@@ -82,8 +82,8 @@
                                                                           <children>
                                                                           <Label text="From" />
                                                       <Label layoutX="74.0" layoutY="16.0" text="To" GridPane.columnIndex="4" />
-                                                      <DatePicker GridPane.columnIndex="2" />
-                                                      <DatePicker GridPane.columnIndex="6" />
+                                                      <DatePicker fx:id="dpFrom" GridPane.columnIndex="2" />
+                                                      <DatePicker fx:id="dpTo" GridPane.columnIndex="6" />
                                                                           </children>
                                                                       </GridPane>
                                                                   </children>
@@ -103,19 +103,19 @@
                                                                             <TableView fx:id="tblViewDetail" maxWidth="1.7976931348623157E308">
                                                                                 <columns>
                                                                                     <TableColumn fx:id="tblRowNoDetail" editable="false" maxWidth="40.0" minWidth="40.0" prefWidth="40.0" resizable="false" sortable="false" text="No." />
-                                                                                    <TableColumn fx:id="tblORNo" editable="false" maxWidth="100.0" minWidth="100.0" prefWidth="100.0" resizable="false" sortable="false" style="-fx-alignment: CENTER-RIGHT;" text="Ledger No" />
-                                                                                    <TableColumn fx:id="tblTransDateDetail" editable="false" maxWidth="100.0" minWidth="100.0" prefWidth="100.0" resizable="false" sortable="false" style="-fx-alignment: CENTER-RIGHT;" text="Date" />
-                                                            <TableColumn fx:id="tblParticular11" editable="false" maxWidth="100.0" minWidth="100.0" prefWidth="100.0" resizable="false" sortable="false" text="Source No" />
-                                                            <TableColumn fx:id="tblParticular1" editable="false" maxWidth="100.0" minWidth="100.0" prefWidth="100.0" resizable="false" sortable="false" text="Source Code" />
-                                                                                    <TableColumn fx:id="tblParticular" editable="false" maxWidth="230.0" minWidth="230.0" prefWidth="230.0" resizable="false" sortable="false" text="Description" />
-                                                                                    <TableColumn fx:id="tblTransAmount" editable="false" maxWidth="100.0" minWidth="100.0" prefWidth="100.0" resizable="false" sortable="false" style="-fx-alignment: CENTER-RIGHT;" text="Debit" />
-                                                            <TableColumn fx:id="tblTransAmount1" editable="false" maxWidth="100.0" minWidth="100.0" prefWidth="100.0" resizable="false" sortable="false" style="-fx-alignment: CENTER-RIGHT;" text="Credit" />
+                                                                                    <TableColumn fx:id="tblLedgerNo" editable="false" maxWidth="100.0" minWidth="100.0" prefWidth="100.0" resizable="false" sortable="false" style="-fx-alignment: CENTER-RIGHT;" text="Ledger No" />
+                                                                                    <TableColumn fx:id="tblTransDate" editable="false" maxWidth="100.0" minWidth="100.0" prefWidth="100.0" resizable="false" sortable="false" style="-fx-alignment: CENTER-RIGHT;" text="Date" />
+                                                            <TableColumn fx:id="tblSourceNo" editable="false" maxWidth="100.0" minWidth="100.0" prefWidth="100.0" resizable="false" sortable="false" text="Source No" />
+                                                            <TableColumn fx:id="tblSourceCode" editable="false" maxWidth="100.0" minWidth="100.0" prefWidth="100.0" resizable="false" sortable="false" text="Source Code" />
+                                                                                    <TableColumn fx:id="tblDescription" editable="false" maxWidth="230.0" minWidth="230.0" prefWidth="230.0" resizable="false" sortable="false" text="Description" />
+                                                                                    <TableColumn fx:id="tblDebit" editable="false" maxWidth="100.0" minWidth="100.0" prefWidth="100.0" resizable="false" sortable="false" style="-fx-alignment: CENTER-RIGHT;" text="Debit" />
+                                                            <TableColumn fx:id="tblCredit" editable="false" maxWidth="100.0" minWidth="100.0" prefWidth="100.0" resizable="false" sortable="false" style="-fx-alignment: CENTER-RIGHT;" text="Credit" />
                                                                                 </columns>
                                                                                 <columnResizePolicy>
                                                                                     <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
                                                                                 </columnResizePolicy>
                                                                             </TableView>
-                                                      <Pagination prefHeight="200.0" prefWidth="200.0" GridPane.rowIndex="2" />
+                                                      <Pagination fx:id="pagination" prefHeight="200.0" prefWidth="200.0" GridPane.rowIndex="2" />
                                                    </children>
                                                 </GridPane>
                                                                   </children>
