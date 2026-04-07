@@ -218,16 +218,6 @@ public class CashDisbursement_HistoryController implements Initializable, Screen
                 poController.setCompanyId(psCompanyId);
                 loadRecordSearch();
                 TriggerWindowEvent();
-                
-                try {
-                    if(!psIndustryId.equals(System.getProperty("sys.main.industry"))){
-                        tfSearchIndustry.setText(poController.Master().Industry().getDescription());
-                        JFXUtil.setDisabled(true, tfSearchIndustry);
-                    }
-                } catch (SQLException | GuanzonException ex) {
-                    Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
-                    ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
-                }
             });
             initAttachmentPreviewPane();
         } catch (SQLException | GuanzonException ex) {
@@ -241,6 +231,19 @@ public class CashDisbursement_HistoryController implements Initializable, Screen
         }
     };
 
+    public void filterIndustry(){
+        try {
+            if(!psIndustryId.equals(System.getProperty("sys.main.industry"))){
+                poController.Master().setIndustryId(psIndustryId);
+                tfSearchIndustry.setText(poController.Master().Industry().getDescription());
+                JFXUtil.setDisabled(true, tfSearchIndustry);
+            }
+        } catch (SQLException | GuanzonException ex) {
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
+        }
+    }
+    
     public void TriggerWindowEvent() {
         root = (AnchorPane) AnchorMain;
         scene = root.getScene();
@@ -440,6 +443,7 @@ public class CashDisbursement_HistoryController implements Initializable, Screen
                 poController.resetTransaction();
                 clearTextFields();
                 JFXUtil.clickTabByTitleText(tabPaneMain, "Cash Disbursement");
+                filterIndustry();
                 pnEditMode = EditMode.UNKNOWN;
             }
 

@@ -226,15 +226,6 @@ public class PettyCashDisbursement_ConfirmationController implements Initializab
                 poController.setTransactionStatus(PettyCashDisbursementStatus.OPEN + PettyCashDisbursementStatus.CONFIRMED);
                 loadRecordSearch();
                 TriggerWindowEvent();
-                try {
-                    if(!psIndustryId.equals(System.getProperty("sys.main.industry"))){
-                        tfSearchIndustry.setText(poController.Master().Industry().getDescription());
-                        JFXUtil.setDisabled(true, tfSearchIndustry);
-                    }
-                } catch (SQLException | GuanzonException ex) {
-                    Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
-                    ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
-                }
             });
             initAttachmentPreviewPane();
         } catch (SQLException | GuanzonException ex) {
@@ -248,6 +239,19 @@ public class PettyCashDisbursement_ConfirmationController implements Initializab
         }
     };
 
+    public void filterIndustry(){
+        try {
+            if(!psIndustryId.equals(System.getProperty("sys.main.industry"))){
+                poController.Master().setIndustryId(psIndustryId);
+                tfSearchIndustry.setText(poController.Master().Industry().getDescription());
+                JFXUtil.setDisabled(true, tfSearchIndustry);
+            }
+        } catch (SQLException | GuanzonException ex) {
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
+        }
+    }
+    
     public void TriggerWindowEvent() {
         root = (AnchorPane) AnchorMain;
         scene = root.getScene();
@@ -630,6 +634,7 @@ public class PettyCashDisbursement_ConfirmationController implements Initializab
                 poController.resetTransaction();
                 clearTextFields();
                 JFXUtil.clickTabByTitleText(tabPaneMain, "Petty Cash Disbursement");
+                filterIndustry();
                 pnEditMode = EditMode.UNKNOWN;
             }
 
@@ -673,6 +678,7 @@ public class PettyCashDisbursement_ConfirmationController implements Initializab
                 if ("error".equals(poJSON.get("result"))) {
                     ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                     poController.resetTransaction();
+                    filterIndustry();
                     return;
                 }
                 pnEditMode = poController.getEditMode();
