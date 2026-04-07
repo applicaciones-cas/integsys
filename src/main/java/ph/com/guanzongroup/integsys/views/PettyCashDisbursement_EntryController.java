@@ -922,146 +922,42 @@ public class PettyCashDisbursement_EntryController implements Initializable, Scr
             });
     ChangeListener<Boolean> txtMaster_Focus = JFXUtil.FocusListener(TextField.class,
             (lsID, lsValue) -> {
-                try {
-                    /*Lost Focus*/
-                    switch (lsID) {
-                        case "tfBranch":
-                            if (lsValue.isEmpty()) {
-                                if (isSourceNoAvailable()) {
-                                    if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
-                                        if (!JFXUtil.isObjectEqualTo(poController.Master().getBranchCode(), null, "")) {
-                                            boolean lbproceed = !JFXUtil.isObjectEqualTo(poController.Detail(0).Particular().getDescription(), null, "");
+                /*Lost Focus*/
+                switch (lsID) {
+                    case "tfBranch":
+                        if (lsValue.isEmpty()) {
+                            poController.Master().setBranchCode("");
+                        }
+                        break;
+                    case "tfPettyCashFund":
+                        if (lsValue.isEmpty()) {
+                            poController.Master().setPettyId("");
+                        }
+                        break;
+                    case "tfDepartment":
+                        if (lsValue.isEmpty()) {
+                            poController.Master().setDepartmentRequest("");
+                        }
+                        break;
+                    case "tfPayee":
+                        if (lsValue.isEmpty()) {
 
-                                            if (poController.getDetailCount() >= 1 && lbproceed) {
-                                                if (!pbKeyPressed) {
-                                                    if (ShowMessageFX.YesNo(null, pxeModuleName,
-                                                            "Are you sure you want to change the Branch name?\nPlease note that this action will delete all Petty Cash Disbursement details.\n\nDo you wish to proceed?") == true) {
-                                                        poController.removeDetails();
-                                                        poController.Master().setPettyId("");
-                                                        poController.Master().setBranchCode("");
-                                                        loadTableDetail.reload();
-                                                    } else {
-                                                        loadRecordMaster();
-                                                        return;
-                                                    }
-                                                } else {
-                                                    loadRecordMaster();
-                                                    return;
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                                poController.Master().setBranchCode("");
-                            }
-                            break;
-                        case "tfPettyCashFund":
-                            if (lsValue.isEmpty()) {
-                                if (isSourceNoAvailable()) {
-                                    if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
-                                        if (!JFXUtil.isObjectEqualTo(poController.Master().getPettyId(), null, "")) {
-                                            boolean lbproceed = !JFXUtil.isObjectEqualTo(poController.Detail(0).Particular().getDescription(), null, "");
-
-                                            if (poController.getDetailCount() >= 1 && lbproceed) {
-                                                if (!pbKeyPressed) {
-                                                    if (ShowMessageFX.YesNo(null, pxeModuleName,
-                                                            "Are you sure you want to change the Cash Fund?\nPlease note that this action will delete all Petty Cash Disbursement details.\n\nDo you wish to proceed?") == true) {
-                                                        poController.removeDetails();
-                                                        poController.Master().setPettyId("");
-                                                        poController.Master().setPettyId("");
-                                                        loadTableDetail.reload();
-                                                    } else {
-                                                        loadRecordMaster();
-                                                        return;
-                                                    }
-                                                } else {
-                                                    loadRecordMaster();
-                                                    return;
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                                poController.Master().setPettyId("");
-                            }
-                            break;
-                        case "tfDepartment":
-                            if (lsValue.isEmpty()) {
-                                if (isSourceNoAvailable()) {
-                                    if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
-                                        if (!JFXUtil.isObjectEqualTo(poController.Master().getPayeeName(), null, "")) {
-                                            boolean lbproceed = !JFXUtil.isObjectEqualTo(poController.Detail(0).Particular().getDescription(), null, "");
-
-                                            if (poController.getDetailCount() >= 1 && lbproceed) {
-                                                if (!pbKeyPressed) {
-                                                    if (ShowMessageFX.YesNo(null, pxeModuleName,
-                                                            "Are you sure you want to change the Department name?\nPlease note that this action will delete all Petty Cash Disbursement details.\n\nDo you wish to proceed?") == true) {
-                                                        poController.removeDetails();
-                                                        poController.Master().setPettyId("");
-                                                        poController.Master().setDepartmentRequest("");
-                                                        loadTableDetail.reload();
-                                                    } else {
-                                                        loadRecordMaster();
-                                                        return;
-                                                    }
-                                                } else {
-                                                    loadRecordMaster();
-                                                    return;
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                                poController.Master().setDepartmentRequest("");
-                            }
-                            break;
-                        case "tfPayee":
-                            if (lsValue.isEmpty()) {
-                                if (isSourceNoAvailable()) {
-                                    if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
-                                        if (!JFXUtil.isObjectEqualTo(poController.Master().getPayeeName(), null, "")) {
-                                            boolean lbproceed = !JFXUtil.isObjectEqualTo(poController.Detail(0).Particular().getDescription(), null, "");
-
-                                            if (poController.getDetailCount() >= 1 && lbproceed) {
-                                                if (!pbKeyPressed) {
-                                                    if (ShowMessageFX.YesNo(null, pxeModuleName,
-                                                            "Are you sure you want to change the Payee name?\nPlease note that this action will delete all Petty Cash Disbursement details.\n\nDo you wish to proceed?") == true) {
-                                                        poController.removeDetails();
-                                                        poController.Master().setPettyId("");
-                                                        poController.Master().setPayeeName("");
-                                                        loadTableDetail.reload();
-                                                    } else {
-                                                        loadRecordMaster();
-                                                        return;
-                                                    }
-                                                } else {
-                                                    loadRecordMaster();
-                                                    return;
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                                poController.Master().setPayeeName("");
-                            }
-                            break;
-                        case "tfCreditTo":
-                            if (lsValue.isEmpty()) {
-                                poController.Master().setCreditedTo("");
-                            }
-                            break;
-                        case "tfReferNo":
-                            poJSON = poController.Master().setReferNo(lsValue);
-                            if (!JFXUtil.isJSONSuccess(poJSON)) {
-                                ShowMessageFX.Information(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
-                            }
-                            break;
-                    }
-                    loadRecordMaster();
-                } catch (SQLException | GuanzonException ex) {
-                    Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
-                    ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
+                            poController.Master().setPayeeName("");
+                        }
+                        break;
+                    case "tfCreditTo":
+                        if (lsValue.isEmpty()) {
+                            poController.Master().setCreditedTo("");
+                        }
+                        break;
+                    case "tfReferNo":
+                        poJSON = poController.Master().setReferNo(lsValue);
+                        if (!JFXUtil.isJSONSuccess(poJSON)) {
+                            ShowMessageFX.Information(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
+                        }
+                        break;
                 }
+                loadRecordMaster();
             });
     ChangeListener<Boolean> txtDetail_Focus = JFXUtil.FocusListener(TextField.class,
             (lsID, lsValue) -> {
@@ -1127,24 +1023,6 @@ public class PettyCashDisbursement_EntryController implements Initializable, Scr
                                 break;
 
                             case "tfBranch":
-                                if (isSourceNoAvailable()) {
-                                    if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
-                                        boolean lbproceed = !JFXUtil.isObjectEqualTo(poController.Detail(0).Particular().getDescription(), null, "");
-                                        if (poController.getDetailCount() >= 1 && lbproceed) {
-                                            pbKeyPressed = true;
-                                            if (ShowMessageFX.YesNo(null, pxeModuleName,
-                                                    "Are you sure you want to change the Branch name?\nPlease note that this action will delete all Petty Petty Cash Disbursement details.\n\nDo you wish to proceed?") == true) {
-                                                poController.Master().setPettyId("");
-                                                poController.removeDetails();
-                                                loadTableDetail.reload();
-                                            } else {
-                                                return;
-                                            }
-                                            pbKeyPressed = false;
-                                        }
-                                    }
-                                }
-
                                 poJSON = poController.SearchBranch(lsValue, false, false);
                                 if ("error".equals(poJSON.get("result"))) {
                                     ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
@@ -1185,23 +1063,6 @@ public class PettyCashDisbursement_EntryController implements Initializable, Scr
                                 loadRecordMaster();
                                 break;
                             case "tfPettyCashFund":
-                                if (isSourceNoAvailable()) {
-                                    if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
-                                        boolean lbproceed = !JFXUtil.isObjectEqualTo(poController.Detail(0).Particular().getDescription(), null, "");
-                                        if (poController.getDetailCount() >= 1 && lbproceed) {
-                                            pbKeyPressed = true;
-                                            if (ShowMessageFX.YesNo(null, pxeModuleName,
-                                                    "Are you sure you want to change the Cash Fund?\nPlease note that this action will delete all Petty Petty Cash Disbursement details.\n\nDo you wish to proceed?") == true) {
-                                                poController.Master().setPettyId("");
-                                                poController.removeDetails();
-                                                loadTableDetail.reload();
-                                            } else {
-                                                return;
-                                            }
-                                            pbKeyPressed = false;
-                                        }
-                                    }
-                                }
                                 poJSON = poController.SearchPettyCash(lsValue, false);
                                 if ("error".equals(poJSON.get("result"))) {
                                     ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
@@ -1213,24 +1074,6 @@ public class PettyCashDisbursement_EntryController implements Initializable, Scr
                                 loadRecordMaster();
                                 break;
                             case "tfPayee":
-                                if (isSourceNoAvailable()) {
-                                    if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
-                                        boolean lbproceed = !JFXUtil.isObjectEqualTo(poController.Detail(0).Particular().getDescription(), null, "");
-
-                                        if (poController.getDetailCount() >= 1 && lbproceed) {
-                                            pbKeyPressed = true;
-                                            if (ShowMessageFX.YesNo(null, pxeModuleName,
-                                                    "Are you sure you want to change the Payee name?\nPlease note that this action will delete all Petty Petty Cash Disbursement details.\n\nDo you wish to proceed?") == true) {
-                                                poController.Master().setPettyId("");
-                                                poController.removeDetails();
-                                                loadTableDetail.reload();
-                                            } else {
-                                                return;
-                                            }
-                                            pbKeyPressed = false;
-                                        }
-                                    }
-                                }
                                 poJSON = poController.SearchPayee(lsValue, false, false);
                                 if ("error".equals(poJSON.get("result"))) {
                                     ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
