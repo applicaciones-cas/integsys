@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package ph.com.guanzongroup.integsys.views;
 
 import java.lang.reflect.Field;
@@ -62,17 +58,17 @@ import org.guanzon.cas.inv.warehouse.services.DeliveryIssuanceControllers;
  *
  * @author User
  */
-public class InventoryRequest_ApprovalMonarchHospitalityController implements Initializable, ScreenInterface{
-    
+public class InventoryRequest_ApprovalControllerLP_Food implements Initializable, ScreenInterface {
+
     private GRiderCAS poApp;
     private LogWrapper poLogWrapper;
     private InventoryRequestApproval poAppController;
-    private String psFormName = "Stock Request Approval Monarch Hospitality";
+    private String psFormName = "Stock Request Approval LP Food";
     private String psIndustryID, psCompanyID, psCategoryID;
     private Control lastFocusedControl;
     private ObservableList<Model_Inv_Stock_Request_Detail> laTransactionDetail;
     private int pnTransaction, pnCTransactionDetail, pnEditMode;
-    
+
     @FXML
     private AnchorPane apMainAnchor, apDetail, apTransactionTable;
 
@@ -80,41 +76,62 @@ public class InventoryRequest_ApprovalMonarchHospitalityController implements In
     private Label lblSource;
 
     @FXML
-    private TextField tfClusterName, tfBranchName, tfBrand, tfBarcode, tfDescription, tfModel, tfVariant, tfRequestQty, 
+    private TextField tfClusterName, tfBranchName, tfBrand, tfBarcode, tfDescription, tfMeasure, tfInventoryType, tfRequestQty,
             tfApprovedQty, tfQOH, tfClassification, tfROQ, tfCancelQty;
-    
+
     @FXML
-    private Button btnSearch, btnUpdate, btnSave, btnCancel, btnPrint, btnRetrieve, btnClose;
+    private Button btnSearch, btnUpdate, btnSave, btnCancel, btnPrint, btnClose;
 
     @FXML
     private TableView<Model_Inv_Stock_Request_Master> tblTransaction;
-    
+
     @FXML
     private TableView<Model_Inv_Stock_Request_Detail> tblRequestDetail;
 
     @FXML
-    private TableColumn<Model_Inv_Stock_Request_Master, String> tblColStockRequestNo, tblColBranch, tblColTransaction, tblColTransactionDate; 
-    
+    private TableColumn<Model_Inv_Stock_Request_Master, String> tblColStockRequestNo, tblColBranch, tblColTransaction, tblColTransactionDate;
+
     @FXML
-    private TableColumn<Model_Inv_Stock_Request_Detail, String> tblColBrand, tblColBarcode, tblColNo, tblColDescription, tblColModel, tblColVariant, tblColQOH,
-            tblColClassification, tblColROQ, tblColRequestQty, tblColCancelQty, tblColApprovedQty ;
+    private TableColumn<Model_Inv_Stock_Request_Detail, String> tblColBrand, tblColBarcode, tblColNo, tblColDescription, tblColMeasure, tblColInventoryType, tblColQOH,
+            tblColClassification, tblColROQ, tblColRequestQty, tblColCancelQty, tblColApprovedQty;
 
     @FXML
     void cmdButton_Click(ActionEvent event) {
-        try{
+        try {
             //get button id
             String btnID = ((Button) event.getSource()).getId();
-            
+
             //trigger action event of last focused object, based on clicked button
-            switch(btnID){
+            switch (btnID) {
+                case "btnPrint":
+                    if (poAppController.getMaster().getTransactionNo() == null || poAppController.getMaster().getTransactionNo().isEmpty()) {
+                        ShowMessageFX.Information("Please load transaction before proceeding..", "Stock Request Approval", "");
+                        break;
+                    }
+                    if (ShowMessageFX.OkayCancel(null, psFormName, "Do you want to print the transaction ?") == true) {
+                        if (!isJSONSuccess(poAppController.printRecord(),
+                                "Initialize Print Transaction")) {
+                            break;
+                        }
+                    }
+                    //refresh ui 
+                    clearAllInputs();
+                    reloadTableDetail();
+
+                    if (poAppController.getBranchCluster().getClusterDescription() != null && !poAppController.getBranchCluster().getClusterDescription().isEmpty()) {
+                        loadSelectedBranchClusterDelivery();
+                    }
+                    pnEditMode = poAppController.getEditMode();
+                    break;
+
                 case "btnSearch":
-                    
+
                     if (lastFocusedControl == null) {
                         ShowMessageFX.Information(null, psFormName,
                                 "Search unavailable. Please ensure a searchable field is selected or focused before proceeding..");
                         break;
                     }
-                    
+
                     if (lastFocusedControl == null) {
                         ShowMessageFX.Information(null, psFormName,
                                 "Search unavailable. Please ensure a searchable field is selected or focused before proceeding..");
@@ -123,6 +140,7 @@ public class InventoryRequest_ApprovalMonarchHospitalityController implements In
                     switch (lastFocusedControl.getId()) {
                         //Search Detail 
                         case "tfClusterName":
+
                             if (!isJSONSuccess(poAppController.searchClusterBranch(tfClusterName.getText(), false), "Initialize Search Cluster")) {
                                 break;
                             }
@@ -136,30 +154,9 @@ public class InventoryRequest_ApprovalMonarchHospitalityController implements In
 
                     }
                     break;
-                    
-                case "btnPrint":
-                    if (poAppController.getMaster().getTransactionNo() == null || poAppController.getMaster().getTransactionNo().isEmpty()) {
-                        ShowMessageFX.Information("Please load transaction before proceeding..", "Stock Request Approval", "");
-                        return;
-                    }
-                    if (ShowMessageFX.OkayCancel(null, psFormName, "Do you want to print the transaction ?") == true) {
-                        if (!isJSONSuccess(poAppController.printRecord(),
-                                "Initialize Print Transaction")) {
-                            return;
-                        }
-                    }
-                    //refresh ui 
-                    clearAllInputs();
-                    reloadTableDetail();
 
-                    if (poAppController.getBranchCluster().getClusterDescription() != null && !poAppController.getBranchCluster().getClusterDescription().isEmpty()) {
-                        loadSelectedBranchClusterDelivery();
-                    }
-                    pnEditMode = poAppController.getEditMode();
-                break;
-                    
                 case "btnUpdate":
-                    
+
                     if (poAppController.getMaster().getTransactionNo() == null || poAppController.getMaster().getTransactionNo().isEmpty()) {
                         ShowMessageFX.Information("Please load transaction before proceeding..", "Stock Request Approval", "");
                         break;
@@ -170,24 +167,30 @@ public class InventoryRequest_ApprovalMonarchHospitalityController implements In
                     }
                     pnEditMode = poAppController.getEditMode();
                     break;
-                    
+
                 case "btnSave":
                     if (poAppController.getMaster().getTransactionNo().isEmpty()) {
                         ShowMessageFX.Information("Please load transaction before proceeding..", "Stock Request Approval", "");
                         break;
                     }
-                    
+
                     if (!isJSONSuccess(poAppController.SaveTransaction(), "Initialize Save Transaction")) {
                         break;
                     }
-                    reloadTableDetail();
-                    clearAllInputs();
+
+                    //refresh ui
+                    if (!isJSONSuccess(poAppController.OpenTransaction(tblColTransaction.getCellData(pnTransaction)),
+                            "Initialize Open Transaction")) {
+                        return;
+
+                    }
+                    getLoadedTransaction();
                     pnEditMode = poAppController.getEditMode();
                     break;
-                    
+
                 case "btnCancel":
                     if (ShowMessageFX.OkayCancel(null, psFormName, "Do you want to disregard changes?") == true) {
-                        
+
                         if (!isJSONSuccess(poAppController.initTransaction(), "Initialize Transaction")) {
                             unloadForm appUnload = new unloadForm();
                             appUnload.unloadForm(apMainAnchor, poApp, psFormName);
@@ -208,33 +211,34 @@ public class InventoryRequest_ApprovalMonarchHospitalityController implements In
 
                 case "btnClose":
                     unloadForm appUnload = new unloadForm();
-                    if (ShowMessageFX.OkayCancel(null, "Close Tab", "Are you sure you want to close this Tab?")) {
+                    if (ShowMessageFX.OkayCancel(null, "Close Tab", "Are you sure you want to close this Tab?") == true) {
                         appUnload.unloadForm(apMainAnchor, poApp, psFormName);
+                        break;
                     }
                     break;
             }
-            
+
             initButtonDisplay(pnEditMode);
-        }catch(Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
-    
+
     @FXML
     void tblTransaction_MouseClicked(MouseEvent event) {
+
+        if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
+            return;
+        }
         pnTransaction = tblTransaction.getSelectionModel().getSelectedIndex();
         if (pnTransaction < 0) {
             return;
         }
-        
-        pnCTransactionDetail = tblRequestDetail.getSelectionModel().getSelectedIndex() + 1;
-        
+
+        pnCTransactionDetail = tblRequestDetail.getSelectionModel().getSelectedIndex();
+
         if (event.getClickCount() == 1 && !event.isConsumed()) {
-            if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
-                if (ShowMessageFX.OkayCancel(null, psFormName, "Do you want to disregard changes?") != true) {
-                    return;
-                }
-            }
+
             try {
                 event.consume();
                 if (!isJSONSuccess(poAppController.OpenTransaction(tblColTransaction.getCellData(pnTransaction)),
@@ -242,6 +246,7 @@ public class InventoryRequest_ApprovalMonarchHospitalityController implements In
                     return;
 
                 }
+                clearAllInputs();
                 getLoadedTransaction();
             } catch (CloneNotSupportedException | SQLException | GuanzonException ex) {
                 Logger.getLogger(DeliverySchedule_EntryController.class.getName()).log(Level.SEVERE, null, ex);
@@ -254,18 +259,22 @@ public class InventoryRequest_ApprovalMonarchHospitalityController implements In
 
     @FXML
     void tblRequestDetail_MouseClicked(MouseEvent event) {
-        pnCTransactionDetail = tblRequestDetail.getSelectionModel().getSelectedIndex() + 1;
-        if (pnCTransactionDetail < 0) {
-            return;
-        }
-        
+
         if (event.getClickCount() == 1 && !event.isConsumed()) {
-            if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
-                if (ShowMessageFX.OkayCancel(null, psFormName, "Do you want to disregard changes?") != true) {
+
+            try {
+
+                if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
+                    if (ShowMessageFX.OkayCancel(null, psFormName, "Do you want to disregard changes?") != true) {
+                        return;
+                    }
+                }
+
+                pnCTransactionDetail = tblRequestDetail.getSelectionModel().getSelectedIndex();
+                if (pnCTransactionDetail < 0) {
                     return;
                 }
-            }
-            try {
+
                 event.consume();
                 loadSelectedDetail(pnCTransactionDetail);
             } catch (CloneNotSupportedException | SQLException | GuanzonException ex) {
@@ -276,7 +285,7 @@ public class InventoryRequest_ApprovalMonarchHospitalityController implements In
         }
         return;
     }
-    
+
     final ChangeListener<? super Boolean> txtField_Focus = (o, ov, nv) -> {
         TextField loTextField = (TextField) ((ReadOnlyBooleanPropertyBase) o).getBean();
         String lsTextFieldID = loTextField.getId();
@@ -289,14 +298,15 @@ public class InventoryRequest_ApprovalMonarchHospitalityController implements In
         if (!nv) {
             /*Lost Focus*/
             switch (lsTextFieldID) {
-                
+
                 case "tfApprovedQty":
                     if (!isValidQty(lsValue)) {
                         loTextField.setText("0.0");
                         loTextField.requestFocus();
                         return;
                     }
-                    poAppController.getDetail(pnCTransactionDetail).setApproved(Double.parseDouble(lsValue));
+                    poAppController.getDetail(pnCTransactionDetail + 1).getApproved();
+                    poAppController.getDetail(pnCTransactionDetail + 1).setApproved(Double.parseDouble(lsValue));
                     break;
                 case "tfCancelQty":
                     if (!isValidQty(lsValue)) {
@@ -304,10 +314,11 @@ public class InventoryRequest_ApprovalMonarchHospitalityController implements In
                         loTextField.requestFocus();
                         return;
                     }
-                    poAppController.getDetail(pnCTransactionDetail).setCancelled(Double.parseDouble(lsValue));
+                    poAppController.getDetail(pnCTransactionDetail + 1).getCancelled();
+                    poAppController.getDetail(pnCTransactionDetail + 1).setCancelled(Double.parseDouble(lsValue));
                     break;
             }
-            
+
             reloadTableDetail();
         } else {
             loTextField.selectAll();
@@ -333,21 +344,21 @@ public class InventoryRequest_ApprovalMonarchHospitalityController implements In
     public void setCategoryID(String fsValue) {
         psCategoryID = fsValue;
     }
-    
+
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        
-        try{
+
+        try {
             //initialize class controller
             poLogWrapper = new LogWrapper(psFormName, psFormName);
             poAppController = new DeliveryIssuanceControllers(poApp, poLogWrapper).InventoryRequestApproval();
-            
+
             //initlalize and validate transaction objects from class controller
             if (!isJSONSuccess(poAppController.initTransaction(), psFormName)) {
                 unloadForm appUnload = new unloadForm();
                 appUnload.unloadForm(apMainAnchor, poApp, psFormName);
             }
-            
+
             //background thread
             Platform.runLater(() -> {
 
@@ -359,14 +370,14 @@ public class InventoryRequest_ApprovalMonarchHospitalityController implements In
                         + "\nCompany :" + psCompanyID
                         + "\nCategory:" + psCategoryID);
             });
-            
+
             initControlEvents();
             initializeTableDetail();
-        }catch(Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
-    
+
     //Fetching All Controller 
     private List<Control> getAllSupportedControls() {
         List<Control> controls = new ArrayList<>();
@@ -389,7 +400,7 @@ public class InventoryRequest_ApprovalMonarchHospitalityController implements In
         }
         return controls;
     }
-    
+
     private StackPane getOverlayProgress(AnchorPane foAnchorPane) {
         ProgressIndicator localIndicator = null;
         StackPane localOverlay = null;
@@ -430,14 +441,14 @@ public class InventoryRequest_ApprovalMonarchHospitalityController implements In
 
         return localOverlay;
     }
-    
+
     private boolean isJSONSuccess(JSONObject loJSON, String fsModule) {
         String result = (String) loJSON.get("result");
         if ("error".equals(result)) {
             String message = (String) loJSON.get("message");
             poLogWrapper.severe(psFormName + " :" + message);
             Platform.runLater(() -> {
-                ShowMessageFX.Warning(null, psFormName, fsModule + ": " + message);
+                ShowMessageFX.Warning(null, psFormName, message);
             });
             return false;
         }
@@ -446,28 +457,28 @@ public class InventoryRequest_ApprovalMonarchHospitalityController implements In
         poLogWrapper.severe(psFormName + " :" + message);
         Platform.runLater(() -> {
             if (message != null) {
-                ShowMessageFX.Information(null, psFormName, fsModule + ": " + message);
+                ShowMessageFX.Information(null, psFormName, message);
             }
         });
         poLogWrapper.info(psFormName + " : Success on " + fsModule);
         return true;
 
     }
-    
-    private boolean isValidQty(String fsVal){
-        if(fsVal == null ? true : fsVal.isEmpty()){
+
+    private boolean isValidQty(String fsVal) {
+        if (fsVal == null ? true : fsVal.isEmpty()) {
             ShowMessageFX.Information("Invalid quantity! Please enter valid quantity", getClass().getSimpleName(), "");
             return false;
         }
-        
+
         if (Double.parseDouble(fsVal) < 0) {
             ShowMessageFX.Information("Invalid quantity! Please enter greater than zero", getClass().getSimpleName(), "");
             return false;
         }
-        
+
         return true;
     }
-    
+
     private void initControlEvents() {
         List<Control> laControls = getAllSupportedControls();
 
@@ -485,19 +496,22 @@ public class InventoryRequest_ApprovalMonarchHospitalityController implements In
         }
         clearAllInputs();
     }
-    
+
     private void initButtonDisplay(int fnEditMode) {
         boolean lbShow = (fnEditMode == EditMode.ADDNEW || fnEditMode == EditMode.UPDATE);
 
         // Always show these buttons
         initButtonControls(true, "btnSearch", "btnClose");
 
+        System.out.print(!lbShow);
+        System.out.print(!lbShow);
+
         // Show-only based on mode
         initButtonControls(lbShow, "btnSave", "btnCancel");
         initButtonControls(!lbShow, "btnPrint", "btnUpdate");
         apDetail.setDisable(!lbShow);
     }
-    
+
     private void initButtonControls(boolean visible, String... buttonFxIdsToShow) {
         Set<String> showOnly = new HashSet<>(Arrays.asList(buttonFxIdsToShow));
 
@@ -522,7 +536,7 @@ public class InventoryRequest_ApprovalMonarchHospitalityController implements In
             }
         }
     }
-    
+
     private void clearAllInputs() {
         List<Control> laControls = getAllSupportedControls();
 
@@ -540,7 +554,7 @@ public class InventoryRequest_ApprovalMonarchHospitalityController implements In
         pnEditMode = poAppController.getEditMode();
         initButtonDisplay(poAppController.getEditMode());
     }
-    
+
     private void controllerFocusTracker(Control control) {
         control.focusedProperty().addListener((obs, oldVal, newVal) -> {
             if (newVal) {
@@ -548,7 +562,7 @@ public class InventoryRequest_ApprovalMonarchHospitalityController implements In
             }
         });
     }
-    
+
     private void txtField_KeyPressed(KeyEvent event) {
         TextField loTxtField = (TextField) event.getSource();
         String txtFieldID = ((TextField) event.getSource()).getId();
@@ -591,7 +605,7 @@ public class InventoryRequest_ApprovalMonarchHospitalityController implements In
             poLogWrapper.severe(psFormName + " :" + ex.getMessage());
         }
     }
-    
+
     private void loadSelectedBranchClusterDelivery() throws CloneNotSupportedException {
         StackPane overlay = getOverlayProgress(apTransactionTable);
         ProgressIndicator pi = (ProgressIndicator) overlay.getChildren().get(0);
@@ -613,8 +627,10 @@ public class InventoryRequest_ApprovalMonarchHospitalityController implements In
 
             @Override
             protected void succeeded() {
-                
-                ObservableList<Model_Inv_Stock_Request_Master> laMasterList = getValue();
+
+                try {
+
+                    ObservableList<Model_Inv_Stock_Request_Master> laMasterList = getValue();
 
                     tblTransaction.setItems(laMasterList);
 
@@ -633,19 +649,18 @@ public class InventoryRequest_ApprovalMonarchHospitalityController implements In
                             Logger.getLogger(InventoryRequest_ApprovalController.class.getName()).log(Level.SEVERE, null, ex);
                             return new SimpleStringProperty("");
                         }
-                       }
+                    }
                     );
                     tblColTransactionDate.setCellValueFactory(loModel
                             -> new SimpleStringProperty(SQLUtil.dateFormat(loModel.getValue().getTransactionDate(), SQLUtil.FORMAT_LONG_DATE)));
 
-                    try {
-                        getLoadedTransaction();
-                    } catch (GuanzonException | SQLException | CloneNotSupportedException ex) {
-                        Logger.getLogger(InventoryRequest_ApprovalController.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-                    
-                    overlay.setVisible(false);
-                    pi.setVisible(false);
+                    getLoadedTransaction();
+                } catch (GuanzonException | SQLException | CloneNotSupportedException ex) {
+                    Logger.getLogger(InventoryRequest_ApprovalController.class.getName()).log(Level.SEVERE, null, ex);
+                }
+
+                overlay.setVisible(false);
+                pi.setVisible(false);
             }
 
             @Override
@@ -670,12 +685,12 @@ public class InventoryRequest_ApprovalMonarchHospitalityController implements In
         thread.setDaemon(true);
         thread.start();
     }
-    
+
     private void initializeTableDetail() {
         if (laTransactionDetail == null) {
-            
+
             laTransactionDetail = FXCollections.observableArrayList();
-            
+
             tblRequestDetail.setItems(laTransactionDetail);
             tblColQOH.setStyle("-fx-alignment: CENTER-RIGHT; -fx-padding: 0 5 0 0;");
             tblColRequestQty.setStyle("-fx-alignment: CENTER-RIGHT; -fx-padding: 0 5 0 0;");
@@ -683,59 +698,59 @@ public class InventoryRequest_ApprovalMonarchHospitalityController implements In
             tblColApprovedQty.setStyle("-fx-alignment: CENTER-RIGHT; -fx-padding: 0 5 0 0;");
 
             tblColNo.setCellValueFactory(loModel -> {
-                    int index = tblRequestDetail.getItems().indexOf(loModel.getValue()) + 1;
-                    return new SimpleStringProperty(String.valueOf(index));
-                });
+                int index = tblRequestDetail.getItems().indexOf(loModel.getValue()) + 1;
+                return new SimpleStringProperty(String.valueOf(index));
+            });
 
             tblColBrand.setCellValueFactory(loModel -> {
-            try {
-                return new SimpleStringProperty(loModel.getValue().Inventory().Brand().getDescription());
-            } catch (SQLException | GuanzonException ex) {
-                Logger.getLogger(InventoryRequest_ApprovalController.class.getName()).log(Level.SEVERE, null, ex);
-                return new SimpleStringProperty("");
-            }
+                try {
+                    return new SimpleStringProperty(loModel.getValue().Inventory().Brand().getDescription());
+                } catch (SQLException | GuanzonException ex) {
+                    Logger.getLogger(InventoryRequest_ApprovalController.class.getName()).log(Level.SEVERE, null, ex);
+                    return new SimpleStringProperty("");
+                }
             });
 
             tblColBarcode.setCellValueFactory(loModel -> {
-            try {
-                 return new SimpleStringProperty(loModel.getValue().Inventory().getBarCode());
-            } catch (SQLException | GuanzonException ex) {
-                Logger.getLogger(InventoryRequest_ApprovalController.class.getName()).log(Level.SEVERE, null, ex);
-                return new SimpleStringProperty("");
-            }
+                try {
+                    return new SimpleStringProperty(loModel.getValue().Inventory().getBarCode());
+                } catch (SQLException | GuanzonException ex) {
+                    Logger.getLogger(InventoryRequest_ApprovalController.class.getName()).log(Level.SEVERE, null, ex);
+                    return new SimpleStringProperty("");
+                }
             });
 
             tblColDescription.setCellValueFactory(loModel -> {
-            try {
-                 return new SimpleStringProperty(loModel.getValue().Inventory().getDescription());
-            } catch (SQLException | GuanzonException ex) {
-                Logger.getLogger(InventoryRequest_ApprovalController.class.getName()).log(Level.SEVERE, null, ex);
-                return new SimpleStringProperty("");
-            }
+                try {
+                    return new SimpleStringProperty(loModel.getValue().Inventory().getDescription());
+                } catch (SQLException | GuanzonException ex) {
+                    Logger.getLogger(InventoryRequest_ApprovalController.class.getName()).log(Level.SEVERE, null, ex);
+                    return new SimpleStringProperty("");
+                }
             });
 
-            tblColModel.setCellValueFactory(loModel -> {
-            try {
-                 return new SimpleStringProperty(loModel.getValue().Inventory().Model().getDescription());
-            } catch (SQLException | GuanzonException ex) {
-                Logger.getLogger(InventoryRequest_ApprovalController.class.getName()).log(Level.SEVERE, null, ex);
-                return new SimpleStringProperty("");
-            }
+            tblColMeasure.setCellValueFactory(loModel -> {
+                try {
+                    return new SimpleStringProperty(loModel.getValue().Inventory().Measure().getDescription());
+                } catch (SQLException | GuanzonException ex) {
+                    Logger.getLogger(InventoryRequest_ApprovalController.class.getName()).log(Level.SEVERE, null, ex);
+                    return new SimpleStringProperty("");
+                }
             });
 
-            tblColVariant.setCellValueFactory(loModel -> {
-            try {
-                 return new SimpleStringProperty(loModel.getValue().Inventory().Variant().getDescription());
-            } catch (SQLException | GuanzonException ex) {
-                Logger.getLogger(InventoryRequest_ApprovalController.class.getName()).log(Level.SEVERE, null, ex);
-                return new SimpleStringProperty("");
-            }
+            tblColInventoryType.setCellValueFactory(loModel -> {
+                try {
+                    return new SimpleStringProperty(loModel.getValue().Inventory().InventoryType().getDescription());
+                } catch (SQLException | GuanzonException ex) {
+                    Logger.getLogger(InventoryRequest_ApprovalController.class.getName()).log(Level.SEVERE, null, ex);
+                    return new SimpleStringProperty("");
+                }
             });
-            
+
             tblColClassification.setCellValueFactory(loModel -> {
-                return new SimpleStringProperty(String.valueOf(loModel.getValue().getClassification()));
+                return new SimpleStringProperty(loModel.getValue().getClassification());
             });
-            
+
             tblColROQ.setCellValueFactory(loModel -> {
                 return new SimpleStringProperty(String.valueOf(loModel.getValue().getRecommendedOrder()));
             });
@@ -755,20 +770,19 @@ public class InventoryRequest_ApprovalMonarchHospitalityController implements In
             tblColApprovedQty.setCellValueFactory(loModel -> {
                 return new SimpleStringProperty(String.valueOf(loModel.getValue().getApproved()));
             });
-
         }
     }
-    
+
     private void loadSelectedDetail(int fnRow) throws SQLException, GuanzonException, CloneNotSupportedException {
-        if(fnRow > 0){
+        if (fnRow >= 0) {
             tfBranchName.setText(tblColBranch.getCellData(fnRow));
             tfBrand.setText(tblColBrand.getCellData(fnRow));
             tfBarcode.setText(tblColBarcode.getCellData(fnRow));
             tfDescription.setText(tblColDescription.getCellData(fnRow));
-            tfModel.setText(tblColModel.getCellData(fnRow));
-            tfVariant.setText(tblColVariant.getCellData(fnRow));
+            tfInventoryType.setText(poAppController.getDetail(fnRow).Inventory().InventoryType().getDescription() == null ? "NONE" : poAppController.getDetail(fnRow).Inventory().InventoryType().getDescription());
             tfClassification.setText(tblColClassification.getCellData(fnRow));
             tfROQ.setText(String.valueOf(tblColROQ.getCellData(fnRow)));
+            tfMeasure.setText(tblColMeasure.getCellData(fnRow));
             tfQOH.setText(tblColQOH.getCellData(fnRow));
             tfRequestQty.setText(tblColRequestQty.getCellData(fnRow));
             tfCancelQty.setText(tblColCancelQty.getCellData(fnRow));
@@ -778,14 +792,13 @@ public class InventoryRequest_ApprovalMonarchHospitalityController implements In
 
     private void getLoadedTransaction() throws CloneNotSupportedException, SQLException, GuanzonException {
         tfClusterName.setText(poAppController.getBranchCluster().getClusterDescription());
-        tfClusterName.setText(poAppController.getBranchCluster().getClusterDescription());
-        lblSource.setText(poAppController.getMaster().Company().getCompanyName() == null ? "": (poAppController.getMaster().Company().getCompanyName() + " - ") + 
-                poAppController.getMaster().Industry().getDescription() == null ? "" : poAppController.getMaster().Industry().getDescription());
-        
+        lblSource.setText(poAppController.getMaster().Company().getCompanyName() == null ? "" : (poAppController.getMaster().Company().getCompanyName() + " - ")
+                + poAppController.getMaster().Industry().getDescription() == null ? "" : poAppController.getMaster().Industry().getDescription());
+
         reloadTableDetail();
         loadSelectedDetail(pnCTransactionDetail);
     }
-    
+
     private void reloadTableDetail() {
         List<Model_Inv_Stock_Request_Detail> rawDetail = poAppController.getDetailList();
         laTransactionDetail.setAll(rawDetail);
@@ -793,12 +806,12 @@ public class InventoryRequest_ApprovalMonarchHospitalityController implements In
         // Restore or select last row
         int indexToSelect = (pnCTransactionDetail >= 0 && pnCTransactionDetail < laTransactionDetail.size())
                 ? pnCTransactionDetail
-                : laTransactionDetail.size() - 1;
-  
+                : laTransactionDetail.size();
+
         tblRequestDetail.getSelectionModel().select(indexToSelect);
-    
-        pnCTransactionDetail = tblRequestDetail.getSelectionModel().getSelectedIndex() + 1; // Not focusedIndex
+
+        pnCTransactionDetail = tblRequestDetail.getSelectionModel().getSelectedIndex(); // Not focusedIndex
 
         tblRequestDetail.refresh();
     }
-   }
+}
