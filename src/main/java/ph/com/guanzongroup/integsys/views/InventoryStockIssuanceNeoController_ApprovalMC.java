@@ -523,7 +523,7 @@ public class InventoryStockIssuanceNeoController_ApprovalMC implements Initializ
             initButtonDisplay(poAppController.getEditMode());
 
         } catch (Exception e) {
-            Logger.getLogger(InventoryRequest_ApprovalApplianceController.class.getName()).log(Level.SEVERE, null, e);
+            Logger.getLogger(InventoryRequest_ApprovalControllerAppliance.class.getName()).log(Level.SEVERE, null, e);
             poLogWrapper.severe(psFormName + " :" + e.getMessage());
         }
     }
