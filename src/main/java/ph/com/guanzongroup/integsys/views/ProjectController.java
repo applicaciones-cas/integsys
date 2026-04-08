@@ -254,24 +254,43 @@ public class ProjectController implements Initializable, ScreenInterface {
                         }
                         break;
                     case "btnSave":
+                        String lsProjectID = oParameters.Project().getModel().getProjectID();
+                        
                         oParameters.Project().getModel().setModifyingId(oApp.getUserID());
                         oParameters.Project().getModel().setModifiedDate(oApp.getServerDate());
+                        
                         poJSON = oParameters.Project().saveRecord();
                         if ("error".equals((String) poJSON.get("result"))) {
                             ShowMessageFX.Error((String) poJSON.get("message"), pxeModuleName, null);
                             break;
                         }
                         ShowMessageFX.Information((String) poJSON.get("message"), pxeModuleName, null);
+                        poJSON = oParameters.Project().openRecord(lsProjectID);
+                        if ("error".equals((String) poJSON.get("result"))) {
+                            ShowMessageFX.Error((String) poJSON.get("message"), pxeModuleName, null);
+                            break;
+                        }
+                        if(ShowMessageFX.YesNo("Do you want to confirm this record?", pxeModuleName, null)){
+                            poJSON = oParameters.Project().ConfirmRecord("");
+                            if ("error".equals(poJSON.get("result"))) {
+                                ShowMessageFX.Error((String) poJSON.get("message"), pxeModuleName, null);
+                                return;
+                            }
+                            ShowMessageFX.Information((String) poJSON.get("message"), pxeModuleName, null);
+                            btnNew.fire();
+                            return;
+                        }
                         btnNew.fire();
                         break;
+                        
                     case "btnVoid":
                         if (ShowMessageFX.YesNo("Are you sure you want to void this record?", pxeModuleName, null)) {
                             poJSON = oParameters.Project().VoidRecord("");
                             if ("error".equals(poJSON.get("result"))) {
-                                ShowMessageFX.Error((String) poJSON.get("message"), "Computerized Accounting System", pxeModuleName);
+                                ShowMessageFX.Error((String) poJSON.get("message"), pxeModuleName, null);
                                 break;
                             }
-                            ShowMessageFX.Information((String) poJSON.get("message"), "Computerized Accounting System", pxeModuleName);
+                            ShowMessageFX.Information((String) poJSON.get("message"), pxeModuleName, null);
                             initializeObject();
                             pnEditMode = EditMode.READY;
                             clearAllFields();
@@ -282,10 +301,10 @@ public class ProjectController implements Initializable, ScreenInterface {
                         if (ShowMessageFX.YesNo("Are you sure you want to confirm this record?", pxeModuleName, null)) {
                             poJSON = oParameters.Project().ConfirmRecord("");
                             if ("error".equals(poJSON.get("result"))) {
-                                ShowMessageFX.Error((String) poJSON.get("message"), "Computerized Accounting System", pxeModuleName);
+                                ShowMessageFX.Error((String) poJSON.get("message"), pxeModuleName, null);
                                 break;
                             }
-                            ShowMessageFX.Information((String) poJSON.get("message"), "Computerized Accounting System", pxeModuleName);
+                            ShowMessageFX.Information((String) poJSON.get("message"), pxeModuleName, null);
                             initializeObject();
                             pnEditMode = EditMode.READY;
                             clearAllFields();
@@ -296,10 +315,10 @@ public class ProjectController implements Initializable, ScreenInterface {
                         if (ShowMessageFX.YesNo("Are you sure you want to cancel this record?", pxeModuleName, null)) {
                             poJSON = oParameters.Project().CancelRecord("");
                             if ("error".equals(poJSON.get("result"))) {
-                                ShowMessageFX.Error((String) poJSON.get("message"), "Computerized Accounting System", pxeModuleName);
+                                ShowMessageFX.Error((String) poJSON.get("message"), pxeModuleName, null);
                                 return;
                             }
-                            ShowMessageFX.Information((String) poJSON.get("message"), "Computerized Accounting System", pxeModuleName);
+                            ShowMessageFX.Information((String) poJSON.get("message"), pxeModuleName, null);
                             initializeObject();
                             pnEditMode = EditMode.READY;
                             clearAllFields();
@@ -442,7 +461,7 @@ public class ProjectController implements Initializable, ScreenInterface {
                         case 01:
                             poJson = oParameters.Project().searchRecord(lsValue, false);
                             if ("error".equals((String) poJson.get("result"))) {
-                                ShowMessageFX.Information((String) poJson.get("message"), "Computerized Acounting System", pxeModuleName);
+                                ShowMessageFX.Information((String) poJson.get("message"), pxeModuleName, null);
                                 txtSeeks01.clear();
                                 break;
                             }
@@ -490,14 +509,14 @@ public class ProjectController implements Initializable, ScreenInterface {
                     case 1:
                         poJSON = oParameters.Project().getModel().setProjectID(lsValue);
                         if ("error".equals((String) poJSON.get("result"))) {
-                            ShowMessageFX.Warning((String) poJSON.get("message"), "Computerized Acounting System", pxeModuleName);
+                            ShowMessageFX.Warning((String) poJSON.get("message"), pxeModuleName, null);
                             return;
                         }
                         break;
                     case 2:
                         oParameters.Project().getModel().setProjectDescription(lsValue);
                         if ("error".equals((String) poJSON.get("result"))) {
-                            ShowMessageFX.Warning((String) poJSON.get("message"), "Computerized Acounting System", pxeModuleName);
+                            ShowMessageFX.Warning((String) poJSON.get("message"), pxeModuleName, null);
                             return;
                         }
                         break;
