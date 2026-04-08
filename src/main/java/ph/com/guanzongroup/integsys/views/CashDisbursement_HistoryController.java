@@ -232,9 +232,9 @@ public class CashDisbursement_HistoryController implements Initializable, Screen
         }
     };
 
-    public void filterIndustry(){
+    public void filterIndustry() {
         try {
-            if(!psIndustryId.equals(System.getProperty("sys.main.industry"))){
+            if (!psIndustryId.equals(System.getProperty("sys.main.industry"))) {
                 poController.Master().setIndustryId(psIndustryId);
                 tfSearchIndustry.setText(poController.Master().Industry().getDescription());
                 JFXUtil.setDisabled(true, tfSearchIndustry);
@@ -244,7 +244,7 @@ public class CashDisbursement_HistoryController implements Initializable, Screen
             ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
-    
+
     public void TriggerWindowEvent() {
         root = (AnchorPane) AnchorMain;
         scene = root.getScene();
@@ -444,7 +444,6 @@ public class CashDisbursement_HistoryController implements Initializable, Screen
                 poController.resetTransaction();
                 clearTextFields();
                 JFXUtil.clickTabByTitleText(tabPaneMain, "Cash Disbursement");
-                filterIndustry();
                 pnEditMode = EditMode.UNKNOWN;
             }
 
@@ -1007,7 +1006,7 @@ public class CashDisbursement_HistoryController implements Initializable, Screen
 
                     case UP:
                         JFXUtil.altSwitch(lsID, new Object[][]{
-                            {new String[]{"tfORNoDetail", "tfAmountDetail", "tfParticularDetail","tfVatExemptDetail"}, (Runnable) () -> moveNext(true, true)},
+                            {new String[]{"tfORNoDetail", "tfAmountDetail", "tfParticularDetail", "tfVatExemptDetail"}, (Runnable) () -> moveNext(true, true)},
                             {new String[]{"tfAccountCode", "tfAccountDescription", "tfCreditAmount"}, (Runnable) () -> moveNextJE(true, true)},
                             {new String[]{"tfTaxCode", "tfParticular", "tfBaseAmount", "tfTaxRate"}, (Runnable) () -> moveNextBIR(true, true)}
                         });
@@ -1015,7 +1014,7 @@ public class CashDisbursement_HistoryController implements Initializable, Screen
                         break;
                     case DOWN:
                         JFXUtil.altSwitch(lsID, new Object[][]{
-                            {new String[]{"tfORNoDetail", "tfAmountDetail", "tfParticularDetail","tfVatExemptDetail"}, (Runnable) () -> moveNext(false, true)},
+                            {new String[]{"tfORNoDetail", "tfAmountDetail", "tfParticularDetail", "tfVatExemptDetail"}, (Runnable) () -> moveNext(false, true)},
                             {new String[]{"tfAccountCode", "tfAccountDescription", "tfCreditAmount"}, (Runnable) () -> moveNextJE(false, true)},
                             {new String[]{"tfTaxCode", "tfParticular", "tfBaseAmount", "tfTaxRate"}, (Runnable) () -> moveNextBIR(false, true)}
                         });
@@ -1351,6 +1350,7 @@ public class CashDisbursement_HistoryController implements Initializable, Screen
         JFXUtil.setValueToNull(previousSearchedTextField, lastFocusedTextField);
         JFXUtil.clearTextFields(apButton, apMasterDetail, apDVMaster1, apDVMaster2, apDVDetail,
                 apBrowse, apJournalMaster, apJournalDetails, apBIRDetail, apAttachments);
+        filterIndustry();
     }
 
 }

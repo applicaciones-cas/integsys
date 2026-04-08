@@ -253,9 +253,9 @@ public class CashDisbursement_ConfirmationController implements Initializable, S
         }
     };
 
-    public void filterIndustry(){
+    public void filterIndustry() {
         try {
-            if(!psIndustryId.equals(System.getProperty("sys.main.industry"))){
+            if (!psIndustryId.equals(System.getProperty("sys.main.industry"))) {
                 poController.Master().setIndustryId(psIndustryId);
                 tfSearchIndustry.setText(poController.Master().Industry().getDescription());
                 JFXUtil.setDisabled(true, tfSearchIndustry);
@@ -265,7 +265,7 @@ public class CashDisbursement_ConfirmationController implements Initializable, S
             ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
-    
+
     public void TriggerWindowEvent() {
         root = (AnchorPane) AnchorMain;
         scene = root.getScene();
@@ -745,7 +745,6 @@ public class CashDisbursement_ConfirmationController implements Initializable, S
 //                poController.Master().setSupplierClientID(psSupplierPayeeId);
                 clearTextFields();
                 JFXUtil.clickTabByTitleText(tabPaneMain, "Cash Disbursement");
-                filterIndustry();
                 pnEditMode = EditMode.UNKNOWN;
             }
 
@@ -2548,6 +2547,7 @@ public class CashDisbursement_ConfirmationController implements Initializable, S
         JFXUtil.setValueToNull(previousSearchedTextField, lastFocusedTextField);
         JFXUtil.clearTextFields(apButton, apMasterDetail, apDVMaster1, apDVMaster2, apDVDetail,
                 apMainList, apBrowse, apJournalMaster, apJournalDetails, apBIRDetail, apAttachments);
+        filterIndustry();
     }
 
 }

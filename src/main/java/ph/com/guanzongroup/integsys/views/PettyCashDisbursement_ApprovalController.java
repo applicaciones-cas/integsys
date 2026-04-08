@@ -235,9 +235,9 @@ public class PettyCashDisbursement_ApprovalController implements Initializable, 
         }
     };
 
-    public void filterIndustry(){
+    public void filterIndustry() {
         try {
-            if(!psIndustryId.equals(System.getProperty("sys.main.industry"))){
+            if (!psIndustryId.equals(System.getProperty("sys.main.industry"))) {
                 poController.Master().setIndustryId(psIndustryId);
                 tfSearchIndustry.setText(poController.Master().Industry().getDescription());
                 JFXUtil.setDisabled(true, tfSearchIndustry);
@@ -247,7 +247,7 @@ public class PettyCashDisbursement_ApprovalController implements Initializable, 
             ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
-    
+
     public void TriggerWindowEvent() {
         root = (AnchorPane) AnchorMain;
         scene = root.getScene();
@@ -459,7 +459,6 @@ public class PettyCashDisbursement_ApprovalController implements Initializable, 
 //                poController.Master().setSupplierClientID(psSupplierPayeeId);
                 clearTextFields();
                 JFXUtil.clickTabByTitleText(tabPaneMain, "Petty Cash Disbursement");
-                filterIndustry();
                 pnEditMode = EditMode.UNKNOWN;
             }
 
@@ -1306,6 +1305,7 @@ public class PettyCashDisbursement_ApprovalController implements Initializable, 
         JFXUtil.setValueToNull(previousSearchedTextField, lastFocusedTextField);
         JFXUtil.clearTextFields(apButton, apMasterDetail, apDVMaster1, apDVMaster2, apDVDetail,
                 apMainList, apAttachments);
+        filterIndustry();
     }
 
 }

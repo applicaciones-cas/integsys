@@ -248,10 +248,10 @@ public class CashDisbursement_ApprovalController implements Initializable, Scree
             setKeyEvent(newScene);
         }
     };
-    
-    public void filterIndustry(){
+
+    public void filterIndustry() {
         try {
-            if(!psIndustryId.equals(System.getProperty("sys.main.industry"))){
+            if (!psIndustryId.equals(System.getProperty("sys.main.industry"))) {
                 poController.Master().setIndustryId(psIndustryId);
                 tfSearchIndustry.setText(poController.Master().Industry().getDescription());
                 JFXUtil.setDisabled(true, tfSearchIndustry);
@@ -529,7 +529,6 @@ public class CashDisbursement_ApprovalController implements Initializable, Scree
 //                poController.Master().setSupplierClientID(psSupplierPayeeId);
                 clearTextFields();
                 JFXUtil.clickTabByTitleText(tabPaneMain, "Cash Disbursement");
-                filterIndustry();
                 pnEditMode = EditMode.UNKNOWN;
             }
 
@@ -1676,7 +1675,7 @@ public class CashDisbursement_ApprovalController implements Initializable, Scree
 
                     case UP:
                         JFXUtil.altSwitch(lsID, new Object[][]{
-                            {new String[]{"tfORNoDetail", "tfAmountDetail", "tfParticularDetail","tfVatExemptDetail"}, (Runnable) () -> moveNext(true, true)},
+                            {new String[]{"tfORNoDetail", "tfAmountDetail", "tfParticularDetail", "tfVatExemptDetail"}, (Runnable) () -> moveNext(true, true)},
                             {new String[]{"tfAccountCode", "tfAccountDescription", "tfCreditAmount"}, (Runnable) () -> moveNextJE(true, true)},
                             {new String[]{"tfTaxCode", "tfParticular", "tfBaseAmount", "tfTaxRate"}, (Runnable) () -> moveNextBIR(true, true)}
                         });
@@ -1684,7 +1683,7 @@ public class CashDisbursement_ApprovalController implements Initializable, Scree
                         break;
                     case DOWN:
                         JFXUtil.altSwitch(lsID, new Object[][]{
-                            {new String[]{"tfORNoDetail", "tfAmountDetail", "tfParticularDetail","tfVatExemptDetail"}, (Runnable) () -> moveNext(false, true)},
+                            {new String[]{"tfORNoDetail", "tfAmountDetail", "tfParticularDetail", "tfVatExemptDetail"}, (Runnable) () -> moveNext(false, true)},
                             {new String[]{"tfAccountCode", "tfAccountDescription", "tfCreditAmount"}, (Runnable) () -> moveNextJE(false, true)},
                             {new String[]{"tfTaxCode", "tfParticular", "tfBaseAmount", "tfTaxRate"}, (Runnable) () -> moveNextBIR(false, true)}
                         });
@@ -2177,6 +2176,7 @@ public class CashDisbursement_ApprovalController implements Initializable, Scree
         JFXUtil.setValueToNull(previousSearchedTextField, lastFocusedTextField);
         JFXUtil.clearTextFields(apButton, apMasterDetail, apDVMaster1, apDVMaster2, apDVDetail,
                 apMainList, apBrowse, apJournalMaster, apJournalDetails, apBIRDetail, apAttachments);
+        filterIndustry();
     }
 
 }

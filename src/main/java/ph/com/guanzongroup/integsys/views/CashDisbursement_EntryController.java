@@ -254,9 +254,9 @@ public class CashDisbursement_EntryController implements Initializable, ScreenIn
         }
     };
 
-    public void filterIndustry(){
+    public void filterIndustry() {
         try {
-            if(!psIndustryId.equals(System.getProperty("sys.main.industry"))){
+            if (!psIndustryId.equals(System.getProperty("sys.main.industry"))) {
                 poController.Master().setIndustryId(psIndustryId);
                 tfSearchIndustry.setText(poController.Master().Industry().getDescription());
                 JFXUtil.setDisabled(true, tfSearchIndustry);
@@ -266,7 +266,7 @@ public class CashDisbursement_EntryController implements Initializable, ScreenIn
             ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
-    
+
     public void TriggerWindowEvent() {
         root = (AnchorPane) AnchorMain;
         scene = root.getScene();
@@ -483,7 +483,6 @@ public class CashDisbursement_EntryController implements Initializable, ScreenIn
 //                    poController.Master().setSupplierClientID(psSupplierPayeeId);
                     JFXUtil.clickTabByTitleText(tabPaneMain, "Cash Disbursement");
                     loadTableDetail.reload();
-                    filterIndustry();
                     pnEditMode = poController.getEditMode();
                     JFXUtil.showRetainedHighlight(false, tblViewMainList, "#A7C7E7", plOrderNoPartial, plOrderNoFinal, highlightedRowsMain, true);
                     break;
@@ -732,7 +731,6 @@ public class CashDisbursement_EntryController implements Initializable, ScreenIn
                 poController.resetTransaction();
                 clearTextFields();
                 JFXUtil.clickTabByTitleText(tabPaneMain, "Cash Disbursement");
-                filterIndustry();
                 pnEditMode = EditMode.UNKNOWN;
             }
 
@@ -2542,6 +2540,7 @@ public class CashDisbursement_EntryController implements Initializable, ScreenIn
         JFXUtil.setValueToNull(previousSearchedTextField, lastFocusedTextField);
         JFXUtil.clearTextFields(apButton, apMasterDetail, apDVMaster1, apDVMaster2, apDVDetail,
                 apMainList, apBrowse, apJournalMaster, apJournalDetails, apBIRDetail, apAttachments);
+        filterIndustry();
     }
 
 }
