@@ -58,12 +58,12 @@ import org.guanzon.cas.inv.warehouse.services.DeliveryIssuanceControllers;
  *
  * @author User
  */
-public class InventoryRequest_ApprovalCarController implements Initializable, ScreenInterface {
+public class InventoryRequest_ApprovalControllerAppliance implements Initializable, ScreenInterface {
 
     private GRiderCAS poApp;
     private LogWrapper poLogWrapper;
     private InventoryRequestApproval poAppController;
-    private String psFormName = "Stock Request Approval Car";
+    private String psFormName = "Stock Request Approval Appliance";
     private String psIndustryID, psCompanyID, psCategoryID;
     private Control lastFocusedControl;
     private ObservableList<Model_Inv_Stock_Request_Detail> laTransactionDetail;
@@ -76,9 +76,9 @@ public class InventoryRequest_ApprovalCarController implements Initializable, Sc
     private Label lblSource;
 
     @FXML
-    private TextField tfClusterName, tfBranchName, tfBrand, tfModel, tfVariant, tfInventoryType, tfRequestQty,
-            tfApprovedQty, tfQOH, tfColor, tfClassification, tfROQ, tfCancelQty;
-    
+    private TextField tfClusterName, tfBranchName, tfBrand, tfBarcode, tfDescription, tfModel, tfVariant, tfRequestQty,
+            tfApprovedQty, tfQOH, tfClassification, tfROQ, tfCancelQty;
+
     @FXML
     private Button btnSearch, btnUpdate, btnSave, btnCancel, btnPrint, btnClose;
 
@@ -92,8 +92,8 @@ public class InventoryRequest_ApprovalCarController implements Initializable, Sc
     private TableColumn<Model_Inv_Stock_Request_Master, String> tblColStockRequestNo, tblColBranch, tblColTransaction, tblColTransactionDate;
 
     @FXML
-    private TableColumn<Model_Inv_Stock_Request_Detail, String> tblColBrand, tblColNo, tblColModel, tblColVariant, tblColColor, tblColQOH,
-            tblColInventoryType, tblColClassification, tblColROQ, tblColRequestQty, tblColCancelQty, tblColApprovedQty;
+    private TableColumn<Model_Inv_Stock_Request_Detail, String> tblColBrand, tblColBarcode, tblColNo, tblColDescription, tblColModel, tblColVariant, tblColQOH,
+            tblColClassification, tblColROQ, tblColRequestQty, tblColCancelQty, tblColApprovedQty;
 
     @FXML
     void cmdButton_Click(ActionEvent event) {
@@ -140,7 +140,7 @@ public class InventoryRequest_ApprovalCarController implements Initializable, Sc
                     switch (lastFocusedControl.getId()) {
                         //Search Detail 
                         case "tfClusterName":
-                            
+
                             if (!isJSONSuccess(poAppController.searchClusterBranch(tfClusterName.getText(), false), "Initialize Search Cluster")) {
                                 break;
                             }
@@ -177,11 +177,11 @@ public class InventoryRequest_ApprovalCarController implements Initializable, Sc
                     if (!isJSONSuccess(poAppController.SaveTransaction(), "Initialize Save Transaction")) {
                         break;
                     }
-                    
+
                     //refresh ui
                     if (!isJSONSuccess(poAppController.OpenTransaction(tblColTransaction.getCellData(pnTransaction)),
-                        "Initialize Open Transaction")) {
-                    return;
+                            "Initialize Open Transaction")) {
+                        return;
 
                     }
                     getLoadedTransaction();
@@ -226,22 +226,18 @@ public class InventoryRequest_ApprovalCarController implements Initializable, Sc
 
     @FXML
     void tblTransaction_MouseClicked(MouseEvent event) {
-        
+
+        if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
+            return;
+        }
         pnTransaction = tblTransaction.getSelectionModel().getSelectedIndex();
         if (pnTransaction < 0) {
             return;
         }
-
         pnCTransactionDetail = tblRequestDetail.getSelectionModel().getSelectedIndex();
 
         if (event.getClickCount() == 1 && !event.isConsumed()) {
-            
-            if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
-                if (ShowMessageFX.OkayCancel(null, psFormName, "Do you want to disregard changes?") != true) {
-                    return;
-                }
-            }
-            
+
             try {
                 event.consume();
                 if (!isJSONSuccess(poAppController.OpenTransaction(tblColTransaction.getCellData(pnTransaction)),
@@ -249,6 +245,8 @@ public class InventoryRequest_ApprovalCarController implements Initializable, Sc
                     return;
 
                 }
+
+                clearAllInputs();
                 getLoadedTransaction();
             } catch (CloneNotSupportedException | SQLException | GuanzonException ex) {
                 Logger.getLogger(DeliverySchedule_EntryController.class.getName()).log(Level.SEVERE, null, ex);
@@ -261,22 +259,15 @@ public class InventoryRequest_ApprovalCarController implements Initializable, Sc
 
     @FXML
     void tblRequestDetail_MouseClicked(MouseEvent event) {
-        
+
         if (event.getClickCount() == 1 && !event.isConsumed()) {
-            
+
             try {
-                
-                if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
-                    if (ShowMessageFX.OkayCancel(null, psFormName, "Do you want to disregard changes?") != true) {
-                        return;
-                    }
-                }
-                
                 pnCTransactionDetail = tblRequestDetail.getSelectionModel().getSelectedIndex();
                 if (pnCTransactionDetail < 0) {
                     return;
                 }
-                
+
                 event.consume();
                 loadSelectedDetail(pnCTransactionDetail);
             } catch (CloneNotSupportedException | SQLException | GuanzonException ex) {
@@ -308,7 +299,7 @@ public class InventoryRequest_ApprovalCarController implements Initializable, Sc
                         return;
                     }
                     poAppController.getDetail(pnCTransactionDetail + 1).getApproved();
-                    poAppController.getDetail(pnCTransactionDetail  + 1).setApproved(Double.parseDouble(lsValue));
+                    poAppController.getDetail(pnCTransactionDetail + 1).setApproved(Double.parseDouble(lsValue));
                     break;
                 case "tfCancelQty":
                     if (!isValidQty(lsValue)) {
@@ -316,8 +307,8 @@ public class InventoryRequest_ApprovalCarController implements Initializable, Sc
                         loTextField.requestFocus();
                         return;
                     }
-                    poAppController.getDetail(pnCTransactionDetail  + 1).getCancelled();
-                    poAppController.getDetail(pnCTransactionDetail  + 1).setCancelled(Double.parseDouble(lsValue));
+                    poAppController.getDetail(pnCTransactionDetail + 1).getCancelled();
+                    poAppController.getDetail(pnCTransactionDetail + 1).setCancelled(Double.parseDouble(lsValue));
                     break;
             }
 
@@ -328,32 +319,27 @@ public class InventoryRequest_ApprovalCarController implements Initializable, Sc
     };
 
     @Override
-    public void setGRider(GRiderCAS foValue
-    ) {
+    public void setGRider(GRiderCAS foValue) {
         poApp = foValue;
     }
 
     @Override
-    public void setIndustryID(String fsValue
-    ) {
+    public void setIndustryID(String fsValue) {
         psIndustryID = fsValue;
     }
 
     @Override
-    public void setCompanyID(String fsValue
-    ) {
+    public void setCompanyID(String fsValue) {
         psCompanyID = fsValue;
     }
 
     @Override
-    public void setCategoryID(String fsValue
-    ) {
+    public void setCategoryID(String fsValue) {
         psCategoryID = fsValue;
     }
 
     @Override
-    public void initialize(URL location, ResourceBundle resources
-    ) {
+    public void initialize(URL location, ResourceBundle resources) {
 
         try {
             //initialize class controller
@@ -381,11 +367,11 @@ public class InventoryRequest_ApprovalCarController implements Initializable, Sc
             initControlEvents();
             initializeTableDetail();
         } catch (Exception e) {
-            poLogWrapper.severe(psFormName + " :" + e.getMessage());
+            e.printStackTrace();
         }
     }
-    //Fetching All Controller 
 
+    //Fetching All Controller 
     private List<Control> getAllSupportedControls() {
         List<Control> controls = new ArrayList<>();
         for (Field field : getClass().getDeclaredFields()) {
@@ -455,7 +441,7 @@ public class InventoryRequest_ApprovalCarController implements Initializable, Sc
             String message = (String) loJSON.get("message");
             poLogWrapper.severe(psFormName + " :" + message);
             Platform.runLater(() -> {
-                ShowMessageFX.Warning(null, psFormName, fsModule + ": " + message);
+                ShowMessageFX.Warning(null, psFormName, message);
             });
             return false;
         }
@@ -464,7 +450,7 @@ public class InventoryRequest_ApprovalCarController implements Initializable, Sc
         poLogWrapper.severe(psFormName + " :" + message);
         Platform.runLater(() -> {
             if (message != null) {
-                ShowMessageFX.Information(null, psFormName, fsModule + ": " + message);
+                ShowMessageFX.Information(null, psFormName, message);
             }
         });
         poLogWrapper.info(psFormName + " : Success on " + fsModule);
@@ -509,9 +495,6 @@ public class InventoryRequest_ApprovalCarController implements Initializable, Sc
 
         // Always show these buttons
         initButtonControls(true, "btnSearch", "btnClose");
-
-        System.out.print(!lbShow);
-        System.out.print(!lbShow);
 
         // Show-only based on mode
         initButtonControls(lbShow, "btnSave", "btnCancel");
@@ -636,7 +619,7 @@ public class InventoryRequest_ApprovalCarController implements Initializable, Sc
             protected void succeeded() {
 
                 try {
-                    
+
                     ObservableList<Model_Inv_Stock_Request_Master> laMasterList = getValue();
 
                     tblTransaction.setItems(laMasterList);
@@ -718,6 +701,24 @@ public class InventoryRequest_ApprovalCarController implements Initializable, Sc
                 }
             });
 
+            tblColBarcode.setCellValueFactory(loModel -> {
+                try {
+                    return new SimpleStringProperty(loModel.getValue().Inventory().getBarCode());
+                } catch (SQLException | GuanzonException ex) {
+                    Logger.getLogger(InventoryRequest_ApprovalController.class.getName()).log(Level.SEVERE, null, ex);
+                    return new SimpleStringProperty("");
+                }
+            });
+
+            tblColDescription.setCellValueFactory(loModel -> {
+                try {
+                    return new SimpleStringProperty(loModel.getValue().Inventory().getDescription());
+                } catch (SQLException | GuanzonException ex) {
+                    Logger.getLogger(InventoryRequest_ApprovalController.class.getName()).log(Level.SEVERE, null, ex);
+                    return new SimpleStringProperty("");
+                }
+            });
+
             tblColModel.setCellValueFactory(loModel -> {
                 try {
                     return new SimpleStringProperty(loModel.getValue().Inventory().Model().getDescription());
@@ -736,28 +737,10 @@ public class InventoryRequest_ApprovalCarController implements Initializable, Sc
                 }
             });
 
-            tblColColor.setCellValueFactory(loModel -> {
-                try {
-                    return new SimpleStringProperty(loModel.getValue().Inventory().Color().getDescription());
-                } catch (SQLException | GuanzonException ex) {
-                    Logger.getLogger(InventoryRequest_ApprovalController.class.getName()).log(Level.SEVERE, null, ex);
-                    return new SimpleStringProperty("");
-                }
-            });
-            
-            tblColInventoryType.setCellValueFactory(loModel -> {
-                try {
-                    return new SimpleStringProperty(loModel.getValue().Inventory().InventoryType().getDescription());
-                } catch (SQLException | GuanzonException ex) {
-                    Logger.getLogger(InventoryRequest_ApprovalController.class.getName()).log(Level.SEVERE, null, ex);
-                    return new SimpleStringProperty("");
-                }
-            });
-            
             tblColClassification.setCellValueFactory(loModel -> {
                 return new SimpleStringProperty(loModel.getValue().getClassification());
             });
-            
+
             tblColROQ.setCellValueFactory(loModel -> {
                 return new SimpleStringProperty(String.valueOf(loModel.getValue().getRecommendedOrder()));
             });
@@ -782,15 +765,16 @@ public class InventoryRequest_ApprovalCarController implements Initializable, Sc
     }
 
     private void loadSelectedDetail(int fnRow) throws SQLException, GuanzonException, CloneNotSupportedException {
-        if(fnRow > 0){
+        if (fnRow >= 0) {
             tfBranchName.setText(tblColBranch.getCellData(fnRow));
             tfBrand.setText(tblColBrand.getCellData(fnRow));
+            tfBarcode.setText(tblColBarcode.getCellData(fnRow));
+            tfDescription.setText(tblColDescription.getCellData(fnRow));
             tfModel.setText(tblColModel.getCellData(fnRow));
             tfVariant.setText(tblColVariant.getCellData(fnRow));
-            tfColor.setText(tblColColor.getCellData(fnRow));
-            tfInventoryType.setText(tblColInventoryType.getCellData(fnRow));
             tfClassification.setText(tblColClassification.getCellData(fnRow));
             tfROQ.setText(String.valueOf(tblColROQ.getCellData(fnRow)));
+
             tfQOH.setText(tblColQOH.getCellData(fnRow));
             tfRequestQty.setText(tblColRequestQty.getCellData(fnRow));
             tfCancelQty.setText(tblColCancelQty.getCellData(fnRow));
@@ -799,6 +783,7 @@ public class InventoryRequest_ApprovalCarController implements Initializable, Sc
     }
 
     private void getLoadedTransaction() throws CloneNotSupportedException, SQLException, GuanzonException {
+        tfClusterName.setText(poAppController.getBranchCluster().getClusterDescription());
         tfClusterName.setText(poAppController.getBranchCluster().getClusterDescription());
         lblSource.setText(poAppController.getMaster().Company().getCompanyName() == null ? "" : (poAppController.getMaster().Company().getCompanyName() + " - ")
                 + poAppController.getMaster().Industry().getDescription() == null ? "" : poAppController.getMaster().Industry().getDescription());
