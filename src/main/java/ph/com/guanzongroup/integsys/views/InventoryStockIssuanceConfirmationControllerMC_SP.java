@@ -182,7 +182,6 @@ public class InventoryStockIssuanceConfirmationControllerMC_SP implements Initia
             initializeTableDetailOther();
             initControlEvents();
         } catch (SQLException | GuanzonException e) {
-            Logger.getLogger(InventoryStockIssuance.class.getName()).log(Level.SEVERE, null, e);
             poLogWrapper.severe(psFormName + " :" + e.getMessage());
         }
     }
@@ -233,7 +232,6 @@ public class InventoryStockIssuanceConfirmationControllerMC_SP implements Initia
             loadSelectedTransactionDetail(pnTransactionDetail);
             reloadTableDetailOther();
         } catch (SQLException | GuanzonException | CloneNotSupportedException ex) {
-            Logger.getLogger(InventoryStockIssuance_PostingController.class.getName()).log(Level.SEVERE, null, ex);
             poLogWrapper.severe(psFormName + " :" + ex.getMessage());
         }
     }
@@ -250,7 +248,6 @@ public class InventoryStockIssuanceConfirmationControllerMC_SP implements Initia
             reloadTableDetail();
             loadSelectedTransactionDetailOther(pnTransactionDetailOther);
         } catch (SQLException | GuanzonException | CloneNotSupportedException ex) {
-            Logger.getLogger(InventoryStockIssuance_PostingController.class.getName()).log(Level.SEVERE, null, ex);
             poLogWrapper.severe(psFormName + " :" + ex.getMessage());
         }
     }
