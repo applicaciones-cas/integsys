@@ -483,6 +483,7 @@ public class CashDisbursement_EntryController implements Initializable, ScreenIn
 //                    poController.Master().setSupplierClientID(psSupplierPayeeId);
                     JFXUtil.clickTabByTitleText(tabPaneMain, "Cash Disbursement");
                     loadTableDetail.reload();
+                    filterIndustry();
                     pnEditMode = poController.getEditMode();
                     JFXUtil.showRetainedHighlight(false, tblViewMainList, "#A7C7E7", plOrderNoPartial, plOrderNoFinal, highlightedRowsMain, true);
                     break;
@@ -729,7 +730,6 @@ public class CashDisbursement_EntryController implements Initializable, ScreenIn
                 pbIsCheckedJournalTab = false;
                 pbIsCheckedBIRTab = false;
                 poController.resetTransaction();
-//                poController.Master().setSupplierClientID(psSupplierPayeeId);
                 clearTextFields();
                 JFXUtil.clickTabByTitleText(tabPaneMain, "Cash Disbursement");
                 filterIndustry();
