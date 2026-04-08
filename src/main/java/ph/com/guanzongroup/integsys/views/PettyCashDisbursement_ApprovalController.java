@@ -1080,6 +1080,7 @@ public class PettyCashDisbursement_ApprovalController implements Initializable, 
             lblSource.setText(poController.Master().Company().getCompanyName() + " - " + poController.Master().Industry().getDescription());
             tfSearchIndustry.setText(poController.getSearchIndustry());
             tfSearchPayee.setText(poController.getSearchPayee());
+            filterIndustry();
             JFXUtil.updateCaretPositions(apBrowse);
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
