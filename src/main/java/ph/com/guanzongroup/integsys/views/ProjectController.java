@@ -255,9 +255,16 @@ public class ProjectController implements Initializable, ScreenInterface {
                         break;
                     case "btnSave":
                         String lsProjectID = oParameters.Project().getModel().getProjectID();
+                        String lsProjectDesc = oParameters.Project().getModel().getProjectDescription();
                         
                         oParameters.Project().getModel().setModifyingId(oApp.getUserID());
                         oParameters.Project().getModel().setModifiedDate(oApp.getServerDate());
+                        
+                        poJSON = oParameters.Project().CheckDuplicate(lsProjectID, lsProjectDesc);
+                        if ("error".equals((String) poJSON.get("result"))) {
+                            ShowMessageFX.Error((String) poJSON.get("message"), pxeModuleName, null);
+                            break;
+                        }
                         
                         poJSON = oParameters.Project().saveRecord();
                         if ("error".equals((String) poJSON.get("result"))) {
