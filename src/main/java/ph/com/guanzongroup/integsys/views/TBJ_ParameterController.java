@@ -42,6 +42,7 @@ import javafx.concurrent.Task;
 import javafx.event.EventHandler;
 import javafx.geometry.Pos;
 import javafx.scene.control.ProgressIndicator;
+import javafx.scene.control.TableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
 import static javafx.scene.input.KeyCode.DOWN;
 import static javafx.scene.input.KeyCode.ENTER;
@@ -1093,6 +1094,36 @@ public class TBJ_ParameterController implements Initializable, ScreenInterface {
         index05.setCellValueFactory(new PropertyValueFactory<>("index06"));
         index06.setCellValueFactory(new PropertyValueFactory<>("index07"));
 
+//        tblDetails.widthProperty().addListener((ObservableValue<? extends Number> source, Number oldWidth, Number newWidth) -> {
+//            Platform.runLater(() -> {
+//                TableHeaderRow header = (TableHeaderRow) tblDetails.lookup("TableHeaderRow");
+//                if (header != null) {
+//                    header.reorderingProperty().addListener((ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) -> {
+//                        header.setReordering(false);
+//                    });
+//                }
+//            });
+//        });
+        // ✅ Add color for Active column
+        index06.setCellFactory(col -> new TableCell<ModelTableDetail, String>() {
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+
+                if (empty || item == null) {
+                    setText(null);
+                    setStyle("");
+                } else {
+                    setText(item);
+                    if ("✔".equals(item)) {
+                        setStyle("-fx-text-fill: green;");
+                    } else {
+                        setStyle("-fx-text-fill: red;");
+                    }
+                }
+            }
+        });
+
         tblDetails.widthProperty().addListener((ObservableValue<? extends Number> source, Number oldWidth, Number newWidth) -> {
             Platform.runLater(() -> {
                 TableHeaderRow header = (TableHeaderRow) tblDetails.lookup("TableHeaderRow");
@@ -1103,6 +1134,7 @@ public class TBJ_ParameterController implements Initializable, ScreenInterface {
                 }
             });
         });
+        
     }
 
     /**

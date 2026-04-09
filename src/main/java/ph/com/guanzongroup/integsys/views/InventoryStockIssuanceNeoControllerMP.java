@@ -1079,7 +1079,7 @@ public class InventoryStockIssuanceNeoControllerMP implements Initializable, Scr
             String message = (String) loJSON.get("message");
             poLogWrapper.severe(psFormName + " :" + message);
             Platform.runLater(() -> {
-                ShowMessageFX.Warning(null, psFormName, fsModule + ": " + message);
+                ShowMessageFX.Warning(null, psFormName,  message);
             });
             return false;
         }
@@ -1088,7 +1088,7 @@ public class InventoryStockIssuanceNeoControllerMP implements Initializable, Scr
         poLogWrapper.severe(psFormName + " :" + message);
         Platform.runLater(() -> {
             if (message != null) {
-                ShowMessageFX.Information(null, psFormName, fsModule + ": " + message);
+                ShowMessageFX.Information(null, psFormName,  message);
             }
         });
         poLogWrapper.info(psFormName + " : Success on " + fsModule);

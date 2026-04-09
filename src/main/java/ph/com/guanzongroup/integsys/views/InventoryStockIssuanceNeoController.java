@@ -164,7 +164,6 @@ public class InventoryStockIssuanceNeoController implements Initializable, Scree
             initializeTableDetail();
             initControlEvents();
         } catch (SQLException | GuanzonException e) {
-            Logger.getLogger(InventoryStockIssuanceNeo.class.getName()).log(Level.SEVERE, null, e);
             poLogWrapper.severe(psFormName + " :" + e.getMessage());
         }
     }
@@ -1079,7 +1078,7 @@ public class InventoryStockIssuanceNeoController implements Initializable, Scree
             String message = (String) loJSON.get("message");
             poLogWrapper.severe(psFormName + " :" + message);
             Platform.runLater(() -> {
-                ShowMessageFX.Warning(null, psFormName, fsModule + ": " + message);
+                ShowMessageFX.Warning(null, psFormName,  message);
             });
             return false;
         }
@@ -1088,7 +1087,7 @@ public class InventoryStockIssuanceNeoController implements Initializable, Scree
         poLogWrapper.severe(psFormName + " :" + message);
         Platform.runLater(() -> {
             if (message != null) {
-                ShowMessageFX.Information(null, psFormName, fsModule + ": " + message);
+                ShowMessageFX.Information(null, psFormName,  message);
             }
         });
         poLogWrapper.info(psFormName + " : Success on " + fsModule);

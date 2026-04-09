@@ -760,7 +760,7 @@ public class InventoryStockIssuanceHistoryControllerMC_SP implements Initializab
             poLogWrapper.severe(psFormName + " :" + message);
             Platform.runLater(() -> {
                 if (message != null) {
-                    ShowMessageFX.Warning(null, psFormName, fsModule + ": " + message);
+                    ShowMessageFX.Warning(null, psFormName,  message);
                 }
             });
             return false;
@@ -770,7 +770,7 @@ public class InventoryStockIssuanceHistoryControllerMC_SP implements Initializab
         poLogWrapper.severe(psFormName + " :" + message);
         Platform.runLater(() -> {
             if (message != null) {
-                ShowMessageFX.Information(null, psFormName, fsModule + ": " + message);
+                ShowMessageFX.Information(null, psFormName,  message);
             }
         });
         poLogWrapper.info(psFormName + " : Success on " + fsModule);

@@ -32,7 +32,9 @@ import org.guanzon.appdriver.base.GuanzonException;
 import org.guanzon.appdriver.base.MiscUtil;
 import org.guanzon.appdriver.constant.RecordStatus;
 import org.guanzon.appdriver.constant.UserRight;
+import org.guanzon.cas.client.account.AP_Client_Master;
 import org.guanzon.cas.client.services.ClientControllers;
+import ph.com.guanzongroup.cas.cashflow.Particular;
 import ph.com.guanzongroup.cas.cashflow.Payee;
 import ph.com.guanzongroup.cas.cashflow.services.CashflowControllers;
 import ph.com.guanzongroup.integsys.utility.JFXUtil;
@@ -327,37 +329,41 @@ public class PayeeController implements Initializable, ScreenInterface {
             String lsValue = (txtField.getText() == null ? "" : txtField.getText());
             JSONObject poJson;
             poJSON = new JSONObject();
-            ClientControllers loController;
+            AP_Client_Master loAPClient;
             switch (event.getCode()) {
                 case F3:
 
                     switch (lnIndex) {
 
                         case 03:
-                            poJson = oParameters.Particular().searchRecord(lsValue, false);
+                            Particular loParticular = oParameters.Particular();
+                            loParticular.setRecordStatus(RecordStatus.ACTIVE);
+                            poJson = loParticular.searchRecord(lsValue, false);
                             if ("error".equalsIgnoreCase(poJson.get("result").toString())) {
                                 ShowMessageFX.Information((String) poJson.get("message"), "Computerized Acounting System", pxeModuleName);
                             }
-                            oParameters.Payee().getModel().setParticularID(oParameters.Particular().getModel().getParticularID());
+                            oParameters.Payee().getModel().setParticularID(loParticular.getModel().getParticularID());
                             loadRecord();
                             break;
 
                         case 04:
-                            loController = new ClientControllers(oApp, null);
-                            poJson = loController.APClientMaster().searchRecord(lsValue, false);
+                            loAPClient = new ClientControllers(oApp, null).APClientMaster();
+                            loAPClient.setRecordStatus(RecordStatus.ACTIVE);
+                            poJson = loAPClient.searchRecord(lsValue, false);
                             if ("error".equalsIgnoreCase(poJson.get("result").toString())) {
                                 ShowMessageFX.Information((String) poJson.get("message"), "Computerized Acounting System", pxeModuleName);
                             }
-                            oParameters.Payee().getModel().setAPClientID(loController.APClientMaster().getModel().getClientId());
+                            oParameters.Payee().getModel().setAPClientID(loAPClient.getModel().getClientId());
                             loadRecord();
                             break;
                         case 05:
-                            loController = new ClientControllers(oApp, null);
-                            poJson = loController.APClientMaster().searchRecord(lsValue, false);
+                            loAPClient = new ClientControllers(oApp, null).APClientMaster();
+                            loAPClient.setRecordStatus(RecordStatus.ACTIVE);
+                            poJson = loAPClient.searchRecord(lsValue, false);
                             if ("error".equalsIgnoreCase(poJson.get("result").toString())) {
                                 ShowMessageFX.Information((String) poJson.get("message"), "Computerized Acounting System", pxeModuleName);
                             }
-                            oParameters.Payee().getModel().setClientID(loController.APClientMaster().getModel().getClientId());
+                            oParameters.Payee().getModel().setClientID(loAPClient.getModel().getClientId());
                             loadRecord();
                             break;
                     }

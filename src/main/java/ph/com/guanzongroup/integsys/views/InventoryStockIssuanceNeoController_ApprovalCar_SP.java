@@ -532,7 +532,7 @@ public class InventoryStockIssuanceNeoController_ApprovalCar_SP implements Initi
             initButtonDisplay(poAppController.getEditMode());
 
         } catch (Exception e) {
-            Logger.getLogger(InventoryRequest_ApprovalApplianceController.class.getName()).log(Level.SEVERE, null, e);
+            Logger.getLogger(InventoryRequest_ApprovalControllerAppliance.class.getName()).log(Level.SEVERE, null, e);
             poLogWrapper.severe(psFormName + " :" + e.getMessage());
         }
     }
@@ -1178,7 +1178,7 @@ public class InventoryStockIssuanceNeoController_ApprovalCar_SP implements Initi
             String message = (String) loJSON.get("message");
             poLogWrapper.severe(psFormName + " :" + message);
             Platform.runLater(() -> {
-                ShowMessageFX.Warning(null, psFormName, fsModule + ": " + message);
+                ShowMessageFX.Warning(null, psFormName,  message);
             });
             return false;
         }
@@ -1187,7 +1187,7 @@ public class InventoryStockIssuanceNeoController_ApprovalCar_SP implements Initi
         poLogWrapper.severe(psFormName + " :" + message);
         Platform.runLater(() -> {
             if (message != null) {
-                ShowMessageFX.Information(null, psFormName, fsModule + ": " + message);
+                ShowMessageFX.Information(null, psFormName,  message);
             }
         });
         poLogWrapper.info(psFormName + " : Success on " + fsModule);

@@ -182,7 +182,6 @@ public class InventoryStockIssuanceConfirmationControllerMC implements Initializ
             initializeTableDetailOther();
             initControlEvents();
         } catch (SQLException | GuanzonException e) {
-            Logger.getLogger(InventoryStockIssuance.class.getName()).log(Level.SEVERE, null, e);
             poLogWrapper.severe(psFormName + " :" + e.getMessage());
         }
     }
@@ -233,7 +232,6 @@ public class InventoryStockIssuanceConfirmationControllerMC implements Initializ
             loadSelectedTransactionDetail(pnTransactionDetail);
             reloadTableDetailOther();
         } catch (SQLException | GuanzonException | CloneNotSupportedException ex) {
-            Logger.getLogger(InventoryStockIssuance_PostingController.class.getName()).log(Level.SEVERE, null, ex);
             poLogWrapper.severe(psFormName + " :" + ex.getMessage());
         }
     }
@@ -250,7 +248,6 @@ public class InventoryStockIssuanceConfirmationControllerMC implements Initializ
             reloadTableDetail();
             loadSelectedTransactionDetailOther(pnTransactionDetailOther);
         } catch (SQLException | GuanzonException | CloneNotSupportedException ex) {
-            Logger.getLogger(InventoryStockIssuance_PostingController.class.getName()).log(Level.SEVERE, null, ex);
             poLogWrapper.severe(psFormName + " :" + ex.getMessage());
         }
     }
@@ -1245,7 +1242,7 @@ public class InventoryStockIssuanceConfirmationControllerMC implements Initializ
             poLogWrapper.severe(psFormName + " :" + message);
             Platform.runLater(() -> {
                 if (message != null) {
-                    ShowMessageFX.Warning(null, psFormName, fsModule + ": " + message);
+                    ShowMessageFX.Warning(null, psFormName, message);
                 }
             });
             return false;
@@ -1255,7 +1252,7 @@ public class InventoryStockIssuanceConfirmationControllerMC implements Initializ
         poLogWrapper.severe(psFormName + " :" + message);
         Platform.runLater(() -> {
             if (message != null) {
-                ShowMessageFX.Information(null, psFormName, fsModule + ": " + message);
+                ShowMessageFX.Information(null, psFormName,  message);
             }
         });
         poLogWrapper.info(psFormName + " : Success on " + fsModule);
