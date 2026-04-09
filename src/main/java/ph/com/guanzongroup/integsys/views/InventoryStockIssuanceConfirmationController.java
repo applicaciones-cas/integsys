@@ -184,7 +184,6 @@ public class InventoryStockIssuanceConfirmationController implements Initializab
             initializeTableDetailOther();
             initControlEvents();
         } catch (SQLException | GuanzonException e) {
-            Logger.getLogger(InventoryStockIssuance.class.getName()).log(Level.SEVERE, null, e);
             poLogWrapper.severe(psFormName + " :" + e.getMessage());
         }
     }
@@ -213,7 +212,6 @@ public class InventoryStockIssuanceConfirmationController implements Initializab
                 loadSelectedTransactionDetail(poAppController.getDetailCount());
                 reloadTableDetailOther();
             } catch (CloneNotSupportedException | SQLException | GuanzonException ex) {
-                Logger.getLogger(DeliverySchedule_EntryController.class.getName()).log(Level.SEVERE, null, ex);
                 poLogWrapper.severe(psFormName + " :" + ex.getMessage());
 
             }
@@ -235,7 +233,6 @@ public class InventoryStockIssuanceConfirmationController implements Initializab
             loadSelectedTransactionDetail(pnTransactionDetail);
             reloadTableDetailOther();
         } catch (SQLException | GuanzonException | CloneNotSupportedException ex) {
-            Logger.getLogger(InventoryStockIssuance_PostingController.class.getName()).log(Level.SEVERE, null, ex);
             poLogWrapper.severe(psFormName + " :" + ex.getMessage());
         }
     }
@@ -252,7 +249,6 @@ public class InventoryStockIssuanceConfirmationController implements Initializab
             reloadTableDetail();
             loadSelectedTransactionDetailOther(pnTransactionDetailOther);
         } catch (SQLException | GuanzonException | CloneNotSupportedException ex) {
-            Logger.getLogger(InventoryStockIssuance_PostingController.class.getName()).log(Level.SEVERE, null, ex);
             poLogWrapper.severe(psFormName + " :" + ex.getMessage());
         }
     }
@@ -589,7 +585,7 @@ public class InventoryStockIssuanceConfirmationController implements Initializab
             initButtonDisplay(poAppController.getEditMode());
 
         } catch (Exception e) {
-            Logger.getLogger(DeliverySchedule_EntryController.class.getName()).log(Level.SEVERE, null, e);
+            
             poLogWrapper.severe(psFormName + " :" + e.getMessage());
         }
     }
@@ -669,7 +665,7 @@ public class InventoryStockIssuanceConfirmationController implements Initializab
                 loTextField.selectAll();
             }
         } catch (SQLException | GuanzonException | CloneNotSupportedException ex) {
-            Logger.getLogger(InventoryStockIssuance_PostingController.class.getName()).log(Level.SEVERE, null, ex);
+            
             poLogWrapper.severe(psFormName + " :" + ex.getMessage());
         }
     };
@@ -778,8 +774,6 @@ public class InventoryStockIssuanceConfirmationController implements Initializab
                 }
             }
         } catch (SQLException | GuanzonException | CloneNotSupportedException ex) {
-            Logger.getLogger(DeliverySchedule_EntryController.class
-                    .getName()).log(Level.SEVERE, null, ex);
             poLogWrapper.severe(psFormName + " :" + ex.getMessage());
         }
     }
@@ -1067,8 +1061,6 @@ public class InventoryStockIssuanceConfirmationController implements Initializab
 
                     return new SimpleStringProperty(xserialname);
                 } catch (SQLException | GuanzonException ex) {
-                    Logger.getLogger(InventoryStockIssuance_PostingController.class
-                            .getName()).log(Level.SEVERE, null, ex);
                     poLogWrapper.severe(psFormName + " :" + ex.getMessage());
                     return new SimpleStringProperty("");
                 }
