@@ -843,6 +843,7 @@ public class PurchaseOrder_ConfirmationSPMCController implements Initializable, 
                                     approved = false;
                                     return;
                                 }
+                                poPurchasingController.PurchaseOrder().setApproving((String) poJSON.get("sUserIDxx"));
                             }
                         }
                     } else {

@@ -851,6 +851,7 @@ public class PurchaseOrder_ConfirmationMonarchFoodController implements Initiali
                                     approved = false;
                                     return;
                                 }
+                                poPurchasingController.PurchaseOrder().setApproving((String) poJSON.get("sUserIDxx"));
                             }
                         }
                     } else {
