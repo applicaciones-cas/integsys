@@ -358,7 +358,7 @@ public class DisbursementVoucher_HistoryController implements Initializable, Scr
                 case "btnPrint":
                     ArrayList<String> checkedItems = new ArrayList<>();
                     checkedItems.add(poController.Master().getTransactionNo());
-                    poJSON = poController.printTransaction(checkedItems);
+                    poJSON = poController.printTransactionPaymentSummary(checkedItems);
                     if ("error".equals((String) poJSON.get("result"))) {
                         ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                     }
