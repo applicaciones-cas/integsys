@@ -2662,6 +2662,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
                     JFXUtil.setButtonsVisibility(true, btnUpdate, btnVoid);
                     break;
                 case DisbursementStatic.CONFIRMED:
+                    JFXUtil.setButtonsVisibility(true, btnUpdate);
                     break;
                 case DisbursementStatic.VERIFIED:
                     JFXUtil.setButtonsVisibility(true, btnUpdate);
