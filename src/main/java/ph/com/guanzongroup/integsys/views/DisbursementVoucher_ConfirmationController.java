@@ -87,9 +87,9 @@ import ph.com.guanzongroup.integsys.model.ModelDeliveryAcceptance_Attachment;
 /**
  * FXML Controller class
  *
- * @author Team 1 & Team 2
+ * @author Team 1
  */
-public class DisbursementVoucher_VerificationController implements Initializable, ScreenInterface {
+public class DisbursementVoucher_ConfirmationController implements Initializable, ScreenInterface {
 
     private GRiderCAS oApp;
     private JSONObject poJSON, poJSONVAT;
@@ -148,7 +148,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
     @FXML
     private TextField tfAdvancesDetail, tfAdvances, tfSearchIndustry, tfSearchTransaction, tfSearchSupplier, tfDVTransactionNo, tfSupplier, tfVoucherNo, tfBankNameCheck, tfBankAccountCheck, tfPayeeName, tfCheckNo, tfCheckAmount, tfAuthorizedPerson, tfBankNameBTransfer, tfBankAccountBTransfer, tfPaymentAmountBTransfer, tfSupplierBank, tfSupplierAccountNoBTransfer, tfBankTransReferNo, tfPaymentStatusBTransfer, tfBankNameOnlinePayment, tfBankAccountOnlinePayment, tfPaymentAmount, tfSupplierServiceName, tfSupplierAccountNo, tfPaymentReferenceNo, tfOnlinePaymentStatus, tfTotalAmount, tfVatableSales, tfVatAmountMaster, tfVatZeroRatedSales, tfVatExemptSales, tfLessWHTax, tfTotalNetAmount, tfRefNoDetail, tfVatableSalesDetail, tfVatExemptDetail, tfVatZeroRatedSalesDetail, tfVatRateDetail, tfVatAmountDetail, tfPurchasedAmountDetail, tfNetAmountDetail, tfJournalTransactionNo, tfTotalDebitAmount, tfTotalCreditAmount, tfAccountCode, tfAccountDescription, tfDebitAmount, tfCreditAmount, tfBIRTransactionNo, tfTaxCode, tfParticular, tfBaseAmount, tfTaxRate, tfTotalTaxAmount, tfAttachmentNo, tfAttachmentSource;
     @FXML
-    private Button btnUpdate, btnSave, btnCancel, btnVerify, btnVoid, btnRetrieve, btnHistory, btnClose, btnUndo, btnArrowLeft, btnArrowRight;
+    private Button btnUpdate, btnSave, btnCancel, btnConfirm, btnVoid, btnRetrieve, btnHistory, btnClose, btnUndo, btnArrowLeft, btnArrowRight;
     @FXML
     private TabPane tabPaneMain, tabPanePaymentMode;
     @FXML
@@ -231,7 +231,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
                 poController.setCompanyID(psCompanyId);
                 poController.setCategoryID(psCategoryId);
                 poController.Master().setBranchCode(oApp.getBranchCode());
-                poController.setTransactionStatus(DisbursementStatic.CONFIRMED);
+                poController.setTransactionStatus(DisbursementStatic.OPEN + DisbursementStatic.RETURNED);
                 loadRecordSearch();
             });
             initAttachmentPreviewPane();
@@ -367,7 +367,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
     }
 
     private void initButtonsClickActions() {
-        List<Button> buttons = Arrays.asList(btnUpdate, btnSave, btnCancel, btnVerify, btnVoid, btnRetrieve, btnHistory, btnClose, btnUndo, btnArrowRight, btnArrowLeft);
+        List<Button> buttons = Arrays.asList(btnUpdate, btnSave, btnCancel, btnConfirm, btnVoid, btnRetrieve, btnHistory, btnClose, btnUndo, btnArrowRight, btnArrowLeft);
         buttons.forEach(button -> button.setOnAction(this::cmdButton_Click));
     }
 
@@ -499,7 +499,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
                 case "btnRetrieve":
                     loadTableMain.reload();
                     break;
-                case "btnVerify":
+                case "btnConfirm":
                     if (ShowMessageFX.YesNo(null, pxeModuleName, "Are you sure you want to verify transaction?")) {
                         pnEditMode = poController.getEditMode();
                         if (pnEditMode == EditMode.READY) {
@@ -606,7 +606,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
                     ShowMessageFX.Warning(null, pxeModuleName, "Button is not registered, Please contact admin to assist about the unregistered button");
                     break;
             }
-            if (JFXUtil.isObjectEqualTo(lsButton, "btnSave", "btnCancel", "btnVoid", "btnVerify", "btnDVCancel")) {
+            if (JFXUtil.isObjectEqualTo(lsButton, "btnSave", "btnCancel", "btnVoid", "btnConfirm", "btnDVCancel")) {
                 pbIsCheckedJournalTab = false;
                 pbIsCheckedBIRTab = false;
                 poController.resetTransaction();
@@ -714,7 +714,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
                             try {
                                 main_data.clear();
                                 JFXUtil.disableAllHighlight(tblViewMainList, highlightedRowsMain);
-                                poJSON = poController.loadTransactionList(tfSearchIndustry.getText(), tfSearchSupplier.getText(), tfSearchTransaction.getText(), DisbursementStatic.VERIFIED);
+                                poJSON = poController.loadTransactionList(tfSearchIndustry.getText(), tfSearchSupplier.getText(), tfSearchTransaction.getText(), DisbursementStatic.CONFIRMED);
                                 int lnRowNo = 0;
                                 if (poController.getMasterList().size() > 0) {
                                     for (int lnCtr = 0; lnCtr <= poController.getMasterList().size() - 1; lnCtr++) {
@@ -2646,15 +2646,13 @@ public class DisbursementVoucher_VerificationController implements Initializable
         JFXUtil.setButtonsVisibility(!lbShow, btnClose);
         JFXUtil.setButtonsVisibility(lbShow, btnSave, btnCancel);
         JFXUtil.setButtonsVisibility(false, btnUpdate, btnVoid);
-        JFXUtil.setButtonsVisibility(lbShow2, btnVerify);
+        JFXUtil.setButtonsVisibility(lbShow2, btnConfirm);
         JFXUtil.setButtonsVisibility(fnEditMode == EditMode.READY, btnHistory);
 
-        JFXUtil.setDisabled(!lbShow, apJournalMaster, apJournalDetails);
+        JFXUtil.setDisabled(!lbShow, apDVMaster1, apDVMaster2, apDVMaster3, apDVDetail,
+                apMasterDVCheck, apMasterDVBTransfer, apMasterDVOp, apJournalMaster, apJournalDetails, apBIRDetail, apAttachments);
 
         JFXUtil.setButtonsVisibility(fnEditMode == EditMode.UPDATE, btnUndo);
-
-        JFXUtil.setDisabled(true, apDVMaster1, apDVMaster2, apDVMaster3, apDVDetail,
-                apMasterDVCheck, apMasterDVBTransfer, apMasterDVOp, apBIRDetail, apAttachments);
 
         if (fnEditMode == EditMode.READY) {
             switch (poController.Master().getTransactionStatus()) {
@@ -2663,7 +2661,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
                     break;
                 case DisbursementStatic.VERIFIED:
                     JFXUtil.setButtonsVisibility(true, btnUpdate);
-                    JFXUtil.setButtonsVisibility(false, btnVerify);
+                    JFXUtil.setButtonsVisibility(false, btnConfirm);
                     break;
                 case DisbursementStatic.RETURNED:
                     JFXUtil.setButtonsVisibility(true, btnUpdate);
@@ -2671,7 +2669,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
                 case DisbursementStatic.VOID:
                 case DisbursementStatic.CANCELLED:
                 default:
-                    JFXUtil.setButtonsVisibility(false, btnVerify, btnUpdate);
+                    JFXUtil.setButtonsVisibility(false, btnConfirm, btnUpdate);
                     break;
             }
             if (JFXUtil.isObjectEqualTo(poController.Master().getTransactionStatus(),
