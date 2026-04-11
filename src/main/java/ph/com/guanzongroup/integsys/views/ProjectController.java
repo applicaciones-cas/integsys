@@ -517,13 +517,17 @@ public class ProjectController implements Initializable, ScreenInterface {
                         poJSON = oParameters.Project().getModel().setProjectID(lsValue);
                         if ("error".equals((String) poJSON.get("result"))) {
                             ShowMessageFX.Warning((String) poJSON.get("message"), pxeModuleName, null);
+                            txtField01.requestFocus();
+                            txtField01.selectAll();
                             return;
                         }
                         break;
                     case 2:
-                        oParameters.Project().getModel().setProjectDescription(lsValue);
+                        poJSON = oParameters.Project().getModel().setProjectDescription(lsValue);
                         if ("error".equals((String) poJSON.get("result"))) {
                             ShowMessageFX.Warning((String) poJSON.get("message"), pxeModuleName, null);
+                            txtField02.requestFocus();
+                            txtField02.selectAll();
                             return;
                         }
                         break;
