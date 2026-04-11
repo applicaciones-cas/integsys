@@ -490,13 +490,13 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                         initButton(pnEditMode);
                     }
                     if (pnEditMode == EditMode.READY) {
-                        if (ShowMessageFX.YesNo(null, pxeModuleName, "Do you want to verify this transaction?")) { //requires to review journal entry
+                        if (ShowMessageFX.YesNo(null, pxeModuleName, "Do you want to confirm this transaction?")) { //requires to review journal entry
                             if (!poController.existJournal().equals("")) {
                                 if (!pbIsCheckedJournalTab) {
                                     ShowMessageFX.Warning(null, pxeModuleName, "Please check the Journal Entry before saving.");
                                     break;
                                 } else if (!pbIsCheckedBIRTab && poController.Master().getVATAmount() > 0.0000) {
-                                    ShowMessageFX.Warning(null, pxeModuleName, "Please check the BIR 2307 before verifying.");
+                                    ShowMessageFX.Warning(null, pxeModuleName, "Please check the BIR 2307 before confirming.");
                                     break;
                                 } else {
                                     poJSON = poController.ConfirmTransaction("");
@@ -508,7 +508,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                                     }
                                 }
                             } else {
-                                ShowMessageFX.Warning(null, pxeModuleName, "No journal entry found. Add a journal entry and save before verifying.");
+                                ShowMessageFX.Warning(null, pxeModuleName, "No journal entry found. Add a journal entry and save before confirming.");
                                 break;
                             }
                         }
@@ -2691,7 +2691,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                     JFXUtil.setButtonsVisibility(true, btnUpdate);
                     JFXUtil.setButtonsVisibility(true, btnVoid);
                     break;
-                case DisbursementStatic.VERIFIED:
+                case DisbursementStatic.CONFIRMED:
                     JFXUtil.setButtonsVisibility(true, btnUpdate);
                     break;
             }
