@@ -499,7 +499,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                                     ShowMessageFX.Warning(null, pxeModuleName, "Please check the BIR 2307 before verifying.");
                                     break;
                                 } else {
-                                    poJSON = poController.VerifyTransaction("");
+                                    poJSON = poController.ConfirmTransaction("");
                                     if ("error".equals((String) poJSON.get("result"))) {
                                         ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                         break;
