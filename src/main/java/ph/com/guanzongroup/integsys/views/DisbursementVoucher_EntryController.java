@@ -102,7 +102,6 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
     private int pnDetailJE = 0;
     private int pnDetailBIR = 0;
     private int pnAttachment = 0;
-    private boolean pbIsCheckedJournalTab = false;
     private boolean pbIsCheckedBIRTab = false;
     private boolean pbIsCheckedAttachmentTab = false;
     private final String pxeModuleName = "Disbursement Voucher";
@@ -267,7 +266,6 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                     if (pnEditMode == EditMode.READY || pnEditMode == EditMode.UPDATE || pnEditMode == EditMode.ADDNEW) {
                         JFXUtil.clearTextFields(apJournalDetails, apJournalMaster);
                         if (poController.Detail(0).getSourceNo() != null && !poController.Detail(0).getSourceNo().isEmpty()) {
-                            pbIsCheckedJournalTab = true;
                             populateJE();
                         } else {
                             JFXUtil.clickTabByTitleText(tabPaneMain, "Disbursement Voucher");
@@ -400,7 +398,6 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                     }
                     pnEditMode = poController.getEditMode();
                     JFXUtil.showRetainedHighlight(false, tblViewMainList, "#A7C7E7", plOrderNoPartial, plOrderNoFinal, highlightedRowsMain, true);
-                    pbIsCheckedJournalTab = false;
                     pbIsCheckedBIRTab = false;
                     JFXUtil.clickTabByTitleText(tabPaneMain, "Disbursement Voucher");
                     pnEditMode = poController.getEditMode();
@@ -437,7 +434,6 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                         ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                         return;
                     }
-                    pbIsCheckedJournalTab = false;
                     pbIsCheckedBIRTab = false;
                     pnEditMode = poController.getEditMode();
                     JFXUtil.clickTabByTitleText(tabPaneMain, "Disbursement Voucher");
@@ -492,10 +488,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                     if (pnEditMode == EditMode.READY) {
                         if (ShowMessageFX.YesNo(null, pxeModuleName, "Do you want to confirm this transaction?")) { //requires to review journal entry
                             if (!poController.existJournal().equals("")) {
-                                if (!pbIsCheckedJournalTab) {
-                                    ShowMessageFX.Warning(null, pxeModuleName, "Please check the Journal Entry before saving.");
-                                    break;
-                                } else if (!pbIsCheckedBIRTab && poController.Master().getVATAmount() > 0.0000) {
+                                if (!pbIsCheckedBIRTab && poController.Master().getVATAmount() > 0.0000) {
                                     ShowMessageFX.Warning(null, pxeModuleName, "Please check the BIR 2307 before confirming.");
                                     break;
                                 } else {
@@ -599,7 +592,6 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                     break;
             }
             if (JFXUtil.isObjectEqualTo(lsButton, "btnSave", "btnCancel", "btnVoid")) {
-                pbIsCheckedJournalTab = false;
                 pbIsCheckedBIRTab = false;
                 poController.resetTransaction();
                 poController.Master().setSupplierClientID(psSupplierPayeeId);
@@ -1308,11 +1300,11 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                                             if (ShowMessageFX.YesNo(null, pxeModuleName,
                                                     "Are you sure you want to change the supplier name?\nPlease note that this action will delete all Disbursement voucher details.\n\nDo you wish to proceed?") == true) {
                                                 poController.removeDetails();
-                                                if (JFXUtil.isObjectEqualTo(poController.Master().getDisbursementType(), DisbursementStatic.DisbursementType.CHECK,DisbursementStatic.DisbursementType.CHECK_DEPOSIT)) {
+                                                if (JFXUtil.isObjectEqualTo(poController.Master().getDisbursementType(), DisbursementStatic.DisbursementType.CHECK, DisbursementStatic.DisbursementType.CHECK_DEPOSIT)) {
                                                     poController.CheckPayments().getModel().setPayeeID("");
                                                     loadRecordMasterCheck();
                                                 }
-                                                
+
                                                 poController.Master().setSupplierClientID("");
                                                 poController.Master().setPayeeID("");
                                                 psSupplierPayeeId = "";
@@ -1420,7 +1412,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                                             if (ShowMessageFX.YesNo(null, pxeModuleName,
                                                     "Are you sure you want to change the supplier name?\nPlease note that this action will delete all Disbursement voucher details.\n\nDo you wish to proceed?") == true) {
                                                 poController.removeDetails();
-                                                if (JFXUtil.isObjectEqualTo(poController.Master().getDisbursementType(), DisbursementStatic.DisbursementType.CHECK,DisbursementStatic.DisbursementType.CHECK_DEPOSIT)) {
+                                                if (JFXUtil.isObjectEqualTo(poController.Master().getDisbursementType(), DisbursementStatic.DisbursementType.CHECK, DisbursementStatic.DisbursementType.CHECK_DEPOSIT)) {
                                                     poController.CheckPayments().getModel().setPayeeID("");
                                                     loadRecordMasterCheck();
                                                 }
@@ -2096,9 +2088,9 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
 
             tfBankNameCheck.setText(poController.CheckPayments().getModel().Banks().getBankName() != null ? poController.CheckPayments().getModel().Banks().getBankName() : "");
 //            tfBankAccountCheck.setText(poController.CheckPayments().getModel().Bank_Account_Master().getAccountNo() != null ? poController.CheckPayments().getModel().Bank_Account_Master().getAccountNo() : "");
-            tfBankAccountCheck.setText(JFXUtil.isObjectEqualTo(poController.Master().getDisbursementType(), DisbursementStatic.DisbursementType.CHECK,DisbursementStatic.DisbursementType.CHECK_DEPOSIT)
-                            ? (poController.CheckPayments().getModel().Bank_Account_Master().getAccountNo() != null
-                            ? poController.CheckPayments().getModel().Bank_Account_Master().getAccountNo() : "") : "");
+            tfBankAccountCheck.setText(JFXUtil.isObjectEqualTo(poController.Master().getDisbursementType(), DisbursementStatic.DisbursementType.CHECK, DisbursementStatic.DisbursementType.CHECK_DEPOSIT)
+                    ? (poController.CheckPayments().getModel().Bank_Account_Master().getAccountNo() != null
+                    ? poController.CheckPayments().getModel().Bank_Account_Master().getAccountNo() : "") : "");
             chbkPrintByBank.setSelected(poController.Master().getBankPrint().equals(Logical.YES));
 
             tfPayeeName.setText(poController.Master().Payee().getPayeeName() != null ? poController.Master().Payee().getPayeeName() : "");

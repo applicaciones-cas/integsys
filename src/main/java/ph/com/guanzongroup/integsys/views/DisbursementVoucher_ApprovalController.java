@@ -410,7 +410,7 @@ public class DisbursementVoucher_ApprovalController implements Initializable, Sc
                         return;
                     }
 
-                    if (DisbursementStatic.VERIFIED.equals(poController.Master().getTransactionStatus())) {
+                    if (DisbursementStatic.APPROVED.equals(poController.Master().getTransactionStatus())) {
                         if (!pbIsCheckedJournalTab) {
                             ShowMessageFX.Warning(null, pxeModuleName, "Please check the Journal Entry before saving."); //only require check this only if higher than encoder
                             return;
@@ -446,7 +446,7 @@ public class DisbursementVoucher_ApprovalController implements Initializable, Sc
                     if ("success".equals(poJSON.get("result"))) {
                         pnEditMode = poController.getEditMode();
                     }
-                    if (pnEditMode == EditMode.READY && !DisbursementStatic.VERIFIED.equals(poController.Master().getTransactionStatus())) {
+                    if (pnEditMode == EditMode.READY && !DisbursementStatic.APPROVED.equals(poController.Master().getTransactionStatus())) {
                         if (ShowMessageFX.YesNo(null, pxeModuleName, "Do you want to approve this transaction?")) { //requires to review journal entry
                             if (!poController.existJournal().equals("")) {
                                 if (!pbIsCheckedJournalTab) {
@@ -552,7 +552,7 @@ public class DisbursementVoucher_ApprovalController implements Initializable, Sc
                                     break;
                                 case DisbursementStatic.APPROVED:
                                 default:
-                                    poJSON = poController.CancelTransaction("");
+                                    poJSON = poController.DisApproveTransaction("");
                                     break;
                             }
                             if ("error".equals((String) poJSON.get("result"))) {
@@ -732,7 +732,7 @@ public class DisbursementVoucher_ApprovalController implements Initializable, Sc
                                         if (poController.getMaster(lnCtr).getTransactionStatus().equals(DisbursementStatic.RETURNED)) {
                                             JFXUtil.highlightByKey(tblViewMainList, String.valueOf(lnRowNo), "#FAA0A0", highlightedRowsMain);
                                         }
-                                        if (poController.getMaster(lnCtr).getTransactionStatus().equals(DisbursementStatic.VERIFIED)) {
+                                        if (poController.getMaster(lnCtr).getTransactionStatus().equals(DisbursementStatic.APPROVED)) {
                                             JFXUtil.highlightByKey(tblViewMainList, String.valueOf(lnRowNo), "#C1E1C1", highlightedRowsMain);
                                         }
                                     }

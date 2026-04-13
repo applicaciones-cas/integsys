@@ -100,8 +100,6 @@ public class DisbursementVoucher_VerificationController implements Initializable
     private int pnDetailBIR = 0;
     private int pnAttachment = 0;
     private boolean pbIsCheckedJournalTab = false;
-    private boolean pbIsCheckedBIRTab = false;
-    private boolean pbIsCheckedAttachmentTab = false;
     private final String pxeModuleName = "Disbursement Voucher Verification";
     private DisbursementVoucher poController;
     public int pnEditMode;
@@ -268,7 +266,6 @@ public class DisbursementVoucher_VerificationController implements Initializable
                     if (pnEditMode == EditMode.READY || pnEditMode == EditMode.UPDATE || pnEditMode == EditMode.ADDNEW) {
                         JFXUtil.clearTextFields(apBIRDetail);
                         if (poController.Detail(0).getSourceNo() != null && !poController.Detail(0).getSourceNo().isEmpty()) {
-                            pbIsCheckedBIRTab = true;
                             populateBIR();
                         } else {
                             JFXUtil.clickTabByTitleText(tabPaneMain, "Disbursement Voucher");
@@ -280,7 +277,6 @@ public class DisbursementVoucher_VerificationController implements Initializable
                     if (pnEditMode == EditMode.READY || pnEditMode == EditMode.UPDATE || pnEditMode == EditMode.ADDNEW) {
                         JFXUtil.clearTextFields(apAttachments);
                         if (poController.Detail(0).getSourceNo() != null && !poController.Detail(0).getSourceNo().isEmpty()) {
-                            pbIsCheckedAttachmentTab = true;
                             try {
                                 poController.loadAttachments();
                             } catch (GuanzonException | SQLException ex) {
@@ -390,7 +386,6 @@ public class DisbursementVoucher_VerificationController implements Initializable
                         return;
                     }
                     pbIsCheckedJournalTab = false;
-                    pbIsCheckedBIRTab = false;
                     pnEditMode = poController.getEditMode();
                     CustomCommonUtil.switchToTab(tabDetails, tabPaneMain);
                     loadTableDetail.reload();
@@ -413,10 +408,6 @@ public class DisbursementVoucher_VerificationController implements Initializable
                     if (DisbursementStatic.VERIFIED.equals(poController.Master().getTransactionStatus())) {
                         if (!pbIsCheckedJournalTab) {
                             ShowMessageFX.Warning(null, pxeModuleName, "Please check the Journal Entry before saving."); //only require check this only if higher than encoder
-                            return;
-                        }
-                        if (!pbIsCheckedBIRTab && poController.Master().getVATAmount() > 0.0000) {
-                            ShowMessageFX.Warning(null, pxeModuleName, "Please check the BIR 2307 before saving."); // check this for encoder or and higher
                             return;
                         }
                     }
@@ -452,9 +443,6 @@ public class DisbursementVoucher_VerificationController implements Initializable
                                 if (!pbIsCheckedJournalTab) {
                                     ShowMessageFX.Warning(null, pxeModuleName, "Please check the Journal Entry before saving.");
                                     break;
-                                } else if (!pbIsCheckedBIRTab && poController.Master().getVATAmount() > 0.0000) {
-                                    ShowMessageFX.Warning(null, pxeModuleName, "Please check the BIR 2307 before verifying.");
-                                    break;
                                 } else {
                                     poJSON = poController.VerifyTransaction("");
                                     if ("error".equals((String) poJSON.get("result"))) {
@@ -473,6 +461,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
                     }
                     pnEditMode = poController.getEditMode();
                     break;
+
                 case "btnCancel":
                     if (ShowMessageFX.OkayCancel(null, pxeModuleName, "Do you want to disregard changes?")) {
                         JFXUtil.disableAllHighlightByColor(tblViewMainList, "#A7C7E7", highlightedRowsMain);
@@ -507,14 +496,6 @@ public class DisbursementVoucher_VerificationController implements Initializable
                                 if (!pbIsCheckedJournalTab) {
                                     ShowMessageFX.Warning(null, pxeModuleName, "Please check the Journal Entry before verifying.");
                                     return;
-                                } else if (poController.Master().getTransactionStatus().equals(DisbursementStatic.VERIFIED)) {
-                                    if (oApp.getUserLevel() > UserRight.ENCODER && !pbIsCheckedBIRTab) {
-                                        ShowMessageFX.Warning(null, pxeModuleName, "Please check the BIR 2307 before verifying.");
-                                        return;
-                                    }
-//                                } else if (poController.Master().getVATAmount() > 0.0000 && !pbIsCheckedBIRTab) {
-//                                    ShowMessageFX.Warning(null, pxeModuleName, "Please check the BIR 2307 before verifying.");
-//                                    return;
                                 } else {
                                     poJSON = poController.VerifyTransaction("Verified");
                                     if ("error".equals((String) poJSON.get("result"))) {
@@ -608,7 +589,6 @@ public class DisbursementVoucher_VerificationController implements Initializable
             }
             if (JFXUtil.isObjectEqualTo(lsButton, "btnSave", "btnCancel", "btnVoid", "btnVerify", "btnDVCancel")) {
                 pbIsCheckedJournalTab = false;
-                pbIsCheckedBIRTab = false;
                 poController.resetTransaction();
                 poController.Master().setSupplierClientID(psSupplierPayeeId);
                 clearTextFields();
