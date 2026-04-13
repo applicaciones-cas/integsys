@@ -146,7 +146,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
     @FXML
     private TextField tfAdvancesDetail, tfAdvances, tfSearchIndustry, tfSearchTransaction, tfSearchSupplier, tfDVTransactionNo, tfSupplier, tfVoucherNo, tfBankNameCheck, tfBankAccountCheck, tfPayeeName, tfCheckNo, tfCheckAmount, tfAuthorizedPerson, tfBankNameBTransfer, tfBankAccountBTransfer, tfPaymentAmountBTransfer, tfSupplierBank, tfSupplierAccountNoBTransfer, tfBankTransReferNo, tfPaymentStatusBTransfer, tfBankNameOnlinePayment, tfBankAccountOnlinePayment, tfPaymentAmount, tfSupplierServiceName, tfSupplierAccountNo, tfPaymentReferenceNo, tfOnlinePaymentStatus, tfTotalAmount, tfVatableSales, tfVatAmountMaster, tfVatZeroRatedSales, tfVatExemptSales, tfLessWHTax, tfTotalNetAmount, tfRefNoDetail, tfVatableSalesDetail, tfVatExemptDetail, tfVatZeroRatedSalesDetail, tfVatRateDetail, tfVatAmountDetail, tfPurchasedAmountDetail, tfNetAmountDetail, tfJournalTransactionNo, tfTotalDebitAmount, tfTotalCreditAmount, tfAccountCode, tfAccountDescription, tfDebitAmount, tfCreditAmount, tfBIRTransactionNo, tfTaxCode, tfParticular, tfBaseAmount, tfTaxRate, tfTotalTaxAmount, tfAttachmentNo, tfAttachmentSource;
     @FXML
-    private Button btnUpdate, btnSave, btnCancel, btnVerify, btnVoid, btnRetrieve, btnHistory, btnClose, btnUndo, btnArrowLeft, btnArrowRight;
+    private Button btnUpdate, btnSave, btnCancel, btnVerify, btnRetrieve, btnHistory, btnClose, btnUndo, btnArrowLeft, btnArrowRight;
     @FXML
     private TabPane tabPaneMain, tabPanePaymentMode;
     @FXML
@@ -363,7 +363,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
     }
 
     private void initButtonsClickActions() {
-        List<Button> buttons = Arrays.asList(btnUpdate, btnSave, btnCancel, btnVerify, btnVoid, btnRetrieve, btnHistory, btnClose, btnUndo, btnArrowRight, btnArrowLeft);
+        List<Button> buttons = Arrays.asList(btnUpdate, btnSave, btnCancel, btnVerify, btnRetrieve, btnHistory, btnClose, btnUndo, btnArrowRight, btnArrowLeft);
         buttons.forEach(button -> button.setOnAction(this::cmdButton_Click));
     }
 
@@ -510,40 +510,6 @@ public class DisbursementVoucher_VerificationController implements Initializable
                             } else {
                                 ShowMessageFX.Warning(null, pxeModuleName, "This transaction has no journal entry. Please add a journal entry by updating the transaction to enable verification.");
                                 return;
-                            }
-                        }
-                    } else {
-                        return;
-                    }
-                    break;
-                case "btnVoid":
-                    String lsTransaction = "";
-                    if (DisbursementStatic.CONFIRMED.equals(poController.Master().getTransactionStatus())) {
-                        lsTransaction = "void";
-                    } else if (DisbursementStatic.VERIFIED.equals(poController.Master().getTransactionStatus())) {
-                        lsTransaction = "cancel";
-                    } else {
-                    }
-                    if (ShowMessageFX.YesNo(null, pxeModuleName, "Are you sure you want to " + lsTransaction + " transaction?")) {
-                        pnEditMode = poController.getEditMode();
-                        if (pnEditMode == EditMode.READY) {
-                            switch (poController.Master().getTransactionStatus()) {
-                                case DisbursementStatic.CONFIRMED:
-                                    poJSON = poController.VoidTransaction("");
-                                    break;
-                                case DisbursementStatic.VERIFIED:
-                                default:
-                                    poJSON = poController.CancelTransaction("");
-                                    break;
-                            }
-                            if ("error".equals((String) poJSON.get("result"))) {
-                                ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-                                return;
-                            } else {
-                                ShowMessageFX.Information(null, pxeModuleName, (String) poJSON.get("message"));
-                                pnEditMode = poController.getEditMode();
-                                JFXUtil.disableAllHighlightByColor(tblViewMainList, "#A7C7E7", highlightedRowsMain);
-                                JFXUtil.highlightByKey(tblViewMainList, String.valueOf(pnMain + 1), "#FAA0A0", highlightedRowsMain);
                             }
                         }
                     } else {
@@ -2625,7 +2591,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
         boolean lbShow2 = (fnEditMode == EditMode.READY);
         JFXUtil.setButtonsVisibility(!lbShow, btnClose);
         JFXUtil.setButtonsVisibility(lbShow, btnSave, btnCancel);
-        JFXUtil.setButtonsVisibility(false, btnUpdate, btnVoid);
+        JFXUtil.setButtonsVisibility(false, btnUpdate);
         JFXUtil.setButtonsVisibility(lbShow2, btnVerify);
         JFXUtil.setButtonsVisibility(fnEditMode == EditMode.READY, btnHistory);
 
@@ -2639,14 +2605,13 @@ public class DisbursementVoucher_VerificationController implements Initializable
         if (fnEditMode == EditMode.READY) {
             switch (poController.Master().getTransactionStatus()) {
                 case DisbursementStatic.OPEN:
-                    JFXUtil.setButtonsVisibility(true, btnUpdate, btnVoid);
+                    JFXUtil.setButtonsVisibility(true, btnUpdate);
                     break;
                 case DisbursementStatic.CONFIRMED:
-                    JFXUtil.setButtonsVisibility(true, btnUpdate, btnVoid);
+                    JFXUtil.setButtonsVisibility(true, btnUpdate);
                     break;
                 case DisbursementStatic.VERIFIED:
-                    JFXUtil.setButtonsVisibility(true, btnUpdate, btnVoid);
-                    JFXUtil.setButtonsVisibility(false, btnVerify);
+                    JFXUtil.setButtonsVisibility(false, btnUpdate, btnVerify);
                     break;
                 case DisbursementStatic.RETURNED:
                     JFXUtil.setButtonsVisibility(true, btnUpdate);
