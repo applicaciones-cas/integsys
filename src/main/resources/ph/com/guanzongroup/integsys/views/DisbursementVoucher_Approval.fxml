@@ -125,7 +125,7 @@
                                                 <Blend />
                                             </effect>
                                         </Button>
-                                        <Button fx:id="btnDisapproive" contentDisplay="TOP" ellipsisString="" mnemonicParsing="false" prefHeight="70.0" prefWidth="80.0" styleClass="button_process" stylesheets="@../css/StyleSheet.css" text="Disapprove">
+                                        <Button fx:id="btnDisapprove" contentDisplay="TOP" ellipsisString="" minWidth="80.0" mnemonicParsing="false" prefHeight="70.0" prefWidth="80.0" styleClass="button_process" stylesheets="@../css/StyleSheet.css" text="Disapprove">
                                             <graphic>
                                                 <FontAwesomeIconView glyphName="TIMES" size="20" />
                                             </graphic>
