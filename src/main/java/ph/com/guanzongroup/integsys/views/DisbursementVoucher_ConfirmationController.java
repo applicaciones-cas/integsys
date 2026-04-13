@@ -408,7 +408,7 @@ public class DisbursementVoucher_ConfirmationController implements Initializable
                     }
 
                     if (DisbursementStatic.CONFIRMED.equals(poController.Master().getTransactionStatus())) {
-                        if (!pbIsCheckedBIRTab && poController.Master().getVATAmount() > 0.0000) {
+                        if (!pbIsCheckedBIRTab && poController.Master().getVATSale()> 0.0000) {
                             ShowMessageFX.Warning(null, pxeModuleName, "Please check the BIR 2307 before saving."); // check this for encoder or and higher
                             return;
                         }
@@ -430,34 +430,24 @@ public class DisbursementVoucher_ConfirmationController implements Initializable
 
                     ShowMessageFX.Information(null, pxeModuleName, (String) poJSON.get("message"));
 
-                    //Arsiela 03-05-2026 Moved to class save others
-//                    poJSON = poController.updatePaymentsStatus();
-//                    if ("error".equals(poJSON.get("result"))) {
-//                        ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-//                    }
                     poJSON = poController.OpenTransaction(poController.Master().getTransactionNo());
                     if ("success".equals(poJSON.get("result"))) {
                         pnEditMode = poController.getEditMode();
                     }
                     if (pnEditMode == EditMode.READY && !DisbursementStatic.CONFIRMED.equals(poController.Master().getTransactionStatus())) {
                         if (ShowMessageFX.YesNo(null, pxeModuleName, "Do you want to confirm this transaction?")) { //requires to review journal entry
-                            if (!poController.existJournal().equals("")) {
-                                if (!pbIsCheckedBIRTab && poController.Master().getVATAmount() > 0.0000) {
-                                    ShowMessageFX.Warning(null, pxeModuleName, "Please check the BIR 2307 before confirming.");
+                            if (!pbIsCheckedBIRTab && poController.Master().getVATSale() > 0.0000) {
+                                ShowMessageFX.Warning(null, pxeModuleName, "Please check the BIR 2307 before confirming.");
+                                break;
+                            } else {
+                                poJSON = poController.ConfirmTransaction("");
+                                if ("error".equals((String) poJSON.get("result"))) {
+                                    ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                     break;
                                 } else {
-                                    poJSON = poController.ConfirmTransaction("");
-                                    if ("error".equals((String) poJSON.get("result"))) {
-                                        ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-                                        break;
-                                    } else {
-                                        ShowMessageFX.Information(null, pxeModuleName, (String) poJSON.get("message"));
-                                        JFXUtil.highlightByKey(tblViewMainList, String.valueOf(pnMain + 1), "#C1E1C1", highlightedRowsMain);
-                                    }
+                                    ShowMessageFX.Information(null, pxeModuleName, (String) poJSON.get("message"));
+                                    JFXUtil.highlightByKey(tblViewMainList, String.valueOf(pnMain + 1), "#C1E1C1", highlightedRowsMain);
                                 }
-                            } else {
-                                ShowMessageFX.Warning(null, pxeModuleName, "No journal entry found. Add a journal entry and save before confirming.");
-                                break;
                             }
                         }
                     }
@@ -493,29 +483,19 @@ public class DisbursementVoucher_ConfirmationController implements Initializable
                     if (ShowMessageFX.YesNo(null, pxeModuleName, "Are you sure you want to confirm transaction?")) {
                         pnEditMode = poController.getEditMode();
                         if (pnEditMode == EditMode.READY) {
-                            if (!poController.existJournal().equals("")) {
-                                if (poController.Master().getTransactionStatus().equals(DisbursementStatic.CONFIRMED)) {
-                                    if (oApp.getUserLevel() > UserRight.ENCODER && !pbIsCheckedBIRTab) {
-                                        ShowMessageFX.Warning(null, pxeModuleName, "Please check the BIR 2307 before confirming.");
-                                        return;
-                                    }
-//                                } else if (poController.Master().getVATAmount() > 0.0000 && !pbIsCheckedBIRTab) {
-//                                    ShowMessageFX.Warning(null, pxeModuleName, "Please check the BIR 2307 before confirming.");
-//                                    return;
-                                } else {
-                                    poJSON = poController.ConfirmTransaction("");
-                                    if ("error".equals((String) poJSON.get("result"))) {
-                                        ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-                                        return;
-                                    } else {
-                                        ShowMessageFX.Information(null, pxeModuleName, (String) poJSON.get("message"));
-                                        JFXUtil.disableAllHighlightByColor(tblViewMainList, "#A7C7E7", highlightedRowsMain);
-                                        JFXUtil.highlightByKey(tblViewMainList, String.valueOf(pnMain + 1), "#C1E1C1", highlightedRowsMain);
-                                    }
-                                }
-                            } else {
-                                ShowMessageFX.Warning(null, pxeModuleName, "This transaction has no journal entry. Please add a journal entry by updating the transaction to enable confirmation.");
+                            if (poController.Master().getVATSale() > 0.0000 && !pbIsCheckedBIRTab) {
+                                ShowMessageFX.Warning(null, pxeModuleName, "Please check the BIR 2307 before confirming.");
                                 return;
+                            }
+                            
+                            poJSON = poController.ConfirmTransaction("");
+                            if ("error".equals((String) poJSON.get("result"))) {
+                                ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                                return;
+                            } else {
+                                ShowMessageFX.Information(null, pxeModuleName, (String) poJSON.get("message"));
+                                JFXUtil.disableAllHighlightByColor(tblViewMainList, "#A7C7E7", highlightedRowsMain);
+                                JFXUtil.highlightByKey(tblViewMainList, String.valueOf(pnMain + 1), "#C1E1C1", highlightedRowsMain);
                             }
                         }
                     } else {
