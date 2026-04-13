@@ -486,24 +486,24 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                         initButton(pnEditMode);
                     }
                     if (pnEditMode == EditMode.READY) {
-                        if (ShowMessageFX.YesNo(null, pxeModuleName, "Do you want to confirm this transaction?")) { //requires to review journal entry
-                            if (!poController.existJournal().equals("")) {
-                                if (!pbIsCheckedBIRTab && poController.Master().getVATAmount() > 0.0000) {
-                                    ShowMessageFX.Warning(null, pxeModuleName, "Please check the BIR 2307 before confirming.");
+                        if (ShowMessageFX.YesNo(null, pxeModuleName, "Do you want to confirm this transaction?")) { 
+//                            if (!poController.existJournal().equals("")) {
+                            if (!pbIsCheckedBIRTab && poController.Master().getVATAmount() > 0.0000) {
+                                ShowMessageFX.Warning(null, pxeModuleName, "Please check the BIR 2307 before confirming.");
+                                break;
+                            } else {
+                                poJSON = poController.ConfirmTransaction("");
+                                if ("error".equals((String) poJSON.get("result"))) {
+                                    ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                     break;
                                 } else {
-                                    poJSON = poController.ConfirmTransaction("");
-                                    if ("error".equals((String) poJSON.get("result"))) {
-                                        ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-                                        break;
-                                    } else {
-                                        ShowMessageFX.Information(null, pxeModuleName, (String) poJSON.get("message"));
-                                    }
+                                    ShowMessageFX.Information(null, pxeModuleName, (String) poJSON.get("message"));
                                 }
-                            } else {
-                                ShowMessageFX.Warning(null, pxeModuleName, "No journal entry found. Add a journal entry and save before confirming.");
-                                break;
                             }
+//                            } else {
+//                                ShowMessageFX.Warning(null, pxeModuleName, "No journal entry found. Add a journal entry and save before confirming.");
+//                                break;
+//                            }
                         }
                     }
                     Platform.runLater(() -> btnNew.fire());
