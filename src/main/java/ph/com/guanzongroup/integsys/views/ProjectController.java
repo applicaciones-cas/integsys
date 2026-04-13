@@ -574,7 +574,7 @@ public class ProjectController implements Initializable, ScreenInterface {
                     lblStatus.setText("CANCELLED");
                     break;
                 case "4":
-                    lblStatus.setText("VOID");
+                    lblStatus.setText("VOIDED");
                     break;
                 default:
                     lblStatus.setText("UNKNOWN");

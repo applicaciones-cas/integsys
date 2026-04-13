@@ -197,7 +197,7 @@
         <dependency>
             <groupId>ph.com.guanzongroup</groupId>
             <artifactId>cas-sysmonitor</artifactId>
-            <version>0.1-SNAPSHOT</version>
+            <version>0.2-SNAPSHOT</version>
             <type>jar</type>
         </dependency>
         <dependency>
