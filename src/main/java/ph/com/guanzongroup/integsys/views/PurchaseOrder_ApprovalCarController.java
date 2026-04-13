@@ -855,6 +855,7 @@ public class PurchaseOrder_ApprovalCarController implements Initializable, Scree
                                     approved = false;
                                     return;
                                 }
+                                poPurchasingController.PurchaseOrder().setApproving((String) poJSON.get("sUserIDxx"));
                             }
                         }
                     } else {

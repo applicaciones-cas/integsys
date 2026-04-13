@@ -855,6 +855,7 @@ public class PurchaseOrder_ApprovalSPMCController implements Initializable, Scre
                                     approved = false;
                                     return;
                                 }
+                                poPurchasingController.PurchaseOrder().setApproving((String) poJSON.get("sUserIDxx"));
                             }
                         }
                     } else {

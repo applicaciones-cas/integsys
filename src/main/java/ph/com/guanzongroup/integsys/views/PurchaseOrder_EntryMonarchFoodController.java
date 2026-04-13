@@ -1138,6 +1138,7 @@ public class PurchaseOrder_EntryMonarchFoodController implements Initializable, 
                                         approved = false;
                                         return;
                                     }
+                                    poPurchasingController.PurchaseOrder().setApproving((String) poJSON.get("sUserIDxx"));
                                 }
                             }
                         } else {

@@ -851,6 +851,7 @@ public class PurchaseOrder_ConfirmationSPCarController implements Initializable,
                                     approved = false;
                                     return;
                                 }
+                                poPurchasingController.PurchaseOrder().setApproving((String) poJSON.get("sUserIDxx"));
                             }
                         }
                     } else {

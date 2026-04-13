@@ -851,6 +851,7 @@ public class PurchaseOrder_ConfirmationLPController implements Initializable, Sc
                                     approved = false;
                                     return;
                                 }
+                                poPurchasingController.PurchaseOrder().setApproving((String) poJSON.get("sUserIDxx"));
                             }
                         }
                     } else {
