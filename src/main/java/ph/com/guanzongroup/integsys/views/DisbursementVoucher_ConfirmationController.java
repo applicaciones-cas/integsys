@@ -408,7 +408,7 @@ public class DisbursementVoucher_ConfirmationController implements Initializable
                     }
 
                     if (DisbursementStatic.CONFIRMED.equals(poController.Master().getTransactionStatus())) {
-                        if (!pbIsCheckedBIRTab && poController.Master().getVATSale()> 0.0000) {
+                        if (!pbIsCheckedBIRTab && poController.Master().getVATSale() > 0.0000) {
                             ShowMessageFX.Warning(null, pxeModuleName, "Please check the BIR 2307 before saving."); // check this for encoder or and higher
                             return;
                         }
@@ -487,7 +487,7 @@ public class DisbursementVoucher_ConfirmationController implements Initializable
                                 ShowMessageFX.Warning(null, pxeModuleName, "Please check the BIR 2307 before confirming.");
                                 return;
                             }
-                            
+
                             poJSON = poController.ConfirmTransaction("");
                             if ("error".equals((String) poJSON.get("result"))) {
                                 ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
@@ -508,7 +508,6 @@ public class DisbursementVoucher_ConfirmationController implements Initializable
                         lsTransaction = "void";
                     } else if (DisbursementStatic.CONFIRMED.equals(poController.Master().getTransactionStatus())) {
                         lsTransaction = "cancel";
-                    } else {
                     }
                     if (ShowMessageFX.YesNo(null, pxeModuleName, "Are you sure you want to " + lsTransaction + " transaction?")) {
                         pnEditMode = poController.getEditMode();
@@ -1959,6 +1958,16 @@ public class DisbursementVoucher_ConfirmationController implements Initializable
         try {
             initDVMasterTabs();
             poController.computeFields(false);
+
+            String lsTransaction = "";
+            if (DisbursementStatic.OPEN.equals(poController.Master().getTransactionStatus())) {
+                lsTransaction = "Void";
+                btnVoid.setText(lsTransaction);
+            } else if (DisbursementStatic.CONFIRMED.equals(poController.Master().getTransactionStatus())) {
+                lsTransaction = "Cancel";
+                btnVoid.setText(lsTransaction);
+            }
+
             JFXUtil.setStatusValue(lblDVTransactionStatus, DisbursementStatic.class, pnEditMode == EditMode.UNKNOWN ? "-1" : poController.Master().getTransactionStatus());
             JFXUtil.setDisabled(true, tfSupplier);
             tfDVTransactionNo.setText(poController.Master().getTransactionNo() != null ? poController.Master().getTransactionNo() : "");
