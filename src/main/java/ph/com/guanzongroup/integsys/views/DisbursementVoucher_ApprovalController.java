@@ -377,6 +377,13 @@ public class DisbursementVoucher_ApprovalController implements Initializable, Sc
             String lsButton = ((Button) event.getSource()).getId();
             switch (lsButton) {
                 case "btnUpdate":
+                    String lsUserId = oApp.getUserID();
+                    String lsPosition = poController.checkPosition(DisbursementStatic.APPROVED, lsUserId);
+                    if (lsPosition == null || "".equals(lsPosition)) {
+                        poJSON.put("result", "error");
+                        poJSON.put("message", "User is not an authorized officer.");
+                        ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                    }
                     //Recheck transaction status
                     poJSON = poController.checkUpdateTransaction(false);
                     if (!"success".equals((String) poJSON.get("result"))) {
@@ -2650,8 +2657,14 @@ public class DisbursementVoucher_ApprovalController implements Initializable, Sc
                     JFXUtil.setButtonsVisibility(true, btnUpdate, btnDisapprove);
                     break;
                 case DisbursementStatic.VERIFIED:
+                    JFXUtil.setButtonsVisibility(true, btnUpdate, btnApprove, btnDisapprove);
+                    break;
+                case DisbursementStatic.APPROVED:
                     JFXUtil.setButtonsVisibility(true, btnUpdate, btnDisapprove);
                     JFXUtil.setButtonsVisibility(false, btnApprove);
+                    break;
+                case DisbursementStatic.DISAPPROVED:
+                    JFXUtil.setButtonsVisibility(false, btnApprove, btnDisapprove, btnUpdate);
                     break;
                 case DisbursementStatic.RETURNED:
                     JFXUtil.setButtonsVisibility(true, btnUpdate);

@@ -422,6 +422,13 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                     JFXUtil.showRetainedHighlight(false, tblViewMainList, "#A7C7E7", plOrderNoPartial, plOrderNoFinal, highlightedRowsMain, true);
                     break;
                 case "btnUpdate":
+                    String lsUserId = oApp.getUserID();
+                    String lsPosition = poController.checkPosition(DisbursementStatic.OPEN, lsUserId);
+                    if (lsPosition == null || "".equals(lsPosition)) {
+                        poJSON.put("result", "error");
+                        poJSON.put("message", "User is not an authorized officer.");
+                        ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                    }
                     //Recheck transaction status
                     poJSON = poController.checkUpdateTransaction(true);
                     if (!"success".equals((String) poJSON.get("result"))) {
@@ -486,7 +493,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                         initButton(pnEditMode);
                     }
                     if (pnEditMode == EditMode.READY) {
-                        if (ShowMessageFX.YesNo(null, pxeModuleName, "Do you want to confirm this transaction?")) { 
+                        if (ShowMessageFX.YesNo(null, pxeModuleName, "Do you want to confirm this transaction?")) {
 //                            if (!poController.existJournal().equals("")) {
                             if (!pbIsCheckedBIRTab && poController.Master().getVATAmount() > 0.0000) {
                                 ShowMessageFX.Warning(null, pxeModuleName, "Please check the BIR 2307 before confirming.");
