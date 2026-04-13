@@ -1,6 +1,5 @@
 package ph.com.guanzongroup.integsys.views;
 
-
 import java.lang.reflect.Field;
 import java.net.URL;
 import java.sql.SQLException;
@@ -400,6 +399,8 @@ public class InventoryStockIssuanceConfirmationControllerCar implements Initiali
                             return;
                         }
                         reloadTableDetail();
+
+                        getLoadedTransaction();
 //                        clearAllInputs();
                         pnEditMode = poAppController.getEditMode();
                         break;
@@ -423,6 +424,8 @@ public class InventoryStockIssuanceConfirmationControllerCar implements Initiali
 
                         }
                         reloadTableDetail();
+
+                        getLoadedTransaction();
 //                        clearAllInputs();
                         pnEditMode = poAppController.getEditMode();
                         break;
@@ -442,7 +445,8 @@ public class InventoryStockIssuanceConfirmationControllerCar implements Initiali
                         }
 
                         reloadTableDetail();
-                        clearAllInputs();
+
+                        getLoadedTransaction();
                         pnEditMode = poAppController.getEditMode();
                         break;
                     }
@@ -458,6 +462,8 @@ public class InventoryStockIssuanceConfirmationControllerCar implements Initiali
                         return;
                     }
                     reloadTableDetail();
+
+                    getLoadedTransaction();
 //                    clearAllInputs();
                     pnEditMode = poAppController.getEditMode();
 
@@ -1238,7 +1244,7 @@ public class InventoryStockIssuanceConfirmationControllerCar implements Initiali
             poLogWrapper.severe(psFormName + " :" + message);
             Platform.runLater(() -> {
                 if (message != null) {
-                    ShowMessageFX.Warning(null, psFormName,  message);
+                    ShowMessageFX.Warning(null, psFormName, message);
                 }
             });
             return false;
@@ -1248,7 +1254,7 @@ public class InventoryStockIssuanceConfirmationControllerCar implements Initiali
         poLogWrapper.severe(psFormName + " :" + message);
         Platform.runLater(() -> {
             if (message != null) {
-                ShowMessageFX.Information(null, psFormName,  message);
+                ShowMessageFX.Information(null, psFormName, message);
             }
         });
         poLogWrapper.info(psFormName + " : Success on " + fsModule);

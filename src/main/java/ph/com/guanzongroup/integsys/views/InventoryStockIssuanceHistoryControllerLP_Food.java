@@ -264,7 +264,7 @@ public class InventoryStockIssuanceHistoryControllerLP_Food implements Initializ
                         }
 
                         reloadTableDetail();
-                        clearAllInputs();
+                        getLoadedTransaction();
                         pnEditMode = poAppController.getEditMode();
                         break;
                     }

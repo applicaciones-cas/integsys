@@ -264,7 +264,7 @@ public class InventoryStockIssuanceHistoryControllerMonarch_Food implements Init
                         }
 
                         reloadTableDetail();
-                        clearAllInputs();
+                        getLoadedTransaction();
                         pnEditMode = poAppController.getEditMode();
                         break;
                     }

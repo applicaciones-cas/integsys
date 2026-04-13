@@ -264,7 +264,7 @@ public class InventoryStockIssuanceHistoryControllerCar_SP implements Initializa
                         }
 
                         reloadTableDetail();
-                        clearAllInputs();
+                        getLoadedTransaction();
                         pnEditMode = poAppController.getEditMode();
                         break;
                     }

@@ -145,8 +145,7 @@ public class InventoryStockIssuance_PostingControllerCar_SP implements Initializ
         try {
             poLogWrapper = new LogWrapper(psFormName, psFormName + "Log");
             poAppController = new DeliveryIssuanceControllers(poApp, poLogWrapper).InventoryStockIssuanceNeo();
-            
-           
+
             if (!isJSONSuccess(poAppController.initTransaction(), "Initialize Transaction")) {
                 unloadForm appUnload = new unloadForm();
                 appUnload.unloadForm(apMainAnchor, poApp, psFormName);
@@ -190,7 +189,7 @@ public class InventoryStockIssuance_PostingControllerCar_SP implements Initializ
                         return;
                     }
                     reloadTableDetail();
-                    clearAllInputs();
+                    getLoadedTransaction();
                     pnEditMode = poAppController.getEditMode();
                     break;
 
@@ -616,7 +615,7 @@ public class InventoryStockIssuance_PostingControllerCar_SP implements Initializ
             String message = (String) loJSON.get("message");
             poLogWrapper.severe(psFormName + " :" + message);
             Platform.runLater(() -> {
-                ShowMessageFX.Warning(null, psFormName,  message);
+                ShowMessageFX.Warning(null, psFormName, message);
             });
             return false;
         }
@@ -625,7 +624,7 @@ public class InventoryStockIssuance_PostingControllerCar_SP implements Initializ
         poLogWrapper.severe(psFormName + " :" + message);
         Platform.runLater(() -> {
             if (message != null) {
-                ShowMessageFX.Information(null, psFormName,  message);
+                ShowMessageFX.Information(null, psFormName, message);
             }
         });
         poLogWrapper.info(psFormName + " : Success on " + fsModule);

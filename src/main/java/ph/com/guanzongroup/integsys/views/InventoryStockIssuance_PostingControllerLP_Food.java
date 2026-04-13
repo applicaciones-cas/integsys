@@ -190,7 +190,7 @@ public class InventoryStockIssuance_PostingControllerLP_Food implements Initiali
                         return;
                     }
                     reloadTableDetail();
-                    clearAllInputs();
+                    getLoadedTransaction();
                     pnEditMode = poAppController.getEditMode();
                     break;
 

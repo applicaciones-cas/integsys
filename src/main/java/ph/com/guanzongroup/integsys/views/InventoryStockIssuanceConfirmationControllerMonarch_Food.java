@@ -1,6 +1,5 @@
 package ph.com.guanzongroup.integsys.views;
 
-
 import java.lang.reflect.Field;
 import java.net.URL;
 import java.sql.SQLException;
@@ -402,7 +401,8 @@ public class InventoryStockIssuanceConfirmationControllerMonarch_Food implements
                             return;
                         }
                         reloadTableDetail();
-//                        clearAllInputs();
+
+                        getLoadedTransaction();
                         pnEditMode = poAppController.getEditMode();
                         break;
                     }
@@ -425,7 +425,8 @@ public class InventoryStockIssuanceConfirmationControllerMonarch_Food implements
 
                         }
                         reloadTableDetail();
-//                        clearAllInputs();
+
+                        getLoadedTransaction();
                         pnEditMode = poAppController.getEditMode();
                         break;
                     }
@@ -444,7 +445,8 @@ public class InventoryStockIssuanceConfirmationControllerMonarch_Food implements
                         }
 
                         reloadTableDetail();
-//                        clearAllInputs();
+
+                        getLoadedTransaction();
                         pnEditMode = poAppController.getEditMode();
                         break;
                     }
@@ -460,7 +462,8 @@ public class InventoryStockIssuanceConfirmationControllerMonarch_Food implements
                         return;
                     }
                     reloadTableDetail();
-//                    clearAllInputs();
+
+                    getLoadedTransaction();
                     pnEditMode = poAppController.getEditMode();
 
                     break;
@@ -1245,7 +1248,7 @@ public class InventoryStockIssuanceConfirmationControllerMonarch_Food implements
             poLogWrapper.severe(psFormName + " :" + message);
             Platform.runLater(() -> {
                 if (message != null) {
-                    ShowMessageFX.Warning(null, psFormName,  message);
+                    ShowMessageFX.Warning(null, psFormName, message);
                 }
             });
             return false;

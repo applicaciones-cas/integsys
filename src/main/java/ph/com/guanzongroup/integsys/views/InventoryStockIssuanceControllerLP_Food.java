@@ -1,6 +1,5 @@
 package ph.com.guanzongroup.integsys.views;
 
-
 import java.lang.reflect.Field;
 import java.net.URL;
 import java.sql.SQLException;
@@ -406,8 +405,13 @@ public class InventoryStockIssuanceControllerLP_Food implements Initializable, S
                     if (!isJSONSuccess(poAppController.SaveTransaction(), "Initialize Save Transaction")) {
                         return;
                     }
+                    if (ShowMessageFX.YesNo(null, psFormName, "Do you want to confirm transaction?") == true) {
+                        if (!isJSONSuccess(poAppController.CloseTransaction(), "Initialize Close Transaction")) {
+                            return;
+                        }
+                    }
                     reloadTableDetail();
-//                    clearAllInputs();
+                    getLoadedTransaction();
                     pnEditMode = poAppController.getEditMode();
 
                     break;
@@ -1187,7 +1191,7 @@ public class InventoryStockIssuanceControllerLP_Food implements Initializable, S
             poLogWrapper.severe(psFormName + " :" + message);
             Platform.runLater(() -> {
                 if (message != null) {
-                    ShowMessageFX.Warning(null, psFormName,  message);
+                    ShowMessageFX.Warning(null, psFormName, message);
                 }
             });
             return false;
@@ -1197,7 +1201,7 @@ public class InventoryStockIssuanceControllerLP_Food implements Initializable, S
         poLogWrapper.severe(psFormName + " :" + message);
         Platform.runLater(() -> {
             if (message != null) {
-                ShowMessageFX.Information(null, psFormName,  message);
+                ShowMessageFX.Information(null, psFormName, message);
             }
         });
         poLogWrapper.info(psFormName + " : Success on " + fsModule);

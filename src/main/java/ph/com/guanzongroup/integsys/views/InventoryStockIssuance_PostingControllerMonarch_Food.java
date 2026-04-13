@@ -189,7 +189,7 @@ public class InventoryStockIssuance_PostingControllerMonarch_Food implements Ini
                         return;
                     }
                     reloadTableDetail();
-                    clearAllInputs();
+                    getLoadedTransaction();
                     pnEditMode = poAppController.getEditMode();
                     break;
 

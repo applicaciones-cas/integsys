@@ -1,6 +1,5 @@
 package ph.com.guanzongroup.integsys.views;
 
-
 import java.lang.reflect.Field;
 import java.net.URL;
 import java.sql.SQLException;
@@ -399,7 +398,8 @@ public class InventoryStockIssuanceConfirmationControllerMC implements Initializ
                             return;
                         }
                         reloadTableDetail();
-//                        clearAllInputs();
+
+                        getLoadedTransaction();
                         pnEditMode = poAppController.getEditMode();
                         break;
                     }
@@ -422,7 +422,8 @@ public class InventoryStockIssuanceConfirmationControllerMC implements Initializ
 
                         }
                         reloadTableDetail();
-//                        clearAllInputs();
+
+                        getLoadedTransaction();
                         pnEditMode = poAppController.getEditMode();
                         break;
                     }
@@ -441,7 +442,8 @@ public class InventoryStockIssuanceConfirmationControllerMC implements Initializ
                         }
 
                         reloadTableDetail();
-//                        clearAllInputs();
+
+                        getLoadedTransaction();
                         pnEditMode = poAppController.getEditMode();
                         break;
                     }
@@ -457,7 +459,8 @@ public class InventoryStockIssuanceConfirmationControllerMC implements Initializ
                         return;
                     }
                     reloadTableDetail();
-//                    clearAllInputs();
+
+                    getLoadedTransaction();
                     pnEditMode = poAppController.getEditMode();
 
                     break;
@@ -1252,7 +1255,7 @@ public class InventoryStockIssuanceConfirmationControllerMC implements Initializ
         poLogWrapper.severe(psFormName + " :" + message);
         Platform.runLater(() -> {
             if (message != null) {
-                ShowMessageFX.Information(null, psFormName,  message);
+                ShowMessageFX.Information(null, psFormName, message);
             }
         });
         poLogWrapper.info(psFormName + " : Success on " + fsModule);

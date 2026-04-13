@@ -400,7 +400,8 @@ public class InventoryStockIssuanceConfirmationControllerLP_Food implements Init
                             return;
                         }
                         reloadTableDetail();
-//                        clearAllInputs();
+
+                    getLoadedTransaction();
                         pnEditMode = poAppController.getEditMode();
                         break;
                     }
@@ -423,7 +424,8 @@ public class InventoryStockIssuanceConfirmationControllerLP_Food implements Init
 
                         }
                         reloadTableDetail();
-//                        clearAllInputs();
+
+                    getLoadedTransaction();
                         pnEditMode = poAppController.getEditMode();
                         break;
                     }
@@ -442,7 +444,8 @@ public class InventoryStockIssuanceConfirmationControllerLP_Food implements Init
                         }
 
                         reloadTableDetail();
-//                        clearAllInputs();
+
+                    getLoadedTransaction();
                         pnEditMode = poAppController.getEditMode();
                         break;
                     }
@@ -458,7 +461,8 @@ public class InventoryStockIssuanceConfirmationControllerLP_Food implements Init
                         return;
                     }
                     reloadTableDetail();
-//                    clearAllInputs();
+
+                    getLoadedTransaction();
                     pnEditMode = poAppController.getEditMode();
 
                     break;

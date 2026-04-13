@@ -189,7 +189,7 @@ public class InventoryStockIssuance_PostingControllerMC_SP implements Initializa
                         return;
                     }
                     reloadTableDetail();
-                    clearAllInputs();
+                    getLoadedTransaction();
                     pnEditMode = poAppController.getEditMode();
                     break;
 

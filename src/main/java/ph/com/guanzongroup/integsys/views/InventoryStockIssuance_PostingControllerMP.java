@@ -189,7 +189,7 @@ public class InventoryStockIssuance_PostingControllerMP implements Initializable
                         return;
                     }
                     reloadTableDetail();
-                    clearAllInputs();
+                    getLoadedTransaction();
                     pnEditMode = poAppController.getEditMode();
                     break;
 

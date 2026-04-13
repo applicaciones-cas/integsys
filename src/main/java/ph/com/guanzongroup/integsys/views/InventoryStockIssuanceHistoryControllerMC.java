@@ -264,7 +264,7 @@ public class InventoryStockIssuanceHistoryControllerMC implements Initializable,
                         }
 
                         reloadTableDetail();
-                        clearAllInputs();
+                        getLoadedTransaction();
                         pnEditMode = poAppController.getEditMode();
                         break;
                     }
