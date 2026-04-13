@@ -260,11 +260,11 @@ public class ProjectController implements Initializable, ScreenInterface {
                         oParameters.Project().getModel().setModifyingId(oApp.getUserID());
                         oParameters.Project().getModel().setModifiedDate(oApp.getServerDate());
                         
-                        poJSON = oParameters.Project().CheckDuplicate(lsProjectID, lsProjectDesc);
-                        if ("error".equals((String) poJSON.get("result"))) {
-                            ShowMessageFX.Error((String) poJSON.get("message"), pxeModuleName, null);
-                            break;
-                        }
+//                        poJSON = oParameters.Project().CheckDuplicate(lsProjectID, lsProjectDesc);
+//                        if ("error".equals((String) poJSON.get("result"))) {
+//                            ShowMessageFX.Error((String) poJSON.get("message"), pxeModuleName, null);
+//                            break;
+//                        }
                         
                         poJSON = oParameters.Project().saveRecord();
                         if ("error".equals((String) poJSON.get("result"))) {
@@ -340,9 +340,17 @@ public class ProjectController implements Initializable, ScreenInterface {
                             oParameters.Project().ShowStatusHistory();
                         break;
                 }
-            } catch (SQLException | GuanzonException | CloneNotSupportedException | ParseException ex) {
+            } catch (SQLException | GuanzonException | CloneNotSupportedException | ParseException  ex) {
                 Logger.getLogger(ProjectController.class.getName()).log(Level.SEVERE, null, ex);
                 ShowMessageFX.Error(ex.getMessage(), pxeModuleName, null);
+                try {
+                    if (oApp != null) {
+
+                        oApp.rollbackTrans(); // 🔥 force rollback
+                    }
+                } catch (SQLException ex1) {
+                    Logger.getLogger(ProjectController.class.getName()).log(Level.SEVERE, null, ex1);
+                }
             } catch (Exception ex) {
                 Logger.getLogger(ProjectController.class.getName()).log(Level.SEVERE, null, ex);
                 ShowMessageFX.Error(ex.getMessage(), pxeModuleName, null);
