@@ -463,7 +463,7 @@ public class DisbursementVoucher_ApprovalController implements Initializable, Sc
                                     ShowMessageFX.Warning(null, pxeModuleName, "Please check the BIR 2307 before approving.");
                                     break;
                                 } else {
-                                    poJSON = poController.VerifyTransaction("");
+                                    poJSON = poController.ApproveTransaction("");
                                     if ("error".equals((String) poJSON.get("result"))) {
                                         ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                         break;
@@ -2640,7 +2640,7 @@ public class DisbursementVoucher_ApprovalController implements Initializable, Sc
         JFXUtil.setButtonsVisibility(false, btnUpdate, btnDisapprove);
         JFXUtil.setButtonsVisibility(lbShow2, btnApprove);
         JFXUtil.setButtonsVisibility(fnEditMode == EditMode.READY, btnHistory);
-
+        
         JFXUtil.setDisabled(!lbShow, apJournalMaster, apJournalDetails);
 
         JFXUtil.setButtonsVisibility(fnEditMode == EditMode.UPDATE, btnUndo);
@@ -2660,8 +2660,7 @@ public class DisbursementVoucher_ApprovalController implements Initializable, Sc
                     JFXUtil.setButtonsVisibility(true, btnUpdate, btnApprove, btnDisapprove);
                     break;
                 case DisbursementStatic.APPROVED:
-                    JFXUtil.setButtonsVisibility(true, btnUpdate, btnDisapprove);
-                    JFXUtil.setButtonsVisibility(false, btnApprove);
+                    JFXUtil.setButtonsVisibility(false, btnUpdate,btnApprove, btnDisapprove);
                     break;
                 case DisbursementStatic.DISAPPROVED:
                     JFXUtil.setButtonsVisibility(false, btnApprove, btnDisapprove, btnUpdate);
