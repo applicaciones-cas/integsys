@@ -536,25 +536,10 @@ public class DisbursementVoucher_ApprovalController implements Initializable, Sc
                     }
                     break;
                 case "btnDisapprove":
-                    String lsTransaction = "";
-                    if (DisbursementStatic.VERIFIED.equals(poController.Master().getTransactionStatus())) {
-                        lsTransaction = "disapprove";
-                    } else if (DisbursementStatic.APPROVED.equals(poController.Master().getTransactionStatus())) {
-                        lsTransaction = "cancel";
-                    } else {
-                    }
-                    if (ShowMessageFX.YesNo(null, pxeModuleName, "Are you sure you want to " + lsTransaction + " transaction?")) {
+                    if (ShowMessageFX.YesNo(null, pxeModuleName, "Are you sure you want to disapprove transaction?")) {
                         pnEditMode = poController.getEditMode();
                         if (pnEditMode == EditMode.READY) {
-                            switch (poController.Master().getTransactionStatus()) {
-                                case DisbursementStatic.VERIFIED:
-                                    poJSON = poController.DisApproveTransaction("");
-                                    break;
-                                case DisbursementStatic.APPROVED:
-                                default:
-                                    poJSON = poController.DisApproveTransaction("");
-                                    break;
-                            }
+                            poJSON = poController.DisApproveTransaction("");
                             if ("error".equals((String) poJSON.get("result"))) {
                                 ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                 return;
