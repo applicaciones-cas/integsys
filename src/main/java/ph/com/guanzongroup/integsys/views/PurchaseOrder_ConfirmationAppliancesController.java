@@ -842,6 +842,7 @@ public class PurchaseOrder_ConfirmationAppliancesController implements Initializ
                                     approved = false;
                                     return;
                                 }
+                                poPurchasingController.PurchaseOrder().setApproving((String) poJSON.get("sUserIDxx"));
                             }
                         }
                     } else {

@@ -1154,6 +1154,7 @@ public class PurchaseOrder_EntryMCController implements Initializable, ScreenInt
                                         approved = false;
                                         return;
                                     }
+                                    poPurchasingController.PurchaseOrder().setApproving((String) poJSON.get("sUserIDxx"));
                                 }
                             }
                         } else {

@@ -856,6 +856,7 @@ public class PurchaseOrder_ApprovalLPController implements Initializable, Screen
                                     approved = false;
                                     return;
                                 }
+                                poPurchasingController.PurchaseOrder().setApproving((String) poJSON.get("sUserIDxx"));
                             }
                         }
                     } else {

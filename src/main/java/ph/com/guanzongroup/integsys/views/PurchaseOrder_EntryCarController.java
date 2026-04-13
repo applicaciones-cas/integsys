@@ -1155,6 +1155,7 @@ public class PurchaseOrder_EntryCarController implements Initializable, ScreenIn
                                         approved = false;
                                         return;
                                     }
+                                    poPurchasingController.PurchaseOrder().setApproving((String) poJSON.get("sUserIDxx"));
                                 }
                             }
                         } else {
