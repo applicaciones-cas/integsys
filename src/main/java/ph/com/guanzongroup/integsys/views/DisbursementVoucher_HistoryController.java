@@ -65,6 +65,7 @@ import org.guanzon.appdriver.constant.DocumentType;
 import org.guanzon.appdriver.constant.EditMode;
 import org.guanzon.appdriver.constant.Logical;
 import org.guanzon.appdriver.constant.RecordStatus;
+import org.guanzon.appdriver.constant.UserRight;
 import org.json.simple.JSONObject;
 import ph.com.guanzongroup.cas.cashflow.DisbursementVoucher;
 import ph.com.guanzongroup.cas.cashflow.services.CashflowControllers;
@@ -373,6 +374,27 @@ public class DisbursementVoucher_HistoryController implements Initializable, Scr
                     }
                     break;
                 case "btnPrintCheck":
+                    if (ShowMessageFX.YesNo(null, pxeModuleName, "Are you sure you want to print check this transaction?")) {
+                        if (oApp.getUserLevel() <= UserRight.ENCODER) {
+                            boolean proceed = ShowMessageFX.YesNo(
+                                    null,
+                                    "Check Printing",
+                                    "This check has already been printed and recorded.\n"
+                                    + "Reprinting should only be done with proper authorization.\n"
+                                    + "Do you wish to proceed with reprinting?"
+                            );
+                            if (proceed) {
+                                poJSON = poController.callApproval();
+                                if (!"success".equals((String) poJSON.get("result"))) {
+                                    ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                                    return;
+                                }
+                            } else {
+                                return;
+                            }
+                        }
+                    }
+
                     ArrayList<String> checkedItems3 = new ArrayList<>();
                     checkedItems3.add(poController.Master().getTransactionNo());
                     poJSON = poController.PrintCheck(checkedItems3);
