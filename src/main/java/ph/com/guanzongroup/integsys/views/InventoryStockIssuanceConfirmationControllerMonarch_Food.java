@@ -47,6 +47,7 @@ import org.guanzon.appdriver.base.LogWrapper;
 import org.guanzon.appdriver.constant.EditMode;
 import javafx.concurrent.Task;
 import org.guanzon.appdriver.base.GuanzonException;
+import org.guanzon.appdriver.base.MiscUtil;
 import org.guanzon.appdriver.base.SQLUtil;
 import org.guanzon.cas.inv.warehouse.model.Model_Inv_Stock_Request_Master;
 import org.json.simple.JSONObject;
@@ -181,7 +182,9 @@ public class InventoryStockIssuanceConfirmationControllerMonarch_Food implements
             initializeTableDetailOther();
             initControlEvents();
         } catch (SQLException | GuanzonException e) {
-            Logger.getLogger(InventoryStockIssuance.class.getName()).log(Level.SEVERE, null, e);
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(e), e);
+            ShowMessageFX.Error(MiscUtil.getException(e), psFormName, null);
+
             poLogWrapper.severe(psFormName + " :" + e.getMessage());
         }
     }
@@ -210,6 +213,8 @@ public class InventoryStockIssuanceConfirmationControllerMonarch_Food implements
                 loadSelectedTransactionDetail(poAppController.getDetailCount());
                 reloadTableDetailOther();
             } catch (CloneNotSupportedException | SQLException | GuanzonException ex) {
+                Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+                ShowMessageFX.Error(MiscUtil.getException(ex), psFormName, null);
 
                 poLogWrapper.severe(psFormName + " :" + ex.getMessage());
 
@@ -232,7 +237,9 @@ public class InventoryStockIssuanceConfirmationControllerMonarch_Food implements
             loadSelectedTransactionDetail(pnTransactionDetail);
             reloadTableDetailOther();
         } catch (SQLException | GuanzonException | CloneNotSupportedException ex) {
-            Logger.getLogger(InventoryStockIssuance_PostingController.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(MiscUtil.getException(ex), psFormName, null);
+
             poLogWrapper.severe(psFormName + " :" + ex.getMessage());
         }
     }
@@ -249,7 +256,6 @@ public class InventoryStockIssuanceConfirmationControllerMonarch_Food implements
             reloadTableDetail();
             loadSelectedTransactionDetailOther(pnTransactionDetailOther);
         } catch (SQLException | GuanzonException | CloneNotSupportedException ex) {
-            Logger.getLogger(InventoryStockIssuance_PostingController.class.getName()).log(Level.SEVERE, null, ex);
             poLogWrapper.severe(psFormName + " :" + ex.getMessage());
         }
     }
@@ -401,8 +407,8 @@ public class InventoryStockIssuanceConfirmationControllerMonarch_Food implements
                             return;
                         }
                         reloadTableDetail();
-
                         getLoadedTransaction();
+//                        clearAllInputs();
                         pnEditMode = poAppController.getEditMode();
                         break;
                     }
@@ -445,7 +451,6 @@ public class InventoryStockIssuanceConfirmationControllerMonarch_Food implements
                         }
 
                         reloadTableDetail();
-
                         getLoadedTransaction();
                         pnEditMode = poAppController.getEditMode();
                         break;
@@ -462,8 +467,8 @@ public class InventoryStockIssuanceConfirmationControllerMonarch_Food implements
                         return;
                     }
                     reloadTableDetail();
-
                     getLoadedTransaction();
+//                    clearAllInputs();
                     pnEditMode = poAppController.getEditMode();
 
                     break;
@@ -590,7 +595,9 @@ public class InventoryStockIssuanceConfirmationControllerMonarch_Food implements
             initButtonDisplay(poAppController.getEditMode());
 
         } catch (Exception e) {
-            Logger.getLogger(DeliverySchedule_EntryController.class.getName()).log(Level.SEVERE, null, e);
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(e), e);
+            ShowMessageFX.Error(MiscUtil.getException(e), psFormName, null);
+
             poLogWrapper.severe(psFormName + " :" + e.getMessage());
         }
     }
@@ -670,7 +677,9 @@ public class InventoryStockIssuanceConfirmationControllerMonarch_Food implements
                 loTextField.selectAll();
             }
         } catch (SQLException | GuanzonException | CloneNotSupportedException ex) {
-            Logger.getLogger(InventoryStockIssuance_PostingController.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(MiscUtil.getException(ex), psFormName, null);
+
             poLogWrapper.severe(psFormName + " :" + ex.getMessage());
         }
     };
@@ -779,8 +788,9 @@ public class InventoryStockIssuanceConfirmationControllerMonarch_Food implements
                 }
             }
         } catch (SQLException | GuanzonException | CloneNotSupportedException ex) {
-            Logger.getLogger(DeliverySchedule_EntryController.class
-                    .getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(MiscUtil.getException(ex), psFormName, null);
+
             poLogWrapper.severe(psFormName + " :" + ex.getMessage());
         }
     }
@@ -832,8 +842,11 @@ public class InventoryStockIssuanceConfirmationControllerMonarch_Food implements
                 tblColBranch.setCellValueFactory(loModel -> {
                     try {
                         return new SimpleStringProperty(String.valueOf(loModel.getValue().Branch().getBranchName()));
-                    } catch (Exception e) {
-                        poLogWrapper.severe(psFormName, e.getMessage());
+                    } catch (Exception ex) {
+                        Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+                        ShowMessageFX.Error(MiscUtil.getException(ex), psFormName, null);
+
+                        poLogWrapper.severe(psFormName + " :" + ex.getMessage());
                         return new SimpleStringProperty("");
                     }
                 });
@@ -892,7 +905,10 @@ public class InventoryStockIssuanceConfirmationControllerMonarch_Food implements
             }
             cbDeliveryType.getSelectionModel().select(1);
         } catch (SQLException | GuanzonException e) {
-            poLogWrapper.severe(psFormName, e.getMessage());
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(e), e);
+            ShowMessageFX.Error(MiscUtil.getException(e), psFormName, null);
+
+            poLogWrapper.severe(psFormName + " :" + e.getMessage());
         }
     }
 
@@ -1033,7 +1049,10 @@ public class InventoryStockIssuanceConfirmationControllerMonarch_Food implements
                     loButton.setManaged(visible);
                 }
             } catch (IllegalAccessException e) {
-                e.printStackTrace();
+                Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(e), e);
+                ShowMessageFX.Error(MiscUtil.getException(e), psFormName, null);
+
+                poLogWrapper.severe(psFormName + " :" + e.getMessage());
                 poLogWrapper.severe(psFormName + " :" + e.getMessage());
             }
         }
@@ -1068,8 +1087,9 @@ public class InventoryStockIssuanceConfirmationControllerMonarch_Food implements
 
                     return new SimpleStringProperty(xserialname);
                 } catch (SQLException | GuanzonException ex) {
-                    Logger.getLogger(InventoryStockIssuance_PostingController.class
-                            .getName()).log(Level.SEVERE, null, ex);
+                    Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+                    ShowMessageFX.Error(MiscUtil.getException(ex), psFormName, null);
+
                     poLogWrapper.severe(psFormName + " :" + ex.getMessage());
                     return new SimpleStringProperty("");
                 }
@@ -1079,7 +1099,11 @@ public class InventoryStockIssuanceConfirmationControllerMonarch_Food implements
                 try {
                     return new SimpleStringProperty(loModel.getValue().Inventory().getBarCode());
                 } catch (SQLException | GuanzonException e) {
-                    poLogWrapper.severe(psFormName, e.getMessage());
+                    Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(e), e);
+                    ShowMessageFX.Error(MiscUtil.getException(e), psFormName, null);
+
+                    poLogWrapper.severe(psFormName + " :" + e.getMessage());
+
                     return new SimpleStringProperty("");
                 }
             });
@@ -1106,7 +1130,11 @@ public class InventoryStockIssuanceConfirmationControllerMonarch_Food implements
                 try {
                     return new SimpleStringProperty(loModel.getValue().Inventory().Variant().getDescription());
                 } catch (SQLException | GuanzonException e) {
-                    poLogWrapper.severe(psFormName, e.getMessage());
+                    Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(e), e);
+                    ShowMessageFX.Error(MiscUtil.getException(e), psFormName, null);
+
+                    poLogWrapper.severe(psFormName + " :" + e.getMessage());
+
                     return new SimpleStringProperty("");
                 }
             });
@@ -1125,7 +1153,11 @@ public class InventoryStockIssuanceConfirmationControllerMonarch_Food implements
                 try {
                     return new SimpleStringProperty(String.valueOf(loModel.getValue().Inventory().getCost()));
                 } catch (SQLException | GuanzonException e) {
-                    poLogWrapper.severe(psFormName, e.getMessage());
+                    Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(e), e);
+                    ShowMessageFX.Error(MiscUtil.getException(e), psFormName, null);
+
+                    poLogWrapper.severe(psFormName + " :" + e.getMessage());
+
                     return new SimpleStringProperty("");
                 }
             });
@@ -1134,7 +1166,11 @@ public class InventoryStockIssuanceConfirmationControllerMonarch_Food implements
                 try {
                     return new SimpleStringProperty(String.valueOf(loModel.getValue().InventoryStockRequest().getQuantity()));
                 } catch (SQLException | GuanzonException e) {
-                    poLogWrapper.severe(psFormName, e.getMessage());
+                    Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(e), e);
+                    ShowMessageFX.Error(MiscUtil.getException(e), psFormName, null);
+
+                    poLogWrapper.severe(psFormName + " :" + e.getMessage());
+
                     return new SimpleStringProperty("");
                 }
             });
@@ -1142,7 +1178,11 @@ public class InventoryStockIssuanceConfirmationControllerMonarch_Food implements
                 try {
                     return new SimpleStringProperty(String.valueOf(loModel.getValue().InventoryStockRequest().getApproved() - loModel.getValue().InventoryStockRequest().getIssued()));
                 } catch (SQLException | GuanzonException e) {
-                    poLogWrapper.severe(psFormName, e.getMessage());
+                    Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(e), e);
+                    ShowMessageFX.Error(MiscUtil.getException(e), psFormName, null);
+
+                    poLogWrapper.severe(psFormName + " :" + e.getMessage());
+
                     return new SimpleStringProperty("");
                 }
             });
@@ -1187,7 +1227,11 @@ public class InventoryStockIssuanceConfirmationControllerMonarch_Food implements
                 try {
                     return new SimpleStringProperty(loModel.getValue().Branch().getBranchName());
                 } catch (SQLException | GuanzonException e) {
-                    poLogWrapper.severe(psFormName, e.getMessage());
+                    Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(e), e);
+                    ShowMessageFX.Error(MiscUtil.getException(e), psFormName, null);
+
+                    poLogWrapper.severe(psFormName + " :" + e.getMessage());
+
                     return new SimpleStringProperty("");
                 }
             });
@@ -1198,7 +1242,11 @@ public class InventoryStockIssuanceConfirmationControllerMonarch_Food implements
                             loModel.getValue().InventoryTransfer().getMaster().getTransactionDate(), SQLUtil.FORMAT_LONG_DATE));
 
                 } catch (SQLException | GuanzonException | CloneNotSupportedException e) {
-                    poLogWrapper.severe(psFormName, e.getMessage());
+                    Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(e), e);
+                    ShowMessageFX.Error(MiscUtil.getException(e), psFormName, null);
+
+                    poLogWrapper.severe(psFormName + " :" + e.getMessage());
+
                     return new SimpleStringProperty("");
                 }
             });
@@ -1210,7 +1258,11 @@ public class InventoryStockIssuanceConfirmationControllerMonarch_Food implements
                             InventoryStockIssuanceStatus.STATUS.get(
                                     Integer.parseInt(loModel.getValue().InventoryTransfer().getMaster().getTransactionStatus())));
                 } catch (SQLException | GuanzonException | CloneNotSupportedException e) {
-                    poLogWrapper.severe(psFormName, e.getMessage());
+                    Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(e), e);
+                    ShowMessageFX.Error(MiscUtil.getException(e), psFormName, null);
+
+                    poLogWrapper.severe(psFormName + " :" + e.getMessage());
+
                     return new SimpleStringProperty("");
                 }
             });
