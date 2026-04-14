@@ -90,7 +90,7 @@ public class PurchaseOrder_HistoryMonarchFoodController implements Initializable
     @FXML
     private AnchorPane AnchorMain;
     @FXML
-    private Button btnBrowse, btnPrint, btnTransHistory, btnClose;
+    private Button btnBrowse, btnPrint, btnTransHistory, btnClose,btnHistApproval;
     @FXML
     private Label lblTransactionStatus, lblSource;
     @FXML
@@ -258,7 +258,7 @@ public class PurchaseOrder_HistoryMonarchFoodController implements Initializable
 
     private void initButtonsClickActions() {
         List<Button> buttons = Arrays.asList(
-                btnPrint, btnTransHistory, btnClose, btnBrowse);
+                btnPrint, btnTransHistory, btnClose, btnBrowse,btnHistApproval);
         buttons.forEach(button -> button.setOnAction(this::handleButtonAction));
     }
 
@@ -314,12 +314,21 @@ public class PurchaseOrder_HistoryMonarchFoodController implements Initializable
                         }
                     }
                     break;
+                case "btnHistApproval":
+                    if (pnEditMode != EditMode.READY && pnEditMode != EditMode.UPDATE) {
+                        ShowMessageFX.Warning("No Approval history to load!", psFormName, null);
+                        return;
+                    }
+                    poPurchasingController.PurchaseOrder().ShowApprovalHistory();
+                    break;
                 default:
                     ShowMessageFX.Warning("Please contact admin to assist about no button available", psFormName, null);
                     break;
             }
             initButtons(pnEditMode);
         } catch (CloneNotSupportedException | SQLException | GuanzonException ex) {
+            Logger.getLogger(PurchaseOrder_HistoryMonarchFoodController.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (Exception ex) {
             Logger.getLogger(PurchaseOrder_HistoryMonarchFoodController.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
@@ -406,6 +415,8 @@ public class PurchaseOrder_HistoryMonarchFoodController implements Initializable
         btnPrint.setManaged(false);
         btnTransHistory.setVisible(fnEditMode != EditMode.UNKNOWN);
         btnTransHistory.setManaged(fnEditMode != EditMode.UNKNOWN);
+        btnHistApproval.setVisible(fnEditMode == EditMode.READY);
+        btnHistApproval.setManaged(fnEditMode == EditMode.READY);
         if (poPurchasingController.PurchaseOrder().Master().getPrint().equals("1")) {
             btnPrint.setText("Reprint");
         } else {

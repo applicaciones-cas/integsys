@@ -1300,6 +1300,7 @@ public class PurchaseOrder_EntryAppliancesController implements Initializable, S
                                         approved = false;
                                         return;
                                     }
+                                    poPurchasingController.PurchaseOrder().setApproving((String) poJSON.get("sUserIDxx"));
                                 }
                             }
                         } else {

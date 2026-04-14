@@ -1136,6 +1136,7 @@ public class PurchaseOrder_EntryLPController implements Initializable, ScreenInt
                                         approved = false;
                                         return;
                                     }
+                                    poPurchasingController.PurchaseOrder().setApproving((String) poJSON.get("sUserIDxx"));
                                 }
                             }
                         } else {

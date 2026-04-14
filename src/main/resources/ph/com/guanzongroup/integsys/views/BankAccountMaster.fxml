@@ -63,6 +63,11 @@
                                     <FontAwesomeIconView fx:id="faActivate" glyphName="CHECK" size="20" styleClass="FontIcon" />
                                  </graphic>
                               </Button>
+                              <Button fx:id="btnLedger" contentDisplay="TOP" graphicTextGap="3.0" maxHeight="70.0" mnemonicParsing="false" prefHeight="50.0" prefWidth="70.0" styleClass="button_process" stylesheets="@../css/StyleSheet.css" text="Ledger">
+                                 <graphic>
+                                    <FontAwesomeIconView fx:id="faLedger" glyphName="LIST" size="20" styleClass="FontIcon" />
+                                 </graphic>
+                              </Button>
                               <Button fx:id="btnClose" contentDisplay="TOP" graphicTextGap="3.0" maxHeight="70.0" mnemonicParsing="false" prefHeight="50.0" prefWidth="70.0" styleClass="button_process" stylesheets="@../css/StyleSheet.css" text="Close">
                                  <graphic>
                                     <FontAwesomeIconView glyphName="POWER_OFF" size="20" styleClass="FontIcon" />

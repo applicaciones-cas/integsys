@@ -1106,13 +1106,8 @@ public class JFXUtil {
 
         if (node instanceof TextField) {
             TextField tf = (TextField) node;
-            //Skip disabled/non-editable TextFields
-            if (tf.isDisabled() || !tf.isEditable()) {
-                return;
-            }
             tf.focusedProperty().addListener(listener);
         } else if (node instanceof AnchorPane) {
-
             for (Node child : ((AnchorPane) node).getChildren()) {
                 processNodeRecursive(child, listener);
             }

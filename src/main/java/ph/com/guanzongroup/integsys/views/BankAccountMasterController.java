@@ -1,6 +1,7 @@
 package ph.com.guanzongroup.integsys.views;
 
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
+import java.io.IOException;
 import java.net.URL;
 import java.sql.SQLException;
 import java.util.ResourceBundle;
@@ -13,7 +14,11 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
@@ -26,6 +31,9 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 import org.guanzon.appdriver.agent.ShowMessageFX;
 import org.guanzon.appdriver.base.CommonUtils;
 import org.guanzon.appdriver.base.GRider;
@@ -35,6 +43,7 @@ import org.guanzon.appdriver.base.LogWrapper;
 import org.guanzon.appdriver.constant.EditMode;
 import org.guanzon.cas.parameter.services.ParamControllers;
 import org.json.simple.JSONObject;
+import ph.com.guanzongroup.cas.cashflow.BankAccountMaster;
 import ph.com.guanzongroup.cas.cashflow.services.CashflowControllers;
 import ph.com.guanzongroup.integsys.model.ModelResultSet;
 import ph.com.guanzongroup.integsys.utility.JFXUtil;
@@ -45,12 +54,17 @@ public class BankAccountMasterController implements Initializable, ScreenInterfa
     private final String pxeModuleName = "Bank Accounts";
     private int pnEditMode;
     private JSONObject poJSON;
-    private CashflowControllers oCashflow;
+    private BankAccountMaster oCashflow;
     private boolean state = false;
     private boolean pbLoaded = false;
     private int pnInventory = 0;
     private int pnRow = 0;
     private String psActiveField = "";
+    private Stage dialogStage = null;
+    
+    private double xOffset = 0;
+    private double yOffset = 0;
+    
     private ObservableList<ModelResultSet> data = FXCollections.observableArrayList();
     ObservableList<String> AccountType = FXCollections.observableArrayList("Sample 1", "Sample 2");
     ObservableList<String> SlipType = FXCollections.observableArrayList("Payment Slip", "Deposit Slip");
@@ -71,7 +85,8 @@ public class BankAccountMasterController implements Initializable, ScreenInterfa
             btnUpdate,
             btnCancel,
             btnActivate,
-            btnClose;
+            btnClose,
+            btnLedger;
 
     @FXML
     private FontAwesomeIconView faActivate;
@@ -118,36 +133,32 @@ public class BankAccountMasterController implements Initializable, ScreenInterfa
         psCategoryID = fsValue;
     }
 
+
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        try {
-            initializeObject();
-            pnEditMode = oCashflow.BankAccountMaster().getEditMode();
+        initializeObject();
+        pnEditMode = oCashflow.getEditMode();
+        initButton(pnEditMode);
+        InitTextFields();
+        initComboboxes();
+        initCheckBox();
+        ClickButton();
+        initTabAnchor();
+        if (oCashflow.getEditMode() == EditMode.ADDNEW) {
             initButton(pnEditMode);
-            InitTextFields();
-            initComboboxes();
-            initCheckBox();
-            ClickButton();
             initTabAnchor();
-
-            if (oCashflow.BankAccountMaster().getEditMode() == EditMode.ADDNEW) {
-                initButton(pnEditMode);
-                initTabAnchor();
-                loadRecord();
-            }
-            pbLoaded = true;
-        } catch (SQLException | GuanzonException ex) {
-            Logger.getLogger(BankAccountMasterController.class.getName()).log(Level.SEVERE, null, ex);
+            loadRecord();
         }
+        pbLoaded = true;
     }
 
     private void initializeObject() {
         try {
             LogWrapper logwrapr = new LogWrapper("CAS", System.getProperty("sys.default.path.temp") + "cas-error.log");
-            oCashflow = new CashflowControllers(oApp, logwrapr);
-            oCashflow.BankAccountMaster().setRecordStatus("0123");
-            oCashflow.BankAccountMaster().getModel().setIndustryCode(psIndustryID);
-            oCashflow.BankAccountMaster().getModel().setCompanyId(psCompanyID);
+            oCashflow = new CashflowControllers(oApp, logwrapr).BankAccountMaster();
+            oCashflow.setRecordStatus("0123");
+            oCashflow.getModel().setIndustryCode(psIndustryID);
+            oCashflow.getModel().setCompanyId(psCompanyID);
         } catch (SQLException ex) {
             Logger.getLogger(BankAccountMasterController.class.getName()).log(Level.SEVERE, null, ex);
         } catch (GuanzonException ex) {
@@ -163,6 +174,7 @@ public class BankAccountMasterController implements Initializable, ScreenInterfa
         btnCancel.setOnAction(this::handleButtonAction);
         btnActivate.setOnAction(this::handleButtonAction);
         btnClose.setOnAction(this::handleButtonAction);
+        btnLedger.setOnAction(this::handleButtonAction);
     }
     public void initComboboxes() {
         JFXUtil.setComboBoxItems(new JFXUtil.Pairs<>(AccountType, cmbField01), new JFXUtil.Pairs<>(SlipType, cmbField02));
@@ -171,19 +183,15 @@ public class BankAccountMasterController implements Initializable, ScreenInterfa
     }
     EventHandler<ActionEvent> comboBoxActionListener = JFXUtil.CmbActionListener(
             (cmbId, selectedIndex, selectedValue) -> {
-                try {
-                    switch (cmbId) {
-                        case "cmbField01":
-                            oCashflow.BankAccountMaster().getModel().setAccountType(String.valueOf(cmbField01.getSelectionModel().getSelectedIndex()));
-                            break;
-                        case "cmbField02":
-                            if (getSlipType((String) selectedValue) != null) {
-                                oCashflow.BankAccountMaster().getModel().setSlipType(getSlipType((String) selectedValue));
-                            }
-                            break;
-                    }
-                } catch (SQLException | GuanzonException ex) {
-                    Logger.getLogger(BankAccountMasterController.class.getName()).log(Level.SEVERE, null, ex);
+                switch (cmbId) {
+                    case "cmbField01":
+                        oCashflow.getModel().setAccountType(String.valueOf(cmbField01.getSelectionModel().getSelectedIndex()));
+                        break;
+                    case "cmbField02":
+                        if (getSlipType((String) selectedValue) != null) {
+                            oCashflow.getModel().setSlipType(getSlipType((String) selectedValue));
+                        }
+                        break;
                 }
             }
     );
@@ -211,10 +219,10 @@ public class BankAccountMasterController implements Initializable, ScreenInterfa
                     case "btnNew":
                         clearAllFields();
                         txtField02.requestFocus();
-                        poJSON = oCashflow.BankAccountMaster().newRecord();
+                        poJSON = oCashflow.newRecord();
                         pnEditMode = EditMode.READY;
                         if ("success".equals((String) poJSON.get("result"))) {
-                            pnEditMode = oCashflow.BankAccountMaster().getEditMode();
+                            pnEditMode = oCashflow.getEditMode();
                             initButton(pnEditMode);
                             initTabAnchor();
                             loadRecord();
@@ -228,43 +236,43 @@ public class BankAccountMasterController implements Initializable, ScreenInterfa
                         String loValue = "";
                         switch (psActiveField) {
                             case "01":
-                                if (!oCashflow.BankAccountMaster().getModel().getAccountNo().isEmpty() && !txtSeeks01.getText().isEmpty()){
-                                    poJSON = oCashflow.BankAccountMaster().searchRecordbyAccount(oCashflow.BankAccountMaster().getModel().getBankAccountId(),true);
+                                if (!oCashflow.getModel().getAccountNo().isEmpty() && !txtSeeks01.getText().isEmpty()){
+                                    poJSON = oCashflow.searchRecordbyAccount(oCashflow.getModel().getBankAccountId(),true);
                                 }else{
                                     loValue = txtSeeks01.getText();
-                                    poJSON = oCashflow.BankAccountMaster().searchRecordbyAccount(loValue, true);
+                                    poJSON = oCashflow.searchRecordbyAccount(loValue, true);
                                 }
                                 break;
                             case "02":
-                                if (!oCashflow.BankAccountMaster().getModel().getAccountName().isEmpty() && !txtSeeks02.getText().isEmpty()){
-                                    poJSON = oCashflow.BankAccountMaster().searchRecordbyAccount(oCashflow.BankAccountMaster().getModel().getBankAccountId(),true);
+                                if (!oCashflow.getModel().getAccountName().isEmpty() && !txtSeeks02.getText().isEmpty()){
+                                    poJSON = oCashflow.searchRecordbyAccount(oCashflow.getModel().getBankAccountId(),true);
                                 }else{
                                     loValue = txtSeeks02.getText();
-                                    poJSON = oCashflow.BankAccountMaster().searchRecordbyAccount(loValue, false);
+                                    poJSON = oCashflow.searchRecordbyAccount(loValue, false);
                                 }
                                 break;
                             default:
                                 loValue = "";
-                                poJSON = oCashflow.BankAccountMaster().searchRecord(loValue,true);
+                                poJSON = oCashflow.searchRecord(loValue,true);
                                 break;
                         }
                         if ("error".equalsIgnoreCase((String) poJSON.get("result"))) {
                             ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                             return;
                         }
-                        pnEditMode = oCashflow.BankAccountMaster().getEditMode();
+                        pnEditMode = oCashflow.getEditMode();
                         System.out.print("EDIT MODE ON BROWSE 1: " + pnEditMode);
                         initButton(pnEditMode);
                         loadRecord();
                         initTabAnchor();
                         break;
                     case "btnUpdate":
-                        poJSON = oCashflow.BankAccountMaster().updateRecord();
+                        poJSON = oCashflow.updateRecord();
                         if ("error".equals((String) poJSON.get("result"))) {
                             ShowMessageFX.Information((String) poJSON.get("message"), "Computerized Acounting System", pxeModuleName);
                             break;
                         }
-                        pnEditMode = oCashflow.BankAccountMaster().getEditMode();
+                        pnEditMode = oCashflow.getEditMode();
                         initButton(pnEditMode);
                         initTabAnchor();
                         break;
@@ -278,9 +286,9 @@ public class BankAccountMasterController implements Initializable, ScreenInterfa
                         }
                         break;
                     case "btnSave":
-                        oCashflow.BankAccountMaster().getModel().setModifyingId(oApp.getUserID());
-                        oCashflow.BankAccountMaster().getModel().setModifiedDate(oApp.getServerDate());
-                        JSONObject saveResult = oCashflow.BankAccountMaster().saveRecord();
+                        oCashflow.getModel().setModifyingId(oApp.getUserID());
+                        oCashflow.getModel().setModifiedDate(oApp.getServerDate());
+                        JSONObject saveResult = oCashflow.saveRecord();
                         if ("success".equals((String) saveResult.get("result"))) {
                             ShowMessageFX.Information((String) saveResult.get("message"), "Computerized Acounting System", pxeModuleName);
                             pnEditMode = EditMode.UNKNOWN;
@@ -291,19 +299,19 @@ public class BankAccountMasterController implements Initializable, ScreenInterfa
                         }
                         break;
                     case "btnActivate":
-                        String Status = oCashflow.BankAccountMaster().getModel().getRecordStatus();
-                        String id = oCashflow.BankAccountMaster().getModel().getBankAccountId();
+                        String Status = oCashflow.getModel().getRecordStatus();
+                        String id = oCashflow.getModel().getBankAccountId();
                         JSONObject poJsON;
 
                         switch (Status) {
                             case "0":
                                 if (ShowMessageFX.YesNo(null, pxeModuleName, "Do you want to Activate this Parameter?") == true) {
-                                    poJsON = oCashflow.BankAccountMaster().activateRecord();
+                                    poJsON = oCashflow.activateRecord();
                                     if ("error".equals(poJsON.get("result"))) {
                                         ShowMessageFX.Information((String) poJsON.get("message"), "Computerized Accounting System", pxeModuleName);
                                         break;
                                     }
-                                    poJsON = oCashflow.BankAccountMaster().openRecord(id);
+                                    poJsON = oCashflow.openRecord(id);
                                     if ("error".equals(poJsON.get("result"))) {
                                         ShowMessageFX.Information((String) poJsON.get("message"), "Computerized Accounting System", pxeModuleName);
                                         break;
@@ -315,12 +323,12 @@ public class BankAccountMasterController implements Initializable, ScreenInterfa
                                 break;
                             case "1":
                                 if (ShowMessageFX.YesNo(null, pxeModuleName, "Do you want to Deactivate this Parameter?") == true) {
-                                    poJsON = oCashflow.BankAccountMaster().deactivateRecord();
+                                    poJsON = oCashflow.deactivateRecord();
                                     if ("error".equals(poJsON.get("result"))) {
                                         ShowMessageFX.Information((String) poJsON.get("message"), "Computerized Accounting System", pxeModuleName);
                                         break;
                                     }
-                                    poJsON = oCashflow.BankAccountMaster().openRecord(id);
+                                    poJsON = oCashflow.openRecord(id);
                                     if ("error".equals(poJsON.get("result"))) {
                                         ShowMessageFX.Information((String) poJsON.get("message"), "Computerized Accounting System", pxeModuleName);
                                         break;
@@ -336,10 +344,77 @@ public class BankAccountMasterController implements Initializable, ScreenInterfa
 
                         }
                         break;
+                    case "btnLedger":
+                        showLedgerDialog();
+                        break;
                 }
             } catch (SQLException | GuanzonException | CloneNotSupportedException ex) {
                 Logger.getLogger(BankAccountMasterController.class.getName()).log(Level.SEVERE, null, ex);
             }
+        }
+    }
+    public void closeLedgerDialog() {
+        if (dialogStage != null && dialogStage.isShowing()) {
+            dialogStage.close();
+            dialogStage = null;
+        } else {
+        }
+    }
+    public void showLedgerDialog() {
+        poJSON = new JSONObject();
+        try {
+//             Check if the dialog is already open
+            if (dialogStage != null) {
+                if (dialogStage.isShowing()) {
+                    dialogStage.toFront();
+                    return;
+                }
+            }
+            URL fxmlUrl = getClass().getResource("/ph/com/guanzongroup/integsys/views/BankAccountLedger.fxml");
+
+            if (fxmlUrl == null) {
+                System.out.println("FXML NOT FOUND!");
+                return;
+            }
+
+            FXMLLoader loader = new FXMLLoader(fxmlUrl);
+//            FXMLLoader loader = new FXMLLoader(getClass().getResource("/ph/com/guanzongroup/integsys/views/PettyCashLedger.fxml"));
+            BankAccountLedgerController controller = new BankAccountLedgerController();
+            loader.setController(controller);
+
+            if (controller != null) {
+                controller.setGRider(oApp);
+                controller.setObject(oCashflow);
+            }
+
+            Parent root = loader.load();
+
+            // Handle drag events for the undecorated window
+            root.setOnMousePressed(event -> {
+                xOffset = event.getSceneX();
+                yOffset = event.getSceneY();
+            });
+
+            root.setOnMouseDragged(event -> {
+                Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+                stage.setX(event.getScreenX() - xOffset);
+                stage.setY(event.getScreenY() - yOffset);
+            });
+
+            dialogStage = new Stage();
+            dialogStage.initStyle(StageStyle.UNDECORATED);
+            dialogStage.initModality(Modality.APPLICATION_MODAL);
+            dialogStage.setTitle("Cash Fund Ledger");
+            dialogStage.setScene(new Scene(root));
+
+            // Clear the reference when closed
+            dialogStage.setOnHidden(event -> {
+                dialogStage = null;
+            });
+            dialogStage.show();
+
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
@@ -364,25 +439,13 @@ public class BankAccountMasterController implements Initializable, ScreenInterfa
         }
         if ((pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE)) {
             cbField02.setOnAction(event -> {
-                try {
-                    oCashflow.BankAccountMaster().getModel().setMonitor(cbField02.isSelected());
-                } catch (SQLException | GuanzonException ex) {
-                    Logger.getLogger(BankAccountMasterController.class.getName()).log(Level.SEVERE, null, ex);
-                }
+                oCashflow.getModel().setMonitor(cbField02.isSelected());
             });
             cbField03.setOnAction(event -> {
-                try {
-                    oCashflow.BankAccountMaster().getModel().setDefault(cbField03.isSelected());
-                } catch (SQLException | GuanzonException ex) {
-                    Logger.getLogger(BankAccountMasterController.class.getName()).log(Level.SEVERE, null, ex);
-                }
+                oCashflow.getModel().setDefault(cbField03.isSelected());
             });
             cbField04.setOnAction(event -> {
-                try {
-                    oCashflow.BankAccountMaster().getModel().setDefault(cbField04.isSelected());
-                } catch (SQLException | GuanzonException ex) {
-                    Logger.getLogger(BankAccountMasterController.class.getName()).log(Level.SEVERE, null, ex);
-                }
+                oCashflow.getModel().setDefault(cbField04.isSelected());
             });
         }
     }
@@ -400,9 +463,28 @@ public class BankAccountMasterController implements Initializable, ScreenInterfa
         btnBrowse.setManaged(!lbShow);
         btnNew.setVisible(!lbShow);
         btnNew.setManaged(!lbShow);
-
-        btnClose.setVisible(true);
-        btnClose.setManaged(true);
+        btnLedger.setVisible(false);
+        btnLedger.setManaged(false);
+        btnActivate.setVisible(false);
+        btnActivate.setManaged(false);
+        btnClose.setVisible(false);
+        btnClose.setManaged(false);
+        if (fnValue == EditMode.READY) {
+            btnLedger.setVisible(true);
+            btnLedger.setManaged(true);
+            btnActivate.setVisible(true);
+            btnActivate.setManaged(true);
+            btnClose.setVisible(true);
+            btnClose.setManaged(true);
+            btnUpdate.setVisible(true);
+            btnUpdate.setManaged(true);
+        }
+        if(fnValue == EditMode.UNKNOWN){
+            btnClose.setVisible(true);
+            btnClose.setManaged(true);
+            btnUpdate.setVisible(false);
+            btnUpdate.setManaged(false);
+        }
     }
 
     private void InitTextFields() {
@@ -435,24 +517,24 @@ public class BankAccountMasterController implements Initializable, ScreenInterfa
                     switch (lnIndex) {
                         case 01:
                             psActiveField = String.valueOf(lnIndex);
-                            poJson = oCashflow.BankAccountMaster().searchRecordbyAccount(lsValue, true);
+                            poJson = oCashflow.searchRecordbyAccount(lsValue, true);
                             if ("error".equals((String) poJson.get("result"))) {
                                 ShowMessageFX.Information((String) poJson.get("message"), "Computerized Acounting System", pxeModuleName);
                                 txtSeeks01.clear();
                                 break;
                             }
-                            txtSeeks01.setText((String) oCashflow.BankAccountMaster().getModel().getAccountNo());
+                            txtSeeks01.setText((String) oCashflow.getModel().getAccountNo());
                             pnEditMode = EditMode.READY;
                             break;
                         case 02:
                             psActiveField = String.valueOf(lnIndex);
-                            poJson = oCashflow.BankAccountMaster().searchRecordbyAccount(lsValue, false);
+                            poJson = oCashflow.searchRecordbyAccount(lsValue, false);
                             if ("error".equals((String) poJson.get("result"))) {
                                 ShowMessageFX.Information((String) poJson.get("message"), "Computerized Acounting System", pxeModuleName);
                                 txtSeeks02.clear();
                                 break;
                             }
-                            txtSeeks02.setText((String) oCashflow.BankAccountMaster().getModel().getAccountName());
+                            txtSeeks02.setText((String) oCashflow.getModel().getAccountName());
                             pnEditMode = EditMode.READY;
                             break;
                     }
@@ -488,25 +570,25 @@ public class BankAccountMasterController implements Initializable, ScreenInterfa
             try {
                 switch (lnIndex) {
                     case 1:
-                        oCashflow.BankAccountMaster().getModel().setBankAccountId(lsValue);
+                        oCashflow.getModel().setBankAccountId(lsValue);
                         break;
                     case 3:
-                        oCashflow.BankAccountMaster().getModel().setAccountNo(lsValue);
+                        oCashflow.getModel().setAccountNo(lsValue);
                         break;
                     case 4:
-                        oCashflow.BankAccountMaster().getModel().setAccountCode(lsValue);
+                        oCashflow.getModel().setAccountCode(lsValue);
                         break;
                     case 5:
-                        oCashflow.BankAccountMaster().getModel().setAccountName(lsValue);
+                        oCashflow.getModel().setAccountName(lsValue);
                         break;
                     case 7:
-                        oCashflow.BankAccountMaster().getModel().setClearingDays(Integer.parseInt(lsValue));
+                        oCashflow.getModel().setClearingDays(Integer.parseInt(lsValue));
                         break;
                     case 8:
-                        oCashflow.BankAccountMaster().getModel().setSignatoryCount(Integer.parseInt(lsValue));
+                        oCashflow.getModel().setSignatoryCount(Integer.parseInt(lsValue));
                         break;
                     case 9:
-                        oCashflow.BankAccountMaster().getModel().setSerialNo(lsValue);
+                        oCashflow.getModel().setSerialNo(lsValue);
                         break;
                     default:
                         break;
@@ -530,20 +612,20 @@ public class BankAccountMasterController implements Initializable, ScreenInterfa
                 case F3:
                     switch (lnIndex) {
                         case 02:
-                            poJson = oCashflow.BankAccountMaster().SearchBanks(lsValue, false);
+                            poJson = oCashflow.SearchBanks(lsValue, false);
                             if ("error".equalsIgnoreCase(poJson.get("result").toString())) {
                                 ShowMessageFX.Information((String) poJson.get("message"), "Computerized Acounting System", pxeModuleName);
                             }
                             
-                            txtField02.setText((String) oCashflow.BankAccountMaster().getModel().Banks().getBankName());
+                            txtField02.setText((String) oCashflow.getModel().Banks().getBankName());
                             break;
                             
                         case 06:
-                            poJson = oCashflow.BankAccountMaster().SearchBanksBranch(lsValue, false);
+                            poJson = oCashflow.SearchBanksBranch(lsValue, false);
                             if ("error".equalsIgnoreCase(poJson.get("result").toString())) {
                                 ShowMessageFX.Information((String) poJson.get("message"), "Computerized Acounting System", pxeModuleName);
                             }
-                            txtField06.setText(oCashflow.BankAccountMaster().getModel().getBranch());
+                            txtField06.setText(oCashflow.getModel().getBranch());
                             break;
                     }
                 case ENTER:
@@ -563,19 +645,19 @@ public class BankAccountMasterController implements Initializable, ScreenInterfa
     }
     private void loadRecord() {
         try {
-            boolean lbActive = oCashflow.BankAccountMaster().getModel().getRecordStatus() == "1";
+            boolean lbActive = oCashflow.getModel().getRecordStatus() == "1";
 
-            txtField01.setText(oCashflow.BankAccountMaster().getModel().getBankAccountId());
-            txtField02.setText(oCashflow.BankAccountMaster().getModel().Banks().getBankName());
-            txtField03.setText(oCashflow.BankAccountMaster().getModel().getAccountNo());
-            txtField04.setText(oCashflow.BankAccountMaster().getModel().getAccountCode());
-            txtField05.setText(oCashflow.BankAccountMaster().getModel().getAccountName());
-            txtField06.setText(oCashflow.BankAccountMaster().getModel().getBranch());
-            txtField07.setText( String.valueOf(oCashflow.BankAccountMaster().getModel().getClearingDays()));
-            txtField08.setText( String.valueOf(oCashflow.BankAccountMaster().getModel().getSignatoryCount()));
-            txtField09.setText(oCashflow.BankAccountMaster().getModel().getSerialNo());
+            txtField01.setText(oCashflow.getModel().getBankAccountId());
+            txtField02.setText(oCashflow.getModel().Banks().getBankName());
+            txtField03.setText(oCashflow.getModel().getAccountNo());
+            txtField04.setText(oCashflow.getModel().getAccountCode());
+            txtField05.setText(oCashflow.getModel().getAccountName());
+            txtField06.setText(oCashflow.getModel().getBranch());
+            txtField07.setText( String.valueOf(oCashflow.getModel().getClearingDays()));
+            txtField08.setText( String.valueOf(oCashflow.getModel().getSignatoryCount()));
+            txtField09.setText(oCashflow.getModel().getSerialNo());
 
-            switch (oCashflow.BankAccountMaster().getModel().getRecordStatus()) {
+            switch (oCashflow.getModel().getRecordStatus()) {
                 case "0":
                     btnActivate.setText("Deactivate");
                     faActivate.setGlyphName("CLOSE");
@@ -587,7 +669,7 @@ public class BankAccountMasterController implements Initializable, ScreenInterfa
                     cbField01.setSelected(true);
                     break;
             }
-            switch (oCashflow.BankAccountMaster().getModel().getAccountType()) {
+            switch (oCashflow.getModel().getAccountType()) {
                 case "0":
                     cmbField01.getSelectionModel().select(0);
                     break;
@@ -596,7 +678,7 @@ public class BankAccountMasterController implements Initializable, ScreenInterfa
                     break;
             }
             
-            switch (oCashflow.BankAccountMaster().getModel().getSlipType()) {
+            switch (oCashflow.getModel().getSlipType()) {
                 case "PS":
                     cmbField02.getSelectionModel().select(0);
                     break;
@@ -605,9 +687,9 @@ public class BankAccountMasterController implements Initializable, ScreenInterfa
                     break;
             }
             
-             cbField02.setSelected(oCashflow.BankAccountMaster().getModel().isMonitor());
-             cbField03.setSelected(oCashflow.BankAccountMaster().getModel().isDefault());
-             cbField04.setSelected(oCashflow.BankAccountMaster().getModel().isBankPrinting());
+             cbField02.setSelected(oCashflow.getModel().isMonitor());
+             cbField03.setSelected(oCashflow.getModel().isDefault());
+             cbField04.setSelected(oCashflow.getModel().isBankPrinting());
             
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(BankAccountMasterController.class.getName()).log(Level.SEVERE, null, ex);
@@ -617,21 +699,9 @@ public class BankAccountMasterController implements Initializable, ScreenInterfa
     @FXML
     void cbField01_Clicked(MouseEvent event) {
         if (cbField01.isSelected()) {
-            try {
-                oCashflow.BankAccountMaster().getModel().setRecordStatus("1");
-            } catch (SQLException ex) {
-                Logger.getLogger(BankAccountMasterController.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (GuanzonException ex) {
-                Logger.getLogger(BankAccountMasterController.class.getName()).log(Level.SEVERE, null, ex);
-            }
+            oCashflow.getModel().setRecordStatus("1");
         } else {
-            try {
-                oCashflow.BankAccountMaster().getModel().setRecordStatus("0");
-            } catch (SQLException ex) {
-                Logger.getLogger(BankAccountMasterController.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (GuanzonException ex) {
-                Logger.getLogger(BankAccountMasterController.class.getName()).log(Level.SEVERE, null, ex);
-            }
+            oCashflow.getModel().setRecordStatus("0");
         }
     }
 

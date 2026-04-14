@@ -323,27 +323,54 @@ public class UserManagement_Controller implements Initializable, ScreenInterface
                         }
                     }
                         break;
-                    case "btnEyeIcon":
-                        if(pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE){
-                            btnEyeIcon.setDisable(false);
-                            FontAwesomeIconView eyeIcon = new FontAwesomeIconView(FontAwesomeIcon.EYE);
+                        case "btnEyeIcon":
+                        if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
+
+                            FontAwesomeIconView eyeIcon = new FontAwesomeIconView();
+
                             if (pfPassword.isVisible()) {
-                                tfPassword.setText(pfPassword.getText());
+                                // SHOW password
                                 pfPassword.setVisible(false);
+                                pfPassword.setManaged(false);
+
                                 tfPassword.setVisible(true);
+                                tfPassword.setManaged(true);
+
                                 eyeIcon.setIcon(FontAwesomeIcon.EYE);
-                                eyeIcon.setStyle("-fx-fill: gray; -glyph-size: 20; ");
-                                btnEyeIcon.setGraphic(eyeIcon);
                             } else {
-                                pfPassword.setText(tfPassword.getText());
+                                // HIDE password
                                 tfPassword.setVisible(false);
+                                tfPassword.setManaged(false);
+
                                 pfPassword.setVisible(true);
+                                pfPassword.setManaged(true);
+
                                 eyeIcon.setIcon(FontAwesomeIcon.EYE_SLASH);
-                                eyeIcon.setStyle("-fx-fill: gray; -glyph-size: 20; ");
-                                btnEyeIcon.setGraphic(eyeIcon);
                             }
+
+                            eyeIcon.setStyle("-fx-fill: gray; -glyph-size: 20;");
+                            btnEyeIcon.setGraphic(eyeIcon);
                         }
-                break;
+                        break;
+//                    case "btnEyeIcon":
+//                        if(pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE){
+//                            btnEyeIcon.setDisable(false);
+//                            FontAwesomeIconView eyeIcon = new FontAwesomeIconView(FontAwesomeIcon.EYE);
+//                            if (pfPassword.isVisible()) {
+//                                pfPassword.setVisible(false);
+//                                tfPassword.setVisible(true);
+//                                eyeIcon.setIcon(FontAwesomeIcon.EYE);
+//                                eyeIcon.setStyle("-fx-fill: gray; -glyph-size: 20; ");
+//                                btnEyeIcon.setGraphic(eyeIcon);
+//                            } else {
+//                                tfPassword.setVisible(false);
+//                                pfPassword.setVisible(true);
+//                                eyeIcon.setIcon(FontAwesomeIcon.EYE_SLASH);
+//                                eyeIcon.setStyle("-fx-fill: gray; -glyph-size: 20; ");
+//                                btnEyeIcon.setGraphic(eyeIcon);
+//                            }
+//                        }
+//                break;
                         
                     case "btnStatus":
                         String userID = poSysUser.getModel().getUserId();
@@ -382,7 +409,7 @@ public class UserManagement_Controller implements Initializable, ScreenInterface
                             ShowMessageFX.Warning((String) poJSON.get("message"), pxeModuleName, null);
                             return;
                         }
-                        ShowMessageFX.Warning((String) poJSON.get("message"), pxeModuleName, null);
+                        ShowMessageFX.Information((String) poJSON.get("message"), pxeModuleName, null);
                         clearTextFields();
                         
                         Platform.runLater(() -> btnNew.fire());
@@ -418,16 +445,26 @@ public class UserManagement_Controller implements Initializable, ScreenInterface
                             poJSON = poSysUser.searchRecord(lsValue, false);
                             if("error".equals(poJSON.get("result"))){
                                 ShowMessageFX.Warning((String)poJSON.get("message"), lsValue, lsValue);
+                                return;
                             }
-                            tfSearchEmployeeName.setText(poSysUser.getModel().getUserName());
+                            loadRecordMaster();
+                            pnEditMode = poSysUser.getEditMode();
+                            initButton(pnEditMode);
+                            tfSearchLogInName.clear();
+                            tfSearchEmployeeName.clear();
                             return;
                         case "tfSearchLogInName":
                             psActiveField = lsID;
                             poJSON = poSysUser.searchRecord(lsValue, false); //replace this line with  >> searchRecordByEmployee("employee name"); <<
                             if("error".equals(poJSON.get("result"))){
                                 ShowMessageFX.Warning((String)poJSON.get("message"), lsValue, lsValue);
+                                return;
                             }
-                            tfSearchLogInName.setText(poSysUser.getModel().getLogName());
+                            loadRecordMaster();
+                            pnEditMode = poSysUser.getEditMode();
+                            initButton(pnEditMode);
+                            tfSearchLogInName.clear();
+                            tfSearchEmployeeName.clear();
                             return;
                         case "tfEmployeeName":
                             poJSON = poSysUser.searchEmployee(lsValue, false);
@@ -455,15 +492,24 @@ public class UserManagement_Controller implements Initializable, ScreenInterface
                     case "tfPassword":
                         poSysUser.getModel().setPassword(lsValue);
                         break;
-//                    case "tfEmployeeName":
-//                        break;
                     case "tfProduct":
                         tfProduct.setText(poSysUser.getModel().getProductId());
                         break;
                 }
                 psActiveField = "";
             });
-
+    private void bindPasswordField(PasswordField pf, String fieldName) {
+        pf.focusedProperty().addListener((obs, oldVal, newVal) -> {
+            if (!newVal) { // lost focus
+                switch (fieldName) {
+                    case "pfPassword":
+                        poSysUser.getModel().setPassword(pf.getText());
+                        break;
+                }
+            }
+        });
+    }
+ 
     ChangeListener<Boolean> txtField_Focus = JFXUtil.FocusListener(TextField.class,
             (lsID, lsValue) -> {
                 /* Lost Focus */
@@ -478,6 +524,7 @@ public class UserManagement_Controller implements Initializable, ScreenInterface
             });
 
     public void initTextFields() {
+        bindPasswordField(pfPassword, "pfPassword");
         JFXUtil.setFocusListener(txtMaster_Focus, tfLogInName, tfPassword,pfPassword, tfEmployeeName, tfProduct);
         JFXUtil.setFocusListener(txtField_Focus, tfSearchEmployeeName, tfSearchLogInName);
         JFXUtil.setKeyPressedListener(this::txtField_KeyPressed, apBrowse, apMaster);
@@ -627,7 +674,7 @@ public class UserManagement_Controller implements Initializable, ScreenInterface
         if(fnValue == EditMode.ADDNEW || fnValue == EditMode.UPDATE) btnEyeIcon.setDisable(false);
         if (lbShow3) {
             FontAwesomeIconView eyeIcon = new FontAwesomeIconView(FontAwesomeIcon.EYE);
-            pfPassword.setText(tfPassword.getText());
+           
             tfPassword.setVisible(false);
             pfPassword.setVisible(true);
             eyeIcon.setIcon(FontAwesomeIcon.EYE_SLASH);
