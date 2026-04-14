@@ -95,6 +95,14 @@
                                                 <Blend />
                                             </effect>
                                         </Button>
+                              <Button fx:id="btnHistApproval" contentDisplay="TOP" ellipsisString="" mnemonicParsing="false" prefHeight="70.0" prefWidth="70.0" styleClass="button_process" stylesheets="@../css/StyleSheet.css" text="Approvals">
+                                 <effect>
+                                    <Blend />
+                                 </effect>
+                                 <graphic>
+                                    <FontAwesomeIconView glyphName="THUMBS_ALT_UP" size="20" />
+                                 </graphic>
+                              </Button>
                                         <Button fx:id="btnTransHistory" contentDisplay="TOP" ellipsisString="" mnemonicParsing="false" prefHeight="70.0" prefWidth="70.0" styleClass="button_process" stylesheets="@../css/StyleSheet.css" text="History">
                                             <effect>
                                                 <Blend />
