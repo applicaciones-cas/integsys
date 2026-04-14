@@ -409,7 +409,7 @@ public class UserManagement_Controller implements Initializable, ScreenInterface
                             ShowMessageFX.Warning((String) poJSON.get("message"), pxeModuleName, null);
                             return;
                         }
-                        ShowMessageFX.Warning((String) poJSON.get("message"), pxeModuleName, null);
+                        ShowMessageFX.Information((String) poJSON.get("message"), pxeModuleName, null);
                         clearTextFields();
                         
                         Platform.runLater(() -> btnNew.fire());
@@ -445,16 +445,26 @@ public class UserManagement_Controller implements Initializable, ScreenInterface
                             poJSON = poSysUser.searchRecord(lsValue, false);
                             if("error".equals(poJSON.get("result"))){
                                 ShowMessageFX.Warning((String)poJSON.get("message"), lsValue, lsValue);
+                                return;
                             }
-                            tfSearchEmployeeName.setText(poSysUser.getModel().getUserName());
+                            loadRecordMaster();
+                            pnEditMode = poSysUser.getEditMode();
+                            initButton(pnEditMode);
+                            tfSearchLogInName.clear();
+                            tfSearchEmployeeName.clear();
                             return;
                         case "tfSearchLogInName":
                             psActiveField = lsID;
                             poJSON = poSysUser.searchRecord(lsValue, false); //replace this line with  >> searchRecordByEmployee("employee name"); <<
                             if("error".equals(poJSON.get("result"))){
                                 ShowMessageFX.Warning((String)poJSON.get("message"), lsValue, lsValue);
+                                return;
                             }
-                            tfSearchLogInName.setText(poSysUser.getModel().getLogName());
+                            loadRecordMaster();
+                            pnEditMode = poSysUser.getEditMode();
+                            initButton(pnEditMode);
+                            tfSearchLogInName.clear();
+                            tfSearchEmployeeName.clear();
                             return;
                         case "tfEmployeeName":
                             poJSON = poSysUser.searchEmployee(lsValue, false);
