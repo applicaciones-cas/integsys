@@ -231,7 +231,7 @@ public class DisbursementVoucher_ApprovalController implements Initializable, Sc
                 poController.setCompanyID(psCompanyId);
                 poController.setCategoryID(psCategoryId);
                 poController.Master().setBranchCode(oApp.getBranchCode());
-                poController.setTransactionStatus(DisbursementStatic.VERIFIED + DisbursementStatic.RETURNED);
+                poController.setTransactionStatus(DisbursementStatic.VERIFIED + DisbursementStatic.RETURNED_I);
                 loadRecordSearch();
             });
             initAttachmentPreviewPane();
@@ -747,7 +747,7 @@ public class DisbursementVoucher_ApprovalController implements Initializable, Sc
                                                 poController.getMaster(lnCtr).getVoucherNo(),
                                                 poController.getMaster(lnCtr).getTransactionNo()
                                         ));
-                                        if (poController.getMaster(lnCtr).getTransactionStatus().equals(DisbursementStatic.RETURNED)) {
+                                        if (poController.getMaster(lnCtr).getTransactionStatus().equals(DisbursementStatic.RETURNED_I)) {
                                             JFXUtil.highlightByKey(tblViewMainList, String.valueOf(lnRowNo), "#FAA0A0", highlightedRowsMain);
                                         }
                                         if (poController.getMaster(lnCtr).getTransactionStatus().equals(DisbursementStatic.APPROVED)) {
@@ -2679,6 +2679,7 @@ public class DisbursementVoucher_ApprovalController implements Initializable, Sc
                 case DisbursementStatic.OPEN:
                 case DisbursementStatic.CONFIRMED:
                 case DisbursementStatic.VERIFIED:
+                case DisbursementStatic.RETURNED_I:
                     JFXUtil.setButtonsVisibility(true, btnUpdate, btnApprove, btnDisapprove);
                     break;
                 case DisbursementStatic.APPROVED:
@@ -2689,8 +2690,7 @@ public class DisbursementVoucher_ApprovalController implements Initializable, Sc
                     JFXUtil.setButtonsVisibility(false, btnApprove, btnDisapprove, btnUpdate, btnReturn);
                     break;
                 case DisbursementStatic.RETURNED:
-                    JFXUtil.setButtonsVisibility(false, btnReturn);
-                    JFXUtil.setButtonsVisibility(true, btnUpdate, btnApprove, btnDisapprove);
+                    JFXUtil.setButtonsVisibility(false, btnReturn,btnUpdate, btnApprove, btnDisapprove);
                     break;
                 case DisbursementStatic.VOID:
                 case DisbursementStatic.CANCELLED:
