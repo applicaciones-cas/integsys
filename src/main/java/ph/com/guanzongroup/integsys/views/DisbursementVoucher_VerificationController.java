@@ -379,6 +379,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
                         poJSON.put("result", "error");
                         poJSON.put("message", "User is not an authorized officer.");
                         ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                        return;
                     }
                     //Recheck transaction status
                     poJSON = poController.checkUpdateTransaction(false);

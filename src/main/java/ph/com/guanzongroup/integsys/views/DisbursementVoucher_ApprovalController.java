@@ -383,6 +383,7 @@ public class DisbursementVoucher_ApprovalController implements Initializable, Sc
                         poJSON.put("result", "error");
                         poJSON.put("message", "User is not an authorized officer.");
                         ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                        return;
                     }
                     //Recheck transaction status
                     poJSON = poController.checkUpdateTransaction(false);
@@ -2676,13 +2677,13 @@ public class DisbursementVoucher_ApprovalController implements Initializable, Sc
                     break;
                 case DisbursementStatic.APPROVED:
                     JFXUtil.setButtonsVisibility(false, btnUpdate, btnApprove, btnDisapprove);
+                    JFXUtil.setButtonsVisibility(true, btnReturn);
                     break;
                 case DisbursementStatic.DISAPPROVED:
                     JFXUtil.setButtonsVisibility(false, btnApprove, btnDisapprove, btnUpdate, btnReturn);
                     break;
                 case DisbursementStatic.RETURNED:
-                    JFXUtil.setButtonsVisibility(true, btnUpdate, btnApprove, btnDisapprove, btnReturn);
-                    JFXUtil.setButtonsVisibility(false, btnReturn);
+                    JFXUtil.setButtonsVisibility(false, btnUpdate, btnApprove, btnDisapprove, btnReturn);
                     break;
                 case DisbursementStatic.VOID:
                 case DisbursementStatic.CANCELLED:
