@@ -2689,7 +2689,8 @@ public class DisbursementVoucher_ApprovalController implements Initializable, Sc
                     JFXUtil.setButtonsVisibility(false, btnApprove, btnDisapprove, btnUpdate, btnReturn);
                     break;
                 case DisbursementStatic.RETURNED:
-                    JFXUtil.setButtonsVisibility(false, btnUpdate, btnApprove, btnDisapprove, btnReturn);
+                    JFXUtil.setButtonsVisibility(false, btnReturn);
+                    JFXUtil.setButtonsVisibility(true, btnUpdate, btnApprove, btnDisapprove);
                     break;
                 case DisbursementStatic.VOID:
                 case DisbursementStatic.CANCELLED:

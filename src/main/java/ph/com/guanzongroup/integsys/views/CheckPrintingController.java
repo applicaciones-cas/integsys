@@ -99,7 +99,7 @@ public class CheckPrintingController implements Initializable, ScreenInterface {
     @FXML
     private DatePicker dpDVDateFrom, dpDVDateTo;
     @FXML
-    private Button btnAssign, btnRetrieve, btnPrintDV, btnPrintCheck, btnClose;
+    private Button btnAssign, btnRetrieve, btnPrintDV, btnPrintCheck, btnClose, btnPrintPaymentSummary;
     @FXML
     private TableView tblViewMainList;
     @FXML
@@ -253,7 +253,7 @@ public class CheckPrintingController implements Initializable, ScreenInterface {
     }
 
     private void initButtonsClickActions() {
-        List<Button> buttons = Arrays.asList(btnAssign, btnRetrieve, btnClose, btnPrintCheck, btnPrintDV);
+        List<Button> buttons = Arrays.asList(btnAssign, btnRetrieve, btnClose, btnPrintCheck, btnPrintDV, btnPrintPaymentSummary);
         buttons.forEach(button -> button.setOnAction(this::cmdButton_Click));
     }
 
@@ -269,6 +269,9 @@ public class CheckPrintingController implements Initializable, ScreenInterface {
                 break;
             case "btnPrintDV":
                 handleDisbursementAction("print dv");
+                break;
+            case "btnPrintPaymentSummary":
+                handleDisbursementAction("print payment summary");
                 break;
             case "btnRetrieve":
                 retrieveDisbursement();
@@ -345,6 +348,15 @@ public class CheckPrintingController implements Initializable, ScreenInterface {
                 case "print dv":
                     if (!checkedItems.isEmpty()) {
                         poJSON = poController.printTransaction(checkedItems);
+                        chckSelectAll.setSelected(false);
+                        checkedItem.clear();
+                    }
+                    retrieveDisbursement();
+                    loadTableMain.reload();
+                    break;
+                case "print payment summary":
+                    if (!checkedItems.isEmpty()) {
+                        poJSON = poController.printTransactionPaymentSummary(checkedItems);
                         chckSelectAll.setSelected(false);
                         checkedItem.clear();
                     }
@@ -614,7 +626,7 @@ public class CheckPrintingController implements Initializable, ScreenInterface {
     }
 
     private void initButtons() {
-        JFXUtil.setButtonsVisibility(!main_data.isEmpty(), btnAssign, btnPrintCheck, btnPrintDV);
+        JFXUtil.setButtonsVisibility(!main_data.isEmpty(), btnAssign, btnPrintCheck, btnPrintDV, btnPrintPaymentSummary);
         disableRowCheckbox.set(main_data.isEmpty()); // set enable/disable in checkboxes in requirements
         JFXUtil.setDisabled(main_data.isEmpty(), chckSelectAll);
     }
