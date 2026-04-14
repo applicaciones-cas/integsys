@@ -925,7 +925,7 @@ public class DisbursementVoucher_ApprovalController implements Initializable, Sc
                         int lnCtr;
                         try {
                             if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
-                                poController.ReloadWTDeductions();
+//                                poController.ReloadWTDeductions();
                             }
                             int lnRowCount = 0;
                             for (lnCtr = 0; lnCtr < poController.getWTaxDeductionsCount(); lnCtr++) {
