@@ -429,13 +429,19 @@ public class DisbursementVoucher_ApprovalController implements Initializable, Sc
                         }
                     }
 
-                    if (!DisbursementStatic.OPEN.equals(poController.Master().getTransactionStatus())) {
-                        poJSON = poController.callApproval();
-                        if (!"success".equals((String) poJSON.get("result"))) {
-                            ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message")); // check this for encoder or and higher
-                            return;
-                        }
+//                    if (!DisbursementStatic.OPEN.equals(poController.Master().getTransactionStatus())) {
+                    poJSON = poController.callApproval();
+                    if (!"success".equals((String) poJSON.get("result"))) {
+                        ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message")); // check this for encoder or and higher
+                        return;
                     }
+                    lsUserId = oApp.getUserID();
+                    lsPosition = poController.checkPosition(poController.Master().getTransactionStatus(), lsUserId);
+                    if (lsPosition == null || "".equals(lsPosition)) {
+                        ShowMessageFX.Warning(null, pxeModuleName, "User is not an authorized officer.");
+                        return;
+                    }
+//                    }
 
                     poJSON = poController.SaveTransaction();
                     if (!"success".equals((String) poJSON.get("result"))) {
@@ -2657,7 +2663,7 @@ public class DisbursementVoucher_ApprovalController implements Initializable, Sc
         boolean lbShow2 = (fnEditMode == EditMode.READY);
         JFXUtil.setButtonsVisibility(!lbShow, btnClose);
         JFXUtil.setButtonsVisibility(lbShow, btnSave, btnCancel);
-        JFXUtil.setButtonsVisibility(false, btnUpdate, btnDisapprove);
+        JFXUtil.setButtonsVisibility(false, btnUpdate, btnDisapprove, btnReturn);
         JFXUtil.setButtonsVisibility(lbShow2, btnApprove);
         JFXUtil.setButtonsVisibility(fnEditMode == EditMode.READY, btnHistory);
 
@@ -2673,7 +2679,7 @@ public class DisbursementVoucher_ApprovalController implements Initializable, Sc
                 case DisbursementStatic.OPEN:
                 case DisbursementStatic.CONFIRMED:
                 case DisbursementStatic.VERIFIED:
-                    JFXUtil.setButtonsVisibility(true, btnUpdate, btnApprove, btnDisapprove, btnReturn);
+                    JFXUtil.setButtonsVisibility(true, btnUpdate, btnApprove, btnDisapprove);
                     break;
                 case DisbursementStatic.APPROVED:
                     JFXUtil.setButtonsVisibility(false, btnUpdate, btnApprove, btnDisapprove);
