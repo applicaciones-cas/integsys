@@ -68,6 +68,7 @@ import org.guanzon.appdriver.constant.RecordStatus;
 import org.json.simple.JSONObject;
 import ph.com.guanzongroup.cas.cashflow.DisbursementVoucher;
 import ph.com.guanzongroup.cas.cashflow.services.CashflowControllers;
+import ph.com.guanzongroup.cas.cashflow.status.CheckStatus;
 import ph.com.guanzongroup.cas.cashflow.status.DisbursementStatic;
 import ph.com.guanzongroup.cas.cashflow.status.JournalStatus;
 import ph.com.guanzongroup.cas.cashflow.status.OtherPaymentStatus;
@@ -123,7 +124,7 @@ public class DisbursementVoucher_HistoryController implements Initializable, Scr
     @FXML
     private TextField tfSearchTransaction, tfSearchSupplier, tfDVTransactionNo, tfSupplier, tfVoucherNo, tfBankNameCheck, tfBankAccountCheck, tfPayeeName, tfCheckNo, tfCheckAmount, tfAuthorizedPerson, tfBankNameBTransfer, tfBankAccountBTransfer, tfPaymentAmountBTransfer, tfSupplierBank, tfSupplierAccountNoBTransfer, tfBankTransReferNo, tfPaymentStatusBTransfer, tfBankNameOnlinePayment, tfBankAccountOnlinePayment, tfPaymentAmount, tfSupplierServiceName, tfSupplierAccountNo, tfPaymentReferenceNo, tfOnlinePaymentStatus, tfTotalAmount, tfVatableSales, tfVatAmountMaster, tfVatZeroRatedSales, tfVatExemptSales, tfLessWHTax, tfTotalNetAmount, tfAdvances, tfRefNoDetail, tfVatableSalesDetail, tfVatExemptDetail, tfVatZeroRatedSalesDetail, tfVatRateDetail, tfVatAmountDetail, tfPurchasedAmountDetail, tfNetAmountDetail, tfAdvancesDetail, tfJournalTransactionNo, tfTotalDebitAmount, tfTotalCreditAmount, tfAccountCode, tfAccountDescription, tfDebitAmount, tfCreditAmount, tfBIRTransactionNo, tfTaxCode, tfParticular, tfBaseAmount, tfTaxRate, tfTotalTaxAmount, tfAttachmentNo, tfAttachmentSource;
     @FXML
-    private Button btnBrowse, btnHistory, btnPrint, btnClose, btnArrowLeft, btnArrowRight, btnPrintPaymentSummary;
+    private Button btnBrowse, btnHistory, btnPrint, btnClose, btnArrowLeft, btnArrowRight, btnPrintPaymentSummary, btnPrintCheck;
     @FXML
     private TabPane tabPaneMain, tabPanePaymentMode;
     @FXML
@@ -332,7 +333,7 @@ public class DisbursementVoucher_HistoryController implements Initializable, Scr
     }
 
     private void initButtonsClickActions() {
-        List<Button> buttons = Arrays.asList(btnBrowse, btnPrint, btnPrintPaymentSummary, btnHistory, btnClose, btnArrowRight, btnArrowLeft);
+        List<Button> buttons = Arrays.asList(btnBrowse, btnPrint, btnPrintCheck, btnPrintPaymentSummary, btnHistory, btnClose, btnArrowRight, btnArrowLeft);
         buttons.forEach(button -> button.setOnAction(this::cmdButton_Click));
     }
 
@@ -367,6 +368,14 @@ public class DisbursementVoucher_HistoryController implements Initializable, Scr
                     ArrayList<String> checkedItems2 = new ArrayList<>();
                     checkedItems2.add(poController.Master().getTransactionNo());
                     poJSON = poController.printTransactionPaymentSummary(checkedItems2);
+                    if ("error".equals((String) poJSON.get("result"))) {
+                        ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                    }
+                    break;
+                case "btnPrintCheck":
+                    ArrayList<String> checkedItems3 = new ArrayList<>();
+                    checkedItems3.add(poController.Master().getTransactionNo());
+                    poJSON = poController.PrintCheck(checkedItems3);
                     if ("error".equals((String) poJSON.get("result"))) {
                         ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                     }
@@ -1269,11 +1278,22 @@ public class DisbursementVoucher_HistoryController implements Initializable, Scr
     }
 
     private void initButton(int fnEditMode) {
-        JFXUtil.setButtonsVisibility(true, btnBrowse, btnClose);
-        JFXUtil.setButtonsVisibility(fnEditMode == EditMode.READY, btnHistory);
-        JFXUtil.setButtonsVisibility(fnEditMode == EditMode.READY, btnPrint, btnPrintPaymentSummary);
-        JFXUtil.setDisabled(true, apDVMaster1, apDVMaster2, apDVMaster3, apDVDetail,
-                apMasterDVCheck, apMasterDVBTransfer, apMasterDVOp, apJournalMaster, apJournalDetails, apBIRDetail);
+        try {
+            JFXUtil.setButtonsVisibility(true, btnBrowse, btnClose);
+            JFXUtil.setButtonsVisibility(fnEditMode == EditMode.READY, btnHistory);
+            JFXUtil.setButtonsVisibility(fnEditMode == EditMode.READY, btnPrint, btnPrintPaymentSummary, btnPrintCheck);
+            JFXUtil.setDisabled(true, apDVMaster1, apDVMaster2, apDVMaster3, apDVDetail,
+                    apMasterDVCheck, apMasterDVBTransfer, apMasterDVOp, apJournalMaster, apJournalDetails, apBIRDetail);
+
+            if (fnEditMode != EditMode.READY) {
+                return;
+            }
+            if (!CheckStatus.PrintStatus.PRINTED.equals(poController.Master().CheckPayments().getPrint())) {
+                JFXUtil.setButtonsVisibility(false, btnPrint, btnPrintPaymentSummary, btnPrintCheck);
+            }
+        } catch (SQLException | GuanzonException ex) {
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     private void clearTextFields() {
