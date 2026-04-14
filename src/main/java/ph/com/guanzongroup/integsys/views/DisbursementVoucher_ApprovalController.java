@@ -2670,30 +2670,24 @@ public class DisbursementVoucher_ApprovalController implements Initializable, Sc
         if (fnEditMode == EditMode.READY) {
             switch (poController.Master().getTransactionStatus()) {
                 case DisbursementStatic.OPEN:
-                    JFXUtil.setButtonsVisibility(true, btnUpdate, btnDisapprove);
-                    break;
                 case DisbursementStatic.CONFIRMED:
-                    JFXUtil.setButtonsVisibility(true, btnUpdate, btnDisapprove);
-                    break;
                 case DisbursementStatic.VERIFIED:
-
                     JFXUtil.setButtonsVisibility(true, btnUpdate, btnApprove, btnDisapprove, btnReturn);
                     break;
                 case DisbursementStatic.APPROVED:
-                    JFXUtil.setButtonsVisibility(true, btnReturn);
                     JFXUtil.setButtonsVisibility(false, btnUpdate, btnApprove, btnDisapprove);
                     break;
                 case DisbursementStatic.DISAPPROVED:
                     JFXUtil.setButtonsVisibility(false, btnApprove, btnDisapprove, btnUpdate, btnReturn);
                     break;
                 case DisbursementStatic.RETURNED:
-                    JFXUtil.setButtonsVisibility(true, btnUpdate);
+                    JFXUtil.setButtonsVisibility(true, btnUpdate, btnApprove, btnDisapprove, btnReturn);
                     JFXUtil.setButtonsVisibility(false, btnReturn);
                     break;
                 case DisbursementStatic.VOID:
                 case DisbursementStatic.CANCELLED:
                 default:
-                    JFXUtil.setButtonsVisibility(false, btnApprove, btnUpdate);
+                    JFXUtil.setButtonsVisibility(false, btnApprove, btnDisapprove, btnUpdate, btnReturn);
                     break;
             }
         }
