@@ -958,7 +958,7 @@ public class DisbursementVoucher_ApprovalController implements Initializable, Sc
                                 pnDetailBIR = lnRow;
                                 loadRecordDetailBIR();
                             }
-                        } catch (SQLException | GuanzonException  ex) {
+                        } catch (SQLException | GuanzonException ex) {
                             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
                             ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
                         }
@@ -2679,18 +2679,19 @@ public class DisbursementVoucher_ApprovalController implements Initializable, Sc
                 case DisbursementStatic.OPEN:
                 case DisbursementStatic.CONFIRMED:
                 case DisbursementStatic.VERIFIED:
-                case DisbursementStatic.RETURNED_I:
-                    JFXUtil.setButtonsVisibility(true, btnUpdate, btnApprove, btnDisapprove);
+                    JFXUtil.setButtonsVisibility(true, btnUpdate, btnApprove, btnDisapprove, btnReturn);
                     break;
                 case DisbursementStatic.APPROVED:
-                    JFXUtil.setButtonsVisibility(false, btnUpdate, btnApprove, btnDisapprove);
-                    JFXUtil.setButtonsVisibility(true, btnReturn);
+                    JFXUtil.setButtonsVisibility(false, btnUpdate, btnApprove, btnDisapprove, btnReturn);
                     break;
                 case DisbursementStatic.DISAPPROVED:
                     JFXUtil.setButtonsVisibility(false, btnApprove, btnDisapprove, btnUpdate, btnReturn);
                     break;
                 case DisbursementStatic.RETURNED:
-                    JFXUtil.setButtonsVisibility(false, btnReturn,btnUpdate, btnApprove, btnDisapprove);
+                    JFXUtil.setButtonsVisibility(false, btnReturn, btnUpdate, btnApprove, btnDisapprove);
+                    break;
+                case DisbursementStatic.RETURNED_I:
+                    JFXUtil.setButtonsVisibility(true, btnReturn, btnUpdate, btnApprove, btnDisapprove);
                     break;
                 case DisbursementStatic.VOID:
                 case DisbursementStatic.CANCELLED:
