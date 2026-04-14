@@ -246,7 +246,19 @@ public class DashboardController implements Initializable {
 //                default:
 //                    setAnchorPaneVisibleManage(false, anchorRightSideBarMenu);
 //            }
-            animator.initialize(apAnchorTitle, 14);
+            apAnchorTitle.sceneProperty().addListener((obs, oldScene, newScene) -> {
+                if (newScene != null) {
+                    newScene.windowProperty().addListener((o, oldWin, newWin) -> {
+                        if (newWin != null) {
+                            newWin.showingProperty().addListener((ow, wasShowing, isShowing) -> {
+                                if (isShowing) {
+                                    animator.initialize(apAnchorTitle, 14);
+                                }
+                            });
+                        }
+                    });
+                }
+            });
 
         } catch (Exception e) {
             e.printStackTrace();
