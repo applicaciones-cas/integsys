@@ -127,12 +127,12 @@
                                     <FontAwesomeIconView glyphName="PRINT" size="20" styleClass="FontIcon" />
                                  </graphic>
                               </Button>
-                              <Button fx:id="btnPrintCheck" contentDisplay="TOP" graphicTextGap="3.0" maxHeight="70.0" minWidth="80.0" mnemonicParsing="false" prefHeight="50.0" prefWidth="70.0" styleClass="button_process" stylesheets="@../css/StyleSheet.css" text="Print Check">
+                              <Button fx:id="btnPrintPaymentSummary" contentDisplay="TOP" graphicTextGap="3.0" maxHeight="70.0" minWidth="95.0" mnemonicParsing="false" prefHeight="50.0" prefWidth="70.0" styleClass="button_process" stylesheets="@../css/StyleSheet.css" text="Print Summary">
                                  <graphic>
                                     <FontAwesomeIconView glyphName="PRINT" size="20" styleClass="FontIcon" />
                                  </graphic>
                               </Button>
-                              <Button fx:id="btnPrintPaymentSummary" contentDisplay="TOP" graphicTextGap="3.0" maxHeight="70.0" minWidth="95.0" mnemonicParsing="false" prefHeight="50.0" prefWidth="70.0" styleClass="button_process" stylesheets="@../css/StyleSheet.css" text="Print Summary">
+                              <Button fx:id="btnPrintCheck" contentDisplay="TOP" graphicTextGap="3.0" maxHeight="70.0" minWidth="80.0" mnemonicParsing="false" prefHeight="50.0" prefWidth="70.0" styleClass="button_process" stylesheets="@../css/StyleSheet.css" text="Print Check">
                                  <graphic>
                                     <FontAwesomeIconView glyphName="PRINT" size="20" styleClass="FontIcon" />
                                  </graphic>

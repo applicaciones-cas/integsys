@@ -107,7 +107,7 @@
                                     <FontAwesomeIconView glyphName="PRINT" size="20" />
                                  </graphic>
                               </Button>
-                              <Button fx:id="btnPrintCheck" contentDisplay="TOP" ellipsisString="" minWidth="80.0" mnemonicParsing="false" prefHeight="70.0" prefWidth="70.0" styleClass="button_process" stylesheets="@../css/StyleSheet.css" text="Print Check">
+                              <Button fx:id="btnPrintPaymentSummary" contentDisplay="TOP" ellipsisString="" minWidth="95.0" mnemonicParsing="false" prefHeight="70.0" prefWidth="70.0" styleClass="button_process" stylesheets="@../css/StyleSheet.css" text="Print Summary">
                                  <effect>
                                     <Blend />
                                  </effect>
@@ -115,7 +115,7 @@
                                     <FontAwesomeIconView glyphName="PRINT" size="20" />
                                  </graphic>
                               </Button>
-                              <Button fx:id="btnPrintPaymentSummary" contentDisplay="TOP" ellipsisString="" minWidth="95.0" mnemonicParsing="false" prefHeight="70.0" prefWidth="70.0" styleClass="button_process" stylesheets="@../css/StyleSheet.css" text="Print Summary">
+                              <Button fx:id="btnPrintCheck" contentDisplay="TOP" ellipsisString="" minWidth="80.0" mnemonicParsing="false" prefHeight="70.0" prefWidth="70.0" styleClass="button_process" stylesheets="@../css/StyleSheet.css" text="Print Check">
                                  <effect>
                                     <Blend />
                                  </effect>
