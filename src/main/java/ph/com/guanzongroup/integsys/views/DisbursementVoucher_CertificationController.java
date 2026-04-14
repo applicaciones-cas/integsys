@@ -141,6 +141,8 @@ public class DisbursementVoucher_CertificationController implements Initializabl
             Platform.runLater(() -> {
                 poDisbursementController.Master().setIndustryID(psIndustryId);
                 poDisbursementController.Master().setCompanyID(psCompanyId);
+                poDisbursementController.setIndustryID(psIndustryId);
+                poDisbursementController.setCompanyID(psCompanyId);
                 loadRecordSearch();
             });
         } catch (SQLException | GuanzonException ex) {

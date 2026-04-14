@@ -139,6 +139,8 @@ public class CheckAuthorizationController implements Initializable, ScreenInterf
             Platform.runLater(() -> {
                 poDisbursementController.Master().setIndustryID(psIndustryId);
                 poDisbursementController.Master().setCompanyID(psCompanyId);
+                poDisbursementController.setIndustryID(psIndustryId);
+                poDisbursementController.setCompanyID(psCompanyId);
                 loadRecordSearch();
             });
             poDisbursementController.setTransactionStatus(DisbursementStatic.CERTIFIED);
