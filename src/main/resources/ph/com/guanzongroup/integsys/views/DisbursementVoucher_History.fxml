@@ -99,6 +99,14 @@
                                                 <FontAwesomeIconView glyphName="BOOK" size="20" />
                                             </graphic>
                                         </Button>
+                              <Button fx:id="btnPrint" contentDisplay="TOP" ellipsisString="" mnemonicParsing="false" prefHeight="70.0" prefWidth="70.0" styleClass="button_process" stylesheets="@../css/StyleSheet.css" text="Print">
+                                 <effect>
+                                    <Blend />
+                                 </effect>
+                                 <graphic>
+                                    <FontAwesomeIconView glyphName="PRINT" size="20" />
+                                 </graphic>
+                              </Button>
                                         <Button fx:id="btnClose" contentDisplay="TOP" ellipsisString="" mnemonicParsing="false" prefHeight="70.0" prefWidth="70.0" styleClass="button_process" stylesheets="@../css/StyleSheet.css" text="Close">
                                             <graphic>
                                                 <FontAwesomeIconView glyphName="POWER_OFF" size="20" />

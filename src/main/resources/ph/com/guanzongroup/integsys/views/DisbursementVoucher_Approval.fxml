@@ -133,6 +133,14 @@
                                                 <Blend />
                                             </effect>
                                         </Button>
+                              <Button fx:id="btnReturn" contentDisplay="TOP" ellipsisString="" mnemonicParsing="false" prefHeight="70.0" prefWidth="70.0" styleClass="button_process" stylesheets="@../css/StyleSheet.css" text="Return">
+                                 <effect>
+                                    <Blend />
+                                 </effect>
+                                 <graphic>
+                                    <FontAwesomeIconView glyphName="REPEAT" size="20" />
+                                 </graphic>
+                              </Button>
                                         <Button fx:id="btnRetrieve" contentDisplay="TOP" ellipsisString="" mnemonicParsing="false" prefHeight="70.0" prefWidth="70.0" styleClass="button_process" stylesheets="@../css/StyleSheet.css" text="Retrieve">
                                             <graphic>
                                                 <FontAwesomeIconView glyphName="LIST_ALT" size="20" />
