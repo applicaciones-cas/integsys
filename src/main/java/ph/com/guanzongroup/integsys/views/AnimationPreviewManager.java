@@ -506,86 +506,84 @@ public class AnimationPreviewManager {
         }
 
         public void initialize(AnchorPane logoPane, double fontSize) {
+            logoPane.setStyle("-fx-background-color: transparent;");
+
+            Font font = Font.font("System", FontWeight.BOLD, fontSize);
+
+            g1 = new Label("G");
+            g2 = new Label("G");
+            c = new Label("C");
+
+            t1 = new Label("UANZON");
+            t2 = new Label("ROUP");
+            tOf = new Label("OF");
+            t3 = new Label("OMPANIES");
+
+            Label[] all = {g1, g2, c, t1, t2, tOf, t3};
+
+            for (Label t : all) {
+                t.setFont(font);
+                t.setTextFill(Color.WHITE);
+            }
+
+            t1.setOpacity(0);
+            t2.setOpacity(0);
+            tOf.setOpacity(0);
+            t3.setOpacity(0);
+
+            logoPane.getChildren().clear();
+            logoPane.getChildren().addAll(all);
+
             Platform.runLater(() -> {
-                logoPane.setStyle("-fx-background-color: transparent;");
 
-                Font font = Font.font("System", FontWeight.BOLD, fontSize);
+                double paneHeight = logoPane.getHeight();
+                double labelHeight = g1.prefHeight(-1);
 
-                g1 = new Label("G");
-                g2 = new Label("G");
-                c = new Label("C");
-
-                t1 = new Label("UANZON");
-                t2 = new Label("ROUP");
-                tOf = new Label("OF");
-                t3 = new Label("OMPANIES");
-
-                Label[] all = {g1, g2, c, t1, t2, tOf, t3};
+                double centerY = (paneHeight - labelHeight) / 2;
 
                 for (Label t : all) {
-                    t.setFont(font);
-                    t.setTextFill(Color.WHITE);
+                    t.setLayoutY(centerY);
                 }
 
-                t1.setOpacity(0);
-                t2.setOpacity(0);
-                tOf.setOpacity(0);
-                t3.setOpacity(0);
+                spacing = new Text(" ").getLayoutBounds().getWidth() * 1.0;
 
-                logoPane.getChildren().clear();
-                logoPane.getChildren().addAll(all);
+                g1W = g1.getLayoutBounds().getWidth();
+                g2W = g2.getLayoutBounds().getWidth();
+                cW = c.getLayoutBounds().getWidth();
 
-                Platform.runLater(() -> {
+                t1W = t1.getLayoutBounds().getWidth();
+                t2W = t2.getLayoutBounds().getWidth();
+                tOfW = tOf.getLayoutBounds().getWidth();
+                t3W = t3.getLayoutBounds().getWidth();
 
-                    double paneHeight = logoPane.getHeight();
-                    double labelHeight = g1.prefHeight(-1);
+                // Initial compact GGC
+                g1.setLayoutX(0);
+                g2.setLayoutX(g1W);
+                c.setLayoutX(g1W + g2W);
 
-                    double centerY = (paneHeight - labelHeight) / 2;
+                // Final expanded positions
+                finalG2X = g1W + t1W + spacing;
+                finalOfX = finalG2X + g2W + t2W + spacing;
+                finalCX = finalOfX + tOfW + spacing;
 
-                    for (Label t : all) {
-                        t.setLayoutY(centerY);
-                    }
+                t1.setLayoutX(g1W);
+                t2.setLayoutX(finalG2X + g2W);
+                tOf.setLayoutX(finalOfX);
+                t3.setLayoutX(finalCX + cW);
 
-                    spacing = new Text(" ").getLayoutBounds().getWidth() * 1.0;
+                logoPane.setPrefWidth(finalCX + cW + t3W);
 
-                    g1W = g1.getLayoutBounds().getWidth();
-                    g2W = g2.getLayoutBounds().getWidth();
-                    cW = c.getLayoutBounds().getWidth();
-
-                    t1W = t1.getLayoutBounds().getWidth();
-                    t2W = t2.getLayoutBounds().getWidth();
-                    tOfW = tOf.getLayoutBounds().getWidth();
-                    t3W = t3.getLayoutBounds().getWidth();
-
-                    // Initial compact GGC
-                    g1.setLayoutX(0);
-                    g2.setLayoutX(g1W);
-                    c.setLayoutX(g1W + g2W);
-
-                    // Final expanded positions
-                    finalG2X = g1W + t1W + spacing;
-                    finalOfX = finalG2X + g2W + t2W + spacing;
-                    finalCX = finalOfX + tOfW + spacing;
-
-                    t1.setLayoutX(g1W);
-                    t2.setLayoutX(finalG2X + g2W);
-                    tOf.setLayoutX(finalOfX);
-                    t3.setLayoutX(finalCX + cW);
-
-                    logoPane.setPrefWidth(finalCX + cW + t3W);
-
-                    expanded = true;
+                expanded = true;
 
 // Move letters to expanded position
-                    g2.setLayoutX(finalG2X);
-                    c.setLayoutX(finalCX);
+                g2.setLayoutX(finalG2X);
+                c.setLayoutX(finalCX);
 
 // Show full words
-                    t1.setOpacity(1);
-                    t2.setOpacity(1);
-                    tOf.setOpacity(1);
-                    t3.setOpacity(1);
-                });
+                t1.setOpacity(1);
+                t2.setOpacity(1);
+                tOf.setOpacity(1);
+                t3.setOpacity(1);
             });
         }
 
