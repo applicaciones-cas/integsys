@@ -123,7 +123,7 @@ public class DisbursementVoucher_HistoryController implements Initializable, Scr
     @FXML
     private TextField tfSearchTransaction, tfSearchSupplier, tfDVTransactionNo, tfSupplier, tfVoucherNo, tfBankNameCheck, tfBankAccountCheck, tfPayeeName, tfCheckNo, tfCheckAmount, tfAuthorizedPerson, tfBankNameBTransfer, tfBankAccountBTransfer, tfPaymentAmountBTransfer, tfSupplierBank, tfSupplierAccountNoBTransfer, tfBankTransReferNo, tfPaymentStatusBTransfer, tfBankNameOnlinePayment, tfBankAccountOnlinePayment, tfPaymentAmount, tfSupplierServiceName, tfSupplierAccountNo, tfPaymentReferenceNo, tfOnlinePaymentStatus, tfTotalAmount, tfVatableSales, tfVatAmountMaster, tfVatZeroRatedSales, tfVatExemptSales, tfLessWHTax, tfTotalNetAmount, tfAdvances, tfRefNoDetail, tfVatableSalesDetail, tfVatExemptDetail, tfVatZeroRatedSalesDetail, tfVatRateDetail, tfVatAmountDetail, tfPurchasedAmountDetail, tfNetAmountDetail, tfAdvancesDetail, tfJournalTransactionNo, tfTotalDebitAmount, tfTotalCreditAmount, tfAccountCode, tfAccountDescription, tfDebitAmount, tfCreditAmount, tfBIRTransactionNo, tfTaxCode, tfParticular, tfBaseAmount, tfTaxRate, tfTotalTaxAmount, tfAttachmentNo, tfAttachmentSource;
     @FXML
-    private Button btnBrowse, btnHistory, btnPrint, btnClose, btnArrowLeft, btnArrowRight;
+    private Button btnBrowse, btnHistory, btnPrint, btnClose, btnArrowLeft, btnArrowRight, btnPrintPaymentSummary;
     @FXML
     private TabPane tabPaneMain, tabPanePaymentMode;
     @FXML
@@ -358,7 +358,15 @@ public class DisbursementVoucher_HistoryController implements Initializable, Scr
                 case "btnPrint":
                     ArrayList<String> checkedItems = new ArrayList<>();
                     checkedItems.add(poController.Master().getTransactionNo());
-                    poJSON = poController.printTransactionPaymentSummary(checkedItems);
+                    poJSON = poController.printTransaction(checkedItems);
+                    if ("error".equals((String) poJSON.get("result"))) {
+                        ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                    }
+                    break;
+                case "btnPrintPaymentSummary":
+                    ArrayList<String> checkedItems2 = new ArrayList<>();
+                    checkedItems2.add(poController.Master().getTransactionNo());
+                    poJSON = poController.printTransactionPaymentSummary(checkedItems2);
                     if ("error".equals((String) poJSON.get("result"))) {
                         ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                     }
@@ -1263,7 +1271,7 @@ public class DisbursementVoucher_HistoryController implements Initializable, Scr
     private void initButton(int fnEditMode) {
         JFXUtil.setButtonsVisibility(true, btnBrowse, btnClose);
         JFXUtil.setButtonsVisibility(fnEditMode == EditMode.READY, btnHistory);
-        JFXUtil.setButtonsVisibility(fnEditMode == EditMode.READY, btnPrint);
+        JFXUtil.setButtonsVisibility(fnEditMode == EditMode.READY, btnPrint, btnPrintPaymentSummary);
         JFXUtil.setDisabled(true, apDVMaster1, apDVMaster2, apDVMaster3, apDVDetail,
                 apMasterDVCheck, apMasterDVBTransfer, apMasterDVOp, apJournalMaster, apJournalDetails, apBIRDetail);
     }
