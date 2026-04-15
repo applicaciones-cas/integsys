@@ -428,7 +428,7 @@ public class DisbursementVoucher_ConfirmationController implements Initializable
                             ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message")); // check this for encoder or and higher
                             return;
                         }
-                        if(!DisbursementStatic.RETURNED.equals(poController.Master().getTransactionStatus())){
+                        if (!DisbursementStatic.RETURNED.equals(poController.Master().getTransactionStatus())) {
                             String lsUserId2 = oApp.getUserID();
                             String lsPosition2 = poController.checkPosition(poController.Master().getTransactionStatus(), lsUserId2);
                             if (lsPosition2 == null || "".equals(lsPosition2)) {
@@ -754,6 +754,7 @@ public class DisbursementVoucher_ConfirmationController implements Initializable
                                 poJSON = poController.computeDetailFields(true);
                                 if ("error".equals((String) poJSON.get("result"))) {
                                     ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                                    details_data.clear();
                                 }
                             }
                             int lnRowCount = 0;
@@ -1126,7 +1127,6 @@ public class DisbursementVoucher_ConfirmationController implements Initializable
         int newIndex = 0;
 
         if (moveDown || moveUp) {
-            newIndex = moveDown ? JFXUtil.moveToNextRow(currentTable) : JFXUtil.moveToPreviousRow(currentTable);
             switch (currentTable.getId()) {
                 case "tblVwDetails":
                     if (details_data.isEmpty()) {
