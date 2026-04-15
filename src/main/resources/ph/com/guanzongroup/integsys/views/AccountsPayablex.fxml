@@ -372,7 +372,7 @@
                                                             <Insets left="5.0" />
                                                          </GridPane.margin>
                                                       </CheckBox>
-                                                      <DatePicker fx:id="dpClientSince" editable="false" prefHeight="28.0" prefWidth="227.0" promptText="YYYY-MM-DD" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="12">
+                                                      <DatePicker fx:id="dpClientSince" disable="true" editable="false" prefHeight="28.0" prefWidth="227.0" promptText="YYYY-MM-DD" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="12">
                                                          <GridPane.margin>
                                                             <Insets left="5.0" />
                                                          </GridPane.margin>
