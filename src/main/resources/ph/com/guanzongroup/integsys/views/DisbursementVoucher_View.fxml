@@ -447,7 +447,7 @@
                                                                                         <Insets right="5.0" />
                                                                                     </padding>
                                                                                     <font>
-                                                                                        <Font name="System Bold" size="14.0" />
+                                                                                         <Font name="System Bold" size="12.0" />
                                                                                     </font>
                                                                                 </Label>
                                                                                 <Label text="Less: Adv. Paym." visible="false" GridPane.columnIndex="6" GridPane.rowIndex="6">

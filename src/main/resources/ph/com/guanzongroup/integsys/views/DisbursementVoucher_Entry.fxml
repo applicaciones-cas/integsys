@@ -542,7 +542,7 @@
                                                                         </Label>
                                                                                                 <Label text="Net Amount Due" textFill="RED" GridPane.columnIndex="8" GridPane.rowIndex="6">
                                                                            <font>
-                                                                              <Font name="System Bold" size="14.0" />
+                                                                              <Font name="System Bold" size="12.0" />
                                                                            </font>
                                                                         </Label>
                                                                                                 <Label text="Less: Adv. Paym." visible="false" GridPane.columnIndex="8" GridPane.rowIndex="6">
