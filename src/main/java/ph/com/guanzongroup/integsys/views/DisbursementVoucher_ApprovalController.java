@@ -435,11 +435,14 @@ public class DisbursementVoucher_ApprovalController implements Initializable, Sc
                         ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message")); // check this for encoder or and higher
                         return;
                     }
-                    String lsUserId2 = oApp.getUserID();
-                    String lsPosition2 = poController.checkPosition(poController.Master().getTransactionStatus(), lsUserId2);
-                    if (lsPosition2 == null || "".equals(lsPosition2)) {
-                        ShowMessageFX.Warning(null, pxeModuleName, "User is not an authorized officer.");
-                        return;
+                    
+                    if(!DisbursementStatic.RETURNED_I.equals(poController.Master().getTransactionStatus())){
+                        String lsUserId2 = oApp.getUserID();
+                        String lsPosition2 = poController.checkPosition(poController.Master().getTransactionStatus(), lsUserId2);
+                        if (lsPosition2 == null || "".equals(lsPosition2)) {
+                            ShowMessageFX.Warning(null, pxeModuleName, "User is not an authorized officer.");
+                            return;
+                        }
                     }
 //                    }
 

@@ -367,6 +367,7 @@ public class CheckAuthorizationController implements Initializable, ScreenInterf
 
                                     switch (disbursementType) {
                                         case DisbursementStatic.DisbursementType.CHECK:
+                                        case DisbursementStatic.DisbursementType.CHECK_DEPOSIT:
                                             lsPaymentForm = "CHECK";
                                             lsBankName = poDisbursementController.getMaster(lnCntr).CheckPayments().Banks().getBankName();
                                             lsBankAccount = poDisbursementController.getMaster(lnCntr).CheckPayments().Bank_Account_Master().getAccountNo();
