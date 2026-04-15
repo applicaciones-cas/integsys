@@ -505,6 +505,7 @@ public class DisbursementVoucher_HistoryController implements Initializable, Scr
                                 poJSON = poController.computeDetailFields(true);
                                 if ("error".equals((String) poJSON.get("result"))) {
                                     ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                                    details_data.clear();
                                 }
                             }
                             int lnRowCount = 0;
