@@ -81,6 +81,7 @@ public class PurchaseOrder_HistoryController implements Initializable, ScreenInt
     private String psSupplierID = "";
     private String psCategoryID = "";
     private String psReferID = "";
+    private String psTransNo = "";
 
     private unloadForm poUnload = new unloadForm();
     private ObservableList<ModelPurchaseOrderDetail> detail_data = FXCollections.observableArrayList();
@@ -94,7 +95,7 @@ public class PurchaseOrder_HistoryController implements Initializable, ScreenInt
     @FXML
     private Label lblTransactionStatus, lblSource;
     @FXML
-    private TextField tfSearchSupplier, tfSearchReferenceNo;
+    private TextField tfSearchSupplier, tfSearchReferenceNo,tfSearchTransNo;
     @FXML
     private TextField tfTransactionNo, tfSupplier, tfDestination, tfReferenceNo,
             tfTerm, tfDiscountRate, tfDiscountAmount, tfAdvancePRate, tfAdvancePAmount, tfTotalAmount, tfNetAmount;
@@ -272,7 +273,7 @@ public class PurchaseOrder_HistoryController implements Initializable, ScreenInt
                 case "btnBrowse":
                     poJSON = poPurchasingController.PurchaseOrder().SearchTransaction("",
                             psSupplierID,
-                            psReferID);
+                            psReferID,psTransNo,1);
                     if ("success".equals((String) poJSON.get("result"))) {
                         clearDetailFields();
                         pnTblDetailRow = -1;
@@ -336,7 +337,7 @@ public class PurchaseOrder_HistoryController implements Initializable, ScreenInt
 
     private void initTextFieldKeyPressed() {
         List<TextField> loTxtField = Arrays.asList(tfSearchSupplier,
-                tfSearchReferenceNo);
+                tfSearchReferenceNo,tfSearchTransNo);
 
         loTxtField.forEach(tf -> tf.setOnKeyPressed(event -> txtField_KeyPressed(event)));
     }
@@ -369,19 +370,43 @@ public class PurchaseOrder_HistoryController implements Initializable, ScreenInt
                                 tfSearchSupplier.setText(poPurchasingController.PurchaseOrder().Master().Supplier().getCompanyName());
                                 break;
                             case "tfSearchReferenceNo":
+                                if(lsValue == null || lsValue.isEmpty()){
+                                    return;
+                                }
                                 poJSON = poPurchasingController.PurchaseOrder().SearchTransaction(lsValue,
                                         psSupplierID,
-                                        psReferID);
+                                        psReferID,psTransNo,2);
                                 if ("success".equals((String) poJSON.get("result"))) {
                                     clearDetailFields();
                                     pnTblDetailRow = -1;
                                     loadRecordMaster();
                                     loadRecordDetail();
                                     loadTableDetail();
+                                    tfSearchReferenceNo.clear();
                                     pnEditMode = poPurchasingController.PurchaseOrder().getEditMode();
                                 } else {
                                     ShowMessageFX.Warning((String) poJSON.get("message"), "Search Information", null);
                                 }
+                                break;
+                            case "tfSearchTransNo":
+                                if(lsValue == null || lsValue.isEmpty()){
+                                    return;
+                                }
+                                poJSON = poPurchasingController.PurchaseOrder().SearchTransaction(lsValue,
+                                        psSupplierID,
+                                        psReferID,psTransNo,1);
+                                if ("success".equals((String) poJSON.get("result"))) {
+                                    clearDetailFields();
+                                    pnTblDetailRow = -1;
+                                    loadRecordMaster();
+                                    loadRecordDetail();
+                                    loadTableDetail();
+                                    tfSearchTransNo.clear();
+                                    pnEditMode = poPurchasingController.PurchaseOrder().getEditMode();
+                                } else {
+                                    ShowMessageFX.Warning((String) poJSON.get("message"), "Search Information", null);
+                                }
+                                break;
                         }
                         event.consume();
                         CommonUtils.SetNextFocus((TextField) event.getSource());

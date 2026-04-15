@@ -348,7 +348,7 @@ public class PurchaseOrder_EntrySPCarController implements Initializable, Screen
                 case "btnBrowse":
                     poJSON = poPurchasingController.PurchaseOrder().SearchTransaction("",
                             poPurchasingController.PurchaseOrder().Master().getSupplierID(),
-                            "");
+                            "","",1);
                     if (!"error".equals((String) poJSON.get("result"))) {
                         tblVwStockRequest.getSelectionModel().clearSelection(pnTblDetailRow);
                         pnTblDetailRow = -1;

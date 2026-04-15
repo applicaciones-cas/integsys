@@ -346,7 +346,7 @@ public class PurchaseOrder_EntryLPController implements Initializable, ScreenInt
             String lsButton = ((Button) event.getSource()).getId();
             switch (lsButton) {
                 case "btnBrowse":
-                    poJSON = poPurchasingController.PurchaseOrder().SearchTransaction("", poPurchasingController.PurchaseOrder().Master().getSupplierID(), "");
+                    poJSON = poPurchasingController.PurchaseOrder().SearchTransaction("", poPurchasingController.PurchaseOrder().Master().getSupplierID(), "","",1);
                     if (!"error".equals((String) poJSON.get("result"))) {
                         tblVwStockRequest.getSelectionModel().clearSelection(pnTblDetailRow);
                         pnTblDetailRow = -1;
