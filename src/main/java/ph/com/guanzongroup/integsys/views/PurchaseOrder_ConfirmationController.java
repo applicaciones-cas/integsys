@@ -537,9 +537,9 @@ public class PurchaseOrder_ConfirmationController implements Initializable, Scre
         if (!nv) {
             /*Lost Focus*/
             switch (lsTextFieldID) {
-//                case "tfReferenceNo":
-//                    poPurchasingController.PurchaseOrder().Master().setReference(lsValue);
-//                    break;
+                case "tfReferenceNo":
+                    poPurchasingController.PurchaseOrder().Master().setReference(lsValue);
+                    break;
                 case "tfDiscountRate":
                     lsValue = JFXUtil.removeComma(lsValue);
                     poJSON = poPurchasingController.PurchaseOrder().setDiscountRate(lsValue);
