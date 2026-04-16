@@ -1,6 +1,5 @@
 package ph.com.guanzongroup.integsys.views;
 
-
 import java.lang.reflect.Field;
 import java.net.URL;
 import java.sql.SQLException;
@@ -51,6 +50,7 @@ import static javafx.scene.input.KeyCode.ENTER;
 import static javafx.scene.input.KeyCode.F3;
 import static javafx.scene.input.KeyCode.TAB;
 import org.guanzon.appdriver.base.GuanzonException;
+import org.guanzon.appdriver.base.MiscUtil;
 import org.json.simple.JSONObject;
 import org.guanzon.cas.inv.warehouse.InventoryStockIssuanceNeo;
 import org.guanzon.cas.inv.warehouse.status.DeliveryIssuanceType;
@@ -167,8 +167,11 @@ public class InventoryStockIssuanceNeoController_ApprovalCar_SP implements Initi
             initializeTableDetail();
             initControlEvents();
         } catch (SQLException | GuanzonException e) {
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(e), e);
+            ShowMessageFX.Error(MiscUtil.getException(e), psFormName, null);
 
             poLogWrapper.severe(psFormName + " :" + e.getMessage());
+
         }
     }
 
@@ -194,9 +197,11 @@ public class InventoryStockIssuanceNeoController_ApprovalCar_SP implements Initi
 
                 getLoadedTransaction();
             } catch (CloneNotSupportedException | SQLException | GuanzonException ex) {
-                Logger.getLogger(InventoryStockIssuanceNeoController.class.getName()).log(Level.SEVERE, null, ex);
-                poLogWrapper.severe(psFormName + " :" + ex.getMessage());
 
+                Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+                ShowMessageFX.Error(MiscUtil.getException(ex), psFormName, null);
+
+                poLogWrapper.severe(psFormName + " :" + ex.getMessage());
             }
 
         }
@@ -213,7 +218,10 @@ public class InventoryStockIssuanceNeoController_ApprovalCar_SP implements Initi
 
             loadSelectedTransactionDetail(pnTransactionDetail);
         } catch (SQLException | GuanzonException | CloneNotSupportedException ex) {
-            Logger.getLogger(InventoryStockIssuanceNeoController_Approval.class.getName()).log(Level.SEVERE, null, ex);
+
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(MiscUtil.getException(ex), psFormName, null);
+
             poLogWrapper.severe(psFormName + " :" + ex.getMessage());
         }
     }
@@ -361,15 +369,6 @@ public class InventoryStockIssuanceNeoController_ApprovalCar_SP implements Initi
                     }
                     break;
 
-                case "btnNew":
-                    if (!isJSONSuccess(poAppController.NewTransaction(), "Initialize New Transaction")) {
-                        return;
-                    }
-                    clearAllInputs();
-                    getLoadedTransaction();
-                    pnEditMode = poAppController.getEditMode();
-                    break;
-
                 case "btnUpdate":
                     if (poAppController.getMaster().getTransactionNo() == null || poAppController.getMaster().getTransactionNo().isEmpty()) {
                         ShowMessageFX.Information("Please load transaction before proceeding..", "Stock Request Issuance", "");
@@ -398,7 +397,7 @@ public class InventoryStockIssuanceNeoController_ApprovalCar_SP implements Initi
                             return;
                         }
                         reloadTableDetail();
-//                        clearAllInputs();
+                        getLoadedTransaction();
                         pnEditMode = poAppController.getEditMode();
                         break;
                     }
@@ -421,7 +420,7 @@ public class InventoryStockIssuanceNeoController_ApprovalCar_SP implements Initi
 
                         }
                         reloadTableDetail();
-//                        clearAllInputs();
+                        getLoadedTransaction();
                         pnEditMode = poAppController.getEditMode();
                         break;
                     }
@@ -439,7 +438,7 @@ public class InventoryStockIssuanceNeoController_ApprovalCar_SP implements Initi
                         }
                     }
                     //refresh ui 
-//                    clearAllInputs();
+                    getLoadedTransaction();
                     reloadTableDetail();
 
                     pnEditMode = poAppController.getEditMode();
@@ -454,8 +453,13 @@ public class InventoryStockIssuanceNeoController_ApprovalCar_SP implements Initi
                     if (!isJSONSuccess(poAppController.SaveTransaction(), "Initialize Save Transaction")) {
                         return;
                     }
+                    if (ShowMessageFX.YesNo(null, psFormName, "Do you want to approve transaction?") == true) {
+                        if (!isJSONSuccess(poAppController.CloseTransaction(), "Initialize Close Transaction")) {
+                            return;
+                        }
+                    }
                     reloadTableDetail();
-//                    clearAllInputs();
+                    getLoadedTransaction();
                     pnEditMode = poAppController.getEditMode();
 
                     break;
@@ -499,24 +503,15 @@ public class InventoryStockIssuanceNeoController_ApprovalCar_SP implements Initi
 
                     switch (lastFocusedControl.getId()) {
                         case "tfSearchSourceno":
-                            if (!tfTransNo.getText().isEmpty()) {
-                                if (ShowMessageFX.OkayCancel(null, "Search Transaction! by Trasaction", "Are you sure you want replace loaded Transaction?") == false) {
-                                    return;
-                                }
-                            }
+
                             loadTransactionMasterList(tfSearchSourceno.getText(), "e.sBranchNm");
-                            getLoadedTransaction();
+//                            getLoadedTransaction();
                             initButtonDisplay(poAppController.getEditMode());
                             break;
                         case "tfSearchTransNo":
-                            if (!tfTransNo.getText().isEmpty()) {
-                                if (ShowMessageFX.OkayCancel(null, "Search Transaction! by Trasaction", "Are you sure you want replace loaded Transaction?") == false) {
-                                    return;
-                                }
-                            }
 
                             loadTransactionMasterList(tfSearchTransNo.getText(), "a.sTransNox");
-                            getLoadedTransaction();
+//                            getLoadedTransaction();
                             initButtonDisplay(poAppController.getEditMode());
                             break;
                     }
@@ -532,7 +527,9 @@ public class InventoryStockIssuanceNeoController_ApprovalCar_SP implements Initi
             initButtonDisplay(poAppController.getEditMode());
 
         } catch (Exception e) {
-            Logger.getLogger(InventoryRequest_ApprovalControllerAppliance.class.getName()).log(Level.SEVERE, null, e);
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(e), e);
+            ShowMessageFX.Error(MiscUtil.getException(e), psFormName, null);
+
             poLogWrapper.severe(psFormName + " :" + e.getMessage());
         }
     }
@@ -632,7 +629,10 @@ public class InventoryStockIssuanceNeoController_ApprovalCar_SP implements Initi
                 loTextField.selectAll();
             }
         } catch (SQLException | GuanzonException | CloneNotSupportedException ex) {
-            Logger.getLogger(InventoryStockIssuanceNeoController_Approval.class.getName()).log(Level.SEVERE, null, ex);
+
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(MiscUtil.getException(ex), psFormName, null);
+
             poLogWrapper.severe(psFormName + " :" + ex.getMessage());
         }
     };
@@ -708,7 +708,7 @@ public class InventoryStockIssuanceNeoController_ApprovalCar_SP implements Initi
                                 initButtonDisplay(poAppController.getEditMode());
                                 break;
                             case "tfSearchTransNo":
-                                if (!tfTransNo.getText().isEmpty()) {
+                                if (!tfTransNo.getText().isEmpty() || tfTransNo.getText() != null) {
                                     if (ShowMessageFX.OkayCancel(null, "Search Transaction! by Trasaction", "Are you sure you want replace loaded Transaction?") == false) {
                                         return;
                                     }
@@ -784,8 +784,10 @@ public class InventoryStockIssuanceNeoController_ApprovalCar_SP implements Initi
                 }
             }
         } catch (Exception ex) {
-            Logger.getLogger(InventoryStockIssuanceNeoControllerAppliance.class
-                    .getName()).log(Level.SEVERE, null, ex);
+
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(MiscUtil.getException(ex), psFormName, null);
+
             poLogWrapper.severe(psFormName + " :" + ex.getMessage());
         }
     }
@@ -891,7 +893,11 @@ public class InventoryStockIssuanceNeoController_ApprovalCar_SP implements Initi
                 btnVoid.setText("Void");
             }
         } catch (SQLException | GuanzonException e) {
-            poLogWrapper.severe(psFormName, e.getMessage());
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(e), e);
+            ShowMessageFX.Error(MiscUtil.getException(e), psFormName, null);
+
+            poLogWrapper.severe(psFormName + " :" + e.getMessage());
+
         }
     }
 
@@ -1034,8 +1040,7 @@ public class InventoryStockIssuanceNeoController_ApprovalCar_SP implements Initi
 
         // Show-only based on mode
         initButtonControls(lbShow, "btnSearch", "btnSave", "btnCancel");
-        initButtonControls(!lbShow, "btnBrowse",
-                "btnUpdate", "btnPrint", "btnApprove", "btnVoid");
+        initButtonControls(!lbShow, "btnBrowse", "btnUpdate", "btnPrint", "btnApprove", "btnVoid");
 
         apMaster.setDisable(!lbShow);
         apDetail.setDisable(!lbShow);
@@ -1060,8 +1065,11 @@ public class InventoryStockIssuanceNeoController_ApprovalCar_SP implements Initi
                     loButton.setManaged(visible);
                 }
             } catch (IllegalAccessException e) {
-                e.printStackTrace();
+                Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(e), e);
+                ShowMessageFX.Error(MiscUtil.getException(e), psFormName, null);
+
                 poLogWrapper.severe(psFormName + " :" + e.getMessage());
+
             }
         }
     }
@@ -1093,8 +1101,9 @@ public class InventoryStockIssuanceNeoController_ApprovalCar_SP implements Initi
 
                     return new SimpleStringProperty(xserialname);
                 } catch (SQLException | GuanzonException ex) {
-                    Logger.getLogger(InventoryStockIssuanceNeoController_Approval.class
-                            .getName()).log(Level.SEVERE, null, ex);
+                    Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+                    ShowMessageFX.Error(MiscUtil.getException(ex), psFormName, null);
+
                     poLogWrapper.severe(psFormName + " :" + ex.getMessage());
                     return new SimpleStringProperty("");
                 }
@@ -1166,7 +1175,7 @@ public class InventoryStockIssuanceNeoController_ApprovalCar_SP implements Initi
     }
 
     private void getLoadedTransaction() throws SQLException, GuanzonException, CloneNotSupportedException {
-        clearAllInputs();
+//        clearAllInputs();
         loadTransactionMaster();
         reloadTableDetail();
         loadSelectedTransactionDetail(pnTransactionDetail);
@@ -1178,7 +1187,7 @@ public class InventoryStockIssuanceNeoController_ApprovalCar_SP implements Initi
             String message = (String) loJSON.get("message");
             poLogWrapper.severe(psFormName + " :" + message);
             Platform.runLater(() -> {
-                ShowMessageFX.Warning(null, psFormName,  message);
+                ShowMessageFX.Warning(null, psFormName, message);
             });
             return false;
         }
@@ -1187,7 +1196,7 @@ public class InventoryStockIssuanceNeoController_ApprovalCar_SP implements Initi
         poLogWrapper.severe(psFormName + " :" + message);
         Platform.runLater(() -> {
             if (message != null) {
-                ShowMessageFX.Information(null, psFormName,  message);
+                ShowMessageFX.Information(null, psFormName, message);
             }
         });
         poLogWrapper.info(psFormName + " : Success on " + fsModule);
@@ -1259,8 +1268,11 @@ public class InventoryStockIssuanceNeoController_ApprovalCar_SP implements Initi
                     controls.add((Control) value);
                 }
             } catch (IllegalAccessException e) {
-                e.printStackTrace();
+                Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(e), e);
+                ShowMessageFX.Error(MiscUtil.getException(e), psFormName, null);
+
                 poLogWrapper.severe(psFormName + " :" + e.getMessage());
+
             }
         }
         return controls;
