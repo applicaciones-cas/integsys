@@ -683,7 +683,7 @@ public class DisbursementVoucher_ApprovalController implements Initializable, Sc
                 if (!JFXUtil.loadValidation(pnEditMode, pxeModuleName, poController.Master().getTransactionNo(), lsTransactionNo)) {
                     return;
                 }
-
+                pbIsCheckedJournalTab = false;
                 int pnRowMain = Integer.parseInt(selected.getIndex01()) - 1;
                 pnMain = pnRowMain;
                 JFXUtil.disableAllHighlightByColor(tblViewMainList, "#A7C7E7", highlightedRowsMain);
