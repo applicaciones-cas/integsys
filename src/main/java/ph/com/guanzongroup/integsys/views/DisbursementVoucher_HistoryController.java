@@ -1325,7 +1325,7 @@ public class DisbursementVoucher_HistoryController implements Initializable, Scr
                     } else {
                         JFXUtil.setButtonsVisibility(false, btnPrintCheck);
                     }
-                    break;l
+                    break;
             }
             
         } catch (SQLException | GuanzonException ex) {
