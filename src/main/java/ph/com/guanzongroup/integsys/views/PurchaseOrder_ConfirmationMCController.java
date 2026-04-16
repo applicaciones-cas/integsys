@@ -1044,7 +1044,7 @@ public class PurchaseOrder_ConfirmationMCController implements Initializable, Sc
                     main_data.clear();
                     JSONObject poJSON = poPurchasingController.PurchaseOrder().getPurchaseOrder(
                             psSupplierID,
-                            psReferID);
+                            psReferID,"");
                     if ("success".equals(poJSON.get("result"))) {
                         if (poPurchasingController.PurchaseOrder().getPOMasterCount() > 0) {
                             for (int lnCntr = 0; lnCntr <= poPurchasingController.PurchaseOrder().getPOMasterCount() - 1; lnCntr++) {

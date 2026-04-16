@@ -271,7 +271,7 @@ public class PurchaseOrder_HistoryMonarchFoodController implements Initializable
                 case "btnBrowse":
                     poJSON = poPurchasingController.PurchaseOrder().SearchTransaction("",
                             psSupplierID,
-                            psReferID);
+                            psReferID,"",1);
                     if ("success".equals((String) poJSON.get("result"))) {
                         clearDetailFields();
                         pnTblDetailRow = -1;
@@ -370,7 +370,7 @@ public class PurchaseOrder_HistoryMonarchFoodController implements Initializable
                             case "tfSearchReferenceNo":
                                 poJSON = poPurchasingController.PurchaseOrder().SearchTransaction(lsValue,
                                         psSupplierID,
-                                        psReferID);
+                                        psReferID,"",1);
                                 if ("success".equals((String) poJSON.get("result"))) {
                                     clearDetailFields();
                                     pnTblDetailRow = -1;

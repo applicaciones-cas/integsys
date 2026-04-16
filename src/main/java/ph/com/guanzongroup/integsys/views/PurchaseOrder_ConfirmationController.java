@@ -95,6 +95,7 @@ public class PurchaseOrder_ConfirmationController implements Initializable, Scre
     private String psCategoryID = "";
     private String psSupplierID = "";
     private String psReferID = "";
+    private String psTransNo = "";
     private String psOldDate = "";
 
     private unloadForm poUnload = new unloadForm();
@@ -110,7 +111,7 @@ public class PurchaseOrder_ConfirmationController implements Initializable, Scre
     @FXML
     private Label lblTransactionStatus, lblSource;
     @FXML
-    private TextField tfSearchSupplier, tfSearchReferenceNo;
+    private TextField tfSearchSupplier, tfSearchReferenceNo,tfSearchTransNo;
     @FXML
     private TextField tfTransactionNo, tfSupplier, tfDestination, tfReferenceNo,
             tfTerm, tfDiscountRate, tfDiscountAmount, tfAdvancePRate, tfAdvancePAmount, tfTotalAmount, tfNetAmount;
@@ -519,7 +520,7 @@ public class PurchaseOrder_ConfirmationController implements Initializable, Scre
 
     private void initTextFieldFocus() {
         List<TextField> loTxtField = Arrays.asList(tfReferenceNo, tfDiscountRate, tfDiscountAmount,
-                tfAdvancePRate, tfAdvancePAmount, tfOrderQuantity, tfSearchReferenceNo);
+                tfAdvancePRate, tfAdvancePAmount, tfOrderQuantity, tfSearchReferenceNo,tfTransactionNo);
         loTxtField.forEach(tf -> tf.focusedProperty().addListener(txtField_Focus));
     }
 
@@ -537,9 +538,9 @@ public class PurchaseOrder_ConfirmationController implements Initializable, Scre
         if (!nv) {
             /*Lost Focus*/
             switch (lsTextFieldID) {
-//                case "tfReferenceNo":
-//                    poPurchasingController.PurchaseOrder().Master().setReference(lsValue);
-//                    break;
+                case "tfReferenceNo":
+                    poPurchasingController.PurchaseOrder().Master().setReference(lsValue);
+                    break;
                 case "tfDiscountRate":
                     lsValue = JFXUtil.removeComma(lsValue);
                     poJSON = poPurchasingController.PurchaseOrder().setDiscountRate(lsValue);
@@ -583,6 +584,10 @@ public class PurchaseOrder_ConfirmationController implements Initializable, Scre
                     psReferID = tfSearchReferenceNo.getText();
                     loadTableMain();
                     break;
+                case "tfSearchTransNo":
+                    psTransNo = tfSearchTransNo.getText();
+                    loadTableMain();
+                    break;
                 case "tfCost":
                     lsValue = JFXUtil.removeComma(lsValue);
                     setOrderCost(lsValue);
@@ -617,7 +622,7 @@ public class PurchaseOrder_ConfirmationController implements Initializable, Scre
         List<TextField> loTxtField = Arrays.asList(tfAdvancePAmount,
                 tfReferenceNo, tfDiscountRate, tfDiscountAmount,
                 tfAdvancePRate,
-                tfOrderQuantity, tfSearchSupplier, tfSearchReferenceNo, tfCost,tfTerm);
+                tfOrderQuantity, tfSearchSupplier, tfSearchReferenceNo,tfSearchTransNo, tfCost,tfTerm);
 
         loTxtField.forEach(tf -> tf.setOnKeyPressed(event -> txtField_KeyPressed(event)));
     }
@@ -689,6 +694,7 @@ public class PurchaseOrder_ConfirmationController implements Initializable, Scre
                             case "tfDiscountRate":
                             case "tfDiscountAmount":
                             case "tfSearchReferenceNo":
+                            case "tfSearchTransNo":
                                 CommonUtils.SetNextFocus((TextField) event.getSource());
                                 break;
                             case "tfCost":
@@ -1068,7 +1074,7 @@ public class PurchaseOrder_ConfirmationController implements Initializable, Scre
             protected Void call() throws Exception {
                 try {
                     main_data.clear();
-                    poJSON = poPurchasingController.PurchaseOrder().getPurchaseOrder(psSupplierID, psReferID);
+                    poJSON = poPurchasingController.PurchaseOrder().getPurchaseOrder(psSupplierID, psReferID,psTransNo);
                     if ("success".equals(poJSON.get("result"))) {
                         if (poPurchasingController.PurchaseOrder().getPOMasterCount() > 0) {
                             for (int lnCntr = 0; lnCntr <= poPurchasingController.PurchaseOrder().getPOMasterCount() - 1; lnCntr++) {
