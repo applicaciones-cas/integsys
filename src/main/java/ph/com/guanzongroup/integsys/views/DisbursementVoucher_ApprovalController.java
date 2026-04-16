@@ -423,10 +423,6 @@ public class DisbursementVoucher_ApprovalController implements Initializable, Sc
                             ShowMessageFX.Warning(null, pxeModuleName, "Please check the Journal Entry before saving."); //only require check this only if higher than encoder
                             return;
                         }
-                        if (!pbIsCheckedBIRTab && poController.Master().getVATAmount() > 0.0000) {
-                            ShowMessageFX.Warning(null, pxeModuleName, "Please check the BIR 2307 before saving."); // check this for encoder or and higher
-                            return;
-                        }
                     }
 
 //                    if (!DisbursementStatic.OPEN.equals(poController.Master().getTransactionStatus())) {
@@ -468,9 +464,6 @@ public class DisbursementVoucher_ApprovalController implements Initializable, Sc
                             if (!poController.existJournal().equals("")) {
                                 if (!pbIsCheckedJournalTab) {
                                     ShowMessageFX.Warning(null, pxeModuleName, "Please check the Journal Entry before saving.");
-                                    break;
-                                } else if (!pbIsCheckedBIRTab && poController.Master().getVATAmount() > 0.0000) {
-                                    ShowMessageFX.Warning(null, pxeModuleName, "Please check the BIR 2307 before approving.");
                                     break;
                                 } else {
                                     poJSON = poController.ApproveTransaction("");
@@ -524,14 +517,6 @@ public class DisbursementVoucher_ApprovalController implements Initializable, Sc
                                 if (!pbIsCheckedJournalTab) {
                                     ShowMessageFX.Warning(null, pxeModuleName, "Please check the Journal Entry before approving.");
                                     return;
-                                } else if (poController.Master().getTransactionStatus().equals(DisbursementStatic.APPROVED)) {
-                                    if (oApp.getUserLevel() > UserRight.ENCODER && !pbIsCheckedBIRTab) {
-                                        ShowMessageFX.Warning(null, pxeModuleName, "Please check the BIR 2307 before approving.");
-                                        return;
-                                    }
-//                                } else if (poController.Master().getVATAmount() > 0.0000 && !pbIsCheckedBIRTab) {
-//                                    ShowMessageFX.Warning(null, pxeModuleName, "Please check the BIR 2307 before approving.");
-//                                    return;
                                 } else {
                                     poJSON = poController.ApproveTransaction("");
                                     if ("error".equals((String) poJSON.get("result"))) {
