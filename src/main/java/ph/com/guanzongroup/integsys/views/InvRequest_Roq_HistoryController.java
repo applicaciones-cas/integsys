@@ -1,4 +1,3 @@
-
 package ph.com.guanzongroup.integsys.views;
 
 import ph.com.guanzongroup.integsys.model.ModelInvOrderDetail;
@@ -138,6 +137,7 @@ public class InvRequest_Roq_HistoryController implements Initializable, ScreenIn
 
         try {
             invRequestController = new InvWarehouseControllers(poApp, logWrapper).StockRequest();
+            poJSON = invRequestController.InitTransaction();
             if (!"success".equals(poJSON.get("result"))) {
                 ShowMessageFX.Warning((String) poJSON.get("message"), "Search Information", null);
             }
@@ -204,7 +204,7 @@ public class InvRequest_Roq_HistoryController implements Initializable, ScreenIn
         }
     }
 
-     private void tableListInformation_Clicked(MouseEvent event) {
+    private void tableListInformation_Clicked(MouseEvent event) {
         poJSON = new JSONObject();
         pnTblInformationRow = tableListInformation.getSelectionModel().getSelectedIndex();
         if (pnTblInformationRow < 0 || pnTblInformationRow >= tableListInformation.getItems().size()) {
@@ -240,7 +240,6 @@ public class InvRequest_Roq_HistoryController implements Initializable, ScreenIn
             }
         }
     }
-
 
     private void loadRecordSearch() {
         try {
