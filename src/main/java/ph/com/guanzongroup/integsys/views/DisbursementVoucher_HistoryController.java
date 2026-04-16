@@ -1311,9 +1311,23 @@ public class DisbursementVoucher_HistoryController implements Initializable, Scr
             if (fnEditMode != EditMode.READY) {
                 return;
             }
-            if (!CheckStatus.PrintStatus.PRINTED.equals(poController.Master().CheckPayments().getPrint())) {
-                JFXUtil.setButtonsVisibility(false, btnPrint, btnPrintPaymentSummary, btnPrintCheck);
+            
+            switch(poController.Master().getDisbursementType()){
+                case DisbursementStatic.DisbursementType.CHECK:
+                case DisbursementStatic.DisbursementType.CHECK_DEPOSIT:
+                    if (!CheckStatus.PrintStatus.PRINTED.equals(poController.Master().CheckPayments().getPrint())) {
+                        JFXUtil.setButtonsVisibility(false, btnPrint, btnPrintPaymentSummary, btnPrintCheck);
+                    }
+                    break;
+                default:
+                    if (!OtherPaymentStatus.POSTED.equals(poController.Master().OtherPayments().getTransactionStatus())) {
+                        JFXUtil.setButtonsVisibility(false, btnPrint, btnPrintPaymentSummary, btnPrintCheck);
+                    } else {
+                        JFXUtil.setButtonsVisibility(false, btnPrintCheck);
+                    }
+                    break;l
             }
+            
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
         }
