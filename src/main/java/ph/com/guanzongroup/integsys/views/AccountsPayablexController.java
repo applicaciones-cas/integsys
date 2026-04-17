@@ -144,7 +144,10 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
     private DatePicker dpBegBalance, dpClientSince;
 
     @FXML
-    private CheckBox cbVatRegistered;
+    private CheckBox cbVatRegistered, cbVatable, cbHasPermit, cbBackOrder, cbHoldOrder;
+    
+    @FXML
+    private ComboBox<String> cmbPayment;
 
     @Override
     public void setGRider(GRiderCAS foValue) {
@@ -691,10 +694,47 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
                 loControlField.focusedProperty().addListener(dPicker_Focus);
             }
         }
+        
+        //vat registered
         cbVatRegistered.focusedProperty().addListener((obs, oldVal, newVal) -> {
             if (newVal) {
-                poAppController.getModel().setVatable(cbVatRegistered.isSelected() == true
+                poAppController.getModel().isVatRegstr(cbVatRegistered.isSelected() == true
                         ? "1" : "0");
+            }
+        });
+        //has permit
+        cbHasPermit.focusedProperty().addListener((obs, oldVal, newVal) -> {
+            if (newVal) {
+                poAppController.getModel().hasPermit(cbHasPermit.isSelected() == true
+                        ? "1" : "0");
+            }
+        });
+        //has back order
+        cbBackOrder.focusedProperty().addListener((obs, oldVal, newVal) -> {
+            if (newVal) {
+                poAppController.getModel().isBackOrder(cbBackOrder.isSelected() == true
+                        ? "1" : "0");
+            }
+        });
+        //vatable
+        cbVatable.focusedProperty().addListener((obs, oldVal, newVal) -> {
+            if (newVal) {
+                poAppController.getModel().setVatable(cbVatable.isSelected() == true
+                        ? "1" : "0");
+            }
+        });
+        //is hold order
+        cbHoldOrder.focusedProperty().addListener((obs, oldVal, newVal) -> {
+            if (newVal) {
+                poAppController.getModel().isHoldOrder(cbHoldOrder.isSelected() == true
+                        ? "1" : "0");
+            }
+        });
+        //payment method
+        cmbPayment.getSelectionModel().selectedIndexProperty().addListener((obs, oldIndex, newIndex) -> {
+            if (newIndex != null && newIndex.intValue() >= 0) {
+                int lnIndex = newIndex.intValue(); // the selected index
+                poAppController.getModel().setPayment(String.valueOf(lnIndex));
             }
         });
         clearAllInputs();
@@ -735,6 +775,11 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
         imgPreview.setImage(null);
 
         initButtonDisplay(poAppController.getEditMode());
+        cmbPayment.setItems(FXCollections.observableArrayList(
+                "Check",
+                "Deposit to Account",
+                "Bank Transfer"
+        ));
     }
 
     private void initButtonDisplay(int fnEditMode) {
@@ -823,8 +868,6 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
             }
         }
     
-    
-
     private void initAttachmentsGrid() {
 
         /*FOCUS ON FIRST ROW*/
