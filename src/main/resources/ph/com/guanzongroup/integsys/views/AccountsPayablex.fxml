@@ -5,6 +5,7 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.DatePicker?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Separator?>
@@ -25,7 +26,7 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<AnchorPane fx:id="apMainAnchor" prefHeight="613.0" prefWidth="1175.0" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane fx:id="apMainAnchor" prefHeight="663.0" prefWidth="1175.0" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1">
    <children>
       <BorderPane prefHeight="558.0" prefWidth="1175.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <bottom>
@@ -174,18 +175,19 @@
                                  <children>
                                     <HBox maxHeight="1.7976931348623157E308" prefWidth="1145.0" AnchorPane.bottomAnchor="-0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                        <children>
-                                          <AnchorPane fx:id="apRecord" maxHeight="-Infinity" prefHeight="464.0" prefWidth="670.0" style="-fx-border-color: orange;">
+                                          <AnchorPane fx:id="apRecord" maxHeight="-Infinity" prefHeight="498.0" prefWidth="780.0" style="-fx-border-color: orange;">
                                              <children>
                                                 <GridPane hgap="2.0" vgap="3.0" AnchorPane.bottomAnchor="-0.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="0.0">
                                                    <columnConstraints>
                                                       <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" minWidth="10.0" prefWidth="110.0" />
                                                       <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="80.0" />
-                                                      <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="80.0" />
-                                                      <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="80.0" />
-                                                      <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="10.0" />
-                                                      <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="130.0" />
-                                                      <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="80.0" />
-                                                      <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="80.0" />
+                                                      <ColumnConstraints hgrow="SOMETIMES" maxWidth="173.0" minWidth="10.0" prefWidth="134.0" />
+                                                      <ColumnConstraints hgrow="SOMETIMES" maxWidth="122.0" minWidth="10.0" prefWidth="22.0" />
+                                                      <ColumnConstraints hgrow="SOMETIMES" maxWidth="10.0" minWidth="10.0" prefWidth="10.0" />
+                                                      <ColumnConstraints hgrow="SOMETIMES" maxWidth="175.0" minWidth="10.0" prefWidth="120.0" />
+                                                      <ColumnConstraints hgrow="SOMETIMES" maxWidth="133.0" minWidth="10.0" prefWidth="87.0" />
+                                                      <ColumnConstraints hgrow="SOMETIMES" maxWidth="152.0" minWidth="10.0" prefWidth="146.0" />
+                                                      <ColumnConstraints />
                                                    </columnConstraints>
                                                    <rowConstraints>
                                                       <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
@@ -201,10 +203,12 @@
                                                       <RowConstraints minHeight="10.0" prefHeight="20.0" vgrow="SOMETIMES" />
                                                       <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                                                       <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                                                       <RowConstraints minHeight="10.0" prefHeight="25.0" vgrow="SOMETIMES" />
                                                       <RowConstraints minHeight="10.0" prefHeight="25.0" vgrow="SOMETIMES" />
                                                       <RowConstraints minHeight="10.0" prefHeight="25.0" vgrow="SOMETIMES" />
                                                       <RowConstraints minHeight="10.0" prefHeight="25.0" vgrow="SOMETIMES" />
+                                                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                                                       <RowConstraints minHeight="10.0" prefHeight="10.0" vgrow="SOMETIMES" />
                                                    </rowConstraints>
                                                    <children>
@@ -260,17 +264,17 @@
                                                             <Insets right="5.0" />
                                                          </GridPane.margin>
                                                       </Label>
-                                                      <Label text="Credit Limit" GridPane.halignment="RIGHT" GridPane.rowIndex="13" GridPane.valignment="CENTER">
+                                                      <Label text="Credit Limit" GridPane.halignment="RIGHT" GridPane.rowIndex="14" GridPane.valignment="CENTER">
                                                          <GridPane.margin>
                                                             <Insets right="5.0" />
                                                          </GridPane.margin>
                                                       </Label>
-                                                      <Label text="Discount" GridPane.halignment="RIGHT" GridPane.rowIndex="14" GridPane.valignment="CENTER">
+                                                      <Label text="Discount" GridPane.halignment="RIGHT" GridPane.rowIndex="15" GridPane.valignment="CENTER">
                                                          <GridPane.margin>
                                                             <Insets right="5.0" />
                                                          </GridPane.margin>
                                                       </Label>
-                                                      <Label text="Term" GridPane.halignment="RIGHT" GridPane.rowIndex="15" GridPane.valignment="CENTER">
+                                                      <Label text="Term" GridPane.halignment="RIGHT" GridPane.rowIndex="16" GridPane.valignment="CENTER">
                                                          <GridPane.margin>
                                                             <Insets right="5.0" />
                                                          </GridPane.margin>
@@ -335,7 +339,7 @@
                                                             <Insets left="5.0" />
                                                          </GridPane.margin>
                                                       </TextField>
-                                                      <TextField fx:id="tfCreditLimit" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="13">
+                                                      <TextField fx:id="tfCreditLimit" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="14">
                                                          <GridPane.margin>
                                                             <Insets left="5.0" />
                                                          </GridPane.margin>
@@ -345,12 +349,12 @@
                                                             <Insets left="5.0" />
                                                          </GridPane.margin>
                                                       </TextField>
-                                                      <TextField fx:id="tfDiscount" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="14">
+                                                      <TextField fx:id="tfDiscount" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="15">
                                                          <GridPane.margin>
                                                             <Insets left="5.0" />
                                                          </GridPane.margin>
                                                       </TextField>
-                                                      <TextField fx:id="tfTerm" promptText="Press F3: Search" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="15">
+                                                      <TextField fx:id="tfTerm" promptText="Press F3: Search" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="16">
                                                          <GridPane.margin>
                                                             <Insets left="5.0" />
                                                          </GridPane.margin>
@@ -367,12 +371,12 @@
                                                       </TextField>
                                                       <Separator maxWidth="1.7976931348623157E308" prefWidth="200.0" style="-fx-background-color: FF8201;" GridPane.columnSpan="8" GridPane.rowIndex="10" />
                                                       <Separator prefWidth="200.0" GridPane.columnIndex="5" GridPane.columnSpan="3" GridPane.rowIndex="14" />
-                                                      <CheckBox fx:id="cbVatRegistered" mnemonicParsing="false" text="VAT Registered" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.halignment="RIGHT" GridPane.rowIndex="16">
+                                                      <CheckBox fx:id="cbVatable" mnemonicParsing="false" text="Vatable" GridPane.columnIndex="1" GridPane.halignment="LEFT" GridPane.rowIndex="17">
                                                          <GridPane.margin>
                                                             <Insets left="5.0" />
                                                          </GridPane.margin>
                                                       </CheckBox>
-                                                      <DatePicker fx:id="dpClientSince" editable="false" prefHeight="28.0" prefWidth="227.0" promptText="YYYY-MM-DD" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="12">
+                                                      <DatePicker fx:id="dpClientSince" disable="true" editable="false" prefHeight="28.0" prefWidth="227.0" promptText="YYYY-MM-DD" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="12">
                                                          <GridPane.margin>
                                                             <Insets left="5.0" />
                                                          </GridPane.margin>
@@ -382,16 +386,26 @@
                                                             <Insets left="5.0" />
                                                          </GridPane.margin>
                                                       </DatePicker>
-                                                      <Label fx:id="lblStatus12" alignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minWidth="142.0" prefHeight="27.0" prefWidth="142.0" style="-fx-background-color: #445054;" text="Company Information" textAlignment="CENTER" textFill="WHITE" GridPane.columnSpan="8">
+                                                      <Label fx:id="lblStatus12" alignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minWidth="142.0" prefHeight="27.0" prefWidth="142.0" style="-fx-background-color: #445054;" text="Company Information" textAlignment="CENTER" textFill="WHITE" GridPane.columnSpan="9">
                                                          <font>
                                                             <Font name="System Bold" size="14.0" />
                                                          </font>
                                                       </Label>
-                                                      <Label fx:id="lblStatus121" alignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minWidth="142.0" prefHeight="27.0" prefWidth="142.0" style="-fx-background-color: #445054;" text="AP Ledger" textAlignment="CENTER" textFill="WHITE" GridPane.columnSpan="8" GridPane.rowIndex="11">
+                                                      <Label fx:id="lblStatus121" alignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minWidth="142.0" prefHeight="27.0" prefWidth="142.0" style="-fx-background-color: #445054;" text="AP Ledger" textAlignment="CENTER" textFill="WHITE" GridPane.columnSpan="9" GridPane.rowIndex="11">
                                                          <font>
                                                             <Font name="System Bold" size="14.0" />
                                                          </font>
                                                       </Label>
+                                                      <CheckBox fx:id="cbHasPermit" mnemonicParsing="false" text="Has Permit" GridPane.columnIndex="6" GridPane.rowIndex="2" />
+                                                      <CheckBox fx:id="cbBackOrder" mnemonicParsing="false" text="Back Order Monitoring" GridPane.columnIndex="7" GridPane.rowIndex="2" />
+                                                      <CheckBox fx:id="cbHoldOrder" mnemonicParsing="false" text="Hold Orders" GridPane.columnIndex="2" GridPane.halignment="RIGHT" GridPane.rowIndex="17" />
+                                                      <Label text="Payment Method" GridPane.rowIndex="13" />
+                                                      <ComboBox fx:id="cmbPayment" maxWidth="1.7976931348623157E308" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="13">
+                                                         <GridPane.margin>
+                                                            <Insets left="5.0" />
+                                                         </GridPane.margin>
+                                                      </ComboBox>
+                                                      <CheckBox fx:id="cbVatRegistered" mnemonicParsing="false" text="VAT Registered" GridPane.columnIndex="5" GridPane.rowIndex="2" />
                                                    </children>
                                                 </GridPane>
                                              </children>
@@ -401,7 +415,8 @@
                                                 <TableView fx:id="tblLedger" onMouseClicked="#tblLedger_Clicked" stylesheets="@../css/Tables.css" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                                    <columns>
                                                       <TableColumn fx:id="tblColNo" maxWidth="25.0" minWidth="25.0" prefWidth="25.0" text="No." />
-                                                      <TableColumn fx:id="tblColDate" maxWidth="150.0" minWidth="100.0" prefWidth="100.0" text="Date" />
+                                                      <TableColumn fx:id="tblLedgerNo" maxWidth="500.0" minWidth="0.0" prefWidth="71.0" text="Ledger No" />
+                                                      <TableColumn fx:id="tblColDate" maxWidth="150.0" minWidth="45.0" prefWidth="45.0" text="Date" />
                                                       <TableColumn fx:id="tblColSourceNo" maxWidth="500.0" minWidth="0.0" prefWidth="71.0" text="Source No" />
                                                       <TableColumn fx:id="tblColSourceCode" maxWidth="500.0" minWidth="0.0" prefWidth="120.0" text="Source Code" />
                                                       <TableColumn fx:id="tblColAmountIn" maxWidth="500.0" minWidth="40.0" prefWidth="58.0" text="Amount In" />
