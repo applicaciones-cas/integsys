@@ -524,6 +524,8 @@ public class DisbursementVoucher_ConfirmationController implements Initializable
                         lsTransaction = "void";
                     } else if (DisbursementStatic.CONFIRMED.equals(poController.Master().getTransactionStatus())) {
                         lsTransaction = "cancel";
+                    } else {
+                        lsTransaction = "cancel";
                     }
                     if (ShowMessageFX.YesNo(null, pxeModuleName, "Are you sure you want to " + lsTransaction + " transaction?")) {
                         pnEditMode = poController.getEditMode();
@@ -1982,6 +1984,9 @@ public class DisbursementVoucher_ConfirmationController implements Initializable
             } else if (DisbursementStatic.CONFIRMED.equals(poController.Master().getTransactionStatus())) {
                 lsTransaction = "Cancel";
                 btnVoid.setText(lsTransaction);
+            } else {
+                lsTransaction = "Cancel";
+                btnVoid.setText(lsTransaction);
             }
 
             JFXUtil.setStatusValue(lblDVTransactionStatus, DisbursementStatic.class, pnEditMode == EditMode.UNKNOWN ? "-1" : poController.Master().getTransactionStatus());
@@ -2655,7 +2660,7 @@ public class DisbursementVoucher_ConfirmationController implements Initializable
                     JFXUtil.setButtonsVisibility(false, btnConfirm);
                     break;
                 case DisbursementStatic.RETURNED:
-                    JFXUtil.setButtonsVisibility(true, btnUpdate);
+                    JFXUtil.setButtonsVisibility(true, btnUpdate, btnVoid);
                     break;
                 case DisbursementStatic.VOID:
                 case DisbursementStatic.CANCELLED:
