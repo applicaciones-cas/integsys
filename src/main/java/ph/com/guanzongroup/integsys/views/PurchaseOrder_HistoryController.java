@@ -370,10 +370,8 @@ public class PurchaseOrder_HistoryController implements Initializable, ScreenInt
                                 tfSearchSupplier.setText(poPurchasingController.PurchaseOrder().Master().Supplier().getCompanyName());
                                 break;
                             case "tfSearchReferenceNo":
-                                if(lsValue == null || lsValue.isEmpty()){
-                                    return;
-                                }
-                                poJSON = poPurchasingController.PurchaseOrder().SearchTransaction(lsValue,
+                                psReferID = lsValue;
+                                poJSON = poPurchasingController.PurchaseOrder().SearchTransaction(psReferID,
                                         psSupplierID,
                                         psReferID,psTransNo,2);
                                 if ("success".equals((String) poJSON.get("result"))) {
@@ -389,10 +387,8 @@ public class PurchaseOrder_HistoryController implements Initializable, ScreenInt
                                 }
                                 break;
                             case "tfSearchTransNo":
-                                if(lsValue == null || lsValue.isEmpty()){
-                                    return;
-                                }
-                                poJSON = poPurchasingController.PurchaseOrder().SearchTransaction(lsValue,
+                                psTransNo = lsValue;
+                                poJSON = poPurchasingController.PurchaseOrder().SearchTransaction(psTransNo,
                                         psSupplierID,
                                         psReferID,psTransNo,1);
                                 if ("success".equals((String) poJSON.get("result"))) {
