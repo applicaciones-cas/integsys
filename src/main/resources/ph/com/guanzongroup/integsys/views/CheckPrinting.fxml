@@ -114,14 +114,6 @@
                                                 <Blend />
                                             </effect>
                                         </Button>
-                                        <Button fx:id="btnRetrieve" contentDisplay="TOP" ellipsisString="" mnemonicParsing="false" prefHeight="70.0" prefWidth="70.0" styleClass="button_process" stylesheets="@../css/StyleSheet.css" text="Retrieve">
-                                            <graphic>
-                                                <FontAwesomeIconView glyphName="LIST_ALT" size="20" />
-                                            </graphic>
-                                            <effect>
-                                                <Blend />
-                                            </effect>
-                                        </Button>
                               <Button fx:id="btnPrintDV" contentDisplay="TOP" graphicTextGap="3.0" maxHeight="70.0" minWidth="80.0" mnemonicParsing="false" prefHeight="50.0" prefWidth="70.0" styleClass="button_process" stylesheets="@../css/StyleSheet.css" text="Print DV">
                                  <graphic>
                                     <FontAwesomeIconView glyphName="PRINT" size="20" styleClass="FontIcon" />
@@ -137,6 +129,14 @@
                                     <FontAwesomeIconView glyphName="PRINT" size="20" styleClass="FontIcon" />
                                  </graphic>
                               </Button>
+                                        <Button fx:id="btnRetrieve" contentDisplay="TOP" ellipsisString="" mnemonicParsing="false" prefHeight="70.0" prefWidth="70.0" styleClass="button_process" stylesheets="@../css/StyleSheet.css" text="Retrieve">
+                                            <graphic>
+                                                <FontAwesomeIconView glyphName="LIST_ALT" size="20" />
+                                            </graphic>
+                                            <effect>
+                                                <Blend />
+                                            </effect>
+                                        </Button>
                                         <Button fx:id="btnClose" contentDisplay="TOP" ellipsisString="" mnemonicParsing="false" prefHeight="70.0" prefWidth="70.0" styleClass="button_process" stylesheets="@../css/StyleSheet.css" text="Close">
                                             <graphic>
                                                 <FontAwesomeIconView glyphName="POWER_OFF" size="20" />
