@@ -274,8 +274,9 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
                                     "Initialize Search Client! ")) {
                                 return;
                             }
+                            clearAllInputs();
+                            
                             poAppController.loadAttachments();
-
                             getLoadedClient();
                             initButtonDisplay(poAppController.getEditMode());
                             break;
@@ -289,8 +290,9 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
                                     "Initialize Search Client! ")) {
                                 return;
                             }
+                            clearAllInputs();
+                            
                             poAppController.loadAttachments();
-
                             getLoadedClient();
                             initButtonDisplay(poAppController.getEditMode());
                             break;
@@ -337,7 +339,18 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
                     if (!isJSONSuccess(poAppController.saveRecord(), "Initialize Save Record")) {
                         return;
                     }
+                    
+                    poAppController.openRecord(poAppController.getModel().getClientId());
+                    if (!isJSONSuccess(poAppController.updateRecord(), "Initialize Update Record")) {
+                        return;
+                    }
+                    clearAllInputs();
+                    
+                    poAppController.loadAttachments();
                     getLoadedClient();
+                    initButtonDisplay(poAppController.getEditMode());
+                    
+                    //getLoadedClient();
 
                     break;
 
@@ -658,6 +671,14 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
             tfContactNo.setText(poAppController.getModel().ClientInstitutionContact().getMobileNo());
             tfTINNo.setText(poAppController.getModel().Client().getTaxIdNumber());
             
+            cbVatRegistered.setSelected(poAppController.getModel().isVatRegstr().equalsIgnoreCase("1") ? true : false);
+            cbHasPermit.setSelected(poAppController.getModel().hasPermit().equalsIgnoreCase("1") ? true : false);
+            cbBackOrder.setSelected(poAppController.getModel().isBackOrder().equalsIgnoreCase("1") ? true : false);
+            cbVatable.setSelected(poAppController.getModel().getVatable().equalsIgnoreCase("1") ? true : false);
+            cbHoldOrder.setSelected(poAppController.getModel().isHoldOrder().equalsIgnoreCase("1") ? true : false);
+            
+            cmbPayment.getSelectionModel().select(Integer.parseInt(poAppController.getModel().getPayment()));
+            
             dpClientSince.setValue(poAppController.getModel().getdateClientSince() == null ? null : ParseDate(poAppController.getModel().getdateClientSince()));
             dpBegBalance.setValue(poAppController.getModel().getBeginningDate() == null ? null : ParseDate(poAppController.getModel().getBeginningDate()));
             tfDiscount.setText(CommonUtils.NumberFormat(poAppController.getModel().getDiscount(), "###,###,##0.0000"));
@@ -696,39 +717,24 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
         }
         
         //vat registered
-        cbVatRegistered.focusedProperty().addListener((obs, oldVal, newVal) -> {
-            if (newVal) {
-                poAppController.getModel().isVatRegstr(cbVatRegistered.isSelected() == true
-                        ? "1" : "0");
-            }
+        cbVatRegistered.selectedProperty().addListener((obs, oldVal, newVal) -> {
+            poAppController.getModel().isVatRegstr(cbVatRegistered.isSelected() == true ? "1" : "0");
         });
         //has permit
-        cbHasPermit.focusedProperty().addListener((obs, oldVal, newVal) -> {
-            if (newVal) {
-                poAppController.getModel().hasPermit(cbHasPermit.isSelected() == true
-                        ? "1" : "0");
-            }
+        cbHasPermit.selectedProperty().addListener((obs, oldVal, newVal) -> {
+            poAppController.getModel().hasPermit(cbHasPermit.isSelected() == true ? "1" : "0");
         });
         //has back order
-        cbBackOrder.focusedProperty().addListener((obs, oldVal, newVal) -> {
-            if (newVal) {
-                poAppController.getModel().isBackOrder(cbBackOrder.isSelected() == true
-                        ? "1" : "0");
-            }
+        cbBackOrder.selectedProperty().addListener((obs, oldVal, newVal) -> {
+            poAppController.getModel().isBackOrder(cbBackOrder.isSelected() == true ? "1" : "0");
         });
         //vatable
-        cbVatable.focusedProperty().addListener((obs, oldVal, newVal) -> {
-            if (newVal) {
-                poAppController.getModel().setVatable(cbVatable.isSelected() == true
-                        ? "1" : "0");
-            }
+        cbVatable.selectedProperty().addListener((obs, oldVal, newVal) -> {
+            poAppController.getModel().setVatable(cbVatable.isSelected() == true ? "1" : "0");
         });
         //is hold order
-        cbHoldOrder.focusedProperty().addListener((obs, oldVal, newVal) -> {
-            if (newVal) {
-                poAppController.getModel().isHoldOrder(cbHoldOrder.isSelected() == true
-                        ? "1" : "0");
-            }
+        cbHoldOrder.selectedProperty().addListener((obs, oldVal, newVal) -> {
+            poAppController.getModel().isHoldOrder(cbHoldOrder.isSelected() == true ? "1" : "0");
         });
         //payment method
         cmbPayment.getSelectionModel().selectedIndexProperty().addListener((obs, oldIndex, newIndex) -> {
@@ -767,6 +773,8 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
                 ((DatePicker) loControl).setValue(null);
             } else if (loControl instanceof ComboBox) {
                 ((ComboBox) loControl).setItems(null);
+            } else if (loControl instanceof CheckBox) {
+                ((CheckBox) loControl).setSelected(false);
             }
         }
 
