@@ -51,6 +51,7 @@ import org.guanzon.appdriver.base.CommonUtils;
 import org.guanzon.appdriver.base.GRiderCAS;
 import org.guanzon.appdriver.base.GuanzonException;
 import org.guanzon.appdriver.base.LogWrapper;
+import org.guanzon.appdriver.base.MiscUtil;
 import org.guanzon.appdriver.base.SQLUtil;
 import org.guanzon.appdriver.constant.EditMode;
 import org.json.simple.JSONObject;
@@ -145,8 +146,7 @@ public class InventoryStockIssuance_PostingControllerCar_SP implements Initializ
         try {
             poLogWrapper = new LogWrapper(psFormName, psFormName + "Log");
             poAppController = new DeliveryIssuanceControllers(poApp, poLogWrapper).InventoryStockIssuanceNeo();
-            
-           
+
             if (!isJSONSuccess(poAppController.initTransaction(), "Initialize Transaction")) {
                 unloadForm appUnload = new unloadForm();
                 appUnload.unloadForm(apMainAnchor, poApp, psFormName);
@@ -165,7 +165,10 @@ public class InventoryStockIssuance_PostingControllerCar_SP implements Initializ
             initializeTableDetail();
             initControlEvents();
         } catch (SQLException | GuanzonException ex) {
-            Logger.getLogger(InventoryStockIssuance_PostingControllerCar_SP.class.getName()).log(Level.SEVERE, null, ex);
+
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(MiscUtil.getException(ex), psFormName, null);
+
             poLogWrapper.severe(psFormName + " :" + ex.getMessage());
         }
     }
@@ -190,7 +193,8 @@ public class InventoryStockIssuance_PostingControllerCar_SP implements Initializ
                         return;
                     }
                     reloadTableDetail();
-                    clearAllInputs();
+                    getLoadedTransaction();
+                    loadTransaction(tfSearchTransaction.getText(), "a.sTransNox");
                     pnEditMode = poAppController.getEditMode();
                     break;
 
@@ -224,9 +228,11 @@ public class InventoryStockIssuance_PostingControllerCar_SP implements Initializ
             initButtonDisplay(poAppController.getEditMode());
 
         } catch (GuanzonException | SQLException | CloneNotSupportedException ex) {
-            Logger.getLogger(InventoryStockIssuance_PostingControllerCar_SP.class.getName()).log(Level.SEVERE, null, ex);
-            poLogWrapper.severe(psFormName + " :" + ex.getMessage());
 
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(MiscUtil.getException(ex), psFormName, null);
+
+            poLogWrapper.severe(psFormName + " :" + ex.getMessage());
         }
     }
 
@@ -251,9 +257,11 @@ public class InventoryStockIssuance_PostingControllerCar_SP implements Initializ
                 }
                 getLoadedTransaction();
             } catch (CloneNotSupportedException | SQLException | GuanzonException ex) {
-                Logger.getLogger(InventoryStockIssuance_PostingControllerCar_SP.class.getName()).log(Level.SEVERE, null, ex);
-                poLogWrapper.severe(psFormName + " :" + ex.getMessage());
 
+                Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+                ShowMessageFX.Error(MiscUtil.getException(ex), psFormName, null);
+
+                poLogWrapper.severe(psFormName + " :" + ex.getMessage());
             }
 
         }
@@ -271,7 +279,10 @@ public class InventoryStockIssuance_PostingControllerCar_SP implements Initializ
 
             loadSelectedTransactionDetail(pnDetailRow);
         } catch (SQLException | GuanzonException | CloneNotSupportedException ex) {
-            Logger.getLogger(InventoryStockIssuance_PostingControllerCar_SP.class.getName()).log(Level.SEVERE, null, ex);
+
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(MiscUtil.getException(ex), psFormName, null);
+
             poLogWrapper.severe(psFormName + " :" + ex.getMessage());
         }
     }
@@ -292,7 +303,9 @@ public class InventoryStockIssuance_PostingControllerCar_SP implements Initializ
                     controls.add((Control) value);
                 }
             } catch (IllegalAccessException e) {
-                e.printStackTrace();
+                Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(e), e);
+                ShowMessageFX.Error(MiscUtil.getException(e), psFormName, null);
+
                 poLogWrapper.severe(psFormName + " :" + e.getMessage());
             }
         }
@@ -386,7 +399,9 @@ public class InventoryStockIssuance_PostingControllerCar_SP implements Initializ
                     loButton.setManaged(visible);
                 }
             } catch (IllegalAccessException e) {
-                e.printStackTrace();
+                Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(e), e);
+                ShowMessageFX.Error(MiscUtil.getException(e), psFormName, null);
+
                 poLogWrapper.severe(psFormName + " :" + e.getMessage());
             }
         }
@@ -447,8 +462,9 @@ public class InventoryStockIssuance_PostingControllerCar_SP implements Initializ
                 loTextField.selectAll();
             }
         } catch (SQLException | GuanzonException | CloneNotSupportedException ex) {
-            Logger.getLogger(InventoryStockIssuance_PostingControllerCar_SP.class
-                    .getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(MiscUtil.getException(ex), psFormName, null);
+
             poLogWrapper.severe(psFormName + " :" + ex.getMessage());
         }
     };
@@ -490,6 +506,9 @@ public class InventoryStockIssuance_PostingControllerCar_SP implements Initializ
                                         "Initialize Search Source! ")) {
                                     return;
                                 }
+                                getLoadedTransaction();
+                                initButtonDisplay(poAppController.getEditMode());
+                                return;
                             default:
                                 CommonUtils.SetNextFocus((TextField) event.getSource());
                                 return;
@@ -504,8 +523,9 @@ public class InventoryStockIssuance_PostingControllerCar_SP implements Initializ
                 }
             }
         } catch (CloneNotSupportedException | SQLException | GuanzonException ex) {
-            Logger.getLogger(InventoryStockIssuance_PostingControllerCar_SP.class
-                    .getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(MiscUtil.getException(ex), psFormName, null);
+
             poLogWrapper.severe(psFormName + " :" + ex.getMessage());
         }
     }
@@ -536,8 +556,9 @@ public class InventoryStockIssuance_PostingControllerCar_SP implements Initializ
             }
 
         } catch (SQLException | GuanzonException | CloneNotSupportedException ex) {
-            Logger.getLogger(InventoryStockIssuance_PostingControllerCar_SP.class
-                    .getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(MiscUtil.getException(ex), psFormName, null);
+
             poLogWrapper.severe(psFormName + " :" + ex.getMessage());
         }
     };
@@ -616,7 +637,7 @@ public class InventoryStockIssuance_PostingControllerCar_SP implements Initializ
             String message = (String) loJSON.get("message");
             poLogWrapper.severe(psFormName + " :" + message);
             Platform.runLater(() -> {
-                ShowMessageFX.Warning(null, psFormName, fsModule + ": " + message);
+                ShowMessageFX.Warning(null, psFormName, message);
             });
             return false;
         }
@@ -625,7 +646,7 @@ public class InventoryStockIssuance_PostingControllerCar_SP implements Initializ
         poLogWrapper.severe(psFormName + " :" + message);
         Platform.runLater(() -> {
             if (message != null) {
-                ShowMessageFX.Information(null, psFormName, fsModule + ": " + message);
+                ShowMessageFX.Information(null, psFormName, message);
             }
         });
         poLogWrapper.info(psFormName + " : Success on " + fsModule);
@@ -714,8 +735,6 @@ public class InventoryStockIssuance_PostingControllerCar_SP implements Initializ
 
                     return new SimpleStringProperty(xserialname);
                 } catch (SQLException | GuanzonException ex) {
-                    Logger.getLogger(InventoryStockIssuance_PostingControllerCar_SP.class
-                            .getName()).log(Level.SEVERE, null, ex);
                     poLogWrapper.severe(psFormName + " :" + ex.getMessage());
                     return new SimpleStringProperty("");
                 }
@@ -727,8 +746,6 @@ public class InventoryStockIssuance_PostingControllerCar_SP implements Initializ
                     return new SimpleStringProperty(barcode != null ? barcode : "");
 
                 } catch (SQLException | GuanzonException ex) {
-                    Logger.getLogger(InventoryStockIssuance_PostingControllerCar_SP.class
-                            .getName()).log(Level.SEVERE, null, ex);
                     poLogWrapper.severe(psFormName + " :" + ex.getMessage());
                     return new SimpleStringProperty("");
                 }
@@ -740,8 +757,6 @@ public class InventoryStockIssuance_PostingControllerCar_SP implements Initializ
                     return new SimpleStringProperty(description != null ? description : "");
 
                 } catch (SQLException | GuanzonException ex) {
-                    Logger.getLogger(InventoryStockIssuance_PostingControllerCar_SP.class
-                            .getName()).log(Level.SEVERE, null, ex);
                     poLogWrapper.severe(psFormName + " :" + ex.getMessage());
                     return new SimpleStringProperty("");
                 }
@@ -753,8 +768,6 @@ public class InventoryStockIssuance_PostingControllerCar_SP implements Initializ
                     return new SimpleStringProperty(lsObject != null ? lsObject : "");
 
                 } catch (SQLException | GuanzonException ex) {
-                    Logger.getLogger(InventoryStockIssuance_PostingControllerCar_SP.class
-                            .getName()).log(Level.SEVERE, null, ex);
                     poLogWrapper.severe(psFormName + " :" + ex.getMessage());
                     return new SimpleStringProperty("");
                 }
@@ -766,8 +779,6 @@ public class InventoryStockIssuance_PostingControllerCar_SP implements Initializ
                     return new SimpleStringProperty(lsObject != null ? lsObject : "");
 
                 } catch (SQLException | GuanzonException ex) {
-                    Logger.getLogger(InventoryStockIssuance_PostingControllerCar_SP.class
-                            .getName()).log(Level.SEVERE, null, ex);
                     poLogWrapper.severe(psFormName + " :" + ex.getMessage());
                     return new SimpleStringProperty("");
                 }
@@ -779,8 +790,6 @@ public class InventoryStockIssuance_PostingControllerCar_SP implements Initializ
                     return new SimpleStringProperty(lsObject != null ? lsObject : "");
 
                 } catch (SQLException | GuanzonException ex) {
-                    Logger.getLogger(InventoryStockIssuance_PostingControllerCar_SP.class
-                            .getName()).log(Level.SEVERE, null, ex);
                     poLogWrapper.severe(psFormName + " :" + ex.getMessage());
                     return new SimpleStringProperty("");
                 }
@@ -865,8 +874,6 @@ public class InventoryStockIssuance_PostingControllerCar_SP implements Initializ
                         return new SimpleStringProperty(lsObject != null ? lsObject : "");
 
                     } catch (SQLException | GuanzonException ex) {
-                        Logger.getLogger(InventoryStockIssuance_PostingControllerCar_SP.class
-                                .getName()).log(Level.SEVERE, null, ex);
                         poLogWrapper.severe(psFormName + " :" + ex.getMessage());
                         return new SimpleStringProperty("");
                     }
@@ -881,7 +888,7 @@ public class InventoryStockIssuance_PostingControllerCar_SP implements Initializ
                 pi.setVisible(false);
                 Throwable ex = getException();
                 Logger
-                        .getLogger(InventoryStockIssuance_PostingControllerCar_SP.class
+                        .getLogger(InventoryStockIssuance_PostingController.class
                                 .getName()).log(Level.SEVERE, null, ex);
                 poLogWrapper.severe(psFormName + " : " + ex.getMessage());
             }
@@ -940,7 +947,7 @@ public class InventoryStockIssuance_PostingControllerCar_SP implements Initializ
     }
 
     private void getLoadedTransaction() throws CloneNotSupportedException, SQLException, GuanzonException {
-        clearAllInputs();
+//        clearAllInputs();
         loadTransactionMaster();
         reloadTableDetail();
         loadSelectedTransactionDetail(pnDetailRow);

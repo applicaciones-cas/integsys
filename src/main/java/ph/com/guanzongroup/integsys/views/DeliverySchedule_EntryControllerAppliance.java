@@ -81,6 +81,7 @@ public class DeliverySchedule_EntryControllerAppliance implements Initializable,
     private String psClusterNameOld = "";
 
     private int pnClusterDetail = -1;
+    private int pnlastClusterDetail = -1;
     private int pnTransaction = -1;
     private int pnBranchList = -1;
     private Control lastFocusedControl = null;
@@ -397,6 +398,14 @@ public class DeliverySchedule_EntryControllerAppliance implements Initializable,
                     if (!isJSONSuccess(poAppController.saveTransaction(), "Initialize Save Transaction")) {
                         break;
                     }
+                    if (ShowMessageFX.YesNo(null, psFormName, "Are you sure you want to confirm transaction?") == true) {
+                        if (!isJSONSuccess(poAppController.CloseTransaction(), "Initialize Close Transaction")) {
+
+                            break;
+
+                        }
+                    }
+                    getLoadedTransaction();
                     reloadTableDetail();
 //                    clearAllInputs();
                     pnEditMode = poAppController.getEditMode();
@@ -519,23 +528,15 @@ public class DeliverySchedule_EntryControllerAppliance implements Initializable,
     }
 
     @FXML
-    private void tblClusterDetail_MouseClicked(MouseEvent event
-    ) {
+    private void tblClusterDetail_MouseClicked(MouseEvent event) {
+        pnClusterDetail = tblClusterDetail.getSelectionModel().getSelectedIndex();
+        if (pnClusterDetail < 0) {
+            return;
+        }
 
         try {
 
             if (event.getClickCount() == 1 && !event.isConsumed()) {
-
-                if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
-                    if (ShowMessageFX.OkayCancel(null, "Search Transaction! by Trasaction", "Do you want to disregard changes?") == false) {
-                        return;
-                    }
-                }
-
-                pnClusterDetail = tblClusterDetail.getSelectionModel().getSelectedIndex();
-                if (pnClusterDetail < 0) {
-                    return;
-                }
 
                 event.consume();
                 loadSelectedTransactionDetail(pnClusterDetail);
@@ -544,7 +545,6 @@ public class DeliverySchedule_EntryControllerAppliance implements Initializable,
                 loadSelectedTransactionDetail(pnClusterDetail);
             }
         } catch (SQLException | GuanzonException | CloneNotSupportedException ex) {
-            Logger.getLogger(DeliverySchedule_EntryControllerMC.class.getName()).log(Level.SEVERE, null, ex);
             poLogWrapper.severe(psFormName + " :" + ex.getMessage());
         }
     }
@@ -917,7 +917,7 @@ public class DeliverySchedule_EntryControllerAppliance implements Initializable,
             String message = (String) loJSON.get("message");
             poLogWrapper.severe(psFormName + " :" + message);
             Platform.runLater(() -> {
-                ShowMessageFX.Warning(null, psFormName, fsModule + ": " + message);
+                ShowMessageFX.Warning(null, psFormName, message);
             });
             return false;
         }
@@ -926,7 +926,7 @@ public class DeliverySchedule_EntryControllerAppliance implements Initializable,
         poLogWrapper.severe(psFormName + " :" + message);
         Platform.runLater(() -> {
             if (message != null) {
-                ShowMessageFX.Information(null, psFormName, fsModule + ": " + message);
+                ShowMessageFX.Information(null, psFormName, message);
             }
         });
         poLogWrapper.info(psFormName + " : Success on " + fsModule);
@@ -969,6 +969,7 @@ public class DeliverySchedule_EntryControllerAppliance implements Initializable,
                 psClusterNameOld = tfClusterName.getText();
                 loadSelectedBranchClusterDelivery(fnRow);
             }
+            pnlastClusterDetail = fnRow + 1;
         }
     }
 

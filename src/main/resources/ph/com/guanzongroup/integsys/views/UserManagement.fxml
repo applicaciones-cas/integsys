@@ -225,6 +225,28 @@
                                                                   </Label>
                                                                           <TextField fx:id="tfUserID" disable="true" editable="false" maxHeight="25.0" style="-fx-font-weight: bold;" styleClass="DisabledTextField" GridPane.columnIndex="2" />
                                                                   <TextField fx:id="tfLogInName" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.rowIndex="2" />
+                                                                  <HBox GridPane.columnIndex="2" GridPane.rowIndex="3">
+                                                                     <children>
+                                                                        <StackPane prefHeight="150.0" prefWidth="200.0">
+                                                                           <children>
+                                                                              <TextField fx:id="tfPassword" maxHeight="25.0" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="255.0" />
+                                                                              <PasswordField fx:id="pfPassword" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="255.0" />
+                                                                           </children>
+                                                                        </StackPane>
+                                                                        <Button fx:id="btnEyeIcon" alignment="CENTER_RIGHT" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" nodeOrientation="RIGHT_TO_LEFT" onAction="#cmdButton_Click" style="-fx-background-color: transparent;">
+                                                                           <cursor>
+                                                                              <Cursor fx:constant="HAND" />
+                                                                           </cursor>
+                                                                           <font>
+                                                                              <Font size="15.0" />
+                                                                           </font>
+                                                                           <graphic>
+                                                                              <FontAwesomeIconView glyphName="EYE" size="20" style="-fx-fill: gray;" textAlignment="CENTER" />
+                                                                              <FontAwesomeIconView glyphName="EYE_SLASH" size="20" style="-fx-fill: gray;" textAlignment="CENTER" />
+                                                                           </graphic>
+                                                                        </Button>
+                                                                     </children>
+                                                                  </HBox>
                                                                           <TextField fx:id="tfEmployeeName" maxHeight="25.0" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.rowIndex="5" />
                                                                   <TextField fx:id="tfProduct" layoutX="85.0" layoutY="78.0" maxHeight="25.0" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.rowIndex="6" />
                                                                   <Label text="Password" GridPane.rowIndex="3">
@@ -262,28 +284,6 @@
                                                                         <Insets left="30.0" />
                                                                      </GridPane.margin>
                                                                   </CheckBox>
-                                                                  <HBox GridPane.columnIndex="2" GridPane.rowIndex="3">
-                                                                     <children>
-                                                                        <StackPane prefHeight="150.0" prefWidth="200.0">
-                                                                           <children>
-                                                                              <TextField fx:id="tfPassword" maxHeight="25.0" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="255.0" />
-                                                                              <PasswordField fx:id="pfPassword" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="255.0" />
-                                                                           </children>
-                                                                        </StackPane>
-                                                                        <Button fx:id="btnEyeIcon" alignment="CENTER_RIGHT" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" nodeOrientation="RIGHT_TO_LEFT" onAction="#cmdButton_Click" style="-fx-background-color: transparent;">
-                                                                           <cursor>
-                                                                              <Cursor fx:constant="HAND" />
-                                                                           </cursor>
-                                                                           <font>
-                                                                              <Font size="15.0" />
-                                                                           </font>
-                                                                           <graphic>
-                                                                              <FontAwesomeIconView glyphName="EYE" size="20" style="-fx-fill: gray;" textAlignment="CENTER" />
-                                                                              <FontAwesomeIconView glyphName="EYE_SLASH" size="20" style="-fx-fill: gray;" textAlignment="CENTER" />
-                                                                           </graphic>
-                                                                        </Button>
-                                                                     </children>
-                                                                  </HBox>
                                                                       </children>
                                                                   </GridPane>
                                                               </children>

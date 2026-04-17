@@ -235,6 +235,7 @@ public class CashDisbursement_ApprovalController implements Initializable, Scree
                 poController.setTransactionStatus(CashDisbursementStatus.CONFIRMED);
                 loadRecordSearch();
                 TriggerWindowEvent();
+                filterIndustry();
             });
             initAttachmentPreviewPane();
         } catch (SQLException | GuanzonException ex) {
@@ -247,6 +248,19 @@ public class CashDisbursement_ApprovalController implements Initializable, Scree
             setKeyEvent(newScene);
         }
     };
+
+    public void filterIndustry() {
+        try {
+            if (!psIndustryId.equals(System.getProperty("sys.main.industry"))) {
+                poController.Master().setIndustryId(psIndustryId);
+                tfSearchIndustry.setText(poController.Master().Industry().getDescription());
+                JFXUtil.setDisabled(true, tfSearchIndustry);
+            }
+        } catch (SQLException | GuanzonException ex) {
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
+        }
+    }
 
     public void TriggerWindowEvent() {
         root = (AnchorPane) AnchorMain;
@@ -1661,7 +1675,7 @@ public class CashDisbursement_ApprovalController implements Initializable, Scree
 
                     case UP:
                         JFXUtil.altSwitch(lsID, new Object[][]{
-                            {new String[]{"tfORNoDetail", "tfAmountDetail", "tfParticularDetail","tfVatExemptDetail"}, (Runnable) () -> moveNext(true, true)},
+                            {new String[]{"tfORNoDetail", "tfAmountDetail", "tfParticularDetail", "tfVatExemptDetail"}, (Runnable) () -> moveNext(true, true)},
                             {new String[]{"tfAccountCode", "tfAccountDescription", "tfCreditAmount"}, (Runnable) () -> moveNextJE(true, true)},
                             {new String[]{"tfTaxCode", "tfParticular", "tfBaseAmount", "tfTaxRate"}, (Runnable) () -> moveNextBIR(true, true)}
                         });
@@ -1669,7 +1683,7 @@ public class CashDisbursement_ApprovalController implements Initializable, Scree
                         break;
                     case DOWN:
                         JFXUtil.altSwitch(lsID, new Object[][]{
-                            {new String[]{"tfORNoDetail", "tfAmountDetail", "tfParticularDetail","tfVatExemptDetail"}, (Runnable) () -> moveNext(false, true)},
+                            {new String[]{"tfORNoDetail", "tfAmountDetail", "tfParticularDetail", "tfVatExemptDetail"}, (Runnable) () -> moveNext(false, true)},
                             {new String[]{"tfAccountCode", "tfAccountDescription", "tfCreditAmount"}, (Runnable) () -> moveNextJE(false, true)},
                             {new String[]{"tfTaxCode", "tfParticular", "tfBaseAmount", "tfTaxRate"}, (Runnable) () -> moveNextBIR(false, true)}
                         });
@@ -1747,6 +1761,7 @@ public class CashDisbursement_ApprovalController implements Initializable, Scree
             lblSource.setText(poController.Master().Company().getCompanyName() + " - " + poController.Master().Industry().getDescription());
             tfSearchIndustry.setText(poController.getSearchIndustry());
             tfSearchPayee.setText(poController.getSearchPayee());
+            filterIndustry();
             JFXUtil.updateCaretPositions(apBrowse);
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
@@ -2161,6 +2176,7 @@ public class CashDisbursement_ApprovalController implements Initializable, Scree
         JFXUtil.setValueToNull(previousSearchedTextField, lastFocusedTextField);
         JFXUtil.clearTextFields(apButton, apMasterDetail, apDVMaster1, apDVMaster2, apDVDetail,
                 apMainList, apBrowse, apJournalMaster, apJournalDetails, apBIRDetail, apAttachments);
+        filterIndustry();
     }
 
 }

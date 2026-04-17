@@ -855,6 +855,7 @@ public class PurchaseOrder_ApprovalMonarchHospitalityController implements Initi
                                     approved = false;
                                     return;
                                 }
+                                poPurchasingController.PurchaseOrder().setApproving((String) poJSON.get("sUserIDxx"));
                             }
                         }
                     } else {

@@ -348,7 +348,7 @@ public class PurchaseOrder_EntryAppliancesController implements Initializable, S
                 case "btnBrowse":
                     poJSON = poPurchasingController.PurchaseOrder().SearchTransaction("",
                             poPurchasingController.PurchaseOrder().Master().getSupplierID(),
-                            "");
+                            "","",1);
                     if (!"error".equals((String) poJSON.get("result"))) {
                         tblVwStockRequest.getSelectionModel().clearSelection(pnTblDetailRow);
                         pnTblDetailRow = -1;
@@ -1300,6 +1300,7 @@ public class PurchaseOrder_EntryAppliancesController implements Initializable, S
                                         approved = false;
                                         return;
                                     }
+                                    poPurchasingController.PurchaseOrder().setApproving((String) poJSON.get("sUserIDxx"));
                                 }
                             }
                         } else {

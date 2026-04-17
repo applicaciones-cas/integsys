@@ -220,12 +220,12 @@
                                                    <children>
                                                       <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Brand" GridPane.columnIndex="1" GridPane.rowIndex="3" />
                                                       <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Model" GridPane.columnIndex="1" GridPane.rowIndex="4" />
-                                                      <TextField fx:id="tfBrand" editable="false" GridPane.columnIndex="3" GridPane.rowIndex="3" />
-                                                      <TextField fx:id="tfModel" editable="false" prefWidth="107.0" GridPane.columnIndex="3" GridPane.rowIndex="4" />
+                                                      <TextField fx:id="tfBrand" disable="true" editable="false" GridPane.columnIndex="3" GridPane.rowIndex="3" />
+                                                      <TextField fx:id="tfModel" disable="true" editable="false" prefWidth="107.0" GridPane.columnIndex="3" GridPane.rowIndex="4" />
                                                       <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Variant" GridPane.columnIndex="10" GridPane.rowIndex="3" />
-                                                      <TextField fx:id="tfVariant" editable="false" GridPane.columnIndex="12" GridPane.rowIndex="3" />
+                                                      <TextField fx:id="tfVariant" disable="true" editable="false" GridPane.columnIndex="12" GridPane.rowIndex="3" />
                                                       <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Request Qty" GridPane.columnIndex="14" GridPane.rowIndex="3" />
-                                                      <TextField fx:id="tfRequestQty" alignment="CENTER_RIGHT" editable="false" text="0" GridPane.columnIndex="16" GridPane.rowIndex="3" />
+                                                      <TextField fx:id="tfRequestQty" alignment="CENTER_RIGHT" disable="true" editable="false" text="0" GridPane.columnIndex="16" GridPane.rowIndex="3" />
                                                       <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Approved Qty" GridPane.columnIndex="14" GridPane.rowIndex="5">
                                                          <font>
                                                             <Font name="System Bold" size="15.0" />
@@ -233,14 +233,14 @@
                                                       </Text>
                                                       <TextField fx:id="tfApprovedQty" alignment="CENTER_RIGHT" text="0" GridPane.columnIndex="16" GridPane.rowIndex="5" />
                                                       <Text strokeType="OUTSIDE" strokeWidth="0.0" text="QOH" GridPane.columnIndex="10" GridPane.rowIndex="6" />
-                                                      <TextField fx:id="tfQOH" editable="false" GridPane.columnIndex="12" GridPane.rowIndex="6" />
+                                                      <TextField fx:id="tfQOH" disable="true" editable="false" GridPane.columnIndex="12" GridPane.rowIndex="6" />
                                                       <Text strokeType="OUTSIDE" strokeWidth="0.0" text="ROQ" GridPane.columnIndex="10" GridPane.rowIndex="5" />
-                                                      <TextField fx:id="tfClassification" alignment="CENTER" editable="false" GridPane.columnIndex="12" GridPane.rowIndex="4" />
+                                                      <TextField fx:id="tfClassification" alignment="CENTER" disable="true" editable="false" GridPane.columnIndex="12" GridPane.rowIndex="4" />
                                                       <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Classification" GridPane.columnIndex="10" GridPane.rowIndex="4" />
-                                                      <TextField fx:id="tfROQ" editable="false" GridPane.columnIndex="12" GridPane.rowIndex="5" />
+                                                      <TextField fx:id="tfROQ" disable="true" editable="false" GridPane.columnIndex="12" GridPane.rowIndex="5" />
                                                       <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Barcode" GridPane.columnIndex="1" GridPane.rowIndex="5" />
-                                                      <TextField fx:id="tfBarcode" editable="false" GridPane.columnIndex="3" GridPane.rowIndex="5" />
-                                                      <TextField fx:id="tfDescription" editable="false" prefWidth="408.0" GridPane.columnIndex="3" GridPane.columnSpan="6" GridPane.rowIndex="6" />
+                                                      <TextField fx:id="tfBarcode" disable="true" editable="false" GridPane.columnIndex="3" GridPane.rowIndex="5" />
+                                                      <TextField fx:id="tfDescription" disable="true" editable="false" prefWidth="408.0" GridPane.columnIndex="3" GridPane.columnSpan="6" GridPane.rowIndex="6" />
                                                       <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Description" GridPane.columnIndex="1" GridPane.rowIndex="6" />
                                                       <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Branch Name" GridPane.columnIndex="1" GridPane.rowIndex="1" />
                                                       <TextField fx:id="tfBranchName" GridPane.columnIndex="3" GridPane.columnSpan="7" GridPane.rowIndex="1" />

@@ -239,6 +239,7 @@ public class CashDisbursement_ConfirmationController implements Initializable, S
                 poController.setTransactionStatus(CashDisbursementStatus.OPEN + CashDisbursementStatus.CONFIRMED);
                 loadRecordSearch();
                 TriggerWindowEvent();
+                filterIndustry();
             });
             initAttachmentPreviewPane();
         } catch (SQLException | GuanzonException ex) {
@@ -251,6 +252,19 @@ public class CashDisbursement_ConfirmationController implements Initializable, S
             setKeyEvent(newScene);
         }
     };
+
+    public void filterIndustry() {
+        try {
+            if (!psIndustryId.equals(System.getProperty("sys.main.industry"))) {
+                poController.Master().setIndustryId(psIndustryId);
+                tfSearchIndustry.setText(poController.Master().Industry().getDescription());
+                JFXUtil.setDisabled(true, tfSearchIndustry);
+            }
+        } catch (SQLException | GuanzonException ex) {
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
+        }
+    }
 
     public void TriggerWindowEvent() {
         root = (AnchorPane) AnchorMain;
@@ -2096,6 +2110,7 @@ public class CashDisbursement_ConfirmationController implements Initializable, S
             lblSource.setText(poController.Master().Company().getCompanyName() + " - " + poController.Master().Industry().getDescription());
             tfSearchIndustry.setText(poController.getSearchIndustry());
             tfSearchPayee.setText(poController.getSearchPayee());
+            filterIndustry();
             JFXUtil.updateCaretPositions(apBrowse);
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
@@ -2532,6 +2547,7 @@ public class CashDisbursement_ConfirmationController implements Initializable, S
         JFXUtil.setValueToNull(previousSearchedTextField, lastFocusedTextField);
         JFXUtil.clearTextFields(apButton, apMasterDetail, apDVMaster1, apDVMaster2, apDVDetail,
                 apMainList, apBrowse, apJournalMaster, apJournalDetails, apBIRDetail, apAttachments);
+        filterIndustry();
     }
 
 }

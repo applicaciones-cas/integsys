@@ -854,6 +854,7 @@ public class PurchaseOrder_ApprovalMCController implements Initializable, Screen
                                     approved = false;
                                     return;
                                 }
+                                poPurchasingController.PurchaseOrder().setApproving((String) poJSON.get("sUserIDxx"));
                             }
                         }
                     } else {

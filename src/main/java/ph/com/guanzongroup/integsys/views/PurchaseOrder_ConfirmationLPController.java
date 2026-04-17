@@ -851,6 +851,7 @@ public class PurchaseOrder_ConfirmationLPController implements Initializable, Sc
                                     approved = false;
                                     return;
                                 }
+                                poPurchasingController.PurchaseOrder().setApproving((String) poJSON.get("sUserIDxx"));
                             }
                         }
                     } else {
@@ -1047,7 +1048,7 @@ public class PurchaseOrder_ConfirmationLPController implements Initializable, Sc
                     main_data.clear();
                     poJSON = poPurchasingController.PurchaseOrder().getPurchaseOrder(
                             psSupplierID,
-                            psReferID);
+                            psReferID,"");
                     if ("success".equals(poJSON.get("result"))) {
                         if (poPurchasingController.PurchaseOrder().getPOMasterCount() > 0) {
                             for (int lnCntr = 0; lnCntr <= poPurchasingController.PurchaseOrder().getPOMasterCount() - 1; lnCntr++) {

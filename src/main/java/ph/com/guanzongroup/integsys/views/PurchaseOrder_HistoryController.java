@@ -81,6 +81,7 @@ public class PurchaseOrder_HistoryController implements Initializable, ScreenInt
     private String psSupplierID = "";
     private String psCategoryID = "";
     private String psReferID = "";
+    private String psTransNo = "";
 
     private unloadForm poUnload = new unloadForm();
     private ObservableList<ModelPurchaseOrderDetail> detail_data = FXCollections.observableArrayList();
@@ -90,11 +91,11 @@ public class PurchaseOrder_HistoryController implements Initializable, ScreenInt
     @FXML
     private AnchorPane AnchorMain;
     @FXML
-    private Button btnBrowse, btnPrint, btnTransHistory, btnClose;
+    private Button btnBrowse, btnPrint, btnTransHistory, btnClose,btnHistApproval;
     @FXML
     private Label lblTransactionStatus, lblSource;
     @FXML
-    private TextField tfSearchSupplier, tfSearchReferenceNo;
+    private TextField tfSearchSupplier, tfSearchReferenceNo,tfSearchTransNo;
     @FXML
     private TextField tfTransactionNo, tfSupplier, tfDestination, tfReferenceNo,
             tfTerm, tfDiscountRate, tfDiscountAmount, tfAdvancePRate, tfAdvancePAmount, tfTotalAmount, tfNetAmount;
@@ -259,7 +260,7 @@ public class PurchaseOrder_HistoryController implements Initializable, ScreenInt
 
     private void initButtonsClickActions() {
         List<Button> buttons = Arrays.asList(
-                btnPrint, btnTransHistory, btnClose, btnBrowse);
+                btnPrint, btnTransHistory, btnClose, btnBrowse,btnHistApproval);
         buttons.forEach(button -> button.setOnAction(this::handleButtonAction));
     }
 
@@ -272,7 +273,7 @@ public class PurchaseOrder_HistoryController implements Initializable, ScreenInt
                 case "btnBrowse":
                     poJSON = poPurchasingController.PurchaseOrder().SearchTransaction("",
                             psSupplierID,
-                            psReferID);
+                            psReferID,psTransNo,1);
                     if ("success".equals((String) poJSON.get("result"))) {
                         clearDetailFields();
                         pnTblDetailRow = -1;
@@ -315,6 +316,13 @@ public class PurchaseOrder_HistoryController implements Initializable, ScreenInt
                         }
                     }
                     break;
+                case "btnHistApproval":
+                    if (pnEditMode != EditMode.READY && pnEditMode != EditMode.UPDATE) {
+                        ShowMessageFX.Warning("No Approval history to load!", psFormName, null);
+                        return;
+                    }
+                    poPurchasingController.PurchaseOrder().ShowApprovalHistory();
+                    break;
                 default:
                     ShowMessageFX.Warning("Please contact admin to assist about no button available", psFormName, null);
                     break;
@@ -322,12 +330,14 @@ public class PurchaseOrder_HistoryController implements Initializable, ScreenInt
             initButtons(pnEditMode);
         } catch (CloneNotSupportedException | SQLException | GuanzonException ex) {
             Logger.getLogger(PurchaseOrder_HistoryController.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (Exception ex) {
+            Logger.getLogger(PurchaseOrder_HistoryController.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
     private void initTextFieldKeyPressed() {
         List<TextField> loTxtField = Arrays.asList(tfSearchSupplier,
-                tfSearchReferenceNo);
+                tfSearchReferenceNo,tfSearchTransNo);
 
         loTxtField.forEach(tf -> tf.setOnKeyPressed(event -> txtField_KeyPressed(event)));
     }
@@ -360,19 +370,43 @@ public class PurchaseOrder_HistoryController implements Initializable, ScreenInt
                                 tfSearchSupplier.setText(poPurchasingController.PurchaseOrder().Master().Supplier().getCompanyName());
                                 break;
                             case "tfSearchReferenceNo":
+                                if(lsValue == null || lsValue.isEmpty()){
+                                    return;
+                                }
                                 poJSON = poPurchasingController.PurchaseOrder().SearchTransaction(lsValue,
                                         psSupplierID,
-                                        psReferID);
+                                        psReferID,psTransNo,2);
                                 if ("success".equals((String) poJSON.get("result"))) {
                                     clearDetailFields();
                                     pnTblDetailRow = -1;
                                     loadRecordMaster();
                                     loadRecordDetail();
                                     loadTableDetail();
+                                    tfSearchReferenceNo.clear();
                                     pnEditMode = poPurchasingController.PurchaseOrder().getEditMode();
                                 } else {
                                     ShowMessageFX.Warning((String) poJSON.get("message"), "Search Information", null);
                                 }
+                                break;
+                            case "tfSearchTransNo":
+                                if(lsValue == null || lsValue.isEmpty()){
+                                    return;
+                                }
+                                poJSON = poPurchasingController.PurchaseOrder().SearchTransaction(lsValue,
+                                        psSupplierID,
+                                        psReferID,psTransNo,1);
+                                if ("success".equals((String) poJSON.get("result"))) {
+                                    clearDetailFields();
+                                    pnTblDetailRow = -1;
+                                    loadRecordMaster();
+                                    loadRecordDetail();
+                                    loadTableDetail();
+                                    tfSearchTransNo.clear();
+                                    pnEditMode = poPurchasingController.PurchaseOrder().getEditMode();
+                                } else {
+                                    ShowMessageFX.Warning((String) poJSON.get("message"), "Search Information", null);
+                                }
+                                break;
                         }
                         event.consume();
                         CommonUtils.SetNextFocus((TextField) event.getSource());
@@ -407,6 +441,8 @@ public class PurchaseOrder_HistoryController implements Initializable, ScreenInt
         btnPrint.setManaged(false);
         btnTransHistory.setVisible(fnEditMode != EditMode.UNKNOWN);
         btnTransHistory.setManaged(fnEditMode != EditMode.UNKNOWN);
+        btnHistApproval.setVisible(fnEditMode == EditMode.READY);
+        btnHistApproval.setManaged(fnEditMode == EditMode.READY);
         if (poPurchasingController.PurchaseOrder().Master().getPrint().equals("1")) {
             btnPrint.setText("Reprint");
         } else {

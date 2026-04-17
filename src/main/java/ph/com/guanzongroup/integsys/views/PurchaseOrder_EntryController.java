@@ -100,7 +100,7 @@ public class PurchaseOrder_EntryController implements Initializable, ScreenInter
     private String psCompanyID = "";
     private String psCategoryID = "";
     private String psOldDate = "";
-
+    String allowedDepartment = System.getProperty("allowed.department");
     private unloadForm poUnload = new unloadForm();
     private ObservableList<ModelPurchaseOrder> main_data = FXCollections.observableArrayList();
     private ObservableList<ModelPurchaseOrderDetail> detail_data = FXCollections.observableArrayList();
@@ -354,7 +354,7 @@ public class PurchaseOrder_EntryController implements Initializable, ScreenInter
                 case "btnBrowse":
                     poJSON = poPurchasingController.PurchaseOrder().SearchTransaction("",
                             poPurchasingController.PurchaseOrder().Master().getSupplierID(),
-                            "");
+                            "","",1);
                     if (!"error".equals((String) poJSON.get("result"))) {
                         tblVwStockRequest.getSelectionModel().clearSelection(pnTblDetailRow);
                         pnTblDetailRow = -1;
@@ -733,9 +733,9 @@ public class PurchaseOrder_EntryController implements Initializable, ScreenInter
         if (!nv) {
             /*Lost Focus*/
             switch (lsTextFieldID) {
-//                case "tfReferenceNo":
-//                    poPurchasingController.PurchaseOrder().Master().setReference(lsValue);
-//                    break;
+                case "tfReferenceNo":
+                    poPurchasingController.PurchaseOrder().Master().setReference(lsValue);
+                    break;
                 case "tfDiscountRate":
                     lsValue = JFXUtil.removeComma(lsValue);
                     poJSON = poPurchasingController.PurchaseOrder().setDiscountRate(lsValue);
@@ -1156,6 +1156,7 @@ public class PurchaseOrder_EntryController implements Initializable, ScreenInter
                                         approved = false;
                                         return;
                                     }
+                                    poPurchasingController.PurchaseOrder().setApproving((String) poJSON.get("sUserIDxx"));
                                 }
                             }
                         } else {

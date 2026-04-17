@@ -1,6 +1,5 @@
 package ph.com.guanzongroup.integsys.views;
 
-
 import java.lang.reflect.Field;
 import java.net.URL;
 import java.sql.SQLException;
@@ -9,7 +8,6 @@ import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.ResourceBundle;
@@ -48,7 +46,11 @@ import org.guanzon.appdriver.base.GRiderCAS;
 import org.guanzon.appdriver.base.LogWrapper;
 import org.guanzon.appdriver.constant.EditMode;
 import javafx.concurrent.Task;
+import static javafx.scene.input.KeyCode.ENTER;
+import static javafx.scene.input.KeyCode.F3;
+import static javafx.scene.input.KeyCode.TAB;
 import org.guanzon.appdriver.base.GuanzonException;
+import org.guanzon.appdriver.base.MiscUtil;
 import org.json.simple.JSONObject;
 import org.guanzon.cas.inv.warehouse.InventoryStockIssuanceNeo;
 import org.guanzon.cas.inv.warehouse.status.DeliveryIssuanceType;
@@ -165,8 +167,11 @@ public class InventoryStockIssuanceNeoControllerMP implements Initializable, Scr
             initializeTableDetail();
             initControlEvents();
         } catch (SQLException | GuanzonException e) {
-            Logger.getLogger(InventoryStockIssuanceNeo.class.getName()).log(Level.SEVERE, null, e);
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(e), e);
+            ShowMessageFX.Error(MiscUtil.getException(e), psFormName, null);
+
             poLogWrapper.severe(psFormName + " :" + e.getMessage());
+
         }
     }
 
@@ -193,6 +198,9 @@ public class InventoryStockIssuanceNeoControllerMP implements Initializable, Scr
                 getLoadedTransaction();
             } catch (CloneNotSupportedException | SQLException | GuanzonException ex) {
 
+                Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+                ShowMessageFX.Error(MiscUtil.getException(ex), psFormName, null);
+
                 poLogWrapper.severe(psFormName + " :" + ex.getMessage());
 
             }
@@ -211,7 +219,10 @@ public class InventoryStockIssuanceNeoControllerMP implements Initializable, Scr
 
             loadSelectedTransactionDetail(pnTransactionDetail);
         } catch (SQLException | GuanzonException | CloneNotSupportedException ex) {
-            Logger.getLogger(InventoryStockIssuance_PostingController.class.getName()).log(Level.SEVERE, null, ex);
+
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(MiscUtil.getException(ex), psFormName, null);
+
             poLogWrapper.severe(psFormName + " :" + ex.getMessage());
         }
     }
@@ -333,7 +344,7 @@ public class InventoryStockIssuanceNeoControllerMP implements Initializable, Scr
                     if (!isJSONSuccess(poAppController.NewTransaction(), "Initialize New Transaction")) {
                         return;
                     }
-                    clearAllInputs();
+//                    clearAllInputs();
                     getLoadedTransaction();
                     pnEditMode = poAppController.getEditMode();
                     break;
@@ -360,8 +371,13 @@ public class InventoryStockIssuanceNeoControllerMP implements Initializable, Scr
                     if (!isJSONSuccess(poAppController.SaveTransaction(), "Initialize Save Transaction")) {
                         return;
                     }
+                    if (ShowMessageFX.YesNo(null, psFormName, "Do you want to approve transaction?") == true) {
+                        if (!isJSONSuccess(poAppController.CloseTransaction(), "Initialize Close Transaction")) {
+                            return;
+                        }
+                    }
                     reloadTableDetail();
-//                    clearAllInputs();
+                    getLoadedTransaction();
                     pnEditMode = poAppController.getEditMode();
 
                     break;
@@ -405,25 +421,15 @@ public class InventoryStockIssuanceNeoControllerMP implements Initializable, Scr
 
                     switch (lastFocusedControl.getId()) {
                         case "tfSearchSourceno":
-                            if (!tfTransNo.getText().isEmpty()) {
-                                if (ShowMessageFX.OkayCancel(null, "Search Transaction! by Trasaction", "Are you sure you want replace loaded Transaction?") == false) {
-                                    return;
-                                }
-                            }
 
                             loadTransactionMasterList(tfSearchSourceno.getText(), "e.sBranchNm");
-                            getLoadedTransaction();
+//                            getLoadedTransaction();
                             initButtonDisplay(poAppController.getEditMode());
                             break;
                         case "tfSearchTransNo":
-                            if (!tfTransNo.getText().isEmpty()) {
-                                if (ShowMessageFX.OkayCancel(null, "Search Transaction! by Trasaction", "Are you sure you want replace loaded Transaction?") == false) {
-                                    return;
-                                }
-                            }
 
                             loadTransactionMasterList(tfSearchTransNo.getText(), "a.sTransNox");
-                            getLoadedTransaction();
+//                            getLoadedTransaction();
                             initButtonDisplay(poAppController.getEditMode());
                             break;
                     }
@@ -439,7 +445,9 @@ public class InventoryStockIssuanceNeoControllerMP implements Initializable, Scr
             initButtonDisplay(poAppController.getEditMode());
 
         } catch (Exception e) {
-            Logger.getLogger(DeliverySchedule_EntryController.class.getName()).log(Level.SEVERE, null, e);
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(e), e);
+            ShowMessageFX.Error(MiscUtil.getException(e), psFormName, null);
+
             poLogWrapper.severe(psFormName + " :" + e.getMessage());
         }
     }
@@ -481,6 +489,7 @@ public class InventoryStockIssuanceNeoControllerMP implements Initializable, Scr
                                 poAppController.getMaster().getFreight(), poAppController.getMaster().getDiscount()));
                         loadTransactionMaster();
                         break;
+
                     case "tfIssuedQty":
                         if (poAppController.getDetail(pnTransactionDetail).getStockId() == null
                                 || poAppController.getDetail(pnTransactionDetail).getStockId().isEmpty()) {
@@ -539,7 +548,10 @@ public class InventoryStockIssuanceNeoControllerMP implements Initializable, Scr
                 loTextField.selectAll();
             }
         } catch (SQLException | GuanzonException | CloneNotSupportedException ex) {
-            Logger.getLogger(InventoryStockIssuance_PostingController.class.getName()).log(Level.SEVERE, null, ex);
+
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(MiscUtil.getException(ex), psFormName, null);
+
             poLogWrapper.severe(psFormName + " :" + ex.getMessage());
         }
     };
@@ -558,6 +570,7 @@ public class InventoryStockIssuanceNeoControllerMP implements Initializable, Scr
                 switch (event.getCode()) {
                     case TAB:
                     case ENTER:
+                    case F3:
                         switch (txtFieldID) {
                             case "tfDiscountRate":
                                 if (lsValue.isEmpty()) {
@@ -597,7 +610,6 @@ public class InventoryStockIssuanceNeoControllerMP implements Initializable, Scr
                                 loadSelectedTransactionDetail(pnTransactionDetail);
                                 break;
                         }
-                    case F3:
                         switch (txtFieldID) {
                             case "tfSearchSourceno":
                                 if (!tfTransNo.getText().isEmpty()) {
@@ -691,8 +703,10 @@ public class InventoryStockIssuanceNeoControllerMP implements Initializable, Scr
                 }
             }
         } catch (Exception ex) {
-            Logger.getLogger(DeliverySchedule_EntryController.class
-                    .getName()).log(Level.SEVERE, null, ex);
+
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(MiscUtil.getException(ex), psFormName, null);
+
             poLogWrapper.severe(psFormName + " :" + ex.getMessage());
         }
     }
@@ -792,7 +806,11 @@ public class InventoryStockIssuanceNeoControllerMP implements Initializable, Scr
             tfTotal.setText(String.valueOf(poAppController.getMaster().getTransactionTotal()));
             cbDelType.getSelectionModel().select(Integer.parseInt(poAppController.getMaster().getDeliveryType()));
         } catch (SQLException | GuanzonException e) {
-            poLogWrapper.severe(psFormName, e.getMessage());
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(e), e);
+            ShowMessageFX.Error(MiscUtil.getException(e), psFormName, null);
+
+            poLogWrapper.severe(psFormName + " :" + e.getMessage());
+
         }
     }
 
@@ -961,8 +979,11 @@ public class InventoryStockIssuanceNeoControllerMP implements Initializable, Scr
                     loButton.setManaged(visible);
                 }
             } catch (IllegalAccessException e) {
-                e.printStackTrace();
+                Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(e), e);
+                ShowMessageFX.Error(MiscUtil.getException(e), psFormName, null);
+
                 poLogWrapper.severe(psFormName + " :" + e.getMessage());
+                ;
             }
         }
     }
@@ -994,8 +1015,9 @@ public class InventoryStockIssuanceNeoControllerMP implements Initializable, Scr
 
                     return new SimpleStringProperty(xserialname);
                 } catch (SQLException | GuanzonException ex) {
-                    Logger.getLogger(InventoryStockIssuance_PostingController.class
-                            .getName()).log(Level.SEVERE, null, ex);
+                    Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+                    ShowMessageFX.Error(MiscUtil.getException(ex), psFormName, null);
+
                     poLogWrapper.severe(psFormName + " :" + ex.getMessage());
                     return new SimpleStringProperty("");
                 }
@@ -1067,7 +1089,7 @@ public class InventoryStockIssuanceNeoControllerMP implements Initializable, Scr
     }
 
     private void getLoadedTransaction() throws SQLException, GuanzonException, CloneNotSupportedException {
-        clearAllInputs();
+//        clearAllInputs();
         loadTransactionMaster();
         reloadTableDetail();
         loadSelectedTransactionDetail(pnTransactionDetail);
@@ -1079,7 +1101,7 @@ public class InventoryStockIssuanceNeoControllerMP implements Initializable, Scr
             String message = (String) loJSON.get("message");
             poLogWrapper.severe(psFormName + " :" + message);
             Platform.runLater(() -> {
-                ShowMessageFX.Warning(null, psFormName, fsModule + ": " + message);
+                ShowMessageFX.Warning(null, psFormName, message);
             });
             return false;
         }
@@ -1088,7 +1110,7 @@ public class InventoryStockIssuanceNeoControllerMP implements Initializable, Scr
         poLogWrapper.severe(psFormName + " :" + message);
         Platform.runLater(() -> {
             if (message != null) {
-                ShowMessageFX.Information(null, psFormName, fsModule + ": " + message);
+                ShowMessageFX.Information(null, psFormName, message);
             }
         });
         poLogWrapper.info(psFormName + " : Success on " + fsModule);
@@ -1160,7 +1182,9 @@ public class InventoryStockIssuanceNeoControllerMP implements Initializable, Scr
                     controls.add((Control) value);
                 }
             } catch (IllegalAccessException e) {
-                e.printStackTrace();
+                Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(e), e);
+                ShowMessageFX.Error(MiscUtil.getException(e), psFormName, null);
+
                 poLogWrapper.severe(psFormName + " :" + e.getMessage());
             }
         }
