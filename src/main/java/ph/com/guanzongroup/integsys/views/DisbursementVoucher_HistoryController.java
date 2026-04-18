@@ -12,6 +12,7 @@ import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -64,9 +65,11 @@ import org.guanzon.appdriver.constant.DocumentType;
 import org.guanzon.appdriver.constant.EditMode;
 import org.guanzon.appdriver.constant.Logical;
 import org.guanzon.appdriver.constant.RecordStatus;
+import org.guanzon.appdriver.constant.UserRight;
 import org.json.simple.JSONObject;
 import ph.com.guanzongroup.cas.cashflow.DisbursementVoucher;
 import ph.com.guanzongroup.cas.cashflow.services.CashflowControllers;
+import ph.com.guanzongroup.cas.cashflow.status.CheckStatus;
 import ph.com.guanzongroup.cas.cashflow.status.DisbursementStatic;
 import ph.com.guanzongroup.cas.cashflow.status.JournalStatus;
 import ph.com.guanzongroup.cas.cashflow.status.OtherPaymentStatus;
@@ -105,7 +108,7 @@ public class DisbursementVoucher_HistoryController implements Initializable, Scr
     JFXUtil.ReloadableTableTask loadTableDetail, loadTableDetailJE, loadTableDetailBIR, loadTableAttachment;
     private final JFXUtil.ImageViewer imageviewerutil = new JFXUtil.ImageViewer();
     ObservableList<String> cPaymentMode = FXCollections.observableArrayList(
-            "CHECK", "BANK TRANSFER", "DIGITAL PAYMENT");
+            "CHECK", "CHECK DEPOSIT", "BANK TRANSFER", "DIGITAL PAYMENT");
     ObservableList<String> cDisbursementMode = FXCollections.observableArrayList("DELIVER", "PICK-UP");
     ObservableList<String> cPayeeType = FXCollections.observableArrayList("INDIVIDUAL", "CORPORATION");
     ObservableList<String> cClaimantType = FXCollections.observableArrayList("AUTHORIZED REPRESENTATIVE", "PAYEE");
@@ -120,9 +123,9 @@ public class DisbursementVoucher_HistoryController implements Initializable, Scr
     @FXML
     private Label lblSource, lblDVTransactionStatus, lblJournalTransactionStatus;
     @FXML
-    private TextField tfAdvancesDetail, tfAdvances, tfSearchTransaction, tfSearchSupplier, tfDVTransactionNo, tfSupplier, tfVoucherNo, tfBankNameCheck, tfBankAccountCheck, tfPayeeName, tfCheckNo, tfCheckAmount, tfAuthorizedPerson, tfBankNameBTransfer, tfBankAccountBTransfer, tfPaymentAmountBTransfer, tfSupplierBank, tfSupplierAccountNoBTransfer, tfBankTransReferNo, tfPaymentStatusBTransfer, tfBankNameOnlinePayment, tfBankAccountOnlinePayment, tfPaymentAmount, tfSupplierServiceName, tfSupplierAccountNo, tfPaymentReferenceNo, tfOnlinePaymentStatus, tfTotalAmount, tfVatableSales, tfVatAmountMaster, tfVatZeroRatedSales, tfVatExemptSales, tfLessWHTax, tfTotalNetAmount, tfRefNoDetail, tfVatableSalesDetail, tfVatExemptDetail, tfVatZeroRatedSalesDetail, tfVatRateDetail, tfVatAmountDetail, tfPurchasedAmountDetail, tfNetAmountDetail, tfJournalTransactionNo, tfTotalDebitAmount, tfTotalCreditAmount, tfAccountCode, tfAccountDescription, tfDebitAmount, tfCreditAmount, tfBIRTransactionNo, tfTaxCode, tfParticular, tfBaseAmount, tfTaxRate, tfTotalTaxAmount, tfAttachmentNo, tfAttachmentSource;
+    private TextField tfSearchTransaction, tfSearchSupplier, tfDVTransactionNo, tfSupplier, tfVoucherNo, tfBankNameCheck, tfBankAccountCheck, tfPayeeName, tfCheckNo, tfCheckAmount, tfAuthorizedPerson, tfBankNameBTransfer, tfBankAccountBTransfer, tfPaymentAmountBTransfer, tfSupplierBank, tfSupplierAccountNoBTransfer, tfBankTransReferNo, tfPaymentStatusBTransfer, tfBankNameOnlinePayment, tfBankAccountOnlinePayment, tfPaymentAmount, tfSupplierServiceName, tfSupplierAccountNo, tfPaymentReferenceNo, tfOnlinePaymentStatus, tfTotalAmount, tfVatableSales, tfVatAmountMaster, tfVatZeroRatedSales, tfVatExemptSales, tfLessWHTax, tfTotalNetAmount, tfAdvances, tfRefNoDetail, tfVatableSalesDetail, tfVatExemptDetail, tfVatZeroRatedSalesDetail, tfVatRateDetail, tfVatAmountDetail, tfPurchasedAmountDetail, tfNetAmountDetail, tfAdvancesDetail, tfJournalTransactionNo, tfTotalDebitAmount, tfTotalCreditAmount, tfAccountCode, tfAccountDescription, tfDebitAmount, tfCreditAmount, tfBIRTransactionNo, tfTaxCode, tfParticular, tfBaseAmount, tfTaxRate, tfTotalTaxAmount, tfAttachmentNo, tfAttachmentSource;
     @FXML
-    private Button btnBrowse, btnHistory, btnClose, btnArrowLeft, btnArrowRight;
+    private Button btnBrowse, btnHistory, btnPrint, btnClose, btnArrowLeft, btnArrowRight, btnPrintPaymentSummary, btnPrintCheck;
     @FXML
     private TabPane tabPaneMain, tabPanePaymentMode;
     @FXML
@@ -304,6 +307,12 @@ public class DisbursementVoucher_HistoryController implements Initializable, Scr
                 loadRecordMasterCheck();
                 //must reset data of check
                 break;
+            case DisbursementStatic.DisbursementType.CHECK_DEPOSIT:
+                JFXUtil.setDisabled(false, tabCheck);
+                JFXUtil.clickTabByTitleText(tabPanePaymentMode, "Check");
+                loadRecordMasterCheck();
+                //must reset data of check
+                break;
             case DisbursementStatic.DisbursementType.WIRED:
                 JFXUtil.setDisabled(false, tabBankTransfer);
                 JFXUtil.clickTabByTitleText(tabPanePaymentMode, "Bank Transfer");
@@ -325,7 +334,7 @@ public class DisbursementVoucher_HistoryController implements Initializable, Scr
     }
 
     private void initButtonsClickActions() {
-        List<Button> buttons = Arrays.asList(btnBrowse, btnHistory, btnClose, btnArrowRight, btnArrowLeft);
+        List<Button> buttons = Arrays.asList(btnBrowse, btnPrint, btnPrintCheck, btnPrintPaymentSummary, btnHistory, btnClose, btnArrowRight, btnArrowLeft);
         buttons.forEach(button -> button.setOnAction(this::cmdButton_Click));
     }
 
@@ -347,6 +356,51 @@ public class DisbursementVoucher_HistoryController implements Initializable, Scr
                     pnEditMode = poController.getEditMode();
                     poController.populateJournal();
                     loadTableDetail.reload();
+                    break;
+                case "btnPrint":
+                    ArrayList<String> checkedItems = new ArrayList<>();
+                    checkedItems.add(poController.Master().getTransactionNo());
+                    poJSON = poController.printTransaction(checkedItems);
+                    if ("error".equals((String) poJSON.get("result"))) {
+                        ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                    }
+                    break;
+                case "btnPrintPaymentSummary":
+                    ArrayList<String> checkedItems2 = new ArrayList<>();
+                    checkedItems2.add(poController.Master().getTransactionNo());
+                    poJSON = poController.printTransactionPaymentSummary(checkedItems2);
+                    if ("error".equals((String) poJSON.get("result"))) {
+                        ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                    }
+                    break;
+                case "btnPrintCheck":
+                    if (ShowMessageFX.YesNo(null, pxeModuleName, "Are you sure you want to print check this transaction?")) {
+                        if (oApp.getUserLevel() <= UserRight.ENCODER) {
+                            boolean proceed = ShowMessageFX.YesNo(
+                                    null,
+                                    "Check Printing",
+                                    "This check has already been printed and recorded.\n"
+                                    + "Reprinting should only be done with proper authorization.\n"
+                                    + "Do you wish to proceed with reprinting?"
+                            );
+                            if (proceed) {
+                                poJSON = poController.callApproval();
+                                if (!"success".equals((String) poJSON.get("result"))) {
+                                    ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                                    return;
+                                }
+                            } else {
+                                return;
+                            }
+                        }
+                    }
+
+                    ArrayList<String> checkedItems3 = new ArrayList<>();
+                    checkedItems3.add(poController.Master().getTransactionNo());
+                    poJSON = poController.PrintCheck(checkedItems3);
+                    if ("error".equals((String) poJSON.get("result"))) {
+                        ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                    }
                     break;
                 case "btnHistory":
                     if (pnEditMode != EditMode.READY && pnEditMode != EditMode.UPDATE) {
@@ -451,6 +505,7 @@ public class DisbursementVoucher_HistoryController implements Initializable, Scr
                                 poJSON = poController.computeDetailFields(true);
                                 if ("error".equals((String) poJSON.get("result"))) {
                                     ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                                    details_data.clear();
                                 }
                             }
                             int lnRowCount = 0;
@@ -1028,10 +1083,9 @@ public class DisbursementVoucher_HistoryController implements Initializable, Scr
 
             tfBankNameCheck.setText(poController.CheckPayments().getModel().Banks().getBankName() != null ? poController.CheckPayments().getModel().Banks().getBankName() : "");
 //            tfBankAccountCheck.setText(poController.CheckPayments().getModel().Bank_Account_Master().getAccountNo() != null ? poController.CheckPayments().getModel().Bank_Account_Master().getAccountNo() : "");
-            tfBankAccountCheck.setText(poController.Master().getDisbursementType().equals(
-                    DisbursementStatic.DisbursementType.CHECK)
-                            ? (poController.CheckPayments().getModel().Bank_Account_Master().getAccountNo() != null
-                            ? poController.CheckPayments().getModel().Bank_Account_Master().getAccountNo() : "") : "");
+            tfBankAccountCheck.setText(JFXUtil.isObjectEqualTo(poController.Master().getDisbursementType(), DisbursementStatic.DisbursementType.CHECK, DisbursementStatic.DisbursementType.CHECK_DEPOSIT)
+                    ? (poController.CheckPayments().getModel().Bank_Account_Master().getAccountNo() != null
+                    ? poController.CheckPayments().getModel().Bank_Account_Master().getAccountNo() : "") : "");
             chbkPrintByBank.setSelected(poController.Master().getBankPrint().equals(Logical.YES));
 
             tfPayeeName.setText(poController.Master().Payee().getPayeeName() != null ? poController.Master().Payee().getPayeeName() : "");
@@ -1247,12 +1301,36 @@ public class DisbursementVoucher_HistoryController implements Initializable, Scr
     }
 
     private void initButton(int fnEditMode) {
-        boolean lbShow = (fnEditMode == EditMode.ADDNEW || fnEditMode == EditMode.UPDATE);
-        JFXUtil.setButtonsVisibility(!lbShow, btnBrowse, btnClose);
-        JFXUtil.setButtonsVisibility(fnEditMode == EditMode.READY, btnHistory);
+        try {
+            JFXUtil.setButtonsVisibility(true, btnBrowse, btnClose);
+            JFXUtil.setButtonsVisibility(fnEditMode == EditMode.READY, btnHistory);
+            JFXUtil.setButtonsVisibility(fnEditMode == EditMode.READY, btnPrint, btnPrintPaymentSummary, btnPrintCheck);
+            JFXUtil.setDisabled(true, apDVMaster1, apDVMaster2, apDVMaster3, apDVDetail,
+                    apMasterDVCheck, apMasterDVBTransfer, apMasterDVOp, apJournalMaster, apJournalDetails, apBIRDetail);
 
-        JFXUtil.setDisabled(!lbShow, apDVMaster1, apDVMaster2, apDVMaster3, apDVDetail,
-                apMasterDVCheck, apMasterDVBTransfer, apMasterDVOp, apJournalMaster, apJournalDetails, apBIRDetail);
+            if (fnEditMode != EditMode.READY) {
+                return;
+            }
+            
+            switch(poController.Master().getDisbursementType()){
+                case DisbursementStatic.DisbursementType.CHECK:
+                case DisbursementStatic.DisbursementType.CHECK_DEPOSIT:
+                    if (!CheckStatus.PrintStatus.PRINTED.equals(poController.Master().CheckPayments().getPrint())) {
+                        JFXUtil.setButtonsVisibility(false, btnPrint, btnPrintPaymentSummary, btnPrintCheck);
+                    }
+                    break;
+                default:
+                    if (!OtherPaymentStatus.POSTED.equals(poController.Master().OtherPayments().getTransactionStatus())) {
+                        JFXUtil.setButtonsVisibility(false, btnPrint, btnPrintPaymentSummary, btnPrintCheck);
+                    } else {
+                        JFXUtil.setButtonsVisibility(false, btnPrintCheck);
+                    }
+                    break;
+            }
+            
+        } catch (SQLException | GuanzonException ex) {
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     private void clearTextFields() {

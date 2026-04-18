@@ -121,7 +121,6 @@ public class CheckAuthorizationController implements Initializable, ScreenInterf
     public void initialize(URL url, ResourceBundle rb) {
         try {
             poDisbursementController = new CashflowControllers(oApp, null).DisbursementVoucher();
-            poDisbursementController.setTransactionStatus(DisbursementStatic.CERTIFIED);
             poJSON = new JSONObject();
             poDisbursementController.setWithUI(true);
             poJSON = poDisbursementController.InitTransaction();
@@ -140,8 +139,12 @@ public class CheckAuthorizationController implements Initializable, ScreenInterf
             Platform.runLater(() -> {
                 poDisbursementController.Master().setIndustryID(psIndustryId);
                 poDisbursementController.Master().setCompanyID(psCompanyId);
+                poDisbursementController.setIndustryID(psIndustryId);
+                poDisbursementController.setCompanyID(psCompanyId);
                 loadRecordSearch();
             });
+            poDisbursementController.setTransactionStatus(DisbursementStatic.CERTIFIED);
+
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
             ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
@@ -328,8 +331,7 @@ public class CheckAuthorizationController implements Initializable, ScreenInterf
 
     private void retrieveDisbursement() {
         try {
-            poJSON = poDisbursementController.loadTransactionList(tfSearchIndustry.getText(), tfSearchBankName.getText(), tfSearchBankAccount.getText(), "", true, true);
-
+            poJSON = poDisbursementController.loadTransactionList(tfSearchIndustry.getText(), tfSearchBankName.getText(), tfSearchBankAccount.getText(), DisbursementStatic.AUTHORIZED);
             if ("error".equals(poJSON.get("result"))) {
 //                ShowMessageFX.Error(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
             } else {
@@ -365,6 +367,7 @@ public class CheckAuthorizationController implements Initializable, ScreenInterf
 
                                     switch (disbursementType) {
                                         case DisbursementStatic.DisbursementType.CHECK:
+                                        case DisbursementStatic.DisbursementType.CHECK_DEPOSIT:
                                             lsPaymentForm = "CHECK";
                                             lsBankName = poDisbursementController.getMaster(lnCntr).CheckPayments().Banks().getBankName();
                                             lsBankAccount = poDisbursementController.getMaster(lnCntr).CheckPayments().Bank_Account_Master().getAccountNo();

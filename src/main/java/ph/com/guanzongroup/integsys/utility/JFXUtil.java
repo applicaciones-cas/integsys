@@ -3477,54 +3477,56 @@ public class JFXUtil {
     private static Timeline radialTimeline;
 
     public static void applyClockwiseFillAnimation(AnchorPane targetPane, double speed) {
-        double width = targetPane.getPrefWidth();
-        double height = targetPane.getPrefHeight();
+        Platform.runLater(() -> {
+            double width = targetPane.getPrefWidth();
+            double height = targetPane.getPrefHeight();
 
-        // Stop previous animation if exists
-        if (radialTimeline != null) {
-            radialTimeline.stop();
-        }
-
-        // Clip for rounded rectangle
-        Rectangle clip = new Rectangle(width, height);
-        clip.setArcWidth(40);
-        clip.setArcHeight(40);
-        targetPane.setClip(clip);
-
-        // Check if canvas already exists (avoid stacking)
-        Canvas canvas;
-        if (!targetPane.getChildren().isEmpty() && targetPane.getChildren().get(0) instanceof Canvas) {
-            canvas = (Canvas) targetPane.getChildren().get(0);
-        } else {
-            canvas = new Canvas(width, height);
-            targetPane.getChildren().add(0, canvas);
-        }
-
-        GraphicsContext gc = canvas.getGraphicsContext2D();
-
-        // Reset angle
-        final double[] angle = {0};
-
-        radialTimeline = new Timeline(new KeyFrame(Duration.millis(15), event -> {
-
-            angle[0] += speed; // 🔥 speed now controls rotation increment
-
-            if (angle[0] > 360) {
-                angle[0] = 360;
-                radialTimeline.stop(); // stop when fully filled (optional)
+            // Stop previous animation if exists
+            if (radialTimeline != null) {
+                radialTimeline.stop();
             }
 
-            // redraw background
-            gc.setFill(Color.web("#F4F4F4"));
-            gc.fillRoundRect(0, 0, width, height, 40, 40);
+            // Clip for rounded rectangle
+            Rectangle clip = new Rectangle(width, height);
+            clip.setArcWidth(40);
+            clip.setArcHeight(40);
+            targetPane.setClip(clip);
 
-            // draw arc
-            gc.setFill(Color.web("#FF8201"));
-            gc.fillArc(-100, -100, width + 200, height + 200, 90, -angle[0], javafx.scene.shape.ArcType.ROUND);
-        }));
+            // Check if canvas already exists (avoid stacking)
+            Canvas canvas;
+            if (!targetPane.getChildren().isEmpty() && targetPane.getChildren().get(0) instanceof Canvas) {
+                canvas = (Canvas) targetPane.getChildren().get(0);
+            } else {
+                canvas = new Canvas(width, height);
+                targetPane.getChildren().add(0, canvas);
+            }
 
-        radialTimeline.setCycleCount(Timeline.INDEFINITE);
-        radialTimeline.playFromStart();
+            GraphicsContext gc = canvas.getGraphicsContext2D();
+
+            // Reset angle
+            final double[] angle = {0};
+
+            radialTimeline = new Timeline(new KeyFrame(Duration.millis(15), event -> {
+
+                angle[0] += speed; // 🔥 speed now controls rotation increment
+
+                if (angle[0] > 360) {
+                    angle[0] = 360;
+                    radialTimeline.stop(); // stop when fully filled (optional)
+                }
+
+                // redraw background
+                gc.setFill(Color.web("#F4F4F4"));
+                gc.fillRoundRect(0, 0, width, height, 40, 40);
+
+                // draw arc
+                gc.setFill(Color.web("#FF8201"));
+                gc.fillArc(-100, -100, width + 200, height + 200, 90, -angle[0], javafx.scene.shape.ArcType.ROUND);
+            }));
+
+            radialTimeline.setCycleCount(Timeline.INDEFINITE);
+            radialTimeline.playFromStart();
+        });
     }
     public String[] buttonPackArray = {"btnSave", "btnCancel", "btnApprove", "btnDisapprove", "btnVoid"};
 
