@@ -114,7 +114,7 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
     private TableView<Model_AP_Client_Ledger> tblLedger;
 
     @FXML
-    private TableColumn<Model_AP_Client_Ledger, String> tblColNo, tblColDate, tblColSourceNo, tblColSourceCode, tblColAmountIn, tblColAmountOut;
+    private TableColumn<Model_AP_Client_Ledger, String> tblColNo, tblLedgerNo, tblColDate, tblColSourceNo, tblColSourceCode, tblColAmountIn, tblColAmountOut;
 
     @FXML
     private TextField tfSearchCompanyName, tfSearchClient, tfClientID, tfContactPerson,
@@ -144,7 +144,10 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
     private DatePicker dpBegBalance, dpClientSince;
 
     @FXML
-    private CheckBox cbVatRegistered;
+    private CheckBox cbVatRegistered, cbVatable, cbHasPermit, cbBackOrder, cbHoldOrder;
+    
+    @FXML
+    private ComboBox<String> cmbPayment;
 
     @Override
     public void setGRider(GRiderCAS foValue) {
@@ -271,8 +274,9 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
                                     "Initialize Search Client! ")) {
                                 return;
                             }
+                            clearAllInputs();
+                            
                             poAppController.loadAttachments();
-
                             getLoadedClient();
                             initButtonDisplay(poAppController.getEditMode());
                             break;
@@ -286,8 +290,9 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
                                     "Initialize Search Client! ")) {
                                 return;
                             }
+                            clearAllInputs();
+                            
                             poAppController.loadAttachments();
-
                             getLoadedClient();
                             initButtonDisplay(poAppController.getEditMode());
                             break;
@@ -334,7 +339,16 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
                     if (!isJSONSuccess(poAppController.saveRecord(), "Initialize Save Record")) {
                         return;
                     }
+                    
+                    poAppController.openRecord(poAppController.getModel().getClientId());
+                    if (!isJSONSuccess(poAppController.updateRecord(), "Initialize Update Record")) {
+                        return;
+                    }
+                    clearAllInputs();
+                    
+                    poAppController.loadAttachments();
                     getLoadedClient();
+                    initButtonDisplay(poAppController.getEditMode());
 
                     break;
 
@@ -583,8 +597,9 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
                                         "")) {
                                     return;
                                 }
+                                clearAllInputs();
+                            
                                 poAppController.loadAttachments();
-
                                 getLoadedClient();
                                 initButtonDisplay(poAppController.getEditMode());
                                 break;
@@ -598,8 +613,9 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
                                         "")) {
                                     return;
                                 }
+                                clearAllInputs();
+                            
                                 poAppController.loadAttachments();
-
                                 getLoadedClient();
                                 initButtonDisplay(poAppController.getEditMode());
                                 break;
@@ -654,7 +670,18 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
             tfContactEmail.setText(poAppController.getModel().ClientInstitutionContact().getMailAddress());
             tfContactNo.setText(poAppController.getModel().ClientInstitutionContact().getMobileNo());
             tfTINNo.setText(poAppController.getModel().Client().getTaxIdNumber());
-
+            
+            cbVatRegistered.setSelected(poAppController.getModel().isVatRegstr() == null || !poAppController.getModel().isVatRegstr().equalsIgnoreCase("1") ? false : true);
+            cbHasPermit.setSelected(poAppController.getModel().hasPermit() == null || !poAppController.getModel().hasPermit().equalsIgnoreCase("1") ? false : true);
+            cbBackOrder.setSelected(poAppController.getModel().isBackOrder() == null || !poAppController.getModel().isBackOrder().equalsIgnoreCase("1") ? false : true);
+            cbVatable.setSelected(poAppController.getModel().getVatable() == null || !poAppController.getModel().getVatable().equalsIgnoreCase("1") ? false : true);
+            cbHoldOrder.setSelected(poAppController.getModel().isHoldOrder() == null || !poAppController.getModel().isHoldOrder().equalsIgnoreCase("1") ? false : true);
+            
+            if (poAppController.getModel().getPayment() == null) {
+            }else{
+                cmbPayment.getSelectionModel().select(Integer.parseInt(poAppController.getModel().getPayment()));
+            }
+            
             dpClientSince.setValue(poAppController.getModel().getdateClientSince() == null ? null : ParseDate(poAppController.getModel().getdateClientSince()));
             dpBegBalance.setValue(poAppController.getModel().getBeginningDate() == null ? null : ParseDate(poAppController.getModel().getBeginningDate()));
             tfDiscount.setText(CommonUtils.NumberFormat(poAppController.getModel().getDiscount(), "###,###,##0.0000"));
@@ -691,10 +718,32 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
                 loControlField.focusedProperty().addListener(dPicker_Focus);
             }
         }
-        cbVatRegistered.focusedProperty().addListener((obs, oldVal, newVal) -> {
-            if (newVal) {
-                poAppController.getModel().setVatable(cbVatRegistered.isSelected() == true
-                        ? "1" : "0");
+        
+        //vat registered
+        cbVatRegistered.selectedProperty().addListener((obs, oldVal, newVal) -> {
+            poAppController.getModel().isVatRegstr(cbVatRegistered.isSelected() == true ? "1" : "0");
+        });
+        //has permit
+        cbHasPermit.selectedProperty().addListener((obs, oldVal, newVal) -> {
+            poAppController.getModel().hasPermit(cbHasPermit.isSelected() == true ? "1" : "0");
+        });
+        //has back order
+        cbBackOrder.selectedProperty().addListener((obs, oldVal, newVal) -> {
+            poAppController.getModel().isBackOrder(cbBackOrder.isSelected() == true ? "1" : "0");
+        });
+        //vatable
+        cbVatable.selectedProperty().addListener((obs, oldVal, newVal) -> {
+            poAppController.getModel().setVatable(cbVatable.isSelected() == true ? "1" : "0");
+        });
+        //is hold order
+        cbHoldOrder.selectedProperty().addListener((obs, oldVal, newVal) -> {
+            poAppController.getModel().isHoldOrder(cbHoldOrder.isSelected() == true ? "1" : "0");
+        });
+        //payment method
+        cmbPayment.getSelectionModel().selectedIndexProperty().addListener((obs, oldIndex, newIndex) -> {
+            if (newIndex != null && newIndex.intValue() >= 0) {
+                int lnIndex = newIndex.intValue(); // the selected index
+                poAppController.getModel().setPayment(String.valueOf(lnIndex));
             }
         });
         clearAllInputs();
@@ -727,6 +776,8 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
                 ((DatePicker) loControl).setValue(null);
             } else if (loControl instanceof ComboBox) {
                 ((ComboBox) loControl).setItems(null);
+            } else if (loControl instanceof CheckBox) {
+                ((CheckBox) loControl).setSelected(false);
             }
         }
 
@@ -735,6 +786,11 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
         imgPreview.setImage(null);
 
         initButtonDisplay(poAppController.getEditMode());
+        cmbPayment.setItems(FXCollections.observableArrayList(
+                "Check",
+                "Deposit to Account",
+                "Bank Transfer"
+        ));
     }
 
     private void initButtonDisplay(int fnEditMode) {
@@ -787,6 +843,7 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
 
             tblColAmountIn.setStyle("-fx-alignment: CENTER-RIGHT; -fx-padding: 0 5 0 0;");
             tblColAmountOut.setStyle("-fx-alignment: CENTER-RIGHT; -fx-padding: 0 5 0 0;");
+            tblLedgerNo.setStyle("-fx-alignment: CENTER; -fx-padding: 0 5 0 0;");
 
             tblColNo.setCellValueFactory((loModel) -> {
                 int index = tblLedger.getItems().indexOf(loModel.getValue()) + 1;
@@ -801,30 +858,32 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
             tblColSourceNo.setCellValueFactory((loModel) -> {
                 return new SimpleStringProperty(loModel.getValue().getSourceNo());
             });
+            
+            tblLedgerNo.setCellValueFactory((loModel) -> {
+                return new SimpleStringProperty(loModel.getValue().getLedgerNo());
+            });
 
-                tblColSourceCode.setCellValueFactory((loModel) -> {
-                    try {
-                        return new SimpleStringProperty(loModel.getValue().TransactionSource().getSourceName());
-                    } catch (SQLException | GuanzonException ex) {
-                        Logger.getLogger(DeliverySchedule_EntryController.class
-                                .getName()).log(Level.SEVERE, null, ex);
-                        poLogWrapper.severe(psFormName + " :" + ex.getMessage());
-                        return new SimpleStringProperty("");
-                    }
-                });
+            tblColSourceCode.setCellValueFactory((loModel) -> {
+                try {
+                    return new SimpleStringProperty(loModel.getValue().TransactionSource().getSourceName());
+                } catch (SQLException | GuanzonException ex) {
+                    Logger.getLogger(DeliverySchedule_EntryController.class
+                            .getName()).log(Level.SEVERE, null, ex);
+                    poLogWrapper.severe(psFormName + " :" + ex.getMessage());
+                    return new SimpleStringProperty("");
+                }
+            });
 
-                tblColAmountIn.setCellValueFactory((loModel) -> {
-                    return new SimpleStringProperty(CommonUtils.NumberFormat(loModel.getValue().getAmountOt(), "###,##0.0000"));
-                });
+            tblColAmountIn.setCellValueFactory((loModel) -> {
+                return new SimpleStringProperty(CommonUtils.NumberFormat(loModel.getValue().getAmountOt(), "###,##0.0000"));
+            });
 
-                tblColAmountOut.setCellValueFactory((loModel) -> {
-                    return new SimpleStringProperty(CommonUtils.NumberFormat(loModel.getValue().getAmountIn(), "###,##0.0000"));
-                });
+            tblColAmountOut.setCellValueFactory((loModel) -> {
+                return new SimpleStringProperty(CommonUtils.NumberFormat(loModel.getValue().getAmountIn(), "###,##0.0000"));
+            });
             }
         }
     
-    
-
     private void initAttachmentsGrid() {
 
         /*FOCUS ON FIRST ROW*/
