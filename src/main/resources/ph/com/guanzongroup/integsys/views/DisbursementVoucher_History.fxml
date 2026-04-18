@@ -548,8 +548,11 @@
                                                                                  </padding>
                                                                               </Label>
                                                                               <TextField fx:id="tfAdvancesDetail" alignment="CENTER_RIGHT" disable="true" editable="false" maxWidth="1.7976931348623157E308" GridPane.columnIndex="1" GridPane.rowIndex="4" />
-                                                                              <Label text="Source No" GridPane.rowIndex="3" />
-                                                                              <TextField fx:id="tfSourceNoDetail" alignment="CENTER_RIGHT" disable="true" editable="false" maxWidth="1.7976931348623157E308" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                                                                              <Label text="Source No" GridPane.rowIndex="3">
+                                                                                 <GridPane.margin>
+                                                                                    <Insets right="5.0" />
+                                                                                 </GridPane.margin></Label>
+                                                                              <TextField fx:id="tfSourceNoDetail" disable="true" editable="false" maxWidth="1.7976931348623157E308" GridPane.columnIndex="1" GridPane.rowIndex="3" />
                                                                                                     </children>
                                                                   </GridPane>
                                                                </children>
