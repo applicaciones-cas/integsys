@@ -567,8 +567,10 @@
                                                                                     </Button>
                                                                                  </children>
                                                                               </HBox>
-                                                                              <Label text="Advances" GridPane.rowIndex="3" />
-                                                                              <TextField fx:id="tfAdvancesDetail" alignment="CENTER_RIGHT" disable="true" editable="false" maxWidth="1.7976931348623157E308" GridPane.columnIndex="2" GridPane.rowIndex="3" />
+                                                                              <Label text="Advances" GridPane.rowIndex="4" />
+                                                                              <TextField fx:id="tfAdvancesDetail" alignment="CENTER_RIGHT" disable="true" editable="false" maxWidth="1.7976931348623157E308" GridPane.columnIndex="2" GridPane.rowIndex="4" />
+                                                                              <Label text="Source No" GridPane.rowIndex="3" />
+                                                                              <TextField fx:id="tfSourceNoDetail" disable="true" editable="false" maxWidth="1.7976931348623157E308" GridPane.columnIndex="2" GridPane.rowIndex="3" />
                                                                                             </children>
                                                                   </GridPane>
                                                                </children>
