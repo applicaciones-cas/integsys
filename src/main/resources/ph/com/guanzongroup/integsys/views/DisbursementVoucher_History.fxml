@@ -542,12 +542,14 @@
                                                                                                         <TextField fx:id="tfVatAmountDetail" alignment="CENTER_RIGHT" disable="true" promptText="0.00" styleClass="DisabledTextField" GridPane.columnIndex="4" GridPane.rowIndex="6" />
                                                                                                         <TextField fx:id="tfPurchasedAmountDetail" alignment="CENTER_RIGHT" promptText="0.00" GridPane.columnIndex="7" GridPane.rowIndex="5" />
                                                                                                         <TextField fx:id="tfNetAmountDetail" alignment="CENTER_RIGHT" disable="true" promptText="0.00" style="-fx-font-weight: bold;" styleClass="DisabledTextField" GridPane.columnIndex="7" GridPane.rowIndex="6" />
-                                                                              <Label text="Advances" GridPane.rowIndex="3">
+                                                                              <Label text="Advances" GridPane.rowIndex="4">
                                                                                  <padding>
                                                                                     <Insets right="5.0" />
                                                                                  </padding>
                                                                               </Label>
-                                                                              <TextField fx:id="tfAdvancesDetail" alignment="CENTER_RIGHT" disable="true" editable="false" maxWidth="1.7976931348623157E308" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                                                                              <TextField fx:id="tfAdvancesDetail" alignment="CENTER_RIGHT" disable="true" editable="false" maxWidth="1.7976931348623157E308" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+                                                                              <Label text="Source No" GridPane.rowIndex="3" />
+                                                                              <TextField fx:id="tfSourceNoDetail" alignment="CENTER_RIGHT" disable="true" editable="false" maxWidth="1.7976931348623157E308" GridPane.columnIndex="1" GridPane.rowIndex="3" />
                                                                                                     </children>
                                                                   </GridPane>
                                                                </children>
