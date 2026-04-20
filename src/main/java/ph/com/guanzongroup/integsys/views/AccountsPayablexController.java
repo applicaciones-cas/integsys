@@ -69,6 +69,7 @@ import org.guanzon.appdriver.base.MiscUtil;
 import org.guanzon.appdriver.constant.DocumentType;
 import org.guanzon.appdriver.constant.RecordStatus;
 import org.guanzon.cas.client.account.AP_Client_Master;
+import org.guanzon.cas.client.constants.APPaymentConstants;
 import org.guanzon.cas.client.model.Model_AP_Client_Ledger;
 import org.guanzon.cas.client.services.ClientControllers;
 import org.json.simple.JSONObject;
@@ -144,10 +145,10 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
     private DatePicker dpBegBalance, dpClientSince;
 
     @FXML
-    private CheckBox cbVatRegistered, cbVatable, cbHasPermit, cbBackOrder, cbHoldOrder;
+    private CheckBox cbVatable, cbHasPermit, cbBackOrder, cbHoldOrder;
     
     @FXML
-    private ComboBox<String> cmbPayment;
+    private ComboBox<String> cmbPayment, cmbRegistration;
 
     @Override
     public void setGRider(GRiderCAS foValue) {
@@ -358,7 +359,7 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
 
                         Platform.runLater(() -> {
                             poAppController.setRecordStatus("01");
-                            poAppController.setRecordStatus("07");
+                            //poAppController.setRecordStatus("07");
 
                             clearAllInputs();
                         });
@@ -671,12 +672,18 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
             tfContactNo.setText(poAppController.getModel().ClientInstitutionContact().getMobileNo());
             tfTINNo.setText(poAppController.getModel().Client().getTaxIdNumber());
             
-            cbVatRegistered.setSelected(poAppController.getModel().isVatRegstr() == null || !poAppController.getModel().isVatRegstr().equalsIgnoreCase("1") ? false : true);
             cbHasPermit.setSelected(poAppController.getModel().hasPermit() == null || !poAppController.getModel().hasPermit().equalsIgnoreCase("1") ? false : true);
             cbBackOrder.setSelected(poAppController.getModel().isBackOrder() == null || !poAppController.getModel().isBackOrder().equalsIgnoreCase("1") ? false : true);
             cbVatable.setSelected(poAppController.getModel().getVatable() == null || !poAppController.getModel().getVatable().equalsIgnoreCase("1") ? false : true);
             cbHoldOrder.setSelected(poAppController.getModel().isHoldOrder() == null || !poAppController.getModel().isHoldOrder().equalsIgnoreCase("1") ? false : true);
             
+            //registration list
+            if (poAppController.getModel().getVatRegstr()== null) {
+            }else{
+                cmbRegistration.getSelectionModel().select(Integer.parseInt(poAppController.getModel().getVatRegstr()));
+            }
+            
+            //payment method
             if (poAppController.getModel().getPayment() == null) {
             }else{
                 cmbPayment.getSelectionModel().select(Integer.parseInt(poAppController.getModel().getPayment()));
@@ -718,11 +725,7 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
                 loControlField.focusedProperty().addListener(dPicker_Focus);
             }
         }
-        
-        //vat registered
-        cbVatRegistered.selectedProperty().addListener((obs, oldVal, newVal) -> {
-            poAppController.getModel().isVatRegstr(cbVatRegistered.isSelected() == true ? "1" : "0");
-        });
+
         //has permit
         cbHasPermit.selectedProperty().addListener((obs, oldVal, newVal) -> {
             poAppController.getModel().hasPermit(cbHasPermit.isSelected() == true ? "1" : "0");
@@ -738,6 +741,13 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
         //is hold order
         cbHoldOrder.selectedProperty().addListener((obs, oldVal, newVal) -> {
             poAppController.getModel().isHoldOrder(cbHoldOrder.isSelected() == true ? "1" : "0");
+        });
+        //vat registration
+        cmbRegistration.getSelectionModel().selectedIndexProperty().addListener((obs, oldIndex, newIndex) -> {
+            if (newIndex != null && newIndex.intValue() >= 0) {
+                int lnIndex = newIndex.intValue(); // the selected index
+                poAppController.getModel().setVatRegstr(String.valueOf(lnIndex));
+            }
         });
         //payment method
         cmbPayment.getSelectionModel().selectedIndexProperty().addListener((obs, oldIndex, newIndex) -> {
@@ -786,11 +796,9 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
         imgPreview.setImage(null);
 
         initButtonDisplay(poAppController.getEditMode());
-        cmbPayment.setItems(FXCollections.observableArrayList(
-                "Check",
-                "Deposit to Account",
-                "Bank Transfer"
-        ));
+        
+        cmbRegistration.setItems(APPaymentConstants.regstrList);
+        cmbPayment.setItems(APPaymentConstants.paymentList);
     }
 
     private void initButtonDisplay(int fnEditMode) {
