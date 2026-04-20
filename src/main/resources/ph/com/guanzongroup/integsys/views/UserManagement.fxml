@@ -53,7 +53,7 @@
                                   <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="28.0" vgrow="SOMETIMES" />
                                 </rowConstraints>
                                  <children>
-                                    <Label text="Log In Name" GridPane.columnIndex="4">
+                                    <Label text="Log In Name" visible="false" GridPane.columnIndex="4">
                                        <font>
                                           <Font name="System Bold" size="14.0" />
                                        </font>
@@ -64,7 +64,7 @@
                                        </font>
                                     </Label>
                                     <TextField fx:id="tfSearchEmployeeName" layoutX="512.0" layoutY="11.0" promptText="Press F3: Search" GridPane.columnIndex="2" />
-                                    <TextField fx:id="tfSearchLogInName" promptText="Press F3: Search" GridPane.columnIndex="6" />
+                                    <TextField fx:id="tfSearchLogInName" promptText="Press F3: Search" visible="false" GridPane.columnIndex="6" />
                                  </children>
                               </GridPane>
                            </children>
