@@ -358,8 +358,8 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
                         poAppController = new ClientControllers(poApp, poLogWrapper).APClientMaster();
 
                         Platform.runLater(() -> {
-//                            poAppController.setRecordStatus("01");
-//                            poAppController.setRecordStatus("07");
+                            poAppController.setRecordStatus("01");
+                            //poAppController.setRecordStatus("07");
 
                             clearAllInputs();
                         });
