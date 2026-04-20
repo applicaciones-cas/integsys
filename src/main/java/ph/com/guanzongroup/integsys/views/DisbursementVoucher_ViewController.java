@@ -102,7 +102,7 @@ public class DisbursementVoucher_ViewController implements Initializable, Screen
     JFXUtil.ReloadableTableTask loadTableDetail, loadTableDetailBIR, loadTableAttachment;
     private final JFXUtil.ImageViewer imageviewerutil = new JFXUtil.ImageViewer();
     ObservableList<String> cPaymentMode = FXCollections.observableArrayList(
-            "CHECK", "BANK TRANSFER", "DIGITAL PAYMENT");
+            "CHECK", "CHECK DEPOSIT", "BANK TRANSFER", "DIGITAL PAYMENT");
     ObservableList<String> cDisbursementMode = FXCollections.observableArrayList("DELIVER", "PICK-UP");
     ObservableList<String> cPayeeType = FXCollections.observableArrayList("INDIVIDUAL", "CORPORATION");
     ObservableList<String> cClaimantType = FXCollections.observableArrayList("AUTHORIZED REPRESENTATIVE", "PAYEE");
@@ -122,7 +122,7 @@ public class DisbursementVoucher_ViewController implements Initializable, Screen
     @FXML
     private Tab tabDisbursement, tabCheck, tabBankTransfer, tabOnlinePayment, tabBIR, tabAttachments;
     @FXML
-    private TextField tfAdvancesDetail, tfAdvances, tfDVTransactionNo, tfSupplier, tfVoucherNo, tfBankNameCheck, tfBankAccountCheck, tfPayeeName, tfCheckNo, tfCheckAmount, tfAuthorizedPerson, tfBankNameBTransfer, tfBankAccountBTransfer, tfPaymentAmountBTransfer, tfSupplierBank, tfSupplierAccountNoBTransfer, tfBankTransReferNo, tfPaymentStatusBTransfer, tfBankNameOnlinePayment, tfBankAccountOnlinePayment, tfPaymentAmount, tfSupplierServiceName, tfSupplierAccountNo, tfPaymentReferenceNo, tfOnlinePaymentStatus, tfTotalAmount, tfVatableSales, tfVatAmountMaster, tfVatZeroRatedSales, tfVatExemptSales, tfLessWHTax, tfTotalNetAmount, tfRefNoDetail, tfVatableSalesDetail, tfVatExemptDetail, tfVatZeroRatedSalesDetail, tfVatRateDetail, tfVatAmountDetail, tfPurchasedAmountDetail, tfNetAmountDetail, tfBIRTransactionNo, tfTaxCode, tfParticular, tfBaseAmount, tfTaxRate, tfTotalTaxAmount, tfAttachmentNo, tfAttachmentSource;
+    private TextField tfAdvancesDetail, tfAdvances, tfDVTransactionNo, tfSupplier, tfVoucherNo, tfBankNameCheck, tfBankAccountCheck, tfPayeeName, tfCheckNo, tfCheckAmount, tfAuthorizedPerson, tfBankNameBTransfer, tfBankAccountBTransfer, tfPaymentAmountBTransfer, tfSupplierBank, tfSupplierAccountNoBTransfer, tfBankTransReferNo, tfPaymentStatusBTransfer, tfBankNameOnlinePayment, tfBankAccountOnlinePayment, tfPaymentAmount, tfSupplierServiceName, tfSupplierAccountNo, tfPaymentReferenceNo, tfOnlinePaymentStatus, tfTotalAmount, tfVatableSales, tfVatAmountMaster, tfVatZeroRatedSales, tfVatExemptSales, tfLessWHTax, tfTotalNetAmount, tfRefNoDetail,tfSourceNoDetail, tfVatableSalesDetail, tfVatExemptDetail, tfVatZeroRatedSalesDetail, tfVatRateDetail, tfVatAmountDetail, tfPurchasedAmountDetail, tfNetAmountDetail, tfBIRTransactionNo, tfTaxCode, tfParticular, tfBaseAmount, tfTaxRate, tfTotalTaxAmount, tfAttachmentNo, tfAttachmentSource;
     @FXML
     private DatePicker dpDVTransactionDate, dpCheckDate, dpPeriodFrom, dpPeriodTo;
     @FXML
@@ -195,7 +195,7 @@ public class DisbursementVoucher_ViewController implements Initializable, Screen
                 }
                 poJSON = poController.OpenTransaction(psTransactionNo);
                 if (!"error".equals((String) poJSON.get("result"))) {
-                    if (poController.Master().getDisbursementType().equals(DisbursementStatic.DisbursementType.CHECK)) {
+                    if (JFXUtil.isObjectEqualTo(poController.Master().getDisbursementType(), DisbursementStatic.DisbursementType.CHECK, DisbursementStatic.DisbursementType.CHECK_DEPOSIT)) {
 //                        poController.setCheckpayment();
                     }
 
@@ -309,6 +309,12 @@ public class DisbursementVoucher_ViewController implements Initializable, Screen
         JFXUtil.setDisabled(true, tabCheck, tabOnlinePayment, tabBankTransfer);
         switch (poController.Master().getDisbursementType()) {
             case DisbursementStatic.DisbursementType.CHECK:
+                JFXUtil.setDisabled(false, tabCheck);
+                JFXUtil.clickTabByTitleText(tabPanePaymentMode, "Check");
+                loadRecordMasterCheck();
+                //must reset data of check
+                break;
+            case DisbursementStatic.DisbursementType.CHECK_DEPOSIT:
                 JFXUtil.setDisabled(false, tabCheck);
                 JFXUtil.clickTabByTitleText(tabPanePaymentMode, "Check");
                 loadRecordMasterCheck();
@@ -717,6 +723,7 @@ public class DisbursementVoucher_ViewController implements Initializable, Screen
             return;
         }
         tfRefNoDetail.setText(poController.getReferenceNo(pnDetail));
+        tfSourceNoDetail.setText(poController.getSourceNo(pnDetail));
         chbkVatClassification.setSelected(poController.Detail(pnDetail).isWithVat());
         tfVatableSalesDetail.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(pnDetail).getDetailVatSales(), true));
         tfVatExemptDetail.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(pnDetail).getDetailVatExempt(), true));
@@ -767,10 +774,9 @@ public class DisbursementVoucher_ViewController implements Initializable, Screen
             chbkIsPersonOnly.setSelected(poController.CheckPayments().getModel().isPayee());
             tfBankNameCheck.setText(poController.CheckPayments().getModel().Banks().getBankName() != null ? poController.CheckPayments().getModel().Banks().getBankName() : "");
 //            tfBankAccountCheck.setText(poController.CheckPayments().getModel().Bank_Account_Master().getAccountNo() != null ? poController.CheckPayments().getModel().Bank_Account_Master().getAccountNo() : "");
-            tfBankAccountCheck.setText(poController.Master().getDisbursementType().equals(
-                    DisbursementStatic.DisbursementType.CHECK)
-                            ? (poController.CheckPayments().getModel().Bank_Account_Master().getAccountNo() != null
-                            ? poController.CheckPayments().getModel().Bank_Account_Master().getAccountNo() : "") : "");
+            tfBankAccountCheck.setText(JFXUtil.isObjectEqualTo(poController.Master().getDisbursementType(), DisbursementStatic.DisbursementType.CHECK, DisbursementStatic.DisbursementType.CHECK_DEPOSIT)
+                    ? (poController.CheckPayments().getModel().Bank_Account_Master().getAccountNo() != null
+                    ? poController.CheckPayments().getModel().Bank_Account_Master().getAccountNo() : "") : "");
             chbkPrintByBank.setSelected(poController.Master().getBankPrint().equals(Logical.YES));
 
             tfPayeeName.setText(poController.Master().Payee().getPayeeName() != null ? poController.Master().Payee().getPayeeName() : "");

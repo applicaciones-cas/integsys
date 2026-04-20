@@ -399,8 +399,15 @@ public class LoginController implements Initializable, ScreenInterface {
 
                 cmbCompany.setItems(companyOptions);
                 if (!cmbCompany.getItems().isEmpty()) {
-                    cmbCompany.getSelectionModel().select(0);
-                    psCompanyID = companyOptions.get(0).getCompanyId();
+                    //select that contains GMC as auto selected company only if the industry is 09
+                    int index = findIndex(companyOptions, "Merchandising");
+                    if ((index != 0) && hasWord( String.valueOf(cmbIndustry.getSelectionModel().getSelectedItem()), "General")) {
+                        cmbCompany.getSelectionModel().select(index);
+                        psCompanyID = companyOptions.get(index).getCompanyId();
+                    } else {
+                        cmbCompany.getSelectionModel().select(0);
+                        psCompanyID = companyOptions.get(0).getCompanyId();
+                    }
                 }
             } else {
                 psIndustryID = oApp.getIndustry();
@@ -412,6 +419,24 @@ public class LoginController implements Initializable, ScreenInterface {
         } catch (SQLException ex) {
             ex.printStackTrace();
         }
+    }
+
+    public static boolean hasWord(String source, String word) {
+        return source != null && word != null
+                && source.toLowerCase().contains(word.toLowerCase());
+    }
+
+    public static int findIndex(ObservableList<ModelLog_In_Company> list, String word) {
+        if (list == null || word == null) {
+            return -1;
+        }
+        for (int i = 0; i < list.size(); i++) {
+            String name = list.get(i).getCompanyName();
+            if (name != null && name.toLowerCase().contains(word.toLowerCase())) {
+                return i; // found index
+            }
+        }
+        return 0; // not found
     }
 
     public JSONObject ValidateLogin() {

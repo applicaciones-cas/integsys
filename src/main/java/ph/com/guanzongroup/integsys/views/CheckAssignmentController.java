@@ -97,6 +97,7 @@ public class CheckAssignmentController implements Initializable {
                     chbkApplyToAll.selectedProperty().set(true);
                 }
             }
+
         } catch (Exception ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
             ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
@@ -141,6 +142,7 @@ public class CheckAssignmentController implements Initializable {
             ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
+    boolean pbSuccess2 = true;
     ChangeListener<Boolean> txtMaster_Focus = JFXUtil.FocusListener(TextField.class,
             (lsID, lsValue) -> {
                 try {
@@ -152,16 +154,20 @@ public class CheckAssignmentController implements Initializable {
                             // Only bother calling the DB if the user actually changed the value                               
                             //Allow editing
                             if (!lsValue.equals(originalCheckNo)) {
-                                poJSON = poController.existCheckNo(lsValue);
-                                if ("error".equals((String) poJSON.get("result"))) {
-                                    ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-                                    tfCheckNo.setText(poController.CheckPayments().getModel().getCheckNo());
-                                    break;
-                                } else {
-                                    poController.CheckPayments().getModel().setCheckNo(lsValue);
+                                if (pbSuccess2) {
+                                    poJSON = poController.existCheckNo(lsValue);
+                                    if ("error".equals((String) poJSON.get("result"))) {
+                                        ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+
+                                    } else {
+                                        poController.CheckPayments().getModel().setCheckNo(lsValue);
+                                    }
                                 }
                             }
+
+                            pbSuccess2 = false;
                             loadRecordMaster();
+                            pbSuccess2 = true;
                             break;
                     }
                 } catch (Exception ex) {
@@ -324,6 +330,8 @@ public class CheckAssignmentController implements Initializable {
                     return;
                 }
                 loadRecordMaster();
+
+                originalCheckNo = poController.CheckPayments().getModel().getCheckNo();
                 initTextFields();
                 pnEditMode = poController.getEditMode();
                 initButton(pnEditMode);

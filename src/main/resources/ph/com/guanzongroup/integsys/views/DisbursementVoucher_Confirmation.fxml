@@ -117,9 +117,17 @@
                                                 <FontAwesomeIconView glyphName="TIMES" size="20" />
                                             </graphic>
                                         </Button>
-                                        <Button fx:id="btnVerify" contentDisplay="TOP" ellipsisString="" mnemonicParsing="false" prefHeight="70.0" prefWidth="70.0" styleClass="button_process" stylesheets="@../css/StyleSheet.css" text="Verify">
+                                        <Button fx:id="btnConfirm" contentDisplay="TOP" ellipsisString="" mnemonicParsing="false" prefHeight="70.0" prefWidth="70.0" styleClass="button_process" stylesheets="@../css/StyleSheet.css" text="Confirm">
                                             <graphic>
                                                 <FontAwesomeIconView glyphName="CHECK" size="20" />
+                                            </graphic>
+                                            <effect>
+                                                <Blend />
+                                            </effect>
+                                        </Button>
+                                        <Button fx:id="btnVoid" contentDisplay="TOP" ellipsisString="" mnemonicParsing="false" prefHeight="70.0" prefWidth="70.0" styleClass="button_process" stylesheets="@../css/StyleSheet.css" text="Void">
+                                            <graphic>
+                                                <FontAwesomeIconView glyphName="TIMES" size="20" />
                                             </graphic>
                                             <effect>
                                                 <Blend />
@@ -513,7 +521,7 @@
                                                                         </Label>
                                                                                                 <Label text="Net Amount Due" textFill="RED" GridPane.columnIndex="8" GridPane.rowIndex="6">
                                                                            <font>
-                                                                                <Font name="System Bold" size="12.0" />
+                                                                              <Font name="System Bold" size="12.0" />
                                                                            </font>
                                                                         </Label>
                                                                                                 <Label text="Less: Adv. Paym." visible="false" GridPane.columnIndex="8" GridPane.rowIndex="6">

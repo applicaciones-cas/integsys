@@ -99,6 +99,30 @@
                                                 <FontAwesomeIconView glyphName="BOOK" size="20" />
                                             </graphic>
                                         </Button>
+                              <Button fx:id="btnPrint" contentDisplay="TOP" ellipsisString="" mnemonicParsing="false" prefHeight="70.0" prefWidth="70.0" styleClass="button_process" stylesheets="@../css/StyleSheet.css" text="Print DV">
+                                 <effect>
+                                    <Blend />
+                                 </effect>
+                                 <graphic>
+                                    <FontAwesomeIconView glyphName="PRINT" size="20" />
+                                 </graphic>
+                              </Button>
+                              <Button fx:id="btnPrintPaymentSummary" contentDisplay="TOP" ellipsisString="" minWidth="95.0" mnemonicParsing="false" prefHeight="70.0" prefWidth="70.0" styleClass="button_process" stylesheets="@../css/StyleSheet.css" text="Print Summary">
+                                 <effect>
+                                    <Blend />
+                                 </effect>
+                                 <graphic>
+                                    <FontAwesomeIconView glyphName="PRINT" size="20" />
+                                 </graphic>
+                              </Button>
+                              <Button fx:id="btnPrintCheck" contentDisplay="TOP" ellipsisString="" minWidth="80.0" mnemonicParsing="false" prefHeight="70.0" prefWidth="70.0" styleClass="button_process" stylesheets="@../css/StyleSheet.css" text="Print Check">
+                                 <effect>
+                                    <Blend />
+                                 </effect>
+                                 <graphic>
+                                    <FontAwesomeIconView glyphName="PRINT" size="20" />
+                                 </graphic>
+                              </Button>
                                         <Button fx:id="btnClose" contentDisplay="TOP" ellipsisString="" mnemonicParsing="false" prefHeight="70.0" prefWidth="70.0" styleClass="button_process" stylesheets="@../css/StyleSheet.css" text="Close">
                                             <graphic>
                                                 <FontAwesomeIconView glyphName="POWER_OFF" size="20" />
@@ -498,7 +522,7 @@
                                                                               <Insets right="5.0" />
                                                                            </padding>
                                                                            <font>
-                                                                              <Font name="System Bold" size="14.0" />
+                                                                              <Font name="System Bold" size="12.0" />
                                                                            </font>
                                                                         </Label>
                                                                                                         <Label text="Less: Adv. Paym." visible="false" GridPane.columnIndex="6" GridPane.rowIndex="6">
@@ -518,12 +542,17 @@
                                                                                                         <TextField fx:id="tfVatAmountDetail" alignment="CENTER_RIGHT" disable="true" promptText="0.00" styleClass="DisabledTextField" GridPane.columnIndex="4" GridPane.rowIndex="6" />
                                                                                                         <TextField fx:id="tfPurchasedAmountDetail" alignment="CENTER_RIGHT" promptText="0.00" GridPane.columnIndex="7" GridPane.rowIndex="5" />
                                                                                                         <TextField fx:id="tfNetAmountDetail" alignment="CENTER_RIGHT" disable="true" promptText="0.00" style="-fx-font-weight: bold;" styleClass="DisabledTextField" GridPane.columnIndex="7" GridPane.rowIndex="6" />
-                                                                              <Label text="Advances" GridPane.rowIndex="3">
+                                                                              <Label text="Advances" GridPane.rowIndex="4">
                                                                                  <padding>
                                                                                     <Insets right="5.0" />
                                                                                  </padding>
                                                                               </Label>
-                                                                              <TextField fx:id="tfAdvancesDetail" alignment="CENTER_RIGHT" disable="true" editable="false" maxWidth="1.7976931348623157E308" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                                                                              <TextField fx:id="tfAdvancesDetail" alignment="CENTER_RIGHT" disable="true" editable="false" maxWidth="1.7976931348623157E308" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+                                                                              <Label text="Source No" GridPane.rowIndex="3">
+                                                                                 <GridPane.margin>
+                                                                                    <Insets right="5.0" />
+                                                                                 </GridPane.margin></Label>
+                                                                              <TextField fx:id="tfSourceNoDetail" disable="true" editable="false" maxWidth="1.7976931348623157E308" GridPane.columnIndex="1" GridPane.rowIndex="3" />
                                                                                                     </children>
                                                                   </GridPane>
                                                                </children>

@@ -418,6 +418,7 @@ public class AnimationPreviewManager {
     }
 
     public static class AnimTitle {
+
         private double duration = 0.25;
         private Label g1, g2, c, t1, t2, tOf, t3;
         private double g1W, g2W, cW, t1W, t2W, tOfW, t3W;
@@ -505,7 +506,6 @@ public class AnimationPreviewManager {
         }
 
         public void initialize(AnchorPane logoPane, double fontSize) {
-
             logoPane.setStyle("-fx-background-color: transparent;");
 
             Font font = Font.font("System", FontWeight.BOLD, fontSize);

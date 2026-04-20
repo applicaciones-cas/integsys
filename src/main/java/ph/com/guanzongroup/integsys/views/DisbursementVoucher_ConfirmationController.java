@@ -87,9 +87,9 @@ import ph.com.guanzongroup.integsys.model.ModelDeliveryAcceptance_Attachment;
 /**
  * FXML Controller class
  *
- * @author Team 1 & Team 2
+ * @author Team 1
  */
-public class DisbursementVoucher_VerificationController implements Initializable, ScreenInterface {
+public class DisbursementVoucher_ConfirmationController implements Initializable, ScreenInterface {
 
     private GRiderCAS oApp;
     private JSONObject poJSON, poJSONVAT;
@@ -99,8 +99,9 @@ public class DisbursementVoucher_VerificationController implements Initializable
     private int pnDetailJE = 0;
     private int pnDetailBIR = 0;
     private int pnAttachment = 0;
-    private boolean pbIsCheckedJournalTab = false;
-    private final String pxeModuleName = "Disbursement Voucher Verification";
+    private boolean pbIsCheckedBIRTab = false;
+    private boolean pbIsCheckedAttachmentTab = false;
+    private final String pxeModuleName = "Disbursement Voucher Confirmation";
     private DisbursementVoucher poController;
     public int pnEditMode;
     boolean pbKeyPressed = false;
@@ -144,9 +145,9 @@ public class DisbursementVoucher_VerificationController implements Initializable
     @FXML
     private Label lblSource, lblDVTransactionStatus, lblJournalTransactionStatus;
     @FXML
-    private TextField tfAdvancesDetail, tfAdvances, tfSearchIndustry, tfSearchTransaction, tfSearchSupplier, tfDVTransactionNo, tfSupplier, tfVoucherNo, tfBankNameCheck, tfBankAccountCheck, tfPayeeName, tfCheckNo, tfCheckAmount, tfAuthorizedPerson, tfBankNameBTransfer, tfBankAccountBTransfer, tfPaymentAmountBTransfer, tfSupplierBank, tfSupplierAccountNoBTransfer, tfBankTransReferNo, tfPaymentStatusBTransfer, tfBankNameOnlinePayment, tfBankAccountOnlinePayment, tfPaymentAmount, tfSupplierServiceName, tfSupplierAccountNo, tfPaymentReferenceNo, tfOnlinePaymentStatus, tfTotalAmount, tfVatableSales, tfVatAmountMaster, tfVatZeroRatedSales, tfVatExemptSales, tfLessWHTax, tfTotalNetAmount, tfRefNoDetail,tfSourceNoDetail, tfVatableSalesDetail, tfVatExemptDetail, tfVatZeroRatedSalesDetail, tfVatRateDetail, tfVatAmountDetail, tfPurchasedAmountDetail, tfNetAmountDetail, tfJournalTransactionNo, tfTotalDebitAmount, tfTotalCreditAmount, tfAccountCode, tfAccountDescription, tfDebitAmount, tfCreditAmount, tfBIRTransactionNo, tfTaxCode, tfParticular, tfBaseAmount, tfTaxRate, tfTotalTaxAmount, tfAttachmentNo, tfAttachmentSource;
+    private TextField tfAdvancesDetail, tfAdvances, tfSearchIndustry, tfSearchTransaction, tfSearchSupplier, tfDVTransactionNo, tfSupplier, tfVoucherNo, tfBankNameCheck, tfBankAccountCheck, tfPayeeName, tfCheckNo, tfCheckAmount, tfAuthorizedPerson, tfBankNameBTransfer, tfBankAccountBTransfer, tfPaymentAmountBTransfer, tfSupplierBank, tfSupplierAccountNoBTransfer, tfBankTransReferNo, tfPaymentStatusBTransfer, tfBankNameOnlinePayment, tfBankAccountOnlinePayment, tfPaymentAmount, tfSupplierServiceName, tfSupplierAccountNo, tfPaymentReferenceNo, tfOnlinePaymentStatus, tfTotalAmount, tfVatableSales, tfVatAmountMaster, tfVatZeroRatedSales, tfVatExemptSales, tfLessWHTax, tfTotalNetAmount, tfRefNoDetail, tfSourceNoDetail, tfVatableSalesDetail, tfVatExemptDetail, tfVatZeroRatedSalesDetail, tfVatRateDetail, tfVatAmountDetail, tfPurchasedAmountDetail, tfNetAmountDetail, tfJournalTransactionNo, tfTotalDebitAmount, tfTotalCreditAmount, tfAccountCode, tfAccountDescription, tfDebitAmount, tfCreditAmount, tfBIRTransactionNo, tfTaxCode, tfParticular, tfBaseAmount, tfTaxRate, tfTotalTaxAmount, tfAttachmentNo, tfAttachmentSource;
     @FXML
-    private Button btnUpdate, btnSave, btnCancel, btnVerify, btnRetrieve, btnHistory, btnClose, btnUndo, btnArrowLeft, btnArrowRight;
+    private Button btnUpdate, btnSave, btnCancel, btnConfirm, btnVoid, btnRetrieve, btnHistory, btnClose, btnUndo, btnArrowLeft, btnArrowRight;
     @FXML
     private TabPane tabPaneMain, tabPanePaymentMode;
     @FXML
@@ -229,7 +230,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
                 poController.setCompanyID(psCompanyId);
                 poController.setCategoryID(psCategoryId);
                 poController.Master().setBranchCode(oApp.getBranchCode());
-                poController.setTransactionStatus(DisbursementStatic.CONFIRMED);
+                poController.setTransactionStatus(DisbursementStatic.OPEN + DisbursementStatic.CONFIRMED + DisbursementStatic.RETURNED);
                 loadRecordSearch();
             });
             initAttachmentPreviewPane();
@@ -254,7 +255,6 @@ public class DisbursementVoucher_VerificationController implements Initializable
                     if (pnEditMode == EditMode.READY || pnEditMode == EditMode.UPDATE || pnEditMode == EditMode.ADDNEW) {
                         JFXUtil.clearTextFields(apJournalDetails, apJournalMaster);
                         if (poController.Detail(0).getSourceNo() != null && !poController.Detail(0).getSourceNo().isEmpty()) {
-                            pbIsCheckedJournalTab = true;
                             populateJE();
                         } else {
                             JFXUtil.clickTabByTitleText(tabPaneMain, "Disbursement Voucher");
@@ -266,6 +266,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
                     if (pnEditMode == EditMode.READY || pnEditMode == EditMode.UPDATE || pnEditMode == EditMode.ADDNEW) {
                         JFXUtil.clearTextFields(apBIRDetail);
                         if (poController.Detail(0).getSourceNo() != null && !poController.Detail(0).getSourceNo().isEmpty()) {
+                            pbIsCheckedBIRTab = true;
                             populateBIR();
                         } else {
                             JFXUtil.clickTabByTitleText(tabPaneMain, "Disbursement Voucher");
@@ -277,6 +278,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
                     if (pnEditMode == EditMode.READY || pnEditMode == EditMode.UPDATE || pnEditMode == EditMode.ADDNEW) {
                         JFXUtil.clearTextFields(apAttachments);
                         if (poController.Detail(0).getSourceNo() != null && !poController.Detail(0).getSourceNo().isEmpty()) {
+                            pbIsCheckedAttachmentTab = true;
                             try {
                                 poController.loadAttachments();
                             } catch (GuanzonException | SQLException ex) {
@@ -363,7 +365,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
     }
 
     private void initButtonsClickActions() {
-        List<Button> buttons = Arrays.asList(btnUpdate, btnSave, btnCancel, btnVerify, btnRetrieve, btnHistory, btnClose, btnUndo, btnArrowRight, btnArrowLeft);
+        List<Button> buttons = Arrays.asList(btnUpdate, btnSave, btnCancel, btnConfirm, btnVoid, btnRetrieve, btnHistory, btnClose, btnUndo, btnArrowRight, btnArrowLeft);
         buttons.forEach(button -> button.setOnAction(this::cmdButton_Click));
     }
 
@@ -374,7 +376,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
             switch (lsButton) {
                 case "btnUpdate":
                     String lsUserId = oApp.getUserID();
-                    String lsPosition = poController.checkPosition(DisbursementStatic.VERIFIED, lsUserId);
+                    String lsPosition = poController.checkPosition(DisbursementStatic.CONFIRMED, lsUserId);
                     if (lsPosition == null || "".equals(lsPosition)) {
                         poJSON.put("result", "error");
                         poJSON.put("message", "User is not an authorized officer.");
@@ -393,7 +395,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
                         ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                         return;
                     }
-                    pbIsCheckedJournalTab = false;
+                    pbIsCheckedBIRTab = false;
                     pnEditMode = poController.getEditMode();
                     CustomCommonUtil.switchToTab(tabDetails, tabPaneMain);
                     loadTableDetail.reload();
@@ -413,12 +415,29 @@ public class DisbursementVoucher_VerificationController implements Initializable
                         return;
                     }
 
-                    if (DisbursementStatic.VERIFIED.equals(poController.Master().getTransactionStatus())) {
-                        if (!pbIsCheckedJournalTab) {
-                            ShowMessageFX.Warning(null, pxeModuleName, "Please check the Journal Entry before saving."); //only require check this only if higher than encoder
+                    if (DisbursementStatic.CONFIRMED.equals(poController.Master().getTransactionStatus())) {
+                        if (!pbIsCheckedBIRTab && poController.Master().getVATSale() > 0.0000) {
+                            ShowMessageFX.Warning(null, pxeModuleName, "Please check the BIR 2307 before saving."); // check this for encoder or and higher
                             return;
                         }
                     }
+
+                    if (!DisbursementStatic.OPEN.equals(poController.Master().getTransactionStatus())) {
+                        poJSON = poController.callApproval();
+                        if (!"success".equals((String) poJSON.get("result"))) {
+                            ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message")); // check this for encoder or and higher
+                            return;
+                        }
+                        if (!DisbursementStatic.RETURNED.equals(poController.Master().getTransactionStatus())) {
+                            String lsUserId2 = oApp.getUserID();
+                            String lsPosition2 = poController.checkPosition(poController.Master().getTransactionStatus(), lsUserId2);
+                            if (lsPosition2 == null || "".equals(lsPosition2)) {
+                                ShowMessageFX.Warning(null, pxeModuleName, "User is not an authorized officer.");
+                                return;
+                            }
+                        }
+                    }
+
                     poJSON = poController.SaveTransaction();
                     if (!"success".equals((String) poJSON.get("result"))) {
                         ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
@@ -427,40 +446,29 @@ public class DisbursementVoucher_VerificationController implements Initializable
 
                     ShowMessageFX.Information(null, pxeModuleName, (String) poJSON.get("message"));
 
-                    //Arsiela 03-05-2026 Moved to class save others
-//                    poJSON = poController.updatePaymentsStatus();
-//                    if ("error".equals(poJSON.get("result"))) {
-//                        ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-//                    }
                     poJSON = poController.OpenTransaction(poController.Master().getTransactionNo());
                     if ("success".equals(poJSON.get("result"))) {
                         pnEditMode = poController.getEditMode();
                     }
-                    if (pnEditMode == EditMode.READY && !DisbursementStatic.VERIFIED.equals(poController.Master().getTransactionStatus())) {
-                        if (ShowMessageFX.YesNo(null, pxeModuleName, "Do you want to verify this transaction?")) { //requires to review journal entry
-                            if (!poController.existJournal().equals("")) {
-                                if (!pbIsCheckedJournalTab) {
-                                    ShowMessageFX.Warning(null, pxeModuleName, "Please check the Journal Entry before saving.");
+                    if (pnEditMode == EditMode.READY && !DisbursementStatic.CONFIRMED.equals(poController.Master().getTransactionStatus())) {
+                        if (ShowMessageFX.YesNo(null, pxeModuleName, "Do you want to confirm this transaction?")) { //requires to review journal entry
+                            if (!pbIsCheckedBIRTab && poController.Master().getVATSale() > 0.0000) {
+                                ShowMessageFX.Warning(null, pxeModuleName, "Please check the BIR 2307 before confirming.");
+                                break;
+                            } else {
+                                poJSON = poController.ConfirmTransaction("");
+                                if ("error".equals((String) poJSON.get("result"))) {
+                                    ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                     break;
                                 } else {
-                                    poJSON = poController.VerifyTransaction("");
-                                    if ("error".equals((String) poJSON.get("result"))) {
-                                        ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-                                        break;
-                                    } else {
-                                        ShowMessageFX.Information(null, pxeModuleName, (String) poJSON.get("message"));
-                                        JFXUtil.highlightByKey(tblViewMainList, String.valueOf(pnMain + 1), "#C1E1C1", highlightedRowsMain);
-                                    }
+                                    ShowMessageFX.Information(null, pxeModuleName, (String) poJSON.get("message"));
+                                    JFXUtil.highlightByKey(tblViewMainList, String.valueOf(pnMain + 1), "#C1E1C1", highlightedRowsMain);
                                 }
-                            } else {
-                                ShowMessageFX.Warning(null, pxeModuleName, "No journal entry found. Add a journal entry and save before verifying.");
-                                break;
                             }
                         }
                     }
                     pnEditMode = poController.getEditMode();
                     break;
-
                 case "btnCancel":
                     if (ShowMessageFX.OkayCancel(null, pxeModuleName, "Do you want to disregard changes?")) {
                         JFXUtil.disableAllHighlightByColor(tblViewMainList, "#A7C7E7", highlightedRowsMain);
@@ -487,28 +495,58 @@ public class DisbursementVoucher_VerificationController implements Initializable
                 case "btnRetrieve":
                     loadTableMain.reload();
                     break;
-                case "btnVerify":
-                    if (ShowMessageFX.YesNo(null, pxeModuleName, "Are you sure you want to verify transaction?")) {
+                case "btnConfirm":
+                    if (ShowMessageFX.YesNo(null, pxeModuleName, "Are you sure you want to confirm transaction?")) {
                         pnEditMode = poController.getEditMode();
                         if (pnEditMode == EditMode.READY) {
-                            if (!poController.existJournal().equals("")) {
-                                if (!pbIsCheckedJournalTab) {
-                                    ShowMessageFX.Warning(null, pxeModuleName, "Please check the Journal Entry before verifying.");
-                                    return;
-                                } else {
-                                    poJSON = poController.VerifyTransaction("Verified");
-                                    if ("error".equals((String) poJSON.get("result"))) {
-                                        ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-                                        return;
-                                    } else {
-                                        ShowMessageFX.Information(null, pxeModuleName, (String) poJSON.get("message"));
-                                        JFXUtil.disableAllHighlightByColor(tblViewMainList, "#A7C7E7", highlightedRowsMain);
-                                        JFXUtil.highlightByKey(tblViewMainList, String.valueOf(pnMain + 1), "#C1E1C1", highlightedRowsMain);
-                                    }
-                                }
-                            } else {
-                                ShowMessageFX.Warning(null, pxeModuleName, "This transaction has no journal entry. Please add a journal entry by updating the transaction to enable verification.");
+                            if (poController.Master().getVATSale() > 0.0000 && !pbIsCheckedBIRTab) {
+                                ShowMessageFX.Warning(null, pxeModuleName, "Please check the BIR 2307 before confirming.");
                                 return;
+                            }
+
+                            poJSON = poController.ConfirmTransaction("");
+                            if ("error".equals((String) poJSON.get("result"))) {
+                                ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                                return;
+                            } else {
+                                ShowMessageFX.Information(null, pxeModuleName, (String) poJSON.get("message"));
+                                JFXUtil.disableAllHighlightByColor(tblViewMainList, "#A7C7E7", highlightedRowsMain);
+                                JFXUtil.highlightByKey(tblViewMainList, String.valueOf(pnMain + 1), "#C1E1C1", highlightedRowsMain);
+                            }
+                        }
+                    } else {
+                        return;
+                    }
+                    break;
+                case "btnVoid":
+                    String lsTransaction = "";
+                    if (DisbursementStatic.OPEN.equals(poController.Master().getTransactionStatus())) {
+                        lsTransaction = "void";
+                    } else if (DisbursementStatic.CONFIRMED.equals(poController.Master().getTransactionStatus())) {
+                        lsTransaction = "cancel";
+                    } else {
+                        lsTransaction = "cancel";
+                    }
+                    if (ShowMessageFX.YesNo(null, pxeModuleName, "Are you sure you want to " + lsTransaction + " transaction?")) {
+                        pnEditMode = poController.getEditMode();
+                        if (pnEditMode == EditMode.READY) {
+                            switch (poController.Master().getTransactionStatus()) {
+                                case DisbursementStatic.OPEN:
+                                    poJSON = poController.VoidTransaction("");
+                                    break;
+                                case DisbursementStatic.CONFIRMED:
+                                default:
+                                    poJSON = poController.CancelTransaction("");
+                                    break;
+                            }
+                            if ("error".equals((String) poJSON.get("result"))) {
+                                ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                                return;
+                            } else {
+                                ShowMessageFX.Information(null, pxeModuleName, (String) poJSON.get("message"));
+                                pnEditMode = poController.getEditMode();
+                                JFXUtil.disableAllHighlightByColor(tblViewMainList, "#A7C7E7", highlightedRowsMain);
+                                JFXUtil.highlightByKey(tblViewMainList, String.valueOf(pnMain + 1), "#FAA0A0", highlightedRowsMain);
                             }
                         }
                     } else {
@@ -552,8 +590,8 @@ public class DisbursementVoucher_VerificationController implements Initializable
                     ShowMessageFX.Warning(null, pxeModuleName, "Button is not registered, Please contact admin to assist about the unregistered button");
                     break;
             }
-            if (JFXUtil.isObjectEqualTo(lsButton, "btnSave", "btnCancel", "btnVoid", "btnVerify", "btnDVCancel")) {
-                pbIsCheckedJournalTab = false;
+            if (JFXUtil.isObjectEqualTo(lsButton, "btnSave", "btnCancel", "btnVoid", "btnConfirm", "btnDVCancel")) {
+                pbIsCheckedBIRTab = false;
                 poController.resetTransaction();
                 poController.Master().setSupplierClientID(psSupplierPayeeId);
                 clearTextFields();
@@ -622,7 +660,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
                 if (!JFXUtil.loadValidation(pnEditMode, pxeModuleName, poController.Master().getTransactionNo(), lsTransactionNo)) {
                     return;
                 }
-                pbIsCheckedJournalTab = false;
+                pbIsCheckedBIRTab = false;
                 int pnRowMain = Integer.parseInt(selected.getIndex01()) - 1;
                 pnMain = pnRowMain;
                 JFXUtil.disableAllHighlightByColor(tblViewMainList, "#A7C7E7", highlightedRowsMain);
@@ -659,7 +697,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
                             try {
                                 main_data.clear();
                                 JFXUtil.disableAllHighlight(tblViewMainList, highlightedRowsMain);
-                                poJSON = poController.loadTransactionList(tfSearchIndustry.getText(), tfSearchSupplier.getText(), tfSearchTransaction.getText(), DisbursementStatic.VERIFIED);
+                                poJSON = poController.loadTransactionList(tfSearchIndustry.getText(), tfSearchSupplier.getText(), tfSearchTransaction.getText(), DisbursementStatic.CONFIRMED);
                                 int lnRowNo = 0;
                                 if (poController.getMasterList().size() > 0) {
                                     for (int lnCtr = 0; lnCtr <= poController.getMasterList().size() - 1; lnCtr++) {
@@ -677,7 +715,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
                                         if (poController.getMaster(lnCtr).getTransactionStatus().equals(DisbursementStatic.RETURNED)) {
                                             JFXUtil.highlightByKey(tblViewMainList, String.valueOf(lnRowNo), "#FAA0A0", highlightedRowsMain);
                                         }
-                                        if (poController.getMaster(lnCtr).getTransactionStatus().equals(DisbursementStatic.VERIFIED)) {
+                                        if (poController.getMaster(lnCtr).getTransactionStatus().equals(DisbursementStatic.CONFIRMED)) {
                                             JFXUtil.highlightByKey(tblViewMainList, String.valueOf(lnRowNo), "#C1E1C1", highlightedRowsMain);
                                         }
                                     }
@@ -1091,7 +1129,6 @@ public class DisbursementVoucher_VerificationController implements Initializable
         int newIndex = 0;
 
         if (moveDown || moveUp) {
-            newIndex = moveDown ? JFXUtil.moveToNextRow(currentTable) : JFXUtil.moveToPreviousRow(currentTable);
             switch (currentTable.getId()) {
                 case "tblVwDetails":
                     if (details_data.isEmpty()) {
@@ -1939,6 +1976,19 @@ public class DisbursementVoucher_VerificationController implements Initializable
         try {
             initDVMasterTabs();
             poController.computeFields(false);
+
+            String lsTransaction = "";
+            if (DisbursementStatic.OPEN.equals(poController.Master().getTransactionStatus())) {
+                lsTransaction = "Void";
+                btnVoid.setText(lsTransaction);
+            } else if (DisbursementStatic.CONFIRMED.equals(poController.Master().getTransactionStatus())) {
+                lsTransaction = "Cancel";
+                btnVoid.setText(lsTransaction);
+            } else {
+                lsTransaction = "Cancel";
+                btnVoid.setText(lsTransaction);
+            }
+
             JFXUtil.setStatusValue(lblDVTransactionStatus, DisbursementStatic.class, pnEditMode == EditMode.UNKNOWN ? "-1" : poController.Master().getTransactionStatus());
             JFXUtil.setDisabled(true, tfSupplier);
             tfDVTransactionNo.setText(poController.Master().getTransactionNo() != null ? poController.Master().getTransactionNo() : "");
@@ -2592,35 +2642,31 @@ public class DisbursementVoucher_VerificationController implements Initializable
         boolean lbShow2 = (fnEditMode == EditMode.READY);
         JFXUtil.setButtonsVisibility(!lbShow, btnClose);
         JFXUtil.setButtonsVisibility(lbShow, btnSave, btnCancel);
-        JFXUtil.setButtonsVisibility(false, btnUpdate);
-        JFXUtil.setButtonsVisibility(lbShow2, btnVerify);
+        JFXUtil.setButtonsVisibility(false, btnUpdate, btnVoid);
+        JFXUtil.setButtonsVisibility(lbShow2, btnConfirm);
         JFXUtil.setButtonsVisibility(fnEditMode == EditMode.READY, btnHistory);
 
-        JFXUtil.setDisabled(!lbShow, apJournalMaster, apJournalDetails);
+        JFXUtil.setDisabled(!lbShow, apDVMaster1, apDVMaster2, apDVMaster3, apDVDetail,
+                apMasterDVCheck, apMasterDVBTransfer, apMasterDVOp, apJournalMaster, apJournalDetails, apBIRDetail, apAttachments);
 
         JFXUtil.setButtonsVisibility(fnEditMode == EditMode.UPDATE, btnUndo);
-
-        JFXUtil.setDisabled(true, apDVMaster1, apDVMaster2, apDVMaster3, apDVDetail,
-                apMasterDVCheck, apMasterDVBTransfer, apMasterDVOp, apBIRDetail, apAttachments);
 
         if (fnEditMode == EditMode.READY) {
             switch (poController.Master().getTransactionStatus()) {
                 case DisbursementStatic.OPEN:
-                    JFXUtil.setButtonsVisibility(true, btnUpdate);
+                    JFXUtil.setButtonsVisibility(true, btnUpdate, btnVoid);
                     break;
                 case DisbursementStatic.CONFIRMED:
-                    JFXUtil.setButtonsVisibility(true, btnUpdate);
-                    break;
-                case DisbursementStatic.VERIFIED:
-                    JFXUtil.setButtonsVisibility(false, btnUpdate, btnVerify);
+                    JFXUtil.setButtonsVisibility(true, btnUpdate, btnVoid);
+                    JFXUtil.setButtonsVisibility(false, btnConfirm);
                     break;
                 case DisbursementStatic.RETURNED:
-                    JFXUtil.setButtonsVisibility(true, btnUpdate);
+                    JFXUtil.setButtonsVisibility(true, btnUpdate, btnVoid);
                     break;
                 case DisbursementStatic.VOID:
                 case DisbursementStatic.CANCELLED:
                 default:
-                    JFXUtil.setButtonsVisibility(false, btnVerify, btnUpdate);
+                    JFXUtil.setButtonsVisibility(false, btnConfirm, btnUpdate);
                     break;
             }
         }

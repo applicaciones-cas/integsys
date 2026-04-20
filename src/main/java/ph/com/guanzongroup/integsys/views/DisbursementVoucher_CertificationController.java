@@ -121,7 +121,8 @@ public class DisbursementVoucher_CertificationController implements Initializabl
     public void initialize(URL url, ResourceBundle rb) {
         try {
             poDisbursementController = new CashflowControllers(oApp, null).DisbursementVoucher();
-            poDisbursementController.setTransactionStatus(DisbursementStatic.VERIFIED);
+//            poDisbursementController.setTransactionStatus(DisbursementStatic.VERIFIED);
+            poDisbursementController.setTransactionStatus(DisbursementStatic.APPROVED);
             poJSON = new JSONObject();
             poDisbursementController.setWithUI(true);
             poJSON = poDisbursementController.InitTransaction();
@@ -140,6 +141,8 @@ public class DisbursementVoucher_CertificationController implements Initializabl
             Platform.runLater(() -> {
                 poDisbursementController.Master().setIndustryID(psIndustryId);
                 poDisbursementController.Master().setCompanyID(psCompanyId);
+                poDisbursementController.setIndustryID(psIndustryId);
+                poDisbursementController.setCompanyID(psCompanyId);
                 loadRecordSearch();
             });
         } catch (SQLException | GuanzonException ex) {
@@ -327,7 +330,9 @@ public class DisbursementVoucher_CertificationController implements Initializabl
 
     private void retrieveDisbursement() {
         try {
-            poJSON = poDisbursementController.loadTransactionList(tfSearchIndustry.getText(), tfSearchBankName.getText(), tfSearchBankAccount.getText(), "", true, false);
+
+            poJSON = poDisbursementController.loadTransactionList(tfSearchIndustry.getText(), tfSearchBankName.getText(), tfSearchBankAccount.getText(), DisbursementStatic.CERTIFIED);
+
             if ("error".equals(poJSON.get("result"))) {
 //                ShowMessageFX.Error(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
             } else {
@@ -363,6 +368,7 @@ public class DisbursementVoucher_CertificationController implements Initializabl
 
                                     switch (disbursementType) {
                                         case DisbursementStatic.DisbursementType.CHECK:
+                                        case DisbursementStatic.DisbursementType.CHECK_DEPOSIT:
                                             lsPaymentForm = "CHECK";
                                             lsBankName = poDisbursementController.getMaster(lnCntr).CheckPayments().Banks().getBankName();
                                             lsBankAccount = poDisbursementController.getMaster(lnCntr).CheckPayments().Bank_Account_Master().getAccountNo();
