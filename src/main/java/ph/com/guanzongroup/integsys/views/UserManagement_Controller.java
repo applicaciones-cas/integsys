@@ -257,7 +257,7 @@ public class UserManagement_Controller implements Initializable, ScreenInterface
                                 break;
                             default:
                                 loValue = "";
-                                poJSON = poSysUser.searchRecord(loValue,true);
+                                poJSON = poSysUser.searchRecord(loValue,false);
                                 break;
                         }
                         if ("error".equalsIgnoreCase((String) poJSON.get("result"))) {
