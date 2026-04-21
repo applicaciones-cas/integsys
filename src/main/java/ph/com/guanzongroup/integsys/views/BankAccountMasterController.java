@@ -66,7 +66,7 @@ public class BankAccountMasterController implements Initializable, ScreenInterfa
     private double yOffset = 0;
     
     private ObservableList<ModelResultSet> data = FXCollections.observableArrayList();
-    ObservableList<String> AccountType = FXCollections.observableArrayList("Sample 1", "Sample 2");
+    ObservableList<String> AccountType = FXCollections.observableArrayList("Saving", "Current","Time Deposit");
     ObservableList<String> SlipType = FXCollections.observableArrayList("Payment Slip", "Deposit Slip");
     
     private String psIndustryID = "";
@@ -676,6 +676,9 @@ public class BankAccountMasterController implements Initializable, ScreenInterfa
                     break;
                 case "1":
                     cmbField01.getSelectionModel().select(1);
+                    break;
+                case "2":
+                    cmbField01.getSelectionModel().select(2);
                     break;
             }
             
