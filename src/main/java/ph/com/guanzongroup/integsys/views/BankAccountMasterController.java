@@ -485,6 +485,7 @@ public class BankAccountMasterController implements Initializable, ScreenInterfa
             btnUpdate.setVisible(false);
             btnUpdate.setManaged(false);
         }
+       
     }
 
     private void InitTextFields() {
@@ -659,13 +660,13 @@ public class BankAccountMasterController implements Initializable, ScreenInterfa
 
             switch (oCashflow.getModel().getRecordStatus()) {
                 case "0":
-                    btnActivate.setText("Deactivate");
-                    faActivate.setGlyphName("CLOSE");
+                    btnActivate.setText("Activate");
+                    faActivate.setGlyphName("CHECK");
                     cbField01.setSelected(false);
                     break;
                 case "1":
-                    btnActivate.setText("Activate");
-                    faActivate.setGlyphName("CHECK");
+                    btnActivate.setText("Deactivate");
+                    faActivate.setGlyphName("CLOSE");
                     cbField01.setSelected(true);
                     break;
             }

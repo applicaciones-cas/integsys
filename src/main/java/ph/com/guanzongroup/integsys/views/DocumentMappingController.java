@@ -47,6 +47,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.StackPane;
 import org.guanzon.appdriver.agent.ShowMessageFX;
 import org.guanzon.appdriver.constant.EditMode;
+import org.guanzon.appdriver.constant.UserRight;
 import org.guanzon.cas.tbjhandler.constant.TBJ_Constant;
 import org.json.simple.parser.ParseException;
 import ph.com.guanzongroup.cas.cashflow.services.CashflowControllers;
@@ -345,6 +346,7 @@ public class DocumentMappingController implements Initializable, ScreenInterface
                     loadTableDetail();
                     LoadMaster();
                     LoadDetail();
+                    initButtons(pnEditMode);
                     Platform.runLater(() -> {
                         if (!tblDetails.getItems().isEmpty()) {
                             tblDetails.getSelectionModel().selectFirst();
@@ -378,6 +380,11 @@ public class DocumentMappingController implements Initializable, ScreenInterface
                     if(poCashflowController.DocumentMapping().Master().getDocumentCode()== null ||
                             poCashflowController.DocumentMapping().Master().getDocumentCode().isEmpty()){
                         ShowMessageFX.Warning("No transaction was loaded. ", psFormName, null);
+                        return;
+                    }
+                    
+                    if (poApp.getUserLevel() < UserRight.SYSADMIN) {
+                        ShowMessageFX.Warning("User is not allowed to modify the record. ", psFormName, null);
                         return;
                     }
                     
@@ -627,6 +634,7 @@ public class DocumentMappingController implements Initializable, ScreenInterface
                                 return;
                             }
                             txtField05.setText(String.valueOf(poCashflowController.DocumentMapping().Detail(pnSelectedDetail).getFontSize()));
+
                             break;  
                         case "txtField06":
                             if(lsValue == null || lsValue.isEmpty()){
@@ -849,7 +857,7 @@ public class DocumentMappingController implements Initializable, ScreenInterface
                                 && !poCashflowController.DocumentMapping().Detail(detailCount - 1).getFieldCode().isEmpty()
                                 && poCashflowController.DocumentMapping().Detail(detailCount - 1).getFontName() != null
                                 && !poCashflowController.DocumentMapping().Detail(detailCount - 1).getFontName().isEmpty()
-                                && poCashflowController.DocumentMapping().Detail(detailCount - 1).getFontSize() > 0.0)) {
+                                && poCashflowController.DocumentMapping().Detail(detailCount - 1).getFontSize() > 0)) {
 
                             poCashflowController.DocumentMapping().AddDetail();
                             detailCount++;
@@ -862,7 +870,7 @@ public class DocumentMappingController implements Initializable, ScreenInterface
                                 String.valueOf(lnCtr + 1),
                                 poCashflowController.DocumentMapping().Detail(lnCtr).getFieldCode(),
                                 poCashflowController.DocumentMapping().Detail(lnCtr).getFontName(),
-                                CustomCommonUtil.setIntegerValueToDecimalFormat(poCashflowController.DocumentMapping().Detail(lnCtr).getFontSize())
+                                String.valueOf(poCashflowController.DocumentMapping().Detail(lnCtr).getFontSize())
                         ));
                     }
                     Platform.runLater(() -> {

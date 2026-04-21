@@ -129,7 +129,7 @@
                                                 <Insets left="5.0" />
                                              </padding>
                                                             </TextField>
-                                                            <TextField fx:id="txtField02" GridPane.columnIndex="1" GridPane.columnSpan="3" GridPane.rowIndex="1">
+                                                            <TextField fx:id="txtField02" promptText="PRESS F3: Search" GridPane.columnIndex="1" GridPane.columnSpan="3" GridPane.rowIndex="1">
                                                                 <GridPane.margin>
                                                                     <Insets />
                                                                 </GridPane.margin>
@@ -140,37 +140,6 @@
                                                 <Insets left="5.0" />
                                              </padding>
                                                             </TextField>
-                                                            <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Bank Account ID">
-                                                                <GridPane.margin>
-                                                                    <Insets left="10.0" />
-                                                                </GridPane.margin>
-                                             <font>
-                                                <Font name="System Bold" size="12.0" />
-                                             </font>
-                                                            </Text>
-                                                            <Label contentDisplay="RIGHT" text="Bank Name" GridPane.rowIndex="1">
-                                                                <graphic>
-                                                                    <Text fill="RED" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="Text2" text="*">
-                                                                        <font>
-                                                                            <Font name="Rockwell" size="14.0" />
-                                                                        </font>
-                                                                    </Text>
-                                                                </graphic>
-                                                                <GridPane.margin>
-                                                                    <Insets left="10.0" />
-                                                                </GridPane.margin>
-                                                            </Label>
-                                                            <CheckBox fx:id="cbField01" disable="true" mnemonicParsing="false" selected="true" text="Active" GridPane.columnIndex="3" GridPane.halignment="CENTER" GridPane.rowIndex="12" GridPane.valignment="CENTER">
-                                                                <font>
-                                                                    <Font size="14.0" />
-                                                                </font>
-                                                                <GridPane.margin>
-                                                                    <Insets />
-                                                                </GridPane.margin>
-                                             <padding>
-                                                <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-                                             </padding>
-                                                            </CheckBox>
                                           <TextField fx:id="txtField03" layoutX="171.0" layoutY="42.0" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="2">
                                              <font>
                                                 <Font size="14.0" />
@@ -179,30 +148,14 @@
                                                 <Insets left="5.0" />
                                              </padding>
                                           </TextField>
-                                          <Label contentDisplay="RIGHT" layoutX="20.0" layoutY="45.0" text="Bank Acount No" GridPane.rowIndex="2">
-                                             <graphic>
-                                                <Text fill="RED" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="Text2" text="*">
-                                                   <font>
-                                                      <Font name="Rockwell" size="14.0" />
-                                                   </font>
-                                                </Text>
-                                             </graphic>
-                                             <GridPane.margin>
-                                                <Insets left="10.0" />
-                                             </GridPane.margin>
-                                          </Label>
-                                          <Label contentDisplay="RIGHT" text="Acount Name " GridPane.rowIndex="4">
-                                             <graphic>
-                                                <Text fill="RED" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="Text2" text="*">
-                                                   <font>
-                                                      <Font name="Rockwell" size="14.0" />
-                                                   </font>
-                                                </Text>
-                                             </graphic>
-                                             <GridPane.margin>
-                                                <Insets left="10.0" />
-                                             </GridPane.margin>
-                                          </Label>
+                                          <TextField fx:id="txtField04" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="3">
+                                             <font>
+                                                <Font size="14.0" />
+                                             </font>
+                                             <padding>
+                                                <Insets left="5.0" />
+                                             </padding>
+                                          </TextField>
                                           <TextField fx:id="txtField05" GridPane.columnIndex="1" GridPane.columnSpan="3" GridPane.rowIndex="4">
                                              <font>
                                                 <Font size="14.0" />
@@ -211,23 +164,16 @@
                                                 <Insets left="5.0" />
                                              </padding>
                                           </TextField>
-                                          <Label contentDisplay="RIGHT" text="Check Clearing Days" GridPane.rowIndex="8">
-                                             <GridPane.margin>
-                                                <Insets left="10.0" />
-                                             </GridPane.margin>
-                                             <graphic>
-                                                <Text fill="RED" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="Text2" text="*">
-                                                   <font>
-                                                      <Font name="Rockwell" size="14.0" />
-                                                   </font>
-                                                </Text>
-                                             </graphic>
-                                          </Label>
-                                          <Label contentDisplay="RIGHT" text="Account Type" GridPane.rowIndex="6">
-                                             <GridPane.margin>
-                                                <Insets left="10.0" />
-                                             </GridPane.margin>
-                                          </Label>
+                                          <TextField fx:id="txtField06" promptText="PRESS F3 : Search" GridPane.columnIndex="1" GridPane.columnSpan="3" GridPane.rowIndex="5">
+                                             <font>
+                                                <Font size="14.0" />
+                                             </font>
+                                             <padding>
+                                                <Insets left="5.0" />
+                                             </padding>
+                                          </TextField>
+                                          <ComboBox fx:id="cmbField01" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="200.0" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="6" />
+                                          <ComboBox fx:id="cmbField02" minWidth="-Infinity" prefWidth="200.0" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="7" />
                                           <TextField fx:id="txtField07" GridPane.columnIndex="1" GridPane.rowIndex="8">
                                              <font>
                                                 <Font size="14.0" />
@@ -236,19 +182,15 @@
                                                 <Insets left="5.0" />
                                              </padding>
                                           </TextField>
-                                          <Label contentDisplay="RIGHT" text="Bank Branch" GridPane.rowIndex="5">
-                                             <graphic>
-                                                <Text fill="RED" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="Text2" text="*">
-                                                   <font>
-                                                      <Font name="Rockwell" size="14.0" />
-                                                   </font>
-                                                </Text>
-                                             </graphic>
-                                             <GridPane.margin>
-                                                <Insets left="10.0" />
-                                             </GridPane.margin>
-                                          </Label>
-                                          <TextField fx:id="txtField06" GridPane.columnIndex="1" GridPane.columnSpan="3" GridPane.rowIndex="5">
+                                          <TextField fx:id="txtField08" GridPane.columnIndex="1" GridPane.rowIndex="9">
+                                             <font>
+                                                <Font size="14.0" />
+                                             </font>
+                                             <padding>
+                                                <Insets left="5.0" />
+                                             </padding>
+                                          </TextField>
+                                          <TextField fx:id="txtField09" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="10">
                                              <font>
                                                 <Font size="14.0" />
                                              </font>
@@ -280,19 +222,95 @@
                                                 <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                                              </padding>
                                           </CheckBox>
+                                                            <CheckBox fx:id="cbField01" disable="true" mnemonicParsing="false" selected="true" text="Active" GridPane.columnIndex="3" GridPane.halignment="CENTER" GridPane.rowIndex="12" GridPane.valignment="CENTER">
+                                                                <font>
+                                                                    <Font size="14.0" />
+                                                                </font>
+                                                                <GridPane.margin>
+                                                                    <Insets />
+                                                                </GridPane.margin>
+                                             <padding>
+                                                <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                             </padding>
+                                                            </CheckBox>
+                                                            <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Bank Account ID">
+                                                                <GridPane.margin>
+                                                                    <Insets left="10.0" />
+                                                                </GridPane.margin>
+                                             <font>
+                                                <Font name="System Bold" size="12.0" />
+                                             </font>
+                                                            </Text>
+                                                            <Label contentDisplay="RIGHT" text="Bank Name" GridPane.rowIndex="1">
+                                                                <graphic>
+                                                                    <Text fill="RED" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="Text2" text="*">
+                                                                        <font>
+                                                                            <Font name="Rockwell" size="14.0" />
+                                                                        </font>
+                                                                    </Text>
+                                                                </graphic>
+                                                                <GridPane.margin>
+                                                                    <Insets left="10.0" />
+                                                                </GridPane.margin>
+                                                            </Label>
+                                          <Label contentDisplay="RIGHT" layoutX="20.0" layoutY="45.0" text="Bank Acount No" GridPane.rowIndex="2">
+                                             <graphic>
+                                                <Text fill="RED" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="Text2" text="*">
+                                                   <font>
+                                                      <Font name="Rockwell" size="14.0" />
+                                                   </font>
+                                                </Text>
+                                             </graphic>
+                                             <GridPane.margin>
+                                                <Insets left="10.0" />
+                                             </GridPane.margin>
+                                          </Label>
+                                          <Label contentDisplay="RIGHT" text="Acount Name " GridPane.rowIndex="4">
+                                             <graphic>
+                                                <Text fill="RED" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="Text2" text="*">
+                                                   <font>
+                                                      <Font name="Rockwell" size="14.0" />
+                                                   </font>
+                                                </Text>
+                                             </graphic>
+                                             <GridPane.margin>
+                                                <Insets left="10.0" />
+                                             </GridPane.margin>
+                                          </Label>
+                                          <Label contentDisplay="RIGHT" text="Check Clearing Days" GridPane.rowIndex="8">
+                                             <GridPane.margin>
+                                                <Insets left="10.0" />
+                                             </GridPane.margin>
+                                             <graphic>
+                                                <Text fill="RED" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="Text2" text="*">
+                                                   <font>
+                                                      <Font name="Rockwell" size="14.0" />
+                                                   </font>
+                                                </Text>
+                                             </graphic>
+                                          </Label>
+                                          <Label contentDisplay="RIGHT" text="Account Type" GridPane.rowIndex="6">
+                                             <GridPane.margin>
+                                                <Insets left="10.0" />
+                                             </GridPane.margin>
+                                          </Label>
+                                          <Label contentDisplay="RIGHT" text="Bank Branch" GridPane.rowIndex="5">
+                                             <graphic>
+                                                <Text fill="RED" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="Text2" text="*">
+                                                   <font>
+                                                      <Font name="Rockwell" size="14.0" />
+                                                   </font>
+                                                </Text>
+                                             </graphic>
+                                             <GridPane.margin>
+                                                <Insets left="10.0" />
+                                             </GridPane.margin>
+                                          </Label>
                                           <Label contentDisplay="RIGHT" text="Account Code" GridPane.rowIndex="3">
                                              <GridPane.margin>
                                                 <Insets left="10.0" />
                                              </GridPane.margin>
                                           </Label>
-                                          <TextField fx:id="txtField04" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="3">
-                                             <font>
-                                                <Font size="14.0" />
-                                             </font>
-                                             <padding>
-                                                <Insets left="5.0" />
-                                             </padding>
-                                          </TextField>
                                           <Label contentDisplay="RIGHT" text="No. of Signatories" GridPane.rowIndex="9">
                                              <GridPane.margin>
                                                 <Insets left="10.0" />
@@ -305,34 +323,16 @@
                                                 </Text>
                                              </graphic>
                                           </Label>
-                                          <TextField fx:id="txtField08" GridPane.columnIndex="1" GridPane.rowIndex="9">
-                                             <font>
-                                                <Font size="14.0" />
-                                             </font>
-                                             <padding>
-                                                <Insets left="5.0" />
-                                             </padding>
-                                          </TextField>
-                                          <ComboBox fx:id="cmbField01" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="200.0" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="6" />
                                           <Label contentDisplay="RIGHT" text="Slip Type" GridPane.rowIndex="7">
                                              <GridPane.margin>
                                                 <Insets left="10.0" />
                                              </GridPane.margin>
                                           </Label>
-                                          <ComboBox fx:id="cmbField02" minWidth="-Infinity" prefWidth="200.0" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="7" />
                                           <Label contentDisplay="RIGHT" text="Serial No" GridPane.rowIndex="10">
                                              <GridPane.margin>
                                                 <Insets left="10.0" />
                                              </GridPane.margin>
                                           </Label>
-                                          <TextField fx:id="txtField09" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="10">
-                                             <font>
-                                                <Font size="14.0" />
-                                             </font>
-                                             <padding>
-                                                <Insets left="5.0" />
-                                             </padding>
-                                          </TextField>
                                        </children>
                                     </GridPane>
                                  </children>
