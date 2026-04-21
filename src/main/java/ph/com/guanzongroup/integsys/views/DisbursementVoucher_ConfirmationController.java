@@ -384,6 +384,7 @@ public class DisbursementVoucher_ConfirmationController implements Initializable
                         return;
                     }
                     //Recheck transaction status
+                    poController.setForm(DisbursementStatic.CONFIRMED);
                     poJSON = poController.checkUpdateTransaction(false);
                     if (!"success".equals((String) poJSON.get("result"))) {
                         ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
@@ -429,7 +430,7 @@ public class DisbursementVoucher_ConfirmationController implements Initializable
                             return;
                         }
                         if (!DisbursementStatic.RETURNED.equals(poController.Master().getTransactionStatus())) {
-                            String lsUserId2 = poJSON.get("sUserIDxx").toString();
+                            String lsUserId2 = (String) poJSON.get("sUserIDxx");
                             if (lsUserId2 == null || "".equals(lsUserId2)) {
                                 lsUserId2 = oApp.getUserID();
                             }

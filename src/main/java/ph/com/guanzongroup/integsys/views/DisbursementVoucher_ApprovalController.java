@@ -386,6 +386,7 @@ public class DisbursementVoucher_ApprovalController implements Initializable, Sc
                         return;
                     }
                     //Recheck transaction status
+                    poController.setForm(DisbursementStatic.APPROVED);
                     poJSON = poController.checkUpdateTransaction(false);
                     if (!"success".equals((String) poJSON.get("result"))) {
                         ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
@@ -425,7 +426,6 @@ public class DisbursementVoucher_ApprovalController implements Initializable, Sc
                         }
                     }
 
-//                    if (!DisbursementStatic.OPEN.equals(poController.Master().getTransactionStatus())) {
                     poJSON = poController.callApproval();
                     if (!"success".equals((String) poJSON.get("result"))) {
                         ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message")); // check this for encoder or and higher
@@ -433,7 +433,7 @@ public class DisbursementVoucher_ApprovalController implements Initializable, Sc
                     }
 
                     if (!DisbursementStatic.RETURNED_I.equals(poController.Master().getTransactionStatus())) {
-                        String lsUserId2 = poJSON.get("sUserIDxx").toString();
+                        String lsUserId2 = (String) poJSON.get("sUserIDxx");
                         if (lsUserId2 == null || "".equals(lsUserId2)) {
                             lsUserId2 = oApp.getUserID();
                         }
@@ -443,7 +443,6 @@ public class DisbursementVoucher_ApprovalController implements Initializable, Sc
                             return;
                         }
                     }
-//                    }
 
                     poJSON = poController.SaveTransaction();
                     if (!"success".equals((String) poJSON.get("result"))) {
