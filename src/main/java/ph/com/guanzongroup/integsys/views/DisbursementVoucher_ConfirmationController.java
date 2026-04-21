@@ -429,7 +429,10 @@ public class DisbursementVoucher_ConfirmationController implements Initializable
                             return;
                         }
                         if (!DisbursementStatic.RETURNED.equals(poController.Master().getTransactionStatus())) {
-                            String lsUserId2 = oApp.getUserID();
+                            String lsUserId2 = poJSON.get("sUserIDxx").toString();
+                            if (lsUserId2 == null || "".equals(lsUserId2)) {
+                                lsUserId2 = oApp.getUserID();
+                            }
                             String lsPosition2 = poController.checkPosition(poController.Master().getTransactionStatus(), lsUserId2);
                             if (lsPosition2 == null || "".equals(lsPosition2)) {
                                 ShowMessageFX.Warning(null, pxeModuleName, "User is not an authorized officer.");
