@@ -640,6 +640,13 @@ public class InvRequest_Roq_ConfirmationController implements Initializable, Scr
                             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
 
                         }
+                    } else {
+                        loadMaster();
+                        pnEditMode = invRequestController.getEditMode();
+                        loadTableInvDetail();
+                        loadDetail();
+                        ShowMessageFX.Information((String) poJSON.get("message"), psFormName, null);
+                        break;
                     }
                     break;
 
@@ -662,7 +669,7 @@ public class InvRequest_Roq_ConfirmationController implements Initializable, Scr
                 case "btnVoid":
                     String status = invRequestController.Master().getTransactionStatus();
 
-                    if (!ShowMessageFX.YesNo(null, psFormName, "Are you sure you want to return this transaction?")) {
+                    if (!ShowMessageFX.YesNo(null, psFormName, "Are you sure you want to void this transaction?")) {
                         return;
                     }
 

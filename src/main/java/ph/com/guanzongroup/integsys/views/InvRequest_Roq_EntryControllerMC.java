@@ -493,7 +493,7 @@ public class InvRequest_Roq_EntryControllerMC implements Initializable, ScreenIn
                 case "btnVoid":
                     String status = invRequestController.Master().getTransactionStatus();
 
-                    if (!ShowMessageFX.YesNo(null, psFormName, "Are you sure you want to return this transaction?")) {
+                    if (!ShowMessageFX.YesNo(null, psFormName, "Are you sure you want to void this transaction?")) {
                         return;
                     }
 
@@ -505,7 +505,6 @@ public class InvRequest_Roq_EntryControllerMC implements Initializable, ScreenIn
 //                            return;
 //                        }
 //                    }
-
                     // Proceed to void the transaction
                     poJSON = invRequestController.VoidTransaction("Voided");
 
@@ -538,8 +537,6 @@ public class InvRequest_Roq_EntryControllerMC implements Initializable, ScreenIn
                     break;
                 case "btnRetrieve":
                     loadTableList();
-
-                 
 
                     break;
                 case "btnUpdate":
@@ -673,6 +670,10 @@ public class InvRequest_Roq_EntryControllerMC implements Initializable, ScreenIn
                         }
                     }
                     Platform.runLater(() -> btnNew.fire());
+                    pnEditMode = invRequestController.getEditMode();
+                    loadMaster();
+                    loadTableInvDetail();
+                    loadDetail();
                     break;
 
                 case "btnCancel":
@@ -1281,7 +1282,7 @@ public class InvRequest_Roq_EntryControllerMC implements Initializable, ScreenIn
 
     private void clearAllTables() {
 
-                        pnTblInvDetailRow = -1;
+        pnTblInvDetailRow = -1;
         invOrderDetail_data.clear();
         tableListInformation_data.clear();
 
