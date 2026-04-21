@@ -384,6 +384,7 @@ public class DisbursementVoucher_ConfirmationController implements Initializable
                         return;
                     }
                     //Recheck transaction status
+                    poController.setForm(DisbursementStatic.CONFIRMED);
                     poJSON = poController.checkUpdateTransaction(false);
                     if (!"success".equals((String) poJSON.get("result"))) {
                         ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
@@ -429,7 +430,10 @@ public class DisbursementVoucher_ConfirmationController implements Initializable
                             return;
                         }
                         if (!DisbursementStatic.RETURNED.equals(poController.Master().getTransactionStatus())) {
-                            String lsUserId2 = oApp.getUserID();
+                            String lsUserId2 = (String) poJSON.get("sUserIDxx");
+                            if (lsUserId2 == null || "".equals(lsUserId2)) {
+                                lsUserId2 = oApp.getUserID();
+                            }
                             String lsPosition2 = poController.checkPosition(poController.Master().getTransactionStatus(), lsUserId2);
                             if (lsPosition2 == null || "".equals(lsPosition2)) {
                                 ShowMessageFX.Warning(null, pxeModuleName, "User is not an authorized officer.");
@@ -593,6 +597,8 @@ public class DisbursementVoucher_ConfirmationController implements Initializable
             if (JFXUtil.isObjectEqualTo(lsButton, "btnSave", "btnCancel", "btnVoid", "btnConfirm", "btnDVCancel")) {
                 pbIsCheckedBIRTab = false;
                 poController.resetTransaction();
+                poController.Master().setIndustryID(psIndustryId);
+                poController.Master().setCompanyID(psCompanyId);
                 poController.Master().setSupplierClientID(psSupplierPayeeId);
                 clearTextFields();
                 JFXUtil.clickTabByTitleText(tabPaneMain, "Disbursement Voucher");
@@ -670,6 +676,8 @@ public class DisbursementVoucher_ConfirmationController implements Initializable
                 poJSON = poController.OpenTransaction(lsTransactionNo);
                 if ("error".equals((String) poJSON.get("result"))) {
                     poController.resetTransaction();
+                    poController.Master().setIndustryID(psIndustryId);
+                    poController.Master().setCompanyID(psCompanyId);
                     pnEditMode = EditMode.UNKNOWN;
                     ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                 } else {
