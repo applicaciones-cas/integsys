@@ -510,7 +510,7 @@ public class InvRequest_EntryControllerAppliances implements Initializable, Scre
                 case "btnVoid":
                     String status = invRequestController.Master().getTransactionStatus();
 
-                    if (!ShowMessageFX.YesNo(null, psFormName, "Are you sure you want to return this transaction?")) {
+                    if (!ShowMessageFX.YesNo(null, psFormName, "Are you sure you want to void this transaction?")) {
                         return;
                     }
 
@@ -522,7 +522,6 @@ public class InvRequest_EntryControllerAppliances implements Initializable, Scre
 //                            return;
 //                        }
 //                    }
-
                     // Proceed to void the transaction
                     poJSON = invRequestController.VoidTransaction("Voided");
 
@@ -668,7 +667,7 @@ public class InvRequest_EntryControllerAppliances implements Initializable, Scre
                     }
                     ShowMessageFX.Information((String) poJSON.get("message"), psFormName, null);
                     poJSON = invRequestController.OpenTransaction(invRequestController.Master().getTransactionNo());
-                     // Confirmation Prompt
+                    // Confirmation Prompt
                     if ("success".equals(poJSON.get("result")) && invRequestController.Master().getTransactionStatus().equals(StockRequestStatus.OPEN)
                             && ShowMessageFX.YesNo(null, psFormName, "Do you want to confirm this transaction?")) {
                         try {
@@ -691,6 +690,7 @@ public class InvRequest_EntryControllerAppliances implements Initializable, Scre
                         }
                     }
                     Platform.runLater(() -> btnNew.fire());
+                    pnEditMode = invRequestController.getEditMode();
                     break;
 
                 case "btnCancel":

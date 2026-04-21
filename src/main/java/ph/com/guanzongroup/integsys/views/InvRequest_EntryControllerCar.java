@@ -496,7 +496,7 @@ public class InvRequest_EntryControllerCar implements Initializable, ScreenInter
                 case "btnVoid":
                     String status = invRequestController.Master().getTransactionStatus();
 
-                    if (!ShowMessageFX.YesNo(null, psFormName, "Are you sure you want to return this transaction?")) {
+                    if (!ShowMessageFX.YesNo(null, psFormName, "Are you sure you want to void this transaction?")) {
                         return;
                     }
 
@@ -508,7 +508,6 @@ public class InvRequest_EntryControllerCar implements Initializable, ScreenInter
 //                            return;
 //                        }
 //                    }
-
                     // Proceed to void the transaction
                     poJSON = invRequestController.VoidTransaction("Voided");
 
@@ -653,7 +652,7 @@ public class InvRequest_EntryControllerCar implements Initializable, ScreenInter
                     }
                     ShowMessageFX.Information((String) poJSON.get("message"), psFormName, null);
                     poJSON = invRequestController.OpenTransaction(invRequestController.Master().getTransactionNo());
-                     // Confirmation Prompt
+                    // Confirmation Prompt
                     if ("success".equals(poJSON.get("result")) && invRequestController.Master().getTransactionStatus().equals(StockRequestStatus.OPEN)
                             && ShowMessageFX.YesNo(null, psFormName, "Do you want to confirm this transaction?")) {
                         try {
@@ -674,7 +673,7 @@ public class InvRequest_EntryControllerCar implements Initializable, ScreenInter
                             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
 
                         }
-                    }
+                    } 
                     Platform.runLater(() -> btnNew.fire());
                     break;
 
@@ -1298,7 +1297,7 @@ public class InvRequest_EntryControllerCar implements Initializable, ScreenInter
         }
     }
 
-     private void tableListInformation_Clicked(MouseEvent event) {
+    private void tableListInformation_Clicked(MouseEvent event) {
         poJSON = new JSONObject();
         pnTblInformationRow = tableListInformation.getSelectionModel().getSelectedIndex();
         if (pnTblInformationRow < 0 || pnTblInformationRow >= tableListInformation.getItems().size()) {
@@ -1407,7 +1406,7 @@ public class InvRequest_EntryControllerCar implements Initializable, ScreenInter
 
     private void clearAllTables() {
 
-                        pnTblInvDetailRow = -1;
+        pnTblInvDetailRow = -1;
         invOrderDetail_data.clear();
         tableListInformation_data.clear();
 

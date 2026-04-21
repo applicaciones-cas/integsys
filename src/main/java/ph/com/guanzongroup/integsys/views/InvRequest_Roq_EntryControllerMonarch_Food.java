@@ -489,7 +489,7 @@ public class InvRequest_Roq_EntryControllerMonarch_Food implements Initializable
                 case "btnVoid":
                     String status = invRequestController.Master().getTransactionStatus();
 
-                    if (!ShowMessageFX.YesNo(null, psFormName, "Are you sure you want to return this transaction?")) {
+                    if (!ShowMessageFX.YesNo(null, psFormName, "Are you sure you want to void this transaction?")) {
                         return;
                     }
 

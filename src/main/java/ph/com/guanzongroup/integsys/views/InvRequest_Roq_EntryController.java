@@ -506,7 +506,7 @@ public class InvRequest_Roq_EntryController implements Initializable, ScreenInte
                 case "btnVoid":
                     String status = invRequestController.Master().getTransactionStatus();
 
-                    if (!ShowMessageFX.YesNo(null, psFormName, "Are you sure you want to return this transaction?")) {
+                    if (!ShowMessageFX.YesNo(null, psFormName, "Are you sure you want to void this transaction?")) {
                         return;
                     }
 //
@@ -682,9 +682,8 @@ public class InvRequest_Roq_EntryController implements Initializable, ScreenInte
                             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
 
                         }
-                    }
-                    Platform.runLater(() -> btnNew.fire());
-                    break;
+                    } 
+                    Platform.runLater(() -> btnNew.fire());                    break;
 
                 case "btnCancel":
                     if (ShowMessageFX.YesNo(null, "Cancel Confirmation", "Are you sure you want to cancel?")) {

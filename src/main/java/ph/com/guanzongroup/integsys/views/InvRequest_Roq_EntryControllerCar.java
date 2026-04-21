@@ -493,7 +493,7 @@ public class InvRequest_Roq_EntryControllerCar implements Initializable, ScreenI
                 case "btnVoid":
                     String status = invRequestController.Master().getTransactionStatus();
 
-                    if (!ShowMessageFX.YesNo(null, psFormName, "Are you sure you want to return this transaction?")) {
+                    if (!ShowMessageFX.YesNo(null, psFormName, "Are you sure you want to void this transaction?")) {
                         return;
                     }
 
@@ -505,7 +505,6 @@ public class InvRequest_Roq_EntryControllerCar implements Initializable, ScreenI
 //                            return;
 //                        }
 //                    }
-
                     // Proceed to void the transaction
                     poJSON = invRequestController.VoidTransaction("Voided");
 
@@ -675,6 +674,10 @@ public class InvRequest_Roq_EntryControllerCar implements Initializable, ScreenI
                         }
                     }
                     Platform.runLater(() -> btnNew.fire());
+                    pnEditMode = invRequestController.getEditMode();
+                    loadMaster();
+                    loadTableInvDetail();
+                    loadDetail();
                     break;
                 case "btnCancel":
                     if (ShowMessageFX.YesNo(null, "Cancel Confirmation", "Are you sure you want to cancel?")) {
@@ -1203,7 +1206,7 @@ public class InvRequest_Roq_EntryControllerCar implements Initializable, ScreenI
         }
     }
 
-   private void tableListInformation_Clicked(MouseEvent event) {
+    private void tableListInformation_Clicked(MouseEvent event) {
         poJSON = new JSONObject();
         pnTblInformationRow = tableListInformation.getSelectionModel().getSelectedIndex();
         if (pnTblInformationRow < 0 || pnTblInformationRow >= tableListInformation.getItems().size()) {
