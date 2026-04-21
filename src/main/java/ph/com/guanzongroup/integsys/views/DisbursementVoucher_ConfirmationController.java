@@ -593,6 +593,8 @@ public class DisbursementVoucher_ConfirmationController implements Initializable
             if (JFXUtil.isObjectEqualTo(lsButton, "btnSave", "btnCancel", "btnVoid", "btnConfirm", "btnDVCancel")) {
                 pbIsCheckedBIRTab = false;
                 poController.resetTransaction();
+                poController.Master().setIndustryID(psIndustryId);
+                poController.Master().setCompanyID(psCompanyId);
                 poController.Master().setSupplierClientID(psSupplierPayeeId);
                 clearTextFields();
                 JFXUtil.clickTabByTitleText(tabPaneMain, "Disbursement Voucher");
@@ -670,6 +672,8 @@ public class DisbursementVoucher_ConfirmationController implements Initializable
                 poJSON = poController.OpenTransaction(lsTransactionNo);
                 if ("error".equals((String) poJSON.get("result"))) {
                     poController.resetTransaction();
+                    poController.Master().setIndustryID(psIndustryId);
+                    poController.Master().setCompanyID(psCompanyId);
                     pnEditMode = EditMode.UNKNOWN;
                     ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                 } else {
