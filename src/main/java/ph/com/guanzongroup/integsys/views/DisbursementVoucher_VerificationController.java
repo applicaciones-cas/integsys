@@ -853,7 +853,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
                         int lnCtr;
                         try {
                             if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
-                                poController.ReloadWTDeductions();
+//                                poController.ReloadWTDeductions();
                             }
                             int lnRowCount = 0;
                             for (lnCtr = 0; lnCtr < poController.getWTaxDeductionsCount(); lnCtr++) {
@@ -886,7 +886,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
                                 pnDetailBIR = lnRow;
                                 loadRecordDetailBIR();
                             }
-                        } catch (SQLException | GuanzonException | CloneNotSupportedException ex) {
+                        } catch (SQLException | GuanzonException  ex) {
                             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
                             ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
                         }
