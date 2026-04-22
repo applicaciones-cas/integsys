@@ -293,7 +293,10 @@ public class PettyCashFundController implements Initializable, ScreenInterface {
 
             String lsBegBalAsOf = CustomCommonUtil.formatDateToShortString(poController.getModel().getBeginningDate());
             dpBegBalAsOf.setValue(CustomCommonUtil.parseDateStringToLocalDate(lsBegBalAsOf, "yyyy-MM-dd"));
-
+            
+            String lsLastTransDate = CustomCommonUtil.formatDateToShortString(poController.getModel().getLastTransactionDate());
+            dpLastTransDate.setValue(CustomCommonUtil.parseDateStringToLocalDate(lsLastTransDate, "yyyy-MM-dd"));
+            
             tfCurrentBalance.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.getModel().getBalance(), false));
             JFXUtil.updateCaretPositions(apMaster);
         } catch (SQLException | GuanzonException ex) {
