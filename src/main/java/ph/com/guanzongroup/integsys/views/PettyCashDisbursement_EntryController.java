@@ -122,7 +122,7 @@ public class PettyCashDisbursement_EntryController implements Initializable, Scr
 
     private int currentIndex = 0;
     Map<String, String> imageinfo_temp = new HashMap<>();
-    JFXUtil.ReloadableTableTask loadTableMain, loadTableDetail, loadTableAttachment;
+    JFXUtil.ReloadableTableTask loadTableDetail, loadTableAttachment;
     private final JFXUtil.ImageViewer imageviewerutil = new JFXUtil.ImageViewer();
     JFXUtil.StageManager stageAttachment = new JFXUtil.StageManager();
     AnchorPane root = null;
@@ -135,7 +135,7 @@ public class PettyCashDisbursement_EntryController implements Initializable, Scr
     @FXML
     private Label lblSource, lblDVTransactionStatus;
     @FXML
-    private Button btnBrowse, btnNew, btnUpdate, btnSearch, btnSave, btnCancel, btnVoid, btnHistory, btnRetrieve, btnClose, btnAddAttachment, btnRemoveAttachment, btnArrowLeft, btnArrowRight;
+    private Button btnBrowse, btnNew, btnUpdate, btnSearch, btnSave, btnCancel, btnVoid, btnHistory, btnClose, btnAddAttachment, btnRemoveAttachment, btnArrowLeft, btnArrowRight;
     @FXML
     private TabPane tabPaneMain;
     @FXML
@@ -367,7 +367,7 @@ public class PettyCashDisbursement_EntryController implements Initializable, Scr
     }
 
     private void initButtonsClickActions() {
-        List<Button> buttons = Arrays.asList(btnRemoveAttachment, btnAddAttachment, btnBrowse, btnNew, btnUpdate, btnSearch, btnSave, btnCancel, btnVoid, btnRetrieve, btnHistory, btnClose, btnArrowRight, btnArrowLeft);
+        List<Button> buttons = Arrays.asList(btnRemoveAttachment, btnAddAttachment, btnBrowse, btnNew, btnUpdate, btnSearch, btnSave, btnCancel, btnVoid, btnHistory, btnClose, btnArrowRight, btnArrowLeft);
         buttons.forEach(button -> button.setOnAction(this::cmdButton_Click));
     }
 
@@ -493,9 +493,6 @@ public class PettyCashDisbursement_EntryController implements Initializable, Scr
                         Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
                         ShowMessageFX.Error(MiscUtil.getException(ex), pxeModuleName, null);
                     }
-                    break;
-                case "btnRetrieve":
-                    loadTableMain.reload();
                     break;
                 case "btnClose":
                     if (ShowMessageFX.YesNo(null, "Close Tab", "Are you sure you want to close this Tab?")) {
@@ -1004,20 +1001,6 @@ public class PettyCashDisbursement_EntryController implements Initializable, Scr
                         break;
                     case F3:
                         switch (lsID) {
-                            case "tfSearchIndustry":
-                                poController.SearchIndustry(lsValue, false);
-                                loadRecordSearch();
-                                loadTableMain.reload();
-                                break;
-                            case "tfSearchPayee":
-                                poJSON = poController.SearchPayee(lsValue, false, true);
-                                loadRecordSearch();
-                                loadTableMain.reload();
-                                break;
-                            case "tfSearchCashAdvanceNo":
-                                loadTableMain.reload();
-                                break;
-
                             case "tfBranch":
                                 poJSON = poController.SearchBranch(lsValue, false, false);
                                 if ("error".equals(poJSON.get("result"))) {
