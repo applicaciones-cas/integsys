@@ -217,16 +217,21 @@ public class PettyCashDisbursement_ConfirmationController implements Initializab
             pagination.setPageCount(1);
 
             Platform.runLater(() -> {
-                poController.Master().setIndustryId(psIndustryId);
-                poController.Master().setCompanyId(psCompanyId);
-                poController.setIndustryId(psIndustryId);
-                poController.setCompanyId(psCompanyId);
+                try {
+                    poController.Master().setIndustryId(psIndustryId);
+                    poController.Master().setCompanyId(psCompanyId);
+                    poController.setIndustryId(psIndustryId);
+                    poController.setCompanyId(psCompanyId);
 //                poController.setCategoryID(psCategoryId);
-                poController.Master().setBranchCode(oApp.getBranchCode());
-                poController.setTransactionStatus(PettyCashDisbursementStatus.OPEN + PettyCashDisbursementStatus.CONFIRMED);
-                loadRecordSearch();
-                TriggerWindowEvent();
-                filterIndustry();
+                    poController.Master().setBranchCode(oApp.getBranchCode());
+                    poController.setTransactionStatus(PettyCashDisbursementStatus.OPEN + PettyCashDisbursementStatus.CONFIRMED);
+                    loadRecordSearch();
+                    TriggerWindowEvent();
+                    filterIndustry();
+                    lblSource.setText(poController.Master().Company().getCompanyName() + " - " + poController.Master().Industry().getDescription());
+                } catch (SQLException | GuanzonException ex) {
+                    Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+                }
             });
             initAttachmentPreviewPane();
         } catch (SQLException | GuanzonException ex) {
@@ -1279,16 +1284,10 @@ public class PettyCashDisbursement_ConfirmationController implements Initializab
     }
 
     private void loadRecordSearch() {
-        try {
-            lblSource.setText(poController.Master().Company().getCompanyName() + " - " + poController.Master().Industry().getDescription());
-            tfSearchIndustry.setText(poController.getSearchIndustry());
-            tfSearchPayee.setText(poController.getSearchPayee());
-            filterIndustry();
-            JFXUtil.updateCaretPositions(apBrowse);
-        } catch (SQLException | GuanzonException ex) {
-            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
-            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
-        }
+        tfSearchIndustry.setText(poController.getSearchIndustry());
+        tfSearchPayee.setText(poController.getSearchPayee());
+        filterIndustry();
+        JFXUtil.updateCaretPositions(apBrowse);
     }
 
     private void loadRecordMaster() {
