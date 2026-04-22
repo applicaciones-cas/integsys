@@ -73,7 +73,6 @@ import org.guanzon.appdriver.constant.DocumentType;
 import org.guanzon.appdriver.constant.EditMode;
 import org.guanzon.appdriver.constant.Logical;
 import org.guanzon.appdriver.constant.RecordStatus;
-import org.guanzon.appdriver.constant.UserRight;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.ParseException;
 import ph.com.guanzongroup.cas.cashflow.DisbursementVoucher;
@@ -232,6 +231,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
                 poController.setTransactionStatus(DisbursementStatic.CONFIRMED);
                 loadRecordSearch();
             });
+            lblSource.setText(poController.Master().Company().getCompanyName() + " - " + poController.Master().Industry().getDescription());
             initAttachmentPreviewPane();
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
@@ -1924,16 +1924,9 @@ public class DisbursementVoucher_VerificationController implements Initializable
     }
 
     private void loadRecordSearch() {
-        try {
-            lblSource.setText(poController.Master().Company().getCompanyName() + " - " + poController.Master().Industry().getDescription());
-            tfSearchIndustry.setText(poController.getSearchIndustry());
-            tfSearchSupplier.setText(poController.getSearchPayee());
-//            tfSearchTransaction.setText(poController.getSearchTransaction());
-            JFXUtil.updateCaretPositions(apBrowse);
-        } catch (SQLException | GuanzonException ex) {
-            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
-            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
-        }
+        tfSearchIndustry.setText(poController.getSearchIndustry());
+        tfSearchSupplier.setText(poController.getSearchPayee());
+        JFXUtil.updateCaretPositions(apBrowse);
     }
 
     private void loadRecordMaster() {
