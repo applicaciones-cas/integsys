@@ -244,6 +244,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                 btnNew.fire();
             });
             initAttachmentPreviewPane();
+            lblSource.setText(poController.Master().Company().getCompanyName() + " - " + poController.Master().Industry().getDescription());
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
             ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
@@ -2003,17 +2004,10 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
     }
 
     private void loadRecordSearch() {
-        try {
-            lblSource.setText(poController.Master().Company().getCompanyName() + " - " + poController.Master().Industry().getDescription());
-//            cmbTransactionType.getSelectionModel().getSelection();
-            tfSearchPayee.setText(poController.getSearchPayee());
-            tfSearchBranch.setText(poController.getSearchBranch());
+        tfSearchPayee.setText(poController.getSearchPayee());
+        tfSearchBranch.setText(poController.getSearchBranch());
 
-            JFXUtil.updateCaretPositions(apBrowse);
-        } catch (SQLException | GuanzonException ex) {
-            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
-            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
-        }
+        JFXUtil.updateCaretPositions(apBrowse);
     }
 
     private void loadRecordMaster() {

@@ -232,8 +232,8 @@ public class DisbursementVoucher_ConfirmationController implements Initializable
                 poController.setTransactionStatus(DisbursementStatic.OPEN + DisbursementStatic.CONFIRMED + DisbursementStatic.RETURNED);
                 loadRecordSearch();
             });
-            lblSource.setText(poController.Master().Company().getCompanyName() + " - " + poController.Master().Industry().getDescription());
             initAttachmentPreviewPane();
+            lblSource.setText(poController.Master().Company().getCompanyName() + " - " + poController.Master().Industry().getDescription());
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
             ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
