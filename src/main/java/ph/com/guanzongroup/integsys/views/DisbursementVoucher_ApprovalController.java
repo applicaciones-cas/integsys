@@ -224,18 +224,21 @@ public class DisbursementVoucher_ApprovalController implements Initializable, Sc
             JFXUtil.initKeyClickObject(AnchorMain, lastFocusedTextField, previousSearchedTextField); // for btnSearch Reference
 
             Platform.runLater(() -> {
-                poController.Master().setIndustryID(psIndustryId);
-                poController.Master().setCompanyID(psCompanyId);
-                poController.setIndustryID(psIndustryId);
-                poController.setCompanyID(psCompanyId);
-                poController.setCategoryID(psCategoryId);
-                poController.Master().setBranchCode(oApp.getBranchCode());
-                poController.setTransactionStatus(DisbursementStatic.VERIFIED + DisbursementStatic.RETURNED_I);
-                loadRecordSearch();
-
+                try {
+                    poController.Master().setIndustryID(psIndustryId);
+                    poController.Master().setCompanyID(psCompanyId);
+                    poController.setIndustryID(psIndustryId);
+                    poController.setCompanyID(psCompanyId);
+                    poController.setCategoryID(psCategoryId);
+                    poController.Master().setBranchCode(oApp.getBranchCode());
+                    poController.setTransactionStatus(DisbursementStatic.VERIFIED + DisbursementStatic.RETURNED_I);
+                    loadRecordSearch();
+                    lblSource.setText(poController.Master().Company().getCompanyName() + " - " + poController.Master().Industry().getDescription());
+                } catch (SQLException | GuanzonException ex) {
+                    Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+                }
             });
             initAttachmentPreviewPane();
-            lblSource.setText(poController.Master().Company().getCompanyName() + " - " + poController.Master().Industry().getDescription());
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
             ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));

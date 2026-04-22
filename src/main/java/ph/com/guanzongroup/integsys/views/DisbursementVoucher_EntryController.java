@@ -232,19 +232,23 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
             JFXUtil.initKeyClickObject(AnchorMain, lastFocusedTextField, previousSearchedTextField); // for btnSearch Reference
 
             Platform.runLater(() -> {
-                poController.Master().setIndustryID(psIndustryId);
-                poController.Master().setCompanyID(psCompanyId);
-                poController.setIndustryID(psIndustryId);
-                poController.setCompanyID(psCompanyId);
-                poController.setCategoryID(psCategoryId);
-                poController.Master().setBranchCode(oApp.getBranchCode());
-                loadRecordSearch();
-                cmbTransactionType.getSelectionModel().select(DisbursementStatic.SourceCode.LOAD_ALL);
-                psTransactionType = DisbursementStatic.SourceCode.LOAD_ALL;
-                btnNew.fire();
+                try {
+                    poController.Master().setIndustryID(psIndustryId);
+                    poController.Master().setCompanyID(psCompanyId);
+                    poController.setIndustryID(psIndustryId);
+                    poController.setCompanyID(psCompanyId);
+                    poController.setCategoryID(psCategoryId);
+                    poController.Master().setBranchCode(oApp.getBranchCode());
+                    loadRecordSearch();
+                    cmbTransactionType.getSelectionModel().select(DisbursementStatic.SourceCode.LOAD_ALL);
+                    psTransactionType = DisbursementStatic.SourceCode.LOAD_ALL;
+                    lblSource.setText(poController.Master().Company().getCompanyName() + " - " + poController.Master().Industry().getDescription());
+                    btnNew.fire();
+                } catch (SQLException | GuanzonException ex) {
+                    Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+                }
             });
             initAttachmentPreviewPane();
-            lblSource.setText(poController.Master().Company().getCompanyName() + " - " + poController.Master().Industry().getDescription());
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
             ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
