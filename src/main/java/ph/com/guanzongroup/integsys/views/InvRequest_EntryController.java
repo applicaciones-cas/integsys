@@ -513,7 +513,7 @@ public class InvRequest_EntryController implements Initializable, ScreenInterfac
                 case "btnVoid":
                     String status = invRequestController.Master().getTransactionStatus();
 
-                    if (!ShowMessageFX.YesNo(null, psFormName, "Are you sure you want to return this transaction?")) {
+                    if (!ShowMessageFX.YesNo(null, psFormName, "Are you sure you want to void this transaction?")) {
                         return;
                     }
 
@@ -525,7 +525,6 @@ public class InvRequest_EntryController implements Initializable, ScreenInterfac
 //                            return;
 //                        }
 //                    }
-
                     // Proceed to void the transaction
                     poJSON = invRequestController.VoidTransaction("Voided");
 
@@ -692,6 +691,7 @@ public class InvRequest_EntryController implements Initializable, ScreenInterfac
                         }
                     }
                     Platform.runLater(() -> btnNew.fire());
+                    pnEditMode = invRequestController.getEditMode();
                     break;
                 case "btnCancel":
                     if (ShowMessageFX.YesNo(null, "Cancel Confirmation", "Are you sure you want to cancel?")) {

@@ -489,7 +489,7 @@ public class InvRequest_Roq_EntryControllerLP_Food implements Initializable, Scr
                 case "btnVoid":
                     String status = invRequestController.Master().getTransactionStatus();
 
-                    if (!ShowMessageFX.YesNo(null, psFormName, "Are you sure you want to return this transaction?")) {
+                    if (!ShowMessageFX.YesNo(null, psFormName, "Are you sure you want to void this transaction?")) {
                         return;
                     }
 
@@ -501,7 +501,6 @@ public class InvRequest_Roq_EntryControllerLP_Food implements Initializable, Scr
 //                            return;
 //                        }
 //                    }
-
                     // Proceed to void the transaction
                     poJSON = invRequestController.VoidTransaction("Voided");
 
@@ -534,7 +533,7 @@ public class InvRequest_Roq_EntryControllerLP_Food implements Initializable, Scr
                     break;
                 case "btnRetrieve":
                     loadTableList();
-                    
+
                     break;
                 case "btnUpdate":
                     poJSON = invRequestController.UpdateTransaction();
@@ -667,6 +666,10 @@ public class InvRequest_Roq_EntryControllerLP_Food implements Initializable, Scr
                         }
                     }
                     Platform.runLater(() -> btnNew.fire());
+                    pnEditMode = invRequestController.getEditMode();
+                    loadMaster();
+                    loadTableInvDetail();
+                    loadDetail();
                     break;
 
                 case "btnCancel":
@@ -1193,7 +1196,7 @@ public class InvRequest_Roq_EntryControllerLP_Food implements Initializable, Scr
         }
     }
 
-   private void tableListInformation_Clicked(MouseEvent event) {
+    private void tableListInformation_Clicked(MouseEvent event) {
         poJSON = new JSONObject();
         pnTblInformationRow = tableListInformation.getSelectionModel().getSelectedIndex();
         if (pnTblInformationRow < 0 || pnTblInformationRow >= tableListInformation.getItems().size()) {
@@ -1277,7 +1280,7 @@ public class InvRequest_Roq_EntryControllerLP_Food implements Initializable, Scr
 
     private void clearAllTables() {
 
-                        pnTblInvDetailRow = -1;
+        pnTblInvDetailRow = -1;
         invOrderDetail_data.clear();
         tableListInformation_data.clear();
 

@@ -212,13 +212,18 @@ public class CashDisbursement_HistoryController implements Initializable, Screen
             initButton(pnEditMode);
 
             Platform.runLater(() -> {
-                poController.Master().setIndustryId(psIndustryId);
-                poController.Master().setCompanyId(psCompanyId);
-                poController.setIndustryId(psIndustryId);
-                poController.setCompanyId(psCompanyId);
-                loadRecordSearch();
-                TriggerWindowEvent();
-                filterIndustry();
+                try {
+                    poController.Master().setIndustryId(psIndustryId);
+                    poController.Master().setCompanyId(psCompanyId);
+                    poController.setIndustryId(psIndustryId);
+                    poController.setCompanyId(psCompanyId);
+                    loadRecordSearch();
+                    TriggerWindowEvent();
+                    filterIndustry();
+                    lblSource.setText(poController.Master().Company().getCompanyName() + " - " + poController.Master().Industry().getDescription());
+                } catch (SQLException | GuanzonException ex) {
+                    Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+                }
             });
             initAttachmentPreviewPane();
         } catch (SQLException | GuanzonException ex) {
@@ -672,6 +677,7 @@ public class CashDisbursement_HistoryController implements Initializable, Screen
                                 if (!BIR_data.isEmpty()) {
                                     /* FOCUS ON FIRST ROW */
                                     JFXUtil.selectAndFocusRow(tblVwBIRDetails, 0);
+
                                     int lnRow = Integer.parseInt(BIR_data.get(0).getIndex07());
                                     pnDetailBIR = lnRow;
                                     loadRecordDetailBIR();
@@ -747,7 +753,6 @@ public class CashDisbursement_HistoryController implements Initializable, Screen
             loadTableAttachment.reload();
             loadRecordAttachment(true);
         });
-
     }
 
     public void initAttachmentsGrid() {
@@ -1088,16 +1093,10 @@ public class CashDisbursement_HistoryController implements Initializable, Screen
     }
 
     private void loadRecordSearch() {
-        try {
-            lblSource.setText(poController.Master().Company().getCompanyName() + " - " + poController.Master().Industry().getDescription());
-            tfSearchIndustry.setText(poController.getSearchIndustry());
-            tfSearchPayee.setText(poController.getSearchPayee());
-            filterIndustry();
-            JFXUtil.updateCaretPositions(apBrowse);
-        } catch (SQLException | GuanzonException ex) {
-            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
-            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
-        }
+        tfSearchIndustry.setText(poController.getSearchIndustry());
+        tfSearchPayee.setText(poController.getSearchPayee());
+        filterIndustry();
+        JFXUtil.updateCaretPositions(apBrowse);
     }
 
     private void loadRecordMaster() {

@@ -73,7 +73,6 @@ import org.guanzon.appdriver.constant.DocumentType;
 import org.guanzon.appdriver.constant.EditMode;
 import org.guanzon.appdriver.constant.Logical;
 import org.guanzon.appdriver.constant.RecordStatus;
-import org.guanzon.appdriver.constant.UserRight;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.ParseException;
 import ph.com.guanzongroup.cas.cashflow.DisbursementVoucher;
@@ -224,14 +223,19 @@ public class DisbursementVoucher_ConfirmationController implements Initializable
             JFXUtil.initKeyClickObject(AnchorMain, lastFocusedTextField, previousSearchedTextField); // for btnSearch Reference
 
             Platform.runLater(() -> {
-                poController.Master().setIndustryID(psIndustryId);
-                poController.Master().setCompanyID(psCompanyId);
-                poController.setIndustryID(psIndustryId);
-                poController.setCompanyID(psCompanyId);
-                poController.setCategoryID(psCategoryId);
-                poController.Master().setBranchCode(oApp.getBranchCode());
-                poController.setTransactionStatus(DisbursementStatic.OPEN + DisbursementStatic.CONFIRMED + DisbursementStatic.RETURNED);
-                loadRecordSearch();
+                try {
+                    poController.Master().setIndustryID(psIndustryId);
+                    poController.Master().setCompanyID(psCompanyId);
+                    poController.setIndustryID(psIndustryId);
+                    poController.setCompanyID(psCompanyId);
+                    poController.setCategoryID(psCategoryId);
+                    poController.Master().setBranchCode(oApp.getBranchCode());
+                    poController.setTransactionStatus(DisbursementStatic.OPEN + DisbursementStatic.CONFIRMED + DisbursementStatic.RETURNED);
+                    loadRecordSearch();
+                    lblSource.setText(poController.Master().Company().getCompanyName() + " - " + poController.Master().Industry().getDescription());
+                } catch (SQLException | GuanzonException ex) {
+                    Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+                }
             });
             initAttachmentPreviewPane();
         } catch (SQLException | GuanzonException ex) {
@@ -384,6 +388,7 @@ public class DisbursementVoucher_ConfirmationController implements Initializable
                         return;
                     }
                     //Recheck transaction status
+                    poController.setForm(DisbursementStatic.CONFIRMED);
                     poJSON = poController.checkUpdateTransaction(false);
                     if (!"success".equals((String) poJSON.get("result"))) {
                         ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
@@ -405,6 +410,7 @@ public class DisbursementVoucher_ConfirmationController implements Initializable
                     break;
                 case "btnSave":
                     //Recheck transaction status
+                    poController.setForm(DisbursementStatic.CONFIRMED);
                     poJSON = poController.checkUpdateTransaction(false);
                     if (!"success".equals((String) poJSON.get("result"))) {
                         ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
@@ -429,7 +435,10 @@ public class DisbursementVoucher_ConfirmationController implements Initializable
                             return;
                         }
                         if (!DisbursementStatic.RETURNED.equals(poController.Master().getTransactionStatus())) {
-                            String lsUserId2 = oApp.getUserID();
+                            String lsUserId2 = (String) poJSON.get("sUserIDxx");
+                            if (lsUserId2 == null || "".equals(lsUserId2)) {
+                                lsUserId2 = oApp.getUserID();
+                            }
                             String lsPosition2 = poController.checkPosition(poController.Master().getTransactionStatus(), lsUserId2);
                             if (lsPosition2 == null || "".equals(lsPosition2)) {
                                 ShowMessageFX.Warning(null, pxeModuleName, "User is not an authorized officer.");
@@ -593,6 +602,8 @@ public class DisbursementVoucher_ConfirmationController implements Initializable
             if (JFXUtil.isObjectEqualTo(lsButton, "btnSave", "btnCancel", "btnVoid", "btnConfirm", "btnDVCancel")) {
                 pbIsCheckedBIRTab = false;
                 poController.resetTransaction();
+                poController.Master().setIndustryID(psIndustryId);
+                poController.Master().setCompanyID(psCompanyId);
                 poController.Master().setSupplierClientID(psSupplierPayeeId);
                 clearTextFields();
                 JFXUtil.clickTabByTitleText(tabPaneMain, "Disbursement Voucher");
@@ -670,6 +681,8 @@ public class DisbursementVoucher_ConfirmationController implements Initializable
                 poJSON = poController.OpenTransaction(lsTransactionNo);
                 if ("error".equals((String) poJSON.get("result"))) {
                     poController.resetTransaction();
+                    poController.Master().setIndustryID(psIndustryId);
+                    poController.Master().setCompanyID(psCompanyId);
                     pnEditMode = EditMode.UNKNOWN;
                     ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                 } else {
@@ -1960,16 +1973,9 @@ public class DisbursementVoucher_ConfirmationController implements Initializable
     }
 
     private void loadRecordSearch() {
-        try {
-            lblSource.setText(poController.Master().Company().getCompanyName() + " - " + poController.Master().Industry().getDescription());
-            tfSearchIndustry.setText(poController.getSearchIndustry());
-            tfSearchSupplier.setText(poController.getSearchPayee());
-//            tfSearchTransaction.setText(poController.getSearchTransaction());
-            JFXUtil.updateCaretPositions(apBrowse);
-        } catch (SQLException | GuanzonException ex) {
-            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
-            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
-        }
+        tfSearchIndustry.setText(poController.getSearchIndustry());
+        tfSearchSupplier.setText(poController.getSearchPayee());
+        JFXUtil.updateCaretPositions(apBrowse);
     }
 
     private void loadRecordMaster() {

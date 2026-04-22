@@ -66,7 +66,7 @@ public class CashFundController implements Initializable, ScreenInterface {
     private double yOffset = 0;
 
     private Stage dialogStage = null;
-    
+
     @FXML
     private AnchorPane apMainAnchor, apBrowse, apButton, apMaster;
     @FXML
@@ -242,7 +242,7 @@ public class CashFundController implements Initializable, ScreenInterface {
             switch (nodeID) {
                 case "dpLastTransDate":
                     if (JFXUtil.isObjectEqualTo(poController.getModel().getLastTransactionDate(), null, "")) {
-                        ShowMessageFX.Warning(null, pxeModuleName, "Date is set once processed in cash disbursement.");
+                        ShowMessageFX.Warning(null, pxeModuleName, "Date is auto set once processed in cash disbursement.");
                     }
                     break;
             }
@@ -291,6 +291,9 @@ public class CashFundController implements Initializable, ScreenInterface {
             String lsBegBalAsOf = CustomCommonUtil.formatDateToShortString(poController.getModel().getBeginningDate());
             dpBegBalAsOf.setValue(CustomCommonUtil.parseDateStringToLocalDate(lsBegBalAsOf, "yyyy-MM-dd"));
 
+            String lsLastTransDate = CustomCommonUtil.formatDateToShortString(poController.getModel().getLastTransactionDate());
+            dpLastTransDate.setValue(CustomCommonUtil.parseDateStringToLocalDate(lsLastTransDate, "yyyy-MM-dd"));
+
             tfCurrentBalance.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.getModel().getBalance(), false));
             JFXUtil.updateCaretPositions(apMaster);
         } catch (SQLException | GuanzonException ex) {
@@ -298,9 +301,7 @@ public class CashFundController implements Initializable, ScreenInterface {
             ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
-    
-    
-    
+
     public void closeLedgerDialog() {
         if (dialogStage != null && dialogStage.isShowing()) {
             dialogStage.close();
@@ -308,7 +309,7 @@ public class CashFundController implements Initializable, ScreenInterface {
         } else {
         }
     }
-    
+
     public void showLedgerDialog() {
         poJSON = new JSONObject();
         try {
@@ -366,7 +367,6 @@ public class CashFundController implements Initializable, ScreenInterface {
             e.printStackTrace();
         }
     }
-    
 
     @FXML
     private void cmdButton_Click(ActionEvent event) {

@@ -640,7 +640,14 @@ public class InvRequest_Roq_ConfirmationControllerAppliances implements Initiali
                             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
 
                         }
-                    }            
+                    } else {
+                        loadMaster();
+                        pnEditMode = invRequestController.getEditMode();
+                        loadTableInvDetail();
+                        loadDetail();
+                        ShowMessageFX.Information((String) poJSON.get("message"), psFormName, null);
+                        break;
+                    }
                     break;
 
                 case "btnConfirm":
@@ -662,7 +669,7 @@ public class InvRequest_Roq_ConfirmationControllerAppliances implements Initiali
                 case "btnVoid":
                     String status = invRequestController.Master().getTransactionStatus();
 
-                    if (!ShowMessageFX.YesNo(null, psFormName, "Are you sure you want to return this transaction?")) {
+                    if (!ShowMessageFX.YesNo(null, psFormName, "Are you sure you want to void this transaction?")) {
                         return;
                     }
 
@@ -674,7 +681,6 @@ public class InvRequest_Roq_ConfirmationControllerAppliances implements Initiali
 //                            return;
 //                        }
 //                    }
-
                      {
                         try {
                             // Proceed to void the transaction
@@ -1193,7 +1199,7 @@ public class InvRequest_Roq_ConfirmationControllerAppliances implements Initiali
         }
     }
 
-   private void tableListInformation_Clicked(MouseEvent event) {
+    private void tableListInformation_Clicked(MouseEvent event) {
         poJSON = new JSONObject();
         pnTblInformationRow = tableListInformation.getSelectionModel().getSelectedIndex();
         if (pnTblInformationRow < 0 || pnTblInformationRow >= tableListInformation.getItems().size()) {
@@ -1284,7 +1290,7 @@ public class InvRequest_Roq_ConfirmationControllerAppliances implements Initiali
 
     private void clearAllTables() {
 
-                        pnTblInvDetailRow = -1;
+        pnTblInvDetailRow = -1;
         invOrderDetail_data.clear();
         tableListInformation_data.clear();
 

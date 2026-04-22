@@ -506,7 +506,7 @@ public class InvRequest_Roq_EntryControllerMC_SP implements Initializable, Scree
                 case "btnVoid":
                     String status = invRequestController.Master().getTransactionStatus();
 
-                    if (!ShowMessageFX.YesNo(null, psFormName, "Are you sure you want to return this transaction?")) {
+                    if (!ShowMessageFX.YesNo(null, psFormName, "Are you sure you want to void this transaction?")) {
                         return;
                     }
 
@@ -518,7 +518,6 @@ public class InvRequest_Roq_EntryControllerMC_SP implements Initializable, Scree
 //                            return;
 //                        }
 //                    }
-
                     // Proceed to void the transaction
                     poJSON = invRequestController.VoidTransaction("Voided");
 
@@ -551,7 +550,7 @@ public class InvRequest_Roq_EntryControllerMC_SP implements Initializable, Scree
                     break;
                 case "btnRetrieve":
                     loadTableList();
-                   
+
                     break;
                 case "btnUpdate":
                     poJSON = invRequestController.UpdateTransaction();
@@ -577,8 +576,8 @@ public class InvRequest_Roq_EntryControllerMC_SP implements Initializable, Scree
                     initFields(pnEditMode);
                     tableListInformation.toFront();
                     break;
-                
-                     case "btnSave":
+
+                case "btnSave":
                     if (!ShowMessageFX.YesNo(null, psFormName, "Are you sure you want to save?")) {
                         return;
                     }
@@ -684,6 +683,10 @@ public class InvRequest_Roq_EntryControllerMC_SP implements Initializable, Scree
                         }
                     }
                     Platform.runLater(() -> btnNew.fire());
+                    pnEditMode = invRequestController.getEditMode();
+                    loadMaster();
+                    loadTableInvDetail();
+                    loadDetail();
                     break;
 
                 case "btnCancel":
@@ -1298,7 +1301,7 @@ public class InvRequest_Roq_EntryControllerMC_SP implements Initializable, Scree
 
     private void clearAllTables() {
 
-                        pnTblInvDetailRow = -1;
+        pnTblInvDetailRow = -1;
         invOrderDetail_data.clear();
         tableListInformation_data.clear();
 

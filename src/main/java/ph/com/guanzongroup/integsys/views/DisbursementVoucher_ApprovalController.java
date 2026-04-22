@@ -73,7 +73,6 @@ import org.guanzon.appdriver.constant.DocumentType;
 import org.guanzon.appdriver.constant.EditMode;
 import org.guanzon.appdriver.constant.Logical;
 import org.guanzon.appdriver.constant.RecordStatus;
-import org.guanzon.appdriver.constant.UserRight;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.ParseException;
 import ph.com.guanzongroup.cas.cashflow.DisbursementVoucher;
@@ -146,7 +145,7 @@ public class DisbursementVoucher_ApprovalController implements Initializable, Sc
     @FXML
     private Label lblSource, lblDVTransactionStatus, lblJournalTransactionStatus;
     @FXML
-    private TextField tfSearchIndustry, tfSearchTransaction, tfSearchSupplier, tfDVTransactionNo, tfSupplier, tfVoucherNo, tfBankNameCheck, tfBankAccountCheck, tfPayeeName, tfCheckNo, tfCheckAmount, tfAuthorizedPerson, tfBankNameBTransfer, tfBankAccountBTransfer, tfPaymentAmountBTransfer, tfSupplierBank, tfSupplierAccountNoBTransfer, tfBankTransReferNo, tfPaymentStatusBTransfer, tfBankNameOnlinePayment, tfBankAccountOnlinePayment, tfPaymentAmount, tfSupplierServiceName, tfSupplierAccountNo, tfPaymentReferenceNo, tfOnlinePaymentStatus, tfTotalAmount, tfVatableSales, tfVatAmountMaster, tfVatZeroRatedSales, tfVatExemptSales, tfLessWHTax, tfTotalNetAmount, tfAdvances, tfRefNoDetail, tfSourceNoDetail,tfVatableSalesDetail, tfVatExemptDetail, tfVatZeroRatedSalesDetail, tfVatRateDetail, tfVatAmountDetail, tfPurchasedAmountDetail, tfNetAmountDetail, tfAdvancesDetail, tfJournalTransactionNo, tfTotalDebitAmount, tfTotalCreditAmount, tfAccountCode, tfAccountDescription, tfDebitAmount, tfCreditAmount, tfBIRTransactionNo, tfTaxCode, tfParticular, tfBaseAmount, tfTaxRate, tfTotalTaxAmount, tfAttachmentNo, tfAttachmentSource;
+    private TextField tfSearchIndustry, tfSearchTransaction, tfSearchSupplier, tfDVTransactionNo, tfSupplier, tfVoucherNo, tfBankNameCheck, tfBankAccountCheck, tfPayeeName, tfCheckNo, tfCheckAmount, tfAuthorizedPerson, tfBankNameBTransfer, tfBankAccountBTransfer, tfPaymentAmountBTransfer, tfSupplierBank, tfSupplierAccountNoBTransfer, tfBankTransReferNo, tfPaymentStatusBTransfer, tfBankNameOnlinePayment, tfBankAccountOnlinePayment, tfPaymentAmount, tfSupplierServiceName, tfSupplierAccountNo, tfPaymentReferenceNo, tfOnlinePaymentStatus, tfTotalAmount, tfVatableSales, tfVatAmountMaster, tfVatZeroRatedSales, tfVatExemptSales, tfLessWHTax, tfTotalNetAmount, tfAdvances, tfRefNoDetail, tfSourceNoDetail, tfVatableSalesDetail, tfVatExemptDetail, tfVatZeroRatedSalesDetail, tfVatRateDetail, tfVatAmountDetail, tfPurchasedAmountDetail, tfNetAmountDetail, tfAdvancesDetail, tfJournalTransactionNo, tfTotalDebitAmount, tfTotalCreditAmount, tfAccountCode, tfAccountDescription, tfDebitAmount, tfCreditAmount, tfBIRTransactionNo, tfTaxCode, tfParticular, tfBaseAmount, tfTaxRate, tfTotalTaxAmount, tfAttachmentNo, tfAttachmentSource;
     @FXML
     private Button btnUpdate, btnSave, btnCancel, btnApprove, btnReturn, btnDisapprove, btnRetrieve, btnHistory, btnClose, btnUndo, btnArrowLeft, btnArrowRight;
     @FXML
@@ -225,14 +224,19 @@ public class DisbursementVoucher_ApprovalController implements Initializable, Sc
             JFXUtil.initKeyClickObject(AnchorMain, lastFocusedTextField, previousSearchedTextField); // for btnSearch Reference
 
             Platform.runLater(() -> {
-                poController.Master().setIndustryID(psIndustryId);
-                poController.Master().setCompanyID(psCompanyId);
-                poController.setIndustryID(psIndustryId);
-                poController.setCompanyID(psCompanyId);
-                poController.setCategoryID(psCategoryId);
-                poController.Master().setBranchCode(oApp.getBranchCode());
-                poController.setTransactionStatus(DisbursementStatic.VERIFIED + DisbursementStatic.RETURNED_I);
-                loadRecordSearch();
+                try {
+                    poController.Master().setIndustryID(psIndustryId);
+                    poController.Master().setCompanyID(psCompanyId);
+                    poController.setIndustryID(psIndustryId);
+                    poController.setCompanyID(psCompanyId);
+                    poController.setCategoryID(psCategoryId);
+                    poController.Master().setBranchCode(oApp.getBranchCode());
+                    poController.setTransactionStatus(DisbursementStatic.VERIFIED + DisbursementStatic.RETURNED_I);
+                    loadRecordSearch();
+                    lblSource.setText(poController.Master().Company().getCompanyName() + " - " + poController.Master().Industry().getDescription());
+                } catch (SQLException | GuanzonException ex) {
+                    Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+                }
             });
             initAttachmentPreviewPane();
         } catch (SQLException | GuanzonException ex) {
@@ -386,6 +390,7 @@ public class DisbursementVoucher_ApprovalController implements Initializable, Sc
                         return;
                     }
                     //Recheck transaction status
+                    poController.setForm(DisbursementStatic.APPROVED);
                     poJSON = poController.checkUpdateTransaction(false);
                     if (!"success".equals((String) poJSON.get("result"))) {
                         ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
@@ -408,6 +413,7 @@ public class DisbursementVoucher_ApprovalController implements Initializable, Sc
                     break;
                 case "btnSave":
                     //Recheck transaction status
+                    poController.setForm(DisbursementStatic.APPROVED);
                     poJSON = poController.checkUpdateTransaction(false);
                     if (!"success".equals((String) poJSON.get("result"))) {
                         ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
@@ -425,7 +431,6 @@ public class DisbursementVoucher_ApprovalController implements Initializable, Sc
                         }
                     }
 
-//                    if (!DisbursementStatic.OPEN.equals(poController.Master().getTransactionStatus())) {
                     poJSON = poController.callApproval();
                     if (!"success".equals((String) poJSON.get("result"))) {
                         ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message")); // check this for encoder or and higher
@@ -433,14 +438,16 @@ public class DisbursementVoucher_ApprovalController implements Initializable, Sc
                     }
 
                     if (!DisbursementStatic.RETURNED_I.equals(poController.Master().getTransactionStatus())) {
-                        String lsUserId2 = oApp.getUserID();
+                        String lsUserId2 = (String) poJSON.get("sUserIDxx");
+                        if (lsUserId2 == null || "".equals(lsUserId2)) {
+                            lsUserId2 = oApp.getUserID();
+                        }
                         String lsPosition2 = poController.checkPosition(poController.Master().getTransactionStatus(), lsUserId2);
                         if (lsPosition2 == null || "".equals(lsPosition2)) {
                             ShowMessageFX.Warning(null, pxeModuleName, "User is not an authorized officer.");
                             return;
                         }
                     }
-//                    }
 
                     poJSON = poController.SaveTransaction();
                     if (!"success".equals((String) poJSON.get("result"))) {
@@ -616,6 +623,8 @@ public class DisbursementVoucher_ApprovalController implements Initializable, Sc
                 pbIsCheckedJournalTab = false;
                 pbIsCheckedBIRTab = false;
                 poController.resetTransaction();
+                poController.Master().setIndustryID(psIndustryId);
+                poController.Master().setCompanyID(psCompanyId);
                 poController.Master().setSupplierClientID(psSupplierPayeeId);
                 clearTextFields();
                 JFXUtil.clickTabByTitleText(tabPaneMain, "Disbursement Voucher");
@@ -693,6 +702,8 @@ public class DisbursementVoucher_ApprovalController implements Initializable, Sc
                 poJSON = poController.OpenTransaction(lsTransactionNo);
                 if ("error".equals((String) poJSON.get("result"))) {
                     poController.resetTransaction();
+                    poController.Master().setIndustryID(psIndustryId);
+                    poController.Master().setCompanyID(psCompanyId);
                     pnEditMode = EditMode.UNKNOWN;
                     ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                 } else {
@@ -1983,16 +1994,9 @@ public class DisbursementVoucher_ApprovalController implements Initializable, Sc
     }
 
     private void loadRecordSearch() {
-        try {
-            lblSource.setText(poController.Master().Company().getCompanyName() + " - " + poController.Master().Industry().getDescription());
-            tfSearchIndustry.setText(poController.getSearchIndustry());
-            tfSearchSupplier.setText(poController.getSearchPayee());
-//            tfSearchTransaction.setText(poController.getSearchTransaction());
-            JFXUtil.updateCaretPositions(apBrowse);
-        } catch (SQLException | GuanzonException ex) {
-            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
-            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
-        }
+        tfSearchIndustry.setText(poController.getSearchIndustry());
+        tfSearchSupplier.setText(poController.getSearchPayee());
+        JFXUtil.updateCaretPositions(apBrowse);
     }
 
     private void loadRecordMaster() {
