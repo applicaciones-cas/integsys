@@ -409,6 +409,7 @@ public class DisbursementVoucher_ApprovalController implements Initializable, Sc
                     break;
                 case "btnSave":
                     //Recheck transaction status
+                    poController.setForm(DisbursementStatic.APPROVED);
                     poJSON = poController.checkUpdateTransaction(false);
                     if (!"success".equals((String) poJSON.get("result"))) {
                         ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));

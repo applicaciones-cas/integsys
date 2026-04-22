@@ -406,6 +406,7 @@ public class DisbursementVoucher_ConfirmationController implements Initializable
                     break;
                 case "btnSave":
                     //Recheck transaction status
+                    poController.setForm(DisbursementStatic.CONFIRMED);
                     poJSON = poController.checkUpdateTransaction(false);
                     if (!"success".equals((String) poJSON.get("result"))) {
                         ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
