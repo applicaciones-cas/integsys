@@ -917,3 +917,26 @@
     -fx-background-radius: 5px;
     -fx-background-insets: 2;
 }
+.check-box:focused .box {
+    -fx-border-color: #FF8201;
+    -fx-border-width: 2;
+}
+
+.check-box:focused .text {
+    -fx-fill: #FF8201;
+}
+.combo-box:focused {
+    -fx-border-color: #FF8201;
+    -fx-border-width: 2;
+    -fx-border-radius: 3;
+}
+
+/* Arrow button */
+.combo-box:focused .arrow-button {
+    -fx-background-color: #FF8201;
+}
+
+/* Arrow icon */
+.combo-box:focused .arrow {
+    -fx-background-color: white;
+}

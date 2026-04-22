@@ -22,6 +22,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.DatePicker;
 import javafx.scene.control.TextField;
 import static javafx.scene.input.KeyCode.DOWN;
 import static javafx.scene.input.KeyCode.ENTER;
@@ -40,12 +41,14 @@ import org.guanzon.appdriver.base.GRider;
 import org.guanzon.appdriver.base.GRiderCAS;
 import org.guanzon.appdriver.base.GuanzonException;
 import org.guanzon.appdriver.base.LogWrapper;
+import org.guanzon.appdriver.base.SQLUtil;
 import org.guanzon.appdriver.constant.EditMode;
 import org.guanzon.cas.parameter.services.ParamControllers;
 import org.json.simple.JSONObject;
 import ph.com.guanzongroup.cas.cashflow.BankAccountMaster;
 import ph.com.guanzongroup.cas.cashflow.services.CashflowControllers;
 import ph.com.guanzongroup.integsys.model.ModelResultSet;
+import ph.com.guanzongroup.integsys.utility.CustomCommonUtil;
 import ph.com.guanzongroup.integsys.utility.JFXUtil;
 
 public class BankAccountMasterController implements Initializable, ScreenInterface {
@@ -87,6 +90,8 @@ public class BankAccountMasterController implements Initializable, ScreenInterfa
             btnActivate,
             btnClose,
             btnLedger;
+    @FXML
+    private DatePicker dpPicker01;
 
     @FXML
     private FontAwesomeIconView faActivate;
@@ -101,6 +106,12 @@ public class BankAccountMasterController implements Initializable, ScreenInterfa
             txtField07,
             txtField08,
             txtField09,
+            txtField10,
+            txtField11,
+            txtField12,
+            txtField13,
+            txtField14,
+            txtField15,
             txtSeeks01,
             txtSeeks02;
 
@@ -140,6 +151,7 @@ public class BankAccountMasterController implements Initializable, ScreenInterfa
         pnEditMode = oCashflow.getEditMode();
         initButton(pnEditMode);
         InitTextFields();
+        initDatePickerActions();
         initComboboxes();
         initCheckBox();
         ClickButton();
@@ -428,10 +440,27 @@ public class BankAccountMasterController implements Initializable, ScreenInterfa
         txtField07.clear();
         txtField08.clear();
         txtField09.clear();
+        txtField10.clear();
+        txtField11.clear();
+        txtField12.clear();
+        txtField13.clear();
+        txtField14.clear();
+        txtField15.clear();
         txtSeeks01.clear();
         cbField01.setSelected(false);
         cmbField01.getSelectionModel().select(-1);
         cmbField02.getSelectionModel().select(-1);
+
+    }
+    private void initDatePickerActions() {
+        dpPicker01.setOnAction(e -> {
+            if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
+                if (dpPicker01.getValue() != null) {
+                    oCashflow.getModel().setBeginningBalanceDate(SQLUtil.toDate(dpPicker01.getValue().toString(), SQLUtil.FORMAT_SHORT_DATE));
+                   
+                }
+            }
+        });
     }
     private void initCheckBox() {
         if(pnEditMode == EditMode.READY || pnEditMode == EditMode.UNKNOWN){
@@ -445,7 +474,7 @@ public class BankAccountMasterController implements Initializable, ScreenInterfa
                 oCashflow.getModel().setDefault(cbField03.isSelected());
             });
             cbField04.setOnAction(event -> {
-                oCashflow.getModel().setDefault(cbField04.isSelected());
+                oCashflow.getModel().setBankPrinting(cbField04.isSelected());
             });
         }
     }
@@ -485,6 +514,14 @@ public class BankAccountMasterController implements Initializable, ScreenInterfa
             btnUpdate.setVisible(false);
             btnUpdate.setManaged(false);
         }
+        if(fnValue == EditMode.UPDATE){
+            dpPicker01.setDisable(true);
+            txtField12.setDisable(true);
+            txtField13.setDisable(true);
+            txtField14.setDisable(true);
+            txtField15.setDisable(true);
+        
+        }
        
     }
 
@@ -498,6 +535,12 @@ public class BankAccountMasterController implements Initializable, ScreenInterfa
         txtField07.focusedProperty().addListener(txtField_Focus);
         txtField08.focusedProperty().addListener(txtField_Focus);
         txtField09.focusedProperty().addListener(txtField_Focus);
+        txtField10.focusedProperty().addListener(txtField_Focus);
+        txtField11.focusedProperty().addListener(txtField_Focus);
+        txtField12.focusedProperty().addListener(txtField_Focus);
+        txtField13.focusedProperty().addListener(txtField_Focus);
+        txtField14.focusedProperty().addListener(txtField_Focus);
+        txtField15.focusedProperty().addListener(txtField_Focus);
         
         txtSeeks01.setOnKeyPressed(this::txtSeeks_KeyPressed);
         txtSeeks02.setOnKeyPressed(this::txtSeeks_KeyPressed);
@@ -511,16 +554,16 @@ public class BankAccountMasterController implements Initializable, ScreenInterfa
             TextField txtField = (TextField) event.getSource();
             int lnIndex = Integer.parseInt(((TextField) event.getSource()).getId().substring(8, 10));
             String lsValue = (txtField.getText() == null ? "" : txtField.getText());
-            JSONObject poJson;
-            poJson = new JSONObject();
+            JSONObject poJSON;
+            poJSON = new JSONObject();
             switch (event.getCode()) {
                 case F3:
                     switch (lnIndex) {
                         case 01:
                             psActiveField = String.valueOf(lnIndex);
-                            poJson = oCashflow.searchRecordbyAccount(lsValue, true);
-                            if ("error".equals((String) poJson.get("result"))) {
-                                ShowMessageFX.Information((String) poJson.get("message"), "Computerized Acounting System", pxeModuleName);
+                            poJSON = oCashflow.searchRecordbyAccount(lsValue, true);
+                            if ("error".equals((String) poJSON.get("result"))) {
+                                ShowMessageFX.Information((String) poJSON.get("message"), "Computerized Acounting System", pxeModuleName);
                                 txtSeeks01.clear();
                                 break;
                             }
@@ -529,9 +572,9 @@ public class BankAccountMasterController implements Initializable, ScreenInterfa
                             break;
                         case 02:
                             psActiveField = String.valueOf(lnIndex);
-                            poJson = oCashflow.searchRecordbyAccount(lsValue, false);
-                            if ("error".equals((String) poJson.get("result"))) {
-                                ShowMessageFX.Information((String) poJson.get("message"), "Computerized Acounting System", pxeModuleName);
+                            poJSON = oCashflow.searchRecordbyAccount(lsValue, false);
+                            if ("error".equals((String) poJSON.get("result"))) {
+                                ShowMessageFX.Information((String) poJSON.get("message"), "Computerized Acounting System", pxeModuleName);
                                 txtSeeks02.clear();
                                 break;
                             }
@@ -571,31 +614,148 @@ public class BankAccountMasterController implements Initializable, ScreenInterfa
             try {
                 switch (lnIndex) {
                     case 1:
-                        oCashflow.getModel().setBankAccountId(lsValue);
+                        poJSON = oCashflow.getModel().setBankAccountId(lsValue);
+                        if ("error".equals(poJSON.get("result"))) {
+                            ShowMessageFX.Error((String) poJSON.get("message"), pxeModuleName, null);
+                            txtField01.requestFocus();
+                            txtField01.selectAll();
+                            return;
+                        }
                         break;
                     case 3:
-                        oCashflow.getModel().setAccountNo(lsValue);
+                        poJSON = oCashflow.getModel().setAccountNo(lsValue);
+                        if ("error".equals(poJSON.get("result"))) {
+                            ShowMessageFX.Error((String) poJSON.get("message"), pxeModuleName, null);
+                            txtField03.requestFocus();
+                            txtField03.selectAll();
+                            return;
+                        }
                         break;
                     case 4:
-                        oCashflow.getModel().setAccountCode(lsValue);
+                        poJSON = oCashflow.getModel().setAccountCode(lsValue);
+                        if ("error".equals(poJSON.get("result"))) {
+                            ShowMessageFX.Error((String) poJSON.get("message"), pxeModuleName, null);
+                            txtField04.requestFocus();
+                            txtField04.selectAll();
+                            return;
+                        }
                         break;
                     case 5:
-                        oCashflow.getModel().setAccountName(lsValue);
+                        poJSON = oCashflow.getModel().setAccountName(lsValue);
+                        if ("error".equals(poJSON.get("result"))) {
+                            ShowMessageFX.Error((String) poJSON.get("message"), pxeModuleName, null);
+                            txtField05.requestFocus();
+                            txtField05.selectAll();
+                            return;
+                        }
                         break;
                     case 7:
-                        oCashflow.getModel().setClearingDays(Integer.parseInt(lsValue));
+                        poJSON = oCashflow.getModel().setClearingDays(Integer.parseInt(lsValue));
+                        if ("error".equals(poJSON.get("result"))) {
+                            ShowMessageFX.Error((String) poJSON.get("message"), pxeModuleName, null);
+                            txtField07.requestFocus();
+                            txtField07.selectAll();
+                            return;
+                        }
                         break;
                     case 8:
-                        oCashflow.getModel().setSignatoryCount(Integer.parseInt(lsValue));
+                        poJSON = oCashflow.getModel().setSignatoryCount(Integer.parseInt(lsValue));
+                        if ("error".equals(poJSON.get("result"))) {
+                            ShowMessageFX.Error((String) poJSON.get("message"), pxeModuleName, null);
+                            txtField08.requestFocus();
+                            txtField08.selectAll();
+                            return;
+                        }
                         break;
                     case 9:
-                        oCashflow.getModel().setSerialNo(lsValue);
+                        poJSON = oCashflow.getModel().setSerialNo(lsValue);
+                        if ("error".equals(poJSON.get("result"))) {
+                            ShowMessageFX.Error((String) poJSON.get("message"), pxeModuleName, null);
+                            txtField09.requestFocus();
+                            txtField09.selectAll();
+                            return;
+                        }
+                        break;
+                    case 10:
+                        poJSON = oCashflow.getModel().setCheckNo(lsValue);
+                        if ("error".equals(poJSON.get("result"))) {
+                            ShowMessageFX.Error((String) poJSON.get("message"), pxeModuleName, null);
+                            txtField10.requestFocus();
+                            txtField10.selectAll();
+                            return;
+                        }
+                        break;
+                    case 11:
+                        poJSON = oCashflow.getModel().setRemarks(lsValue);
+                        if ("error".equals(poJSON.get("result"))) {
+                            ShowMessageFX.Error((String) poJSON.get("message"), pxeModuleName, null);
+                            txtField11.requestFocus();
+                            txtField11.selectAll();
+                            return;
+                        }
+                        break;
+                    case 12:
+                        JFXUtil.inputDecimalOnly(txtField12);
+                        lsValue = JFXUtil.removeComma(lsValue);
+                        poJSON = oCashflow.getModel().setOutstandingBeginningBalance(Double.parseDouble(lsValue));
+                        if ("error".equals(poJSON.get("result"))) {
+                            ShowMessageFX.Error((String) poJSON.get("message"), pxeModuleName, null);
+                            txtField12.requestFocus();
+                            txtField12.selectAll();
+                            return;
+                        }
+                        txtField12.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(oCashflow.getModel().getOutstandingBeginningBalance(), true));
+                        break;
+                    case 13:
+                        JFXUtil.inputDecimalOnly(txtField13);
+                        lsValue = JFXUtil.removeComma(lsValue);
+                        poJSON = oCashflow.getModel().setOutstandingBalance(Double.parseDouble(lsValue));
+                        if ("error".equals(poJSON.get("result"))) {
+                            ShowMessageFX.Error((String) poJSON.get("message"), pxeModuleName, null);
+                            txtField13.requestFocus();
+                            txtField13.selectAll();
+                            return;
+                        }
+                        txtField13.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(oCashflow.getModel().getOutstandingBalance(), true));
+                        break;
+                    case 14:
+                        JFXUtil.inputDecimalOnly(txtField14);
+                        lsValue = JFXUtil.removeComma(lsValue);
+                        poJSON = oCashflow.getModel().setAccountBeginningBalance(Double.parseDouble(lsValue));
+                        if ("error".equals(poJSON.get("result"))) {
+                            ShowMessageFX.Error((String) poJSON.get("message"), pxeModuleName, null);
+                            txtField14.requestFocus();
+                            txtField14.selectAll();
+                            return;
+                        }
+                        txtField14.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(oCashflow.getModel().getAccountBeginningBalance(), true));
+                        break;
+                    case 15:
+                        JFXUtil.inputDecimalOnly(txtField15);
+                        lsValue = JFXUtil.removeComma(lsValue);
+                        poJSON = oCashflow.getModel().setAccountBalance(Double.parseDouble(lsValue));
+                        if ("error".equals(poJSON.get("result"))) {
+                            ShowMessageFX.Error((String) poJSON.get("message"), pxeModuleName, null);
+                            txtField15.requestFocus();
+                            txtField15.selectAll();
+                            return;
+                        }
+                        txtField15.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(oCashflow.getModel().getAccountBalance(), true));
                         break;
                     default:
                         break;
                 }
-            } catch (Exception e) {
-                System.err.println("Error processing input: " + e.getMessage());
+            } catch (Exception ex) {
+                Logger.getLogger(BankAccountMasterController.class.getName()).log(Level.SEVERE, null, ex);
+                ShowMessageFX.Error(ex.getMessage(), pxeModuleName, null);
+                try {
+                    if (oApp != null) {
+
+                        oApp.rollbackTrans(); // 🔥 force rollback
+                    }
+                } catch (SQLException ex1) {
+                    Logger.getLogger(ProjectController.class.getName()).log(Level.SEVERE, null, ex1);
+                }
             }
         } else {
             txtField.selectAll();
@@ -607,24 +767,24 @@ public class BankAccountMasterController implements Initializable, ScreenInterfa
             TextField txtField = (TextField) event.getSource();
             int lnIndex = Integer.parseInt(((TextField) event.getSource()).getId().substring(8, 10));
             String lsValue = (txtField.getText() == null ? "" : txtField.getText());
-            JSONObject poJson;
-            poJson = new JSONObject();
+
+            poJSON = new JSONObject();
             switch (event.getCode()) {
                 case F3:
                     switch (lnIndex) {
                         case 02:
-                            poJson = oCashflow.SearchBanks(lsValue, false);
-                            if ("error".equalsIgnoreCase(poJson.get("result").toString())) {
-                                ShowMessageFX.Information((String) poJson.get("message"), "Computerized Acounting System", pxeModuleName);
+                            poJSON = oCashflow.SearchBanks(lsValue, false);
+                            if ("error".equalsIgnoreCase(poJSON.get("result").toString())) {
+                                ShowMessageFX.Information((String) poJSON.get("message"), "Computerized Acounting System", pxeModuleName);
                             }
                             
                             txtField02.setText((String) oCashflow.getModel().Banks().getBankName());
                             break;
                             
                         case 06:
-                            poJson = oCashflow.SearchBanksBranch(lsValue, false);
-                            if ("error".equalsIgnoreCase(poJson.get("result").toString())) {
-                                ShowMessageFX.Information((String) poJson.get("message"), "Computerized Acounting System", pxeModuleName);
+                            poJSON = oCashflow.SearchBanksBranch(lsValue, false);
+                            if ("error".equalsIgnoreCase(poJSON.get("result").toString())) {
+                                ShowMessageFX.Information((String) poJSON.get("message"), "Computerized Acounting System", pxeModuleName);
                             }
                             txtField06.setText(oCashflow.getModel().getBranch());
                             break;
@@ -657,7 +817,13 @@ public class BankAccountMasterController implements Initializable, ScreenInterfa
             txtField07.setText( String.valueOf(oCashflow.getModel().getClearingDays()));
             txtField08.setText( String.valueOf(oCashflow.getModel().getSignatoryCount()));
             txtField09.setText(oCashflow.getModel().getSerialNo());
-
+            txtField10.setText(oCashflow.getModel().getCheckNo());
+            txtField11.setText(oCashflow.getModel().getRemarks());
+            txtField12.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(oCashflow.getModel().getOutstandingBeginningBalance(), true));
+            txtField13.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(oCashflow.getModel().getOutstandingBalance(), true));
+            txtField14.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(oCashflow.getModel().getAccountBeginningBalance(), true));
+            txtField15.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(oCashflow.getModel().getAccountBalance(), true));
+            dpPicker01.setValue(CustomCommonUtil.parseDateStringToLocalDate(SQLUtil.dateFormat(oCashflow.getModel().getBeginningBalanceDate(), SQLUtil.FORMAT_SHORT_DATE)));
             switch (oCashflow.getModel().getRecordStatus()) {
                 case "0":
                     btnActivate.setText("Activate");
@@ -675,7 +841,7 @@ public class BankAccountMasterController implements Initializable, ScreenInterfa
                     cmbField01.getSelectionModel().select(0);
                     break;
                 case "1":
-                    cmbField01.getSelectionModel().select(1);
+                        cmbField01.getSelectionModel().select(1);
                     break;
                 case "2":
                     cmbField01.getSelectionModel().select(2);
