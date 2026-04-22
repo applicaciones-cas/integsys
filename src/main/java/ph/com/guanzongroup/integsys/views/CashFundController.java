@@ -242,7 +242,7 @@ public class CashFundController implements Initializable, ScreenInterface {
             switch (nodeID) {
                 case "dpLastTransDate":
                     if (JFXUtil.isObjectEqualTo(poController.getModel().getLastTransactionDate(), null, "")) {
-                        ShowMessageFX.Warning(null, pxeModuleName, "Date is set once processed in cash disbursement.");
+                        ShowMessageFX.Warning(null, pxeModuleName, "Date is auto set once processed in cash disbursement.");
                     }
                     break;
             }
