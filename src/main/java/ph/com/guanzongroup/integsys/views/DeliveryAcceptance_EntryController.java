@@ -1095,6 +1095,19 @@ public class DeliveryAcceptance_EntryController implements Initializable, Screen
                                 tfBarcode.setText("");
                                 break;
                             }
+                            /**
+                             * Author: Teejei De Celis Date: April 21, 2026
+                             *
+                             * Purpose: Sets the barcode text field based on the
+                             * selected detail row.
+                             *
+                             * Description: Retrieves the barcode from the
+                             * Inventory object of the current detail row and
+                             * displays it in the barcode text field
+                             * (tfBarcode).
+                             */
+                            tfBarcode.setText(poPurchaseReceivingController.PurchaseOrderReceiving().Detail(lnRow).Inventory().getBarCode());
+                            
                             loadTableDetail();
 
                             Platform.runLater(() -> {
@@ -1119,6 +1132,19 @@ public class DeliveryAcceptance_EntryController implements Initializable, Screen
                                 tfDescription.setText("");
                                 break;
                             }
+                             /**
+                             * Author: Teejei De Celis Date: April 21, 2026
+                             *
+                             * Purpose: Sets the description text field based on the
+                             * selected detail row.
+                             *
+                             * Description: Retrieves the description from the
+                             * Inventory object of the current detail row and
+                             * displays it in the description text field
+                             * (tfBarcode).
+                             */
+                            tfDescription.setText(poPurchaseReceivingController.PurchaseOrderReceiving().Detail(lnRow).Inventory().getDescription());
+                            
                             loadTableDetail();
                             Platform.runLater(() -> {
                                 PauseTransition delay = new PauseTransition(Duration.seconds(0.50));
@@ -1157,6 +1183,18 @@ public class DeliveryAcceptance_EntryController implements Initializable, Screen
                                 tfBarcode.setText("");
                                 break;
                             }
+                            /**
+                             * Author: Teejei De Celis Date: April 21, 2026
+                             *
+                             * Purpose: Sets the barcode text field based on the
+                             * selected detail row.
+                             *
+                             * Description: Retrieves the barcode from the
+                             * Inventory object of the current detail row and
+                             * displays it in the barcode text field
+                             * (tfBarcode).
+                             */
+                            tfBarcode.setText(poPurchaseReceivingController.PurchaseOrderReceiving().Detail(lnRow).Inventory().getBarCode());
                             loadTableDetail();
                             Platform.runLater(() -> {
                                 PauseTransition delay = new PauseTransition(Duration.seconds(0.50));
@@ -1181,6 +1219,18 @@ public class DeliveryAcceptance_EntryController implements Initializable, Screen
                                 tfDescription.setText("");
                                 break;
                             }
+                            /**
+                             * Author: Teejei De Celis Date: April 21, 2026
+                             *
+                             * Purpose: Sets the description text field based on the
+                             * selected detail row.
+                             *
+                             * Description: Retrieves the description from the
+                             * Inventory object of the current detail row and
+                             * displays it in the description text field
+                             * (tfBarcode).
+                             */
+                            tfDescription.setText(poPurchaseReceivingController.PurchaseOrderReceiving().Detail(lnRow).Inventory().getDescription());
                             loadTableDetail();
                             Platform.runLater(() -> {
                                 PauseTransition delay = new PauseTransition(Duration.seconds(0.50));
