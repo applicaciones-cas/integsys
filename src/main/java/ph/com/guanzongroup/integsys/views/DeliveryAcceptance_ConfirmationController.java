@@ -464,14 +464,14 @@ public class DeliveryAcceptance_ConfirmationController implements Initializable,
                             return;
                         }
                     case "btnHistory":
-                        if(pnEditMode != EditMode.READY && pnEditMode != EditMode.UPDATE){
+                        if (pnEditMode != EditMode.READY && pnEditMode != EditMode.UPDATE) {
                             ShowMessageFX.Warning("No transaction status history to load!", pxeModuleName, null);
                             return;
-                        } 
-                        
+                        }
+
                         try {
                             poPurchaseReceivingController.PurchaseOrderReceiving().ShowStatusHistory();
-                        }  catch (NullPointerException npe) {
+                        } catch (NullPointerException npe) {
                             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(npe), npe);
                             ShowMessageFX.Error("No transaction status history to load!", pxeModuleName, null);
                         } catch (Exception ex) {
@@ -555,7 +555,13 @@ public class DeliveryAcceptance_ConfirmationController implements Initializable,
                         break;
                     case "btnVoid":
                         poJSON = new JSONObject();
-                        if (ShowMessageFX.YesNo(null, pxeModuleName, "Are you sure you want to void transaction?") == true) {
+                        String lsStatus = "";
+                        if (PurchaseOrderReceivingStatus.CONFIRMED.equals(poPurchaseReceivingController.PurchaseOrderReceiving().Master().getTransactionStatus())) {
+                            lsStatus = "cancel";
+                        } else {
+                            lsStatus = "void";
+                        }
+                        if (ShowMessageFX.YesNo(null, pxeModuleName, "Are you sure you want to " + lsStatus + " transaction?") == true) {
                             if (PurchaseOrderReceivingStatus.CONFIRMED.equals(poPurchaseReceivingController.PurchaseOrderReceiving().Master().getTransactionStatus())) {
                                 poJSON = poPurchaseReceivingController.PurchaseOrderReceiving().CancelTransaction("");
                             } else {
@@ -1977,6 +1983,11 @@ public class DeliveryAcceptance_ConfirmationController implements Initializable,
     }
 
     public void loadRecordMaster() {
+        if (PurchaseOrderReceivingStatus.CONFIRMED.equals(poPurchaseReceivingController.PurchaseOrderReceiving().Master().getTransactionStatus())) {
+            btnVoid.setText("Cancel");
+        } else {
+            btnVoid.setText("Void");
+        }
         boolean lbDisable = poPurchaseReceivingController.PurchaseOrderReceiving().getEditMode() == EditMode.UPDATE;
         if (lbDisable) {
 

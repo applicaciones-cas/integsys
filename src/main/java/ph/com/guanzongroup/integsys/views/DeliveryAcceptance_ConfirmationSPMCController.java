@@ -454,7 +454,13 @@ public class DeliveryAcceptance_ConfirmationSPMCController implements Initializa
                         break;
                     case "btnVoid":
                         poJSON = new JSONObject();
-                        if (ShowMessageFX.YesNo(null, pxeModuleName, "Are you sure you want to void transaction?") == true) {
+                        String lsStatus = "";
+                        if (PurchaseOrderReceivingStatus.CONFIRMED.equals(poPurchaseReceivingController.PurchaseOrderReceiving().Master().getTransactionStatus())) {
+                            lsStatus = "cancel";
+                        } else {
+                            lsStatus = "void";
+                        }
+                        if (ShowMessageFX.YesNo(null, pxeModuleName, "Are you sure you want to " + lsStatus + " transaction?") == true) {
                             if (PurchaseOrderReceivingStatus.CONFIRMED.equals(poPurchaseReceivingController.PurchaseOrderReceiving().Master().getTransactionStatus())) {
                                 poJSON = poPurchaseReceivingController.PurchaseOrderReceiving().CancelTransaction("");
                             } else {
@@ -1713,6 +1719,11 @@ public class DeliveryAcceptance_ConfirmationSPMCController implements Initializa
     }
 
     public void loadRecordMaster() {
+        if (PurchaseOrderReceivingStatus.CONFIRMED.equals(poPurchaseReceivingController.PurchaseOrderReceiving().Master().getTransactionStatus())) {
+            btnVoid.setText("Cancel");
+        } else {
+            btnVoid.setText("Void");
+        }
         boolean lbDisable = poPurchaseReceivingController.PurchaseOrderReceiving().getEditMode() == EditMode.UPDATE;
         if (lbDisable) {
 
