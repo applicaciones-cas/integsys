@@ -317,7 +317,7 @@ public class DisbursementVoucher_ApprovalController implements Initializable, Sc
                     case "Digital Payment":
                         if (pnEditMode == EditMode.READY || pnEditMode == EditMode.UPDATE || pnEditMode == EditMode.ADDNEW) {
                             poController.populateOtherPayment();
-                            loadRecordMasterBankTransfer();
+                            loadRecordMasterOnlinePayment();
                         }
                         break;
                 }

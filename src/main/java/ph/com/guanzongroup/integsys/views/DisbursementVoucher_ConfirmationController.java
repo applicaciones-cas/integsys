@@ -315,7 +315,7 @@ public class DisbursementVoucher_ConfirmationController implements Initializable
                     case "Digital Payment":
                         if (pnEditMode == EditMode.READY || pnEditMode == EditMode.UPDATE || pnEditMode == EditMode.ADDNEW) {
                             poController.populateOtherPayment();
-                            loadRecordMasterBankTransfer();
+                            loadRecordMasterOnlinePayment();
                         }
                         break;
                 }

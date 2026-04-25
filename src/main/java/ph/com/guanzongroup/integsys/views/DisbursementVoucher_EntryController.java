@@ -327,7 +327,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                     case "Digital Payment":
                         if (pnEditMode == EditMode.READY || pnEditMode == EditMode.UPDATE || pnEditMode == EditMode.ADDNEW) {
                             poController.populateOtherPayment();
-                            loadRecordMasterBankTransfer();
+                            loadRecordMasterOnlinePayment();
                         }
                         break;
                 }
