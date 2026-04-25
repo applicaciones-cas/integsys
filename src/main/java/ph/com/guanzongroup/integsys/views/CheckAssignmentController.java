@@ -12,6 +12,8 @@ import java.util.List;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.event.ActionEvent;
@@ -21,6 +23,7 @@ import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
+import javafx.util.Duration;
 import javax.script.ScriptException;
 import org.guanzon.appdriver.agent.ShowMessageFX;
 import org.guanzon.appdriver.base.CommonUtils;
@@ -90,6 +93,7 @@ public class CheckAssignmentController implements Initializable {
             initDatePicker();
             initButton(pnEditMode);
             clearTextFields();
+
             if (transactionNos != null && !transactionNos.isEmpty()) {
                 loadTransaction(currentTransactionIndex);
                 initButton(pnEditMode);
@@ -322,6 +326,8 @@ public class CheckAssignmentController implements Initializable {
                 loadTransaction(++currentTransactionIndex);
                 return;
             }
+
+            boolean isNull = JFXUtil.isObjectEqualTo(poController.CheckPayments().getModel().getCheckNo(), null, "");
             poJSON = poController.UpdateTransaction();
             if (!"error".equals((String) poJSON.get("result"))) {
                 poJSON = poController.populateCheckNo();
@@ -335,6 +341,15 @@ public class CheckAssignmentController implements Initializable {
                 initTextFields();
                 pnEditMode = poController.getEditMode();
                 initButton(pnEditMode);
+
+                if (isNull) {
+                    JFXUtil.runTextReveal(80, tfCheckNo);
+                } else {
+                    Platform.runLater(() -> {
+                        tfCheckNo.requestFocus();
+                        tfCheckNo.positionCaret(tfCheckNo.getText().length());
+                    });
+                }
             } else {
                 ShowMessageFX.Warning((String) poJSON.get("message"), pxeModuleName, null);
                 CommonUtils.closeStage(btnClose);

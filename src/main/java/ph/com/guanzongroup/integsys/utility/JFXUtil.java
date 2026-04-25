@@ -3422,7 +3422,6 @@ public class JFXUtil {
                 LocalDate ldSelectedDate
         );
     }
-
     public static EventHandler<ActionEvent> DatePickerAction(DatePickerCommand command) {
         return event -> {
 
@@ -3540,5 +3539,33 @@ public class JFXUtil {
         } catch (NumberFormatException e) {
             return false;
         }
+    }
+
+    public static void runTextReveal(double duration, TextField textField) {
+        String fullText = textField.getText();
+
+        textField.setText(""); // hide first
+
+        Timeline timeline = new Timeline();
+
+        for (int i = 0; i <= fullText.length(); i++) {
+            final int index = i;
+
+            KeyFrame keyFrame = new KeyFrame(
+                    Duration.millis(i * duration),
+                    e -> textField.setText(fullText.substring(0, index))
+            );
+
+            timeline.getKeyFrames().add(keyFrame);
+        }
+
+        timeline.setOnFinished(e -> {
+            Platform.runLater(() -> {
+                textField.requestFocus();
+                textField.positionCaret(textField.getText().length());
+            });
+        });
+
+        timeline.play();
     }
 }
