@@ -137,11 +137,17 @@ public class CheckAuthorizationController implements Initializable, ScreenInterf
             pagination.setPageCount(1);
 
             Platform.runLater(() -> {
-                poDisbursementController.Master().setIndustryID(psIndustryId);
-                poDisbursementController.Master().setCompanyID(psCompanyId);
-                poDisbursementController.setIndustryID(psIndustryId);
-                poDisbursementController.setCompanyID(psCompanyId);
-                loadRecordSearch();
+                try {
+                    poDisbursementController.Master().setIndustryID(psIndustryId);
+                    poDisbursementController.Master().setCompanyID(psCompanyId);
+                    poDisbursementController.setIndustryID(psIndustryId);
+                    poDisbursementController.setCompanyID(psCompanyId);
+                    loadRecordSearch();
+                    lblSource.setText(poDisbursementController.Master().Company().getCompanyName() + " - " + poDisbursementController.Master().Industry().getDescription());
+                } catch (SQLException | GuanzonException ex) {
+                    Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+                }
+
             });
             poDisbursementController.setTransactionStatus(DisbursementStatic.CERTIFIED);
 
@@ -198,7 +204,6 @@ public class CheckAuthorizationController implements Initializable, ScreenInterf
 
     private void loadRecordSearch() {
         try {
-            lblSource.setText(poDisbursementController.Master().Company().getCompanyName() + " - " + poDisbursementController.Master().Industry().getDescription());
             tfSearchIndustry.setText(poDisbursementController.getSearchIndustry());
             tfSearchBankName.setText(poDisbursementController.CheckPayments().getModel().Banks().getBankName() != null ? poDisbursementController.CheckPayments().getModel().Banks().getBankName() : "");
             tfSearchBankAccount.setText(poDisbursementController.CheckPayments().getModel().Bank_Account_Master().getAccountNo() != null ? poDisbursementController.CheckPayments().getModel().Bank_Account_Master().getAccountNo() : "");
