@@ -192,7 +192,7 @@ public class BIRPrintingController implements Initializable, ScreenInterface {
                             pnMain = rowIndex;
                             Platform.runLater(() -> {
                                 loadTableMain.reload();
-                                JFXUtil.runWithDelay(0.30, () -> {
+                                JFXUtil.runWithDelay(0.50, () -> {
                                     if (lbisTrue) {
                                         JFXUtil.selectAndFocusRow(tblViewMainList, rowIndex);
                                     }
