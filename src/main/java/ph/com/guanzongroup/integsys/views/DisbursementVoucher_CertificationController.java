@@ -183,7 +183,14 @@ public class DisbursementVoucher_CertificationController implements Initializabl
                             //set external temporary data of index to save as reference
                             // if detected unchecked then must update
                             pnMain = rowIndex;
-                            loadTableMain.reload();
+                            Platform.runLater(() -> {
+                                loadTableMain.reload();
+                                JFXUtil.runWithDelay(0.30, () -> {
+                                    if (lbisTrue) {
+                                        JFXUtil.selectAndFocusRow(tblViewMainList, rowIndex);
+                                    }
+                                });
+                            });
                             break;
                     }
                 }, 1);//starts 0,1,2 
