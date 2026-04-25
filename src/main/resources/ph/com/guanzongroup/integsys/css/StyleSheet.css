@@ -429,7 +429,7 @@
 .text-field, .text-area:focused {
     -fx-min-height: 26;
     -fx-background-color:
-        orange,
+        #FF8201,
         white;
 }
 .text-field, .text-area:disabled {
@@ -780,30 +780,28 @@
 
 .combo-box {
     -fx-border-color: gray;
-    /*    -fx-max-height: 26px;
-        -fx-min-height: 26px;*/
     -fx-background-color: white;
-    /*-fx-border-width: 1px;*/
     -fx-border-radius: 2px;
-    /*-fx-padding:3px;*/
     -fx-background-radius:3px;
 }
 
 .combo-box .arrow-button {
     -fx-background-color: transparent;
-    /*-fx-font-size:10px;*/
-    /*-fx-padding: 3;*/
-    /*-fx-shape: "";*/
-
-}
-.combo-box:focused {
-    /*-fx-border-color: #F88222 ;*/
 }
 
 .combo-box-base:disabled,
 .list-cell:disabled{
     -fx-opacity: 1;
 }
+
+.combo-box:focused {
+    -fx-border-color: #FF8201;
+    -fx-border-width: 1;
+}
+.combo-box:disabled{
+    -fx-background-color: #EEEEEE;
+}
+
 
 .check-box > .box > .mark {
     -fx-background-color: null;
@@ -854,11 +852,14 @@
     -fx-opacity: 1.0;
     -fx-cursor: default;
 }
-.check-box:selected:focused > .box {
+.check-box:selected > .box {
     -fx-background-color: -material-design-color-transparent-24, -material-design-color;
     -fx-background-insets: -5, 0;
     -fx-background-radius: 1024, 2px;
     -fx-border-color: transparent;
+}
+.check-box:focused .box {
+    -fx-border-color: #FF8201;
 }
 
 .button_process2 {
@@ -917,26 +918,4 @@
     -fx-background-radius: 5px;
     -fx-background-insets: 2;
 }
-.check-box:focused .box {
-    -fx-border-color: #FF8201;
-    -fx-border-width: 2;
-}
 
-.check-box:focused .text {
-    -fx-fill: #FF8201;
-}
-.combo-box:focused {
-    -fx-border-color: #FF8201;
-    -fx-border-width: 2;
-    -fx-border-radius: 3;
-}
-
-/* Arrow button */
-.combo-box:focused .arrow-button {
-    -fx-background-color: #FF8201;
-}
-
-/* Arrow icon */
-.combo-box:focused .arrow {
-    -fx-background-color: white;
-}
