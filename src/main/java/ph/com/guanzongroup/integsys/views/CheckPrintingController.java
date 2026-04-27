@@ -241,9 +241,8 @@ public class CheckPrintingController implements Initializable, ScreenInterface {
     private void loadRecordSearch() {
         try {
             tfSearchIndustry.setText(poController.getSearchIndustry());
-            tfSearchBankName.setText(poController.CheckPayments().getModel().Banks().getBankName() != null ? poController.CheckPayments().getModel().Banks().getBankName() : "");
-            tfSearchBankAccount.setText(poController.CheckPayments().getModel().Bank_Account_Master().getAccountNo() != null ? poController.CheckPayments().getModel().Bank_Account_Master().getAccountNo() : "");
-
+            tfSearchBankName.setText(poController.getSearchBankName());
+            tfSearchBankAccount.setText(poController.getSearchBankAccountNo());
             //define if both are empty
             if (dpDVDateFrom.getEditor().getText().equals("")) {
                 String lsDateFrom = CustomCommonUtil.formatDateToShortString(getFirstDayOfMonth(oApp.getServerDate()));
@@ -257,7 +256,7 @@ public class CheckPrintingController implements Initializable, ScreenInterface {
             }
 
             JFXUtil.updateCaretPositions(apBrowse);
-        } catch (SQLException | GuanzonException ex) {
+        } catch (SQLException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
             ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
@@ -404,15 +403,15 @@ public class CheckPrintingController implements Initializable, ScreenInterface {
                         break;
                     case "tfSearchBankName":
                         if (lsValue.isEmpty()) {
-                            poController.CheckPayments().getModel().setBankID("");
-                            poController.CheckPayments().getModel().setBankAcountID("");
+                            poController.setSearchBankName("");
+                            poController.setSearchBankAccountNo("");
                             psSearchBankID = "";
                             psSearchBankAccountID = "";
                         }
                         break;
                     case "tfSearchBankAccount":
                         if (lsValue.isEmpty()) {
-                            poController.CheckPayments().getModel().setBankAcountID("");
+                            poController.setSearchBankAccountNo("");
                             psSearchBankAccountID = "";
                         }
                         break;
@@ -495,7 +494,7 @@ public class CheckPrintingController implements Initializable, ScreenInterface {
                                 }
                                 break;
                             case "tfSearchBankName":
-                                poJSON = poController.SearchBanks(lsValue, false);
+                                poJSON = poController.SearchBanks(lsValue, false, true);
                                 if ("error".equals((String) poJSON.get("result"))) {
                                     ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                     return;
@@ -506,7 +505,7 @@ public class CheckPrintingController implements Initializable, ScreenInterface {
                                 psSearchBankID = poController.CheckPayments().getModel().getBankID();
                                 break;
                             case "tfSearchBankAccount":
-                                poJSON = poController.SearchBankAccount(lsValue, poController.CheckPayments().getModel().getBankID(), false);
+                                poJSON = poController.SearchBankAccount(lsValue, poController.CheckPayments().getModel().getBankID(), false, true);
                                 if ("error".equals((String) poJSON.get("result"))) {
                                     ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                     return;

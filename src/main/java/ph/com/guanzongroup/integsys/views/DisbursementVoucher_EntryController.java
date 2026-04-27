@@ -1749,7 +1749,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
 
                             //apMasterDVCheck
                             case "tfBankNameCheck":
-                                poJSON = poController.SearchBanks(lsValue, false);
+                                poJSON = poController.SearchBanks(lsValue, false, false);
                                 if ("error".equals((String) poJSON.get("result"))) {
                                     ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                 } else {
@@ -1758,7 +1758,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                                 loadRecordMasterCheck();
                                 break;
                             case "tfBankAccountCheck":
-                                poJSON = poController.SearchBankAccount(lsValue, poController.CheckPayments().getModel().getBankID(), false);
+                                poJSON = poController.SearchBankAccount(lsValue, poController.CheckPayments().getModel().getBankID(), false, false);
                                 if ("error".equals((String) poJSON.get("result"))) {
                                     ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                 } else {
@@ -1787,7 +1787,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
 
                             //apMasterDVBTransfer
                             case "tfBankNameBTransfer":
-                                poJSON = poController.SearchBanks(lsValue, false);
+                                poJSON = poController.SearchBanks(lsValue, false, false);
                                 if ("error".equals((String) poJSON.get("result"))) {
                                     ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                 } else {
@@ -1796,7 +1796,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                                 loadRecordMasterBankTransfer();
                                 break;
                             case "tfBankAccountBTransfer":
-                                poJSON = poController.SearchBankAccount(lsValue, poController.OtherPayments().getModel().getBankID(), false);
+                                poJSON = poController.SearchBankAccount(lsValue, poController.OtherPayments().getModel().getBankID(), false, false);
                                 if ("error".equals((String) poJSON.get("result"))) {
                                     ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                 } else {
@@ -1824,7 +1824,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
 
                             //apMasterDVOp
                             case "tfBankNameOnlinePayment":
-                                poJSON = poController.SearchBanks(lsValue, false);
+                                poJSON = poController.SearchBanks(lsValue, false, false);
                                 if ("error".equals((String) poJSON.get("result"))) {
                                     ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                 } else {
@@ -1833,7 +1833,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                                 loadRecordMasterOnlinePayment();
                                 break;
                             case "tfBankAccountOnlinePayment":
-                                poJSON = poController.SearchBankAccount(lsValue, poController.OtherPayments().getModel().getBankID(), false);
+                                poJSON = poController.SearchBankAccount(lsValue, poController.OtherPayments().getModel().getBankID(), false, false);
                                 if ("error".equals((String) poJSON.get("result"))) {
                                     ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                 } else {
