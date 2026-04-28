@@ -287,7 +287,7 @@ public class DisbursementVoucher_HistoryController implements Initializable, Scr
                     case "Digital Payment":
                         if (pnEditMode == EditMode.READY || pnEditMode == EditMode.UPDATE || pnEditMode == EditMode.ADDNEW) {
                             poController.populateOtherPayment();
-                            loadRecordMasterBankTransfer();
+                            loadRecordMasterOnlinePayment();
                         }
                         break;
                 }

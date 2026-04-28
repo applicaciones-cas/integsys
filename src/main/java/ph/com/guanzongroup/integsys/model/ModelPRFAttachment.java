@@ -35,7 +35,8 @@ public class ModelPRFAttachment {
     public StringProperty index18;
     public StringProperty index19;
     public StringProperty index20;
-    public static ObservableList<String> documentType = FXCollections.observableArrayList("Other", "Billing Statement", "Delivery Receipt", "Sales Invoice", "Official Receipt");
+    /*04272026 - Team 1 Removed 'Billing Statement' option in documentType as it dd not exist to options used in DV*/
+    public static ObservableList<String> documentType = FXCollections.observableArrayList("Other", "Delivery Receipt", "Sales Invoice", "Official Receipt");
 
     public ModelPRFAttachment(String index01,
             String index02,

@@ -183,7 +183,14 @@ public class DisbursementVoucher_CertificationController implements Initializabl
                             //set external temporary data of index to save as reference
                             // if detected unchecked then must update
                             pnMain = rowIndex;
-                            loadTableMain.reload();
+                            Platform.runLater(() -> {
+                                loadTableMain.reload();
+                                JFXUtil.runWithDelay(0.30, () -> {
+                                    if (lbisTrue) {
+                                        JFXUtil.selectAndFocusRow(tblViewMainList, rowIndex);
+                                    }
+                                });
+                            });
                             break;
                     }
                 }, 1);//starts 0,1,2 
@@ -193,8 +200,8 @@ public class DisbursementVoucher_CertificationController implements Initializabl
         try {
             lblSource.setText(poDisbursementController.Master().Company().getCompanyName() + " - " + poDisbursementController.Master().Industry().getDescription());
             tfSearchIndustry.setText(poDisbursementController.getSearchIndustry());
-            tfSearchBankName.setText(poDisbursementController.CheckPayments().getModel().Banks().getBankName() != null ? poDisbursementController.CheckPayments().getModel().Banks().getBankName() : "");
-            tfSearchBankAccount.setText(poDisbursementController.CheckPayments().getModel().Bank_Account_Master().getAccountNo() != null ? poDisbursementController.CheckPayments().getModel().Bank_Account_Master().getAccountNo() : "");
+            tfSearchBankName.setText(poDisbursementController.getSearchBankName());
+            tfSearchBankAccount.setText(poDisbursementController.getSearchBankAccountNo());
             JFXUtil.updateCaretPositions(apBrowse);
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
@@ -251,16 +258,16 @@ public class DisbursementVoucher_CertificationController implements Initializabl
                         }
                         break;
                     case "tfSearchBankName":
-                        if (lsValue.isEmpty()) {
-                            poDisbursementController.CheckPayments().getModel().setBankID("");
-                            poDisbursementController.CheckPayments().getModel().setBankAcountID("");
+                        if (lsValue.isEmpty()) {;
+                            poDisbursementController.setSearchBankName("");
+                            poDisbursementController.setSearchBankAccountNo("");
                             psSearchBankID = "";
                             psSearchBankAccountID = "";
                         }
                         break;
                     case "tfSearchBankAccount":
                         if (lsValue.isEmpty()) {
-                            poDisbursementController.CheckPayments().getModel().setBankAcountID("");
+                            poDisbursementController.setSearchBankAccountNo("");
                             psSearchBankAccountID = "";
                         }
                         break;
@@ -295,7 +302,7 @@ public class DisbursementVoucher_CertificationController implements Initializabl
                                 }
                                 break;
                             case "tfSearchBankName":
-                                poJSON = poDisbursementController.SearchBanks(lsValue, false);
+                                poJSON = poDisbursementController.SearchBanks(lsValue, false, true);
                                 if ("error".equals((String) poJSON.get("result"))) {
                                     ShowMessageFX.Information(null, pxeModuleName, (String) poJSON.get("message"));
                                     return;
@@ -306,7 +313,7 @@ public class DisbursementVoucher_CertificationController implements Initializabl
                                 psSearchBankID = poDisbursementController.CheckPayments().getModel().getBankID();
                                 break;
                             case "tfSearchBankAccount":
-                                poJSON = poDisbursementController.SearchBankAccount(lsValue, poDisbursementController.CheckPayments().getModel().getBankID(), false);
+                                poJSON = poDisbursementController.SearchBankAccount(lsValue, poDisbursementController.CheckPayments().getModel().getBankID(), false, true);
                                 if ("error".equals((String) poJSON.get("result"))) {
                                     ShowMessageFX.Information(null, pxeModuleName, (String) poJSON.get("message"));
                                     return;

@@ -155,12 +155,17 @@ public class CheckPrintingController implements Initializable, ScreenInterface {
             pagination.setPageCount(1);
 
             Platform.runLater(() -> {
-                poController.Master().setIndustryID(psIndustryId);
-                poController.Master().setCompanyID(psCompanyId);
-                poController.setIndustryID(psIndustryId);
-                poController.setCompanyID(psCompanyId);
-                poController.setCategoryID(psCategoryId);
-                loadRecordSearch();
+                try {
+                    poController.Master().setIndustryID(psIndustryId);
+                    poController.Master().setCompanyID(psCompanyId);
+                    poController.setIndustryID(psIndustryId);
+                    poController.setCompanyID(psCompanyId);
+                    poController.setCategoryID(psCategoryId);
+                    loadRecordSearch();
+                    lblSource.setText(poController.Master().Company().getCompanyName() + " - " + poController.Master().Industry().getDescription());
+                } catch (SQLException | GuanzonException ex) {
+                    Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+                }
             });
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
@@ -200,7 +205,14 @@ public class CheckPrintingController implements Initializable, ScreenInterface {
                             //set external temporary data of index to save as reference
                             // if detected unchecked then must update
                             pnMain = rowIndex;
-                            loadTableMain.reload();
+                            Platform.runLater(() -> {
+                                loadTableMain.reload();
+                                JFXUtil.runWithDelay(0.30, () -> {
+                                    if (lbisTrue) {
+                                        JFXUtil.selectAndFocusRow(tblViewMainList, rowIndex);
+                                    }
+                                });
+                            });
                             break;
                     }
                 }, 1);//starts 0,1,2 
@@ -228,11 +240,9 @@ public class CheckPrintingController implements Initializable, ScreenInterface {
 
     private void loadRecordSearch() {
         try {
-            lblSource.setText(poController.Master().Company().getCompanyName() + " - " + poController.Master().Industry().getDescription());
             tfSearchIndustry.setText(poController.getSearchIndustry());
-            tfSearchBankName.setText(poController.CheckPayments().getModel().Banks().getBankName() != null ? poController.CheckPayments().getModel().Banks().getBankName() : "");
-            tfSearchBankAccount.setText(poController.CheckPayments().getModel().Bank_Account_Master().getAccountNo() != null ? poController.CheckPayments().getModel().Bank_Account_Master().getAccountNo() : "");
-
+            tfSearchBankName.setText(poController.getSearchBankName());
+            tfSearchBankAccount.setText(poController.getSearchBankAccountNo());
             //define if both are empty
             if (dpDVDateFrom.getEditor().getText().equals("")) {
                 String lsDateFrom = CustomCommonUtil.formatDateToShortString(getFirstDayOfMonth(oApp.getServerDate()));
@@ -246,7 +256,7 @@ public class CheckPrintingController implements Initializable, ScreenInterface {
             }
 
             JFXUtil.updateCaretPositions(apBrowse);
-        } catch (SQLException | GuanzonException ex) {
+        } catch (SQLException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
             ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
@@ -393,15 +403,15 @@ public class CheckPrintingController implements Initializable, ScreenInterface {
                         break;
                     case "tfSearchBankName":
                         if (lsValue.isEmpty()) {
-                            poController.CheckPayments().getModel().setBankID("");
-                            poController.CheckPayments().getModel().setBankAcountID("");
+                            poController.setSearchBankName("");
+                            poController.setSearchBankAccountNo("");
                             psSearchBankID = "";
                             psSearchBankAccountID = "";
                         }
                         break;
                     case "tfSearchBankAccount":
                         if (lsValue.isEmpty()) {
-                            poController.CheckPayments().getModel().setBankAcountID("");
+                            poController.setSearchBankAccountNo("");
                             psSearchBankAccountID = "";
                         }
                         break;
@@ -484,7 +494,7 @@ public class CheckPrintingController implements Initializable, ScreenInterface {
                                 }
                                 break;
                             case "tfSearchBankName":
-                                poJSON = poController.SearchBanks(lsValue, false);
+                                poJSON = poController.SearchBanks(lsValue, false, true);
                                 if ("error".equals((String) poJSON.get("result"))) {
                                     ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                     return;
@@ -495,7 +505,7 @@ public class CheckPrintingController implements Initializable, ScreenInterface {
                                 psSearchBankID = poController.CheckPayments().getModel().getBankID();
                                 break;
                             case "tfSearchBankAccount":
-                                poJSON = poController.SearchBankAccount(lsValue, poController.CheckPayments().getModel().getBankID(), false);
+                                poJSON = poController.SearchBankAccount(lsValue, poController.CheckPayments().getModel().getBankID(), false, true);
                                 if ("error".equals((String) poJSON.get("result"))) {
                                     ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                     return;
