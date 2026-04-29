@@ -629,6 +629,11 @@ public class APPaymentAdjustment_ConfirmationMCController implements Initializab
 
     public void loadRecordMaster() {
         try {
+            if (APPaymentAdjustmentStatus.CONFIRMED.equals(poAPPaymentAdjustmentController.APPaymentAdjustment().getModel().getTransactionStatus())) {
+                btnVoid.setText("Cancel");
+            } else {
+                btnVoid.setText("Void");
+            }
             tfTransactionNo.setText(poAPPaymentAdjustmentController.APPaymentAdjustment().getModel().getTransactionNo());
             Platform.runLater(() -> {
                 String lsActive = pnEditMode == EditMode.UNKNOWN ? "-1" : poAPPaymentAdjustmentController.APPaymentAdjustment().getModel().getTransactionStatus();
@@ -739,7 +744,7 @@ public class APPaymentAdjustment_ConfirmationMCController implements Initializab
                     case "btnSave":
                         //Validator
                         poJSON = new JSONObject();
-                        if (ShowMessageFX.YesNo(null, "Close Tab", "Are you sure you want to save the transaction?") == true) {
+                        if (ShowMessageFX.YesNo(null, pxeModuleName, "Are you sure you want to save the transaction?") == true) {
                             poAPPaymentAdjustmentController.APPaymentAdjustment().getModel().setClientId(psSupplierId);
                             poAPPaymentAdjustmentController.APPaymentAdjustment().getModel().setCompanyId(psCompanyId);
                             poJSON = poAPPaymentAdjustmentController.APPaymentAdjustment().SaveTransaction();
@@ -797,7 +802,13 @@ public class APPaymentAdjustment_ConfirmationMCController implements Initializab
                         break;
                     case "btnVoid":
                         poJSON = new JSONObject();
-                        if (ShowMessageFX.YesNo(null, "Close Tab", "Are you sure you want to void transaction?") == true) {
+                        String lsStatus = "";
+                        if (APPaymentAdjustmentStatus.CONFIRMED.equals(poAPPaymentAdjustmentController.APPaymentAdjustment().getModel().getTransactionStatus())) {
+                            lsStatus = "cancel";
+                        } else {
+                            lsStatus = "void";
+                        }
+                        if (ShowMessageFX.YesNo(null, pxeModuleName, "Are you sure you want to " + lsStatus + " transaction?") == true) {
                             if (poAPPaymentAdjustmentController.APPaymentAdjustment().getModel().getTransactionStatus().equals(APPaymentAdjustmentStatus.OPEN)) {
                                 poJSON = poAPPaymentAdjustmentController.APPaymentAdjustment().VoidTransaction("");
                             } else {
@@ -817,7 +828,7 @@ public class APPaymentAdjustment_ConfirmationMCController implements Initializab
                         break;
                     case "btnReturn":
                         poJSON = new JSONObject();
-                        if (ShowMessageFX.YesNo(null, "Close Tab", "Are you sure you want to return transaction?") == true) {
+                        if (ShowMessageFX.YesNo(null, pxeModuleName, "Are you sure you want to return transaction?") == true) {
                             poJSON = poAPPaymentAdjustmentController.APPaymentAdjustment().ReturnTransaction("");
                             if ("error".equals((String) poJSON.get("result"))) {
                                 ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
