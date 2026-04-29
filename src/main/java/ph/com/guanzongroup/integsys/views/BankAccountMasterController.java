@@ -234,6 +234,8 @@ public class BankAccountMasterController implements Initializable, ScreenInterfa
                         poJSON = oCashflow.newRecord();
                         pnEditMode = EditMode.READY;
                         if ("success".equals((String) poJSON.get("result"))) {
+                            oCashflow.getModel().setIndustryCode(psIndustryID);
+                            oCashflow.getModel().setCompanyId(psCompanyID);
                             pnEditMode = oCashflow.getEditMode();
                             initButton(pnEditMode);
                             initTabAnchor();
@@ -303,9 +305,11 @@ public class BankAccountMasterController implements Initializable, ScreenInterfa
                         JSONObject saveResult = oCashflow.saveRecord();
                         if ("success".equals((String) saveResult.get("result"))) {
                             ShowMessageFX.Information((String) saveResult.get("message"), "Computerized Acounting System", pxeModuleName);
+                            initializeObject();
                             pnEditMode = EditMode.UNKNOWN;
                             initButton(pnEditMode);
                             clearAllFields();
+                            btnNew.fire();
                         } else {
                             ShowMessageFX.Information((String) saveResult.get("message"), "Computerized Acounting System", pxeModuleName);
                         }
