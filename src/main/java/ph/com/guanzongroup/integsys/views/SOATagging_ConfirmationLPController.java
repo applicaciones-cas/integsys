@@ -265,7 +265,7 @@ public class SOATagging_ConfirmationLPController implements Initializable, Scree
                     case "btnSave":
                         //Validator
                         poJSON = new JSONObject();
-                        if (ShowMessageFX.YesNo(null, "Close Tab", "Are you sure you want to save the transaction?") == true) {
+                        if (ShowMessageFX.YesNo(null, pxeModuleName, "Are you sure you want to save the transaction?") == true) {
                             poSOATaggingController.SOATagging().Master().setClientId(psSupplierId);
                             poSOATaggingController.SOATagging().Master().setCompanyId(psCompanyId);
                             poJSON = poSOATaggingController.SOATagging().SaveTransaction();
@@ -313,7 +313,16 @@ public class SOATagging_ConfirmationLPController implements Initializable, Scree
                         break;
                     case "btnVoid":
                         poJSON = new JSONObject();
-                        if (ShowMessageFX.YesNo(null, "Close Tab", "Are you sure you want to void transaction?") == true) {
+                        String lsStat = "";
+                        switch (poSOATaggingController.SOATagging().Master().getTransactionStatus()) {
+                            case SOATaggingStatus.OPEN:
+                                lsStat = "void";
+                                break;
+                            case SOATaggingStatus.CONFIRMED:
+                                lsStat = "cancel";
+                                break;
+                        }
+                        if (ShowMessageFX.YesNo(null, pxeModuleName, "Are you sure you want to " + lsStat + " transaction?") == true) {
                             switch (poSOATaggingController.SOATagging().Master().getTransactionStatus()) {
                                 case SOATaggingStatus.OPEN:
                                     poJSON = poSOATaggingController.SOATagging().VoidTransaction("");
@@ -937,6 +946,14 @@ public class SOATagging_ConfirmationLPController implements Initializable, Scree
 
     public void loadRecordMaster() {
         try {
+            switch (poSOATaggingController.SOATagging().Master().getTransactionStatus()) {
+                case SOATaggingStatus.OPEN:
+                    btnVoid.setText("Void");
+                    break;
+                case SOATaggingStatus.CONFIRMED:
+                    btnVoid.setText("Cancel");
+                    break;
+            }
             JFXUtil.setStatusValue(lblStatus, SOATaggingStatus.class, pnEditMode == EditMode.UNKNOWN ? "-1" : poSOATaggingController.SOATagging().Master().getTransactionStatus());
             poSOATaggingController.SOATagging().computeFields();
 

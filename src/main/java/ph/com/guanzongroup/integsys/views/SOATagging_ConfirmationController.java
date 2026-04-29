@@ -103,7 +103,7 @@ public class SOATagging_ConfirmationController implements Initializable, ScreenI
     @FXML
     private Label lblSource, lblStatus;
     @FXML
-    private TextField  tfSearchSupplier, tfSearchReferenceNo, tfTransactionNo, tfSOANo, tfCompany, tfClient, tfIssuedTo, tfTransactionTotal, tfDiscountAmount, tfFreight, tfVatAmount, tfNonVatSales, tfZeroVatSales, tfVatExemptSales, tfNetTotal, tfSourceNo, tfReferenceNo, tfCreditAmount, tfDebitAmount, tfAppliedAmtDetail;
+    private TextField tfSearchSupplier, tfSearchReferenceNo, tfTransactionNo, tfSOANo, tfCompany, tfClient, tfIssuedTo, tfTransactionTotal, tfDiscountAmount, tfFreight, tfVatAmount, tfNonVatSales, tfZeroVatSales, tfVatExemptSales, tfNetTotal, tfSourceNo, tfReferenceNo, tfCreditAmount, tfDebitAmount, tfAppliedAmtDetail;
     @FXML
     private HBox hbButtons, hboxid;
     @FXML
@@ -246,14 +246,14 @@ public class SOATagging_ConfirmationController implements Initializable, ScreenI
                             return;
                         }
                     case "btnHistory":
-                        if(pnEditMode != EditMode.READY && pnEditMode != EditMode.UPDATE){
+                        if (pnEditMode != EditMode.READY && pnEditMode != EditMode.UPDATE) {
                             ShowMessageFX.Warning("No transaction status history to load!", pxeModuleName, null);
                             return;
-                        } 
-                        
+                        }
+
                         try {
                             poSOATaggingController.SOATagging().ShowStatusHistory();
-                        }  catch (NullPointerException npe) {
+                        } catch (NullPointerException npe) {
                             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(npe), npe);
                             ShowMessageFX.Error("No transaction status history to load!", pxeModuleName, null);
                         } catch (Exception ex) {
@@ -267,7 +267,7 @@ public class SOATagging_ConfirmationController implements Initializable, ScreenI
                     case "btnSave":
                         //Validator
                         poJSON = new JSONObject();
-                        if (ShowMessageFX.YesNo(null, "Close Tab", "Are you sure you want to save the transaction?") == true) {
+                        if (ShowMessageFX.YesNo(null, pxeModuleName, "Are you sure you want to save the transaction?") == true) {
                             poSOATaggingController.SOATagging().Master().setClientId(psSupplierId);
                             poSOATaggingController.SOATagging().Master().setCompanyId(psCompanyId);
                             poJSON = poSOATaggingController.SOATagging().SaveTransaction();
@@ -315,7 +315,16 @@ public class SOATagging_ConfirmationController implements Initializable, ScreenI
                         break;
                     case "btnVoid":
                         poJSON = new JSONObject();
-                        if (ShowMessageFX.YesNo(null, "Close Tab", "Are you sure you want to void transaction?") == true) {
+                        String lsStat = "";
+                        switch (poSOATaggingController.SOATagging().Master().getTransactionStatus()) {
+                            case SOATaggingStatus.OPEN:
+                                lsStat = "void";
+                                break;
+                            case SOATaggingStatus.CONFIRMED:
+                                lsStat = "cancel";
+                                break;
+                        }
+                        if (ShowMessageFX.YesNo(null, pxeModuleName, "Are you sure you want to " + lsStat + " transaction?") == true) {
                             switch (poSOATaggingController.SOATagging().Master().getTransactionStatus()) {
                                 case SOATaggingStatus.OPEN:
                                     poJSON = poSOATaggingController.SOATagging().VoidTransaction("");
@@ -647,7 +656,7 @@ public class SOATagging_ConfirmationController implements Initializable, ScreenI
                                 ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                 break;
                             }
-    //                        psCompanyId = poSOATaggingController.SOATagging().Master().getCompanyId();
+                            //                        psCompanyId = poSOATaggingController.SOATagging().Master().getCompanyId();
                             loadRecordMaster();
                             return;
                         case "tfIssuedTo":
@@ -939,6 +948,14 @@ public class SOATagging_ConfirmationController implements Initializable, ScreenI
 
     public void loadRecordMaster() {
         try {
+            switch (poSOATaggingController.SOATagging().Master().getTransactionStatus()) {
+                case SOATaggingStatus.OPEN:
+                    btnVoid.setText("Void");
+                    break;
+                case SOATaggingStatus.CONFIRMED:
+                    btnVoid.setText("Cancel");
+                    break;
+            }
             JFXUtil.setStatusValue(lblStatus, SOATaggingStatus.class, pnEditMode == EditMode.UNKNOWN ? "-1" : poSOATaggingController.SOATagging().Master().getTransactionStatus());
             poSOATaggingController.SOATagging().computeFields();
 
@@ -1143,7 +1160,7 @@ public class SOATagging_ConfirmationController implements Initializable, ScreenI
             JFXUtil.setVerticalScroll(taRemarks);
         });
         JFXUtil.setFocusListener(txtArea_Focus, taRemarks);
-        JFXUtil.setFocusListener(txtMaster_Focus, tfCompany, tfClient, tfIssuedTo, tfSOANo, tfDiscountAmount,  tfSearchSupplier);
+        JFXUtil.setFocusListener(txtMaster_Focus, tfCompany, tfClient, tfIssuedTo, tfSOANo, tfDiscountAmount, tfSearchSupplier);
         JFXUtil.setFocusListener(txtDetail_Focus, tfSourceNo, tfReferenceNo, tfAppliedAmtDetail);
 
         JFXUtil.setKeyPressedListener(this::txtField_KeyPressed, apBrowse, apMaster, apDetail);
