@@ -1636,9 +1636,11 @@ public class DashboardController implements Initializable {
         new ControllerBinding(PettyCashDisbursement_ConfirmationController.class),
         new ControllerBinding(PettyCashDisbursement_ApprovalController.class),
         new ControllerBinding(PettyCashDisbursement_HistoryController.class),
-         new ControllerBinding(DisbursementVoucher_EntryController.class),
-         new ControllerBinding(DisbursementVoucher_ConfirmationController.class),
-         new ControllerBinding(DisbursementVoucher_HistoryController.class)
+        new ControllerBinding(DisbursementVoucher_EntryController.class),
+        new ControllerBinding(DisbursementVoucher_ConfirmationController.class),
+        new ControllerBinding(DisbursementVoucher_VerificationController.class),
+        new ControllerBinding(DisbursementVoucher_ApprovalController.class),
+        new ControllerBinding(DisbursementVoucher_HistoryController.class)
     };
 
     private void SIPostingWindowKeyEvent(Tab newTab, ScreenInterface fxObj, boolean isRemove) {
