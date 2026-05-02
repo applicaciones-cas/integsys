@@ -4,6 +4,7 @@
  */
 package ph.com.guanzongroup.integsys.views;
 
+import java.io.IOException;
 import ph.com.guanzongroup.integsys.model.ModelDisbursementVoucher_Detail;
 import ph.com.guanzongroup.integsys.model.ModelDisbursementVoucher_Main;
 import ph.com.guanzongroup.integsys.model.ModelJournalEntry_Detail;
@@ -38,6 +39,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
@@ -62,6 +64,7 @@ import static javafx.scene.input.KeyCode.UP;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.StackPane;
+import javafx.stage.Stage;
 import javafx.util.Duration;
 import javafx.util.Pair;
 import javax.script.ScriptException;
@@ -147,6 +150,10 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
             "CLEARED  / POSTED", "CANCELLED", "STALED", "HOLD / STOP PAYMENT",
             "BOUNCED / DISCHONORED", "VOID");
     ObservableList<String> documentType = ModelDeliveryAcceptance_Attachment.documentType;
+
+    JFXUtil.StageManager stageAttachment = new JFXUtil.StageManager();
+    AnchorPane root = null;
+    Scene scene = null;
     /* DV  & Journal */
     @FXML
     private AnchorPane AnchorMain, apButton, apMasterDetail, apDVMaster1, apMasterDVCheck, apMasterDVBTransfer, apMasterDVOp, apDVMaster2, apDVMaster3, apDVDetail, apMainList, apBrowse, apJournalMaster, apJournalDetails, apBIRDetail, apAttachments;
@@ -197,6 +204,91 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
     @Override
     public void setCategoryID(String fsValue) {
         psCategoryId = fsValue;
+    }
+    ChangeListener<Scene> WindowKeyEvent = (obs, oldScene, newScene) -> {
+        if (newScene != null) {
+            setKeyEvent(newScene);
+        }
+    };
+
+    public void TriggerWindowEvent() {
+        root = (AnchorPane) AnchorMain;
+        scene = root.getScene();
+        if (scene != null) {
+            setKeyEvent(scene);
+        } else {
+            root.sceneProperty().addListener(WindowKeyEvent);
+        }
+    }
+
+    public void RemoveWindowEvent() {
+        root.sceneProperty().removeListener(WindowKeyEvent);
+        scene.setOnKeyPressed(null);
+        stageAttachment.closeDialog();
+    }
+
+    private void setKeyEvent(Scene scene) {
+        scene.setOnKeyPressed(event -> {
+            if (event.getCode() == KeyCode.F5) {
+
+                if (JFXUtil.isObjectEqualTo(poController.getEditMode(), EditMode.ADDNEW, EditMode.READY, EditMode.UPDATE)) {
+                    if (poController.Detail(0).getSourceNo() != null && !poController.Detail(0).getSourceNo().isEmpty()) {
+                        pbIsCheckedAttachmentTab = true;
+                        try {
+                            poController.loadAttachments();
+                        } catch (GuanzonException | SQLException ex) {
+                            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+                            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
+                        }
+                        loadTableAttachment.reload();
+                    }
+                    showAttachmentDialog();
+                }
+            }
+            if (event.getCode() == KeyCode.F12) {
+                LoginControllerHolder.getMainController().eventf12(LoginControllerHolder.getMainController().getTab());
+            }
+        }
+        );
+        scene.focusOwnerProperty().addListener((obs, oldNode, newNode) -> {
+            if (newNode != null) {
+                if (newNode instanceof Button) {
+                } else {
+                    lastFocusedTextField.set(newNode);
+                    previousSearchedTextField.set(null);
+                }
+            }
+        });
+    }
+
+    public void showAttachmentDialog() {
+        poJSON = new JSONObject();
+        stageAttachment.closeDialog();
+        if (poController.getTransactionAttachmentCount() <= 0) {
+            ShowMessageFX.Warning(null, pxeModuleName, "No transaction attachment to load.");
+            return;
+        }
+        Map<String, Pair<String, String>> data = new HashMap<>();
+        data.clear();
+        int lnCount = 0;
+        for (int lnCtr = 0; lnCtr < poController.getTransactionAttachmentCount(); lnCtr++) {
+            if (RecordStatus.INACTIVE.equals(poController.TransactionAttachmentList(lnCtr).getModel().getRecordStatus())) {
+                continue;
+            }
+            lnCount += 1;
+            data.put(String.valueOf(lnCount), new Pair<>(String.valueOf(poController.TransactionAttachmentList(lnCtr).getModel().getFileName()),
+                    poController.TransactionAttachmentList(lnCtr).getModel().getDocumentType()));
+        }
+        AttachmentDialogController controller = new AttachmentDialogController();
+        controller.setOpenedImage(pnAttachment);
+        controller.addData(data);
+
+        try {
+            stageAttachment.showDialog((Stage) btnClose.getScene().getWindow(), getClass().getResource("/ph/com/guanzongroup/integsys/views/AttachmentDialog.fxml"), controller, "Attachment Dialog", false, false, true);
+        } catch (IOException ex) {
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
+        }
     }
 
     /**
@@ -549,6 +641,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                     break;
                 case "btnClose":
                     if (ShowMessageFX.YesNo(null, "Close Tab", "Are you sure you want to close this Tab?")) {
+                        stageAttachment.closeDialog();
                         poUnload.unloadForm(AnchorMain, oApp, pxeModuleName);
                     } else {
                         return;
@@ -700,6 +793,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
             ModelDisbursementVoucher_Main selected = (ModelDisbursementVoucher_Main) tblViewMainList.getSelectionModel().getSelectedItem();
             if (selected != null) {
                 try {
+                    stageAttachment.closeDialog();
                     int pnRowMain = Integer.parseInt(selected.getIndex01()) - 1;
                     pnMain = pnRowMain;
                     String lsPayableType = selected.getIndex11();
@@ -2698,6 +2792,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
     }
 
     private void clearTextFields() {
+        stageAttachment.closeDialog();
         JFXUtil.setValueToNull(previousSearchedTextField, lastFocusedTextField);
         JFXUtil.clearTextFields(apDVMaster1, apDVDetail, apDVMaster2, apDVMaster3, apMasterDVCheck, apMasterDVBTransfer, apMasterDVOp, apJournalMaster, apJournalDetails, apBIRDetail, apAttachments);
     }
