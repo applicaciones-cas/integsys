@@ -666,6 +666,7 @@ public class DisbursementVoucher_ApprovalController implements Initializable, Sc
                     break;
                 case "btnClose":
                     if (ShowMessageFX.YesNo(null, "Close Tab", "Are you sure you want to close this Tab?")) {
+                        stageAttachment.closeDialog();
                         poUnload.unloadForm(AnchorMain, oApp, pxeModuleName);
                     } else {
                         return;
