@@ -431,6 +431,7 @@ public class DisbursementVoucher_HistoryController implements Initializable, Scr
             String lsButton = ((Button) event.getSource()).getId();
             switch (lsButton) {
                 case "btnBrowse":
+                    stageAttachment.closeDialog();
                     poController.Master().setIndustryID(psIndustryId);
                     poController.Master().setCompanyID(psCompanyId);
                     poController.Master().setBranchCode(oApp.getBranchCode());

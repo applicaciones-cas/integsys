@@ -483,6 +483,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
             String lsButton = ((Button) event.getSource()).getId();
             switch (lsButton) {
                 case "btnBrowse":
+                    stageAttachment.closeDialog();
                     poController.Master().setIndustryID(psIndustryId);
                     poController.Master().setCompanyID(psCompanyId);
                     poController.Master().setBranchCode(oApp.getBranchCode());
