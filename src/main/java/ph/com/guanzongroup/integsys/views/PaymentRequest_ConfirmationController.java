@@ -128,7 +128,6 @@ public class PaymentRequest_ConfirmationController implements Initializable, Scr
     private ObservableList<ModelTableDetail> detail_data = FXCollections.observableArrayList();
     private ObservableList<ModelPRFAttachment> attachment_data = FXCollections.observableArrayList();
     ObservableList<String> documentType = ModelPRFAttachment.documentType;
-    Map<String, String> imageinfo_temp = new HashMap<>();
     AtomicReference<Object> lastFocusedTextField = new AtomicReference<>();
     AtomicReference<Object> previousSearchedTextField = new AtomicReference<>();
     @FXML
@@ -531,13 +530,6 @@ public class PaymentRequest_ConfirmationController implements Initializable, Scr
                                 return;
                             }
                         }
-                        if (imageinfo_temp.containsKey(selectedFile.getName().toString())) {
-                            ShowMessageFX.Warning(null, psFormName, "File name already exists.");
-                            loadRecordAttachment(true);
-                            return;
-                        } else {
-                            imageinfo_temp.put(selectedFile.getName().toString(), imgPath.toString());
-                        }
 
                         //Limit maximum pages of pdf to add
                         if (imgPath2.toLowerCase().endsWith(".pdf")) {
@@ -582,7 +574,6 @@ public class PaymentRequest_ConfirmationController implements Initializable, Scr
                     if (pnAttachment != 0) {
                         pnAttachment -= 1;
                     }
-                    imageinfo_temp.clear();
                     loadRecordAttachment(false);
                     loadTableAttachment();
                     if (attachment_data.size() <= 0) {
@@ -705,15 +696,12 @@ public class PaymentRequest_ConfirmationController implements Initializable, Scr
                     try {
                         String filePath = (String) attachment_data.get(tblAttachments.getSelectionModel().getSelectedIndex()).getIndex02();
                         String filePath2 = "";
-                        if (imageinfo_temp.containsKey((String) attachment_data.get(tblAttachments.getSelectionModel().getSelectedIndex()).getIndex02())) {
-                            filePath2 = imageinfo_temp.get((String) attachment_data.get(tblAttachments.getSelectionModel().getSelectedIndex()).getIndex02());
+
+                        // in server
+                        if (poGLControllers.PaymentRequest().TransactionAttachmentList(pnAttachment).getModel().getImagePath() != null && !"".equals(poGLControllers.PaymentRequest().TransactionAttachmentList(pnAttachment).getModel().getImagePath())) {
+                            filePath2 = poGLControllers.PaymentRequest().TransactionAttachmentList(pnAttachment).getModel().getImagePath() + "/" + (String) attachment_data.get(tblAttachments.getSelectionModel().getSelectedIndex()).getIndex02();
                         } else {
-                            // in server
-                            if (poGLControllers.PaymentRequest().TransactionAttachmentList(pnAttachment).getModel().getImagePath() != null && !"".equals(poGLControllers.PaymentRequest().TransactionAttachmentList(pnAttachment).getModel().getImagePath())) {
-                                filePath2 = poGLControllers.PaymentRequest().TransactionAttachmentList(pnAttachment).getModel().getImagePath() + "/" + (String) attachment_data.get(tblAttachments.getSelectionModel().getSelectedIndex()).getIndex02();
-                            } else {
-                                filePath2 = System.getProperty("sys.default.path.temp.attachments") + "/" + (String) attachment_data.get(tblAttachments.getSelectionModel().getSelectedIndex()).getIndex02();
-                            }
+                            filePath2 = System.getProperty("sys.default.path.temp.attachments") + "/" + (String) attachment_data.get(tblAttachments.getSelectionModel().getSelectedIndex()).getIndex02();
                         }
 
                         if (filePath != null && !filePath.isEmpty()) {

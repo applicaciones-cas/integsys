@@ -127,7 +127,6 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
     private int currentIndex = 0;
     double ldstackPaneWidth = 0;
     double ldstackPaneHeight = 0;
-    Map<String, String> imageinfo_temp = new HashMap<>();
 
     private ObservableList<ModelTableMain> main_data = FXCollections.observableArrayList();
     private ObservableList<ModelTableDetail> detail_data = FXCollections.observableArrayList();
@@ -633,13 +632,6 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
                                 return;
                             }
                         }
-                        if (imageinfo_temp.containsKey(selectedFile.getName().toString())) {
-                            ShowMessageFX.Warning(null, psFormName, "File name already exists.");
-                            loadRecordAttachment(true);
-                            return;
-                        } else {
-                            imageinfo_temp.put(selectedFile.getName().toString(), imgPath.toString());
-                        }
 
                         //Limit maximum pages of pdf to add
                         if (imgPath2.toLowerCase().endsWith(".pdf")) {
@@ -684,7 +676,6 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
                     if (pnAttachment != 0) {
                         pnAttachment -= 1;
                     }
-                    imageinfo_temp.clear();
                     loadRecordAttachment(false);
                     loadTableAttachment();
                     if (attachment_data.size() <= 0) {
@@ -760,15 +751,12 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
                     try {
                         String filePath = (String) attachment_data.get(tblAttachments.getSelectionModel().getSelectedIndex()).getIndex02();
                         String filePath2 = "";
-                        if (imageinfo_temp.containsKey((String) attachment_data.get(tblAttachments.getSelectionModel().getSelectedIndex()).getIndex02())) {
-                            filePath2 = imageinfo_temp.get((String) attachment_data.get(tblAttachments.getSelectionModel().getSelectedIndex()).getIndex02());
+
+                        // in server
+                        if (poGLControllers.PaymentRequest().TransactionAttachmentList(pnAttachment).getModel().getImagePath() != null && !"".equals(poGLControllers.PaymentRequest().TransactionAttachmentList(pnAttachment).getModel().getImagePath())) {
+                            filePath2 = poGLControllers.PaymentRequest().TransactionAttachmentList(pnAttachment).getModel().getImagePath() + "/" + (String) attachment_data.get(tblAttachments.getSelectionModel().getSelectedIndex()).getIndex02();
                         } else {
-                            // in server
-                            if (poGLControllers.PaymentRequest().TransactionAttachmentList(pnAttachment).getModel().getImagePath() != null && !"".equals(poGLControllers.PaymentRequest().TransactionAttachmentList(pnAttachment).getModel().getImagePath())) {
-                                filePath2 = poGLControllers.PaymentRequest().TransactionAttachmentList(pnAttachment).getModel().getImagePath() + "/" + (String) attachment_data.get(tblAttachments.getSelectionModel().getSelectedIndex()).getIndex02();
-                            } else {
-                                filePath2 = System.getProperty("sys.default.path.temp.attachments") + "/" + (String) attachment_data.get(tblAttachments.getSelectionModel().getSelectedIndex()).getIndex02();
-                            }
+                            filePath2 = System.getProperty("sys.default.path.temp.attachments") + "/" + (String) attachment_data.get(tblAttachments.getSelectionModel().getSelectedIndex()).getIndex02();
                         }
 
                         if (filePath != null && !filePath.isEmpty()) {
