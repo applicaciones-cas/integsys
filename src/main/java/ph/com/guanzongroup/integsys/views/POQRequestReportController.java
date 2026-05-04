@@ -206,29 +206,34 @@ public class POQRequestReportController implements Initializable, ScreenInterfac
 
     @FXML
     private void cmdButton_Click(ActionEvent event) {
-        poJSON = new JSONObject();
-        String lsButton = ((Button) event.getSource()).getId();
-        switch (lsButton) {
-            case "btnRetrieve":
-                loadTableMain.reload();
-                break;
-            case "btnPrint":
-//                poJSON = poController.printTransaction();
-                if (!JFXUtil.isJSONSuccess(poJSON)) {
-                    ShowMessageFX.Information(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
-                }
-                loadTableMain.reload();
-                break;
-            case "btnClose":
-                if (ShowMessageFX.YesNo(null, "Close Tab", "Are you sure you want to close this Tab?")) {
-                    poUnload.unloadForm(AnchorMain, oApp, pxeModuleName);
-                }
-                break;
-            default:
-                ShowMessageFX.Warning("Button is not registered, Please contact admin to assist about the unregistered button", pxeModuleName, null);
-                break;
+        try {
+            poJSON = new JSONObject();
+            String lsButton = ((Button) event.getSource()).getId();
+            switch (lsButton) {
+                case "btnRetrieve":
+                    loadTableMain.reload();
+                    break;
+                case "btnPrint":
+                    poJSON = poController.printReport(rbSummary.isSelected(), psSearchDateFrom, psSearchDateTo);
+                    if (!JFXUtil.isJSONSuccess(poJSON)) {
+                        ShowMessageFX.Information(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
+                    }
+                    loadTableMain.reload();
+                    break;
+                case "btnClose":
+                    if (ShowMessageFX.YesNo(null, "Close Tab", "Are you sure you want to close this Tab?")) {
+                        poUnload.unloadForm(AnchorMain, oApp, pxeModuleName);
+                    }
+                    break;
+                default:
+                    ShowMessageFX.Warning("Button is not registered, Please contact admin to assist about the unregistered button", pxeModuleName, null);
+                    break;
+            }
+            initButtons();
+        } catch (CloneNotSupportedException | SQLException | GuanzonException ex) {
+            Logger.getLogger(POQRequestReportController.class.getName()).log(Level.SEVERE, null, ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
-        initButtons();
     }
 
     private void initToggleGroup() {
