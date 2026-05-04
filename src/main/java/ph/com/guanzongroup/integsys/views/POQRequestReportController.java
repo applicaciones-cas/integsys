@@ -155,6 +155,12 @@ public class POQRequestReportController implements Initializable, ScreenInterfac
                 Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
             }
         });
+        boolean lbShow = rbSummary.isSelected();
+        tblTransactionTotal.setVisible(lbShow);
+        tblQuantity.setVisible(!lbShow);
+        tblUnitPrice.setVisible(!lbShow);
+        tblTotal.setVisible(!lbShow);
+        loadTableMain.reload();
 //        } catch (SQLException | GuanzonException ex) {
 //            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
 //            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
@@ -475,7 +481,7 @@ public class POQRequestReportController implements Initializable, ScreenInterfac
                                                 obj.get("xSupplier") != null ? obj.get("xSupplier").toString() : "", // Supplier
                                                 obj.get("xTermCode") != null ? obj.get("xTermCode").toString() : "", // Term
                                                 CustomCommonUtil.setIntegerValueToDecimalFormat(obj.get("xTranTotal") != null ? obj.get("xTranTotal").toString() : "", false), // Transaction Total
-                                                obj.get("xQuantity") != null ? obj.get("xQuantity").toString() : "",
+                                                CustomCommonUtil.setIntegerValueToDecimalFormat(obj.get("xQuantity") != null ? obj.get("xQuantity").toString() : "", false),
                                                 CustomCommonUtil.setIntegerValueToDecimalFormat(obj.get("xUnitPrce") != null ? obj.get("xUnitPrce").toString() : "", false),
                                                 CustomCommonUtil.setIntegerValueToDecimalFormat(obj.get("xDetTotal") != null ? obj.get("xDetTotal").toString() : "", false)
                                         );
