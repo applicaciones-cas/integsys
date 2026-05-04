@@ -198,7 +198,7 @@
                                                                 <TableColumn fx:id="tblTransactionDate" maxWidth="100.0" minWidth="100.0" prefWidth="100.0" resizable="false" sortable="false" text="Date" />
                                                                 <TableColumn fx:id="tblReferenceNo" maxWidth="90.0" minWidth="90.0" prefWidth="90.0" resizable="false" sortable="false" text="Reference No" />
                                                                 <TableColumn fx:id="tblBranch" maxWidth="150.0" minWidth="150.0" prefWidth="150.0" resizable="false" sortable="false" text="Branch" />
-                                                                <TableColumn fx:id="tblDestination" maxWidth="100.0" minWidth="100.0" prefWidth="100.0" resizable="false" sortable="false" text="Destination" />
+                                                                <TableColumn fx:id="tblDestination" maxWidth="160.0" minWidth="160.0" prefWidth="160.0" resizable="false" sortable="false" text="Destination" />
                                                                 <TableColumn fx:id="tblDepartment" maxWidth="220.0" minWidth="220.0" prefWidth="220.0" resizable="false" sortable="false" text="Department" />
                                                                 <TableColumn fx:id="tblCategory" maxWidth="90.0" minWidth="90.0" prefWidth="90.0" resizable="false" sortable="false" text="Category" />
                                                                 <TableColumn fx:id="tblCompany" maxWidth="200.0" minWidth="200.0" prefWidth="200.0" resizable="false" sortable="false" text="Company" />
