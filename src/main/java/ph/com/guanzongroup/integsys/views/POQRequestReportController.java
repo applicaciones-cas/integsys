@@ -26,6 +26,7 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.Pagination;
@@ -76,6 +77,8 @@ public class POQRequestReportController implements Initializable, ScreenInterfac
 
     BooleanProperty disableRowCheckbox = new SimpleBooleanProperty(false);
     JFXUtil.ReloadableTableTask loadTableMain;
+    ObservableList<String> comboboxlist = FXCollections.observableArrayList("ALL", "OPEN", "CONFIRMED", "APPROVED", "POSTED", "RETURNED", "VOID", "CANCELLED");
+
     int pnMain = 0;
     @FXML
     private AnchorPane AnchorMain, apBrowse, apButton;
@@ -89,6 +92,8 @@ public class POQRequestReportController implements Initializable, ScreenInterfac
     private TextField tfSearchCompany, tfSearchIndustry, tfSearchCategory, tfSearchBranch, tfSearchDestination, tfSearchDepartment, tfSearchSupplier;
     @FXML
     private DatePicker dpDateFrom, dpDateTo;
+    @FXML
+    private ComboBox cmbStatus;
     @FXML
     private Button btnPrint, btnRetrieve, btnClose;
     @FXML
@@ -140,6 +145,7 @@ public class POQRequestReportController implements Initializable, ScreenInterfac
         initButtons();
         initDatePickers();
         initToggleGroup();
+        initComboBox();
         pagination.setPageCount(1);
 
         Platform.runLater(() -> {
@@ -466,7 +472,7 @@ public class POQRequestReportController implements Initializable, ScreenInterfac
                     Platform.runLater(() -> {
                         try {
                             main_data.clear();
-                            poJSON = poController.loadReport(rbSummary.isSelected(), psSearchDateFrom, psSearchDateTo);
+                            poJSON = poController.loadReport(rbSummary.isSelected(), psSearchDateFrom, psSearchDateTo, cmbStatus.getSelectionModel().getSelectedItem());
                             if ("success".equals(poJSON.get("result"))) {
                                 JSONArray unifiedPayments = (JSONArray) poJSON.get("data");
                                 if (unifiedPayments != null && !unifiedPayments.isEmpty()) {
@@ -519,6 +525,20 @@ public class POQRequestReportController implements Initializable, ScreenInterfac
                         initButtons();
                     });
                 });
+    }
+    EventHandler<ActionEvent> comboBoxActionListener = JFXUtil.CmbActionListener(
+            (cmbId, selectedIndex, selectedValue) -> {
+                switch (cmbId) {
+                    case "cmbStatus":
+                        loadTableMain.reload();
+                        break;
+                }
+            });
+
+    private void initComboBox() {
+        JFXUtil.setComboBoxItems(new JFXUtil.Pairs<>(comboboxlist, cmbStatus));
+        JFXUtil.setComboBoxActionListener(comboBoxActionListener, cmbStatus);
+        JFXUtil.initComboBoxCellDesignColor("#FF8201", cmbStatus);
     }
 
     private void initMainGrid() {
