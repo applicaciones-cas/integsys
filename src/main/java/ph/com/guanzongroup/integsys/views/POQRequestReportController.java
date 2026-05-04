@@ -242,6 +242,7 @@ public class POQRequestReportController implements Initializable, ScreenInterfac
                     case "rbDetailed":
                         break;
                 }
+                loadTableMain.reload();
             }
         });
     }
@@ -297,6 +298,7 @@ public class POQRequestReportController implements Initializable, ScreenInterfac
                         break;
                 }
                 loadRecordSearch();
+                loadTableMain.reload();
             });
 
     EventHandler<ActionEvent> datepicker_Action = JFXUtil.DatePickerAction(
@@ -395,7 +397,7 @@ public class POQRequestReportController implements Initializable, ScreenInterfac
                                 }
                                 break;
                             case "tfSearchDestination":
-                                poJSON = poController.SearchDestination(lsValue, false);
+                                poJSON = poController.SearchDestination(lsValue, false, true);
                                 if ("error".equals((String) poJSON.get("result"))) {
                                     ShowMessageFX.Information(null, pxeModuleName, (String) poJSON.get("message"));
                                     return;
@@ -462,8 +464,9 @@ public class POQRequestReportController implements Initializable, ScreenInterfac
                                                 obj.get("xCompanyx") != null ? obj.get("xCompanyx").toString() : "", // Company
                                                 obj.get("xSupplier") != null ? obj.get("xSupplier").toString() : "", // Supplier
                                                 obj.get("xTermCode") != null ? obj.get("xTermCode").toString() : "", // Term
-                                                obj.get("xTranTotal") != null ? obj.get("xTranTotal").toString() : "" // Transaction Total
+                                                CustomCommonUtil.setIntegerValueToDecimalFormat(obj.get("xTranTotal") != null ? obj.get("xTranTotal").toString() : "", false) // Transaction Total
                                         );
+
                                         main_data.add(loMain);
                                     }
                                 } else {

@@ -195,15 +195,15 @@
                                                             <columns>
                                                                 <TableColumn fx:id="tblRowNo" maxWidth="30.0" minWidth="30.0" prefWidth="30.0" resizable="false" sortable="false" text="No." />
                                                                 <TableColumn fx:id="tblTransactionNo" maxWidth="150.0" minWidth="150.0" prefWidth="150.0" resizable="false" sortable="false" text="Transaction No" />
-                                                                <TableColumn fx:id="tblTransactionDate" maxWidth="120.0" minWidth="120.0" prefWidth="120.0" resizable="false" sortable="false" text="Date" />
-                                                                <TableColumn fx:id="tblReferenceNo" maxWidth="250.0" minWidth="28.0" prefWidth="111.0" resizable="false" sortable="false" text="Reference No" />
-                                                                <TableColumn fx:id="tblBranch" maxWidth="472.0" minWidth="178.0" prefWidth="207.0" resizable="false" sortable="false" text="Branch" />
-                                                                <TableColumn fx:id="tblDestination" maxWidth="461.0" minWidth="183.0" prefWidth="183.0" resizable="false" sortable="false" text="Destination" />
-                                                                <TableColumn fx:id="tblDepartment" maxWidth="429.0" minWidth="111.0" prefWidth="111.0" resizable="false" sortable="false" text="Department" />
-                                                                <TableColumn fx:id="tblCategory" maxWidth="436.0" minWidth="64.0" prefWidth="116.0" resizable="false" sortable="false" text="Category" />
-                                                                <TableColumn fx:id="tblCompany" maxWidth="527.0" minWidth="92.0" prefWidth="99.0" resizable="false" sortable="false" text="Company" />
+                                                                <TableColumn fx:id="tblTransactionDate" maxWidth="100.0" minWidth="100.0" prefWidth="100.0" resizable="false" sortable="false" text="Date" />
+                                                                <TableColumn fx:id="tblReferenceNo" maxWidth="90.0" minWidth="90.0" prefWidth="90.0" resizable="false" sortable="false" text="Reference No" />
+                                                                <TableColumn fx:id="tblBranch" maxWidth="170.0" minWidth="170.0" prefWidth="170.0" resizable="false" sortable="false" text="Branch" />
+                                                                <TableColumn fx:id="tblDestination" maxWidth="100.0" minWidth="100.0" prefWidth="100.0" resizable="false" sortable="false" text="Destination" />
+                                                                <TableColumn fx:id="tblDepartment" maxWidth="220.0" minWidth="220.0" prefWidth="220.0" resizable="false" sortable="false" text="Department" />
+                                                                <TableColumn fx:id="tblCategory" maxWidth="90.0" minWidth="90.0" prefWidth="90.0" resizable="false" sortable="false" text="Category" />
+                                                                <TableColumn fx:id="tblCompany" maxWidth="200.0" minWidth="200.0" prefWidth="200.0" resizable="false" sortable="false" text="Company" />
                                                                 <TableColumn fx:id="tblSupplier" maxWidth="449.0" minWidth="108.0" prefWidth="153.0" resizable="false" sortable="false" text="Supplier" />
-                                                <TableColumn fx:id="tblTerm" maxWidth="449.0" minWidth="87.0" prefWidth="144.0" resizable="false" sortable="false" text="Term" />
+                                                <TableColumn fx:id="tblTerm" maxWidth="100.0" minWidth="100.0" prefWidth="100.0" resizable="false" sortable="false" text="Term" />
                                                 <TableColumn fx:id="tblTransactionTotal" maxWidth="118.0" minWidth="118.0" prefWidth="118.0" resizable="false" sortable="false" text="Transacton Total" />
                                                             </columns>
                                                             <GridPane.margin>
