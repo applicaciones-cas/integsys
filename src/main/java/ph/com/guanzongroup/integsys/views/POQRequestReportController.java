@@ -221,9 +221,9 @@ public class POQRequestReportController implements Initializable, ScreenInterfac
                     break;
                 case "btnPrint":
                     poJSON = poController.printReport(rbSummary.isSelected(), psSearchDateFrom, psSearchDateTo);
-                    if (!JFXUtil.isJSONSuccess(poJSON)) {
-                        ShowMessageFX.Information(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
-                    }
+//                    if (!JFXUtil.isJSONSuccess(poJSON)) {
+//                        ShowMessageFX.Information(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
+//                    }
                     loadTableMain.reload();
                     break;
                 case "btnClose":
