@@ -490,7 +490,7 @@ public class POQRequestReportController implements Initializable, ScreenInterfac
                                                 CustomCommonUtil.setIntegerValueToDecimalFormat(obj.get("xUnitPrce") != null ? obj.get("xUnitPrce").toString() : "", false),
                                                 CustomCommonUtil.setIntegerValueToDecimalFormat(obj.get("xQuantity") != null ? obj.get("xQuantity").toString() : "", false),
                                                 CustomCommonUtil.setIntegerValueToDecimalFormat(obj.get("xDetTotal") != null ? obj.get("xDetTotal").toString() : "", false),
-                                                ""
+                                                obj.get("xTranStat") != null ? obj.get("xTranStat").toString() : ""
                                         );
 
                                         main_data.add(loMain);
