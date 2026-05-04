@@ -28,6 +28,9 @@ public class ModelPOQRequestReport {
     public SimpleStringProperty index13;
     public SimpleStringProperty index14;
     public SimpleStringProperty index15;
+    public SimpleStringProperty index16;
+    public SimpleStringProperty index17;
+    public SimpleStringProperty index18;
     private CheckBox select;
 
     public ModelPOQRequestReport(
@@ -45,7 +48,10 @@ public class ModelPOQRequestReport {
             String index12,
             String index13,
             String index14,
-            String index15) {
+            String index15,
+            String index16,
+            String index17,
+            String index18) {
 
         this.index01 = new SimpleStringProperty(index01);
         this.select = new CheckBox();
@@ -63,6 +69,9 @@ public class ModelPOQRequestReport {
         this.index13 = new SimpleStringProperty(index13);
         this.index14 = new SimpleStringProperty(index14);
         this.index15 = new SimpleStringProperty(index15);
+        this.index16 = new SimpleStringProperty(index16);
+        this.index17 = new SimpleStringProperty(index17);
+        this.index18 = new SimpleStringProperty(index18);
     }
 
     public CheckBox getSelect() {
@@ -191,6 +200,30 @@ public class ModelPOQRequestReport {
 
     public void setIndex15(String index15) {
         this.index15.set(index15);
+    }
+
+    public String getIndex16() {
+        return index16.get();
+    }
+
+    public void setIndex16(String index16) {
+        this.index16.set(index16);
+    }
+
+    public String getIndex17() {
+        return index17.get();
+    }
+
+    public void setIndex17(String index17) {
+        this.index17.set(index17);
+    }
+
+    public String getIndex18() {
+        return index18.get();
+    }
+
+    public void setIndex18(String index18) {
+        this.index18.set(index18);
     }
 
 }

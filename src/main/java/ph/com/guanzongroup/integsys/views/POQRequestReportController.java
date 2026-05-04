@@ -94,7 +94,7 @@ public class POQRequestReportController implements Initializable, ScreenInterfac
     @FXML
     private TableView tblViewMainList;
     @FXML
-    private TableColumn tblRowNo, tblTransactionNo, tblTransactionDate, tblReferenceNo, tblBranch, tblDestination, tblDepartment, tblCategory, tblCompany, tblSupplier, tblTerm, tblTransactionTotal, tblQuantity, tblUnitPrice, tblTotal;
+    private TableColumn tblRowNo, tblTransactionNo, tblTransactionDate, tblReferenceNo, tblBranch, tblDestination, tblDepartment, tblCategory, tblCompany, tblSupplier, tblTerm, tblTransactionTotal, tblRow, tblItem, tblUnitPrice, tblQuantity, tblTotal, tblStatus;
     @FXML
     private Pagination pagination;
 
@@ -160,6 +160,8 @@ public class POQRequestReportController implements Initializable, ScreenInterfac
         tblQuantity.setVisible(!lbShow);
         tblUnitPrice.setVisible(!lbShow);
         tblTotal.setVisible(!lbShow);
+        tblRow.setVisible(!lbShow);
+        tblItem.setVisible(!lbShow);
         loadTableMain.reload();
 //        } catch (SQLException | GuanzonException ex) {
 //            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
@@ -258,6 +260,8 @@ public class POQRequestReportController implements Initializable, ScreenInterfac
                 tblQuantity.setVisible(!lbShow);
                 tblUnitPrice.setVisible(!lbShow);
                 tblTotal.setVisible(!lbShow);
+                tblRow.setVisible(!lbShow);
+                tblItem.setVisible(!lbShow);
                 loadTableMain.reload();
             }
         });
@@ -481,9 +485,12 @@ public class POQRequestReportController implements Initializable, ScreenInterfac
                                                 obj.get("xSupplier") != null ? obj.get("xSupplier").toString() : "", // Supplier
                                                 obj.get("xTermCode") != null ? obj.get("xTermCode").toString() : "", // Term
                                                 CustomCommonUtil.setIntegerValueToDecimalFormat(obj.get("xTranTotal") != null ? obj.get("xTranTotal").toString() : "", false), // Transaction Total
-                                                CustomCommonUtil.setIntegerValueToDecimalFormat(obj.get("xQuantity") != null ? obj.get("xQuantity").toString() : "", false),
+                                                obj.get("xEntryNox") != null ? obj.get("xEntryNox").toString() : "",
+                                                obj.get("xDetDescx") != null ? obj.get("xDetDescx").toString() : "",
                                                 CustomCommonUtil.setIntegerValueToDecimalFormat(obj.get("xUnitPrce") != null ? obj.get("xUnitPrce").toString() : "", false),
-                                                CustomCommonUtil.setIntegerValueToDecimalFormat(obj.get("xDetTotal") != null ? obj.get("xDetTotal").toString() : "", false)
+                                                CustomCommonUtil.setIntegerValueToDecimalFormat(obj.get("xQuantity") != null ? obj.get("xQuantity").toString() : "", false),
+                                                CustomCommonUtil.setIntegerValueToDecimalFormat(obj.get("xDetTotal") != null ? obj.get("xDetTotal").toString() : "", false),
+                                                ""
                                         );
 
                                         main_data.add(loMain);
@@ -515,9 +522,9 @@ public class POQRequestReportController implements Initializable, ScreenInterfac
     }
 
     private void initMainGrid() {
-        JFXUtil.setColumnCenter(tblRowNo, tblTransactionNo, tblTransactionDate, tblReferenceNo);
-        JFXUtil.setColumnLeft(tblBranch, tblDestination, tblDepartment, tblCategory, tblCompany, tblSupplier, tblTerm);
-        JFXUtil.setColumnRight(tblTransactionTotal, tblQuantity, tblUnitPrice, tblTotal);
+        JFXUtil.setColumnCenter(tblRowNo, tblTransactionNo, tblTransactionDate, tblReferenceNo, tblRow);
+        JFXUtil.setColumnLeft(tblBranch, tblDestination, tblDepartment, tblCategory, tblCompany, tblSupplier, tblTerm, tblItem, tblStatus);
+        JFXUtil.setColumnRight(tblTransactionTotal, tblUnitPrice, tblQuantity, tblTotal);
         JFXUtil.setColumnsIndexAndDisableReordering(tblViewMainList);
         filteredMain_Data = new FilteredList<>(main_data, b -> true);
         tblViewMainList.setItems(filteredMain_Data);
