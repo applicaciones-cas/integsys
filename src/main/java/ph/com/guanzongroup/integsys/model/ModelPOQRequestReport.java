@@ -25,6 +25,9 @@ public class ModelPOQRequestReport {
     public SimpleStringProperty index10;
     public SimpleStringProperty index11;
     public SimpleStringProperty index12;
+    public SimpleStringProperty index13;
+    public SimpleStringProperty index14;
+    public SimpleStringProperty index15;
     private CheckBox select;
 
     public ModelPOQRequestReport(
@@ -66,7 +69,10 @@ public class ModelPOQRequestReport {
             String index09,
             String index10,
             String index11,
-            String index12) {
+            String index12,
+            String index13,
+            String index14,
+            String index15) {
 
         this.index01 = new SimpleStringProperty(index01);
         this.select = new CheckBox();
@@ -81,6 +87,9 @@ public class ModelPOQRequestReport {
         this.index10 = new SimpleStringProperty(index10);
         this.index11 = new SimpleStringProperty(index11);
         this.index12 = new SimpleStringProperty(index12);
+        this.index13 = new SimpleStringProperty(index13);
+        this.index14 = new SimpleStringProperty(index14);
+        this.index15 = new SimpleStringProperty(index15);
     }
 
     public ModelPOQRequestReport(String index01,

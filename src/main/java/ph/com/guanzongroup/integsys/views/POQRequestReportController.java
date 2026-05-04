@@ -94,7 +94,7 @@ public class POQRequestReportController implements Initializable, ScreenInterfac
     @FXML
     private TableView tblViewMainList;
     @FXML
-    private TableColumn tblRowNo, tblTransactionNo, tblTransactionDate, tblReferenceNo, tblBranch, tblDestination, tblDepartment, tblCategory, tblCompany, tblSupplier, tblTerm, tblTransactionTotal;
+    private TableColumn tblRowNo, tblTransactionNo, tblTransactionDate, tblReferenceNo, tblBranch, tblDestination, tblDepartment, tblCategory, tblCompany, tblSupplier, tblTerm, tblTransactionTotal, tblQuantity, tblUnitPrice, tblTotal;
     @FXML
     private Pagination pagination;
 
@@ -247,6 +247,11 @@ public class POQRequestReportController implements Initializable, ScreenInterfac
                     case "rbDetailed":
                         break;
                 }
+                boolean lbShow = (selected.getId()).equals("rbSummary");
+                tblTransactionTotal.setVisible(lbShow);
+                tblQuantity.setVisible(!lbShow);
+                tblUnitPrice.setVisible(!lbShow);
+                tblTotal.setVisible(!lbShow);
                 loadTableMain.reload();
             }
         });
@@ -469,7 +474,10 @@ public class POQRequestReportController implements Initializable, ScreenInterfac
                                                 obj.get("xCompanyx") != null ? obj.get("xCompanyx").toString() : "", // Company
                                                 obj.get("xSupplier") != null ? obj.get("xSupplier").toString() : "", // Supplier
                                                 obj.get("xTermCode") != null ? obj.get("xTermCode").toString() : "", // Term
-                                                CustomCommonUtil.setIntegerValueToDecimalFormat(obj.get("xTranTotal") != null ? obj.get("xTranTotal").toString() : "", false) // Transaction Total
+                                                CustomCommonUtil.setIntegerValueToDecimalFormat(obj.get("xTranTotal") != null ? obj.get("xTranTotal").toString() : "", false), // Transaction Total
+                                                obj.get("xQuantity") != null ? obj.get("xQuantity").toString() : "",
+                                                CustomCommonUtil.setIntegerValueToDecimalFormat(obj.get("xUnitPrce") != null ? obj.get("xUnitPrce").toString() : "", false),
+                                                CustomCommonUtil.setIntegerValueToDecimalFormat(obj.get("xDetTotal") != null ? obj.get("xDetTotal").toString() : "", false)
                                         );
 
                                         main_data.add(loMain);
@@ -503,7 +511,7 @@ public class POQRequestReportController implements Initializable, ScreenInterfac
     private void initMainGrid() {
         JFXUtil.setColumnCenter(tblRowNo, tblTransactionNo, tblTransactionDate, tblReferenceNo);
         JFXUtil.setColumnLeft(tblBranch, tblDestination, tblDepartment, tblCategory, tblCompany, tblSupplier, tblTerm);
-        JFXUtil.setColumnRight(tblTransactionTotal);
+        JFXUtil.setColumnRight(tblTransactionTotal, tblQuantity, tblUnitPrice, tblTotal);
         JFXUtil.setColumnsIndexAndDisableReordering(tblViewMainList);
         filteredMain_Data = new FilteredList<>(main_data, b -> true);
         tblViewMainList.setItems(filteredMain_Data);
