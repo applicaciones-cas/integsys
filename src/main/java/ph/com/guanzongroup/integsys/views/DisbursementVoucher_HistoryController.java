@@ -283,10 +283,7 @@ public class DisbursementVoucher_HistoryController implements Initializable, Scr
                 try {
                     poController.Master().setIndustryID(psIndustryId);
                     poController.Master().setCompanyID(psCompanyId);
-                    poController.setIndustryID(psIndustryId);
                     poController.setCompanyID(psCompanyId);
-                    poController.setCategoryID(psCategoryId);
-                    poController.Master().setBranchCode(oApp.getBranchCode());
                     loadRecordSearch();
                     lblSource.setText(poController.Master().Company().getCompanyName() + " - " + poController.Master().Industry().getDescription());
                 } catch (SQLException | GuanzonException ex) {
@@ -435,7 +432,7 @@ public class DisbursementVoucher_HistoryController implements Initializable, Scr
                     poController.Master().setIndustryID(psIndustryId);
                     poController.Master().setCompanyID(psCompanyId);
                     poController.Master().setBranchCode(oApp.getBranchCode());
-                    poJSON = poController.SearchTransaction(tfSearchTransaction.getText());
+                    poJSON = poController.SearchTransaction(tfSearchTransaction.getText(),tfSearchSupplier.getText(),0);
                     if ("error".equalsIgnoreCase((String) poJSON.get("result"))) {
                         ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                         return;
@@ -1018,8 +1015,8 @@ public class DisbursementVoucher_HistoryController implements Initializable, Scr
                 switch (lsID) {
                     case "tfSearchSupplier":
                         if (lsValue.isEmpty()) {
-                            poController.Master().setPayeeID("");
-                            poController.Master().setSupplierClientID("");
+                            poController.setSearchPayee("");
+                            poController.setSearchClient("");
                         }
                         loadRecordSearch();
                         break;
@@ -1048,10 +1045,7 @@ public class DisbursementVoucher_HistoryController implements Initializable, Scr
                         switch (lsID) {
                             //apBrowse?
                             case "tfSearchTransaction":
-                                poController.Master().setIndustryID(psIndustryId);
-                                poController.Master().setCompanyID(psCompanyId);
-                                poController.Master().setBranchCode(oApp.getBranchCode());
-                                poJSON = poController.SearchTransaction(lsValue);
+                                poJSON = poController.SearchTransaction(lsValue,tfSearchSupplier.getText(),2);
                                 if ("error".equals((String) poJSON.get("result"))) {
                                     ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                     return;
@@ -1065,14 +1059,27 @@ public class DisbursementVoucher_HistoryController implements Initializable, Scr
                                 }
                                 break;
                             case "tfSearchSupplier":
-                                poJSON = poController.SearchPayee(lsValue, false, true);
+                                poJSON = poController.SearchTransaction(tfSearchTransaction.getText(),lsValue,4);
                                 if ("error".equals((String) poJSON.get("result"))) {
                                     ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                     return;
                                 } else {
+                                    psSearchTransactionNo = poController.Master().getTransactionNo();
                                     loadRecordSearch();
+                                    JFXUtil.clickTabByTitleText(tabPaneMain, "Disbursement Voucher");
+                                    pnEditMode = poController.getEditMode();
+                                    poController.populateJournal();
+                                    loadTableDetail.reload();
                                 }
                                 break;
+//                                poJSON = poController.SearchPayee(lsValue, false, true);
+//                                if ("error".equals((String) poJSON.get("result"))) {
+//                                    ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+//                                    return;
+//                                } else {
+//                                    loadRecordSearch();
+//                                }
+//                                break;
                         }
                         event.consume();
                         break;
@@ -1087,8 +1094,8 @@ public class DisbursementVoucher_HistoryController implements Initializable, Scr
     }
 
     private void loadRecordSearch() {
-        tfSearchSupplier.setText(poController.getSearchPayee() != null ? poController.getSearchPayee() : "");
-        tfSearchTransaction.setText(psSearchTransactionNo);
+//        tfSearchSupplier.setText(poController.getSearchPayee() != null ? poController.getSearchPayee() : "");
+//        tfSearchTransaction.setText(psSearchTransactionNo);
         JFXUtil.updateCaretPositions(apBrowse);
     }
 

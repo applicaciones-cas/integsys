@@ -54,7 +54,7 @@
                                                 <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="28.0" vgrow="SOMETIMES" />
                                             </rowConstraints>
                                             <children>
-                                            <Label text="Reference No.">
+                                            <Label text="Voucher No">
                                                     <font>
                                                         <Font name="System Bold" size="14.0" />
                                                     </font>
