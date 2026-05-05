@@ -1740,31 +1740,26 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
                         }
                         int lnRowCount = 0;
                         for (int lnCtr = 0; lnCtr < poGLControllers.PaymentRequest().getDetailCount(); lnCtr++) {
-                            //                        double totalNetDetailPayable = 0.00;
-//                        double totalTaxAmount = 0.00;
-//                        double lnAmount = poGLControllers.PaymentRequest().Detail(lnCtr).getAmount().doubleValue();
-//                        double lnDiscountAmount = poGLControllers.PaymentRequest().Detail(lnCtr).getAddDiscount().doubleValue();
+
                             String lsIsVatable = "N";
                             if (poGLControllers.PaymentRequest().Detail(lnCtr).isVatable()) {
-//                            poJSON = poGLControllers.PaymentRequest().computeNetPayableDetails(lnAmount - lnDiscountAmount, true, 0.12, 0.00);
                                 lsIsVatable = "Y";
                             }
-//                        } else {
-//                            poJSON = poGLControllers.PaymentRequest().computeNetPayableDetails(lnAmount - lnDiscountAmount, false, 0.12, 0.00);
-//                        }
-//                        totalTaxAmount = Double.parseDouble(poJSON.get("vat").toString());
-//                        totalNetDetailPayable = Double.parseDouble(poJSON.get("netPayable").toString());
                             if (!poGLControllers.PaymentRequest().Detail(lnCtr).isReverse()) {
                                 continue;
                             }
                             lnRowCount += 1;
+
+                            double lnDetailDiscountRate = poGLControllers.PaymentRequest().Detail(lnCtr).getAmount() * poGLControllers.PaymentRequest().Detail(lnCtr).getDiscount();
+                            double lnTotalDiscountAmount = poGLControllers.PaymentRequest().Detail(lnCtr).getAddDiscount() + lnDetailDiscountRate;
+
                             detail_data.add(new ModelTableDetail(
                                     String.valueOf(lnRowCount),
                                     poGLControllers.PaymentRequest().Detail(lnCtr).getParticularID(),
                                     poGLControllers.PaymentRequest().Detail(lnCtr).Particular().getDescription(),
                                     CustomCommonUtil.setIntegerValueToDecimalFormat(poGLControllers.PaymentRequest().Detail(lnCtr).getAmount(), true),
                                     CustomCommonUtil.setIntegerValueToDecimalFormat(poGLControllers.PaymentRequest().Detail(lnCtr).getDiscount(), true),
-                                    CustomCommonUtil.setIntegerValueToDecimalFormat(poGLControllers.PaymentRequest().Detail(lnCtr).getAddDiscount(), true),
+                                    CustomCommonUtil.setIntegerValueToDecimalFormat(lnTotalDiscountAmount, true),
                                     lsIsVatable,
                                     "0.00",
                                     CustomCommonUtil.setIntegerValueToDecimalFormat(poGLControllers.PaymentRequest().Detail(lnCtr).getNetTotal(), true),

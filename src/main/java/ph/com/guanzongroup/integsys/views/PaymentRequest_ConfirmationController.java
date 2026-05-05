@@ -1475,9 +1475,9 @@ public class PaymentRequest_ConfirmationController implements Initializable, Scr
                             for (int lnCntr = 0; lnCntr < poGLControllers.PaymentRequest().getPRFMasterCount(); lnCntr++) {
                                 main_data.add(new ModelTableMain(
                                         String.valueOf(lnCntr + 1),
-                                        poGLControllers.PaymentRequest().poPRFMaster(lnCntr).getTransactionNo(),
                                         poGLControllers.PaymentRequest().poPRFMaster(lnCntr).Branch().getBranchName(),
                                         poGLControllers.PaymentRequest().poPRFMaster(lnCntr).Payee().getPayeeName(),
+                                        poGLControllers.PaymentRequest().poPRFMaster(lnCntr).getTransactionNo(),
                                         poGLControllers.PaymentRequest().poPRFMaster(lnCntr).getTransactionStatus(),
                                         "", "", "", "", ""));
                             }
@@ -1615,23 +1615,16 @@ public class PaymentRequest_ConfirmationController implements Initializable, Scr
                         int detailCount = poGLControllers.PaymentRequest().getDetailCount();
                         int lnRowCount = 0;
                         for (int lnCtr = 0; lnCtr < detailCount; lnCtr++) {
-//                        double totalNetDetailPayable = 0.00;
-//                        double totalTaxAmount = 0.00;
-//                        double lnAmount = poGLControllers.PaymentRequest().Detail(lnCtr).getAmount().doubleValue();
-//                        double lnDiscountAmount = poGLControllers.PaymentRequest().Detail(lnCtr).getAddDiscount().doubleValue();
                             String lsIsVatable = "N";
                             if (poGLControllers.PaymentRequest().Detail(lnCtr).isVatable()) {
-//                            poJSON = poGLControllers.PaymentRequest().computeNetPayableDetails(lnAmount - lnDiscountAmount, true, 0.12, 0.00);
                                 lsIsVatable = "Y";
                             }
-//                        } else {
-//                            poJSON = poGLControllers.PaymentRequest().computeNetPayableDetails(lnAmount - lnDiscountAmount, false, 0.12, 0.00);
-//                        }
-//                        totalTaxAmount = Double.parseDouble(poJSON.get("vat").toString());
-//                        totalNetDetailPayable = Double.parseDouble(poJSON.get("netPayable").toString());
                             if (!poGLControllers.PaymentRequest().Detail(lnCtr).isReverse()) {
                                 continue;
                             }
+
+                            double lnDetailDiscountRate = poGLControllers.PaymentRequest().Detail(lnCtr).getAmount() * poGLControllers.PaymentRequest().Detail(lnCtr).getDiscount();
+                            double lnTotalDiscountAmount = poGLControllers.PaymentRequest().Detail(lnCtr).getAddDiscount() + lnDetailDiscountRate;
                             lnRowCount += 1;
                             detail_data.add(new ModelTableDetail(
                                     String.valueOf(lnRowCount),
@@ -1639,7 +1632,7 @@ public class PaymentRequest_ConfirmationController implements Initializable, Scr
                                     poGLControllers.PaymentRequest().Detail(lnCtr).Particular().getDescription(),
                                     CustomCommonUtil.setIntegerValueToDecimalFormat(poGLControllers.PaymentRequest().Detail(lnCtr).getAmount(), true),
                                     CustomCommonUtil.setIntegerValueToDecimalFormat(poGLControllers.PaymentRequest().Detail(lnCtr).getDiscount()),
-                                    CustomCommonUtil.setIntegerValueToDecimalFormat(poGLControllers.PaymentRequest().Detail(lnCtr).getAddDiscount(), true),
+                                    CustomCommonUtil.setIntegerValueToDecimalFormat(lnTotalDiscountAmount, true),
                                     lsIsVatable,
                                     "0.00",
                                     CustomCommonUtil.setIntegerValueToDecimalFormat(poGLControllers.PaymentRequest().Detail(lnCtr).getNetTotal(), true),
@@ -1791,7 +1784,7 @@ public class PaymentRequest_ConfirmationController implements Initializable, Scr
             ModelTableMain loSelectedPaymentRequest = (ModelTableMain) tblVwPaymentRequest.getSelectionModel().getSelectedItem();
             if (loSelectedPaymentRequest != null) {
                 try {
-                    String lsTransactionNo = loSelectedPaymentRequest.getIndex02();
+                    String lsTransactionNo = loSelectedPaymentRequest.getIndex04();
                     if (!JFXUtil.loadValidation(pnEditMode, psFormName, poGLControllers.PaymentRequest().Master().getTransactionNo(), lsTransactionNo)) {
                         return;
                     }
