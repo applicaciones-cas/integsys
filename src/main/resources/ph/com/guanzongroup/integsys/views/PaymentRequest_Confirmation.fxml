@@ -180,7 +180,7 @@
                             <children>
                                 <HBox prefHeight="100.0" prefWidth="200.0" spacing="5.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                     <children>
-                                        <TabPane fx:id="ImTabPane" maxWidth="-Infinity" minWidth="-Infinity" prefHeight="200.0" prefWidth="880.0" tabClosingPolicy="UNAVAILABLE" HBox.hgrow="NEVER">
+                                        <TabPane fx:id="ImTabPane" maxWidth="-Infinity" minWidth="-Infinity" prefHeight="200.0" prefWidth="890.0" tabClosingPolicy="UNAVAILABLE" HBox.hgrow="NEVER">
                                             <tabs>
                                                 <Tab fx:id="tabDetails" text="Details">
                                                     <content>
@@ -188,7 +188,7 @@
                                                             <children>
                                                                 <VBox spacing="5.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="5.0">
                                                                     <children>
-                                                                                <AnchorPane fx:id="apMaster" maxWidth="875.0" minWidth="875.0" style="-fx-border-color: orange;">
+                                                                                <AnchorPane fx:id="apMaster" minWidth="875.0" style="-fx-border-color: orange;">
                                                                                     <children>
                                                                                         <GridPane layoutX="33.0" layoutY="34.0" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="5.0">
                                                                                             <columnConstraints>
@@ -277,7 +277,7 @@
                                                                                                 <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="10.0" />
                                                                                                 <ColumnConstraints hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="200.0" />
                                                                         <ColumnConstraints hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="10.0" />
-                                                                        <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="80.0" />
+                                                                        <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="90.0" />
                                                                                                 <ColumnConstraints hgrow="SOMETIMES" maxWidth="10.0" minWidth="10.0" prefWidth="10.0" />
                                                                                                 <ColumnConstraints hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="180.0" />
                                                                                                 <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="10.0" />
@@ -301,7 +301,7 @@
                                                                                                 <Label text="Particular" GridPane.columnIndex="4" GridPane.rowIndex="2" />
                                                                                                 <Label text="Amount" GridPane.columnIndex="4" GridPane.rowIndex="3" />
                                                                                                 <Label text="Disc. Rate (%)" GridPane.columnIndex="4" GridPane.rowIndex="4" />
-                                                                                                <Label text="Disc. Amt" GridPane.columnIndex="4" GridPane.rowIndex="5" />
+                                                                                                <Label text="Addl. Disc. Amt" GridPane.columnIndex="4" GridPane.rowIndex="5" />
                                                                                                 <Label text="Reverse" GridPane.columnIndex="8" GridPane.rowIndex="4" />
                                                                                                 <Label text="Total Amount" GridPane.columnIndex="8" GridPane.rowIndex="5">
                                                                                                     <font>
@@ -462,6 +462,9 @@
                                                     </content>
                                                 </Tab>
                                             </tabs>
+                                 <HBox.margin>
+                                    <Insets bottom="5.0" />
+                                 </HBox.margin>
                                         </TabPane>
                                         <AnchorPane style="-fx-border-color: orange;">
                                             <children>
@@ -509,6 +512,9 @@
                                                     </children>
                                                 </GridPane>
                                             </children>
+                                 <HBox.margin>
+                                    <Insets bottom="5.0" top="5.0" />
+                                 </HBox.margin>
                                         </AnchorPane>
                                         <AnchorPane prefHeight="200.0" prefWidth="200.0" HBox.hgrow="ALWAYS" />
                                     </children>

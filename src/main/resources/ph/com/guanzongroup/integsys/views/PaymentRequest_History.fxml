@@ -284,6 +284,9 @@
                                                                                     </children>
                                                                                 </AnchorPane>
                                                                             </children>
+                                                         <padding>
+                                                            <Insets bottom="5.0" />
+                                                         </padding>
                                                                         </VBox>
                                                                     </children>
                                                                     <HBox.margin>
