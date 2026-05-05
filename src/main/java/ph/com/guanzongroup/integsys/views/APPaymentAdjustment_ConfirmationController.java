@@ -244,6 +244,8 @@ public class APPaymentAdjustment_ConfirmationController implements Initializable
                                 tfClient.setText("");
                                 psSupplierId = "";
                                 break;
+                            } else {
+                                JFXUtil.textFieldMoveNext(tfCreditAmount);
                             }
                             psSupplierId = poAPPaymentAdjustmentController.APPaymentAdjustment().getModel().getClientId();
                             loadRecordMaster();
@@ -254,6 +256,8 @@ public class APPaymentAdjustment_ConfirmationController implements Initializable
                                 ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                 tfIssuedTo.setText("");
                                 break;
+                            } else {
+                                JFXUtil.textFieldMoveNext(tfCreditAmount);
                             }
                             loadRecordMaster();
                             break;
@@ -868,7 +872,7 @@ public class APPaymentAdjustment_ConfirmationController implements Initializable
     public void retrieveAPAdjustment() {
         poJSON = new JSONObject();
         poAPPaymentAdjustmentController.APPaymentAdjustment().setRecordStatus(APPaymentAdjustmentStatus.OPEN + "" + APPaymentAdjustmentStatus.CONFIRMED);
-        poJSON =poAPPaymentAdjustmentController.APPaymentAdjustment().loadAPPaymentAdjustment("", tfSearchSupplier.getText(), tfSearchReferenceNo.getText());
+        poJSON = poAPPaymentAdjustmentController.APPaymentAdjustment().loadAPPaymentAdjustment("", tfSearchSupplier.getText(), tfSearchReferenceNo.getText());
         if (!"success".equals((String) poJSON.get("result"))) {
             ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
         } else {

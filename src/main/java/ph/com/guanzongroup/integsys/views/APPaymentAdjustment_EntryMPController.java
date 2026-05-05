@@ -154,6 +154,8 @@ public class APPaymentAdjustment_EntryMPController implements Initializable, Scr
                                 ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                 tfClient.setText("");
                                 break;
+                            } else {
+                                JFXUtil.textFieldMoveNext(tfCreditAmount);
                             }
                             loadRecordMaster();
                             break;
@@ -163,6 +165,8 @@ public class APPaymentAdjustment_EntryMPController implements Initializable, Scr
                                 ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                 tfIssuedTo.setText("");
                                 break;
+                            } else {
+                                JFXUtil.textFieldMoveNext(tfCreditAmount);
                             }
                             loadRecordMaster();
                             break;

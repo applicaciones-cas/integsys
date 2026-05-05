@@ -245,6 +245,8 @@ public class APPaymentAdjustment_ConfirmationAppliancesController implements Ini
                                 tfClient.setText("");
                                 psSupplierId = "";
                                 break;
+                            } else {
+                                JFXUtil.textFieldMoveNext(tfCreditAmount);
                             }
                             psSupplierId = poAPPaymentAdjustmentController.APPaymentAdjustment().getModel().getClientId();
                             loadRecordMaster();
@@ -255,6 +257,8 @@ public class APPaymentAdjustment_ConfirmationAppliancesController implements Ini
                                 ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                 tfIssuedTo.setText("");
                                 break;
+                            } else {
+                                JFXUtil.textFieldMoveNext(tfCreditAmount);
                             }
                             loadRecordMaster();
                             break;
