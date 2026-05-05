@@ -210,6 +210,7 @@ public class PaymentRequest_ConfirmationController implements Initializable, Scr
             Platform.runLater(() -> setBranchAndDepartment());
             initAll();
             JFXUtil.initKeyClickObject(AnchorMain, lastFocusedTextField, previousSearchedTextField);
+            pagination.setPageCount(1);
         } catch (ExceptionInInitializerError | SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
         }
@@ -1308,10 +1309,6 @@ public class PaymentRequest_ConfirmationController implements Initializable, Scr
                 tfDepartment);
         if (poApp.isMainOffice() || poApp.isWarehouse()) {
             tfDepartment.setDisable(!lbShow); //mag open siya pag add new or update sa editmode
-        }
-        if (tblVwPaymentRequest.getItems().isEmpty()) {
-            pagination.setVisible(false);
-            pagination.setManaged(false);
         }
     }
 

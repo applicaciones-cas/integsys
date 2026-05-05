@@ -112,7 +112,7 @@ public class PaymentRequest_HistoryController implements Initializable, ScreenIn
     @FXML
     private Label lblSource, lblStatus;
     @FXML
-    private TextField tfSourceTranTotal, tfAdvances, tfSearchPayee, tfTransactionNo, tfBranch, tfDepartment, tfPayee, tfSeriesNo, tfTotalAmount, tfDiscountAmount, tfNetAmount, tfSourceNo, tfRecurringNo, tfBranchDetail, tfAccountNo, tfEmployee, tfParticular, tfAmount, tfDiscRate, tfDiscAmountDetail, tfAmountDetail, tfAttachmentNo;
+    private TextField tfSearchTransaction, tfSourceTranTotal, tfAdvances, tfSearchPayee, tfTransactionNo, tfBranch, tfDepartment, tfPayee, tfSeriesNo, tfTotalAmount, tfDiscountAmount, tfNetAmount, tfSourceNo, tfRecurringNo, tfBranchDetail, tfAccountNo, tfEmployee, tfParticular, tfAmount, tfDiscRate, tfDiscAmountDetail, tfAmountDetail, tfAttachmentNo;
     @FXML
     private HBox hbButtons;
     @FXML
@@ -749,7 +749,7 @@ public class PaymentRequest_HistoryController implements Initializable, ScreenIn
     };
 
     private void initTextFieldKeyPressed() {
-        List<TextField> loTxtField = Arrays.asList(tfSearchPayee);
+        List<TextField> loTxtField = Arrays.asList(tfSearchPayee, tfSearchTransaction);
 
         loTxtField.forEach(tf -> tf.setOnKeyPressed(event -> txtField_KeyPressed(event)));
     }
@@ -768,25 +768,45 @@ public class PaymentRequest_HistoryController implements Initializable, ScreenIn
                 case TAB:
                 case ENTER:
                 case F3:
+                           try {
                     switch (txtFieldID) {
-                        case "tfSearchPayee": {
-                            try {
-                                poJSON = poGLControllers.PaymentRequest().SearchPayee(tfSearchPayee.getText(), false);
-                                if ("error".equals(poJSON.get("result"))) {
-                                    ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
-                                    tfPayee.setText("");
-                                    break;
-                                }
-                                prevPayee = poGLControllers.PaymentRequest().Master().getPayeeID();
-                                tfSearchPayee.setText(poGLControllers.PaymentRequest().Master().Payee().getPayeeName());
-                            } catch (ExceptionInInitializerError | SQLException | GuanzonException ex) {
-                                Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+                        case "tfSearchPayee":
+                            poJSON = poGLControllers.PaymentRequest().SearchPayee(tfSearchPayee.getText(), false);
+                            if ("error".equals(poJSON.get("result"))) {
+                                ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
+                                tfPayee.setText("");
+                                break;
                             }
-                        }
-                        break;
+                            prevPayee = poGLControllers.PaymentRequest().Master().getPayeeID();
+                            tfSearchPayee.setText(poGLControllers.PaymentRequest().Master().Payee().getPayeeName());
+                            break;
+                        case "tfSearchTransaction":
+                            poJSON = poGLControllers.PaymentRequest().SearchTransaction("", prevPayee);
+                            if ("error".equals(poJSON.get("result"))) {
+                                ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
+                                break;
+                            }
+                            clearMasterFields();
+                            clearDetailFields();
+                            loadRecordMaster();
+                            poGLControllers.PaymentRequest().loadAttachments();
+                            Platform.runLater(() -> {
+                                loadTableDetail();
+                            });
+                            tfAttachmentNo.clear();
+                            cmbAttachmentType.setItems(documentType);
+                            imageView.setImage(null);
+                            stackPaneClip();
+                            Platform.runLater(() -> {
+                                loadTableAttachment();
+                            });
+                            break;
                     }
                     event.consume();
-                    break;
+                } catch (SQLException | GuanzonException | CloneNotSupportedException ex) {
+                    Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+                }
+                break;
                 case UP:
                     event.consume();
                     CommonUtils.SetPreviousFocus((TextField) event.getSource());

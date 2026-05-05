@@ -248,6 +248,7 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
             Platform.runLater(() -> btnNew.fire());
             initAll();
             JFXUtil.initKeyClickObject(AnchorMain, lastFocusedTextField, previousSearchedTextField);
+            pagination.setPageCount(1);
         } catch (ExceptionInInitializerError | SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
         }
@@ -1458,12 +1459,7 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
         if (poApp.isMainOffice() || poApp.isWarehouse()) {
             tfDepartment.setDisable(!lbShow); //mag open siya pag add new or update sa editmode
         }
-        if (tblVwRecurringExpense.getItems().isEmpty()) {
-            pagination.setVisible(false);
-            pagination.setManaged(false);
-        }
         tfPayee.setDisable(fnEditMode == EditMode.UPDATE);
-
     }
 
     private void loadTableMain() {
