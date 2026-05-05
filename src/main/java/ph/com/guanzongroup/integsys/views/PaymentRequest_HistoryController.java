@@ -15,9 +15,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.SQLException;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -986,33 +984,12 @@ public class PaymentRequest_HistoryController implements Initializable, ScreenIn
         tfSearchPayee.textProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue != null) {
                 if (newValue.isEmpty()) {
-//                    try {
-//                        poGLControllers.PaymentRequest().Master().setPayeeID("");
                     prevPayee = "";
                     tfSearchPayee.setText("");
-//                    } catch (SQLException | GuanzonException ex) {
-//                        Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
-//                    }
                 }
             }
         }
         );
-    }
-
-    private void loadTableDetailAndSelectedRow() {
-        if (pnTblDetailRow >= 0) {
-            Platform.runLater(() -> {
-                // Run a delay after the UI thread is free
-                PauseTransition delay = new PauseTransition(Duration.millis(10));
-                delay.setOnFinished(event -> {
-                    Platform.runLater(() -> { // Run UI updates in the next cycle
-                        loadTableDetail();
-                    });
-                });
-                delay.play();
-            });
-            loadRecordDetail();
-        }
     }
 
     private void tblVwDetail_Clicked(MouseEvent event) {

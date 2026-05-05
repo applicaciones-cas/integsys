@@ -17,9 +17,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.SQLException;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Level;
@@ -1307,72 +1305,6 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
         }
     }
 
-//    private void setAmountToDetail(String fsValue) {
-//        try {
-//            if (fsValue == null || fsValue.isEmpty()) {
-//                fsValue = "0.0000";
-//            }
-//
-//            double amount = Double.parseDouble(fsValue.replace(",", ""));
-//            if (amount < 0.0000) {
-//                ShowMessageFX.Warning("Invalid Amount", psFormName, null);
-//                amount = 0.0000;
-//            }
-//
-//            if (tfAmount.isFocused() && tfParticular.getText().isEmpty()) {
-//                ShowMessageFX.Warning("Invalid action, Please enter particular first.", psFormName, null);
-//                tfParticular.requestFocus();
-//                return;
-//            }
-//
-//            if (pnTblDetailRow < 0) {
-//                ShowMessageFX.Warning("Invalid row to update.", psFormName, null);
-//                clearDetailFields();
-//                int detailCount = poGLControllers.PaymentRequest().getDetailCount();
-//                pnTblDetailRow = detailCount > 0 ? detailCount - 1 : 0;
-//                return;
-//            }
-//
-//            // Check for duplicate amount and particular
-//            for (int lnCtr = 0; lnCtr < poGLControllers.PaymentRequest().getDetailCount(); lnCtr++) {
-//                if (lnCtr == pnTblDetailRow) {
-//                    continue; // Skip current row
-//                }
-//                boolean isSameParticular = poGLControllers.PaymentRequest().Detail(lnCtr).getParticularID()
-//                        .equals(poGLControllers.PaymentRequest().Detail(pnTblDetailRow).getParticularID());
-//
-//                boolean isSameAmount = poGLControllers.PaymentRequest().Detail(lnCtr).getAmount() == amount;
-//
-//                if (isSameParticular && isSameAmount) {
-//                    // Duplicate found
-//                    amount = 0.0000;
-//                    poGLControllers.PaymentRequest().Detail(pnTblDetailRow).setAmount(amount);
-//                    tfAmount.setText("0.0000");
-//
-//                    ShowMessageFX.Warning("Amount and Particular already exist in table at row: " + (lnCtr + 1), psFormName, null);
-//                    pnTblDetailRow = lnCtr;
-//                    loadTableDetail();
-////                    initDetailFocus();
-//                    return;
-//                }
-//            }
-//
-//            // If amount is zero, clear discount fields
-//            if (amount == 0.00) {
-//                poGLControllers.PaymentRequest().Detail(pnTblDetailRow).setDiscount(0.00);
-//                poGLControllers.PaymentRequest().Detail(pnTblDetailRow).setAddDiscount(0.00);
-//            }
-//
-//            poGLControllers.PaymentRequest().Detail(pnTblDetailRow).setAmount(amount);
-//            tfAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(amount, true));
-//
-//        } catch (SQLException | GuanzonException ex) {
-//            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
-//        } catch (NumberFormatException ex) {
-//            ShowMessageFX.Warning("Invalid numeric input for amount.", psFormName, null);
-//            tfAmount.setText("0.0000");
-//        }
-//    }
     private void initTextFieldPattern() {
         CustomCommonUtil.inputDecimalOnly(
                 tfTotalAmount, tfDiscountAmount, tfNetAmount,
@@ -1534,69 +1466,6 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
                                     "",
                                     "",
                                     ""));
-
-//                                String lsDueDate = SQLUtil.dateFormat(poGLControllers.PaymentRequest().Recurring_Issuance(lnCntr).getDueDate(), SQLUtil.FORMAT_SHORT_DATE);
-//                                String lsLastRequestNo = poGLControllers.PaymentRequest().Recurring_Issuance(lnCntr).getLastPRFTrans();
-//                                String lsLastRequestPRFStatus = "";
-//                                if (poGLControllers.PaymentRequest().getPaymentStatusFromIssuanceLastPRFNo(lsLastRequestNo) != null) {
-//                                    lsLastRequestPRFStatus = poGLControllers.PaymentRequest().getPaymentStatusFromIssuanceLastPRFNo(lsLastRequestNo);
-//                                }
-//
-//                                String status = "0";
-//                                if (lsDueDate != null && !lsDueDate.isEmpty()) {
-//                                    try {
-//                                        LocalDate dueDate = CustomCommonUtil.parseDateStringToLocalDate(lsDueDate);
-//                                        long daysUntilDue = ChronoUnit.DAYS.between(LocalDate.now(), dueDate);
-//                                        if (daysUntilDue <= 0 && !lsLastRequestPRFStatus.equals(PaymentRequestStatus.PAID)) {
-//                                            status = STATUS_DUE_DATE;
-//                                        } else if (daysUntilDue <= 5 && !lsLastRequestPRFStatus.equals(PaymentRequestStatus.PAID)) {
-//                                            status = STATUS_WARNING_DUE_DATE;
-//                                        } else if (lsLastRequestPRFStatus.equals(PaymentRequestStatus.PAID)) {
-//                                            status = STATUS_PAID;
-//                                        }
-//                                    } catch (DateTimeParseException e) {
-//                                        // Invalid date format, ignore and continue
-//                                        System.err.println("Invalid due date format: " + lsDueDate);
-//                                    }
-//                                }
-//                            String lsDueDate = SQLUtil.dateFormat(
-//                                    poGLControllers.PaymentRequest().Recurring_Issuance(lnCntr).getDueDate(),
-//                                    SQLUtil.FORMAT_SHORT_DATE
-//                            );
-//
-//                            String lsLastRequestNo = poGLControllers.PaymentRequest().Recurring_Issuance(lnCntr).getLastPRFTrans();
-//                            String lsLastRequestPRFStatus = poGLControllers.PaymentRequest().getPaymentStatusFromIssuanceLastPRFNo(lsLastRequestNo);
-//
-//                            String status = STATUS_NOT_CLICKED;
-//
-//                            try {
-//                                if (lsLastRequestPRFStatus != null && lsLastRequestPRFStatus.equals(PaymentRequestStatus.PAID)) {
-//                                    status = STATUS_PAID;
-//                                } else if (lsDueDate != null && !lsDueDate.isEmpty()) {
-//                                    LocalDate dueDate = CustomCommonUtil.parseDateStringToLocalDate(lsDueDate);
-//                                    long daysUntilDue = ChronoUnit.DAYS.between(LocalDate.now(), dueDate);
-//
-//                                    if (daysUntilDue <= 0) {
-//                                        status = STATUS_DUE_DATE;
-//                                    } else if (daysUntilDue <= 5) {
-//                                        status = STATUS_WARNING_DUE_DATE;
-//                                    }
-//                                }
-//                            } catch (DateTimeParseException e) {
-//                                System.err.println("Invalid due date format: " + lsDueDate);
-//                            }
-//                            main_data.add(new ModelTableMain(
-//                                    String.valueOf(lnCntr + 1),
-//                                    poGLControllers.PaymentRequest().Recurring_Issuance(lnCntr).Payee().getPayeeName(),
-//                                    SQLUtil.dateFormat(poGLControllers.PaymentRequest().Recurring_Issuance(lnCntr).getBillingDate(), SQLUtil.FORMAT_SHORT_DATE),
-//                                    SQLUtil.dateFormat(poGLControllers.PaymentRequest().Recurring_Issuance(lnCntr).getDueDate(), SQLUtil.FORMAT_SHORT_DATE),
-//                                    //                                                                                CustomCommonUtil.setIntegerValueToDecimalFormat(poGLControllers.PaymentRequest().Recurring_Issuance(lnCntr).getAmount()),
-//                                    poGLControllers.PaymentRequest().Recurring_Issuance(lnCntr).Particular().getDescription(),
-//                                    poGLControllers.PaymentRequest().Recurring_Issuance(lnCntr).getParticularID(),
-//                                    poGLControllers.PaymentRequest().Recurring_Issuance(lnCntr).getPayeeID(),
-//                                    status,
-//                                    poGLControllers.PaymentRequest().Recurring_Issuance(lnCntr).getAccountNo(),
-//                                    ""));
                         }
                     }
 
@@ -1825,7 +1694,6 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
         tblParticular.setCellValueFactory(new PropertyValueFactory<>("index03"));
         tblAmount.setCellValueFactory(new PropertyValueFactory<>("index04"));
         tblDiscAmount.setCellValueFactory(new PropertyValueFactory<>("index06"));
-//        tblVATable.setCellValueFactory(new PropertyValueFactory<>("index07"));
         tbTotalAmount.setCellValueFactory(new PropertyValueFactory<>("index09"));
         // Prevent column reordering
         tblVwPRDetail.widthProperty().addListener((ObservableValue<? extends Number> source, Number oldWidth, Number newWidth) -> {

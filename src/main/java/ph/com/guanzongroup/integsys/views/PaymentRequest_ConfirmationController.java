@@ -15,9 +15,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.SQLException;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Level;
@@ -941,7 +939,6 @@ public class PaymentRequest_ConfirmationController implements Initializable, Scr
 
         if (newIndex != -1 && (newIndex <= attachment_data.size() - 1)) {
             ModelPRFAttachment image = attachment_data.get(newIndex);
-            String filePath2 = "D:\\GGC_Maven_Systems\\temp\\attachments\\" + image.getIndex02();
             TranslateTransition slideOut = new TranslateTransition(Duration.millis(300), imageView);
             slideOut.setByX(direction * -400); // Move left or right
 
@@ -999,8 +996,6 @@ public class PaymentRequest_ConfirmationController implements Initializable, Scr
     }
 
     private void initTextFieldFocus() {
-//        List<TextField> loTxtField = Arrays.asList(tfAmount, tfDiscRate, tfDiscAmountDetail);
-//        loTxtField.forEach(tf -> tf.focusedProperty().addListener(txtField_Focus));
         tfSearchPayee.setOnMouseClicked(e -> activeField = tfSearchPayee);
         tfSearchTransaction.setOnMouseClicked(e -> activeField = tfSearchTransaction);
         tfParticular.setOnMouseClicked(e -> activeField = tfParticular);
@@ -1187,136 +1182,6 @@ public class PaymentRequest_ConfirmationController implements Initializable, Scr
         }
     }
 
-    private void setDiscountRate(String fsValue) {
-        try {
-            if (fsValue == null || fsValue.isEmpty()) {
-                fsValue = "0.00";
-            }
-
-            double lnPerDetailTotal = Double.parseDouble(tfAmount.getText().replace(",", ""));
-            if (lnPerDetailTotal == 0.00) {
-                ShowMessageFX.Warning("You're not allowed to enter discount rate, no amount entered.", psFormName, null);
-                fsValue = "0.00";
-            }
-
-            double lnDiscountRate = Double.parseDouble(fsValue);
-            if (lnDiscountRate < 0.00 || lnDiscountRate > 1.00) {
-                ShowMessageFX.Warning("Invalid Discount Rate. Must be between 0.00 and 1.00 (1.00 = 100%)", psFormName, null);
-                lnDiscountRate = 0.00;
-            }
-
-            double lnDiscountAmount = lnDiscountRate * lnPerDetailTotal;
-
-            // Store rate (e.g., 0.10 = 10%) and amount
-            poGLControllers.PaymentRequest().Detail(pnTblDetailRow).setDiscount(lnDiscountRate);        // decimal: 1.00 = 100%
-            poGLControllers.PaymentRequest().Detail(pnTblDetailRow).setAddDiscount(lnDiscountAmount);   // amount: 10.00
-
-            tfDiscRate.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(lnDiscountRate));        // show: 0.10
-            tfDiscAmountDetail.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poGLControllers.PaymentRequest().Detail(pnTblDetailRow).getAddDiscount(), true));
-        } catch (SQLException | GuanzonException ex) {
-            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
-        }
-    }
-
-    private void setDiscountAmount(String fsValue) {
-        try {
-            if (fsValue == null || fsValue.isEmpty()) {
-                fsValue = "0.00";
-            }
-
-            double lnPerDetailTotal = Double.parseDouble(tfAmount.getText().replace(",", ""));
-
-            if (lnPerDetailTotal == 0.00) {
-                ShowMessageFX.Warning("You're not allowed to enter discount amount, no amount entered.", psFormName, null);
-                fsValue = "0.00";
-            }
-
-            double lnDiscountAmount = Double.parseDouble(fsValue.replace(",", ""));
-            if (lnDiscountAmount < 0.0 || lnDiscountAmount > lnPerDetailTotal) {
-                ShowMessageFX.Warning("Invalid Discount Amount", psFormName, null);
-                lnDiscountAmount = 0.00;
-            }
-
-            // ✅ Compute discount rate in decimal (e.g., 0.10 for 10%)
-            double lnDiscountRate = lnDiscountAmount / lnPerDetailTotal;
-
-            // ✅ Store to model (rate and amount)
-            poGLControllers.PaymentRequest().Detail(pnTblDetailRow).setDiscount(lnDiscountRate);       // decimal rate: 0.10 = 10%
-            poGLControllers.PaymentRequest().Detail(pnTblDetailRow).setAddDiscount(lnDiscountAmount);  // amount
-
-            // ✅ Display to user
-            tfDiscRate.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(lnDiscountRate));        // 0.10
-            tfDiscAmountDetail.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poGLControllers.PaymentRequest().Detail(pnTblDetailRow).getAddDiscount(), true));
-        } catch (SQLException | GuanzonException ex) {
-            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
-        }
-    }
-
-//    private void setAmountToDetail(String fsValue) {
-//        try {
-//            if (fsValue == null || fsValue.isEmpty()) {
-//                fsValue = "0.00";
-//            }
-//
-//            double amount = Double.parseDouble(fsValue.replace(",", ""));
-//            if (amount < 0.0) {
-//                ShowMessageFX.Warning("Invalid Amount", psFormName, null);
-//                amount = 0.00;
-//            }
-//
-//            if (tfAmount.isFocused() && tfParticular.getText().isEmpty()) {
-//                ShowMessageFX.Warning("Invalid action, Please enter particular first.", psFormName, null);
-//                tfParticular.requestFocus();
-//                return;
-//            }
-//
-//            if (pnTblDetailRow < 0) {
-//                ShowMessageFX.Warning("Invalid row to update.", psFormName, null);
-//                clearDetailFields();
-//                int detailCount = poGLControllers.PaymentRequest().getDetailCount();
-//                pnTblDetailRow = detailCount > 0 ? detailCount - 1 : 0;
-//                return;
-//            }
-//
-//            // Check for duplicate amount and particular
-//            for (int lnCtr = 0; lnCtr < poGLControllers.PaymentRequest().getDetailCount(); lnCtr++) {
-//                if (lnCtr == pnTblDetailRow) {
-//                    continue; // Skip current row
-//                }
-//                boolean isSameParticular = poGLControllers.PaymentRequest().Detail(lnCtr).getParticularID()
-//                        .equals(poGLControllers.PaymentRequest().Detail(pnTblDetailRow).getParticularID());
-//
-//                boolean isSameAmount = poGLControllers.PaymentRequest().Detail(lnCtr).getAmount() == amount;
-//
-//                if (isSameParticular && isSameAmount) {
-//                    // Duplicate found
-//                    amount = 0.00;
-//                    poGLControllers.PaymentRequest().Detail(pnTblDetailRow).setAmount(amount);
-//                    tfAmount.setText("0.00");
-//
-//                    ShowMessageFX.Warning("Amount and Particular already exist in table at row: " + (lnCtr + 1), psFormName, null);
-//                    pnTblDetailRow = lnCtr;
-//                    loadTableDetail();
-////                    initDetailFocus();
-//                    return;
-//                }
-//            }
-//
-//            // If amount is zero, clear discount fields
-//            if (amount == 0.00) {
-//                poGLControllers.PaymentRequest().Detail(pnTblDetailRow).setDiscount(0.00);
-//                poGLControllers.PaymentRequest().Detail(pnTblDetailRow).setAddDiscount(0.00);
-//            }
-//
-//            poGLControllers.PaymentRequest().Detail(pnTblDetailRow).setAmount(amount);
-//            tfAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poGLControllers.PaymentRequest().Detail(pnTblDetailRow).getAmount(), true));
-//        } catch (SQLException | GuanzonException ex) {
-//            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
-//        } catch (NumberFormatException ex) {
-//            ShowMessageFX.Warning("Invalid numeric input for amount.", psFormName, null);
-//            tfAmount.setText("0.00");
-//        }
-//    }
     private void initTextFieldPattern() {
         CustomCommonUtil.inputDecimalOnly(
                 tfTotalAmount, tfDiscountAmount, tfNetAmount,
@@ -1697,7 +1562,6 @@ public class PaymentRequest_ConfirmationController implements Initializable, Scr
         tblParticular.setCellValueFactory(new PropertyValueFactory<>("index03"));
         tblAmount.setCellValueFactory(new PropertyValueFactory<>("index04"));
         tblDiscAmount.setCellValueFactory(new PropertyValueFactory<>("index06"));
-//        tblVATable.setCellValueFactory(new PropertyValueFactory<>("index07"));
         tbTotalAmount.setCellValueFactory(new PropertyValueFactory<>("index09"));
         // Prevent column reordering
         tblVwPRDetail.widthProperty().addListener((ObservableValue<? extends Number> source, Number oldWidth, Number newWidth) -> {
@@ -1813,23 +1677,6 @@ public class PaymentRequest_ConfirmationController implements Initializable, Scr
             }
         }
 
-    }
-
-    private void loadTableDetailAndSelectedRow() {
-        if (pnTblDetailRow >= 0) {
-            Platform.runLater(() -> {
-                // Run a delay after the UI thread is free
-                PauseTransition delay = new PauseTransition(Duration.millis(10));
-                delay.setOnFinished(event -> {
-                    Platform.runLater(() -> { // Run UI updates in the next cycle
-                        loadTableDetail();
-                    });
-                });
-                delay.play();
-            });
-            loadRecordDetail();
-            initDetailFocus();
-        }
     }
 
     private void tblVwDetail_Clicked(MouseEvent event) {
