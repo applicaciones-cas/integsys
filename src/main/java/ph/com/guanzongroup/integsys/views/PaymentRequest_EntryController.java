@@ -139,7 +139,7 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
     @FXML
     private HBox hbButtons;
     @FXML
-    private Button btnBrowse, btnNew, btnUpdate, btnSearch, btnSave, btnCancel, btnHistory, btnRetrieve, btnClose, btnAddAttachment, btnRemoveAttachment, btnArrowLeft, btnArrowRight;
+    private Button btnBrowse, btnNew, btnUpdate, btnSearch, btnSave, btnCancel, btnHistory, btnRetrieve, btnClose, btnAddAttachment, btnRemoveAttachment, btnArrowLeft, btnArrowRight, btnVoid;
     @FXML
     private TabPane ImTabPane;
     @FXML
@@ -383,7 +383,7 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
 
     private void initButtonsClickActions() {
         List<Button> buttons = Arrays.asList(btnBrowse, btnNew, btnUpdate, btnSearch, btnSave, btnCancel, btnRetrieve, btnHistory, btnClose,
-                btnAddAttachment, btnRemoveAttachment, btnArrowLeft, btnArrowRight);
+                btnAddAttachment, btnRemoveAttachment, btnArrowLeft, btnArrowRight, btnVoid);
         buttons.forEach(button -> button.setOnAction(this::handleButtonAction));
     }
 
@@ -588,6 +588,36 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
                             lsStatus = recurringItem.getIndex08();
                         }
                         main_data.get(pnTblMainRow).setIndex08(lsStatus);
+                    }
+                    break;
+                case "btnVoid":
+                    if (ShowMessageFX.YesNo(null, psFormName, "Are you sure you want to void transaction?")) {
+                        pnEditMode = poGLControllers.PaymentRequest().getEditMode();
+                        if (pnEditMode == EditMode.READY) {
+                            poJSON = poGLControllers.PaymentRequest().VoidTransaction("");
+                            if ("error".equals((String) poJSON.get("result"))) {
+                                ShowMessageFX.Warning(null, psFormName, (String) poJSON.get("message"));
+                                return;
+                            } else {
+                                ShowMessageFX.Information(null, psFormName, (String) poJSON.get("message"));
+
+                                clearMasterFields();
+                                clearDetailFields();
+                                detail_data.clear();
+                                poJSON = poGLControllers.PaymentRequest().OpenTransaction(poGLControllers.PaymentRequest().Master().getTransactionNo());
+                                if ("success".equals((String) poJSON.get("result"))) {
+                                    CustomCommonUtil.switchToTab(tabDetails, ImTabPane);
+                                    pnTblDetailRow = -1;
+                                    loadRecordMaster();
+                                    clearDetailFields();
+                                    pnEditMode = poGLControllers.PaymentRequest().getEditMode();
+                                    loadTableDetail();
+                                }
+                                poGLControllers.PaymentRequest().loadAttachments();
+                            }
+                        }
+                    } else {
+                        return;
                     }
                     break;
                 case "btnRetrieve":
@@ -1395,12 +1425,13 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
         CustomCommonUtil.setManaged(false, btnUpdate);
 
         JFXUtil.setButtonsVisibility(fnEditMode == EditMode.READY, btnHistory);
-
+        JFXUtil.setButtonsVisibility(false, btnVoid);
         JFXUtil.setDisabled(!lbShow, apMaster, apDetail, apAttachments);
         if (fnEditMode == EditMode.READY) {
             try {
                 switch (poGLControllers.PaymentRequest().Master().getTransactionStatus()) {
                     case PaymentRequestStatus.OPEN:
+                        JFXUtil.setButtonsVisibility(true, btnVoid);
                     case PaymentRequestStatus.CONFIRMED:
                     case PaymentRequestStatus.RETURNED:
                         CustomCommonUtil.setVisible(true, btnUpdate);
