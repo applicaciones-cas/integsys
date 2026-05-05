@@ -65,7 +65,7 @@ public class APPaymentAdjustment_EntryCarController implements Initializable, Sc
     @FXML
     private Label lblSource, lblStatus;
     @FXML
-    private Button btnBrowse, btnNew, btnUpdate, btnSearch, btnSave, btnCancel, btnHistory, btnClose;
+    private Button btnBrowse, btnNew, btnUpdate, btnSearch, btnSave, btnCancel,btnHistory, btnClose, btnVoid;
     @FXML
     private TextField tfTransactionNo, tfClient, tfIssuedTo, tfCreditAmount, tfDebitAmount, tfReferenceNo, tfCompany;
     @FXML
@@ -538,6 +538,27 @@ public class APPaymentAdjustment_EntryCarController implements Initializable, Sc
                         } else {
                             return;
                         }
+                    case "btnVoid":
+                        if (ShowMessageFX.YesNo(null, pxeModuleName, "Are you sure you want to void transaction?")) {
+                            pnEditMode = poAPPaymentAdjustmentController.APPaymentAdjustment().getEditMode();
+                            if (pnEditMode == EditMode.READY) {
+                                poJSON = poAPPaymentAdjustmentController.APPaymentAdjustment().VoidTransaction("");
+                                if ("error".equals((String) poJSON.get("result"))) {
+                                    ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                                    return;
+                                } else {
+                                    ShowMessageFX.Information(null, pxeModuleName, (String) poJSON.get("message"));
+
+                                    poAPPaymentAdjustmentController.APPaymentAdjustment().resetMaster();
+                                    poAPPaymentAdjustmentController.APPaymentAdjustment().getModel().setIndustryId(psIndustryId);
+                                    clearTextFields();
+                                    pnEditMode = EditMode.UNKNOWN;
+                                }
+                            }
+                        } else {
+                            return;
+                        }
+                        break;
                     case "btnHistory":
                         if(pnEditMode != EditMode.READY && pnEditMode != EditMode.UPDATE){
                             ShowMessageFX.Warning("No transaction status history to load!", pxeModuleName, null);
@@ -616,12 +637,19 @@ public class APPaymentAdjustment_EntryCarController implements Initializable, Sc
         JFXUtil.setButtonsVisibility(lbShow, btnSearch, btnSave, btnCancel);
         JFXUtil.setButtonsVisibility(lbShow2, btnUpdate, btnHistory);
         JFXUtil.setButtonsVisibility(lbShow3, btnBrowse, btnClose);
+        JFXUtil.setButtonsVisibility(false, btnVoid);
 
 //        apMaster.setDisable(!lbShow);
         JFXUtil.setDisabled(!lbShow, taRemarks);
         JFXUtil.setDisabled(lbShow3, apMaster);
 
+        if (fnValue != EditMode.READY) {
+            return;
+        }
         switch (poAPPaymentAdjustmentController.APPaymentAdjustment().getModel().getTransactionStatus()) {
+            case APPaymentAdjustmentStatus.OPEN:
+                JFXUtil.setButtonsVisibility(true, btnVoid);
+                break;
             case APPaymentAdjustmentStatus.PAID:
                 JFXUtil.setButtonsVisibility(false, btnUpdate);
                 break;
