@@ -828,7 +828,7 @@ public class POQuotationRequest_ApprovalController implements Initializable, Scr
             tfModel.setText(lsModel);
             tfBarcode.setText(poController.POQuotationRequest().Detail(pnDetail).Inventory().getBarCode());
             tfDescription.setText(poController.POQuotationRequest().Detail(pnDetail).getDescription());
-            tfCost.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.POQuotationRequest().Detail(pnDetail).Inventory().getCost(), true));
+            tfCost.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.POQuotationRequest().Detail(pnDetail).getUnitPrice(), true));
             tfQuantity.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.POQuotationRequest().Detail(pnDetail).getQuantity(), false));
             JFXUtil.updateCaretPositions(apDetail);
         } catch (SQLException | GuanzonException ex) {
@@ -993,13 +993,13 @@ public class POQuotationRequest_ApprovalController implements Initializable, Scr
                                         lsDescription = poController.POQuotationRequest().Detail(lnCtr).getDescription();
                                     }
                                     lnRowCount += 1;
-                                    double lnTotal = poController.POQuotationRequest().Detail(lnCtr).getQuantity() * poController.POQuotationRequest().Detail(lnCtr).Inventory().getCost().doubleValue();
+                                    double lnTotal = poController.POQuotationRequest().Detail(lnCtr).getQuantity() * poController.POQuotationRequest().Detail(lnCtr).getUnitPrice();
                                     details_data.add(
                                             new ModelPOQuotationRequest_Detail(
                                                     String.valueOf(lnRowCount),
                                                     String.valueOf(lsBarcode),
                                                     lsDescription,
-                                                    String.valueOf(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.POQuotationRequest().Detail(lnCtr).Inventory().getCost(), true)),
+                                                    String.valueOf(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.POQuotationRequest().Detail(lnCtr).getUnitPrice(), true)),
                                                     String.valueOf(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.POQuotationRequest().Detail(lnCtr).getQuantity(), false)),
                                                     CustomCommonUtil.setIntegerValueToDecimalFormat(String.valueOf(lnTotal), true), String.valueOf(lnCtr)
                                             ));
