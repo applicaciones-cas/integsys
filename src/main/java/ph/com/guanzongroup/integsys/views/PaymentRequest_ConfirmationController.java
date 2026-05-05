@@ -28,6 +28,7 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.collections.transformation.FilteredList;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -121,7 +122,7 @@ public class PaymentRequest_ConfirmationController implements Initializable, Scr
     private int currentIndex = 0;
     double ldstackPaneWidth = 0;
     double ldstackPaneHeight = 0;
-
+    private FilteredList<ModelTableMain> filteredData;
     private ObservableList<ModelTableMain> main_data = FXCollections.observableArrayList();
     private ObservableList<ModelTableDetail> detail_data = FXCollections.observableArrayList();
     private ObservableList<ModelPRFAttachment> attachment_data = FXCollections.observableArrayList();
@@ -433,7 +434,6 @@ public class PaymentRequest_ConfirmationController implements Initializable, Scr
                                     loadTableDetail();
                                 } else {
                                     ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
-                                    return;
                                 }
                             }
                         }
@@ -1065,9 +1065,9 @@ public class PaymentRequest_ConfirmationController implements Initializable, Scr
                                 }
                                 psPayeeID = poGLControllers.PaymentRequest().Master().getPayeeID();
                                 tfSearchPayee.setText(poGLControllers.PaymentRequest().Master().Payee().getPayeeName());
-                                if (!tfSearchPayee.getText().isEmpty()) {
-                                    loadTableMain();
-                                }
+//                                if (!tfSearchPayee.getText().isEmpty()) {
+                                loadTableMain();
+//                                }
                                 break;
                             case "tfDepartment":
                                 poJSON = poGLControllers.PaymentRequest().SearchDepartment(lsValue, false);
@@ -1331,7 +1331,7 @@ public class PaymentRequest_ConfirmationController implements Initializable, Scr
             protected Void call() throws Exception {
                 try {
                     main_data.clear();
-                    poJSON = poGLControllers.PaymentRequest().getPaymentRequest(tfSearchTransaction.getText(), tfSearchPayee.getText());
+                    poJSON = poGLControllers.PaymentRequest().getPaymentRequest(tfSearchTransaction.getText(), psPayeeID);
                     if ("success".equals(poJSON.get("result"))) {
                         if (poGLControllers.PaymentRequest().getPRFMasterCount() > 0) {
                             for (int lnCntr = 0; lnCntr < poGLControllers.PaymentRequest().getPRFMasterCount(); lnCntr++) {
@@ -1353,7 +1353,9 @@ public class PaymentRequest_ConfirmationController implements Initializable, Scr
                             tblVwPaymentRequest.setPlaceholder(new Label("NO RECORD TO LOAD"));
                         }
                     });
-
+                    Platform.runLater(() -> {
+                        JFXUtil.loadTab(pagination, main_data.size(), 50, tblVwPaymentRequest, filteredData);
+                    });
                 } catch (SQLException | GuanzonException ex) {
                     Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
                 }
@@ -1367,16 +1369,7 @@ public class PaymentRequest_ConfirmationController implements Initializable, Scr
 
                 if (main_data == null || main_data.isEmpty()) {
                     tblVwPaymentRequest.setPlaceholder(new Label("NO RECORD TO LOAD"));
-                    ShowMessageFX.Warning("No Record Payment Request to Load.", psFormName, null);
                 } else {
-                    if (pagination != null) {
-                        int pageCount = (int) Math.ceil((double) main_data.size() / pnTblMain_Page);
-                        pagination.setPageCount(pageCount);
-                        pagination.currentPageIndexProperty().addListener((obs, oldIndex, newIndex) -> createPage(newIndex.intValue()));
-                    }
-                    createPage(0);
-                    pagination.setVisible(true);
-                    pagination.setManaged(true);
                     tblVwPaymentRequest.toFront();
                 }
             }
@@ -1391,33 +1384,14 @@ public class PaymentRequest_ConfirmationController implements Initializable, Scr
         new Thread(task).start();
     }
 
-    private Node createPage(int pageIndex) {
-        int totalPages = (int) Math.ceil((double) main_data.size() / pnTblMain_Page);
-        if (totalPages == 0) {
-            totalPages = 1;
-        }
-
-        pageIndex = Math.max(0, Math.min(pageIndex, totalPages - 1));
-        int fromIndex = pageIndex * pnTblMain_Page;
-        int toIndex = Math.min(fromIndex + pnTblMain_Page, main_data.size());
-
-        if (!main_data.isEmpty()) {
-            tblVwPaymentRequest.setItems(FXCollections.observableArrayList(main_data.subList(fromIndex, toIndex)));
-        }
-
-        if (pagination != null) { // Replace with your actual Pagination variable
-            pagination.setPageCount(totalPages);
-            pagination.setCurrentPageIndex(pageIndex);
-        }
-        return tblVwPaymentRequest;
-    }
-
     private void initTablePaymentRequest() {
         JFXUtil.setColumnCenter(tblRowNo, tblTransactionNo);
         JFXUtil.setColumnLeft(tblBranch, tblPayee);
         JFXUtil.setColumnsIndexAndDisableReordering(tblVwPaymentRequest);
-        tblVwPaymentRequest.setItems(FXCollections.observableArrayList(main_data));
+        JFXUtil.setColumnsIndexAndDisableReordering(tblVwPaymentRequest);
 
+        filteredData = new FilteredList<>(main_data, b -> true);
+        tblVwPaymentRequest.setItems(filteredData);
         initTableHighlithers();
     }
 

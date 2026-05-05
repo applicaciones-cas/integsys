@@ -30,6 +30,7 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.collections.transformation.FilteredList;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -125,7 +126,7 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
     private int currentIndex = 0;
     double ldstackPaneWidth = 0;
     double ldstackPaneHeight = 0;
-
+    private FilteredList<ModelTableMain> filteredData;
     private ObservableList<ModelTableMain> main_data = FXCollections.observableArrayList();
     private ObservableList<ModelTableDetail> detail_data = FXCollections.observableArrayList();
     private ObservableList<ModelPRFAttachment> attachment_data = FXCollections.observableArrayList();
@@ -1476,6 +1477,7 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
         Task<Void> task = new Task<Void>() {
             @Override
             protected Void call() throws Exception {
+
                 try {
                     main_data.clear();
                     poJSON = poGLControllers.PaymentRequest().loadPayables();
@@ -1495,17 +1497,12 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
                                     ""));
                         }
                     }
-
+                    if (main_data.isEmpty()) {
+                        tblVwRecurringExpense.setPlaceholder(new Label("NO RECORD TO LOAD"));
+                    }
                     Platform.runLater(() -> {
-                        if (main_data.isEmpty()) {
-                            tblVwRecurringExpense.setPlaceholder(new Label("NO RECORD TO LOAD"));
-//                            ShowMessageFX.Warning("No Record Recurring Expense to Load.", psFormName, null);
-                            tblVwRecurringExpense.setItems(FXCollections.observableArrayList(main_data));
-                        } else {
-                            tblVwRecurringExpense.setItems(FXCollections.observableArrayList(main_data));
-                        }
+                        JFXUtil.loadTab(pagination, main_data.size(), 50, tblVwRecurringExpense, filteredData);
                     });
-
                 } catch (SQLException | GuanzonException ex) {
                     Logger.getLogger(getClass()
                             .getName()).log(Level.SEVERE, null, ex);
@@ -1520,14 +1517,6 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
                 if (main_data == null || main_data.isEmpty()) {
                     tblVwRecurringExpense.setPlaceholder(new Label("NO RECORD TO LOAD"));
                 } else {
-                    if (pagination != null) {
-                        int pageCount = (int) Math.ceil((double) main_data.size() / pnTblMain_Page);
-                        pagination.setPageCount(pageCount);
-                        pagination.currentPageIndexProperty().addListener((obs, oldIndex, newIndex) -> createPage(newIndex.intValue()));
-                    }
-                    createPage(0);
-                    pagination.setVisible(true);
-                    pagination.setManaged(true);
                     tblVwRecurringExpense.toFront();
                 }
             }
@@ -1540,77 +1529,6 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
             }
         };
         new Thread(task).start(); // Run task in background
-    }
-
-    private Node createPage(int pageIndex) {
-        int totalPages = (int) Math.ceil((double) main_data.size() / pnTblMain_Page);
-        if (totalPages == 0) {
-            totalPages = 1;
-        }
-
-        pageIndex = Math.max(0, Math.min(pageIndex, totalPages - 1));
-        int fromIndex = pageIndex * pnTblMain_Page;
-        int toIndex = Math.min(fromIndex + pnTblMain_Page, main_data.size());
-
-        if (!main_data.isEmpty()) {
-            tblVwRecurringExpense.setItems(FXCollections.observableArrayList(main_data.subList(fromIndex, toIndex)));
-        }
-
-        if (pagination != null) { // Replace with your actual Pagination variable
-            pagination.setPageCount(totalPages);
-            pagination.setCurrentPageIndex(pageIndex);
-        }
-
-        return tblVwRecurringExpense;
-    }
-
-    private void initTableRecurringExpense() {
-        JFXUtil.setColumnCenter(tblRowNo, tblTransNo, tblDate);
-        JFXUtil.setColumnLeft(tblSupplier);
-        JFXUtil.setColumnsIndexAndDisableReordering(tblVwRecurringExpense);
-
-        if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
-            tblVwRecurringExpense.setEditable(true);
-        } else {
-            tblVwRecurringExpense.setEditable(false);
-        }
-        initTableHighlithers();
-    }
-
-    private void initTableHighlithers() {
-        tblVwRecurringExpense.setRowFactory(tv -> {
-            return new TableRow<ModelTableMain>() {
-                @Override
-                protected void updateItem(ModelTableMain item, boolean empty) {
-                    super.updateItem(item, empty);
-                    if (item == null || empty) {
-                        setStyle("");
-                    } else {
-                        String lsStatus = item.getIndex08();
-                        switch (lsStatus) {
-                            case STATUS_NOT_CLICKED:
-                                setStyle("");
-                                break;
-                            case STATUS_CLICKED:
-                                setStyle("-fx-background-color: #A7C7E7;"); // light blue
-                                break;
-                            case STATUS_WARNING_DUE_DATE:
-                                setStyle("-fx-background-color: #FFD8A8;"); // Orange: near due
-                                break;
-                            case STATUS_DUE_DATE:
-                                setStyle("-fx-background-color: #FAA0A0;"); // Red: overdue
-                                break;
-                            case STATUS_PAID:
-                                setStyle("-fx-background-color: #C1E1C1;"); // ligh green
-                                break;
-                            default:
-                                setStyle("");
-                                break;
-                        }
-                    }
-                }
-            };
-        });
     }
 
     private void loadTableDetail() {
@@ -1709,6 +1627,58 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
         };
 
         new Thread(task).start();
+    }
+
+    private void initTableRecurringExpense() {
+        JFXUtil.setColumnCenter(tblRowNo, tblTransNo, tblDate);
+        JFXUtil.setColumnLeft(tblSupplier);
+        JFXUtil.setColumnsIndexAndDisableReordering(tblVwRecurringExpense);
+
+        filteredData = new FilteredList<>(main_data, b -> true);
+        tblVwRecurringExpense.setItems(filteredData);
+
+        if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
+            tblVwRecurringExpense.setEditable(true);
+        } else {
+            tblVwRecurringExpense.setEditable(false);
+        }
+        initTableHighlithers();
+    }
+
+    private void initTableHighlithers() {
+        tblVwRecurringExpense.setRowFactory(tv -> {
+            return new TableRow<ModelTableMain>() {
+                @Override
+                protected void updateItem(ModelTableMain item, boolean empty) {
+                    super.updateItem(item, empty);
+                    if (item == null || empty) {
+                        setStyle("");
+                    } else {
+                        String lsStatus = item.getIndex08();
+                        switch (lsStatus) {
+                            case STATUS_NOT_CLICKED:
+                                setStyle("");
+                                break;
+                            case STATUS_CLICKED:
+                                setStyle("-fx-background-color: #A7C7E7;"); // light blue
+                                break;
+                            case STATUS_WARNING_DUE_DATE:
+                                setStyle("-fx-background-color: #FFD8A8;"); // Orange: near due
+                                break;
+                            case STATUS_DUE_DATE:
+                                setStyle("-fx-background-color: #FAA0A0;"); // Red: overdue
+                                break;
+                            case STATUS_PAID:
+                                setStyle("-fx-background-color: #C1E1C1;"); // ligh green
+                                break;
+                            default:
+                                setStyle("");
+                                break;
+                        }
+                    }
+                }
+            };
+        });
     }
 
     private void initTableDetail() {
