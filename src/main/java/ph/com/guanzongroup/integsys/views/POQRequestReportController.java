@@ -472,7 +472,7 @@ public class POQRequestReportController implements Initializable, ScreenInterfac
                     Platform.runLater(() -> {
                         try {
                             main_data.clear();
-                            poJSON = poController.loadReport(rbSummary.isSelected(), psSearchDateFrom, psSearchDateTo, cmbStatus.getSelectionModel().getSelectedItem());
+                            poJSON = poController.loadReport(rbSummary.isSelected(), psSearchDateFrom, psSearchDateTo, cmbStatus.getSelectionModel().getSelectedItem().toString());
                             if ("success".equals(poJSON.get("result"))) {
                                 JSONArray unifiedPayments = (JSONArray) poJSON.get("data");
                                 if (unifiedPayments != null && !unifiedPayments.isEmpty()) {
@@ -533,6 +533,7 @@ public class POQRequestReportController implements Initializable, ScreenInterfac
                         loadTableMain.reload();
                         break;
                 }
+
             });
 
     private void initComboBox() {
