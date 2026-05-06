@@ -7,7 +7,6 @@ package ph.com.guanzongroup.integsys.views;
 import ph.com.guanzongroup.integsys.model.ModelPRFAttachment;
 import ph.com.guanzongroup.integsys.model.ModelTableDetail;
 import ph.com.guanzongroup.integsys.utility.CustomCommonUtil;
-import com.sun.javafx.scene.control.skin.TableHeaderRow;
 import javafx.scene.control.ComboBox;
 import javafx.scene.image.ImageView;
 import java.net.URL;
@@ -24,7 +23,6 @@ import javafx.animation.TranslateTransition;
 import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyBooleanPropertyBase;
 import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
@@ -44,7 +42,6 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
-import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import static javafx.scene.input.KeyCode.DOWN;
 import static javafx.scene.input.KeyCode.ENTER;
@@ -234,7 +231,6 @@ public class PaymentRequest_HistoryController implements Initializable, ScreenIn
         initTextAreaFocus();
         initTextFieldKeyPressed();
         initTextFieldsProperty();
-        initCheckBoxActions();
         initTextFieldPattern();
         initTableDetail();
         initAttachmentsGrid();
@@ -268,7 +264,6 @@ public class PaymentRequest_HistoryController implements Initializable, ScreenIn
             tfSeriesNo.setText(poGLControllers.PaymentRequest().Master().getSeriesNo());
             tfTotalAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poGLControllers.PaymentRequest().Master().getTranTotal(), true));
             tfDiscountAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poGLControllers.PaymentRequest().Master().getDiscountAmount(), true));
-//            tfTotalVATableAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poGLControllers.PaymentRequest().Master().getVatAmount(), true));
             tfNetAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poGLControllers.PaymentRequest().Master().getNetTotal(), true));
             taRemarks.setText(poGLControllers.PaymentRequest().Master().getRemarks());
             tfAdvances.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poGLControllers.PaymentRequest().Master().PurchaseOrder().getAmountPaid(), true));
@@ -288,15 +283,11 @@ public class PaymentRequest_HistoryController implements Initializable, ScreenIn
                         poGLControllers.PaymentRequest().Detail(pnTblDetailRow).getAmount(), true));
                 tfDiscRate.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poGLControllers.PaymentRequest().Detail(pnTblDetailRow).getDiscount())); // rate
                 tfDiscAmountDetail.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poGLControllers.PaymentRequest().Detail(pnTblDetailRow).getAddDiscount(), true)); // amount
-//                chkbVatable.setSelected(poGLControllers.PaymentRequest().Detail(pnTblDetailRow).isVatable());
-
                 tfRecurringNo.setText(poGLControllers.PaymentRequest().Detail(pnTblDetailRow).RecurringExpensePaymentMonitor().RecurringExpenseSchedule().getRecurringNo());
                 tfBranchDetail.setText(poGLControllers.PaymentRequest().Detail(pnTblDetailRow).RecurringExpensePaymentMonitor().RecurringExpenseSchedule().Branch().getBranchName());
                 tfAccountNo.setText(poGLControllers.PaymentRequest().Detail(pnTblDetailRow).RecurringExpensePaymentMonitor().RecurringExpenseSchedule().getAccountNo());
                 tfEmployee.setText(poGLControllers.PaymentRequest().Detail(pnTblDetailRow).RecurringExpensePaymentMonitor().RecurringExpenseSchedule().Employee().getCompanyName());
-//                tfVatAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poGLControllers.PaymentRequest().Detail(pnTblDetailRow).getVatAmount(), true));
                 tfAmountDetail.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poGLControllers.PaymentRequest().Detail(pnTblDetailRow).getNetTotal(), true));
-//                tfTaxAmount.setText("0.00");
             } catch (SQLException | GuanzonException ex) {
                 Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
             }
@@ -664,7 +655,6 @@ public class PaymentRequest_HistoryController implements Initializable, ScreenIn
 
         if (newIndex != -1 && (newIndex <= attachment_data.size() - 1)) {
             ModelPRFAttachment image = attachment_data.get(newIndex);
-            String filePath2 = "D:\\GGC_Maven_Systems\\temp\\attachments\\" + image.getIndex02();
             TranslateTransition slideOut = new TranslateTransition(Duration.millis(300), imageView);
             slideOut.setByX(direction * -400); // Move left or right
 
@@ -829,19 +819,6 @@ public class PaymentRequest_HistoryController implements Initializable, ScreenIn
         );
     }
 
-    private void initCheckBoxActions() {
-//        chkbVatable.setOnAction(event -> {
-//            if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
-//                try {
-//                    poGLControllers.PaymentRequest().Detail(pnTblDetailRow).isVatable(chkbVatable.isSelected());
-//                    loadTableDetailAndSelectedRow();
-//                } catch (SQLException | GuanzonException ex) {
-//                    Logger.getLogger(PaymentRequest_EntryController.class.getName()).log(Level.SEVERE, null, ex);
-//                }
-//            }
-//        });
-    }
-
     private void clearMasterFields() {
         pnTblDetailRow = -1;
         lblStatus.setText("");
@@ -900,32 +877,27 @@ public class PaymentRequest_HistoryController implements Initializable, ScreenIn
                             lnRowCount += 1;
                             detail_data.add(new ModelTableDetail(
                                     String.valueOf(lnRowCount),
-                                    poGLControllers.PaymentRequest().Detail(lnCtr).getParticularID(),
                                     poGLControllers.PaymentRequest().Detail(lnCtr).Particular().getDescription(),
                                     CustomCommonUtil.setIntegerValueToDecimalFormat(poGLControllers.PaymentRequest().Detail(lnCtr).getAmount(), true),
-                                    CustomCommonUtil.setIntegerValueToDecimalFormat(poGLControllers.PaymentRequest().Detail(lnCtr).getDiscount()),
                                     CustomCommonUtil.setIntegerValueToDecimalFormat(lnTotalDiscountAmount, true),
-                                    lsIsVatable,
-                                    "0.0000",
                                     CustomCommonUtil.setIntegerValueToDecimalFormat(poGLControllers.PaymentRequest().Detail(lnCtr).getNetTotal(), true),
-                                    "",
                                     String.valueOf(lnCtr)
                             ));
                         }
-                        int lnTempRow = JFXUtil.getDetailRow(detail_data, pnTblDetailRow, 11); //this method is used only when Reverse is applied
+                        int lnTempRow = JFXUtil.getDetailRow(detail_data, pnTblDetailRow, 6); //this method is used only when Reverse is applied
                         if (lnTempRow < 0 || lnTempRow
                                 >= detail_data.size()) {
                             if (!detail_data.isEmpty()) {
                                 /* FOCUS ON FIRST ROW */
                                 JFXUtil.selectAndFocusRow(tblVwPRDetail, 0);
-                                int lnRow = Integer.parseInt(detail_data.get(0).getIndex11());
+                                int lnRow = Integer.parseInt(detail_data.get(0).getIndex06());
                                 pnTblDetailRow = lnRow;
                                 loadRecordDetail();
                             }
                         } else {
                             /* FOCUS ON THE ROW THAT pnRowDetail POINTS TO */
                             JFXUtil.selectAndFocusRow(tblVwPRDetail, lnTempRow);
-                            int lnRow = Integer.parseInt(detail_data.get(tblVwPRDetail.getSelectionModel().getSelectedIndex()).getIndex11());
+                            int lnRow = Integer.parseInt(detail_data.get(tblVwPRDetail.getSelectionModel().getSelectedIndex()).getIndex06());
                             pnTblDetailRow = lnRow;
                             loadRecordDetail();
                         }
@@ -956,22 +928,6 @@ public class PaymentRequest_HistoryController implements Initializable, ScreenIn
         JFXUtil.setColumnLeft(tblParticular);
         JFXUtil.setColumnRight(tblAmount, tblDiscAmount, tbTotalAmount);
         JFXUtil.setColumnsIndexAndDisableReordering(tblVwPRDetail);
-
-        tblRowNoDetail.setCellValueFactory(new PropertyValueFactory<>("index01"));
-        tblParticular.setCellValueFactory(new PropertyValueFactory<>("index03"));
-        tblAmount.setCellValueFactory(new PropertyValueFactory<>("index04"));
-        tblDiscAmount.setCellValueFactory(new PropertyValueFactory<>("index06"));
-//        tblVATable.setCellValueFactory(new PropertyValueFactory<>("index07"));
-        tbTotalAmount.setCellValueFactory(new PropertyValueFactory<>("index09"));
-        // Prevent column reordering
-        tblVwPRDetail.widthProperty().addListener((ObservableValue<? extends Number> msource, Number oldWidth, Number newWidth) -> {
-            TableHeaderRow header = (TableHeaderRow) tblVwPRDetail.lookup("TableHeaderRow");
-            if (header != null) {
-                header.reorderingProperty().addListener((ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) -> {
-                    header.setReordering(false);
-                });
-            }
-        });
         tblVwPRDetail.setItems(detail_data);
     }
 
@@ -982,7 +938,7 @@ public class PaymentRequest_HistoryController implements Initializable, ScreenIn
             switch (currentTableID) {
                 case "tblVwPRDetail":
                     newIndex = isMovedDown
-                            ? Integer.parseInt(detail_data.get(JFXUtil.moveToNextRow(currentTable)).getIndex11()) : Integer.parseInt(detail_data.get(JFXUtil.moveToPreviousRow(currentTable)).getIndex11());
+                            ? Integer.parseInt(detail_data.get(JFXUtil.moveToNextRow(currentTable)).getIndex06()) : Integer.parseInt(detail_data.get(JFXUtil.moveToPreviousRow(currentTable)).getIndex06());
                     if (!detail_data.isEmpty()) {
                         pnTblDetailRow = newIndex;
                         loadRecordDetail();
@@ -1014,7 +970,7 @@ public class PaymentRequest_HistoryController implements Initializable, ScreenIn
 
     private void tblVwDetail_Clicked(MouseEvent event) {
         if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE || pnEditMode == EditMode.READY) {
-            int lnRow = Integer.parseInt(detail_data.get(tblVwPRDetail.getSelectionModel().getSelectedIndex()).getIndex11());
+            int lnRow = Integer.parseInt(detail_data.get(tblVwPRDetail.getSelectionModel().getSelectedIndex()).getIndex06());
             pnTblDetailRow = lnRow;
             ModelTableDetail selectedItem = (ModelTableDetail) tblVwPRDetail.getSelectionModel().getSelectedItem();
             if (event.getClickCount() == 1) {

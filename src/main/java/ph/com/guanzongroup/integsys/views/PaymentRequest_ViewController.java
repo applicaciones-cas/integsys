@@ -439,7 +439,7 @@ public class PaymentRequest_ViewController implements Initializable, ScreenInter
 //                            reselectLastRow();
                         initFields(pnEditMode);
 
-                        int lnTempRow = JFXUtil.getDetailRow(detail_data, pnTblDetailRow, 11); //this method is used only when Reverse is applied
+                        int lnTempRow = JFXUtil.getDetailRow(detail_data, pnTblDetailRow, 6); //this method is used only when Reverse is applied
                         if (lnTempRow < 0 || lnTempRow
                                 >= detail_data.size()) {
                             if (!detail_data.isEmpty()) {
