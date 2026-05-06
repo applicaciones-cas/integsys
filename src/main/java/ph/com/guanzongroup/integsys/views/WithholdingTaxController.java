@@ -1,0 +1,362 @@
+package ph.com.guanzongroup.integsys.views;
+
+import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
+import java.net.URL;
+import java.sql.SQLException;
+import java.util.ResourceBundle;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javafx.beans.value.ChangeListener;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
+import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
+import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.TextField;
+import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.HBox;
+import org.guanzon.appdriver.agent.ShowMessageFX;
+import org.guanzon.appdriver.base.GRiderCAS;
+import org.guanzon.appdriver.base.GuanzonException;
+import org.guanzon.appdriver.base.LogWrapper;
+import org.guanzon.appdriver.constant.EditMode;
+import org.json.simple.JSONObject;
+import ph.com.guanzongroup.cas.cashflow.WithholdingTax;
+import ph.com.guanzongroup.cas.cashflow.services.CashflowControllers;
+import ph.com.guanzongroup.cas.sales.utility.CustomCommonUtil;
+import ph.com.guanzongroup.integsys.model.ModelResultSet;
+import ph.com.guanzongroup.integsys.utility.JFXUtil;
+
+public class WithholdingTaxController implements Initializable, ScreenInterface {
+
+    private GRiderCAS oApp;
+    private final String pxeModuleName = "Withholding Tax";
+    private int pnEditMode;
+    private WithholdingTax poController;
+    private boolean state = false;
+    private boolean pbLoaded = false;
+    private int pnInventory = 0;
+    private int pnRow = 0;
+    private ObservableList<ModelResultSet> data = FXCollections.observableArrayList();
+    JSONObject poJSON = new JSONObject();
+    @FXML
+    private AnchorPane AnchorMain, apMaster;
+    @FXML
+    private HBox hbButtons;
+    @FXML
+    private Button btnBrowse, btnNew, btnSave, btnUpdate, btnCancel, btnActivate, btnClose;
+    @FXML
+    private FontAwesomeIconView faActivate;
+    @FXML
+    private TextField tfTaxRateID, tfTaxDescription, tfAccountName, tfTaxCode, tfTaxType, tfTaxRate, tfSearchTaxDescription;
+    @FXML
+    private CheckBox cbActive;
+
+    @Override
+    public void setGRider(GRiderCAS foValue) {
+        oApp = foValue;
+    }
+
+    @Override
+    public void setIndustryID(String fsValue) {
+    }
+
+    @Override
+    public void setCompanyID(String fsValue) {
+    }
+
+    @Override
+    public void setCategoryID(String fsValue) {
+    }
+
+    private void initializeObject() {
+        try {
+            LogWrapper logwrapr = new LogWrapper("CAS", System.getProperty("sys.default.path.temp") + "cas-error.log");
+            poController = new CashflowControllers(oApp, logwrapr).WithholdingTax();
+            poController.setRecordStatus("0123");
+        } catch (SQLException | GuanzonException ex) {
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    @Override
+    public void initialize(URL url, ResourceBundle rb) {
+        initializeObject();
+        pnEditMode = poController.getEditMode();
+        initButton(pnEditMode);
+        initTextFields();
+        pbLoaded = true;
+
+        if (poController.getEditMode() == EditMode.ADDNEW) {
+            initButton(pnEditMode);
+            loadRecordMaster();
+        }
+
+    }
+
+    private void loadRecordSearch() {
+        tfSearchTaxDescription.setText(poController.getModel().getDescription());
+    }
+
+    private void loadRecordMaster() {
+        try {
+
+            tfTaxRateID.setText(poController.getModel().getTaxRateId());
+            tfTaxDescription.setText(poController.getModel().getDescription());
+            tfAccountName.setText(poController.getModel().AccountChart().getDescription());
+            tfTaxCode.setText(poController.getModel().getTaxCode());
+            tfTaxType.setText(poController.getModel().getTaxType());
+            tfTaxRate.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.getModel().getTaxRate(), false));
+
+            switch (poController.getModel().getRecordStatus()) {
+                case "1":
+                    btnActivate.setText("Deactivate");
+                    btnActivate.setMinWidth(85);
+                    faActivate.setGlyphName("CLOSE");
+                    cbActive.setSelected(true);
+                    break;
+                case "0":
+                    btnActivate.setText("Activate");
+                    btnActivate.setMinWidth(70);
+                    faActivate.setGlyphName("CHECK");
+                    cbActive.setSelected(false);
+                    break;
+            }
+        } catch (SQLException | GuanzonException ex) {
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    @FXML
+    void cmdButton_Click(ActionEvent event) {
+        Object source = event.getSource();
+
+        if (source instanceof Button) {
+            try {
+                Button clickedButton = (Button) source;
+                unloadForm appUnload = new unloadForm();
+                switch (clickedButton.getId()) {
+                    case "btnClose":
+                        if (ShowMessageFX.YesNo("Do you really want to cancel this record? \nAny data collected will not be kept.", "Computerized Acounting System", pxeModuleName)) {
+                            appUnload.unloadForm(AnchorMain, oApp, pxeModuleName);
+                        }
+                        break;
+                    case "btnNew":
+                        clearAllFields();
+                        JSONObject poJSON = poController.newRecord();
+                        pnEditMode = EditMode.READY;
+                        if ("success".equals((String) poJSON.get("result"))) {
+                            pnEditMode = EditMode.ADDNEW;
+                            initButton(pnEditMode);
+                            poController.getModel().setTaxRateId(poController.getModel().getNextCode());
+                            loadRecordMaster();
+                        } else {
+                            ShowMessageFX.Information((String) poJSON.get("message"), "Computerized Acounting System", pxeModuleName);
+                        }
+                        break;
+                    case "btnBrowse":
+                        String lsValue = (tfTaxDescription.getText() == null) ? "" : tfTaxDescription.getText();
+                        poJSON = poController.searchRecord(lsValue, false);
+                        if ("error".equals((String) poJSON.get("result"))) {
+                            ShowMessageFX.Information((String) poJSON.get("message"), "Computerized Acounting System", pxeModuleName);
+                            tfTaxDescription.clear();
+                            break;
+                        }
+                        pnEditMode = EditMode.READY;
+                        loadRecordMaster();
+                        break;
+                    case "btnUpdate":
+                        poJSON = poController.updateRecord();
+                        if ("error".equals((String) poJSON.get("result"))) {
+                            ShowMessageFX.Information((String) poJSON.get("message"), "Computerized Acounting System", pxeModuleName);
+                            break;
+                        }
+                        pnEditMode = poController.getEditMode();
+                        initButton(pnEditMode);
+                        break;
+                    case "btnCancel":
+                        if (ShowMessageFX.YesNo("Do you really want to cancel this record? \nAny data collected will not be kept.", "Computerized Acounting System", pxeModuleName)) {
+                            clearAllFields();
+                            initializeObject();
+                            pnEditMode = EditMode.UNKNOWN;
+                            initButton(pnEditMode);
+                        }
+                        break;
+                    case "btnSave":
+                        poController.getModel().setModifyingBy(oApp.getUserID());
+                        poController.getModel().setModifiedDate(oApp.getServerDate());
+                        JSONObject saveResult = poController.saveRecord();
+                        if ("success".equals((String) saveResult.get("result"))) {
+                            ShowMessageFX.Information((String) saveResult.get("message"), "Computerized Acounting System", pxeModuleName);
+                            pnEditMode = EditMode.UNKNOWN;
+                            initButton(pnEditMode);
+                            clearAllFields();
+                        } else {
+                            ShowMessageFX.Information((String) saveResult.get("message"), "Computerized Acounting System", pxeModuleName);
+                        }
+                        break;
+                    case "btnActivate":
+                        String Status = poController.getModel().getRecordStatus();
+                        String id = poController.getModel().getTaxCode();
+                        JSONObject poJsON;
+
+                        switch (Status) {
+                            case "0":
+                                if (ShowMessageFX.YesNo(null, pxeModuleName, "Do you want to Activate this Parameter?") == true) {
+                                    ShowMessageFX.Information(String.valueOf(poController.getEditMode()), "Computerized Accounting System", pxeModuleName);
+                                    poController.initialize();
+                                    poJsON = poController.activateRecord();
+                                    if ("error".equals(poJsON.get("result"))) {
+                                        ShowMessageFX.Information((String) poJsON.get("message"), "Computerized Accounting System", pxeModuleName);
+                                        break;
+                                    }
+                                    poJsON = poController.openRecord(id);
+                                    if ("error".equals(poJsON.get("result"))) {
+                                        ShowMessageFX.Information((String) poJsON.get("message"), "Computerized Accounting System", pxeModuleName);
+                                        break;
+                                    }
+                                    clearAllFields();
+                                    loadRecordMaster();
+                                    ShowMessageFX.Information((String) poJsON.get("message"), "Computerized Accounting System", pxeModuleName);
+                                }
+                                break;
+                            case "1":
+                                if (ShowMessageFX.YesNo(null, pxeModuleName, "Do you want to Deactivate this Parameter?") == true) {
+//                                    ShowMessageFX.Information(String.valueOf(poController.Category().getEditMode()), "Computerized Accounting System", pxeModuleName);
+                                    poJsON = poController.deactivateRecord();
+                                    if ("error".equals(poJsON.get("result"))) {
+                                        ShowMessageFX.Information((String) poJsON.get("message"), "Computerized Accounting System", pxeModuleName);
+                                        break;
+                                    }
+                                    poJsON = poController.openRecord(id);
+                                    if ("error".equals(poJsON.get("result"))) {
+                                        ShowMessageFX.Information((String) poJsON.get("message"), "Computerized Accounting System", pxeModuleName);
+                                        break;
+                                    }
+                                    clearAllFields();
+                                    loadRecordMaster();
+                                    ShowMessageFX.Information((String) poJsON.get("message"), "Computerized Accounting System", pxeModuleName);
+                                }
+                                break;
+                        }
+
+                }
+            } catch (SQLException | GuanzonException | CloneNotSupportedException ex) {
+                Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+    }
+
+    private void initTextFields() {
+        JFXUtil.setFocusListener(txtField_Focus, AnchorMain);
+
+        JFXUtil.setKeyPressedListener(this::txtField_KeyPressed, AnchorMain);
+        JFXUtil.inputDecimalOnly(tfTaxRateID, tfTaxRate);
+    }
+    ChangeListener<Boolean> txtField_Focus = JFXUtil.FocusListener(TextField.class,
+            (lsID, lsValue) -> {
+                switch (lsID) {
+                    case "tfTaxRateID":
+                        break;
+                    case "tfTaxDescription":
+                        poJSON = poController.getModel().setDescription(lsValue);
+                        if (!JFXUtil.isJSONSuccess(poJSON)) {
+                            ShowMessageFX.Information(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
+                        }
+                        break;
+                    case "tfAccountName":
+                        if (lsValue.isEmpty()) {
+                            poController.getModel().setDescription(lsValue);
+                        }
+                        break;
+                    case "tfTaxCode":
+                        if (lsValue.isEmpty()) {
+                            poController.getModel().setTaxCode(lsValue);
+                        }
+                        break;
+                    case "tfTaxType":
+                        poJSON = poController.getModel().setTaxType(lsValue);
+                        if (!JFXUtil.isJSONSuccess(poJSON)) {
+                            ShowMessageFX.Information(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
+                        }
+                        break;
+                    case "tfTaxRate":
+                        lsValue = JFXUtil.removeComma(lsValue);
+                        poJSON = poController.getModel().setTaxRate(Double.valueOf(lsValue));
+                        if (!JFXUtil.isJSONSuccess(poJSON)) {
+                            ShowMessageFX.Information(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
+                        }
+                        break;
+                    case "tfSearchTaxDescription":
+                        if (lsValue.isEmpty()) {
+                            poController.getModel().setDescription(lsValue);
+                        }
+                        break;
+                }
+                loadRecordMaster();
+            });
+
+    private void txtField_KeyPressed(KeyEvent event) {
+        try {
+            TextField txtField = (TextField) event.getSource();
+            String lsID = (((TextField) event.getSource()).getId());
+            String lsValue = (txtField.getText() == null ? "" : txtField.getText());
+            poJSON = new JSONObject();
+            if (null != event.getCode()) {
+                switch (event.getCode()) {
+                    case F3:
+                        switch (lsID) {
+                            //AnchorMain
+                            case "tfSearchTaxDescription":
+                                poJSON = poController.searchRecord(lsValue, false);
+                                if (!JFXUtil.isJSONSuccess(poJSON)) {
+                                    ShowMessageFX.Information(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
+                                }
+
+                                loadRecordSearch();
+                                loadRecordMaster();
+                                break;
+                            case "tfAccountName":
+                                poJSON = poController.SearchAccountName(lsValue, false);
+                                if (!JFXUtil.isJSONSuccess(poJSON)) {
+                                    ShowMessageFX.Information(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
+                                }
+                                loadRecordMaster();
+                                break;
+                            case "tfTaxCode":
+                                poJSON = poController.SearchTaxCode(lsValue, false);
+                                if (!JFXUtil.isJSONSuccess(poJSON)) {
+                                    ShowMessageFX.Information(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
+                                }
+                                loadRecordMaster();
+                                break;
+
+                        }
+                        event.consume();
+                        break;
+                    default:
+                        break;
+                }
+            }
+        } catch (SQLException | GuanzonException ex) {
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    private void clearAllFields() {
+        JFXUtil.clearTextFields(apMaster);
+    }
+
+    private void initButton(int fnValue) {
+        boolean lbShow = (fnValue == EditMode.ADDNEW || fnValue == EditMode.UPDATE);
+        JFXUtil.setButtonsVisibility(lbShow, btnCancel, btnSave);
+        JFXUtil.setButtonsVisibility(!lbShow, btnUpdate, btnBrowse, btnNew);
+
+        btnClose.setVisible(true);
+        btnClose.setManaged(true);
+    }
+
+}
