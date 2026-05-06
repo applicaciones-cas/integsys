@@ -185,8 +185,7 @@ public class PaymentRequest_ViewController implements Initializable, ScreenInter
             initTextFieldKeyPressed();
             initDetailGrid();
             initButtonsClickActions();
-            initFields(pnEditMode);
-
+            JFXUtil.setDisabled(true, apMaster, apDetail);
             poJSON = poController.InitTransaction(); // Initialize transaction
             if (!"success".equals((String) poJSON.get("result"))) {
                 ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
@@ -219,8 +218,6 @@ public class PaymentRequest_ViewController implements Initializable, ScreenInter
 
     private void loadRecordMaster() {
         try {
-            boolean lbShow = pnEditMode == EditMode.UPDATE;
-            JFXUtil.setDisabled(lbShow, tfBranch, tfDepartment, tfPayee);
 
             JFXUtil.setStatusValue(lblStatus, PaymentRequestStatus.class, pnEditMode == EditMode.UNKNOWN ? "-1" : poController.Master().getTransactionStatus());
             poController.computeFields();
@@ -254,15 +251,6 @@ public class PaymentRequest_ViewController implements Initializable, ScreenInter
     }
 
     private void loadRecordDetail() {
-        boolean lbShow = !PaymentRequestStatus.OPEN.equals(poController.Master().getTransactionStatus());
-        JFXUtil.setDisabled(lbShow, cbReverse);
-
-        boolean lbIsRecurring = !JFXUtil.isObjectEqualTo(poController.Detail(pnTblDetailRow).getRecurringNo(), null, "");
-        if (lbIsRecurring) {
-            JFXUtil.setDisabled(lbIsRecurring, tfParticular);
-        } else {
-            JFXUtil.setDisabled(poController.Detail(pnTblDetailRow).getEditMode() == EditMode.UPDATE, tfParticular);
-        }
 
         if (pnTblDetailRow >= 0) {
             try {
@@ -344,9 +332,8 @@ public class PaymentRequest_ViewController implements Initializable, ScreenInter
             String lsButton = ((Button) event.getSource()).getId();
             switch (lsButton) {
                 case "btnClose":
-                    unloadForm appUnload = new unloadForm();
-                    if (ShowMessageFX.OkayCancel(null, "Close Tab", "Are you sure you want to close this Tab?") == true) {
-                        appUnload.unloadForm(AnchorMain, poApp, pxeModuleName);
+                    if (ShowMessageFX.YesNo(null, "Close Tab", "Are you sure you want to close this Tab?")) {
+                        CommonUtils.closeStage(btnClose);
                     } else {
                         return;
                     }
@@ -373,21 +360,6 @@ public class PaymentRequest_ViewController implements Initializable, ScreenInter
 
     private void clearDetailFields() {
         JFXUtil.clearTextFields(apDetail);
-    }
-
-    private void initFields(int fnEditMode) {
-        boolean lbShow = (fnEditMode == EditMode.ADDNEW || fnEditMode == EditMode.UPDATE);
-
-        /*Master Fields */
-        CustomCommonUtil.setDisable(!lbShow, tfPayee, tfAmount, taRemarks);
-
-        CustomCommonUtil.setDisable(true, tfDepartment, dpTransaction, tfTransactionNo, tfBranch,
-                tfSeriesNo, tfTotalAmount, tfDiscountAmount, tfNetAmount
-        );
-        if (poApp.isMainOffice() || poApp.isWarehouse()) {
-            tfDepartment.setDisable(!lbShow); //mag open siya pag add new or update sa editmode
-        }
-        tfPayee.setDisable(fnEditMode == EditMode.UPDATE);
     }
 
     private void loadTableDetail() {
@@ -434,8 +406,6 @@ public class PaymentRequest_ViewController implements Initializable, ScreenInter
                         tfTotalAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Master().getTranTotal(), true));
                         tfDiscountAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Master().getDiscountAmount(), true));
                         tfNetAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Master().getNetTotal(), true));
-//                            reselectLastRow();
-                        initFields(pnEditMode);
 
                         int lnTempRow = JFXUtil.getDetailRow(detail_data, pnTblDetailRow, 6); //this method is used only when Reverse is applied
                         if (lnTempRow < 0 || lnTempRow

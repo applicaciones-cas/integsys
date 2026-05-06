@@ -116,13 +116,13 @@ public class SIPosting_ViewController implements Initializable, ScreenInterface 
     @FXML
     private Tab tabSIPosting, tabJE;
     @FXML
-    private TextField tfTransactionNo, tfSupplier, tfBranch, tfTrucking, tfTerm, tfReferenceNo, tfSINo, tfTransactionTotal, tfDiscountRate, tfDiscountAmount, tfFreightAmt, tfVatRate, tfVatSales, tfVatAmount, tfZeroVatSales, tfVatExemptSales, tfNetTotal, tfAdvancePayment, tfOrderNo, tfBarcode, tfDescription, tfSupersede, tfMeasure, tfOrderQuantity, tfReceiveQuantity, tfSRPAmount, tfDiscRateDetail, tfAddlDiscAmtDetail, tfCost, tfJETransactionNo, tfTotalCreditAmt, tfTotalDebitAmt, tfJEAcctCode, tfJEAcctDescription, tfCreditAmt, tfDebitAmt;
+    private TextField tfTransactionNo, tfSupplier, tfBranch, tfTrucking, tfTerm, tfReferenceNo, tfSINo, tfTransactionTotal, tfDiscountRate, tfDiscountAmount, tfFreightAmt, tfVatRate, tfVatSales, tfVatAmount, tfZeroVatSales, tfVatExemptSales, tfNetTotal, tfAdvancePayment, tfIndustry, tfOrderNo, tfBarcode, tfDescription, tfSupersede, tfMeasure, tfOrderQuantity, tfReceiveQuantity, tfSRPAmount, tfDiscRateDetail, tfAddlDiscAmtDetail, tfCost, tfJETransactionNo, tfTotalCreditAmt, tfTotalDebitAmt, tfJEAcctCode, tfJEAcctDescription, tfCreditAmt, tfDebitAmt;
     @FXML
     private DatePicker dpTransactionDate, dpReferenceDate, dpSIDate, dpExpiryDate, dpJETransactionDate, dpReportMonthYear;
     @FXML
-    private CheckBox cbToFollowInv, cbVatInclusive, cbVatable, cbJEReverse;
-    @FXML
     private Label lblStatus, lblJEStatus;
+    @FXML
+    private CheckBox cbVatInclusive, cbVatable, cbJEReverse;
     @FXML
     private TextArea taRemarks, taJERemarks;
     @FXML
@@ -255,10 +255,8 @@ public class SIPosting_ViewController implements Initializable, ScreenInterface 
             String lsButton = clickedButton.getId();
             switch (lsButton) {
                 case "btnClose":
-                    unloadForm appUnload = new unloadForm();
-                    if (ShowMessageFX.OkayCancel(null, "Close Tab", "Are you sure you want to close this Tab?") == true) {
-                        closeDialog();
-                        appUnload.unloadForm(apMainAnchor, oApp, pxeModuleName);
+                    if (ShowMessageFX.YesNo(null, "Close Tab", "Are you sure you want to close this Tab?")) {
+                        CommonUtils.closeStage(btnClose);
                     } else {
                         return;
                     }
@@ -447,7 +445,7 @@ public class SIPosting_ViewController implements Initializable, ScreenInterface 
                     poController.computeDiscountRate(poController.Master().getDiscount().doubleValue());
                 }
             }
-
+            tfIndustry.setText(poController.Master().Industry().getDescription());
             poController.computeFields();
 
             tfTransactionNo.setText(poController.Master().getTransactionNo());
@@ -464,7 +462,6 @@ public class SIPosting_ViewController implements Initializable, ScreenInterface 
             dpSIDate.setValue(JFXUtil.isObjectEqualTo(lsSIDate, "1900-01-01") ? null : CustomCommonUtil.parseDateStringToLocalDate(lsSIDate, "yyyy-MM-dd"));
             tfReferenceNo.setText(poController.Master().getReferenceNo());
             boolean lbShow = "To-follow".equals(poController.Master().getSalesInvoice());
-            cbToFollowInv.setSelected(lbShow);
             JFXUtil.setDisabled(lbShow, tfSINo);
             if (lbShow) {
                 tfSINo.setTextFormatter(null);
