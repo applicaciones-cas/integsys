@@ -1466,36 +1466,34 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
         Task<Void> task = new Task<Void>() {
             @Override
             protected Void call() throws Exception {
-
-                try {
-                    main_data.clear();
-                    poJSON = poGLControllers.PaymentRequest().loadPayables();
+                main_data.clear();
+                poJSON = poGLControllers.PaymentRequest().loadPayables();
+                Platform.runLater(() -> {
                     if ("success".equals(poJSON.get("result"))) {
-                        main_data.clear();
-                        for (int lnCntr = 0; lnCntr <= poGLControllers.PaymentRequest().getPayableCount() - 1; lnCntr++) {
-                            main_data.add(new ModelTableMain(
-                                    String.valueOf(lnCntr + 1),
-                                    poGLControllers.PaymentRequest().Payable(lnCntr).getTransactionNo(),
-                                    SQLUtil.dateFormat(poGLControllers.PaymentRequest().Payable(lnCntr).getTransactionDate(), SQLUtil.FORMAT_SHORT_DATE), //TODO Bill Day
-                                    poGLControllers.PaymentRequest().Payable(lnCntr).Supplier().getCompanyName(), //TODO Due Day
-                                    poGLControllers.PaymentRequest().Payable(lnCntr).getTransactionNo(),
-                                    "",
-                                    "",
-                                    "",
-                                    "",
-                                    ""));
+                        try {
+                            main_data.clear();
+                            for (int lnCntr = 0; lnCntr <= poGLControllers.PaymentRequest().getPayableCount() - 1; lnCntr++) {
+                                main_data.add(new ModelTableMain(
+                                        String.valueOf(lnCntr + 1),
+                                        poGLControllers.PaymentRequest().Payable(lnCntr).getTransactionNo(),
+                                        SQLUtil.dateFormat(poGLControllers.PaymentRequest().Payable(lnCntr).getTransactionDate(), SQLUtil.FORMAT_SHORT_DATE), //TODO Bill Day
+                                        poGLControllers.PaymentRequest().Payable(lnCntr).Supplier().getCompanyName(), //TODO Due Day
+                                        poGLControllers.PaymentRequest().Payable(lnCntr).getTransactionNo(),
+                                        "",
+                                        "",
+                                        "",
+                                        "",
+                                        ""));
+                            }
+                        } catch (SQLException | GuanzonException ex) {
+                            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
                         }
                     }
                     if (main_data.isEmpty()) {
                         tblVwRecurringExpense.setPlaceholder(new Label("NO RECORD TO LOAD"));
                     }
-                    Platform.runLater(() -> {
-                        JFXUtil.loadTab(pagination, main_data.size(), 50, tblVwRecurringExpense, filteredData);
-                    });
-                } catch (SQLException | GuanzonException ex) {
-                    Logger.getLogger(getClass()
-                            .getName()).log(Level.SEVERE, null, ex);
-                }
+                    JFXUtil.loadTab(pagination, main_data.size(), 50, tblVwRecurringExpense, filteredData);
+                });
                 return null;
             }
 

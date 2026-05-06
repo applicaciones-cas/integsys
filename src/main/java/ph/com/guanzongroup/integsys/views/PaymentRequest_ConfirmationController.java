@@ -1536,37 +1536,35 @@ public class PaymentRequest_ConfirmationController implements Initializable, Scr
         Task<Void> task = new Task<Void>() {
             @Override
             protected Void call() throws Exception {
-                try {
-                    main_data.clear();
-                    poJSON = poGLControllers.PaymentRequest().getPaymentRequest(tfSearchTransaction.getText(), psPayeeID);
+                main_data.clear();
+                poJSON = poGLControllers.PaymentRequest().getPaymentRequest(tfSearchTransaction.getText(), psPayeeID);
+                Platform.runLater(() -> {
                     if ("success".equals(poJSON.get("result"))) {
-                        if (poGLControllers.PaymentRequest().getPRFMasterCount() > 0) {
-                            for (int lnCntr = 0; lnCntr < poGLControllers.PaymentRequest().getPRFMasterCount(); lnCntr++) {
-                                main_data.add(new ModelTableMain(
-                                        String.valueOf(lnCntr + 1),
-                                        poGLControllers.PaymentRequest().poPRFMaster(lnCntr).getTransactionNo(),
-                                        CustomCommonUtil.formatDateToShortString(poGLControllers.PaymentRequest().poPRFMaster(lnCntr).getTransactionDate()),
-                                        poGLControllers.PaymentRequest().poPRFMaster(lnCntr).Branch().getBranchName(),
-                                        poGLControllers.PaymentRequest().poPRFMaster(lnCntr).Payee().getPayeeName(),
-                                        poGLControllers.PaymentRequest().poPRFMaster(lnCntr).getTransactionStatus(),
-                                        "", "", "", ""));
+                        try {
+                            if (poGLControllers.PaymentRequest().getPRFMasterCount() > 0) {
+                                for (int lnCntr = 0; lnCntr < poGLControllers.PaymentRequest().getPRFMasterCount(); lnCntr++) {
+                                    main_data.add(new ModelTableMain(
+                                            String.valueOf(lnCntr + 1),
+                                            poGLControllers.PaymentRequest().poPRFMaster(lnCntr).getTransactionNo(),
+                                            CustomCommonUtil.formatDateToShortString(poGLControllers.PaymentRequest().poPRFMaster(lnCntr).getTransactionDate()),
+                                            poGLControllers.PaymentRequest().poPRFMaster(lnCntr).Branch().getBranchName(),
+                                            poGLControllers.PaymentRequest().poPRFMaster(lnCntr).Payee().getPayeeName(),
+                                            poGLControllers.PaymentRequest().poPRFMaster(lnCntr).getTransactionStatus(),
+                                            "", "", "", ""));
+                                }
+                            } else {
+                                main_data.clear();
                             }
-                        } else {
-                            main_data.clear();
+                        } catch (GuanzonException | SQLException ex) {
+                            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
                         }
                     }
 
-                    Platform.runLater(() -> {
-                        if (main_data.isEmpty()) {
-                            tblVwPaymentRequest.setPlaceholder(new Label("NO RECORD TO LOAD"));
-                        }
-                    });
-                    Platform.runLater(() -> {
-                        JFXUtil.loadTab(pagination, main_data.size(), 50, tblVwPaymentRequest, filteredData);
-                    });
-                } catch (SQLException | GuanzonException ex) {
-                    Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
-                }
+                    if (main_data.isEmpty()) {
+                        tblVwPaymentRequest.setPlaceholder(new Label("NO RECORD TO LOAD"));
+                    }
+                    JFXUtil.loadTab(pagination, main_data.size(), 50, tblVwPaymentRequest, filteredData);
+                });
                 return null;
             }
 
