@@ -152,7 +152,6 @@ public class SIPosting_ViewController implements Initializable, ScreenInterface 
             poJSON = poController.OpenTransaction(psTransactionNo);
             if (!"error".equals((String) poJSON.get("result"))) {
 
-                pnEditMode = poController.getEditMode();
             } else {
                 Platform.runLater(() -> {
                     ShowMessageFX.Warning((String) poJSON.get("message"), pxeModuleName, null);
@@ -169,9 +168,8 @@ public class SIPosting_ViewController implements Initializable, ScreenInterface 
                 poController.initFields();
                 poController.setWithUI(true);
             });
-
+            pnEditMode = poController.getEditMode();
             loadTableDetail();
-            pnEditMode = EditMode.UNKNOWN;
             initButton(pnEditMode);
         } catch (CloneNotSupportedException | SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
