@@ -16,8 +16,6 @@ import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
-import static javafx.scene.input.KeyCode.ENTER;
-import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import org.guanzon.appdriver.agent.ShowMessageFX;
@@ -38,18 +36,13 @@ import ph.com.guanzongroup.integsys.utility.JFXUtil;
  *
  * @author Team 1
  */
-public class APPaymentAdjustment_ViewController implements Initializable, ScreenInterface {
+public class APPaymentAdjustment_ViewController implements Initializable {
 
     private GRiderCAS oApp;
     static APPaymentAdjustment poController;
     private JSONObject poJSON;
     public int pnEditMode;
     private String pxeModuleName = JFXUtil.getFormattedClassTitle(this.getClass());
-    private boolean isGeneral = false;
-    private String psIndustryId = "";
-    private String psCompanyId = "";
-    private String psCategoryId = "";
-    private String psSupplierId = "";
     private String psTransactionNo = "";
     @FXML
     private AnchorPane apMainAnchor, apBrowse, apButton, apMaster;
@@ -68,8 +61,6 @@ public class APPaymentAdjustment_ViewController implements Initializable, Screen
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        try {
-            //        psIndustryId = ""; // general
             poJSON = new JSONObject();
             poController = new CashflowControllers(oApp, null).APPaymentAdjustment();
             poController.initialize(); // Initialize transaction
@@ -79,86 +70,30 @@ public class APPaymentAdjustment_ViewController implements Initializable, Screen
             pnEditMode = EditMode.UNKNOWN;
             initButton(pnEditMode);
 
-            poJSON = poController.initFields(); // Initialize transaction
-            if (!"success".equals((String) poJSON.get("result"))) {
-                ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-                CommonUtils.closeStage(btnClose);
-            }
-            poJSON = poController.OpenTransaction(psTransactionNo);
-            if (!"error".equals((String) poJSON.get("result"))) {
-
-                pnEditMode = poController.getEditMode();
-            } else {
-                Platform.runLater(() -> {
-                    ShowMessageFX.Warning((String) poJSON.get("message"), pxeModuleName, null);
-                    CommonUtils.closeStage(btnClose);
-                });
-            }
-
             Platform.runLater(() -> {
-                poController.getModel().setIndustryId(psIndustryId);
-                poController.getModel().setCompanyId(psCompanyId);
-                poController.setIndustryId(psIndustryId);
-                poController.setCompanyId(psCompanyId);
-                poController.setWithUI(true);
-                loadRecordSearch();
+                try {
+                    poJSON = poController.OpenTransaction(psTransactionNo);
+                    if ("error".equals((String) poJSON.get("result"))) {
+                        ShowMessageFX.Warning((String) poJSON.get("message"), pxeModuleName, null);
+                        CommonUtils.closeStage(btnClose);
+                    }
+                    pnEditMode = poController.getEditMode();
+                    initButton(pnEditMode);
+                    loadRecordSearch();
+                    loadRecordMaster();
+                } catch (CloneNotSupportedException | SQLException | GuanzonException ex) {
+                    Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+                }
             });
             loadRecordMaster();
-        } catch (CloneNotSupportedException | SQLException | GuanzonException ex) {
-            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
-        }
     }
 
-    @Override
     public void setGRider(GRiderCAS foValue) {
         oApp = foValue;
     }
 
-    @Override
-    public void setIndustryID(String fsValue) {
-        psIndustryId = fsValue;
-    }
-
-    @Override
-    public void setCompanyID(String fsValue) {
-        psCompanyId = fsValue;
-    }
-
-    @Override
-    public void setCategoryID(String fsValue) {
-        psCategoryId = fsValue;
-    }
-
     public void setTransaction(String fsValue) {
         psTransactionNo = fsValue;
-    }
-
-    public void setDisbursement(APPaymentAdjustment foValue) {
-        poController = foValue;
-    }
-
-    private void txtField_KeyPressed(KeyEvent event) {
-        TextField txtField = (TextField) event.getSource();
-        String lsID = (((TextField) event.getSource()).getId());
-        String lsValue = (txtField.getText() == null ? "" : txtField.getText());
-        poJSON = new JSONObject();
-        switch (event.getCode()) {
-            case F3:
-                break;
-            default:
-                break;
-        }
-
-        switch (event.getCode()) {
-            case ENTER:
-                CommonUtils.SetNextFocus(txtField);
-            case DOWN:
-                CommonUtils.SetNextFocus(txtField);
-                break;
-            case UP:
-                CommonUtils.SetPreviousFocus(txtField);
-        }
-
     }
 
     public void loadRecordSearch() {
@@ -177,7 +112,6 @@ public class APPaymentAdjustment_ViewController implements Initializable, Screen
 
     public void initTextFields() {
         JFXUtil.setCommaFormatter(tfDebitAmount, tfCreditAmount);
-        JFXUtil.setKeyPressedListener(this::txtField_KeyPressed, apBrowse);
     }
 
     public void initDatePickers() {
@@ -249,9 +183,8 @@ public class APPaymentAdjustment_ViewController implements Initializable, Screen
                         }
                         break;
                     case "btnClose":
-                        unloadForm appUnload = new unloadForm();
-                        if (ShowMessageFX.OkayCancel(null, "Close Tab", "Are you sure you want to close this Tab?") == true) {
-                            appUnload.unloadForm(apMainAnchor, oApp, pxeModuleName);
+                        if (ShowMessageFX.YesNo(null, "Close Tab", "Are you sure you want to close this dialog?")) {
+                            CommonUtils.closeStage(btnClose);
                         } else {
                             return;
                         }
