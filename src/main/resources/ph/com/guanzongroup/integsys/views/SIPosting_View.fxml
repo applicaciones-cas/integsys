@@ -500,8 +500,8 @@
                                                                                  </font>
                                                                               </Label>
                                                                               <Label text="Report Month/Year" GridPane.rowIndex="2" />
-                                                                        <TextField fx:id="tfJEAcctCode" promptText="Press F3: Search" GridPane.columnIndex="2" />
-                                                                          <TextField fx:id="tfJEAcctDescription" promptText="Press F3: Search" GridPane.columnIndex="2" GridPane.columnSpan="5" GridPane.rowIndex="1" />
+                                                                        <TextField fx:id="tfJEAcctCode" GridPane.columnIndex="2" />
+                                                                          <TextField fx:id="tfJEAcctDescription" GridPane.columnIndex="2" GridPane.columnSpan="5" GridPane.rowIndex="1" />
                                                                               <DatePicker fx:id="dpReportMonthYear" GridPane.columnIndex="2" GridPane.rowIndex="2" />
                                                                               <TextField fx:id="tfCreditAmt" alignment="CENTER_RIGHT" promptText="0.0000" GridPane.columnIndex="10" GridPane.rowIndex="1" />
                                                       <TextField fx:id="tfDebitAmt" alignment="CENTER_RIGHT" prefWidth="171.0" promptText="0.0000" GridPane.columnIndex="10" GridPane.rowIndex="2" />
