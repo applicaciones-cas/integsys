@@ -80,6 +80,7 @@ import org.guanzon.appdriver.base.SQLUtil;
 import org.guanzon.appdriver.constant.DocumentType;
 import org.guanzon.appdriver.constant.EditMode;
 import org.guanzon.appdriver.constant.RecordStatus;
+import org.guanzon.cas.inv.InvTransCons;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.ParseException;
 import ph.com.guanzongroup.cas.cashflow.services.CashflowControllers;
@@ -152,7 +153,7 @@ public class PaymentRequest_ConfirmationController implements Initializable, Scr
     @FXML
     private TableView tblVwPRDetail, tblAttachments, tblVwPaymentRequest;
     @FXML
-    private TableColumn tblRowNoDetail, tblParticular, tblAmount, tblDiscAmount, tbTotalAmount, tblRowNoAttachment, tblFileNameAttachment, tblRowNo, tblBranch, tblPayee, tblTransactionNo;
+    private TableColumn tblRowNoDetail, tblParticular, tblAmount, tblDiscAmount, tbTotalAmount, tblRowNoAttachment, tblFileNameAttachment, tblRowNo, tblBranch, tblPayee, tblTransactionNo, tblTransactionDate;
     @FXML
     private ComboBox cmbAttachmentType;
     @FXML
@@ -286,8 +287,25 @@ public class PaymentRequest_ConfirmationController implements Initializable, Scr
             } else {
                 btnVoid.setText("Void");
             }
+            JFXUtil.setDisabled(true, tfBranch);
             boolean lbShow = pnEditMode == EditMode.UPDATE;
-            JFXUtil.setDisabled(lbShow, tfBranch, tfDepartment, tfPayee);
+            if(lbShow){
+                //Do not allow to update payee when there's a transaction source
+                if ( poGLControllers.PaymentRequest().Master().getSourceNo() != null && !"".equals(poGLControllers.PaymentRequest().Master().getSourceNo()) ){
+                    JFXUtil.setDisabled(true, tfPayee,tfDepartment);
+                } else {
+                    //Do not allow to update payee when there's a transaction source
+                    if(poGLControllers.PaymentRequest().getDetailCount() > 0){
+                        if ( (poGLControllers.PaymentRequest().Detail(0).getRecurringNo() != null && !"".equals(poGLControllers.PaymentRequest().Detail(0).getRecurringNo())) ){
+                            JFXUtil.setDisabled(true, tfPayee,tfDepartment);
+                        } else {
+                            JFXUtil.setDisabled(!PaymentRequestStatus.OPEN.equals(poGLControllers.PaymentRequest().Master().getTransactionStatus()), tfPayee,tfDepartment);
+                        }
+                    }
+                }
+                
+                JFXUtil.setDisabled(!PaymentRequestStatus.OPEN.equals(poGLControllers.PaymentRequest().Master().getTransactionStatus()), taRemarks);
+            }
 
             JFXUtil.setStatusValue(lblStatus, PaymentRequestStatus.class, pnEditMode == EditMode.UNKNOWN ? "-1" : poGLControllers.PaymentRequest().Master().getTransactionStatus());
 
@@ -430,7 +448,7 @@ public class PaymentRequest_ConfirmationController implements Initializable, Scr
                                     ShowMessageFX.Information((String) poJSON.get("message"), psFormName, null);
                                     poGLControllers.PaymentRequest().OpenTransaction(poGLControllers.PaymentRequest().Master().getTransactionNo());
                                     tblVwPaymentRequest.refresh();
-                                    main_data.get(pnTblMainRow).setIndex05(PaymentRequestStatus.CONFIRMED);
+                                    main_data.get(pnTblMainRow).setIndex06(PaymentRequestStatus.CONFIRMED);
                                     loadTableDetail();
                                 } else {
                                     ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
@@ -483,7 +501,7 @@ public class PaymentRequest_ConfirmationController implements Initializable, Scr
                         pnTblDetailRow = -1;
                         //this code below use to highlight tblpurchase
                         tblVwPaymentRequest.refresh();
-                        main_data.get(pnTblMainRow).setIndex05(PaymentRequestStatus.CONFIRMED);
+                        main_data.get(pnTblMainRow).setIndex06(PaymentRequestStatus.CONFIRMED);
                         pagination.toBack();
                     } else {
                         return;
@@ -595,7 +613,7 @@ public class PaymentRequest_ConfirmationController implements Initializable, Scr
                         }
                         ShowMessageFX.Information((String) poJSON.get("message"), psFormName, null);
                         tblVwPaymentRequest.refresh();
-                        main_data.get(pnTblMainRow).setIndex05(PaymentRequestStatus.RETURNED);
+                        main_data.get(pnTblMainRow).setIndex06(PaymentRequestStatus.RETURNED);
                     } else {
                         return;
                     }
@@ -619,7 +637,7 @@ public class PaymentRequest_ConfirmationController implements Initializable, Scr
                         }
                         ShowMessageFX.Information((String) poJSON.get("message"), psFormName, null);
                         tblVwPaymentRequest.refresh();
-                        main_data.get(pnTblMainRow).setIndex05(PaymentRequestStatus.VOID);
+                        main_data.get(pnTblMainRow).setIndex06(PaymentRequestStatus.VOID);
                     } else {
                         return;
                     }
@@ -1028,11 +1046,196 @@ public class PaymentRequest_ConfirmationController implements Initializable, Scr
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
         }
     };
+    
+    
+    //revised by Arsiela 05-05-2026
+    private boolean checkSource() throws SQLException, GuanzonException{
+        if ( poGLControllers.PaymentRequest().Master().getSourceNo() != null && !"".equals(poGLControllers.PaymentRequest().Master().getSourceNo()) ){
+            return true;
+        } else {
+            if(poGLControllers.PaymentRequest().getDetailCount() > 0){
+                if ( (poGLControllers.PaymentRequest().Detail(0).getRecurringNo() != null && !"".equals(poGLControllers.PaymentRequest().Detail(0).getRecurringNo())) ){
+                    return true;
+                }
+            }
+        }
+        
+        return false;
+    }
+    
+    boolean pbShow = false;
+    private boolean isExchangingPayee(String fsPayeeID, boolean keyPressed) {
+        if (pnEditMode == EditMode.UPDATE) {
+            try {
+                if (checkSource()) {
+                    if(pnEditMode == EditMode.UPDATE){
+                        if(!pbShow){
+                            ShowMessageFX.Warning("A transaction source is already linked to this Payment Request.\nChanging the payee during an update is not permitted.", psFormName, null);
+                            pbShow = true;
+                        }
+                        return false;
+                    }
+                    
+                    if(!pbShow){
+                        pbShow = true;
+                        if (!ShowMessageFX.YesNo("This Payment Request is linked to a transaction source. Are you sure you want to change the payee?\nPlease note that proceeding will reset all currently entered information.", psFormName, null)) {
+                            poGLControllers.PaymentRequest().Master().setPayeeID(fsPayeeID);
+                            tfPayee.setText(poGLControllers.PaymentRequest().Master().Payee().getPayeeName());
+                            return false;
+                        }
+
+                        int detailCount = poGLControllers.PaymentRequest().getDetailCount();
+                        for (int lnCtr = detailCount - 1; lnCtr >= 0; lnCtr--) {
+                            if (poGLControllers.PaymentRequest().Detail(lnCtr).getParticularID().isEmpty()
+                                    || poGLControllers.PaymentRequest().Detail(lnCtr).getAmount() == 0.0000) {
+                                continue; // Skip deleting this row
+                            }
+                            poGLControllers.PaymentRequest().Detail().remove(lnCtr);
+                        }
+                        poGLControllers.PaymentRequest().Master().setSourceCode("");
+                        poGLControllers.PaymentRequest().Master().setSourceNo("");
+                        pnTblDetailRow = -1;
+                        pnTblMainRow = -1;
+                        clearDetailFields();
+                        loadTableDetail();
+
+                        try {
+                            if(keyPressed){
+                                poJSON = new JSONObject();
+                                poJSON = poGLControllers.PaymentRequest().SearchPayee(tfPayee.getText(), false);
+                                if (!"success".equals((String) poJSON.get("result"))) {
+                                    ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
+                                    return false;
+                                }
+                                tfPayee.setText(poGLControllers.PaymentRequest().Master().Payee().getPayeeName());
+                                return false;
+                            }
+
+                        } catch (ExceptionInInitializerError | SQLException | GuanzonException ex) {
+                            Logger.getLogger(getClass()
+                                    .getName()).log(Level.SEVERE, null, ex);
+
+                        }
+                    }
+                } else {
+                    if(!pbShow && keyPressed){
+                        pbShow = true;
+                        try {
+                            poJSON = new JSONObject();
+                            poJSON = poGLControllers.PaymentRequest().SearchPayee(tfPayee.getText(), false);
+                            if (!"success".equals((String) poJSON.get("result"))) {
+                                ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
+                                return false;
+                            }
+                            tfPayee.setText(poGLControllers.PaymentRequest().Master().Payee().getPayeeName());
+                            return false;
+
+                        } catch (ExceptionInInitializerError | SQLException | GuanzonException ex) {
+                            Logger.getLogger(getClass()
+                                    .getName()).log(Level.SEVERE, null, ex);
+
+                        }
+                    }
+                }
+            } catch (SQLException | GuanzonException ex) {
+                Logger.getLogger(getClass()
+                        .getName()).log(Level.SEVERE, null, ex);
+
+            }
+        }
+
+        return true;
+    }
+    
+    private boolean isExchangingDepartment(String fsDepartmentId, boolean keyPressed) {
+        if (pnEditMode == EditMode.UPDATE) {
+            try {
+                if (checkSource() && !InvTransCons.PURCHASE_ORDER.equals(poGLControllers.PaymentRequest().Master().getSourceCode())) {
+                    if(pnEditMode == EditMode.UPDATE){
+                        if(!pbShow){
+                            ShowMessageFX.Warning("A transaction source is already linked to this Payment Request.\nChanging the department during an update is not permitted.", psFormName, null);
+                            pbShow = true;
+                        }
+                        return false;
+                    }
+                    
+                    if(!pbShow){
+                        pbShow = true;
+                        if (!ShowMessageFX.YesNo("This Payment Request is linked to a transaction source. Are you sure you want to change the department?\nPlease note that proceeding will reset all currently entered information.", psFormName, null)) {
+                            poGLControllers.PaymentRequest().Master().setDepartmentID(fsDepartmentId);
+                            tfDepartment.setText(poGLControllers.PaymentRequest().Master().Department().getDescription());
+                            return false;
+                        }
+
+                        int detailCount = poGLControllers.PaymentRequest().getDetailCount();
+                        for (int lnCtr = detailCount - 1; lnCtr >= 0; lnCtr--) {
+                            if (poGLControllers.PaymentRequest().Detail(lnCtr).getParticularID().isEmpty()
+                                    || poGLControllers.PaymentRequest().Detail(lnCtr).getAmount() == 0.0000) {
+                                continue; // Skip deleting this row
+                            }
+                            poGLControllers.PaymentRequest().Detail().remove(lnCtr);
+                        }
+                        poGLControllers.PaymentRequest().Master().setSourceCode("");
+                        poGLControllers.PaymentRequest().Master().setSourceNo("");
+                        pnTblDetailRow = -1;
+                        pnTblMainRow = -1;
+                        clearDetailFields();
+                        loadTableDetail();
+
+                        try {
+                            if(keyPressed){
+                                poJSON = new JSONObject();
+                                poJSON = poGLControllers.PaymentRequest().SearchDepartment(tfDepartment.getText(), false);
+                                if ("error".equals(poJSON.get("result"))) {
+                                    ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
+                                    tfDepartment.setText("");
+                                    return false;
+                                }
+                                tfDepartment.setText(poGLControllers.PaymentRequest().Master().Department().getDescription());
+                                return false;
+                            }
+
+                        } catch (ExceptionInInitializerError | SQLException | GuanzonException ex) {
+                            Logger.getLogger(getClass()
+                                    .getName()).log(Level.SEVERE, null, ex);
+
+                        }
+                    }
+                } else {
+                    if(!pbShow && keyPressed){
+                        pbShow = true;
+                        try {
+                            poJSON = new JSONObject();
+                            poJSON = poGLControllers.PaymentRequest().SearchDepartment(tfDepartment.getText(), false);
+                            if ("error".equals(poJSON.get("result"))) {
+                                ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
+                                tfDepartment.setText("");
+                                return false;
+                            }
+                            tfDepartment.setText(poGLControllers.PaymentRequest().Master().Department().getDescription());
+                            return false;
+
+                        } catch (ExceptionInInitializerError | SQLException | GuanzonException ex) {
+                            Logger.getLogger(getClass()
+                                    .getName()).log(Level.SEVERE, null, ex);
+
+                        }
+                    }
+                }
+            } catch (SQLException | GuanzonException ex) {
+                Logger.getLogger(getClass()
+                        .getName()).log(Level.SEVERE, null, ex);
+
+            }
+        }
+
+        return true;
+    }
 
     private void initTextFieldKeyPressed() {
         List<TextField> loTxtField = Arrays.asList(
                 tfParticular, tfSearchTransaction, tfSearchPayee,
-                tfAmount, tfDiscRate, tfDiscAmountDetail);
+                tfAmount, tfDiscRate, tfDiscAmountDetail, tfPayee, tfDepartment);
 
         loTxtField.forEach(tf -> tf.setOnKeyPressed(event -> txtField_KeyPressed(event)));
     }
@@ -1053,6 +1256,28 @@ public class PaymentRequest_ConfirmationController implements Initializable, Scr
                     case ENTER:
                     case F3:
                         switch (txtFieldID) {
+                            case "tfPayee":
+                                if (!isExchangingPayee(poGLControllers.PaymentRequest().Master().getPayeeID(), true)) {
+                                    pbShow = false;
+                                    return;
+                                }
+                                pbShow = false;
+                                break;
+                            case "tfDepartment":
+                                if (!isExchangingDepartment(poGLControllers.PaymentRequest().Master().getDepartmentID(), true)) {
+                                    pbShow = false;
+                                    return;
+                                }
+                                pbShow = false;
+//                                poJSON = poGLControllers.PaymentRequest().SearchDepartment(lsValue, false);
+//                                if ("error".equals(poJSON.get("result"))) {
+//                                    ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
+//                                    tfDepartment.setText("");
+//                                    break;
+//                                }
+//                                tfDepartment.setText(poGLControllers.PaymentRequest().Master().Department().getDescription());
+
+                                break;
                             case "tfSearchTransaction":
                                 loadTableMain();
                                 break;
@@ -1068,16 +1293,6 @@ public class PaymentRequest_ConfirmationController implements Initializable, Scr
 //                                if (!tfSearchPayee.getText().isEmpty()) {
                                 loadTableMain();
 //                                }
-                                break;
-                            case "tfDepartment":
-                                poJSON = poGLControllers.PaymentRequest().SearchDepartment(lsValue, false);
-                                if ("error".equals(poJSON.get("result"))) {
-                                    ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
-                                    tfDepartment.setText("");
-                                    break;
-                                }
-                                tfDepartment.setText(poGLControllers.PaymentRequest().Master().Department().getDescription());
-
                                 break;
                             case "tfParticular":
                                 if (!tfPayee.getText().isEmpty()) {
@@ -1211,6 +1426,21 @@ public class PaymentRequest_ConfirmationController implements Initializable, Scr
                 Logger.getLogger(PaymentRequest_ConfirmationController.class.getName()).log(Level.SEVERE, null, ex);
             }
         });
+        
+        JFXUtil.handleDisabledNodeClick(apMaster, pnEditMode, nodeID -> {
+            try {
+                switch (nodeID) {
+                    case "taRemarks":
+                        if(!PaymentRequestStatus.OPEN.equals(poGLControllers.PaymentRequest().Master().getTransactionStatus())){
+                            ShowMessageFX.Warning(null, psFormName,
+                                    "Remarks is disabled for non-open transactions.");
+                        }
+                        break;
+                }
+            } catch (SQLException | GuanzonException ex) {
+                Logger.getLogger(PaymentRequest_ConfirmationController.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        });
     }
 
     private void initDatePickerActions() {
@@ -1337,11 +1567,12 @@ public class PaymentRequest_ConfirmationController implements Initializable, Scr
                             for (int lnCntr = 0; lnCntr < poGLControllers.PaymentRequest().getPRFMasterCount(); lnCntr++) {
                                 main_data.add(new ModelTableMain(
                                         String.valueOf(lnCntr + 1),
+                                        poGLControllers.PaymentRequest().poPRFMaster(lnCntr).getTransactionNo(),
+                                        CustomCommonUtil.formatDateToShortString(poGLControllers.PaymentRequest().poPRFMaster(lnCntr).getTransactionDate()), 
                                         poGLControllers.PaymentRequest().poPRFMaster(lnCntr).Branch().getBranchName(),
                                         poGLControllers.PaymentRequest().poPRFMaster(lnCntr).Payee().getPayeeName(),
-                                        poGLControllers.PaymentRequest().poPRFMaster(lnCntr).getTransactionNo(),
                                         poGLControllers.PaymentRequest().poPRFMaster(lnCntr).getTransactionStatus(),
-                                        "", "", "", "", ""));
+                                        "", "", "", ""));
                             }
                         } else {
                             main_data.clear();
@@ -1385,7 +1616,7 @@ public class PaymentRequest_ConfirmationController implements Initializable, Scr
     }
 
     private void initTablePaymentRequest() {
-        JFXUtil.setColumnCenter(tblRowNo, tblTransactionNo);
+        JFXUtil.setColumnCenter(tblRowNo, tblTransactionNo,tblTransactionDate);
         JFXUtil.setColumnLeft(tblBranch, tblPayee);
         JFXUtil.setColumnsIndexAndDisableReordering(tblVwPaymentRequest);
         JFXUtil.setColumnsIndexAndDisableReordering(tblVwPaymentRequest);
@@ -1404,8 +1635,8 @@ public class PaymentRequest_ConfirmationController implements Initializable, Scr
                 if (item == null || empty) {
                     setStyle("");
                 } else {
-                    // Assuming empIndex05 corresponds to an employee status
-                    String status = item.getIndex05(); // Replace with actual getter
+                    // Assuming empIndex06 corresponds to an employee status
+                    String status = item.getIndex06(); // Replace with actual getter
                     switch (status) {
                         case PaymentRequestStatus.CONFIRMED:
                             setStyle("-fx-background-color: #C1E1C1;");
@@ -1606,6 +1837,39 @@ public class PaymentRequest_ConfirmationController implements Initializable, Scr
             }
         }
         );
+        
+        tfPayee.focusedProperty().addListener((obs, wasFocused, isNowFocused) -> {
+            if (!isNowFocused) { // lost focus
+                try {
+                    if (tfPayee.getText() == null || tfPayee.getText().isEmpty()) {
+                        if (!isExchangingPayee(poGLControllers.PaymentRequest().Master().getPayeeID(), false)) {
+                            return;
+                        }
+                        poGLControllers.PaymentRequest().Master().setPayeeID("");
+                        tfPayee.setText("");
+                    }
+                } catch (SQLException | GuanzonException ex) {
+                    Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        });
+        
+        
+        tfDepartment.focusedProperty().addListener((obs, wasFocused, isNowFocused) -> {
+            if (!isNowFocused) { // lost focus
+                try {
+                    if (tfDepartment.getText() == null || tfDepartment.getText().isEmpty()) {
+                        if (!isExchangingDepartment(poGLControllers.PaymentRequest().Master().getDepartmentID(), false)) {
+                            return;
+                        }
+                        poGLControllers.PaymentRequest().Master().setDepartmentID("");
+                        tfDepartment.setText("");
+                    }
+                } catch (SQLException | GuanzonException ex) {
+                    Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        });
     }
 
     private void tblVwMain_Clicked(MouseEvent event) {
@@ -1619,7 +1883,7 @@ public class PaymentRequest_ConfirmationController implements Initializable, Scr
             ModelTableMain loSelectedPaymentRequest = (ModelTableMain) tblVwPaymentRequest.getSelectionModel().getSelectedItem();
             if (loSelectedPaymentRequest != null) {
                 try {
-                    String lsTransactionNo = loSelectedPaymentRequest.getIndex04();
+                    String lsTransactionNo = loSelectedPaymentRequest.getIndex02();
                     if (!JFXUtil.loadValidation(pnEditMode, psFormName, poGLControllers.PaymentRequest().Master().getTransactionNo(), lsTransactionNo)) {
                         return;
                     }

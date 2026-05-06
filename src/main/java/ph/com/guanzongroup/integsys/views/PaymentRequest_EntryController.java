@@ -308,8 +308,25 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
 
     private void loadRecordMaster() {
         try {
+            JFXUtil.setDisabled(true, tfBranch);
             boolean lbShow = pnEditMode == EditMode.UPDATE;
-            JFXUtil.setDisabled(lbShow, tfBranch, tfDepartment, tfPayee);
+            if(lbShow){
+                //Do not allow to update payee when there's a transaction source
+                if ( poGLControllers.PaymentRequest().Master().getSourceNo() != null && !"".equals(poGLControllers.PaymentRequest().Master().getSourceNo()) ){
+                    JFXUtil.setDisabled(true, tfPayee, tfDepartment);
+                } else {
+                    //Do not allow to update payee when there's a transaction source
+                    if(poGLControllers.PaymentRequest().getDetailCount() > 0){
+                        if ( (poGLControllers.PaymentRequest().Detail(0).getRecurringNo() != null && !"".equals(poGLControllers.PaymentRequest().Detail(0).getRecurringNo())) ){
+                            JFXUtil.setDisabled(true, tfPayee,tfDepartment);
+                        } else {
+                            JFXUtil.setDisabled(!PaymentRequestStatus.OPEN.equals(poGLControllers.PaymentRequest().Master().getTransactionStatus()), tfPayee,tfDepartment);
+                        }
+                    }
+                }
+                
+                JFXUtil.setDisabled(!PaymentRequestStatus.OPEN.equals(poGLControllers.PaymentRequest().Master().getTransactionStatus()), taRemarks);
+            }
 
             JFXUtil.setStatusValue(lblStatus, PaymentRequestStatus.class, pnEditMode == EditMode.UNKNOWN ? "-1" : poGLControllers.PaymentRequest().Master().getTransactionStatus());
             poGLControllers.PaymentRequest().computeFields();
@@ -1144,30 +1161,37 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
                     case F3:
                         switch (txtFieldID) {
                             case "tfPayee":
-                                if (!isExchangingPayee()) {
+                                if (!isExchangingPayee(poGLControllers.PaymentRequest().Master().getPayeeID(), true )) {
+                                    pbShow = false;
                                     return;
                                 }
-                                poJSON = poGLControllers.PaymentRequest().SearchPayee(lsValue, false);
-                                if ("error".equals(poJSON.get("result"))) {
-                                    ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
-                                    tfPayee.setText("");
-                                    break;
-                                }
-                                prevPayee = poGLControllers.PaymentRequest().Master().getPayeeID();
-                                tfPayee.setText(poGLControllers.PaymentRequest().Master().Payee().getPayeeName());
-                                if (!tfPayee.getText().isEmpty()) {
-                                    loadTableMain();
-                                }
+                                pbShow = false;
+//                                poJSON = poGLControllers.PaymentRequest().SearchPayee(lsValue, false);
+//                                if ("error".equals(poJSON.get("result"))) {
+//                                    ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
+//                                    tfPayee.setText("");
+//                                    break;
+//                                }
+//                                prevPayee = poGLControllers.PaymentRequest().Master().getPayeeID();
+//                                tfPayee.setText(poGLControllers.PaymentRequest().Master().Payee().getPayeeName());
+//                                if (!tfPayee.getText().isEmpty()) {
+//                                    loadTableMain();
+//                                }
 
                                 break;
                             case "tfDepartment":
-                                poJSON = poGLControllers.PaymentRequest().SearchDepartment(lsValue, false);
-                                if ("error".equals(poJSON.get("result"))) {
-                                    ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
-                                    tfDepartment.setText("");
-                                    break;
+                                if (!isExchangingDepartment(poGLControllers.PaymentRequest().Master().getDepartmentID(), true)) {
+                                    pbShow = false;
+                                    return;
                                 }
-                                tfDepartment.setText(poGLControllers.PaymentRequest().Master().Department().getDescription());
+                                pbShow = false;
+//                                poJSON = poGLControllers.PaymentRequest().SearchDepartment(lsValue, false);
+//                                if ("error".equals(poJSON.get("result"))) {
+//                                    ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
+//                                    tfDepartment.setText("");
+//                                    break;
+//                                }
+//                                tfDepartment.setText(poGLControllers.PaymentRequest().Master().Department().getDescription());
                                 break;
                             case "tfParticular":
                                 if (!tfPayee.getText().isEmpty()) {
@@ -1744,7 +1768,7 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
             if (!isNowFocused) { // lost focus
                 try {
                     if (tfPayee.getText() == null || tfPayee.getText().isEmpty()) {
-                        if (!isExchangingPayee()) {
+                        if (!isExchangingPayee(poGLControllers.PaymentRequest().Master().getPayeeID(), false)) {
                             return;
                         }
                         poGLControllers.PaymentRequest().Master().setPayeeID("");
@@ -1757,22 +1781,150 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
                 }
             }
         });
+        
+        tfDepartment.focusedProperty().addListener((obs, wasFocused, isNowFocused) -> {
+            if (!isNowFocused) { // lost focus
+                try {
+                    if (tfDepartment.getText() == null || tfDepartment.getText().isEmpty()) {
+                        if (!isExchangingDepartment(poGLControllers.PaymentRequest().Master().getDepartmentID(), false)) {
+                            return;
+                        }
+                        poGLControllers.PaymentRequest().Master().setDepartmentID("");
+                        tfDepartment.setText("");
+                    }
+                } catch (SQLException | GuanzonException ex) {
+                    Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        });
     }
-
-    private boolean isExchangingPayee() {
+//
+//    private boolean isExchangingPayee() {
+//        if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
+//            try {
+//                boolean isHaveAmountAndStockId = false;
+//                if (poGLControllers.PaymentRequest().getDetailCount() >= 1) {
+//                    if (poGLControllers.PaymentRequest().Detail(0).getParticularID() != null && poGLControllers.PaymentRequest().Detail(0).getAmount() != 0.0000) {
+//                        if (!poGLControllers.PaymentRequest().Detail(0).getParticularID().isEmpty()
+//                                || poGLControllers.PaymentRequest().Detail(0).getAmount() != 0.0000) {
+//                            isHaveAmountAndStockId = true;
+//                        }
+//                    }
+//                }
+//                if (isHaveAmountAndStockId) {
+//                    if (ShowMessageFX.YesNo("Payment Request Details already have items, are you sure you want to change payee?", psFormName, null)) {
+//                        int detailCount = poGLControllers.PaymentRequest().getDetailCount();
+//                        for (int lnCtr = detailCount - 1; lnCtr >= 0; lnCtr--) {
+//                            if (poGLControllers.PaymentRequest().Detail(lnCtr).getParticularID().isEmpty()
+//                                    || poGLControllers.PaymentRequest().Detail(lnCtr).getAmount() == 0.0000) {
+//                                continue; // Skip deleting this row
+//                            }
+//                            poGLControllers.PaymentRequest().Detail().remove(lnCtr);
+//                        }
+//                        pnTblDetailRow = -1;
+//                        pnTblMainRow = -1;
+//                        clearDetailFields();
+//                        loadTableDetail();
+//                    } else {
+//                        try {
+//                            poJSON = new JSONObject();
+//                            poJSON = poGLControllers.PaymentRequest().SearchPayee(poGLControllers.PaymentRequest().Master().getPayeeID(), true);
+//                            if (!"success".equals((String) poJSON.get("result"))) {
+//                                ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
+//                                return false;
+//                            }
+//                            tfPayee.setText(poGLControllers.PaymentRequest().Master().Payee().getPayeeName());
+//                            return false;
+//
+//                        } catch (ExceptionInInitializerError | SQLException | GuanzonException ex) {
+//                            Logger.getLogger(getClass()
+//                                    .getName()).log(Level.SEVERE, null, ex);
+//
+//                        }
+//                    }
+//                }
+//            } catch (SQLException | GuanzonException ex) {
+//                Logger.getLogger(getClass()
+//                        .getName()).log(Level.SEVERE, null, ex);
+//
+//            }
+//        }
+//        if (pnEditMode == EditMode.READY) {
+//            try {
+//                if (!tfTransactionNo.getText().isEmpty()
+//                        && !tfSeriesNo.getText().isEmpty()) {
+//                    if (ShowMessageFX.YesNo("You have an open transaction. Are you sure you want to change the payee?", psFormName, null)) {
+//                        clearDetailFields();
+//                        clearMasterFields();
+//                        detail_data.clear();
+//                        tblVwPRDetail.getItems().clear();
+//                        pnEditMode = EditMode.UNKNOWN;
+//                        poGLControllers.PaymentRequest().Master().setPayeeID(prevPayee);
+//                        tfPayee.setText(poGLControllers.PaymentRequest().Master().Payee().getPayeeName());
+//                        pnTblMainRow = -1;
+//                        tblVwRecurringExpense.getItems().clear();
+//                        tblVwRecurringExpense.setPlaceholder(new Label("NO RECORD TO LOAD"));
+//                        initButtons(pnEditMode);
+//                        initFields(pnEditMode);
+//                        return true;
+//                    } else {
+//                        poJSON = new JSONObject();
+//                        poJSON = poGLControllers.PaymentRequest().SearchPayee(poGLControllers.PaymentRequest().Master().getPayeeID(), true);
+//                        if (!"success".equals((String) poJSON.get("result"))) {
+//                            ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
+//                            return false;
+//                        }
+//                        tfPayee.setText(poGLControllers.PaymentRequest().Master().Payee().getPayeeName());
+//
+//                        return false;
+//
+//                    }
+//                }
+//            } catch (ExceptionInInitializerError | SQLException | GuanzonException ex) {
+//                Logger.getLogger(getClass()
+//                        .getName()).log(Level.SEVERE, null, ex);
+//            }
+//        }
+//
+//        return true;
+//    }
+    
+    //revised by Arsiela 05-05-2026
+    private boolean checkSource() throws SQLException, GuanzonException{
+        if ( poGLControllers.PaymentRequest().Master().getSourceNo() != null && !"".equals(poGLControllers.PaymentRequest().Master().getSourceNo()) ){
+            return true;
+        } else {
+            if(poGLControllers.PaymentRequest().getDetailCount() > 0){
+                if ( (poGLControllers.PaymentRequest().Detail(0).getRecurringNo() != null && !"".equals(poGLControllers.PaymentRequest().Detail(0).getRecurringNo())) ){
+                    return true;
+                }
+            }
+        }
+        
+        return false;
+    }
+    
+    boolean pbShow = false;
+    private boolean isExchangingPayee(String fsPayeeID, boolean keyPressed) {
         if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
             try {
-                boolean isHaveAmountAndStockId = false;
-                if (poGLControllers.PaymentRequest().getDetailCount() >= 1) {
-                    if (poGLControllers.PaymentRequest().Detail(0).getParticularID() != null && poGLControllers.PaymentRequest().Detail(0).getAmount() != 0.0000) {
-                        if (!poGLControllers.PaymentRequest().Detail(0).getParticularID().isEmpty()
-                                || poGLControllers.PaymentRequest().Detail(0).getAmount() != 0.0000) {
-                            isHaveAmountAndStockId = true;
+                if (checkSource()) {
+                    if(pnEditMode == EditMode.UPDATE){
+                        if(!pbShow){
+                            ShowMessageFX.Warning("A transaction source is already linked to this Payment Request.\nChanging the payee during an update is not permitted.", psFormName, null);
+                            pbShow = true;
                         }
+                        return false;
                     }
-                }
-                if (isHaveAmountAndStockId) {
-                    if (ShowMessageFX.YesNo("Payment Request Details already have items, are you sure you want to change payee?", psFormName, null)) {
+                    
+                    if(!pbShow){
+                        pbShow = true;
+                        if (!ShowMessageFX.YesNo("This Payment Request is linked to a transaction source. Are you sure you want to change the payee?\nPlease note that proceeding will reset all currently entered information.", psFormName, null)) {
+                            poGLControllers.PaymentRequest().Master().setPayeeID(fsPayeeID);
+                            tfPayee.setText(poGLControllers.PaymentRequest().Master().Payee().getPayeeName());
+                            return false;
+                        }
+
                         int detailCount = poGLControllers.PaymentRequest().getDetailCount();
                         for (int lnCtr = detailCount - 1; lnCtr >= 0; lnCtr--) {
                             if (poGLControllers.PaymentRequest().Detail(lnCtr).getParticularID().isEmpty()
@@ -1781,14 +1933,37 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
                             }
                             poGLControllers.PaymentRequest().Detail().remove(lnCtr);
                         }
+                        poGLControllers.PaymentRequest().Master().setSourceCode("");
+                        poGLControllers.PaymentRequest().Master().setSourceNo("");
                         pnTblDetailRow = -1;
                         pnTblMainRow = -1;
                         clearDetailFields();
                         loadTableDetail();
-                    } else {
+
+                        try {
+                            if(keyPressed){
+                                poJSON = new JSONObject();
+                                poJSON = poGLControllers.PaymentRequest().SearchPayee(tfPayee.getText(), false);
+                                if (!"success".equals((String) poJSON.get("result"))) {
+                                    ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
+                                    return false;
+                                }
+                                tfPayee.setText(poGLControllers.PaymentRequest().Master().Payee().getPayeeName());
+                                return false;
+                            }
+
+                        } catch (ExceptionInInitializerError | SQLException | GuanzonException ex) {
+                            Logger.getLogger(getClass()
+                                    .getName()).log(Level.SEVERE, null, ex);
+
+                        }
+                    }
+                } else {
+                    if(!pbShow && keyPressed){
+                        pbShow = true;
                         try {
                             poJSON = new JSONObject();
-                            poJSON = poGLControllers.PaymentRequest().SearchPayee(poGLControllers.PaymentRequest().Master().getPayeeID(), true);
+                            poJSON = poGLControllers.PaymentRequest().SearchPayee(tfPayee.getText(), false);
                             if (!"success".equals((String) poJSON.get("result"))) {
                                 ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
                                 return false;
@@ -1809,40 +1984,90 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
 
             }
         }
-        if (pnEditMode == EditMode.READY) {
+
+        return true;
+    }
+    
+    //Added by arsiela 05-06-2026
+    private boolean isExchangingDepartment(String fsDepartmentId, boolean keyPressed) {
+        if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
             try {
-                if (!tfTransactionNo.getText().isEmpty()
-                        && !tfSeriesNo.getText().isEmpty()) {
-                    if (ShowMessageFX.YesNo("You have an open transaction. Are you sure you want to change the payee?", psFormName, null)) {
-                        clearDetailFields();
-                        clearMasterFields();
-                        detail_data.clear();
-                        tblVwPRDetail.getItems().clear();
-                        pnEditMode = EditMode.UNKNOWN;
-                        poGLControllers.PaymentRequest().Master().setPayeeID(prevPayee);
-                        tfPayee.setText(poGLControllers.PaymentRequest().Master().Payee().getPayeeName());
-                        pnTblMainRow = -1;
-                        tblVwRecurringExpense.getItems().clear();
-                        tblVwRecurringExpense.setPlaceholder(new Label("NO RECORD TO LOAD"));
-                        initButtons(pnEditMode);
-                        initFields(pnEditMode);
-                        return true;
-                    } else {
-                        poJSON = new JSONObject();
-                        poJSON = poGLControllers.PaymentRequest().SearchPayee(poGLControllers.PaymentRequest().Master().getPayeeID(), true);
-                        if (!"success".equals((String) poJSON.get("result"))) {
-                            ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
+                if (checkSource() && !InvTransCons.PURCHASE_ORDER.equals(poGLControllers.PaymentRequest().Master().getSourceCode())) {
+                    if(pnEditMode == EditMode.UPDATE){
+                        if(!pbShow){
+                            ShowMessageFX.Warning("A transaction source is already linked to this Payment Request.\nChanging the department during an update is not permitted.", psFormName, null);
+                            pbShow = true;
+                        }
+                        return false;
+                    }
+                    
+                    if(!pbShow){
+                        pbShow = true;
+                        if (!ShowMessageFX.YesNo("This Payment Request is linked to a transaction source. Are you sure you want to change the department?\nPlease note that proceeding will reset all currently entered information.", psFormName, null)) {
+                            poGLControllers.PaymentRequest().Master().setDepartmentID(fsDepartmentId);
+                            tfDepartment.setText(poGLControllers.PaymentRequest().Master().Department().getDescription());
                             return false;
                         }
-                        tfPayee.setText(poGLControllers.PaymentRequest().Master().Payee().getPayeeName());
 
-                        return false;
+                        int detailCount = poGLControllers.PaymentRequest().getDetailCount();
+                        for (int lnCtr = detailCount - 1; lnCtr >= 0; lnCtr--) {
+                            if (poGLControllers.PaymentRequest().Detail(lnCtr).getParticularID().isEmpty()
+                                    || poGLControllers.PaymentRequest().Detail(lnCtr).getAmount() == 0.0000) {
+                                continue; // Skip deleting this row
+                            }
+                            poGLControllers.PaymentRequest().Detail().remove(lnCtr);
+                        }
+                        poGLControllers.PaymentRequest().Master().setSourceCode("");
+                        poGLControllers.PaymentRequest().Master().setSourceNo("");
+                        pnTblDetailRow = -1;
+                        pnTblMainRow = -1;
+                        clearDetailFields();
+                        loadTableDetail();
 
+                        try {
+                            if(keyPressed){
+                                poJSON = new JSONObject();
+                                poJSON = poGLControllers.PaymentRequest().SearchDepartment(tfDepartment.getText(), false);
+                                if ("error".equals(poJSON.get("result"))) {
+                                    ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
+                                    tfDepartment.setText("");
+                                    return false;
+                                }
+                                tfDepartment.setText(poGLControllers.PaymentRequest().Master().Department().getDescription());
+                                return false;
+                            }
+
+                        } catch (ExceptionInInitializerError | SQLException | GuanzonException ex) {
+                            Logger.getLogger(getClass()
+                                    .getName()).log(Level.SEVERE, null, ex);
+
+                        }
+                    }
+                } else {
+                    if(!pbShow && keyPressed){
+                        pbShow = true;
+                        try {
+                            poJSON = new JSONObject();
+                            poJSON = poGLControllers.PaymentRequest().SearchDepartment(tfDepartment.getText(), false);
+                            if ("error".equals(poJSON.get("result"))) {
+                                ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
+                                tfDepartment.setText("");
+                                return false;
+                            }
+                            tfDepartment.setText(poGLControllers.PaymentRequest().Master().Department().getDescription());
+                            return false;
+
+                        } catch (ExceptionInInitializerError | SQLException | GuanzonException ex) {
+                            Logger.getLogger(getClass()
+                                    .getName()).log(Level.SEVERE, null, ex);
+
+                        }
                     }
                 }
-            } catch (ExceptionInInitializerError | SQLException | GuanzonException ex) {
+            } catch (SQLException | GuanzonException ex) {
                 Logger.getLogger(getClass()
                         .getName()).log(Level.SEVERE, null, ex);
+
             }
         }
 

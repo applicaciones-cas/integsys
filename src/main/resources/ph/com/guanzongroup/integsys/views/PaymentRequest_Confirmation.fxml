@@ -48,7 +48,7 @@
                                                 <ColumnConstraints hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="400.0" />
                                                 <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="100.0" />
                                                 <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="10.0" />
-                                                <ColumnConstraints halignment="RIGHT" maxWidth="565.0" minWidth="565.0" prefWidth="565.0" />
+                                                <ColumnConstraints halignment="RIGHT" maxWidth="700.0" minWidth="565.0" prefWidth="630.0" />
                                                 <ColumnConstraints halignment="RIGHT" hgrow="ALWAYS" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="10.0" />
                                             </columnConstraints>
                                             <rowConstraints>
@@ -493,9 +493,10 @@
                                                         <TableView fx:id="tblVwPaymentRequest" minWidth="242.0" GridPane.rowIndex="1">
                                                             <columns>
                                                                 <TableColumn fx:id="tblRowNo" maxWidth="30.0" minWidth="30.0" prefWidth="30.0" resizable="false" sortable="false" text="No." />
-                                                                <TableColumn fx:id="tblBranch" maxWidth="200.0" minWidth="200.0" prefWidth="200.0" resizable="false" sortable="false" text="Branch" />
-                                                                <TableColumn fx:id="tblPayee" maxWidth="236.0" minWidth="236.0" prefWidth="236.0" resizable="false" sortable="false" text="Payee" />
-                                                                <TableColumn fx:id="tblTransactionNo" maxWidth="150.0" minWidth="150.0" prefWidth="150.0" resizable="false" sortable="false" text="Refer No." />
+                                                                <TableColumn fx:id="tblTransactionNo" maxWidth="150.0" minWidth="105.0" prefWidth="105.0" resizable="false" sortable="false" text="Refer No." />
+                                                <TableColumn fx:id="tblTransactionDate" maxWidth="150.0" minWidth="105.0" prefWidth="105.0" resizable="false" sortable="false" text="Date" />
+                                                                <TableColumn fx:id="tblBranch" maxWidth="245.0" minWidth="192.0" prefWidth="192.0" resizable="false" sortable="false" text="Branch" />
+                                                                <TableColumn fx:id="tblPayee" maxWidth="281.0" minWidth="227.0" prefWidth="243.0" resizable="false" sortable="false" text="Payee" />
                                                             </columns>
                                                             <GridPane.margin>
                                                                 <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
