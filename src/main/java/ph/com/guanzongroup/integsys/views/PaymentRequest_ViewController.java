@@ -68,7 +68,6 @@ public class PaymentRequest_ViewController implements Initializable, ScreenInter
     private String psIndustryID = "";
     private String psCompanyID = "";
     private String psCategoryID = "";
-    unloadForm poUnload = new unloadForm();
     private int pnTblDetailRow = -1;
     private String prevPayee = "";
     private String psTransactionNo = "";
@@ -345,17 +344,16 @@ public class PaymentRequest_ViewController implements Initializable, ScreenInter
             String lsButton = ((Button) event.getSource()).getId();
             switch (lsButton) {
                 case "btnClose":
-                    if (ShowMessageFX.YesNo("Are you sure you want to close this form?", pxeModuleName, null)) {
-                        if (poUnload != null) {
-                            poUnload.unloadForm(AnchorMain, poApp, pxeModuleName);
-                        } else {
-                            ShowMessageFX.Warning("Please notify the system administrator to configure the null value at the close button.", "Warning", null);
-                        }
+                    unloadForm appUnload = new unloadForm();
+                    if (ShowMessageFX.OkayCancel(null, "Close Tab", "Are you sure you want to close this Tab?") == true) {
+                        appUnload.unloadForm(AnchorMain, poApp, pxeModuleName);
+                    } else {
+                        return;
                     }
                     break;
                 case "btnHistory":
                     poController.ShowStatusHistory();
-                    break;
+                    return;
                 default:
                     ShowMessageFX.Warning("Please contact admin to assist about no button available", pxeModuleName, null);
                     break;

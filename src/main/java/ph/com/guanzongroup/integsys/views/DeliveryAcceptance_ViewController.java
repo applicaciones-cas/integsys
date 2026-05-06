@@ -299,6 +299,7 @@ public class DeliveryAcceptance_ViewController implements Initializable, ScreenI
 
                     try {
                         poController.ShowStatusHistory();
+                        return;
                     } catch (NullPointerException npe) {
                         Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(npe), npe);
                         ShowMessageFX.Error("No transaction status history to load!", pxeModuleName, null);

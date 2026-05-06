@@ -238,6 +238,7 @@ public class APPaymentAdjustment_ViewController implements Initializable, Screen
 
                         try {
                             poController.ShowStatusHistory();
+                            return;
                         } catch (NullPointerException npe) {
                             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(npe), npe);
                             ShowMessageFX.Error("No transaction status history to load!", pxeModuleName, null);
