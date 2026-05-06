@@ -128,46 +128,46 @@ public class SIPosting_ViewController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-            poJSON = new JSONObject();
-            poController = new PurchaseOrderReceivingControllers(oApp, null).PurchaseOrderReceiving();
-            poJSON = poController.InitTransaction(); // Initialize transaction
-            if (!"success".equals((String) poJSON.get("result"))) {
-                ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-                CommonUtils.closeStage(btnClose);
-            }
-            initTextFields();
-            initDatePickers();
-            initDetailsGrid();
-            initJEDetailsGrid();
-            initTableOnClick();
-            initTabSelection();
-            clearTextFields();
-            
-            Platform.runLater(() -> {
-                try {
-                    poJSON = poController.OpenTransaction(psTransactionNo);
-                    if ("error".equals((String) poJSON.get("result"))) {
-                        ShowMessageFX.Warning((String) poJSON.get("message"), pxeModuleName, null);
-                        CommonUtils.closeStage(btnClose);
-                    } 
-                    pnEditMode = poController.getEditMode();
-                    initButton(pnEditMode);
-                    loadRecordSearch();
-                    loadTableDetail();
-                } catch (CloneNotSupportedException | SQLException | GuanzonException ex) {
-                    Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+        poJSON = new JSONObject();
+        poController = new PurchaseOrderReceivingControllers(oApp, null).PurchaseOrderReceiving();
+        poJSON = poController.InitTransaction(); // Initialize transaction
+        if (!"success".equals((String) poJSON.get("result"))) {
+            ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+            CommonUtils.closeStage(btnClose);
+        }
+        initTextFields();
+        initDatePickers();
+        initDetailsGrid();
+        initJEDetailsGrid();
+        initTableOnClick();
+        initTabSelection();
+        clearTextFields();
+
+        Platform.runLater(() -> {
+            try {
+                poJSON = poController.OpenTransaction(psTransactionNo);
+                if ("error".equals((String) poJSON.get("result"))) {
+                    ShowMessageFX.Warning((String) poJSON.get("message"), pxeModuleName, null);
+                    CommonUtils.closeStage(btnClose);
                 }
-            });
+                pnEditMode = poController.getEditMode();
+                initButton(pnEditMode);
+                loadRecordSearch();
+                loadTableDetail();
+            } catch (CloneNotSupportedException | SQLException | GuanzonException ex) {
+                Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+            }
+        });
     }
-    
+
     public void setGRider(GRiderCAS foValue) {
         oApp = foValue;
     }
-    
+
     public void setTransaction(String fsValue) {
         psTransactionNo = fsValue;
     }
-    
+
     public void loadRecordSearch() {
         try {
             if (poController.Master().Industry().getDescription() != null && !"".equals(poController.Master().Industry().getDescription())) {
@@ -261,7 +261,7 @@ public class SIPosting_ViewController implements Initializable {
         }
 
     }
-    
+
     public void loadRecordJEDetail() {
         try {
             //DISABLING
@@ -673,7 +673,7 @@ public class SIPosting_ViewController implements Initializable {
         tblViewTransDetailList.setOnMouseClicked(event -> {
             if (details_data.size() > 0) {
                 ModelDeliveryAcceptance_Detail selected = (ModelDeliveryAcceptance_Detail) tblViewTransDetailList.getSelectionModel().getSelectedItem();
-                switch(event.getClickCount()){
+                switch (event.getClickCount()) {
                     case 1:
                         if (selected != null) {
                             stageSerial.closeDialog();
@@ -681,28 +681,28 @@ public class SIPosting_ViewController implements Initializable {
                             loadRecordDetail();
                             tfCost.requestFocus();
                         }
-                    break;
+                        break;
                     case 2:
                         if (selected != null) {
                             try {
                                 pnDetail = Integer.parseInt(selected.getIndex01()) - 1;
-                                if(poController.Detail(pnDetail).getOrderNo() != null && !"".equals(poController.Detail(pnDetail).getOrderNo())){
-                                    switch(poController.Master().getPurpose()){
+                                if (poController.Detail(pnDetail).getOrderNo() != null && !"".equals(poController.Detail(pnDetail).getOrderNo())) {
+                                    switch (poController.Master().getPurpose()) {
                                         case PurchaseOrderReceivingStatus.Purpose.REGULAR:
                                             //load order history
                                             PurchaseOrder loPOController = new PurchaseOrderControllers(oApp, null).PurchaseOrder();
-                                            poJSON = loController.InitTransaction(); // Initialize transaction
+                                            poJSON = loPOController.InitTransaction(); // Initialize transaction
                                             if (!"success".equals((String) poJSON.get("result"))) {
                                                 ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                                 CommonUtils.closeStage(btnClose);
                                             }
-                                            poJSON = loController.OpenTransaction(poController.Detail(pnDetail).getOrderNo()); 
+                                            poJSON = loPOController.OpenTransaction(poController.Detail(pnDetail).getOrderNo());
                                             if (!"success".equals((String) poJSON.get("result"))) {
                                                 ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                                 return;
                                             }
                                             try {
-                                                loController.ShowStatusHistory();
+                                                loPOController.ShowStatusHistory();
                                             } catch (NullPointerException npe) {
                                                 Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(npe), npe);
                                                 ShowMessageFX.Error("No transaction status history to load!", pxeModuleName, null);
@@ -710,7 +710,7 @@ public class SIPosting_ViewController implements Initializable {
                                                 Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
                                                 ShowMessageFX.Error(MiscUtil.getException(ex), pxeModuleName, null);
                                             }
-                                        break;
+                                            break;
                                         case PurchaseOrderReceivingStatus.Purpose.REPLACEMENT:
                                             //load order history
                                             PurchaseOrderReturn loPOReturnController = new PurchaseOrderReturnControllers(oApp, null).PurchaseOrderReturn();
@@ -719,7 +719,7 @@ public class SIPosting_ViewController implements Initializable {
                                                 ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                                 CommonUtils.closeStage(btnClose);
                                             }
-                                            poJSON = loPOReturnController.OpenTransaction(poController.Detail(pnDetail).getOrderNo()); 
+                                            poJSON = loPOReturnController.OpenTransaction(poController.Detail(pnDetail).getOrderNo());
                                             if (!"success".equals((String) poJSON.get("result"))) {
                                                 ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                                 return;
@@ -733,17 +733,17 @@ public class SIPosting_ViewController implements Initializable {
                                                 Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
                                                 ShowMessageFX.Error(MiscUtil.getException(ex), pxeModuleName, null);
                                             }
-                                        break;
+                                            break;
 
                                     }
                                 }
-                                
+
                             } catch (CloneNotSupportedException | SQLException | GuanzonException ex) {
                                 Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
-                                ShowMessageFX.Error(null, pxeModuleName,MiscUtil.getException(ex));
+                                ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
                             }
                         }
-                    break;
+                        break;
                 }
             }
         });
