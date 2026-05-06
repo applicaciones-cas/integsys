@@ -158,7 +158,7 @@ public class PaymentRequest_ViewController implements Initializable, ScreenInter
     public void initTableOnClick() {
         tblVwPRDetail.setOnMouseClicked(event -> {
             if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE || pnEditMode == EditMode.READY) {
-                int lnRow = Integer.parseInt(detail_data.get(tblVwPRDetail.getSelectionModel().getSelectedIndex()).getIndex11());
+                int lnRow = Integer.parseInt(detail_data.get(tblVwPRDetail.getSelectionModel().getSelectedIndex()).getIndex06());
                 pnTblDetailRow = lnRow;
                 ModelTableDetail selectedItem = (ModelTableDetail) tblVwPRDetail.getSelectionModel().getSelectedItem();
                 if (event.getClickCount() == 1) {
@@ -313,7 +313,7 @@ public class PaymentRequest_ViewController implements Initializable, ScreenInter
                     break;
                 case UP:
                     if (JFXUtil.isObjectEqualTo(lsTxtField.getId(), "tfParticular", "tfAmount", "tfDiscRate", "tfDiscAmountDetail")) {
-                        pnTblDetailRow = Integer.parseInt(detail_data.get(JFXUtil.moveToPreviousRow(tblVwPRDetail)).getIndex11());
+                        pnTblDetailRow = Integer.parseInt(detail_data.get(JFXUtil.moveToPreviousRow(tblVwPRDetail)).getIndex06());
                     }
                     loadRecordDetail();
                     initDetailFocus();
@@ -321,7 +321,7 @@ public class PaymentRequest_ViewController implements Initializable, ScreenInter
                     break;
                 case DOWN:
                     if (JFXUtil.isObjectEqualTo(lsTxtField.getId(), "tfParticular", "tfAmount", "tfDiscRate", "tfDiscAmountDetail")) {
-                        pnTblDetailRow = Integer.parseInt(detail_data.get(JFXUtil.moveToNextRow(tblVwPRDetail)).getIndex11());
+                        pnTblDetailRow = Integer.parseInt(detail_data.get(JFXUtil.moveToNextRow(tblVwPRDetail)).getIndex06());
                     }
                     loadRecordDetail();
                     initDetailFocus();
@@ -445,14 +445,14 @@ public class PaymentRequest_ViewController implements Initializable, ScreenInter
                             if (!detail_data.isEmpty()) {
                                 /* FOCUS ON FIRST ROW */
                                 JFXUtil.selectAndFocusRow(tblVwPRDetail, 0);
-                                int lnRow = Integer.parseInt(detail_data.get(0).getIndex11());
+                                int lnRow = Integer.parseInt(detail_data.get(0).getIndex06());
                                 pnTblDetailRow = lnRow;
                                 loadRecordDetail();
                             }
                         } else {
                             /* FOCUS ON THE ROW THAT pnRowDetail POINTS TO */
                             JFXUtil.selectAndFocusRow(tblVwPRDetail, lnTempRow);
-                            int lnRow = Integer.parseInt(detail_data.get(tblVwPRDetail.getSelectionModel().getSelectedIndex()).getIndex11());
+                            int lnRow = Integer.parseInt(detail_data.get(tblVwPRDetail.getSelectionModel().getSelectedIndex()).getIndex06());
                             pnTblDetailRow = lnRow;
                             loadRecordDetail();
                         }
@@ -494,7 +494,7 @@ public class PaymentRequest_ViewController implements Initializable, ScreenInter
             switch (currentTableID) {
                 case "tblVwPRDetail":
                     newIndex = isMovedDown
-                            ? Integer.parseInt(detail_data.get(JFXUtil.moveToNextRow(currentTable)).getIndex11()) : Integer.parseInt(detail_data.get(JFXUtil.moveToPreviousRow(currentTable)).getIndex11());
+                            ? Integer.parseInt(detail_data.get(JFXUtil.moveToNextRow(currentTable)).getIndex06()) : Integer.parseInt(detail_data.get(JFXUtil.moveToPreviousRow(currentTable)).getIndex06());
                     if (!detail_data.isEmpty()) {
                         pnTblDetailRow = newIndex;
                         loadRecordDetail();
