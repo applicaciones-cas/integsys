@@ -43,6 +43,7 @@ import org.guanzon.appdriver.base.CommonUtils;
 import org.guanzon.appdriver.base.GRiderCAS;
 import org.guanzon.appdriver.base.GuanzonException;
 import org.guanzon.appdriver.base.LogWrapper;
+import org.guanzon.appdriver.base.MiscUtil;
 import org.guanzon.appdriver.base.SQLUtil;
 import org.guanzon.appdriver.constant.EditMode;
 import org.json.simple.JSONObject;
@@ -56,24 +57,16 @@ import ph.com.guanzongroup.integsys.utility.JFXUtil;
  *
  * @author Team 1
  */
-public class PaymentRequest_ViewController implements Initializable, ScreenInterface {
+public class PaymentRequest_ViewController implements Initializable {
 
     private GRiderCAS poApp;
     private PaymentRequest poController;
-    private String pxeModuleName = "Payment Request";
-    private String psRecurringMonitor = "";
-    private LogWrapper logWrapper;
-    private int pnEditMode;
     private JSONObject poJSON;
-    private String psIndustryID = "";
-    private String psCompanyID = "";
-    private String psCategoryID = "";
-    private int pnTblDetailRow = -1;
-    private String prevPayee = "";
+    private String pxeModuleName = "Payment Request";
+    private int pnEditMode;
+    private int pnTblDetailRow = 0;
     private String psTransactionNo = "";
     private ObservableList<ModelTableDetail> detail_data = FXCollections.observableArrayList();
-    AtomicReference<Object> lastFocusedTextField = new AtomicReference<>();
-    AtomicReference<Object> previousSearchedTextField = new AtomicReference<>();
     @FXML
     private AnchorPane AnchorMain, apBrowse, apButton, apMaster, apDetail;
     @FXML
@@ -95,54 +88,47 @@ public class PaymentRequest_ViewController implements Initializable, ScreenInter
     @FXML
     private TableColumn tblRowNoDetail, tblParticular, tblAmount, tblDiscAmount, tbTotalAmount;
 
-    @Override
     public void setGRider(GRiderCAS foValue) {
         poApp = foValue;
-    }
-
-    @Override
-    public void setIndustryID(String fsValue) {
-        psIndustryID = fsValue;
-    }
-
-    @Override
-    public void setCompanyID(String fsValue) {
-        psCompanyID = fsValue;
-    }
-
-    @Override
-    public void setCategoryID(String fsValue) {
-        psCategoryID = fsValue;
-    }
-
-    public void setReloadDetail(String fsValue) {
-        psRecurringMonitor = fsValue;
     }
 
     public void setTransaction(String fsValue) {
         psTransactionNo = fsValue;
     }
-
-    public void setPaymentRequest(PaymentRequest foValue) {
-        poController = foValue;
-    }
-
+    
     /**
      * Initializes the controller class.
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         try {
-            poController = new CashflowControllers(poApp, logWrapper).PaymentRequest();
-            poController.setTransactionStatus(PaymentRequestStatus.OPEN
-                    + PaymentRequestStatus.CONFIRMED
-                    + PaymentRequestStatus.RETURNED);
-
+            poController = new CashflowControllers(poApp, null).PaymentRequest();
             JFXUtil.setKeyEventFilter(tableKeyEvents, tblVwPRDetail);
-            initAll();
-            JFXUtil.initKeyClickObject(AnchorMain, lastFocusedTextField, previousSearchedTextField);
+            initTableOnClick();
+            initDetailGrid();
+            initButtonsClickActions();
+            JFXUtil.setDisabled(true, apMaster, apDetail);
+            poJSON = poController.InitTransaction(); // Initialize transaction
+            if (!"success".equals((String) poJSON.get("result"))) {
+                ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                CommonUtils.closeStage(btnClose);
+            }
+            Platform.runLater((() -> {
+                try {
+                    poJSON = poController.OpenTransaction(psTransactionNo);
+                    if ("error".equals((String) poJSON.get("result"))) {
+                        ShowMessageFX.Warning((String) poJSON.get("message"), pxeModuleName, null);
+                        CommonUtils.closeStage(btnClose);
+                    } 
+                    pnEditMode = poController.getEditMode();
+                    loadRecordSearch();
+                    loadTableDetail();
+                } catch (CloneNotSupportedException | SQLException | GuanzonException ex) {
+                    Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+                }
+            }));
         } catch (ExceptionInInitializerError | SQLException | GuanzonException ex) {
-            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
         }
     }
 
@@ -150,7 +136,7 @@ public class PaymentRequest_ViewController implements Initializable, ScreenInter
         try {
             lblSource.setText(poController.Master().Company().getCompanyName() + " - " + poController.Master().Industry().getDescription());
         } catch (GuanzonException | SQLException ex) {
-            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
         }
     }
 
@@ -171,49 +157,6 @@ public class PaymentRequest_ViewController implements Initializable, ScreenInter
                 }
             }
         });
-    }
-
-    private void setBranchAndDepartment() {
-        poController.Master().setBranchCode(poApp.getBranchCode());
-        poController.Master().setDepartmentID(poApp.getDepartment());
-
-    }
-
-    private void initAll() {
-        try {
-            initTableOnClick();
-            initTextFieldKeyPressed();
-            initDetailGrid();
-            initButtonsClickActions();
-            JFXUtil.setDisabled(true, apMaster, apDetail);
-            poJSON = poController.InitTransaction(); // Initialize transaction
-            if (!"success".equals((String) poJSON.get("result"))) {
-                ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-                CommonUtils.closeStage(btnClose);
-            }
-            poJSON = poController.OpenTransaction(psTransactionNo);
-            if (!"error".equals((String) poJSON.get("result"))) {
-
-                pnEditMode = poController.getEditMode();
-                loadTableDetail();
-            } else {
-                Platform.runLater(() -> {
-                    ShowMessageFX.Warning((String) poJSON.get("message"), pxeModuleName, null);
-                    CommonUtils.closeStage(btnClose);
-                });
-            }
-            Platform.runLater((() -> {
-                poController.setIndustryId(psIndustryID);
-                poController.setCompanyId(psCompanyID);
-                poController.Master().setIndustryID(psIndustryID);
-                poController.Master().setCompanyID(psCompanyID);
-                loadRecordSearch();
-            }));
-            Platform.runLater(() -> setBranchAndDepartment());
-        } catch (CloneNotSupportedException | SQLException | GuanzonException ex) {
-            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
-        }
-
     }
 
     private void loadRecordMaster() {
@@ -272,54 +215,6 @@ public class PaymentRequest_ViewController implements Initializable, ScreenInter
             }
         }
 
-    }
-
-    private void initTextFieldKeyPressed() {
-        List<TextField> loTxtField = Arrays.asList(tfPayee,
-                tfParticular, tfDiscountAmount, tfTotalAmount,
-                tfDepartment,
-                tfAmount, tfDiscRate, tfDiscAmountDetail);
-
-        loTxtField.forEach(tf -> tf.setOnKeyPressed(event -> txtField_KeyPressed(event)));
-    }
-
-    private void txtField_KeyPressed(KeyEvent event) {
-        TextField lsTxtField = (TextField) event.getSource();
-        String txtFieldID = ((TextField) event.getSource()).getId();
-        String lsValue = "";
-        if (lsTxtField.getText() == null) {
-            lsValue = "";
-        } else {
-            lsValue = lsTxtField.getText();
-        }
-        if (null != event.getCode()) {
-            switch (event.getCode()) {
-                case TAB:
-                case ENTER:
-                case F3:
-                    break;
-                case UP:
-                    if (JFXUtil.isObjectEqualTo(lsTxtField.getId(), "tfParticular", "tfAmount", "tfDiscRate", "tfDiscAmountDetail")) {
-                        pnTblDetailRow = Integer.parseInt(detail_data.get(JFXUtil.moveToPreviousRow(tblVwPRDetail)).getIndex06());
-                    }
-                    loadRecordDetail();
-                    initDetailFocus();
-                    event.consume();
-                    break;
-                case DOWN:
-                    if (JFXUtil.isObjectEqualTo(lsTxtField.getId(), "tfParticular", "tfAmount", "tfDiscRate", "tfDiscAmountDetail")) {
-                        pnTblDetailRow = Integer.parseInt(detail_data.get(JFXUtil.moveToNextRow(tblVwPRDetail)).getIndex06());
-                    }
-                    loadRecordDetail();
-                    initDetailFocus();
-                    event.consume(); // Consume event after handling focus
-                    break;
-                default:
-                    break;
-
-            }
-
-        }
     }
 
     private void initButtonsClickActions() {

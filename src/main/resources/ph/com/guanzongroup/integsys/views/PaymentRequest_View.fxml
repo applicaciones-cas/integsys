@@ -28,7 +28,31 @@
             <children>
                 <BorderPane>
                     <top>
-                        <AnchorPane BorderPane.alignment="CENTER" />
+                        <AnchorPane BorderPane.alignment="CENTER">
+                     <children>
+                        <AnchorPane fx:id="apBrowse" style="-fx-background-color: A0A0A0;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                           <children>
+                              <GridPane prefHeight="28.0" prefWidth="1447.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0">
+                                 <columnConstraints>
+                                    <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="10.0" />
+                                    <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="10.0" />
+                                    <ColumnConstraints halignment="RIGHT" hgrow="ALWAYS" minWidth="-Infinity" prefWidth="630.0" />
+                                    <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="1.7976931348623157E308" minWidth="-Infinity" prefWidth="10.0" />
+                                 </columnConstraints>
+                                 <rowConstraints>
+                                    <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="28.0" vgrow="SOMETIMES" />
+                                 </rowConstraints>
+                                 <children>
+                                    <Label fx:id="lblSource" layoutX="367.0" layoutY="14.0" text="Company - Industry" GridPane.columnIndex="2">
+                                       <font>
+                                          <Font name="System Bold" size="14.0" />
+                                       </font>
+                                    </Label>
+                                 </children>
+                              </GridPane>
+                           </children>
+                        </AnchorPane>
+                     </children></AnchorPane>
                     </top>
                     <bottom>
                         <AnchorPane fx:id="apButton" prefHeight="80.0" BorderPane.alignment="CENTER">

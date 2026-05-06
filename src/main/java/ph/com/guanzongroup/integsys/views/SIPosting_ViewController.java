@@ -59,14 +59,18 @@ import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.stage.Stage;
 import javax.script.ScriptException;
+import org.guanzon.cas.purchasing.controller.PurchaseOrder;
 import org.guanzon.cas.purchasing.controller.PurchaseOrderReceiving;
+import org.guanzon.cas.purchasing.controller.PurchaseOrderReturn;
+import org.guanzon.cas.purchasing.services.PurchaseOrderControllers;
+import org.guanzon.cas.purchasing.services.PurchaseOrderReturnControllers;
 import ph.com.guanzongroup.cas.cashflow.status.JournalStatus;
 
 /**
  *
  * @author Team 1
  */
-public class SIPosting_ViewController implements Initializable, ScreenInterface {
+public class SIPosting_ViewController implements Initializable {
 
     private GRiderCAS oApp;
     static PurchaseOrderReceiving poController;
@@ -75,13 +79,7 @@ public class SIPosting_ViewController implements Initializable, ScreenInterface 
     private final String pxeModuleName = JFXUtil.getFormattedClassTitle(this.getClass());
     int pnJEDetail = 0;
     int pnDetail = 0;
-    private String psIndustryId = "";
-    private String psCompanyId = "";
-    private String psCategoryId = "";
-    private String psSupplierId = "";
-    private String psBranchId = "";
     private String psTransactionNo = "";
-    private boolean pbEntered = false;
 
     private ObservableList<ModelDeliveryAcceptance_Detail> details_data = FXCollections.observableArrayList();
     private ObservableList<ModelJournalEntry_Detail> JEdetails_data = FXCollections.observableArrayList();
@@ -95,8 +93,6 @@ public class SIPosting_ViewController implements Initializable, ScreenInterface 
     boolean lbSelectTabJE = false;
 
     private final Map<String, List<String>> highlightedRowsDetail = new HashMap<>();
-    AtomicReference<Object> lastFocusedTextField = new AtomicReference<>();
-    AtomicReference<Object> previousSearchedTextField = new AtomicReference<>();
 
     private Stage dialogStage = null;
     private final JFXUtil.ImageViewer imageviewerutil = new JFXUtil.ImageViewer();
@@ -106,7 +102,7 @@ public class SIPosting_ViewController implements Initializable, ScreenInterface 
     Scene scene = null;
 
     @FXML
-    private AnchorPane apMainAnchor, apButton, apMaster, apDetail, apJEMaster, apJEDetail;
+    private AnchorPane apMainAnchor, apButton, apMaster, apDetail, apJEMaster, apJEDetail, apBrowse;
     @FXML
     private HBox hbButtons;
     @FXML
@@ -116,11 +112,11 @@ public class SIPosting_ViewController implements Initializable, ScreenInterface 
     @FXML
     private Tab tabSIPosting, tabJE;
     @FXML
-    private TextField tfTransactionNo, tfSupplier, tfBranch, tfTrucking, tfTerm, tfReferenceNo, tfSINo, tfTransactionTotal, tfDiscountRate, tfDiscountAmount, tfFreightAmt, tfVatRate, tfVatSales, tfVatAmount, tfZeroVatSales, tfVatExemptSales, tfNetTotal, tfAdvancePayment, tfIndustry, tfOrderNo, tfBarcode, tfDescription, tfSupersede, tfMeasure, tfOrderQuantity, tfReceiveQuantity, tfSRPAmount, tfDiscRateDetail, tfAddlDiscAmtDetail, tfCost, tfJETransactionNo, tfTotalCreditAmt, tfTotalDebitAmt, tfJEAcctCode, tfJEAcctDescription, tfCreditAmt, tfDebitAmt;
+    private TextField tfTransactionNo, tfSupplier, tfBranch, tfTrucking, tfTerm, tfReferenceNo, tfSINo, tfTransactionTotal, tfDiscountRate, tfDiscountAmount, tfFreightAmt, tfVatRate, tfVatSales, tfVatAmount, tfZeroVatSales, tfVatExemptSales, tfNetTotal, tfAdvancePayment, tfOrderNo, tfBarcode, tfDescription, tfSupersede, tfMeasure, tfOrderQuantity, tfReceiveQuantity, tfSRPAmount, tfDiscRateDetail, tfAddlDiscAmtDetail, tfCost, tfJETransactionNo, tfTotalCreditAmt, tfTotalDebitAmt, tfJEAcctCode, tfJEAcctDescription, tfCreditAmt, tfDebitAmt;
     @FXML
     private DatePicker dpTransactionDate, dpReferenceDate, dpSIDate, dpExpiryDate, dpJETransactionDate, dpReportMonthYear;
     @FXML
-    private Label lblStatus, lblJEStatus;
+    private Label lblStatus, lblJEStatus, lblSource;
     @FXML
     private CheckBox cbVatInclusive, cbVatable, cbJEReverse;
     @FXML
@@ -132,10 +128,13 @@ public class SIPosting_ViewController implements Initializable, ScreenInterface 
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        try {
-            poController = new PurchaseOrderReceivingControllers(oApp, null).PurchaseOrderReceiving();
             poJSON = new JSONObject();
-
+            poController = new PurchaseOrderReceivingControllers(oApp, null).PurchaseOrderReceiving();
+            poJSON = poController.InitTransaction(); // Initialize transaction
+            if (!"success".equals((String) poJSON.get("result"))) {
+                ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                CommonUtils.closeStage(btnClose);
+            }
             initTextFields();
             initDatePickers();
             initDetailsGrid();
@@ -143,67 +142,44 @@ public class SIPosting_ViewController implements Initializable, ScreenInterface 
             initTableOnClick();
             initTabSelection();
             clearTextFields();
-
-            poJSON = poController.InitTransaction(); // Initialize transaction
-            if (!"success".equals((String) poJSON.get("result"))) {
-                ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-                CommonUtils.closeStage(btnClose);
-            }
-            poJSON = poController.OpenTransaction(psTransactionNo);
-            if (!"error".equals((String) poJSON.get("result"))) {
-
-                pnEditMode = poController.getEditMode();
-            } else {
-                Platform.runLater(() -> {
-                    ShowMessageFX.Warning((String) poJSON.get("message"), pxeModuleName, null);
-                    CommonUtils.closeStage(btnClose);
-                });
-            }
+            
             Platform.runLater(() -> {
-                poController.Master().setIndustryId(psIndustryId);
-                poController.Master().setCompanyId(psCompanyId);
-                poController.setIndustryId(psIndustryId);
-                poController.setCompanyId(psCompanyId);
-                poController.setCategoryId(psCategoryId);
-                poController.isFinance(true);
-                poController.initFields();
-                poController.setWithUI(true);
+                try {
+                    poJSON = poController.OpenTransaction(psTransactionNo);
+                    if ("error".equals((String) poJSON.get("result"))) {
+                        ShowMessageFX.Warning((String) poJSON.get("message"), pxeModuleName, null);
+                        CommonUtils.closeStage(btnClose);
+                    } 
+                    pnEditMode = poController.getEditMode();
+                    initButton(pnEditMode);
+                    loadRecordSearch();
+                    loadTableDetail();
+                } catch (CloneNotSupportedException | SQLException | GuanzonException ex) {
+                    Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+                }
             });
-
-            loadTableDetail();
-            pnEditMode = EditMode.UNKNOWN;
-            initButton(pnEditMode);
-        } catch (CloneNotSupportedException | SQLException | GuanzonException ex) {
-            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
-        }
     }
-
-    @Override
+    
     public void setGRider(GRiderCAS foValue) {
         oApp = foValue;
     }
-
-    @Override
-    public void setIndustryID(String fsValue) {
-        psIndustryId = fsValue;
-    }
-
-    @Override
-    public void setCompanyID(String fsValue) {
-        psCompanyId = fsValue;
-    }
-
-    @Override
-    public void setCategoryID(String fsValue) {
-        psCategoryId = fsValue;
-    }
-
+    
     public void setTransaction(String fsValue) {
         psTransactionNo = fsValue;
     }
-
-    public void setPurchaseOrderReceiving(PurchaseOrderReceiving foValue) {
-        poController = foValue;
+    
+    public void loadRecordSearch() {
+        try {
+            if (poController.Master().Industry().getDescription() != null && !"".equals(poController.Master().Industry().getDescription())) {
+                lblSource.setText(poController.Master().Company().getCompanyName() + " - " + poController.Master().Industry().getDescription());
+            } else {
+                lblSource.setText(poController.Master().Company().getCompanyName() + " - General");
+            }
+            JFXUtil.updateCaretPositions(apBrowse);
+        } catch (SQLException | GuanzonException ex) {
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
+        }
     }
 
     private void populateJE() {
@@ -282,60 +258,10 @@ public class SIPosting_ViewController implements Initializable, ScreenInterface 
                     ShowMessageFX.Warning(null, pxeModuleName, "Button with name " + lsButton + " not registered.");
                     break;
             }
-            if (JFXUtil.isObjectEqualTo(lsButton, "btnSave", "btnCancel")) {
-                poController.resetMaster();
-                poController.resetOthers();
-                poController.Detail().clear();
-                poController.resetJournal();
-                pnEditMode = EditMode.UNKNOWN;
-                clearTextFields();
-            }
-
-            if (JFXUtil.isObjectEqualTo(lsButton, "btnArrowRight", "btnArrowLeft", "btnRetrieve", "btnHistory")) {
-            } else {
-                loadRecordMaster();
-                loadTableDetail();
-
-                Tab currentTab = tabPaneForm.getSelectionModel().getSelectedItem();
-                if (currentTab.getId().equals("tabJE")) {
-                    populateJE();
-                }
-            }
-            initButton(pnEditMode);
         }
 
     }
-
-    private void txtField_KeyPressed(KeyEvent event) {
-        TextField txtField = (TextField) event.getSource();
-        String lsID = (((TextField) event.getSource()).getId());
-        String lsValue = (txtField.getText() == null ? "" : txtField.getText());
-        poJSON = new JSONObject();
-
-        switch (event.getCode()) {
-            case TAB:
-            case ENTER:
-                pbEntered = true;
-                CommonUtils.SetNextFocus(txtField);
-                event.consume();
-                break;
-            case F3:
-                break;
-            default:
-                break;
-        }
-        switch (event.getCode()) {
-            case ENTER:
-                CommonUtils.SetNextFocus(txtField);
-            case DOWN:
-                CommonUtils.SetNextFocus(txtField);
-                break;
-            case UP:
-                CommonUtils.SetPreviousFocus(txtField);
-        }
-
-    }
-
+    
     public void loadRecordJEDetail() {
         try {
             //DISABLING
@@ -445,7 +371,6 @@ public class SIPosting_ViewController implements Initializable, ScreenInterface 
                     poController.computeDiscountRate(poController.Master().getDiscount().doubleValue());
                 }
             }
-            tfIndustry.setText(poController.Master().Industry().getDescription());
             poController.computeFields();
 
             tfTransactionNo.setText(poController.Master().getTransactionNo());
@@ -612,7 +537,6 @@ public class SIPosting_ViewController implements Initializable, ScreenInterface 
     }
 
     public void loadTableDetail() {
-        pbEntered = false;
         // Setting data to table detail
         JFXUtil.disableAllHighlight(tblViewTransDetailList, highlightedRowsDetail);
 
@@ -717,8 +641,6 @@ public class SIPosting_ViewController implements Initializable, ScreenInterface 
 
     public void initTextFields() {
 
-        JFXUtil.setKeyPressedListener(this::txtField_KeyPressed, apMaster, apDetail, apJEDetail);
-
         JFXUtil.setCommaFormatter(tfDiscountAmount, tfFreightAmt, tfVatSales,
                 tfVatAmount, tfZeroVatSales, tfVatExemptSales, tfCost, tfCreditAmt,
                 tfDebitAmt, tfAddlDiscAmtDetail, tfSRPAmount);
@@ -750,14 +672,78 @@ public class SIPosting_ViewController implements Initializable, ScreenInterface 
 
         tblViewTransDetailList.setOnMouseClicked(event -> {
             if (details_data.size() > 0) {
-                if (event.getClickCount() == 1) {  // Detect single click (or use another condition for double click)
-                    ModelDeliveryAcceptance_Detail selected = (ModelDeliveryAcceptance_Detail) tblViewTransDetailList.getSelectionModel().getSelectedItem();
-                    if (selected != null) {
-                        stageSerial.closeDialog();
-                        pnDetail = Integer.parseInt(selected.getIndex01()) - 1;
-                        loadRecordDetail();
-                        tfCost.requestFocus();
-                    }
+                ModelDeliveryAcceptance_Detail selected = (ModelDeliveryAcceptance_Detail) tblViewTransDetailList.getSelectionModel().getSelectedItem();
+                switch(event.getClickCount()){
+                    case 1:
+                        if (selected != null) {
+                            stageSerial.closeDialog();
+                            pnDetail = Integer.parseInt(selected.getIndex01()) - 1;
+                            loadRecordDetail();
+                            tfCost.requestFocus();
+                        }
+                    break;
+                    case 2:
+                        if (selected != null) {
+                            try {
+                                pnDetail = Integer.parseInt(selected.getIndex01()) - 1;
+                                if(poController.Detail(pnDetail).getOrderNo() != null && !"".equals(poController.Detail(pnDetail).getOrderNo())){
+                                    switch(poController.Master().getPurpose()){
+                                        case PurchaseOrderReceivingStatus.Purpose.REGULAR:
+                                            //load order history
+                                            PurchaseOrder loPOController = new PurchaseOrderControllers(oApp, null).PurchaseOrder();
+                                            poJSON = loPOController.InitTransaction(); // Initialize transaction
+                                            if (!"success".equals((String) poJSON.get("result"))) {
+                                                ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                                                CommonUtils.closeStage(btnClose);
+                                            }
+                                            poJSON = loPOController.OpenTransaction(poController.Detail(pnDetail).getOrderNo()); 
+                                            if (!"success".equals((String) poJSON.get("result"))) {
+                                                ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                                                return;
+                                            }
+                                            try {
+                                                loPOController.ShowStatusHistory();
+                                            } catch (NullPointerException npe) {
+                                                Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(npe), npe);
+                                                ShowMessageFX.Error("No transaction status history to load!", pxeModuleName, null);
+                                            } catch (Exception ex) {
+                                                Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+                                                ShowMessageFX.Error(MiscUtil.getException(ex), pxeModuleName, null);
+                                            }
+                                        break;
+                                        case PurchaseOrderReceivingStatus.Purpose.REPLACEMENT:
+                                            //load order history
+                                            PurchaseOrderReturn loPOReturnController = new PurchaseOrderReturnControllers(oApp, null).PurchaseOrderReturn();
+                                            poJSON = loPOReturnController.InitTransaction(); // Initialize transaction
+                                            if (!"success".equals((String) poJSON.get("result"))) {
+                                                ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                                                CommonUtils.closeStage(btnClose);
+                                            }
+                                            poJSON = loPOReturnController.OpenTransaction(poController.Detail(pnDetail).getOrderNo()); 
+                                            if (!"success".equals((String) poJSON.get("result"))) {
+                                                ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                                                return;
+                                            }
+                                            try {
+                                                loPOReturnController.ShowStatusHistory();
+                                            } catch (NullPointerException npe) {
+                                                Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(npe), npe);
+                                                ShowMessageFX.Error("No transaction status history to load!", pxeModuleName, null);
+                                            } catch (Exception ex) {
+                                                Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+                                                ShowMessageFX.Error(MiscUtil.getException(ex), pxeModuleName, null);
+                                            }
+                                        break;
+
+                                    }
+                                }
+                                
+                            } catch (CloneNotSupportedException | SQLException | GuanzonException ex) {
+                                Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+                                ShowMessageFX.Error(null, pxeModuleName,MiscUtil.getException(ex));
+                            }
+                        }
+                    break;
                 }
             }
         });
@@ -845,9 +831,6 @@ public class SIPosting_ViewController implements Initializable, ScreenInterface 
     public void clearTextFields() {
         Platform.runLater(() -> {
             imageinfo_temp.clear();
-            JFXUtil.setValueToNull(previousSearchedTextField, lastFocusedTextField);
-            psSupplierId = "";
-            psBranchId = "";
             JFXUtil.clearTextFields(apMaster, apDetail, apJEDetail, apJEMaster);
             closeDialog();
         });
