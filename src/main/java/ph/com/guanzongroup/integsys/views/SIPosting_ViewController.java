@@ -170,6 +170,7 @@ public class SIPosting_ViewController implements Initializable, ScreenInterface 
                 poController.setWithUI(true);
             });
 
+            loadTableDetail();
             pnEditMode = EditMode.UNKNOWN;
             initButton(pnEditMode);
         } catch (CloneNotSupportedException | SQLException | GuanzonException ex) {

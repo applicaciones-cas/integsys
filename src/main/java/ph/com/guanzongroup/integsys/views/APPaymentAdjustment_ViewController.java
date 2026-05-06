@@ -103,6 +103,7 @@ public class APPaymentAdjustment_ViewController implements Initializable, Screen
                 poController.setWithUI(true);
                 loadRecordSearch();
             });
+            loadRecordMaster();
         } catch (CloneNotSupportedException | SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
         }
