@@ -691,18 +691,18 @@ public class SIPosting_ViewController implements Initializable {
                                         case PurchaseOrderReceivingStatus.Purpose.REGULAR:
                                             //load order history
                                             PurchaseOrder loPOController = new PurchaseOrderControllers(oApp, null).PurchaseOrder();
-                                            poJSON = loPOController.InitTransaction(); // Initialize transaction
+                                            poJSON = loController.InitTransaction(); // Initialize transaction
                                             if (!"success".equals((String) poJSON.get("result"))) {
                                                 ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                                 CommonUtils.closeStage(btnClose);
                                             }
-                                            poJSON = loPOController.OpenTransaction(poController.Detail(pnDetail).getOrderNo()); 
+                                            poJSON = loController.OpenTransaction(poController.Detail(pnDetail).getOrderNo()); 
                                             if (!"success".equals((String) poJSON.get("result"))) {
                                                 ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                                 return;
                                             }
                                             try {
-                                                loPOController.ShowStatusHistory();
+                                                loController.ShowStatusHistory();
                                             } catch (NullPointerException npe) {
                                                 Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(npe), npe);
                                                 ShowMessageFX.Error("No transaction status history to load!", pxeModuleName, null);

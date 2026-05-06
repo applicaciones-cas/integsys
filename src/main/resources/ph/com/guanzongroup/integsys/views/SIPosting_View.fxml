@@ -248,7 +248,7 @@
                                                                                                         <TextField fx:id="tfVatExemptSales" alignment="CENTER_RIGHT" disable="true" editable="false" promptText="0.0000" GridPane.columnIndex="11" GridPane.rowIndex="11" />
                                                                                                         <TextField fx:id="tfNetTotal" alignment="CENTER_RIGHT" disable="true" editable="false" promptText="0.0000" styleClass="DisabledTextField" GridPane.columnIndex="11" GridPane.rowIndex="12" />
                                                                                                         <TextField fx:id="tfAdvancePayment" alignment="CENTER_RIGHT" disable="true" promptText="0.0000" styleClass="DisabledTextField" GridPane.columnIndex="11" GridPane.rowIndex="13" />
-                                                                                                        <TextArea fx:id="taRemarks" maxHeight="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="184.0" prefWidth="577.0" wrapText="true" GridPane.columnIndex="2" GridPane.rowIndex="7" GridPane.rowSpan="7">
+                                                                                                        <TextArea fx:id="taRemarks" maxHeight="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="193.0" prefWidth="577.0" wrapText="true" GridPane.columnIndex="2" GridPane.halignment="LEFT" GridPane.rowIndex="7" GridPane.rowSpan="7" GridPane.valignment="TOP">
                                                          <GridPane.margin>
                                                             <Insets top="1.0" />
                                                          </GridPane.margin>
