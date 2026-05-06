@@ -344,7 +344,7 @@ public class PaymentRequest_HistoryController implements Initializable, ScreenIn
                     break;
                 case "btnHistory":
                     poGLControllers.PaymentRequest().ShowStatusHistory();
-                    break;
+                    return;
                 case "btnArrowLeft":
                     slideImage(-1);
                     break;

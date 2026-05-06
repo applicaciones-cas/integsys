@@ -640,7 +640,7 @@ public class PaymentRequest_EntryController implements Initializable, ScreenInte
                     break;
                 case "btnHistory":
                     poGLControllers.PaymentRequest().ShowStatusHistory();
-                    break;
+                    return;
                 case "btnClose":
                     if (ShowMessageFX.YesNo("Are you sure you want to close this form?", psFormName, null)) {
                         if (poUnload != null) {
