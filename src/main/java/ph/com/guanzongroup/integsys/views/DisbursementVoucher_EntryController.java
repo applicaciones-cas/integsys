@@ -735,6 +735,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
             JFXUtil.clearTextFields(apBIRDetail);
             poJSON = poController.populateWithholdingTaxDeduction();
             if (JFXUtil.isJSONSuccess(poJSON)) {
+                poController.setDefaultWithHoldingTax();
                 loadTableDetailBIR.reload();
             } else {
                 BIR_data.clear();

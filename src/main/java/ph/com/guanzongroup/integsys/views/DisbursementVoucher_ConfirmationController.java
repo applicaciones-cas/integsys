@@ -719,6 +719,7 @@ public class DisbursementVoucher_ConfirmationController implements Initializable
             JFXUtil.clearTextFields(apBIRDetail);
             poJSON = poController.populateWithholdingTaxDeduction();
             if (JFXUtil.isJSONSuccess(poJSON)) {
+                poController.setDefaultWithHoldingTax();
                 loadTableDetailBIR.reload();
             } else {
                 BIR_data.clear();
