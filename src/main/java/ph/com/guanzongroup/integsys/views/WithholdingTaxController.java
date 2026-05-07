@@ -206,6 +206,7 @@ public class WithholdingTaxController implements Initializable, ScreenInterface 
                                 clearAllFields();
                             } else {
                                 ShowMessageFX.Information(null, pxeModuleName, (String) saveResult.get("message"));
+                                return;
                             }
                             Platform.runLater(() -> {
                                 btnNew.fire();
@@ -223,7 +224,7 @@ public class WithholdingTaxController implements Initializable, ScreenInterface 
                                     poJsON = poController.activateRecord();
                                     if ("error".equals(poJsON.get("result"))) {
                                         ShowMessageFX.Information(null, pxeModuleName, (String) poJsON.get("message"));
-                                        break;
+                                        return;
                                     } else {
                                         ShowMessageFX.Information(null, pxeModuleName, "Record Activated successfully");
                                     }
@@ -238,7 +239,7 @@ public class WithholdingTaxController implements Initializable, ScreenInterface 
                                     poJsON = poController.deactivateRecord();
                                     if ("error".equals(poJsON.get("result"))) {
                                         ShowMessageFX.Information(null, pxeModuleName, (String) poJsON.get("message"));
-                                        break;
+                                        return;
                                     } else {
                                         ShowMessageFX.Information(null, pxeModuleName, "Record Deactivated successfully");
                                     }
