@@ -264,7 +264,7 @@ public class WithholdingTaxController implements Initializable, ScreenInterface 
                         break;
                     case "tfAccountName":
                         if (lsValue.isEmpty()) {
-                            poController.getModel().setDescription(lsValue);
+                            poController.getModel().setAccountCode(lsValue);
                         }
                         break;
                     case "tfTaxCode":
