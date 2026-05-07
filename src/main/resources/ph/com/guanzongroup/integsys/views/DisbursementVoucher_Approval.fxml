@@ -63,7 +63,7 @@
                                           <Font name="System Bold" size="14.0" />
                                        </font>
                                     </Label>
-                                                <Label text="Reference No." GridPane.columnIndex="4">
+                                                <Label text="Voucher No" GridPane.columnIndex="4">
                                                     <font>
                                                         <Font name="System Bold" size="14.0" />
                                                     </font>
@@ -966,7 +966,7 @@
                                                                 <TableColumn fx:id="tblSupplier" maxWidth="236.0" minWidth="-1.0" prefWidth="236.0" resizable="false" sortable="false" text="Supplier" />
                                                                 <TableColumn fx:id="tblPaymentForm" maxWidth="120.0" minWidth="120.0" prefWidth="120.0" resizable="false" sortable="false" text="Payment Form" />
                                                                 <TableColumn fx:id="tblTransDate" maxWidth="120.0" minWidth="120.0" prefWidth="120.0" resizable="false" sortable="false" text="Date" />
-                                                                <TableColumn fx:id="tblReferNo" maxWidth="90.0" minWidth="90.0" prefWidth="90.0" resizable="false" sortable="false" text="Refer No." />
+                                                                <TableColumn fx:id="tblReferNo" maxWidth="90.0" minWidth="90.0" prefWidth="90.0" resizable="false" sortable="false" text="Voucher No" />
                                                             </columns>
                                                             <GridPane.margin>
                                                                 <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />

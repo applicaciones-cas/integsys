@@ -78,10 +78,14 @@ import org.guanzon.appdriver.constant.DocumentType;
 import org.guanzon.appdriver.constant.EditMode;
 import org.guanzon.appdriver.constant.Logical;
 import org.guanzon.appdriver.constant.RecordStatus;
+import org.guanzon.cas.purchasing.controller.PurchaseOrderReceiving;
+import org.guanzon.cas.purchasing.services.PurchaseOrderReceivingControllers;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.ParseException;
+import ph.com.guanzongroup.cas.cashflow.APPaymentAdjustment;
 import ph.com.guanzongroup.cas.cashflow.DisbursementVoucher;
+import ph.com.guanzongroup.cas.cashflow.PaymentRequest;
 import ph.com.guanzongroup.cas.cashflow.services.CashflowControllers;
 import ph.com.guanzongroup.cas.cashflow.status.DisbursementStatic;
 import ph.com.guanzongroup.cas.cashflow.status.JournalStatus;
@@ -98,6 +102,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
 
     private GRiderCAS oApp;
     private JSONObject poJSON, poJSONVAT;
+    JFXUtil.StageManager stageView = new JFXUtil.StageManager();
     private static final int ROWS_PER_PAGE = 50;
     private int pnMain = 0;
     private int pnDetail = 0;
@@ -730,6 +735,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
             JFXUtil.clearTextFields(apBIRDetail);
             poJSON = poController.populateWithholdingTaxDeduction();
             if (JFXUtil.isJSONSuccess(poJSON)) {
+//                poController.setDefaultWithHoldingTax();
                 loadTableDetailBIR.reload();
             } else {
                 BIR_data.clear();
@@ -842,9 +848,9 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                 () -> {
                     try {
                         Thread.sleep(100);
+                        main_data.clear();
+                        poJSON = poController.loadPayables(psTransactionType);
                         Platform.runLater(() -> {
-                            main_data.clear();
-                            poJSON = poController.loadPayables(psTransactionType);
                             if ("success".equals(poJSON.get("result"))) {
                                 JSONArray unifiedPayments = (JSONArray) poJSON.get("data");
                                 if (unifiedPayments != null && !unifiedPayments.isEmpty()) {
@@ -1230,13 +1236,24 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
             }
         });
         tblVwDetails.setOnMouseClicked(event -> {
-            if (!details_data.isEmpty() && event.getClickCount() == 1) {
+            if (!details_data.isEmpty()) {
                 ModelDisbursementVoucher_Detail selected = (ModelDisbursementVoucher_Detail) tblVwDetails.getSelectionModel().getSelectedItem();
-                if (selected != null) {
-                    int lnRow = Integer.parseInt(details_data.get(tblVwDetails.getSelectionModel().getSelectedIndex()).getIndex11());
-                    pnDetail = lnRow;
-                    loadRecordDetail();
-                    moveNext(false, false);
+                switch (event.getClickCount()) {
+                    case 1:
+                        if (selected != null) {
+                            int lnRow = Integer.parseInt(details_data.get(tblVwDetails.getSelectionModel().getSelectedIndex()).getIndex11());
+                            pnDetail = lnRow;
+                            loadRecordDetail();
+                            moveNext(false, false);
+                        }
+                        break;
+                    case 2:
+                        if (selected != null) {
+                            int lnRow = Integer.parseInt(details_data.get(tblVwDetails.getSelectionModel().getSelectedIndex()).getIndex11());
+                            pnDetail = lnRow;
+                            loadDetailView();
+                        }
+                        break;
                 }
             }
         });
@@ -1269,6 +1286,66 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
         JFXUtil.applyRowHighlighting(tblViewMainList, item -> ((ModelDisbursementVoucher_Main) item).getIndex10(), highlightedRowsMain);
         JFXUtil.setKeyEventFilter(this::tableKeyEvents, tblVwDetails, tblVwJournalDetails, tblVwBIRDetails);
         JFXUtil.adjustColumnForScrollbar(tblViewMainList, tblVwDetails, tblVwJournalDetails, tblVwBIRDetails);
+    }
+
+    private void loadDetailView() {
+        try {
+            String lsSourceCode = poController.Detail(pnDetail).getSourceCode();
+            String lsSourceNo = poController.Detail(pnDetail).getSourceNo();
+
+            if (lsSourceCode == null || "".equals(lsSourceCode)) {
+                return;
+            }
+
+            if (DisbursementStatic.SourceCode.ACCOUNTS_PAYABLE.equals(lsSourceCode)) {
+                lsSourceCode = poController.Detail(pnDetail).SOADetail().getSourceCode();
+                lsSourceNo = poController.Detail(pnDetail).SOADetail().getSourceNo();
+            }
+            loadBySourceCode(lsSourceCode, lsSourceNo);
+        } catch (SQLException | GuanzonException ex) {
+            Logger.getLogger(getClass().getName())
+                    .log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
+        }
+    }
+
+    private void loadBySourceCode(String fsSourceCode, String fsSourceNo) {
+        poJSON = new JSONObject();
+        stageView.closeDialog();
+
+        switch (fsSourceCode) {
+            case DisbursementStatic.SourceCode.PAYMENT_REQUEST:
+                PaymentRequest_ViewController loPRFController = new PaymentRequest_ViewController();
+                loPRFController.setGRider(oApp);
+                loPRFController.setTransaction(fsSourceNo);
+                showDialog("/ph/com/guanzongroup/integsys/views/PaymentRequest_View.fxml", loPRFController);
+                break;
+            case DisbursementStatic.SourceCode.AP_ADJUSTMENT:
+                APPaymentAdjustment_ViewController loAPAdjController = new APPaymentAdjustment_ViewController();
+                loAPAdjController.setGRider(oApp);
+                loAPAdjController.setTransaction(fsSourceNo);
+                showDialog("/ph/com/guanzongroup/integsys/views/APPaymentAdjustment_View.fxml", loAPAdjController);
+                break;
+            case DisbursementStatic.SourceCode.PO_RECEIVING:
+                SIPosting_ViewController loSIPostingController = new SIPosting_ViewController();
+                loSIPostingController.setGRider(oApp);
+                loSIPostingController.setTransaction(fsSourceNo);
+                showDialog("/ph/com/guanzongroup/integsys/views/SIPosting_View.fxml", loSIPostingController);
+                break;
+            default:
+                ShowMessageFX.Warning(null, pxeModuleName, "Failed to open detail form for source: " + fsSourceCode + ". Please contact the system administrator.");
+                break;
+        }
+    }
+
+    private void showDialog(String fsSource, Object controller) {
+        try {
+            stageView.showDialog((Stage) AnchorMain.getScene().getWindow(), getClass().getResource(fsSource), controller,
+                    "Disbursement Dialog", true, true, false);
+        } catch (IOException ex) {
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
+        }
     }
 
     private void tableKeyEvents(KeyEvent event) {

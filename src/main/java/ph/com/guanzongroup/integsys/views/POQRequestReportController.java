@@ -151,12 +151,23 @@ public class POQRequestReportController implements Initializable, ScreenInterfac
         Platform.runLater(() -> {
             try {
                 poController.Master().setIndustryId(psIndustryId);
-//                    poController.Master().setCompanyId(psCompanyId);
                 poController.setIndustryId(psIndustryId);
                 poController.setCompanyId(psCompanyId);
                 poController.setCategoryId(psCategoryId);
+                
+                if (!psIndustryId.equals(System.getProperty("sys.main.industry")) && !psIndustryId.equals(System.getProperty("sys.general.industry"))) {
+                    poController.initializeFilter();
+                    JFXUtil.setDisabled(true, tfSearchCompany,tfSearchIndustry,tfSearchCategory, tfSearchBranch);
+                }
+                
+                String lsCompany = poController.getCompanyName(psCompanyId) ;
+                if(lsCompany != null && !"".equals(lsCompany)){
+                    lblSource.setText(lsCompany + " - " + poController.Master().Industry().getDescription());
+                } else {
+                    lblSource.setText(poController.Master().Industry().getDescription());
+                }
+                
                 loadRecordSearch();
-                lblSource.setText(poController.Master().Industry().getDescription());
             } catch (SQLException | GuanzonException ex) {
                 Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
             }

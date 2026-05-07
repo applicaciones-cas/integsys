@@ -339,9 +339,7 @@ public class DisbursementVoucher_CertificationController implements Initializabl
         try {
 
             poJSON = poDisbursementController.loadTransactionList(tfSearchIndustry.getText(), tfSearchBankName.getText(), tfSearchBankAccount.getText(), DisbursementStatic.CERTIFIED);
-
             if ("error".equals(poJSON.get("result"))) {
-//                ShowMessageFX.Error(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
             } else {
                 Platform.runLater(() -> {
                     chckSelectAll.setSelected(false);
@@ -424,12 +422,14 @@ public class DisbursementVoucher_CertificationController implements Initializabl
                                 JFXUtil.selectAndFocusRow(tblViewMainList, pnMain);
                             }
                             JFXUtil.loadTab(pagination, main_data.size(), ROWS_PER_PAGE, tblViewMainList, filteredMain_Data);
+
+                            initButtons();
                         } catch (SQLException | GuanzonException ex) {
                             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
                             ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
                         }
-                        initButtons();
                     });
+
                 });
     }
 

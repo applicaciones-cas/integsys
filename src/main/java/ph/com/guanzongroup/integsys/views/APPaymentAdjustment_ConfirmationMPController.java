@@ -244,6 +244,8 @@ public class APPaymentAdjustment_ConfirmationMPController implements Initializab
                                 tfClient.setText("");
                                 psSupplierId = "";
                                 break;
+                            } else {
+                                JFXUtil.textFieldMoveNext(tfCreditAmount);
                             }
                             psSupplierId = poAPPaymentAdjustmentController.APPaymentAdjustment().getModel().getClientId();
                             loadRecordMaster();
@@ -254,6 +256,8 @@ public class APPaymentAdjustment_ConfirmationMPController implements Initializab
                                 ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                 tfIssuedTo.setText("");
                                 break;
+                            } else {
+                                JFXUtil.textFieldMoveNext(tfCreditAmount);
                             }
                             loadRecordMaster();
                             break;

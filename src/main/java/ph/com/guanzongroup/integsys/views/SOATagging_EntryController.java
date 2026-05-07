@@ -106,7 +106,7 @@ public class SOATagging_EntryController implements Initializable, ScreenInterfac
     @FXML
     private Label lblSource, lblStatus;
     @FXML
-    private Button btnBrowse, btnNew, btnUpdate, btnSearch, btnSave, btnCancel, btnHistory, btnRetrieve, btnClose;
+    private Button btnBrowse, btnVoid, btnNew, btnUpdate, btnSearch, btnSave, btnCancel, btnHistory, btnRetrieve, btnClose;
     @FXML
     private TextField tfTransactionNo, tfSOANo, tfClient, tfIssuedTo, tfTransactionTotal, tfVatAmount, tfNonVatSales, tfZeroVatSales, tfVatExemptSales,
             tfNetTotal, tfCompany, tfDiscountAmount, tfFreight, tfSourceNo, tfSourceCode, tfReferenceNo, tfCreditAmount, tfDebitAmount, tfAppliedAmtDetail;
@@ -262,6 +262,23 @@ public class SOATagging_EntryController implements Initializable, ScreenInterfac
                         } else {
                             return;
                         }
+                    case "btnVoid":
+                        if (ShowMessageFX.YesNo(null, pxeModuleName, "Are you sure you want to void transaction?")) {
+                            pnEditMode = poSOATaggingController.SOATagging().getEditMode();
+                            if (pnEditMode == EditMode.READY) {
+                                poJSON = poSOATaggingController.SOATagging().VoidTransaction("");
+                                if ("error".equals((String) poJSON.get("result"))) {
+                                    ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                                    return;
+                                } else {
+                                    ShowMessageFX.Information(null, pxeModuleName, (String) poJSON.get("message"));
+                                    pnEditMode = EditMode.UNKNOWN;
+                                }
+                            }
+                        } else {
+                            return;
+                        }
+                        break;
                     case "btnHistory":
                         if (pnEditMode != EditMode.READY && pnEditMode != EditMode.UPDATE) {
                             ShowMessageFX.Warning("No transaction status history to load!", pxeModuleName, null);
@@ -335,7 +352,7 @@ public class SOATagging_EntryController implements Initializable, ScreenInterfac
                         break;
                 }
 
-                if (JFXUtil.isObjectEqualTo(lsButton, "btnSave", "btnConfirm", "btnReturn", "btnVoid", "btnCancel")) {
+                if (JFXUtil.isObjectEqualTo(lsButton, "btnSave", "btnConfirm", "btnReturn", "btnVoid", "btnCancel", "btnVoid")) {
                     poSOATaggingController.SOATagging().resetMaster();
                     poSOATaggingController.SOATagging().Detail().clear();
                     pnEditMode = EditMode.UNKNOWN;
@@ -1327,8 +1344,15 @@ public class SOATagging_EntryController implements Initializable, ScreenInterfac
         JFXUtil.setButtonsVisibility(lbShow3, btnBrowse, btnClose);
 
         JFXUtil.setDisabled(!lbShow, taRemarks, apMaster, apDetail);
-
+        
+        JFXUtil.setButtonsVisibility(false, btnVoid);
+        if (fnValue != EditMode.READY) {
+            return;
+        }
         switch (poSOATaggingController.SOATagging().Master().getTransactionStatus()) {
+            case SOATaggingStatus.OPEN:
+                JFXUtil.setButtonsVisibility(true, btnVoid);
+                break;
             case SOATaggingStatus.PAID:
                 JFXUtil.setButtonsVisibility(false, btnUpdate);
                 break;
