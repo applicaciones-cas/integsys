@@ -126,6 +126,7 @@ public class WithholdingTaxController implements Initializable, ScreenInterface 
                     cbActive.setSelected(false);
                     break;
             }
+            JFXUtil.updateCaretPositions(apMaster);
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
         }
@@ -323,6 +324,8 @@ public class WithholdingTaxController implements Initializable, ScreenInterface 
                                 poJSON = poController.SearchAccountName(lsValue, false);
                                 if (!JFXUtil.isJSONSuccess(poJSON)) {
                                     ShowMessageFX.Information(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
+                                } else {
+                                    JFXUtil.textFieldMoveNext(tfTaxCode);
                                 }
                                 loadRecordMaster();
                                 break;
@@ -330,6 +333,8 @@ public class WithholdingTaxController implements Initializable, ScreenInterface 
                                 poJSON = poController.SearchTaxCode(lsValue, false);
                                 if (!JFXUtil.isJSONSuccess(poJSON)) {
                                     ShowMessageFX.Information(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
+                                } else {
+                                    JFXUtil.textFieldMoveNext(tfTaxType);
                                 }
                                 loadRecordMaster();
                                 break;
