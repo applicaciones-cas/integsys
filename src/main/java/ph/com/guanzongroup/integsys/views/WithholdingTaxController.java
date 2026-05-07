@@ -114,7 +114,7 @@ public class WithholdingTaxController implements Initializable, ScreenInterface 
             switch (poController.getModel().getRecordStatus()) {
                 case "1":
                     btnActivate.setText("Deactivate");
-                    btnActivate.setMinWidth(85);
+                    btnActivate.setMinWidth(80);
                     faActivate.setGlyphName("CLOSE");
                     cbActive.setSelected(true);
                     break;
@@ -153,14 +153,14 @@ public class WithholdingTaxController implements Initializable, ScreenInterface 
                             initButton(pnEditMode);
                             loadRecordMaster();
                         } else {
-                            ShowMessageFX.Information((String) poJSON.get("message"), "Computerized Acounting System", pxeModuleName);
+                            ShowMessageFX.Information(null, pxeModuleName, (String) poJSON.get("message"));
                         }
                         break;
                     case "btnBrowse":
                         String lsValue = (tfTaxDescription.getText() == null) ? "" : tfTaxDescription.getText();
                         poJSON = poController.searchRecord(lsValue, false);
                         if ("error".equals((String) poJSON.get("result"))) {
-                            ShowMessageFX.Information((String) poJSON.get("message"), "Computerized Acounting System", pxeModuleName);
+                            ShowMessageFX.Information(null, pxeModuleName, (String) poJSON.get("message"));
                             tfTaxDescription.clear();
                             break;
                         }
@@ -170,14 +170,14 @@ public class WithholdingTaxController implements Initializable, ScreenInterface 
                     case "btnUpdate":
                         poJSON = poController.updateRecord();
                         if ("error".equals((String) poJSON.get("result"))) {
-                            ShowMessageFX.Information((String) poJSON.get("message"), "Computerized Acounting System", pxeModuleName);
+                            ShowMessageFX.Information(null, pxeModuleName, (String) poJSON.get("message"));
                             break;
                         }
                         pnEditMode = poController.getEditMode();
                         initButton(pnEditMode);
                         break;
                     case "btnCancel":
-                        if (ShowMessageFX.YesNo("Do you really want to cancel this record? \nAny data collected will not be kept.", "Computerized Acounting System", pxeModuleName)) {
+                        if (ShowMessageFX.YesNo(null, pxeModuleName, "Do you really want to cancel this record? \nAny data collected will not be kept.")) {
                             clearAllFields();
                             initializeObject();
                             pnEditMode = EditMode.UNKNOWN;
@@ -189,12 +189,12 @@ public class WithholdingTaxController implements Initializable, ScreenInterface 
                         poController.getModel().setModifiedDate(oApp.getServerDate());
                         JSONObject saveResult = poController.saveRecord();
                         if ("success".equals((String) saveResult.get("result"))) {
-                            ShowMessageFX.Information((String) saveResult.get("message"), "Computerized Acounting System", pxeModuleName);
+                            ShowMessageFX.Information(null, pxeModuleName, (String) saveResult.get("message"));
                             pnEditMode = EditMode.UNKNOWN;
                             initButton(pnEditMode);
                             clearAllFields();
                         } else {
-                            ShowMessageFX.Information((String) saveResult.get("message"), "Computerized Acounting System", pxeModuleName);
+                            ShowMessageFX.Information(null, pxeModuleName, (String) saveResult.get("message"));
                         }
                         break;
                     case "btnActivate":
@@ -205,43 +205,41 @@ public class WithholdingTaxController implements Initializable, ScreenInterface 
                         switch (Status) {
                             case "0":
                                 if (ShowMessageFX.YesNo(null, pxeModuleName, "Do you want to Activate this Parameter?") == true) {
-                                    ShowMessageFX.Information(String.valueOf(poController.getEditMode()), "Computerized Accounting System", pxeModuleName);
                                     poController.initialize();
                                     poJsON = poController.activateRecord();
                                     if ("error".equals(poJsON.get("result"))) {
-                                        ShowMessageFX.Information((String) poJsON.get("message"), "Computerized Accounting System", pxeModuleName);
+                                        ShowMessageFX.Information(null, pxeModuleName, (String) poJsON.get("message"));
                                         break;
+                                    } else {
+                                        ShowMessageFX.Information(null, pxeModuleName, (String) poJsON.get("message"));
                                     }
                                     poJsON = poController.openRecord(id);
                                     if ("error".equals(poJsON.get("result"))) {
-                                        ShowMessageFX.Information((String) poJsON.get("message"), "Computerized Accounting System", pxeModuleName);
+                                        ShowMessageFX.Information(null, pxeModuleName, (String) poJsON.get("message"));
                                         break;
                                     }
                                     clearAllFields();
                                     loadRecordMaster();
-                                    ShowMessageFX.Information((String) poJsON.get("message"), "Computerized Accounting System", pxeModuleName);
                                 }
                                 break;
                             case "1":
                                 if (ShowMessageFX.YesNo(null, pxeModuleName, "Do you want to Deactivate this Parameter?") == true) {
-//                                    ShowMessageFX.Information(String.valueOf(poController.Category().getEditMode()), "Computerized Accounting System", pxeModuleName);
                                     poJsON = poController.deactivateRecord();
                                     if ("error".equals(poJsON.get("result"))) {
-                                        ShowMessageFX.Information((String) poJsON.get("message"), "Computerized Accounting System", pxeModuleName);
+                                        ShowMessageFX.Information(null, pxeModuleName, (String) poJsON.get("message"));
                                         break;
                                     }
                                     poJsON = poController.openRecord(id);
                                     if ("error".equals(poJsON.get("result"))) {
-                                        ShowMessageFX.Information((String) poJsON.get("message"), "Computerized Accounting System", pxeModuleName);
+                                        ShowMessageFX.Information(null, pxeModuleName, (String) poJsON.get("message"));
                                         break;
                                     }
                                     clearAllFields();
                                     loadRecordMaster();
-                                    ShowMessageFX.Information((String) poJsON.get("message"), "Computerized Accounting System", pxeModuleName);
+                                    ShowMessageFX.Information(null, pxeModuleName, (String) poJsON.get("message"));
                                 }
                                 break;
                         }
-
                 }
             } catch (SQLException | GuanzonException | CloneNotSupportedException ex) {
                 Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
@@ -258,8 +256,6 @@ public class WithholdingTaxController implements Initializable, ScreenInterface 
     ChangeListener<Boolean> txtField_Focus = JFXUtil.FocusListener(TextField.class,
             (lsID, lsValue) -> {
                 switch (lsID) {
-                    case "tfTaxRateID":
-                        break;
                     case "tfTaxDescription":
                         poJSON = poController.getModel().setDescription(lsValue);
                         if (!JFXUtil.isJSONSuccess(poJSON)) {
@@ -356,6 +352,18 @@ public class WithholdingTaxController implements Initializable, ScreenInterface 
 
         btnClose.setVisible(true);
         btnClose.setManaged(true);
+        JFXUtil.setButtonsVisibility(false, btnActivate);
+        if (fnValue != EditMode.READY) {
+            return;
+        }
+        switch (poController.getModel().getRecordStatus()) {
+            case "1":
+                JFXUtil.setButtonsVisibility(true, btnActivate);
+                break;
+            case "0":
+                break;
+        }
+
     }
 
 }
