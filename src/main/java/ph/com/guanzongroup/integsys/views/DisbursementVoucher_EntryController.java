@@ -735,7 +735,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
             JFXUtil.clearTextFields(apBIRDetail);
             poJSON = poController.populateWithholdingTaxDeduction();
             if (JFXUtil.isJSONSuccess(poJSON)) {
-                poController.setDefaultWithHoldingTax();
+//                poController.setDefaultWithHoldingTax();
                 loadTableDetailBIR.reload();
             } else {
                 BIR_data.clear();
@@ -848,9 +848,9 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                 () -> {
                     try {
                         Thread.sleep(100);
+                        main_data.clear();
+                        poJSON = poController.loadPayables(psTransactionType);
                         Platform.runLater(() -> {
-                            main_data.clear();
-                            poJSON = poController.loadPayables(psTransactionType);
                             if ("success".equals(poJSON.get("result"))) {
                                 JSONArray unifiedPayments = (JSONArray) poJSON.get("data");
                                 if (unifiedPayments != null && !unifiedPayments.isEmpty()) {
@@ -1238,7 +1238,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
         tblVwDetails.setOnMouseClicked(event -> {
             if (!details_data.isEmpty()) {
                 ModelDisbursementVoucher_Detail selected = (ModelDisbursementVoucher_Detail) tblVwDetails.getSelectionModel().getSelectedItem();
-                switch(event.getClickCount()){
+                switch (event.getClickCount()) {
                     case 1:
                         if (selected != null) {
                             int lnRow = Integer.parseInt(details_data.get(tblVwDetails.getSelectionModel().getSelectedIndex()).getIndex11());
@@ -1246,14 +1246,14 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                             loadRecordDetail();
                             moveNext(false, false);
                         }
-                    break;
+                        break;
                     case 2:
                         if (selected != null) {
                             int lnRow = Integer.parseInt(details_data.get(tblVwDetails.getSelectionModel().getSelectedIndex()).getIndex11());
                             pnDetail = lnRow;
                             loadDetailView();
                         }
-                    break;
+                        break;
                 }
             }
         });
@@ -1287,24 +1287,24 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
         JFXUtil.setKeyEventFilter(this::tableKeyEvents, tblVwDetails, tblVwJournalDetails, tblVwBIRDetails);
         JFXUtil.adjustColumnForScrollbar(tblViewMainList, tblVwDetails, tblVwJournalDetails, tblVwBIRDetails);
     }
-    
+
     private void loadDetailView() {
         try {
             String lsSourceCode = poController.Detail(pnDetail).getSourceCode();
             String lsSourceNo = poController.Detail(pnDetail).getSourceNo();
-            
-            if(lsSourceCode == null || "".equals(lsSourceCode)){
+
+            if (lsSourceCode == null || "".equals(lsSourceCode)) {
                 return;
             }
-            
-            if (DisbursementStatic.SourceCode.ACCOUNTS_PAYABLE.equals(lsSourceCode) ) {
+
+            if (DisbursementStatic.SourceCode.ACCOUNTS_PAYABLE.equals(lsSourceCode)) {
                 lsSourceCode = poController.Detail(pnDetail).SOADetail().getSourceCode();
                 lsSourceNo = poController.Detail(pnDetail).SOADetail().getSourceNo();
             }
             loadBySourceCode(lsSourceCode, lsSourceNo);
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName())
-                  .log(Level.SEVERE, MiscUtil.getException(ex), ex);
+                    .log(Level.SEVERE, MiscUtil.getException(ex), ex);
             ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
@@ -1312,7 +1312,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
     private void loadBySourceCode(String fsSourceCode, String fsSourceNo) {
         poJSON = new JSONObject();
         stageView.closeDialog();
-        
+
         switch (fsSourceCode) {
             case DisbursementStatic.SourceCode.PAYMENT_REQUEST:
                 PaymentRequest_ViewController loPRFController = new PaymentRequest_ViewController();
@@ -1337,8 +1337,8 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                 break;
         }
     }
-    
-    private void showDialog(String fsSource, Object controller ){
+
+    private void showDialog(String fsSource, Object controller) {
         try {
             stageView.showDialog((Stage) AnchorMain.getScene().getWindow(), getClass().getResource(fsSource), controller,
                     "Disbursement Dialog", true, true, false);
@@ -1347,7 +1347,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
             ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
-    
+
     private void tableKeyEvents(KeyEvent event) {
         TableView<?> currentTable = (TableView<?>) event.getSource();
         TablePosition<?, ?> focusedCell = currentTable.getFocusModel().getFocusedCell();
