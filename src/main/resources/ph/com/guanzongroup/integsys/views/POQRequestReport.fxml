@@ -107,7 +107,7 @@
                                           <Font name="System Bold" size="14.0" />
                                        </font>
                                     </Label>
-                                                <Label fx:id="lblSource" alignment="CENTER_RIGHT" layoutX="367.0" layoutY="14.0" maxWidth="1.7976931348623157E308" prefHeight="20.0" prefWidth="457.0" text="Company" GridPane.columnIndex="18">
+                                                <Label fx:id="lblSource" alignment="CENTER_RIGHT" layoutX="367.0" layoutY="14.0" maxWidth="1.7976931348623157E308" prefHeight="20.0" prefWidth="457.0" text="Company" GridPane.columnIndex="15" GridPane.columnSpan="4">
                                                     <font>
                                                         <Font name="System Bold" size="14.0" />
                                                     </font>
