@@ -174,7 +174,7 @@
                                                 <Font name="System Bold" size="12.0" />
                                              </font>
                                                             </Text>
-                                                        <TextField fx:id="tfTaxRateID" styleClass="DisabledTextField" GridPane.columnIndex="1">
+                                                        <TextField fx:id="tfTaxRateID" disable="true" editable="false" styleClass="DisabledTextField" GridPane.columnIndex="1">
                                                                 <GridPane.margin>
                                                                     <Insets />
                                                                 </GridPane.margin>
