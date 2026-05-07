@@ -11,10 +11,12 @@ import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
@@ -43,6 +45,8 @@ public class WithholdingTaxController implements Initializable, ScreenInterface 
     private int pnRow = 0;
     private ObservableList<ModelResultSet> data = FXCollections.observableArrayList();
     JSONObject poJSON = new JSONObject();
+    ObservableList<String> comboboxlist = FXCollections.observableArrayList("WTC", "EWT", "FWT", "GMP/WGV", "FBT");
+
     @FXML
     private AnchorPane AnchorMain, apMaster;
     @FXML
@@ -52,9 +56,11 @@ public class WithholdingTaxController implements Initializable, ScreenInterface 
     @FXML
     private FontAwesomeIconView faActivate;
     @FXML
-    private TextField tfTaxRateID, tfTaxDescription, tfAccountName, tfTaxCode, tfTaxType, tfTaxRate, tfSearchTaxDescription;
+    private TextField tfTaxRateID, tfTaxDescription, tfAccountName, tfTaxCode, tfTaxRate, tfSearchTaxDescription;
     @FXML
     private CheckBox cbActive;
+    @FXML
+    private ComboBox cmbTaxType;
 
     @Override
     public void setGRider(GRiderCAS foValue) {
@@ -89,6 +95,7 @@ public class WithholdingTaxController implements Initializable, ScreenInterface 
         pnEditMode = poController.getEditMode();
         initButton(pnEditMode);
         initTextFields();
+        initCombobox();
         pbLoaded = true;
 
         if (poController.getEditMode() == EditMode.ADDNEW) {
@@ -109,7 +116,7 @@ public class WithholdingTaxController implements Initializable, ScreenInterface 
             tfTaxDescription.setText(poController.getModel().getDescription());
             tfAccountName.setText(poController.getModel().AccountChart().getDescription());
             tfTaxCode.setText(poController.getModel().getTaxCode());
-            tfTaxType.setText(poController.getModel().getTaxType());
+            JFXUtil.setCmbValue(cmbTaxType, poController.getModel().getTaxType());
             tfTaxRate.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.getModel().getTaxRate(), false));
 
             switch (poController.getModel().getRecordStatus()) {
@@ -188,20 +195,22 @@ public class WithholdingTaxController implements Initializable, ScreenInterface 
                         }
                         break;
                     case "btnSave":
-                        poController.getModel().setModifyingBy(oApp.getUserID());
-                        poController.getModel().setModifiedDate(oApp.getServerDate());
-                        JSONObject saveResult = poController.saveRecord();
-                        if ("success".equals((String) saveResult.get("result"))) {
-                            ShowMessageFX.Information(null, pxeModuleName, (String) saveResult.get("message"));
-                            pnEditMode = EditMode.UNKNOWN;
-                            initButton(pnEditMode);
-                            clearAllFields();
-                        } else {
-                            ShowMessageFX.Information(null, pxeModuleName, (String) saveResult.get("message"));
+                        if (ShowMessageFX.YesNo(null, pxeModuleName, "Are you sure you want to save?")) {
+                            poController.getModel().setModifyingBy(oApp.getUserID());
+                            poController.getModel().setModifiedDate(oApp.getServerDate());
+                            JSONObject saveResult = poController.saveRecord();
+                            if ("success".equals((String) saveResult.get("result"))) {
+                                ShowMessageFX.Information(null, pxeModuleName, (String) saveResult.get("message"));
+                                pnEditMode = EditMode.UNKNOWN;
+                                initButton(pnEditMode);
+                                clearAllFields();
+                            } else {
+                                ShowMessageFX.Information(null, pxeModuleName, (String) saveResult.get("message"));
+                            }
+                            Platform.runLater(() -> {
+                                btnNew.fire();
+                            });
                         }
-                        Platform.runLater(() -> {
-                            btnNew.fire();
-                        });
                         break;
                     case "btnActivate":
                         String Status = poController.getModel().getRecordStatus();
@@ -249,6 +258,24 @@ public class WithholdingTaxController implements Initializable, ScreenInterface 
             }
         }
     }
+    EventHandler<ActionEvent> comboBoxActionListener = JFXUtil.CmbActionListener(
+            (cmbId, selectedIndex, selectedValue) -> {
+                switch (cmbId) {
+                    case "cmbTaxType":
+                        poJSON = poController.getModel().setTaxType(selectedValue.toString());
+                        if (!JFXUtil.isJSONSuccess(poJSON)) {
+                            ShowMessageFX.Information(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
+                        }
+                        loadRecordMaster();
+                        break;
+                }
+            });
+
+    private void initCombobox() {
+        JFXUtil.setComboBoxItems(new JFXUtil.Pairs<>(comboboxlist, cmbTaxType));
+        JFXUtil.setComboBoxActionListener(comboBoxActionListener, cmbTaxType);
+        JFXUtil.initComboBoxCellDesignColor("#FF8201", cmbTaxType);
+    }
 
     private void initTextFields() {
         JFXUtil.setFocusListener(txtField_Focus, AnchorMain);
@@ -273,12 +300,6 @@ public class WithholdingTaxController implements Initializable, ScreenInterface 
                     case "tfTaxCode":
                         if (lsValue.isEmpty()) {
                             poController.getModel().setTaxCode(lsValue);
-                        }
-                        break;
-                    case "tfTaxType":
-                        poJSON = poController.getModel().setTaxType(lsValue);
-                        if (!JFXUtil.isJSONSuccess(poJSON)) {
-                            ShowMessageFX.Information(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
                         }
                         break;
                     case "tfTaxRate":
@@ -333,8 +354,6 @@ public class WithholdingTaxController implements Initializable, ScreenInterface 
                                 poJSON = poController.SearchTaxCode(lsValue, false);
                                 if (!JFXUtil.isJSONSuccess(poJSON)) {
                                     ShowMessageFX.Information(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
-                                } else {
-                                    JFXUtil.textFieldMoveNext(tfTaxType);
                                 }
                                 loadRecordMaster();
                                 break;

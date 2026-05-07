@@ -5,6 +5,7 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Separator?>
 <?import javafx.scene.control.TextField?>
@@ -211,14 +212,6 @@
                                                 <Insets left="5.0" />
                                              </padding>
                                           </TextField>
-                                                        <TextField fx:id="tfTaxType" minWidth="-Infinity" prefWidth="225.0" GridPane.columnIndex="1" GridPane.rowIndex="4">
-                                             <font>
-                                                <Font size="14.0" />
-                                             </font>
-                                             <padding>
-                                                <Insets left="5.0" />
-                                             </padding>
-                                          </TextField>
                                                         <TextField fx:id="tfTaxRate" alignment="CENTER_RIGHT" promptText="0.00" GridPane.columnIndex="1" GridPane.rowIndex="5">
                                              <font>
                                                 <Font size="14.0" />
@@ -238,6 +231,7 @@
                                                 <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                                              </padding>
                                                             </CheckBox>
+                                          <ComboBox fx:id="cmbTaxType" minWidth="-Infinity" prefHeight="27.0" prefWidth="224.0" GridPane.columnIndex="1" GridPane.rowIndex="4" />
                                                     </children>
                                     </GridPane>
                                  </children>
