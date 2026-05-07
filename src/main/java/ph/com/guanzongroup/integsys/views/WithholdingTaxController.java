@@ -6,6 +6,7 @@ import java.sql.SQLException;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -157,8 +158,7 @@ public class WithholdingTaxController implements Initializable, ScreenInterface 
                         }
                         break;
                     case "btnBrowse":
-                        String lsValue = (tfTaxDescription.getText() == null) ? "" : tfTaxDescription.getText();
-                        poJSON = poController.searchRecord(lsValue, false);
+                        poJSON = poController.searchRecord("", false);
                         if ("error".equals((String) poJSON.get("result"))) {
                             ShowMessageFX.Information(null, pxeModuleName, (String) poJSON.get("message"));
                             tfTaxDescription.clear();
@@ -196,6 +196,9 @@ public class WithholdingTaxController implements Initializable, ScreenInterface 
                         } else {
                             ShowMessageFX.Information(null, pxeModuleName, (String) saveResult.get("message"));
                         }
+                        Platform.runLater(() -> {
+                            btnNew.fire();
+                        });
                         break;
                     case "btnActivate":
                         String Status = poController.getModel().getRecordStatus();
@@ -204,43 +207,36 @@ public class WithholdingTaxController implements Initializable, ScreenInterface 
 
                         switch (Status) {
                             case "0":
-                                if (ShowMessageFX.YesNo(null, pxeModuleName, "Do you want to Activate this Parameter?") == true) {
-                                    poController.initialize();
+                                if (ShowMessageFX.YesNo(null, pxeModuleName, "Do you want to Activate this parameter?") == true) {
                                     poJsON = poController.activateRecord();
                                     if ("error".equals(poJsON.get("result"))) {
                                         ShowMessageFX.Information(null, pxeModuleName, (String) poJsON.get("message"));
                                         break;
                                     } else {
-                                        ShowMessageFX.Information(null, pxeModuleName, (String) poJsON.get("message"));
-                                    }
-                                    poJsON = poController.openRecord(id);
-                                    if ("error".equals(poJsON.get("result"))) {
-                                        ShowMessageFX.Information(null, pxeModuleName, (String) poJsON.get("message"));
-                                        break;
+                                        ShowMessageFX.Information(null, pxeModuleName, "Record Aeactivated successfully");
                                     }
                                     clearAllFields();
                                     loadRecordMaster();
                                 }
                                 break;
                             case "1":
-                                if (ShowMessageFX.YesNo(null, pxeModuleName, "Do you want to Deactivate this Parameter?") == true) {
+                                if (ShowMessageFX.YesNo(null, pxeModuleName, "Do you want to Deactivate this parameter?") == true) {
                                     poJsON = poController.deactivateRecord();
                                     if ("error".equals(poJsON.get("result"))) {
                                         ShowMessageFX.Information(null, pxeModuleName, (String) poJsON.get("message"));
                                         break;
-                                    }
-                                    poJsON = poController.openRecord(id);
-                                    if ("error".equals(poJsON.get("result"))) {
-                                        ShowMessageFX.Information(null, pxeModuleName, (String) poJsON.get("message"));
-                                        break;
+                                    } else {
+                                        ShowMessageFX.Information(null, pxeModuleName, "Record Deactivated successfully");
                                     }
                                     clearAllFields();
                                     loadRecordMaster();
-                                    ShowMessageFX.Information(null, pxeModuleName, (String) poJsON.get("message"));
                                 }
                                 break;
                         }
+                        pnEditMode = EditMode.UNKNOWN;
+                        break;
                 }
+                initButton(pnEditMode);
             } catch (SQLException | GuanzonException | CloneNotSupportedException ex) {
                 Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
             }
@@ -361,6 +357,7 @@ public class WithholdingTaxController implements Initializable, ScreenInterface 
                 JFXUtil.setButtonsVisibility(true, btnActivate);
                 break;
             case "0":
+                JFXUtil.setButtonsVisibility(true, btnActivate);
                 break;
         }
 
