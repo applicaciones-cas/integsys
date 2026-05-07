@@ -179,7 +179,7 @@ public class WithholdingTaxController implements Initializable, ScreenInterface 
                         initButton(pnEditMode);
                         break;
                     case "btnCancel":
-                        if (ShowMessageFX.YesNo(null, pxeModuleName, "Do you really want to cancel this record? \nAny data collected will not be kept.")) {
+                        if (ShowMessageFX.YesNo(null, pxeModuleName, "Do you want to disregard changes?")) {
                             clearAllFields();
                             initializeObject();
                             pnEditMode = EditMode.UNKNOWN;
@@ -288,10 +288,6 @@ public class WithholdingTaxController implements Initializable, ScreenInterface 
                         }
                         break;
                     case "tfSearchTaxDescription":
-                        if (lsValue.isEmpty()) {
-                            poController.getModel().setDescription(lsValue);
-                        }
-                        loadRecordSearch();
                         break;
                 }
                 if (!lsID.equals("tfSearchTaxDescription")) {
