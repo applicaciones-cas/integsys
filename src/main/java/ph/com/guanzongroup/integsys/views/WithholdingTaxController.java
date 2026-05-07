@@ -164,6 +164,7 @@ public class WithholdingTaxController implements Initializable, ScreenInterface 
                             tfTaxDescription.clear();
                             break;
                         }
+                        tfSearchTaxDescription.setText("");
                         pnEditMode = EditMode.READY;
                         loadRecordMaster();
                         break;
@@ -213,8 +214,10 @@ public class WithholdingTaxController implements Initializable, ScreenInterface 
                                         ShowMessageFX.Information(null, pxeModuleName, (String) poJsON.get("message"));
                                         break;
                                     } else {
-                                        ShowMessageFX.Information(null, pxeModuleName, "Record Aeactivated successfully");
+                                        ShowMessageFX.Information(null, pxeModuleName, "Record Activated successfully");
                                     }
+                                    tfSearchTaxDescription.setText("");
+                                    poController.initialize();
                                     clearAllFields();
                                     loadRecordMaster();
                                 }
@@ -228,6 +231,8 @@ public class WithholdingTaxController implements Initializable, ScreenInterface 
                                     } else {
                                         ShowMessageFX.Information(null, pxeModuleName, "Record Deactivated successfully");
                                     }
+                                    tfSearchTaxDescription.setText("");
+                                    poController.initialize();
                                     clearAllFields();
                                     loadRecordMaster();
                                 }
@@ -285,9 +290,13 @@ public class WithholdingTaxController implements Initializable, ScreenInterface 
                         if (lsValue.isEmpty()) {
                             poController.getModel().setDescription(lsValue);
                         }
+                        loadRecordSearch();
                         break;
                 }
-                loadRecordMaster();
+                if (!lsID.equals("tfSearchTaxDescription")) {
+                    loadRecordMaster();
+
+                }
             });
 
     private void txtField_KeyPressed(KeyEvent event) {
@@ -309,6 +318,8 @@ public class WithholdingTaxController implements Initializable, ScreenInterface 
 
                                 loadRecordSearch();
                                 loadRecordMaster();
+                                pnEditMode = poController.getEditMode();
+                                initButton(pnEditMode);
                                 break;
                             case "tfAccountName":
                                 poJSON = poController.SearchAccountName(lsValue, false);
@@ -344,10 +355,13 @@ public class WithholdingTaxController implements Initializable, ScreenInterface 
     private void initButton(int fnValue) {
         boolean lbShow = (fnValue == EditMode.ADDNEW || fnValue == EditMode.UPDATE);
         JFXUtil.setButtonsVisibility(lbShow, btnCancel, btnSave);
-        JFXUtil.setButtonsVisibility(!lbShow, btnUpdate, btnBrowse, btnNew);
+        JFXUtil.setButtonsVisibility(!lbShow, btnBrowse, btnNew);
+        JFXUtil.setButtonsVisibility(false, btnUpdate);
 
         btnClose.setVisible(true);
         btnClose.setManaged(true);
+
+        JFXUtil.setDisabled(!lbShow, apMaster);
         JFXUtil.setButtonsVisibility(false, btnActivate);
         if (fnValue != EditMode.READY) {
             return;
@@ -355,6 +369,7 @@ public class WithholdingTaxController implements Initializable, ScreenInterface 
         switch (poController.getModel().getRecordStatus()) {
             case "1":
                 JFXUtil.setButtonsVisibility(true, btnActivate);
+                JFXUtil.setButtonsVisibility(true, btnUpdate);
                 break;
             case "0":
                 JFXUtil.setButtonsVisibility(true, btnActivate);
