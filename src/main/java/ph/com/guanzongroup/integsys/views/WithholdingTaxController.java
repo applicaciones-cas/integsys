@@ -354,6 +354,8 @@ public class WithholdingTaxController implements Initializable, ScreenInterface 
                                 poJSON = poController.SearchTaxCode(lsValue, false);
                                 if (!JFXUtil.isJSONSuccess(poJSON)) {
                                     ShowMessageFX.Information(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
+                                } else {
+                                    JFXUtil.textFieldMoveNext(cmbTaxType);
                                 }
                                 loadRecordMaster();
                                 break;
