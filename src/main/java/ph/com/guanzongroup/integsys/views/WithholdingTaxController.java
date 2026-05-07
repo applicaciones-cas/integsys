@@ -158,6 +158,7 @@ public class WithholdingTaxController implements Initializable, ScreenInterface 
                         }
                         break;
                     case "btnBrowse":
+                        poController.setRecordStatus("0123");
                         poJSON = poController.searchRecord("", false);
                         if ("error".equals((String) poJSON.get("result"))) {
                             ShowMessageFX.Information(null, pxeModuleName, (String) poJSON.get("message"));
@@ -311,6 +312,7 @@ public class WithholdingTaxController implements Initializable, ScreenInterface 
                         switch (lsID) {
                             //AnchorMain
                             case "tfSearchTaxDescription":
+                                poController.setRecordStatus("0123");
                                 poJSON = poController.searchRecord(lsValue, false);
                                 if (!JFXUtil.isJSONSuccess(poJSON)) {
                                     ShowMessageFX.Information(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
