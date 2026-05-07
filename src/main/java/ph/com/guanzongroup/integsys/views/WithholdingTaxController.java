@@ -140,7 +140,7 @@ public class WithholdingTaxController implements Initializable, ScreenInterface 
                 unloadForm appUnload = new unloadForm();
                 switch (clickedButton.getId()) {
                     case "btnClose":
-                        if (ShowMessageFX.YesNo("Do you really want to cancel this record? \nAny data collected will not be kept.", "Computerized Acounting System", pxeModuleName)) {
+                        if (ShowMessageFX.OkayCancel(null, "Close Tab", "Are you sure you want to close this Tab?") == true) {
                             appUnload.unloadForm(AnchorMain, oApp, pxeModuleName);
                         }
                         break;
@@ -151,7 +151,6 @@ public class WithholdingTaxController implements Initializable, ScreenInterface 
                         if ("success".equals((String) poJSON.get("result"))) {
                             pnEditMode = EditMode.ADDNEW;
                             initButton(pnEditMode);
-                            poController.getModel().setTaxRateId(poController.getModel().getNextCode());
                             loadRecordMaster();
                         } else {
                             ShowMessageFX.Information((String) poJSON.get("message"), "Computerized Acounting System", pxeModuleName);
@@ -254,7 +253,7 @@ public class WithholdingTaxController implements Initializable, ScreenInterface 
         JFXUtil.setFocusListener(txtField_Focus, AnchorMain);
 
         JFXUtil.setKeyPressedListener(this::txtField_KeyPressed, AnchorMain);
-        JFXUtil.inputDecimalOnly(tfTaxRateID, tfTaxRate);
+        JFXUtil.inputDecimalOnly(tfTaxRate);
     }
     ChangeListener<Boolean> txtField_Focus = JFXUtil.FocusListener(TextField.class,
             (lsID, lsValue) -> {
