@@ -76,7 +76,7 @@ public class DisbursementVoucher_CertificationController implements Initializabl
     ArrayList<String> checkedItem = new ArrayList<>();
     ArrayList<String> checkedItems = new ArrayList<>();
     JFXUtil.ReloadableTableTask loadTableMain;
-    boolean isretrieve = true;
+
     @FXML
     private AnchorPane AnchorMain, apBrowse, apButton;
     @FXML
@@ -167,7 +167,6 @@ public class DisbursementVoucher_CertificationController implements Initializabl
                             checkedItem.set(lnCtr, "0");
                         }
                     }
-                    isretrieve = false;
                     loadTableMain.reload();
                     break;
             }
@@ -185,7 +184,6 @@ public class DisbursementVoucher_CertificationController implements Initializabl
                             // if detected unchecked then must update
                             pnMain = rowIndex;
                             Platform.runLater(() -> {
-                                isretrieve = false;
                                 loadTableMain.reload();
                                 JFXUtil.runWithDelay(0.30, () -> {
                                     if (lbisTrue) {
@@ -231,7 +229,7 @@ public class DisbursementVoucher_CertificationController implements Initializabl
                 handleDisbursementAction("disapprove");
                 break;
             case "btnRetrieve":
-                loadTableMain.reload();
+                retrieveDisbursement();
                 break;
             case "btnClose":
                 if (ShowMessageFX.YesNo(null, "Close Tab", "Are you sure you want to close this Tab?")) {
@@ -300,7 +298,7 @@ public class DisbursementVoucher_CertificationController implements Initializabl
                                     return;
                                 } else {
                                     loadRecordSearch();
-                                    loadTableMain.reload();
+                                    retrieveDisbursement();
                                 }
                                 break;
                             case "tfSearchBankName":
@@ -310,7 +308,7 @@ public class DisbursementVoucher_CertificationController implements Initializabl
                                     return;
                                 } else {
                                     loadRecordSearch();
-                                    loadTableMain.reload();
+                                    retrieveDisbursement();
                                 }
                                 psSearchBankID = poDisbursementController.CheckPayments().getModel().getBankID();
                                 break;
@@ -321,7 +319,7 @@ public class DisbursementVoucher_CertificationController implements Initializabl
                                     return;
                                 } else {
                                     loadRecordSearch();
-                                    loadTableMain.reload();
+                                    retrieveDisbursement();
                                 }
                                 psSearchBankAccountID = poDisbursementController.CheckPayments().getModel().getBankAcountID();
                                 break;
@@ -337,99 +335,101 @@ public class DisbursementVoucher_CertificationController implements Initializabl
         }
     }
 
+    private void retrieveDisbursement() {
+        try {
+
+            poJSON = poDisbursementController.loadTransactionList(tfSearchIndustry.getText(), tfSearchBankName.getText(), tfSearchBankAccount.getText(), DisbursementStatic.CERTIFIED);
+            if ("error".equals(poJSON.get("result"))) {
+            } else {
+                Platform.runLater(() -> {
+                    chckSelectAll.setSelected(false);
+                    checkedItem.clear();
+                    for (int lnCntr = 0; lnCntr < poDisbursementController.getMasterList().size(); lnCntr++) {
+                        checkedItem.add("0");
+                    }
+                });
+            }
+            loadTableMain.reload();
+        } catch (SQLException | GuanzonException ex) {
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
+        }
+    }
+
     private void initLoadTable() {
         loadTableMain = new JFXUtil.ReloadableTableTask(
                 tblViewMainList,
                 main_data,
                 () -> {
-                    try {
-                        if (isretrieve) {
-                            poJSON = poDisbursementController.loadTransactionList(tfSearchIndustry.getText(), tfSearchBankName.getText(), tfSearchBankAccount.getText(), DisbursementStatic.CERTIFIED);
-                            if ("error".equals(poJSON.get("result"))) {
+                    Platform.runLater(() -> {
+                        try {
+                            main_data.clear();
+                            if (poDisbursementController.getMasterList().size() > 0) {
+                                for (int lnCntr = 0; lnCntr < poDisbursementController.getMasterList().size(); lnCntr++) {
+                                    String lsPaymentForm = "";
+                                    String lsBankName = "";
+                                    String lsBankAccount = "";
+                                    String disbursementType = poDisbursementController.getMaster(lnCntr).getDisbursementType();
+
+                                    switch (disbursementType) {
+                                        case DisbursementStatic.DisbursementType.CHECK:
+                                        case DisbursementStatic.DisbursementType.CHECK_DEPOSIT:
+                                            lsPaymentForm = "CHECK";
+                                            lsBankName = poDisbursementController.getMaster(lnCntr).CheckPayments().Banks().getBankName();
+                                            lsBankAccount = poDisbursementController.getMaster(lnCntr).CheckPayments().Bank_Account_Master().getAccountNo();
+                                            break;
+                                        case DisbursementStatic.DisbursementType.DIGITAL_PAYMENT:
+                                            lsPaymentForm = "DIGITAL PAYMENT";
+                                            lsBankName = poDisbursementController.getMaster(lnCntr).OtherPayments().Banks().getBankName();
+                                            lsBankAccount = poDisbursementController.getMaster(lnCntr).OtherPayments().Bank_Account_Master().getAccountNo();
+                                            break;
+                                        case DisbursementStatic.DisbursementType.WIRED:
+                                            lsPaymentForm = "BANK TRANSFER";
+                                            lsBankName = poDisbursementController.getMaster(lnCntr).OtherPayments().Banks().getBankName();
+                                            lsBankAccount = poDisbursementController.getMaster(lnCntr).OtherPayments().Bank_Account_Master().getAccountNo();
+                                            break;
+                                        default:
+                                            lsPaymentForm = "";
+                                            break;
+                                    }
+
+                                    main_data.add(new ModelDisbursementVoucher_Main(
+                                            String.valueOf(lnCntr + 1),
+                                            checkedItem.get(lnCntr),// 0 as unchecked, 1 as checked
+                                            poDisbursementController.getMaster(lnCntr).getVoucherNo(),
+                                            CustomCommonUtil.formatDateToShortString(poDisbursementController.getMaster(lnCntr).getTransactionDate()),
+                                            poDisbursementController.getMaster(lnCntr).Payee().Client().getCompanyName(),
+                                            poDisbursementController.getMaster(lnCntr).Payee().getPayeeName(),
+                                            lsPaymentForm,
+                                            lsBankName,
+                                            lsBankAccount,
+                                            CustomCommonUtil.setIntegerValueToDecimalFormat(poDisbursementController.getMaster(lnCntr).getNetTotal(), true),
+                                            poDisbursementController.getMaster(lnCntr).getTransactionNo()
+                                    ));
+                                }
                             } else {
-                                Platform.runLater(() -> {
-                                    chckSelectAll.setSelected(false);
-                                    checkedItem.clear();
-                                    for (int lnCntr = 0; lnCntr < poDisbursementController.getMasterList().size(); lnCntr++) {
-                                        checkedItem.add("0");
-                                    }
-                                });
+                                checkedItem.clear();
                             }
+                            if (pnMain < 0 || pnMain
+                                    >= main_data.size()) {
+                                if (!main_data.isEmpty()) {
+                                    /* FOCUS ON FIRST ROW */
+                                    JFXUtil.selectAndFocusRow(tblViewMainList, 0);
+                                    pnMain = tblViewMainList.getSelectionModel().getSelectedIndex();
+                                }
+                            } else {
+                                /* FOCUS ON THE ROW THAT pnRowDetail POINTS TO */
+                                JFXUtil.selectAndFocusRow(tblViewMainList, pnMain);
+                            }
+                            JFXUtil.loadTab(pagination, main_data.size(), ROWS_PER_PAGE, tblViewMainList, filteredMain_Data);
+
+                            initButtons();
+                        } catch (SQLException | GuanzonException ex) {
+                            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+                            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
                         }
-                        isretrieve = true;
-                        Platform.runLater(() -> {
-                            try {
-                                main_data.clear();
-                                if (poDisbursementController.getMasterList().size() > 0) {
-                                    for (int lnCntr = 0; lnCntr < poDisbursementController.getMasterList().size(); lnCntr++) {
-                                        String lsPaymentForm = "";
-                                        String lsBankName = "";
-                                        String lsBankAccount = "";
-                                        String disbursementType = poDisbursementController.getMaster(lnCntr).getDisbursementType();
+                    });
 
-                                        switch (disbursementType) {
-                                            case DisbursementStatic.DisbursementType.CHECK:
-                                            case DisbursementStatic.DisbursementType.CHECK_DEPOSIT:
-                                                lsPaymentForm = "CHECK";
-                                                lsBankName = poDisbursementController.getMaster(lnCntr).CheckPayments().Banks().getBankName();
-                                                lsBankAccount = poDisbursementController.getMaster(lnCntr).CheckPayments().Bank_Account_Master().getAccountNo();
-                                                break;
-                                            case DisbursementStatic.DisbursementType.DIGITAL_PAYMENT:
-                                                lsPaymentForm = "DIGITAL PAYMENT";
-                                                lsBankName = poDisbursementController.getMaster(lnCntr).OtherPayments().Banks().getBankName();
-                                                lsBankAccount = poDisbursementController.getMaster(lnCntr).OtherPayments().Bank_Account_Master().getAccountNo();
-                                                break;
-                                            case DisbursementStatic.DisbursementType.WIRED:
-                                                lsPaymentForm = "BANK TRANSFER";
-                                                lsBankName = poDisbursementController.getMaster(lnCntr).OtherPayments().Banks().getBankName();
-                                                lsBankAccount = poDisbursementController.getMaster(lnCntr).OtherPayments().Bank_Account_Master().getAccountNo();
-                                                break;
-                                            default:
-                                                lsPaymentForm = "";
-                                                break;
-                                        }
-
-                                        main_data.add(new ModelDisbursementVoucher_Main(
-                                                String.valueOf(lnCntr + 1),
-                                                checkedItem.get(lnCntr),// 0 as unchecked, 1 as checked
-                                                poDisbursementController.getMaster(lnCntr).getVoucherNo(),
-                                                CustomCommonUtil.formatDateToShortString(poDisbursementController.getMaster(lnCntr).getTransactionDate()),
-                                                poDisbursementController.getMaster(lnCntr).Payee().Client().getCompanyName(),
-                                                poDisbursementController.getMaster(lnCntr).Payee().getPayeeName(),
-                                                lsPaymentForm,
-                                                lsBankName,
-                                                lsBankAccount,
-                                                CustomCommonUtil.setIntegerValueToDecimalFormat(poDisbursementController.getMaster(lnCntr).getNetTotal(), true),
-                                                poDisbursementController.getMaster(lnCntr).getTransactionNo()
-                                        ));
-                                    }
-                                } else {
-                                    checkedItem.clear();
-                                }
-                                if (pnMain < 0 || pnMain
-                                        >= main_data.size()) {
-                                    if (!main_data.isEmpty()) {
-                                        /* FOCUS ON FIRST ROW */
-                                        JFXUtil.selectAndFocusRow(tblViewMainList, 0);
-                                        pnMain = tblViewMainList.getSelectionModel().getSelectedIndex();
-                                    }
-                                } else {
-                                    /* FOCUS ON THE ROW THAT pnRowDetail POINTS TO */
-                                    JFXUtil.selectAndFocusRow(tblViewMainList, pnMain);
-                                }
-                                JFXUtil.loadTab(pagination, main_data.size(), ROWS_PER_PAGE, tblViewMainList, filteredMain_Data);
-
-                                initButtons();
-
-                            } catch (SQLException | GuanzonException ex) {
-                                Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
-                                ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
-                            }
-                        });
-                    } catch (SQLException | GuanzonException ex) {
-                        Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
-                        ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
-                    }
                 });
     }
 
@@ -531,6 +531,7 @@ public class DisbursementVoucher_CertificationController implements Initializabl
                     throw new AssertionError();
             }
             Platform.runLater(() -> {
+                retrieveDisbursement();
                 loadTableMain.reload();
             });
         } catch (ParseException | SQLException | GuanzonException | CloneNotSupportedException | ScriptException ex) {
