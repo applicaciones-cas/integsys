@@ -140,12 +140,12 @@ public class CheckTransfer_ConfirmationController implements Initializable, Scre
 
     @Override
     public void setCompanyID(String fsValue) {
-//        psCompanyID = fsValue;
+        psCompanyID = fsValue;
     }
 
     @Override
     public void setCategoryID(String fsValue) {
-//        psCategoryID = fsValue;
+        psCategoryID = fsValue;
     }
 /**
      * Initializes the controller class.
@@ -536,8 +536,8 @@ public class CheckTransfer_ConfirmationController implements Initializable, Scre
         CustomCommonUtil.setManaged(lbShow, btnSave, btnCancel,btnSearch);
 
         // Default hide Update
-        CustomCommonUtil.setVisible(false, btnUpdate,btnVoid,btnApprove,btnPrint);
-        CustomCommonUtil.setManaged(false, btnUpdate,btnVoid,btnApprove,btnPrint);
+        CustomCommonUtil.setVisible(false, btnUpdate,btnVoid,btnApprove,btnPrint,btnHistory);
+        CustomCommonUtil.setManaged(false, btnUpdate,btnVoid,btnApprove,btnPrint,btnHistory);
 
         String lsTransNo = poGLControllers.CheckTransfers()
                 .Master()
@@ -547,8 +547,8 @@ public class CheckTransfer_ConfirmationController implements Initializable, Scre
                 && lsTransNo != null
                 && !lsTransNo.isEmpty()) {
 
-        CustomCommonUtil.setVisible(true, btnUpdate,btnVoid,btnApprove,btnPrint);
-        CustomCommonUtil.setManaged(true, btnUpdate,btnVoid,btnApprove,btnPrint);
+        CustomCommonUtil.setVisible(true, btnUpdate,btnVoid,btnApprove,btnPrint,btnHistory);
+        CustomCommonUtil.setManaged(true, btnUpdate,btnVoid,btnApprove,btnPrint,btnHistory);
         }
 
         if (fnEditMode == EditMode.UPDATE || fnEditMode == EditMode.ADDNEW) {

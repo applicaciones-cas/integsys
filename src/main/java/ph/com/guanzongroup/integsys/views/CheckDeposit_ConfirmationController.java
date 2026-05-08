@@ -660,8 +660,8 @@ public class CheckDeposit_ConfirmationController implements Initializable, Scree
         CustomCommonUtil.setManaged(lbShow, btnSave, btnCancel,btnSearch);
 
         // Default hide Update
-        CustomCommonUtil.setVisible(false, btnUpdate,btnVoid,btnApprove,btnPrint);
-        CustomCommonUtil.setManaged(false, btnUpdate,btnVoid,btnApprove,btnPrint);
+        CustomCommonUtil.setVisible(false, btnUpdate,btnVoid,btnApprove,btnPrint,btnHistory);
+        CustomCommonUtil.setManaged(false, btnUpdate,btnVoid,btnApprove,btnPrint,btnHistory);
 
         String lsTransNo = poGLControllers.CheckDeposits()
                 .Master()
@@ -671,8 +671,8 @@ public class CheckDeposit_ConfirmationController implements Initializable, Scree
                 && lsTransNo != null
                 && !lsTransNo.isEmpty()) {
 
-        CustomCommonUtil.setVisible(true, btnUpdate,btnVoid,btnApprove,btnPrint);
-        CustomCommonUtil.setManaged(true, btnUpdate,btnVoid,btnApprove,btnPrint);
+        CustomCommonUtil.setVisible(true, btnUpdate,btnVoid,btnApprove,btnPrint,btnHistory);
+        CustomCommonUtil.setManaged(true, btnUpdate,btnVoid,btnApprove,btnPrint,btnHistory);
         }
 
         if (fnEditMode == EditMode.UPDATE || fnEditMode == EditMode.ADDNEW) {

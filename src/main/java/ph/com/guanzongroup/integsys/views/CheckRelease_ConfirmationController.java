@@ -329,22 +329,22 @@ public class CheckRelease_ConfirmationController implements Initializable, Scree
                         ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
                         return;
                     }
-                    ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
+                    ShowMessageFX.Information((String) poJSON.get("message"), psFormName, null);
                     pnEditMode = poGLControllers.CheckReleases().getEditMode();
-                    if( poGLControllers.CheckTransfers().Master().getTransactionStatus().equals(CheckTransferStatus.OPEN)){
+                    if( poGLControllers.CheckReleases().Master().getTransactionStatus().equals(CheckReleaseStatus.OPEN)){
                         if (ShowMessageFX.YesNo(null, psFormName, "Do you want to confirm this transaction?")) {
                                 poJSON = poGLControllers.CheckReleases().OpenTransaction(poGLControllers.CheckReleases().Master().getTransactionNo());
                                 poJSON = poGLControllers.CheckReleases().ConfirmTransaction("");
-                          
                             if (!"success".equals((String) poJSON.get("result"))) {
                                 ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
                                 return;
                             }
-                            
+                            ShowMessageFX.Information((String) poJSON.get("message"), psFormName, null);
+                            poJSON = poGLControllers.CheckReleases().OpenTransaction(poGLControllers.CheckReleases().Master().getTransactionNo());
                         }
                     }
                     if (ShowMessageFX.YesNo(null, psFormName, "Do you want to print this transaction?")) {
-                        poJSON = poGLControllers.CheckTransfers().printTransaction();
+                        poJSON = poGLControllers.CheckReleases().printTransaction();
                         if ("error".equals((String) poJSON.get("result"))) {
                             ShowMessageFX.Error((String) poJSON.get("message"), psFormName, null);
                             ClearAll();
@@ -538,8 +538,8 @@ public class CheckRelease_ConfirmationController implements Initializable, Scree
         CustomCommonUtil.setManaged(lbShow, btnSave, btnCancel,btnSearch);
 
         // Default hide Update
-        CustomCommonUtil.setVisible(false, btnUpdate,btnVoid,btnApprove,btnPrint);
-        CustomCommonUtil.setManaged(false, btnUpdate,btnVoid,btnApprove,btnPrint);
+        CustomCommonUtil.setVisible(false, btnUpdate,btnVoid,btnApprove,btnPrint,btnHistory);
+        CustomCommonUtil.setManaged(false, btnUpdate,btnVoid,btnApprove,btnPrint,btnHistory);
 
         String lsTransNo = poGLControllers.CheckReleases()
                 .Master()
@@ -549,8 +549,8 @@ public class CheckRelease_ConfirmationController implements Initializable, Scree
                 && lsTransNo != null
                 && !lsTransNo.isEmpty()) {
 
-        CustomCommonUtil.setVisible(true, btnUpdate,btnVoid,btnApprove,btnPrint);
-        CustomCommonUtil.setManaged(true, btnUpdate,btnVoid,btnApprove,btnPrint);
+        CustomCommonUtil.setVisible(true, btnUpdate,btnVoid,btnApprove,btnPrint,btnHistory);
+        CustomCommonUtil.setManaged(true, btnUpdate,btnVoid,btnApprove,btnPrint,btnHistory);
         }
         
         cbReverse.setDisable(true);

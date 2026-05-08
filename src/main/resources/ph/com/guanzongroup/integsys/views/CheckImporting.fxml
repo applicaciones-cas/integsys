@@ -47,12 +47,12 @@
                                                         <Font name="System Bold" size="14.0" />
                                                     </font>
                                                 </Label>
-                                                <Label text="Bank Name" GridPane.rowIndex="1">
+                                                <Label text="Bank Name" visible="false" GridPane.rowIndex="1">
                                                     <font>
                                                         <Font name="System Bold" size="14.0" />
                                                     </font>
                                                 </Label>
-                                                <TextField fx:id="tfSearchBankName" maxWidth="1.7976931348623157E308" promptText="Press F3: Search" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+                                                <TextField fx:id="tfSearchBankName" maxWidth="1.7976931348623157E308" promptText="Press F3: Search" visible="false" GridPane.columnIndex="2" GridPane.rowIndex="1" />
                                             </children>
                                         </GridPane>
                                     </children>
