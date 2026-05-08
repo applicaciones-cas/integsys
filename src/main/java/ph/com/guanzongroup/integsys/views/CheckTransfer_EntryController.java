@@ -554,8 +554,8 @@ public class CheckTransfer_EntryController implements Initializable, ScreenInter
         CustomCommonUtil.setManaged(lbShow, btnSave, btnCancel,btnSearch);
 
         // Default hide Update
-        CustomCommonUtil.setVisible(false, btnUpdate);
-        CustomCommonUtil.setManaged(false, btnUpdate);
+        CustomCommonUtil.setVisible(false, btnUpdate,btnHistory);
+        CustomCommonUtil.setManaged(false, btnUpdate,btnHistory);
 
         String lsTransNo = poGLControllers.CheckTransfers()
                 .Master()
@@ -565,13 +565,13 @@ public class CheckTransfer_EntryController implements Initializable, ScreenInter
                 && lsTransNo != null
                 && !lsTransNo.isEmpty()) {
 
-            CustomCommonUtil.setVisible(true, btnUpdate);
-            CustomCommonUtil.setManaged(true, btnUpdate);
+            CustomCommonUtil.setVisible(true, btnUpdate,btnHistory);
+            CustomCommonUtil.setManaged(true, btnUpdate,btnHistory);
         }
 
         if (fnEditMode == EditMode.UPDATE || fnEditMode == EditMode.ADDNEW) {
-            CustomCommonUtil.setVisible(false, btnUpdate);
-            CustomCommonUtil.setManaged(false, btnUpdate);
+            CustomCommonUtil.setVisible(false, btnUpdate,btnHistory);
+            CustomCommonUtil.setManaged(false, btnUpdate,btnHistory);
         }
     }
 

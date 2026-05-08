@@ -559,7 +559,7 @@ public class CheckDeposit_EntryController implements Initializable, ScreenInterf
                 tfTransactionNo,
                 tfCheckTransNo,
                 tfCheckNo,
-                taRemarks
+                tfNote
         );
         if (CheckTransferStatus.CONFIRMED.equals(poGLControllers.CheckDeposits().Master().getTransactionStatus())) {
             apMaster.setDisable(true);
@@ -686,8 +686,8 @@ public class CheckDeposit_EntryController implements Initializable, ScreenInterf
         CustomCommonUtil.setManaged(lbShow, btnSave, btnCancel,btnSearch);
 
         // Default hide Update
-        CustomCommonUtil.setVisible(false, btnUpdate);
-        CustomCommonUtil.setManaged(false, btnUpdate);
+        CustomCommonUtil.setVisible(false, btnUpdate,btnHistory);
+        CustomCommonUtil.setManaged(false, btnUpdate,btnHistory);
 
         String lsTransNo = poGLControllers.CheckDeposits()
                 .Master()
@@ -697,13 +697,13 @@ public class CheckDeposit_EntryController implements Initializable, ScreenInterf
                 && lsTransNo != null
                 && !lsTransNo.isEmpty()) {
 
-            CustomCommonUtil.setVisible(true, btnUpdate);
-            CustomCommonUtil.setManaged(true, btnUpdate);
+            CustomCommonUtil.setVisible(true, btnUpdate,btnHistory);
+            CustomCommonUtil.setManaged(true, btnUpdate,btnHistory);
         }
 
         if (fnEditMode == EditMode.UPDATE || fnEditMode == EditMode.ADDNEW) {
-            CustomCommonUtil.setVisible(false, btnUpdate);
-            CustomCommonUtil.setManaged(false, btnUpdate);
+            CustomCommonUtil.setVisible(false, btnUpdate,btnHistory);
+            CustomCommonUtil.setManaged(false, btnUpdate,btnHistory);
         }
         
     }
@@ -1101,9 +1101,9 @@ public class CheckDeposit_EntryController implements Initializable, ScreenInterf
                             return;
                         }
 
-                        if (poGLControllers.CheckDeposits().Master().BankAccount().Banks().getBankName()!= null) {
+                        if (poGLControllers.CheckDeposits().Master().Banks().getBankName()!= null) {
                             tfBankMaster.setText(
-                                    poGLControllers.CheckDeposits().Master().BankAccount().Banks().getBankName());
+                                    poGLControllers.CheckDeposits().Master().Banks().getBankName());
                         } else {
                             tfBankMaster.clear();
                             tfBankAccountName.clear();

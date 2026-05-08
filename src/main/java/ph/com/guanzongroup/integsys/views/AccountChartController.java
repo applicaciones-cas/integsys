@@ -258,12 +258,18 @@ public class AccountChartController implements Initializable, ScreenInterface {
                             oParameters.AccountChart().ShowStatusHistory();
                         break;
                 }
-            } catch (SQLException | GuanzonException | CloneNotSupportedException ex) {
+            } catch (SQLException | GuanzonException | CloneNotSupportedException |ParseException ex) {
                 Logger.getLogger(AccountChartController.class.getName()).log(Level.SEVERE, null, ex);
                 ShowMessageFX.Error(ex.getMessage(), pxeModuleName, null);
-            } catch (ParseException ex) {
-                Logger.getLogger(AccountChartController.class.getName()).log(Level.SEVERE, null, ex);
-                ShowMessageFX.Error(ex.getMessage(), pxeModuleName, null);
+                 try {
+                    if (oApp != null) {
+
+                        oApp.rollbackTrans(); // 🔥 force rollback
+                    }
+                } catch (SQLException ex1) {
+                    Logger.getLogger(ProjectController.class.getName()).log(Level.SEVERE, null, ex1);
+                }
+               
             } catch (Exception ex) {
                 Logger.getLogger(AccountChartController.class.getName()).log(Level.SEVERE, null, ex);
                 ShowMessageFX.Error(ex.getMessage(), pxeModuleName, null);
@@ -331,12 +337,12 @@ public class AccountChartController implements Initializable, ScreenInterface {
                                 CustomCommonUtil.setVisible(true, btnBrowse, btnNew, btnUpdate, btnConfirm, btnVoid, btnClose);
                                 CustomCommonUtil.setManaged(true, btnBrowse, btnNew, btnUpdate, btnConfirm, btnVoid, btnClose);
                                 break;
-                            case "2": // CONFIRM
+                            case "1": // CONFIRM
                                 CustomCommonUtil.setVisible(true, btnBrowse, btnNew,  btnDeactivate, btnClose);
                                 CustomCommonUtil.setManaged(true, btnBrowse, btnNew,  btnDeactivate, btnClose);
                                 break;
                             case "3": // VOID
-                            case "1": // CANCEL
+                            case "2": // CANCEL
                                 CustomCommonUtil.setVisible(true, btnBrowse, btnClose);
                                 CustomCommonUtil.setManaged(true, btnBrowse, btnClose);
                                 break;
@@ -422,10 +428,18 @@ public class AccountChartController implements Initializable, ScreenInterface {
             try {
                 switch (lnIndex) {
                     case 1:
-                        oParameters.AccountChart().getModel().setAccountCode(lsValue);
+                        poJSON = oParameters.AccountChart().getModel().setAccountCode(lsValue);
+                        if("error".equals((String)poJSON.get("result"))){
+                            ShowMessageFX.Warning((String)poJSON.get("message"), pxeModuleName, null);
+                            return;
+                        }
                         break;
                     case 2:
-                        oParameters.AccountChart().getModel().setDescription(lsValue);
+                        poJSON = oParameters.AccountChart().getModel().setDescription(lsValue);
+                        if("error".equals((String)poJSON.get("result"))){
+                            ShowMessageFX.Warning((String)poJSON.get("message"), pxeModuleName, null);
+                            return;
+                        }
 //                    case 5:
 //                        oParameters.AccountChart().getModel().setAccountGroup(lsValue);
 //                    case 6:
@@ -627,10 +641,10 @@ public class AccountChartController implements Initializable, ScreenInterface {
                 case "0":
                     lblStatus.setText("OPEN");
                     break;
-                case "1":
+                case "2":
                     lblStatus.setText("DEACTIVATED");
                     break;
-                case "2":
+                case "1":
                     lblStatus.setText("CONFIRM");
                     break;
                 case "3":

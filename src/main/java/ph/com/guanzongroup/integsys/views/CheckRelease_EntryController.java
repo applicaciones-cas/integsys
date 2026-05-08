@@ -59,6 +59,7 @@ import org.guanzon.appdriver.constant.UserRight;
 import org.json.simple.JSONObject;
 import ph.com.guanzongroup.cas.cashflow.status.CheckTransferStatus;
 import ph.com.guanzongroup.cas.cashflow.services.CashflowControllers;
+import ph.com.guanzongroup.cas.cashflow.status.CheckReleaseStatus;
 import ph.com.guanzongroup.integsys.model.ModelTableDetail;
 import ph.com.guanzongroup.integsys.model.ModelTableMain;
 import ph.com.guanzongroup.integsys.utility.CustomCommonUtil;
@@ -347,20 +348,23 @@ public class CheckRelease_EntryController implements Initializable, ScreenInterf
                             if (!"success".equals((String) poJSON.get("result"))) {
                                 ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
                                 ClearAll();
+                                
                                 initButtons(pnEditMode);
                                 return;
                             }
                             ShowMessageFX.Information((String) poJSON.get("message"), psFormName, null);
+                            poJSON = poGLControllers.CheckReleases().OpenTransaction(poGLControllers.CheckReleases().Master().getTransactionNo());
                         }
-                        if (ShowMessageFX.YesNo(null, psFormName, "Do you want to print this transaction?")) {
-                            poJSON = poGLControllers.CheckReleases().printTransaction();
-                            if ("error".equals((String) poJSON.get("result"))) {
-                                ShowMessageFX.Error((String) poJSON.get("message"), psFormName, null);
-                                ClearAll();
-                                initButtons(pnEditMode);
-                                return;
+                        if (poGLControllers.CheckReleases().Master().getTransactionStatus().equals(CheckReleaseStatus.CONFIRMED)) {
+                            if (ShowMessageFX.YesNo(null, psFormName, "Do you want to print this transaction?")) {
+                                poJSON = poGLControllers.CheckReleases().printTransaction();
+                                if ("error".equals((String) poJSON.get("result"))) {
+                                    ShowMessageFX.Error((String) poJSON.get("message"), psFormName, null);
+                                    ClearAll();
+                                    initButtons(pnEditMode);
+                                    return;
+                                }
                             }
-                            
                         }
 
                     ClearAll();
@@ -538,8 +542,8 @@ public class CheckRelease_EntryController implements Initializable, ScreenInterf
         CustomCommonUtil.setManaged(lbShow, btnSave, btnCancel);
 
         // Default hide Update
-        CustomCommonUtil.setVisible(false, btnUpdate);
-        CustomCommonUtil.setManaged(false, btnUpdate);
+        CustomCommonUtil.setVisible(false, btnUpdate,btnHistory);
+        CustomCommonUtil.setManaged(false, btnUpdate,btnHistory);
 
         String lsTransNo = poGLControllers.CheckReleases()
                 .Master()
@@ -549,13 +553,13 @@ public class CheckRelease_EntryController implements Initializable, ScreenInterf
                 && lsTransNo != null
                 && !lsTransNo.isEmpty()) {
 
-            CustomCommonUtil.setVisible(true, btnUpdate);
-            CustomCommonUtil.setManaged(true, btnUpdate);
+            CustomCommonUtil.setVisible(true, btnUpdate,btnHistory);
+            CustomCommonUtil.setManaged(true, btnUpdate,btnHistory);
         }
 
         if (fnEditMode == EditMode.UPDATE || fnEditMode == EditMode.ADDNEW) {
-            CustomCommonUtil.setVisible(false, btnUpdate);
-            CustomCommonUtil.setManaged(false, btnUpdate);
+            CustomCommonUtil.setVisible(false, btnUpdate,btnHistory);
+            CustomCommonUtil.setManaged(false, btnUpdate,btnHistory);
             cbReverse.setDisable(false);
         }
     }
