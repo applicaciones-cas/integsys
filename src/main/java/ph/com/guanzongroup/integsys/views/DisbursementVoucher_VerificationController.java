@@ -77,6 +77,7 @@ import org.guanzon.appdriver.constant.DocumentType;
 import org.guanzon.appdriver.constant.EditMode;
 import org.guanzon.appdriver.constant.Logical;
 import org.guanzon.appdriver.constant.RecordStatus;
+import org.guanzon.cas.purchasing.services.PurchaseOrderReceivingControllers;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.ParseException;
 import ph.com.guanzongroup.cas.cashflow.DisbursementVoucher;
@@ -96,6 +97,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
 
     private GRiderCAS oApp;
     private JSONObject poJSON, poJSONVAT;
+    JFXUtil.StageManager stageView = new JFXUtil.StageManager();
     private static final int ROWS_PER_PAGE = 50;
     private int pnMain = 0;
     private int pnDetail = 0;
@@ -1129,13 +1131,26 @@ public class DisbursementVoucher_VerificationController implements Initializable
                 JFXUtil.resetImageBounds(imageView, stackPane1);
             }
         });
+        
         tblVwDetails.setOnMouseClicked(event -> {
-            if (!details_data.isEmpty() && event.getClickCount() == 1) {
+            if (!details_data.isEmpty()) {
                 ModelDisbursementVoucher_Detail selected = (ModelDisbursementVoucher_Detail) tblVwDetails.getSelectionModel().getSelectedItem();
-                if (selected != null) {
-                    int lnRow = Integer.parseInt(details_data.get(tblVwDetails.getSelectionModel().getSelectedIndex()).getIndex11());
-                    pnDetail = lnRow;
-                    moveNext(false, false);
+                switch(event.getClickCount()){
+                    case 1:
+                        if (selected != null) {
+                            int lnRow = Integer.parseInt(details_data.get(tblVwDetails.getSelectionModel().getSelectedIndex()).getIndex11());
+                            pnDetail = lnRow;
+                            loadRecordDetail();
+                            moveNext(false, false);
+                        }
+                    break;
+                    case 2:
+                        if (selected != null) {
+                            int lnRow = Integer.parseInt(details_data.get(tblVwDetails.getSelectionModel().getSelectedIndex()).getIndex11());
+                            pnDetail = lnRow;
+                            loadDetailView();
+                        }
+                    break;
                 }
             }
         });
@@ -1167,6 +1182,66 @@ public class DisbursementVoucher_VerificationController implements Initializable
         JFXUtil.applyRowHighlighting(tblViewMainList, item -> ((ModelDisbursementVoucher_Main) item).getIndex01(), highlightedRowsMain);
         JFXUtil.setKeyEventFilter(this::tableKeyEvents, tblVwDetails, tblVwJournalDetails, tblVwBIRDetails, tblAttachments);
         JFXUtil.adjustColumnForScrollbar(tblViewMainList, tblVwDetails, tblVwJournalDetails, tblVwBIRDetails, tblAttachments);
+    }
+    
+    private void loadDetailView() {
+        try {
+            String lsSourceCode = poController.Detail(pnDetail).getSourceCode();
+            String lsSourceNo = poController.Detail(pnDetail).getSourceNo();
+            
+            if(lsSourceCode == null || "".equals(lsSourceCode)){
+                return;
+            }
+            
+            if (DisbursementStatic.SourceCode.ACCOUNTS_PAYABLE.equals(lsSourceCode) ) {
+                lsSourceCode = poController.Detail(pnDetail).SOADetail().getSourceCode();
+                lsSourceNo = poController.Detail(pnDetail).SOADetail().getSourceNo();
+            }
+            loadBySourceCode(lsSourceCode, lsSourceNo);
+        } catch (SQLException | GuanzonException ex) {
+            Logger.getLogger(getClass().getName())
+                  .log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
+        }
+    }
+
+    private void loadBySourceCode(String fsSourceCode, String fsSourceNo) {
+        poJSON = new JSONObject();
+        stageView.closeDialog();
+        
+        switch (fsSourceCode) {
+            case DisbursementStatic.SourceCode.PAYMENT_REQUEST:
+                PaymentRequest_ViewController loPRFController = new PaymentRequest_ViewController();
+                loPRFController.setGRider(oApp);
+                loPRFController.setTransaction(fsSourceNo);
+                showDialog("/ph/com/guanzongroup/integsys/views/PaymentRequest_View.fxml", loPRFController);
+                break;
+            case DisbursementStatic.SourceCode.AP_ADJUSTMENT:
+                APPaymentAdjustment_ViewController loAPAdjController = new APPaymentAdjustment_ViewController();
+                loAPAdjController.setGRider(oApp);
+                loAPAdjController.setTransaction(fsSourceNo);
+                showDialog("/ph/com/guanzongroup/integsys/views/APPaymentAdjustment_View.fxml", loAPAdjController);
+                break;
+            case DisbursementStatic.SourceCode.PO_RECEIVING:
+                SIPosting_ViewController loSIPostingController = new SIPosting_ViewController();
+                loSIPostingController.setGRider(oApp);
+                loSIPostingController.setTransaction(fsSourceNo);
+                showDialog("/ph/com/guanzongroup/integsys/views/SIPosting_View.fxml", loSIPostingController);
+                break;
+            default:
+                ShowMessageFX.Warning(null, pxeModuleName, "Failed to open detail form for source: " + fsSourceCode + ". Please contact the system administrator.");
+                break;
+        }
+    }
+    
+    private void showDialog(String fsSource, Object controller ){
+        try {
+            stageView.showDialog((Stage) AnchorMain.getScene().getWindow(), getClass().getResource(fsSource), controller,
+                    "Disbursement Dialog", true, true, false);
+        } catch (IOException ex) {
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
+        }
     }
 
     private void tableKeyEvents(KeyEvent event) {

@@ -37,7 +37,7 @@
                             <children>
                                 <AnchorPane fx:id="apBrowse" style="-fx-background-color: A0A0A0;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                     <children>
-                                        <GridPane prefHeight="28.0" prefWidth="1447.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="10.0">
+                                        <GridPane prefHeight="28.0" prefWidth="1447.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0">
                                             <columnConstraints>
                                                 <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="120.0" />
                                                 <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="10.0" />
@@ -48,14 +48,14 @@
                                                 <ColumnConstraints hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="400.0" />
                                                 <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="100.0" />
                                                 <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="10.0" />
-                                                <ColumnConstraints halignment="RIGHT" maxWidth="565.0" minWidth="565.0" prefWidth="565.0" />
-                                                <ColumnConstraints halignment="RIGHT" hgrow="ALWAYS" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="10.0" />
+                                                <ColumnConstraints halignment="RIGHT" maxWidth="620.0" minWidth="620.0" prefWidth="620.0" />
+                                                <ColumnConstraints halignment="RIGHT" hgrow="ALWAYS" maxWidth="1.7976931348623157E308" />
                                             </columnConstraints>
                                             <rowConstraints>
                                                 <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="28.0" vgrow="SOMETIMES" />
                                             </rowConstraints>
                                             <children>
-                                            <Label text="Reference No.">
+                                            <Label text="Transaction No.">
                                                     <font>
                                                         <Font name="System Bold" size="14.0" />
                                                     </font>
@@ -65,7 +65,7 @@
                                                         <Font name="System Bold" size="14.0" />
                                                     </font>
                                                 </Label>
-                                                <Label fx:id="lblSource" alignment="CENTER_RIGHT" maxWidth="1.7976931348623157E308" text="Company - Industry" GridPane.columnIndex="9">
+                                                <Label fx:id="lblSource" alignment="CENTER_RIGHT" maxWidth="1.7976931348623157E308" prefWidth="630.0" text="Company - Industry" GridPane.columnIndex="9">
                                        <font>
                                           <Font name="System Bold" size="14.0" />
                                        </font>
@@ -180,7 +180,7 @@
                             <children>
                                 <HBox prefHeight="100.0" prefWidth="200.0" spacing="5.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                     <children>
-                                        <TabPane fx:id="ImTabPane" maxWidth="-Infinity" minWidth="-Infinity" prefHeight="200.0" prefWidth="880.0" tabClosingPolicy="UNAVAILABLE" HBox.hgrow="NEVER">
+                                        <TabPane fx:id="ImTabPane" maxWidth="-Infinity" minWidth="-Infinity" prefHeight="200.0" prefWidth="890.0" tabClosingPolicy="UNAVAILABLE" HBox.hgrow="NEVER">
                                             <tabs>
                                                 <Tab fx:id="tabDetails" text="Details">
                                                     <content>
@@ -188,7 +188,7 @@
                                                             <children>
                                                                 <VBox spacing="5.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="5.0">
                                                                     <children>
-                                                                                <AnchorPane fx:id="apMaster" maxWidth="875.0" minWidth="875.0" style="-fx-border-color: orange;">
+                                                                                <AnchorPane fx:id="apMaster" minWidth="875.0" style="-fx-border-color: orange;">
                                                                                     <children>
                                                                                         <GridPane layoutX="33.0" layoutY="34.0" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="5.0">
                                                                                             <columnConstraints>
@@ -277,7 +277,7 @@
                                                                                                 <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="10.0" />
                                                                                                 <ColumnConstraints hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="200.0" />
                                                                         <ColumnConstraints hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="10.0" />
-                                                                        <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="80.0" />
+                                                                        <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="90.0" />
                                                                                                 <ColumnConstraints hgrow="SOMETIMES" maxWidth="10.0" minWidth="10.0" prefWidth="10.0" />
                                                                                                 <ColumnConstraints hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="180.0" />
                                                                                                 <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="10.0" />
@@ -301,7 +301,7 @@
                                                                                                 <Label text="Particular" GridPane.columnIndex="4" GridPane.rowIndex="2" />
                                                                                                 <Label text="Amount" GridPane.columnIndex="4" GridPane.rowIndex="3" />
                                                                                                 <Label text="Disc. Rate (%)" GridPane.columnIndex="4" GridPane.rowIndex="4" />
-                                                                                                <Label text="Disc. Amt" GridPane.columnIndex="4" GridPane.rowIndex="5" />
+                                                                                                <Label text="Addl. Disc. Amt" GridPane.columnIndex="4" GridPane.rowIndex="5" />
                                                                                                 <Label text="Reverse" GridPane.columnIndex="8" GridPane.rowIndex="4" />
                                                                                                 <Label text="Total Amount" GridPane.columnIndex="8" GridPane.rowIndex="5">
                                                                                                     <font>
@@ -329,7 +329,7 @@
                                                                                         <TableColumn fx:id="tblRowNoDetail" editable="false" maxWidth="40.0" minWidth="40.0" prefWidth="40.0" resizable="false" sortable="false" text="No." />
                                                                                         <TableColumn fx:id="tblParticular" editable="false" maxWidth="510.0" minWidth="510.0" prefWidth="510.0" resizable="false" sortable="false" text="Particular" />
                                                                                         <TableColumn fx:id="tblAmount" editable="false" maxWidth="100.0" minWidth="100.0" prefWidth="100.0" resizable="false" sortable="false" style="-fx-alignment: CENTER-RIGHT;" text="Amount" />
-                                                                                        <TableColumn fx:id="tblDiscAmount" editable="false" maxWidth="100.0" minWidth="100.0" prefWidth="100.0" resizable="false" sortable="false" style="-fx-alignment: CENTER-RIGHT;" text="Disc. Amt" />
+                                                                                        <TableColumn fx:id="tblDiscAmount" editable="false" maxWidth="100.0" minWidth="100.0" prefWidth="100.0" resizable="false" sortable="false" style="-fx-alignment: CENTER-RIGHT;" text="Total Disc. Amt" />
                                                                                         <TableColumn fx:id="tbTotalAmount" editable="false" maxWidth="100.0" minWidth="100.0" prefWidth="100.0" resizable="false" sortable="false" style="-fx-alignment: CENTER-RIGHT;" text="Total Amount" />
                                                                                     </columns>
                                                                                     <columnResizePolicy>
@@ -462,6 +462,9 @@
                                                     </content>
                                                 </Tab>
                                             </tabs>
+                                 <HBox.margin>
+                                    <Insets bottom="5.0" />
+                                 </HBox.margin>
                                         </TabPane>
                                         <AnchorPane style="-fx-border-color: orange;">
                                             <children>
@@ -490,9 +493,10 @@
                                                         <TableView fx:id="tblVwPaymentRequest" minWidth="242.0" GridPane.rowIndex="1">
                                                             <columns>
                                                                 <TableColumn fx:id="tblRowNo" maxWidth="30.0" minWidth="30.0" prefWidth="30.0" resizable="false" sortable="false" text="No." />
-                                                                <TableColumn fx:id="tblBranch" maxWidth="200.0" minWidth="200.0" prefWidth="200.0" resizable="false" sortable="false" text="Branch" />
-                                                                <TableColumn fx:id="tblPayee" maxWidth="236.0" minWidth="236.0" prefWidth="236.0" resizable="false" sortable="false" text="Payee" />
-                                                                <TableColumn fx:id="tblTransactionNo" maxWidth="150.0" minWidth="150.0" prefWidth="150.0" resizable="false" sortable="false" text="Refer No." />
+                                                                <TableColumn fx:id="tblTransactionNo" maxWidth="150.0" minWidth="105.0" prefWidth="105.0" resizable="false" sortable="false" text="Refer No." />
+                                                <TableColumn fx:id="tblTransactionDate" maxWidth="150.0" minWidth="105.0" prefWidth="105.0" resizable="false" sortable="false" text="Date" />
+                                                                <TableColumn fx:id="tblBranch" maxWidth="245.0" minWidth="192.0" prefWidth="192.0" resizable="false" sortable="false" text="Branch" />
+                                                                <TableColumn fx:id="tblPayee" maxWidth="281.0" minWidth="227.0" prefWidth="243.0" resizable="false" sortable="false" text="Payee" />
                                                             </columns>
                                                             <GridPane.margin>
                                                                 <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
@@ -509,6 +513,9 @@
                                                     </children>
                                                 </GridPane>
                                             </children>
+                                 <HBox.margin>
+                                    <Insets bottom="5.0" top="5.0" />
+                                 </HBox.margin>
                                         </AnchorPane>
                                         <AnchorPane prefHeight="200.0" prefWidth="200.0" HBox.hgrow="ALWAYS" />
                                     </children>
