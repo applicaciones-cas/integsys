@@ -23,6 +23,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import static javafx.scene.input.KeyCode.DOWN;
 import static javafx.scene.input.KeyCode.ENTER;
@@ -75,7 +76,10 @@ public class BankAccountMasterController implements Initializable, ScreenInterfa
     private String psIndustryID = "";
     private String psCompanyID = "";
     private String psCategoryID = "";
-
+    
+    @FXML
+    private Label lblSource;
+    
     @FXML
     private AnchorPane AnchorMain, AnchorInputs;
     @FXML
@@ -113,7 +117,8 @@ public class BankAccountMasterController implements Initializable, ScreenInterfa
             txtField14,
             txtField15,
             txtSeeks01,
-            txtSeeks02;
+            txtSeeks02,
+            txtSeeks03;
 
     @FXML
     private CheckBox cbField01,
@@ -157,7 +162,7 @@ public class BankAccountMasterController implements Initializable, ScreenInterfa
         ClickButton();
         initTabAnchor();
         if (oCashflow.getEditMode() == EditMode.ADDNEW) {
-            initButton(pnEditMode);
+            initButton(pnEditMode);        
             initTabAnchor();
             loadRecord();
         }
@@ -171,6 +176,8 @@ public class BankAccountMasterController implements Initializable, ScreenInterfa
             oCashflow.setRecordStatus("0123");
             oCashflow.getModel().setIndustryCode(psIndustryID);
             oCashflow.getModel().setCompanyId(psCompanyID);
+            oCashflow.setCompanyId(psCompanyID);
+            lblSource.setText(oCashflow.getModel().Company().getCompanyName() + " - " + oCashflow.getModel().Industry().getDescription());
         } catch (SQLException ex) {
             Logger.getLogger(BankAccountMasterController.class.getName()).log(Level.SEVERE, null, ex);
         } catch (GuanzonException ex) {
@@ -236,6 +243,7 @@ public class BankAccountMasterController implements Initializable, ScreenInterfa
                         if ("success".equals((String) poJSON.get("result"))) {
                             oCashflow.getModel().setIndustryCode(psIndustryID);
                             oCashflow.getModel().setCompanyId(psCompanyID);
+                            cmbField01.getSelectionModel().select(0);
                             pnEditMode = oCashflow.getEditMode();
                             initButton(pnEditMode);
                             initTabAnchor();
@@ -264,6 +272,10 @@ public class BankAccountMasterController implements Initializable, ScreenInterfa
                                     loValue = txtSeeks02.getText();
                                     poJSON = oCashflow.searchRecordbyAccount(loValue, false);
                                 }
+                                break;
+                            case "03":
+                                loValue = txtSeeks03.getText();
+                                poJSON = oCashflow.searchRecordbyBranchBank(loValue, false);
                                 break;
                             default:
                                 loValue = "";
@@ -548,6 +560,7 @@ public class BankAccountMasterController implements Initializable, ScreenInterfa
         
         txtSeeks01.setOnKeyPressed(this::txtSeeks_KeyPressed);
         txtSeeks02.setOnKeyPressed(this::txtSeeks_KeyPressed);
+        txtSeeks03.setOnKeyPressed(this::txtSeeks_KeyPressed);
         txtField02.setOnKeyPressed(this::txtField_KeyPressed);
         txtField06.setOnKeyPressed(this::txtField_KeyPressed);
 
@@ -571,8 +584,14 @@ public class BankAccountMasterController implements Initializable, ScreenInterfa
                                 txtSeeks01.clear();
                                 break;
                             }
+                            txtSeeks02.clear();
+                            txtSeeks03.clear();
                             txtSeeks01.setText((String) oCashflow.getModel().getAccountNo());
-                            pnEditMode = EditMode.READY;
+                            pnEditMode = oCashflow.getEditMode();
+                            System.out.print("EDIT MODE ON BROWSE 1: " + pnEditMode);
+                            initButton(pnEditMode);
+                            loadRecord();
+                            initTabAnchor();
                             break;
                         case 02:
                             psActiveField = String.valueOf(lnIndex);
@@ -582,8 +601,31 @@ public class BankAccountMasterController implements Initializable, ScreenInterfa
                                 txtSeeks02.clear();
                                 break;
                             }
+                            txtSeeks01.clear();
+                            txtSeeks03.clear();
                             txtSeeks02.setText((String) oCashflow.getModel().getAccountName());
-                            pnEditMode = EditMode.READY;
+                            pnEditMode = oCashflow.getEditMode();
+                            System.out.print("EDIT MODE ON BROWSE 1: " + pnEditMode);
+                            initButton(pnEditMode);
+                            loadRecord();
+                            initTabAnchor();
+                            break;
+                        case 03:
+                            psActiveField = String.valueOf(lnIndex);
+                            poJSON = oCashflow.searchRecordbyBranchBank(lsValue, false);
+                            if ("error".equals((String) poJSON.get("result"))) {
+                                ShowMessageFX.Information((String) poJSON.get("message"), "Computerized Acounting System", pxeModuleName);
+                                txtSeeks03.clear();
+                                break;
+                            }
+                            txtSeeks01.clear();
+                            txtSeeks02.clear();
+                            txtSeeks03.setText((String) oCashflow.getModel().BanksBranh().getBranchBankName());
+                            pnEditMode = oCashflow.getEditMode();
+                            System.out.print("EDIT MODE ON BROWSE 1: " + pnEditMode);
+                            initButton(pnEditMode);
+                            loadRecord();
+                            initTabAnchor();
                             break;
                     }
                 case ENTER:
@@ -790,7 +832,7 @@ public class BankAccountMasterController implements Initializable, ScreenInterfa
                             if ("error".equalsIgnoreCase(poJSON.get("result").toString())) {
                                 ShowMessageFX.Information((String) poJSON.get("message"), "Computerized Acounting System", pxeModuleName);
                             }
-                            txtField06.setText(oCashflow.getModel().getBranch());
+                            txtField06.setText(oCashflow.getModel().BanksBranh().getBranchBankName());
                             break;
                     }
                 case ENTER:

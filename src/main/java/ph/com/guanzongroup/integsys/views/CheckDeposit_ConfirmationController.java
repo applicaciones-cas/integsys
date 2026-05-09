@@ -485,20 +485,29 @@ public class CheckDeposit_ConfirmationController implements Initializable, Scree
                        initButtons(pnEditMode);
                 break;
                 case "btnApprove":
-                       poJSON = poGLControllers.CheckDeposits().ConfirmTransaction("");
-                       if (!"success".equals((String) poJSON.get("result"))) {
-                           ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
-                           return;
-                       }
-                       ShowMessageFX.Information((String) poJSON.get("message"), psFormName, null);
-                       ClearAll();
-                       initializeObject();
-                       pnEditMode = poGLControllers.CheckDeposits().getEditMode();
-                       initButtons(pnEditMode);
-                break;
+                    String sTransnox = poGLControllers.CheckDeposits().Master().getTransactionNo();
+                    poJSON = poGLControllers.CheckDeposits().ConfirmTransaction("");
+                        if (!"success".equals((String) poJSON.get("result"))) {
+                            ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
+                            return;
+                        }
+                    ShowMessageFX.Information((String) poJSON.get("message"), psFormName, null);
+                    poJSON = poGLControllers.CheckDeposits().OpenTransaction(sTransnox);
+                        if (ShowMessageFX.YesNo(null, psFormName, "Do you want to print this transaction?")) {
+                            poJSON = poGLControllers.CheckDeposits().printDepositSlip();
+                            if ("error".equals((String) poJSON.get("result"))) {
+                                ShowMessageFX.Error((String) poJSON.get("message"), psFormName, null);
+                                return;
+                            }
+                            ShowMessageFX.Information((String) poJSON.get("message"), psFormName, null);
+                        }
+                    ClearAll();
+                    initializeObject();
+                    pnEditMode = poGLControllers.CheckDeposits().getEditMode();
+                    initButtons(pnEditMode);
+                    break;
                 
                 case "btnPrint":
-                    
                     if (ShowMessageFX.YesNo(null, psFormName, "Do you want to print this transaction?")) {
                         poJSON = poGLControllers.CheckDeposits().printDepositSlip();
                         if ("error".equals((String) poJSON.get("result"))) {
