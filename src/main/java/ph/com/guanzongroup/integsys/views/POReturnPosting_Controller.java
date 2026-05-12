@@ -51,7 +51,6 @@ import org.guanzon.appdriver.base.GuanzonException;
 import org.guanzon.appdriver.base.MiscUtil;
 import org.guanzon.appdriver.base.SQLUtil;
 import org.guanzon.appdriver.constant.EditMode;
-import org.guanzon.cas.purchasing.status.PurchaseOrderReturnStatus;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.ParseException;
 import java.util.concurrent.atomic.AtomicReference;
@@ -88,6 +87,7 @@ public class POReturnPosting_Controller implements Initializable, ScreenInterfac
     private String psSearchBranchId = "";
     private String openedAttachment = "";
     private boolean pbEntered = false;
+    private boolean pbEnteredJE = false;
 
     private ObservableList<ModelDeliveryAcceptance_Main> main_data = FXCollections.observableArrayList();
     private ObservableList<ModelDeliveryAcceptance_Detail> details_data = FXCollections.observableArrayList();
@@ -255,7 +255,7 @@ public class POReturnPosting_Controller implements Initializable, ScreenInterfac
                     }
                     loadTableJEDetail.reload();
                     if (checkedBox.isSelected()) {
-                        moveNext();
+                        moveNextJE(false, false);
                     }
                     break;
             }
@@ -408,7 +408,7 @@ public class POReturnPosting_Controller implements Initializable, ScreenInterfac
 
     public void retrievePOR() {
         poJSON = new JSONObject();
-        poJSON = poController.PurchaseOrderReturn().loadPurchaseOrderReturn("posting", psSupplierId, tfSearchReferenceNo.getText());
+        poJSON = poController.PurchaseOrderReturn().loadPurchaseOrderReturn("posting", psSearchSupplierId, tfSearchReferenceNo.getText());
         if (!"success".equals((String) poJSON.get("result"))) {
             ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
         } else {
@@ -416,37 +416,39 @@ public class POReturnPosting_Controller implements Initializable, ScreenInterfac
         }
     }
 
-    public void moveNext() {
-        if (poController.PurchaseOrderReturn().getDetailCount() <= 0) {
+    public void moveNext(boolean isUp, boolean continueNext) {
+        if (continueNext) {
+            apDetail.requestFocus();
+            pnDetail = isUp ? JFXUtil.moveToPreviousRow(tblViewDetails)
+                    : JFXUtil.moveToNextRow(tblViewDetails);
+        }
+        loadRecordDetail();
+        if (pnDetail < 0 || pnDetail > poController.PurchaseOrderReturn().getDetailCount() - 1) {
             return;
         }
-        double lnReceiveQty = poController.PurchaseOrderReturn().Detail(pnDetail).getQuantity().doubleValue();
-        apDetail.requestFocus();
-        double lnNewvalue = poController.PurchaseOrderReturn().Detail(pnDetail).getQuantity().doubleValue();
-        if (lnReceiveQty != lnNewvalue && (lnReceiveQty > 0
-                && poController.PurchaseOrderReturn().Detail(pnDetail).getStockId() != null
-                && !"".equals(poController.PurchaseOrderReturn().Detail(pnDetail).getStockId()))) {
-            tfCost.requestFocus();
-        } else {
-            pnDetail = JFXUtil.moveToNextRow(tblViewDetails);
-            loadRecordDetail();
-            tfCost.requestFocus();
-        }
+        JFXUtil.requestFocusNullField(new Object[][]{ // alternative to if , else if
+            {poController.PurchaseOrderReturn().Detail(pnDetail).getStockId(), tfCost},}, tfCost); // default
     }
 
-    public void moveNextJE(boolean isUp) {
-        apJEDetail.requestFocus();
-        pnJEDetail = isUp ? Integer.parseInt(JEdetails_data.get(JFXUtil.moveToPreviousRow(tblViewJEDetails)).getIndex07())
-                : Integer.parseInt(JEdetails_data.get(JFXUtil.moveToNextRow(tblViewJEDetails)).getIndex07());
-        loadRecordJEDetail();
-        if (JFXUtil.isObjectEqualTo(poController.PurchaseOrderReturn().Journal().Detail(pnJEDetail).getAccountCode(), null, "")) {
-            tfJEAcctCode.requestFocus();
-        } else {
-            if (poController.PurchaseOrderReturn().Journal().Detail(pnJEDetail).getCreditAmount() > 0) {
-                tfCreditAmt.requestFocus();
-            } else {
-                tfDebitAmt.requestFocus();
+    public void moveNextJE(boolean isUp, boolean continueNext) {
+        try {
+            if (continueNext) {
+                apJEDetail.requestFocus();
+                pnJEDetail = isUp ? Integer.parseInt(JEdetails_data.get(JFXUtil.moveToPreviousRow(tblViewJEDetails)).getIndex07())
+                        : Integer.parseInt(JEdetails_data.get(JFXUtil.moveToNextRow(tblViewJEDetails)).getIndex07());
             }
+            loadRecordJEDetail();
+            if (pnJEDetail < 0 || pnJEDetail > poController.PurchaseOrderReturn().Journal().getDetailCount() - 1) {
+                return;
+            }
+            JFXUtil.requestFocusNullField(new Object[][]{ // alternative to if , else if
+                {poController.PurchaseOrderReturn().Journal().Detail(pnJEDetail).getAccountCode(), tfJEAcctCode},
+                {poController.PurchaseOrderReturn().Journal().Detail(pnJEDetail).Account_Chart().getDescription(), tfJEAcctDescription}, // if null or empty, then requesting focus to the txtfield
+                {poController.PurchaseOrderReturn().Journal().Detail(pnJEDetail).getCreditAmount(), tfCreditAmt},
+                {poController.PurchaseOrderReturn().Journal().Detail(pnJEDetail).getDebitAmount(), tfDebitAmt},}, tfDebitAmt); // default
+        } catch (SQLException | GuanzonException ex) {
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -460,7 +462,12 @@ public class POReturnPosting_Controller implements Initializable, ScreenInterfac
             switch (event.getCode()) {
                 case TAB:
                 case ENTER:
-                    pbEntered = true;
+                    if (tfFreightDetail.isFocused()) {
+                        pbEntered = true;
+                    }
+                    if (tfDebitAmt.isFocused()) {
+                        pbEnteredJE = true;
+                    }
                     CommonUtils.SetNextFocus(txtField);
                     event.consume();
                     break;
@@ -521,14 +528,14 @@ public class POReturnPosting_Controller implements Initializable, ScreenInterfac
                     break;
                 case UP:
                     JFXUtil.altSwitch(lsID, new Object[][]{
-                        {new String[]{"tfCost", "tfDiscRateDetail", "tfAddlDiscAmtDetail"}, (Runnable) () -> moveNext()},
-                        {new String[]{"tfJEAcctCode", "tfCreditAmt", "tfDebitAmt"}, (Runnable) () -> moveNextJE(true)}
+                        {new String[]{"tfCost", "tfDiscRateDetail", "tfAddlDiscAmtDetail"}, (Runnable) () -> moveNext(true, true)},
+                        {new String[]{"tfJEAcctCode", "tfCreditAmt", "tfDebitAmt"}, (Runnable) () -> moveNextJE(true, true)}
                     });
                     break;
                 case DOWN:
                     JFXUtil.altSwitch(lsID, new Object[][]{
-                        {new String[]{"tfCost", "tfDiscRateDetail", "tfAddlDiscAmtDetail"}, (Runnable) () -> moveNext()},
-                        {new String[]{"tfJEAcctCode", "tfCreditAmt", "tfDebitAmt"}, (Runnable) () -> moveNextJE(false)}
+                        {new String[]{"tfCost", "tfDiscRateDetail", "tfAddlDiscAmtDetail"}, (Runnable) () -> moveNext(false, true)},
+                        {new String[]{"tfJEAcctCode", "tfCreditAmt", "tfDebitAmt"}, (Runnable) () -> moveNextJE(false, true)}
                     });
                     break;
                 default:
@@ -592,22 +599,6 @@ public class POReturnPosting_Controller implements Initializable, ScreenInterfac
 
     public void loadRecordMaster() {
         try {
-//            boolean lbShow1 = (pnEditMode == EditMode.UPDATE);
-//            boolean lbShow2 = (pnEditMode == EditMode.READY || pnEditMode == EditMode.UPDATE);
-//            boolean lbShow3 = (pnEditMode == EditMode.READY);
-//            boolean lbShow4 = lbShow2 && JFXUtil.isObjectEqualTo(poController.PurchaseOrderReturn().Master().getTransactionStatus(), PurchaseOrderReturnStatus.POSTED, PurchaseOrderReturnStatus.PAID)
-//                    && "To-follow".equals(poController.PurchaseOrderReturn().Master().getSalesInvoice());
-//            if (lbShow4) {
-//                if (lbShow1) {
-//                    JFXUtil.setDisabled(true, apDetail, apJEMaster, apJEDetail);
-////                    JFXUtil.setDisabledExcept(true, apMaster, dpSIDate, cbToFollowInv);
-//                }
-//            } else {
-//                if (!JFXUtil.isObjectEqualTo(poController.PurchaseOrderReturn().Master().getTransactionStatus(), PurchaseOrderReturnStatus.POSTED, PurchaseOrderReturnStatus.PAID)) {
-//                    JFXUtil.setDisabled(!lbShow1, tfReferenceNo, tfDiscountRate, tfDiscountAmount, tfFreightAmt,
-//                            tfVatRate, taRemarks);
-//                }
-//            }
             poController.PurchaseOrderReturn().Master().setSupplierId(psSupplierId);
             poController.PurchaseOrderReturn().Master().setBranchCode(psBranchId);
 
@@ -1080,9 +1071,6 @@ public class POReturnPosting_Controller implements Initializable, ScreenInterfac
                 switch (lsID) {
                     case "tfCost":
                         lsValue = JFXUtil.removeComma(lsValue);
-                        double lnNewVal = Double.valueOf(lsValue);
-                        double lnOldVal = poController.PurchaseOrderReturn().Detail(pnDetail).getUnitPrce().doubleValue();
-
                         poJSON = poController.PurchaseOrderReturn().Detail(pnDetail).setUnitPrce((Double.valueOf(lsValue)));
                         if ("error".equals((String) poJSON.get("result"))) {
                             System.err.println((String) poJSON.get("message"));
@@ -1091,17 +1079,7 @@ public class POReturnPosting_Controller implements Initializable, ScreenInterfac
                         }
 
                         if (pbEntered) {
-                            if (lnNewVal != lnOldVal) {
-                                if ((Double.valueOf(lsValue) > 0
-                                && poController.PurchaseOrderReturn().Detail(pnDetail).getStockId() != null
-                                && !"".equals(poController.PurchaseOrderReturn().Detail(pnDetail).getStockId()))) {
-                                    moveNext();
-                                } else {
-                                    moveNext();
-                                }
-                            } else {
-                                moveNext();
-                            }
+                            moveNext(false, true);
                             pbEntered = false;
                         }
                         break;
@@ -1173,12 +1151,12 @@ public class POReturnPosting_Controller implements Initializable, ScreenInterfac
 
                             }
                         }
-                        if (pbEntered) {
+                        if (pbEnteredJE) {
                             JFXUtil.runWithDelay(0.50, () -> {
                                 loadTableJEDetail.reload();
                                 JFXUtil.runWithDelay(0.50, () -> {
-                                    moveNextJE(false);
-                                    pbEntered = false;
+                                    moveNextJE(false, true);
+                                    pbEnteredJE = false;
                                 });
                             });
 
