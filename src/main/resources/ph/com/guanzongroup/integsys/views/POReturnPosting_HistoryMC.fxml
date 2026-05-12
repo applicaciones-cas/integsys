@@ -281,9 +281,8 @@
                                                                         <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="28.0" vgrow="SOMETIMES" />
                                                                           <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="28.0" vgrow="SOMETIMES" />
                                                       <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="28.0" vgrow="SOMETIMES" />
-                                                                        <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="10.0" vgrow="SOMETIMES" />
                                                       <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="28.0" vgrow="SOMETIMES" />
-                                                      <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="28.0" vgrow="SOMETIMES" />
+                                                                              <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="28.0" vgrow="SOMETIMES" />
                                                                       </rowConstraints>
                                                                       <children>
                                                                           <Label text="Barcode">
@@ -298,50 +297,46 @@
                                                                                  <font>
                                                                                     <Font size="12.0" />
                                                                                  </font></Label>
-                                                                          <Label text="Return Qty" GridPane.columnIndex="4" GridPane.rowIndex="5">
+                                                                          <Label text="Return Qty" GridPane.columnIndex="8" GridPane.rowIndex="1">
                                                                               <font>
                                                                                   <Font name="System Bold" size="12.0" />
                                                                               </font>
                                                                           </Label>
-                                                      <Label text="Cost" GridPane.columnIndex="8" GridPane.rowIndex="5">
+                                                      <Label text="Cost" GridPane.columnIndex="8" GridPane.rowIndex="3">
                                                                                  <font>
                                                                                     <Font name="System Bold" size="12.0" />
                                                                                  </font></Label>
                                                                           <TextField fx:id="tfBarcode" disable="true" maxHeight="25.0" styleClass="DisabledTextField" GridPane.columnIndex="2" />
                                                                           <TextField fx:id="tfDescription" disable="true" styleClass="DisabledTextField" GridPane.columnIndex="2" GridPane.columnSpan="5" GridPane.rowIndex="1" />
-                                                      <TextField fx:id="tfReturnQuantity" alignment="CENTER_RIGHT" disable="true" promptText="0" styleClass="DisabledTextField" GridPane.columnIndex="6" GridPane.rowIndex="5" />
+                                                      <TextField fx:id="tfReturnQuantity" alignment="CENTER_RIGHT" disable="true" editable="false" promptText="0" styleClass="DisabledTextField" GridPane.columnIndex="10" GridPane.rowIndex="1" />
                                                                           <TextField fx:id="tfFrameNo" disable="true" maxHeight="25.0" styleClass="DisabledTextField" GridPane.columnIndex="6" GridPane.rowIndex="2" />
-                                                      <TextField fx:id="tfCost" alignment="CENTER_RIGHT" promptText="0.0000" GridPane.columnIndex="10" GridPane.rowIndex="5" />
-                                                                  <Label layoutX="699.0" layoutY="84.0" text="Receive Qty" GridPane.columnIndex="4" GridPane.rowIndex="4" />
-                                                                  <TextField fx:id="tfReceiveQuantity" alignment="CENTER_RIGHT" disable="true" layoutX="85.0" layoutY="79.0" maxHeight="25.0" promptText="0" styleClass="DisabledTextField" GridPane.columnIndex="6" GridPane.rowIndex="4" />
-                                                                  <Label text="Vatable" GridPane.columnIndex="8" GridPane.rowIndex="4">
+                                                      <TextField fx:id="tfCost" alignment="CENTER_RIGHT" disable="true" editable="false" promptText="0.0000" GridPane.columnIndex="10" GridPane.rowIndex="3" />
+                                                                  <Label layoutX="699.0" layoutY="84.0" text="Receive Qty" GridPane.columnIndex="8" />
+                                                                  <TextField fx:id="tfReceiveQuantity" alignment="CENTER_RIGHT" disable="true" layoutX="85.0" layoutY="79.0" maxHeight="25.0" promptText="0" styleClass="DisabledTextField" GridPane.columnIndex="10" />
+                                                                  <Label text="Vatable" GridPane.columnIndex="8" GridPane.rowIndex="2">
                                                                      <font>
                                                                         <Font size="12.0" />
                                                                      </font>
                                                                   </Label>
-                                                                  <CheckBox mnemonicParsing="false" GridPane.columnIndex="10" GridPane.rowIndex="4" />
-                                                                  <TextField fx:id="tfSRPAmount" alignment="CENTER_RIGHT" disable="true" editable="false" promptText="0.0000" styleClass="DisabledTextField" GridPane.columnIndex="10" />
-                                                                  <Label text="SRP" GridPane.columnIndex="8">
-                                                                     <font>
-                                                                        <Font size="12.0" />
-                                                                     </font>
-                                                                  </Label>
-                                                                  <Label text="Disc. Rate (%)" GridPane.columnIndex="8" GridPane.rowIndex="1" />
-                                                                  <Label text="Addl. Disc. Amt" GridPane.columnIndex="8" GridPane.rowIndex="2" />
-                                                                  <TextField fx:id="tfDiscRateDetail" alignment="CENTER_RIGHT" promptText="0.00" GridPane.columnIndex="10" GridPane.rowIndex="1" />
-                                                                  <TextField fx:id="tfAddlDiscAmtDetail" alignment="CENTER_RIGHT" promptText="0.0000" GridPane.columnIndex="10" GridPane.rowIndex="2" />
+                                                                  <CheckBox mnemonicParsing="false" GridPane.columnIndex="10" GridPane.rowIndex="2" />
                                                                               <Label text="Frame No" GridPane.columnIndex="4" GridPane.rowIndex="2">
                                                                                  <font>
                                                                                     <Font size="12.0" />
                                                                                  </font>
                                                                               </Label>
                                                                               <TextField fx:id="tfEngineNo" disable="true" editable="false" maxHeight="25.0" styleClass="DisabledTextField" GridPane.columnIndex="2" GridPane.rowIndex="2" />
-                                                                              <Label text="Plate No" GridPane.rowIndex="4">
+                                                                              <Label text="Plate No" GridPane.rowIndex="3">
                                                                                  <font>
                                                                                     <Font size="12.0" />
                                                                                  </font>
                                                                               </Label>
-                                                                              <TextField fx:id="tfPlateNo" disable="true" editable="false" maxHeight="25.0" styleClass="DisabledTextField" GridPane.columnIndex="2" GridPane.rowIndex="4" />
+                                                                              <TextField fx:id="tfPlateNo" disable="true" editable="false" maxHeight="25.0" styleClass="DisabledTextField" GridPane.columnIndex="2" GridPane.rowIndex="3" />
+                                                                              <Label text="Freight" GridPane.columnIndex="8" GridPane.rowIndex="4">
+                                                                                 <font>
+                                                                                    <Font size="12.0" />
+                                                                                 </font>
+                                                                              </Label>
+                                                                              <TextField fx:id="tfFreightDetail" alignment="CENTER_RIGHT" disable="true" editable="false" promptText="0.00" GridPane.columnIndex="10" GridPane.rowIndex="4" />
                                                                       </children>
                                                                   </GridPane>
                                                               </children>
