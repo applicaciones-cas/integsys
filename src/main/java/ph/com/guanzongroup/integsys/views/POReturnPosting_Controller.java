@@ -201,7 +201,9 @@ public class POReturnPosting_Controller implements Initializable, ScreenInterfac
             JFXUtil.clearTextFields(apJEMaster, apJEDetail);
             pnJSON = poController.PurchaseOrderReturn().populateJournal();
             if (JFXUtil.isJSONSuccess(pnJSON)) {
-                loadTableJEDetail.reload();
+                Platform.runLater(() -> {
+                    loadTableJEDetail.reload();
+                });
             } else {
                 lblJEStatus.setText("UNKNOWN");
                 JEdetails_data.clear();
