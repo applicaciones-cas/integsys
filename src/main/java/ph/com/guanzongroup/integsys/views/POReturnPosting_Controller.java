@@ -1007,10 +1007,7 @@ public class POReturnPosting_Controller implements Initializable, ScreenInterfac
 
                         break;
                     case "tfFreightAmt":
-                        if (lsValue.isEmpty()) {
-                            lsValue = "0.00";
-                        }
-
+                        JFXUtil.removeComma(lsValue);
                         if (Double.valueOf(lsValue.replace(",", "")) > poController.PurchaseOrderReturn().Master().getTransactionTotal().doubleValue()) {
                             ShowMessageFX.Warning(null, pxeModuleName, "Invalid freight amount");
                             break;
@@ -1024,10 +1021,7 @@ public class POReturnPosting_Controller implements Initializable, ScreenInterfac
                         break;
 
                     case "tfTaxAmount":
-                        if (lsValue.isEmpty()) {
-                            lsValue = "0.00";
-                        }
-
+                        JFXUtil.removeComma(lsValue);
                         poJSON = poController.PurchaseOrderReturn().Master().setWithHoldingTax(Double.valueOf(lsValue.replace(",", "")));
                         if ("error".equals(poJSON.get("result"))) {
                             ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
@@ -1035,10 +1029,7 @@ public class POReturnPosting_Controller implements Initializable, ScreenInterfac
                         }
                         break;
                     case "tfVatRate":
-                        if (lsValue.isEmpty()) {
-                            lsValue = "0.00";
-                        }
-
+                        JFXUtil.removeComma(lsValue);
                         if (Double.valueOf(lsValue.replace(",", "")) > 100.00) {
                             ShowMessageFX.Warning(null, pxeModuleName, "Invalid vat rate.");
                             break;
@@ -1212,14 +1203,6 @@ public class POReturnPosting_Controller implements Initializable, ScreenInterfac
         JFXUtil.setKeyPressedListener(this::txtField_KeyPressed, apMaster, apDetail, apJEDetail, apBrowse);
 
         JFXUtil.handleDisabledNodeClick(apMaster, pnEditMode, nodeID -> {
-//            boolean lbShow = JFXUtil.isObjectEqualTo(poController.PurchaseOrderReturn().Master().getTransactionStatus(), PurchaseOrderReceivingStatus.POSTED, PurchaseOrderReceivingStatus.PAID)
-//                    && "To-follow".equals(poController.PurchaseOrderReturn().Master().getSalesInvoice());
-//            if (nodeID.equals("tfSINo")) {
-//                if (lbShow) {
-//                    ShowMessageFX.Warning(null, pxeModuleName, "Modify \"To-follow Inv\" to enable editing Invoice No field.");
-//                    return;
-//                }
-//            }
             if (JFXUtil.isObjectEqualTo(poController.PurchaseOrderReturn().Master().getTransactionStatus(), PurchaseOrderReceivingStatus.POSTED, PurchaseOrderReceivingStatus.PAID)) {
                 ShowMessageFX.Warning(null, pxeModuleName, "Only the Invoice Date, To Follow Invoice, and Invoice No. are editable\nfor posted and paid transactions.");
                 return;
@@ -1230,17 +1213,6 @@ public class POReturnPosting_Controller implements Initializable, ScreenInterfac
                         ShowMessageFX.Warning(null, pxeModuleName,
                                 "Only available when Invoice No is provided or set \"To-follow\".");
                     }
-                    break;
-            }
-        });
-        JFXUtil.handleDisabledNodeClick(apDetail, pnEditMode, nodeID -> {
-            switch (nodeID) {
-                case "cbVatable":
-//                    if (JFXUtil.isObjectEqualTo(poController.PurchaseOrderReturn().Master().getSalesInvoice(), null, "")
-//                            && !JFXUtil.isObjectEqualTo(poController.PurchaseOrderReturn().Master().getTransactionStatus(), PurchaseOrderReceivingStatus.POSTED, PurchaseOrderReceivingStatus.PAID)) {
-//                        ShowMessageFX.Warning(null, pxeModuleName,
-//                                "Only available when Invoice No is provided or set \"To-follow\".");
-//                    }
                     break;
             }
         });
@@ -1323,11 +1295,6 @@ public class POReturnPosting_Controller implements Initializable, ScreenInterfac
                 JFXUtil.setButtonsVisibility(false, btnUpdate);
                 break;
         }
-//        boolean lbShow5 = lbShow2 && JFXUtil.isObjectEqualTo(poController.PurchaseOrderReturn().Master().getTransactionStatus(), PurchaseOrderReceivingStatus.POSTED, PurchaseOrderReceivingStatus.PAID)
-//                && "To-follow".equals(poController.PurchaseOrderReturn().Master().getSalesInvoice());
-//        if (lbShow5) {
-//            JFXUtil.setButtonsVisibility(lbShow3, btnUpdate);
-//        }
     }
 
     public void initDetailsGrid() {
