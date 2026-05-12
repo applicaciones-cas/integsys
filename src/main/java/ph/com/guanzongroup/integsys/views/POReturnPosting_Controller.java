@@ -587,71 +587,6 @@ public class POReturnPosting_Controller implements Initializable, ScreenInterfac
         }
     }
 
-    public void loadRecordJEDetail() {
-        try {
-            //DISABLING
-            if (!JFXUtil.isObjectEqualTo(poController.PurchaseOrderReturn().Journal().Detail(pnJEDetail).getAccountCode(), null, "")) {
-                JFXUtil.setDisabled(poController.PurchaseOrderReturn().Journal().Detail(pnJEDetail).getEditMode() != EditMode.ADDNEW, tfJEAcctCode, tfJEAcctDescription);
-            } else {
-                JFXUtil.setDisabled(false, tfJEAcctCode, tfJEAcctDescription);
-            }
-            boolean lbNotZero = poController.PurchaseOrderReturn().Journal().Detail(pnJEDetail).getDebitAmount() > 0 || poController.PurchaseOrderReturn().Journal().Detail(pnJEDetail).getCreditAmount() > 0;
-            cbJEReverse.selectedProperty().set(lbNotZero);
-
-            tfJEAcctCode.setText(poController.PurchaseOrderReturn().Journal().Detail(pnJEDetail).getAccountCode());
-            tfJEAcctDescription.setText(poController.PurchaseOrderReturn().Journal().Detail(pnJEDetail).Account_Chart().getDescription());
-            String lsReportMonthYear = CustomCommonUtil.formatDateToShortString(poController.PurchaseOrderReturn().Journal().Detail(pnJEDetail).getForMonthOf());
-            dpReportMonthYear.setValue(CustomCommonUtil.parseDateStringToLocalDate(lsReportMonthYear, "yyyy-MM-dd"));
-            tfCreditAmt.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.PurchaseOrderReturn().Journal().Detail(pnJEDetail).getCreditAmount(), true));
-            tfDebitAmt.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.PurchaseOrderReturn().Journal().Detail(pnJEDetail).getDebitAmount(), true));
-            JFXUtil.updateCaretPositions(apJEDetail);
-        } catch (SQLException | GuanzonException ex) {
-            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
-            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
-        }
-    }
-
-    public void loadRecordDetail() {
-        try {
-            if (pnDetail < 0 || pnDetail > poController.PurchaseOrderReturn().getDetailCount() - 1) {
-                return;
-            }
-            tfBarcode.setText(poController.PurchaseOrderReturn().Detail(pnDetail).Inventory().getBarCode());
-            tfDescription.setText(poController.PurchaseOrderReturn().Detail(pnDetail).Inventory().getDescription());
-            tfReturnQuantity.setText(String.valueOf(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.PurchaseOrderReturn().Detail(pnDetail).getQuantity())));
-            tfMeasure.setText(poController.PurchaseOrderReturn().Detail(pnDetail).Inventory().Measure().getDescription());
-            tfCost.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.PurchaseOrderReturn().Detail(pnDetail).getUnitPrce(), true));
-            tfReceiveQuantity.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.PurchaseOrderReturn().Detail(pnDetail).getQuantity().doubleValue()));
-            cbVatable.setSelected(poController.PurchaseOrderReturn().Detail(pnDetail).isVatable());
-
-            JFXUtil.updateCaretPositions(apDetail);
-        } catch (SQLException | GuanzonException ex) {
-            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
-            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
-        }
-    }
-
-    public void loadRecordJEMaster() {
-        JFXUtil.setStatusValue(lblJEStatus, JournalStatus.class, pnEditMode == EditMode.UNKNOWN ? "-1" : poController.PurchaseOrderReturn().Journal().Master().getTransactionStatus());
-        if (poController.PurchaseOrderReturn().Journal().Master().getTransactionNo() != null) {
-            tfJETransactionNo.setText(poController.PurchaseOrderReturn().Journal().Master().getTransactionNo());
-            String lsJETransactionDate = CustomCommonUtil.formatDateToShortString(poController.PurchaseOrderReturn().Journal().Master().getTransactionDate());
-            dpJETransactionDate.setValue(CustomCommonUtil.parseDateStringToLocalDate(lsJETransactionDate, "yyyy-MM-dd"));
-
-            taJERemarks.setText(poController.PurchaseOrderReturn().Journal().Master().getRemarks());
-            double lnTotalDebit = 0;
-            double lnTotalCredit = 0;
-            for (int lnCtr = 0; lnCtr < poController.PurchaseOrderReturn().Journal().getDetailCount(); lnCtr++) {
-                lnTotalDebit += poController.PurchaseOrderReturn().Journal().Detail(lnCtr).getDebitAmount();
-                lnTotalCredit += poController.PurchaseOrderReturn().Journal().Detail(lnCtr).getCreditAmount();
-            }
-
-            tfTotalCreditAmt.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(lnTotalCredit, true));
-            tfTotalDebitAmt.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(lnTotalDebit, true));
-            JFXUtil.updateCaretPositions(apJEMaster);
-        }
-    }
-
     public void loadRecordMaster() {
         try {
 //            boolean lbShow1 = (pnEditMode == EditMode.UPDATE);
@@ -715,6 +650,71 @@ public class POReturnPosting_Controller implements Initializable, ScreenInterfac
             JFXUtil.updateCaretPositions(apMaster);
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
+        }
+    }
+
+    public void loadRecordDetail() {
+        try {
+            if (pnDetail < 0 || pnDetail > poController.PurchaseOrderReturn().getDetailCount() - 1) {
+                return;
+            }
+            tfBarcode.setText(poController.PurchaseOrderReturn().Detail(pnDetail).Inventory().getBarCode());
+            tfDescription.setText(poController.PurchaseOrderReturn().Detail(pnDetail).Inventory().getDescription());
+            tfReturnQuantity.setText(String.valueOf(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.PurchaseOrderReturn().Detail(pnDetail).getQuantity())));
+            tfMeasure.setText(poController.PurchaseOrderReturn().Detail(pnDetail).Inventory().Measure().getDescription());
+            tfCost.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.PurchaseOrderReturn().Detail(pnDetail).getUnitPrce(), true));
+            tfReceiveQuantity.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.PurchaseOrderReturn().Detail(pnDetail).getQuantity().doubleValue()));
+            cbVatable.setSelected(poController.PurchaseOrderReturn().Detail(pnDetail).isVatable());
+
+            JFXUtil.updateCaretPositions(apDetail);
+        } catch (SQLException | GuanzonException ex) {
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
+        }
+    }
+
+    public void loadRecordJEMaster() {
+        JFXUtil.setStatusValue(lblJEStatus, JournalStatus.class, pnEditMode == EditMode.UNKNOWN ? "-1" : poController.PurchaseOrderReturn().Journal().Master().getTransactionStatus());
+        if (poController.PurchaseOrderReturn().Journal().Master().getTransactionNo() != null) {
+            tfJETransactionNo.setText(poController.PurchaseOrderReturn().Journal().Master().getTransactionNo());
+            String lsJETransactionDate = CustomCommonUtil.formatDateToShortString(poController.PurchaseOrderReturn().Journal().Master().getTransactionDate());
+            dpJETransactionDate.setValue(CustomCommonUtil.parseDateStringToLocalDate(lsJETransactionDate, "yyyy-MM-dd"));
+
+            taJERemarks.setText(poController.PurchaseOrderReturn().Journal().Master().getRemarks());
+            double lnTotalDebit = 0;
+            double lnTotalCredit = 0;
+            for (int lnCtr = 0; lnCtr < poController.PurchaseOrderReturn().Journal().getDetailCount(); lnCtr++) {
+                lnTotalDebit += poController.PurchaseOrderReturn().Journal().Detail(lnCtr).getDebitAmount();
+                lnTotalCredit += poController.PurchaseOrderReturn().Journal().Detail(lnCtr).getCreditAmount();
+            }
+
+            tfTotalCreditAmt.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(lnTotalCredit, true));
+            tfTotalDebitAmt.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(lnTotalDebit, true));
+            JFXUtil.updateCaretPositions(apJEMaster);
+        }
+    }
+
+    public void loadRecordJEDetail() {
+        try {
+            //DISABLING
+            if (!JFXUtil.isObjectEqualTo(poController.PurchaseOrderReturn().Journal().Detail(pnJEDetail).getAccountCode(), null, "")) {
+                JFXUtil.setDisabled(poController.PurchaseOrderReturn().Journal().Detail(pnJEDetail).getEditMode() != EditMode.ADDNEW, tfJEAcctCode, tfJEAcctDescription);
+            } else {
+                JFXUtil.setDisabled(false, tfJEAcctCode, tfJEAcctDescription);
+            }
+            boolean lbNotZero = poController.PurchaseOrderReturn().Journal().Detail(pnJEDetail).getDebitAmount() > 0 || poController.PurchaseOrderReturn().Journal().Detail(pnJEDetail).getCreditAmount() > 0;
+            cbJEReverse.selectedProperty().set(lbNotZero);
+
+            tfJEAcctCode.setText(poController.PurchaseOrderReturn().Journal().Detail(pnJEDetail).getAccountCode());
+            tfJEAcctDescription.setText(poController.PurchaseOrderReturn().Journal().Detail(pnJEDetail).Account_Chart().getDescription());
+            String lsReportMonthYear = CustomCommonUtil.formatDateToShortString(poController.PurchaseOrderReturn().Journal().Detail(pnJEDetail).getForMonthOf());
+            dpReportMonthYear.setValue(CustomCommonUtil.parseDateStringToLocalDate(lsReportMonthYear, "yyyy-MM-dd"));
+            tfCreditAmt.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.PurchaseOrderReturn().Journal().Detail(pnJEDetail).getCreditAmount(), true));
+            tfDebitAmt.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.PurchaseOrderReturn().Journal().Detail(pnJEDetail).getDebitAmount(), true));
+            JFXUtil.updateCaretPositions(apJEDetail);
+        } catch (SQLException | GuanzonException ex) {
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
             ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
