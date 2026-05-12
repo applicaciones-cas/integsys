@@ -288,17 +288,19 @@
                                                                         <Font name="System Bold" size="15.0" />
                                                                      </font>
                                                                   </Label>
-                                                                                                        <Label fx:id="lblStatus" alignment="CENTER" contentDisplay="CENTER" prefHeight="27.0" prefWidth="142.0" text="STATUS" textAlignment="CENTER" GridPane.columnIndex="11">
-                                                                                <font>
-                                                                                    <Font name="System Bold" size="14.0" />
-                                                                                </font>
-                                                                            </Label>
                                                                                                         <TextField fx:id="tfTransactionNo" editable="false" maxHeight="25.0" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="139.0" style="-fx-font-weight: bold;" styleClass="DisabledTextField" GridPane.columnIndex="2" GridPane.columnSpan="2" />
                                                                                                         <DatePicker fx:id="dpTransactionDate" disable="true" GridPane.columnIndex="2" GridPane.rowIndex="2" />
                                                                                                         <TextField fx:id="tfSupplier" disable="true" editable="false" maxHeight="25.0" promptText="" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.rowIndex="3" />
                                                                                                         <TextField fx:id="tfReferenceNo" disable="true" editable="false" maxHeight="25.0" promptText="" GridPane.columnIndex="7" GridPane.rowIndex="2" />
                                                                                                         <TextField fx:id="tfPOReceivingNo" disable="true" editable="false" layoutX="85.0" layoutY="11.0" maxHeight="25.0" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="139.0" promptText="" GridPane.columnIndex="7" GridPane.rowIndex="3" />
-                                                                                                        <AnchorPane maxWidth="-Infinity" minWidth="-Infinity" prefHeight="27.0" prefWidth="140.0" style="-fx-background-color: FF8201;" GridPane.columnIndex="11" />
+                                                                                                        <AnchorPane maxWidth="-Infinity" minWidth="-Infinity" prefHeight="27.0" prefWidth="140.0" style="-fx-background-color: FF8201;" GridPane.columnIndex="11">
+                                                                                 <children>
+                                                                                                              <Label fx:id="lblStatus" alignment="CENTER" contentDisplay="CENTER" prefHeight="27.0" prefWidth="142.0" text="STATUS" textAlignment="CENTER">
+                                                                                      <font>
+                                                                                          <Font name="System Bold" size="14.0" />
+                                                                                      </font>
+                                                                                  </Label>
+                                                                                 </children></AnchorPane>
                                                                                                         <TextField fx:id="tfTransactionTotal" alignment="CENTER_RIGHT" disable="true" editable="false" promptText="0.0000" styleClass="DisabledTextField" GridPane.columnIndex="11" GridPane.rowIndex="2" />
                                                                                                         <TextField fx:id="tfDiscountRate" alignment="CENTER_RIGHT" promptText="0.00" GridPane.columnIndex="11" GridPane.rowIndex="3" />
                                                                                                         <TextField fx:id="tfDiscountAmount" alignment="CENTER_RIGHT" promptText="0.0000" GridPane.columnIndex="11" GridPane.rowIndex="4" />

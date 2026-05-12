@@ -61,6 +61,7 @@ import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javax.script.ScriptException;
 import org.guanzon.cas.purchasing.services.PurchaseOrderReturnControllers;
+import org.guanzon.cas.purchasing.status.PurchaseOrderReturnStatus;
 import ph.com.guanzongroup.cas.cashflow.status.JournalStatus;
 
 /**
@@ -610,7 +611,7 @@ public class POReturnPosting_Controller implements Initializable, ScreenInterfac
             poController.PurchaseOrderReturn().Master().setSupplierId(psSupplierId);
             poController.PurchaseOrderReturn().Master().setBranchCode(psBranchId);
 
-            JFXUtil.setStatusValue(lblStatus, PurchaseOrderReceivingStatus.class, pnEditMode == EditMode.UNKNOWN ? "-1" : poController.PurchaseOrderReturn().Master().getTransactionStatus());
+            JFXUtil.setStatusValue(lblStatus, PurchaseOrderReturnStatus.class, pnEditMode == EditMode.UNKNOWN ? "-1" : poController.PurchaseOrderReturn().Master().getTransactionStatus());
             if (poController.PurchaseOrderReturn().Master().getDiscountRate().doubleValue() > 0.00) {
                 poController.PurchaseOrderReturn().computeDiscount(poController.PurchaseOrderReturn().Master().getDiscountRate().doubleValue());
             } else {
