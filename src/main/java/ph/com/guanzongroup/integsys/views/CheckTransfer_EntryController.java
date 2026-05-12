@@ -272,7 +272,7 @@ public class CheckTransfer_EntryController implements Initializable, ScreenInter
 //                                break;
 
                         case "tfDepartment":
-                            lsValue = tfDestination.getText();
+                            lsValue = tfDepartment.getText();
                             poJSON = poGLControllers.CheckTransfers().SearchDepartment(lsValue, false);
                             if ("error".equals(poJSON.get("result"))) {
                                 ShowMessageFX.Warning((String) poJSON.get("message"), lsValue, lsValue);
@@ -280,7 +280,7 @@ public class CheckTransfer_EntryController implements Initializable, ScreenInter
                             tfDepartment.setText(poGLControllers.CheckTransfers().Master().Department().getDescription());
                             return;
                         case "tfCheckTransNo":
-                            lsValue = tfDestination.getText();
+                            lsValue = tfCheckTransNo.getText();
                             poJSON = poGLControllers.CheckTransfers().SearchChecks(lsValue, "", pnSelectedDetail, false);
                             if ("error".equals(poJSON.get("result"))) {
                                 ShowMessageFX.Warning((String) poJSON.get("message"), lsValue, lsValue);
@@ -289,7 +289,7 @@ public class CheckTransfer_EntryController implements Initializable, ScreenInter
                             loadTableDetail();
                             return;
                         case "tfCheckNo":
-                            lsValue = tfDestination.getText();
+                            lsValue = tfCheckNo.getText();
                             poJSON = poGLControllers.CheckTransfers().SearchChecks("", lsValue, pnSelectedDetail, false);
                             if ("error".equals(poJSON.get("result"))) {
                                 ShowMessageFX.Warning((String) poJSON.get("message"), lsValue, lsValue);

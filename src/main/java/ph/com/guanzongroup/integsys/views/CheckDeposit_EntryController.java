@@ -408,6 +408,9 @@ public class CheckDeposit_EntryController implements Initializable, ScreenInterf
                                 }
                                 tfCheckTransNo.setText(poGLControllers.CheckDeposits().Detail(pnSelectedDetail).CheckPayment().getTransactionNo());
                                 loadTableDetail();
+                                poJSON = poGLControllers.CheckDeposits().computeMasterFields();
+                                tfTotal.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(
+                            poGLControllers.CheckDeposits().Master().getTransactionTotalDeposit(), true));
                                 return;   
                             case "tfCheckNo":
                                 poJSON = poGLControllers.CheckDeposits().SearchChecks("", lsValue,pnSelectedDetail,false);
@@ -417,6 +420,9 @@ public class CheckDeposit_EntryController implements Initializable, ScreenInterf
                                 }
                                 tfCheckNo.setText(poGLControllers.CheckDeposits().Detail(pnSelectedDetail).CheckPayment().getCheckNo());
                                 loadTableDetail();
+                                poJSON = poGLControllers.CheckDeposits().computeMasterFields();
+                                tfTotal.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(
+                            poGLControllers.CheckDeposits().Master().getTransactionTotalDeposit(), true));
                                 return; 
                         default:
                             ShowMessageFX.Warning("Looks like no searchable field is selected. \nPlease choose one to continue.", psFormName, null);

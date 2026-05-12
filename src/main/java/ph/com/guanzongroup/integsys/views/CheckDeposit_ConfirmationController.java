@@ -383,6 +383,9 @@ public class CheckDeposit_ConfirmationController implements Initializable, Scree
                                 }
                                 tfCheckTransNo.setText(poGLControllers.CheckDeposits().Detail(pnSelectedDetail).CheckPayment().getTransactionNo());
                                 loadTableDetail();
+                                poJSON = poGLControllers.CheckDeposits().computeMasterFields();
+                                tfTotal.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(
+                            poGLControllers.CheckDeposits().Master().getTransactionTotalDeposit(), true));
                                 return;   
                             case "tfCheckNo":
                                 poJSON = poGLControllers.CheckDeposits().SearchChecks("", lsValue,pnSelectedDetail,false);
@@ -392,6 +395,9 @@ public class CheckDeposit_ConfirmationController implements Initializable, Scree
                                 }
                                 tfCheckNo.setText(poGLControllers.CheckDeposits().Detail(pnSelectedDetail).CheckPayment().getCheckNo());
                                 loadTableDetail();
+                                poJSON = poGLControllers.CheckDeposits().computeMasterFields();
+                                tfTotal.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(
+                            poGLControllers.CheckDeposits().Master().getTransactionTotalDeposit(), true));
                                 return; 
                             case "tfSearchTransNo":
                                 
