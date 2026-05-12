@@ -727,12 +727,16 @@ public class POReturnPosting_Controller implements Initializable, ScreenInterfac
 
             ModelDeliveryAcceptance_Main selected = (ModelDeliveryAcceptance_Main) tblViewMainList.getSelectionModel().getSelectedItem();
             if (selected != null) {
+                String lsTransactionNo = poController.PurchaseOrderReturn().PurchaseOrderReturnList(pnMain).getTransactionNo();
+                if (!JFXUtil.loadValidation(pnEditMode, pxeModuleName, poController.PurchaseOrderReturn().Master().getTransactionNo(), lsTransactionNo)) {
+                    return;
+                }
                 int pnRowMain = Integer.parseInt(selected.getIndex01()) - 1;
                 pnMain = pnRowMain;
                 JFXUtil.disableAllHighlightByColor(tblViewMainList, "#A7C7E7", highlightedRowsMain);
                 JFXUtil.highlightByKey(tblViewMainList, String.valueOf(pnRowMain + 1), "#A7C7E7", highlightedRowsMain);
 
-                poJSON = poController.PurchaseOrderReturn().OpenTransaction(poController.PurchaseOrderReturn().PurchaseOrderReturnList(pnMain).getTransactionNo());
+                poJSON = poController.PurchaseOrderReturn().OpenTransaction(lsTransactionNo);
                 if ("error".equals((String) poJSON.get("result"))) {
                     ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                     return;
