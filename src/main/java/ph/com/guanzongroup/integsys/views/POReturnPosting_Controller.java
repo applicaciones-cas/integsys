@@ -580,7 +580,6 @@ public class POReturnPosting_Controller implements Initializable, ScreenInterfac
         try {
             lblSource.setText(poController.PurchaseOrderReturn().Master().Company().getCompanyName());
             tfSearchSupplier.setText(psSearchSupplierId.equals("") ? "" : poController.PurchaseOrderReturn().Master().Supplier().getCompanyName());
-            tfSearchReferenceNo.setText("");
             JFXUtil.updateCaretPositions(apBrowse);
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
@@ -619,7 +618,7 @@ public class POReturnPosting_Controller implements Initializable, ScreenInterfac
             }
             tfBarcode.setText(poController.PurchaseOrderReturn().Detail(pnDetail).Inventory().getBarCode());
             tfDescription.setText(poController.PurchaseOrderReturn().Detail(pnDetail).Inventory().getDescription());
-            tfReturnQuantity.setText("");
+            tfReturnQuantity.setText(String.valueOf(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.PurchaseOrderReturn().Detail(pnDetail).getQuantity())));
             tfMeasure.setText(poController.PurchaseOrderReturn().Detail(pnDetail).Inventory().Measure().getDescription());
             tfCost.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.PurchaseOrderReturn().Detail(pnDetail).getUnitPrce(), true));
             tfReceiveQuantity.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.PurchaseOrderReturn().Detail(pnDetail).getQuantity().doubleValue()));
