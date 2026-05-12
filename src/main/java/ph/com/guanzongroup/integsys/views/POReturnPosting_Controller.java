@@ -51,7 +51,7 @@ import org.guanzon.appdriver.base.GuanzonException;
 import org.guanzon.appdriver.base.MiscUtil;
 import org.guanzon.appdriver.base.SQLUtil;
 import org.guanzon.appdriver.constant.EditMode;
-import org.guanzon.cas.purchasing.status.PurchaseOrderReceivingStatus;
+import org.guanzon.cas.purchasing.status.PurchaseOrderReturnStatus;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.ParseException;
 import java.util.concurrent.atomic.AtomicReference;
@@ -334,7 +334,7 @@ public class POReturnPosting_Controller implements Initializable, ScreenInterfac
                                 // Confirmation Prompt
                                 JSONObject loJSON = poController.PurchaseOrderReturn().OpenTransaction(poController.PurchaseOrderReturn().Master().getTransactionNo());
                                 if ("success".equals(loJSON.get("result"))) {
-                                    if (poController.PurchaseOrderReturn().Master().getTransactionStatus().equals(PurchaseOrderReceivingStatus.OPEN)) {
+                                    if (poController.PurchaseOrderReturn().Master().getTransactionStatus().equals(PurchaseOrderReturnStatus.OPEN)) {
                                         if (ShowMessageFX.YesNo(null, pxeModuleName, "Do you want to confirm this transaction?")) {
                                             loJSON = poController.PurchaseOrderReturn().ConfirmTransaction("Confirmed");
                                             if ("success".equals((String) loJSON.get("result"))) {
@@ -595,7 +595,7 @@ public class POReturnPosting_Controller implements Initializable, ScreenInterfac
 //            boolean lbShow1 = (pnEditMode == EditMode.UPDATE);
 //            boolean lbShow2 = (pnEditMode == EditMode.READY || pnEditMode == EditMode.UPDATE);
 //            boolean lbShow3 = (pnEditMode == EditMode.READY);
-//            boolean lbShow4 = lbShow2 && JFXUtil.isObjectEqualTo(poController.PurchaseOrderReturn().Master().getTransactionStatus(), PurchaseOrderReceivingStatus.POSTED, PurchaseOrderReceivingStatus.PAID)
+//            boolean lbShow4 = lbShow2 && JFXUtil.isObjectEqualTo(poController.PurchaseOrderReturn().Master().getTransactionStatus(), PurchaseOrderReturnStatus.POSTED, PurchaseOrderReturnStatus.PAID)
 //                    && "To-follow".equals(poController.PurchaseOrderReturn().Master().getSalesInvoice());
 //            if (lbShow4) {
 //                if (lbShow1) {
@@ -603,7 +603,7 @@ public class POReturnPosting_Controller implements Initializable, ScreenInterfac
 ////                    JFXUtil.setDisabledExcept(true, apMaster, dpSIDate, cbToFollowInv);
 //                }
 //            } else {
-//                if (!JFXUtil.isObjectEqualTo(poController.PurchaseOrderReturn().Master().getTransactionStatus(), PurchaseOrderReceivingStatus.POSTED, PurchaseOrderReceivingStatus.PAID)) {
+//                if (!JFXUtil.isObjectEqualTo(poController.PurchaseOrderReturn().Master().getTransactionStatus(), PurchaseOrderReturnStatus.POSTED, PurchaseOrderReturnStatus.PAID)) {
 //                    JFXUtil.setDisabled(!lbShow1, tfReferenceNo, tfDiscountRate, tfDiscountAmount, tfFreightAmt,
 //                            tfVatRate, taRemarks);
 //                }
@@ -786,7 +786,7 @@ public class POReturnPosting_Controller implements Initializable, ScreenInterfac
                                     ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
                                 }
 
-                                if (JFXUtil.isObjectEqualTo(poController.PurchaseOrderReturn().PurchaseOrderReturnList(lnCtr).getTransactionStatus(), PurchaseOrderReceivingStatus.POSTED, PurchaseOrderReceivingStatus.PAID)) {
+                                if (JFXUtil.isObjectEqualTo(poController.PurchaseOrderReturn().PurchaseOrderReturnList(lnCtr).getTransactionStatus(), PurchaseOrderReturnStatus.POSTED, PurchaseOrderReturnStatus.PAID)) {
                                     JFXUtil.highlightByKey(tblViewMainList, String.valueOf(lnCtr + 1), "C1E1C1", highlightedRowsMain);
                                 }
                             }
@@ -817,13 +817,13 @@ public class POReturnPosting_Controller implements Initializable, ScreenInterfac
                             boolean lbIsEnable = true;
                             boolean lbShow1 = (pnEditMode == EditMode.UPDATE);
                             boolean lbShow2 = (pnEditMode == EditMode.READY || pnEditMode == EditMode.UPDATE);
-                            boolean lbShow4 = lbShow2 && JFXUtil.isObjectEqualTo(poController.PurchaseOrderReturn().Master().getTransactionStatus(), PurchaseOrderReceivingStatus.POSTED, PurchaseOrderReceivingStatus.PAID);
+                            boolean lbShow4 = lbShow2 && JFXUtil.isObjectEqualTo(poController.PurchaseOrderReturn().Master().getTransactionStatus(), PurchaseOrderReturnStatus.POSTED, PurchaseOrderReturnStatus.PAID);
                             if (lbShow4) {
                                 if (lbShow1) {
                                     lbIsEnable = false;
                                 }
                             } else {
-                                if (JFXUtil.isObjectEqualTo(poController.PurchaseOrderReturn().Master().getTransactionStatus(), PurchaseOrderReceivingStatus.POSTED, PurchaseOrderReceivingStatus.PAID)) {
+                                if (JFXUtil.isObjectEqualTo(poController.PurchaseOrderReturn().Master().getTransactionStatus(), PurchaseOrderReturnStatus.POSTED, PurchaseOrderReturnStatus.PAID)) {
                                     lbIsEnable = false;
                                 }
                             }
@@ -1206,13 +1206,13 @@ public class POReturnPosting_Controller implements Initializable, ScreenInterfac
         JFXUtil.setKeyPressedListener(this::txtField_KeyPressed, apMaster, apDetail, apJEDetail, apBrowse);
 
         JFXUtil.handleDisabledNodeClick(apMaster, pnEditMode, nodeID -> {
-            if (JFXUtil.isObjectEqualTo(poController.PurchaseOrderReturn().Master().getTransactionStatus(), PurchaseOrderReceivingStatus.POSTED, PurchaseOrderReceivingStatus.PAID)) {
+            if (JFXUtil.isObjectEqualTo(poController.PurchaseOrderReturn().Master().getTransactionStatus(), PurchaseOrderReturnStatus.POSTED, PurchaseOrderReturnStatus.PAID)) {
                 ShowMessageFX.Warning(null, pxeModuleName, "Only the Invoice Date, To Follow Invoice, and Invoice No. are editable\nfor posted and paid transactions.");
                 return;
             }
             switch (nodeID) {
                 case "cbVatInclusive":
-                    if (!JFXUtil.isObjectEqualTo(poController.PurchaseOrderReturn().Master().getTransactionStatus(), PurchaseOrderReceivingStatus.POSTED, PurchaseOrderReceivingStatus.PAID)) {
+                    if (!JFXUtil.isObjectEqualTo(poController.PurchaseOrderReturn().Master().getTransactionStatus(), PurchaseOrderReturnStatus.POSTED, PurchaseOrderReturnStatus.PAID)) {
                         ShowMessageFX.Warning(null, pxeModuleName,
                                 "Only available when Invoice No is provided or set \"To-follow\".");
                     }
@@ -1286,15 +1286,15 @@ public class POReturnPosting_Controller implements Initializable, ScreenInterfac
         JFXUtil.setDisabled(!lbShow1, apMaster, apDetail, apJEMaster, apJEDetail);
 
         switch (poController.PurchaseOrderReturn().Master().getTransactionStatus()) {
-            case PurchaseOrderReceivingStatus.CONFIRMED:
+            case PurchaseOrderReturnStatus.CONFIRMED:
                 JFXUtil.setButtonsVisibility(lbShow3, btnPost);
 
                 break;
-            case PurchaseOrderReceivingStatus.POSTED:
-            case PurchaseOrderReceivingStatus.PAID:
-            case PurchaseOrderReceivingStatus.VOID:
-            case PurchaseOrderReceivingStatus.CANCELLED:
-            case PurchaseOrderReceivingStatus.RETURNED:
+            case PurchaseOrderReturnStatus.POSTED:
+            case PurchaseOrderReturnStatus.PAID:
+            case PurchaseOrderReturnStatus.VOID:
+            case PurchaseOrderReturnStatus.CANCELLED:
+            case PurchaseOrderReturnStatus.RETURNED:
                 JFXUtil.setButtonsVisibility(false, btnUpdate);
                 break;
         }
