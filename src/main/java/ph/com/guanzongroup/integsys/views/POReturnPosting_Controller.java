@@ -68,7 +68,7 @@ import ph.com.guanzongroup.cas.cashflow.status.JournalStatus;
  * @author Team 1
  */
 public class POReturnPosting_Controller implements Initializable, ScreenInterface {
-    
+
     private GRiderCAS oApp;
     static PurchaseOrderReturnControllers poController;
     private JSONObject poJSON;
@@ -87,25 +87,25 @@ public class POReturnPosting_Controller implements Initializable, ScreenInterfac
     private String psSearchBranchId = "";
     private String openedAttachment = "";
     private boolean pbEntered = false;
-    
+
     private ObservableList<ModelDeliveryAcceptance_Main> main_data = FXCollections.observableArrayList();
     private ObservableList<ModelDeliveryAcceptance_Detail> details_data = FXCollections.observableArrayList();
     private ObservableList<ModelJournalEntry_Detail> JEdetails_data = FXCollections.observableArrayList();
     private FilteredList<ModelDeliveryAcceptance_Main> filteredData;
     private FilteredList<ModelDeliveryAcceptance_Detail> filteredDataDetail;
     Map<String, String> imageinfo_temp = new HashMap<>();
-    
+
     private FileChooser fileChooser;
-    
+
     private int currentIndex = 0;
     boolean lbSelectTabJE = false;
-    
+
     private final Map<String, List<String>> highlightedRowsMain = new HashMap<>();
     private final Map<String, List<String>> highlightedRowsDetail = new HashMap<>();
     AtomicReference<Object> lastFocusedTextField = new AtomicReference<>();
     AtomicReference<Object> previousSearchedTextField = new AtomicReference<>();
     private boolean tooltipShown = false;
-    
+
     @FXML
     private AnchorPane apMainAnchor, apBrowse, apButton, apMaster, apDetail, apJEMaster, apJEDetail;
     @FXML
@@ -132,9 +132,9 @@ public class POReturnPosting_Controller implements Initializable, ScreenInterfac
     private TableColumn tblRowNoDetail, tblBarcodeDetail, tblDescriptionDetail, tblCostDetail, tblReceiveQuantityDetail, tblReturnQuantityDetail, tblTotalDetail, tblRowNo, tblSupplier, tblDate, tblReferenceNo, tblJERowNoDetail, tblReportMonthDetail, tblJEAcctCodeDetail, tblJEAcctDescriptionDetail, tblJECreditAmtDetail, tblJEDebitAmtDetail;
     @FXML
     private Pagination pgPagination;
-    
+
     JFXUtil.ReloadableTableTask loadTableMain, loadTableDetail, loadTableJEDetail;
-    
+
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         poController = new PurchaseOrderReturnControllers(oApp, null);
@@ -144,7 +144,7 @@ public class POReturnPosting_Controller implements Initializable, ScreenInterfac
             System.err.println((String) poJSON.get("message"));
             ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
         }
-        
+
         initTextFields();
         initDatePickers();
         initMainGrid();
@@ -164,36 +164,36 @@ public class POReturnPosting_Controller implements Initializable, ScreenInterfac
             poController.PurchaseOrderReturn().initFields();
             poController.PurchaseOrderReturn().setWithUI(true);
             loadRecordSearch();
-            
+
         });
-        
+
         pgPagination.setPageCount(1);
         JFXUtil.initKeyClickObject(apMainAnchor, lastFocusedTextField, previousSearchedTextField); // for btnSearch Reference
 
         pnEditMode = EditMode.UNKNOWN;
         initButton(pnEditMode);
     }
-    
+
     @Override
     public void setGRider(GRiderCAS foValue) {
         oApp = foValue;
     }
-    
+
     @Override
     public void setIndustryID(String fsValue) {
         psIndustryId = "09";
     }
-    
+
     @Override
     public void setCompanyID(String fsValue) {
         psCompanyId = fsValue;
     }
-    
+
     @Override
     public void setCategoryID(String fsValue) {
         psCategoryId = fsValue;
     }
-    
+
     private void populateJE() {
         try {
             JSONObject pnJSON = new JSONObject();
@@ -211,7 +211,7 @@ public class POReturnPosting_Controller implements Initializable, ScreenInterfac
             ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
-    
+
     private void initTabSelection() {
         tabJE.setOnSelectionChanged(event -> {
             if (tabJE.isSelected()) {
@@ -220,7 +220,7 @@ public class POReturnPosting_Controller implements Initializable, ScreenInterfac
             }
         });
     }
-    
+
     @FXML
     private void cmdCheckBox_Click(ActionEvent event) {
         poJSON = new JSONObject();
@@ -258,7 +258,7 @@ public class POReturnPosting_Controller implements Initializable, ScreenInterfac
             }
         }
     }
-    
+
     @FXML
     private void cmdButton_Click(ActionEvent event) {
         poJSON = new JSONObject();
@@ -283,7 +283,7 @@ public class POReturnPosting_Controller implements Initializable, ScreenInterfac
                             ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                             return;
                         }
-                        
+
                         pnEditMode = poController.PurchaseOrderReturn().getEditMode();
                         break;
                     case "btnSearch":
@@ -301,7 +301,7 @@ public class POReturnPosting_Controller implements Initializable, ScreenInterfac
                             ShowMessageFX.Warning("No transaction status history to load!", pxeModuleName, null);
                             return;
                         }
-                        
+
                         try {
                             poController.PurchaseOrderReturn().ShowStatusHistory();
                         } catch (NullPointerException npe) {
@@ -343,13 +343,13 @@ public class POReturnPosting_Controller implements Initializable, ScreenInterfac
                                         }
                                     }
                                 }
-                                
+
                                 JFXUtil.disableAllHighlightByColor(tblViewMainList, "#A7C7E7", highlightedRowsMain);
                             }
                         } else {
                             return;
                         }
-                        
+
                         break;
                     case "btnPost":
                         poJSON = new JSONObject();
@@ -358,7 +358,7 @@ public class POReturnPosting_Controller implements Initializable, ScreenInterfac
                                 ShowMessageFX.Warning(null, pxeModuleName, "Please review and verify all Journal Entry details before posting the transaction.");
                                 return;
                             }
-                            
+
                             poJSON = poController.PurchaseOrderReturn().PostTransaction("");
                             if ("error".equals((String) poJSON.get("result"))) {
                                 ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
@@ -372,7 +372,7 @@ public class POReturnPosting_Controller implements Initializable, ScreenInterfac
                             return;
                         }
                         break;
-                    
+
                     default:
                         ShowMessageFX.Warning(null, pxeModuleName, "Button with name " + lsButton + " not registered.");
                         break;
@@ -384,12 +384,12 @@ public class POReturnPosting_Controller implements Initializable, ScreenInterfac
                     pnEditMode = EditMode.UNKNOWN;
                     clearTextFields();
                 }
-                
+
                 if (JFXUtil.isObjectEqualTo(lsButton, "btnArrowRight", "btnArrowLeft", "btnRetrieve", "btnHistory")) {
                 } else {
                     loadRecordMaster();
                     loadTableDetail.reload();
-                    
+
                     Tab currentTab = tabPaneForm.getSelectionModel().getSelectedItem();
                     if (currentTab.getId().equals("tabJE")) {
                         populateJE();
@@ -402,7 +402,7 @@ public class POReturnPosting_Controller implements Initializable, ScreenInterfac
             ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
-    
+
     public void retrievePOR() {
         poJSON = new JSONObject();
         poJSON = poController.PurchaseOrderReturn().loadPurchaseOrderReturn(tfSearchSupplier.getText(), tfSearchSupplier.getText(), tfSearchReferenceNo.getText());
@@ -412,7 +412,7 @@ public class POReturnPosting_Controller implements Initializable, ScreenInterfac
             loadTableMain.reload();
         }
     }
-    
+
     public void moveNext() {
         if (poController.PurchaseOrderReturn().getDetailCount() <= 0) {
             return;
@@ -430,7 +430,7 @@ public class POReturnPosting_Controller implements Initializable, ScreenInterfac
             tfCost.requestFocus();
         }
     }
-    
+
     public void moveNextJE(boolean isUp) {
         apJEDetail.requestFocus();
         pnJEDetail = isUp ? Integer.parseInt(JEdetails_data.get(JFXUtil.moveToPreviousRow(tblViewJEDetails)).getIndex07())
@@ -446,14 +446,14 @@ public class POReturnPosting_Controller implements Initializable, ScreenInterfac
             }
         }
     }
-    
+
     private void txtField_KeyPressed(KeyEvent event) {
         try {
             TextField txtField = (TextField) event.getSource();
             String lsID = (((TextField) event.getSource()).getId());
             String lsValue = (txtField.getText() == null ? "" : txtField.getText());
             poJSON = new JSONObject();
-            
+
             switch (event.getCode()) {
                 case TAB:
                 case ENTER:
@@ -493,7 +493,7 @@ public class POReturnPosting_Controller implements Initializable, ScreenInterfac
                                 ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                 break;
                             }
-                            
+
                             pnJEDetail = Integer.parseInt(String.valueOf(poJSON.get("row")));
                             loadTableJEDetail.reload();
                             JFXUtil.textFieldMoveNext(tfCreditAmt);
@@ -509,7 +509,7 @@ public class POReturnPosting_Controller implements Initializable, ScreenInterfac
                                 ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                 break;
                             }
-                            
+
                             pnJEDetail = Integer.parseInt(String.valueOf(poJSON.get("row")));
                             loadTableJEDetail.reload();
                             JFXUtil.textFieldMoveNext(tfCreditAmt);
@@ -536,7 +536,7 @@ public class POReturnPosting_Controller implements Initializable, ScreenInterfac
             ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
-    
+
     boolean pbSuccess = true;
     EventHandler<ActionEvent> datepicker_Action = JFXUtil.DatePickerAction(
             (datePicker, sdfFormat, lsServerDate, ldCurrentDate, lsSelectedDate, ldSelectedDate) -> {
@@ -575,7 +575,7 @@ public class POReturnPosting_Controller implements Initializable, ScreenInterfac
 //                    Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
 //                }
             });
-    
+
     public void loadRecordSearch() {
         try {
             lblSource.setText(poController.PurchaseOrderReturn().Master().Company().getCompanyName());
@@ -586,7 +586,7 @@ public class POReturnPosting_Controller implements Initializable, ScreenInterfac
             ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
-    
+
     public void loadRecordMaster() {
         try {
 //            boolean lbShow1 = (pnEditMode == EditMode.UPDATE);
@@ -607,7 +607,7 @@ public class POReturnPosting_Controller implements Initializable, ScreenInterfac
 //            }
             poController.PurchaseOrderReturn().Master().setSupplierId(psSupplierId);
             poController.PurchaseOrderReturn().Master().setBranchCode(psBranchId);
-            
+
             JFXUtil.setStatusValue(lblStatus, PurchaseOrderReceivingStatus.class, pnEditMode == EditMode.UNKNOWN ? "-1" : poController.PurchaseOrderReturn().Master().getTransactionStatus());
             if (poController.PurchaseOrderReturn().Master().getDiscountRate().doubleValue() > 0.00) {
                 poController.PurchaseOrderReturn().computeDiscount(poController.PurchaseOrderReturn().Master().getDiscountRate().doubleValue());
@@ -616,44 +616,44 @@ public class POReturnPosting_Controller implements Initializable, ScreenInterfac
                     poController.PurchaseOrderReturn().computeDiscountRate(poController.PurchaseOrderReturn().Master().getDiscount().doubleValue());
                 }
             }
-            
+
             poController.PurchaseOrderReturn().computeFields();
-            
+
             tfTransactionNo.setText(poController.PurchaseOrderReturn().Master().getTransactionNo());
             String lsTransactionDate = CustomCommonUtil.formatDateToShortString(poController.PurchaseOrderReturn().Master().getTransactionDate());
             dpTransactionDate.setValue(CustomCommonUtil.parseDateStringToLocalDate(lsTransactionDate, "yyyy-MM-dd"));
             tfSupplier.setText(poController.PurchaseOrderReturn().Master().Supplier().getCompanyName());
             tfReferenceNo.setText(poController.PurchaseOrderReturn().Master().PurchaseOrderReceivingMaster().getReferenceNo());
-            
+
             tfPOReceivingNo.setText(poController.PurchaseOrderReturn().Master().getSourceNo());
             taRemarks.setText(poController.PurchaseOrderReturn().Master().getRemarks());
             tfTransactionTotal.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(String.valueOf(getGrossTotal()), true));
-            
+
             Platform.runLater(() -> {
                 double lnValue = poController.PurchaseOrderReturn().Master().getDiscountRate().doubleValue();
                 tfDiscountRate.setText(String.format("%.2f", Double.isNaN(lnValue) ? 0.00 : lnValue));
                 double lnVat = poController.PurchaseOrderReturn().Master().getVatRate().doubleValue();
                 tfVatRate.setText(String.format("%.2f", Double.isNaN(lnVat) ? 0.00 : lnVat));
             });
-            
+
             tfDiscountAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.PurchaseOrderReturn().Master().getDiscount().doubleValue(), true));
             cbVatInclusive.setSelected(poController.PurchaseOrderReturn().Master().isVatTaxable());
-            
+
             tfVatSales.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.PurchaseOrderReturn().Master().getVatSales().doubleValue(), true));
-            
+
             tfVatAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.PurchaseOrderReturn().Master().getVatAmount().doubleValue(), true));
             tfZeroVatSales.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.PurchaseOrderReturn().Master().getZeroVatSales().doubleValue(), true));
             tfVatExemptSales.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.PurchaseOrderReturn().Master().getVatExemptSales().doubleValue(), true));
             tfNetTotal.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.PurchaseOrderReturn().getNetTotal(), true));
             tfFreightAmt.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.PurchaseOrderReturn().Master().getFreight().doubleValue()));
-            
+
             JFXUtil.updateCaretPositions(apMaster);
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
             ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
-    
+
     public void loadRecordDetail() {
         try {
             if (pnDetail < 0 || pnDetail > poController.PurchaseOrderReturn().getDetailCount() - 1) {
@@ -672,14 +672,14 @@ public class POReturnPosting_Controller implements Initializable, ScreenInterfac
             ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
-    
+
     public void loadRecordJEMaster() {
         JFXUtil.setStatusValue(lblJEStatus, JournalStatus.class, pnEditMode == EditMode.UNKNOWN ? "-1" : poController.PurchaseOrderReturn().Journal().Master().getTransactionStatus());
         if (poController.PurchaseOrderReturn().Journal().Master().getTransactionNo() != null) {
             tfJETransactionNo.setText(poController.PurchaseOrderReturn().Journal().Master().getTransactionNo());
             String lsJETransactionDate = CustomCommonUtil.formatDateToShortString(poController.PurchaseOrderReturn().Journal().Master().getTransactionDate());
             dpJETransactionDate.setValue(CustomCommonUtil.parseDateStringToLocalDate(lsJETransactionDate, "yyyy-MM-dd"));
-            
+
             taJERemarks.setText(poController.PurchaseOrderReturn().Journal().Master().getRemarks());
             double lnTotalDebit = 0;
             double lnTotalCredit = 0;
@@ -687,13 +687,13 @@ public class POReturnPosting_Controller implements Initializable, ScreenInterfac
                 lnTotalDebit += poController.PurchaseOrderReturn().Journal().Detail(lnCtr).getDebitAmount();
                 lnTotalCredit += poController.PurchaseOrderReturn().Journal().Detail(lnCtr).getCreditAmount();
             }
-            
+
             tfTotalCreditAmt.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(lnTotalCredit, true));
             tfTotalDebitAmt.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(lnTotalDebit, true));
             JFXUtil.updateCaretPositions(apJEMaster);
         }
     }
-    
+
     public void loadRecordJEDetail() {
         try {
             //DISABLING
@@ -704,7 +704,7 @@ public class POReturnPosting_Controller implements Initializable, ScreenInterfac
             }
             boolean lbNotZero = poController.PurchaseOrderReturn().Journal().Detail(pnJEDetail).getDebitAmount() > 0 || poController.PurchaseOrderReturn().Journal().Detail(pnJEDetail).getCreditAmount() > 0;
             cbJEReverse.selectedProperty().set(lbNotZero);
-            
+
             tfJEAcctCode.setText(poController.PurchaseOrderReturn().Journal().Detail(pnJEDetail).getAccountCode());
             tfJEAcctDescription.setText(poController.PurchaseOrderReturn().Journal().Detail(pnJEDetail).Account_Chart().getDescription());
             String lsReportMonthYear = CustomCommonUtil.formatDateToShortString(poController.PurchaseOrderReturn().Journal().Detail(pnJEDetail).getForMonthOf());
@@ -717,7 +717,7 @@ public class POReturnPosting_Controller implements Initializable, ScreenInterfac
             ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
-    
+
     private double getGrossTotal() {
         double ldblGrossTotal = 0.0000;
         for (int lnCtr = 0; lnCtr <= poController.PurchaseOrderReturn().getDetailCount() - 1; lnCtr++) {
@@ -726,28 +726,28 @@ public class POReturnPosting_Controller implements Initializable, ScreenInterfac
         }
         return ldblGrossTotal;
     }
-    
+
     public void loadTableDetailFromMain() {
         try {
             poJSON = new JSONObject();
-            
+
             ModelDeliveryAcceptance_Main selected = (ModelDeliveryAcceptance_Main) tblViewMainList.getSelectionModel().getSelectedItem();
             if (selected != null) {
                 int pnRowMain = Integer.parseInt(selected.getIndex01()) - 1;
                 pnMain = pnRowMain;
                 JFXUtil.disableAllHighlightByColor(tblViewMainList, "#A7C7E7", highlightedRowsMain);
                 JFXUtil.highlightByKey(tblViewMainList, String.valueOf(pnRowMain + 1), "#A7C7E7", highlightedRowsMain);
-                
+
                 poJSON = poController.PurchaseOrderReturn().OpenTransaction(poController.PurchaseOrderReturn().PurchaseOrderReturnList(pnMain).getTransactionNo());
                 if ("error".equals((String) poJSON.get("result"))) {
                     ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                     return;
                 }
                 lbSelectTabJE = false;
-                
+
                 psSupplierId = poController.PurchaseOrderReturn().Master().getSupplierId();
                 psBranchId = poController.PurchaseOrderReturn().Master().getBranchCode();
-                
+
                 Platform.runLater(() -> {
                     loadTableDetail.reload();
                 });
@@ -757,7 +757,7 @@ public class POReturnPosting_Controller implements Initializable, ScreenInterfac
             ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
-    
+
     private void initLoadTable() {
         loadTableMain = new JFXUtil.ReloadableTableTask(
                 tblViewMainList,
@@ -768,7 +768,7 @@ public class POReturnPosting_Controller implements Initializable, ScreenInterfac
 //                        Thread.sleep(100);
                         main_data.clear();
                         JFXUtil.disableAllHighlight(tblViewMainList, highlightedRowsMain);
-                        
+
                         if (poController.PurchaseOrderReturn().getPurchaseOrderReturnCount() > 0) {
                             //pending
                             //retreiving using column index
@@ -782,13 +782,13 @@ public class POReturnPosting_Controller implements Initializable, ScreenInterfac
                                     Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
                                     ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
                                 }
-                                
+
                                 if (JFXUtil.isObjectEqualTo(poController.PurchaseOrderReturn().PurchaseOrderReturnList(lnCtr).getTransactionStatus(), PurchaseOrderReceivingStatus.POSTED, PurchaseOrderReceivingStatus.PAID)) {
                                     JFXUtil.highlightByKey(tblViewMainList, String.valueOf(lnCtr + 1), "C1E1C1", highlightedRowsMain);
                                 }
                             }
                         }
-                        
+
                         if (pnMain < 0 || pnMain
                                 >= main_data.size()) {
                             if (!main_data.isEmpty()) {
@@ -824,7 +824,7 @@ public class POReturnPosting_Controller implements Initializable, ScreenInterfac
                                     lbIsEnable = false;
                                 }
                             }
-                            
+
                             double lnTotal = 0.00;
                             double lnDiscountAmt = 0.00;
                             for (lnCtr = 0; lnCtr < poController.PurchaseOrderReturn().getDetailCount(); lnCtr++) {
@@ -882,7 +882,7 @@ public class POReturnPosting_Controller implements Initializable, ScreenInterfac
                         }
                     });
                 });
-        
+
         loadTableJEDetail = new JFXUtil.ReloadableTableTask(
                 tblViewJEDetails,
                 JEdetails_data,
@@ -894,7 +894,7 @@ public class POReturnPosting_Controller implements Initializable, ScreenInterfac
                             if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
                                 poController.PurchaseOrderReturn().Journal().ReloadDetail();
                             }
-                            
+
                             String lsReportMonthYear = "";
                             String lsAcctCode = "";
                             String lsAccDesc = "";
@@ -926,7 +926,7 @@ public class POReturnPosting_Controller implements Initializable, ScreenInterfac
                                                 String.valueOf(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.PurchaseOrderReturn().Journal().Detail(lnCtr).getDebitAmount(), true)),
                                                 String.valueOf(lnCtr)
                                         ));
-                                
+
                                 lsReportMonthYear = "";
                                 lsAcctCode = "";
                                 lsAccDesc = "";
@@ -956,7 +956,7 @@ public class POReturnPosting_Controller implements Initializable, ScreenInterfac
                     });
                 });
     }
-    
+
     public void initDatePickers() {
         // DatePicker setup
         JFXUtil.setDatePickerFormat("MM/dd/yyyy", dpTransactionDate, dpJETransactionDate, dpReportMonthYear);
@@ -974,7 +974,7 @@ public class POReturnPosting_Controller implements Initializable, ScreenInterfac
                         break;
                 }
             });
-    
+
     ChangeListener<Boolean> txtMaster_Focus = JFXUtil.FocusListener(TextField.class,
             (lsID, lsValue) -> {
                 switch (lsID) {
@@ -990,7 +990,7 @@ public class POReturnPosting_Controller implements Initializable, ScreenInterfac
                             ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                             break;
                         }
-                        
+
                         break;
                     case "tfDiscountAmount":
                         JFXUtil.removeComma(lsValue);
@@ -1004,30 +1004,30 @@ public class POReturnPosting_Controller implements Initializable, ScreenInterfac
                             ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                             break;
                         }
-                        
+
                         break;
                     case "tfFreightAmt":
                         if (lsValue.isEmpty()) {
                             lsValue = "0.00";
                         }
-                        
+
                         if (Double.valueOf(lsValue.replace(",", "")) > poController.PurchaseOrderReturn().Master().getTransactionTotal().doubleValue()) {
                             ShowMessageFX.Warning(null, pxeModuleName, "Invalid freight amount");
                             break;
                         }
-                        
+
                         poJSON = poController.PurchaseOrderReturn().Master().setFreight(Double.valueOf(lsValue.replace(",", "")));
                         if ("error".equals(poJSON.get("result"))) {
                             ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                             break;
                         }
                         break;
-                    
+
                     case "tfTaxAmount":
                         if (lsValue.isEmpty()) {
                             lsValue = "0.00";
                         }
-                        
+
                         poJSON = poController.PurchaseOrderReturn().Master().setWithHoldingTax(Double.valueOf(lsValue.replace(",", "")));
                         if ("error".equals(poJSON.get("result"))) {
                             ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
@@ -1038,12 +1038,12 @@ public class POReturnPosting_Controller implements Initializable, ScreenInterfac
                         if (lsValue.isEmpty()) {
                             lsValue = "0.00";
                         }
-                        
+
                         if (Double.valueOf(lsValue.replace(",", "")) > 100.00) {
                             ShowMessageFX.Warning(null, pxeModuleName, "Invalid vat rate.");
                             break;
                         }
-                        
+
                         poJSON = poController.PurchaseOrderReturn().Master().setVatRate((Double.valueOf(lsValue.replace(",", ""))));
                         if ("error".equals(poJSON.get("result"))) {
                             ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
@@ -1057,7 +1057,7 @@ public class POReturnPosting_Controller implements Initializable, ScreenInterfac
                     loadRecordMaster();
                 }
             });
-    
+
     ChangeListener<Boolean> txtArea_Focus = JFXUtil.FocusListener(TextArea.class,
             (lsID, lsValue) -> {
                 switch (lsID) {
@@ -1088,14 +1088,14 @@ public class POReturnPosting_Controller implements Initializable, ScreenInterfac
                         lsValue = JFXUtil.removeComma(lsValue);
                         double lnNewVal = Double.valueOf(lsValue);
                         double lnOldVal = poController.PurchaseOrderReturn().Detail(pnDetail).getUnitPrce().doubleValue();
-                        
+
                         poJSON = poController.PurchaseOrderReturn().Detail(pnDetail).setUnitPrce((Double.valueOf(lsValue)));
                         if ("error".equals((String) poJSON.get("result"))) {
                             System.err.println((String) poJSON.get("message"));
                             ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                             break;
                         }
-                        
+
                         if (pbEntered) {
                             if (lnNewVal != lnOldVal) {
                                 if ((Double.valueOf(lsValue) > 0
@@ -1111,7 +1111,7 @@ public class POReturnPosting_Controller implements Initializable, ScreenInterfac
                             pbEntered = false;
                         }
                         break;
-                    case "tfFreight":
+                    case "tfFreightDetail":
                         lsValue = JFXUtil.removeComma(lsValue);
                         poJSON = poController.PurchaseOrderReturn().Detail(pnDetail).setFreight((Double.valueOf(lsValue)));
                         if (!JFXUtil.isJSONSuccess(poJSON)) {
@@ -1119,11 +1119,11 @@ public class POReturnPosting_Controller implements Initializable, ScreenInterfac
                         }
                         break;
                 }
-                
+
                 JFXUtil.runWithDelay(0.50, () -> {
                     loadTableDetail.reload();
                 });
-                
+
             });
     ChangeListener<Boolean> txtJEDetail_Focus = JFXUtil.FocusListener(TextField.class,
             (lsID, lsValue) -> {
@@ -1176,7 +1176,7 @@ public class POReturnPosting_Controller implements Initializable, ScreenInterfac
                                 });
                                 return;
                             } else {
-                                
+
                             }
                         }
                         if (pbEntered) {
@@ -1187,7 +1187,7 @@ public class POReturnPosting_Controller implements Initializable, ScreenInterfac
                                     pbEntered = false;
                                 });
                             });
-                            
+
                         }
                         break;
                 }
@@ -1195,22 +1195,22 @@ public class POReturnPosting_Controller implements Initializable, ScreenInterfac
                     loadTableJEDetail.reload();
                 });
             });
-    
+
     public void initTextFields() {
         JFXUtil.setFocusListener(txtArea_Focus, taRemarks, taJERemarks);
         JFXUtil.setFocusListener(txtBrowse_Focus, apBrowse);
         JFXUtil.setFocusListener(txtMaster_Focus, apMaster);
         JFXUtil.setFocusListener(txtDetail_Focus, apDetail);
         JFXUtil.setFocusListener(txtJEDetail_Focus, apJEDetail);
-        
+
         JFXUtil.setKeyPressedListener(this::txtField_KeyPressed, apBrowse, apMaster, apDetail, apJEDetail);
         JFXUtil.inputDecimalOnly(tfDiscountRate);
         JFXUtil.setCommaFormatter(tfDiscountAmount, tfFreightAmt, tfCost, tfCreditAmt, tfDebitAmt);
-        
+
         JFXUtil.adjustColumnForScrollbar(tblViewDetails, tblViewMainList, tblViewJEDetails);
-        
+
         JFXUtil.setKeyPressedListener(this::txtField_KeyPressed, apMaster, apDetail, apJEDetail, apBrowse);
-        
+
         JFXUtil.handleDisabledNodeClick(apMaster, pnEditMode, nodeID -> {
 //            boolean lbShow = JFXUtil.isObjectEqualTo(poController.PurchaseOrderReturn().Master().getTransactionStatus(), PurchaseOrderReceivingStatus.POSTED, PurchaseOrderReceivingStatus.PAID)
 //                    && "To-follow".equals(poController.PurchaseOrderReturn().Master().getSalesInvoice());
@@ -1245,7 +1245,7 @@ public class POReturnPosting_Controller implements Initializable, ScreenInterfac
             }
         });
     }
-    
+
     public void initTableOnClick() {
         tblViewJEDetails.setOnMouseClicked(event -> {
             ModelJournalEntry_Detail selected = (ModelJournalEntry_Detail) tblViewJEDetails.getSelectionModel().getSelectedItem();
@@ -1264,7 +1264,7 @@ public class POReturnPosting_Controller implements Initializable, ScreenInterfac
                 }
             }
         });
-        
+
         tblViewDetails.setOnMouseClicked(event -> {
             if (details_data.size() > 0) {
                 if (event.getClickCount() == 1) {  // Detect single click (or use another condition for double click)
@@ -1277,7 +1277,7 @@ public class POReturnPosting_Controller implements Initializable, ScreenInterfac
                 }
             }
         });
-        
+
         tblViewMainList.setOnMouseClicked(event -> {
             pnMain = tblViewMainList.getSelectionModel().getSelectedIndex();
             if (pnMain >= 0) {
@@ -1293,7 +1293,7 @@ public class POReturnPosting_Controller implements Initializable, ScreenInterfac
         JFXUtil.setKeyEventFilter(tableKeyEvents, tblViewDetails, tblViewJEDetails);
         JFXUtil.adjustColumnForScrollbar(tblViewMainList, tblViewDetails, tblViewJEDetails);
     }
-    
+
     private void initButton(int fnValue) {
         boolean lbShow1 = (fnValue == EditMode.UPDATE);
 //        boolean lbShow2 = (fnValue == EditMode.READY || fnValue == EditMode.UPDATE);
@@ -1309,11 +1309,11 @@ public class POReturnPosting_Controller implements Initializable, ScreenInterfac
         //Unkown || Ready
         JFXUtil.setButtonsVisibility(lbShow4, btnClose);
         JFXUtil.setDisabled(!lbShow1, apMaster, apDetail, apJEMaster, apJEDetail);
-        
+
         switch (poController.PurchaseOrderReturn().Master().getTransactionStatus()) {
             case PurchaseOrderReceivingStatus.CONFIRMED:
                 JFXUtil.setButtonsVisibility(lbShow3, btnPost);
-                
+
                 break;
             case PurchaseOrderReceivingStatus.POSTED:
             case PurchaseOrderReceivingStatus.PAID:
@@ -1329,40 +1329,40 @@ public class POReturnPosting_Controller implements Initializable, ScreenInterfac
 //            JFXUtil.setButtonsVisibility(lbShow3, btnUpdate);
 //        }
     }
-    
+
     public void initDetailsGrid() {
-        
+
         JFXUtil.setColumnCenter(tblRowNoDetail, tblReceiveQuantityDetail, tblReturnQuantityDetail);
         JFXUtil.setColumnLeft(tblBarcodeDetail, tblDescriptionDetail);
         JFXUtil.setColumnRight(tblCostDetail, tblTotalDetail);
         JFXUtil.setColumnsIndexAndDisableReordering(tblViewDetails);
-        
+
         filteredDataDetail = new FilteredList<>(details_data, b -> true);
-        
+
         SortedList<ModelDeliveryAcceptance_Detail> sortedData = new SortedList<>(filteredDataDetail);
         sortedData.comparatorProperty().bind(tblViewDetails.comparatorProperty());
         tblViewDetails.setItems(sortedData);
         tblViewDetails.autosize();
     }
-    
+
     public void initJEDetailsGrid() {
         JFXUtil.setColumnCenter(tblJERowNoDetail, tblReportMonthDetail);
         JFXUtil.setColumnLeft(tblJEAcctCodeDetail, tblJEAcctDescriptionDetail);
         JFXUtil.setColumnRight(tblJECreditAmtDetail, tblJEDebitAmtDetail);
         JFXUtil.setColumnsIndexAndDisableReordering(tblViewJEDetails);
-        
+
         tblViewJEDetails.setItems(JEdetails_data);
     }
-    
+
     public void initMainGrid() {
         JFXUtil.setColumnCenter(tblRowNo, tblDate, tblReferenceNo);
         JFXUtil.setColumnLeft(tblSupplier);
         JFXUtil.setColumnsIndexAndDisableReordering(tblViewMainList);
-        
+
         filteredData = new FilteredList<>(main_data, b -> true);
         tblViewMainList.setItems(filteredData);
     }
-    
+
     JFXUtil.TableKeyEvent tableKeyEvents = new JFXUtil.TableKeyEvent() {
         @Override
         protected void onRowMove(TableView<?> currentTable, String currentTableID, boolean isMovedDown) {
@@ -1383,7 +1383,7 @@ public class POReturnPosting_Controller implements Initializable, ScreenInterfac
             }
         }
     };
-    
+
     public void clearTextFields() {
         Platform.runLater(() -> {
             imageinfo_temp.clear();
@@ -1392,7 +1392,7 @@ public class POReturnPosting_Controller implements Initializable, ScreenInterfac
             psSearchBranchId = "";
             psSupplierId = "";
             psBranchId = "";
-            
+
             JFXUtil.clearTextFields(apMaster, apDetail, apJEDetail, apJEMaster);
         });
     }
