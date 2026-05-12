@@ -778,6 +778,8 @@ public class CheckRelease_EntryController implements Initializable, ScreenInterf
                      
                     loadTableDetail();
                     poGLControllers.CheckReleases().computeMasterFields();
+                    tfTotal.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(
+                            poGLControllers.CheckReleases().Master().getTransactionTotal(), true));
                    
                 } catch (SQLException | GuanzonException ex) {
                     Logger.getLogger(CheckRelease_EntryController.class.getName()).log(Level.SEVERE, null, ex);
@@ -891,6 +893,7 @@ public class CheckRelease_EntryController implements Initializable, ScreenInterf
                                 tblViewMaster.refresh();
                                 loadTableDetail();
                                 poJSON = poGLControllers.CheckReleases().computeMasterFields();
+                                
                                  
                             }
                         }else{
@@ -1076,6 +1079,9 @@ public class CheckRelease_EntryController implements Initializable, ScreenInterf
                                 }
                                 tfCheckTransNo.setText(poGLControllers.CheckReleases().Detail(pnSelectedDetail).CheckPayment().getTransactionNo());
                                 loadTableDetail();
+                                poJSON = poGLControllers.CheckReleases().computeMasterFields();
+                                tfTotal.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(
+                            poGLControllers.CheckReleases().Master().getTransactionTotal(), true));
                                 return;   
                             case "tfCheckNo":
                                 poJSON = poGLControllers.CheckReleases().SearchChecks("", lsValue,pnSelectedDetail,false);
@@ -1085,6 +1091,9 @@ public class CheckRelease_EntryController implements Initializable, ScreenInterf
                                 }
                                 tfCheckNo.setText(poGLControllers.CheckReleases().Detail(pnSelectedDetail).CheckPayment().getCheckNo());
                                 loadTableDetail();
+                                poJSON = poGLControllers.CheckReleases().computeMasterFields();
+                                tfTotal.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(
+                            poGLControllers.CheckReleases().Master().getTransactionTotal(), true));
                                 return; 
                              
                         }

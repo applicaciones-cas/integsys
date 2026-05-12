@@ -372,6 +372,7 @@ public class CheckRelease_ConfirmationController implements Initializable, Scree
                        initButtons(pnEditMode);
                 break;
                 case "btnApprove":
+                    String lsTransNox = poGLControllers.CheckReleases().Master().getTransactionNo();
                         if (CheckReleaseStatus.VOID.equals(poGLControllers.CheckReleases().Master().getTransactionStatus())) {
                             ShowMessageFX.Warning("This transaction is void and cannot be updated.", psFormName, null);
                             return;
@@ -382,6 +383,15 @@ public class CheckRelease_ConfirmationController implements Initializable, Scree
                            return;
                        }
                        ShowMessageFX.Information((String) poJSON.get("message"), psFormName, null);
+                       poJSON = poGLControllers.CheckReleases().OpenTransaction(lsTransNox);
+                       if (ShowMessageFX.YesNo(null, psFormName, "Do you want to print this transaction?")) {
+
+                        poJSON = poGLControllers.CheckReleases().printTransaction();
+                            if ("error".equals((String) poJSON.get("result"))) {
+                                ShowMessageFX.Error((String) poJSON.get("message"), psFormName, null);
+                                return;
+                            }
+                        }
                        
                        ClearAll();
                        initializeObject();
@@ -1085,6 +1095,9 @@ public class CheckRelease_ConfirmationController implements Initializable, Scree
                                 }
                                 tfCheckTransNo.setText(poGLControllers.CheckReleases().Detail(pnSelectedDetail).CheckPayment().getTransactionNo());
                                 loadTableDetail();
+                                poJSON = poGLControllers.CheckReleases().computeMasterFields();
+                                tfTotal.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(
+                            poGLControllers.CheckReleases().Master().getTransactionTotal(), true));
                                 return;   
                             case "tfCheckNo":
                                 poJSON = poGLControllers.CheckReleases().SearchChecks("", lsValue,pnSelectedDetail,false);
@@ -1094,6 +1107,9 @@ public class CheckRelease_ConfirmationController implements Initializable, Scree
                                 }
                                 tfCheckNo.setText(poGLControllers.CheckReleases().Detail(pnSelectedDetail).CheckPayment().getCheckNo());
                                 loadTableDetail();
+                                poJSON = poGLControllers.CheckReleases().computeMasterFields();
+                                tfTotal.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(
+                            poGLControllers.CheckReleases().Master().getTransactionTotal(), true));
                                 return; 
                             case "tfSearchTransNo":
                                 poJSON = poGLControllers.CheckReleases().SearchTransaction(lsValue,null);
