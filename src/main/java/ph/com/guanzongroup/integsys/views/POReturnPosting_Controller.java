@@ -749,6 +749,10 @@ public class POReturnPosting_Controller implements Initializable, ScreenInterfac
 
                 psSupplierId = poController.PurchaseOrderReturn().Master().getSupplierId();
                 psBranchId = poController.PurchaseOrderReturn().Master().getBranchCode();
+
+                Platform.runLater(() -> {
+                    loadTableDetail.reload();
+                });
             }
         } catch (CloneNotSupportedException | SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
