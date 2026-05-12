@@ -405,7 +405,7 @@ public class POReturnPosting_Controller implements Initializable, ScreenInterfac
 
     public void retrievePOR() {
         poJSON = new JSONObject();
-        poJSON = poController.PurchaseOrderReturn().loadPurchaseOrderReturn(tfSearchSupplier.getText(), tfSearchSupplier.getText(), tfSearchReferenceNo.getText());
+        poJSON = poController.PurchaseOrderReturn().loadPurchaseOrderReturn("posting", psSupplierId, tfSearchReferenceNo.getText());
         if (!"success".equals((String) poJSON.get("result"))) {
             ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
         } else {
