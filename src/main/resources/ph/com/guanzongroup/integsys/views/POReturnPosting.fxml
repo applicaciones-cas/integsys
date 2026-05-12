@@ -295,7 +295,7 @@
                                                                                                         <TextField fx:id="tfPOReceivingNo" disable="true" editable="false" layoutX="85.0" layoutY="11.0" maxHeight="25.0" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="139.0" promptText="" GridPane.columnIndex="7" GridPane.rowIndex="3" />
                                                                                                         <AnchorPane maxWidth="-Infinity" minWidth="-Infinity" prefHeight="27.0" prefWidth="140.0" style="-fx-background-color: FF8201;" GridPane.columnIndex="11">
                                                                                  <children>
-                                                                                                              <Label fx:id="lblStatus" alignment="CENTER" contentDisplay="CENTER" prefHeight="27.0" prefWidth="142.0" text="STATUS" textAlignment="CENTER">
+                                                                                                              <Label fx:id="lblStatus" alignment="CENTER" contentDisplay="CENTER" prefHeight="27.0" prefWidth="142.0" text="STATUS" textAlignment="CENTER" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                                                                       <font>
                                                                                           <Font name="System Bold" size="14.0" />
                                                                                       </font>
@@ -531,14 +531,16 @@
                                                                                     <Font name="System Bold" size="12.0" />
                                                                                  </font>
                                                                                                         </Label>
-                                                                                                        <Label fx:id="lblJEStatus" alignment="CENTER" contentDisplay="CENTER" prefHeight="27.0" prefWidth="142.0" text="STATUS" textAlignment="CENTER" GridPane.columnIndex="7">
-                                                                                <font>
-                                                                                    <Font name="System Bold" size="14.0" />
-                                                                                </font>
-                                                                            </Label>
                                                                                                         <TextField fx:id="tfJETransactionNo" disable="true" editable="false" maxHeight="25.0" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="139.0" style="-fx-font-weight: bold;" styleClass="DisabledTextField" GridPane.columnIndex="2" GridPane.columnSpan="2" />
                                                                                                         <DatePicker fx:id="dpJETransactionDate" disable="true" editable="false" GridPane.columnIndex="2" GridPane.rowIndex="2" />
-                                                                                                        <AnchorPane maxWidth="-Infinity" minWidth="-Infinity" prefHeight="27.0" prefWidth="140.0" style="-fx-background-color: FF8201;" GridPane.columnIndex="7" />
+                                                                                                        <AnchorPane maxWidth="-Infinity" minWidth="-Infinity" prefHeight="27.0" prefWidth="140.0" style="-fx-background-color: FF8201;" GridPane.columnIndex="7">
+                                                                                 <children>
+                                                                                                              <Label fx:id="lblJEStatus" alignment="CENTER" contentDisplay="CENTER" prefHeight="27.0" prefWidth="142.0" text="STATUS" textAlignment="CENTER" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                                                                      <font>
+                                                                                          <Font name="System Bold" size="14.0" />
+                                                                                      </font>
+                                                                                  </Label>
+                                                                                 </children></AnchorPane>
                                                                                                         <TextField fx:id="tfTotalCreditAmt" alignment="CENTER_RIGHT" disable="true" editable="false" promptText="0.0000" styleClass="DisabledTextField" GridPane.columnIndex="7" GridPane.rowIndex="2" />
                                                                                                         <TextField fx:id="tfTotalDebitAmt" alignment="CENTER_RIGHT" disable="true" editable="false" promptText="0.0000" styleClass="DisabledTextField" GridPane.columnIndex="7" GridPane.rowIndex="3" />
                                                                                                         <TextArea fx:id="taJERemarks" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" prefHeight="27.0" prefWidth="797.0" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.rowIndex="3">
