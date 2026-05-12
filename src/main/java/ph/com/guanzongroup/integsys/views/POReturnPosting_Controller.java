@@ -691,7 +691,7 @@ public class POReturnPosting_Controller implements Initializable, ScreenInterfac
             tfSupplier.setText(poController.PurchaseOrderReturn().Master().Supplier().getCompanyName());
             tfReferenceNo.setText(poController.PurchaseOrderReturn().Master().PurchaseOrderReceivingMaster().getReferenceNo());
 
-            tfPOReceivingNo.setText("");
+            tfPOReceivingNo.setText(poController.PurchaseOrderReturn().Master().getSourceNo());
             taRemarks.setText(poController.PurchaseOrderReturn().Master().getRemarks());
             tfTransactionTotal.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(String.valueOf(getGrossTotal()), true));
 
