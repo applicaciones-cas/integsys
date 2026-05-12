@@ -1077,17 +1077,16 @@ public class POReturnPosting_Controller implements Initializable, ScreenInterfac
                             ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                             break;
                         }
-
-                        if (pbEntered) {
-                            moveNext(false, true);
-                            pbEntered = false;
-                        }
                         break;
                     case "tfFreightDetail":
                         lsValue = JFXUtil.removeComma(lsValue);
                         poJSON = poController.PurchaseOrderReturn().Detail(pnDetail).setFreight((Double.valueOf(lsValue)));
                         if (!JFXUtil.isJSONSuccess(poJSON)) {
                             ShowMessageFX.Information(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
+                        }
+                        if (pbEntered) {
+                            moveNext(false, true);
+                            pbEntered = false;
                         }
                         break;
                 }
