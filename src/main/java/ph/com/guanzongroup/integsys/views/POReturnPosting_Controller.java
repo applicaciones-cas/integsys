@@ -160,7 +160,7 @@ public class POReturnPosting_Controller implements Initializable, ScreenInterfac
             poController.PurchaseOrderReturn().setIndustryId(psIndustryId);
             poController.PurchaseOrderReturn().setCompanyId(psCompanyId);
             poController.PurchaseOrderReturn().setCategoryId(psCategoryId);
-//            poController.PurchaseOrderReturn().isFinance(true);
+            poController.PurchaseOrderReturn().isFinance(true);
             poController.PurchaseOrderReturn().initFields();
             poController.PurchaseOrderReturn().setWithUI(true);
             loadRecordSearch();
@@ -1112,7 +1112,13 @@ public class POReturnPosting_Controller implements Initializable, ScreenInterfac
                             pbEntered = false;
                         }
                         break;
-
+                    case "tfFreight":
+                        lsValue = JFXUtil.removeComma(lsValue);
+                        poJSON = poController.PurchaseOrderReturn().Detail(pnDetail).setFreight((Double.valueOf(lsValue)));
+                        if (!JFXUtil.isJSONSuccess(poJSON)) {
+                            ShowMessageFX.Information(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
+                        }
+                        break;
                 }
 
                 JFXUtil.runWithDelay(0.50, () -> {
