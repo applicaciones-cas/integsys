@@ -109,7 +109,7 @@ public class POReturnPosting_Controller implements Initializable, ScreenInterfac
     @FXML
     private AnchorPane apMainAnchor, apBrowse, apButton, apMaster, apDetail, apJEMaster, apJEDetail;
     @FXML
-    private TextField tfSearchSupplier, tfSearchReferenceNo, tfTransactionNo, tfSupplier, tfReferenceNo, tfPOReceivingNo, tfTransactionTotal, tfDiscountRate, tfDiscountAmount, tfVatRate, tfVatSales, tfVatAmount, tfZeroVatSales, tfVatExemptSales, tfNetTotal, tfFreightAmt, tfBarcode, tfDescription, tfReturnQuantity, tfMeasure, tfCost, tfReceiveQuantity, tfJETransactionNo, tfTotalCreditAmt, tfTotalDebitAmt, tfJEAcctCode, tfJEAcctDescription, tfCreditAmt, tfDebitAmt;
+    private TextField tfSearchSupplier, tfSearchReferenceNo, tfTransactionNo, tfSupplier, tfReferenceNo, tfPOReceivingNo, tfTransactionTotal, tfDiscountRate, tfDiscountAmount, tfVatRate, tfVatSales, tfVatAmount, tfZeroVatSales, tfVatExemptSales, tfNetTotal, tfFreightAmt, tfBarcode, tfDescription, tfReturnQuantity, tfMeasure, tfCost, tfReceiveQuantity, tfFreightDetail, tfJETransactionNo, tfTotalCreditAmt, tfTotalDebitAmt, tfJEAcctCode, tfJEAcctDescription, tfCreditAmt, tfDebitAmt;
     @FXML
     private Label lblSource, lblStatus, lblJEStatus;
     @FXML
@@ -119,7 +119,7 @@ public class POReturnPosting_Controller implements Initializable, ScreenInterfac
     @FXML
     private TabPane tabPaneForm;
     @FXML
-    private Tab tabSIPosting, tabJE;
+    private Tab tabPOReturnPosting, tabJE;
     @FXML
     private DatePicker dpTransactionDate, dpJETransactionDate, dpReportMonthYear;
     @FXML
@@ -132,6 +132,7 @@ public class POReturnPosting_Controller implements Initializable, ScreenInterfac
     private TableColumn tblRowNoDetail, tblBarcodeDetail, tblDescriptionDetail, tblCostDetail, tblReceiveQuantityDetail, tblReturnQuantityDetail, tblTotalDetail, tblRowNo, tblSupplier, tblDate, tblReferenceNo, tblJERowNoDetail, tblReportMonthDetail, tblJEAcctCodeDetail, tblJEAcctDescriptionDetail, tblJECreditAmtDetail, tblJEDebitAmtDetail;
     @FXML
     private Pagination pgPagination;
+
     JFXUtil.ReloadableTableTask loadTableMain, loadTableDetail, loadTableJEDetail;
 
     @Override
