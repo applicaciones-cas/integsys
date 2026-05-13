@@ -1164,20 +1164,6 @@ public class POReturnPosting_SPCarController implements Initializable, ScreenInt
 
         JFXUtil.setKeyPressedListener(this::txtField_KeyPressed, apMaster, apDetail, apJEDetail, apBrowse);
 
-        JFXUtil.handleDisabledNodeClick(apMaster, pnEditMode, nodeID -> {
-            if (JFXUtil.isObjectEqualTo(poController.PurchaseOrderReturn().Master().getTransactionStatus(), PurchaseOrderReturnStatus.POSTED, PurchaseOrderReturnStatus.PAID)) {
-                ShowMessageFX.Warning(null, pxeModuleName, "Only the Invoice Date, To Follow Invoice, and Invoice No. are editable\nfor posted and paid transactions.");
-                return;
-            }
-            switch (nodeID) {
-                case "cbVatInclusive":
-                    if (!JFXUtil.isObjectEqualTo(poController.PurchaseOrderReturn().Master().getTransactionStatus(), PurchaseOrderReturnStatus.POSTED, PurchaseOrderReturnStatus.PAID)) {
-                        ShowMessageFX.Warning(null, pxeModuleName,
-                                "Only available when Invoice No is provided or set \"To-follow\".");
-                    }
-                    break;
-            }
-        });
     }
 
     public void initTableOnClick() {
