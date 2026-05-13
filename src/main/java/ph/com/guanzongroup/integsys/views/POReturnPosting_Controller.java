@@ -809,44 +809,14 @@ public class POReturnPosting_Controller implements Initializable, ScreenInterfac
                         details_data.clear();
                         int lnCtr;
                         try {
-                            boolean lbIsEnable = true;
                             boolean lbShow1 = (pnEditMode == EditMode.UPDATE);
                             boolean lbShow2 = (pnEditMode == EditMode.READY || pnEditMode == EditMode.UPDATE);
                             boolean lbShow4 = lbShow2 && JFXUtil.isObjectEqualTo(poController.PurchaseOrderReturn().Master().getTransactionStatus(), PurchaseOrderReturnStatus.POSTED, PurchaseOrderReturnStatus.PAID);
-                            if (lbShow4) {
-                                if (lbShow1) {
-                                    lbIsEnable = false;
-                                }
-                            } else {
-                                if (JFXUtil.isObjectEqualTo(poController.PurchaseOrderReturn().Master().getTransactionStatus(), PurchaseOrderReturnStatus.POSTED, PurchaseOrderReturnStatus.PAID)) {
-                                    lbIsEnable = false;
-                                }
-                            }
 
                             double lnTotal = 0.00;
-                            double lnDiscountAmt = 0.00;
                             for (lnCtr = 0; lnCtr < poController.PurchaseOrderReturn().getDetailCount(); lnCtr++) {
-                                if (lbIsEnable) {
-//                                if (JFXUtil.isObjectEqualTo(poController.PurchaseOrderReturn().Master().getSalesInvoice(), null, "")) {
-//                                    poController.PurchaseOrderReturn().Detail(lnCtr).isVatable(false);
-//                                    poController.PurchaseOrderReturn().Master().isVatTaxable(false);
-//                                    JFXUtil.setDisabled(true, cbVatable, cbVatInclusive);
-//                                } else {
-//                                    JFXUtil.setDisabled(false, cbVatable, cbVatInclusive);
-//                                }
-                                }
-//                            try {
                                 lnTotal = poController.PurchaseOrderReturn().Detail(lnCtr).getUnitPrce().doubleValue() * poController.PurchaseOrderReturn().Detail(lnCtr).getQuantity().intValue();
-//                                lnDiscountAmt = poController.PurchaseOrderReturn().Detail(lnCtr).getDiscountAmount().doubleValue()
-//                                        + (lnTotal * (poController.PurchaseOrderReturn().Detail(lnCtr).getDiscountRate().doubleValue() / 100));
-//                            } catch (Exception e) {
-//                            }
 
-//                            if ((!poController.PurchaseOrderReturn().Detail(lnCtr).getOrderNo().equals("") && poController.PurchaseOrderReturn().Detail(lnCtr).getOrderNo() != null)
-//                                    && poController.PurchaseOrderReturn().Detail(lnCtr).getOrderQty().intValue() != poController.PurchaseOrderReturn().Detail(lnCtr).getQuantity().intValue()
-//                                    && poController.PurchaseOrderReturn().Detail(lnCtr).getQuantity().intValue() != 0) {
-//                                JFXUtil.highlightByKey(tblViewDetails, String.valueOf(lnCtr + 1), "#FAA0A0", highlightedRowsDetail);
-//                            }
                                 if (poController.PurchaseOrderReturn().Detail(lnCtr).getStockId() != null && !"".equals(poController.PurchaseOrderReturn().Detail(lnCtr).getStockId())) {
                                     details_data.add(
                                             new ModelDeliveryAcceptance_Detail(String.valueOf(lnCtr + 1),
