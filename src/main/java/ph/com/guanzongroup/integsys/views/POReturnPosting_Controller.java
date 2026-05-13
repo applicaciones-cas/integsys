@@ -658,7 +658,7 @@ public class POReturnPosting_Controller implements Initializable, ScreenInterfac
             tfReturnQuantity.setText(String.valueOf(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.PurchaseOrderReturn().Detail(pnDetail).getQuantity())));
             tfMeasure.setText(poController.PurchaseOrderReturn().Detail(pnDetail).Inventory().Measure().getDescription());
             tfCost.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.PurchaseOrderReturn().Detail(pnDetail).getUnitPrce(), true));
-            tfReceiveQuantity.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.PurchaseOrderReturn().Detail(pnDetail).getQuantity().doubleValue()));
+            tfReceiveQuantity.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.PurchaseOrderReturn().Detail(pnDetail).getReceivedQty().doubleValue()));
             cbVatable.setSelected(poController.PurchaseOrderReturn().Detail(pnDetail).isVatable());
             tfFreightDetail.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.PurchaseOrderReturn().Detail(pnDetail).getFreight().doubleValue(), false));
         } catch (SQLException | GuanzonException ex) {
@@ -836,7 +836,7 @@ public class POReturnPosting_Controller implements Initializable, ScreenInterfac
 //                                }
                                 }
 //                            try {
-//                                lnTotal = poController.PurchaseOrderReturn().Detail(lnCtr).getUnitPrce().doubleValue() * poController.PurchaseOrderReturn().Detail(lnCtr).getQuantity().intValue();
+                                lnTotal = poController.PurchaseOrderReturn().Detail(lnCtr).getUnitPrce().doubleValue() * poController.PurchaseOrderReturn().Detail(lnCtr).getQuantity().intValue();
 //                                lnDiscountAmt = poController.PurchaseOrderReturn().Detail(lnCtr).getDiscountAmount().doubleValue()
 //                                        + (lnTotal * (poController.PurchaseOrderReturn().Detail(lnCtr).getDiscountRate().doubleValue() / 100));
 //                            } catch (Exception e) {
@@ -853,11 +853,11 @@ public class POReturnPosting_Controller implements Initializable, ScreenInterfac
                                                     String.valueOf(poController.PurchaseOrderReturn().Detail(lnCtr).Inventory().getBarCode()),
                                                     String.valueOf(poController.PurchaseOrderReturn().Detail(lnCtr).Inventory().getDescription()),
                                                     String.valueOf(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.PurchaseOrderReturn().Detail(lnCtr).getUnitPrce(), true)),
-                                                    String.valueOf(poController.PurchaseOrderReturn().Detail(lnCtr).getReceivedQty().intValue()),
-                                                    String.valueOf(poController.PurchaseOrderReturn().Detail(lnCtr).getQuantity().intValue()),
-                                                    //                                                String.valueOf(CustomCommonUtil.setIntegerValueToDecimalFormat(lnDiscountAmt, true)),
+                                                    String.valueOf( CustomCommonUtil.setIntegerValueToDecimalFormat(poController.PurchaseOrderReturn().Detail(lnCtr).getReceivedQty(), false)),
+                                                    String.valueOf( CustomCommonUtil.setIntegerValueToDecimalFormat(poController.PurchaseOrderReturn().Detail(lnCtr).getQuantity(), false)),
                                                     String.valueOf(CustomCommonUtil.setIntegerValueToDecimalFormat(lnTotal, true)) //identify total
                                             ));
+                                   
                                 }
                             }
                             if (pnDetail < 0 || pnDetail
@@ -1084,6 +1084,10 @@ public class POReturnPosting_Controller implements Initializable, ScreenInterfac
                         break;
                     case "tfFreightDetail":
                         lsValue = JFXUtil.removeComma(lsValue);
+                        if ((Double.valueOf(lsValue)) > poController.PurchaseOrderReturn().Master().getTransactionTotal().doubleValue()) {
+                            ShowMessageFX.Warning(null, pxeModuleName, "Freight value must not be greater than transaction total!");
+                            break;
+                        }
                         poJSON = poController.PurchaseOrderReturn().Detail(pnDetail).setFreight((Double.valueOf(lsValue)));
                         if (!JFXUtil.isJSONSuccess(poJSON)) {
                             ShowMessageFX.Information(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
@@ -1180,7 +1184,7 @@ public class POReturnPosting_Controller implements Initializable, ScreenInterfac
 
         JFXUtil.setKeyPressedListener(this::txtField_KeyPressed, apBrowse, apMaster, apDetail, apJEDetail);
         JFXUtil.inputDecimalOnly(tfDiscountRate);
-        JFXUtil.setCommaFormatter(tfDiscountAmount, tfFreightAmt, tfCost, tfCreditAmt, tfDebitAmt);
+        JFXUtil.setCommaFormatter(tfDiscountAmount, tfFreightAmt, tfFreightDetail,tfCost, tfCreditAmt, tfDebitAmt);
 
         JFXUtil.adjustColumnForScrollbar(tblViewDetails, tblViewMainList, tblViewJEDetails);
 
