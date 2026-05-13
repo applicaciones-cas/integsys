@@ -182,7 +182,7 @@ public class POReturnPosting_Controller implements Initializable, ScreenInterfac
 
     @Override
     public void setIndustryID(String fsValue) {
-        psIndustryId = "09";
+        psIndustryId = fsValue;
     }
 
     @Override
