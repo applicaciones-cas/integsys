@@ -405,7 +405,7 @@
                                                                                                         <TextField fx:id="tfFrameNo" disable="true" maxHeight="25.0" styleClass="DisabledTextField" GridPane.columnIndex="6" GridPane.rowIndex="4" />
                                                                                                         <TextField fx:id="tfReceiveQuantity" alignment="CENTER_RIGHT" disable="true" layoutX="85.0" layoutY="79.0" maxHeight="25.0" promptText="0" styleClass="DisabledTextField" GridPane.columnIndex="10" GridPane.rowIndex="1" />
                                                                                                         <TextField fx:id="tfReturnQuantity" alignment="CENTER_RIGHT" disable="true" promptText="0" styleClass="DisabledTextField" GridPane.columnIndex="10" GridPane.rowIndex="2" />
-                                                                                                        <CheckBox mnemonicParsing="false" GridPane.columnIndex="10" GridPane.rowIndex="3" />
+                                                                                                        <CheckBox fx:id="cbVatable" mnemonicParsing="false" onAction="#cmdCheckBox_Click" GridPane.columnIndex="10" GridPane.rowIndex="3" />
                                                                                                         <TextField fx:id="tfCost" alignment="CENTER_RIGHT" promptText="0.0000" GridPane.columnIndex="10" GridPane.rowIndex="4" />
                                                                                                         <TextField fx:id="tfFreightDetail" alignment="CENTER_RIGHT" promptText="0.00" GridPane.columnIndex="10" GridPane.rowIndex="5" />
                                                                                                     </children>
@@ -470,7 +470,7 @@
                                                                   <Insets left="5.0" right="5.0" top="5.0" />
                                                               </GridPane.margin>
                                                           </AnchorPane>
-                                                          <TableView fx:id="tblViewPuchaseOrderReturn" minWidth="242.0" prefHeight="614.0" prefWidth="551.0" GridPane.rowIndex="1">
+                                                          <TableView fx:id="tblViewMainList" minWidth="242.0" prefHeight="614.0" prefWidth="551.0" GridPane.rowIndex="1">
                                                               <columns>
                                                                   <TableColumn fx:id="tblRowNo" editable="false" maxWidth="30.0" minWidth="30.0" prefWidth="30.0" resizable="false" sortable="false" style="-fx-font-size: 12;" text="No." />
                                                                   <TableColumn fx:id="tblSupplier" editable="false" maxWidth="300.0" minWidth="-1.0" prefWidth="300.0" resizable="false" sortable="false" style="-fx-font-size: 12;" text="Supplier" />
