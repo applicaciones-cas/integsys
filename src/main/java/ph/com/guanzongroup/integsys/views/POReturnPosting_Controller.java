@@ -528,13 +528,13 @@ public class POReturnPosting_Controller implements Initializable, ScreenInterfac
                     break;
                 case UP:
                     JFXUtil.altSwitch(lsID, new Object[][]{
-                        {new String[]{"tfCost", "tfDiscRateDetail", "tfAddlDiscAmtDetail"}, (Runnable) () -> moveNext(true, true)},
+                        {new String[]{"tfCost", "tfFreightDetail"}, (Runnable) () -> moveNext(true, true)},
                         {new String[]{"tfJEAcctCode", "tfCreditAmt", "tfDebitAmt"}, (Runnable) () -> moveNextJE(true, true)}
                     });
                     break;
                 case DOWN:
                     JFXUtil.altSwitch(lsID, new Object[][]{
-                        {new String[]{"tfCost", "tfDiscRateDetail", "tfAddlDiscAmtDetail"}, (Runnable) () -> moveNext(false, true)},
+                        {new String[]{"tfCost", "tfFreightDetail"}, (Runnable) () -> moveNext(false, true)},
                         {new String[]{"tfJEAcctCode", "tfCreditAmt", "tfDebitAmt"}, (Runnable) () -> moveNextJE(false, true)}
                     });
                     break;
