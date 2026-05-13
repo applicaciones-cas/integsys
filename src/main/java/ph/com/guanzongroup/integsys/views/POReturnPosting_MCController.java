@@ -824,7 +824,7 @@ public class POReturnPosting_MCController implements Initializable, ScreenInterf
                                     details_data.add(
                                             new ModelDeliveryAcceptance_Detail(String.valueOf(lnCtr + 1),
                                                     String.valueOf(poController.PurchaseOrderReturn().Detail(lnCtr).Inventory().getBarCode()),
-                                                    String.valueOf(poController.PurchaseOrderReturn().Detail(lnCtr).Inventory().getDescription()),
+                                                    String.valueOf(poController.PurchaseOrderReturn().Detail(lnCtr).Inventory().getDescription() + " : " + poController.PurchaseOrderReturn().Detail(pnDetail).InventorySerial().getSerial01()),
                                                     String.valueOf(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.PurchaseOrderReturn().Detail(lnCtr).getUnitPrce(), true)),
                                                     String.valueOf(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.PurchaseOrderReturn().getReceiveQty(lnCtr), false)),
                                                     String.valueOf(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.PurchaseOrderReturn().Detail(lnCtr).getQuantity(), false)),
