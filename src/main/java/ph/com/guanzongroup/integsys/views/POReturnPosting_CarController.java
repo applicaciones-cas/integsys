@@ -659,7 +659,7 @@ public class POReturnPosting_CarController implements Initializable, ScreenInter
             tfCSNo.setText(poController.PurchaseOrderReturn().Detail(pnDetail).InventorySerialRegistration().getConductionStickerNo());
 
             tfCost.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.PurchaseOrderReturn().Detail(pnDetail).getUnitPrce(), true));
-            tfReceiveQuantity.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.PurchaseOrderReturn().Detail(pnDetail).getReceivedQty().doubleValue()));
+            tfReceiveQuantity.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.PurchaseOrderReturn().getReceiveQty(pnDetail).doubleValue()));
             cbVatable.setSelected(poController.PurchaseOrderReturn().Detail(pnDetail).isVatable());
             tfFreightDetail.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.PurchaseOrderReturn().Detail(pnDetail).getFreight().doubleValue(), false));
         } catch (SQLException | GuanzonException ex) {
@@ -824,7 +824,7 @@ public class POReturnPosting_CarController implements Initializable, ScreenInter
                                                     String.valueOf(poController.PurchaseOrderReturn().Detail(lnCtr).Inventory().getBarCode()),
                                                     String.valueOf(poController.PurchaseOrderReturn().Detail(lnCtr).Inventory().getDescription()),
                                                     String.valueOf(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.PurchaseOrderReturn().Detail(lnCtr).getUnitPrce(), true)),
-                                                    String.valueOf(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.PurchaseOrderReturn().Detail(lnCtr).getReceivedQty(), false)),
+                                                    String.valueOf(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.PurchaseOrderReturn().getReceiveQty(lnCtr), false)),
                                                     String.valueOf(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.PurchaseOrderReturn().Detail(lnCtr).getQuantity(), false)),
                                                     String.valueOf(CustomCommonUtil.setIntegerValueToDecimalFormat(lnTotal, true)) //identify total
                                             ));
