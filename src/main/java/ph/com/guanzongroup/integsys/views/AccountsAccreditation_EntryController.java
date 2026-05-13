@@ -231,13 +231,14 @@ public class AccountsAccreditation_EntryController implements Initializable, Scr
                             return;
                         }
                         ShowMessageFX.Information("Client saved successfully!", "Initialize Save Record", null);
+                        
+                        if (!isJSONSuccess(poAppController.openRecord(poAppController.getModel().getTransactionNo()), "Initialize Open Record")) {
+                            return;
+                        }
+                        
                         if (poAppController.getModel().getRecordStatus().equals("0")) {
                             
                             if (ShowMessageFX.OkayCancel(null, psFormName, "Do you want to Confirm transaction?") == true) {
-
-                                if (!isJSONSuccess(poAppController.openRecord(poAppController.getModel().getTransactionNo()), "Initialize Open Transaction")) {
-                                    return;
-                                }
 
                                 if (!isJSONSuccess(poAppController.CloseTransaction(), "Initialize Close Transaction")) {
                                     return;
