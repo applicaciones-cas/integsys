@@ -761,45 +761,49 @@ public class POReturnPosting_Controller implements Initializable, ScreenInterfac
                 tblViewMainList,
                 main_data,
                 () -> {
-//                Thread.sleep(1000);
-                    Platform.runLater(() -> {
+                    try {
+                        Thread.sleep(1000);
+                        Platform.runLater(() -> {
 //                        Thread.sleep(100);
-                        main_data.clear();
-                        JFXUtil.disableAllHighlight(tblViewMainList, highlightedRowsMain);
+                            main_data.clear();
+                            JFXUtil.disableAllHighlight(tblViewMainList, highlightedRowsMain);
 
-                        if (poController.PurchaseOrderReturn().getPurchaseOrderReturnCount() > 0) {
-                            //pending
-                            //retreiving using column index
-                            for (int lnCtr = 0; lnCtr <= poController.PurchaseOrderReturn().getPurchaseOrderReturnCount() - 1; lnCtr++) {
-                                try {
-                                    main_data.add(new ModelDeliveryAcceptance_Main(String.valueOf(lnCtr + 1),
-                                            String.valueOf(poController.PurchaseOrderReturn().PurchaseOrderReturnList(lnCtr).Supplier().getCompanyName()),
-                                            String.valueOf(poController.PurchaseOrderReturn().PurchaseOrderReturnList(lnCtr).getTransactionDate()),
-                                            String.valueOf(poController.PurchaseOrderReturn().PurchaseOrderReturnList(lnCtr).getTransactionNo())));
-                                } catch (SQLException | GuanzonException ex) {
-                                    Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
-                                    ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
-                                }
+                            if (poController.PurchaseOrderReturn().getPurchaseOrderReturnCount() > 0) {
+                                //pending
+                                //retreiving using column index
+                                for (int lnCtr = 0; lnCtr <= poController.PurchaseOrderReturn().getPurchaseOrderReturnCount() - 1; lnCtr++) {
+                                    try {
+                                        main_data.add(new ModelDeliveryAcceptance_Main(String.valueOf(lnCtr + 1),
+                                                String.valueOf(poController.PurchaseOrderReturn().PurchaseOrderReturnList(lnCtr).Supplier().getCompanyName()),
+                                                String.valueOf(poController.PurchaseOrderReturn().PurchaseOrderReturnList(lnCtr).getTransactionDate()),
+                                                String.valueOf(poController.PurchaseOrderReturn().PurchaseOrderReturnList(lnCtr).getTransactionNo())));
+                                    } catch (SQLException | GuanzonException ex) {
+                                        Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+                                        ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
+                                    }
 
-                                if (JFXUtil.isObjectEqualTo(poController.PurchaseOrderReturn().PurchaseOrderReturnList(lnCtr).getTransactionStatus(), PurchaseOrderReturnStatus.POSTED, PurchaseOrderReturnStatus.PAID)) {
-                                    JFXUtil.highlightByKey(tblViewMainList, String.valueOf(lnCtr + 1), "C1E1C1", highlightedRowsMain);
+                                    if (JFXUtil.isObjectEqualTo(poController.PurchaseOrderReturn().PurchaseOrderReturnList(lnCtr).getTransactionStatus(), PurchaseOrderReturnStatus.POSTED, PurchaseOrderReturnStatus.PAID)) {
+                                        JFXUtil.highlightByKey(tblViewMainList, String.valueOf(lnCtr + 1), "C1E1C1", highlightedRowsMain);
+                                    }
                                 }
                             }
-                        }
 
-                        if (pnMain < 0 || pnMain
-                                >= main_data.size()) {
-                            if (!main_data.isEmpty()) {
-                                /* FOCUS ON FIRST ROW */
-                                JFXUtil.selectAndFocusRow(tblViewMainList, 0);
-                                pnMain = tblViewMainList.getSelectionModel().getSelectedIndex();
+                            if (pnMain < 0 || pnMain
+                                    >= main_data.size()) {
+                                if (!main_data.isEmpty()) {
+                                    /* FOCUS ON FIRST ROW */
+                                    JFXUtil.selectAndFocusRow(tblViewMainList, 0);
+                                    pnMain = tblViewMainList.getSelectionModel().getSelectedIndex();
+                                }
+                            } else {
+                                /* FOCUS ON THE ROW THAT pnRowDetail POINTS TO */
+                                JFXUtil.selectAndFocusRow(tblViewMainList, pnMain);
                             }
-                        } else {
-                            /* FOCUS ON THE ROW THAT pnRowDetail POINTS TO */
-                            JFXUtil.selectAndFocusRow(tblViewMainList, pnMain);
-                        }
-                        JFXUtil.loadTab(pgPagination, main_data.size(), ROWS_PER_PAGE, tblViewMainList, filteredData);
-                    });
+                            JFXUtil.loadTab(pgPagination, main_data.size(), ROWS_PER_PAGE, tblViewMainList, filteredData);
+                        });
+                    } catch (InterruptedException ex) {
+                        Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+                    }
                 });
         loadTableDetail = new JFXUtil.ReloadableTableTask(
                 tblViewDetails,
