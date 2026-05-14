@@ -1150,6 +1150,7 @@ public class POReturnPosting_Controller implements Initializable, ScreenInterfac
             });
 
     public void initTextFields() {
+        JFXUtil.setDisabled(true, tfVatRate);
         JFXUtil.setFocusListener(txtArea_Focus, taRemarks, taJERemarks);
         JFXUtil.setFocusListener(txtBrowse_Focus, apBrowse);
         JFXUtil.setFocusListener(txtMaster_Focus, apMaster);
