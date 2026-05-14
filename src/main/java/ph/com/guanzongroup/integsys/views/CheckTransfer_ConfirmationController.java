@@ -280,7 +280,7 @@ public class CheckTransfer_ConfirmationController implements Initializable, Scre
                             return;
                         case "tfCheckTransNo":
                             lsValue = tfDestination.getText();
-                            poJSON = poGLControllers.CheckTransfers().SearchChecks(lsValue, "", pnSelectedDetail, false);
+                            poJSON = poGLControllers.CheckTransfers().SearchChecks(lsValue, "", pnSelectedDetail, true);
                             if ("error".equals(poJSON.get("result"))) {
                                 ShowMessageFX.Warning((String) poJSON.get("message"), lsValue, lsValue);
                             }
@@ -437,7 +437,7 @@ public class CheckTransfer_ConfirmationController implements Initializable, Scre
             loTxtField.forEach(tf -> tf.setOnKeyPressed(event -> txtField_KeyPressed(event)));
 //
 //            JFXUtil.setFocusListener(txtArea_Focus, taRemarks);
-            JFXUtil.setFocusListener(txtField_Focus, tfDestination, tfDepartment,tfNote,tfSearchTransNo);
+            JFXUtil.setFocusListener(txtField_Focus, tfDestination, tfDepartment,tfNote,tfSearchTransNo,tfCheckNo,tfCheckTransNo);
             JFXUtil.setFocusListener(txtArea_Focus, taRemarks);
 
 //            cmbAccountType.setItems(AccountType);
@@ -1007,6 +1007,9 @@ public class CheckTransfer_ConfirmationController implements Initializable, Scre
                         psActiveField = lsID;
                         JFXUtil.inputIntegersOnly(tfCheckNo);
                         break;
+                     case "tfCheckTransNo":
+                        psActiveField = lsID;
+                        break;
                     case "tfSearchTransNo":
                         loadTableMaster();
                         break;
@@ -1085,7 +1088,7 @@ public class CheckTransfer_ConfirmationController implements Initializable, Scre
                                 tfDepartment.setText(poGLControllers.CheckTransfers().Master().Department().getDescription());
                                 return;
                             case "tfCheckTransNo":
-                                poJSON = poGLControllers.CheckTransfers().SearchChecks(lsValue, "",pnSelectedDetail,false);
+                                poJSON = poGLControllers.CheckTransfers().SearchChecks(lsValue, "",pnSelectedDetail,true);
                                 if ("error".equals(poJSON.get("result"))) {
                                     ShowMessageFX.Warning((String) poJSON.get("message"), lsValue, lsValue);
                                     return;
@@ -1116,6 +1119,8 @@ public class CheckTransfer_ConfirmationController implements Initializable, Scre
                 }
             } catch (SQLException | GuanzonException | ExceptionInInitializerError ex) {
                 Logger.getLogger(TBJ_ParameterController.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (CloneNotSupportedException ex) {
+                Logger.getLogger(CheckTransfer_ConfirmationController.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
     }

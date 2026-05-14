@@ -281,12 +281,15 @@ public class CheckTransfer_EntryController implements Initializable, ScreenInter
                             return;
                         case "tfCheckTransNo":
                             lsValue = tfCheckTransNo.getText();
-                            poJSON = poGLControllers.CheckTransfers().SearchChecks(lsValue, "", pnSelectedDetail, false);
+                            poJSON = poGLControllers.CheckTransfers().SearchChecks(lsValue, "", pnSelectedDetail, true);
                             if ("error".equals(poJSON.get("result"))) {
                                 ShowMessageFX.Warning((String) poJSON.get("message"), lsValue, lsValue);
                             }
                             tfCheckTransNo.setText(poGLControllers.CheckTransfers().Detail(pnSelectedDetail).CheckPayment().getTransactionNo());
                             loadTableDetail();
+                            poJSON = poGLControllers.CheckTransfers().computeMasterFields();
+                                tfTotal.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(
+                            poGLControllers.CheckTransfers().Master().getTransactionTotal(), true));
                             return;
                         case "tfCheckNo":
                             lsValue = tfCheckNo.getText();
@@ -296,6 +299,9 @@ public class CheckTransfer_EntryController implements Initializable, ScreenInter
                             }
                             tfCheckNo.setText(poGLControllers.CheckTransfers().Detail(pnSelectedDetail).CheckPayment().getCheckNo());
                             loadTableDetail();
+                            poJSON = poGLControllers.CheckTransfers().computeMasterFields();
+                                tfTotal.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(
+                            poGLControllers.CheckTransfers().Master().getTransactionTotal(), true));
                             return;
                         default:
                             ShowMessageFX.Warning("Looks like no searchable field is selected. \nPlease choose one to continue.", psFormName, null);
@@ -456,7 +462,7 @@ public class CheckTransfer_EntryController implements Initializable, ScreenInter
             loTxtField.forEach(tf -> tf.setOnKeyPressed(event -> txtField_KeyPressed(event)));
 //
 //            JFXUtil.setFocusListener(txtArea_Focus, taRemarks);
-            JFXUtil.setFocusListener(txtField_Focus, tfDestination, tfDepartment,tfNote);
+            JFXUtil.setFocusListener(txtField_Focus, tfDestination, tfDepartment,tfNote,tfCheckNo,tfCheckTransNo);
             JFXUtil.setFocusListener(txtArea_Focus, taRemarks);
 
 //            cmbAccountType.setItems(AccountType);
@@ -1000,6 +1006,10 @@ public class CheckTransfer_EntryController implements Initializable, ScreenInter
                         psActiveField = lsID;
                         JFXUtil.inputIntegersOnly(tfCheckNo);
                         break;
+                     case "tfCheckTransNo":
+                        psActiveField = lsID;
+                        break;
+
                 }
 
             } catch (SQLException | GuanzonException ex) {
@@ -1069,13 +1079,16 @@ public class CheckTransfer_EntryController implements Initializable, ScreenInter
                                 tfDepartment.setText(poGLControllers.CheckTransfers().Master().Department().getDescription());
                                 return;
                             case "tfCheckTransNo":
-                                poJSON = poGLControllers.CheckTransfers().SearchChecks(lsValue, "",pnSelectedDetail,false);
+                                poJSON = poGLControllers.CheckTransfers().SearchChecks(lsValue, "",pnSelectedDetail,true);
                                 if ("error".equals(poJSON.get("result"))) {
                                     ShowMessageFX.Warning((String) poJSON.get("message"), lsValue, lsValue);
                                     return;
                                 }
                                 tfCheckTransNo.setText(poGLControllers.CheckTransfers().Detail(pnSelectedDetail).CheckPayment().getTransactionNo());
                                 loadTableDetail();
+                                poJSON = poGLControllers.CheckTransfers().computeMasterFields();
+                                    tfTotal.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(
+                                poGLControllers.CheckTransfers().Master().getTransactionTotal(), true));
                                 return;   
                             case "tfCheckNo":
                                 poJSON = poGLControllers.CheckTransfers().SearchChecks("", lsValue,pnSelectedDetail,false);
@@ -1085,6 +1098,9 @@ public class CheckTransfer_EntryController implements Initializable, ScreenInter
                                 }
                                 tfCheckNo.setText(poGLControllers.CheckTransfers().Detail(pnSelectedDetail).CheckPayment().getCheckNo());
                                 loadTableDetail();
+                                poJSON = poGLControllers.CheckTransfers().computeMasterFields();
+                                    tfTotal.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(
+                                poGLControllers.CheckTransfers().Master().getTransactionTotal(), true));
                                 return; 
                              
                         }
@@ -1100,6 +1116,8 @@ public class CheckTransfer_EntryController implements Initializable, ScreenInter
                 }
             } catch (SQLException | GuanzonException | ExceptionInInitializerError ex) {
                 Logger.getLogger(TBJ_ParameterController.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (CloneNotSupportedException ex) {
+                Logger.getLogger(CheckTransfer_EntryController.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
     }
