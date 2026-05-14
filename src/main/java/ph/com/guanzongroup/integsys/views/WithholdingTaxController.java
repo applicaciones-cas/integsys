@@ -174,7 +174,7 @@ public class WithholdingTaxController implements Initializable, ScreenInterface 
                             break;
                         }
                         tfSearchTaxDescription.setText("");
-                        pnEditMode = EditMode.READY;
+                        pnEditMode = poController.getEditMode();
                         loadRecordMaster();
                         break;
                     case "btnUpdate":
@@ -220,7 +220,7 @@ public class WithholdingTaxController implements Initializable, ScreenInterface 
 
                         switch (Status) {
                             case "0":
-                                if (ShowMessageFX.YesNo(null, pxeModuleName, "Do you want to Activate this parameter?") == true) {
+                                if (ShowMessageFX.YesNo(null, pxeModuleName, "Do you want to activate this record?") == true) {
                                     poJsON = poController.activateRecord();
                                     if ("error".equals(poJsON.get("result"))) {
                                         ShowMessageFX.Information(null, pxeModuleName, (String) poJsON.get("message"));
@@ -235,7 +235,7 @@ public class WithholdingTaxController implements Initializable, ScreenInterface 
                                 }
                                 break;
                             case "1":
-                                if (ShowMessageFX.YesNo(null, pxeModuleName, "Do you want to Deactivate this parameter?") == true) {
+                                if (ShowMessageFX.YesNo(null, pxeModuleName, "Do you want to deactivate this record?") == true) {
                                     poJsON = poController.deactivateRecord();
                                     if ("error".equals(poJsON.get("result"))) {
                                         ShowMessageFX.Information(null, pxeModuleName, (String) poJsON.get("message"));
@@ -250,7 +250,7 @@ public class WithholdingTaxController implements Initializable, ScreenInterface 
                                 }
                                 break;
                         }
-                        pnEditMode = EditMode.UNKNOWN;
+                        pnEditMode = poController.getEditMode();
                         break;
                 }
                 initButton(pnEditMode);

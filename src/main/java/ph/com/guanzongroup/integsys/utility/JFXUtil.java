@@ -220,6 +220,11 @@ public class JFXUtil {
         }
     }
 
+    public static boolean checkHighlightIfExists(String key, String color, Map<String, List<String>> highlightMap) {
+        List<String> colors = highlightMap.computeIfAbsent(key, k -> new ArrayList<>());
+        return colors.contains(color);
+    }
+
     /* Dynamic Highlighter for TableView */
  /* Requires TableView, string key (basis value), String Color in hex(e.g. #H1H1H1), Map list for local storage of highlights */
     public static <T> void highlightByKey(TableView<T> table, String key, String color, Map<String, List<String>> highlightMap) {
@@ -3422,6 +3427,7 @@ public class JFXUtil {
                 LocalDate ldSelectedDate
         );
     }
+
     public static EventHandler<ActionEvent> DatePickerAction(DatePickerCommand command) {
         return event -> {
 
