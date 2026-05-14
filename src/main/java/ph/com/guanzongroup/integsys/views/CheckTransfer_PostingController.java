@@ -1032,7 +1032,7 @@ public class CheckTransfer_PostingController implements Initializable, ScreenInt
                                 tfDepartment.setText(poGLControllers.CheckTransfers().Master().Department().getDescription());
                                 return;
                             case "tfCheckTransNo":
-                                poJSON = poGLControllers.CheckTransfers().SearchChecks(lsValue, "",pnSelectedDetail,false);
+                                poJSON = poGLControllers.CheckTransfers().SearchChecks(lsValue, "",pnSelectedDetail,true);
                                 if ("error".equals(poJSON.get("result"))) {
                                     ShowMessageFX.Warning((String) poJSON.get("message"), lsValue, lsValue);
                                     return;
@@ -1063,6 +1063,8 @@ public class CheckTransfer_PostingController implements Initializable, ScreenInt
                 }
             } catch (SQLException | GuanzonException | ExceptionInInitializerError ex) {
                 Logger.getLogger(TBJ_ParameterController.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (CloneNotSupportedException ex) {
+                Logger.getLogger(CheckTransfer_PostingController.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
     }
