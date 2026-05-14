@@ -365,6 +365,7 @@ public class CheckDeposit_ConfirmationController implements Initializable, Scree
                                 }
                                 tfBankAccountNo.setText(poGLControllers.CheckDeposits().Master().BankAccount().getAccountNo());
                                 tfBankAccountName.setText(poGLControllers.CheckDeposits().Master().BankAccount().getAccountName());
+                                tfBankMaster.setText(poGLControllers.CheckDeposits().Master().Banks().getBankName());
                                 return;   
                             case "tfBankAccountName":
                                 poJSON = poGLControllers.CheckDeposits().SearchBankAccounts(lsValue,false);
@@ -373,7 +374,8 @@ public class CheckDeposit_ConfirmationController implements Initializable, Scree
                                     return;
                                 }
                                 tfBankAccountNo.setText(poGLControllers.CheckDeposits().Master().BankAccount().getAccountNo());
-                                tfBankAccountName.setText(poGLControllers.CheckDeposits().Master().BankAccount().getAccountName());
+                                tfBankAccountName.setText(poGLControllers.CheckDeposits().Master().BankAccount().getAccountName());                                
+                                tfBankMaster.setText(poGLControllers.CheckDeposits().Master().Banks().getBankName());
                                 return; 
                             case "tfCheckTransNo":
                                 poJSON = poGLControllers.CheckDeposits().SearchChecks(lsValue, "",pnSelectedDetail,false);
@@ -452,6 +454,8 @@ public class CheckDeposit_ConfirmationController implements Initializable, Scree
                     }
                     break;
                 case "btnSave":
+                    String lstransnox = poGLControllers.CheckDeposits().Master().getTransactionNo();
+                    if (ShowMessageFX.YesNo(null, psFormName, "Do you want to save this transaction?")) {
                     poJSON = poGLControllers.CheckDeposits().SaveTransaction();
                     if (!"success".equals((String) poJSON.get("result"))) {
                         ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
@@ -461,7 +465,7 @@ public class CheckDeposit_ConfirmationController implements Initializable, Scree
                     pnEditMode = poGLControllers.CheckDeposits().getEditMode();
                     if(poGLControllers.CheckDeposits().Master().getTransactionStatus().equals(CheckDepositStatus.OPEN)){
                         if (ShowMessageFX.YesNo(null, psFormName, "Do you want to confirm this transaction?")) {
-                                poJSON = poGLControllers.CheckDeposits().OpenTransaction(poGLControllers.CheckDeposits().Master().getTransactionNo());
+                                poJSON = poGLControllers.CheckDeposits().OpenTransaction(lstransnox);
                                 poJSON = poGLControllers.CheckDeposits().ConfirmTransaction("");
                           
                             if (!"success".equals((String) poJSON.get("result"))) {
@@ -470,35 +474,51 @@ public class CheckDeposit_ConfirmationController implements Initializable, Scree
                                 initButtons(pnEditMode);
                                 return;
                             }
+                            ShowMessageFX.Information((String) poJSON.get("message"), psFormName, null);
+                            poJSON = poGLControllers.CheckDeposits().OpenTransaction(lstransnox);
+                            if (ShowMessageFX.YesNo(null, psFormName, "Do you want to print this transaction?")) {
+                                poJSON = poGLControllers.CheckDeposits().printDepositSlip();
+                                if ("error".equals((String) poJSON.get("result"))) {
+                                    ShowMessageFX.Error((String) poJSON.get("message"), psFormName, null);
+                                    ClearAll();
+                                    return;
+                                }
+                                ShowMessageFX.Information((String) poJSON.get("message"), psFormName, null);
+
+                            }
                             JFXUtil.disableAllHighlightByColor(tblViewMaster, "#A7C7E7", highlightedRowsMain);
                         }
                     }
 
                     ClearAll();
+                    }
                     break;
 
                 case "btnVoid":
-                    poJSON = poGLControllers.CheckDeposits().VoidTransaction("");
-                       if (!"success".equals((String) poJSON.get("result"))) {
-                           ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
-                           return;
-                       }
-                       ShowMessageFX.Information((String) poJSON.get("message"), psFormName, null);
-                       ClearAll();
-                       initializeObject();
-                       pnEditMode = poGLControllers.CheckDeposits().getEditMode();
-                       loadTableMaster();
-                       initButtons(pnEditMode);
-                break;
-                case "btnApprove":
-                    String sTransnox = poGLControllers.CheckDeposits().Master().getTransactionNo();
-                    poJSON = poGLControllers.CheckDeposits().ConfirmTransaction("");
+                    if (ShowMessageFX.YesNo(null, psFormName, "Do you want to void this transaction?")) {
+                        poJSON = poGLControllers.CheckDeposits().VoidTransaction("");
                         if (!"success".equals((String) poJSON.get("result"))) {
                             ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
                             return;
                         }
-                    ShowMessageFX.Information((String) poJSON.get("message"), psFormName, null);
-                    poJSON = poGLControllers.CheckDeposits().OpenTransaction(sTransnox);
+                        ShowMessageFX.Information((String) poJSON.get("message"), psFormName, null);
+                        ClearAll();
+                        initializeObject();
+                        pnEditMode = poGLControllers.CheckDeposits().getEditMode();
+                        loadTableMaster();
+                        initButtons(pnEditMode);
+                    }
+                break;
+                case "btnApprove":
+                    String sTransnox = poGLControllers.CheckDeposits().Master().getTransactionNo();
+                    if (ShowMessageFX.YesNo(null, psFormName, "Do you want to confirm this transaction?")) {
+                        poJSON = poGLControllers.CheckDeposits().ConfirmTransaction("");
+                        if (!"success".equals((String) poJSON.get("result"))) {
+                            ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
+                            return;
+                        }
+                        ShowMessageFX.Information((String) poJSON.get("message"), psFormName, null);
+                        poJSON = poGLControllers.CheckDeposits().OpenTransaction(sTransnox);
                         if (ShowMessageFX.YesNo(null, psFormName, "Do you want to print this transaction?")) {
                             poJSON = poGLControllers.CheckDeposits().printDepositSlip();
                             if ("error".equals((String) poJSON.get("result"))) {
@@ -507,10 +527,11 @@ public class CheckDeposit_ConfirmationController implements Initializable, Scree
                             }
                             ShowMessageFX.Information((String) poJSON.get("message"), psFormName, null);
                         }
-                    ClearAll();
-                    initializeObject();
-                    pnEditMode = poGLControllers.CheckDeposits().getEditMode();
-                    initButtons(pnEditMode);
+                        ClearAll();
+                        initializeObject();
+                        pnEditMode = poGLControllers.CheckDeposits().getEditMode();
+                        initButtons(pnEditMode);
+                    }
                     break;
                 
                 case "btnPrint":
@@ -547,8 +568,8 @@ public class CheckDeposit_ConfirmationController implements Initializable, Scree
                 tfCheckNo,
                 taRemarks,
                 dpTransactionReferDate,
-                dpTransactionDate
-                
+                dpTransactionDate,
+                tfNote
         );
         if (CheckTransferStatus.CONFIRMED.equals(poGLControllers.CheckDeposits().Master().getTransactionStatus())) {
             apMaster.setDisable(true);
@@ -934,10 +955,12 @@ public class CheckDeposit_ConfirmationController implements Initializable, Scree
                         if(poGLControllers.CheckDeposits().Detail(pnSelectedDetail).getSourceNo().isEmpty()){
                             tfCheckTransNo.setDisable(false);
                             tfCheckNo.setDisable(false);
+                            tfNote.setDisable(false);
                             cbReverse.setDisable(true);
                         }else{
                             tfCheckTransNo.setDisable(true);
                             tfCheckNo.setDisable(true);
+                            tfNote.setDisable(true);
                             cbReverse.setDisable(false);
                         }
                                 
@@ -1093,87 +1116,84 @@ public class CheckDeposit_ConfirmationController implements Initializable, Scree
     ChangeListener<Boolean> txtField_Focus = JFXUtil.FocusListener(TextField.class,
         (lsID, lsValue) -> {
 
-            try {
-                /* Lost Focus */
-                switch (lsID) {
-                    case "tfBankMaster":
-                        psActiveField = lsID;
-                        if (lsValue == null || lsValue.trim().isEmpty()) {
-                            tfBankMaster.clear();
-                            poGLControllers.CheckDeposits().Master().setBanks(null);
-                            return;
-                        }
-
-                        if (poGLControllers.CheckDeposits().Master().Banks().getBankName()!= null) {
-                            tfBankMaster.setText(
-                                    poGLControllers.CheckDeposits().Master().Banks().getBankName());
-                        } else {
-                            tfBankMaster.clear();
-                        }
-                        break;
-
-                    case "tfBankAccountNo":
-                        psActiveField = lsID;
-                        if (lsValue == null || lsValue.trim().isEmpty()) {
-                            tfBankAccountNo.clear();
-                            poGLControllers.CheckDeposits().Master().setBankAccount(null);
-                            return;
-                        }
-
-                        if (poGLControllers.CheckDeposits().Master().getBankAccount()!= null) {
-                            tfBankAccountNo.setText(
-                                    poGLControllers.CheckDeposits().Master().getBankAccount());
-                        } else {
-                            tfBankAccountNo.clear();
-                        }
-                        break;
-                    case "tfBankAccountName":
-                        psActiveField = lsID;
-                        if (lsValue == null || lsValue.trim().isEmpty()) {
-                            tfBankAccountName.clear();
-                            poGLControllers.CheckDeposits().Master().setBankAccount(null);
-                            return;
-                        }
-
-                        if (poGLControllers.CheckDeposits().Master().getBankAccount() != null) {
-                            tfBankAccountName.setText(
-                                    poGLControllers.CheckDeposits().Master().getBankAccount());
-                        } else {
-                            tfBankAccountName.clear();
-                        }
-                        break;    
+            /* Lost Focus */
+            switch (lsID) {
+                case "tfBankMaster":
+                     psActiveField = lsID;
+                    if (lsValue == null || lsValue.trim().isEmpty()) {
+                        tfBankMaster.clear();
+                        tfBankAccountName.clear();
+                        tfBankAccountNo.clear();
+                        poGLControllers.CheckDeposits().Master().setBanks(null);
+                        poGLControllers.CheckDeposits().Master().setBankAccount(null);
+                        return;
+                    }
                     
-                    case "taRemarks":
-                        poGLControllers.CheckDeposits().Master().setRemarks(lsValue.trim());
-                        break;
-                    case "tfNote":
-                        psActiveField = lsID;
-                        poGLControllers.CheckDeposits().Detail(pnSelectedDetail).setRemarks(lsValue.trim());
-                        break;
-                    case "tfCheckNo":
-                        psActiveField = lsID;
-                        JFXUtil.inputIntegersOnly(tfCheckNo);
-                        break;
-                    case "tfCheckTransNo":
-                        psActiveField = lsID;
-                        break;
-                    case "tfSearchTransNo":
-                        psActiveField = lsID;
-                        break;
-                    case "tfSearchBankAccountNo":
-                        psActiveField = lsID;
-                        break;
-                }
-
-            } catch (SQLException | GuanzonException ex) {
-                Logger.getLogger(CheckTransfer_EntryController.class.getName())
-                        .log(Level.SEVERE, null, ex);
-
-                ShowMessageFX.Warning(
-                        "Error processing field: " + ex.getMessage(),
-                        psFormName,
-                        null
-                );
+//                        if (poGLControllers.CheckDeposits().Master().BankAccount().Banks().getBankName()!= null) {
+//                            tfBankMaster.setText(
+//                                    poGLControllers.CheckDeposits().Master().BankAccount().Banks().getBankName());
+//                        } else {
+//                            tfBankMaster.clear();
+//                        }
+                    break;
+                    
+                case "tfBankAccountNo":
+                    
+                     psActiveField = lsID;
+                    if (lsValue == null || lsValue.trim().isEmpty()) {
+                        tfBankAccountNo.clear();
+                        tfBankAccountName.clear();
+                        poGLControllers.CheckDeposits().Master().setBankAccount(null);
+                        return;
+                    }
+                    
+//                        if (poGLControllers.CheckDeposits().Master().getBankAccount()!= null) {
+//                            tfBankAccountNo.setText(
+//                                    poGLControllers.CheckDeposits().Master().BankAccount().getAccountNo());
+//                        } else {
+//                            tfBankAccountNo.clear();
+//                            tfBankAccountName.clear();
+//                        }
+                    break;
+                case "tfBankAccountName":
+                    psActiveField = lsID;
+                    if (lsValue == null || lsValue.trim().isEmpty()) {
+                        tfBankAccountName.clear();
+                        tfBankAccountNo.clear();
+                        poGLControllers.CheckDeposits().Master().setBankAccount(null);
+                        return;
+                    }
+                    
+//                        if (poGLControllers.CheckDeposits().Master().getBankAccount() != null) {
+//                            System.out.println("tfBankAccountNo : " + poGLControllers.CheckDeposits().Master().getBankAccount());
+//                            tfBankAccountName.setText(
+//                                    poGLControllers.CheckDeposits().Master().BankAccount().getAccountName());
+//                        } else {
+//                            tfBankAccountName.clear();
+//                            tfBankAccountNo.clear();
+//                        }
+                    break;    
+                    
+                case "taRemarks":
+                    poGLControllers.CheckDeposits().Master().setRemarks(lsValue.trim());
+                    break;
+                case "tfNote":
+                    psActiveField = lsID;
+                    poGLControllers.CheckDeposits().Detail(pnSelectedDetail).setRemarks(lsValue.trim());
+                    break;
+                case "tfCheckNo":
+                    psActiveField = lsID;
+                    JFXUtil.inputIntegersOnly(tfCheckNo);
+                    break;
+                case "tfCheckTransNo":
+                    psActiveField = lsID;
+                    break;
+                case "tfSearchTransNo":
+                    psActiveField = lsID;
+                    break;
+                case "tfSearchBankAccountNo":
+                    psActiveField = lsID;
+                    break;
             }
         });
     
@@ -1217,7 +1237,7 @@ public class CheckDeposit_ConfirmationController implements Initializable, Scree
                                 if ("error".equals(poJSON.get("result"))) {
                                     ShowMessageFX.Warning((String) poJSON.get("message"), lsValue, lsValue);
                                 }
-                                tfBankMaster.setText(poGLControllers.CheckDeposits().Master().Banks().getBankName());
+                                 tfBankMaster.setText(poGLControllers.CheckDeposits().Master().BankAccount().Banks().getBankName());
                                 break;
                             case "tfBankAccountNo":
                                 poJSON = poGLControllers.CheckDeposits().SearchBankAccounts(lsValue,false);
@@ -1242,6 +1262,9 @@ public class CheckDeposit_ConfirmationController implements Initializable, Scree
                                 }
                                 tfCheckTransNo.setText(poGLControllers.CheckDeposits().Detail(pnSelectedDetail).CheckPayment().getTransactionNo());
                                 loadTableDetail();
+                                poJSON = poGLControllers.CheckDeposits().computeMasterFields();
+                                tfTotal.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(
+                            poGLControllers.CheckDeposits().Master().getTransactionTotalDeposit(), true));
                                 return;   
                             case "tfCheckNo":
                                 poJSON = poGLControllers.CheckDeposits().SearchChecks("", lsValue,pnSelectedDetail,false);
@@ -1250,6 +1273,9 @@ public class CheckDeposit_ConfirmationController implements Initializable, Scree
                                 }
                                 tfCheckNo.setText(poGLControllers.CheckDeposits().Detail(pnSelectedDetail).CheckPayment().getCheckNo());
                                 loadTableDetail();
+                                poJSON = poGLControllers.CheckDeposits().computeMasterFields();
+                                tfTotal.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(
+                            poGLControllers.CheckDeposits().Master().getTransactionTotalDeposit(), true));
                                 return; 
                             case "tfSearchTransNo":
                                 

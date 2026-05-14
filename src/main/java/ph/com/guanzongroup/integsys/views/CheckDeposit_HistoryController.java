@@ -255,9 +255,10 @@ public class CheckDeposit_HistoryController implements Initializable, ScreenInte
                     }
                     break;
                 case "btnPrint":
-                   if(poGLControllers.CheckDeposits().Master().getTransactionNo() != null ||
-                            poGLControllers.CheckDeposits().Master().getTransactionNo().isEmpty()){
-                       
+                    if (ShowMessageFX.YesNo("Do you want to print this transaction?", psFormName, null)) {
+                        if (poGLControllers.CheckDeposits().Master().getTransactionNo() != null
+                                || poGLControllers.CheckDeposits().Master().getTransactionNo().isEmpty()) {
+
                             poJSON = poGLControllers.CheckDeposits().printDepositSlip();
                             if (!"success".equals((String) poJSON.get("result"))) {
                                 ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
@@ -265,10 +266,12 @@ public class CheckDeposit_HistoryController implements Initializable, ScreenInte
                             }
                             ShowMessageFX.Information((String) poJSON.get("message"), psFormName, null);
                             poGLControllers.CheckDeposits().OpenTransaction(poGLControllers.CheckDeposits().Master().getTransactionNo());
-                   }
+                        }
+                    }
                     break;
                     
                 case "btnPost":
+                    if (ShowMessageFX.YesNo("Do you want to post this transaction?", psFormName, null)) {
                     if (poGLControllers.CheckDeposits().Master().getTransactionNo() == null
                             || poGLControllers.CheckDeposits().Master().getTransactionNo().isEmpty()) {
                         ShowMessageFX.Warning("No transaction selected.", psFormName, null);
@@ -308,6 +311,7 @@ public class CheckDeposit_HistoryController implements Initializable, ScreenInte
                     ClearAll();
                     initializeObject();
                     pnEditMode = poGLControllers.CheckDeposits().getEditMode();
+                    }
                     break;
                 
 

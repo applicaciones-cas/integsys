@@ -245,6 +245,7 @@ public class CheckImportingController implements Initializable, ScreenInterface 
             initButtons(pnEditMode);
         } catch (SQLException | GuanzonException | CloneNotSupportedException | ScriptException ex) {
             Logger.getLogger(CheckImportingController.class.getName()).log(Level.SEVERE, null, ex);
+            ShowMessageFX.Error(ex.getMessage(), pxeModuleName, null);
         }
     }
 
