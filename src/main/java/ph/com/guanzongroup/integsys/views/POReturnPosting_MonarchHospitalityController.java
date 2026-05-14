@@ -741,6 +741,16 @@ public class POReturnPosting_MonarchHospitalityController implements Initializab
                     ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                     return;
                 }
+                Platform.runLater(() -> {
+                    if (JFXUtil.isObjectEqualTo(poController.PurchaseOrderReturn().Master().getTransactionStatus(), PurchaseOrderReturnStatus.POSTED)) {
+                        if (!JFXUtil.checkHighlightIfExists(String.valueOf(pnRowMain + 1), "C1E1C1", highlightedRowsMain)) {
+                            JFXUtil.highlightByKey(tblViewMainList, String.valueOf(pnRowMain + 1), "C1E1C1", highlightedRowsMain);
+
+                            JFXUtil.disableAllHighlightByColor(tblViewMainList, "#A7C7E7", highlightedRowsMain);
+                            JFXUtil.highlightByKey(tblViewMainList, String.valueOf(pnRowMain + 1), "#A7C7E7", highlightedRowsMain);
+                        }
+                    }
+                });
                 lbSelectTabJE = false;
 
                 psSupplierId = poController.PurchaseOrderReturn().Master().getSupplierId();

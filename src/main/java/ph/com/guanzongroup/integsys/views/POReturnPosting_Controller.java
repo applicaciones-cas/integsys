@@ -741,6 +741,16 @@ public class POReturnPosting_Controller implements Initializable, ScreenInterfac
                     ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                     return;
                 }
+                Platform.runLater(() -> {
+                    if (JFXUtil.isObjectEqualTo(poController.PurchaseOrderReturn().Master().getTransactionStatus(), PurchaseOrderReturnStatus.POSTED)) {
+                        if (!JFXUtil.checkHighlightIfExists(String.valueOf(pnRowMain + 1), "C1E1C1", highlightedRowsMain)) {
+                            JFXUtil.highlightByKey(tblViewMainList, String.valueOf(pnRowMain + 1), "C1E1C1", highlightedRowsMain);
+
+                            JFXUtil.disableAllHighlightByColor(tblViewMainList, "#A7C7E7", highlightedRowsMain);
+                            JFXUtil.highlightByKey(tblViewMainList, String.valueOf(pnRowMain + 1), "#A7C7E7", highlightedRowsMain);
+                        }
+                    }
+                });
                 lbSelectTabJE = false;
 
                 psSupplierId = poController.PurchaseOrderReturn().Master().getSupplierId();
@@ -827,11 +837,11 @@ public class POReturnPosting_Controller implements Initializable, ScreenInterfac
                                                     String.valueOf(poController.PurchaseOrderReturn().Detail(lnCtr).Inventory().getBarCode()),
                                                     String.valueOf(poController.PurchaseOrderReturn().Detail(lnCtr).Inventory().getDescription()),
                                                     String.valueOf(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.PurchaseOrderReturn().Detail(lnCtr).getUnitPrce(), true)),
-                                                    String.valueOf( CustomCommonUtil.setIntegerValueToDecimalFormat(poController.PurchaseOrderReturn().getReceiveQty(lnCtr), false)),
-                                                    String.valueOf( CustomCommonUtil.setIntegerValueToDecimalFormat(poController.PurchaseOrderReturn().Detail(lnCtr).getQuantity(), false)),
+                                                    String.valueOf(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.PurchaseOrderReturn().getReceiveQty(lnCtr), false)),
+                                                    String.valueOf(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.PurchaseOrderReturn().Detail(lnCtr).getQuantity(), false)),
                                                     String.valueOf(CustomCommonUtil.setIntegerValueToDecimalFormat(lnTotal, true)) //identify total
                                             ));
-                                   
+
                                 }
                             }
                             if (pnDetail < 0 || pnDetail
@@ -1159,7 +1169,7 @@ public class POReturnPosting_Controller implements Initializable, ScreenInterfac
 
         JFXUtil.setKeyPressedListener(this::txtField_KeyPressed, apBrowse, apMaster, apDetail, apJEDetail);
         JFXUtil.inputDecimalOnly(tfDiscountRate);
-        JFXUtil.setCommaFormatter(tfDiscountAmount, tfFreightAmt, tfFreightDetail,tfCost, tfCreditAmt, tfDebitAmt);
+        JFXUtil.setCommaFormatter(tfDiscountAmount, tfFreightAmt, tfFreightDetail, tfCost, tfCreditAmt, tfDebitAmt);
 
         JFXUtil.adjustColumnForScrollbar(tblViewDetails, tblViewMainList, tblViewJEDetails);
 
