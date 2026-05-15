@@ -659,7 +659,9 @@ public class CashDisbursement_ApprovalController implements Initializable, Scree
                                         }
                                     }
                                 } else {
-                                    ShowMessageFX.Warning(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
+                                    if (tfSearchIndustry.getText().isEmpty()) {
+                                        ShowMessageFX.Warning(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
+                                    }
                                 }
                                 if (pnMain < 0 || pnMain
                                         >= main_data.size()) {

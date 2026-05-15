@@ -224,7 +224,7 @@ public class PettyCashDisbursement_ConfirmationController implements Initializab
                     poController.setCompanyId(psCompanyId);
 //                poController.setCategoryID(psCategoryId);
                     poController.Master().setBranchCode(oApp.getBranchCode());
-                    poController.setTransactionStatus(PettyCashDisbursementStatus.OPEN + PettyCashDisbursementStatus.CONFIRMED);
+                    poController.setTransactionStatus(PettyCashDisbursementStatus.OPEN);
                     loadRecordSearch();
                     TriggerWindowEvent();
                     filterIndustry();
@@ -733,7 +733,9 @@ public class PettyCashDisbursement_ConfirmationController implements Initializab
                                         }
                                     }
                                 } else {
-                                    ShowMessageFX.Warning(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
+                                    if (tfSearchIndustry.getText().isEmpty()) {
+                                        ShowMessageFX.Warning(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
+                                    }
                                 }
                                 if (pnMain < 0 || pnMain
                                         >= main_data.size()) {

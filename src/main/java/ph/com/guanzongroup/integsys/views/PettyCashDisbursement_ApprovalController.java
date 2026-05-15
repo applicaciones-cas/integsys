@@ -555,7 +555,9 @@ public class PettyCashDisbursement_ApprovalController implements Initializable, 
                                         }
                                     }
                                 } else {
-                                    ShowMessageFX.Warning(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
+                                    if (tfSearchIndustry.getText().isEmpty()) {
+                                        ShowMessageFX.Warning(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
+                                    }
                                 }
                                 if (pnMain < 0 || pnMain
                                         >= main_data.size()) {

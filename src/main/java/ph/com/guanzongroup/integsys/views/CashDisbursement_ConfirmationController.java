@@ -237,7 +237,7 @@ public class CashDisbursement_ConfirmationController implements Initializable, S
                     poController.setCompanyId(psCompanyId);
 //                poController.setCategoryID(psCategoryId);
                     poController.Master().setBranchCode(oApp.getBranchCode());
-                    poController.setTransactionStatus(CashDisbursementStatus.OPEN + CashDisbursementStatus.CONFIRMED);
+                    poController.setTransactionStatus(CashDisbursementStatus.OPEN);
                     loadRecordSearch();
                     TriggerWindowEvent();
                     filterIndustry();
@@ -877,7 +877,9 @@ public class CashDisbursement_ConfirmationController implements Initializable, S
                                         }
                                     }
                                 } else {
-                                    ShowMessageFX.Warning(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
+                                    if (tfSearchIndustry.getText().isEmpty()) {
+                                        ShowMessageFX.Warning(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
+                                    }
                                 }
                                 if (pnMain < 0 || pnMain
                                         >= main_data.size()) {
@@ -2129,8 +2131,10 @@ public class CashDisbursement_ConfirmationController implements Initializable, S
                     break;
             }
             btnVoid.setText(lsStat);
-            boolean lbShow2 = pnEditMode == EditMode.UPDATE;
-            JFXUtil.setDisabled(true, tfBranch, tfDepartment, tfCashFund, tfPayee, tfCreditTo);
+            boolean lbShow3 = JFXUtil.isObjectEqualTo(poController.Master().getTransactionStatus(), CashDisbursementStatus.OPEN);
+            JFXUtil.setDisabled(!lbShow3, tfCreditTo);
+
+            JFXUtil.setDisabled(true, tfBranch, tfDepartment, tfCashFund, tfPayee);
 
             boolean lbShow = !JFXUtil.isObjectEqualTo(poController.Master().getSourceNo(), null, "");
             JFXUtil.setDisabled(lbShow, cbReverse);
