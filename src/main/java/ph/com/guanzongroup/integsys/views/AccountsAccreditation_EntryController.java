@@ -72,7 +72,7 @@ public class AccountsAccreditation_EntryController implements Initializable, Scr
 
     @FXML
     private Button btnSearch, btnBrowse, btnNew, btnCancel, btnUpdate, btnSave,
-            btnClose, btnHistory;
+            btnClose, btnHistory, btnAddClompany;
 
     @FXML
     private TextField tfTransactionNo, tfCategory, tfCompany,
@@ -173,7 +173,7 @@ public class AccountsAccreditation_EntryController implements Initializable, Scr
                             break;
 
                         case "tfCompany":
-                            if (!isJSONSuccess(poAppController.searchClient(tfCompany.getText(), false),
+                            if (!isJSONSuccess(poAppController.searchCompany(tfCompany.getText(), false),
                                     "Initialize Search Client! ")) {
                                 return;
                             }
@@ -198,6 +198,10 @@ public class AccountsAccreditation_EntryController implements Initializable, Scr
                     getLoadedClient();
                     initButtonDisplay(poAppController.getEditMode());
                     return;
+                    
+                case "btnAddClompany":
+                    poAppController.addCompany();
+                    break;
 
                 case "btnUpdate":
                     if (poAppController.getModel().getClientId() == null || poAppController.getModel().getClientId().isEmpty()) {
@@ -362,7 +366,7 @@ public class AccountsAccreditation_EntryController implements Initializable, Scr
                                 break;
                             case "tfCompany":
                                 if (!isJSONSuccess(
-                                        poAppController.searchClient(tfCompany.getText(), false),
+                                        poAppController.searchCompany(tfCompany.getText(), false),
                                         "Initialize Search Client! ")) {
                                     return;
                                 }

@@ -70,7 +70,7 @@ public class AccountsAccreditation_ConfirmationController implements Initializab
 
     @FXML
     private Button btnSearch, btnBrowse, btnVoid, btnConfirm, btnCancel, btnUpdate, btnSave,
-            btnClose, btnHistory;
+            btnClose, btnHistory, btnAddClompany;
 
     @FXML
     private TextField tfTransactionNo, tfCategory, tfCompany,
@@ -170,7 +170,7 @@ public class AccountsAccreditation_ConfirmationController implements Initializab
                             break;
 
                         case "tfCompany":
-                            if (!isJSONSuccess(poAppController.searchClient(tfCompany.getText(), false),
+                            if (!isJSONSuccess(poAppController.searchCompany(tfCompany.getText(), false),
                                     "Initialize Search Client! ")) {
                                 return;
                             }
@@ -195,6 +195,10 @@ public class AccountsAccreditation_ConfirmationController implements Initializab
                     getLoadedClient();
                     initButtonDisplay(poAppController.getEditMode());
                     return;
+                    
+                case "btnAddClompany":
+                    poAppController.addCompany();
+                    break;
 
                 case "btnUpdate":
                     if (poAppController.getModel().getClientId() == null || poAppController.getModel().getClientId().isEmpty()) {
@@ -256,7 +260,7 @@ public class AccountsAccreditation_ConfirmationController implements Initializab
                         if (!isJSONSuccess(poAppController.CloseTransaction(), "Initialize Close Transaction")) {
                             return;
                         }
-                        ShowMessageFX.Information("Transaction ocnfirmed successfully", null, psFormName);
+                        ShowMessageFX.Information("Transaction confirmed successfully", null, psFormName);
                         
                         //reset data to avoid transaction errors
                         clearAllInputs();
@@ -397,7 +401,7 @@ public class AccountsAccreditation_ConfirmationController implements Initializab
                                 break;
                                 
                             case "tfCompany":
-                                if (!isJSONSuccess(poAppController.searchClient(tfCompany.getText(), false),
+                                if (!isJSONSuccess(poAppController.searchCompany(tfCompany.getText(), false),
                                         "Initialize Search Client! ")) {
                                     return;
                                 }
