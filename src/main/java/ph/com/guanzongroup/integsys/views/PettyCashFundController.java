@@ -486,7 +486,7 @@ public class PettyCashFundController implements Initializable, ScreenInterface {
                         //Validator
                         poJSON = new JSONObject();
                         if (ShowMessageFX.YesNo(null, pxeModuleName, "Are you sure you want to save the record?") == true) {
-                            poJSON = poController.saveRecord();
+                            poJSON = poController.SaveRecord();
                             if (!"success".equals((String) poJSON.get("result"))) {
                                 ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                 return;
