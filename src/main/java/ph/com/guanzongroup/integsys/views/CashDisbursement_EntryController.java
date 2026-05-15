@@ -1378,6 +1378,15 @@ public class CashDisbursement_EntryController implements Initializable, ScreenIn
                     break;
             }
         });
+        JFXUtil.handleDisabledNodeClick(apAttachmentButtons, pnEditMode, nodeID -> {
+            switch (nodeID) {
+                case "btnAddAttachment":
+                case "btnRemoveAttachment":
+                    ShowMessageFX.Warning(null, pxeModuleName,
+                            "This button is disabled when linked from Cash Liquidation.");
+                    break;
+            }
+        });
     }
     ChangeListener<Boolean> txtSearch_Focus = JFXUtil.FocusListener(TextField.class,
             (lsID, lsValue) -> {
@@ -2530,8 +2539,8 @@ public class CashDisbursement_EntryController implements Initializable, ScreenIn
 
         }
         boolean lbShow4 = !isSourceNoAvailable() && lbShow;
-        JFXUtil.setDisabled(!lbShow4, apAttachmentButtons, cmbAttachmentType);
-        JFXUtil.setButtonsVisibility(!isSourceNoAvailable(), btnAddAttachment, btnRemoveAttachment);
+        JFXUtil.setDisabled(!lbShow4, cmbAttachmentType);
+        JFXUtil.setDisabled(!lbShow4, btnAddAttachment, btnRemoveAttachment);
     }
 
     private void clearTextFields() {
