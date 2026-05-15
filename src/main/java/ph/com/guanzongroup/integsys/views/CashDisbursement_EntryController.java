@@ -132,7 +132,7 @@ public class CashDisbursement_EntryController implements Initializable, ScreenIn
     private boolean pbEnteredDV = false;
     private boolean pbEnteredJE = false;
     private boolean pbEnteredBIR = false;
-
+    private boolean tooltipShown = false;
     List<Pair<String, String>> plOrderNoPartial = new ArrayList<>();
     List<Pair<String, String>> plOrderNoFinal = new ArrayList<>();
     private int currentIndex = 0;
@@ -1810,6 +1810,10 @@ public class CashDisbursement_EntryController implements Initializable, ScreenIn
                                 loadTableMain.reload();
                                 break;
                             case "tfSearchCashAdvanceNo":
+                                if (!tooltipShown) {
+                                    JFXUtil.showTooltip("NOTE: Results appear directly in the table view, no pop-up dialog.", tfSearchCashAdvanceNo);
+                                    tooltipShown = true;
+                                }
                                 loadTableMain.reload();
                                 break;
 
