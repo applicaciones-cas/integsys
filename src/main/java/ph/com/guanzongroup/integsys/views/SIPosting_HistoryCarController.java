@@ -752,8 +752,7 @@ public class SIPosting_HistoryCarController implements Initializable, ScreenInte
             } else {
                 JFXUtil.setDisabled(false, tfJEAcctCode, tfJEAcctDescription);
             }
-            boolean lbNotZero = poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(pnJEDetail).getDebitAmount() > 0 || poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(pnJEDetail).getCreditAmount() > 0;
-            cbJEReverse.selectedProperty().set(lbNotZero);
+            cbJEReverse.setSelected(poPurchaseReceivingController.PurchaseOrderReceiving().Detail(pnDetail).isReverse());
             tfJEAcctCode.setText(poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(pnJEDetail).getAccountCode());
             tfJEAcctDescription.setText(poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(pnJEDetail).Account_Chart().getDescription());
             String lsReportMonthYear = CustomCommonUtil.formatDateToShortString(poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(pnJEDetail).getForMonthOf());
@@ -947,10 +946,7 @@ public class SIPosting_HistoryCarController implements Initializable, ScreenInte
                             if (lsAccDesc == null) {
                                 lsAccDesc = "";
                             }
-                            if (poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(lnCtr).getCreditAmount() <= 0.0000
-                                    && poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(lnCtr).getDebitAmount() <= 0.0000
-                                    && !"".equals(lsAcctCode)
-                                    && poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(lnCtr).getEditMode() != EditMode.ADDNEW) {
+                            if (!poPurchaseReceivingController.PurchaseOrderReceiving().Detail(lnCtr).isReverse()) {
                                 continue;
                             }
                             lnRowCount += 1;

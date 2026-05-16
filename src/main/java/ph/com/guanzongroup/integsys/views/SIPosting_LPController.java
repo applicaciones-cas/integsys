@@ -364,13 +364,10 @@ public class SIPosting_LPController implements Initializable, ScreenInterface {
                     loadRecordMaster();
                     break;
                 case "cbJEReverse":
-                    if (!checkedBox.isSelected()) {
-                        if (poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(pnJEDetail).getEditMode() == EditMode.ADDNEW) {
-                            poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail().remove(pnJEDetail);
-                        } else {
-                            poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(pnJEDetail).setDebitAmount(0.0000);
-                            poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(pnJEDetail).setCreditAmount(0.0000);
-                        }
+                    if (poPurchaseReceivingController.PurchaseOrderReceiving().Detail(pnDetail).getEditMode() == EditMode.ADDNEW) {
+                        poPurchaseReceivingController.PurchaseOrderReceiving().Detail().remove(pnDetail);
+                    } else {
+                        poPurchaseReceivingController.PurchaseOrderReceiving().Detail(pnDetail).isReverse(cbJEReverse.isSelected());
                     }
                     loadTableJEDetail();
                     if (checkedBox.isSelected()) {
@@ -1054,7 +1051,8 @@ public class SIPosting_LPController implements Initializable, ScreenInterface {
                                 JFXUtil.showTooltip("NOTE: Results appear directly in the table view, no pop-up dialog.", tfSearchReferenceNo);
                                 tooltipShown = true;
                             }
-                            retrievePOR();                            return;
+                            retrievePOR();
+                            return;
                         case "tfTerm":
                             poJSON = poPurchaseReceivingController.PurchaseOrderReceiving().SearchTerm(lsValue, false);
                             if ("error".equals(poJSON.get("result"))) {
@@ -1254,7 +1252,7 @@ public class SIPosting_LPController implements Initializable, ScreenInterface {
                                 ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
                             }
 
-                            if (JFXUtil.isObjectEqualTo(poPurchaseReceivingController.PurchaseOrderReceiving().PurchaseOrderReceivingList(lnCtr).getTransactionStatus(), PurchaseOrderReceivingStatus.POSTED,PurchaseOrderReceivingStatus.PAID)) {
+                            if (JFXUtil.isObjectEqualTo(poPurchaseReceivingController.PurchaseOrderReceiving().PurchaseOrderReceivingList(lnCtr).getTransactionStatus(), PurchaseOrderReceivingStatus.POSTED, PurchaseOrderReceivingStatus.PAID)) {
                                 JFXUtil.highlightByKey(tblViewMainList, String.valueOf(lnCtr + 1), "C1E1C1", highlightedRowsMain);
                             }
                         }
@@ -1405,8 +1403,7 @@ public class SIPosting_LPController implements Initializable, ScreenInterface {
             } else {
                 JFXUtil.setDisabled(false, tfJEAcctCode, tfJEAcctDescription);
             }
-            boolean lbNotZero = poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(pnJEDetail).getDebitAmount() > 0 || poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(pnJEDetail).getCreditAmount() > 0;
-            cbJEReverse.selectedProperty().set(lbNotZero);
+            cbJEReverse.setSelected(poPurchaseReceivingController.PurchaseOrderReceiving().Detail(pnDetail).isReverse());
             tfJEAcctCode.setText(poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(pnJEDetail).getAccountCode());
             tfJEAcctDescription.setText(poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(pnJEDetail).Account_Chart().getDescription());
             String lsReportMonthYear = CustomCommonUtil.formatDateToShortString(poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(pnJEDetail).getForMonthOf());
@@ -1678,10 +1675,7 @@ public class SIPosting_LPController implements Initializable, ScreenInterface {
                             if (lsAccDesc == null) {
                                 lsAccDesc = "";
                             }
-                            if (poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(lnCtr).getCreditAmount() <= 0.0000
-                                    && poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(lnCtr).getDebitAmount() <= 0.0000
-                                    && !"".equals(lsAcctCode)
-                                    && poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(lnCtr).getEditMode() != EditMode.ADDNEW) {
+                            if (!poPurchaseReceivingController.PurchaseOrderReceiving().Detail(lnCtr).isReverse()) {
                                 continue;
                             }
                             lnRowCount += 1;
@@ -1988,12 +1982,13 @@ public class SIPosting_LPController implements Initializable, ScreenInterface {
             if (JFXUtil.isObjectEqualTo(poPurchaseReceivingController.PurchaseOrderReceiving().Master().getTransactionStatus(), PurchaseOrderReceivingStatus.POSTED, PurchaseOrderReceivingStatus.PAID)) {
                 ShowMessageFX.Warning(null, pxeModuleName, "Only the Invoice Date, To Follow Invoice, and Invoice No. are editable\nfor posted and paid transactions.");
                 return;
-            }            switch (nodeID) {
+            }
+            switch (nodeID) {
                 case "cbVatInclusive":
                     if (JFXUtil.isObjectEqualTo(poPurchaseReceivingController.PurchaseOrderReceiving().Master().getSalesInvoice(), null, "")
                             && !JFXUtil.isObjectEqualTo(poPurchaseReceivingController.PurchaseOrderReceiving().Master().getTransactionStatus(), PurchaseOrderReceivingStatus.POSTED, PurchaseOrderReceivingStatus.PAID)) {
                         ShowMessageFX.Warning(null, pxeModuleName,
-                               "Only available when Invoice No is provided or set \"To-follow\".");
+                                "Only available when Invoice No is provided or set \"To-follow\".");
                     }
                     break;
             }
@@ -2004,7 +1999,7 @@ public class SIPosting_LPController implements Initializable, ScreenInterface {
                     if (JFXUtil.isObjectEqualTo(poPurchaseReceivingController.PurchaseOrderReceiving().Master().getSalesInvoice(), null, "")
                             && !JFXUtil.isObjectEqualTo(poPurchaseReceivingController.PurchaseOrderReceiving().Master().getTransactionStatus(), PurchaseOrderReceivingStatus.POSTED, PurchaseOrderReceivingStatus.PAID)) {
                         ShowMessageFX.Warning(null, pxeModuleName,
-                               "Only available when Invoice No is provided or set \"To-follow\".");
+                                "Only available when Invoice No is provided or set \"To-follow\".");
                     }
                     break;
             }
