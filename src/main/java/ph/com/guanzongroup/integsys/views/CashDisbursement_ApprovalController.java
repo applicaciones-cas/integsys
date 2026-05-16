@@ -781,10 +781,7 @@ public class CashDisbursement_ApprovalController implements Initializable, Scree
                                 if (lsAccDesc == null) {
                                     lsAccDesc = "";
                                 }
-                                if (poController.Journal().Detail(lnCtr).getCreditAmount() <= 0.0000
-                                        && poController.Journal().Detail(lnCtr).getDebitAmount() <= 0.0000
-                                        && !"".equals(lsAcctCode)
-                                        && poController.Journal().Detail(lnCtr).getEditMode() != EditMode.ADDNEW) {
+                                if (!poController.Journal().Detail(lnCtr).isReverse()) {
                                     continue;
                                 }
                                 lnRowCount += 1;
@@ -2116,13 +2113,10 @@ public class CashDisbursement_ApprovalController implements Initializable, Scree
                     }
                     break;
                 case "cbJEReverse":
-                    if (!checkedBox.isSelected()) {
-                        if (poController.Journal().Detail(pnDetailJE).getEditMode() == EditMode.ADDNEW) {
-                            poController.Journal().Detail().remove(pnDetailJE);
-                        } else {
-                            poController.Journal().Detail(pnDetailJE).setDebitAmount(0.0000);
-                            poController.Journal().Detail(pnDetailJE).setCreditAmount(0.0000);
-                        }
+                    if (poController.Journal().Detail(pnDetail).getEditMode() == EditMode.ADDNEW) {
+                        poController.Journal().Detail().remove(pnDetail);
+                    } else {
+                        poController.Journal().Detail(pnDetail).isReverse(cbReverse.isSelected());
                     }
                     loadRecordMasterJE();
                     loadTableDetailJE.reload();
