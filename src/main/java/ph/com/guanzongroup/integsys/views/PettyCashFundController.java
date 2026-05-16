@@ -277,6 +277,11 @@ public class PettyCashFundController implements Initializable, ScreenInterface {
 
     public void loadRecordMaster() {
         try {
+            if(oApp.getIndustry().equals(System.getProperty("sys.main.industry"))){
+                JFXUtil.setDisabled(psIndustryId.equals(System.getProperty("sys.main.industry")), tfBranch);
+            } else {
+                JFXUtil.setDisabled(true, tfBranch, tfDepartment);
+            }
             JFXUtil.setDisabled(true, tfCurrentBalance);
             switch (poController.getModel().getTransactionStatus()) {
                 case PettyCashStatus.ACTIVE:
