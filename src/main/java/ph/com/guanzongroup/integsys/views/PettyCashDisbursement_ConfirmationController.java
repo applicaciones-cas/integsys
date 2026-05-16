@@ -1036,6 +1036,17 @@ public class PettyCashDisbursement_ConfirmationController implements Initializab
                     break;
             }
         });
+        JFXUtil.handleDisabledNodeClick(apDVMaster1, pnEditMode, nodeID -> {
+            switch (nodeID) {
+                case "tfPettyCash":
+                case "tfPayee":
+                case "tfDepartment":
+                    ShowMessageFX.Warning(null, pxeModuleName,
+                            "This field cannot be modified if the transaction is non-open and contains a reference number.");
+                    break;
+
+            }
+        });
     }
     ChangeListener<Boolean> txtSearch_Focus = JFXUtil.FocusListener(TextField.class,
             (lsID, lsValue) -> {
@@ -1304,8 +1315,13 @@ public class PettyCashDisbursement_ConfirmationController implements Initializab
                     break;
             }
             btnVoid.setText(lsStat);
-            boolean lbShow2 = pnEditMode == EditMode.UPDATE;
-            JFXUtil.setDisabled(true, tfBranch, tfDepartment, tfPettyCash, tfPayee);
+            boolean lbShow3 = JFXUtil.isObjectEqualTo(poController.Master().getTransactionStatus(), PettyCashDisbursementStatus.OPEN);
+            JFXUtil.setDisabled(!lbShow3, tfCreditTo);
+
+            boolean lbShow4 = JFXUtil.isObjectEqualTo(poController.Master().getReferNo(), null, "");
+            JFXUtil.setDisabled(!lbShow3 || !lbShow4, tfDepartment, tfPayee, tfPettyCash);
+
+            JFXUtil.setDisabled(true, tfBranch);
 
             poController.computeFields(false);
             JFXUtil.setStatusValue(lblDVTransactionStatus, PettyCashDisbursementStatus.class, pnEditMode == EditMode.UNKNOWN ? "-1" : poController.Master().getTransactionStatus());
