@@ -1471,7 +1471,7 @@ public class SIPosting_Controller implements Initializable, ScreenInterface {
             } else {
                 JFXUtil.setDisabled(false, tfJEAcctCode, tfJEAcctDescription);
             }
-            cbJEReverse.setSelected(poPurchaseReceivingController.PurchaseOrderReceiving().Detail(pnDetail).isReverse());
+            cbJEReverse.setSelected(poPurchaseReceivingController.PurchaseOrderReceiving().Detail(pnJEDetail).isReverse());
 
             tfJEAcctCode.setText(poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(pnJEDetail).getAccountCode());
             tfJEAcctDescription.setText(poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(pnJEDetail).Account_Chart().getDescription());

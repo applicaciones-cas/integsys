@@ -643,7 +643,7 @@ public class SIPosting_HistorySPMCController implements Initializable, ScreenInt
             } else {
                 JFXUtil.setDisabled(false, tfJEAcctCode, tfJEAcctDescription);
             }
-            cbJEReverse.setSelected(poPurchaseReceivingController.PurchaseOrderReceiving().Detail(pnDetail).isReverse());
+            cbJEReverse.setSelected(poPurchaseReceivingController.PurchaseOrderReceiving().Detail(pnJEDetail).isReverse());
             tfJEAcctCode.setText(poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(pnJEDetail).getAccountCode());
             tfJEAcctDescription.setText(poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(pnJEDetail).Account_Chart().getDescription());
             String lsReportMonthYear = CustomCommonUtil.formatDateToShortString(poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(pnJEDetail).getForMonthOf());
