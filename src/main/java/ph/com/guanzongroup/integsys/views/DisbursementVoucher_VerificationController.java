@@ -2714,7 +2714,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
                     if (poController.Journal().Detail(pnDetail).getEditMode() == EditMode.ADDNEW) {
                         poController.Journal().Detail().remove(pnDetail);
                     } else {
-                        poController.Journal().Detail(pnDetail).isReverse(cbReverse.isSelected());
+                        poController.Journal().Detail(pnDetail).isReverse(cbJEReverse.isSelected());
                     }
                     loadRecordMasterJE();
                     loadTableDetailJE.reload();

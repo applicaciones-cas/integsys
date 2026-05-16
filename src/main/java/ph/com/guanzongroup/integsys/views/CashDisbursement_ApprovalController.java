@@ -2115,7 +2115,7 @@ public class CashDisbursement_ApprovalController implements Initializable, Scree
                     if (poController.Journal().Detail(pnDetail).getEditMode() == EditMode.ADDNEW) {
                         poController.Journal().Detail().remove(pnDetail);
                     } else {
-                        poController.Journal().Detail(pnDetail).isReverse(cbReverse.isSelected());
+                        poController.Journal().Detail(pnDetail).isReverse(cbJEReverse.isSelected());
                     }
                     loadRecordMasterJE();
                     loadTableDetailJE.reload();
