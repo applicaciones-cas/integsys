@@ -935,10 +935,7 @@ public class DisbursementVoucher_ConfirmationController implements Initializable
                                 if (lsAccDesc == null) {
                                     lsAccDesc = "";
                                 }
-                                if (poController.Journal().Detail(lnCtr).getCreditAmount() <= 0.0000
-                                        && poController.Journal().Detail(lnCtr).getDebitAmount() <= 0.0000
-                                        && !"".equals(lsAcctCode)
-                                        && poController.Journal().Detail(lnCtr).getEditMode() != EditMode.ADDNEW) {
+                                if (!poController.Journal().Detail(lnCtr).isReverse()) {
                                     continue;
                                 }
                                 lnRowCount += 1;
@@ -2324,8 +2321,7 @@ public class DisbursementVoucher_ConfirmationController implements Initializable
             boolean lbShow = poController.Journal().Detail(pnDetailJE).getEditMode() == EditMode.UPDATE;
             JFXUtil.setDisabled(lbShow, tfAccountCode, tfAccountDescription);
 
-            boolean lbNotZero = poController.Journal().Detail(pnDetailJE).getDebitAmount() > 0 || poController.Journal().Detail(pnDetailJE).getCreditAmount() > 0;
-            cbJEReverse.selectedProperty().set(lbNotZero);
+            cbJEReverse.setSelected(poController.Journal().Detail(pnDetail).isReverse());
 
             tfAccountCode.setText(poController.Journal().Detail(pnDetailJE).getAccountCode());
             tfAccountDescription.setText(poController.Journal().Detail(pnDetailJE).Account_Chart().getDescription());
@@ -2773,13 +2769,10 @@ public class DisbursementVoucher_ConfirmationController implements Initializable
                     }
                     break;
                 case "cbJEReverse":
-                    if (!checkedBox.isSelected()) {
-                        if (poController.Journal().Detail(pnDetailJE).getEditMode() == EditMode.ADDNEW) {
-                            poController.Journal().Detail().remove(pnDetailJE);
-                        } else {
-                            poController.Journal().Detail(pnDetailJE).setDebitAmount(0.0000);
-                            poController.Journal().Detail(pnDetailJE).setCreditAmount(0.0000);
-                        }
+                    if (poController.Journal().Detail(pnDetail).getEditMode() == EditMode.ADDNEW) {
+                        poController.Journal().Detail().remove(pnDetail);
+                    } else {
+                        poController.Journal().Detail(pnDetail).isReverse(cbReverse.isSelected());
                     }
                     loadRecordMasterJE();
                     loadTableDetailJE.reload();
