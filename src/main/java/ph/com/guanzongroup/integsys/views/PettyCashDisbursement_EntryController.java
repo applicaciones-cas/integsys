@@ -899,6 +899,17 @@ public class PettyCashDisbursement_EntryController implements Initializable, Scr
                     break;
             }
         });
+        JFXUtil.handleDisabledNodeClick(apDVMaster1, pnEditMode, nodeID -> {
+            switch (nodeID) {
+                case "tfPettyCash":
+                case "tfPayee":
+                case "tfDepartment":
+                    ShowMessageFX.Warning(null, pxeModuleName,
+                            "This field cannot be modified if the transaction is non-open and contains a reference number.");
+                    break;
+
+            }
+        });
     }
 
     ChangeListener<Boolean> txtArea_Focus = JFXUtil.FocusListener(TextArea.class,
@@ -1128,10 +1139,11 @@ public class PettyCashDisbursement_EntryController implements Initializable, Scr
 
     private void loadRecordMaster() {
         try {
-            boolean lbShow2 = pnEditMode == EditMode.UPDATE;
-            JFXUtil.setDisabled(lbShow2, tfPayee);
-            boolean lbShow3 = pnEditMode == EditMode.ADDNEW;
-            JFXUtil.setDisabled(!lbShow3, tfDepartment, tfPettyCashFund);
+            boolean lbShow3 = JFXUtil.isObjectEqualTo(poController.Master().getTransactionStatus(), PettyCashDisbursementStatus.OPEN);
+            JFXUtil.setDisabled(!lbShow3, tfCreditTo);
+
+            boolean lbShow4 = JFXUtil.isObjectEqualTo(poController.Master().getReferNo(), null, "");
+            JFXUtil.setDisabled(!lbShow3 || !lbShow4, tfDepartment, tfPayee, tfPettyCashFund);
 
             poController.computeFields(false);
             JFXUtil

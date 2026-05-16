@@ -1377,7 +1377,7 @@ public class CashDisbursement_ConfirmationController implements Initializable, S
                 case "tfPayee":
                 case "tfDepartment":
                     ShowMessageFX.Warning(null, pxeModuleName,
-                            "This field cannot be modified if the transaction is non-open and contains a reference number.");
+                            "This field cannot be modified if the transaction is non-open and contains a Source.");
                     break;
 
             }
