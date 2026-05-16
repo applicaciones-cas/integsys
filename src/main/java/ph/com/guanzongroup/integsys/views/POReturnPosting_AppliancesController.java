@@ -694,7 +694,7 @@ public class POReturnPosting_AppliancesController implements Initializable, Scre
             } else {
                 JFXUtil.setDisabled(false, tfJEAcctCode, tfJEAcctDescription);
             }
-            cbJEReverse.setSelected(poController.PurchaseOrderReturn().Detail(pnDetail).isReverse());
+            cbJEReverse.setSelected(poController.PurchaseOrderReturn().Detail(pnJEDetail).isReverse());
 
             tfJEAcctCode.setText(poController.PurchaseOrderReturn().Journal().Detail(pnJEDetail).getAccountCode());
             tfJEAcctDescription.setText(poController.PurchaseOrderReturn().Journal().Detail(pnJEDetail).Account_Chart().getDescription());
