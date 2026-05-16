@@ -1186,8 +1186,7 @@ public class CashDisbursement_HistoryController implements Initializable, Screen
             boolean lbShow = poController.Journal().Detail(pnDetailJE).getEditMode() == EditMode.UPDATE;
             JFXUtil.setDisabled(lbShow, tfAccountCode, tfAccountDescription);
 
-            boolean lbNotZero = poController.Journal().Detail(pnDetailJE).getDebitAmount() > 0 || poController.Journal().Detail(pnDetailJE).getCreditAmount() > 0;
-            cbJEReverse.selectedProperty().set(lbNotZero);
+            cbJEReverse.setSelected(poController.Journal().Detail(pnDetail).isReverse());
 
             tfAccountCode.setText(poController.Journal().Detail(pnDetailJE).getAccountCode());
             tfAccountDescription.setText(poController.Journal().Detail(pnDetailJE).Account_Chart().getDescription());
