@@ -2359,7 +2359,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
             boolean lbShow = poController.Journal().Detail(pnDetailJE).getEditMode() == EditMode.UPDATE;
             JFXUtil.setDisabled(lbShow, tfAccountCode, tfAccountDescription);
 
-            cbJEReverse.setSelected(poController.Journal().Detail(pnDetail).isReverse());
+            cbJEReverse.setSelected(poController.Journal().Detail(pnDetailJE).isReverse());
 
             tfAccountCode.setText(poController.Journal().Detail(pnDetailJE).getAccountCode());
             tfAccountDescription.setText(poController.Journal().Detail(pnDetailJE).Account_Chart().getDescription());

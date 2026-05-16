@@ -2253,7 +2253,7 @@ public class CashDisbursement_EntryController implements Initializable, ScreenIn
             boolean lbShow = poController.Journal().Detail(pnDetailJE).getEditMode() == EditMode.UPDATE;
             JFXUtil.setDisabled(lbShow, tfAccountCode, tfAccountDescription);
 
-            cbJEReverse.setSelected(poController.Journal().Detail(pnDetail).isReverse());
+            cbJEReverse.setSelected(poController.Journal().Detail(pnDetailJE).isReverse());
             tfAccountCode.setText(poController.Journal().Detail(pnDetailJE).getAccountCode());
             tfAccountDescription.setText(poController.Journal().Detail(pnDetailJE).Account_Chart().getDescription());
             String lsReportMonth = CustomCommonUtil.formatDateToShortString(poController.Journal().Detail(pnDetailJE).getForMonthOf());
