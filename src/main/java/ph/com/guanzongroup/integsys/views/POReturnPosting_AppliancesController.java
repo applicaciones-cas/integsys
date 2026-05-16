@@ -245,13 +245,10 @@ public class POReturnPosting_AppliancesController implements Initializable, Scre
                     loadRecordMaster();
                     break;
                 case "cbJEReverse":
-                    if (!checkedBox.isSelected()) {
-                        if (poController.PurchaseOrderReturn().Journal().Detail(pnJEDetail).getEditMode() == EditMode.ADDNEW) {
-                            poController.PurchaseOrderReturn().Journal().Detail().remove(pnJEDetail);
-                        } else {
-                            poController.PurchaseOrderReturn().Journal().Detail(pnJEDetail).setDebitAmount(0.0000);
-                            poController.PurchaseOrderReturn().Journal().Detail(pnJEDetail).setCreditAmount(0.0000);
-                        }
+                    if (poController.PurchaseOrderReturn().Detail(pnDetail).getEditMode() == EditMode.ADDNEW) {
+                        poController.PurchaseOrderReturn().Detail().remove(pnDetail);
+                    } else {
+                        poController.PurchaseOrderReturn().Detail(pnDetail).isReverse(cbJEReverse.isSelected());
                     }
                     loadTableJEDetail.reload();
                     if (checkedBox.isSelected()) {
@@ -697,8 +694,7 @@ public class POReturnPosting_AppliancesController implements Initializable, Scre
             } else {
                 JFXUtil.setDisabled(false, tfJEAcctCode, tfJEAcctDescription);
             }
-            boolean lbNotZero = poController.PurchaseOrderReturn().Journal().Detail(pnJEDetail).getDebitAmount() > 0 || poController.PurchaseOrderReturn().Journal().Detail(pnJEDetail).getCreditAmount() > 0;
-            cbJEReverse.selectedProperty().set(lbNotZero);
+            cbJEReverse.setSelected(poController.PurchaseOrderReturn().Detail(pnDetail).isReverse());
 
             tfJEAcctCode.setText(poController.PurchaseOrderReturn().Journal().Detail(pnJEDetail).getAccountCode());
             tfJEAcctDescription.setText(poController.PurchaseOrderReturn().Journal().Detail(pnJEDetail).Account_Chart().getDescription());
@@ -892,10 +888,7 @@ public class POReturnPosting_AppliancesController implements Initializable, Scre
                                 if (lsAccDesc == null) {
                                     lsAccDesc = "";
                                 }
-                                if (poController.PurchaseOrderReturn().Journal().Detail(lnCtr).getCreditAmount() <= 0.0000
-                                        && poController.PurchaseOrderReturn().Journal().Detail(lnCtr).getDebitAmount() <= 0.0000
-                                        && !"".equals(lsAcctCode)
-                                        && poController.PurchaseOrderReturn().Journal().Detail(lnCtr).getEditMode() != EditMode.ADDNEW) {
+                                if (!poController.PurchaseOrderReturn().Detail(lnCtr).isReverse()) {
                                     continue;
                                 }
                                 lnRowCount += 1;
