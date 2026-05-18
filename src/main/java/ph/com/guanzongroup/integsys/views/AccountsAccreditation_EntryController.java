@@ -43,6 +43,7 @@ import org.guanzon.appdriver.base.GRiderCAS;
 import org.guanzon.appdriver.base.LogWrapper;
 import org.guanzon.appdriver.constant.EditMode;
 import org.guanzon.appdriver.base.GuanzonException;
+import org.guanzon.appdriver.base.MiscUtil;
 import org.guanzon.cas.client.Client;
 import org.guanzon.cas.client.account.Account_Accreditation;
 import org.guanzon.cas.client.services.ClientControllers;
@@ -71,7 +72,7 @@ public class AccountsAccreditation_EntryController implements Initializable, Scr
 
     @FXML
     private Button btnSearch, btnBrowse, btnNew, btnCancel, btnUpdate, btnSave,
-            btnClose, btnHistory;
+            btnClose, btnHistory, btnAddClompany;
 
     @FXML
     private TextField tfTransactionNo, tfCategory, tfCompany,
@@ -172,7 +173,7 @@ public class AccountsAccreditation_EntryController implements Initializable, Scr
                             break;
 
                         case "tfCompany":
-                            if (!isJSONSuccess(poAppController.searchClient(tfCompany.getText(), false),
+                            if (!isJSONSuccess(poAppController.searchCompany(tfCompany.getText(), false),
                                     "Initialize Search Client! ")) {
                                 return;
                             }
@@ -197,6 +198,10 @@ public class AccountsAccreditation_EntryController implements Initializable, Scr
                     getLoadedClient();
                     initButtonDisplay(poAppController.getEditMode());
                     return;
+                    
+                case "btnAddClompany":
+                    poAppController.addCompany();
+                    break;
 
                 case "btnUpdate":
                     if (poAppController.getModel().getClientId() == null || poAppController.getModel().getClientId().isEmpty()) {
@@ -231,13 +236,14 @@ public class AccountsAccreditation_EntryController implements Initializable, Scr
                             return;
                         }
                         ShowMessageFX.Information("Client saved successfully!", "Initialize Save Record", null);
+                        
                         if (poAppController.getModel().getRecordStatus().equals("0")) {
                             
+                            if (!isJSONSuccess(poAppController.openRecord(poAppController.getModel().getTransactionNo()), "Initialize Open Record")) {
+                                return;
+                            }
+                            
                             if (ShowMessageFX.OkayCancel(null, psFormName, "Do you want to Confirm transaction?") == true) {
-
-                                if (!isJSONSuccess(poAppController.openRecord(poAppController.getModel().getTransactionNo()), "Initialize Open Transaction")) {
-                                    return;
-                                }
 
                                 if (!isJSONSuccess(poAppController.CloseTransaction(), "Initialize Close Transaction")) {
                                     return;
@@ -264,8 +270,20 @@ public class AccountsAccreditation_EntryController implements Initializable, Scr
                     }
                     break;
                 case "btnHistory":
-                    ShowMessageFX.Information(null, psFormName,
-                            "This feature is under development and will be available soon.\nThank you for your patience!");
+                    if (poAppController.getEditMode() != EditMode.READY && poAppController.getEditMode() != EditMode.UPDATE) {
+                        ShowMessageFX.Warning("No transaction status history to load!", psFormName, null);
+                        return;
+                    }
+                    
+                    try {
+                        poAppController.ShowStatusHistory();
+                    } catch (NullPointerException npe) {
+                        Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(npe), npe);
+                        ShowMessageFX.Error("No transaction status history to load!", psFormName, null);
+                    } catch (Exception ex) {
+                        Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+                        ShowMessageFX.Error(MiscUtil.getException(ex), psFormName, null);
+                    }
                     break;
                 case "btnClose":
                     if (ShowMessageFX.YesNo("Are you sure you want to close this form?", psFormName, null)) {
@@ -348,7 +366,7 @@ public class AccountsAccreditation_EntryController implements Initializable, Scr
                                 break;
                             case "tfCompany":
                                 if (!isJSONSuccess(
-                                        poAppController.searchClient(tfCompany.getText(), false),
+                                        poAppController.searchCompany(tfCompany.getText(), false),
                                         "Initialize Search Client! ")) {
                                     return;
                                 }

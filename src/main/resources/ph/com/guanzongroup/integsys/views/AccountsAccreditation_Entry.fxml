@@ -9,6 +9,7 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.Tooltip?>
 <?import javafx.scene.effect.Blend?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
@@ -184,8 +185,8 @@
                                                         <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="124.0" />
                                                         <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="10.0" />
                                                         <ColumnConstraints hgrow="SOMETIMES" maxWidth="138.0" minWidth="-Infinity" prefWidth="138.0" />
-                                                        <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="210.0" />
-                                                <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="10.0" />
+                                                        <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="180.0" />
+                                                <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="30.0" />
                                                 <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="10.0" prefWidth="10.0" />
                                                 <ColumnConstraints />
                                                 <ColumnConstraints />
@@ -231,12 +232,12 @@
                                                 <RowConstraints maxHeight="-Infinity" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                                                     </rowConstraints>
                                                     <children>
-                                    <AnchorPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minWidth="-Infinity" prefHeight="27.0" prefWidth="140.0" style="-fx-background-color: FF8201;" GridPane.columnSpan="4">
+                                    <AnchorPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minWidth="-Infinity" prefHeight="27.0" prefWidth="140.0" style="-fx-background-color: FF8201;" GridPane.columnSpan="5">
                                                    <GridPane.margin>
                                                       <Insets left="5.0" />
                                                    </GridPane.margin>
                                                 </AnchorPane>
-                                                          <Label fx:id="lblStatus" alignment="CENTER" contentDisplay="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="27.0" prefWidth="142.0" text="STATUS" textAlignment="CENTER" GridPane.columnSpan="4">
+                                                          <Label fx:id="lblStatus" alignment="CENTER" contentDisplay="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="27.0" prefWidth="142.0" text="STATUS" textAlignment="CENTER" GridPane.columnSpan="5">
                                                               <font>
                                                                   <Font name="System Bold" size="14.0" />
                                                               </font>
@@ -270,7 +271,7 @@
                                                       <Font size="12.0" />
                                                    </font>
                                                 </Label>
-                                                <Label fx:id="lblStatus1" alignment="CENTER" contentDisplay="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="27.0" prefWidth="142.0" style="-fx-background-color: #445054;" text="Company Details" textAlignment="CENTER" textFill="WHITE" GridPane.columnSpan="4" GridPane.rowIndex="17">
+                                                <Label fx:id="lblStatus1" alignment="CENTER" contentDisplay="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="27.0" prefWidth="142.0" style="-fx-background-color: #445054;" text="Company Details" textAlignment="CENTER" textFill="WHITE" GridPane.columnSpan="5" GridPane.rowIndex="17">
                                                    <font>
                                                       <Font name="System Bold" size="14.0" />
                                                    </font>
@@ -290,7 +291,7 @@
                                                                   <Font size="12.0" />
                                                                </font>
                                                 </Label>
-                                                <Label fx:id="lblStatus11" alignment="CENTER" contentDisplay="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="27.0" prefWidth="142.0" style="-fx-background-color: #445054;" text="Contact Information" textAlignment="CENTER" textFill="WHITE" GridPane.columnSpan="4" GridPane.rowIndex="23">
+                                                <Label fx:id="lblStatus11" alignment="CENTER" contentDisplay="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="27.0" prefWidth="142.0" style="-fx-background-color: #445054;" text="Contact Information" textAlignment="CENTER" textFill="WHITE" GridPane.columnSpan="5" GridPane.rowIndex="23">
                                                    <font>
                                                       <Font name="System Bold" size="14.0" />
                                                    </font>
@@ -326,16 +327,24 @@
                                                    </font>
                                                 </Label>
                                                             <DatePicker fx:id="dpTransactionDate" maxHeight="1.7976931348623157E308" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.rowIndex="4" />
-                                                <ComboBox fx:id="cmbAccountType" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.rowIndex="6" />
-                                                <ComboBox fx:id="cmbTransType" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.rowIndex="8" />
-                                                        <TextField fx:id="tfTransactionNo" disable="true" editable="false" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minWidth="-Infinity" prefWidth="139.0" style="-fx-font-weight: bold;" styleClass="DisabledTextField" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.rowIndex="2" />
-                                                <TextField fx:id="tfCategory" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" promptText="Press F3: Search" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.rowIndex="10" />
+                                                <ComboBox fx:id="cmbAccountType" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" GridPane.columnIndex="2" GridPane.columnSpan="3" GridPane.rowIndex="6" />
+                                                <ComboBox fx:id="cmbTransType" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" GridPane.columnIndex="2" GridPane.columnSpan="3" GridPane.rowIndex="8" />
+                                                        <TextField fx:id="tfTransactionNo" disable="true" editable="false" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minWidth="-Infinity" prefWidth="139.0" style="-fx-font-weight: bold;" styleClass="DisabledTextField" GridPane.columnIndex="2" GridPane.columnSpan="3" GridPane.rowIndex="2" />
+                                                <TextField fx:id="tfCategory" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" promptText="Press F3: Search" GridPane.columnIndex="2" GridPane.columnSpan="3" GridPane.rowIndex="10" />
                                                 <TextField fx:id="tfCompany" layoutX="100.0" layoutY="107.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" promptText="Press F3: Search" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.rowIndex="12">
                                                    <GridPane.margin>
-                                                      <Insets />
+                                                      <Insets right="10.0" />
                                                    </GridPane.margin>
                                                 </TextField>
-                                    <TextArea fx:id="taRemarks" maxHeight="1.7976931348623157E308" wrapText="true" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.rowIndex="14" GridPane.rowSpan="2">
+                                                <Button fx:id="btnAddClompany" contentDisplay="CENTER" minHeight="27.0" minWidth="27.0" mnemonicParsing="false" onAction="#cmdButton_Click" styleClass="button_process" wrapText="true" GridPane.columnIndex="4" GridPane.rowIndex="12">
+                                                   <graphic>
+                                                      <FontAwesomeIconView glyphName="PLUS" size="15" textAlignment="CENTER" />
+                                                   </graphic>
+                                                   <tooltip>
+                                                      <Tooltip text="ADD ADDRESS" />
+                                                   </tooltip>
+                                                </Button>
+                                    <TextArea fx:id="taRemarks" maxHeight="1.7976931348623157E308" wrapText="true" GridPane.columnIndex="2" GridPane.columnSpan="3" GridPane.rowIndex="14" GridPane.rowSpan="2">
                                        <GridPane.margin>
                                           <Insets top="1.0" />
                                        </GridPane.margin>
@@ -343,17 +352,20 @@
                                                       <Insets top="5.0" />
                                                    </padding>
                                     </TextArea>
-                                                <TextField fx:id="tfAddress" editable="false" layoutX="85.0" layoutY="78.0" maxHeight="1.7976931348623157E308" styleClass="DisabledTextField" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.rowIndex="19" />
-                                                <TextField fx:id="tfTIN" editable="false" maxHeight="1.7976931348623157E308" styleClass="DisabledTextField" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.rowIndex="21" />
-                                                <TextField fx:id="tfContactRole" editable="false" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" styleClass="DisabledTextField" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.rowIndex="32" />
-                                                        <TextField fx:id="tfContactPerson" editable="false" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" styleClass="DisabledTextField" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.rowIndex="25" />
-                                                <TextField fx:id="tfContactNo" editable="false" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" styleClass="DisabledTextField" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.rowIndex="27" />
-                                                <TextField fx:id="tfContactEmail" editable="false" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" styleClass="DisabledTextField" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.rowIndex="30" />
-                                                <TextField fx:id="tfContactDepartment" editable="false" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" styleClass="DisabledTextField" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.rowIndex="34" />
-                                                <TextField fx:id="tfContactPosition" editable="false" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" styleClass="DisabledTextField" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.rowIndex="36" />
+                                                <TextField fx:id="tfAddress" editable="false" layoutX="85.0" layoutY="78.0" maxHeight="1.7976931348623157E308" styleClass="DisabledTextField" GridPane.columnIndex="2" GridPane.columnSpan="3" GridPane.rowIndex="19" />
+                                                <TextField fx:id="tfTIN" editable="false" maxHeight="1.7976931348623157E308" styleClass="DisabledTextField" GridPane.columnIndex="2" GridPane.columnSpan="3" GridPane.rowIndex="21" />
+                                                <TextField fx:id="tfContactRole" editable="false" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" styleClass="DisabledTextField" GridPane.columnIndex="2" GridPane.columnSpan="3" GridPane.rowIndex="32" />
+                                                        <TextField fx:id="tfContactPerson" editable="false" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" styleClass="DisabledTextField" GridPane.columnIndex="2" GridPane.columnSpan="3" GridPane.rowIndex="25" />
+                                                <TextField fx:id="tfContactNo" editable="false" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" styleClass="DisabledTextField" GridPane.columnIndex="2" GridPane.columnSpan="3" GridPane.rowIndex="27" />
+                                                <TextField fx:id="tfContactEmail" editable="false" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" styleClass="DisabledTextField" GridPane.columnIndex="2" GridPane.columnSpan="3" GridPane.rowIndex="30" />
+                                                <TextField fx:id="tfContactDepartment" editable="false" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" styleClass="DisabledTextField" GridPane.columnIndex="2" GridPane.columnSpan="3" GridPane.rowIndex="34" />
+                                                <TextField fx:id="tfContactPosition" editable="false" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" styleClass="DisabledTextField" GridPane.columnIndex="2" GridPane.columnSpan="3" GridPane.rowIndex="36" />
                                                     </children>
                                                 </GridPane>
                                             </children>
+                                       <padding>
+                                          <Insets bottom="5.0" top="5.0" />
+                                       </padding>
                                         </AnchorPane>
                                           
                                              </children>

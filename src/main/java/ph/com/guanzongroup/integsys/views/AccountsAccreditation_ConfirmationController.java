@@ -42,6 +42,7 @@ import org.guanzon.appdriver.base.GRiderCAS;
 import org.guanzon.appdriver.base.LogWrapper;
 import org.guanzon.appdriver.constant.EditMode;
 import org.guanzon.appdriver.base.GuanzonException;
+import org.guanzon.appdriver.base.MiscUtil;
 import org.guanzon.appdriver.constant.TransactionStatus;
 import org.guanzon.cas.client.account.Account_Accreditation;
 import org.guanzon.cas.client.services.ClientControllers;
@@ -69,7 +70,7 @@ public class AccountsAccreditation_ConfirmationController implements Initializab
 
     @FXML
     private Button btnSearch, btnBrowse, btnVoid, btnConfirm, btnCancel, btnUpdate, btnSave,
-            btnClose, btnHistory;
+            btnClose, btnHistory, btnAddClompany;
 
     @FXML
     private TextField tfTransactionNo, tfCategory, tfCompany,
@@ -169,7 +170,7 @@ public class AccountsAccreditation_ConfirmationController implements Initializab
                             break;
 
                         case "tfCompany":
-                            if (!isJSONSuccess(poAppController.searchClient(tfCompany.getText(), false),
+                            if (!isJSONSuccess(poAppController.searchCompany(tfCompany.getText(), false),
                                     "Initialize Search Client! ")) {
                                 return;
                             }
@@ -194,6 +195,10 @@ public class AccountsAccreditation_ConfirmationController implements Initializab
                     getLoadedClient();
                     initButtonDisplay(poAppController.getEditMode());
                     return;
+                    
+                case "btnAddClompany":
+                    poAppController.addCompany();
+                    break;
 
                 case "btnUpdate":
                     if (poAppController.getModel().getClientId() == null || poAppController.getModel().getClientId().isEmpty()) {
@@ -255,7 +260,7 @@ public class AccountsAccreditation_ConfirmationController implements Initializab
                         if (!isJSONSuccess(poAppController.CloseTransaction(), "Initialize Close Transaction")) {
                             return;
                         }
-                        ShowMessageFX.Information("Transaction ocnfirmed successfully", null, psFormName);
+                        ShowMessageFX.Information("Transaction confirmed successfully", null, psFormName);
                         
                         //reset data to avoid transaction errors
                         clearAllInputs();
@@ -299,8 +304,21 @@ public class AccountsAccreditation_ConfirmationController implements Initializab
                     }
                     break;
                 case "btnHistory":
-                    ShowMessageFX.Information(null, psFormName,
-                            "This feature is under development and will be available soon.\nThank you for your patience!");
+                    
+                    if (poAppController.getEditMode() != EditMode.READY && poAppController.getEditMode() != EditMode.UPDATE) {
+                        ShowMessageFX.Warning("No transaction status history to load!", psFormName, null);
+                        return;
+                    }
+                    
+                    try {
+                        poAppController.ShowStatusHistory();
+                    } catch (NullPointerException npe) {
+                        Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(npe), npe);
+                        ShowMessageFX.Error("No transaction status history to load!", psFormName, null);
+                    } catch (Exception ex) {
+                        Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+                        ShowMessageFX.Error(MiscUtil.getException(ex), psFormName, null);
+                    }
                     break;
                 case "btnClose":
                     if (ShowMessageFX.YesNo("Are you sure you want to close this form?", psFormName, null)) {
@@ -383,7 +401,7 @@ public class AccountsAccreditation_ConfirmationController implements Initializab
                                 break;
                                 
                             case "tfCompany":
-                                if (!isJSONSuccess(poAppController.searchClient(tfCompany.getText(), false),
+                                if (!isJSONSuccess(poAppController.searchCompany(tfCompany.getText(), false),
                                         "Initialize Search Client! ")) {
                                     return;
                                 }
