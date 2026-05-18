@@ -1344,7 +1344,7 @@ public class CashDisbursement_HistoryController implements Initializable, Screen
         stageAttachment.closeDialog();
         JFXUtil.setValueToNull(previousSearchedTextField, lastFocusedTextField);
         JFXUtil.clearTextFields(apButton, apMasterDetail, apDVMaster1, apDVMaster2, apDVDetail,
-                apBrowse, apJournalMaster, apJournalDetails, apBIRDetail, apAttachments);
+                apJournalMaster, apJournalDetails, apBIRDetail, apAttachments);
         filterIndustry();
     }
 

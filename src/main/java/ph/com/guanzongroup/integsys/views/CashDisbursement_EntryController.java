@@ -2555,7 +2555,7 @@ public class CashDisbursement_EntryController implements Initializable, ScreenIn
         stageAttachment.closeDialog();
         JFXUtil.setValueToNull(previousSearchedTextField, lastFocusedTextField);
         JFXUtil.clearTextFields(apButton, apMasterDetail, apDVMaster1, apDVMaster2, apDVDetail,
-                apMainList, apBrowse, apJournalMaster, apJournalDetails, apBIRDetail, apAttachments);
+                apMainList, apJournalMaster, apJournalDetails, apBIRDetail, apAttachments);
         filterIndustry();
     }
 

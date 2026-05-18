@@ -2169,7 +2169,7 @@ public class CashDisbursement_ApprovalController implements Initializable, Scree
         stageAttachment.closeDialog();
         JFXUtil.setValueToNull(previousSearchedTextField, lastFocusedTextField);
         JFXUtil.clearTextFields(apButton, apMasterDetail, apDVMaster1, apDVMaster2, apDVDetail,
-                apMainList, apBrowse, apJournalMaster, apJournalDetails, apBIRDetail, apAttachments);
+                apMainList,  apJournalMaster, apJournalDetails, apBIRDetail, apAttachments);
         filterIndustry();
     }
 

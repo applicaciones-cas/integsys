@@ -2565,7 +2565,7 @@ public class CashDisbursement_ConfirmationController implements Initializable, S
     private void clearTextFields() {
         JFXUtil.setValueToNull(previousSearchedTextField, lastFocusedTextField);
         JFXUtil.clearTextFields(apButton, apMasterDetail, apDVMaster1, apDVMaster2, apDVDetail,
-                apMainList, apBrowse, apJournalMaster, apJournalDetails, apBIRDetail, apAttachments);
+                apMainList, apJournalMaster, apJournalDetails, apBIRDetail, apAttachments);
         filterIndustry();
     }
 
