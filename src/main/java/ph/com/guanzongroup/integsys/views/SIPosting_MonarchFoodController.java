@@ -364,10 +364,10 @@ public class SIPosting_MonarchFoodController implements Initializable, ScreenInt
                     loadRecordMaster();
                     break;
                 case "cbJEReverse":
-                    if (poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(pnDetail).getEditMode() == EditMode.ADDNEW) {
-                        poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail().remove(pnDetail);
+                    if (poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(pnJEDetail).getEditMode() == EditMode.ADDNEW) {
+                        poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail().remove(pnJEDetail);
                     } else {
-                        poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(pnDetail).isReverse(cbJEReverse.isSelected());
+                        poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(pnJEDetail).isReverse(cbJEReverse.isSelected());
                     }
                     loadTableJEDetail();
                     if (checkedBox.isSelected()) {
