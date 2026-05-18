@@ -124,7 +124,8 @@ public class CheckImportingController implements Initializable, ScreenInterface 
         try {
             poCheckImporting = new CashflowControllers(oApp, null).CheckPaymentImporting();
             poCheckImporting.setRecordStatus(DisbursementStatic.VERIFIED);
-            poCheckImporting.getModel().setCompany(oApp.getCompnyId());
+            poCheckImporting.getModel().setCompany(psCompanyId);
+            poCheckImporting.setCompanyId(psCompanyId);
             poCheckImporting.getModel().setIndustryID(psIndustryId);
             
             poJSON = new JSONObject();
@@ -244,6 +245,7 @@ public class CheckImportingController implements Initializable, ScreenInterface 
             initButtons(pnEditMode);
         } catch (SQLException | GuanzonException | CloneNotSupportedException | ScriptException ex) {
             Logger.getLogger(CheckImportingController.class.getName()).log(Level.SEVERE, null, ex);
+            ShowMessageFX.Error(ex.getMessage(), pxeModuleName, null);
         }
     }
 

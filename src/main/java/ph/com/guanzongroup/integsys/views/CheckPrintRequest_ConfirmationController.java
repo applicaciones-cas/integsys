@@ -404,6 +404,27 @@ public class CheckPrintRequest_ConfirmationController implements Initializable, 
     }
 
     private boolean isSavingValid() {
+        int detailCount = poCheckPrintingRequestController.getDetailCount();
+        boolean hasValidItem = false; // True if at least one valid item exists
+
+        if (detailCount == 0) {
+            ShowMessageFX.Warning("Your order is empty. Please add at least one item.", pxeModuleName, null);
+            return false;
+        }
+        for (int lnCntr = 0; lnCntr <= detailCount - 1; lnCntr++) {
+            String lsSourceNo = (String) poCheckPrintingRequestController.Detail(lnCntr).getSourceNo();
+            if (detailCount == 1) {
+                if (lsSourceNo == null || lsSourceNo.trim().isEmpty()) {
+                    ShowMessageFX.Warning("Your check print reques must have at least one valid item with a Reference No.", pxeModuleName, null);
+                    return false;
+                }
+            }
+            hasValidItem = true;
+        }
+        if (!hasValidItem) {
+            ShowMessageFX.Warning("Invalid item in check print request detail. Ensure all items have a valid Source No", pxeModuleName, null);
+            return false;
+        }
         return true;
     }
 
