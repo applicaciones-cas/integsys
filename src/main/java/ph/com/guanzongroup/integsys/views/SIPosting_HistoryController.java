@@ -716,7 +716,7 @@ public class SIPosting_HistoryController implements Initializable, ScreenInterfa
             } else {
                 JFXUtil.setDisabled(false, tfJEAcctCode, tfJEAcctDescription);
             }
-            cbJEReverse.setSelected(poPurchaseReceivingController.PurchaseOrderReceiving().Detail(pnJEDetail).isReverse());
+            cbJEReverse.setSelected(poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(pnJEDetail).isReverse());
             tfJEAcctCode.setText(poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(pnJEDetail).getAccountCode());
             tfJEAcctDescription.setText(poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(pnJEDetail).Account_Chart().getDescription());
             String lsReportMonthYear = CustomCommonUtil.formatDateToShortString(poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(pnJEDetail).getForMonthOf());
@@ -913,7 +913,7 @@ public class SIPosting_HistoryController implements Initializable, ScreenInterfa
                             if (lsAccDesc == null) {
                                 lsAccDesc = "";
                             }
-                            if (!poPurchaseReceivingController.PurchaseOrderReceiving().Detail(lnCtr).isReverse()) {
+                            if (!poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(lnCtr).isReverse()) {
                                 continue;
                             }
                             lnRowCount += 1;
