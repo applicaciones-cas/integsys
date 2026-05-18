@@ -241,10 +241,10 @@ public class POReturnPosting_MCController implements Initializable, ScreenInterf
                     loadRecordMaster();
                     break;
                 case "cbJEReverse":
-                    if (poController.PurchaseOrderReturn().Detail(pnDetail).getEditMode() == EditMode.ADDNEW) {
-                        poController.PurchaseOrderReturn().Detail().remove(pnDetail);
+                    if (poController.PurchaseOrderReturn().Journal().Detail(pnJEDetail).getEditMode() == EditMode.ADDNEW) {
+                        poController.PurchaseOrderReturn().Journal().Detail().remove(pnJEDetail);
                     } else {
-                        poController.PurchaseOrderReturn().Detail(pnDetail).isReverse(cbJEReverse.isSelected());
+                        poController.PurchaseOrderReturn().Journal().Detail(pnJEDetail).isReverse(cbJEReverse.isSelected());
                     }
                     loadTableJEDetail.reload();
                     if (checkedBox.isSelected()) {
@@ -692,7 +692,7 @@ public class POReturnPosting_MCController implements Initializable, ScreenInterf
             } else {
                 JFXUtil.setDisabled(false, tfJEAcctCode, tfJEAcctDescription);
             }
-            cbJEReverse.setSelected(poController.PurchaseOrderReturn().Detail(pnJEDetail).isReverse());
+            cbJEReverse.setSelected(poController.PurchaseOrderReturn().Journal().Detail(pnJEDetail).isReverse());
 
             tfJEAcctCode.setText(poController.PurchaseOrderReturn().Journal().Detail(pnJEDetail).getAccountCode());
             tfJEAcctDescription.setText(poController.PurchaseOrderReturn().Journal().Detail(pnJEDetail).Account_Chart().getDescription());
@@ -886,7 +886,7 @@ public class POReturnPosting_MCController implements Initializable, ScreenInterf
                                 if (lsAccDesc == null) {
                                     lsAccDesc = "";
                                 }
-                                if (!poController.PurchaseOrderReturn().Detail(lnCtr).isReverse()) {
+                                if (!poController.PurchaseOrderReturn().Journal().Detail(lnCtr).isReverse()) {
                                     continue;
                                 }
                                 lnRowCount += 1;

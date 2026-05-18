@@ -501,7 +501,7 @@ public class POReturnPosting_HistoryCarController implements Initializable, Scre
             } else {
                 JFXUtil.setDisabled(false, tfJEAcctCode, tfJEAcctDescription);
             }
-            cbJEReverse.setSelected(poController.PurchaseOrderReturn().Detail(pnJEDetail).isReverse());
+            cbJEReverse.setSelected(poController.PurchaseOrderReturn().Journal().Detail(pnJEDetail).isReverse());
 
             tfJEAcctCode.setText(poController.PurchaseOrderReturn().Journal().Detail(pnJEDetail).getAccountCode());
             tfJEAcctDescription.setText(poController.PurchaseOrderReturn().Journal().Detail(pnJEDetail).Account_Chart().getDescription());
@@ -602,7 +602,7 @@ public class POReturnPosting_HistoryCarController implements Initializable, Scre
                                 if (lsAccDesc == null) {
                                     lsAccDesc = "";
                                 }
-                                if (!poController.PurchaseOrderReturn().Detail(lnCtr).isReverse()) {
+                                if (!poController.PurchaseOrderReturn().Journal().Detail(lnCtr).isReverse()) {
                                     continue;
                                 }
                                 lnRowCount += 1;
