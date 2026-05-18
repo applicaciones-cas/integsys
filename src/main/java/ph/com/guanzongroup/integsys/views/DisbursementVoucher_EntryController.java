@@ -2811,10 +2811,10 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                     }
                     break;
                 case "cbJEReverse":
-                    if (poController.Journal().Detail(pnDetail).getEditMode() == EditMode.ADDNEW) {
-                        poController.Journal().Detail().remove(pnDetail);
+                    if (poController.Journal().Detail(pnDetailJE).getEditMode() == EditMode.ADDNEW) {
+                        poController.Journal().Detail().remove(pnDetailJE);
                     } else {
-                        poController.Journal().Detail(pnDetail).isReverse(cbJEReverse.isSelected());
+                        poController.Journal().Detail(pnDetailJE).isReverse(cbJEReverse.isSelected());
                     }
                     loadRecordMasterJE();
                     loadTableDetailJE.reload();
