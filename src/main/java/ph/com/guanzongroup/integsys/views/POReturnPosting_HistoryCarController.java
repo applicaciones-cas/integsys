@@ -501,8 +501,7 @@ public class POReturnPosting_HistoryCarController implements Initializable, Scre
             } else {
                 JFXUtil.setDisabled(false, tfJEAcctCode, tfJEAcctDescription);
             }
-            boolean lbNotZero = poController.PurchaseOrderReturn().Journal().Detail(pnJEDetail).getDebitAmount() > 0 || poController.PurchaseOrderReturn().Journal().Detail(pnJEDetail).getCreditAmount() > 0;
-            cbJEReverse.selectedProperty().set(lbNotZero);
+            cbJEReverse.setSelected(poController.PurchaseOrderReturn().Journal().Detail(pnJEDetail).isReverse());
 
             tfJEAcctCode.setText(poController.PurchaseOrderReturn().Journal().Detail(pnJEDetail).getAccountCode());
             tfJEAcctDescription.setText(poController.PurchaseOrderReturn().Journal().Detail(pnJEDetail).Account_Chart().getDescription());
@@ -603,10 +602,7 @@ public class POReturnPosting_HistoryCarController implements Initializable, Scre
                                 if (lsAccDesc == null) {
                                     lsAccDesc = "";
                                 }
-                                if (poController.PurchaseOrderReturn().Journal().Detail(lnCtr).getCreditAmount() <= 0.0000
-                                        && poController.PurchaseOrderReturn().Journal().Detail(lnCtr).getDebitAmount() <= 0.0000
-                                        && !"".equals(lsAcctCode)
-                                        && poController.PurchaseOrderReturn().Journal().Detail(lnCtr).getEditMode() != EditMode.ADDNEW) {
+                                if (!poController.PurchaseOrderReturn().Journal().Detail(lnCtr).isReverse()) {
                                     continue;
                                 }
                                 lnRowCount += 1;

@@ -659,7 +659,9 @@ public class CashDisbursement_ApprovalController implements Initializable, Scree
                                         }
                                     }
                                 } else {
-                                    ShowMessageFX.Warning(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
+                                    if (tfSearchIndustry.getText().isEmpty()) {
+                                        ShowMessageFX.Warning(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
+                                    }
                                 }
                                 if (pnMain < 0 || pnMain
                                         >= main_data.size()) {
@@ -779,10 +781,7 @@ public class CashDisbursement_ApprovalController implements Initializable, Scree
                                 if (lsAccDesc == null) {
                                     lsAccDesc = "";
                                 }
-                                if (poController.Journal().Detail(lnCtr).getCreditAmount() <= 0.0000
-                                        && poController.Journal().Detail(lnCtr).getDebitAmount() <= 0.0000
-                                        && !"".equals(lsAcctCode)
-                                        && poController.Journal().Detail(lnCtr).getEditMode() != EditMode.ADDNEW) {
+                                if (!poController.Journal().Detail(lnCtr).isReverse()) {
                                     continue;
                                 }
                                 lnRowCount += 1;
@@ -1870,8 +1869,7 @@ public class CashDisbursement_ApprovalController implements Initializable, Scree
             boolean lbShow = poController.Journal().Detail(pnDetailJE).getEditMode() == EditMode.UPDATE;
             JFXUtil.setDisabled(lbShow, tfAccountCode, tfAccountDescription);
 
-            boolean lbNotZero = poController.Journal().Detail(pnDetailJE).getDebitAmount() > 0 || poController.Journal().Detail(pnDetailJE).getCreditAmount() > 0;
-            cbJEReverse.selectedProperty().set(lbNotZero);
+            cbJEReverse.setSelected(poController.Journal().Detail(pnDetailJE).isReverse());
 
             tfAccountCode.setText(poController.Journal().Detail(pnDetailJE).getAccountCode());
             tfAccountDescription.setText(poController.Journal().Detail(pnDetailJE).Account_Chart().getDescription());
@@ -2114,13 +2112,10 @@ public class CashDisbursement_ApprovalController implements Initializable, Scree
                     }
                     break;
                 case "cbJEReverse":
-                    if (!checkedBox.isSelected()) {
-                        if (poController.Journal().Detail(pnDetailJE).getEditMode() == EditMode.ADDNEW) {
-                            poController.Journal().Detail().remove(pnDetailJE);
-                        } else {
-                            poController.Journal().Detail(pnDetailJE).setDebitAmount(0.0000);
-                            poController.Journal().Detail(pnDetailJE).setCreditAmount(0.0000);
-                        }
+                    if (poController.Journal().Detail(pnDetailJE).getEditMode() == EditMode.ADDNEW) {
+                        poController.Journal().Detail().remove(pnDetailJE);
+                    } else {
+                        poController.Journal().Detail(pnDetailJE).isReverse(cbJEReverse.isSelected());
                     }
                     loadRecordMasterJE();
                     loadTableDetailJE.reload();
@@ -2174,7 +2169,7 @@ public class CashDisbursement_ApprovalController implements Initializable, Scree
         stageAttachment.closeDialog();
         JFXUtil.setValueToNull(previousSearchedTextField, lastFocusedTextField);
         JFXUtil.clearTextFields(apButton, apMasterDetail, apDVMaster1, apDVMaster2, apDVDetail,
-                apMainList, apBrowse, apJournalMaster, apJournalDetails, apBIRDetail, apAttachments);
+                apMainList,  apJournalMaster, apJournalDetails, apBIRDetail, apAttachments);
         filterIndustry();
     }
 

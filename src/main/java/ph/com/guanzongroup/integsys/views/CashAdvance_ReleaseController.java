@@ -509,7 +509,9 @@ public class CashAdvance_ReleaseController implements Initializable, ScreenInter
         poJSON = new JSONObject();
         poJSON = poController.loadTransactionList(tfSearchIndustry.getText(), tfSearchBranch.getText(), tfSearchPayee.getText(), tfSearchTransNo.getText());
         if (!"success".equals((String) poJSON.get("result"))) {
-            ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+            if (tfSearchIndustry.getText().isEmpty()) {
+                ShowMessageFX.Warning(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
+            }
         } else {
         }
         loadTableMain.reload();

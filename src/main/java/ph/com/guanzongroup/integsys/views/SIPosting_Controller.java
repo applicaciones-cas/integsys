@@ -417,13 +417,10 @@ public class SIPosting_Controller implements Initializable, ScreenInterface {
                     loadRecordMaster();
                     break;
                 case "cbJEReverse":
-                    if (!checkedBox.isSelected()) {
-                        if (poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(pnJEDetail).getEditMode() == EditMode.ADDNEW) {
-                            poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail().remove(pnJEDetail);
-                        } else {
-                            poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(pnJEDetail).setDebitAmount(0.0000);
-                            poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(pnJEDetail).setCreditAmount(0.0000);
-                        }
+                    if (poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(pnJEDetail).getEditMode() == EditMode.ADDNEW) {
+                        poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail().remove(pnJEDetail);
+                    } else {
+                        poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(pnJEDetail).isReverse(cbJEReverse.isSelected());
                     }
                     loadTableJEDetail();
                     if (checkedBox.isSelected()) {
@@ -1474,8 +1471,7 @@ public class SIPosting_Controller implements Initializable, ScreenInterface {
             } else {
                 JFXUtil.setDisabled(false, tfJEAcctCode, tfJEAcctDescription);
             }
-            boolean lbNotZero = poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(pnJEDetail).getDebitAmount() > 0 || poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(pnJEDetail).getCreditAmount() > 0;
-            cbJEReverse.selectedProperty().set(lbNotZero);
+            cbJEReverse.setSelected(poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(pnJEDetail).isReverse());
 
             tfJEAcctCode.setText(poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(pnJEDetail).getAccountCode());
             tfJEAcctDescription.setText(poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(pnJEDetail).Account_Chart().getDescription());
@@ -1866,10 +1862,7 @@ public class SIPosting_Controller implements Initializable, ScreenInterface {
                             if (lsAccDesc == null) {
                                 lsAccDesc = "";
                             }
-                            if (poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(lnCtr).getCreditAmount() <= 0.0000
-                                    && poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(lnCtr).getDebitAmount() <= 0.0000
-                                    && !"".equals(lsAcctCode)
-                                    && poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(lnCtr).getEditMode() != EditMode.ADDNEW) {
+                            if (!poPurchaseReceivingController.PurchaseOrderReceiving().Journal().Detail(lnCtr).isReverse()) {
                                 continue;
                             }
                             lnRowCount += 1;

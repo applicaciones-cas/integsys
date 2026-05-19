@@ -245,13 +245,10 @@ public class POReturnPosting_Controller implements Initializable, ScreenInterfac
                     loadRecordMaster();
                     break;
                 case "cbJEReverse":
-                    if (!checkedBox.isSelected()) {
-                        if (poController.PurchaseOrderReturn().Journal().Detail(pnJEDetail).getEditMode() == EditMode.ADDNEW) {
-                            poController.PurchaseOrderReturn().Journal().Detail().remove(pnJEDetail);
-                        } else {
-                            poController.PurchaseOrderReturn().Journal().Detail(pnJEDetail).setDebitAmount(0.0000);
-                            poController.PurchaseOrderReturn().Journal().Detail(pnJEDetail).setCreditAmount(0.0000);
-                        }
+                    if (poController.PurchaseOrderReturn().Journal().Detail(pnJEDetail).getEditMode() == EditMode.ADDNEW) {
+                        poController.PurchaseOrderReturn().Journal().Detail().remove(pnJEDetail);
+                    } else {
+                        poController.PurchaseOrderReturn().Journal().Detail(pnJEDetail).isReverse(cbJEReverse.isSelected());
                     }
                     loadTableJEDetail.reload();
                     if (checkedBox.isSelected()) {
@@ -696,9 +693,8 @@ public class POReturnPosting_Controller implements Initializable, ScreenInterfac
             } else {
                 JFXUtil.setDisabled(false, tfJEAcctCode, tfJEAcctDescription);
             }
-            boolean lbNotZero = poController.PurchaseOrderReturn().Journal().Detail(pnJEDetail).getDebitAmount() > 0 || poController.PurchaseOrderReturn().Journal().Detail(pnJEDetail).getCreditAmount() > 0;
-            cbJEReverse.selectedProperty().set(lbNotZero);
-
+            cbJEReverse.setSelected(poController.PurchaseOrderReturn().Journal().Detail(pnJEDetail).isReverse());
+            
             tfJEAcctCode.setText(poController.PurchaseOrderReturn().Journal().Detail(pnJEDetail).getAccountCode());
             tfJEAcctDescription.setText(poController.PurchaseOrderReturn().Journal().Detail(pnJEDetail).Account_Chart().getDescription());
             String lsReportMonthYear = CustomCommonUtil.formatDateToShortString(poController.PurchaseOrderReturn().Journal().Detail(pnJEDetail).getForMonthOf());
@@ -750,6 +746,7 @@ public class POReturnPosting_Controller implements Initializable, ScreenInterfac
                             JFXUtil.highlightByKey(tblViewMainList, String.valueOf(pnRowMain + 1), "#A7C7E7", highlightedRowsMain);
                         }
                     }
+
                 });
                 lbSelectTabJE = false;
 
@@ -891,10 +888,7 @@ public class POReturnPosting_Controller implements Initializable, ScreenInterfac
                                 if (lsAccDesc == null) {
                                     lsAccDesc = "";
                                 }
-                                if (poController.PurchaseOrderReturn().Journal().Detail(lnCtr).getCreditAmount() <= 0.0000
-                                        && poController.PurchaseOrderReturn().Journal().Detail(lnCtr).getDebitAmount() <= 0.0000
-                                        && !"".equals(lsAcctCode)
-                                        && poController.PurchaseOrderReturn().Journal().Detail(lnCtr).getEditMode() != EditMode.ADDNEW) {
+                                if (!poController.PurchaseOrderReturn().Journal().Detail(lnCtr).isReverse()) {
                                     continue;
                                 }
                                 lnRowCount += 1;

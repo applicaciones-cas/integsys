@@ -132,7 +132,7 @@ public class CashDisbursement_EntryController implements Initializable, ScreenIn
     private boolean pbEnteredDV = false;
     private boolean pbEnteredJE = false;
     private boolean pbEnteredBIR = false;
-
+    private boolean tooltipShown = false;
     List<Pair<String, String>> plOrderNoPartial = new ArrayList<>();
     List<Pair<String, String>> plOrderNoFinal = new ArrayList<>();
     private int currentIndex = 0;
@@ -1006,10 +1006,7 @@ public class CashDisbursement_EntryController implements Initializable, ScreenIn
                                 if (lsAccDesc == null) {
                                     lsAccDesc = "";
                                 }
-                                if (poController.Journal().Detail(lnCtr).getCreditAmount() <= 0.0000
-                                        && poController.Journal().Detail(lnCtr).getDebitAmount() <= 0.0000
-                                        && !"".equals(lsAcctCode)
-                                        && poController.Journal().Detail(lnCtr).getEditMode() != EditMode.ADDNEW) {
+                                if (!poController.Journal().Detail(lnCtr).isReverse()) {
                                     continue;
                                 }
                                 lnRowCount += 1;
@@ -1376,6 +1373,26 @@ public class CashDisbursement_EntryController implements Initializable, ScreenIn
                     ShowMessageFX.Warning(null, pxeModuleName,
                             "Amount is editable only in manual entry of details.");
                     break;
+            }
+        });
+        JFXUtil.handleDisabledNodeClick(apAttachmentButtons, pnEditMode, nodeID -> {
+            switch (nodeID) {
+                case "btnAddAttachment":
+                case "btnRemoveAttachment":
+                    ShowMessageFX.Warning(null, pxeModuleName,
+                            "This button is disabled when linked from Cash Liquidation.");
+                    break;
+            }
+        });
+        JFXUtil.handleDisabledNodeClick(apDVMaster1, pnEditMode, nodeID -> {
+            switch (nodeID) {
+                case "tfCashFund":
+                case "tfPayee":
+                case "tfDepartment":
+                    ShowMessageFX.Warning(null, pxeModuleName,
+                            "This field cannot be modified if the transaction is non-open and contains a Source");
+                    break;
+
             }
         });
     }
@@ -1801,6 +1818,10 @@ public class CashDisbursement_EntryController implements Initializable, ScreenIn
                                 loadTableMain.reload();
                                 break;
                             case "tfSearchCashAdvanceNo":
+                                if (!tooltipShown) {
+                                    JFXUtil.showTooltip("NOTE: Results appear directly in the table view, no pop-up dialog.", tfSearchCashAdvanceNo);
+                                    tooltipShown = true;
+                                }
                                 loadTableMain.reload();
                                 break;
 
@@ -2129,10 +2150,11 @@ public class CashDisbursement_EntryController implements Initializable, ScreenIn
 
     private void loadRecordMaster() {
         try {
-            boolean lbShow2 = pnEditMode == EditMode.UPDATE;
-            JFXUtil.setDisabled(lbShow2, tfPayee);
-            boolean lbShow3 = pnEditMode == EditMode.ADDNEW;
-            JFXUtil.setDisabled(!lbShow3, tfDepartment, tfCashFund);
+            boolean lbShow3 = JFXUtil.isObjectEqualTo(poController.Master().getTransactionStatus(), CashDisbursementStatus.OPEN);
+            JFXUtil.setDisabled(!lbShow3, tfCreditTo);
+
+            boolean lbShow4 = JFXUtil.isObjectEqualTo(poController.Master().getSourceNo(), null, "");
+            JFXUtil.setDisabled(!lbShow3 || !lbShow4, tfDepartment, tfPayee, tfCashFund);
 
             boolean lbShow = !JFXUtil.isObjectEqualTo(poController.Master().getSourceNo(), null, "");
             JFXUtil.setDisabled(lbShow, cbReverse);
@@ -2231,9 +2253,7 @@ public class CashDisbursement_EntryController implements Initializable, ScreenIn
             boolean lbShow = poController.Journal().Detail(pnDetailJE).getEditMode() == EditMode.UPDATE;
             JFXUtil.setDisabled(lbShow, tfAccountCode, tfAccountDescription);
 
-            boolean lbNotZero = poController.Journal().Detail(pnDetailJE).getDebitAmount() > 0 || poController.Journal().Detail(pnDetailJE).getCreditAmount() > 0;
-            cbJEReverse.selectedProperty().set(lbNotZero);
-
+            cbJEReverse.setSelected(poController.Journal().Detail(pnDetailJE).isReverse());
             tfAccountCode.setText(poController.Journal().Detail(pnDetailJE).getAccountCode());
             tfAccountDescription.setText(poController.Journal().Detail(pnDetailJE).Account_Chart().getDescription());
             String lsReportMonth = CustomCommonUtil.formatDateToShortString(poController.Journal().Detail(pnDetailJE).getForMonthOf());
@@ -2475,13 +2495,10 @@ public class CashDisbursement_EntryController implements Initializable, ScreenIn
                     }
                     break;
                 case "cbJEReverse":
-                    if (!checkedBox.isSelected()) {
-                        if (poController.Journal().Detail(pnDetailJE).getEditMode() == EditMode.ADDNEW) {
-                            poController.Journal().Detail().remove(pnDetailJE);
-                        } else {
-                            poController.Journal().Detail(pnDetailJE).setDebitAmount(0.0000);
-                            poController.Journal().Detail(pnDetailJE).setCreditAmount(0.0000);
-                        }
+                    if (poController.Journal().Detail(pnDetailJE).getEditMode() == EditMode.ADDNEW) {
+                        poController.Journal().Detail().remove(pnDetailJE);
+                    } else {
+                        poController.Journal().Detail(pnDetailJE).isReverse(cbJEReverse.isSelected());
                     }
                     loadRecordMasterJE();
                     loadTableDetailJE.reload();
@@ -2530,15 +2547,15 @@ public class CashDisbursement_EntryController implements Initializable, ScreenIn
 
         }
         boolean lbShow4 = !isSourceNoAvailable() && lbShow;
-        JFXUtil.setDisabled(!lbShow4, apAttachmentButtons, cmbAttachmentType);
-        JFXUtil.setButtonsVisibility(!isSourceNoAvailable(), btnAddAttachment, btnRemoveAttachment);
+        JFXUtil.setDisabled(!lbShow4, cmbAttachmentType);
+        JFXUtil.setDisabled(!lbShow4, btnAddAttachment, btnRemoveAttachment);
     }
 
     private void clearTextFields() {
         stageAttachment.closeDialog();
         JFXUtil.setValueToNull(previousSearchedTextField, lastFocusedTextField);
         JFXUtil.clearTextFields(apButton, apMasterDetail, apDVMaster1, apDVMaster2, apDVDetail,
-                apMainList, apBrowse, apJournalMaster, apJournalDetails, apBIRDetail, apAttachments);
+                apMainList, apJournalMaster, apJournalDetails, apBIRDetail, apAttachments);
         filterIndustry();
     }
 

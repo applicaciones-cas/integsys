@@ -245,13 +245,10 @@ public class POReturnPosting_SPMCController implements Initializable, ScreenInte
                     loadRecordMaster();
                     break;
                 case "cbJEReverse":
-                    if (!checkedBox.isSelected()) {
-                        if (poController.PurchaseOrderReturn().Journal().Detail(pnJEDetail).getEditMode() == EditMode.ADDNEW) {
-                            poController.PurchaseOrderReturn().Journal().Detail().remove(pnJEDetail);
-                        } else {
-                            poController.PurchaseOrderReturn().Journal().Detail(pnJEDetail).setDebitAmount(0.0000);
-                            poController.PurchaseOrderReturn().Journal().Detail(pnJEDetail).setCreditAmount(0.0000);
-                        }
+                    if (poController.PurchaseOrderReturn().Journal().Detail(pnJEDetail).getEditMode() == EditMode.ADDNEW) {
+                        poController.PurchaseOrderReturn().Journal().Detail().remove(pnJEDetail);
+                    } else {
+                        poController.PurchaseOrderReturn().Journal().Detail(pnJEDetail).isReverse(cbJEReverse.isSelected());
                     }
                     loadTableJEDetail.reload();
                     if (checkedBox.isSelected()) {
@@ -696,8 +693,7 @@ public class POReturnPosting_SPMCController implements Initializable, ScreenInte
             } else {
                 JFXUtil.setDisabled(false, tfJEAcctCode, tfJEAcctDescription);
             }
-            boolean lbNotZero = poController.PurchaseOrderReturn().Journal().Detail(pnJEDetail).getDebitAmount() > 0 || poController.PurchaseOrderReturn().Journal().Detail(pnJEDetail).getCreditAmount() > 0;
-            cbJEReverse.selectedProperty().set(lbNotZero);
+            cbJEReverse.setSelected(poController.PurchaseOrderReturn().Journal().Detail(pnJEDetail).isReverse());
 
             tfJEAcctCode.setText(poController.PurchaseOrderReturn().Journal().Detail(pnJEDetail).getAccountCode());
             tfJEAcctDescription.setText(poController.PurchaseOrderReturn().Journal().Detail(pnJEDetail).Account_Chart().getDescription());
@@ -891,10 +887,7 @@ public class POReturnPosting_SPMCController implements Initializable, ScreenInte
                                 if (lsAccDesc == null) {
                                     lsAccDesc = "";
                                 }
-                                if (poController.PurchaseOrderReturn().Journal().Detail(lnCtr).getCreditAmount() <= 0.0000
-                                        && poController.PurchaseOrderReturn().Journal().Detail(lnCtr).getDebitAmount() <= 0.0000
-                                        && !"".equals(lsAcctCode)
-                                        && poController.PurchaseOrderReturn().Journal().Detail(lnCtr).getEditMode() != EditMode.ADDNEW) {
+                                if (!poController.PurchaseOrderReturn().Journal().Detail(lnCtr).isReverse()) {
                                     continue;
                                 }
                                 lnRowCount += 1;
