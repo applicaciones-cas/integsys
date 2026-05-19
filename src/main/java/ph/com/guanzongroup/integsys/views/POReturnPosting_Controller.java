@@ -675,10 +675,12 @@ public class POReturnPosting_Controller implements Initializable, ScreenInterfac
             double lnTotalDebit = 0;
             double lnTotalCredit = 0;
             for (int lnCtr = 0; lnCtr < poController.PurchaseOrderReturn().Journal().getDetailCount(); lnCtr++) {
+                if (!poController.PurchaseOrderReturn().Journal().Detail(lnCtr).isReverse()) {
+                    continue;
+                }
                 lnTotalDebit += poController.PurchaseOrderReturn().Journal().Detail(lnCtr).getDebitAmount();
                 lnTotalCredit += poController.PurchaseOrderReturn().Journal().Detail(lnCtr).getCreditAmount();
             }
-
             tfTotalCreditAmt.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(lnTotalCredit, true));
             tfTotalDebitAmt.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(lnTotalDebit, true));
             JFXUtil.updateCaretPositions(apJEMaster);
@@ -694,7 +696,7 @@ public class POReturnPosting_Controller implements Initializable, ScreenInterfac
                 JFXUtil.setDisabled(false, tfJEAcctCode, tfJEAcctDescription);
             }
             cbJEReverse.setSelected(poController.PurchaseOrderReturn().Journal().Detail(pnJEDetail).isReverse());
-            
+
             tfJEAcctCode.setText(poController.PurchaseOrderReturn().Journal().Detail(pnJEDetail).getAccountCode());
             tfJEAcctDescription.setText(poController.PurchaseOrderReturn().Journal().Detail(pnJEDetail).Account_Chart().getDescription());
             String lsReportMonthYear = CustomCommonUtil.formatDateToShortString(poController.PurchaseOrderReturn().Journal().Detail(pnJEDetail).getForMonthOf());
