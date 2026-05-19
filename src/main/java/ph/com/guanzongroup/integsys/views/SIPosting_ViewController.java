@@ -270,8 +270,7 @@ public class SIPosting_ViewController implements Initializable {
             } else {
                 JFXUtil.setDisabled(false, tfJEAcctCode, tfJEAcctDescription);
             }
-            boolean lbNotZero = poController.Journal().Detail(pnJEDetail).getDebitAmount() > 0 || poController.Journal().Detail(pnJEDetail).getCreditAmount() > 0;
-            cbJEReverse.selectedProperty().set(lbNotZero);
+            cbJEReverse.setSelected(poController.Journal().Detail(pnJEDetail).isReverse());
             tfJEAcctCode.setText(poController.Journal().Detail(pnJEDetail).getAccountCode());
             tfJEAcctDescription.setText(poController.Journal().Detail(pnJEDetail).Account_Chart().getDescription());
             String lsReportMonthYear = CustomCommonUtil.formatDateToShortString(poController.Journal().Detail(pnJEDetail).getForMonthOf());
@@ -466,10 +465,7 @@ public class SIPosting_ViewController implements Initializable {
                             if (lsAccDesc == null) {
                                 lsAccDesc = "";
                             }
-                            if (poController.Journal().Detail(lnCtr).getCreditAmount() <= 0.0000
-                                    && poController.Journal().Detail(lnCtr).getDebitAmount() <= 0.0000
-                                    && !"".equals(lsAcctCode)
-                                    && poController.Journal().Detail(lnCtr).getEditMode() != EditMode.ADDNEW) {
+                           if (!poController.Journal().Detail(lnCtr).isReverse()) {
                                 continue;
                             }
                             lnRowCount += 1;

@@ -26,6 +26,7 @@ import javafx.scene.effect.DropShadow;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
+import jdk.nashorn.internal.runtime.regexp.joni.Regex;
 
 /**
  *
@@ -470,6 +471,15 @@ public class CustomCommonUtil {
         } catch (DateTimeParseException e) {
             return null; // or log the error if needed
         }
+    }
+    
+    /*MOBILE FORMAT VALIDATOR*/
+    /**
+     * Check mobile number format based on PH
+     */
+    public static Boolean isMobileOkay(String fsMobile){
+        
+        return fsMobile.matches("^(09\\d{9}|\\+639\\d{9})$");
     }
 
     /**

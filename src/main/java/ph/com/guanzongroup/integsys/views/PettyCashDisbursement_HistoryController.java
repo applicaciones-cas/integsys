@@ -948,7 +948,7 @@ public class PettyCashDisbursement_HistoryController implements Initializable, S
         stageAttachment.closeDialog();
         JFXUtil.setValueToNull(previousSearchedTextField, lastFocusedTextField);
         JFXUtil.clearTextFields(apButton, apDVMaster1, apDVMaster1, apDVDetail,
-                apBrowse, apAttachments);
+                apAttachments);
         filterIndustry();
 
     }

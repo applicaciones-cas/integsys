@@ -257,14 +257,14 @@ public class CashLiquidation_EntryController implements Initializable, ScreenInt
                         break;
                     case "btnUpdate":
                         poJSON = poController.OpenTransaction(poController.Master().getTransactionNo());
-                        
+
                         //Recheck transaction status
                         poJSON = poController.checkUpdateTransaction(false);
                         if (!"success".equals((String) poJSON.get("result"))) {
                             ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                             return;
                         }
-                        
+
                         poJSON = poController.UpdateTransaction();
                         if ("error".equals((String) poJSON.get("result"))) {
                             ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
@@ -508,7 +508,9 @@ public class CashLiquidation_EntryController implements Initializable, ScreenInt
             if (!"success".equals((String) poJSON.get("result"))) {
                 //show this only if the focus is on btnRetrieve or tfSearchIndustry or tfSearchPayee or tfTransNo
                 if (btnRetrieve.isFocused() || tfSearchIndustry.isFocused() || tfSearchIndustry.isFocused() || tfSearchPayee.isFocused() || tfSearchTransNo.isFocused()) {
-                    ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                    if (tfSearchIndustry.getText().isEmpty()) {
+                        ShowMessageFX.Warning(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
+                    }
                 }
             }
             loadTableMain.reload();

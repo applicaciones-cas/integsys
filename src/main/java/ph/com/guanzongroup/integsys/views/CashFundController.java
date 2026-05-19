@@ -274,6 +274,11 @@ public class CashFundController implements Initializable, ScreenInterface {
 
     public void loadRecordMaster() {
         try {
+            if(oApp.getIndustry().equals(System.getProperty("sys.main.industry"))){
+                JFXUtil.setDisabled(psIndustryId.equals(System.getProperty("sys.main.industry")), tfBranch);
+            } else {
+                JFXUtil.setDisabled(true, tfBranch);
+            }
             JFXUtil.setDisabled(true, tfCurrentBalance);
             switch (poController.getModel().getTransactionStatus()) {
                 case CashFundStatus.ACTIVE:
@@ -483,7 +488,7 @@ public class CashFundController implements Initializable, ScreenInterface {
                         //Validator
                         poJSON = new JSONObject();
                         if (ShowMessageFX.YesNo(null, pxeModuleName, "Are you sure you want to save the record?") == true) {
-                            poJSON = poController.saveRecord();
+                            poJSON = poController.SaveRecord();
                             if (!"success".equals((String) poJSON.get("result"))) {
                                 ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                 return;
