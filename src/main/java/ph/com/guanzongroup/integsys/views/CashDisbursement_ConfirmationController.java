@@ -2235,6 +2235,9 @@ public class CashDisbursement_ConfirmationController implements Initializable, S
         double lnTotalDebit = 0;
         double lnTotalCredit = 0;
         for (int lnCtr = 0; lnCtr < poController.Journal().getDetailCount(); lnCtr++) {
+            if (!poController.Journal().Detail(lnCtr).isReverse()) {
+                continue;
+            }
             lnTotalDebit += poController.Journal().Detail(lnCtr).getDebitAmount();
             lnTotalCredit += poController.Journal().Detail(lnCtr).getCreditAmount();
         }
