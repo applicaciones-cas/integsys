@@ -8,7 +8,11 @@ import ph.com.guanzongroup.integsys.model.ModelPurchaseOrder;
 import ph.com.guanzongroup.integsys.model.ModelPurchaseOrderDetail;
 import ph.com.guanzongroup.integsys.utility.CustomCommonUtil;
 import com.sun.javafx.scene.control.skin.TableHeaderRow;
+import java.io.IOException;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -21,20 +25,23 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import javafx.animation.PauseTransition;
+import javafx.animation.TranslateTransition;
 import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyBooleanPropertyBase;
 import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.geometry.Bounds;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.Pagination;
@@ -46,6 +53,8 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import static javafx.scene.input.KeyCode.DOWN;
 import static javafx.scene.input.KeyCode.ENTER;
 import static javafx.scene.input.KeyCode.F3;
@@ -54,10 +63,15 @@ import static javafx.scene.input.KeyCode.TAB;
 import static javafx.scene.input.KeyCode.UP;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
+import javafx.stage.FileChooser;
+import javafx.stage.Stage;
 import javafx.util.Duration;
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.rendering.PDFRenderer;
 import org.guanzon.appdriver.agent.ShowDialogFX;
 import org.guanzon.appdriver.agent.ShowMessageFX;
 import org.guanzon.appdriver.base.CommonUtils;
@@ -66,7 +80,9 @@ import org.guanzon.appdriver.base.GuanzonException;
 import org.guanzon.appdriver.base.LogWrapper;
 import org.guanzon.appdriver.base.MiscUtil;
 import org.guanzon.appdriver.base.SQLUtil;
+import org.guanzon.appdriver.constant.DocumentType;
 import org.guanzon.appdriver.constant.EditMode;
+import org.guanzon.appdriver.constant.RecordStatus;
 import org.guanzon.appdriver.constant.UserRight;
 import org.guanzon.cas.purchasing.model.Model_PO_Detail;
 import org.guanzon.cas.purchasing.services.PurchaseOrderControllers;
@@ -75,6 +91,7 @@ import org.guanzon.cas.purchasing.status.PurchaseOrderStatus;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.ParseException;
+import ph.com.guanzongroup.integsys.model.ModelPOAttachment;
 import ph.com.guanzongroup.integsys.utility.JFXUtil;
 
 /**
@@ -142,6 +159,38 @@ public class PurchaseOrder_EntrySPCarController implements Initializable, Screen
     private ProgressIndicator piTableStockRequestLoading, piTableDetailLoading;
     @FXML
     private Pagination pagination;
+    
+    @FXML
+    private TableView tblAttachments;
+    @FXML
+    private TableColumn tblRowNoAttachment,tblFileNameAttachment;
+    
+    @FXML
+    private ImageView imageView;
+    
+    @FXML
+    private ComboBox cmbAttachmentType;
+    
+    @FXML
+    private TextField tfAttachmentNo;
+    @FXML
+    private AnchorPane apAttachments;
+    
+    private FileChooser fileChooser;
+    private int pnAttachment;
+    private double mouseAnchorX;
+    private double mouseAnchorY;
+    private double scaleFactor = 1.0;
+    private int currentIndex = 0;
+    double ldstackPaneWidth = 0;
+    double ldstackPaneHeight = 0;
+    @FXML
+    private StackPane stackPane1;
+    private ObservableList<ModelPOAttachment> attachment_data = FXCollections.observableArrayList();
+    ObservableList<String> documentType = ModelPOAttachment.documentType;
+    @FXML
+    private Button  btnAddAttachment, btnRemoveAttachment, btnArrowLeft, btnArrowRight;
+    
 
     @Override
     public void setGRider(GRiderCAS foValue) {
@@ -209,10 +258,22 @@ public class PurchaseOrder_EntrySPCarController implements Initializable, Screen
         initTextFieldPattern();
         initTableStockRequest();
         initTableDetail();
+        initAttachmentsGrid();
+        initAttachmentPreviewPane();
+        initStackPaneListener();
+        initComboBoxes();
         tblVwStockRequest.setOnMouseClicked(this::tblVwMain_Clicked);
         tblVwOrderDetails.setOnMouseClicked(this::tblVwDetail_Clicked);
         initButtons(pnEditMode);
         initFields(pnEditMode);
+        tblAttachments.setOnMouseClicked(event -> {
+            pnAttachment = tblAttachments.getSelectionModel().getSelectedIndex();
+            if (pnAttachment >= 0) {
+                scaleFactor = 1.0;
+                loadRecordAttachment(true);
+                resetImageBounds();
+            }
+        });
     }
 
     private int moveToNextRow(TableView<?> table, TablePosition<?, ?> focusedCell) {
@@ -336,7 +397,7 @@ public class PurchaseOrder_EntrySPCarController implements Initializable, Screen
 
     private void initButtonsClickActions() {
         List<Button> buttons = Arrays.asList(btnBrowse, btnNew, btnUpdate, btnSearch, btnSave, btnCancel,
-                btnPrint, btnRetrieve, btnTransHistory, btnClose);
+                btnPrint, btnRetrieve, btnTransHistory, btnClose, btnAddAttachment, btnRemoveAttachment, btnArrowLeft, btnArrowRight);
 
         buttons.forEach(button -> button.setOnAction(this::handleButtonAction));
     }
@@ -353,6 +414,7 @@ public class PurchaseOrder_EntrySPCarController implements Initializable, Screen
                         tblVwStockRequest.getSelectionModel().clearSelection(pnTblDetailRow);
                         pnTblDetailRow = -1;
                         loadRecordMaster();
+                        loadTableDetailFromMain();
                         pnEditMode = poPurchasingController.PurchaseOrder().getEditMode();
                         loadRecordDetail();
                         loadTableDetail();
@@ -369,6 +431,8 @@ public class PurchaseOrder_EntrySPCarController implements Initializable, Screen
                     clearDetailFields();
                     clearMasterFields();
                     detail_data.clear();
+                    attachment_data.clear();
+                    poPurchasingController.PurchaseOrder().resetattachment();
                     poJSON = poPurchasingController.PurchaseOrder().NewTransaction();
                     if ("success".equals((String) poJSON.get("result"))) {
                         poPurchasingController.PurchaseOrder().Master().setSupplierID(prevSupplier);
@@ -393,6 +457,7 @@ public class PurchaseOrder_EntrySPCarController implements Initializable, Screen
                     }
                     pnTblDetailRow = -1;
                     loadRecordMaster();
+                    poPurchasingController.PurchaseOrder().loadAttachments();
                     pnEditMode = poPurchasingController.PurchaseOrder().getEditMode();
                     loadTableDetail();
                     selectTheExistedDetailFromMainTable();
@@ -606,7 +671,9 @@ public class PurchaseOrder_EntrySPCarController implements Initializable, Screen
                             ShowMessageFX.Warning((String) poJSON.get("message"), "Print Purchase Order", null);
                         }
                     }
-
+                    attachment_data.clear();
+                    poPurchasingController.PurchaseOrder().resetattachment();
+                    loadTableDetailFromMain();
                     Platform.runLater(() -> btnNew.fire());
                     break;
                 case "btnCancel":
@@ -615,6 +682,8 @@ public class PurchaseOrder_EntrySPCarController implements Initializable, Screen
                             clearDetailFields();
                             clearMasterFields();
                             detail_data.clear();
+                            attachment_data.clear();
+                            poPurchasingController.PurchaseOrder().resetattachment();
                             tblVwOrderDetails.getItems().clear();
                             pnEditMode = EditMode.UNKNOWN;
                             poPurchasingController.PurchaseOrder().Master().setIndustryID(psIndustryID);
@@ -632,6 +701,8 @@ public class PurchaseOrder_EntrySPCarController implements Initializable, Screen
                             clearMasterFields();
                             clearDetailFields();
                             detail_data.clear();
+                            attachment_data.clear();
+                            poPurchasingController.PurchaseOrder().resetattachment();
                             poJSON = poPurchasingController.PurchaseOrder().OpenTransaction(poPurchasingController.PurchaseOrder().Master().getTransactionNo());
                             if ("success".equals((String) poJSON.get("result"))) {
                                 pnTblDetailRow = -1;
@@ -689,13 +760,106 @@ public class PurchaseOrder_EntrySPCarController implements Initializable, Screen
                         }
                     }
                     break;
+                case "btnAddAttachment":
+                    fileChooser = new FileChooser();
+                    fileChooser.setTitle("Choose Image");
+                    fileChooser.getExtensionFilters().addAll(
+                            new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg", "*.gif", "*.pdf")
+                    );
+                    java.io.File selectedFile = fileChooser.showOpenDialog((Stage) btnAddAttachment.getScene().getWindow());
+
+                    if (selectedFile != null) {
+                        // Read image from the selected file
+                        Path imgPath = selectedFile.toPath();
+                        Image loimage = new Image(Files.newInputStream(imgPath));
+                        imageView.setImage(loimage);
+
+                        //Validate attachment
+                        String imgPath2 = selectedFile.getName().toString();
+                        for (int lnCtr = 0; lnCtr <= poPurchasingController.PurchaseOrder().getTransactionAttachmentCount() - 1; lnCtr++) {
+                            if (imgPath2.equals(poPurchasingController.PurchaseOrder().TransactionAttachmentList(lnCtr).getModel().getFileName())
+                                    && RecordStatus.ACTIVE.equals(poPurchasingController.PurchaseOrder().TransactionAttachmentList(lnCtr).getModel().getRecordStatus())) {
+                                ShowMessageFX.Warning(null, psFormName, "File name already exists.");
+                                pnAttachment = lnCtr;
+                                loadRecordAttachment(true);
+                                return;
+                            }
+                        }
+
+                        //Limit maximum pages of pdf to add
+                        if (imgPath2.toLowerCase().endsWith(".pdf")) {
+                            try (PDDocument document = PDDocument.load(selectedFile)) {
+                                PDFRenderer pdfRenderer = new PDFRenderer(document);
+                                int pageCount = document.getNumberOfPages();
+                                if (pageCount > 5) {
+                                    ShowMessageFX.Warning(null, psFormName, "PDF exceeds maximum allowed pages.");
+                                    return;
+                                }
+                            } catch (IOException ex) {
+                                Logger.getLogger(PurchaseOrder_EntryMCController.class.getName()).log(Level.SEVERE, null, ex);
+                            }
+                        }
+
+//                            int lnTempRow = JFXUtil.getDetailTempRow(attachment_data,  poPurchasingController.PurchaseOrder().addAttachment(imgPath2), 3);
+//                            pnAttachment = lnTempRow;
+                        pnAttachment = poPurchasingController.PurchaseOrder().addAttachment(imgPath2);
+                        //Copy file to Attachment path
+                        poPurchasingController.PurchaseOrder().copyFile(selectedFile.toString());
+                        loadTableAttachment();
+                        tblAttachments.getFocusModel().focus(pnAttachment);
+                        tblAttachments.getSelectionModel().select(pnAttachment);
+                    }
+                    break;
+                case "btnRemoveAttachment":
+                    if (poPurchasingController.PurchaseOrder().getTransactionAttachmentCount() <= 0) {
+                        return;
+                    } else {
+                        for (int lnCtr = 0; lnCtr < poPurchasingController.PurchaseOrder().getTransactionAttachmentCount(); lnCtr++) {
+                            if (RecordStatus.INACTIVE.equals(poPurchasingController.PurchaseOrder().TransactionAttachmentList(lnCtr).getModel().getRecordStatus())) {
+                                if (pnAttachment == lnCtr) {
+                                    return;
+                                }
+                            }
+                        }
+                    }
+                    poJSON = poPurchasingController.PurchaseOrder().removeAttachment(pnAttachment);
+                    if ("error".equals((String) poJSON.get("result"))) {
+                        ShowMessageFX.Warning(null, psFormName, (String) poJSON.get("message"));
+                        return;
+                    }
+                    attachment_data.remove(tblAttachments.getSelectionModel().getSelectedIndex());
+                    if (pnAttachment != 0) {
+                        pnAttachment -= 1;
+                    }
+                    loadRecordAttachment(false);
+                    loadTableAttachment();
+                    if (attachment_data.size() <= 0) {
+                        JFXUtil.clearTextFields(apAttachments);
+                    }
+                    initAttachmentsGrid();
+                    break;
+                case "btnArrowLeft":
+                    slideImage(-1);
+                    break;
+                case "btnArrowRight":
+                    slideImage(1);
+                    break;
                 default:
                     ShowMessageFX.Warning("Please contact admin to assist about no button available", psFormName, null);
                     break;
             }
+            if (lsButton.equals("btnRetrieve") || lsButton.equals("btnAddAttachment") || lsButton.equals("btnRemoveAttachment")
+                    || lsButton.equals("btnArrowRight") || lsButton.equals("btnArrowLeft") || lsButton.equals("btnRetrieve") || lsButton.equals("btnHistory")) {
+            } else {
+                loadRecordMaster();
+                loadTableDetail();
+                loadTableAttachment();
+            }
             initButtons(pnEditMode);
             initFields(pnEditMode);
         } catch (CloneNotSupportedException | ExceptionInInitializerError | SQLException | GuanzonException | ParseException | NullPointerException ex) {
+            Logger.getLogger(PurchaseOrder_EntrySPCarController.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
             Logger.getLogger(PurchaseOrder_EntrySPCarController.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
@@ -1925,6 +2089,357 @@ public class PurchaseOrder_EntrySPCarController implements Initializable, Screen
                 }
             }
 
+        }
+    }
+    
+    private void loadTableAttachment() {
+        // Setting data to table detail
+        ProgressIndicator progressIndicator = new ProgressIndicator();
+        progressIndicator.setMaxHeight(50);
+        progressIndicator.setStyle("-fx-progress-color: #FF8201;");
+        StackPane loadingPane = new StackPane(progressIndicator);
+        loadingPane.setAlignment(Pos.CENTER);
+        tblAttachments.setPlaceholder(loadingPane);
+        progressIndicator.setVisible(true);
+
+        Label placeholderLabel = new Label("NO RECORD TO LOAD");
+        placeholderLabel.setStyle("-fx-font-size: 10px;"); // Adjust the size as needed
+
+        Task<Void> task = new Task<Void>() {
+            @Override
+            protected Void call() throws Exception {
+                scaleFactor = 1.0;
+                JFXUtil.resetImageBounds(imageView, stackPane1);
+                Platform.runLater(() -> {
+                    try {
+                        attachment_data.clear();
+                        int lnCtr;
+                        int lnCount = 0;
+                        for (lnCtr = 0; lnCtr < poPurchasingController.PurchaseOrder().getTransactionAttachmentCount(); lnCtr++) {
+                            if (RecordStatus.INACTIVE.equals(poPurchasingController.PurchaseOrder().TransactionAttachmentList(lnCtr).getModel().getRecordStatus())) {
+                                continue;
+                            }
+                            lnCount += 1;
+                            attachment_data.add(
+                                    new ModelPOAttachment(String.valueOf(lnCount),
+                                            String.valueOf(poPurchasingController.PurchaseOrder().TransactionAttachmentList(lnCtr).getModel().getFileName()),
+                                            String.valueOf(lnCtr)
+                                    ));
+                        }
+                        int lnTempRow = JFXUtil.getDetailRow(attachment_data, pnAttachment, 3); //this method is used only when Reverse is applied
+                        if (lnTempRow < 0 || lnTempRow
+                                >= attachment_data.size()) {
+                            if (!attachment_data.isEmpty()) {
+                                /* FOCUS ON FIRST ROW */
+                                JFXUtil.selectAndFocusRow(tblAttachments, 0);
+                                int lnRow = Integer.parseInt(attachment_data.get(0).getIndex03());
+                                pnAttachment = lnRow;
+                                loadRecordAttachment(true);
+                            }
+                        } else {
+                            /* FOCUS ON THE ROW THAT pnRowDetail POINTS TO */
+                            JFXUtil.selectAndFocusRow(tblAttachments, lnTempRow);
+                            int lnRow = Integer.parseInt(attachment_data.get(tblAttachments.getSelectionModel().getSelectedIndex()).getIndex03());
+                            pnAttachment = lnRow;
+                            loadRecordAttachment(true);
+                        }
+                        if (attachment_data.size() <= 0) {
+                            loadRecordAttachment(false);
+                        }
+                    } catch (Exception e) {
+                    }
+                });
+
+                return null;
+            }
+
+            @Override
+            protected void succeeded() {
+                if (attachment_data == null || attachment_data.isEmpty()) {
+                    tblAttachments.setPlaceholder(placeholderLabel);
+                } else {
+                    tblAttachments.toFront();
+                }
+                progressIndicator.setVisible(false);
+
+            }
+
+            @Override
+            protected void failed() {
+                if (attachment_data == null || attachment_data.isEmpty()) {
+                    tblAttachments.setPlaceholder(placeholderLabel);
+                }
+                progressIndicator.setVisible(false);
+            }
+
+        };
+        new Thread(task).start(); // Run task in background
+
+    }
+    
+    public void loadRecordAttachment(boolean lbloadImage) {
+        try {
+            boolean lbShow2 = pnEditMode == EditMode.UPDATE || pnEditMode == EditMode.ADDNEW;
+            JFXUtil.setDisabled(!lbShow2, cmbAttachmentType, btnAddAttachment, btnRemoveAttachment);
+            if (attachment_data.size() > 0) {
+                tfAttachmentNo.setText(attachment_data.get(tblAttachments.getSelectionModel().getSelectedIndex()).getIndex01());
+                String lsAttachmentType = poPurchasingController.PurchaseOrder().TransactionAttachmentList(pnAttachment).getModel().getDocumentType();
+                if (lsAttachmentType.equals("")) {
+                    poPurchasingController.PurchaseOrder().TransactionAttachmentList(pnAttachment).getModel().setDocumentType(DocumentType.OTHER);
+                    lsAttachmentType = poPurchasingController.PurchaseOrder().TransactionAttachmentList(pnAttachment).getModel().getDocumentType();
+                }
+                int lnAttachmentType = 0;
+                lnAttachmentType = Integer.parseInt(lsAttachmentType);
+                cmbAttachmentType.getSelectionModel().select(lnAttachmentType);
+                if (lbloadImage) {
+                    try {
+                        String filePath = (String) attachment_data.get(tblAttachments.getSelectionModel().getSelectedIndex()).getIndex02();
+                        String filePath2 = "";
+
+                        // in server
+                        if (poPurchasingController.PurchaseOrder().TransactionAttachmentList(pnAttachment).getModel().getImagePath() != null && !"".equals(poPurchasingController.PurchaseOrder().TransactionAttachmentList(pnAttachment).getModel().getImagePath())) {
+                            filePath2 = poPurchasingController.PurchaseOrder().TransactionAttachmentList(pnAttachment).getModel().getImagePath() + "/" + (String) attachment_data.get(tblAttachments.getSelectionModel().getSelectedIndex()).getIndex02();
+                        } else {
+                            filePath2 = System.getProperty("sys.default.path.temp.attachments") + "/" + (String) attachment_data.get(tblAttachments.getSelectionModel().getSelectedIndex()).getIndex02();
+                        }
+
+                        if (filePath != null && !filePath.isEmpty()) {
+                            Path imgPath = Paths.get(filePath2);
+                            String convertedPath = imgPath.toUri().toString();
+                            boolean isPdf = filePath.toLowerCase().endsWith(".pdf");
+
+                            // Clear previous content
+                            stackPane1.getChildren().clear();
+                            if (!isPdf) {
+                                // ----- IMAGE VIEW -----
+                                Image loimage = new Image(convertedPath);
+                                imageView.setImage(loimage);
+                                JFXUtil.adjustImageSize(loimage, imageView, ldstackPaneWidth, ldstackPaneHeight);
+
+                                PauseTransition delay = new PauseTransition(Duration.seconds(2)); // 2-second delay
+                                delay.setOnFinished(event -> {
+                                    Platform.runLater(() -> {
+                                        JFXUtil.stackPaneClip(stackPane1);
+                                    });
+                                });
+                                delay.play();
+
+                                // Add ImageView directly to stackPane
+                                stackPane1.getChildren().add(imageView);
+                                stackPane1.getChildren().addAll(btnArrowLeft, btnArrowRight);
+
+                                // Align buttons on top
+                                StackPane.setAlignment(btnArrowLeft, Pos.CENTER_LEFT);
+                                StackPane.setAlignment(btnArrowRight, Pos.CENTER_RIGHT);
+
+                                // Optional: add some margin
+                                StackPane.setMargin(btnArrowLeft, new Insets(0, 0, 0, 10));
+                                StackPane.setMargin(btnArrowRight, new Insets(0, 10, 0, 0));
+
+                            } else {
+                                // ----- PDF VIEW -----
+                                JFXUtil.PDFViewConfig(filePath2, stackPane1, btnArrowLeft, btnArrowRight, ldstackPaneWidth, ldstackPaneHeight);
+                            }
+                        } else {
+                            imageView.setImage(null);
+                        }
+
+                    } catch (Exception e) {
+                        imageView.setImage(null);
+                    }
+                }
+            } else {
+                if (!lbloadImage) {
+                    imageView.setImage(null);
+                    // Clear previous content
+                    stackPane1.getChildren().clear();
+                    // Add ImageView directly to stackPane
+                    stackPane1.getChildren().add(imageView);
+                    stackPane1.getChildren().addAll(btnArrowLeft, btnArrowRight);
+                    Platform.runLater(() -> JFXUtil.stackPaneClip(stackPane1));
+                    pnAttachment = 0;
+                }
+            }
+        } catch (Exception ex) {
+        }
+    }
+    
+    private void initStackPaneListener() {
+        stackPane1.widthProperty().addListener((observable, oldValue, newWidth) -> {
+            double computedWidth = newWidth.doubleValue();
+            ldstackPaneWidth = computedWidth;
+
+        });
+        stackPane1.heightProperty().addListener((observable, oldValue, newHeight) -> {
+            double computedHeight = newHeight.doubleValue();
+            ldstackPaneHeight = computedHeight;
+            loadTableAttachment();
+            loadRecordAttachment(true);
+            initAttachmentsGrid();
+        });
+    }
+
+    private void initAttachmentPreviewPane() {
+        stackPane1.layoutBoundsProperty().addListener((observable, oldBounds, newBounds) -> {
+            stackPane1.setClip(new javafx.scene.shape.Rectangle(
+                    newBounds.getMinX(),
+                    newBounds.getMinY(),
+                    newBounds.getWidth(),
+                    newBounds.getHeight()
+            ));
+        });
+        imageView.setOnScroll((ScrollEvent event) -> {
+            double delta = event.getDeltaY();
+            scaleFactor = Math.max(0.5, Math.min(scaleFactor * (delta > 0 ? 1.1 : 0.9), 5.0));
+            imageView.setScaleX(scaleFactor);
+            imageView.setScaleY(scaleFactor);
+        });
+
+        imageView.setOnMousePressed((MouseEvent event) -> {
+            mouseAnchorX = event.getSceneX() - imageView.getTranslateX();
+            mouseAnchorY = event.getSceneY() - imageView.getTranslateY();
+        });
+
+        imageView.setOnMouseDragged((MouseEvent event) -> {
+            double translateX = event.getSceneX() - mouseAnchorX;
+            double translateY = event.getSceneY() - mouseAnchorY;
+            imageView.setTranslateX(translateX);
+            imageView.setTranslateY(translateY);
+        });
+
+        stackPane1.widthProperty().addListener((observable, oldValue, newWidth) -> {
+            double computedWidth = newWidth.doubleValue();
+            ldstackPaneWidth = computedWidth;
+
+        });
+        stackPane1.heightProperty().addListener((observable, oldValue, newHeight) -> {
+            double computedHeight = newHeight.doubleValue();
+            ldstackPaneHeight = computedHeight;
+
+            //Placed to get height and width of stack pane in computed size before loading the image
+            initStackPaneListener();
+            initAttachmentsGrid();
+        });
+
+    }
+
+    private void initAttachmentsGrid() {
+        /*FOCUS ON FIRST ROW*/
+        JFXUtil.setColumnCenter(tblRowNoAttachment);
+        JFXUtil.setColumnLeft(tblFileNameAttachment);
+        JFXUtil.setColumnsIndexAndDisableReordering(tblAttachments);
+        tblAttachments.setItems(attachment_data);
+
+        if (pnAttachment < 0 || pnAttachment >= attachment_data.size()) {
+            if (!attachment_data.isEmpty()) {
+                /* FOCUS ON FIRST ROW */
+                tblAttachments.getSelectionModel().select(0);
+                tblAttachments.getFocusModel().focus(0);
+                pnAttachment = tblAttachments.getSelectionModel().getSelectedIndex();
+            }
+        } else {
+            /* FOCUS ON THE ROW THAT pnRowDetail POINTS TO */
+            tblAttachments.getSelectionModel().select(pnAttachment);
+            tblAttachments.getFocusModel().focus(pnAttachment);
+        }
+
+    }
+
+    private void slideImage(int direction) {
+        if (attachment_data.size() <= 0) {
+            return;
+        }
+
+        currentIndex = pnAttachment;
+        int newIndex = currentIndex + direction;
+
+        if (newIndex != -1 && (newIndex <= attachment_data.size() - 1)) {
+            ModelPOAttachment image = attachment_data.get(newIndex);
+            String filePath2 = "D:\\GGC_Maven_Systems\\temp\\attachments\\" + image.getIndex02();
+            TranslateTransition slideOut = new TranslateTransition(Duration.millis(300), imageView);
+            slideOut.setByX(direction * -400); // Move left or right
+
+            tblAttachments.getFocusModel().focus(newIndex);
+            tblAttachments.getSelectionModel().select(newIndex);
+            pnAttachment = newIndex;
+            loadRecordAttachment(false);
+
+            // Create a transition animation
+            slideOut.setOnFinished(event -> {
+                imageView.setTranslateX(direction * 400);
+                TranslateTransition slideIn = new TranslateTransition(Duration.millis(300), imageView);
+                slideIn.setToX(0);
+                slideIn.play();
+
+                loadRecordAttachment(true);
+            });
+
+            slideOut.play();
+        }
+        if (isImageViewOutOfBounds(imageView, stackPane1)) {
+            resetImageBounds();
+        }
+    }
+
+    private boolean isImageViewOutOfBounds(ImageView imageView, StackPane stackPane) {
+        Bounds clipBounds = stackPane.getClip().getBoundsInParent();
+        Bounds imageBounds = imageView.getBoundsInParent();
+
+        return imageBounds.getMaxX() < clipBounds.getMinX()
+                || imageBounds.getMinX() > clipBounds.getMaxX()
+                || imageBounds.getMaxY() < clipBounds.getMinY()
+                || imageBounds.getMinY() > clipBounds.getMaxY();
+    }
+
+    private void resetImageBounds() {
+        imageView.setScaleX(1.0);
+        imageView.setScaleY(1.0);
+        imageView.setTranslateX(0);
+        imageView.setTranslateY(0);
+        stackPane1.setAlignment(imageView, javafx.geometry.Pos.CENTER);
+    }
+
+    private void stackPaneClip() {
+        javafx.scene.shape.Rectangle clip = new javafx.scene.shape.Rectangle(
+                stackPane1.getWidth() - 8, // Subtract 10 for padding (5 on each side)
+                stackPane1.getHeight() - 8 // Subtract 10 for padding (5 on each side)
+        );
+        clip.setArcWidth(8); // Optional: Rounded corners for aesthetics
+        clip.setArcHeight(8);
+        clip.setLayoutX(4); // Set padding offset for X
+        clip.setLayoutY(4); // Set padding offset for Y
+        stackPane1.setClip(clip);
+
+    }
+    private void initComboBoxes() {
+        JFXUtil.initComboBoxCellDesignColor("#FF8201", cmbAttachmentType);
+        cmbAttachmentType.setItems(documentType);
+        cmbAttachmentType.setOnAction(event -> {
+            if (attachment_data.size() > 0) {
+                int selectedIndex = cmbAttachmentType.getSelectionModel().getSelectedIndex();
+                poPurchasingController.PurchaseOrder().TransactionAttachmentList(pnAttachment).getModel().setDocumentType("000" + String.valueOf(selectedIndex));
+                cmbAttachmentType.getSelectionModel().select(selectedIndex);
+            }
+        });
+    }
+    public void loadTableDetailFromMain() {
+        try {
+            poJSON = new JSONObject();
+            if (poPurchasingController.PurchaseOrder().getEditMode() == EditMode.READY || poPurchasingController.PurchaseOrder().getEditMode() == EditMode.UPDATE
+                    || poPurchasingController.PurchaseOrder().getEditMode() == EditMode.UPDATE) {
+                poPurchasingController.PurchaseOrder().loadAttachments();
+
+                tfAttachmentNo.clear();
+                cmbAttachmentType.setItems(documentType);
+                imageView.setImage(null);
+                stackPaneClip();
+                Platform.runLater(() -> {
+                    loadTableAttachment();
+                });
+            }
+
+        } catch (SQLException | GuanzonException ex) {
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
         }
     }
 }
