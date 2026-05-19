@@ -676,6 +676,9 @@ public class POReturnPosting_MPController implements Initializable, ScreenInterf
             double lnTotalDebit = 0;
             double lnTotalCredit = 0;
             for (int lnCtr = 0; lnCtr < poController.PurchaseOrderReturn().Journal().getDetailCount(); lnCtr++) {
+                if (!poController.PurchaseOrderReturn().Journal().Detail(lnCtr).isReverse()) {
+                    continue;
+                }
                 lnTotalDebit += poController.PurchaseOrderReturn().Journal().Detail(lnCtr).getDebitAmount();
                 lnTotalCredit += poController.PurchaseOrderReturn().Journal().Detail(lnCtr).getCreditAmount();
             }
