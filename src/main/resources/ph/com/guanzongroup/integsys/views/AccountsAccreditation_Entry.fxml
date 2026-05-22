@@ -313,7 +313,7 @@
                                                    </children>
                                                 </AnchorPane>
                                                                 <TextField fx:id="tfTransactionNo" disable="true" editable="false" maxWidth="-Infinity" minWidth="-Infinity" prefHeight="25.0" prefWidth="176.0" style="-fx-font-weight: bold;" styleClass="DisabledTextField" GridPane.columnIndex="2" GridPane.columnSpan="3" />
-                                                                <DatePicker fx:id="dpTransactionDate" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.rowIndex="2" />
+                                                                <DatePicker fx:id="dpTransactionDate" prefHeight="25.0" prefWidth="137.0" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.rowIndex="2" />
                                                                 <ComboBox fx:id="cmbAccountType" maxWidth="-Infinity" minWidth="-Infinity" prefHeight="25.0" prefWidth="226.0" GridPane.columnIndex="2" GridPane.columnSpan="3" GridPane.rowIndex="3" />
                                                                 <ComboBox fx:id="cmbTransType" maxWidth="-Infinity" prefHeight="25.0" prefWidth="225.0" GridPane.columnIndex="2" GridPane.columnSpan="3" GridPane.rowIndex="4" />
                                                                 <TextField fx:id="tfCategory" maxWidth="-Infinity" prefHeight="25.0" prefWidth="224.0" promptText="Press F3: Search" GridPane.columnIndex="2" GridPane.columnSpan="3" GridPane.rowIndex="5" />
@@ -323,16 +323,16 @@
                                                    </GridPane.margin>
                                                 </TextField>
                                                                 <TextField fx:id="tfAddress" editable="false" layoutX="85.0" layoutY="78.0" styleClass="DisabledTextField" GridPane.columnIndex="2" GridPane.columnSpan="3" GridPane.rowIndex="13" />
-                                                                <TextField fx:id="tfTIN" editable="false" styleClass="DisabledTextField" GridPane.columnIndex="2" GridPane.columnSpan="3" GridPane.rowIndex="14" />
+                                                                <TextField fx:id="tfTIN" editable="false" maxWidth="-Infinity" minWidth="-Infinity" prefHeight="25.0" prefWidth="224.0" styleClass="DisabledTextField" GridPane.columnIndex="2" GridPane.columnSpan="3" GridPane.rowIndex="14" />
                                                                 <TextField fx:id="tfContactPerson" editable="false" maxWidth="1.7976931348623157E308" styleClass="DisabledTextField" GridPane.columnIndex="2" GridPane.columnSpan="3" GridPane.rowIndex="18" />
                                                                 <TextField fx:id="tfContactNo" editable="false" maxWidth="-Infinity" prefHeight="25.0" prefWidth="225.0" styleClass="DisabledTextField" GridPane.columnIndex="2" GridPane.columnSpan="3" GridPane.rowIndex="19" />
                                                                 <TextField fx:id="tfContactEmail" editable="false" maxWidth="1.7976931348623157E308" styleClass="DisabledTextField" GridPane.columnIndex="2" GridPane.columnSpan="3" GridPane.rowIndex="20" />
                                                                 <TextField fx:id="tfContactRole" editable="false" maxWidth="-Infinity" prefHeight="25.0" prefWidth="225.0" styleClass="DisabledTextField" GridPane.columnIndex="2" GridPane.columnSpan="3" GridPane.rowIndex="21" />
                                                                 <TextField fx:id="tfContactDepartment" editable="false" maxWidth="1.7976931348623157E308" styleClass="DisabledTextField" GridPane.columnIndex="2" GridPane.columnSpan="3" GridPane.rowIndex="22" />
                                                                 <TextField fx:id="tfContactPosition" editable="false" maxWidth="-Infinity" prefHeight="25.0" prefWidth="224.0" styleClass="DisabledTextField" GridPane.columnIndex="2" GridPane.columnSpan="3" GridPane.rowIndex="23" />
-                                                                <Button fx:id="btnAddClompany" contentDisplay="CENTER" maxHeight="15.0" maxWidth="30.0" mnemonicParsing="false" onAction="#cmdButton_Click" styleClass="button_process" wrapText="true" GridPane.columnIndex="4" GridPane.rowIndex="6">
+                                                                <Button fx:id="btnAddClompany" contentDisplay="CENTER" maxHeight="24.0" maxWidth="30.0" minWidth="24.0" mnemonicParsing="false" onAction="#cmdButton_Click" styleClass="button_process" wrapText="true" GridPane.columnIndex="4" GridPane.rowIndex="6">
                                                    <graphic>
-                                                      <FontAwesomeIconView glyphName="PENCIL_SQUARE_ALT" size="15" textAlignment="CENTER" />
+                                                      <FontAwesomeIconView fx:id="faAdd" glyphName="PENCIL_SQUARE_ALT" size="15" textAlignment="CENTER" />
                                                    </graphic>
                                                    <tooltip>
                                                       <Tooltip text="ADD ADDRESS" />
