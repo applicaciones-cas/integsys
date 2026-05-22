@@ -1,24 +1,22 @@
 package ph.com.guanzongroup.integsys.views;
 
-import ph.com.guanzongroup.integsys.views.ScreenInterface;
+import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import java.lang.reflect.Field;
 import java.net.URL;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
 import java.util.ResourceBundle;
-import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyBooleanPropertyBase;
 import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -30,28 +28,27 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
-import static javafx.scene.input.KeyCode.DOWN;
 import static javafx.scene.input.KeyCode.ENTER;
 import static javafx.scene.input.KeyCode.F3;
 import static javafx.scene.input.KeyCode.TAB;
-import static javafx.scene.input.KeyCode.UP;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
 import org.guanzon.appdriver.agent.ShowMessageFX;
-import org.guanzon.appdriver.base.CommonUtils;
 import org.guanzon.appdriver.base.GRiderCAS;
 import org.guanzon.appdriver.base.LogWrapper;
 import org.guanzon.appdriver.constant.EditMode;
 import org.guanzon.appdriver.base.GuanzonException;
 import org.guanzon.appdriver.base.MiscUtil;
 import org.guanzon.cas.client.account.Account_Accreditation;
+import org.guanzon.cas.client.constants.AccountAccreditationStatus;
 import org.guanzon.cas.client.services.ClientControllers;
 import org.json.simple.JSONObject;
+import ph.com.guanzongroup.integsys.utility.JFXUtil;
 
 /**
  * FXML Controller class
  *
- * @author User
+ * @author Guiller & Team 1
  */
 public class AccountsAccreditation_HistoryController implements Initializable, ScreenInterface {
 
@@ -59,32 +56,27 @@ public class AccountsAccreditation_HistoryController implements Initializable, S
     private LogWrapper poLogWrapper;
     private String psFormName = "Accounts Accreditation Entry";
     private Control lastFocusedControl;
-    private Account_Accreditation poAppController;
+    private Account_Accreditation poController;
 
     private unloadForm poUnload = new unloadForm();
-
+    ObservableList<String> comboboxlistAccounttype = FXCollections.observableArrayList("Accounts Payable", "Accounts Receivable");
+    ObservableList<String> comboboxlistTranstype = FXCollections.observableArrayList("Accreditation", "Black Listing");
     @FXML
-    private AnchorPane apMainAnchor, apMaster, apBrowse, apButton;
+    private AnchorPane apMainAnchor, apBrowse, apButton, apMaster;
     @FXML
-    private Label lblStatus, lblSource;
-
+    private Label lblSource, lblStatus1, lblStatus11, lblStatus;
     @FXML
-    private Button btnBrowse, btnClose, btnHistory;
-
+    private TextField tfSearchCompany, tfTransactionNo, tfCategory, tfCompany, tfAddress, tfTIN, tfContactPerson, tfContactNo, tfContactEmail, tfContactRole, tfContactDepartment, tfContactPosition;
     @FXML
-    private TextField tfTransactionNo, tfCategory, tfCompany,
-            tfContactPerson, tfAddress, tfSearchCompany, tfTIN,
-            tfContactRole, tfContactNo, tfContactEmail,
-            tfContactDepartment, tfContactPosition;
-
+    private Button btnBrowse, btnHistory, btnClose, btnAddClompany;
     @FXML
     private DatePicker dpTransactionDate;
-
+    @FXML
+    private ComboBox cmbAccountType, cmbTransType;
+    @FXML
+    private FontAwesomeIconView faAdd;
     @FXML
     private TextArea taRemarks;
-
-    @FXML
-    private ComboBox<String> cmbAccountType, cmbTransType;
 
     @Override
     public void setGRider(GRiderCAS foValue) {
@@ -114,17 +106,16 @@ public class AccountsAccreditation_HistoryController implements Initializable, S
 
         try {
             poLogWrapper = new LogWrapper(psFormName, psFormName);
-            poAppController = new ClientControllers(poApp, poLogWrapper).AccountAccreditation();
+            poController = new ClientControllers(poApp, poLogWrapper).AccountAccreditation();
 
-            //initlalize and validate record objects from class controller
-            //background thread
+            initComboboxes();
             Platform.runLater(() -> {
-                poAppController.setRecordStatus("01234");
+                poController.setRecordStatus("01234");
             });
-
+//            lblSource.setText(poController.getModel());
             initControlEvents();
-            getLoadedClient();
-        } catch (SQLException | GuanzonException | CloneNotSupportedException e) {
+            loadRecordMaster();
+        } catch (SQLException | GuanzonException e) {
             Logger.getLogger(AccountsAccreditation_HistoryController.class.getName()).log(Level.SEVERE, null, e);
             poLogWrapper.severe(psFormName + " :" + e.getMessage());
         }
@@ -143,24 +134,24 @@ public class AccountsAccreditation_HistoryController implements Initializable, S
                             return;
                         }
                     }
-                    if (!isJSONSuccess(poAppController.searchRecord(tfSearchCompany.getText(), false),
+                    if (!isJSONSuccess(poController.searchRecord(tfSearchCompany.getText(), false),
                             "")) {
                         return;
                     }
 
-                    getLoadedClient();
-                    initButtonDisplay(poAppController.getEditMode());
+                    loadRecordMaster();
+                    initButtonDisplay(poController.getEditMode());
                     return;
 
                 case "btnHistory":
-                    
-                    if (poAppController.getEditMode() != EditMode.READY && poAppController.getEditMode() != EditMode.UPDATE) {
+
+                    if (poController.getEditMode() != EditMode.READY && poController.getEditMode() != EditMode.UPDATE) {
                         ShowMessageFX.Warning("No transaction status history to load!", psFormName, null);
                         return;
                     }
-                    
+
                     try {
-                        poAppController.ShowStatusHistory();
+                        poController.ShowStatusHistory();
                     } catch (NullPointerException npe) {
                         Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(npe), npe);
                         ShowMessageFX.Error("No transaction status history to load!", psFormName, null);
@@ -179,7 +170,7 @@ public class AccountsAccreditation_HistoryController implements Initializable, S
                     }
             }
 
-            initButtonDisplay(poAppController.getEditMode());
+            initButtonDisplay(poController.getEditMode());
 
         } catch (Exception e) {
             poLogWrapper.severe(psFormName + " :" + e.getMessage());
@@ -208,12 +199,6 @@ public class AccountsAccreditation_HistoryController implements Initializable, S
     private void txtField_KeyPressed(KeyEvent event) {
         TextField loTxtField = (TextField) event.getSource();
         String txtFieldID = ((TextField) event.getSource()).getId();
-        String lsValue = "";
-        if (loTxtField.getText() == null) {
-            lsValue = "";
-        } else {
-            lsValue = loTxtField.getText();
-        }
         try {
             if (null != event.getCode()) {
                 switch (event.getCode()) {
@@ -227,12 +212,12 @@ public class AccountsAccreditation_HistoryController implements Initializable, S
                                         return;
                                     }
                                 }
-                                if (!isJSONSuccess(poAppController.searchRecord(tfSearchCompany.getText(), false),
+                                if (!isJSONSuccess(poController.searchRecord(tfSearchCompany.getText(), false),
                                         "")) {
                                     return;
                                 }
-                                getLoadedClient();
-                                initButtonDisplay(poAppController.getEditMode());
+                                loadRecordMaster();
+                                initButtonDisplay(poController.getEditMode());
                                 break;
 
                         }
@@ -243,242 +228,72 @@ public class AccountsAccreditation_HistoryController implements Initializable, S
             poLogWrapper.severe(psFormName + " :" + ex.getMessage());
         }
     }
-    
-    final ChangeListener<? super Boolean> dPicker_Focus = (o, ov, nv) -> {
-        DatePicker loDatePicker = (DatePicker) ((ReadOnlyBooleanPropertyBase) o).getBean();
-        String lsDatePickerID = loDatePicker.getId();
-        LocalDate loValue = loDatePicker.getValue();
 
-        if (loValue == null) {
-            return;
-        }
-        Date ldDateValue = Date.from(loValue.atStartOfDay(ZoneId.systemDefault()).toInstant());
-        if (!nv) {
-            /*Lost Focus*/
-            switch (lsDatePickerID) {
-
-            }
-        }
-    };
-
-    private final ChangeListener<? super Boolean> txtArea_Focus = (o, ov, nv) -> {
-        TextArea loTextField = (TextArea) ((ReadOnlyBooleanPropertyBase) o).getBean();
-        String lsTextFieldID = loTextField.getId();
-        String lsValue = loTextField.getText();
-        if (lsValue == null) {
-            return;
-        }
-
+    private void loadRecordMaster() {
         try {
-            if (!nv) {
-                /*Lost Focus*/
-                switch (lsTextFieldID) {
+            JFXUtil.setStatusValue(lblStatus, AccountAccreditationStatus.class, poController.getModel().getEditMode() == EditMode.UNKNOWN ? "-1" : poController.getModel().getRecordStatus());
 
-                    case "taRemarks":
+            tfTransactionNo.setText(poController.getModel().getTransactionNo() != null ? poController.getModel().getTransactionNo() : "");
+            dpTransactionDate.setValue(ParseDate(poController.getModel().getDateTransact()));
+            tfCategory.setText(poController.getModel().Category().getDescription());
+            tfCompany.setText(poController.getModel().Client().getCompanyName());
 
-                }
-            } else {
-                loTextField.selectAll();
-            }
-        } catch (Exception ex) {
-            poLogWrapper.severe(psFormName + " :" + ex.getMessage());
-        }
-    };
+            tfContactPerson.setText(poController.getModel().ClientInstitutionContact().getContactPersonName());
+            tfContactRole.setText(poController.getModel().ClientInstitutionContact().ContactRole().getsRoleDesc());
 
-    private void txtArea_KeyPressed(KeyEvent event) {
-        TextArea loTxtField = (TextArea) event.getSource();
-        String txtFieldID = ((TextArea) event.getSource()).getId();
-        String lsValue = "";
-        if (loTxtField.getText() == null) {
-            lsValue = "";
-        } else {
-            lsValue = loTxtField.getText();
-        }
-        try {
-            if (null != event.getCode()) {
-                switch (event.getCode()) {
-                    case TAB:
-                    case ENTER:
-                    case UP:
-                        CommonUtils.SetPreviousFocus((TextField) event.getSource());
-                        return;
-                    case DOWN:
-                        CommonUtils.SetNextFocus(loTxtField);
-                        return;
-
-                }
-            }
-        } catch (Exception ex) {
-            Logger.getLogger(DeliverySchedule_EntryController.class
-                    .getName()).log(Level.SEVERE, null, ex);
-            poLogWrapper.severe(psFormName + " :" + ex.getMessage());
-        }
-    }
-
-    private void loadClientMaster() {
-        try {
-            lblStatus.setText(poAppController.getModel().getRecordStatus().equals("0") == true ? "OPEN"
-                    : poAppController.getModel().getRecordStatus().equals("1") == true ? "CONFIRMED"
-                    : poAppController.getModel().getRecordStatus().equals("3") == true ? "CANCELLED" : "VOID");
-            lblSource.setText("");
-
-            tfTransactionNo.setText(poAppController.getModel().getTransactionNo() != null ? poAppController.getModel().getTransactionNo() : "");
-            dpTransactionDate.setValue(ParseDate(poAppController.getModel().getDateTransact()));
-            tfCategory.setText(poAppController.getModel().Category().getDescription());
-            tfCompany.setText(poAppController.getModel().Client().getCompanyName());
-            
-            tfContactPerson.setText(poAppController.getModel().ClientInstitutionContact().getContactPersonName());
-            tfContactRole.setText(poAppController.getModel().ClientInstitutionContact().ContactRole().getsRoleDesc());
-            
             //set landline no (mobile no is empty), set fax no(landline no is empty), by default set mobile no
-            
-            String lsMobile = poAppController.getModel().ClientInstitutionContact().getMobileNo();
-            String lsLandline = poAppController.getModel().ClientInstitutionContact().getLandlineNo();
-            String lsFaxno = poAppController.getModel().ClientInstitutionContact().getFaxNo();
-            
-            tfContactNo.setText(lsMobile == null? (lsLandline == null? (lsFaxno == null ? "" : lsFaxno) : lsLandline) : lsMobile );
-            tfContactEmail.setText(poAppController.getModel().ClientInstitutionContact().getMailAddress());
-            tfContactDepartment.setText(poAppController.getModel().ClientInstitutionContact().getsDeprtmnt());
-            tfContactPosition.setText(poAppController.getModel().ClientInstitutionContact().getContactPersonPosition());
-            
-            String lshouseno = poAppController.getModel().ClientAddress().getHouseNo() == null || poAppController.getModel().ClientAddress().getHouseNo().isEmpty() ? "" : poAppController.getModel().ClientAddress().getHouseNo() + " ";
-            String lsaddress = poAppController.getModel().ClientAddress().getAddress() == null || poAppController.getModel().ClientAddress().getAddress().isEmpty() ? "" : poAppController.getModel().ClientAddress().getAddress();
-            String lsbrgy = poAppController.getModel().ClientAddress().Barangay().getBarangayName() == null || poAppController.getModel().ClientAddress().Barangay().getBarangayName().isEmpty() ? "" : ", " + poAppController.getModel().ClientAddress().Barangay().getBarangayName();
-            String lscity = poAppController.getModel().ClientAddress().Town().getDescription() == null || poAppController.getModel().ClientAddress().Town().getDescription().isEmpty() ? " " : ", " + poAppController.getModel().ClientAddress().Town().getDescription();
-            String lsprovince = poAppController.getModel().ClientAddress().Town().Province().getDescription() == null || poAppController.getModel().ClientAddress().Town().Province().getDescription().isEmpty() ? " " : " " + poAppController.getModel().ClientAddress().Town().Province().getDescription();
-            
-            tfAddress.setText( lshouseno + lsaddress + lsbrgy + lscity + lsprovince);
-            
-            tfTIN.setText(poAppController.getModel().Client().getTaxIdNumber() == null ? "" : poAppController.getModel().Client().getTaxIdNumber());
-            taRemarks.setText(poAppController.getModel().getRemarks());
-            cmbAccountType.getSelectionModel().select(Integer.parseInt(poAppController.getModel().getAccountType()));
-            cmbTransType.getSelectionModel().select(Integer.parseInt(poAppController.getModel().getTransactionType()));
+            String lsMobile = poController.getModel().ClientInstitutionContact().getMobileNo();
+            String lsLandline = poController.getModel().ClientInstitutionContact().getLandlineNo();
+            String lsFaxno = poController.getModel().ClientInstitutionContact().getFaxNo();
+
+            tfContactNo.setText(lsMobile == null ? (lsLandline == null ? (lsFaxno == null ? "" : lsFaxno) : lsLandline) : lsMobile);
+            tfContactEmail.setText(poController.getModel().ClientInstitutionContact().getMailAddress());
+            tfContactDepartment.setText(poController.getModel().ClientInstitutionContact().getsDeprtmnt());
+            tfContactPosition.setText(poController.getModel().ClientInstitutionContact().getContactPersonPosition());
+
+            String lshouseno = poController.getModel().ClientAddress().getHouseNo() == null || poController.getModel().ClientAddress().getHouseNo().isEmpty() ? "" : poController.getModel().ClientAddress().getHouseNo() + " ";
+            String lsaddress = poController.getModel().ClientAddress().getAddress() == null || poController.getModel().ClientAddress().getAddress().isEmpty() ? "" : poController.getModel().ClientAddress().getAddress();
+            String lsbrgy = poController.getModel().ClientAddress().Barangay().getBarangayName() == null || poController.getModel().ClientAddress().Barangay().getBarangayName().isEmpty() ? "" : ", " + poController.getModel().ClientAddress().Barangay().getBarangayName();
+            String lscity = poController.getModel().ClientAddress().Town().getDescription() == null || poController.getModel().ClientAddress().Town().getDescription().isEmpty() ? " " : ", " + poController.getModel().ClientAddress().Town().getDescription();
+            String lsprovince = poController.getModel().ClientAddress().Town().Province().getDescription() == null || poController.getModel().ClientAddress().Town().Province().getDescription().isEmpty() ? " " : " " + poController.getModel().ClientAddress().Town().Province().getDescription();
+
+            tfAddress.setText(lshouseno + lsaddress + lsbrgy + lscity + lsprovince);
+
+            tfTIN.setText(poController.getModel().Client().getTaxIdNumber() == null ? "" : poController.getModel().Client().getTaxIdNumber());
+            taRemarks.setText(poController.getModel().getRemarks());
+            cmbAccountType.getSelectionModel().select(Integer.parseInt(poController.getModel().getAccountType()));
+            cmbTransType.getSelectionModel().select(Integer.parseInt(poController.getModel().getTransactionType()));
 
         } catch (SQLException | GuanzonException e) {
             poLogWrapper.severe(psFormName, e.getMessage());
         }
     }
 
+    private void initComboboxes() {
+        JFXUtil.setComboBoxItems(new JFXUtil.Pairs<>(comboboxlistAccounttype, cmbAccountType), new JFXUtil.Pairs<>(comboboxlistTranstype, cmbTransType));
+        JFXUtil.initComboBoxCellDesignColor("#FF8201", cmbAccountType, cmbTransType);
+    }
+
+    private void initButtonDisplay(int fnValue) {
+
+        boolean lbShow1 = (fnValue == EditMode.READY);
+        boolean lbShow2 = (fnValue == EditMode.UNKNOWN || fnValue == EditMode.READY);
+
+        JFXUtil.setButtonsVisibility(lbShow1, btnHistory);
+        JFXUtil.setButtonsVisibility(lbShow2, btnClose);
+
+        JFXUtil.setDisabled(true, apMaster);
+        JFXUtil.setButtonsVisibility(true, btnBrowse);
+    }
+
     private void initControlEvents() {
-        List<Control> laControls = getAllSupportedControls();
-
-        for (Control loControl : laControls) {
-            //add more if required
-            if (loControl instanceof TextField) {
-                TextField loControlField = (TextField) loControl;
-                controllerFocusTracker(loControlField);
-                loControlField.setOnKeyPressed(this::txtField_KeyPressed);
-                loControlField.focusedProperty().addListener(txtField_Focus);
-            } else if (loControl instanceof TableView) {
-                TableView loControlField = (TableView) loControl;
-                controllerFocusTracker(loControlField);
-            } else if (loControl instanceof TextArea) {
-                TextArea loControlField = (TextArea) loControl;
-                controllerFocusTracker(loControlField);
-                loControlField.setOnKeyPressed(this::txtArea_KeyPressed);
-                loControlField.focusedProperty().addListener(txtArea_Focus);
-            } else if (loControl instanceof ComboBox) {
-                ComboBox loControlField = (ComboBox) loControl;
-                controllerFocusTracker(loControlField);
-            } else if (loControl instanceof DatePicker) {
-                DatePicker loControlField = (DatePicker) loControl;
-                controllerFocusTracker(loControlField);
-                loControlField.focusedProperty().addListener(dPicker_Focus);
-            }
-        }
-
+        JFXUtil.setKeyPressedListener(this::txtField_KeyPressed, apBrowse, apMaster);
         clearAllInputs();
-
-    }
-
-    private void controllerFocusTracker(Control control) {
-        control.focusedProperty().addListener((obs, oldVal, newVal) -> {
-            if (newVal) {
-                lastFocusedControl = control;
-            }
-        });
-    }
-
-    private void clearAllInputs() {
-
-        List<Control> laControls = getAllSupportedControls();
-
-        for (Control loControl : laControls) {
-            if (loControl instanceof TextField) {
-                ((TextField) loControl).clear();
-            } else if (loControl instanceof TextArea) {
-                ((TextArea) loControl).clear();
-            } else if (loControl != null && loControl instanceof TableView) {
-                TableView<?> table = (TableView<?>) loControl;
-                if (table.getItems() != null) {
-                    table.getItems().clear();
-                }
-
-            } else if (loControl instanceof DatePicker) {
-                ((DatePicker) loControl).setValue(null);
-            } else if (loControl instanceof ComboBox) {
-                ((ComboBox) loControl).setItems(null);
-            }
-        }
-        initButtonDisplay(poAppController.getEditMode());
-        cmbAccountType.setItems(FXCollections.observableArrayList(
-                "Accounts Payable",
-                "Accounts Receivable"
-        ));
-        cmbTransType.setItems(FXCollections.observableArrayList(
-                "Accreditation", // empty option
-                "Black Listing"
-        ));
-    }
-
-    private void initButtonDisplay(int fnEditMode) {
-        boolean lbShow = (fnEditMode == EditMode.ADDNEW || fnEditMode == EditMode.UPDATE);
-
-        // Always show these buttons
-        initButtonControls(true, "btnClose");
-
-        // Show-only based on mode
-        initButtonControls(lbShow, "btnSearch", "btnSave", "btnCancel");
-        initButtonControls(!lbShow, "btnBrowse", "btnHistory", "btnNew", "btnUpdate");
-
-        apMaster.setDisable(!lbShow);
-    }
-
-    private void initButtonControls(boolean visible, String... buttonFxIdsToShow) {
-        Set<String> showOnly = new HashSet<>(Arrays.asList(buttonFxIdsToShow));
-
-        for (Field loField : getClass().getDeclaredFields()) {
-            loField.setAccessible(true);
-            String fieldName = loField.getName(); // fx:id
-
-            // Only touch the buttons listed
-            if (!showOnly.contains(fieldName)) {
-                continue;
-            }
-            try {
-                Object value = loField.get(this);
-                if (value instanceof Button) {
-                    Button loButton = (Button) value;
-                    loButton.setVisible(visible);
-                    loButton.setManaged(visible);
-                }
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
-                poLogWrapper.severe(psFormName + " :" + e.getMessage());
-            }
-        }
-    }
-
-    private void getLoadedClient() throws SQLException, GuanzonException, CloneNotSupportedException {
-//        clearAllInputs();
-        loadClientMaster();
     }
 
     private boolean isJSONSuccess(JSONObject loJSON, String fsModule) {
         String result = (String) loJSON.get("result");
         String message = (String) loJSON.get("message");
-
-        System.out.println("isJSONSuccess called. Thread: " + Thread.currentThread().getName());
 
         if ("error".equalsIgnoreCase(result)) {
             poLogWrapper.severe(psFormName + " : " + message);
@@ -493,13 +308,6 @@ public class AccountsAccreditation_HistoryController implements Initializable, S
         }
 
         if ("success".equalsIgnoreCase(result)) {
-//            if (message != null && !message.trim().isEmpty()) {
-//                if (Platform.isFxApplicationThread()) {
-//                    ShowMessageFX.Information(null, psFormName, fsModule + ": " + message);
-//                } else {
-//                    Platform.runLater(() -> ShowMessageFX.Information(null, psFormName, fsModule + ": " + message));
-//                }
-//            }
             poLogWrapper.info(psFormName + " : Success on " + fsModule);
             return true;
         }
@@ -537,5 +345,10 @@ public class AccountsAccreditation_HistoryController implements Initializable, S
             }
         }
         return controls;
+    }
+
+    private void clearAllInputs() {
+        JFXUtil.clearTextFields(apMaster);
+        initButtonDisplay(poController.getEditMode());
     }
 }
