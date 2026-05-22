@@ -69,7 +69,7 @@ import org.guanzon.appdriver.base.MiscUtil;
 import org.guanzon.appdriver.constant.DocumentType;
 import org.guanzon.appdriver.constant.RecordStatus;
 import org.guanzon.cas.client.account.AP_Client_Master;
-import org.guanzon.cas.client.constants.APPaymentConstants;
+//import org.guanzon.cas.client.constants.APPaymentConstants;
 import org.guanzon.cas.client.model.Model_AP_Client_Ledger;
 import org.guanzon.cas.client.services.ClientControllers;
 import org.json.simple.JSONObject;
@@ -127,19 +127,19 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
     StackPane stackpane;
 
     @FXML
-    private TextField txtAttachmentNo;
+    private TextField tfAttachmentNo;
 
     @FXML
     private TableView<ModelDeliveryAcceptance_Attachment> tblAttachments;
 
     @FXML
-    private TableColumn<ModelDeliveryAcceptance_Attachment, String> tblColAttachIndex, tblColAttachFile;
+    private TableColumn<ModelDeliveryAcceptance_Attachment, String> tblRowNoAttachment, tblFileNameAttachment;
 
     @FXML
-    private ImageView imgPreview;
+    private ImageView imageView;
 
     @FXML
-    private Button btnAttach, btnRemoveFile, btnPrevious, btnNext;
+    private Button btnAddAttachment, btnRemoveAttachment, btnPrevious, btnNext;
 
     @FXML
     private DatePicker dpBegBalance, dpClientSince;
@@ -216,7 +216,7 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
             imageviewerutil.scaleFactor = 1.0;
 
             loadRecordAttachment(true);
-            JFXUtil.resetImageBounds(imgPreview, stackpane);
+            JFXUtil.resetImageBounds(imageView, stackpane);
         }
     }
 
@@ -372,20 +372,20 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
                     reloadTableLedger();
                     break;
 
-                case "btnAttach":
+                case "btnAddAttachment":
 
                     FileChooser fileChooser = new FileChooser();
                     fileChooser.setTitle("Choose Image");
                     fileChooser.getExtensionFilters().addAll(
                             new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg", "*.gif", "*.pdf")
                     );
-                    java.io.File selectedFile = fileChooser.showOpenDialog((Stage) btnAttach.getScene().getWindow());
+                    java.io.File selectedFile = fileChooser.showOpenDialog((Stage) btnAddAttachment.getScene().getWindow());
                     if (selectedFile != null) {
                         // Read image from the selected file
                         Path imgPath = selectedFile.toPath();
                         Image loimage = new Image(Files.newInputStream(imgPath));
 
-                        imgPreview.setImage(loimage);
+                        imageView.setImage(loimage);
 
                         //Validate attachment
                         String imgPath2 = selectedFile.getName().toString();
@@ -436,7 +436,7 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
                         tblAttachments.getSelectionModel().select(pnAttachments);
                     }
                     break;
-                case "btnRemoveFile":
+                case "btnRemoveAttachment":
                     if (poAppController.getTransactionAttachmentCount() <= 0) {
                         return;
                     } else {
@@ -678,10 +678,10 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
             cbHoldOrder.setSelected(poAppController.getModel().isHoldOrder() == null || !poAppController.getModel().isHoldOrder().equalsIgnoreCase("1") ? false : true);
             
             //registration list
-            if (poAppController.getModel().getVatRegstr()== null) {
-            }else{
-                cmbRegistration.getSelectionModel().select(Integer.parseInt(poAppController.getModel().getVatRegstr()));
-            }
+//            if (poAppController.getModel().getVatRegstr()== null) {
+//            }else{
+//                cmbRegistration.getSelectionModel().select(Integer.parseInt(poAppController.getModel().getVatRegstr()));
+//            }
             
             //payment method
             if (poAppController.getModel().getPayment() == null) {
@@ -743,12 +743,12 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
             poAppController.getModel().isHoldOrder(cbHoldOrder.isSelected() == true ? "1" : "0");
         });
         //vat registration
-        cmbRegistration.getSelectionModel().selectedIndexProperty().addListener((obs, oldIndex, newIndex) -> {
-            if (newIndex != null && newIndex.intValue() >= 0) {
-                int lnIndex = newIndex.intValue(); // the selected index
-                poAppController.getModel().setVatRegstr(String.valueOf(lnIndex));
-            }
-        });
+//        cmbRegistration.getSelectionModel().selectedIndexProperty().addListener((obs, oldIndex, newIndex) -> {
+//            if (newIndex != null && newIndex.intValue() >= 0) {
+//                int lnIndex = newIndex.intValue(); // the selected index
+//                poAppController.getModel().setVatRegstr(String.valueOf(lnIndex));
+//            }
+//        });
         //payment method
         cmbPayment.getSelectionModel().selectedIndexProperty().addListener((obs, oldIndex, newIndex) -> {
             if (newIndex != null && newIndex.intValue() >= 0) {
@@ -793,12 +793,12 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
 
         //reset image objects
         imageinfo_temp.clear();
-        imgPreview.setImage(null);
+        imageView.setImage(null);
 
         initButtonDisplay(poAppController.getEditMode());
-        
-        cmbRegistration.setItems(APPaymentConstants.regstrList);
-        cmbPayment.setItems(APPaymentConstants.paymentList);
+//        
+//        cmbRegistration.setItems(APPaymentConstants.regstrList);
+//        cmbPayment.setItems(APPaymentConstants.paymentList);
     }
 
     private void initButtonDisplay(int fnEditMode) {
@@ -814,8 +814,8 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
         apRecord.setDisable(!lbShow);
 
         //initialize file buttons
-        btnAttach.setDisable(!lbShow);
-        btnRemoveFile.setDisable(!lbShow);
+        btnAddAttachment.setDisable(!lbShow);
+        btnRemoveAttachment.setDisable(!lbShow);
     }
 
     private void initButtonControls(boolean visible, String... buttonFxIdsToShow) {
@@ -895,8 +895,8 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
     private void initAttachmentsGrid() {
 
         /*FOCUS ON FIRST ROW*/
-        JFXUtil.setColumnCenter(tblColAttachIndex);
-        JFXUtil.setColumnLeft(tblColAttachFile);
+        JFXUtil.setColumnCenter(tblRowNoAttachment);
+        JFXUtil.setColumnLeft(tblFileNameAttachment);
         JFXUtil.setColumnsIndexAndDisableReordering(tblAttachments);
 
         tblAttachments.setItems(laAttachments);
@@ -972,7 +972,7 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
                 laAttachments,
                 () -> {
 
-                    JFXUtil.resetImageBounds(imgPreview, stackpane);
+                    JFXUtil.resetImageBounds(imageView, stackpane);
                     Platform.runLater(() -> {
 
                         try {
@@ -1041,7 +1041,7 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
     }
 
     private void initAttachmentPreviewPane() {
-        imageviewerutil.initAttachmentPreviewPane(stackpane, imgPreview);
+        imageviewerutil.initAttachmentPreviewPane(stackpane, imageView);
         stackpane.heightProperty().addListener((observable, oldValue, newHeight) -> {
             double computedHeight = newHeight.doubleValue();
             imageviewerutil.ldstackPaneHeight = computedHeight;
@@ -1054,7 +1054,7 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
         try {
             if (laAttachments.size() > 0) {
 
-                txtAttachmentNo.setText(laAttachments.get(tblAttachments.getSelectionModel().getSelectedIndex()).getIndex01());
+                tfAttachmentNo.setText(laAttachments.get(tblAttachments.getSelectionModel().getSelectedIndex()).getIndex01());
 
                 String lsAttachmentType = poAppController.getAttachmentList().get(pnAttachments).getModel().getDocumentType();
                 if (lsAttachmentType.equals("")) {
@@ -1088,10 +1088,10 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
 
                                 // ----- IMAGE VIEW -----
                                 Image loimage = new Image(convertedPath);
-                                imgPreview.setImage(loimage);
+                                imageView.setImage(loimage);
 
                                 //no need to auto adjust the size, image can be scaled manually, besides, this method affects the margins and sizes of forms when maxed value
-                                //JFXUtil.adjustImageSize(loimage, imgPreview, imageviewerutil.ldstackPaneWidth, imageviewerutil.ldstackPaneHeight);
+                                //JFXUtil.adjustImageSize(loimage, imageView, imageviewerutil.ldstackPaneWidth, imageviewerutil.ldstackPaneHeight);
                                 PauseTransition delay = new PauseTransition(Duration.seconds(2)); // 2-second delay
                                 delay.setOnFinished(event -> {
                                     Platform.runLater(() -> {
@@ -1101,7 +1101,7 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
                                 delay.play();
 
                                 // Add ImageView directly to stackPane
-                                stackpane.getChildren().add(imgPreview);
+                                stackpane.getChildren().add(imageView);
                                 stackpane.getChildren().addAll(btnPrevious, btnNext);
 
                                 // Align buttons on top
@@ -1116,23 +1116,23 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
                                 JFXUtil.PDFViewConfig(filePath2, stackpane, btnPrevious, btnNext, imageviewerutil.ldstackPaneWidth, imageviewerutil.ldstackPaneHeight);
                             }
                         } else {
-                            imgPreview.setImage(null);
+                            imageView.setImage(null);
                         }
                     } catch (Exception e) {
-                        imgPreview.setImage(null);
+                        imageView.setImage(null);
                     }
                 }
             } else {
 
                 if (!lbloadImage) {
 
-                    imgPreview.setImage(null);
+                    imageView.setImage(null);
 
                     // Clear previous content
                     stackpane.getChildren().clear();
 
                     // Add ImageView directly to stackPane
-                    stackpane.getChildren().add(imgPreview);
+                    stackpane.getChildren().add(imageView);
                     stackpane.getChildren().addAll(btnPrevious, btnNext);
 
                     Platform.runLater(() -> JFXUtil.stackPaneClip(stackpane));
@@ -1146,9 +1146,9 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
     public void reloadTableAttachments() {
 
         //reset image objects
-        txtAttachmentNo.clear();
+        tfAttachmentNo.clear();
         imageinfo_temp.clear();
-        imgPreview.setImage(null);
+        imageView.setImage(null);
 
         //reload table attachment
         loadTableAttachment.reload();
@@ -1164,7 +1164,7 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
         int newIndex = currentIndex + direction;
 
         if (newIndex != -1 && (newIndex <= laAttachments.size() - 1)) {
-            TranslateTransition slideOut = new TranslateTransition(Duration.millis(300), imgPreview);
+            TranslateTransition slideOut = new TranslateTransition(Duration.millis(300), imageView);
             slideOut.setByX(direction * -400); // Move left or right
 
             JFXUtil.selectAndFocusRow(tblAttachments, newIndex);
@@ -1175,8 +1175,8 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
 
             // Create a transition animation
             slideOut.setOnFinished(event -> {
-                imgPreview.setTranslateX(direction * 400);
-                TranslateTransition slideIn = new TranslateTransition(Duration.millis(300), imgPreview);
+                imageView.setTranslateX(direction * 400);
+                TranslateTransition slideIn = new TranslateTransition(Duration.millis(300), imageView);
                 slideIn.setToX(0);
                 slideIn.play();
 
@@ -1185,8 +1185,8 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
 
             slideOut.play();
         }
-        if (JFXUtil.isImageViewOutOfBounds(imgPreview, stackpane)) {
-            JFXUtil.resetImageBounds(imgPreview, stackpane);
+        if (JFXUtil.isImageViewOutOfBounds(imageView, stackpane)) {
+            JFXUtil.resetImageBounds(imageView, stackpane);
         }
     }
 
