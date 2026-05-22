@@ -485,7 +485,7 @@
                                                       <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="28.0" vgrow="SOMETIMES" />
                                                    </rowConstraints>
                                                    <children>
-                                                      <AnchorPane fx:id="apAttachments1" prefHeight="200.0" prefWidth="200.0">
+                                                      <AnchorPane fx:id="apAttachments" prefHeight="200.0" prefWidth="200.0">
                                                          <children>
                                                             <GridPane AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="5.0">
                                                                <columnConstraints>

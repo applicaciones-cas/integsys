@@ -1,6 +1,5 @@
 package ph.com.guanzongroup.integsys.views;
 
-import ph.com.guanzongroup.integsys.views.ScreenInterface;
 import java.lang.reflect.Field;
 import java.net.URL;
 import java.nio.file.Files;
@@ -43,6 +42,7 @@ import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.Pagination;
 import javafx.scene.control.ProgressIndicator;
+import javafx.scene.control.Tab;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
@@ -104,14 +104,6 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
 
     private JFXUtil.ReloadableTableTask loadTableAttachment;
     private FilteredList<Model_AP_Client_Ledger> filteredData;
-    @FXML
-    private AnchorPane apMainAnchor, apRecord, apLedger, apAttachments;
-    @FXML
-    private Label lblStatus;
-
-    @FXML
-    private Button btnSearch, btnBrowse, btnCancel, btnUpdate, btnSave,
-            btnRetrieve, btnClose;
 
     @FXML
     private TableView<Model_AP_Client_Ledger> tblLedger;
@@ -120,40 +112,34 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
     private TableColumn<Model_AP_Client_Ledger, String> tblColNo, tblLedgerNo, tblColDate, tblColSourceNo, tblColSourceCode, tblColAmountIn, tblColAmountOut;
 
     @FXML
-    private TextField tfSearchCompanyName, tfSearchClient, tfClientID, tfContactPerson,
-            tfCompanyName, tfCreditLimit, tfBegBalanace, tfCategory,
-            tfDiscount, tfTerm, tfAvailBalance, tfOutStandingBalance,
-            tfAddress, tfContactNo, tfTINNo, tfContactEmail;
-
-    @FXML
-    StackPane stackpane;
-
-    @FXML
-    private TextField tfAttachmentNo;
-
-    @FXML
     private TableView<ModelDeliveryAcceptance_Attachment> tblAttachments;
 
     @FXML
     private TableColumn<ModelDeliveryAcceptance_Attachment, String> tblRowNoAttachment, tblFileNameAttachment;
 
     @FXML
-    private ImageView imageView;
-
+    private AnchorPane apMainAnchor, apRecord, apLedger, apAttachments, apAttachmentButtons;
     @FXML
-    private Button btnAddAttachment, btnRemoveAttachment, btnPrevious, btnNext;
-
+    private Button btnBrowse, btnSearch, btnSave, btnUpdate, btnCancel, btnRetrieve, btnClose, btnAddAttachment, btnRemoveAttachment, btnArrowLeft, btnArrowRight;
     @FXML
-    private DatePicker dpBegBalance, dpClientSince;
-
+    private TextField tfSearchCompanyName, tfSearchClient, tfClientID, tfCategory, tfCompanyName, tfAddress, tfTINNo, tfContactPerson, tfContactEmail, tfContactNo, tfCreditLimit, tfBegBalanace, tfDiscount, tfTerm, tfAvailBalance, tfOutStandingBalance, tfAttachmentNo;
     @FXML
-    private CheckBox cbVatable, cbHasPermit, cbBackOrder, cbHoldOrder;
-
+    private Label lblSource, lblStatus, lblStatus12, lblStatus121;
     @FXML
-    private ComboBox<String> cmbPayment, cmbRegistration;
-
+    private ComboBox cmbRegistration, cmbPayment;
+    @FXML
+    private CheckBox cbHasPermit, cbBackOrder, cbVatable, cbHoldOrder;
+    @FXML
+    private DatePicker dpClientSince, dpBegBalance;
     @FXML
     private Pagination pgPagination;
+    @FXML
+    private Tab tabAttachments;
+    
+    @FXML
+    private StackPane stackpane;
+    @FXML
+    private ImageView imageView;
 
     @Override
     public void setGRider(GRiderCAS foValue) {
@@ -447,10 +433,10 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
                     }
                     initAttachmentsGrid();
                     break;
-                case "btnNext":
+                case "btnArrowRight":
                     slideImage(1);
                     break;
-                case "btnPrevious":
+                case "btnArrowLeft":
                     slideImage(-1);
                     break;
 
@@ -1062,18 +1048,18 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
 
                                 // Add ImageView directly to stackPane
                                 stackpane.getChildren().add(imageView);
-                                stackpane.getChildren().addAll(btnPrevious, btnNext);
+                                stackpane.getChildren().addAll(btnArrowLeft, btnArrowRight);
 
                                 // Align buttons on top
-                                StackPane.setAlignment(btnPrevious, Pos.CENTER_LEFT);
-                                StackPane.setAlignment(btnNext, Pos.CENTER_RIGHT);
+                                StackPane.setAlignment(btnArrowLeft, Pos.CENTER_LEFT);
+                                StackPane.setAlignment(btnArrowRight, Pos.CENTER_RIGHT);
 
                                 // Optional: add some margin
-                                StackPane.setMargin(btnPrevious, new Insets(0, 0, 0, 10));
-                                StackPane.setMargin(btnNext, new Insets(0, 10, 0, 0));
+                                StackPane.setMargin(btnArrowLeft, new Insets(0, 0, 0, 10));
+                                StackPane.setMargin(btnArrowRight, new Insets(0, 10, 0, 0));
                             } else {
                                 // ----- PDF VIEW -----
-                                JFXUtil.PDFViewConfig(filePath2, stackpane, btnPrevious, btnNext, imageviewerutil.ldstackPaneWidth, imageviewerutil.ldstackPaneHeight);
+                                JFXUtil.PDFViewConfig(filePath2, stackpane, btnArrowLeft, btnArrowRight, imageviewerutil.ldstackPaneWidth, imageviewerutil.ldstackPaneHeight);
                             }
                         } else {
                             imageView.setImage(null);
@@ -1093,7 +1079,7 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
 
                     // Add ImageView directly to stackPane
                     stackpane.getChildren().add(imageView);
-                    stackpane.getChildren().addAll(btnPrevious, btnNext);
+                    stackpane.getChildren().addAll(btnArrowLeft, btnArrowRight);
 
                     Platform.runLater(() -> JFXUtil.stackPaneClip(stackpane));
                     pnAttachments = 0;
