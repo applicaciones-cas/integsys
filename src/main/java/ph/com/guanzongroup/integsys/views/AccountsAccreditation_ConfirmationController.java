@@ -190,8 +190,8 @@ public class AccountsAccreditation_ConfirmationController implements Initializab
 
                 case "btnAddClompany":
                     poController.addCompany();
+                    loadRecordMaster();
                     break;
-
                 case "btnUpdate":
                     if (poController.getModel().getClientId() == null || poController.getModel().getClientId().isEmpty()) {
                         ShowMessageFX.Information("Please load record before proceeding..", psFormName, "");

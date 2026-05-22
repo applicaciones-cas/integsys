@@ -183,6 +183,7 @@ public class AccountsAccreditation_EntryController implements Initializable, Scr
 
                 case "btnAddClompany":
                     poController.addCompany();
+                    loadRecordMaster();
                     break;
                 case "btnUpdate":
                     if (poController.getModel().getClientId() == null || poController.getModel().getClientId().isEmpty()) {
