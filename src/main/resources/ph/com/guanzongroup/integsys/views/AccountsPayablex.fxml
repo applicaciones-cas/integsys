@@ -27,7 +27,7 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<AnchorPane fx:id="apMainAnchor" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane fx:id="apMainAnchor" prefHeight="860.0" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1">
    <children>
       <BorderPane AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <bottom>
@@ -35,7 +35,7 @@
                <children>
                   <HBox alignment="CENTER_LEFT" spacing="5.0" style="-fx-background-color: #E9E9E9;" styleClass="button_process" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="5.0">
                      <children>
-                        <Button fx:id="btnBrowse" contentDisplay="TOP" ellipsisString="" maxHeight="70.0" mnemonicParsing="false" onAction="#cmdButton_Click" prefHeight="50.0" prefWidth="70.0" styleClass="button_process" stylesheets="@../css/StyleSheet.css" text="Browse">
+                        <Button fx:id="btnBrowse" contentDisplay="TOP" ellipsisString="" maxHeight="70.0" minHeight="70.0" mnemonicParsing="false" onAction="#cmdButton_Click" prefHeight="70.0" prefWidth="70.0" styleClass="button_process" stylesheets="@../css/StyleSheet.css" text="Browse">
                            <graphic>
                               <FontAwesomeIconView glyphName="FOLDER_OPEN" size="20" />
                            </graphic>
@@ -170,9 +170,9 @@
                                  <children>
                                     <HBox spacing="5.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="0.0">
                                        <children>
-                                          <AnchorPane fx:id="apRecord" style="-fx-border-color: orange;">
+                                          <AnchorPane fx:id="apRecord" maxHeight="400.0" style="-fx-border-color: orange;">
                                              <children>
-                                                <GridPane AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="5.0">
+                                                <GridPane AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="5.0">
                                                    <columnConstraints>
                                                       <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="100.0" />
                                                       <ColumnConstraints hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="5.0" />
@@ -211,7 +211,7 @@
                                                       <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="28.0" vgrow="SOMETIMES" />
                                                       <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="28.0" vgrow="SOMETIMES" />
                                                       <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="28.0" vgrow="SOMETIMES" />
-                                                      <RowConstraints minHeight="10.0" prefHeight="10.0" vgrow="SOMETIMES" />
+                                                      <RowConstraints minHeight="-Infinity" vgrow="SOMETIMES" />
                                                    </rowConstraints>
                                                    <children>
                                                       <Label fx:id="lblStatus" alignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minWidth="142.0" prefHeight="27.0" prefWidth="142.0" style="-fx-background-color: FF8201;" text="Active" textAlignment="CENTER" textFill="#111111" GridPane.columnIndex="7" GridPane.columnSpan="2" GridPane.halignment="RIGHT" GridPane.rowIndex="2">
@@ -327,12 +327,12 @@
                                                             <Insets />
                                                          </GridPane.margin>
                                                       </ComboBox>
-                                                      <CheckBox fx:id="cbHasPermit" mnemonicParsing="false" text="Has Permit" GridPane.columnIndex="5" GridPane.halignment="RIGHT" GridPane.rowIndex="6">
+                                                      <CheckBox fx:id="cbHasPermit" mnemonicParsing="false" onAction="#cmdCheckBox_Click" text="Has Permit" GridPane.columnIndex="5" GridPane.halignment="RIGHT" GridPane.rowIndex="6">
                                                          <GridPane.margin>
                                                             <Insets />
                                                          </GridPane.margin>
                                                       </CheckBox>
-                                                      <CheckBox fx:id="cbBackOrder" mnemonicParsing="false" text="Back Order Monitoring" GridPane.columnIndex="7" GridPane.columnSpan="2" GridPane.rowIndex="6" />
+                                                      <CheckBox fx:id="cbBackOrder" mnemonicParsing="false" onAction="#cmdCheckBox_Click" text="Back Order Monitoring" GridPane.columnIndex="7" GridPane.columnSpan="2" GridPane.rowIndex="6" />
                                                       <TextField fx:id="tfClientID" editable="false" style="-fx-font-weight: bold;" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.rowIndex="2">
                                                          <GridPane.margin>
                                                             <Insets />
@@ -403,7 +403,7 @@
                                                             <Insets />
                                                          </GridPane.margin>
                                                       </TextField>
-                                                      <CheckBox fx:id="cbVatable" mnemonicParsing="false" text="Vatable" GridPane.columnIndex="2" GridPane.halignment="LEFT" GridPane.rowIndex="23">
+                                                      <CheckBox fx:id="cbVatable" mnemonicParsing="false" onAction="#cmdCheckBox_Click" text="Vatable" GridPane.columnIndex="2" GridPane.halignment="LEFT" GridPane.rowIndex="23">
                                                          <GridPane.margin>
                                                             <Insets />
                                                          </GridPane.margin>
@@ -418,7 +418,7 @@
                                                             <Insets />
                                                          </GridPane.margin>
                                                       </DatePicker>
-                                                      <CheckBox fx:id="cbHoldOrder" mnemonicParsing="false" text="Hold Orders" GridPane.columnIndex="7" GridPane.halignment="LEFT" GridPane.rowIndex="23" />
+                                                      <CheckBox fx:id="cbHoldOrder" mnemonicParsing="false" onAction="#cmdCheckBox_Click" text="Hold Orders" GridPane.columnIndex="7" GridPane.halignment="LEFT" GridPane.rowIndex="23" />
                                                       <Label text="Payment Method" GridPane.rowIndex="18" />
                                                       <ComboBox fx:id="cmbPayment" prefWidth="175.0" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.rowIndex="18">
                                                          <GridPane.margin>
@@ -442,7 +442,7 @@
                                                     <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="50.0" vgrow="SOMETIMES" />
                                                   </rowConstraints>
                                                    <children>
-                                                      <Pagination GridPane.rowIndex="1" />
+                                                      <Pagination fx:id="pgPagination" GridPane.rowIndex="1" />
                                                       <TableView fx:id="tblLedger" onMouseClicked="#tblLedger_Clicked" stylesheets="@../css/Tables.css">
                                                          <columns>
                                                             <TableColumn fx:id="tblColNo" editable="false" maxWidth="30.0" minWidth="30.0" prefWidth="30.0" sortable="false" text="No." />

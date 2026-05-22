@@ -27,6 +27,7 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.collections.transformation.FilteredList;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -40,6 +41,7 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.Control;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
+import javafx.scene.control.Pagination;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -88,11 +90,11 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
     private GRiderCAS poApp;
     private LogWrapper poLogWrapper;
     private Control lastFocusedControl;
-    private AP_Client_Master poAppController;
+    private AP_Client_Master poController;
 
     private String psFormName = "Account Payable";
     private int pnLedger, pnAttachments, currentIndex;
-
+    JSONObject poJSON = new JSONObject();
     private ObservableList<Model_AP_Client_Ledger> laLedger;
     private ObservableList<ModelDeliveryAcceptance_Attachment> laAttachments = FXCollections.observableArrayList();
 
@@ -101,7 +103,7 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
     private unloadForm poUnload = new unloadForm();
 
     private JFXUtil.ReloadableTableTask loadTableAttachment;
-
+    private FilteredList<Model_AP_Client_Ledger> filteredData;
     @FXML
     private AnchorPane apMainAnchor, apRecord, apLedger, apAttachments;
     @FXML
@@ -146,9 +148,12 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
 
     @FXML
     private CheckBox cbVatable, cbHasPermit, cbBackOrder, cbHoldOrder;
-    
+
     @FXML
     private ComboBox<String> cmbPayment, cmbRegistration;
+
+    @FXML
+    private Pagination pgPagination;
 
     @Override
     public void setGRider(GRiderCAS foValue) {
@@ -178,16 +183,17 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
 
         try {
             poLogWrapper = new LogWrapper(psFormName, psFormName);
-            poAppController = new ClientControllers(poApp, poLogWrapper).APClientMaster();
+            poController = new ClientControllers(poApp, poLogWrapper).APClientMaster();
 
             //initlalize and validate record objects from class controller
             //background thread
+            pgPagination.setPageCount(1);
             Platform.runLater(() -> {
-                poAppController.setRecordStatus("10");
+                poController.setRecordStatus("10");
             });
-
-            initializeTableLedger();
+            initComboboxes();
             initControlEvents();
+            initMainGrid();
             initAttachmentsGrid();
             initTableAttachments();
             initAttachmentPreviewPane();
@@ -199,28 +205,6 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
     }
 
     @FXML
-    void tblLedger_Clicked(MouseEvent e) {
-        pnLedger = tblLedger.getSelectionModel().getSelectedIndex();
-        if (pnLedger < 0) {
-            return;
-        }
-    }
-
-    @FXML
-    void tblAttachment_Clicked(MouseEvent e) {
-        pnAttachments = tblAttachments.getSelectionModel().getSelectedIndex();
-
-        if (pnAttachments >= 0) {
-            int lnRow = Integer.parseInt(laAttachments.get(tblAttachments.getSelectionModel().getSelectedIndex()).getIndex03());
-            pnAttachments = lnRow;
-            imageviewerutil.scaleFactor = 1.0;
-
-            loadRecordAttachment(true);
-            JFXUtil.resetImageBounds(imageView, stackpane);
-        }
-    }
-
-    @FXML
     private void cmdButton_Click(ActionEvent event) {
         try {
             //get button id
@@ -228,15 +212,12 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
             switch (btnID) {
                 case "btnSearch":
                     if (lastFocusedControl == null) {
-                        ShowMessageFX.Information(null, psFormName,
-                                "Search unavailable. Please ensure a searchable field is selected or focused before proceeding..");
+                        ShowMessageFX.Information(null, psFormName, "Search unavailable. Please ensure a searchable field is selected or focused before proceeding..");
                         return;
                     }
-
                     switch (lastFocusedControl.getId()) {
                         case "tfTerm":
-                            if (!isJSONSuccess(poAppController.searchTerm(tfTerm.getText() == null ? "" : tfTerm.getText(), false),
-                                    "Initialize Search Category! ")) {
+                            if (!isJSONSuccess(poController.searchTerm(tfTerm.getText() == null ? "" : tfTerm.getText(), false), "Initialize Search Category! ")) {
                                 return;
                             }
                             loadClientMaster();
@@ -252,34 +233,33 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
                                 return;
                             }
                         }
-                        if (!isJSONSuccess(poAppController.searchRecord(tfSearchClient.getText(), true),
+                        if (!isJSONSuccess(poController.searchRecord(tfSearchClient.getText(), true),
                                 "")) {
                             return;
                         }
-                        poAppController.loadAttachments();
+                        poController.loadAttachments();
 
                         getLoadedClient();
-                        initButtonDisplay(poAppController.getEditMode());
+                        initButtonDisplay(poController.getEditMode());
                         return;
                     }
 
                     switch (lastFocusedControl.getId()) {
-
                         case "tfSearchClient":
                             if (!tfClientID.getText().isEmpty()) {
                                 if (ShowMessageFX.OkayCancel(null, "Search Client! by ID", "Are you sure you want replace loaded Record?") == false) {
                                     return;
                                 }
                             }
-                            if (!isJSONSuccess(poAppController.searchRecord(tfSearchClient.getText(), true),
+                            if (!isJSONSuccess(poController.searchRecord(tfSearchClient.getText(), true),
                                     "Initialize Search Client! ")) {
                                 return;
                             }
                             clearAllInputs();
-                            
-                            poAppController.loadAttachments();
+
+                            poController.loadAttachments();
                             getLoadedClient();
-                            initButtonDisplay(poAppController.getEditMode());
+                            initButtonDisplay(poController.getEditMode());
                             break;
                         case "tfSearchCompanyName":
                             if (!tfClientID.getText().isEmpty()) {
@@ -287,15 +267,15 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
                                     return;
                                 }
                             }
-                            if (!isJSONSuccess(poAppController.searchRecord(tfSearchCompanyName.getText(), false),
+                            if (!isJSONSuccess(poController.searchRecord(tfSearchCompanyName.getText(), false),
                                     "Initialize Search Client! ")) {
                                 return;
                             }
                             clearAllInputs();
-                            
-                            poAppController.loadAttachments();
+
+                            poController.loadAttachments();
                             getLoadedClient();
-                            initButtonDisplay(poAppController.getEditMode());
+                            initButtonDisplay(poController.getEditMode());
                             break;
 
                         default:
@@ -304,31 +284,31 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
                                     return;
                                 }
                             }
-                            if (!isJSONSuccess(poAppController.searchRecord(tfSearchClient.getText(), true),
+                            if (!isJSONSuccess(poController.searchRecord(tfSearchClient.getText(), true),
                                     "Initialize Search Client! ")) {
                                 return;
                             }
-                            poAppController.loadAttachments();
+                            poController.loadAttachments();
 
                             getLoadedClient();
-                            initButtonDisplay(poAppController.getEditMode());
+                            initButtonDisplay(poController.getEditMode());
                             break;
                     }
                     break;
 
                 case "btnUpdate":
-                    if (poAppController.getModel().getClientId() == null || poAppController.getModel().getClientId().isEmpty()) {
+                    if (poController.getModel().getClientId() == null || poController.getModel().getClientId().isEmpty()) {
                         ShowMessageFX.Information("Please load record before proceeding..", psFormName, "");
                         return;
                     }
-                    poAppController.openRecord(poAppController.getModel().getClientId());
-                    if (!isJSONSuccess(poAppController.updateRecord(), "Initialize Update Record")) {
+                    poController.openRecord(poController.getModel().getClientId());
+                    if (!isJSONSuccess(poController.updateRecord(), "Initialize Update Record")) {
                         return;
                     }
-                    poAppController.loadAttachments();
+                    poController.loadAttachments();
 
                     getLoadedClient();
-                    initButtonDisplay(poAppController.getEditMode());
+                    initButtonDisplay(poController.getEditMode());
                     break;
 
                 case "btnSave":
@@ -337,29 +317,29 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
                         return;
                     }
 
-                    if (!isJSONSuccess(poAppController.saveRecord(), "Initialize Save Record")) {
+                    if (!isJSONSuccess(poController.saveRecord(), "Initialize Save Record")) {
                         return;
                     }
-                    
-                    poAppController.openRecord(poAppController.getModel().getClientId());
-                    if (!isJSONSuccess(poAppController.updateRecord(), "Initialize Update Record")) {
+
+                    poController.openRecord(poController.getModel().getClientId());
+                    if (!isJSONSuccess(poController.updateRecord(), "Initialize Update Record")) {
                         return;
                     }
                     clearAllInputs();
-                    
-                    poAppController.loadAttachments();
+
+                    poController.loadAttachments();
                     getLoadedClient();
-                    initButtonDisplay(poAppController.getEditMode());
+                    initButtonDisplay(poController.getEditMode());
 
                     break;
 
                 case "btnCancel":
                     if (ShowMessageFX.OkayCancel(null, psFormName, "Do you want to disregard changes?") == true) {
-                        poAppController = new ClientControllers(poApp, poLogWrapper).APClientMaster();
+                        poController = new ClientControllers(poApp, poLogWrapper).APClientMaster();
 
                         Platform.runLater(() -> {
-                            poAppController.setRecordStatus("01");
-                            //poAppController.setRecordStatus("07");
+                            poController.setRecordStatus("01");
+                            //poController.setRecordStatus("07");
 
                             clearAllInputs();
                         });
@@ -389,10 +369,10 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
 
                         //Validate attachment
                         String imgPath2 = selectedFile.getName().toString();
-                        for (int lnCtr = 0; lnCtr <= poAppController.getTransactionAttachmentCount() - 1; lnCtr++) {
+                        for (int lnCtr = 0; lnCtr <= poController.getTransactionAttachmentCount() - 1; lnCtr++) {
 
-                            if (imgPath2.equals(poAppController.getAttachmentList().get(lnCtr).getModel().getFileName())
-                                    && RecordStatus.ACTIVE.equals(poAppController.getAttachmentList().get(lnCtr).getModel().getRecordStatus())) {
+                            if (imgPath2.equals(poController.getAttachmentList().get(lnCtr).getModel().getFileName())
+                                    && RecordStatus.ACTIVE.equals(poController.getAttachmentList().get(lnCtr).getModel().getRecordStatus())) {
 
                                 ShowMessageFX.Warning(null, psFormName, "File name already exists.");
                                 pnAttachments = lnCtr;
@@ -423,10 +403,10 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
                             }
                         }
 
-                        pnAttachments = poAppController.addAttachment(imgPath2);
+                        pnAttachments = poController.addAttachment(imgPath2);
 
                         //Copy file to Attachment path
-                        poAppController.copyFile(selectedFile.toString());
+                        poController.copyFile(selectedFile.toString());
 
                         //reload table
                         loadTableAttachment.reload();
@@ -437,11 +417,11 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
                     }
                     break;
                 case "btnRemoveAttachment":
-                    if (poAppController.getTransactionAttachmentCount() <= 0) {
+                    if (poController.getTransactionAttachmentCount() <= 0) {
                         return;
                     } else {
-                        for (int lnCtr = 0; lnCtr < poAppController.getTransactionAttachmentCount(); lnCtr++) {
-                            if (RecordStatus.INACTIVE.equals(poAppController.getAttachmentList().get(lnCtr).getModel().getRecordStatus())) {
+                        for (int lnCtr = 0; lnCtr < poController.getTransactionAttachmentCount(); lnCtr++) {
+                            if (RecordStatus.INACTIVE.equals(poController.getAttachmentList().get(lnCtr).getModel().getRecordStatus())) {
                                 if (pnAttachments == lnCtr) {
                                     return;
                                 }
@@ -449,7 +429,7 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
                         }
                     }
 
-                    JSONObject loJSON = poAppController.removeAttachment(pnAttachments);
+                    JSONObject loJSON = poController.removeAttachment(pnAttachments);
                     if ("error".equals((String) loJSON.get("result"))) {
                         ShowMessageFX.Warning(null, psFormName, (String) loJSON.get("message"));
                         return;
@@ -490,87 +470,81 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
                 initButtonDisplay(EditMode.UNKNOWN);
                 return;
             }
-            initButtonDisplay(poAppController.getEditMode());
+            initButtonDisplay(poController.getEditMode());
 
         } catch (Exception e) {
             poLogWrapper.severe(psFormName + " :" + e.getMessage());
             ShowMessageFX.Error(null, psFormName, MiscUtil.getException(e));
         }
     }
-
-    private final ChangeListener<? super Boolean> txtField_Focus = (o, ov, nv) -> {
-        TextField loTextField = (TextField) ((ReadOnlyBooleanPropertyBase) o).getBean();
-        String lsTextFieldID = loTextField.getId();
-        String lsValue = loTextField.getText();
-        if (lsValue == null) {
-            return;
-        }
-
-        lsValue.replace(",", "");
-
-        if (!nv) {
-            /*Lost Focus*/
-            switch (lsTextFieldID) {
-                case "tfCreditLimit":
-                    if (poAppController.getModel().getClientId() == null
-                            || poAppController.getModel().getClientId() == null) {
-                        if (Double.parseDouble(lsValue) > 0.0) {
-                            tfCreditLimit.setText("0.00");
-                            loTextField.requestFocus();
-                            ShowMessageFX.Information("Unable to set Credit Limit! No Client Detected", psFormName, null);
+    ChangeListener<Boolean> txtField_Focus = JFXUtil.FocusListener(TextField.class,
+            (lsID, lsValue) -> {
+                switch (lsID) {
+                    case "tfCreditLimit":
+                        lsValue = JFXUtil.removeComma(lsValue);
+                        if (JFXUtil.isObjectEqualTo(poController.getModel().getClientId(), null, "")) {
+                            if (Double.parseDouble(lsValue) > 0.0) {
+                                tfCreditLimit.setText("0.00");
+                                tfCreditLimit.requestFocus();
+                                ShowMessageFX.Information("Unable to set Credit Limit! No Client Detected", psFormName, null);
+                            }
+                            return;
                         }
-                        return;
-                    }
-                    double lnCreditAmount;
-                    try {
-                        lnCreditAmount = Double.parseDouble(lsValue);
-                    } catch (NumberFormatException e) {
-                        lnCreditAmount = 0.0; // default if parsing fails
-                        poAppController.getModel().setCreditLimit(lnCreditAmount);
-                        loadClientMaster();
-                        loTextField.requestFocus();
-                    }
-                    if (lnCreditAmount < 0.00) {
-                        return;
-                    }
-
-                    poAppController.getModel().setCreditLimit(lnCreditAmount);
-                    loadClientMaster();
-                    break;
-
-                case "tfDiscount":
-                    if (poAppController.getModel().getClientId() == null
-                            || poAppController.getModel().getClientId() == null) {
-                        if (Double.parseDouble(lsValue) > 0.0) {
-                            tfDiscount.setText("0.00");
-                            loTextField.requestFocus();
-                            ShowMessageFX.Information("Unable to set Discount! No Client Detected", psFormName, null);
+                        double lnCreditAmount;
+                        try {
+                            lnCreditAmount = Double.parseDouble(lsValue);
+                        } catch (NumberFormatException e) {
+                            lnCreditAmount = 0.0; // default if parsing fails
+                            poJSON = poController.getModel().setCreditLimit(lnCreditAmount);
+                            if (!JFXUtil.isJSONSuccess(poJSON)) {
+                                ShowMessageFX.Information(null, psFormName, JFXUtil.getJSONMessage(poJSON));
+                            }
+                            loadClientMaster();
+                            tfCreditLimit.requestFocus();
                         }
-                        return;
-                    }
-                    double lnDiscount;
-                    try {
-                        lnDiscount = Double.parseDouble(lsValue);
-                    } catch (NumberFormatException e) {
-                        lnDiscount = 0.0; // default if parsing fails
-                        poAppController.getModel().setDiscount(lnDiscount);
+                        if (lnCreditAmount < 0.00) {
+                            return;
+                        }
+
+                        poJSON = poController.getModel().setCreditLimit(lnCreditAmount);
+                        if (!JFXUtil.isJSONSuccess(poJSON)) {
+                            ShowMessageFX.Information(null, psFormName, JFXUtil.getJSONMessage(poJSON));
+                        }
                         loadClientMaster();
-                        loTextField.requestFocus();
-                    }
-                    if (lnDiscount < 0.00) {
-                        return;
-                    }
-
-                    poAppController.getModel().setDiscount(lnDiscount);
-                    loadClientMaster();
-                    break;
-
-            }
-        } else {
-            loTextField.selectAll();
-        }
-
-    };
+                        break;
+                    case "tfDiscount":
+                        lsValue = JFXUtil.removeComma(lsValue);
+                        if (JFXUtil.isObjectEqualTo(poController.getModel().getClientId(), null, "")) {
+                            if (Double.parseDouble(lsValue) > 0.0) {
+                                tfDiscount.setText("0.00");
+                                tfCreditLimit.requestFocus();
+                                ShowMessageFX.Information("Unable to set Discount! No Client Detected", psFormName, null);
+                            }
+                            return;
+                        }
+                        double lnDiscount;
+                        try {
+                            lnDiscount = Double.parseDouble(lsValue);
+                        } catch (NumberFormatException e) {
+                            lnDiscount = 0.0; // default if parsing fails
+                            poJSON = poController.getModel().setDiscount(lnDiscount);
+                            if (!JFXUtil.isJSONSuccess(poJSON)) {
+                                ShowMessageFX.Information(null, psFormName, JFXUtil.getJSONMessage(poJSON));
+                            }
+                            loadClientMaster();
+                            tfCreditLimit.requestFocus();
+                        }
+                        if (lnDiscount < 0.00) {
+                            return;
+                        }
+                        poJSON = poController.getModel().setDiscount(lnDiscount);
+                        if (!JFXUtil.isJSONSuccess(poJSON)) {
+                            ShowMessageFX.Information(null, psFormName, JFXUtil.getJSONMessage(poJSON));
+                        }
+                        loadClientMaster();
+                        break;
+                }
+            });
 
     private void txtField_KeyPressed(KeyEvent event) {
         TextField loTxtField = (TextField) event.getSource();
@@ -594,15 +568,15 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
                                         return;
                                     }
                                 }
-                                if (!isJSONSuccess(poAppController.searchRecord(tfSearchClient.getText(), true),
+                                if (!isJSONSuccess(poController.searchRecord(tfSearchClient.getText(), true),
                                         "")) {
                                     return;
                                 }
                                 clearAllInputs();
-                            
-                                poAppController.loadAttachments();
+
+                                poController.loadAttachments();
                                 getLoadedClient();
-                                initButtonDisplay(poAppController.getEditMode());
+                                initButtonDisplay(poController.getEditMode());
                                 break;
                             case "tfSearchCompanyName":
                                 if (!tfClientID.getText().isEmpty()) {
@@ -610,19 +584,19 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
                                         return;
                                     }
                                 }
-                                if (!isJSONSuccess(poAppController.searchRecord(tfSearchCompanyName.getText(), false),
+                                if (!isJSONSuccess(poController.searchRecord(tfSearchCompanyName.getText(), false),
                                         "")) {
                                     return;
                                 }
                                 clearAllInputs();
-                            
-                                poAppController.loadAttachments();
+
+                                poController.loadAttachments();
                                 getLoadedClient();
-                                initButtonDisplay(poAppController.getEditMode());
+                                initButtonDisplay(poController.getEditMode());
                                 break;
 
                             case "tfTerm":
-                                if (!isJSONSuccess(poAppController.searchTerm(tfTerm.getText() == null ? "" : tfTerm.getText(), false),
+                                if (!isJSONSuccess(poController.searchTerm(tfTerm.getText() == null ? "" : tfTerm.getText(), false),
                                         "Initialize Search Category! ")) {
                                     return;
                                 }
@@ -651,7 +625,7 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
             /*Lost Focus*/
             switch (lsDatePickerID) {
                 case "dpClientSince":
-                    poAppController.getModel().setdateClientSince(ldDateValue);
+                    poController.getModel().setdateClientSince(ldDateValue);
                     return;
 
             }
@@ -660,46 +634,84 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
 
     private void loadClientMaster() {
         try {
-            lblStatus.setText(poAppController.getModel().getRecordStatus().equals("0") == false ? "ACTIVE" : "INACTIVE");
+            lblStatus.setText(poController.getModel().getRecordStatus().equals("0") == false ? "ACTIVE" : "INACTIVE");
 
-            tfClientID.setText(poAppController.getModel().getClientId());
+            tfClientID.setText(poController.getModel().getClientId());
 
-            tfCategory.setText(poAppController.getModel().Category().getDescription());
-            tfCompanyName.setText(poAppController.getModel().Client().getCompanyName());
-            tfAddress.setText(poAppController.getModel().ClientAddress().getAddress());
-            tfContactPerson.setText(poAppController.getModel().ClientInstitutionContact().getContactPersonName());
-            tfContactEmail.setText(poAppController.getModel().ClientInstitutionContact().getMailAddress());
-            tfContactNo.setText(poAppController.getModel().ClientInstitutionContact().getMobileNo());
-            tfTINNo.setText(poAppController.getModel().Client().getTaxIdNumber());
-            
-            cbHasPermit.setSelected(poAppController.getModel().hasPermit() == null || !poAppController.getModel().hasPermit().equalsIgnoreCase("1") ? false : true);
-            cbBackOrder.setSelected(poAppController.getModel().isBackOrder() == null || !poAppController.getModel().isBackOrder().equalsIgnoreCase("1") ? false : true);
-            cbVatable.setSelected(poAppController.getModel().getVatable() == null || !poAppController.getModel().getVatable().equalsIgnoreCase("1") ? false : true);
-            cbHoldOrder.setSelected(poAppController.getModel().isHoldOrder() == null || !poAppController.getModel().isHoldOrder().equalsIgnoreCase("1") ? false : true);
-            
+            tfCategory.setText(poController.getModel().Category().getDescription());
+            tfCompanyName.setText(poController.getModel().Client().getCompanyName());
+            tfAddress.setText(poController.getModel().ClientAddress().getAddress());
+            tfContactPerson.setText(poController.getModel().ClientInstitutionContact().getContactPersonName());
+            tfContactEmail.setText(poController.getModel().ClientInstitutionContact().getMailAddress());
+            tfContactNo.setText(poController.getModel().ClientInstitutionContact().getMobileNo());
+            tfTINNo.setText(poController.getModel().Client().getTaxIdNumber());
+
+            cbHasPermit.setSelected(poController.getModel().hasPermit() == null || !poController.getModel().hasPermit().equalsIgnoreCase("1") ? false : true);
+            cbBackOrder.setSelected(poController.getModel().isBackOrder() == null || !poController.getModel().isBackOrder().equalsIgnoreCase("1") ? false : true);
+            cbVatable.setSelected(poController.getModel().getVatable() == null || !poController.getModel().getVatable().equalsIgnoreCase("1") ? false : true);
+            cbHoldOrder.setSelected(poController.getModel().isHoldOrder() == null || !poController.getModel().isHoldOrder().equalsIgnoreCase("1") ? false : true);
+
             //registration list
-//            if (poAppController.getModel().getVatRegstr()== null) {
+//            if (poController.getModel().getVatRegstr()== null) {
 //            }else{
-//                cmbRegistration.getSelectionModel().select(Integer.parseInt(poAppController.getModel().getVatRegstr()));
+//                cmbRegistration.getSelectionModel().select(Integer.parseInt(poController.getModel().getVatRegstr()));
 //            }
-            
             //payment method
-            if (poAppController.getModel().getPayment() == null) {
-            }else{
-                cmbPayment.getSelectionModel().select(Integer.parseInt(poAppController.getModel().getPayment()));
+            if (poController.getModel().getPayment() == null) {
+            } else {
+                cmbPayment.getSelectionModel().select(Integer.parseInt(poController.getModel().getPayment()));
             }
-            
-            dpClientSince.setValue(poAppController.getModel().getdateClientSince() == null ? null : ParseDate(poAppController.getModel().getdateClientSince()));
-            dpBegBalance.setValue(poAppController.getModel().getBeginningDate() == null ? null : ParseDate(poAppController.getModel().getBeginningDate()));
-            tfDiscount.setText(CommonUtils.NumberFormat(poAppController.getModel().getDiscount(), "###,###,##0.0000"));
-            tfTerm.setText(poAppController.getModel().Term().getDescription());
-            tfCreditLimit.setText(CommonUtils.NumberFormat(poAppController.getModel().getCreditLimit(), "###,###,##0.0000"));
-            tfBegBalanace.setText(CommonUtils.NumberFormat(poAppController.getModel().getBeginningBalance(), "###,###,##0.0000"));
-            tfAvailBalance.setText(CommonUtils.NumberFormat(poAppController.getModel().getAccountBalance(), "###,###,##0.0000"));
-            tfOutStandingBalance.setText(CommonUtils.NumberFormat(poAppController.getModel().getOBalance(), "###,###,##0.0000"));
+
+            dpClientSince.setValue(poController.getModel().getdateClientSince() == null ? null : ParseDate(poController.getModel().getdateClientSince()));
+            dpBegBalance.setValue(poController.getModel().getBeginningDate() == null ? null : ParseDate(poController.getModel().getBeginningDate()));
+            tfDiscount.setText(CommonUtils.NumberFormat(poController.getModel().getDiscount(), "###,###,##0.0000"));
+            tfTerm.setText(poController.getModel().Term().getDescription());
+            tfCreditLimit.setText(CommonUtils.NumberFormat(poController.getModel().getCreditLimit(), "###,###,##0.0000"));
+            tfBegBalanace.setText(CommonUtils.NumberFormat(poController.getModel().getBeginningBalance(), "###,###,##0.0000"));
+            tfAvailBalance.setText(CommonUtils.NumberFormat(poController.getModel().getAccountBalance(), "###,###,##0.0000"));
+            tfOutStandingBalance.setText(CommonUtils.NumberFormat(poController.getModel().getOBalance(), "###,###,##0.0000"));
 
         } catch (SQLException | GuanzonException e) {
             poLogWrapper.severe(psFormName, e.getMessage());
+        }
+    }
+
+    private void initComboboxes() {
+        JFXUtil.initComboBoxCellDesignColor("#FF8201", cmbRegistration, cmbPayment);
+    }
+
+    @FXML
+    private void cmdCheckBox_Click(ActionEvent event) {
+        poJSON = new JSONObject();
+        Object source = event.getSource();
+        if (source instanceof CheckBox) {
+            CheckBox checkedBox = (CheckBox) source;
+            switch (checkedBox.getId()) {
+                case "cbHasPermit":
+                    poJSON = poController.getModel().hasPermit(cbHasPermit.isSelected() == true ? "1" : "0");
+                    if (!JFXUtil.isJSONSuccess(poJSON)) {
+                        ShowMessageFX.Information(null, psFormName, JFXUtil.getJSONMessage(poJSON));
+                    }
+                    break;
+                case "cbBackOrder":
+                    poJSON = poController.getModel().isBackOrder(cbBackOrder.isSelected() == true ? "1" : "0");
+                    if (!JFXUtil.isJSONSuccess(poJSON)) {
+                        ShowMessageFX.Information(null, psFormName, JFXUtil.getJSONMessage(poJSON));
+                    }
+                    break;
+                case "cbVatable":
+                    poJSON = poController.getModel().setVatable(cbVatable.isSelected() == true ? "1" : "0");
+                    if (!JFXUtil.isJSONSuccess(poJSON)) {
+                        ShowMessageFX.Information(null, psFormName, JFXUtil.getJSONMessage(poJSON));
+                    }
+                    break;
+                case "cbHoldOrder":
+                    poJSON = poController.getModel().isHoldOrder(cbHoldOrder.isSelected() == true ? "1" : "0");
+                    if (!JFXUtil.isJSONSuccess(poJSON)) {
+                        ShowMessageFX.Information(null, psFormName, JFXUtil.getJSONMessage(poJSON));
+                    }
+                    break;
+            }
         }
     }
 
@@ -726,34 +738,18 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
             }
         }
 
-        //has permit
-        cbHasPermit.selectedProperty().addListener((obs, oldVal, newVal) -> {
-            poAppController.getModel().hasPermit(cbHasPermit.isSelected() == true ? "1" : "0");
-        });
-        //has back order
-        cbBackOrder.selectedProperty().addListener((obs, oldVal, newVal) -> {
-            poAppController.getModel().isBackOrder(cbBackOrder.isSelected() == true ? "1" : "0");
-        });
-        //vatable
-        cbVatable.selectedProperty().addListener((obs, oldVal, newVal) -> {
-            poAppController.getModel().setVatable(cbVatable.isSelected() == true ? "1" : "0");
-        });
-        //is hold order
-        cbHoldOrder.selectedProperty().addListener((obs, oldVal, newVal) -> {
-            poAppController.getModel().isHoldOrder(cbHoldOrder.isSelected() == true ? "1" : "0");
-        });
         //vat registration
 //        cmbRegistration.getSelectionModel().selectedIndexProperty().addListener((obs, oldIndex, newIndex) -> {
 //            if (newIndex != null && newIndex.intValue() >= 0) {
 //                int lnIndex = newIndex.intValue(); // the selected index
-//                poAppController.getModel().setVatRegstr(String.valueOf(lnIndex));
+//                poController.getModel().setVatRegstr(String.valueOf(lnIndex));
 //            }
 //        });
         //payment method
         cmbPayment.getSelectionModel().selectedIndexProperty().addListener((obs, oldIndex, newIndex) -> {
             if (newIndex != null && newIndex.intValue() >= 0) {
                 int lnIndex = newIndex.intValue(); // the selected index
-                poAppController.getModel().setPayment(String.valueOf(lnIndex));
+                poController.getModel().setPayment(String.valueOf(lnIndex));
             }
         });
         clearAllInputs();
@@ -765,40 +761,6 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
                 lastFocusedControl = control;
             }
         });
-    }
-
-    private void clearAllInputs() {
-
-        List<Control> laControls = getAllSupportedControls();
-
-        for (Control loControl : laControls) {
-            if (loControl instanceof TextField) {
-                ((TextField) loControl).clear();
-            } else if (loControl instanceof TextArea) {
-                ((TextArea) loControl).clear();
-            } else if (loControl != null && loControl instanceof TableView) {
-                TableView<?> table = (TableView<?>) loControl;
-                if (table.getItems() != null) {
-                    table.getItems().clear();
-                }
-
-            } else if (loControl instanceof DatePicker) {
-                ((DatePicker) loControl).setValue(null);
-            } else if (loControl instanceof ComboBox) {
-                ((ComboBox) loControl).setItems(null);
-            } else if (loControl instanceof CheckBox) {
-                ((CheckBox) loControl).setSelected(false);
-            }
-        }
-
-        //reset image objects
-        imageinfo_temp.clear();
-        imageView.setImage(null);
-
-        initButtonDisplay(poAppController.getEditMode());
-//        
-//        cmbRegistration.setItems(APPaymentConstants.regstrList);
-//        cmbPayment.setItems(APPaymentConstants.paymentList);
     }
 
     private void initButtonDisplay(int fnEditMode) {
@@ -843,15 +805,14 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
         }
     }
 
-    private void initializeTableLedger() {
+    private void initMainGrid() {
         if (laLedger == null) {
             laLedger = FXCollections.observableArrayList();
 
-            tblLedger.setItems(laLedger);
-
-            tblColAmountIn.setStyle("-fx-alignment: CENTER-RIGHT; -fx-padding: 0 5 0 0;");
-            tblColAmountOut.setStyle("-fx-alignment: CENTER-RIGHT; -fx-padding: 0 5 0 0;");
-            tblLedgerNo.setStyle("-fx-alignment: CENTER; -fx-padding: 0 5 0 0;");
+            JFXUtil.setColumnCenter(tblColNo, tblLedgerNo, tblColDate, tblColSourceNo);
+            JFXUtil.setColumnLeft(tblColSourceCode);
+            JFXUtil.setColumnRight(tblColAmountIn, tblColAmountOut);
+            JFXUtil.setColumnsIndexAndDisableReordering(tblLedger);
 
             tblColNo.setCellValueFactory((loModel) -> {
                 int index = tblLedger.getItems().indexOf(loModel.getValue()) + 1;
@@ -866,7 +827,7 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
             tblColSourceNo.setCellValueFactory((loModel) -> {
                 return new SimpleStringProperty(loModel.getValue().getSourceNo());
             });
-            
+
             tblLedgerNo.setCellValueFactory((loModel) -> {
                 return new SimpleStringProperty(loModel.getValue().getLedgerNo());
             });
@@ -889,11 +850,10 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
             tblColAmountOut.setCellValueFactory((loModel) -> {
                 return new SimpleStringProperty(CommonUtils.NumberFormat(loModel.getValue().getAmountIn(), "###,##0.0000"));
             });
-            }
         }
-    
-    private void initAttachmentsGrid() {
+    }
 
+    private void initAttachmentsGrid() {
         /*FOCUS ON FIRST ROW*/
         JFXUtil.setColumnCenter(tblRowNoAttachment);
         JFXUtil.setColumnLeft(tblFileNameAttachment);
@@ -903,7 +863,7 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
     }
 
     private void reloadTableLedger() {
-        List<Model_AP_Client_Ledger> rawDetail = poAppController.getLedgerList();
+        List<Model_AP_Client_Ledger> rawDetail = poController.getLedgerList();
         laLedger.setAll(rawDetail);
 
         //Restore or select last row
@@ -918,7 +878,6 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
     }
 
     private void loadLedgerList() {
-
         StackPane overlay = getOverlayProgress(apLedger);
         ProgressIndicator pi = (ProgressIndicator) overlay.getChildren().get(0);
         overlay.setVisible(true);
@@ -927,13 +886,12 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
         Task<ObservableList<Model_AP_Client_Ledger>> loadLedger = new Task<ObservableList<Model_AP_Client_Ledger>>() {
             @Override
             protected ObservableList<Model_AP_Client_Ledger> call() throws Exception {
-                if (!isJSONSuccess(poAppController.loadLedgerList(),
-                        "Initialize : Load of Ledger List")) {
+                if (!isJSONSuccess(poController.loadLedgerList(), "Initialize : Load of Ledger List")) {
                     return null;
                 }
 
-                List<Model_AP_Client_Ledger> rawList = poAppController.getLedgerList();
-                System.out.print("The size of list is " + rawList.size());
+                List<Model_AP_Client_Ledger> rawList = poController.getLedgerList();
+
                 return FXCollections.observableArrayList(new ArrayList<>(rawList));
             }
 
@@ -941,7 +899,10 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
             protected void succeeded() {
                 ObservableList<Model_AP_Client_Ledger> laListLoader = getValue();
                 tblLedger.setItems(laListLoader);
-
+                filteredData = new FilteredList<>(laListLoader, b -> true);
+                Platform.runLater(() -> {
+                    JFXUtil.loadTab(pgPagination, laListLoader.size(), 50, tblLedger, filteredData);
+                });
                 overlay.setVisible(false);
                 pi.setVisible(false);
             }
@@ -966,7 +927,6 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
     }
 
     public void initTableAttachments() {
-
         loadTableAttachment = new JFXUtil.ReloadableTableTask(
                 tblAttachments,
                 laAttachments,
@@ -985,10 +945,10 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
 
                             //re initialize attachment list
                             laAttachments.clear();
-                            for (lnCtr = 0; lnCtr < poAppController.getTransactionAttachmentCount(); lnCtr++) {
+                            for (lnCtr = 0; lnCtr < poController.getTransactionAttachmentCount(); lnCtr++) {
 
                                 //skip current iteration, if status is inactive
-                                if (RecordStatus.INACTIVE.equals(poAppController.getAttachmentList().get(lnCtr).getModel().getRecordStatus())) {
+                                if (RecordStatus.INACTIVE.equals(poController.getAttachmentList().get(lnCtr).getModel().getRecordStatus())) {
                                     continue;
                                 }
                                 lnCount += 1;
@@ -996,7 +956,7 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
                                 //add to attachment list
                                 laAttachments.add(
                                         new ModelDeliveryAcceptance_Attachment(String.valueOf(lnCount),
-                                                String.valueOf(poAppController.getAttachmentList().get(lnCtr).getModel().getFileName()),
+                                                String.valueOf(poController.getAttachmentList().get(lnCtr).getModel().getFileName()),
                                                 String.valueOf(lnCtr)
                                         ));
                             }
@@ -1056,10 +1016,10 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
 
                 tfAttachmentNo.setText(laAttachments.get(tblAttachments.getSelectionModel().getSelectedIndex()).getIndex01());
 
-                String lsAttachmentType = poAppController.getAttachmentList().get(pnAttachments).getModel().getDocumentType();
+                String lsAttachmentType = poController.getAttachmentList().get(pnAttachments).getModel().getDocumentType();
                 if (lsAttachmentType.equals("")) {
-                    poAppController.getAttachmentList().get(pnAttachments).getModel().setDocumentType(DocumentType.OTHER);
-                    lsAttachmentType = poAppController.getAttachmentList().get(pnAttachments).getModel().getDocumentType();
+                    poController.getAttachmentList().get(pnAttachments).getModel().setDocumentType(DocumentType.OTHER);
+                    lsAttachmentType = poController.getAttachmentList().get(pnAttachments).getModel().getDocumentType();
                 }
 
                 if (lbloadImage) {
@@ -1070,8 +1030,8 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
                             filePath2 = imageinfo_temp.get((String) laAttachments.get(tblAttachments.getSelectionModel().getSelectedIndex()).getIndex02());
                         } else {
 
-                            if (poAppController.getAttachmentList().get(pnAttachments).getModel().getImagePath() != null && !"".equals(poAppController.getAttachmentList().get(pnAttachments).getModel().getImagePath())) {
-                                filePath2 = poAppController.getAttachmentList().get(pnAttachments).getModel().getImagePath() + "/" + (String) laAttachments.get(tblAttachments.getSelectionModel().getSelectedIndex()).getIndex02();
+                            if (poController.getAttachmentList().get(pnAttachments).getModel().getImagePath() != null && !"".equals(poController.getAttachmentList().get(pnAttachments).getModel().getImagePath())) {
+                                filePath2 = poController.getAttachmentList().get(pnAttachments).getModel().getImagePath() + "/" + (String) laAttachments.get(tblAttachments.getSelectionModel().getSelectedIndex()).getIndex02();
                             } else {
                                 filePath2 = System.getProperty("sys.default.path.temp.attachments") + "/" + (String) laAttachments.get(tblAttachments.getSelectionModel().getSelectedIndex()).getIndex02();
                             }
@@ -1196,11 +1156,31 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
         reloadTableAttachments();
     }
 
+    @FXML
+    void tblLedger_Clicked(MouseEvent e) {
+        pnLedger = tblLedger.getSelectionModel().getSelectedIndex();
+        if (pnLedger < 0) {
+            return;
+        }
+    }
+
+    @FXML
+    void tblAttachment_Clicked(MouseEvent e) {
+        pnAttachments = tblAttachments.getSelectionModel().getSelectedIndex();
+
+        if (pnAttachments >= 0) {
+            int lnRow = Integer.parseInt(laAttachments.get(tblAttachments.getSelectionModel().getSelectedIndex()).getIndex03());
+            pnAttachments = lnRow;
+            imageviewerutil.scaleFactor = 1.0;
+
+            loadRecordAttachment(true);
+            JFXUtil.resetImageBounds(imageView, stackpane);
+        }
+    }
+
     private boolean isJSONSuccess(JSONObject loJSON, String fsModule) {
         String result = (String) loJSON.get("result");
         String message = (String) loJSON.get("message");
-
-        System.out.println("isJSONSuccess called. Thread: " + Thread.currentThread().getName());
 
         if ("error".equalsIgnoreCase(result)) {
             poLogWrapper.severe(psFormName + " : " + message);
@@ -1300,5 +1280,14 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
             }
         }
         return controls;
+    }
+
+    private void clearAllInputs() {
+        JFXUtil.clearTextFields(apRecord, apLedger, apAttachments);
+        imageinfo_temp.clear();
+        imageView.setImage(null);
+        initButtonDisplay(poController.getEditMode());
+//        cmbRegistration.setItems(APPaymentConstants.regstrList);
+//        cmbPayment.setItems(APPaymentConstants.paymentList);
     }
 }
