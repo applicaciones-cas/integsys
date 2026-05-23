@@ -394,6 +394,13 @@ public class AccountsAccreditation_ConfirmationController implements Initializab
             boolean lbShow2 = !JFXUtil.isObjectEqualTo(poController.getModel().Client().getCompanyName(), null, "");
             JFXUtil.setDisabled(lbShow2, tfCompany);
             faAdd.setIcon(lbShow2 ? FontAwesomeIcon.PENCIL_SQUARE_ALT : FontAwesomeIcon.PLUS);
+
+            if (lbShow2) {
+                JFXUtil.applyHoverTooltip("Edit company info", btnAddClompany);
+            } else {
+                JFXUtil.applyHoverTooltip("Add new company", btnAddClompany);
+            }
+
             JFXUtil.setStatusValue(lblStatus, AccountAccreditationStatus.class, poController.getModel().getEditMode() == EditMode.UNKNOWN ? "-1" : poController.getModel().getRecordStatus());
 
             tfTransactionNo.setText(poController.getModel().getTransactionNo() != null ? poController.getModel().getTransactionNo() : "");
@@ -462,13 +469,13 @@ public class AccountsAccreditation_ConfirmationController implements Initializab
         boolean lbShow2 = (fnValue == EditMode.READY);
         boolean lbShow3 = (fnValue == EditMode.UNKNOWN || fnValue == EditMode.READY);
         boolean lbShow4 = fnValue == EditMode.READY || fnValue == EditMode.UNKNOWN;
-
         JFXUtil.setButtonsVisibility(lbShow1, btnSearch, btnSave, btnCancel);
         JFXUtil.setButtonsVisibility(lbShow2, btnUpdate, btnHistory, btnVoid, btnConfirm);
         JFXUtil.setButtonsVisibility(lbShow3, btnClose);
 
         JFXUtil.setDisabled(!lbShow1, apMaster);
         JFXUtil.setButtonsVisibility(lbShow4, btnBrowse);
+        JFXUtil.setButtonsVisibility(!lbShow4, btnAddClompany);
 
         if (fnValue != EditMode.READY) {
             return;

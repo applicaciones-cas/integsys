@@ -262,6 +262,7 @@ public class AccountsAccreditation_HistoryController implements Initializable, S
 
         JFXUtil.setDisabled(true, apMaster);
         JFXUtil.setButtonsVisibility(true, btnBrowse);
+        JFXUtil.setButtonsVisibility(false, btnAddClompany);
     }
 
     private void initControlEvents() {

@@ -345,9 +345,6 @@
                                                    <graphic>
                                                       <FontAwesomeIconView fx:id="faAdd" glyphName="PLUS" size="15" textAlignment="CENTER" />
                                                    </graphic>
-                                                   <tooltip>
-                                                      <Tooltip text="ADD ADDRESS" />
-                                                   </tooltip>
                                                    <GridPane.margin>
                                                       <Insets left="5.0" />
                                                    </GridPane.margin>

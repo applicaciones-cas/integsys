@@ -351,9 +351,17 @@ public class AccountsAccreditation_EntryController implements Initializable, Scr
 
     private void loadRecordMaster() {
         try {
+
             boolean lbShow = JFXUtil.isObjectEqualTo(poController.getModel().getEditMode(), EditMode.UPDATE, EditMode.READY);
             boolean lbShow2 = !JFXUtil.isObjectEqualTo(poController.getModel().Client().getCompanyName(), null, "");
             JFXUtil.setDisabled(lbShow, tfCompany);
+            JFXUtil.setButtonsVisibility(!lbShow, btnAddClompany);
+
+            if (lbShow2) {
+                JFXUtil.applyHoverTooltip("Edit company info", btnAddClompany);
+            } else {
+                JFXUtil.applyHoverTooltip("Add new company", btnAddClompany);
+            }
 
             faAdd.setIcon(lbShow2 ? FontAwesomeIcon.PENCIL_SQUARE_ALT : FontAwesomeIcon.PLUS);
 
@@ -428,7 +436,7 @@ public class AccountsAccreditation_EntryController implements Initializable, Scr
         JFXUtil.setButtonsVisibility(lbShow3, btnBrowse, btnClose);
 
         JFXUtil.setDisabled(!lbShow1, apMaster);
-
+        JFXUtil.setButtonsVisibility(!lbShow3, btnAddClompany);
         if (fnValue != EditMode.READY) {
             return;
         }
