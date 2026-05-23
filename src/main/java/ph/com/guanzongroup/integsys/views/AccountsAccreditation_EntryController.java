@@ -352,9 +352,10 @@ public class AccountsAccreditation_EntryController implements Initializable, Scr
     private void loadRecordMaster() {
         try {
             boolean lbShow = JFXUtil.isObjectEqualTo(poController.getModel().getEditMode(), EditMode.UPDATE, EditMode.READY);
+            boolean lbShow2 = !JFXUtil.isObjectEqualTo(poController.getModel().Client().getCompanyName(), null, "");
             JFXUtil.setDisabled(lbShow, tfCompany);
 
-            faAdd.setIcon(lbShow ? FontAwesomeIcon.PENCIL_SQUARE_ALT : FontAwesomeIcon.PLUS);
+            faAdd.setIcon(lbShow2 ? FontAwesomeIcon.PENCIL_SQUARE_ALT : FontAwesomeIcon.PLUS);
 
             JFXUtil.setStatusValue(lblStatus, AccountAccreditationStatus.class, poController.getModel().getEditMode() == EditMode.UNKNOWN ? "-1" : poController.getModel().getRecordStatus());
 
