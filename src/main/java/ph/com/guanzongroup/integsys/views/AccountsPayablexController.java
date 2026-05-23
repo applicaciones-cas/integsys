@@ -440,8 +440,6 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
         try {
             if (null != event.getCode()) {
                 switch (event.getCode()) {
-                    case TAB:
-                    case ENTER:
                     case F3:
                         switch (txtFieldID) {
                             case "tfSearchClient":
@@ -455,6 +453,7 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
                                     ShowMessageFX.Information(null, psFormName, JFXUtil.getJSONMessage(poJSON));
                                     return;
                                 }
+                                loadRecordSearch();
                                 clearAllInputs();
                                 poController.loadAttachments();
                                 getLoadedClient();
@@ -471,6 +470,7 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
                                     ShowMessageFX.Information(null, psFormName, JFXUtil.getJSONMessage(poJSON));
                                     return;
                                 }
+                                loadRecordSearch();
                                 clearAllInputs();
                                 poController.loadAttachments();
                                 getLoadedClient();
@@ -737,6 +737,15 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
     private void getLoadedClient() throws SQLException, GuanzonException, CloneNotSupportedException {
         loadRecordMaster();
         reloadTableAttachments();
+    }
+
+    private void loadRecordSearch() {
+        try {
+            tfSearchClient.setText(poController.getModel().Client().getCompanyName());
+//            tfSearchCompany.setText(poController.getModel().Company().getCompanyName());
+        } catch (SQLException | GuanzonException ex) {
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     private void loadRecordMaster() {

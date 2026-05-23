@@ -266,8 +266,6 @@ public class AccountsAccreditation_EntryController implements Initializable, Scr
         try {
             if (null != event.getCode()) {
                 switch (event.getCode()) {
-                    case TAB:
-                    case ENTER:
                     case F3:
                         switch (txtFieldID) {
                             case "tfSearchCompany":

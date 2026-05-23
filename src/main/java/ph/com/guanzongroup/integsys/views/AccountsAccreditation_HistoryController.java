@@ -171,8 +171,6 @@ public class AccountsAccreditation_HistoryController implements Initializable, S
         try {
             if (null != event.getCode()) {
                 switch (event.getCode()) {
-                    case TAB:
-                    case ENTER:
                     case F3:
                         switch (txtFieldID) {
                             case "tfSearchCompany":
