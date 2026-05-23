@@ -1,5 +1,6 @@
 package ph.com.guanzongroup.integsys.views;
 
+import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import java.net.URL;
 import java.sql.SQLException;
@@ -389,8 +390,9 @@ public class AccountsAccreditation_ConfirmationController implements Initializab
 
     private void loadRecordMaster() {
         try {
-            boolean lbShow = JFXUtil.isObjectEqualTo(poController.getModel().getEditMode(), EditMode.UPDATE, EditMode.READY);
-            JFXUtil.setDisabled(lbShow, tfCompany);
+            boolean lbShow2 = !JFXUtil.isObjectEqualTo(poController.getModel().Client().getCompanyName(), null, "");
+            JFXUtil.setDisabled(lbShow2, tfCompany);
+            faAdd.setIcon(lbShow2 ? FontAwesomeIcon.PENCIL_SQUARE_ALT : FontAwesomeIcon.PLUS);
             JFXUtil.setStatusValue(lblStatus, AccountAccreditationStatus.class, poController.getModel().getEditMode() == EditMode.UNKNOWN ? "-1" : poController.getModel().getRecordStatus());
 
             tfTransactionNo.setText(poController.getModel().getTransactionNo() != null ? poController.getModel().getTransactionNo() : "");

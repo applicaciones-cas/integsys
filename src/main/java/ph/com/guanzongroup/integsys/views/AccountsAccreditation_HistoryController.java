@@ -1,5 +1,6 @@
 package ph.com.guanzongroup.integsys.views;
 
+import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import java.lang.reflect.Field;
 import java.net.URL;
@@ -170,25 +171,6 @@ public class AccountsAccreditation_HistoryController implements Initializable, S
         }
     }
 
-    private final ChangeListener<? super Boolean> txtField_Focus = (o, ov, nv) -> {
-        TextField loTextField = (TextField) ((ReadOnlyBooleanPropertyBase) o).getBean();
-        String lsTextFieldID = loTextField.getId();
-        String lsValue = loTextField.getText();
-        if (lsValue == null) {
-            return;
-        }
-
-        if (!nv) {
-            /*Lost Focus*/
-            switch (lsTextFieldID) {
-
-            }
-        } else {
-            loTextField.selectAll();
-        }
-
-    };
-
     private void txtField_KeyPressed(KeyEvent event) {
         TextField loTxtField = (TextField) event.getSource();
         String txtFieldID = ((TextField) event.getSource()).getId();
@@ -224,6 +206,9 @@ public class AccountsAccreditation_HistoryController implements Initializable, S
 
     private void loadRecordMaster() {
         try {
+            boolean lbShow2 = !JFXUtil.isObjectEqualTo(poController.getModel().Client().getCompanyName(), null, "");
+            JFXUtil.setDisabled(lbShow2, tfCompany);
+            faAdd.setIcon(lbShow2 ? FontAwesomeIcon.PENCIL_SQUARE_ALT : FontAwesomeIcon.PLUS);
             JFXUtil.setStatusValue(lblStatus, AccountAccreditationStatus.class, poController.getModel().getEditMode() == EditMode.UNKNOWN ? "-1" : poController.getModel().getRecordStatus());
 
             tfTransactionNo.setText(poController.getModel().getTransactionNo() != null ? poController.getModel().getTransactionNo() : "");
@@ -316,28 +301,6 @@ public class AccountsAccreditation_HistoryController implements Initializable, S
         }
         Date loDate = new java.util.Date(date.getTime());
         return loDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-    }
-
-    private List<Control> getAllSupportedControls() {
-        List<Control> controls = new ArrayList<>();
-        for (Field field : getClass().getDeclaredFields()) {
-            field.setAccessible(true);
-            try {
-                Object value = field.get(this);
-                if (value instanceof TextField
-                        || value instanceof TextArea
-                        || value instanceof Button
-                        || value instanceof TableView
-                        || value instanceof DatePicker
-                        || value instanceof ComboBox) {
-                    controls.add((Control) value);
-                }
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
-                poLogWrapper.severe(psFormName + " :" + e.getMessage());
-            }
-        }
-        return controls;
     }
 
     private void clearAllInputs() {
