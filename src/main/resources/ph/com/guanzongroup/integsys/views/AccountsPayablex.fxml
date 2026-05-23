@@ -166,7 +166,7 @@
                     <tabs>
                       <Tab text="Details">
                         <content>
-                          <AnchorPane fx:id="apRecord">
+                          <AnchorPane >
                                  <children>
                                     <HBox spacing="5.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="0.0">
                                        <children>
@@ -408,7 +408,7 @@
                                                             <Insets />
                                                          </GridPane.margin>
                                                       </CheckBox>
-                                                      <DatePicker fx:id="dpClientSince" disable="true" editable="false" prefHeight="28.0" prefWidth="150.0" promptText="YYYY-MM-DD" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.rowIndex="16">
+                                                      <DatePicker fx:id="dpClientSince" disable="true" editable="false" prefWidth="150.0" promptText="YYYY-MM-DD" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.rowIndex="16">
                                                          <GridPane.margin>
                                                             <Insets />
                                                          </GridPane.margin>
@@ -443,7 +443,7 @@
                                                   </rowConstraints>
                                                    <children>
                                                       <Pagination fx:id="pgPagination" GridPane.rowIndex="1" />
-                                                      <TableView fx:id="tblLedger" onMouseClicked="#tblLedger_Clicked" stylesheets="@../css/Tables.css">
+                                                      <TableView fx:id="tblMain" stylesheets="@../css/Tables.css">
                                                          <columns>
                                                             <TableColumn fx:id="tblColNo" editable="false" maxWidth="30.0" minWidth="30.0" prefWidth="30.0" sortable="false" text="No." />
                                                             <TableColumn fx:id="tblLedgerNo" editable="false" maxWidth="100.0" minWidth="100.0" prefWidth="100.0" sortable="false" text="Ledger No" />
