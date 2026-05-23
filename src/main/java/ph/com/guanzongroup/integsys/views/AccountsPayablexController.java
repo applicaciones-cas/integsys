@@ -642,7 +642,7 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
                             int lnCount = 0;
 
                             laAccountsPayable.clear();
-                            for (lnCtr = 0; lnCtr < rawList.size(); lnCtr++) {
+                            for (lnCtr = 0; lnCtr < 52; lnCtr++) {
                                 lnCount += 1;
                                 //add to attachment list
                                 laAccountsPayable.add(
