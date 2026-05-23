@@ -23,6 +23,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
@@ -518,8 +519,29 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
     };
 
     private void initComboboxes() {
+        JFXUtil.setComboBoxActionListener(comboBoxActionListener, cmbRegistration, cmbPayment);
         JFXUtil.initComboBoxCellDesignColor("#FF8201", cmbRegistration, cmbPayment);
+        cmbRegistration.setItems(APPaymentConstants.regstrList);
+        cmbPayment.setItems(APPaymentConstants.paymentList);
     }
+    EventHandler<ActionEvent> comboBoxActionListener = JFXUtil.CmbActionListener(
+            (cmbId, selectedIndex, selectedValue) -> {
+                switch (cmbId) {
+                    case "cmbRegistration":
+                        poJSON = poController.getModel().setVatRegstr(String.valueOf(selectedIndex));
+                        if (!JFXUtil.isJSONSuccess(poJSON)) {
+                            ShowMessageFX.Information(null, psFormName, JFXUtil.getJSONMessage(poJSON));
+                        }
+                        break;
+                    case "cmbPayment":
+                        poJSON = poController.getModel().setPayment(String.valueOf(selectedIndex));
+                        if (!JFXUtil.isJSONSuccess(poJSON)) {
+                            ShowMessageFX.Information(null, psFormName, JFXUtil.getJSONMessage(poJSON));
+                        }
+                        break;
+                }
+                loadRecordMaster();
+            });
 
     @FXML
     private void cmdCheckBox_Click(ActionEvent event) {
@@ -563,17 +585,6 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
         dpClientSince.focusedProperty().addListener(dPicker_Focus);
         dpBegBalance.focusedProperty().addListener(dPicker_Focus);
         JFXUtil.setCommaFormatter(tfAvailBalance, tfOutStandingBalance, tfCreditLimit, tfDiscount);
-
-        cmbRegistration.setItems(APPaymentConstants.regstrList);
-        cmbPayment.setItems(APPaymentConstants.paymentList);
-        //payment method
-        cmbPayment.getSelectionModel().selectedIndexProperty().addListener((obs, oldIndex, newIndex) -> {
-            if (newIndex != null && newIndex.intValue() >= 0) {
-                int lnIndex = newIndex.intValue(); // the selected index
-                poController.getModel().setPayment(String.valueOf(lnIndex));
-            }
-        });
-        clearAllInputs();
     }
 
     private void initMainGrid() {
