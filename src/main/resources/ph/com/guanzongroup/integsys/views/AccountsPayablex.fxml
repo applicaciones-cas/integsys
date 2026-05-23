@@ -407,7 +407,7 @@
                                                             <Insets />
                                                          </GridPane.margin>
                                                       </CheckBox>
-                                                                        <DatePicker fx:id="dpBegBalance" disable="true" prefHeight="28.0" prefWidth="150.0" promptText="YYYY-MM-DD" GridPane.columnIndex="7" GridPane.columnSpan="2" GridPane.rowIndex="18">
+                                                                        <DatePicker fx:id="dpBegBalance" disable="true" prefWidth="150.0" GridPane.columnIndex="7" GridPane.columnSpan="2" GridPane.rowIndex="18">
                                                          <GridPane.margin>
                                                             <Insets />
                                                          </GridPane.margin>
