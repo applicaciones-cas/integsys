@@ -7,6 +7,7 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Date;
 import java.util.ResourceBundle;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.application.Platform;
@@ -57,10 +58,12 @@ public class AccountsAccreditation_ConfirmationController implements Initializab
     private Account_Accreditation poController;
 
     private unloadForm poUnload = new unloadForm();
-
+    public int pnEditMode;
     ObservableList<String> comboboxlistAccounttype = FXCollections.observableArrayList("Accounts Payable", "Accounts Receivable");
     ObservableList<String> comboboxlistTranstype = FXCollections.observableArrayList("Accreditation", "Black Listing");
     JSONObject poJSON = new JSONObject();
+    AtomicReference<Object> lastFocusedTextField = new AtomicReference<>();
+    AtomicReference<Object> previousSearchedTextField = new AtomicReference<>();
     @FXML
     private AnchorPane apMainAnchor, apBrowse, apButton, apMaster;
     @FXML
@@ -130,60 +133,12 @@ public class AccountsAccreditation_ConfirmationController implements Initializab
             String btnID = ((Button) event.getSource()).getId();
             switch (btnID) {
                 case "btnSearch":
-                    if (lastFocusedControl == null) {
-                        ShowMessageFX.Information(null, psFormName,
-                                "Search unavailable. Please ensure a searchable field is selected or focused before proceeding..");
-                        return;
-                    }
-
-                    switch (lastFocusedControl.getId()) {
-
-                        case "tfSearchCompany":
-                            if (!(tfTransactionNo.getText() == null ? "" : tfTransactionNo.getText()).isEmpty()) {
-                                if (ShowMessageFX.OkayCancel(null, "Search Client! by ID", "Are you sure you want replace loaded Record?") == false) {
-                                    return;
-                                }
-                            }
-                            if (!isJSONSuccess(poController.searchRecord(tfSearchCompany.getText(), false),
-                                    "")) {
-                                return;
-                            }
-
-                            loadRecordMaster();
-                            initButtonDisplay(poController.getEditMode());
-                            return;
-
-                        case "tfCategory":
-                            if (!isJSONSuccess(poController.searchCategory(tfCategory.getText() == null ? "" : tfCategory.getText(), false),
-                                    "Initialize Search Category! ")) {
-                                return;
-                            }
-                            loadRecordMaster();
-                            break;
-
-                        case "tfCompany":
-                            if (!isJSONSuccess(poController.searchCompany(tfCompany.getText(), false),
-                                    "Initialize Search Client! ")) {
-                                return;
-                            }
-                            loadRecordMaster();
-                            initButtonDisplay(poController.getEditMode());
-                            break;
-
-                    }
+                    JFXUtil.initiateBtnSearch(psFormName, lastFocusedTextField, previousSearchedTextField, apMaster, apBrowse);
                     break;
-
                 case "btnBrowse":
-                    if (!(tfTransactionNo.getText() == null ? "" : tfTransactionNo.getText()).isEmpty()) {
-                        if (ShowMessageFX.OkayCancel(null, "Search Client! by ID", "Are you sure you want replace loaded Record?") == false) {
-                            return;
-                        }
-                    }
-                    if (!isJSONSuccess(poController.searchRecord(tfSearchCompany.getText(), false),
-                            "")) {
+                    if (!isJSONSuccess(poController.searchRecord(tfSearchCompany.getText(), false), "")) {
                         return;
                     }
-
                     loadRecordMaster();
                     initButtonDisplay(poController.getEditMode());
                     return;
@@ -233,8 +188,11 @@ public class AccountsAccreditation_ConfirmationController implements Initializab
                                 ShowMessageFX.Information("Transaction confirmed successfully", null, psFormName);
                             }
                         }
+                        pnEditMode = poController.getEditMode();
                         //reset data to avoid transaction errors
                         clearAllInputs();
+                    } else {
+                        pnEditMode = poController.getEditMode();
                     }
                     break;
                 case "btnConfirm":
@@ -324,7 +282,7 @@ public class AccountsAccreditation_ConfirmationController implements Initializab
 
             //manually reset button, edit mode not initialized on model
             if (btnID.equalsIgnoreCase("btnSave")) {
-                initButtonDisplay(EditMode.UNKNOWN);
+                initButtonDisplay(pnEditMode);
                 return;
             }
             initButtonDisplay(poController.getEditMode());
@@ -556,6 +514,7 @@ public class AccountsAccreditation_ConfirmationController implements Initializab
     }
 
     private void clearAllInputs() {
+        JFXUtil.setValueToNull(previousSearchedTextField, lastFocusedTextField);
         JFXUtil.clearTextFields(apMaster);
         initButtonDisplay(poController.getEditMode());
     }

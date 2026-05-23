@@ -129,20 +129,13 @@ public class AccountsAccreditation_HistoryController implements Initializable, S
             switch (btnID) {
 
                 case "btnBrowse":
-                    if (!tfTransactionNo.getText().isEmpty()) {
-                        if (ShowMessageFX.OkayCancel(null, "Search Client! by ID", "Are you sure you want replace loaded Record?") == false) {
-                            return;
-                        }
-                    }
                     if (!isJSONSuccess(poController.searchRecord(tfSearchCompany.getText(), false),
                             "")) {
                         return;
                     }
-
                     loadRecordMaster();
                     initButtonDisplay(poController.getEditMode());
                     return;
-
                 case "btnHistory":
 
                     if (poController.getEditMode() != EditMode.READY && poController.getEditMode() != EditMode.UPDATE) {
