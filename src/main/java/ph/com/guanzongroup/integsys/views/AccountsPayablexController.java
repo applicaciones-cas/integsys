@@ -187,12 +187,12 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
                     JFXUtil.initiateBtnSearch(psFormName, lastFocusedTextField, previousSearchedTextField, apMainAnchor, apRecord);
                     break;
                 case "btnBrowse":
-                    if (!isJSONSuccess(poController.searchRecord(tfSearchClient.getText(), true),
-                            "")) {
+                    poJSON = poController.searchRecord(tfSearchClient.getText(), true);
+                    if (!JFXUtil.isJSONSuccess(poJSON)) {
+                        ShowMessageFX.Information(null, psFormName, JFXUtil.getJSONMessage(poJSON));
                         return;
                     }
                     poController.loadAttachments();
-
                     getLoadedClient();
                     initButtonDisplay(poController.getEditMode());
                     return;
@@ -449,7 +449,9 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
                                         return;
                                     }
                                 }
-                                if (!isJSONSuccess(poController.searchRecord(tfSearchClient.getText(), true), "")) {
+                                poJSON = poController.searchRecord(tfSearchClient.getText(), true);
+                                if (!JFXUtil.isJSONSuccess(poJSON)) {
+                                    ShowMessageFX.Information(null, psFormName, JFXUtil.getJSONMessage(poJSON));
                                     return;
                                 }
                                 clearAllInputs();
@@ -463,17 +465,20 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
                                         return;
                                     }
                                 }
-                                if (!isJSONSuccess(poController.searchRecord(tfSearchCompanyName.getText(), false), "")) {
+                                poJSON = poController.searchRecord(tfSearchCompanyName.getText(), true);
+                                if (!JFXUtil.isJSONSuccess(poJSON)) {
+                                    ShowMessageFX.Information(null, psFormName, JFXUtil.getJSONMessage(poJSON));
                                     return;
                                 }
                                 clearAllInputs();
-
                                 poController.loadAttachments();
                                 getLoadedClient();
                                 initButtonDisplay(poController.getEditMode());
                                 break;
                             case "tfTerm":
-                                if (!isJSONSuccess(poController.searchTerm(tfTerm.getText() == null ? "" : tfTerm.getText(), false), "Initialize Search Category! ")) {
+                                poJSON = poController.searchTerm(tfTerm.getText() == null ? "" : tfTerm.getText(), false);
+                                if (!JFXUtil.isJSONSuccess(poJSON)) {
+                                    ShowMessageFX.Information(null, psFormName, JFXUtil.getJSONMessage(poJSON));
                                     return;
                                 }
                                 loadRecordMaster();
