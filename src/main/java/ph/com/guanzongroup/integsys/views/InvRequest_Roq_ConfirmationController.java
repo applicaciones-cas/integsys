@@ -46,6 +46,7 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 import javafx.util.Duration;
+import net.sf.jasperreports.engine.JRException;
 import org.guanzon.appdriver.agent.ShowDialogFX;
 import org.guanzon.appdriver.agent.ShowMessageFX;
 import org.guanzon.appdriver.base.CommonUtils;
@@ -70,7 +71,7 @@ import org.json.simple.parser.ParseException;
 public class InvRequest_Roq_ConfirmationController implements Initializable, ScreenInterface {
 
     @FXML
-    private String psFormName = "Inv Stock Request ROQ Confirmation LP General";
+    private String psFormName = "Inv Stock Request ROQ Confirmation";
     @FXML
     private AnchorPane AnchorMain, AnchorDetailMaster;
     unloadForm poUnload = new unloadForm();
@@ -98,7 +99,7 @@ public class InvRequest_Roq_ConfirmationController implements Initializable, Scr
     @FXML
     private TextField tfTransactionNo, tfBrand, tfModel, tfInvType,
             tfVariant, tfColor, tfROQ, tfClassification, tfQOH, tfReferenceNo, tfReservationQTY,
-            tfOrderQuantity, tfSearchTransNo, tfSearchReferenceNo, tfDescription, tfBarCode;
+            tfOrderQuantity, tfSearchTransNo, tfSearchReferenceNo, tfDescription, tfBarCode, tfMeasure;
 
     @FXML
     private Label lblTransactionStatus, lblSource;
@@ -113,12 +114,12 @@ public class InvRequest_Roq_ConfirmationController implements Initializable, Scr
     private TableView<ModelInvTableListInformation> tableListInformation;
 
     @FXML
-    private Button btnClose, btnSave, btnCancel, btnBrowse, btnUpdate, btnRetrieve, btnConfirm, btnVoid;
+    private Button btnClose, btnSave, btnCancel, btnBrowse, btnUpdate, btnRetrieve, btnConfirm, btnVoid, btnTransHistory,btnPrint;
 
     @FXML
     private TableColumn<ModelInvOrderDetail, String> tblBrandDetail, tblModelDetail, tblVariantDetail, tblColorDetail,
             tblInvTypeDetail, tblROQDetail, tblClassificationDetail, tblQOHDetail, tblReservationQtyDetail,
-            tblOrderQuantityDetail, tblBarCodeDetail, tblDescriptionDetail;
+            tblOrderQuantityDetail, tblBarCodeDetail, tblDescriptionDetail, tblMeasureDetail;
 
     @FXML
     private TableColumn<ModelInvTableListInformation, String> tblTransactionNo, tblReferenceNo, tblTransactionDate;
@@ -165,9 +166,16 @@ public class InvRequest_Roq_ConfirmationController implements Initializable, Scr
                 invRequestController.setCompanyID(psCompanyID);
                 invRequestController.setCategoryID(psCategoryID);
                 invRequestController.setIndustryID(psIndustryID);
+                invRequestController.Master().setCompanyID(psCompanyID);
+                invRequestController.Master().setCategoryId(psCategoryID);
+                invRequestController.Master().setIndustryId(psIndustryID);
+
                 loadRecordSearch();
 
             }));
+
+            initTableList();
+            initTableInvDetail();
             tblViewOrderDetails.addEventFilter(KeyEvent.KEY_PRESSED, this::tableKeyEvents);
             initTextFieldPattern();
             initButtonsClickActions();
@@ -423,7 +431,11 @@ public class InvRequest_Roq_ConfirmationController implements Initializable, Scr
                     lsBarCode = invRequestController.Detail(pnTblInvDetailRow).Inventory().getBarCode();
                 }
                 tfBarCode.setText(lsBarCode);
-
+                String lsMeasure = "";
+                if (invRequestController.Detail(pnTblInvDetailRow).Inventory().Measure().getDescription() != null) {
+                    lsMeasure = invRequestController.Detail(pnTblInvDetailRow).Inventory().Measure().getDescription();
+                }
+                tfMeasure.setText(lsMeasure);
                 String lsModel = "";
                 if (invRequestController.Detail(pnTblInvDetailRow).Inventory().Model().getDescription() != null) {
                     lsModel = invRequestController.Detail(pnTblInvDetailRow).Inventory().Model().getDescription();
@@ -681,7 +693,6 @@ public class InvRequest_Roq_ConfirmationController implements Initializable, Scr
 //                            return;
 //                        }
 //                    }
-
                      {
                         try {
                             // Proceed to void the transaction
@@ -732,14 +743,66 @@ public class InvRequest_Roq_ConfirmationController implements Initializable, Scr
                         }
                     }
                     break;
+                case "btnTransHistory":
+                    if (pnEditMode != EditMode.READY && pnEditMode != EditMode.UPDATE) {
+                        ShowMessageFX.Warning("No transaction status history to load!", psFormName, null);
+                        return;
+                    }
+
+                    try {
+                        invRequestController.ShowStatusHistory();
+                    } catch (NullPointerException npe) {
+                        Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(npe), npe);
+                        ShowMessageFX.Error("No transaction status history to load!", psFormName, null);
+                    } catch (Exception ex) {
+                        Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+                        ShowMessageFX.Error(MiscUtil.getException(ex), psFormName, null);
+                    }
+                    break;
+                case "btnPrint":
+                    if (invRequestController.Master().getTransactionNo() == null || invRequestController.Master().getTransactionNo().isEmpty()) {
+                        ShowMessageFX.Information("Please load transaction before proceeding..", "Stock Request Approval", "");
+                        break;
+                    }
+                    if (ShowMessageFX.OkayCancel(null, psFormName, "Do you want to print the transaction ?") == true) {
+                        if (!isJSONSuccess(invRequestController.printRecord(),
+                                "Initialize Print Transaction")) {
+                            break;
+                        }
+                    }
+
+                    break;
 
             }
             initButtons(pnEditMode);
             initFields(pnEditMode);
-        } catch (CloneNotSupportedException | ExceptionInInitializerError | SQLException | GuanzonException | NullPointerException e) {
-            ShowMessageFX.Error(getStage(), e.getMessage(), "Error", psFormName);
-            System.exit(1);
+        } catch (JRException | CloneNotSupportedException | ExceptionInInitializerError | SQLException | GuanzonException | NullPointerException e) {
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(e), e);
+            ShowMessageFX.Error(MiscUtil.getException(e), psFormName, null);
         }
+    }
+
+    private boolean isJSONSuccess(JSONObject loJSON, String fsModule) {
+        String result = (String) loJSON.get("result");
+        if ("error".equals(result)) {
+            String message = (String) loJSON.get("message");
+//            poLogWrapper.severe(psFormName + " :" + message);
+            Platform.runLater(() -> {
+                ShowMessageFX.Warning(null, psFormName, message);
+            });
+            return false;
+        }
+        String message = (String) loJSON.get("message");
+
+//        poLogWrapper.severe(psFormName + " :" + message);
+        Platform.runLater(() -> {
+            if (message != null) {
+                ShowMessageFX.Information(null, psFormName, message);
+            }
+        });
+//        poLogWrapper.info(psFormName + " : Success on " + fsModule);
+        return true;
+
     }
 
     private void loadTableList() {
@@ -810,7 +873,9 @@ public class InvRequest_Roq_ConfirmationController implements Initializable, Scr
     private void clearDetailFields() {
         /* Detail Fields*/
         CustomCommonUtil.setText("", tfBrand, tfModel, tfBarCode, tfDescription,
-                tfColor, tfReservationQTY, tfQOH, tfInvType, tfVariant, tfROQ, tfClassification);
+                tfColor, tfReservationQTY, tfQOH, tfInvType,
+                tfVariant, tfROQ, tfClassification,
+                tfMeasure);
         CustomCommonUtil.setText("0", tfOrderQuantity);
     }
 
@@ -873,7 +938,8 @@ public class InvRequest_Roq_ConfirmationController implements Initializable, Scr
                                 detail.getClassification(),
                                 String.valueOf(detail.getQuantityOnHand()),
                                 String.valueOf(detail.getReservedOrder()),
-                                String.valueOf(detail.getQuantity())
+                                String.valueOf(detail.getQuantity()),
+                                detail.Inventory().Measure().getDescription()
                         ));
                     }
 
@@ -986,7 +1052,7 @@ public class InvRequest_Roq_ConfirmationController implements Initializable, Scr
 
     private void initButtonsClickActions() {
         List<Button> buttons = Arrays.asList(btnSave, btnCancel,
-                btnClose, btnBrowse, btnUpdate, btnRetrieve, btnConfirm, btnVoid);
+                btnClose, btnBrowse, btnUpdate, btnRetrieve, btnConfirm, btnVoid, btnTransHistory,btnPrint);
 
         buttons.forEach(button -> button.setOnAction(this::handleButtonAction));
     }
@@ -1045,8 +1111,13 @@ public class InvRequest_Roq_ConfirmationController implements Initializable, Scr
                             if (!invOrderDetail_data.isEmpty() && pnTblInvDetailRow < invOrderDetail_data.size() - 1) {
                                 pnTblInvDetailRow++;
                             }
-                            CommonUtils.SetNextFocus((TextField) event.getSource());
+
                             loadTableInvDetailAndSelectedRow();
+
+                            Platform.runLater(() -> {
+                                tfOrderQuantity.requestFocus();
+                                tfOrderQuantity.selectAll();
+                            });
                             break;
                     }
                     event.consume();
@@ -1165,6 +1236,7 @@ public class InvRequest_Roq_ConfirmationController implements Initializable, Scr
         tblQOHDetail.setCellValueFactory(new PropertyValueFactory<>("index10"));
         tblReservationQtyDetail.setCellValueFactory(new PropertyValueFactory<>("index11"));
         tblOrderQuantityDetail.setCellValueFactory(new PropertyValueFactory<>("index12"));
+        tblMeasureDetail.setCellValueFactory(new PropertyValueFactory<>("index13"));
 
         // Prevent column reordering
         tblViewOrderDetails.widthProperty().addListener((ObservableValue<? extends Number> source, Number oldWidth, Number newWidth) -> {
@@ -1245,6 +1317,10 @@ public class InvRequest_Roq_ConfirmationController implements Initializable, Scr
         CustomCommonUtil.setVisible(lbShow, btnSave, btnCancel);
         CustomCommonUtil.setManaged(lbShow, btnSave, btnCancel);
 
+        btnPrint.setVisible(fnEditMode != EditMode.ADDNEW && fnEditMode != EditMode.UNKNOWN);
+        btnPrint.setManaged(fnEditMode != EditMode.ADDNEW && fnEditMode != EditMode.UNKNOWN);
+        btnTransHistory.setVisible(fnEditMode != EditMode.ADDNEW && fnEditMode != EditMode.UNKNOWN);
+        btnTransHistory.setManaged(fnEditMode != EditMode.ADDNEW && fnEditMode != EditMode.UNKNOWN);
         CustomCommonUtil.setVisible(false, btnConfirm, btnVoid, btnUpdate);
         CustomCommonUtil.setManaged(false, btnConfirm, btnVoid, btnUpdate);
 
