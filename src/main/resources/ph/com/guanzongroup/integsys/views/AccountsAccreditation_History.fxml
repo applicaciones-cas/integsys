@@ -258,7 +258,7 @@
                                                    </children>
                                                 </AnchorPane>
                                                                 <TextField fx:id="tfTransactionNo" disable="true" editable="false" maxWidth="-Infinity" minWidth="-Infinity" prefHeight="25.0" prefWidth="176.0" style="-fx-font-weight: bold;" styleClass="DisabledTextField" GridPane.columnIndex="2" GridPane.columnSpan="3" />
-                                                                <DatePicker fx:id="dpTransactionDate" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.rowIndex="2" />
+                                                                <DatePicker fx:id="dpTransactionDate" prefHeight="25.0" prefWidth="137.0" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.rowIndex="2" />
                                                                 <ComboBox fx:id="cmbAccountType" maxWidth="-Infinity" minWidth="-Infinity" prefHeight="25.0" prefWidth="226.0" GridPane.columnIndex="2" GridPane.columnSpan="3" GridPane.rowIndex="3" />
                                                                 <ComboBox fx:id="cmbTransType" maxWidth="-Infinity" prefHeight="25.0" prefWidth="225.0" GridPane.columnIndex="2" GridPane.columnSpan="3" GridPane.rowIndex="4" />
                                                                 <TextField fx:id="tfCategory" maxWidth="-Infinity" prefHeight="25.0" prefWidth="224.0" promptText="Press F3: Search" GridPane.columnIndex="2" GridPane.columnSpan="3" GridPane.rowIndex="5" />

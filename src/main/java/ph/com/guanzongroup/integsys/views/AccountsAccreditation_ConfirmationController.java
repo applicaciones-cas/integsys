@@ -389,6 +389,8 @@ public class AccountsAccreditation_ConfirmationController implements Initializab
 
     private void loadRecordMaster() {
         try {
+            boolean lbShow = JFXUtil.isObjectEqualTo(poController.getModel().getEditMode(), EditMode.UPDATE, EditMode.READY);
+            JFXUtil.setDisabled(lbShow, tfCompany);
             JFXUtil.setStatusValue(lblStatus, AccountAccreditationStatus.class, poController.getModel().getEditMode() == EditMode.UNKNOWN ? "-1" : poController.getModel().getRecordStatus());
 
             tfTransactionNo.setText(poController.getModel().getTransactionNo() != null ? poController.getModel().getTransactionNo() : "");
