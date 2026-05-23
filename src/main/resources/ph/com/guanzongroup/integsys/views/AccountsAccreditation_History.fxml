@@ -277,7 +277,7 @@
                                                                 <TextField fx:id="tfContactPosition" editable="false" maxWidth="-Infinity" prefHeight="25.0" prefWidth="224.0" styleClass="DisabledTextField" GridPane.columnIndex="2" GridPane.columnSpan="3" GridPane.rowIndex="23" />
                                                                 <Button fx:id="btnAddClompany" contentDisplay="CENTER" maxHeight="25.0" maxWidth="30.0" minWidth="25.0" mnemonicParsing="false" onAction="#cmdButton_Click" styleClass="button_process" wrapText="true" GridPane.columnIndex="4" GridPane.rowIndex="6">
                                                    <graphic>
-                                                      <FontAwesomeIconView fx:id="faAdd" glyphName="PENCIL_SQUARE_ALT" size="15" textAlignment="CENTER" />
+                                                      <FontAwesomeIconView fx:id="faAdd" glyphName="PLUS" size="15" textAlignment="CENTER" />
                                                    </graphic>
                                                    <tooltip>
                                                       <Tooltip text="ADD ADDRESS" />
