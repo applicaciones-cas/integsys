@@ -39,6 +39,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
+import net.sf.jasperreports.engine.JRException;
 import org.guanzon.appdriver.agent.ShowDialogFX;
 import org.guanzon.appdriver.agent.ShowMessageFX;
 import org.guanzon.appdriver.base.CommonUtils;
@@ -54,6 +55,7 @@ import org.guanzon.cas.inv.warehouse.model.Model_Inv_Stock_Request_Detail;
 import org.guanzon.cas.inv.warehouse.services.InvWarehouseControllers;
 import org.guanzon.cas.inv.warehouse.status.StockRequestStatus;
 import org.json.simple.JSONObject;
+import org.json.simple.parser.ParseException;
 
 /**
  *
@@ -93,7 +95,7 @@ public class InvRequest_HistoryController implements Initializable, ScreenInterf
     private TextField tfBrand, tfModel, tfInvType,
             tfVariant, tfColor, tfROQ, tfClassification, tfQOH;
     @FXML
-    private Button btnBrowse, btnRetrieve, btnClose, btnTransHistory;
+    private Button btnBrowse, btnRetrieve, btnClose, btnTransHistory,btnPrint;
     @FXML
     private Label lblTransactionStatus, lblSource;
     @FXML
@@ -183,7 +185,7 @@ public class InvRequest_HistoryController implements Initializable, ScreenInterf
         CustomCommonUtil.setText("", tfBrand, tfModel,
                 tfColor, tfReservationQTY, tfQOH,
                 tfInvType, tfVariant, tfROQ, tfClassification,
-                 tfMeasure);
+                tfMeasure);
         CustomCommonUtil.setText("0", tfOrderQuantity);
     }
 
@@ -374,13 +376,50 @@ public class InvRequest_HistoryController implements Initializable, ScreenInterf
                         ShowMessageFX.Error(MiscUtil.getException(ex), psFormName, null);
                     }
                     break;
+                case "btnPrint":
+                    if (invRequestController.Master().getTransactionNo() == null || invRequestController.Master().getTransactionNo().isEmpty()) {
+                        ShowMessageFX.Information("Please load transaction before proceeding..", "Stock Request Approval", "");
+                        break;
+                    }
+                    if (ShowMessageFX.OkayCancel(null, psFormName, "Do you want to print the transaction ?") == true) {
+                        if (!isJSONSuccess(invRequestController.printRecord(),
+                                "Initialize Print Transaction")) {
+                            break;
+                        }
+                    }
+
+                    break;
+
             }
             initButtons(pnEditMode);
-            initFields(EditMode.UNKNOWN);
-        } catch (CloneNotSupportedException | SQLException | GuanzonException e) {
-            ShowMessageFX.Error(getStage(), e.getMessage(), "Error", psFormName);
-
+            initFields(pnEditMode);
+        } catch (JRException | CloneNotSupportedException | ExceptionInInitializerError | SQLException | GuanzonException | NullPointerException e) {
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(e), e);
+            ShowMessageFX.Error(MiscUtil.getException(e), psFormName, null);
         }
+    }
+
+    private boolean isJSONSuccess(JSONObject loJSON, String fsModule) {
+        String result = (String) loJSON.get("result");
+        if ("error".equals(result)) {
+            String message = (String) loJSON.get("message");
+//            poLogWrapper.severe(psFormName + " :" + message);
+            Platform.runLater(() -> {
+                ShowMessageFX.Warning(null, psFormName, message);
+            });
+            return false;
+        }
+        String message = (String) loJSON.get("message");
+
+//        poLogWrapper.severe(psFormName + " :" + message);
+        Platform.runLater(() -> {
+            if (message != null) {
+                ShowMessageFX.Information(null, psFormName, message);
+            }
+        });
+//        poLogWrapper.info(psFormName + " : Success on " + fsModule);
+        return true;
+
     }
 
     private void loadTableList() {
@@ -483,13 +522,15 @@ public class InvRequest_HistoryController implements Initializable, ScreenInterf
         CustomCommonUtil.setVisible(true, btnRetrieve, btnBrowse, btnClose);
         CustomCommonUtil.setManaged(true, btnRetrieve, btnBrowse, btnClose);
 
+        btnPrint.setVisible(fnEditMode != EditMode.ADDNEW && fnEditMode != EditMode.UNKNOWN);
+        btnPrint.setManaged(fnEditMode != EditMode.ADDNEW && fnEditMode != EditMode.UNKNOWN);
         btnTransHistory.setVisible(fnEditMode != EditMode.ADDNEW && fnEditMode != EditMode.UNKNOWN);
         btnTransHistory.setManaged(fnEditMode != EditMode.ADDNEW && fnEditMode != EditMode.UNKNOWN);
     }
 
     private void initButtonsClickActions() {
         List<Button> buttons = Arrays.asList(btnBrowse,
-                btnRetrieve, btnClose, btnTransHistory);
+                btnRetrieve, btnClose, btnTransHistory,btnPrint);
 
         buttons.forEach(button -> button.setOnAction(this::handleButtonAction));
     }
@@ -807,7 +848,7 @@ public class InvRequest_HistoryController implements Initializable, ScreenInterf
         CustomCommonUtil.setDisable(true,
                 tfInvType, tfVariant, tfColor, tfReservationQTY,
                 tfQOH, tfROQ, tfClassification, tfModel, tfBrand, tfDescription, tfBarCode,
-                 tfMeasure);
+                tfMeasure);
         if (!tfReferenceNo.getText().isEmpty()) {
             dpTransactionDate.setDisable(!lbShow);
         }

@@ -49,6 +49,7 @@ import org.guanzon.cas.inv.warehouse.services.InvWarehouseControllers;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.StackPane;
 import javafx.util.Duration;
+import net.sf.jasperreports.engine.JRException;
 import org.guanzon.appdriver.agent.ShowDialogFX;
 import org.guanzon.appdriver.agent.ShowMessageFX;
 import org.guanzon.appdriver.base.CommonUtils;
@@ -113,7 +114,7 @@ public class InvRequest_EntryControllerMC implements Initializable, ScreenInterf
     private TableView<ModelInvTableListInformation> tableListInformation;
 
     @FXML
-    private Button btnClose, btnSave, btnCancel, btnBrowse, btnUpdate, btnRetrieve, btnNew, btnVoid, btnTransHistory;
+    private Button btnClose, btnSave, btnCancel, btnBrowse, btnUpdate, btnRetrieve, btnNew, btnVoid, btnTransHistory,btnPrint;
 
     @FXML
     private TableColumn<ModelInvOrderDetail, String> tblBrandDetail, tblModelDetail, tblVariantDetail, tblColorDetail, tblInvTypeDetail, tblROQDetail, tblClassificationDetail, tblQOHDetail, tblReservationQtyDetail, tblOrderQuantityDetail;
@@ -730,14 +731,66 @@ public class InvRequest_EntryControllerMC implements Initializable, ScreenInterf
                         }
                     }
                     break;
+                case "btnTransHistory":
+                    if (pnEditMode != EditMode.READY && pnEditMode != EditMode.UPDATE) {
+                        ShowMessageFX.Warning("No transaction status history to load!", psFormName, null);
+                        return;
+                    }
+
+                    try {
+                        invRequestController.ShowStatusHistory();
+                    } catch (NullPointerException npe) {
+                        Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(npe), npe);
+                        ShowMessageFX.Error("No transaction status history to load!", psFormName, null);
+                    } catch (Exception ex) {
+                        Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+                        ShowMessageFX.Error(MiscUtil.getException(ex), psFormName, null);
+                    }
+                    break;
+                case "btnPrint":
+                    if (invRequestController.Master().getTransactionNo() == null || invRequestController.Master().getTransactionNo().isEmpty()) {
+                        ShowMessageFX.Information("Please load transaction before proceeding..", "Stock Request Approval", "");
+                        break;
+                    }
+                    if (ShowMessageFX.OkayCancel(null, psFormName, "Do you want to print the transaction ?") == true) {
+                        if (!isJSONSuccess(invRequestController.printRecord(),
+                                "Initialize Print Transaction")) {
+                            break;
+                        }
+                    }
+
+                    break;
 
             }
             initButtons(pnEditMode);
             initFields(pnEditMode);
-        } catch (CloneNotSupportedException | ExceptionInInitializerError | SQLException | ParseException | GuanzonException | NullPointerException e) {
-            ShowMessageFX.Error(getStage(), e.getMessage(), "Error", psFormName);
-//            System.exit(1);
+        } catch (ParseException | JRException | CloneNotSupportedException | ExceptionInInitializerError | SQLException | GuanzonException | NullPointerException e) {
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(e), e);
+            ShowMessageFX.Error(MiscUtil.getException(e), psFormName, null);
         }
+    }
+
+    private boolean isJSONSuccess(JSONObject loJSON, String fsModule) {
+        String result = (String) loJSON.get("result");
+        if ("error".equals(result)) {
+            String message = (String) loJSON.get("message");
+//            poLogWrapper.severe(psFormName + " :" + message);
+            Platform.runLater(() -> {
+                ShowMessageFX.Warning(null, psFormName, message);
+            });
+            return false;
+        }
+        String message = (String) loJSON.get("message");
+
+//        poLogWrapper.severe(psFormName + " :" + message);
+        Platform.runLater(() -> {
+            if (message != null) {
+                ShowMessageFX.Information(null, psFormName, message);
+            }
+        });
+//        poLogWrapper.info(psFormName + " : Success on " + fsModule);
+        return true;
+
     }
 
     private void loadTableList() {
@@ -992,7 +1045,7 @@ public class InvRequest_EntryControllerMC implements Initializable, ScreenInterf
 
     private void initButtonsClickActions() {
         List<Button> buttons = Arrays.asList(btnSave, btnCancel,
-                btnClose, btnBrowse, btnUpdate, btnRetrieve, btnNew, btnVoid, btnTransHistory);
+                btnClose, btnBrowse, btnUpdate, btnRetrieve, btnNew, btnVoid, btnTransHistory,btnPrint);
 
         buttons.forEach(button -> button.setOnAction(this::handleButtonAction));
     }
@@ -1353,6 +1406,8 @@ public class InvRequest_EntryControllerMC implements Initializable, ScreenInterf
         CustomCommonUtil.setVisible(lbShow, btnSave, btnCancel);
         CustomCommonUtil.setManaged(lbShow, btnSave, btnCancel);
 
+        btnPrint.setVisible(fnEditMode != EditMode.ADDNEW && fnEditMode != EditMode.UNKNOWN);
+        btnPrint.setManaged(fnEditMode != EditMode.ADDNEW && fnEditMode != EditMode.UNKNOWN);
         btnTransHistory.setVisible(fnEditMode != EditMode.ADDNEW && fnEditMode != EditMode.UNKNOWN);
         btnTransHistory.setManaged(fnEditMode != EditMode.ADDNEW && fnEditMode != EditMode.UNKNOWN);
         CustomCommonUtil.setVisible(false, btnUpdate, btnVoid);
