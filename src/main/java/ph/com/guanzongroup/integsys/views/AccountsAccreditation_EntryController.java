@@ -135,6 +135,7 @@ public class AccountsAccreditation_EntryController implements Initializable, Scr
             switch (btnID) {
                 case "btnSearch":
                     JFXUtil.initiateBtnSearch(psFormName, lastFocusedTextField, previousSearchedTextField, apMaster, apBrowse);
+                    break;
                 case "btnBrowse":
                     if (!isJSONSuccess(poController.searchRecord(tfSearchCompany.getText(), false), "")) {
                         return;
