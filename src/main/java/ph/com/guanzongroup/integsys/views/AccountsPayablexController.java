@@ -173,7 +173,7 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
             pnEditMode = EditMode.UNKNOWN;
             initButtonDisplay(pnEditMode);
         } catch (SQLException | GuanzonException e) {
-            Logger.getLogger(AccountsPayablexController.class.getName()).log(Level.SEVERE, null, e);
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, e);
             poLogWrapper.severe(psFormName + " :" + e.getMessage());
         }
     }
@@ -729,7 +729,7 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
                 poController.loadAttachments();
                 getLoadedClient();
             } catch (SQLException | GuanzonException | CloneNotSupportedException ex) {
-                Logger.getLogger(AccountsPayablexController.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
             }
         }
     }

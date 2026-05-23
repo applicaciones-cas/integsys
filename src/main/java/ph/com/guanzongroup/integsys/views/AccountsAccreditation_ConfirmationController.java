@@ -123,7 +123,7 @@ public class AccountsAccreditation_ConfirmationController implements Initializab
             loadRecordMaster();
             JFXUtil.initKeyClickObject(apMainAnchor, lastFocusedTextField, previousSearchedTextField);
         } catch (SQLException | GuanzonException e) {
-            Logger.getLogger(AccountsAccreditation_ConfirmationController.class.getName()).log(Level.SEVERE, null, e);
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, e);
             poLogWrapper.severe(psFormName + " :" + e.getMessage());
         }
     }
@@ -331,8 +331,8 @@ public class AccountsAccreditation_ConfirmationController implements Initializab
                                     return;
                                 }
                                 loadRecordMaster();
+                                JFXUtil.textFieldMoveNext(tfCompany);
                                 break;
-
                             case "tfCompany":
                                 if (!isJSONSuccess(poController.searchCompany(tfCompany.getText(), false),
                                         "Initialize Search Client! ")) {
@@ -340,6 +340,7 @@ public class AccountsAccreditation_ConfirmationController implements Initializab
                                 }
                                 loadRecordMaster();
                                 initButtonDisplay(poController.getEditMode());
+                                JFXUtil.textFieldMoveNext(taRemarks);
                                 break;
                         }
                         break;

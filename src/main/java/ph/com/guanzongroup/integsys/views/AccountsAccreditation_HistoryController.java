@@ -111,7 +111,7 @@ public class AccountsAccreditation_HistoryController implements Initializable, S
             initControlEvents();
             loadRecordMaster();
         } catch (SQLException | GuanzonException e) {
-            Logger.getLogger(AccountsAccreditation_HistoryController.class.getName()).log(Level.SEVERE, null, e);
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, e);
             poLogWrapper.severe(psFormName + " :" + e.getMessage());
         }
     }

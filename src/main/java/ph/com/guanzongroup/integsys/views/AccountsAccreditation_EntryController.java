@@ -122,7 +122,7 @@ public class AccountsAccreditation_EntryController implements Initializable, Scr
             loadRecordMaster();
             JFXUtil.initKeyClickObject(apMainAnchor, lastFocusedTextField, previousSearchedTextField);
         } catch (SQLException | GuanzonException e) {
-            Logger.getLogger(AccountsAccreditation_EntryController.class.getName()).log(Level.SEVERE, null, e);
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, e);
             poLogWrapper.severe(psFormName + " :" + e.getMessage());
         }
     }
@@ -289,6 +289,7 @@ public class AccountsAccreditation_EntryController implements Initializable, Scr
                                     return;
                                 }
                                 loadRecordMaster();
+                                JFXUtil.textFieldMoveNext(tfCompany);
                                 break;
                             case "tfCompany":
                                 if (!isJSONSuccess(
@@ -298,6 +299,7 @@ public class AccountsAccreditation_EntryController implements Initializable, Scr
                                 }
                                 loadRecordMaster();
                                 initButtonDisplay(poController.getEditMode());
+                                JFXUtil.textFieldMoveNext(taRemarks);
                                 break;
                         }
                         break;
