@@ -45,6 +45,7 @@ import org.guanzon.appdriver.base.CommonUtils;
 import org.guanzon.appdriver.base.GRiderCAS;
 import org.guanzon.appdriver.base.GuanzonException;
 import org.guanzon.appdriver.base.LogWrapper;
+import org.guanzon.appdriver.base.MiscUtil;
 import org.guanzon.appdriver.base.SQLUtil;
 import org.guanzon.appdriver.constant.EditMode;
 import org.guanzon.appdriver.constant.UserRight;
@@ -62,7 +63,7 @@ public class InvRequest_Roq_HistoryController implements Initializable, ScreenIn
 
     //test
     @FXML
-    private String psFormName = "Inv Stock Request ROQ History LP General";
+    private String psFormName = "Inv Stock Request ROQ History";
     unloadForm poUnload = new unloadForm();
     @FXML
     private AnchorPane AnchorMain;
@@ -86,14 +87,16 @@ public class InvRequest_Roq_HistoryController implements Initializable, ScreenIn
 
     @FXML
     private TextField tfReservationQTY, tfOrderQuantity, tfTransactionNo, tfReferenceNo,
-            tfSearchTransNo, tfSearchReferenceNo, tfBarCode, tfDescription;
+            tfSearchTransNo, tfSearchReferenceNo, tfBarCode, tfDescription, tfMeasure;
     @FXML
-    private TableColumn<ModelInvOrderDetail, String> tblBrandDetail, tblBarCodeDetail, tblDescriptionDetail, tblModelDetail, tblVariantDetail, tblColorDetail, tblInvTypeDetail, tblROQDetail, tblClassificationDetail, tblQOHDetail, tblReservationQtyDetail, tblOrderQuantityDetail;
+    private TableColumn<ModelInvOrderDetail, String> tblBrandDetail, tblBarCodeDetail, tblDescriptionDetail, tblModelDetail,
+            tblVariantDetail, tblColorDetail, tblInvTypeDetail, tblROQDetail, tblClassificationDetail,
+            tblQOHDetail, tblReservationQtyDetail, tblOrderQuantityDetail,tblMeasureDetail;
     @FXML
     private TextField tfBrand, tfModel, tfInvType,
             tfVariant, tfColor, tfROQ, tfClassification, tfQOH;
     @FXML
-    private Button btnBrowse, btnRetrieve, btnClose;
+    private Button btnBrowse, btnRetrieve, btnClose, btnTransHistory;
     @FXML
     private Label lblTransactionStatus, lblSource;
     @FXML
@@ -156,6 +159,8 @@ public class InvRequest_Roq_HistoryController implements Initializable, ScreenIn
             initButtons(pnEditMode);
             initFields(pnEditMode);
 
+            initTableInvDetail();
+            initTableList();
             initButtonsClickActions();
             initDatePickerActions();
             initTextFieldsProperty();
@@ -348,6 +353,22 @@ public class InvRequest_Roq_HistoryController implements Initializable, ScreenIn
                         }
                     }
                     break;
+                case "btnTransHistory":
+                    if (pnEditMode != EditMode.READY && pnEditMode != EditMode.UPDATE) {
+                        ShowMessageFX.Warning("No transaction status history to load!", psFormName, null);
+                        return;
+                    }
+
+                    try {
+                        invRequestController.ShowStatusHistory();
+                    } catch (NullPointerException npe) {
+                        Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(npe), npe);
+                        ShowMessageFX.Error("No transaction status history to load!", psFormName, null);
+                    } catch (Exception ex) {
+                        Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+                        ShowMessageFX.Error(MiscUtil.getException(ex), psFormName, null);
+                    }
+                    break;
             }
             initButtons(pnEditMode);
             initFields(EditMode.UNKNOWN);
@@ -457,11 +478,14 @@ public class InvRequest_Roq_HistoryController implements Initializable, ScreenIn
         CustomCommonUtil.setVisible(true, btnRetrieve, btnBrowse, btnClose);
         CustomCommonUtil.setManaged(true, btnRetrieve, btnBrowse, btnClose);
 
+        btnTransHistory.setVisible(fnEditMode != EditMode.ADDNEW && fnEditMode != EditMode.UNKNOWN);
+        btnTransHistory.setManaged(fnEditMode != EditMode.ADDNEW && fnEditMode != EditMode.UNKNOWN);
+
     }
 
     private void initButtonsClickActions() {
         List<Button> buttons = Arrays.asList(btnBrowse,
-                btnRetrieve, btnClose);
+                btnRetrieve, btnClose, btnTransHistory);
 
         buttons.forEach(button -> button.setOnAction(this::handleButtonAction));
     }
@@ -549,7 +573,8 @@ public class InvRequest_Roq_HistoryController implements Initializable, ScreenIn
                                 detail.getClassification(),
                                 String.valueOf(detail.getQuantityOnHand()),
                                 String.valueOf(detail.getReservedOrder()),
-                                String.valueOf(detail.getQuantity())
+                                String.valueOf(detail.getQuantity()),
+                                detail.Inventory().Measure().getDescription()
                         ));
                     }
 
@@ -604,6 +629,12 @@ public class InvRequest_Roq_HistoryController implements Initializable, ScreenIn
                 }
                 tfBarCode.setText(lsBarCode);
 
+                String lsMeasure = "";
+                if (invRequestController.Detail(pnTblInvDetailRow).Inventory().Measure().getDescription() != null) {
+                    lsMeasure = invRequestController.Detail(pnTblInvDetailRow).Inventory().Measure().getDescription();
+                }
+                tfMeasure.setText(lsMeasure);
+                
                 String lsModel = "";
                 if (invRequestController.Detail(pnTblInvDetailRow).Inventory().Model().getDescription() != null) {
                     lsModel = invRequestController.Detail(pnTblInvDetailRow).Inventory().Model().getDescription();
@@ -815,6 +846,8 @@ public class InvRequest_Roq_HistoryController implements Initializable, ScreenIn
         tblQOHDetail.setCellValueFactory(new PropertyValueFactory<>("index10"));
         tblReservationQtyDetail.setCellValueFactory(new PropertyValueFactory<>("index11"));
         tblOrderQuantityDetail.setCellValueFactory(new PropertyValueFactory<>("index12"));
+        tblMeasureDetail.setCellValueFactory(new PropertyValueFactory<>("index13"));
+        
         // Prevent column reordering
         tblViewOrderDetails.widthProperty().addListener((ObservableValue<? extends Number> source, Number oldWidth, Number newWidth) -> {
             TableHeaderRow header = (TableHeaderRow) tblViewOrderDetails.lookup("TableHeaderRow");

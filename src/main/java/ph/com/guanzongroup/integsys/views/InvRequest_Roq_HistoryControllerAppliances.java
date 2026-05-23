@@ -47,6 +47,7 @@ import org.guanzon.appdriver.base.CommonUtils;
 import org.guanzon.appdriver.base.GRiderCAS;
 import org.guanzon.appdriver.base.GuanzonException;
 import org.guanzon.appdriver.base.LogWrapper;
+import org.guanzon.appdriver.base.MiscUtil;
 import org.guanzon.appdriver.base.SQLUtil;
 import org.guanzon.appdriver.constant.EditMode;
 import org.guanzon.appdriver.constant.UserRight;
@@ -63,7 +64,7 @@ import org.json.simple.JSONObject;
 public class InvRequest_Roq_HistoryControllerAppliances implements Initializable, ScreenInterface {
 
     @FXML
-    private String psFormName = "Inv Stock Request ROQ History Appliances";
+    private String psFormName = "Inv Stock Request ROQ History";
     unloadForm poUnload = new unloadForm();
     @FXML
     private AnchorPane AnchorMain;
@@ -96,7 +97,7 @@ public class InvRequest_Roq_HistoryControllerAppliances implements Initializable
     private TextField tfBrand, tfModel, tfInvType,
             tfVariant, tfColor, tfROQ, tfClassification, tfQOH;
     @FXML
-    private Button btnBrowse, btnRetrieve, btnClose;
+    private Button btnBrowse, btnRetrieve, btnClose,btnTransHistory;
     @FXML
     private Label lblTransactionStatus, lblSource;
     @FXML
@@ -159,6 +160,8 @@ public class InvRequest_Roq_HistoryControllerAppliances implements Initializable
             initButtons(pnEditMode);
             initFields(pnEditMode);
 
+            initTableInvDetail();
+            initTableList();
             initButtonsClickActions();
             initDatePickerActions();
             initTextFieldsProperty();
@@ -207,7 +210,7 @@ public class InvRequest_Roq_HistoryControllerAppliances implements Initializable
         }
     }
 
-  private void tableListInformation_Clicked(MouseEvent event) {
+    private void tableListInformation_Clicked(MouseEvent event) {
         poJSON = new JSONObject();
         pnTblInformationRow = tableListInformation.getSelectionModel().getSelectedIndex();
         if (pnTblInformationRow < 0 || pnTblInformationRow >= tableListInformation.getItems().size()) {
@@ -243,7 +246,6 @@ public class InvRequest_Roq_HistoryControllerAppliances implements Initializable
             }
         }
     }
-
 
     private void loadRecordSearch() {
         try {
@@ -350,6 +352,22 @@ public class InvRequest_Roq_HistoryControllerAppliances implements Initializable
                         } else {
                             ShowMessageFX.Warning("Please notify the system administrator to configure the null value at the close button.", "Warning", null);
                         }
+                    }
+                    break;
+                case "btnTransHistory":
+                    if (pnEditMode != EditMode.READY && pnEditMode != EditMode.UPDATE) {
+                        ShowMessageFX.Warning("No transaction status history to load!", psFormName, null);
+                        return;
+                    }
+
+                    try {
+                        invRequestController.ShowStatusHistory();
+                    } catch (NullPointerException npe) {
+                        Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(npe), npe);
+                        ShowMessageFX.Error("No transaction status history to load!", psFormName, null);
+                    } catch (Exception ex) {
+                        Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+                        ShowMessageFX.Error(MiscUtil.getException(ex), psFormName, null);
                     }
                     break;
             }
@@ -460,12 +478,14 @@ public class InvRequest_Roq_HistoryControllerAppliances implements Initializable
         boolean lbShow = (fnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE);
         CustomCommonUtil.setVisible(true, btnRetrieve, btnBrowse, btnClose);
         CustomCommonUtil.setManaged(true, btnRetrieve, btnBrowse, btnClose);
+        btnTransHistory.setVisible(fnEditMode != EditMode.ADDNEW && fnEditMode != EditMode.UNKNOWN);
+        btnTransHistory.setManaged(fnEditMode != EditMode.ADDNEW && fnEditMode != EditMode.UNKNOWN);
 
     }
 
     private void initButtonsClickActions() {
         List<Button> buttons = Arrays.asList(btnBrowse,
-                btnRetrieve, btnClose);
+                btnRetrieve, btnClose,btnTransHistory);
 
         buttons.forEach(button -> button.setOnAction(this::handleButtonAction));
     }

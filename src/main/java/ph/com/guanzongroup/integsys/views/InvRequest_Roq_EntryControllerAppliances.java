@@ -70,7 +70,7 @@ import org.json.simple.parser.ParseException;
 public class InvRequest_Roq_EntryControllerAppliances implements Initializable, ScreenInterface {
 
     @FXML
-    private String psFormName = "Inv Stock Request ROQ Entry Appliances";
+    private String psFormName = "Inv Stock Request ROQ Entry";
     @FXML
     private AnchorPane AnchorMain, AnchorDetailMaster;
     unloadForm poUnload = new unloadForm();
@@ -113,7 +113,7 @@ public class InvRequest_Roq_EntryControllerAppliances implements Initializable, 
     private TableView<ModelInvTableListInformation> tableListInformation;
 
     @FXML
-    private Button btnClose, btnSave, btnCancel, btnBrowse, btnUpdate, btnRetrieve, btnNew, btnVoid;
+    private Button btnClose, btnSave, btnCancel, btnBrowse, btnUpdate, btnRetrieve, btnNew, btnVoid,btnTransHistory;
 
     @FXML
     private TableColumn<ModelInvOrderDetail, String> tblBrandDetail, tblModelDetail, tblVariantDetail,
@@ -162,11 +162,12 @@ public class InvRequest_Roq_EntryControllerAppliances implements Initializable, 
             Platform.runLater((() -> {
                 try {
                     //set edit mode to new transaction temporily to assign industry and company
-                    invRequestController.NewTransaction();
                     invRequestController.setTransactionStatus("102");
                     invRequestController.setCompanyID(psCompanyID);
                     invRequestController.setCategoryID(psCategoryID);
                     invRequestController.setIndustryID(psIndustryID);
+                    invRequestController.NewTransaction();
+                    
                     loadRecordSearch();
 
                 } catch (CloneNotSupportedException e) {
@@ -993,7 +994,7 @@ public class InvRequest_Roq_EntryControllerAppliances implements Initializable, 
 
     private void initButtonsClickActions() {
         List<Button> buttons = Arrays.asList(btnSave, btnCancel,
-                btnClose, btnBrowse, btnUpdate, btnRetrieve, btnNew, btnVoid);
+                btnClose, btnBrowse, btnUpdate, btnRetrieve, btnNew, btnVoid,btnTransHistory);
 
         buttons.forEach(button -> button.setOnAction(this::handleButtonAction));
     }
@@ -1034,8 +1035,8 @@ public class InvRequest_Roq_EntryControllerAppliances implements Initializable, 
                                 pnTblInvDetailRow++;
                             }//step 9W
                             Platform.runLater(() -> {
-                                taRemarks.requestFocus();
-                                taRemarks.selectAll();
+                                tfOrderQuantity.requestFocus();
+                                tfOrderQuantity.selectAll();
                             });
 
                             event.consume();
@@ -1255,6 +1256,8 @@ public class InvRequest_Roq_EntryControllerAppliances implements Initializable, 
         CustomCommonUtil.setVisible(lbShow, btnSave, btnCancel);
         CustomCommonUtil.setManaged(lbShow, btnSave, btnCancel);
 
+        btnTransHistory.setVisible(fnEditMode != EditMode.ADDNEW && fnEditMode != EditMode.UNKNOWN);
+        btnTransHistory.setManaged(fnEditMode != EditMode.ADDNEW && fnEditMode != EditMode.UNKNOWN);
         CustomCommonUtil.setVisible(false, btnUpdate, btnVoid);
         CustomCommonUtil.setManaged(false, btnUpdate, btnVoid);
 
