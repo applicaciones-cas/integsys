@@ -482,10 +482,9 @@ public class AccountsAccreditation_ConfirmationController implements Initializab
         }
         switch (poController.getModel().getRecordStatus()) {
             case AccountAccreditationStatus.CONFIRMED:
-                JFXUtil.setButtonsVisibility(false, btnConfirm);
+                JFXUtil.setButtonsVisibility(false, btnConfirm, btnUpdate);
                 break;
             case AccountAccreditationStatus.VOID:
-            case AccountAccreditationStatus.CANCELLED:
                 JFXUtil.setButtonsVisibility(false, btnConfirm, btnUpdate, btnVoid);
                 break;
         }

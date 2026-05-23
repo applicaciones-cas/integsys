@@ -442,7 +442,7 @@ public class AccountsAccreditation_EntryController implements Initializable, Scr
         }
         switch (poController.getModel().getRecordStatus()) {
             case AccountAccreditationStatus.VOID:
-            case AccountAccreditationStatus.CANCELLED:
+            case AccountAccreditationStatus.CONFIRMED:
                 JFXUtil.setButtonsVisibility(false, btnUpdate);
                 break;
         }
