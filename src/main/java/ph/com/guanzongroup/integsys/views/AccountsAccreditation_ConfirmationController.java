@@ -498,21 +498,20 @@ public class AccountsAccreditation_ConfirmationController implements Initializab
             poLogWrapper.severe(psFormName + " : " + message);
             if (message != null && !message.trim().isEmpty()) {
                 if (Platform.isFxApplicationThread()) {
-                    ShowMessageFX.Warning(null, psFormName, fsModule + ": " + message);
+                    ShowMessageFX.Warning(null, psFormName, message);
                 } else {
-                    Platform.runLater(() -> ShowMessageFX.Warning(null, psFormName, fsModule + ": " + message));
+                    Platform.runLater(() -> ShowMessageFX.Warning(null, psFormName, message));
                 }
             }
             return false;
         }
 
         if ("success".equalsIgnoreCase(result)) {
-            poLogWrapper.info(psFormName + " : Success on " + fsModule);
+            poLogWrapper.info("Success on " + fsModule);
             return true;
         }
-
         // Unknown or null result
-        poLogWrapper.warning(psFormName + " : Unrecognized result: " + result);
+        poLogWrapper.warning("Unrecognized result: " + result);
         return false;
     }
 

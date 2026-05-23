@@ -992,12 +992,12 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
                     Platform.runLater(() -> ShowMessageFX.Information(null, psFormName, message));
                 }
             }
-            poLogWrapper.info(psFormName + " : Success on " + fsModule);
+            poLogWrapper.info("Success on " + fsModule);
             return true;
         }
 
         // Unknown or null result
-        poLogWrapper.warning(psFormName + " : Unrecognized result: " + result);
+        poLogWrapper.warning("Unrecognized result: " + result);
         return false;
     }
 
