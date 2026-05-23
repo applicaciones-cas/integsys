@@ -113,7 +113,7 @@ public class InvRequest_Roq_ConfirmationControllerCar_SP implements Initializabl
     private TableView<ModelInvTableListInformation> tableListInformation;
 
     @FXML
-    private Button btnClose, btnSave, btnCancel, btnBrowse, btnUpdate, btnRetrieve, btnConfirm, btnVoid,btnTransHistory;
+    private Button btnClose, btnSave, btnCancel, btnBrowse, btnUpdate, btnRetrieve, btnConfirm, btnVoid, btnTransHistory;
 
     @FXML
     private TableColumn<ModelInvOrderDetail, String> tblBrandDetail, tblModelDetail, tblVariantDetail, tblColorDetail,
@@ -164,9 +164,14 @@ public class InvRequest_Roq_ConfirmationControllerCar_SP implements Initializabl
                 invRequestController.setCompanyID(psCompanyID);
                 invRequestController.setCategoryID(psCategoryID);
                 invRequestController.setIndustryID(psIndustryID);
+                invRequestController.Master().setCompanyID(psCompanyID);
+                invRequestController.Master().setCategoryId(psCategoryID);
+                invRequestController.Master().setIndustryId(psIndustryID);
+
                 loadRecordSearch();
 
             }));
+
             tblViewOrderDetails.addEventFilter(KeyEvent.KEY_PRESSED, this::tableKeyEvents);
             initTextFieldPattern();
             initButtonsClickActions();
@@ -679,7 +684,6 @@ public class InvRequest_Roq_ConfirmationControllerCar_SP implements Initializabl
 //                            return;
 //                        }
 //                    }
-
                      {
                         try {
                             // Proceed to void the transaction
@@ -1001,7 +1005,7 @@ public class InvRequest_Roq_ConfirmationControllerCar_SP implements Initializabl
 
     private void initButtonsClickActions() {
         List<Button> buttons = Arrays.asList(btnSave, btnCancel,
-                btnClose, btnBrowse, btnUpdate, btnRetrieve, btnConfirm, btnVoid,btnTransHistory);
+                btnClose, btnBrowse, btnUpdate, btnRetrieve, btnConfirm, btnVoid, btnTransHistory);
 
         buttons.forEach(button -> button.setOnAction(this::handleButtonAction));
     }
@@ -1064,7 +1068,7 @@ public class InvRequest_Roq_ConfirmationControllerCar_SP implements Initializabl
                             }
                             CommonUtils.SetNextFocus((TextField) event.getSource());
                             loadTableInvDetailAndSelectedRow();
-                            
+
                             Platform.runLater(() -> {
                                 tfOrderQuantity.requestFocus();
                                 tfOrderQuantity.selectAll();
@@ -1220,7 +1224,7 @@ public class InvRequest_Roq_ConfirmationControllerCar_SP implements Initializabl
         }
     }
 
-   private void tableListInformation_Clicked(MouseEvent event) {
+    private void tableListInformation_Clicked(MouseEvent event) {
         poJSON = new JSONObject();
         pnTblInformationRow = tableListInformation.getSelectionModel().getSelectedIndex();
         if (pnTblInformationRow < 0 || pnTblInformationRow >= tableListInformation.getItems().size()) {
@@ -1313,7 +1317,7 @@ public class InvRequest_Roq_ConfirmationControllerCar_SP implements Initializabl
 
     private void clearAllTables() {
 
-                        pnTblInvDetailRow = -1;
+        pnTblInvDetailRow = -1;
         invOrderDetail_data.clear();
         tableListInformation_data.clear();
 

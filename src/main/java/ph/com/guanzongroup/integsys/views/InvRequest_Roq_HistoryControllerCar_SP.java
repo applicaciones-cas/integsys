@@ -97,7 +97,7 @@ public class InvRequest_Roq_HistoryControllerCar_SP implements Initializable, Sc
     private TextField tfBrand, tfModel, tfInvType,
             tfVariant, tfColor, tfROQ, tfClassification, tfQOH;
     @FXML
-    private Button btnBrowse, btnRetrieve, btnClose,btnTransHistory;
+    private Button btnBrowse, btnRetrieve, btnClose, btnTransHistory;
     @FXML
     private Label lblTransactionStatus, lblSource;
     @FXML
@@ -151,6 +151,9 @@ public class InvRequest_Roq_HistoryControllerCar_SP implements Initializable, Sc
                 invRequestController.setCompanyID(psCompanyID);
                 invRequestController.setCategoryID(psCategoryID);
                 invRequestController.setIndustryID(psIndustryID);
+                invRequestController.Master().setCompanyID(psCompanyID);
+                invRequestController.Master().setCategoryId(psCategoryID);
+                invRequestController.Master().setIndustryId(psIndustryID);
                 loadRecordSearch();
 
             }));
@@ -210,7 +213,7 @@ public class InvRequest_Roq_HistoryControllerCar_SP implements Initializable, Sc
         }
     }
 
-     private void tableListInformation_Clicked(MouseEvent event) {
+    private void tableListInformation_Clicked(MouseEvent event) {
         poJSON = new JSONObject();
         pnTblInformationRow = tableListInformation.getSelectionModel().getSelectedIndex();
         if (pnTblInformationRow < 0 || pnTblInformationRow >= tableListInformation.getItems().size()) {
@@ -246,7 +249,6 @@ public class InvRequest_Roq_HistoryControllerCar_SP implements Initializable, Sc
             }
         }
     }
-
 
     private void loadRecordSearch() {
         try {
@@ -486,7 +488,7 @@ public class InvRequest_Roq_HistoryControllerCar_SP implements Initializable, Sc
 
     private void initButtonsClickActions() {
         List<Button> buttons = Arrays.asList(btnBrowse,
-                btnRetrieve, btnClose,btnTransHistory);
+                btnRetrieve, btnClose, btnTransHistory);
 
         buttons.forEach(button -> button.setOnAction(this::handleButtonAction));
     }

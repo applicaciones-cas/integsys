@@ -70,7 +70,7 @@ import org.json.simple.parser.ParseException;
 public class InvRequest_ConfirmationControllerMC implements Initializable, ScreenInterface {
 
     @FXML
-    private String psFormName = "Inv Stock Request Confirmation Mc";
+    private String psFormName = "Inv Stock Request Confirmation";
 
     @FXML
     private AnchorPane AnchorMain, AnchorDetailMaster;
@@ -113,7 +113,7 @@ public class InvRequest_ConfirmationControllerMC implements Initializable, Scree
     private TableView<ModelInvTableListInformation> tableListInformation;
 
     @FXML
-    private Button btnClose, btnSave, btnCancel, btnBrowse, btnUpdate, btnRetrieve, btnConfirm, btnVoid;
+    private Button btnClose, btnSave, btnCancel, btnBrowse, btnUpdate, btnRetrieve, btnConfirm, btnVoid, btnTransHistory;
 
     @FXML
     private TableColumn<ModelInvOrderDetail, String> tblBrandDetail, tblModelDetail, tblVariantDetail, tblColorDetail, tblInvTypeDetail, tblROQDetail, tblClassificationDetail, tblQOHDetail, tblReservationQtyDetail, tblOrderQuantityDetail;
@@ -162,6 +162,10 @@ public class InvRequest_ConfirmationControllerMC implements Initializable, Scree
                 invRequestController.setCompanyID(psCompanyID);
                 invRequestController.setCategoryID(psCategoryID);
                 invRequestController.setIndustryID(psIndustryID);
+                invRequestController.Master().setCompanyID(psCompanyID);
+                invRequestController.Master().setCategoryId(psCategoryID);
+                invRequestController.Master().setIndustryId(psIndustryID);
+                loadRecordSearch();
             }));
             tblViewOrderDetails.addEventFilter(KeyEvent.KEY_PRESSED, this::tableKeyEvents);
             initTextFieldPattern();
@@ -741,6 +745,23 @@ public class InvRequest_ConfirmationControllerMC implements Initializable, Scree
                         }
                     }
                     break;
+                    
+                case "btnTransHistory":
+                    if (pnEditMode != EditMode.READY && pnEditMode != EditMode.UPDATE) {
+                        ShowMessageFX.Warning("No transaction status history to load!", psFormName, null);
+                        return;
+                    }
+
+                    try {
+                        invRequestController.ShowStatusHistory();
+                    } catch (NullPointerException npe) {
+                        Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(npe), npe);
+                        ShowMessageFX.Error("No transaction status history to load!", psFormName, null);
+                    } catch (Exception ex) {
+                        Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+                        ShowMessageFX.Error(MiscUtil.getException(ex), psFormName, null);
+                    }
+                    break;
 
             }
             initButtons(pnEditMode);
@@ -993,7 +1014,7 @@ public class InvRequest_ConfirmationControllerMC implements Initializable, Scree
 
     private void initButtonsClickActions() {
         List<Button> buttons = Arrays.asList(btnSave, btnCancel,
-                btnClose, btnBrowse, btnUpdate, btnRetrieve, btnConfirm, btnVoid);
+                btnClose, btnBrowse, btnUpdate, btnRetrieve, btnConfirm, btnVoid, btnTransHistory);
 
         buttons.forEach(button -> button.setOnAction(this::handleButtonAction));
     }
@@ -1054,6 +1075,11 @@ public class InvRequest_ConfirmationControllerMC implements Initializable, Scree
                             }
                             CommonUtils.SetNextFocus((TextField) event.getSource());
                             loadTableInvDetailAndSelectedRow();
+                            
+                            Platform.runLater(() -> {
+                                tfOrderQuantity.requestFocus();
+                                tfOrderQuantity.selectAll();
+                            });
                             break;
                     }
                     event.consume();

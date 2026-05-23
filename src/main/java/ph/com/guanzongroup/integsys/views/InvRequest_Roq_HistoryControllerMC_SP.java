@@ -93,7 +93,7 @@ public class InvRequest_Roq_HistoryControllerMC_SP implements Initializable, Scr
     private TextField tfBrand, tfModel, tfInvType,
             tfVariant, tfColor, tfROQ, tfClassification, tfQOH;
     @FXML
-    private Button btnBrowse, btnRetrieve, btnClose,btnTransHistory;
+    private Button btnBrowse, btnRetrieve, btnClose, btnTransHistory;
     @FXML
     private Label lblTransactionStatus, lblSource;
     @FXML
@@ -147,6 +147,9 @@ public class InvRequest_Roq_HistoryControllerMC_SP implements Initializable, Scr
                 invRequestController.setCompanyID(psCompanyID);
                 invRequestController.setCategoryID(psCategoryID);
                 invRequestController.setIndustryID(psIndustryID);
+                invRequestController.Master().setCompanyID(psCompanyID);
+                invRequestController.Master().setCategoryId(psCategoryID);
+                invRequestController.Master().setIndustryId(psIndustryID);
                 loadRecordSearch();
 
             }));
@@ -482,7 +485,7 @@ public class InvRequest_Roq_HistoryControllerMC_SP implements Initializable, Scr
 
     private void initButtonsClickActions() {
         List<Button> buttons = Arrays.asList(btnBrowse,
-                btnRetrieve, btnClose,btnTransHistory);
+                btnRetrieve, btnClose, btnTransHistory);
 
         buttons.forEach(button -> button.setOnAction(this::handleButtonAction));
     }

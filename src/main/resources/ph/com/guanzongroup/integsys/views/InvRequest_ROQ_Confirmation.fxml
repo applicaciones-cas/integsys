@@ -295,7 +295,7 @@
                                                             <TextField fx:id="tfBarCode" GridPane.columnIndex="2" GridPane.rowIndex="1" />
                                                             <TextField fx:id="tfDescription" prefWidth="408.0" GridPane.columnIndex="2" GridPane.columnSpan="6" GridPane.rowIndex="2" />
                                                             <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Description" GridPane.rowIndex="2" />
-                                                            <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Measur" GridPane.rowIndex="3" />
+                                                            <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Measure" GridPane.rowIndex="3" />
                                                          </children>
                                                       </GridPane>
                                                    </children>

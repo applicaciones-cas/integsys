@@ -70,7 +70,7 @@ import org.json.simple.parser.ParseException;
 public class InvRequest_ConfirmationControllerLP_Food implements Initializable, ScreenInterface {
 
     @FXML
-    private String psFormName = "Inv Stock Request Confirmation LP Food";
+    private String psFormName = "Inv Stock Request Confirmation";
     @FXML
     private AnchorPane AnchorMain, AnchorDetailMaster;
     unloadForm poUnload = new unloadForm();
@@ -113,7 +113,7 @@ public class InvRequest_ConfirmationControllerLP_Food implements Initializable, 
     private TableView<ModelInvTableListInformation> tableListInformation;
 
     @FXML
-    private Button btnClose, btnSave, btnCancel, btnBrowse, btnUpdate, btnRetrieve, btnConfirm, btnVoid;
+    private Button btnClose, btnSave, btnCancel, btnBrowse, btnUpdate, btnRetrieve, btnConfirm, btnVoid, btnTransHistory;
 
     @FXML
     private TableColumn<ModelInvOrderDetail, String> tblBrandDetail,
@@ -164,6 +164,10 @@ public class InvRequest_ConfirmationControllerLP_Food implements Initializable, 
                 invRequestController.setCompanyID(psCompanyID);
                 invRequestController.setCategoryID(psCategoryID);
                 invRequestController.setIndustryID(psIndustryID);
+                invRequestController.Master().setCompanyID(psCompanyID);
+                invRequestController.Master().setCategoryId(psCategoryID);
+                invRequestController.Master().setIndustryId(psIndustryID);
+                loadRecordSearch();
             }));
             tblViewOrderDetails.addEventFilter(KeyEvent.KEY_PRESSED, this::tableKeyEvents);
             initTextFieldPattern();
@@ -716,6 +720,23 @@ public class InvRequest_ConfirmationControllerLP_Food implements Initializable, 
                         }
                     }
                     break;
+                    
+                case "btnTransHistory":
+                    if (pnEditMode != EditMode.READY && pnEditMode != EditMode.UPDATE) {
+                        ShowMessageFX.Warning("No transaction status history to load!", psFormName, null);
+                        return;
+                    }
+
+                    try {
+                        invRequestController.ShowStatusHistory();
+                    } catch (NullPointerException npe) {
+                        Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(npe), npe);
+                        ShowMessageFX.Error("No transaction status history to load!", psFormName, null);
+                    } catch (Exception ex) {
+                        Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+                        ShowMessageFX.Error(MiscUtil.getException(ex), psFormName, null);
+                    }
+                    break;
 
             }
             initButtons(pnEditMode);
@@ -970,7 +991,7 @@ public class InvRequest_ConfirmationControllerLP_Food implements Initializable, 
 
     private void initButtonsClickActions() {
         List<Button> buttons = Arrays.asList(btnSave, btnCancel,
-                btnClose, btnBrowse, btnUpdate, btnRetrieve, btnConfirm, btnVoid);
+                btnClose, btnBrowse, btnUpdate, btnRetrieve, btnConfirm, btnVoid, btnTransHistory);
 
         buttons.forEach(button -> button.setOnAction(this::handleButtonAction));
     }
@@ -1033,6 +1054,11 @@ public class InvRequest_ConfirmationControllerLP_Food implements Initializable, 
                             }
                             CommonUtils.SetNextFocus((TextField) event.getSource());
                             loadTableInvDetailAndSelectedRow();
+                            
+                            Platform.runLater(() -> {
+                                tfOrderQuantity.requestFocus();
+                                tfOrderQuantity.selectAll();
+                            });
                             break;
                     }
                     event.consume();
@@ -1234,6 +1260,8 @@ public class InvRequest_ConfirmationControllerLP_Food implements Initializable, 
         CustomCommonUtil.setVisible(lbShow, btnSave, btnCancel);
         CustomCommonUtil.setManaged(lbShow, btnSave, btnCancel);
 
+        btnTransHistory.setVisible(fnEditMode != EditMode.ADDNEW && fnEditMode != EditMode.UNKNOWN);
+        btnTransHistory.setManaged(fnEditMode != EditMode.ADDNEW && fnEditMode != EditMode.UNKNOWN);
         CustomCommonUtil.setVisible(false, btnConfirm, btnVoid, btnUpdate);
         CustomCommonUtil.setManaged(false, btnConfirm, btnVoid, btnUpdate);
 

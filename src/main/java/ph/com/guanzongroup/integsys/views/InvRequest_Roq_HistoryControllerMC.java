@@ -148,6 +148,9 @@ public class InvRequest_Roq_HistoryControllerMC implements Initializable, Screen
                 invRequestController.setCompanyID(psCompanyID);
                 invRequestController.setCategoryID(psCategoryID);
                 invRequestController.setIndustryID(psIndustryID);
+                invRequestController.Master().setCompanyID(psCompanyID);
+                invRequestController.Master().setCategoryId(psCategoryID);
+                invRequestController.Master().setIndustryId(psIndustryID);
                 loadRecordSearch();
 
             }));

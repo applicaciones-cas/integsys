@@ -113,7 +113,7 @@ public class InvRequest_Roq_ConfirmationControllerMonarch_Food implements Initia
     private TableView<ModelInvTableListInformation> tableListInformation;
 
     @FXML
-    private Button btnClose, btnSave, btnCancel, btnBrowse, btnUpdate, btnRetrieve, btnConfirm, btnVoid,btnTransHistory;
+    private Button btnClose, btnSave, btnCancel, btnBrowse, btnUpdate, btnRetrieve, btnConfirm, btnVoid, btnTransHistory;
 
     @FXML
     private TableColumn<ModelInvOrderDetail, String> tblBrandDetail,
@@ -164,6 +164,9 @@ public class InvRequest_Roq_ConfirmationControllerMonarch_Food implements Initia
                 invRequestController.setCompanyID(psCompanyID);
                 invRequestController.setCategoryID(psCategoryID);
                 invRequestController.setIndustryID(psIndustryID);
+                invRequestController.Master().setCompanyID(psCompanyID);
+                invRequestController.Master().setCategoryId(psCategoryID);
+                invRequestController.Master().setIndustryId(psIndustryID);
                 loadRecordSearch();
 
             }));
@@ -522,7 +525,7 @@ public class InvRequest_Roq_ConfirmationControllerMonarch_Food implements Initia
                     initFields(pnEditMode);
                     tableListInformation.toFront();
                     break;
-                 case "btnSave":
+                case "btnSave":
                     if (!ShowMessageFX.YesNo(null, psFormName, "Are you sure you want to save?")) {
                         return;
                     }
@@ -667,7 +670,6 @@ public class InvRequest_Roq_ConfirmationControllerMonarch_Food implements Initia
 //                            return;
 //                        }
 //                    }
-
                      {
                         try {
                             // Proceed to void the transaction
@@ -988,7 +990,7 @@ public class InvRequest_Roq_ConfirmationControllerMonarch_Food implements Initia
 
     private void initButtonsClickActions() {
         List<Button> buttons = Arrays.asList(btnSave, btnCancel,
-                btnClose, btnBrowse, btnUpdate, btnRetrieve, btnConfirm, btnVoid,btnTransHistory);
+                btnClose, btnBrowse, btnUpdate, btnRetrieve, btnConfirm, btnVoid, btnTransHistory);
 
         buttons.forEach(button -> button.setOnAction(this::handleButtonAction));
     }
@@ -1051,7 +1053,7 @@ public class InvRequest_Roq_ConfirmationControllerMonarch_Food implements Initia
                             }
                             CommonUtils.SetNextFocus((TextField) event.getSource());
                             loadTableInvDetailAndSelectedRow();
-                            
+
                             Platform.runLater(() -> {
                                 tfOrderQuantity.requestFocus();
                                 tfOrderQuantity.selectAll();
@@ -1297,7 +1299,7 @@ public class InvRequest_Roq_ConfirmationControllerMonarch_Food implements Initia
 
     private void clearAllTables() {
 
-                        pnTblInvDetailRow = -1;
+        pnTblInvDetailRow = -1;
         invOrderDetail_data.clear();
         tableListInformation_data.clear();
 

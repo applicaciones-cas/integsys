@@ -118,7 +118,7 @@ public class InvRequest_Roq_ConfirmationController implements Initializable, Scr
     @FXML
     private TableColumn<ModelInvOrderDetail, String> tblBrandDetail, tblModelDetail, tblVariantDetail, tblColorDetail,
             tblInvTypeDetail, tblROQDetail, tblClassificationDetail, tblQOHDetail, tblReservationQtyDetail,
-            tblOrderQuantityDetail, tblBarCodeDetail, tblDescriptionDetail,tblMeasureDetail;
+            tblOrderQuantityDetail, tblBarCodeDetail, tblDescriptionDetail, tblMeasureDetail;
 
     @FXML
     private TableColumn<ModelInvTableListInformation, String> tblTransactionNo, tblReferenceNo, tblTransactionDate;
@@ -165,9 +165,16 @@ public class InvRequest_Roq_ConfirmationController implements Initializable, Scr
                 invRequestController.setCompanyID(psCompanyID);
                 invRequestController.setCategoryID(psCategoryID);
                 invRequestController.setIndustryID(psIndustryID);
+                invRequestController.Master().setCompanyID(psCompanyID);
+                invRequestController.Master().setCategoryId(psCategoryID);
+                invRequestController.Master().setIndustryId(psIndustryID);
+
                 loadRecordSearch();
 
             }));
+
+            initTableList();
+            initTableInvDetail();
             tblViewOrderDetails.addEventFilter(KeyEvent.KEY_PRESSED, this::tableKeyEvents);
             initTextFieldPattern();
             initButtonsClickActions();
@@ -829,7 +836,9 @@ public class InvRequest_Roq_ConfirmationController implements Initializable, Scr
     private void clearDetailFields() {
         /* Detail Fields*/
         CustomCommonUtil.setText("", tfBrand, tfModel, tfBarCode, tfDescription,
-                tfColor, tfReservationQTY, tfQOH, tfInvType, tfVariant, tfROQ, tfClassification);
+                tfColor, tfReservationQTY, tfQOH, tfInvType, 
+                tfVariant, tfROQ, tfClassification,
+                 tfMeasure);
         CustomCommonUtil.setText("0", tfOrderQuantity);
     }
 

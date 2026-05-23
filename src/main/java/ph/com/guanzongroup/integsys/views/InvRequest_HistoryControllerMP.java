@@ -47,6 +47,7 @@ import org.guanzon.appdriver.base.CommonUtils;
 import org.guanzon.appdriver.base.GRiderCAS;
 import org.guanzon.appdriver.base.GuanzonException;
 import org.guanzon.appdriver.base.LogWrapper;
+import org.guanzon.appdriver.base.MiscUtil;
 import org.guanzon.appdriver.base.SQLUtil;
 import org.guanzon.appdriver.constant.EditMode;
 import org.guanzon.appdriver.constant.UserRight;
@@ -62,7 +63,7 @@ import org.json.simple.JSONObject;
  */
 public class InvRequest_HistoryControllerMP implements Initializable, ScreenInterface {
 
-    private String psFormName = "Inv Stock Request History MP";
+    private String psFormName = "Inv Stock Request History";
     unloadForm poUnload = new unloadForm();
     @FXML
     private AnchorPane AnchorMain;
@@ -95,7 +96,7 @@ public class InvRequest_HistoryControllerMP implements Initializable, ScreenInte
     private TextField tfBrand, tfModel, tfInvType,
             tfVariant, tfColor, tfROQ, tfClassification, tfQOH;
     @FXML
-    private Button btnBrowse, btnRetrieve, btnClose;
+    private Button btnBrowse, btnRetrieve, btnClose, btnTransHistory;
     @FXML
     private Label lblTransactionStatus, lblSource;
     @FXML
@@ -150,13 +151,16 @@ public class InvRequest_HistoryControllerMP implements Initializable, ScreenInte
                 invRequestController.setCompanyID(psCompanyID);
                 invRequestController.setCategoryID(psCategoryID);
                 invRequestController.setIndustryID(psIndustryID);
+                invRequestController.Master().setCompanyID(psCompanyID);
+                invRequestController.Master().setCategoryId(psCategoryID);
+                invRequestController.Master().setIndustryId(psIndustryID);
 
-                initTableList();
-                initTableInvDetail();
                 loadRecordSearch();
-                ;
 
             }));
+
+            initTableList();
+            initTableInvDetail();
             pnEditMode = EditMode.UNKNOWN;
             System.out.print("initReached...");
 //                Platform.runLater(() -> btnRetrieve.fire());
@@ -211,7 +215,7 @@ public class InvRequest_HistoryControllerMP implements Initializable, ScreenInte
         }
     }
 
-   private void tableListInformation_Clicked(MouseEvent event) {
+    private void tableListInformation_Clicked(MouseEvent event) {
         poJSON = new JSONObject();
         pnTblInformationRow = tableListInformation.getSelectionModel().getSelectedIndex();
         if (pnTblInformationRow < 0 || pnTblInformationRow >= tableListInformation.getItems().size()) {
@@ -247,7 +251,6 @@ public class InvRequest_HistoryControllerMP implements Initializable, ScreenInte
             }
         }
     }
-
 
     private void loadRecordSearch() {
         try {
@@ -353,6 +356,23 @@ public class InvRequest_HistoryControllerMP implements Initializable, ScreenInte
                         } else {
                             ShowMessageFX.Warning("Please notify the system administrator to configure the null value at the close button.", "Warning", null);
                         }
+                    }
+                    break;
+
+                case "btnTransHistory":
+                    if (pnEditMode != EditMode.READY && pnEditMode != EditMode.UPDATE) {
+                        ShowMessageFX.Warning("No transaction status history to load!", psFormName, null);
+                        return;
+                    }
+
+                    try {
+                        invRequestController.ShowStatusHistory();
+                    } catch (NullPointerException npe) {
+                        Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(npe), npe);
+                        ShowMessageFX.Error("No transaction status history to load!", psFormName, null);
+                    } catch (Exception ex) {
+                        Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+                        ShowMessageFX.Error(MiscUtil.getException(ex), psFormName, null);
                     }
                     break;
             }

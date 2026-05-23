@@ -70,7 +70,7 @@ import org.json.simple.parser.ParseException;
 public class InvRequest_ConfirmationController implements Initializable, ScreenInterface {
 
     @FXML
-    private String psFormName = "Inv Stock Request Confirmation General";
+    private String psFormName = "Inv Stock Request Confirmation";
     @FXML
     private AnchorPane AnchorMain, AnchorDetailMaster;
     unloadForm poUnload = new unloadForm();
@@ -98,7 +98,7 @@ public class InvRequest_ConfirmationController implements Initializable, ScreenI
     @FXML
     private TextField tfTransactionNo, tfBrand, tfModel, tfInvType,
             tfVariant, tfColor, tfROQ, tfClassification, tfQOH, tfReferenceNo, tfReservationQTY,
-            tfOrderQuantity, tfSearchTransNo, tfSearchReferenceNo, tfDescription, tfBarCode;
+            tfOrderQuantity, tfSearchTransNo, tfSearchReferenceNo, tfDescription, tfBarCode, tfMeasure;
 
     @FXML
     private Label lblTransactionStatus, lblSource;
@@ -113,7 +113,7 @@ public class InvRequest_ConfirmationController implements Initializable, ScreenI
     private TableView<ModelInvTableListInformation> tableListInformation;
 
     @FXML
-    private Button btnClose, btnSave, btnCancel, btnBrowse, btnUpdate, btnRetrieve, btnConfirm, btnVoid;
+    private Button btnClose, btnSave, btnCancel, btnBrowse, btnUpdate, btnRetrieve, btnConfirm, btnVoid, btnTransHistory;
 
     @FXML
     private TableColumn<ModelInvOrderDetail, String> tblBrandDetail, tblModelDetail, tblVariantDetail, tblColorDetail,
@@ -165,6 +165,9 @@ public class InvRequest_ConfirmationController implements Initializable, ScreenI
                 invRequestController.setCompanyID(psCompanyID);
                 invRequestController.setCategoryID(psCategoryID);
                 invRequestController.setIndustryID(psIndustryID);
+                invRequestController.Master().setCompanyID(psCompanyID);
+                invRequestController.Master().setCategoryId(psCategoryID);
+                invRequestController.Master().setIndustryId(psIndustryID);
                 loadRecordSearch();
 
             }));
@@ -424,6 +427,12 @@ public class InvRequest_ConfirmationController implements Initializable, ScreenI
                     lsBarCode = invRequestController.Detail(pnTblInvDetailRow).Inventory().getBarCode();
                 }
                 tfBarCode.setText(lsBarCode);
+
+                String lsMeasure = "";
+                if (invRequestController.Detail(pnTblInvDetailRow).Inventory().Measure().getDescription() != null) {
+                    lsMeasure = invRequestController.Detail(pnTblInvDetailRow).Inventory().Measure().getDescription();
+                }
+                tfMeasure.setText(lsMeasure);
 
                 String lsModel = "";
                 if (invRequestController.Detail(pnTblInvDetailRow).Inventory().Model().getDescription() != null) {
@@ -737,6 +746,23 @@ public class InvRequest_ConfirmationController implements Initializable, ScreenI
                     }
                     break;
 
+                case "btnTransHistory":
+                    if (pnEditMode != EditMode.READY && pnEditMode != EditMode.UPDATE) {
+                        ShowMessageFX.Warning("No transaction status history to load!", psFormName, null);
+                        return;
+                    }
+
+                    try {
+                        invRequestController.ShowStatusHistory();
+                    } catch (NullPointerException npe) {
+                        Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(npe), npe);
+                        ShowMessageFX.Error("No transaction status history to load!", psFormName, null);
+                    } catch (Exception ex) {
+                        Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+                        ShowMessageFX.Error(MiscUtil.getException(ex), psFormName, null);
+                    }
+                    break;
+
             }
             initButtons(pnEditMode);
             initFields(pnEditMode);
@@ -815,7 +841,9 @@ public class InvRequest_ConfirmationController implements Initializable, ScreenI
     private void clearDetailFields() {
         /* Detail Fields*/
         CustomCommonUtil.setText("", tfBrand, tfModel, tfBarCode, tfDescription,
-                tfColor, tfReservationQTY, tfQOH, tfInvType, tfVariant, tfROQ, tfClassification);
+                tfColor, tfReservationQTY, tfQOH, tfInvType,
+                tfVariant, tfROQ, tfClassification,
+                tfMeasure);
         CustomCommonUtil.setText("0", tfOrderQuantity);
     }
 
@@ -950,7 +978,9 @@ public class InvRequest_ConfirmationController implements Initializable, ScreenI
 
             CustomCommonUtil.setDisable(true,
                     tfInvType, tfReferenceNo, dpTransactionDate, tfReservationQTY,
-                    tfQOH, tfROQ, tfClassification, tfVariant, tfColor, tfBrand, tfModel, tfBarCode, tfDescription);
+                    tfQOH, tfROQ, tfClassification, tfVariant, tfColor, tfBrand, tfModel,
+                    tfBarCode, tfDescription,
+                    tfMeasure);
             CustomCommonUtil.setDisable(!lbShow, tfOrderQuantity, taRemarks);
 
         } else {
@@ -992,7 +1022,7 @@ public class InvRequest_ConfirmationController implements Initializable, ScreenI
 
     private void initButtonsClickActions() {
         List<Button> buttons = Arrays.asList(btnSave, btnCancel,
-                btnClose, btnBrowse, btnUpdate, btnRetrieve, btnConfirm, btnVoid);
+                btnClose, btnBrowse, btnUpdate, btnRetrieve, btnConfirm, btnVoid, btnTransHistory);
 
         buttons.forEach(button -> button.setOnAction(this::handleButtonAction));
     }
@@ -1053,6 +1083,11 @@ public class InvRequest_ConfirmationController implements Initializable, ScreenI
                             }
                             CommonUtils.SetNextFocus((TextField) event.getSource());
                             loadTableInvDetailAndSelectedRow();
+
+                            Platform.runLater(() -> {
+                                tfOrderQuantity.requestFocus();
+                                tfOrderQuantity.selectAll();
+                            });
                             break;
                     }
                     event.consume();
@@ -1257,6 +1292,8 @@ public class InvRequest_ConfirmationController implements Initializable, ScreenI
         CustomCommonUtil.setVisible(lbShow, btnSave, btnCancel);
         CustomCommonUtil.setManaged(lbShow, btnSave, btnCancel);
 
+        btnTransHistory.setVisible(fnEditMode != EditMode.ADDNEW && fnEditMode != EditMode.UNKNOWN);
+        btnTransHistory.setManaged(fnEditMode != EditMode.ADDNEW && fnEditMode != EditMode.UNKNOWN);
         CustomCommonUtil.setVisible(false, btnConfirm, btnVoid, btnUpdate);
         CustomCommonUtil.setManaged(false, btnConfirm, btnVoid, btnUpdate);
 

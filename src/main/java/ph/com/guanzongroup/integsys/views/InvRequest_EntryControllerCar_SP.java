@@ -70,7 +70,7 @@ import org.json.simple.parser.ParseException;
 public class InvRequest_EntryControllerCar_SP implements Initializable, ScreenInterface {
 
     @FXML
-    private String psFormName = "Inv Stock Request Entry Car Sp";
+    private String psFormName = "Inv Stock Request Entry";
 
     @FXML
     private AnchorPane AnchorMain, AnchorDetailMaster;
@@ -114,7 +114,7 @@ public class InvRequest_EntryControllerCar_SP implements Initializable, ScreenIn
     private TableView<ModelInvTableListInformation> tableListInformation;
 
     @FXML
-    private Button btnClose, btnSave, btnCancel, btnBrowse, btnUpdate, btnRetrieve, btnNew, btnVoid;
+    private Button btnClose, btnSave, btnCancel, btnBrowse, btnUpdate, btnRetrieve, btnNew, btnVoid, btnTransHistory;
 
     @FXML
     private TableColumn<ModelInvOrderDetail, String> tblBrandDetail, tblModelDetail, tblVariantDetail,
@@ -743,6 +743,23 @@ public class InvRequest_EntryControllerCar_SP implements Initializable, ScreenIn
                     }
                     break;
 
+                case "btnTransHistory":
+                    if (pnEditMode != EditMode.READY && pnEditMode != EditMode.UPDATE) {
+                        ShowMessageFX.Warning("No transaction status history to load!", psFormName, null);
+                        return;
+                    }
+
+                    try {
+                        invRequestController.ShowStatusHistory();
+                    } catch (NullPointerException npe) {
+                        Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(npe), npe);
+                        ShowMessageFX.Error("No transaction status history to load!", psFormName, null);
+                    } catch (Exception ex) {
+                        Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+                        ShowMessageFX.Error(MiscUtil.getException(ex), psFormName, null);
+                    }
+                    break;
+
             }
             initButtons(pnEditMode);
             initFields(pnEditMode);
@@ -938,6 +955,11 @@ public class InvRequest_EntryControllerCar_SP implements Initializable, ScreenIn
                     psReferID = tfSearchReferenceNo.getText();
                     //loadTableList();
                     break;
+                case "tfBrand":
+                    if (tfBrand.getText().trim().isEmpty()) {
+                        brandID = null;
+                    }
+                    break;
             }
         } else {
             loTextField.selectAll();
@@ -1001,7 +1023,7 @@ public class InvRequest_EntryControllerCar_SP implements Initializable, ScreenIn
 
     private void initButtonsClickActions() {
         List<Button> buttons = Arrays.asList(btnSave, btnCancel,
-                btnClose, btnBrowse, btnUpdate, btnRetrieve, btnNew, btnVoid);
+                btnClose, btnBrowse, btnUpdate, btnRetrieve, btnNew, btnVoid, btnTransHistory);
 
         buttons.forEach(button -> button.setOnAction(this::handleButtonAction));
     }
@@ -1073,13 +1095,15 @@ public class InvRequest_EntryControllerCar_SP implements Initializable, ScreenIn
 
                             if ("error".equals(loJSON.get("result"))) {
                                 ShowMessageFX.Warning((String) loJSON.get("message"), psFormName, null);
+                                brandID = null;
                                 tfBrand.setText("");
                                 tfBrand.requestFocus();
                                 break;
                             }
 
                             brandID = (String) loJSON.get("brandID");
-
+//                            invRequestController.Detail(pnTblInvDetailRow).Inventory().setBrandId(brandID);
+                            invRequestController.Detail(pnTblInvDetailRow).setStockId("");
                             brandDesc = (String) loJSON.get("brandDesc");
                             tfBrand.setText(brandDesc);
 
@@ -1173,6 +1197,11 @@ public class InvRequest_EntryControllerCar_SP implements Initializable, ScreenIn
                             }
                             CommonUtils.SetNextFocus((TextField) event.getSource());
                             loadTableInvDetailAndSelectedRow();
+
+                            Platform.runLater(() -> {
+                                tfOrderQuantity.requestFocus();
+                                tfOrderQuantity.selectAll();
+                            });
                             break;
                     }
                     event.consume();
@@ -1392,6 +1421,8 @@ public class InvRequest_EntryControllerCar_SP implements Initializable, ScreenIn
         CustomCommonUtil.setVisible(lbShow, btnSave, btnCancel);
         CustomCommonUtil.setManaged(lbShow, btnSave, btnCancel);
 
+        btnTransHistory.setVisible(fnEditMode != EditMode.ADDNEW && fnEditMode != EditMode.UNKNOWN);
+        btnTransHistory.setManaged(fnEditMode != EditMode.ADDNEW && fnEditMode != EditMode.UNKNOWN);
         CustomCommonUtil.setVisible(false, btnUpdate, btnVoid);
         CustomCommonUtil.setManaged(false, btnUpdate, btnVoid);
 

@@ -91,7 +91,7 @@ public class InvRequest_Roq_HistoryController implements Initializable, ScreenIn
     @FXML
     private TableColumn<ModelInvOrderDetail, String> tblBrandDetail, tblBarCodeDetail, tblDescriptionDetail, tblModelDetail,
             tblVariantDetail, tblColorDetail, tblInvTypeDetail, tblROQDetail, tblClassificationDetail,
-            tblQOHDetail, tblReservationQtyDetail, tblOrderQuantityDetail,tblMeasureDetail;
+            tblQOHDetail, tblReservationQtyDetail, tblOrderQuantityDetail, tblMeasureDetail;
     @FXML
     private TextField tfBrand, tfModel, tfInvType,
             tfVariant, tfColor, tfROQ, tfClassification, tfQOH;
@@ -150,6 +150,9 @@ public class InvRequest_Roq_HistoryController implements Initializable, ScreenIn
                 invRequestController.setCompanyID(psCompanyID);
                 invRequestController.setCategoryID(psCategoryID);
                 invRequestController.setIndustryID(psIndustryID);
+                invRequestController.Master().setCompanyID(psCompanyID);
+                invRequestController.Master().setCategoryId(psCategoryID);
+                invRequestController.Master().setIndustryId(psIndustryID);
                 loadRecordSearch();
 
             }));
@@ -178,7 +181,9 @@ public class InvRequest_Roq_HistoryController implements Initializable, ScreenIn
     private void clearDetailFields() {
         /* Detail Fields*/
         CustomCommonUtil.setText("", tfBrand, tfModel,
-                tfColor, tfReservationQTY, tfQOH, tfInvType, tfVariant, tfROQ, tfClassification);
+                tfColor, tfReservationQTY, tfQOH,
+                tfInvType, tfVariant, tfROQ, tfClassification,
+                tfMeasure);
         CustomCommonUtil.setText("0", tfOrderQuantity);
     }
 
@@ -634,7 +639,7 @@ public class InvRequest_Roq_HistoryController implements Initializable, ScreenIn
                     lsMeasure = invRequestController.Detail(pnTblInvDetailRow).Inventory().Measure().getDescription();
                 }
                 tfMeasure.setText(lsMeasure);
-                
+
                 String lsModel = "";
                 if (invRequestController.Detail(pnTblInvDetailRow).Inventory().Model().getDescription() != null) {
                     lsModel = invRequestController.Detail(pnTblInvDetailRow).Inventory().Model().getDescription();
@@ -804,7 +809,9 @@ public class InvRequest_Roq_HistoryController implements Initializable, ScreenIn
                 tfOrderQuantity);
         CustomCommonUtil.setDisable(true,
                 tfInvType, tfVariant, tfColor, tfReservationQTY,
-                tfQOH, tfROQ, tfClassification, tfModel, tfBrand, tfDescription, tfBarCode);
+                tfQOH, tfROQ, tfClassification, tfModel, tfBrand,
+                tfDescription, tfBarCode,
+                tfMeasure);
         if (!tfReferenceNo.getText().isEmpty()) {
             dpTransactionDate.setDisable(!lbShow);
         }
@@ -847,7 +854,7 @@ public class InvRequest_Roq_HistoryController implements Initializable, ScreenIn
         tblReservationQtyDetail.setCellValueFactory(new PropertyValueFactory<>("index11"));
         tblOrderQuantityDetail.setCellValueFactory(new PropertyValueFactory<>("index12"));
         tblMeasureDetail.setCellValueFactory(new PropertyValueFactory<>("index13"));
-        
+
         // Prevent column reordering
         tblViewOrderDetails.widthProperty().addListener((ObservableValue<? extends Number> source, Number oldWidth, Number newWidth) -> {
             TableHeaderRow header = (TableHeaderRow) tblViewOrderDetails.lookup("TableHeaderRow");

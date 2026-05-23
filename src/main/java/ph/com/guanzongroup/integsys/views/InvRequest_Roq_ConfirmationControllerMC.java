@@ -112,7 +112,7 @@ public class InvRequest_Roq_ConfirmationControllerMC implements Initializable, S
     private TableView<ModelInvTableListInformation> tableListInformation;
 
     @FXML
-    private Button btnClose, btnSave, btnCancel, btnBrowse, btnUpdate, btnRetrieve, btnConfirm, btnVoid,btnTransHistory;
+    private Button btnClose, btnSave, btnCancel, btnBrowse, btnUpdate, btnRetrieve, btnConfirm, btnVoid, btnTransHistory;
 
     @FXML
     private TableColumn<ModelInvOrderDetail, String> tblBrandDetail, tblModelDetail, tblVariantDetail, tblColorDetail, tblInvTypeDetail, tblROQDetail, tblClassificationDetail, tblQOHDetail, tblReservationQtyDetail, tblOrderQuantityDetail;
@@ -161,10 +161,14 @@ public class InvRequest_Roq_ConfirmationControllerMC implements Initializable, S
                 invRequestController.setCompanyID(psCompanyID);
                 invRequestController.setCategoryID(psCategoryID);
                 invRequestController.setIndustryID(psIndustryID);
+                invRequestController.Master().setCompanyID(psCompanyID);
+                invRequestController.Master().setCategoryId(psCategoryID);
+                invRequestController.Master().setIndustryId(psIndustryID);
+
                 loadRecordSearch();
 
             }));
-            
+
             tblViewOrderDetails.addEventFilter(KeyEvent.KEY_PRESSED, this::tableKeyEvents);
             initTextFieldPattern();
             initButtonsClickActions();
@@ -668,7 +672,6 @@ public class InvRequest_Roq_ConfirmationControllerMC implements Initializable, S
 //                            return;
 //                        }
 //                    }
-
                      {
                         try {
                             // Proceed to void the transaction
@@ -1013,7 +1016,7 @@ public class InvRequest_Roq_ConfirmationControllerMC implements Initializable, S
 
     private void initButtonsClickActions() {
         List<Button> buttons = Arrays.asList(btnSave, btnCancel,
-                btnClose, btnBrowse, btnUpdate, btnRetrieve, btnConfirm, btnVoid,btnTransHistory);
+                btnClose, btnBrowse, btnUpdate, btnRetrieve, btnConfirm, btnVoid, btnTransHistory);
 
         buttons.forEach(button -> button.setOnAction(this::handleButtonAction));
     }
@@ -1076,7 +1079,7 @@ public class InvRequest_Roq_ConfirmationControllerMC implements Initializable, S
                             }
                             CommonUtils.SetNextFocus((TextField) event.getSource());
                             loadTableInvDetailAndSelectedRow();
-                            
+
                             Platform.runLater(() -> {
                                 tfOrderQuantity.requestFocus();
                                 tfOrderQuantity.selectAll();
@@ -1321,7 +1324,7 @@ public class InvRequest_Roq_ConfirmationControllerMC implements Initializable, S
 
     private void clearAllTables() {
 
-                        pnTblInvDetailRow = -1;
+        pnTblInvDetailRow = -1;
         invOrderDetail_data.clear();
         tableListInformation_data.clear();
 

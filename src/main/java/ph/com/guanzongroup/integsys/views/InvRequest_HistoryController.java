@@ -45,6 +45,7 @@ import org.guanzon.appdriver.base.CommonUtils;
 import org.guanzon.appdriver.base.GRiderCAS;
 import org.guanzon.appdriver.base.GuanzonException;
 import org.guanzon.appdriver.base.LogWrapper;
+import org.guanzon.appdriver.base.MiscUtil;
 import org.guanzon.appdriver.base.SQLUtil;
 import org.guanzon.appdriver.constant.EditMode;
 import org.guanzon.appdriver.constant.UserRight;
@@ -61,7 +62,7 @@ import org.json.simple.JSONObject;
 public class InvRequest_HistoryController implements Initializable, ScreenInterface {
 
     @FXML
-    private String psFormName = "Inv Stock Request History General";
+    private String psFormName = "Inv Stock Request History";
     unloadForm poUnload = new unloadForm();
     @FXML
     private AnchorPane AnchorMain;
@@ -85,14 +86,14 @@ public class InvRequest_HistoryController implements Initializable, ScreenInterf
 
     @FXML
     private TextField tfReservationQTY, tfOrderQuantity, tfTransactionNo, tfReferenceNo,
-            tfSearchTransNo, tfSearchReferenceNo, tfBarCode, tfDescription;
+            tfSearchTransNo, tfSearchReferenceNo, tfBarCode, tfDescription, tfMeasure;
     @FXML
     private TableColumn<ModelInvOrderDetail, String> tblBrandDetail, tblBarCodeDetail, tblDescriptionDetail, tblModelDetail, tblVariantDetail, tblColorDetail, tblInvTypeDetail, tblROQDetail, tblClassificationDetail, tblQOHDetail, tblReservationQtyDetail, tblOrderQuantityDetail;
     @FXML
     private TextField tfBrand, tfModel, tfInvType,
             tfVariant, tfColor, tfROQ, tfClassification, tfQOH;
     @FXML
-    private Button btnBrowse, btnRetrieve, btnClose;
+    private Button btnBrowse, btnRetrieve, btnClose, btnTransHistory;
     @FXML
     private Label lblTransactionStatus, lblSource;
     @FXML
@@ -147,13 +148,16 @@ public class InvRequest_HistoryController implements Initializable, ScreenInterf
                 invRequestController.setCompanyID(psCompanyID);
                 invRequestController.setCategoryID(psCategoryID);
                 invRequestController.setIndustryID(psIndustryID);
+                invRequestController.Master().setCompanyID(psCompanyID);
+                invRequestController.Master().setCategoryId(psCategoryID);
+                invRequestController.Master().setIndustryId(psIndustryID);
 
-                initTableList();
-                initTableInvDetail();
                 loadRecordSearch();
-                ;
 
             }));
+
+            initTableList();
+            initTableInvDetail();
             pnEditMode = EditMode.UNKNOWN;
             System.out.print("initReached...");
 //                Platform.runLater(() -> btnRetrieve.fire());
@@ -177,7 +181,9 @@ public class InvRequest_HistoryController implements Initializable, ScreenInterf
     private void clearDetailFields() {
         /* Detail Fields*/
         CustomCommonUtil.setText("", tfBrand, tfModel,
-                tfColor, tfReservationQTY, tfQOH, tfInvType, tfVariant, tfROQ, tfClassification);
+                tfColor, tfReservationQTY, tfQOH,
+                tfInvType, tfVariant, tfROQ, tfClassification,
+                 tfMeasure);
         CustomCommonUtil.setText("0", tfOrderQuantity);
     }
 
@@ -244,7 +250,6 @@ public class InvRequest_HistoryController implements Initializable, ScreenInterf
             }
         }
     }
-
 
     private void loadRecordSearch() {
         try {
@@ -350,6 +355,23 @@ public class InvRequest_HistoryController implements Initializable, ScreenInterf
                         } else {
                             ShowMessageFX.Warning("Please notify the system administrator to configure the null value at the close button.", "Warning", null);
                         }
+                    }
+                    break;
+
+                case "btnTransHistory":
+                    if (pnEditMode != EditMode.READY && pnEditMode != EditMode.UPDATE) {
+                        ShowMessageFX.Warning("No transaction status history to load!", psFormName, null);
+                        return;
+                    }
+
+                    try {
+                        invRequestController.ShowStatusHistory();
+                    } catch (NullPointerException npe) {
+                        Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(npe), npe);
+                        ShowMessageFX.Error("No transaction status history to load!", psFormName, null);
+                    } catch (Exception ex) {
+                        Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+                        ShowMessageFX.Error(MiscUtil.getException(ex), psFormName, null);
                     }
                     break;
             }
@@ -461,11 +483,13 @@ public class InvRequest_HistoryController implements Initializable, ScreenInterf
         CustomCommonUtil.setVisible(true, btnRetrieve, btnBrowse, btnClose);
         CustomCommonUtil.setManaged(true, btnRetrieve, btnBrowse, btnClose);
 
+        btnTransHistory.setVisible(fnEditMode != EditMode.ADDNEW && fnEditMode != EditMode.UNKNOWN);
+        btnTransHistory.setManaged(fnEditMode != EditMode.ADDNEW && fnEditMode != EditMode.UNKNOWN);
     }
 
     private void initButtonsClickActions() {
         List<Button> buttons = Arrays.asList(btnBrowse,
-                btnRetrieve, btnClose);
+                btnRetrieve, btnClose, btnTransHistory);
 
         buttons.forEach(button -> button.setOnAction(this::handleButtonAction));
     }
@@ -607,6 +631,11 @@ public class InvRequest_HistoryController implements Initializable, ScreenInterf
                     lsBarCode = invRequestController.Detail(pnTblInvDetailRow).Inventory().getBarCode();
                 }
                 tfBarCode.setText(lsBarCode);
+                String lsMeasure = "";
+                if (invRequestController.Detail(pnTblInvDetailRow).Inventory().Measure().getDescription() != null) {
+                    lsMeasure = invRequestController.Detail(pnTblInvDetailRow).Inventory().Measure().getDescription();
+                }
+                tfMeasure.setText(lsMeasure);
 
                 String lsModel = "";
                 if (invRequestController.Detail(pnTblInvDetailRow).Inventory().Model().getDescription() != null) {
@@ -777,7 +806,8 @@ public class InvRequest_HistoryController implements Initializable, ScreenInterf
                 tfOrderQuantity);
         CustomCommonUtil.setDisable(true,
                 tfInvType, tfVariant, tfColor, tfReservationQTY,
-                tfQOH, tfROQ, tfClassification, tfModel, tfBrand, tfDescription, tfBarCode);
+                tfQOH, tfROQ, tfClassification, tfModel, tfBrand, tfDescription, tfBarCode,
+                 tfMeasure);
         if (!tfReferenceNo.getText().isEmpty()) {
             dpTransactionDate.setDisable(!lbShow);
         }

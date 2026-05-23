@@ -113,7 +113,7 @@ public class InvRequest_Roq_ConfirmationControllerLP_Food implements Initializab
     private TableView<ModelInvTableListInformation> tableListInformation;
 
     @FXML
-    private Button btnClose, btnSave, btnCancel, btnBrowse, btnUpdate, btnRetrieve, btnConfirm, btnVoid,btnTransHistory;
+    private Button btnClose, btnSave, btnCancel, btnBrowse, btnUpdate, btnRetrieve, btnConfirm, btnVoid, btnTransHistory;
 
     @FXML
     private TableColumn<ModelInvOrderDetail, String> tblBrandDetail,
@@ -159,15 +159,19 @@ public class InvRequest_Roq_ConfirmationControllerLP_Food implements Initializab
                 ShowMessageFX.Warning((String) poJSON.get("message"), "Search Information", null);
             }
 
-           
             Platform.runLater((() -> {
                 invRequestController.setTransactionStatus("102");
                 invRequestController.setCompanyID(psCompanyID);
                 invRequestController.setCategoryID(psCategoryID);
                 invRequestController.setIndustryID(psIndustryID);
+                invRequestController.Master().setCompanyID(psCompanyID);
+                invRequestController.Master().setCategoryId(psCategoryID);
+                invRequestController.Master().setIndustryId(psIndustryID);
+
                 loadRecordSearch();
 
             }));
+
             tblViewOrderDetails.addEventFilter(KeyEvent.KEY_PRESSED, this::tableKeyEvents);
             initTextFieldPattern();
             initButtonsClickActions();
@@ -523,7 +527,7 @@ public class InvRequest_Roq_ConfirmationControllerLP_Food implements Initializab
                     initFields(pnEditMode);
                     tableListInformation.toFront();
                     break;
- case "btnSave":
+                case "btnSave":
                     if (!ShowMessageFX.YesNo(null, psFormName, "Are you sure you want to save?")) {
                         return;
                     }
@@ -668,7 +672,6 @@ public class InvRequest_Roq_ConfirmationControllerLP_Food implements Initializab
 //                            return;
 //                        }
 //                    }
-
                      {
                         try {
                             // Proceed to void the transaction
@@ -948,7 +951,7 @@ public class InvRequest_Roq_ConfirmationControllerLP_Food implements Initializab
 
             CustomCommonUtil.setDisable(true,
                     tfInvType, dpTransactionDate, tfReservationQTY,
-                     tfQOH, tfROQ, tfReferenceNo, tfClassification, tfBrand, tfBarCode, tfDescription);
+                    tfQOH, tfROQ, tfReferenceNo, tfClassification, tfBrand, tfBarCode, tfDescription);
             CustomCommonUtil.setDisable(!lbShow, tfOrderQuantity);
 
         } else {
@@ -990,7 +993,7 @@ public class InvRequest_Roq_ConfirmationControllerLP_Food implements Initializab
 
     private void initButtonsClickActions() {
         List<Button> buttons = Arrays.asList(btnSave, btnCancel,
-                btnClose, btnBrowse, btnUpdate, btnRetrieve, btnConfirm, btnVoid,btnTransHistory);
+                btnClose, btnBrowse, btnUpdate, btnRetrieve, btnConfirm, btnVoid, btnTransHistory);
 
         buttons.forEach(button -> button.setOnAction(this::handleButtonAction));
     }
@@ -1053,7 +1056,7 @@ public class InvRequest_Roq_ConfirmationControllerLP_Food implements Initializab
                             }
                             CommonUtils.SetNextFocus((TextField) event.getSource());
                             loadTableInvDetailAndSelectedRow();
-                            
+
                             Platform.runLater(() -> {
                                 tfOrderQuantity.requestFocus();
                                 tfOrderQuantity.selectAll();
@@ -1299,7 +1302,7 @@ public class InvRequest_Roq_ConfirmationControllerLP_Food implements Initializab
 
     private void clearAllTables() {
 
-                        pnTblInvDetailRow = -1;
+        pnTblInvDetailRow = -1;
         invOrderDetail_data.clear();
         tableListInformation_data.clear();
 

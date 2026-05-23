@@ -118,7 +118,7 @@ public class InvRequest_Roq_EntryController implements Initializable, ScreenInte
     @FXML
     private TableColumn<ModelInvOrderDetail, String> tblBrandDetail, tblModelDetail, tblVariantDetail,
             tblColorDetail, tblInvTypeDetail, tblROQDetail, tblClassificationDetail,
-            tblQOHDetail, tblReservationQtyDetail, tblOrderQuantityDetail, tblDescriptionDetail, tblBarCodeDetail,tblMeasureDetail;
+            tblQOHDetail, tblReservationQtyDetail, tblOrderQuantityDetail, tblDescriptionDetail, tblBarCodeDetail, tblMeasureDetail;
 
     @FXML
     private TableColumn<ModelInvTableListInformation, String> tblTransactionNo, tblReferenceNo, tblTransactionDate;
@@ -166,6 +166,9 @@ public class InvRequest_Roq_EntryController implements Initializable, ScreenInte
                     invRequestController.setCompanyID(psCompanyID);
                     invRequestController.setCategoryID(psCategoryID);
                     invRequestController.setIndustryID(psIndustryID);
+                    invRequestController.Master().setCompanyID(psCompanyID);
+                    invRequestController.Master().setCategoryId(psCategoryID);
+                    invRequestController.Master().setIndustryId(psIndustryID);
                     invRequestController.NewTransaction();
                     loadRecordSearch();
 
@@ -429,13 +432,13 @@ public class InvRequest_Roq_EntryController implements Initializable, ScreenInte
                     lsBarCode = invRequestController.Detail(pnTblInvDetailRow).Inventory().getBarCode();
                 }
                 tfBarCode.setText(lsBarCode);
-                
+
                 String lsMeasure = "";
                 if (invRequestController.Detail(pnTblInvDetailRow).Inventory().Measure().getDescription() != null) {
                     lsMeasure = invRequestController.Detail(pnTblInvDetailRow).Inventory().Measure().getDescription();
                 }
                 tfMeasure.setText(lsMeasure);
-                
+
                 String lsModel = "";
                 if (invRequestController.Detail(pnTblInvDetailRow).Inventory().Model().getDescription() != null) {
                     lsModel = invRequestController.Detail(pnTblInvDetailRow).Inventory().Model().getDescription();
@@ -841,7 +844,8 @@ public class InvRequest_Roq_EntryController implements Initializable, ScreenInte
         /* Detail Fields*/
         CustomCommonUtil.setText("", tfBrand, tfModel,
                 tfColor, tfReservationQTY, tfQOH, tfInvType,
-                tfVariant, tfROQ, tfClassification, tfBarCode, tfDescription);
+                tfVariant, tfROQ, tfClassification, tfBarCode, tfDescription,
+                tfMeasure);
         CustomCommonUtil.setText("0", tfOrderQuantity);
     }
 
@@ -978,7 +982,9 @@ public class InvRequest_Roq_EntryController implements Initializable, ScreenInte
 
             CustomCommonUtil.setDisable(true,
                     tfInvType, tfReservationQTY,
-                    tfQOH, tfROQ, tfClassification, tfVariant, tfColor, tfBrand, tfModel, tfBarCode, tfDescription);
+                    tfQOH, tfROQ, tfClassification, tfVariant, tfColor, tfBrand, tfModel,
+                     tfBarCode, tfDescription,
+                    tfMeasure);
             CustomCommonUtil.setDisable(!lbShow, tfOrderQuantity, taRemarks);
 
         } else {
