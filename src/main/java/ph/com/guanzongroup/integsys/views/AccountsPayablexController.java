@@ -517,45 +517,6 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
         }
     };
 
-    private void loadRecordMaster() {
-        try {
-            lblStatus.setText(poController.getModel().getRecordStatus().equals("0") == false ? "ACTIVE" : "INACTIVE");
-
-            tfClientID.setText(poController.getModel().getClientId());
-
-            tfCategory.setText(poController.getModel().Category().getDescription());
-            tfCompanyName.setText(poController.getModel().Client().getCompanyName());
-            tfAddress.setText(poController.getModel().ClientAddress().getAddress());
-            tfContactPerson.setText(poController.getModel().ClientInstitutionContact().getContactPersonName());
-            tfContactEmail.setText(poController.getModel().ClientInstitutionContact().getMailAddress());
-            tfContactNo.setText(poController.getModel().ClientInstitutionContact().getMobileNo());
-            tfTINNo.setText(poController.getModel().Client().getTaxIdNumber());
-
-            cbHasPermit.setSelected(poController.getModel().hasPermit() == null || !poController.getModel().hasPermit().equalsIgnoreCase("1") ? false : true);
-            cbBackOrder.setSelected(poController.getModel().isBackOrder() == null || !poController.getModel().isBackOrder().equalsIgnoreCase("1") ? false : true);
-            cbVatable.setSelected(poController.getModel().getVatable() == null || !poController.getModel().getVatable().equalsIgnoreCase("1") ? false : true);
-            cbHoldOrder.setSelected(poController.getModel().isHoldOrder() == null || !poController.getModel().isHoldOrder().equalsIgnoreCase("1") ? false : true);
-
-            //payment method
-            if (poController.getModel().getPayment() == null) {
-            } else {
-                cmbPayment.getSelectionModel().select(Integer.parseInt(poController.getModel().getPayment()));
-            }
-
-            dpClientSince.setValue(poController.getModel().getdateClientSince() == null ? null : ParseDate(poController.getModel().getdateClientSince()));
-            dpBegBalance.setValue(poController.getModel().getBeginningDate() == null ? null : ParseDate(poController.getModel().getBeginningDate()));
-            tfDiscount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.getModel().getDiscount(), false));
-            tfTerm.setText(poController.getModel().Term().getDescription());
-            tfCreditLimit.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.getModel().getCreditLimit(), false));
-            tfBegBalanace.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.getModel().getBeginningBalance(), false));
-            tfAvailBalance.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.getModel().getAccountBalance(), false));
-            tfOutStandingBalance.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.getModel().getOBalance(), false));
-
-        } catch (SQLException | GuanzonException e) {
-            poLogWrapper.severe(psFormName, e.getMessage());
-        }
-    }
-
     private void initComboboxes() {
         JFXUtil.initComboBoxCellDesignColor("#FF8201", cmbRegistration, cmbPayment);
     }
@@ -743,14 +704,67 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
         );
     }
 
-    private void initAttachmentPreviewPane() {
-        imageviewerutil.initAttachmentPreviewPane(stackpane, imageView);
-        stackpane.heightProperty().addListener((observable, oldValue, newHeight) -> {
-            double computedHeight = newHeight.doubleValue();
-            imageviewerutil.ldstackPaneHeight = computedHeight;
-            loadTableAttachment.reload();
-            loadRecordAttachment(true);
-        });
+    private void loadTableDetailFromMain() {
+        ModelAccountsPayable selected = (ModelAccountsPayable) tblMain.getSelectionModel().getSelectedItem();
+        if (selected != null) {
+            try {
+                int pnRowMain = Integer.parseInt(selected.getIndex01()) - 1;
+                pnMain = pnRowMain;
+                poJSON = poController.openRecord(selected.getIndex02());
+                if ("error".equals((String) poJSON.get("result"))) {
+                    ShowMessageFX.Warning(null, psFormName, (String) poJSON.get("message"));
+                    return;
+                }
+                poController.loadAttachments();
+                getLoadedClient();
+            } catch (SQLException | GuanzonException | CloneNotSupportedException ex) {
+                Logger.getLogger(AccountsPayablexController.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+    }
+
+    private void getLoadedClient() throws SQLException, GuanzonException, CloneNotSupportedException {
+        loadRecordMaster();
+        reloadTableAttachments();
+    }
+
+    private void loadRecordMaster() {
+        try {
+            lblStatus.setText(poController.getModel().getRecordStatus().equals("0") == false ? "ACTIVE" : "INACTIVE");
+
+            tfClientID.setText(poController.getModel().getClientId());
+
+            tfCategory.setText(poController.getModel().Category().getDescription());
+            tfCompanyName.setText(poController.getModel().Client().getCompanyName());
+            tfAddress.setText(poController.getModel().ClientAddress().getAddress());
+            tfContactPerson.setText(poController.getModel().ClientInstitutionContact().getContactPersonName());
+            tfContactEmail.setText(poController.getModel().ClientInstitutionContact().getMailAddress());
+            tfContactNo.setText(poController.getModel().ClientInstitutionContact().getMobileNo());
+            tfTINNo.setText(poController.getModel().Client().getTaxIdNumber());
+
+            cbHasPermit.setSelected(poController.getModel().hasPermit() == null || !poController.getModel().hasPermit().equalsIgnoreCase("1") ? false : true);
+            cbBackOrder.setSelected(poController.getModel().isBackOrder() == null || !poController.getModel().isBackOrder().equalsIgnoreCase("1") ? false : true);
+            cbVatable.setSelected(poController.getModel().getVatable() == null || !poController.getModel().getVatable().equalsIgnoreCase("1") ? false : true);
+            cbHoldOrder.setSelected(poController.getModel().isHoldOrder() == null || !poController.getModel().isHoldOrder().equalsIgnoreCase("1") ? false : true);
+
+            //payment method
+            if (poController.getModel().getPayment() == null) {
+            } else {
+                cmbPayment.getSelectionModel().select(Integer.parseInt(poController.getModel().getPayment()));
+            }
+
+            dpClientSince.setValue(poController.getModel().getdateClientSince() == null ? null : ParseDate(poController.getModel().getdateClientSince()));
+            dpBegBalance.setValue(poController.getModel().getBeginningDate() == null ? null : ParseDate(poController.getModel().getBeginningDate()));
+            tfDiscount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.getModel().getDiscount(), false));
+            tfTerm.setText(poController.getModel().Term().getDescription());
+            tfCreditLimit.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.getModel().getCreditLimit(), false));
+            tfBegBalanace.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.getModel().getBeginningBalance(), false));
+            tfAvailBalance.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.getModel().getAccountBalance(), false));
+            tfOutStandingBalance.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.getModel().getOBalance(), false));
+
+        } catch (SQLException | GuanzonException e) {
+            poLogWrapper.severe(psFormName, e.getMessage());
+        }
     }
 
     public void loadRecordAttachment(boolean lbloadImage) {
@@ -857,6 +871,16 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
 
     }
 
+    private void initAttachmentPreviewPane() {
+        imageviewerutil.initAttachmentPreviewPane(stackpane, imageView);
+        stackpane.heightProperty().addListener((observable, oldValue, newHeight) -> {
+            double computedHeight = newHeight.doubleValue();
+            imageviewerutil.ldstackPaneHeight = computedHeight;
+            loadTableAttachment.reload();
+            loadRecordAttachment(true);
+        });
+    }
+
     public void slideImage(int direction) {
         if (attachment_data.size() <= 0) {
             return;
@@ -891,30 +915,22 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
             JFXUtil.resetImageBounds(imageView, stackpane);
         }
     }
+    JFXUtil.TableKeyEvent tableKeyEvents = new JFXUtil.TableKeyEvent() {
+        @Override
+        protected void onRowMove(TableView<?> currentTable, String currentTableID, boolean isMovedDown) {
+            int newIndex = 0;
+            switch (currentTableID) {
+                case "tblAttachments":
+                    if (!attachment_data.isEmpty()) {
+                        pnAttachment = isMovedDown ? Integer.parseInt(attachment_data.get(JFXUtil.moveToNextRow(currentTable)).getIndex03())
+                                : Integer.parseInt(attachment_data.get(JFXUtil.moveToNextRow(currentTable)).getIndex03());
+                        loadRecordAttachment(true);
 
-    private void loadTableDetailFromMain() {
-        ModelAccountsPayable selected = (ModelAccountsPayable) tblMain.getSelectionModel().getSelectedItem();
-        if (selected != null) {
-            try {
-                int pnRowMain = Integer.parseInt(selected.getIndex01()) - 1;
-                pnMain = pnRowMain;
-                poJSON = poController.openRecord(selected.getIndex02());
-                if ("error".equals((String) poJSON.get("result"))) {
-                    ShowMessageFX.Warning(null, psFormName, (String) poJSON.get("message"));
-                    return;
-                }
-                poController.loadAttachments();
-                getLoadedClient();
-            } catch (SQLException | GuanzonException | CloneNotSupportedException ex) {
-                Logger.getLogger(AccountsPayablexController.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                    break;
             }
         }
-    }
-
-    private void getLoadedClient() throws SQLException, GuanzonException, CloneNotSupportedException {
-        loadRecordMaster();
-        reloadTableAttachments();
-    }
+    };
 
     public void initTableOnClick() {
         tblMain.setOnMouseClicked(event -> {
@@ -940,20 +956,6 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
 
         JFXUtil.setKeyEventFilter(tableKeyEvents, tblAttachments);
     }
-    JFXUtil.TableKeyEvent tableKeyEvents = new JFXUtil.TableKeyEvent() {
-        @Override
-        protected void onRowMove(TableView<?> currentTable, String currentTableID, boolean isMovedDown) {
-            int newIndex = 0;
-            switch (currentTableID) {
-                case "tblAttachments":
-                    if (!attachment_data.isEmpty()) {
-                        pnAttachment = isMovedDown ? JFXUtil.moveToNextRow(currentTable) : JFXUtil.moveToPreviousRow(currentTable);
-                        loadRecordAttachment(true);
-                    }
-                    break;
-            }
-        }
-    };
 
     private boolean isJSONSuccess(JSONObject loJSON, String fsModule) {
         String result = (String) loJSON.get("result");
