@@ -121,6 +121,7 @@ public class AccountsAccreditation_ConfirmationController implements Initializab
 //            lblSource.setText(poController.getModel());
             initControlEvents();
             loadRecordMaster();
+            JFXUtil.initKeyClickObject(apMainAnchor, lastFocusedTextField, previousSearchedTextField);
         } catch (SQLException | GuanzonException e) {
             Logger.getLogger(AccountsAccreditation_ConfirmationController.class.getName()).log(Level.SEVERE, null, e);
             poLogWrapper.severe(psFormName + " :" + e.getMessage());
