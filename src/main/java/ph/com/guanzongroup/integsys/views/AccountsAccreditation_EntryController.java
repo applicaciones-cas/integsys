@@ -103,7 +103,6 @@ public class AccountsAccreditation_EntryController implements Initializable, Scr
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-
         try {
             poLogWrapper = new LogWrapper(psFormName, psFormName);
             poController = new ClientControllers(poApp, poLogWrapper).AccountAccreditation();
@@ -121,7 +120,7 @@ public class AccountsAccreditation_EntryController implements Initializable, Scr
             JFXUtil.initKeyClickObject(apMainAnchor, lastFocusedTextField, previousSearchedTextField);
         } catch (SQLException | GuanzonException e) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, e);
-            poLogWrapper.severe(psFormName + " :" + e.getMessage());
+            ShowMessageFX.Error(null, psFormName, MiscUtil.getException(e));
         }
     }
 
@@ -172,20 +171,17 @@ public class AccountsAccreditation_EntryController implements Initializable, Scr
                     }
 
                     if (ShowMessageFX.OkayCancel(null, psFormName, "Are you sure you want to save client??") == true) {
-
                         if (!isJSONSuccess(poController.saveRecord(), "Initialize Save Record")) {
                             return;
                         }
                         ShowMessageFX.Information("Client saved successfully!", "Initialize Save Record", null);
 
                         if (poController.getModel().getRecordStatus().equals("0")) {
-
                             if (!isJSONSuccess(poController.openRecord(poController.getModel().getTransactionNo()), "Initialize Open Record")) {
                                 return;
                             }
 
                             if (ShowMessageFX.OkayCancel(null, psFormName, "Do you want to Confirm transaction?") == true) {
-
                                 if (!isJSONSuccess(poController.CloseTransaction(), "Initialize Close Transaction")) {
                                     return;
                                 }
@@ -223,10 +219,10 @@ public class AccountsAccreditation_EntryController implements Initializable, Scr
                         poController.ShowStatusHistory();
                     } catch (NullPointerException npe) {
                         Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(npe), npe);
-                        ShowMessageFX.Error("No transaction status history to load!", psFormName, null);
+                        ShowMessageFX.Error(null, psFormName, MiscUtil.getException(npe));
                     } catch (Exception ex) {
                         Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
-                        ShowMessageFX.Error(MiscUtil.getException(ex), psFormName, null);
+                        ShowMessageFX.Error(null, psFormName, MiscUtil.getException(ex));
                     }
                     break;
                 case "btnClose":
@@ -245,10 +241,9 @@ public class AccountsAccreditation_EntryController implements Initializable, Scr
                 return;
             }
             initButtonDisplay(poController.getEditMode());
-
         } catch (Exception e) {
-            e.printStackTrace();
-            poLogWrapper.severe(psFormName + " :" + e.getMessage());
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(e), e);
+            ShowMessageFX.Error(null, psFormName, MiscUtil.getException(e));
         }
     }
 
@@ -303,8 +298,8 @@ public class AccountsAccreditation_EntryController implements Initializable, Scr
                 }
             }
         } catch (Exception ex) {
-            ex.printStackTrace();
-            poLogWrapper.severe(psFormName + " :" + ex.getMessage());
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(null, psFormName, MiscUtil.getException(ex));
         }
     }
 
@@ -326,7 +321,6 @@ public class AccountsAccreditation_EntryController implements Initializable, Scr
                         ShowMessageFX.Information(null, psFormName, JFXUtil.getJSONMessage(poJSON));
                     }
                     return;
-
             }
         }
     };
@@ -343,14 +337,13 @@ public class AccountsAccreditation_EntryController implements Initializable, Scr
                             break;
                     }
                 } catch (Exception ex) {
-                    poLogWrapper.severe(psFormName + " :" + ex.getMessage());
+                    Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+                    ShowMessageFX.Error(null, psFormName, MiscUtil.getException(ex));
                 }
-
             });
 
     private void loadRecordMaster() {
         try {
-
             boolean lbShow = JFXUtil.isObjectEqualTo(poController.getModel().getEditMode(), EditMode.UPDATE, EditMode.READY);
             boolean lbShow2 = !JFXUtil.isObjectEqualTo(poController.getModel().Client().getCompanyName(), null, "");
             JFXUtil.setDisabled(lbShow, tfCompany);
@@ -398,10 +391,9 @@ public class AccountsAccreditation_EntryController implements Initializable, Scr
 
             cmbAccountType.getSelectionModel().select(Integer.parseInt(poController.getModel().getAccountType()));
             cmbTransType.getSelectionModel().select(Integer.parseInt(poController.getModel().getTransactionType()));
-
-        } catch (SQLException | GuanzonException e) {
-            e.printStackTrace();
-            poLogWrapper.severe(psFormName, e.getMessage());
+        } catch (SQLException | GuanzonException ex) {
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(null, psFormName, MiscUtil.getException(ex));
         }
     }
 
@@ -424,7 +416,6 @@ public class AccountsAccreditation_EntryController implements Initializable, Scr
     }
 
     private void initButtonDisplay(int fnValue) {
-
         boolean lbShow1 = (fnValue == EditMode.ADDNEW || fnValue == EditMode.UPDATE);
         boolean lbShow2 = fnValue == EditMode.READY;
         boolean lbShow3 = (fnValue == EditMode.READY || fnValue == EditMode.UNKNOWN);

@@ -96,7 +96,6 @@ public class AccountsAccreditation_HistoryController implements Initializable, S
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-
         try {
             poLogWrapper = new LogWrapper(psFormName, psFormName);
             poController = new ClientControllers(poApp, poLogWrapper).AccountAccreditation();
@@ -108,9 +107,9 @@ public class AccountsAccreditation_HistoryController implements Initializable, S
 //            lblSource.setText(poController.getModel());
             initControlEvents();
             loadRecordMaster();
-        } catch (SQLException | GuanzonException e) {
-            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, e);
-            poLogWrapper.severe(psFormName + " :" + e.getMessage());
+        } catch (SQLException | GuanzonException ex) {
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(null, psFormName, MiscUtil.getException(ex));
         }
     }
 
@@ -120,7 +119,6 @@ public class AccountsAccreditation_HistoryController implements Initializable, S
             //get button id
             String btnID = ((Button) event.getSource()).getId();
             switch (btnID) {
-
                 case "btnBrowse":
                     if (!isJSONSuccess(poController.searchRecord(tfSearchCompany.getText(), false),
                             "")) {
@@ -140,10 +138,10 @@ public class AccountsAccreditation_HistoryController implements Initializable, S
                         poController.ShowStatusHistory();
                     } catch (NullPointerException npe) {
                         Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(npe), npe);
-                        ShowMessageFX.Error("No transaction status history to load!", psFormName, null);
+                        ShowMessageFX.Error(null, psFormName, MiscUtil.getException(npe));
                     } catch (Exception ex) {
                         Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
-                        ShowMessageFX.Error(MiscUtil.getException(ex), psFormName, null);
+                        ShowMessageFX.Error(null, psFormName, MiscUtil.getException(ex));
                     }
                     break;
                 case "btnClose":
@@ -157,9 +155,9 @@ public class AccountsAccreditation_HistoryController implements Initializable, S
             }
 
             initButtonDisplay(poController.getEditMode());
-
-        } catch (Exception e) {
-            poLogWrapper.severe(psFormName + " :" + e.getMessage());
+        } catch (Exception ex) {
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(null, psFormName, MiscUtil.getException(ex));
         }
     }
 
@@ -184,13 +182,13 @@ public class AccountsAccreditation_HistoryController implements Initializable, S
                                 loadRecordMaster();
                                 initButtonDisplay(poController.getEditMode());
                                 break;
-
                         }
                         break;
                 }
             }
         } catch (Exception ex) {
-            poLogWrapper.severe(psFormName + " :" + ex.getMessage());
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(null, psFormName, MiscUtil.getException(ex));
         }
     }
 
@@ -231,9 +229,9 @@ public class AccountsAccreditation_HistoryController implements Initializable, S
             taRemarks.setText(poController.getModel().getRemarks());
             cmbAccountType.getSelectionModel().select(Integer.parseInt(poController.getModel().getAccountType()));
             cmbTransType.getSelectionModel().select(Integer.parseInt(poController.getModel().getTransactionType()));
-
-        } catch (SQLException | GuanzonException e) {
-            poLogWrapper.severe(psFormName, e.getMessage());
+        } catch (SQLException | GuanzonException ex) {
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(null, psFormName, MiscUtil.getException(ex));
         }
     }
 
@@ -243,7 +241,6 @@ public class AccountsAccreditation_HistoryController implements Initializable, S
     }
 
     private void initButtonDisplay(int fnValue) {
-
         boolean lbShow1 = (fnValue == EditMode.READY);
         boolean lbShow2 = (fnValue == EditMode.UNKNOWN || fnValue == EditMode.READY);
 

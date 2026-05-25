@@ -105,7 +105,6 @@ public class AccountsAccreditation_ConfirmationController implements Initializab
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-
         try {
             poLogWrapper = new LogWrapper(psFormName, psFormName);
             poController = new ClientControllers(poApp, poLogWrapper).AccountAccreditation();
@@ -120,9 +119,9 @@ public class AccountsAccreditation_ConfirmationController implements Initializab
             initControlEvents();
             loadRecordMaster();
             JFXUtil.initKeyClickObject(apMainAnchor, lastFocusedTextField, previousSearchedTextField);
-        } catch (SQLException | GuanzonException e) {
-            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, e);
-            poLogWrapper.severe(psFormName + " :" + e.getMessage());
+        } catch (SQLException | GuanzonException ex) {
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+            ShowMessageFX.Error(null, psFormName, MiscUtil.getException(ex));
         }
     }
 
@@ -168,16 +167,13 @@ public class AccountsAccreditation_ConfirmationController implements Initializab
                     }
 
                     if (ShowMessageFX.OkayCancel(null, psFormName, "Are you sure you want to save client??") == true) {
-
                         if (!isJSONSuccess(poController.saveRecord(), "Initialize Save Record")) {
                             return;
                         }
                         ShowMessageFX.Information("Client saved successfully!", "Initialize Save Record", null);
 
                         if (poController.getModel().getRecordStatus().equals("0")) {
-
                             if (ShowMessageFX.OkayCancel(null, psFormName, "Do you want to Confirm transaction?") == true) {
-
                                 if (!isJSONSuccess(poController.openRecord(poController.getModel().getTransactionNo()), "Initialize Open Transaction")) {
                                     return;
                                 }
@@ -229,7 +225,6 @@ public class AccountsAccreditation_ConfirmationController implements Initializab
                     }
 
                     if (ShowMessageFX.YesNo(null, psFormName, "Are you sure you want to Void/Cancel transaction?") == true) {
-
                         if (!isJSONSuccess(poController.VoidTransaction(), "Initialize Void Transaction")) {
                             return;
                         }
@@ -264,10 +259,10 @@ public class AccountsAccreditation_ConfirmationController implements Initializab
                         poController.ShowStatusHistory();
                     } catch (NullPointerException npe) {
                         Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(npe), npe);
-                        ShowMessageFX.Error("No transaction status history to load!", psFormName, null);
+                        ShowMessageFX.Error(null, psFormName, MiscUtil.getException(npe));
                     } catch (Exception ex) {
                         Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
-                        ShowMessageFX.Error(MiscUtil.getException(ex), psFormName, null);
+                        ShowMessageFX.Error(null, psFormName, MiscUtil.getException(ex));
                     }
                     break;
                 case "btnClose":
@@ -286,10 +281,9 @@ public class AccountsAccreditation_ConfirmationController implements Initializab
                 return;
             }
             initButtonDisplay(poController.getEditMode());
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            poLogWrapper.severe(psFormName + " :" + e.getMessage());
+        } catch (Exception ex) {
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(null, psFormName, MiscUtil.getException(ex));
         }
     }
 
@@ -343,7 +337,8 @@ public class AccountsAccreditation_ConfirmationController implements Initializab
                 }
             }
         } catch (Exception ex) {
-            poLogWrapper.severe(psFormName + " :" + ex.getMessage());
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(null, psFormName, MiscUtil.getException(ex));
         }
     }
     final ChangeListener<? super Boolean> dPicker_Focus = (o, ov, nv) -> {
@@ -364,7 +359,6 @@ public class AccountsAccreditation_ConfirmationController implements Initializab
                         ShowMessageFX.Information(null, psFormName, JFXUtil.getJSONMessage(poJSON));
                     }
                     return;
-
             }
         }
     };
@@ -381,9 +375,9 @@ public class AccountsAccreditation_ConfirmationController implements Initializab
                             break;
                     }
                 } catch (Exception ex) {
-                    poLogWrapper.severe(psFormName + " :" + ex.getMessage());
+                    Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+                    ShowMessageFX.Error(null, psFormName, MiscUtil.getException(ex));
                 }
-
             });
 
     private void loadRecordMaster() {
@@ -430,9 +424,9 @@ public class AccountsAccreditation_ConfirmationController implements Initializab
             taRemarks.setText(poController.getModel().getRemarks());
             cmbAccountType.getSelectionModel().select(Integer.parseInt(poController.getModel().getAccountType()));
             cmbTransType.getSelectionModel().select(Integer.parseInt(poController.getModel().getTransactionType()));
-
-        } catch (SQLException | GuanzonException e) {
-            poLogWrapper.severe(psFormName, e.getMessage());
+        } catch (SQLException | GuanzonException ex) {
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(null, psFormName, MiscUtil.getException(ex));
         }
     }
 
@@ -461,7 +455,6 @@ public class AccountsAccreditation_ConfirmationController implements Initializab
     }
 
     private void initButtonDisplay(int fnValue) {
-
         boolean lbShow1 = (fnValue == EditMode.UPDATE);
         boolean lbShow2 = (fnValue == EditMode.READY);
         boolean lbShow3 = (fnValue == EditMode.UNKNOWN || fnValue == EditMode.READY);
