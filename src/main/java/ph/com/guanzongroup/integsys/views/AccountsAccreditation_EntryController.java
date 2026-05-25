@@ -143,7 +143,7 @@ public class AccountsAccreditation_EntryController implements Initializable, Scr
                 case "btnAddClompany":
                     poController.addCompany();
                     loadRecordMaster();
-                    break;
+                    return;
                 case "btnUpdate":
                     if (poController.getModel().getClientId() == null || poController.getModel().getClientId().isEmpty()) {
                         ShowMessageFX.Warning(null, psFormName, "Please load record before proceeding..");
@@ -160,9 +160,7 @@ public class AccountsAccreditation_EntryController implements Initializable, Scr
                     if (!isJSONSuccess(poController.newRecord(), "Initialize New Transaction")) {
                         break;
                     }
-
                     loadRecordMaster();
-                    initButtonDisplay(poController.getEditMode());
                     break;
                 case "btnSave":
                     if (tfTransactionNo.getText().isEmpty()) {
@@ -170,7 +168,7 @@ public class AccountsAccreditation_EntryController implements Initializable, Scr
                         return;
                     }
 
-                    if (ShowMessageFX.OkayCancel(null, psFormName, "Are you sure you want to save client?") == true) {
+                    if (ShowMessageFX.YesNo(null, psFormName, "Are you sure you want to save client?") == true) {
                         if (!isJSONSuccess(poController.saveRecord(), "Initialize Save Record")) {
                             return;
                         }
@@ -178,24 +176,26 @@ public class AccountsAccreditation_EntryController implements Initializable, Scr
 
                         if (poController.getModel().getRecordStatus().equals("0")) {
                             if (!isJSONSuccess(poController.openRecord(poController.getModel().getTransactionNo()), "Initialize Open Record")) {
-                                return;
-                            }
-
-                            if (ShowMessageFX.OkayCancel(null, psFormName, "Do you want to Confirm transaction?") == true) {
-                                if (!isJSONSuccess(poController.CloseTransaction(), "Initialize Close Transaction")) {
-                                    return;
+                            } else {
+                                if (ShowMessageFX.YesNo(null, psFormName, "Do you want to Confirm transaction?") == true) {
+                                    if (!isJSONSuccess(poController.CloseTransaction(), "Initialize Close Transaction")) {
+                                        break;
+                                    } else {
+                                        ShowMessageFX.Information(null, psFormName, "Transaction confirmed successfully");
+                                    }
                                 }
-                                ShowMessageFX.Information(null, psFormName, "Transaction confirmed successfully");
                             }
                         }
-                        pnEditMode = poController.getEditMode();
+                        pnEditMode = EditMode.UNKNOWN;
                         //reset data to avoid transaction errors
                         clearAllInputs();
+                        Platform.runLater(() -> {
+                            btnNew.fire();
+                        });
                     } else {
                         pnEditMode = poController.getEditMode();
                     }
                     break;
-
                 case "btnCancel":
                     if (ShowMessageFX.OkayCancel(null, psFormName, "Do you want to disregard changes?") == true) {
                         poController = new ClientControllers(poApp, poLogWrapper).AccountAccreditation();
@@ -224,7 +224,7 @@ public class AccountsAccreditation_EntryController implements Initializable, Scr
                         Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
                         ShowMessageFX.Error(null, psFormName, MiscUtil.getException(ex));
                     }
-                    break;
+                    return;
                 case "btnClose":
                     if (ShowMessageFX.YesNo("Are you sure you want to close this form?", psFormName, null)) {
                         if (poUnload != null) {
@@ -233,6 +233,7 @@ public class AccountsAccreditation_EntryController implements Initializable, Scr
                             ShowMessageFX.Warning("Please notify the system administrator to configure the null value at the close button.", "Warning", null);
                         }
                     }
+                    break;
             }
 
             //manually reset button, edit mode not initialized on model
@@ -318,7 +319,7 @@ public class AccountsAccreditation_EntryController implements Initializable, Scr
                 case "dpTransactionDate":
                     poJSON = poController.getModel().setDateTransact(ldDateValue);
                     if (!JFXUtil.isJSONSuccess(poJSON)) {
-                        ShowMessageFX.Information(null, psFormName, JFXUtil.getJSONMessage(poJSON));
+                        ShowMessageFX.Warning(null, psFormName, JFXUtil.getJSONMessage(poJSON));
                     }
                     return;
             }
@@ -331,7 +332,7 @@ public class AccountsAccreditation_EntryController implements Initializable, Scr
                         case "taRemarks":
                             poJSON = poController.getModel().setRemarks(lsValue);
                             if (!JFXUtil.isJSONSuccess(poJSON)) {
-                                ShowMessageFX.Information(null, psFormName, JFXUtil.getJSONMessage(poJSON));
+                                ShowMessageFX.Warning(null, psFormName, JFXUtil.getJSONMessage(poJSON));
                             }
                             loadRecordMaster();
                             break;
@@ -347,7 +348,6 @@ public class AccountsAccreditation_EntryController implements Initializable, Scr
             boolean lbShow = JFXUtil.isObjectEqualTo(poController.getModel().getEditMode(), EditMode.UPDATE, EditMode.READY);
             boolean lbShow2 = !JFXUtil.isObjectEqualTo(poController.getModel().Client().getCompanyName(), null, "");
             JFXUtil.setDisabled(lbShow, tfCompany);
-            JFXUtil.setButtonsVisibility(!lbShow, btnAddClompany);
 
             if (lbShow2) {
                 JFXUtil.applyHoverTooltip("Edit company info", btnAddClompany);
@@ -480,7 +480,6 @@ public class AccountsAccreditation_EntryController implements Initializable, Scr
 
     private void clearAllInputs() {
         JFXUtil.setValueToNull(previousSearchedTextField, lastFocusedTextField);
-        JFXUtil.clearTextFields(apMaster);
         initButtonDisplay(poController.getEditMode());
     }
 }

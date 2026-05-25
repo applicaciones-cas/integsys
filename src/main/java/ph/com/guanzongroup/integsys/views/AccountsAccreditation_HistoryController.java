@@ -152,6 +152,7 @@ public class AccountsAccreditation_HistoryController implements Initializable, S
                             ShowMessageFX.Warning(null, psFormName, "Please notify the system administrator to configure the null value at the close button.");
                         }
                     }
+                    break;
             }
 
             initButtonDisplay(poController.getEditMode());
@@ -292,6 +293,5 @@ public class AccountsAccreditation_HistoryController implements Initializable, S
 
     private void clearAllInputs() {
         JFXUtil.clearTextFields(apMaster);
-        initButtonDisplay(poController.getEditMode());
     }
 }

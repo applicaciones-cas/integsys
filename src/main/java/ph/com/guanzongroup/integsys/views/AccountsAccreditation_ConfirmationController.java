@@ -118,6 +118,8 @@ public class AccountsAccreditation_ConfirmationController implements Initializab
             initControlEvents();
             loadRecordMaster();
             JFXUtil.initKeyClickObject(apMainAnchor, lastFocusedTextField, previousSearchedTextField);
+            pnEditMode = EditMode.UNKNOWN;
+            initButtonDisplay(poController.getEditMode());
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
             ShowMessageFX.Error(null, psFormName, MiscUtil.getException(ex));
@@ -145,7 +147,7 @@ public class AccountsAccreditation_ConfirmationController implements Initializab
                 case "btnAddClompany":
                     poController.addCompany();
                     loadRecordMaster();
-                    break;
+                    return;
                 case "btnUpdate":
                     if (poController.getModel().getClientId() == null || poController.getModel().getClientId().isEmpty()) {
                         ShowMessageFX.Warning(null, psFormName, "Please load record before proceeding.");
@@ -159,29 +161,26 @@ public class AccountsAccreditation_ConfirmationController implements Initializab
                     initButtonDisplay(poController.getEditMode());
                     break;
                 case "btnSave":
-
-                    String lotransactioNo = tfTransactionNo.getText();
                     if (tfTransactionNo.getText().isEmpty()) {
                         ShowMessageFX.Warning(null, psFormName, "Please load record before proceeding.");
                         return;
                     }
 
-                    if (ShowMessageFX.OkayCancel(null, psFormName, "Are you sure you want to save client?") == true) {
+                    if (ShowMessageFX.YesNo(null, psFormName, "Are you sure you want to save client?") == true) {
                         if (!isJSONSuccess(poController.saveRecord(), "Initialize Save Record")) {
                             return;
                         }
                         ShowMessageFX.Information(null, psFormName, "Client saved successfully!");
 
                         if (poController.getModel().getRecordStatus().equals("0")) {
-                            if (ShowMessageFX.OkayCancel(null, psFormName, "Do you want to Confirm transaction?") == true) {
+                            if (ShowMessageFX.YesNo(null, psFormName, "Do you want to Confirm transaction?") == true) {
                                 if (!isJSONSuccess(poController.openRecord(poController.getModel().getTransactionNo()), "Initialize Open Transaction")) {
-                                    return;
+                                } else {
+                                    if (!isJSONSuccess(poController.CloseTransaction(), "Initialize Close Transaction")) {
+                                        break;
+                                    }
+                                    ShowMessageFX.Information(null, psFormName, "Transaction confirmed successfully");
                                 }
-
-                                if (!isJSONSuccess(poController.CloseTransaction(), "Initialize Close Transaction")) {
-                                    return;
-                                }
-                                ShowMessageFX.Information(null, psFormName, "Transaction confirmed successfully");
                             }
                         }
                         pnEditMode = EditMode.UNKNOWN;
@@ -199,18 +198,19 @@ public class AccountsAccreditation_ConfirmationController implements Initializab
 
                     if (!poController.getModel().getRecordStatus().equalsIgnoreCase(TransactionStatus.STATE_OPEN)) {
                         ShowMessageFX.Warning(null, psFormName, "Status is already tagged");
-                        return;
+                        break;
                     }
 
                     if (ShowMessageFX.YesNo(null, psFormName, "Are you sure you want to confirm transaction?") == true) {
                         if (!isJSONSuccess(poController.CloseTransaction(), "Initialize Close Transaction")) {
-                            return;
+                            break;
+                        } else {
+                            ShowMessageFX.Information(null, psFormName, "Transaction confirmed successfully");
                         }
-                        ShowMessageFX.Information(null, psFormName, "Transaction confirmed successfully");
                         //reset data to avoid transaction errors
-                        clearAllInputs();
                         break;
                     }
+                    clearAllInputs();
                     break;
                 case "btnVoid":
                     if (tfTransactionNo.getText().isEmpty()) {
@@ -220,18 +220,19 @@ public class AccountsAccreditation_ConfirmationController implements Initializab
 
                     if (!poController.getModel().getRecordStatus().equalsIgnoreCase(TransactionStatus.STATE_OPEN)) {
                         ShowMessageFX.Warning("Status was already tagged", null, psFormName);
-                        return;
-                    }
-
-                    if (ShowMessageFX.YesNo(null, psFormName, "Are you sure you want to Void/Cancel transaction?") == true) {
-                        if (!isJSONSuccess(poController.VoidTransaction(), "Initialize Void Transaction")) {
-                            return;
-                        }
-                        ShowMessageFX.Information(null, psFormName, "Transaction voided successfully");
-                        //reset data to avoid transaction errors
-                        clearAllInputs();
                         break;
                     }
+
+                    if (ShowMessageFX.YesNo(null, psFormName, "Are you sure you want to Void transaction?") == true) {
+                        if (!isJSONSuccess(poController.VoidTransaction(), "Initialize Void Transaction")) {
+                            break;
+                        } else {
+                            ShowMessageFX.Information(null, psFormName, "Transaction voided successfully");
+                        }
+                        //reset data to avoid transaction errors
+                        break;
+                    }
+                    clearAllInputs();
                     break;
                 case "btnCancel":
                     if (ShowMessageFX.OkayCancel(null, psFormName, "Do you want to disregard changes?") == true) {
@@ -262,7 +263,7 @@ public class AccountsAccreditation_ConfirmationController implements Initializab
                         Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
                         ShowMessageFX.Error(null, psFormName, MiscUtil.getException(ex));
                     }
-                    break;
+                    return;
                 case "btnClose":
                     if (ShowMessageFX.YesNo("Are you sure you want to close this form?", psFormName, null)) {
                         if (poUnload != null) {
@@ -271,6 +272,7 @@ public class AccountsAccreditation_ConfirmationController implements Initializab
                             ShowMessageFX.Warning("Please notify the system administrator to configure the null value at the close button.", "Warning", null);
                         }
                     }
+                    break;
             }
 
             //manually reset button, edit mode not initialized on model
@@ -354,7 +356,7 @@ public class AccountsAccreditation_ConfirmationController implements Initializab
                 case "dpTransactionDate":
                     poJSON = poController.getModel().setDateTransact(ldDateValue);
                     if (!JFXUtil.isJSONSuccess(poJSON)) {
-                        ShowMessageFX.Information(null, psFormName, JFXUtil.getJSONMessage(poJSON));
+                        ShowMessageFX.Warning(null, psFormName, JFXUtil.getJSONMessage(poJSON));
                     }
                     return;
             }
@@ -367,7 +369,7 @@ public class AccountsAccreditation_ConfirmationController implements Initializab
                         case "taRemarks":
                             poJSON = poController.getModel().setRemarks(lsValue);
                             if (!JFXUtil.isJSONSuccess(poJSON)) {
-                                ShowMessageFX.Information(null, psFormName, JFXUtil.getJSONMessage(poJSON));
+                                ShowMessageFX.Warning(null, psFormName, JFXUtil.getJSONMessage(poJSON));
                             }
                             loadRecordMaster();
                             break;
@@ -514,6 +516,5 @@ public class AccountsAccreditation_ConfirmationController implements Initializab
     private void clearAllInputs() {
         JFXUtil.setValueToNull(previousSearchedTextField, lastFocusedTextField);
         JFXUtil.clearTextFields(apMaster);
-        initButtonDisplay(poController.getEditMode());
     }
 }
