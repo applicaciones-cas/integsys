@@ -130,7 +130,7 @@ public class AccountsAccreditation_HistoryController implements Initializable, S
                 case "btnHistory":
 
                     if (poController.getEditMode() != EditMode.READY && poController.getEditMode() != EditMode.UPDATE) {
-                        ShowMessageFX.Warning("No transaction status history to load!", psFormName, null);
+                        ShowMessageFX.Warning(null, psFormName, "No transaction status history to load!");
                         return;
                     }
 
@@ -149,7 +149,7 @@ public class AccountsAccreditation_HistoryController implements Initializable, S
                         if (poUnload != null) {
                             poUnload.unloadForm(apMainAnchor, poApp, psFormName);
                         } else {
-                            ShowMessageFX.Warning("Please notify the system administrator to configure the null value at the close button.", "Warning", null);
+                            ShowMessageFX.Warning(null, psFormName, "Please notify the system administrator to configure the null value at the close button.");
                         }
                     }
             }

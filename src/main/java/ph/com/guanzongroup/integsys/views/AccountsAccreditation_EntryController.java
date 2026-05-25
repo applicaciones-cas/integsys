@@ -146,7 +146,7 @@ public class AccountsAccreditation_EntryController implements Initializable, Scr
                     break;
                 case "btnUpdate":
                     if (poController.getModel().getClientId() == null || poController.getModel().getClientId().isEmpty()) {
-                        ShowMessageFX.Information("Please load record before proceeding..", psFormName, "");
+                        ShowMessageFX.Warning(null, psFormName, "Please load record before proceeding..");
                         return;
                     }
                     //poController.openRecord(poController.getModel().getClientId());
@@ -166,7 +166,7 @@ public class AccountsAccreditation_EntryController implements Initializable, Scr
                     break;
                 case "btnSave":
                     if (tfTransactionNo.getText().isEmpty()) {
-                        ShowMessageFX.Information("Please load record before proceeding..", psFormName, "");
+                        ShowMessageFX.Warning(null, psFormName, "Please load record before proceeding..");
                         return;
                     }
 
@@ -174,7 +174,7 @@ public class AccountsAccreditation_EntryController implements Initializable, Scr
                         if (!isJSONSuccess(poController.saveRecord(), "Initialize Save Record")) {
                             return;
                         }
-                        ShowMessageFX.Information("Client saved successfully!", "Initialize Save Record", null);
+                        ShowMessageFX.Information(null, psFormName, "Client saved successfully!");
 
                         if (poController.getModel().getRecordStatus().equals("0")) {
                             if (!isJSONSuccess(poController.openRecord(poController.getModel().getTransactionNo()), "Initialize Open Record")) {
@@ -185,7 +185,7 @@ public class AccountsAccreditation_EntryController implements Initializable, Scr
                                 if (!isJSONSuccess(poController.CloseTransaction(), "Initialize Close Transaction")) {
                                     return;
                                 }
-                                ShowMessageFX.Information("Transaction confirmed successfully", null, psFormName);
+                                ShowMessageFX.Information(null, psFormName, "Transaction confirmed successfully");
                             }
                         }
                         pnEditMode = poController.getEditMode();
@@ -211,7 +211,7 @@ public class AccountsAccreditation_EntryController implements Initializable, Scr
                     break;
                 case "btnHistory":
                     if (poController.getEditMode() != EditMode.READY && poController.getEditMode() != EditMode.UPDATE) {
-                        ShowMessageFX.Warning("No transaction status history to load!", psFormName, null);
+                        ShowMessageFX.Warning(null, psFormName, "No transaction status history to load!");
                         return;
                     }
 

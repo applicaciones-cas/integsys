@@ -53,7 +53,6 @@ public class AccountsAccreditation_ConfirmationController implements Initializab
     private GRiderCAS poApp;
     private LogWrapper poLogWrapper;
     private String psFormName = "Accounts Accreditation Entry";
-    private Control lastFocusedControl;
     private Account_Accreditation poController;
 
     private unloadForm poUnload = new unloadForm();
@@ -135,6 +134,7 @@ public class AccountsAccreditation_ConfirmationController implements Initializab
                     JFXUtil.initiateBtnSearch(psFormName, lastFocusedTextField, previousSearchedTextField, apMaster, apBrowse);
                     break;
                 case "btnBrowse":
+                    poController.setRecordStatus("0");
                     if (!isJSONSuccess(poController.searchRecord(tfSearchCompany.getText(), false), "")) {
                         return;
                     }
@@ -148,7 +148,7 @@ public class AccountsAccreditation_ConfirmationController implements Initializab
                     break;
                 case "btnUpdate":
                     if (poController.getModel().getClientId() == null || poController.getModel().getClientId().isEmpty()) {
-                        ShowMessageFX.Information("Please load record before proceeding..", psFormName, "");
+                        ShowMessageFX.Warning(null, psFormName, "Please load record before proceeding.");
                         return;
                     }
                     //poController.openRecord(poController.getModel().getClientId());
@@ -162,7 +162,7 @@ public class AccountsAccreditation_ConfirmationController implements Initializab
 
                     String lotransactioNo = tfTransactionNo.getText();
                     if (tfTransactionNo.getText().isEmpty()) {
-                        ShowMessageFX.Information("Please load record before proceeding..", psFormName, "");
+                        ShowMessageFX.Warning(null, psFormName, "Please load record before proceeding.");
                         return;
                     }
 
@@ -170,7 +170,7 @@ public class AccountsAccreditation_ConfirmationController implements Initializab
                         if (!isJSONSuccess(poController.saveRecord(), "Initialize Save Record")) {
                             return;
                         }
-                        ShowMessageFX.Information("Client saved successfully!", "Initialize Save Record", null);
+                        ShowMessageFX.Information(null, psFormName, "Client saved successfully!");
 
                         if (poController.getModel().getRecordStatus().equals("0")) {
                             if (ShowMessageFX.OkayCancel(null, psFormName, "Do you want to Confirm transaction?") == true) {
@@ -181,10 +181,10 @@ public class AccountsAccreditation_ConfirmationController implements Initializab
                                 if (!isJSONSuccess(poController.CloseTransaction(), "Initialize Close Transaction")) {
                                     return;
                                 }
-                                ShowMessageFX.Information("Transaction confirmed successfully", null, psFormName);
+                                ShowMessageFX.Information(null, psFormName, "Transaction confirmed successfully");
                             }
                         }
-                        pnEditMode = poController.getEditMode();
+                        pnEditMode = EditMode.UNKNOWN;
                         //reset data to avoid transaction errors
                         clearAllInputs();
                     } else {
@@ -193,12 +193,12 @@ public class AccountsAccreditation_ConfirmationController implements Initializab
                     break;
                 case "btnConfirm":
                     if (tfTransactionNo.getText().isEmpty()) {
-                        ShowMessageFX.Information("Please load transaction before proceeding..", null, psFormName);
+                        ShowMessageFX.Warning(null, psFormName, "Please load transaction before proceeding..");
                         return;
                     }
 
                     if (!poController.getModel().getRecordStatus().equalsIgnoreCase(TransactionStatus.STATE_OPEN)) {
-                        ShowMessageFX.Information("Status was already tagged", null, psFormName);
+                        ShowMessageFX.Warning(null, psFormName, "Status is already tagged");
                         return;
                     }
 
@@ -206,8 +206,7 @@ public class AccountsAccreditation_ConfirmationController implements Initializab
                         if (!isJSONSuccess(poController.CloseTransaction(), "Initialize Close Transaction")) {
                             return;
                         }
-                        ShowMessageFX.Information("Transaction confirmed successfully", null, psFormName);
-
+                        ShowMessageFX.Information(null, psFormName, "Transaction confirmed successfully");
                         //reset data to avoid transaction errors
                         clearAllInputs();
                         break;
@@ -215,12 +214,12 @@ public class AccountsAccreditation_ConfirmationController implements Initializab
                     break;
                 case "btnVoid":
                     if (tfTransactionNo.getText().isEmpty()) {
-                        ShowMessageFX.Information("Please load transaction before proceeding..", null, psFormName);
+                        ShowMessageFX.Warning(null, psFormName, "Please load transaction before proceeding..");
                         return;
                     }
 
                     if (!poController.getModel().getRecordStatus().equalsIgnoreCase(TransactionStatus.STATE_OPEN)) {
-                        ShowMessageFX.Information("Status was already tagged", null, psFormName);
+                        ShowMessageFX.Warning("Status was already tagged", null, psFormName);
                         return;
                     }
 
@@ -228,8 +227,7 @@ public class AccountsAccreditation_ConfirmationController implements Initializab
                         if (!isJSONSuccess(poController.VoidTransaction(), "Initialize Void Transaction")) {
                             return;
                         }
-                        ShowMessageFX.Information("Transaction voided successfully", null, psFormName);
-
+                        ShowMessageFX.Information(null, psFormName, "Transaction voided successfully");
                         //reset data to avoid transaction errors
                         clearAllInputs();
                         break;
@@ -251,7 +249,7 @@ public class AccountsAccreditation_ConfirmationController implements Initializab
                 case "btnHistory":
 
                     if (poController.getEditMode() != EditMode.READY && poController.getEditMode() != EditMode.UPDATE) {
-                        ShowMessageFX.Warning("No transaction status history to load!", psFormName, null);
+                        ShowMessageFX.Warning(null, psFormName, "No transaction status history to load!");
                         return;
                     }
 
