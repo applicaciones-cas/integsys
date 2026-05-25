@@ -170,7 +170,7 @@ public class AccountsAccreditation_EntryController implements Initializable, Scr
                         return;
                     }
 
-                    if (ShowMessageFX.OkayCancel(null, psFormName, "Are you sure you want to save client??") == true) {
+                    if (ShowMessageFX.OkayCancel(null, psFormName, "Are you sure you want to save client?") == true) {
                         if (!isJSONSuccess(poController.saveRecord(), "Initialize Save Record")) {
                             return;
                         }
