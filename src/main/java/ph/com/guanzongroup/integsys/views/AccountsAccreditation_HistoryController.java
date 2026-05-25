@@ -107,6 +107,7 @@ public class AccountsAccreditation_HistoryController implements Initializable, S
             lblSource.setText(poController.getCompany());
             initControlEvents();
             loadRecordMaster();
+            initButtonDisplay(EditMode.UNKNOWN);
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
             ShowMessageFX.Error(null, psFormName, MiscUtil.getException(ex));

@@ -203,15 +203,15 @@ public class AccountsAccreditation_ConfirmationController implements Initializab
 
                     if (ShowMessageFX.YesNo(null, psFormName, "Are you sure you want to confirm transaction?") == true) {
                         if (!isJSONSuccess(poController.CloseTransaction(), "Initialize Close Transaction")) {
-                            break;
                         } else {
                             ShowMessageFX.Information(null, psFormName, "Transaction confirmed successfully");
                         }
-                        //reset data to avoid transaction errors
+                        clearAllInputs();
+                        loadRecordMaster();
                         break;
+                    } else {
+                        return;
                     }
-                    clearAllInputs();
-                    break;
                 case "btnVoid":
                     if (tfTransactionNo.getText().isEmpty()) {
                         ShowMessageFX.Warning(null, psFormName, "Please load transaction before proceeding..");
@@ -222,18 +222,18 @@ public class AccountsAccreditation_ConfirmationController implements Initializab
                         ShowMessageFX.Warning("Status was already tagged", null, psFormName);
                         break;
                     }
-
                     if (ShowMessageFX.YesNo(null, psFormName, "Are you sure you want to Void transaction?") == true) {
                         if (!isJSONSuccess(poController.VoidTransaction(), "Initialize Void Transaction")) {
-                            break;
                         } else {
                             ShowMessageFX.Information(null, psFormName, "Transaction voided successfully");
                         }
                         //reset data to avoid transaction errors
+                        clearAllInputs();
+                        loadRecordMaster();
                         break;
+                    } else {
+                        return;
                     }
-                    clearAllInputs();
-                    break;
                 case "btnCancel":
                     if (ShowMessageFX.OkayCancel(null, psFormName, "Do you want to disregard changes?") == true) {
                         poController = new ClientControllers(poApp, poLogWrapper).AccountAccreditation();

@@ -480,6 +480,6 @@ public class AccountsAccreditation_EntryController implements Initializable, Scr
 
     private void clearAllInputs() {
         JFXUtil.setValueToNull(previousSearchedTextField, lastFocusedTextField);
-        initButtonDisplay(poController.getEditMode());
+        JFXUtil.clearTextFields(apMaster);
     }
 }
