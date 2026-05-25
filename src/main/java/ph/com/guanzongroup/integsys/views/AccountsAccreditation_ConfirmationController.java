@@ -196,12 +196,8 @@ public class AccountsAccreditation_ConfirmationController implements Initializab
                         return;
                     }
 
-                    if (!poController.getModel().getRecordStatus().equalsIgnoreCase(TransactionStatus.STATE_OPEN)) {
-                        ShowMessageFX.Warning(null, psFormName, "Status is already tagged");
-                        break;
-                    }
-
                     if (ShowMessageFX.YesNo(null, psFormName, "Are you sure you want to confirm transaction?") == true) {
+
                         if (!isJSONSuccess(poController.CloseTransaction(), "Initialize Close Transaction")) {
                         } else {
                             ShowMessageFX.Information(null, psFormName, "Transaction confirmed successfully");
@@ -218,10 +214,6 @@ public class AccountsAccreditation_ConfirmationController implements Initializab
                         return;
                     }
 
-                    if (!poController.getModel().getRecordStatus().equalsIgnoreCase(TransactionStatus.STATE_OPEN)) {
-                        ShowMessageFX.Warning("Status was already tagged", null, psFormName);
-                        break;
-                    }
                     if (ShowMessageFX.YesNo(null, psFormName, "Are you sure you want to Void transaction?") == true) {
                         if (!isJSONSuccess(poController.VoidTransaction(), "Initialize Void Transaction")) {
                         } else {
@@ -472,8 +464,6 @@ public class AccountsAccreditation_ConfirmationController implements Initializab
         }
         switch (poController.getModel().getRecordStatus()) {
             case AccountAccreditationStatus.CONFIRMED:
-                JFXUtil.setButtonsVisibility(false, btnConfirm, btnUpdate);
-                break;
             case AccountAccreditationStatus.VOID:
                 JFXUtil.setButtonsVisibility(false, btnConfirm, btnUpdate, btnVoid);
                 break;
