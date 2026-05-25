@@ -104,7 +104,7 @@ public class AccountsAccreditation_HistoryController implements Initializable, S
             Platform.runLater(() -> {
                 poController.setRecordStatus("01234");
             });
-//            lblSource.setText(poController.getModel());
+            lblSource.setText(poController.getCompany());
             initControlEvents();
             loadRecordMaster();
         } catch (SQLException | GuanzonException ex) {

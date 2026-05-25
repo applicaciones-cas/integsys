@@ -115,7 +115,7 @@ public class AccountsAccreditation_ConfirmationController implements Initializab
             Platform.runLater(() -> {
                 poController.setRecordStatus("0");
             });
-//            lblSource.setText(poController.getModel());
+            lblSource.setText(poController.getCompany());
             initControlEvents();
             loadRecordMaster();
             JFXUtil.initKeyClickObject(apMainAnchor, lastFocusedTextField, previousSearchedTextField);

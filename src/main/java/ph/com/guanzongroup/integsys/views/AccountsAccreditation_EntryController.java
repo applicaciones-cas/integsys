@@ -113,7 +113,7 @@ public class AccountsAccreditation_EntryController implements Initializable, Scr
                 poController.setRecordStatus("0");
             });
 
-//            lblSource.setText(poController.getModel());
+            lblSource.setText(poController.getCompany());
             btnNew.fire();
             initControlEvents();
             loadRecordMaster();
