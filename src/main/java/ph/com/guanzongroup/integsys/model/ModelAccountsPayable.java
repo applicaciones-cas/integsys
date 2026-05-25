@@ -46,7 +46,7 @@ public class ModelAccountsPayable {
         this.index02 = new SimpleStringProperty(index02);
         this.index03 = new SimpleStringProperty(index03);
         this.index04 = new SimpleStringProperty(index04);
-        this.index05 = new SimpleStringProperty(index06);
+        this.index05 = new SimpleStringProperty(index05);
         this.index06 = new SimpleStringProperty(index06);
         this.index07 = new SimpleStringProperty(index07);
 
