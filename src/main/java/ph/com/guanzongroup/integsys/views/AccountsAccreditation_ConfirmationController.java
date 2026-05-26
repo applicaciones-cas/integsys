@@ -301,7 +301,7 @@ public class AccountsAccreditation_ConfirmationController implements Initializab
                         switch (txtFieldID) {
                             case "tfSearchCompany":
                                 if (!JFXUtil.isObjectEqualTo(tfTransactionNo.getText(), null, "") && JFXUtil.isObjectEqualTo(poController.getEditMode(), EditMode.UPDATE, EditMode.ADDNEW)) {
-                                    if (ShowMessageFX.OkayCancel(null, "Search Client! by Name", "Are you sure you want to replace loaded Record?") == false) {
+                                    if (ShowMessageFX.OkayCancel(null, "Search Client! by Name", "Are you sure you want to replace existing Record?") == false) {
                                         return;
                                     }
                                 }
