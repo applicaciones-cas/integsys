@@ -163,7 +163,7 @@
          <center>
             <AnchorPane BorderPane.alignment="TOP_LEFT">
                <children>
-                  <TabPane layoutX="15.0" layoutY="15.0" tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                  <TabPane fx:id="tabPaneMain" layoutX="15.0" layoutY="15.0" tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                     <tabs>
                       <Tab text="Details">
                         <content>
@@ -209,9 +209,9 @@
                                                       <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="28.0" vgrow="SOMETIMES" />
                                                       <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="28.0" vgrow="SOMETIMES" />
                                                       <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="20.0" vgrow="SOMETIMES" />
-                                                      <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="30.0" vgrow="SOMETIMES" />
-                                                      <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="30.0" vgrow="SOMETIMES" />
-                                                      <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                      <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="28.0" vgrow="SOMETIMES" />
+                                                      <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="28.0" vgrow="SOMETIMES" />
+                                                      <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="28.0" vgrow="SOMETIMES" />
                                                       <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="20.0" vgrow="SOMETIMES" />
                                                       <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="28.0" vgrow="SOMETIMES" />
                                                       <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="28.0" vgrow="SOMETIMES" />
@@ -423,6 +423,7 @@
                                                             <Insets />
                                                          </GridPane.margin>
                                                       </CheckBox>
+                                                                        <CheckBox fx:id="cbHoldOrder" mnemonicParsing="false" onAction="#cmdCheckBox_Click" text="Hold Orders" GridPane.columnIndex="7" GridPane.halignment="LEFT" GridPane.rowIndex="27" />
                                                                         <DatePicker fx:id="dpBegBalance" disable="true" prefWidth="150.0" GridPane.columnIndex="7" GridPane.columnSpan="2" GridPane.rowIndex="18">
                                                          <GridPane.margin>
                                                             <Insets />
@@ -443,7 +444,6 @@
                                                             <Insets />
                                                          </GridPane.margin>
                                                       </TextField>
-                                                                        <CheckBox fx:id="cbHoldOrder" mnemonicParsing="false" onAction="#cmdCheckBox_Click" text="Hold Orders" GridPane.columnIndex="7" GridPane.halignment="LEFT" GridPane.rowIndex="27" />
                                                       <Separator prefWidth="200.0" GridPane.columnSpan="9" GridPane.rowIndex="7" GridPane.valignment="CENTER">
                                                          <GridPane.margin>
                                                             <Insets />

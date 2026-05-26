@@ -27,10 +27,13 @@ import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import static javafx.scene.input.KeyCode.ENTER;
 import static javafx.scene.input.KeyCode.F3;
+import static javafx.scene.input.KeyCode.TAB;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
 import org.guanzon.appdriver.agent.ShowMessageFX;
+import org.guanzon.appdriver.base.CommonUtils;
 import org.guanzon.appdriver.base.GRiderCAS;
 import org.guanzon.appdriver.base.LogWrapper;
 import org.guanzon.appdriver.constant.EditMode;
@@ -260,6 +263,11 @@ public class AccountsAccreditation_EntryController implements Initializable, Scr
         try {
             if (null != event.getCode()) {
                 switch (event.getCode()) {
+                    case TAB:
+                    case ENTER:
+                        CommonUtils.SetNextFocus(loTxtField);
+                        event.consume();
+                        break;
                     case F3:
                         switch (txtFieldID) {
                             case "tfSearchCompany":
