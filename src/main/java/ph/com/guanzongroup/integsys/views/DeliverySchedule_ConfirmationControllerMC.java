@@ -169,14 +169,15 @@ public class DeliverySchedule_ConfirmationControllerMC implements Initializable,
                         + "\nCompany :" + psCompanyID
                         + "\nCategory:" + psCategoryID);
             });
+
+            tfSearchCluster.requestFocus();
+            lastFocusedControl = tfSearchCluster;
             initializeTableDetail();
             initControlEvents();
             poAppController.getMaster().setIndustryId(psIndustryID);
             poAppController.getMaster().setCompanyID(psCompanyID);
             lblSource.setText(poAppController.getMaster().Company().getCompanyName() + " - " + poAppController.getMaster().Industry().getDescription());
 
-            tfSearchCluster.requestFocus();
-            lastFocusedControl = tfSearchCluster;
         } catch (SQLException | GuanzonException ex) {
             poLogWrapper.severe(psFormName + " :" + ex.getMessage());
         }
@@ -298,6 +299,8 @@ public class DeliverySchedule_ConfirmationControllerMC implements Initializable,
                             if (pnClusterDetail >= 0) {
                                 if (!isJSONSuccess(poAppController.searchClusterBranch(pnClusterDetail, tfClusterName.getText(), false),
                                         "Search Cluster! ")) {
+                                    reloadTableDetail();
+                                    loadSelectedTransactionDetail(pnClusterDetail);
                                     break;
                                 }
                                 loadSelectedTransactionDetail(pnClusterDetail);
@@ -728,6 +731,8 @@ public class DeliverySchedule_ConfirmationControllerMC implements Initializable,
                                 if (pnClusterDetail >= 0) {
                                     if (!isJSONSuccess(poAppController.searchClusterBranch(pnClusterDetail, tfClusterName.getText(), false),
                                             "Search Cluster")) {
+                                        reloadTableDetail();
+                                        loadSelectedTransactionDetail(pnClusterDetail);
                                         break;
                                     }
                                     loadSelectedTransactionDetail(pnClusterDetail);

@@ -300,6 +300,9 @@ public class DeliverySchedule_EntryControllerMC implements Initializable, Screen
                             if (pnClusterDetail >= 0) {
                                 if (!isJSONSuccess(poAppController.searchClusterBranch(pnClusterDetail, tfClusterName.getText(), false),
                                         "Search Cluster! ")) {
+
+                                    reloadTableDetail();
+                                    loadSelectedTransactionDetail(pnClusterDetail);
                                     break;
                                 }
                                 loadSelectedTransactionDetail(pnClusterDetail);
@@ -455,7 +458,7 @@ public class DeliverySchedule_EntryControllerMC implements Initializable, Screen
             initButtonDisplay(poAppController.getEditMode());
 
         } catch (GuanzonException | SQLException | CloneNotSupportedException ex) {
-             poLogWrapper.severe(psFormName + " :" + ex.getMessage());
+            poLogWrapper.severe(psFormName + " :" + ex.getMessage());
 
         }
     }
@@ -493,7 +496,7 @@ public class DeliverySchedule_EntryControllerMC implements Initializable, Screen
                 initButtonDisplay(poAppController.getEditMode());
                 pnEditMode = poAppController.getEditMode();
             } catch (CloneNotSupportedException | SQLException | GuanzonException ex) {
-                 poLogWrapper.severe(psFormName + " :" + ex.getMessage());
+                poLogWrapper.severe(psFormName + " :" + ex.getMessage());
 
             }
 
@@ -716,6 +719,9 @@ public class DeliverySchedule_EntryControllerMC implements Initializable, Screen
                                 if (pnClusterDetail >= 0) {
                                     if (!isJSONSuccess(poAppController.searchClusterBranch(pnClusterDetail, tfClusterName.getText(), false),
                                             "Search Cluster! ")) {
+
+                                        reloadTableDetail();
+                                        loadSelectedTransactionDetail(pnClusterDetail);
                                         break;
                                     }
                                     loadSelectedTransactionDetail(pnClusterDetail);
@@ -766,7 +772,7 @@ public class DeliverySchedule_EntryControllerMC implements Initializable, Screen
                 }
             }
         } catch (SQLException | GuanzonException | CloneNotSupportedException ex) {
-             poLogWrapper.severe(psFormName + " :" + ex.getMessage());
+            poLogWrapper.severe(psFormName + " :" + ex.getMessage());
         }
     }
 
@@ -884,7 +890,7 @@ public class DeliverySchedule_EntryControllerMC implements Initializable, Screen
             event.consume();
 
         } catch (CloneNotSupportedException | SQLException | GuanzonException ex) {
-             poLogWrapper.severe(psFormName + " :" + ex.getMessage());
+            poLogWrapper.severe(psFormName + " :" + ex.getMessage());
         }
     }
 
@@ -974,7 +980,7 @@ public class DeliverySchedule_EntryControllerMC implements Initializable, Screen
                     return new SimpleStringProperty(desc != null ? desc : "");
 
                 } catch (SQLException | GuanzonException ex) {
-                     poLogWrapper.severe(psFormName + " :" + ex.getMessage());
+                    poLogWrapper.severe(psFormName + " :" + ex.getMessage());
                     return new SimpleStringProperty("");
                 }
             });
@@ -1013,7 +1019,7 @@ public class DeliverySchedule_EntryControllerMC implements Initializable, Screen
                         }
                     }
                 } catch (Exception ex) {
-                      poLogWrapper.severe(psFormName + " :" + ex.getMessage());
+                    poLogWrapper.severe(psFormName + " :" + ex.getMessage());
                 }
                 return new SimpleStringProperty("0");
             });
@@ -1168,7 +1174,7 @@ public class DeliverySchedule_EntryControllerMC implements Initializable, Screen
                         return new SimpleStringProperty(loModel.getValue().Branch().getBranchName());
 
                     } catch (SQLException | GuanzonException ex) {
-                         poLogWrapper.severe(psFormName + " :" + ex.getMessage());
+                        poLogWrapper.severe(psFormName + " :" + ex.getMessage());
                         return new SimpleStringProperty("");
                     }
                 });

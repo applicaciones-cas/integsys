@@ -169,7 +169,7 @@ public class DeliverySchedule_ConfirmationController implements Initializable, S
                         + "\nCompany :" + psCompanyID
                         + "\nCategory:" + psCategoryID);
             });
-            
+
             tfSearchCluster.requestFocus();
             lastFocusedControl = tfSearchCluster;
             initializeTableDetail();
@@ -299,6 +299,8 @@ public class DeliverySchedule_ConfirmationController implements Initializable, S
                             if (pnClusterDetail >= 0) {
                                 if (!isJSONSuccess(poAppController.searchClusterBranch(pnClusterDetail, tfClusterName.getText(), false),
                                         "Search Cluster! ")) {
+                                    reloadTableDetail();
+                                    loadSelectedTransactionDetail(pnClusterDetail);
                                     break;
                                 }
                                 loadSelectedTransactionDetail(pnClusterDetail);
@@ -729,6 +731,9 @@ public class DeliverySchedule_ConfirmationController implements Initializable, S
                                 if (pnClusterDetail >= 0) {
                                     if (!isJSONSuccess(poAppController.searchClusterBranch(pnClusterDetail, tfClusterName.getText(), false),
                                             "Search Cluster")) {
+
+                                        reloadTableDetail();
+                                        loadSelectedTransactionDetail(pnClusterDetail);
                                         break;
                                     }
                                     loadSelectedTransactionDetail(pnClusterDetail);
