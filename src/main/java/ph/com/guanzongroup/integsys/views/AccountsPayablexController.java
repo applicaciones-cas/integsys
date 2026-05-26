@@ -856,6 +856,7 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
                     JFXUtil.resetImageBounds(imageView, stackPane1);
                     Platform.runLater(() -> {
                         try {
+                            JFXUtil.clearTextFields(apAttachments);
                             attachment_data.clear();
                             int lnCtr;
                             int lnCount = 0;
@@ -887,6 +888,7 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
                                 pnAttachment = lnRow;
                                 loadRecordAttachment(true);
                             }
+
                             if (attachment_data.size() <= 0) {
                                 loadRecordAttachment(false);
                             }
