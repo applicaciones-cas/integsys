@@ -115,7 +115,7 @@ public class InventoryRequest_ApprovalControllerLP_Food implements Initializable
                         }
                     }
                     //refresh ui 
-                    clearAllInputs();
+//                    clearAllInputs();
                     reloadTableDetail();
 
                     if (poAppController.getBranchCluster().getClusterDescription() != null && !poAppController.getBranchCluster().getClusterDescription().isEmpty()) {
@@ -246,7 +246,7 @@ public class InventoryRequest_ApprovalControllerLP_Food implements Initializable
                     return;
 
                 }
-                clearAllInputs();
+//                clearAllInputs();
                 getLoadedTransaction();
             } catch (CloneNotSupportedException | SQLException | GuanzonException ex) {
                 Logger.getLogger(DeliverySchedule_EntryController.class.getName()).log(Level.SEVERE, null, ex);
@@ -370,7 +370,14 @@ public class InventoryRequest_ApprovalControllerLP_Food implements Initializable
                         + "\nCompany :" + psCompanyID
                         + "\nCategory:" + psCategoryID);
             });
+            poAppController.getMaster().setIndustryId(psIndustryID);
+            poAppController.getMaster().setCompanyID(psCompanyID);
+            poAppController.getMaster().setCategoryId(psCategoryID);
+            lblSource.setText(poAppController.getMaster().Company().getCompanyName() == null ? "" : (poAppController.getMaster().Company().getCompanyName() + " - ")
+                    + poAppController.getMaster().Industry().getDescription() == null ? "" : poAppController.getMaster().Industry().getDescription());
 
+            tfClusterName.requestFocus();
+            lastFocusedControl = tfClusterName;
             initControlEvents();
             initializeTableDetail();
         } catch (Exception e) {
@@ -774,20 +781,20 @@ public class InventoryRequest_ApprovalControllerLP_Food implements Initializable
     }
 
     private void loadSelectedDetail(int fnRow) throws SQLException, GuanzonException, CloneNotSupportedException {
-        if (fnRow >= 0) {
-            tfBranchName.setText(tblColBranch.getCellData(fnRow));
-            tfBrand.setText(tblColBrand.getCellData(fnRow));
-            tfBarcode.setText(tblColBarcode.getCellData(fnRow));
-            tfDescription.setText(tblColDescription.getCellData(fnRow));
-            tfInventoryType.setText(poAppController.getDetail(fnRow).Inventory().InventoryType().getDescription() == null ? "NONE" : poAppController.getDetail(fnRow).Inventory().InventoryType().getDescription());
-            tfClassification.setText(tblColClassification.getCellData(fnRow));
-            tfROQ.setText(String.valueOf(tblColROQ.getCellData(fnRow)));
-            tfMeasure.setText(tblColMeasure.getCellData(fnRow));
-            tfQOH.setText(tblColQOH.getCellData(fnRow));
-            tfRequestQty.setText(tblColRequestQty.getCellData(fnRow));
-            tfCancelQty.setText(tblColCancelQty.getCellData(fnRow));
-            tfApprovedQty.setText(tblColApprovedQty.getCellData(fnRow));
-        }
+
+        tfBranchName.setText(tblColBranch.getCellData(fnRow));
+        tfBrand.setText(tblColBrand.getCellData(fnRow));
+        tfBarcode.setText(tblColBarcode.getCellData(fnRow));
+        tfDescription.setText(tblColDescription.getCellData(fnRow));
+        tfInventoryType.setText(poAppController.getDetail(fnRow).Inventory().InventoryType().getDescription() == null ? "NONE" : poAppController.getDetail(fnRow).Inventory().InventoryType().getDescription());
+        tfClassification.setText(tblColClassification.getCellData(fnRow));
+        tfROQ.setText(String.valueOf(tblColROQ.getCellData(fnRow)));
+        tfMeasure.setText(tblColMeasure.getCellData(fnRow));
+        tfQOH.setText(tblColQOH.getCellData(fnRow));
+        tfRequestQty.setText(tblColRequestQty.getCellData(fnRow));
+        tfCancelQty.setText(tblColCancelQty.getCellData(fnRow));
+        tfApprovedQty.setText(tblColApprovedQty.getCellData(fnRow));
+
     }
 
     private void getLoadedTransaction() throws CloneNotSupportedException, SQLException, GuanzonException {
@@ -806,7 +813,7 @@ public class InventoryRequest_ApprovalControllerLP_Food implements Initializable
         // Restore or select last row
         int indexToSelect = (pnCTransactionDetail >= 0 && pnCTransactionDetail < laTransactionDetail.size())
                 ? pnCTransactionDetail
-                : laTransactionDetail.size();
+                : laTransactionDetail.size() - 1;
 
         tblRequestDetail.getSelectionModel().select(indexToSelect);
 

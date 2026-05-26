@@ -115,7 +115,7 @@ public class InventoryRequest_ApprovalControllerMP implements Initializable, Scr
                         }
                     }
                     //refresh ui 
-                    clearAllInputs();
+//                    clearAllInputs();
                     reloadTableDetail();
 
                     if (poAppController.getBranchCluster().getClusterDescription() != null && !poAppController.getBranchCluster().getClusterDescription().isEmpty()) {
@@ -247,7 +247,7 @@ public class InventoryRequest_ApprovalControllerMP implements Initializable, Scr
 
                 }
 
-                clearAllInputs();
+//                clearAllInputs();
                 getLoadedTransaction();
             } catch (CloneNotSupportedException | SQLException | GuanzonException ex) {
                 Logger.getLogger(DeliverySchedule_EntryController.class.getName()).log(Level.SEVERE, null, ex);
@@ -371,7 +371,14 @@ public class InventoryRequest_ApprovalControllerMP implements Initializable, Scr
                         + "\nCompany :" + psCompanyID
                         + "\nCategory:" + psCategoryID);
             });
+            poAppController.getMaster().setIndustryId(psIndustryID);
+            poAppController.getMaster().setCompanyID(psCompanyID);
+            poAppController.getMaster().setCategoryId(psCategoryID);
+            lblSource.setText(poAppController.getMaster().Company().getCompanyName() == null ? "" : (poAppController.getMaster().Company().getCompanyName() + " - ")
+                    + poAppController.getMaster().Industry().getDescription() == null ? "" : poAppController.getMaster().Industry().getDescription());
 
+            tfClusterName.requestFocus();
+            lastFocusedControl = tfClusterName;
             initControlEvents();
             initializeTableDetail();
         } catch (Exception e) {
@@ -792,22 +799,22 @@ public class InventoryRequest_ApprovalControllerMP implements Initializable, Scr
     }
 
     private void loadSelectedDetail(int fnRow) throws SQLException, GuanzonException, CloneNotSupportedException {
-        if (fnRow >= 0) {
-            tfBranchName.setText(tblColBranch.getCellData(fnRow));
-            tfBrand.setText(tblColBrand.getCellData(fnRow));
-            tfModel.setText(tblColModel.getCellData(fnRow));
-            tfBarcode.setText(tblColBarcode.getCellData(fnRow));
-            tfDescription.setText(tblColDescription.getCellData(fnRow));
-            tfVariant.setText(tblColVariant.getCellData(fnRow));
-            tfColor.setText(tblColColor.getCellData(fnRow));
-            tfInventoryType.setText(tblColInventoryType.getCellData(fnRow));
-            tfClassification.setText(tblColClassification.getCellData(fnRow));
-            tfROQ.setText(String.valueOf(tblColROQ.getCellData(fnRow)));
-            tfQOH.setText(tblColQOH.getCellData(fnRow));
-            tfRequestQty.setText(tblColRequestQty.getCellData(fnRow));
-            tfCancelQty.setText(tblColCancelQty.getCellData(fnRow));
-            tfApprovedQty.setText(tblColApprovedQty.getCellData(fnRow));
-        }
+
+        tfBranchName.setText(tblColBranch.getCellData(fnRow));
+        tfBrand.setText(tblColBrand.getCellData(fnRow));
+        tfModel.setText(tblColModel.getCellData(fnRow));
+        tfBarcode.setText(tblColBarcode.getCellData(fnRow));
+        tfDescription.setText(tblColDescription.getCellData(fnRow));
+        tfVariant.setText(tblColVariant.getCellData(fnRow));
+        tfColor.setText(tblColColor.getCellData(fnRow));
+        tfInventoryType.setText(tblColInventoryType.getCellData(fnRow));
+        tfClassification.setText(tblColClassification.getCellData(fnRow));
+        tfROQ.setText(String.valueOf(tblColROQ.getCellData(fnRow)));
+        tfQOH.setText(tblColQOH.getCellData(fnRow));
+        tfRequestQty.setText(tblColRequestQty.getCellData(fnRow));
+        tfCancelQty.setText(tblColCancelQty.getCellData(fnRow));
+        tfApprovedQty.setText(tblColApprovedQty.getCellData(fnRow));
+
     }
 
     private void getLoadedTransaction() throws CloneNotSupportedException, SQLException, GuanzonException {
@@ -826,7 +833,7 @@ public class InventoryRequest_ApprovalControllerMP implements Initializable, Scr
         // Restore or select last row
         int indexToSelect = (pnCTransactionDetail >= 0 && pnCTransactionDetail < laTransactionDetail.size())
                 ? pnCTransactionDetail
-                : laTransactionDetail.size();
+                : laTransactionDetail.size() - 1;
 
         tblRequestDetail.getSelectionModel().select(indexToSelect);
 
