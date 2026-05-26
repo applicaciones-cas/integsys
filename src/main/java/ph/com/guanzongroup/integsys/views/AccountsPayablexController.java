@@ -23,7 +23,6 @@ import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
-import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -33,11 +32,9 @@ import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
-import javafx.scene.control.Control;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.Pagination;
-import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TableColumn;
@@ -84,7 +81,6 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
 
     private GRiderCAS poApp;
     private LogWrapper poLogWrapper;
-    private Control lastFocusedControl;
     private AP_Client_Master poController;
     public int pnEditMode;
     private String psFormName = "Account Payable";
@@ -246,6 +242,30 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
 
         return calendar.getTime();
     }
+    
+    final ChangeListener<? super Boolean> dPicker_Focus = (o, ov, nv) -> {
+        DatePicker loDatePicker = (DatePicker) ((ReadOnlyBooleanPropertyBase) o).getBean();
+        String lsDatePickerID = loDatePicker.getId();
+        LocalDate loValue = loDatePicker.getValue();
+
+        if (loValue == null) {
+            return;
+        }
+        Date ldDateValue = Date.from(loValue.atStartOfDay(ZoneId.systemDefault()).toInstant());
+        if (!nv) {
+            /*Lost Focus*/
+            switch (lsDatePickerID) {
+                case "dpClientSince":
+                    poJSON = poController.getModel().setdateClientSince(ldDateValue);
+                    if (!JFXUtil.isJSONSuccess(poJSON)) {
+                        ShowMessageFX.Information(null, psFormName, JFXUtil.getJSONMessage(poJSON));
+                    }
+                    loadRecordMaster();
+                    return;
+
+            }
+        }
+    };
 
     private void datepicker_Action(ActionEvent event) {
         try {
@@ -611,7 +631,7 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
                         switch (txtFieldID) {
                             case "tfSearchClient":
                                 if (!JFXUtil.isObjectEqualTo(tfClientID.getText(), null, "") && JFXUtil.isObjectEqualTo(poController.getEditMode(), EditMode.UPDATE, EditMode.ADDNEW)) {
-                                    if (ShowMessageFX.OkayCancel(null, "Search Client! by ID", "Are you sure you want to replace existing Record?") == false) {
+                                    if (ShowMessageFX.OkayCancel(null, "Search Client! by ID", "Are you sure you want to replace existing record?") == false) {
                                         return;
                                     }
                                 }
@@ -681,30 +701,6 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
             ShowMessageFX.Error(null, psFormName, MiscUtil.getException(ex));
         }
     }
-
-    final ChangeListener<? super Boolean> dPicker_Focus = (o, ov, nv) -> {
-        DatePicker loDatePicker = (DatePicker) ((ReadOnlyBooleanPropertyBase) o).getBean();
-        String lsDatePickerID = loDatePicker.getId();
-        LocalDate loValue = loDatePicker.getValue();
-
-        if (loValue == null) {
-            return;
-        }
-        Date ldDateValue = Date.from(loValue.atStartOfDay(ZoneId.systemDefault()).toInstant());
-        if (!nv) {
-            /*Lost Focus*/
-            switch (lsDatePickerID) {
-                case "dpClientSince":
-                    poJSON = poController.getModel().setdateClientSince(ldDateValue);
-                    if (!JFXUtil.isJSONSuccess(poJSON)) {
-                        ShowMessageFX.Information(null, psFormName, JFXUtil.getJSONMessage(poJSON));
-                    }
-                    loadRecordMaster();
-                    return;
-
-            }
-        }
-    };
 
     private void initComboboxes() {
         JFXUtil.setComboBoxActionListener(comboBoxActionListener, cmbRegistration, cmbPayment);
@@ -1051,7 +1047,6 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
     }
 
     private void initAttachmentsGrid() {
-        /*FOCUS ON FIRST ROW*/
         JFXUtil.setColumnCenter(tblRowNoAttachment);
         JFXUtil.setColumnLeft(tblFileNameAttachment);
         JFXUtil.setColumnsIndexAndDisableReordering(tblAttachments);
@@ -1107,7 +1102,6 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
     JFXUtil.TableKeyEvent tableKeyEvents = new JFXUtil.TableKeyEvent() {
         @Override
         protected void onRowMove(TableView<?> currentTable, String currentTableID, boolean isMovedDown) {
-            int newIndex = 0;
             switch (currentTableID) {
                 case "tblAttachments":
                     if (!attachment_data.isEmpty()) {

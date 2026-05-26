@@ -272,7 +272,7 @@ public class AccountsAccreditation_EntryController implements Initializable, Scr
                         switch (txtFieldID) {
                             case "tfSearchCompany":
                                 if (!JFXUtil.isObjectEqualTo(tfTransactionNo.getText(), null, "") && JFXUtil.isObjectEqualTo(poController.getEditMode(), EditMode.UPDATE, EditMode.ADDNEW)) {
-                                    if (ShowMessageFX.OkayCancel(null, "Search Client! by Name", "Are you sure you want to replace existing Record?") == false) {
+                                    if (ShowMessageFX.OkayCancel(null, "Search Client! by Name", "Are you sure you want to replace existing record?") == false) {
                                         return;
                                     }
                                 }
@@ -358,7 +358,7 @@ public class AccountsAccreditation_EntryController implements Initializable, Scr
             JFXUtil.setDisabled(lbShow, tfCompany);
 
             if (lbShow2) {
-                JFXUtil.applyHoverTooltip("Edit company info", btnAddClompany);
+                JFXUtil.applyHoverTooltip("Update company info", btnAddClompany);
             } else {
                 JFXUtil.applyHoverTooltip("Add new company", btnAddClompany);
             }
