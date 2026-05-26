@@ -784,7 +784,7 @@ public class InvRequest_Roq_ConfirmationControllerMC implements Initializable, S
             }
             initButtons(pnEditMode);
             initFields(pnEditMode);
-        } catch (JRException | CloneNotSupportedException | ExceptionInInitializerError | SQLException | GuanzonException | NullPointerException e) {
+        } catch (ParseException | JRException | CloneNotSupportedException | ExceptionInInitializerError | SQLException | GuanzonException | NullPointerException e) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(e), e);
             ShowMessageFX.Error(MiscUtil.getException(e), psFormName, null);
         }

@@ -752,7 +752,7 @@ public class InvRequest_Roq_ConfirmationControllerLP_Food implements Initializab
             }
             initButtons(pnEditMode);
             initFields(pnEditMode);
-        } catch (JRException | CloneNotSupportedException | ExceptionInInitializerError | SQLException | GuanzonException | NullPointerException e) {
+        } catch (ParseException | JRException | CloneNotSupportedException | ExceptionInInitializerError | SQLException | GuanzonException | NullPointerException e) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(e), e);
             ShowMessageFX.Error(MiscUtil.getException(e), psFormName, null);
         }
