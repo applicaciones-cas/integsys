@@ -216,7 +216,7 @@ public class DeliverySchedule_EntryControllerMC implements Initializable, Screen
 //                            }
                             if (!tfTransactionNo.getText().isEmpty()) {
                                 if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
-                                    if (ShowMessageFX.OkayCancel(null, "Search Transaction! by Trasaction", "Do you want to disregard changes?") == false) {
+                                    if (ShowMessageFX.OkayCancel(null, "Search Transaction! by Transaction", "Do you want to disregard changes?") == false) {
                                         break;
                                     }
                                 }
@@ -473,7 +473,7 @@ public class DeliverySchedule_EntryControllerMC implements Initializable, Screen
 
                 if (!tfTransactionNo.getText().isEmpty()) {
                     if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
-                        if (ShowMessageFX.OkayCancel(null, "Search Transaction! by Trasaction", "Do you want to disregard changes?") == false) {
+                        if (ShowMessageFX.OkayCancel(null, "Search Transaction! by Transaction", "Do you want to disregard changes?") == false) {
                             return;
                         }
                     }
@@ -741,7 +741,7 @@ public class DeliverySchedule_EntryControllerMC implements Initializable, Screen
 
                                 if (!tfTransactionNo.getText().isEmpty()) {
                                     if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
-                                        if (ShowMessageFX.OkayCancel(null, "Search Transaction! by Trasaction", "Do you want to disregard changes?") == false) {
+                                        if (ShowMessageFX.OkayCancel(null, "Search Transaction! by Transaction", "Do you want to disregard changes?") == false) {
                                             break;
                                         }
                                     }

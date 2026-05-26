@@ -166,6 +166,10 @@ public class InventoryStockIssuanceNeoController_HistoryAppliance implements Ini
 
             initializeTableDetail();
             initControlEvents();
+            poAppController.getMaster().setIndustryId(psIndustryID);
+            poAppController.getMaster().setCompanyID(psCompanyID);
+            lblSource.setText(poAppController.getMaster().Company().getCompanyName() + " - " + poAppController.getMaster().Industry().getDescription());
+
         } catch (SQLException | GuanzonException e) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(e), e);
             ShowMessageFX.Error(MiscUtil.getException(e), psFormName, null);
@@ -241,7 +245,7 @@ public class InventoryStockIssuanceNeoController_HistoryAppliance implements Ini
 
                         case "tfSearchSourceno":
                             if (!tfTransNo.getText().isEmpty()) {
-                                if (ShowMessageFX.OkayCancel(null, "Search Transaction! by Trasaction", "Are you sure you want replace loaded Transaction?") == false) {
+                                if (ShowMessageFX.OkayCancel(null, "Search Transaction! by Transaction", "Are you sure you want to replace loaded Transaction?") == false) {
                                     return;
                                 }
                             }
@@ -256,7 +260,7 @@ public class InventoryStockIssuanceNeoController_HistoryAppliance implements Ini
                             break;
                         case "tfSearchTransNo":
                             if (!tfTransNo.getText().isEmpty()) {
-                                if (ShowMessageFX.OkayCancel(null, "Search Transaction! by Trasaction", "Are you sure you want replace loaded Transaction?") == false) {
+                                if (ShowMessageFX.OkayCancel(null, "Search Transaction! by Transaction", "Are you sure you want to replace loaded Transaction?") == false) {
                                     return;
                                 }
                             }
@@ -291,10 +295,21 @@ public class InventoryStockIssuanceNeoController_HistoryAppliance implements Ini
                     break;
 
                 case "btnHistory":
-                    ShowMessageFX.Information(null, psFormName,
-                            "This feature is under development and will be available soon.\nThank you for your patience!");
-                    break;
+                    if (pnEditMode != EditMode.READY && pnEditMode != EditMode.UPDATE) {
+                        ShowMessageFX.Warning("No transaction status history to load!", psFormName, null);
+                        return;
+                    }
 
+                    try {
+                        poAppController.ShowStatusHistory();
+                    } catch (NullPointerException npe) {
+                        Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(npe), npe);
+                        ShowMessageFX.Error("No transaction status history to load!", psFormName, null);
+                    } catch (Exception ex) {
+                        Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+                        ShowMessageFX.Error(MiscUtil.getException(ex), psFormName, null);
+                    }
+                    break;
                 case "btnRetrieve":
                     if (lastFocusedControl == null) {
                         ShowMessageFX.Information(null, psFormName,
@@ -373,7 +388,7 @@ public class InventoryStockIssuanceNeoController_HistoryAppliance implements Ini
                         switch (txtFieldID) {
                             case "tfSearchSourceno":
                                 if (!tfTransNo.getText().isEmpty()) {
-                                    if (ShowMessageFX.OkayCancel(null, "Search Transaction! by Trasaction", "Are you sure you want replace loaded Transaction?") == false) {
+                                    if (ShowMessageFX.OkayCancel(null, "Search Transaction! by Transaction", "Are you sure you want to replace loaded Transaction?") == false) {
                                         return;
                                     }
                                 }
@@ -388,7 +403,7 @@ public class InventoryStockIssuanceNeoController_HistoryAppliance implements Ini
                                 break;
                             case "tfSearchTransNo":
                                 if (!tfTransNo.getText().isEmpty()) {
-                                    if (ShowMessageFX.OkayCancel(null, "Search Transaction! by Trasaction", "Are you sure you want replace loaded Transaction?") == false) {
+                                    if (ShowMessageFX.OkayCancel(null, "Search Transaction! by Transaction", "Are you sure you want to replace loaded Transaction?") == false) {
                                         return;
                                     }
                                 }
@@ -505,6 +520,9 @@ public class InventoryStockIssuanceNeoController_HistoryAppliance implements Ini
             tfTotal.setText(String.valueOf(poAppController.getMaster().getTransactionTotal()));
             cbDelType.getSelectionModel().select(Integer.parseInt(poAppController.getMaster().getDeliveryType()));
 
+            if (tfTransNo.getText().trim().isEmpty()) {
+                lblStatus.setText("UNKNOWN");
+            }
         } catch (SQLException | GuanzonException e) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(e), e);
             ShowMessageFX.Error(MiscUtil.getException(e), psFormName, null);
@@ -604,11 +622,14 @@ public class InventoryStockIssuanceNeoController_HistoryAppliance implements Ini
 
     private void initButtonDisplay(int fnEditMode) {
         boolean lbShow = (fnEditMode == EditMode.ADDNEW || fnEditMode == EditMode.UPDATE);
+        String lsTransNo = tfTransNo.getText();
+        boolean lbHasTransaction = lsTransNo != null && !lsTransNo.isEmpty();
+        boolean lbIsApproved = lbHasTransaction
+                && "1".equals(poAppController.getMaster().getTransactionStatus());
 
         // Always show these buttons
-        initButtonControls(true, "btnSearch", "btnRetrieve", "btnPrint", "btnHistory", "btnClose");
-
-        // Show-only based on mode
+        initButtonControls(true, "btnSearch", "btnRetrieve", "btnClose");
+        initButtonControls(!lbShow && lbHasTransaction, "btnPrint", "btnHistory");
         apMaster.setDisable(!lbShow);
         apDetail.setDisable(!lbShow);
     }
