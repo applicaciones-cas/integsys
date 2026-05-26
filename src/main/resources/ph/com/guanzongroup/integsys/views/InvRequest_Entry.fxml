@@ -283,7 +283,7 @@
                                                             <TextField fx:id="tfModel" prefWidth="107.0" GridPane.columnIndex="2" GridPane.rowIndex="4" />
                                                             <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Variant" GridPane.rowIndex="5" />
                                                             <TextField fx:id="tfVariant" GridPane.columnIndex="2" GridPane.rowIndex="5" />
-                                                            <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Color" GridPane.columnIndex="5" GridPane.rowIndex="4" />
+                                                            <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Color" GridPane.columnIndex="4" GridPane.rowIndex="4" />
                                                             <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Reservation Qty" GridPane.columnIndex="13" GridPane.rowIndex="4" />
                                                             <TextField fx:id="tfColor" GridPane.columnIndex="6" GridPane.rowIndex="4" />
                                                             <TextField fx:id="tfReservationQTY" GridPane.columnIndex="15" GridPane.rowIndex="4" />
@@ -295,7 +295,7 @@
                                                             <TextField fx:id="tfOrderQuantity" promptText="0" GridPane.columnIndex="15" GridPane.rowIndex="5" />
                                                             <Text strokeType="OUTSIDE" strokeWidth="0.0" text="QOH" GridPane.columnIndex="8" GridPane.rowIndex="5" />
                                                             <TextField fx:id="tfQOH" GridPane.columnIndex="10" GridPane.rowIndex="5" />
-                                                            <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Inv Type" GridPane.columnIndex="5" GridPane.rowIndex="3" />
+                                                            <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Inv Type" GridPane.columnIndex="4" GridPane.rowIndex="3" />
                                                             <TextField fx:id="tfInvType" GridPane.columnIndex="6" GridPane.rowIndex="3" />
                                                             <Text strokeType="OUTSIDE" strokeWidth="0.0" text="ROQ" GridPane.columnIndex="8" GridPane.rowIndex="3" />
                                                             <TextField fx:id="tfROQ" GridPane.columnIndex="10" GridPane.rowIndex="3" />
