@@ -381,7 +381,7 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
                         loadRecordMaster();
                         break;
                     }
-                    break;
+                    return;
                 case "btnRetrieve":
                     retrieveLedger();
                     break;
@@ -503,6 +503,16 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
     ChangeListener<Boolean> txtField_Focus = JFXUtil.FocusListener(TextField.class,
             (lsID, lsValue) -> {
                 switch (lsID) {
+                    case "tfTerm":
+                        if (lsValue.isEmpty()) {
+                            poController.getModel().setTermId("");
+                        }
+                        break;
+                    case "tfBank":
+                        if (lsValue.isEmpty()) {
+                            poController.BankAccount().setBankID("");
+                        }
+                        break;
                     case "tfCreditLimit":
                         lsValue = JFXUtil.removeComma(lsValue);
                         if (JFXUtil.isObjectEqualTo(poController.getModel().getClientId(), null, "")) {
@@ -533,7 +543,6 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
                         if (!JFXUtil.isJSONSuccess(poJSON)) {
                             ShowMessageFX.Information(null, psFormName, JFXUtil.getJSONMessage(poJSON));
                         }
-                        loadRecordMaster();
                         break;
                     case "tfDiscount":
                         lsValue = JFXUtil.removeComma(lsValue);
@@ -564,7 +573,6 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
                         if (!JFXUtil.isJSONSuccess(poJSON)) {
                             ShowMessageFX.Information(null, psFormName, JFXUtil.getJSONMessage(poJSON));
                         }
-                        loadRecordMaster();
                         break;
                     case "tfAccountNumber":
                         poJSON = poController.BankAccount().setAccountNumber(lsValue);
@@ -578,8 +586,8 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
                             ShowMessageFX.Information(null, psFormName, JFXUtil.getJSONMessage(poJSON));
                         }
                         break;
-
                 }
+                loadRecordMaster();
             });
 
     private void txtField_KeyPressed(KeyEvent event) {
@@ -648,18 +656,20 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
                                 if (!JFXUtil.isJSONSuccess(poJSON)) {
                                     ShowMessageFX.Information(null, psFormName, JFXUtil.getJSONMessage(poJSON));
                                     return;
+                                } else {
+                                    JFXUtil.textFieldMoveNext(tfBank);
                                 }
                                 loadRecordMaster();
-                                JFXUtil.textFieldMoveNext(tfBank);
                                 break;
                             case "tfBank":
                                 poJSON = poController.searchBank(tfBank.getText() == null ? "" : tfBank.getText(), false);
                                 if (!JFXUtil.isJSONSuccess(poJSON)) {
                                     ShowMessageFX.Information(null, psFormName, JFXUtil.getJSONMessage(poJSON));
                                     return;
+                                } else {
+                                    JFXUtil.textFieldMoveNext(tfAccountNumber);
                                 }
                                 loadRecordMaster();
-                                JFXUtil.textFieldMoveNext(tfAccountNumber);
                                 break;
 
                         }
