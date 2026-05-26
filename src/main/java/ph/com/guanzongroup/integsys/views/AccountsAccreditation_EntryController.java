@@ -263,8 +263,8 @@ public class AccountsAccreditation_EntryController implements Initializable, Scr
                     case F3:
                         switch (txtFieldID) {
                             case "tfSearchCompany":
-                                if (!(tfTransactionNo.getText() == null ? "" : tfTransactionNo.getText()).isEmpty()) {
-                                    if (ShowMessageFX.OkayCancel(null, "Search Client! by Name", "Are you sure you want replace loaded Record?") == false) {
+                                if (!JFXUtil.isObjectEqualTo(tfTransactionNo.getText(), null, "") && JFXUtil.isObjectEqualTo(poController.getEditMode(), EditMode.UPDATE, EditMode.ADDNEW)) {
+                                    if (ShowMessageFX.OkayCancel(null, "Search Client! by Name", "Are you sure you want to replace loaded Record?") == false) {
                                         return;
                                     }
                                 }

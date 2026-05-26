@@ -22,7 +22,6 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
-import javafx.scene.control.Control;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
@@ -36,7 +35,6 @@ import org.guanzon.appdriver.base.LogWrapper;
 import org.guanzon.appdriver.constant.EditMode;
 import org.guanzon.appdriver.base.GuanzonException;
 import org.guanzon.appdriver.base.MiscUtil;
-import org.guanzon.appdriver.constant.TransactionStatus;
 import org.guanzon.cas.client.account.Account_Accreditation;
 import org.guanzon.cas.client.constants.AccountAccreditationStatus;
 import org.guanzon.cas.client.services.ClientControllers;
@@ -294,8 +292,8 @@ public class AccountsAccreditation_ConfirmationController implements Initializab
                     case F3:
                         switch (txtFieldID) {
                             case "tfSearchCompany":
-                                if (!(tfTransactionNo.getText() == null ? "" : tfTransactionNo.getText()).isEmpty()) {
-                                    if (ShowMessageFX.OkayCancel(null, "Search Client! by Name", "Are you sure you want replace loaded Record?") == false) {
+                                if (!JFXUtil.isObjectEqualTo(tfTransactionNo.getText(), null, "") && JFXUtil.isObjectEqualTo(poController.getEditMode(), EditMode.UPDATE, EditMode.ADDNEW)) {
+                                    if (ShowMessageFX.OkayCancel(null, "Search Client! by Name", "Are you sure you want to replace loaded Record?") == false) {
                                         return;
                                     }
                                 }

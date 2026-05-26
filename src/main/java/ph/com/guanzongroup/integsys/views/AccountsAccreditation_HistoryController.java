@@ -172,11 +172,6 @@ public class AccountsAccreditation_HistoryController implements Initializable, S
                     case F3:
                         switch (txtFieldID) {
                             case "tfSearchCompany":
-                                if (!tfTransactionNo.getText().isEmpty()) {
-                                    if (ShowMessageFX.OkayCancel(null, "Search Client! by Name", "Are you sure you want replace loaded Record?") == false) {
-                                        return;
-                                    }
-                                }
                                 if (!isJSONSuccess(poController.searchRecord(tfSearchCompany.getText(), false),
                                         "")) {
                                     return;

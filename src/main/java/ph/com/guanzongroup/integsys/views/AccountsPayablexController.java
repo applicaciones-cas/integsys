@@ -28,7 +28,6 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.geometry.Bounds;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
@@ -47,8 +46,6 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import static javafx.scene.input.KeyCode.F3;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.input.MouseEvent;
-import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.StackPane;
 import javafx.stage.FileChooser;
@@ -71,7 +68,6 @@ import org.guanzon.cas.client.services.ClientControllers;
 import org.json.simple.JSONObject;
 import ph.com.guanzongroup.cas.sales.utility.CustomCommonUtil;
 import ph.com.guanzongroup.integsys.model.ModelAccountsPayable;
-import ph.com.guanzongroup.integsys.model.ModelAttachment;
 import ph.com.guanzongroup.integsys.model.ModelDeliveryAcceptance_Attachment;
 import ph.com.guanzongroup.integsys.utility.JFXUtil;
 
@@ -106,10 +102,10 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
     private double mouseAnchorY;
     private double scaleFactor = 1.0;
     private FileChooser fileChooser;
-    
+
     double ldstackPaneWidth = 0;
     double ldstackPaneHeight = 0;
-    
+
     private JFXUtil.ReloadableTableTask loadTableAttachment, loadTableMain;
     private FilteredList<ModelAccountsPayable> filteredData;
     AtomicReference<Object> lastFocusedTextField = new AtomicReference<>();
@@ -135,9 +131,9 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
     @FXML
     private TableColumn tblColNo, tblLedgerNo, tblColDate, tblColSourceNo, tblColSourceCode, tblColAmountIn, tblColAmountOut, tblRowNoAttachment, tblFileNameAttachment;
     @FXML
-    private Tab tabAttachments; 
-   @FXML
-    private StackPane stackpane;
+    private Tab tabAttachments;
+    @FXML
+    private StackPane stackPane1;
     @FXML
     private ImageView imageView;
     @FXML
@@ -186,19 +182,19 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
                     ShowMessageFX.Error(null, psFormName, MiscUtil.getException(ex));
                 }
             });
-            
+
             initDatePickers();
             initComboboxes();
             initControlEvents();
             initMainGrid();
             initTableOnClick();
             initTable();
-            
+
             //Attachment
             initAttachmentsGrid();
             initAttachmentPreviewPane();
             initStackPaneListener();
-            
+
             JFXUtil.initKeyClickObject(apMainAnchor, lastFocusedTextField, previousSearchedTextField);
 
             pnEditMode = EditMode.UNKNOWN;
@@ -208,7 +204,7 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
             ShowMessageFX.Error(null, psFormName, MiscUtil.getException(ex));
         }
     }
-    
+
     private void loadRecordSearch() {
         try {
             //define if both are empty
@@ -224,19 +220,19 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
             }
 
             JFXUtil.updateCaretPositions(apDetail);
-            
+
 //            tfSearchClient.setText(poController.getModel().Client().getCompanyName());
         } catch (SQLException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
             ShowMessageFX.Error(null, psFormName, MiscUtil.getException(ex));
-        } 
+        }
     }
 
     private void initDatePickers() {
         JFXUtil.setDatePickerFormat("MM/dd/yyyy", dpFrom, dpTo);
         JFXUtil.setActionListener(this::datepicker_Action, dpFrom, dpTo);
     }
-    
+
     public static Date getFirstDayOfMonth(Date date) {
         if (date == null) {
             return null;
@@ -256,7 +252,7 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
 
         return calendar.getTime();
     }
-    
+
     private void datepicker_Action(ActionEvent event) {
         try {
             poJSON = new JSONObject();
@@ -304,11 +300,11 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
             ShowMessageFX.Error(null, psFormName, MiscUtil.getException(ex));
         }
     }
-    
+
     private void retrieveLedger() {
         try {
             loadRecordSearch();
-            poJSON = poController.loadLedgerList( psSearchDateFrom, psSearchDateTo);
+            poJSON = poController.loadLedgerList(psSearchDateFrom, psSearchDateTo);
             if ("error".equals(poJSON.get("result"))) {
                 ShowMessageFX.Error(null, psFormName, JFXUtil.getJSONMessage(poJSON));
             }
@@ -316,7 +312,7 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
         } catch (SQLException | GuanzonException | CloneNotSupportedException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
             ShowMessageFX.Error(null, psFormName, MiscUtil.getException(ex));
-        } 
+        }
     }
 
     @FXML
@@ -368,7 +364,7 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
                     if (!isJSONSuccess(poController.saveRecord(), "Initialize Save Record")) {
                         return;
                     }
-                    
+
                     poJSON = poController.openRecord(poController.getModel().getClientId());
                     if (!"success".equals((String) poJSON.get("result"))) {
                         ShowMessageFX.Warning(null, psFormName, (String) poJSON.get("message"));
@@ -377,7 +373,7 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
                         initButtonDisplay(pnEditMode);
                         return;
                     }
-                    
+
                     pnEditMode = poController.getEditMode();
                     clearAllInputs();
                     poController.loadBankAccount();
@@ -393,13 +389,12 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
                         Platform.runLater(() -> {
                             poController.setRecordStatus("01");
                             //poController.setRecordStatus("07");
-
                             clearAllInputs();
                         });
+                        loadRecordMaster();
                         break;
                     }
                     break;
-
                 case "btnRetrieve":
                     retrieveLedger();
                     break;
@@ -504,9 +499,8 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
                     initButtonDisplay(pnEditMode);
                     return;
                 }
-                initButtonDisplay(poController.getEditMode());
             }
-
+            initButtonDisplay(poController.getEditMode());
         } catch (Exception ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
             ShowMessageFX.Error(null, psFormName, MiscUtil.getException(ex));
@@ -590,7 +584,7 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
                             ShowMessageFX.Information(null, psFormName, JFXUtil.getJSONMessage(poJSON));
                         }
                         break;
-                    
+
                 }
             });
 
@@ -609,8 +603,8 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
                     case F3:
                         switch (txtFieldID) {
                             case "tfSearchClient":
-                                if (tfClientID.getText() != null && !"".equals(tfClientID.getText())) {
-                                    if (ShowMessageFX.OkayCancel(null, "Search Client! by ID", "Are you sure you want replace loaded Record?") == false) {
+                                if (!JFXUtil.isObjectEqualTo(tfClientID.getText(), null, "") && JFXUtil.isObjectEqualTo(poController.getEditMode(), EditMode.UPDATE, EditMode.ADDNEW)) {
+                                    if (ShowMessageFX.OkayCancel(null, "Search Client! by ID", "Are you sure you want to replace loaded Record?") == false) {
                                         return;
                                     }
                                 }
@@ -627,8 +621,8 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
                                 initButtonDisplay(poController.getEditMode());
                                 break;
                             case "tfSearchCompanyName":
-                                if (tfClientID.getText() != null && !"".equals(tfClientID.getText())) {
-                                    if (ShowMessageFX.OkayCancel(null, "Search Client! by Name", "Are you sure you want replace loaded Record?") == false) {
+                                if (!JFXUtil.isObjectEqualTo(tfClientID.getText(), null, "") && JFXUtil.isObjectEqualTo(poController.getEditMode(), EditMode.UPDATE, EditMode.ADDNEW)) {
+                                    if (ShowMessageFX.OkayCancel(null, "Search Client! by Name", "Are you sure you want to replace loaded Record?") == false) {
                                         return;
                                     }
                                 }
@@ -701,7 +695,7 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
         cmbRegistration.setItems(APPaymentConstants.regstrList);
         cmbPayment.setItems(APPaymentConstants.paymentList);
     }
-    
+
     EventHandler<ActionEvent> comboBoxActionListener = JFXUtil.CmbActionListener(
             (cmbId, selectedIndex, selectedValue) -> {
                 switch (cmbId) {
@@ -780,7 +774,6 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
         loadRecordMaster();
         tfAttachmentNo.clear();
         imageView.setImage(null);
-        stackPaneClip();
         Platform.runLater(() -> {
             loadTableAttachment();
         });
@@ -788,7 +781,19 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
 
     private void loadRecordMaster() {
         try {
-            lblStatus.setText(poController.getModel().getRecordStatus().equals("0") == false ? "ACTIVE" : "INACTIVE");
+            String lsStat = "";
+            switch (poController.getModel().getRecordStatus()) {
+                case "0":
+                    lsStat = "INACTIVE";
+                    break;
+                case "1":
+                    lsStat = "ACTIVE";
+                    break;
+            }
+            if (!JFXUtil.isObjectEqualTo(poController.getEditMode(), EditMode.ADDNEW, EditMode.UPDATE, EditMode.READY)) {
+                lsStat = "UNKNOWN";
+            }
+            lblStatus.setText(lsStat);
 
             tfClientID.setText(poController.getModel().getClientId());
 
@@ -804,9 +809,8 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
             cbBackOrder.setSelected(poController.getModel().isBackOrder() == null || !poController.getModel().isBackOrder().equalsIgnoreCase("1") ? false : true);
             cbVatable.setSelected(poController.getModel().getVatable() == null || !poController.getModel().getVatable().equalsIgnoreCase("1") ? false : true);
             cbHoldOrder.setSelected(poController.getModel().isHoldOrder() == null || !poController.getModel().isHoldOrder().equalsIgnoreCase("1") ? false : true);
-            
-            
-            if(poController.getModel().getClientId() == null || "".equals(poController.getModel().getClientId())){
+
+            if (poController.getModel().getClientId() == null || "".equals(poController.getModel().getClientId())) {
                 cmbRegistration.getSelectionModel().clearSelection();
                 cmbPayment.getSelectionModel().clearSelection();
             } else {
@@ -833,27 +837,27 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
             tfBegBalanace.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.getModel().getBeginningBalance(), false));
             tfAvailBalance.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.getModel().getAccountBalance(), false));
             tfOutStandingBalance.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.getModel().getOBalance(), false));
-            
+
             //Bank Account
             tfBank.setText(poController.BankAccount().Banks().getBankName());
             tfAccountNumber.setText(poController.BankAccount().getAccountNumber());
             tfAccountName.setText(poController.BankAccount().getAccountName());
-            
+
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
             ShowMessageFX.Error(null, psFormName, MiscUtil.getException(ex));
         }
     }
-    
+
     public void initTable() {
         loadTableMain = new JFXUtil.ReloadableTableTask(
                 tblMain,
                 laAccountsPayable,
                 () -> {
-                    JFXUtil.resetImageBounds(imageView, stackpane);
+                    JFXUtil.resetImageBounds(imageView, stackPane1);
                     Platform.runLater(() -> {
                         try {
-                            
+
                             List<Model_AP_Client_Ledger> rawList = poController.getLedgerList();
                             int lnCtr;
                             int lnCount = 0;
@@ -900,26 +904,33 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
         );
     }
 
-    /*********************************************************
+    /**
+     * *******************************************************
      ************* TRANSACTION ATTACHEMENT PROPERTIES ********
-     ********************************************************/
-    
+     * ******************************************************
+     */
     public void loadRecordAttachment(boolean lbloadImage) {
         try {
-            boolean lbShow2 = pnEditMode == EditMode.UPDATE || pnEditMode == EditMode.ADDNEW;
-            JFXUtil.setDisabled(!lbShow2, btnAddAttachment, btnRemoveAttachment);
             if (attachment_data.size() > 0) {
                 tfAttachmentNo.setText(attachment_data.get(tblAttachments.getSelectionModel().getSelectedIndex()).getIndex01());
+                String lsAttachmentType = poController.TransactionAttachmentList(pnAttachment).getModel().getDocumentType();
+                if (lsAttachmentType.equals("")) {
+                    poController.TransactionAttachmentList(pnAttachment).getModel().setDocumentType(DocumentType.OTHER);
+                    lsAttachmentType = poController.TransactionAttachmentList(pnAttachment).getModel().getDocumentType();
+                }
                 if (lbloadImage) {
                     try {
                         String filePath = (String) attachment_data.get(tblAttachments.getSelectionModel().getSelectedIndex()).getIndex02();
                         String filePath2 = "";
-
-                        // in server
-                        if (poController.TransactionAttachmentList(pnAttachment).getModel().getImagePath() != null && !"".equals(poController.TransactionAttachmentList(pnAttachment).getModel().getImagePath())) {
-                            filePath2 = poController.TransactionAttachmentList(pnAttachment).getModel().getImagePath() + "/" + (String) attachment_data.get(tblAttachments.getSelectionModel().getSelectedIndex()).getIndex02();
+                        if (imageinfo_temp.containsKey((String) attachment_data.get(tblAttachments.getSelectionModel().getSelectedIndex()).getIndex02())) {
+                            filePath2 = imageinfo_temp.get((String) attachment_data.get(tblAttachments.getSelectionModel().getSelectedIndex()).getIndex02());
                         } else {
-                            filePath2 = System.getProperty("sys.default.path.temp.attachments") + "/" + (String) attachment_data.get(tblAttachments.getSelectionModel().getSelectedIndex()).getIndex02();
+                            // in server
+                            if (poController.TransactionAttachmentList(pnAttachment).getModel().getImagePath() != null && !"".equals(poController.TransactionAttachmentList(pnAttachment).getModel().getImagePath())) {
+                                filePath2 = poController.TransactionAttachmentList(pnAttachment).getModel().getImagePath() + "/" + (String) attachment_data.get(tblAttachments.getSelectionModel().getSelectedIndex()).getIndex02();
+                            } else {
+                                filePath2 = System.getProperty("sys.default.path.temp.attachments") + "/" + (String) attachment_data.get(tblAttachments.getSelectionModel().getSelectedIndex()).getIndex02();
+                            }
                         }
 
                         if (filePath != null && !filePath.isEmpty()) {
@@ -928,24 +939,24 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
                             boolean isPdf = filePath.toLowerCase().endsWith(".pdf");
 
                             // Clear previous content
-                            stackpane.getChildren().clear();
+                            stackPane1.getChildren().clear();
                             if (!isPdf) {
                                 // ----- IMAGE VIEW -----
                                 Image loimage = new Image(convertedPath);
                                 imageView.setImage(loimage);
-                                JFXUtil.adjustImageSize(loimage, imageView, ldstackPaneWidth, ldstackPaneHeight);
+                                JFXUtil.adjustImageSize(loimage, imageView, imageviewerutil.ldstackPaneWidth, imageviewerutil.ldstackPaneHeight);
 
                                 PauseTransition delay = new PauseTransition(Duration.seconds(2)); // 2-second delay
                                 delay.setOnFinished(event -> {
                                     Platform.runLater(() -> {
-                                        JFXUtil.stackPaneClip(stackpane);
+                                        JFXUtil.stackPaneClip(stackPane1);
                                     });
                                 });
                                 delay.play();
 
                                 // Add ImageView directly to stackPane
-                                stackpane.getChildren().add(imageView);
-                                stackpane.getChildren().addAll(btnArrowLeft, btnArrowRight);
+                                stackPane1.getChildren().add(imageView);
+                                stackPane1.getChildren().addAll(btnArrowLeft, btnArrowRight);
 
                                 // Align buttons on top
                                 StackPane.setAlignment(btnArrowLeft, Pos.CENTER_LEFT);
@@ -957,7 +968,7 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
 
                             } else {
                                 // ----- PDF VIEW -----
-                                JFXUtil.PDFViewConfig(filePath2, stackpane, btnArrowLeft, btnArrowRight, ldstackPaneWidth, ldstackPaneHeight);
+                                JFXUtil.PDFViewConfig(filePath2, stackPane1, btnArrowLeft, btnArrowRight, imageviewerutil.ldstackPaneWidth, imageviewerutil.ldstackPaneHeight);
                             }
                         } else {
                             imageView.setImage(null);
@@ -971,11 +982,11 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
                 if (!lbloadImage) {
                     imageView.setImage(null);
                     // Clear previous content
-                    stackpane.getChildren().clear();
+                    stackPane1.getChildren().clear();
                     // Add ImageView directly to stackPane
-                    stackpane.getChildren().add(imageView);
-                    stackpane.getChildren().addAll(btnArrowLeft, btnArrowRight);
-                    Platform.runLater(() -> JFXUtil.stackPaneClip(stackpane));
+                    stackPane1.getChildren().add(imageView);
+                    stackPane1.getChildren().addAll(btnArrowLeft, btnArrowRight);
+                    Platform.runLater(() -> JFXUtil.stackPaneClip(stackPane1));
                     pnAttachment = 0;
                 }
             }
@@ -1000,7 +1011,7 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
             @Override
             protected Void call() throws Exception {
                 scaleFactor = 1.0;
-                JFXUtil.resetImageBounds(imageView, stackpane);
+                JFXUtil.resetImageBounds(imageView, stackPane1);
                 Platform.runLater(() -> {
                     try {
                         attachment_data.clear();
@@ -1067,7 +1078,7 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
         new Thread(task).start(); // Run task in background
 
     }
-    
+
     private void initAttachmentsGrid() {
         /*FOCUS ON FIRST ROW*/
         JFXUtil.setColumnCenter(tblRowNoAttachment);
@@ -1089,58 +1100,25 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
         }
 
     }
-    
+
     private void initAttachmentPreviewPane() {
-        stackpane.layoutBoundsProperty().addListener((observable, oldBounds, newBounds) -> {
-            stackpane.setClip(new javafx.scene.shape.Rectangle(
-                    newBounds.getMinX(),
-                    newBounds.getMinY(),
-                    newBounds.getWidth(),
-                    newBounds.getHeight()
-            ));
-        });
-        imageView.setOnScroll((ScrollEvent event) -> {
-            double delta = event.getDeltaY();
-            scaleFactor = Math.max(0.5, Math.min(scaleFactor * (delta > 0 ? 1.1 : 0.9), 5.0));
-            imageView.setScaleX(scaleFactor);
-            imageView.setScaleY(scaleFactor);
-        });
-
-        imageView.setOnMousePressed((MouseEvent event) -> {
-            mouseAnchorX = event.getSceneX() - imageView.getTranslateX();
-            mouseAnchorY = event.getSceneY() - imageView.getTranslateY();
-        });
-
-        imageView.setOnMouseDragged((MouseEvent event) -> {
-            double translateX = event.getSceneX() - mouseAnchorX;
-            double translateY = event.getSceneY() - mouseAnchorY;
-            imageView.setTranslateX(translateX);
-            imageView.setTranslateY(translateY);
-        });
-
-        stackpane.widthProperty().addListener((observable, oldValue, newWidth) -> {
-            double computedWidth = newWidth.doubleValue();
-            ldstackPaneWidth = computedWidth;
-
-        });
-        stackpane.heightProperty().addListener((observable, oldValue, newHeight) -> {
+        imageviewerutil.initAttachmentPreviewPane(stackPane1, imageView);
+        stackPane1.heightProperty().addListener((observable, oldValue, newHeight) -> {
             double computedHeight = newHeight.doubleValue();
-            ldstackPaneHeight = computedHeight;
-
-            //Placed to get height and width of stack pane in computed size before loading the image
-            initStackPaneListener();
-            initAttachmentsGrid();
+            imageviewerutil.ldstackPaneHeight = computedHeight;
+            loadTableAttachment.reload();
+            loadRecordAttachment(true);
         });
 
     }
-    
+
     private void initStackPaneListener() {
-        stackpane.widthProperty().addListener((observable, oldValue, newWidth) -> {
+        stackPane1.widthProperty().addListener((observable, oldValue, newWidth) -> {
             double computedWidth = newWidth.doubleValue();
             ldstackPaneWidth = computedWidth;
 
         });
-        stackpane.heightProperty().addListener((observable, oldValue, newHeight) -> {
+        stackPane1.heightProperty().addListener((observable, oldValue, newHeight) -> {
             double computedHeight = newHeight.doubleValue();
             ldstackPaneHeight = computedHeight;
             loadTableAttachment();
@@ -1149,24 +1127,22 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
         });
     }
 
-    
-    private void slideImage(int direction) {
+    public void slideImage(int direction) {
         if (attachment_data.size() <= 0) {
             return;
         }
-
-        currentIndex = pnAttachment;
+        int lnRow = Integer.valueOf(attachment_data.get(tblAttachments.getSelectionModel().getSelectedIndex()).getIndex01());
+        currentIndex = lnRow - 1;
         int newIndex = currentIndex + direction;
 
         if (newIndex != -1 && (newIndex <= attachment_data.size() - 1)) {
-            ModelDeliveryAcceptance_Attachment image = attachment_data.get(newIndex);
-            String filePath2 = "D:\\GGC_Maven_Systems\\temp\\attachments\\" + image.getIndex02();
             TranslateTransition slideOut = new TranslateTransition(Duration.millis(300), imageView);
             slideOut.setByX(direction * -400); // Move left or right
 
-            tblAttachments.getFocusModel().focus(newIndex);
-            tblAttachments.getSelectionModel().select(newIndex);
-            pnAttachment = newIndex;
+            JFXUtil.selectAndFocusRow(tblAttachments, newIndex);
+            int lnIndex = Integer.valueOf(attachment_data.get(newIndex).getIndex01());
+            int lnTempRow = JFXUtil.getDetailTempRow(attachment_data, lnIndex, 3);
+            pnAttachment = lnTempRow;
             loadRecordAttachment(false);
 
             // Create a transition animation
@@ -1181,42 +1157,11 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
 
             slideOut.play();
         }
-        if (isImageViewOutOfBounds(imageView, stackpane)) {
-            resetImageBounds();
+        if (JFXUtil.isImageViewOutOfBounds(imageView, stackPane1)) {
+            JFXUtil.resetImageBounds(imageView, stackPane1);
         }
     }
 
-    private boolean isImageViewOutOfBounds(ImageView imageView, StackPane stackPane) {
-        Bounds clipBounds = stackPane.getClip().getBoundsInParent();
-        Bounds imageBounds = imageView.getBoundsInParent();
-
-        return imageBounds.getMaxX() < clipBounds.getMinX()
-                || imageBounds.getMinX() > clipBounds.getMaxX()
-                || imageBounds.getMaxY() < clipBounds.getMinY()
-                || imageBounds.getMinY() > clipBounds.getMaxY();
-    }
-
-    private void resetImageBounds() {
-        imageView.setScaleX(1.0);
-        imageView.setScaleY(1.0);
-        imageView.setTranslateX(0);
-        imageView.setTranslateY(0);
-        stackpane.setAlignment(imageView, javafx.geometry.Pos.CENTER);
-    }
-
-    private void stackPaneClip() {
-        javafx.scene.shape.Rectangle clip = new javafx.scene.shape.Rectangle(
-                stackpane.getWidth() - 8, // Subtract 10 for padding (5 on each side)
-                stackpane.getHeight() - 8 // Subtract 10 for padding (5 on each side)
-        );
-        clip.setArcWidth(8); // Optional: Rounded corners for aesthetics
-        clip.setArcHeight(8);
-        clip.setLayoutX(4); // Set padding offset for X
-        clip.setLayoutY(4); // Set padding offset for Y
-        stackpane.setClip(clip);
-
-    }
-    
     JFXUtil.TableKeyEvent tableKeyEvents = new JFXUtil.TableKeyEvent() {
         @Override
         protected void onRowMove(TableView<?> currentTable, String currentTableID, boolean isMovedDown) {
@@ -1247,7 +1192,7 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
             if (pnAttachment >= 0) {
                 scaleFactor = 1.0;
                 loadRecordAttachment(true);
-                resetImageBounds();
+                JFXUtil.resetImageBounds(imageView, stackPane1);
             }
         });
 
@@ -1297,15 +1242,14 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
 
     private void initButtonDisplay(int fnEditMode) {
         boolean lbShow = (fnEditMode == EditMode.ADDNEW || fnEditMode == EditMode.UPDATE);
-
+        boolean lbShow2 = fnEditMode == EditMode.READY;
         JFXUtil.setButtonsVisibility(lbShow, btnSearch, btnSave, btnCancel);
-        JFXUtil.setButtonsVisibility(!lbShow, btnBrowse, btnRetrieve);
+        JFXUtil.setButtonsVisibility(!lbShow, btnBrowse);
         JFXUtil.setButtonsVisibility(false, btnUpdate);
-        apRecord.setDisable(!lbShow);
+        JFXUtil.setButtonsVisibility(lbShow || lbShow2, btnRetrieve);
 
         //initialize file buttons
-        btnAddAttachment.setDisable(!lbShow);
-        btnRemoveAttachment.setDisable(!lbShow);
+        JFXUtil.setDisabled(!lbShow, apRecord, btnAddAttachment, btnRemoveAttachment);
 
         if (fnEditMode != EditMode.READY) {
             return;
