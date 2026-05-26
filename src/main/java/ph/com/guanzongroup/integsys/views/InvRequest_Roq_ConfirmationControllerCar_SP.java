@@ -114,7 +114,7 @@ public class InvRequest_Roq_ConfirmationControllerCar_SP implements Initializabl
     private TableView<ModelInvTableListInformation> tableListInformation;
 
     @FXML
-    private Button btnClose, btnSave, btnCancel, btnBrowse, btnUpdate, btnRetrieve, btnConfirm, btnVoid, btnTransHistory,btnPrint;
+    private Button btnClose, btnSave, btnCancel, btnBrowse, btnUpdate, btnRetrieve, btnConfirm, btnVoid, btnTransHistory, btnPrint;
 
     @FXML
     private TableColumn<ModelInvOrderDetail, String> tblBrandDetail, tblModelDetail, tblVariantDetail, tblColorDetail,
@@ -656,17 +656,20 @@ public class InvRequest_Roq_ConfirmationControllerCar_SP implements Initializabl
                     break;
                 case "btnConfirm":
                     if (ShowMessageFX.YesNo(null, psFormName, "Do you want to confirm this transaction?")) {
-                        try {
-                            loJSON = invRequestController.ConfirmTransaction("Confirmed");
 
-                            if (!"success".equals((String) loJSON.get("result"))) {
-                                ShowMessageFX.Warning((String) loJSON.get("message"), psFormName, null);
-                                return;
-                            }
-                            ShowMessageFX.Information((String) loJSON.get("message"), psFormName, null);
-                        } catch (ParseException ex) {
-                            Logger.getLogger(InvRequest_Roq_EntryControllerMC.class.getName()).log(Level.SEVERE, null, ex);
+                        poJSON = invRequestController.ConfirmTransaction("Confirmed");
+
+                        loadMaster();
+                        pnEditMode = invRequestController.getEditMode();
+                        loadTableInvDetail();
+                        loadDetail();
+                        ShowMessageFX.Information((String) poJSON.get("message"), psFormName, null);
+
+                        if (!"success".equals(poJSON.get("result"))) {
+                            return;
                         }
+                        btnPrint.fire();
+
                     }
 
                     break;
@@ -694,16 +697,15 @@ public class InvRequest_Roq_ConfirmationControllerCar_SP implements Initializabl
                         }
                     }
 
-                    if (!"success".equals((String) poJSON.get("result"))) {
-                        ShowMessageFX.Warning((String) poJSON.get("message"), psFormName, null);
-                        break;
-                    }
-
+                    loadMaster();
+                    pnEditMode = invRequestController.getEditMode();
+                    loadTableInvDetail();
+                    loadDetail();
                     ShowMessageFX.Information((String) poJSON.get("message"), psFormName, null);
-                    clearMasterFields();
-                    clearDetailFields();
-                    invOrderDetail_data.clear();
-                    pnEditMode = EditMode.UNKNOWN;
+
+                    if (!"success".equals(poJSON.get("result"))) {
+                        return;
+                    }
 
                     break;
 
@@ -1042,7 +1044,7 @@ public class InvRequest_Roq_ConfirmationControllerCar_SP implements Initializabl
 
     private void initButtonsClickActions() {
         List<Button> buttons = Arrays.asList(btnSave, btnCancel,
-                btnClose, btnBrowse, btnUpdate, btnRetrieve, btnConfirm, btnVoid, btnTransHistory,btnPrint);
+                btnClose, btnBrowse, btnUpdate, btnRetrieve, btnConfirm, btnVoid, btnTransHistory, btnPrint);
 
         buttons.forEach(button -> button.setOnAction(this::handleButtonAction));
     }

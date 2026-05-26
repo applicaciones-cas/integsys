@@ -50,6 +50,7 @@ import org.guanzon.appdriver.base.CommonUtils;
 import org.guanzon.appdriver.base.GRiderCAS;
 import org.guanzon.appdriver.base.GuanzonException;
 import org.guanzon.appdriver.base.LogWrapper;
+import org.guanzon.appdriver.base.MiscUtil;
 import org.guanzon.appdriver.base.SQLUtil;
 import org.guanzon.appdriver.constant.EditMode;
 import org.json.simple.JSONObject;
@@ -78,7 +79,7 @@ public class DeliverySchedule_HistoryControllerCar_SP implements Initializable, 
     private LogWrapper poLogWrapper;
     private int pnEditMode;
     private DeliverySchedule poAppController;
-    private String psFormName = "Delivery Schedule History Car SP";
+    private String psFormName = "Delivery Schedule History";
 
     private String psClusterNameOld = "";
 
@@ -151,14 +152,12 @@ public class DeliverySchedule_HistoryControllerCar_SP implements Initializable, 
         try {
             poLogWrapper = new LogWrapper(psFormName, psFormName + "Log");
             poAppController = new DeliveryIssuanceControllers(poApp, poLogWrapper).DeliverySchedule();
-
             if (!isJSONSuccess(poAppController.initTransaction(), "Initialize Transaction")) {
                 unloadForm appUnload = new unloadForm();
                 appUnload.unloadForm(apMainAnchor, poApp, psFormName);
             }
 
             Platform.runLater(() -> {
-
                 poAppController.setTransactionStatus("12340");
                 poAppController.getMaster().setIndustryId(psIndustryID);
                 poAppController.setIndustryID(psIndustryID);
@@ -169,10 +168,16 @@ public class DeliverySchedule_HistoryControllerCar_SP implements Initializable, 
                         + "\nCategory:" + psCategoryID);
 //            poAppController.initFields();
             });
+            
+            tfSearchCluster.requestFocus();
+            lastFocusedControl = tfSearchCluster;
             initializeTableDetail();
             initControlEvents();
+            poAppController.getMaster().setIndustryId(psIndustryID);
+            poAppController.getMaster().setCompanyID(psCompanyID);
+            lblSource.setText(poAppController.getMaster().Company().getCompanyName() + " - " + poAppController.getMaster().Industry().getDescription());
+
         } catch (SQLException | GuanzonException ex) {
-            Logger.getLogger(DeliverySchedule_HistoryControllerCar_SP.class.getName()).log(Level.SEVERE, null, ex);
             poLogWrapper.severe(psFormName + " :" + ex.getMessage());
         }
     }
@@ -185,21 +190,18 @@ public class DeliverySchedule_HistoryControllerCar_SP implements Initializable, 
 
                 case "btnSearch":
                     if (lastFocusedControl == null) {
-                        ShowMessageFX.Information(null, psFormName,
-                                "Search unavailable. Please ensure a searchable field is selected or focused before proceeding..");
-                        break;
+                        tfSearchCluster.requestFocus();
+                        lastFocusedControl = tfSearchCluster;
                     }
                     switch (lastFocusedControl.getId()) {
-
                         //Browse Transaction 
                         case "tfSearchCluster":
 
-                            if (tfSearchCluster.getText().isEmpty()) {
-                                ShowMessageFX.Information(null, psFormName,
-                                        "Search unavailable. Please ensure the selected or focused field is not empty");
-                                break;
-                            }
-
+//                            if (tfSearchCluster.getText().isEmpty()) {
+//                                ShowMessageFX.Information(null, psFormName,
+//                                        "Search unavailable. Please ensure the selected or focused field is not empty");
+//                                break;
+//                            }
                             if (!tfTransactionNo.getText().isEmpty()) {
                                 if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
                                     if (ShowMessageFX.OkayCancel(null, "Search Transaction! by Trasaction", "Do you want to disregard changes?") == false) {
@@ -210,9 +212,6 @@ public class DeliverySchedule_HistoryControllerCar_SP implements Initializable, 
 
                             if (!isJSONSuccess(poAppController.searchTransaction(tfSearchCluster.getText(), true, true),
                                     "Search Transaction!")) {
-
-                                ShowMessageFX.Information(null, psFormName,
-                                        "Search unavailable. Transaction not found");
                                 break;
                             }
 
@@ -265,15 +264,58 @@ public class DeliverySchedule_HistoryControllerCar_SP implements Initializable, 
                             break;
 
                         default:
-                            ShowMessageFX.Information(null, psFormName,
-                                    "Search unavailable. Please ensure a searchable field is selected or focused before proceeding..");
+                            if (!isJSONSuccess(poAppController.searchTransaction("%", true, true),
+                                    "Search Transaction!")) {
+                                break;
+                            }
 
+                            clearAllInputs();
+                            getLoadedTransaction();
+                            initButtonDisplay(poAppController.getEditMode());
+                            pnEditMode = poAppController.getEditMode();
                             break;
                     }
                     break;
                 case "btnHistory":
-                    ShowMessageFX.Information(null, psFormName,
-                            "This feature is under development and will be available soon.\nThank you for your patience!");
+                    if (pnEditMode != EditMode.READY && pnEditMode != EditMode.UPDATE) {
+                        ShowMessageFX.Warning("No transaction status history to load!", psFormName, null);
+                        return;
+                    }
+
+                    try {
+                        poAppController.ShowStatusHistory();
+                    } catch (NullPointerException npe) {
+                        Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(npe), npe);
+                        ShowMessageFX.Error("No transaction status history to load!", psFormName, null);
+                    } catch (Exception ex) {
+                        Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+                        ShowMessageFX.Error(MiscUtil.getException(ex), psFormName, null);
+                    }
+                    break;
+                case "btnPost":
+
+                    if (tfTransactionNo.getText().isEmpty()) {
+                        ShowMessageFX.Information("Please load transaction before proceeding..", "Delivery Schedule Confirmation", "");
+                        break;
+                    }
+                    if (poAppController.getMaster().getTransactionStatus().equalsIgnoreCase(DeliveryScheduleStatus.OPEN)) {
+                        ShowMessageFX.Information("Status was not yet confirmed and still " + DeliveryScheduleStatus.STATUS.get(Integer.parseInt(poAppController.getMaster().getTransactionStatus())).toLowerCase(), "Search Transaction! by Trasaction", "Delivery Schedule Confirmation");
+                        break;
+                    }
+                    if (!poAppController.getMaster().getTransactionStatus().equalsIgnoreCase(DeliveryScheduleStatus.CONFIRMED)) {
+                        ShowMessageFX.Information("Status was already " + DeliveryScheduleStatus.STATUS.get(Integer.parseInt(poAppController.getMaster().getTransactionStatus())).toLowerCase(), "Search Transaction! by Trasaction", "Delivery Schedule Confirmation");
+                        break;
+                    }
+
+                    if (ShowMessageFX.YesNo(null, psFormName, "Are you sure you want to post transaction?") == true) {
+                        if (!isJSONSuccess(poAppController.PostTransaction(), "Initialize Post Transaction")) {
+                            break;
+                        }
+                        reloadTableDetail();
+                        getLoadedTransaction();
+                        pnEditMode = poAppController.getEditMode();
+                        break;
+                    }
                     break;
                 case "btnRetrieve":
                     switch (lastFocusedControl.getId()) {
@@ -318,7 +360,6 @@ public class DeliverySchedule_HistoryControllerCar_SP implements Initializable, 
             initButtonDisplay(poAppController.getEditMode());
 
         } catch (GuanzonException | SQLException | CloneNotSupportedException ex) {
-            Logger.getLogger(DeliverySchedule_EntryController.class.getName()).log(Level.SEVERE, null, ex);
             poLogWrapper.severe(psFormName + " :" + ex.getMessage());
 
         }
@@ -357,7 +398,6 @@ public class DeliverySchedule_HistoryControllerCar_SP implements Initializable, 
                 initButtonDisplay(poAppController.getEditMode());
                 pnEditMode = poAppController.getEditMode();
             } catch (CloneNotSupportedException | SQLException | GuanzonException ex) {
-                Logger.getLogger(DeliverySchedule_EntryControllerMC.class.getName()).log(Level.SEVERE, null, ex);
                 poLogWrapper.severe(psFormName + " :" + ex.getMessage());
 
             }
@@ -510,9 +550,14 @@ public class DeliverySchedule_HistoryControllerCar_SP implements Initializable, 
 
     private void initButtonDisplay(int fnEditMode) {
         boolean lbShow = (fnEditMode == EditMode.ADDNEW || fnEditMode == EditMode.UPDATE);
+        String lsTransNo = tfTransactionNo.getText();
+        boolean lbHasTransaction = lsTransNo != null && !lsTransNo.isEmpty();
+        boolean lbIsApproved = lbHasTransaction
+                && "1".equals(poAppController.getMaster().getTransactionStatus());
 
         // Always show these buttons
-        initButtonControls(true, "btnSearch", "btnHistory", "btnRetrieve", "btnClose");
+        initButtonControls(true, "btnSearch", "btnRetrieve", "btnClose");
+        initButtonControls(!lbShow && lbHasTransaction, "btnPost", "btnHistory");
         apMaster.setDisable(!lbShow);
         apDetail.setDisable(!lbShow);
     }
@@ -533,6 +578,7 @@ public class DeliverySchedule_HistoryControllerCar_SP implements Initializable, 
                     case ENTER:
                     case F3:
                         switch (txtFieldID) {
+
                             //Browse Transaction 
                             case "tfSearchCluster":
 
@@ -578,8 +624,6 @@ public class DeliverySchedule_HistoryControllerCar_SP implements Initializable, 
                 }
             }
         } catch (SQLException | GuanzonException | CloneNotSupportedException ex) {
-            Logger.getLogger(DeliverySchedule_EntryController.class
-                    .getName()).log(Level.SEVERE, null, ex);
             poLogWrapper.severe(psFormName + " :" + ex.getMessage());
         }
     }
@@ -650,9 +694,7 @@ public class DeliverySchedule_HistoryControllerCar_SP implements Initializable, 
             event.consume();
 
         } catch (CloneNotSupportedException | SQLException | GuanzonException ex) {
-            Logger.getLogger(DeliverySchedule_EntryControllerMC.class
-                    .getName()).log(Level.SEVERE, null, ex);
-            poLogWrapper.severe(psFormName + " :" + ex.getMessage());
+             poLogWrapper.severe(psFormName + " :" + ex.getMessage());
         }
     }
 
@@ -660,10 +702,12 @@ public class DeliverySchedule_HistoryControllerCar_SP implements Initializable, 
         String result = (String) loJSON.get("result");
         if ("error".equals(result)) {
             String message = (String) loJSON.get("message");
-            poLogWrapper.severe(psFormName + " :" + message);
-            Platform.runLater(() -> {
-                ShowMessageFX.Warning(null, psFormName, message);
-            });
+            if (message != null) {
+                poLogWrapper.severe(psFormName + " :" + message);
+                Platform.runLater(() -> {
+                    ShowMessageFX.Warning(null, psFormName, message);
+                });
+            }
             return false;
         }
         String message = (String) loJSON.get("message");
@@ -736,8 +780,6 @@ public class DeliverySchedule_HistoryControllerCar_SP implements Initializable, 
                     String desc = loModel.getValue().BranchCluster().getClusterDescription();
                     return new SimpleStringProperty(desc != null ? desc : "");
                 } catch (SQLException | GuanzonException ex) {
-                    Logger.getLogger(DeliverySchedule_HistoryControllerCar_SP.class.getName()).log(Level.SEVERE, null, ex);
-                    poLogWrapper.severe(psFormName + " :" + ex.getMessage());
                     return new SimpleStringProperty("");
                 }
             });
@@ -757,9 +799,7 @@ public class DeliverySchedule_HistoryControllerCar_SP implements Initializable, 
                         }
                     }
                 } catch (Exception ex) {
-                    Logger.getLogger(DeliverySchedule_EntryControllerMC.class
-                            .getName()).log(Level.SEVERE, null, ex);
-                    poLogWrapper.severe(psFormName + " :" + ex.getMessage());
+                     poLogWrapper.severe(psFormName + " :" + ex.getMessage());
                     return new SimpleStringProperty("UNKNOWN");
                 }
                 return new SimpleStringProperty("UNKNOWN");
@@ -778,9 +818,7 @@ public class DeliverySchedule_HistoryControllerCar_SP implements Initializable, 
                         }
                     }
                 } catch (Exception ex) {
-                    Logger.getLogger(DeliverySchedule_EntryControllerMC.class
-                            .getName()).log(Level.SEVERE, null, ex);
-                    poLogWrapper.severe(psFormName + " :" + ex.getMessage());
+                     poLogWrapper.severe(psFormName + " :" + ex.getMessage());
                 }
                 return new SimpleStringProperty("0");
             });
@@ -856,7 +894,6 @@ public class DeliverySchedule_HistoryControllerCar_SP implements Initializable, 
                     apDetail.setDisable(false);
                     reloadTableDetail();
                 } catch (SQLException | GuanzonException | CloneNotSupportedException ex) {
-                    Logger.getLogger(DeliverySchedule_HistoryControllerCar_SP.class.getName()).log(Level.SEVERE, null, ex);
                     poLogWrapper.severe(psFormName + " :" + ex.getMessage());
                 }
             }
@@ -927,7 +964,7 @@ public class DeliverySchedule_HistoryControllerCar_SP implements Initializable, 
                 }
                 overlay.setVisible(false);
                 pi.setVisible(false);
-                //tblBranchList.getItems().clear();// Clear and update table
+//                tblBranchList.getItems().clear();// Clear and update table
                 tblBranchList.setItems(laBranchList);
 
                 tblColBranchNo.setCellValueFactory(loModel -> {
@@ -940,8 +977,6 @@ public class DeliverySchedule_HistoryControllerCar_SP implements Initializable, 
                         return new SimpleStringProperty(loModel.getValue().Branch().getBranchName());
 
                     } catch (SQLException | GuanzonException ex) {
-                        Logger.getLogger(DeliverySchedule_HistoryControllerCar_SP.class
-                                .getName()).log(Level.SEVERE, null, ex);
                         poLogWrapper.severe(psFormName + " :" + ex.getMessage());
                         return new SimpleStringProperty("");
                     }
@@ -952,8 +987,6 @@ public class DeliverySchedule_HistoryControllerCar_SP implements Initializable, 
                         return new SimpleStringProperty(loModel.getValue().Branch().getAddress());
 
                     } catch (SQLException | GuanzonException ex) {
-                        Logger.getLogger(DeliverySchedule_HistoryControllerCar_SP.class
-                                .getName()).log(Level.SEVERE, null, ex);
                         poLogWrapper.severe(psFormName + " :" + ex.getMessage());
                         return new SimpleStringProperty("");
                     }
@@ -1028,7 +1061,6 @@ public class DeliverySchedule_HistoryControllerCar_SP implements Initializable, 
                 overlay.setVisible(false);
                 pi.setVisible(false);
                 Throwable ex = getException();
-                Logger.getLogger(DeliverySchedule_HistoryControllerCar_SP.class.getName()).log(Level.SEVERE, null, ex);
                 poLogWrapper.severe(psFormName + " : " + ex.getMessage());
             }
 
