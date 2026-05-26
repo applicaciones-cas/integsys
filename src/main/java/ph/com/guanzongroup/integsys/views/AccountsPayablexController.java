@@ -166,6 +166,7 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
             pgPagination.setPageCount(1);
             Platform.runLater(() -> {
                 try {
+                    poController.validateEntry(true);
                     poController.setRecordStatus("01");
                     lblSource.setText(poController.getCompany());
                     loadRecordSearch();
