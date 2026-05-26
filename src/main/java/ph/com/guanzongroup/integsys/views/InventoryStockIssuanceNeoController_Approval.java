@@ -166,6 +166,10 @@ public class InventoryStockIssuanceNeoController_Approval implements Initializab
 
             initializeTableDetail();
             initControlEvents();
+            poAppController.getMaster().setIndustryId(psIndustryID);
+            poAppController.getMaster().setCompanyID(psCompanyID);
+            lblSource.setText(poAppController.getMaster().Company().getCompanyName() + " - " + poAppController.getMaster().Industry().getDescription());
+
         } catch (SQLException | GuanzonException e) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(e), e);
             ShowMessageFX.Error(MiscUtil.getException(e), psFormName, null);
