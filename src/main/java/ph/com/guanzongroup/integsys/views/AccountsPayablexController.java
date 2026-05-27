@@ -804,7 +804,7 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
 
             tfCategory.setText(poController.getModel().Category().getDescription());
             tfCompanyName.setText(poController.getModel().Client().getCompanyName());
-            tfAddress.setText(poController.getModel().ClientAddress().getAddress());
+            tfAddress.setText(poController.getFullAddress());
             tfContactPerson.setText(poController.getModel().ClientInstitutionContact().getContactPersonName());
             tfContactEmail.setText(poController.getModel().ClientInstitutionContact().getMailAddress());
             tfContactNo.setText(poController.getModel().ClientInstitutionContact().getMobileNo());
