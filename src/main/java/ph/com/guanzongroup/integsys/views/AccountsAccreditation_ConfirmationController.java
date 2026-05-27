@@ -317,18 +317,20 @@ public class AccountsAccreditation_ConfirmationController implements Initializab
                                 if (!isJSONSuccess(poController.searchCategory(tfCategory.getText() == null ? "" : tfCategory.getText(), false),
                                         "Initialize Search Category! ")) {
                                     return;
+                                } else {
+                                    JFXUtil.textFieldMoveNext(tfCompany);
                                 }
                                 loadRecordMaster();
-                                JFXUtil.textFieldMoveNext(tfCompany);
                                 break;
                             case "tfCompany":
                                 if (!isJSONSuccess(poController.searchCompany(tfCompany.getText(), false),
                                         "Initialize Search Client! ")) {
                                     return;
+                                } else {
+                                    JFXUtil.textFieldMoveNext(taRemarks);
                                 }
                                 loadRecordMaster();
                                 initButtonDisplay(poController.getEditMode());
-                                JFXUtil.textFieldMoveNext(taRemarks);
                                 break;
                         }
                         break;
