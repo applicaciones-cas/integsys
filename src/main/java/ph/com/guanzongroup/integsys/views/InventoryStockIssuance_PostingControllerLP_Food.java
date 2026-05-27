@@ -164,6 +164,10 @@ public class InventoryStockIssuance_PostingControllerLP_Food implements Initiali
 
             initializeTableDetail();
             initControlEvents();
+            poAppController.getMaster().setIndustryId(psIndustryID);
+            poAppController.getMaster().setCompanyID(psCompanyID);
+            lblSource.setText(poAppController.getMaster().Company().getCompanyName() + " - " + poAppController.getMaster().Industry().getDescription());
+
         } catch (SQLException | GuanzonException ex) {
 
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
@@ -487,7 +491,7 @@ public class InventoryStockIssuance_PostingControllerLP_Food implements Initiali
                         switch (txtFieldID) {
                             case "tfSearchSource":
                                 if (!tfTransactionNo.getText().isEmpty()) {
-                                    if (ShowMessageFX.OkayCancel(null, "Search Transaction! by Transaction ", "Are you sure you want replace loaded Transaction?") == false) {
+                                    if (ShowMessageFX.OkayCancel(null, "Search Transaction! by Transaction ", "Are you sure you want to replace loaded Transaction?") == false) {
                                         return;
                                     }
                                 }
@@ -637,7 +641,9 @@ public class InventoryStockIssuance_PostingControllerLP_Food implements Initiali
             String message = (String) loJSON.get("message");
             poLogWrapper.severe(psFormName + " :" + message);
             Platform.runLater(() -> {
-                ShowMessageFX.Warning(null, psFormName, message);
+                if (message != null) {
+                    ShowMessageFX.Warning(null, psFormName, message);
+                }
             });
             return false;
         }

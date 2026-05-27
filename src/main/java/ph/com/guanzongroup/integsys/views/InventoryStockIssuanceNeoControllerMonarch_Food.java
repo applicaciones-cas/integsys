@@ -96,7 +96,7 @@ public class InventoryStockIssuanceNeoControllerMonarch_Food implements Initiali
             tfVariant, tfMeasure, tfInvType, tfCost, tfIssuedQty;
 
     @FXML
-    Button btnNew, btnUpdate, btnSearch, btnBrowse, btnSave, btnCancel, btnHistory, btnRetrieve, btnClose;
+    Button btnNew, btnUpdate, btnSearch, btnBrowse, btnSave, btnCancel, btnHistory, btnRetrieve, btnClose, btnVoid;
 
     @FXML
     TableView<Model_Inventory_Transfer_Master> tblViewMaster;
@@ -143,8 +143,7 @@ public class InventoryStockIssuanceNeoControllerMonarch_Food implements Initiali
         try {
             poLogWrapper = new LogWrapper(psFormName, psFormName);
             poAppController = new DeliveryIssuanceControllers(poApp, poLogWrapper).InventoryStockIssuanceNeo();
-            poAppController.setTransactionStatus(InventoryStockIssuanceStatus.OPEN);
-
+            poAppController.setTransactionStatus("10");
             //initlalize and validate transaction objects from class controller
             if (!isJSONSuccess(poAppController.initTransaction(), psFormName)) {
                 unloadForm appUnload = new unloadForm();
@@ -153,7 +152,7 @@ public class InventoryStockIssuanceNeoControllerMonarch_Food implements Initiali
 
             //background thread
             Platform.runLater(() -> {
-                poAppController.setTransactionStatus("0");
+                poAppController.setTransactionStatus("10");
                 //initialize logged in category
                 poAppController.setIndustryID(psIndustryID);
                 poAppController.setCompanyID(psCompanyID);
@@ -309,7 +308,7 @@ public class InventoryStockIssuanceNeoControllerMonarch_Food implements Initiali
                     switch (lastFocusedControl.getId()) {
                         case "tfSearchSourceno":
                             if (!tfTransNo.getText().isEmpty()) {
-                                if (ShowMessageFX.OkayCancel(null, "Search Transaction! by Trasaction", "Are you sure you want replace loaded Transaction?") == false) {
+                                if (ShowMessageFX.OkayCancel(null, "Search Transaction! by Transaction", "Are you sure you want to replace loaded Transaction?") == false) {
                                     return;
                                 }
                             }
@@ -324,7 +323,7 @@ public class InventoryStockIssuanceNeoControllerMonarch_Food implements Initiali
                             break;
                         case "tfSearchTransNo":
                             if (!tfTransNo.getText().isEmpty()) {
-                                if (ShowMessageFX.OkayCancel(null, "Search Transaction! by Trasaction", "Are you sure you want replace loaded Transaction?") == false) {
+                                if (ShowMessageFX.OkayCancel(null, "Search Transaction! by Transaction", "Are you sure you want to replace loaded Transaction?") == false) {
                                     return;
                                 }
                             }
@@ -371,7 +370,7 @@ public class InventoryStockIssuanceNeoControllerMonarch_Food implements Initiali
                     if (!isJSONSuccess(poAppController.SaveTransaction(), "Initialize Save Transaction")) {
                         return;
                     }
-                    if (ShowMessageFX.YesNo(null, psFormName, "Do you want to approve transaction?") == true) {
+                    if (ShowMessageFX.YesNo(null, psFormName, "Do you want to confirm transaction?") == true) {
                         if (!isJSONSuccess(poAppController.CloseTransaction(), "Initialize Close Transaction")) {
                             return;
                         }
@@ -385,7 +384,7 @@ public class InventoryStockIssuanceNeoControllerMonarch_Food implements Initiali
                 case "btnCancel":
                     if (ShowMessageFX.OkayCancel(null, psFormName, "Do you want to disregard changes?") == true) {
                         poAppController = new DeliveryIssuanceControllers(poApp, poLogWrapper).InventoryStockIssuanceNeo();
-                        poAppController.setTransactionStatus("0");
+                        poAppController.setTransactionStatus("10");
 
                         if (!isJSONSuccess(poAppController.initTransaction(), "Initialize Transaction")) {
                             unloadForm appUnload = new unloadForm();
@@ -394,7 +393,7 @@ public class InventoryStockIssuanceNeoControllerMonarch_Food implements Initiali
 
                         Platform.runLater(() -> {
 
-                            poAppController.setTransactionStatus("0");
+                            poAppController.setTransactionStatus("10");
                             poAppController.getMaster().setIndustryId(psIndustryID);
                             poAppController.setIndustryID(psIndustryID);
                             poAppController.setCompanyID(psCompanyID);
@@ -408,8 +407,20 @@ public class InventoryStockIssuanceNeoControllerMonarch_Food implements Initiali
                     break;
 
                 case "btnHistory":
-                    ShowMessageFX.Information(null, psFormName,
-                            "This feature is under development and will be available soon.\nThank you for your patience!");
+                    if (pnEditMode != EditMode.READY && pnEditMode != EditMode.UPDATE) {
+                        ShowMessageFX.Warning("No transaction status history to load!", psFormName, null);
+                        return;
+                    }
+
+                    try {
+                        poAppController.ShowStatusHistory();
+                    } catch (NullPointerException npe) {
+                        Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(npe), npe);
+                        ShowMessageFX.Error("No transaction status history to load!", psFormName, null);
+                    } catch (Exception ex) {
+                        Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+                        ShowMessageFX.Error(MiscUtil.getException(ex), psFormName, null);
+                    }
                     break;
 
                 case "btnRetrieve":
@@ -532,11 +543,11 @@ public class InventoryStockIssuanceNeoControllerMonarch_Food implements Initiali
 
                             }
                         }
-                        if (lnIssuedQty > poAppController.getDetail(pnTransactionDetail).InventoryStockRequest().getApproved()) {
-                            lnIssuedQty = poAppController.getDetail(pnTransactionDetail).InventoryStockRequest().getApproved();
-                            ShowMessageFX.Information("Issued Quantity exceed Approved Detected", psFormName, null);
-                            loTextField.setText(String.valueOf(lnIssuedQty));
-                        }
+//                        if (lnIssuedQty > poAppController.getDetail(pnTransactionDetail).InventoryStockRequest().getApproved()) {
+//                            lnIssuedQty = poAppController.getDetail(pnTransactionDetail).InventoryStockRequest().getApproved();
+//                            ShowMessageFX.Information("Issued Quantity exceed Approved Detected", psFormName, null);
+//                            loTextField.setText(String.valueOf(lnIssuedQty));
+//                        }
 
                         poAppController.getDetail(pnTransactionDetail).setQuantity(lnIssuedQty);
 
@@ -613,7 +624,7 @@ public class InventoryStockIssuanceNeoControllerMonarch_Food implements Initiali
                         switch (txtFieldID) {
                             case "tfSearchSourceno":
                                 if (!tfTransNo.getText().isEmpty()) {
-                                    if (ShowMessageFX.OkayCancel(null, "Search Transaction! by Trasaction", "Are you sure you want replace loaded Transaction?") == false) {
+                                    if (ShowMessageFX.OkayCancel(null, "Search Transaction! by Transaction", "Are you sure you want to replace loaded Transaction?") == false) {
                                         return;
                                     }
                                 }
@@ -628,7 +639,7 @@ public class InventoryStockIssuanceNeoControllerMonarch_Food implements Initiali
                                 break;
                             case "tfSearchTransNo":
                                 if (!tfTransNo.getText().isEmpty()) {
-                                    if (ShowMessageFX.OkayCancel(null, "Search Transaction! by Trasaction", "Are you sure you want replace loaded Transaction?") == false) {
+                                    if (ShowMessageFX.OkayCancel(null, "Search Transaction! by Transaction", "Are you sure you want to replace loaded Transaction?") == false) {
                                         return;
                                     }
                                 }
@@ -805,6 +816,14 @@ public class InventoryStockIssuanceNeoControllerMonarch_Food implements Initiali
             tfDiscountAmount.setText(String.valueOf(poAppController.getMaster().getDiscount()));
             tfTotal.setText(String.valueOf(poAppController.getMaster().getTransactionTotal()));
             cbDelType.getSelectionModel().select(Integer.parseInt(poAppController.getMaster().getDeliveryType()));
+            if (poAppController.getMaster().getTransactionStatus().equals(InventoryStockIssuanceStatus.CONFIRMED)) {
+                btnVoid.setText("Cancel");
+            } else {
+                btnVoid.setText("Void");
+            }
+            if (tfTransNo.getText().trim().isEmpty()) {
+                lblStatus.setText("UNKNOWN");
+            }
         } catch (SQLException | GuanzonException e) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(e), e);
             ShowMessageFX.Error(MiscUtil.getException(e), psFormName, null);
@@ -947,17 +966,29 @@ public class InventoryStockIssuanceNeoControllerMonarch_Food implements Initiali
     }
 
     private void initButtonDisplay(int fnEditMode) {
-        boolean lbShow = (fnEditMode == EditMode.ADDNEW || fnEditMode == EditMode.UPDATE);
 
-        // Always show these buttons
-        initButtonControls(true, "btnRetrieve", "btnHistory", "btnClose");
+        boolean lbEditing = (fnEditMode == EditMode.ADDNEW || fnEditMode == EditMode.UPDATE);
 
-        // Show-only based on mode
-        initButtonControls(lbShow, "btnSearch", "btnSave", "btnCancel");
-        initButtonControls(!lbShow, "btnBrowse", "btnNew", "btnUpdate");
+        String lsTransNo = tfTransNo.getText();
+        boolean lbHasTransaction = lsTransNo != null && !lsTransNo.isEmpty();
+        boolean lbIsApproved = lbHasTransaction
+                && "1".equals(poAppController.getMaster().getTransactionStatus());
 
-        apMaster.setDisable(!lbShow);
-        apDetail.setDisable(!lbShow);
+        // Always visible
+        initButtonControls(true, "btnRetrieve", "btnClose");
+
+        // Editing mode buttons
+        initButtonControls(lbEditing, "btnSearch", "btnSave", "btnCancel");
+        initButtonControls(!lbEditing, "btnBrowse", "btnNew");
+
+        // Transaction-dependent buttons (only when not editing)
+        initButtonControls(!lbEditing && lbHasTransaction, "btnUpdate", "btnVoid", "btnHistory", "btnPrint");
+        initButtonControls(!lbEditing && lbHasTransaction && !lbIsApproved, "btnUpdate");
+
+        // Disable panes during editing
+        apMaster.setDisable(!lbEditing);
+        apDetail.setDisable(!lbEditing);
+
     }
 
     private void initButtonControls(boolean visible, String... buttonFxIdsToShow) {
@@ -1101,7 +1132,9 @@ public class InventoryStockIssuanceNeoControllerMonarch_Food implements Initiali
             String message = (String) loJSON.get("message");
             poLogWrapper.severe(psFormName + " :" + message);
             Platform.runLater(() -> {
-                ShowMessageFX.Warning(null, psFormName, message);
+                if (message != null) {
+                    ShowMessageFX.Warning(null, psFormName, message);
+                }
             });
             return false;
         }

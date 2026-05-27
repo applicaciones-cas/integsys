@@ -204,7 +204,7 @@ public class DeliverySchedule_HistoryControllerMonarch_Food implements Initializ
 //                            }
                             if (!tfTransactionNo.getText().isEmpty()) {
                                 if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
-                                    if (ShowMessageFX.OkayCancel(null, "Search Transaction! by Trasaction", "Do you want to disregard changes?") == false) {
+                                    if (ShowMessageFX.OkayCancel(null, "Search Transaction! by Transaction", "Do you want to disregard changes?") == false) {
                                         break;
                                     }
                                 }
@@ -299,11 +299,11 @@ public class DeliverySchedule_HistoryControllerMonarch_Food implements Initializ
                         break;
                     }
                     if (poAppController.getMaster().getTransactionStatus().equalsIgnoreCase(DeliveryScheduleStatus.OPEN)) {
-                        ShowMessageFX.Information("Status was not yet confirmed and still " + DeliveryScheduleStatus.STATUS.get(Integer.parseInt(poAppController.getMaster().getTransactionStatus())).toLowerCase(), "Search Transaction! by Trasaction", "Delivery Schedule Confirmation");
+                        ShowMessageFX.Information("Status was not yet confirmed and still " + DeliveryScheduleStatus.STATUS.get(Integer.parseInt(poAppController.getMaster().getTransactionStatus())).toLowerCase(), "Search Transaction! by Transaction", "Delivery Schedule Confirmation");
                         break;
                     }
                     if (!poAppController.getMaster().getTransactionStatus().equalsIgnoreCase(DeliveryScheduleStatus.CONFIRMED)) {
-                        ShowMessageFX.Information("Status was already " + DeliveryScheduleStatus.STATUS.get(Integer.parseInt(poAppController.getMaster().getTransactionStatus())).toLowerCase(), "Search Transaction! by Trasaction", "Delivery Schedule Confirmation");
+                        ShowMessageFX.Information("Status was already " + DeliveryScheduleStatus.STATUS.get(Integer.parseInt(poAppController.getMaster().getTransactionStatus())).toLowerCase(), "Search Transaction! by Transaction", "Delivery Schedule Confirmation");
                         break;
                     }
 
@@ -375,7 +375,7 @@ public class DeliverySchedule_HistoryControllerMonarch_Food implements Initializ
 
                 if (!tfTransactionNo.getText().isEmpty()) {
                     if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
-                        if (ShowMessageFX.OkayCancel(null, "Search Transaction! by Trasaction", "Do you want to disregard changes?") == false) {
+                        if (ShowMessageFX.OkayCancel(null, "Search Transaction! by Transaction", "Do you want to disregard changes?") == false) {
                             return;
                         }
                     }
@@ -590,7 +590,7 @@ public class DeliverySchedule_HistoryControllerMonarch_Food implements Initializ
 
                                 if (!tfTransactionNo.getText().isEmpty()) {
                                     if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
-                                        if (ShowMessageFX.OkayCancel(null, "Search Transaction! by Trasaction", "Do you want to disregard changes?") == false) {
+                                        if (ShowMessageFX.OkayCancel(null, "Search Transaction! by Transaction", "Do you want to disregard changes?") == false) {
                                             break;
                                         }
                                     }

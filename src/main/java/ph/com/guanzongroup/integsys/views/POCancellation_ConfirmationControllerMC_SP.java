@@ -211,7 +211,7 @@ public class POCancellation_ConfirmationControllerMC_SP implements Initializable
                 if (poAppController.getMaster().getSourceNo() != null) {
                     if (!poAppController.getMaster().getSourceNo().isEmpty()) {
 
-                        if (ShowMessageFX.OkayCancel(null, "Search Transaction! by Trasaction", "Are you sure you want replace loaded Transaction?") == false) {
+                        if (ShowMessageFX.OkayCancel(null, "Search Transaction! by Transaction", "Are you sure you want to replace loaded Transaction?") == false) {
                             return;
                         }
                     }
@@ -305,7 +305,7 @@ public class POCancellation_ConfirmationControllerMC_SP implements Initializable
                 case "btnBrowse":
                     if (lastFocusedControl == null) {
                         if (!tfTransactionNo.getText().isEmpty()) {
-                            if (ShowMessageFX.OkayCancel(null, "Search Transaction! by Trasaction", "Are you sure you want replace loaded Transaction?") == false) {
+                            if (ShowMessageFX.OkayCancel(null, "Search Transaction! by Transaction", "Are you sure you want to replace loaded Transaction?") == false) {
                                 return;
                             }
                         }
@@ -323,7 +323,7 @@ public class POCancellation_ConfirmationControllerMC_SP implements Initializable
                     switch (lastFocusedControl.getId()) {
                         case "tfSearchTransaction":
                             if (!tfTransactionNo.getText().isEmpty()) {
-                                if (ShowMessageFX.OkayCancel(null, "Search Transaction! by Trasaction", "Are you sure you want replace loaded Transaction?") == false) {
+                                if (ShowMessageFX.OkayCancel(null, "Search Transaction! by Transaction", "Are you sure you want to replace loaded Transaction?") == false) {
                                     return;
                                 }
                             }
@@ -337,7 +337,7 @@ public class POCancellation_ConfirmationControllerMC_SP implements Initializable
                             break;
                         case "tfSearchSupplier":
                             if (!tfTransactionNo.getText().isEmpty()) {
-                                if (ShowMessageFX.OkayCancel(null, "Search Transaction! by Supplier", "Are you sure you want replace loaded Transaction?") == false) {
+                                if (ShowMessageFX.OkayCancel(null, "Search Transaction! by Supplier", "Are you sure you want to replace loaded Transaction?") == false) {
                                     return;
                                 }
                             }
@@ -351,7 +351,7 @@ public class POCancellation_ConfirmationControllerMC_SP implements Initializable
                             break;
                         case "tfSearchReferNo":
                             if (!tfTransactionNo.getText().isEmpty()) {
-                                if (ShowMessageFX.OkayCancel(null, "Search Transaction! by Reference", "Are you sure you want replace loaded Transaction?") == false) {
+                                if (ShowMessageFX.OkayCancel(null, "Search Transaction! by Reference", "Are you sure you want to replace loaded Transaction?") == false) {
                                     return;
                                 }
                             }
@@ -365,7 +365,7 @@ public class POCancellation_ConfirmationControllerMC_SP implements Initializable
                             break;
                         default:
                             if (!tfTransactionNo.getText().isEmpty()) {
-                                if (ShowMessageFX.OkayCancel(null, "Search Transaction! by Trasaction", "Are you sure you want replace loaded Transaction?") == false) {
+                                if (ShowMessageFX.OkayCancel(null, "Search Transaction! by Transaction", "Are you sure you want to replace loaded Transaction?") == false) {
                                     return;
                                 }
                             }
@@ -716,7 +716,7 @@ public class POCancellation_ConfirmationControllerMC_SP implements Initializable
                         switch (txtFieldID) {
                             case "tfSearchTransaction":
                                 if (!tfTransactionNo.getText().isEmpty()) {
-                                    if (ShowMessageFX.OkayCancel(null, "Search Transaction! by Trasaction", "Are you sure you want replace loaded Transaction?") == false) {
+                                    if (ShowMessageFX.OkayCancel(null, "Search Transaction! by Transaction", "Are you sure you want to replace loaded Transaction?") == false) {
                                         return;
                                     }
                                 }
@@ -730,7 +730,7 @@ public class POCancellation_ConfirmationControllerMC_SP implements Initializable
                                 break;
                             case "tfSearchSupplier":
                                 if (!tfTransactionNo.getText().isEmpty()) {
-                                    if (ShowMessageFX.OkayCancel(null, "Search Transaction! by Supplier", "Are you sure you want replace loaded Transaction?") == false) {
+                                    if (ShowMessageFX.OkayCancel(null, "Search Transaction! by Supplier", "Are you sure you want to replace loaded Transaction?") == false) {
                                         return;
                                     }
                                 }
@@ -744,7 +744,7 @@ public class POCancellation_ConfirmationControllerMC_SP implements Initializable
                                 break;
                             case "tfSearchReferNo":
                                 if (!tfTransactionNo.getText().isEmpty()) {
-                                    if (ShowMessageFX.OkayCancel(null, "Search Transaction! by Reference", "Are you sure you want replace loaded Transaction?") == false) {
+                                    if (ShowMessageFX.OkayCancel(null, "Search Transaction! by Reference", "Are you sure you want to replace loaded Transaction?") == false) {
                                         return;
                                     }
                                 }

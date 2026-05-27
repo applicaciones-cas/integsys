@@ -181,6 +181,10 @@ public class InventoryStockIssuanceConfirmationControllerCar_SP implements Initi
             initializeTableDetail();
             initializeTableDetailOther();
             initControlEvents();
+            poAppController.getMaster().setIndustryId(psIndustryID);
+            poAppController.getMaster().setCompanyID(psCompanyID);
+            lblSource.setText(poAppController.getMaster().Company().getCompanyName() + " - " + poAppController.getMaster().Industry().getDescription());
+
         } catch (SQLException | GuanzonException e) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(e), e);
             ShowMessageFX.Error(MiscUtil.getException(e), psFormName, null);
@@ -499,8 +503,20 @@ public class InventoryStockIssuanceConfirmationControllerCar_SP implements Initi
                     break;
 
                 case "btnHistory":
-                    ShowMessageFX.Information(null, psFormName,
-                            "This feature is under development and will be available soon.\nThank you for your patience!");
+                    if (pnEditMode != EditMode.READY && pnEditMode != EditMode.UPDATE) {
+                        ShowMessageFX.Warning("No transaction status history to load!", psFormName, null);
+                        return;
+                    }
+
+                    try {
+                        poAppController.ShowStatusHistory();
+                    } catch (NullPointerException npe) {
+                        Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(npe), npe);
+                        ShowMessageFX.Error("No transaction status history to load!", psFormName, null);
+                    } catch (Exception ex) {
+                        Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+                        ShowMessageFX.Error(MiscUtil.getException(ex), psFormName, null);
+                    }
                     break;
 
                 case "btnRetrieve":
@@ -1017,17 +1033,29 @@ public class InventoryStockIssuanceConfirmationControllerCar_SP implements Initi
     }
 
     private void initButtonDisplay(int fnEditMode) {
-        boolean lbShow = (fnEditMode == EditMode.ADDNEW || fnEditMode == EditMode.UPDATE);
+        boolean lbEditing = (fnEditMode == EditMode.ADDNEW || fnEditMode == EditMode.UPDATE);
 
-        // Always show these buttons
-        initButtonControls(true, "btnRetrieve", "btnHistory", "btnClose");
+        String lsTransNo = tfTransNo.getText();
+        boolean lbHasTransaction = lsTransNo != null && !lsTransNo.isEmpty();
+        boolean lbIsApproved = lbHasTransaction
+                && "1".equals(poAppController.getMaster().getTransactionStatus());
 
-        // Show-only based on mode
-        initButtonControls(lbShow, "btnSearch", "btnSave", "btnCancel");
-        initButtonControls(!lbShow, "btnBrowse", "btnUpdate", "btnDeparture", "btnApprove", "btnVoid");
+        // Always visible
+        initButtonControls(true, "btnRetrieve", "btnClose");
 
-        apMaster.setDisable(!lbShow);
-        apMasterDelivery.setDisable(!lbShow);
+        // Editing mode buttons
+        initButtonControls(lbEditing, "btnSearch", "btnSave", "btnCancel");
+        initButtonControls(!lbEditing, "btnBrowse");
+
+        // Transaction-dependent buttons (only when not editing)
+        initButtonControls(!lbEditing && lbHasTransaction, "btnVoid", "btnHistory", "btnPrint");
+        initButtonControls(!lbEditing && lbHasTransaction && !lbIsApproved, "btnUpdate", "btnApprove");
+
+        initButtonControls(!lbEditing && lbHasTransaction && lbIsApproved, "btnDeparture");
+
+        // Disable panes during editing
+        apMaster.setDisable(!lbEditing);
+        apMasterDelivery.setDisable(!lbEditing);
     }
 
     private void initButtonControls(boolean visible, String... buttonFxIdsToShow) {

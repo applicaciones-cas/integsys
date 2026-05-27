@@ -774,21 +774,21 @@ public class InvRequest_EntryControllerMC implements Initializable, ScreenInterf
         String result = (String) loJSON.get("result");
         if ("error".equals(result)) {
             String message = (String) loJSON.get("message");
-//            poLogWrapper.severe(psFormName + " :" + message);
-            Platform.runLater(() -> {
-                ShowMessageFX.Warning(null, psFormName, message);
-            });
+
+            if (message != null) {
+                Platform.runLater(() -> {
+                    ShowMessageFX.Warning(null, psFormName, message);
+                });
+            }
             return false;
         }
         String message = (String) loJSON.get("message");
 
-//        poLogWrapper.severe(psFormName + " :" + message);
         Platform.runLater(() -> {
             if (message != null) {
                 ShowMessageFX.Information(null, psFormName, message);
             }
         });
-//        poLogWrapper.info(psFormName + " : Success on " + fsModule);
         return true;
 
     }
