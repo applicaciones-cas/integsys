@@ -196,29 +196,6 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
         }
     }
 
-    private void loadRecordSearch() {
-        try {
-            //define if both are empty
-            if (dpFrom.getEditor().getText().equals("")) {
-                String lsDateFrom = CustomCommonUtil.formatDateToShortString(getFirstDayOfMonth(poApp.getServerDate()));
-                JFXUtil.setDateValue(dpFrom, CustomCommonUtil.parseDateStringToLocalDate(lsDateFrom, "yyyy-MM-dd"));
-                psSearchDateFrom = CustomCommonUtil.formatLocalDateToShortString(CustomCommonUtil.parseDateStringToLocalDate(lsDateFrom, "yyyy-MM-dd"));
-            }
-            if (dpTo.getEditor().getText().equals("")) {
-                String lsDateTo = CustomCommonUtil.formatDateToShortString(poApp.getServerDate());
-                JFXUtil.setDateValue(dpTo, CustomCommonUtil.parseDateStringToLocalDate(lsDateTo, "yyyy-MM-dd"));
-                psSearchDateTo = CustomCommonUtil.formatLocalDateToShortString(CustomCommonUtil.parseDateStringToLocalDate(lsDateTo, "yyyy-MM-dd"));
-            }
-
-            JFXUtil.updateCaretPositions(apDetail);
-
-//            tfSearchClient.setText(poController.getModel().Client().getCompanyName());
-        } catch (SQLException ex) {
-            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
-            ShowMessageFX.Error(null, psFormName, MiscUtil.getException(ex));
-        }
-    }
-
     private void initDatePickers() {
         JFXUtil.setDatePickerFormat("MM/dd/yyyy", dpFrom, dpTo);
         JFXUtil.setActionListener(this::datepicker_Action, dpFrom, dpTo);
@@ -231,19 +208,14 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
 
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(date);
-
-        // Set to first day of the same month and year
         calendar.set(Calendar.DAY_OF_MONTH, 1);
-
-        // Optional: Reset time to start of the day
         calendar.set(Calendar.HOUR_OF_DAY, 0);
         calendar.set(Calendar.MINUTE, 0);
         calendar.set(Calendar.SECOND, 0);
         calendar.set(Calendar.MILLISECOND, 0);
-
         return calendar.getTime();
     }
-    
+
     final ChangeListener<? super Boolean> dPicker_Focus = (o, ov, nv) -> {
         DatePicker loDatePicker = (DatePicker) ((ReadOnlyBooleanPropertyBase) o).getBean();
         String lsDatePickerID = loDatePicker.getId();
@@ -653,7 +625,7 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
                                 break;
                             case "tfSearchCompanyName":
                                 if (!JFXUtil.isObjectEqualTo(tfClientID.getText(), null, "") && JFXUtil.isObjectEqualTo(poController.getEditMode(), EditMode.UPDATE, EditMode.ADDNEW)) {
-                                    if (ShowMessageFX.OkayCancel(null, "Search Client! by Name", "Are you sure you want to replace existing Record?") == false) {
+                                    if (ShowMessageFX.OkayCancel(null, "Search Client! by Name", "Are you sure you want to replace existing record?") == false) {
                                         return;
                                     }
                                 }
@@ -765,95 +737,6 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
         }
     }
 
-    private void initTextFields() {
-        JFXUtil.setFocusListener(txtField_Focus, apRecord);
-        JFXUtil.setKeyPressedListener(this::txtField_KeyPressed, apMainAnchor, apRecord);
-        dpClientSince.focusedProperty().addListener(dPicker_Focus);
-        dpBegBalance.focusedProperty().addListener(dPicker_Focus);
-        JFXUtil.setCommaFormatter(tfAvailBalance, tfOutStandingBalance, tfCreditLimit, tfDiscount);
-        CustomCommonUtil.inputIntegersOnly(tfAccountNumber);
-    }
-
-    private void initMainGrid() {
-        JFXUtil.setColumnCenter(tblColNo, tblLedgerNo, tblColDate, tblColSourceNo);
-        JFXUtil.setColumnLeft(tblColSourceCode);
-        JFXUtil.setColumnRight(tblColAmountIn, tblColAmountOut);
-        JFXUtil.setColumnsIndexAndDisableReordering(tblMain);
-
-        tblMain.setItems(laAccountsPayable);
-        filteredData = new FilteredList<>(laAccountsPayable, b -> true);
-    }
-
-    private void loadRecordMaster() {
-        try {
-            String lsStat = "";
-            switch (poController.getModel().getRecordStatus()) {
-                case "0":
-                    lsStat = "INACTIVE";
-                    break;
-                case "1":
-                    lsStat = "ACTIVE";
-                    break;
-            }
-            if (!JFXUtil.isObjectEqualTo(poController.getEditMode(), EditMode.ADDNEW, EditMode.UPDATE, EditMode.READY)) {
-                lsStat = "UNKNOWN";
-            }
-            lblStatus.setText(lsStat);
-
-            tfClientID.setText(poController.getModel().getClientId());
-
-            tfCategory.setText(poController.getModel().Category().getDescription());
-            tfCompanyName.setText(poController.getModel().Client().getCompanyName());
-            tfAddress.setText(poController.getFullAddress());
-            tfContactPerson.setText(poController.getModel().ClientInstitutionContact().getContactPersonName());
-            tfContactEmail.setText(poController.getModel().ClientInstitutionContact().getMailAddress());
-            tfContactNo.setText(poController.getModel().ClientInstitutionContact().getMobileNo());
-            tfTINNo.setText(poController.getModel().Client().getTaxIdNumber());
-
-            cbHasPermit.setSelected(poController.getModel().hasPermit() == null || !poController.getModel().hasPermit().equalsIgnoreCase("1") ? false : true);
-            cbBackOrder.setSelected(poController.getModel().isBackOrder() == null || !poController.getModel().isBackOrder().equalsIgnoreCase("1") ? false : true);
-            cbVatable.setSelected(poController.getModel().getVatable() == null || !poController.getModel().getVatable().equalsIgnoreCase("1") ? false : true);
-            cbHoldOrder.setSelected(poController.getModel().isHoldOrder() == null || !poController.getModel().isHoldOrder().equalsIgnoreCase("1") ? false : true);
-
-            if (poController.getModel().getClientId() == null || "".equals(poController.getModel().getClientId())) {
-                cmbRegistration.getSelectionModel().clearSelection();
-                cmbPayment.getSelectionModel().clearSelection();
-            } else {
-                //supplier registration
-                if (poController.getModel().getVatRegstr() == null || "".equals(poController.getModel().getVatRegstr())) {
-                    cmbRegistration.getSelectionModel().clearSelection();
-                } else {
-                    cmbRegistration.getSelectionModel().select(Integer.parseInt(poController.getModel().getVatRegstr()));
-                }
-
-                //payment method
-                if (poController.getModel().getPayment() == null || "".equals(poController.getModel().getPayment())) {
-                    cmbPayment.getSelectionModel().clearSelection();
-                } else {
-                    cmbPayment.getSelectionModel().select(Integer.parseInt(poController.getModel().getPayment()));
-                }
-            }
-
-            dpClientSince.setValue(poController.getModel().getdateClientSince() == null ? null : ParseDate(poController.getModel().getdateClientSince()));
-            dpBegBalance.setValue(poController.getModel().getBeginningDate() == null ? null : ParseDate(poController.getModel().getBeginningDate()));
-            tfDiscount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.getModel().getDiscount(), true));
-            tfTerm.setText(poController.getModel().Term().getDescription());
-            tfCreditLimit.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.getModel().getCreditLimit(), true));
-            tfBegBalanace.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.getModel().getBeginningBalance(), true));
-            tfAvailBalance.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.getModel().getAccountBalance(), true));
-            tfOutStandingBalance.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.getModel().getOBalance(), true));
-
-            //Bank Account
-            tfBank.setText(poController.BankAccount().Banks().getBankName());
-            tfAccountNumber.setText(poController.BankAccount().getAccountNumber());
-            tfAccountName.setText(poController.BankAccount().getAccountName());
-
-        } catch (SQLException | GuanzonException ex) {
-            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
-            ShowMessageFX.Error(null, psFormName, MiscUtil.getException(ex));
-        }
-    }
-
     public void initTable() {
         loadTableAttachment = new JFXUtil.ReloadableTableTask(
                 tblAttachments,
@@ -957,6 +840,99 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
         );
     }
 
+    private void loadRecordSearch() {
+        try {
+            //define if both are empty
+            if (dpFrom.getEditor().getText().equals("")) {
+                String lsDateFrom = CustomCommonUtil.formatDateToShortString(getFirstDayOfMonth(poApp.getServerDate()));
+                JFXUtil.setDateValue(dpFrom, CustomCommonUtil.parseDateStringToLocalDate(lsDateFrom, "yyyy-MM-dd"));
+                psSearchDateFrom = CustomCommonUtil.formatLocalDateToShortString(CustomCommonUtil.parseDateStringToLocalDate(lsDateFrom, "yyyy-MM-dd"));
+            }
+            if (dpTo.getEditor().getText().equals("")) {
+                String lsDateTo = CustomCommonUtil.formatDateToShortString(poApp.getServerDate());
+                JFXUtil.setDateValue(dpTo, CustomCommonUtil.parseDateStringToLocalDate(lsDateTo, "yyyy-MM-dd"));
+                psSearchDateTo = CustomCommonUtil.formatLocalDateToShortString(CustomCommonUtil.parseDateStringToLocalDate(lsDateTo, "yyyy-MM-dd"));
+            }
+
+            JFXUtil.updateCaretPositions(apDetail);
+
+//            tfSearchClient.setText(poController.getModel().Client().getCompanyName());
+        } catch (SQLException ex) {
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(null, psFormName, MiscUtil.getException(ex));
+        }
+    }
+
+    private void loadRecordMaster() {
+        try {
+            String lsStat = "";
+            switch (poController.getModel().getRecordStatus()) {
+                case "0":
+                    lsStat = "INACTIVE";
+                    break;
+                case "1":
+                    lsStat = "ACTIVE";
+                    break;
+            }
+            if (!JFXUtil.isObjectEqualTo(poController.getEditMode(), EditMode.ADDNEW, EditMode.UPDATE, EditMode.READY)) {
+                lsStat = "UNKNOWN";
+            }
+            lblStatus.setText(lsStat);
+
+            tfClientID.setText(poController.getModel().getClientId());
+
+            tfCategory.setText(poController.getModel().Category().getDescription());
+            tfCompanyName.setText(poController.getModel().Client().getCompanyName());
+            tfAddress.setText(poController.getFullAddress());
+            tfContactPerson.setText(poController.getModel().ClientInstitutionContact().getContactPersonName());
+            tfContactEmail.setText(poController.getModel().ClientInstitutionContact().getMailAddress());
+            tfContactNo.setText(poController.getModel().ClientInstitutionContact().getMobileNo());
+            tfTINNo.setText(poController.getModel().Client().getTaxIdNumber());
+
+            cbHasPermit.setSelected(poController.getModel().hasPermit() == null || !poController.getModel().hasPermit().equalsIgnoreCase("1") ? false : true);
+            cbBackOrder.setSelected(poController.getModel().isBackOrder() == null || !poController.getModel().isBackOrder().equalsIgnoreCase("1") ? false : true);
+            cbVatable.setSelected(poController.getModel().getVatable() == null || !poController.getModel().getVatable().equalsIgnoreCase("1") ? false : true);
+            cbHoldOrder.setSelected(poController.getModel().isHoldOrder() == null || !poController.getModel().isHoldOrder().equalsIgnoreCase("1") ? false : true);
+
+            if (poController.getModel().getClientId() == null || "".equals(poController.getModel().getClientId())) {
+                cmbRegistration.getSelectionModel().clearSelection();
+                cmbPayment.getSelectionModel().clearSelection();
+            } else {
+                //supplier registration
+                if (poController.getModel().getVatRegstr() == null || "".equals(poController.getModel().getVatRegstr())) {
+                    cmbRegistration.getSelectionModel().clearSelection();
+                } else {
+                    cmbRegistration.getSelectionModel().select(Integer.parseInt(poController.getModel().getVatRegstr()));
+                }
+
+                //payment method
+                if (poController.getModel().getPayment() == null || "".equals(poController.getModel().getPayment())) {
+                    cmbPayment.getSelectionModel().clearSelection();
+                } else {
+                    cmbPayment.getSelectionModel().select(Integer.parseInt(poController.getModel().getPayment()));
+                }
+            }
+
+            dpClientSince.setValue(poController.getModel().getdateClientSince() == null ? null : ParseDate(poController.getModel().getdateClientSince()));
+            dpBegBalance.setValue(poController.getModel().getBeginningDate() == null ? null : ParseDate(poController.getModel().getBeginningDate()));
+            tfDiscount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.getModel().getDiscount(), true));
+            tfTerm.setText(poController.getModel().Term().getDescription());
+            tfCreditLimit.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.getModel().getCreditLimit(), true));
+            tfBegBalanace.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.getModel().getBeginningBalance(), true));
+            tfAvailBalance.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.getModel().getAccountBalance(), true));
+            tfOutStandingBalance.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.getModel().getOBalance(), true));
+
+            //Bank Account
+            tfBank.setText(poController.BankAccount().Banks().getBankName());
+            tfAccountNumber.setText(poController.BankAccount().getAccountNumber());
+            tfAccountName.setText(poController.BankAccount().getAccountName());
+
+        } catch (SQLException | GuanzonException ex) {
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(null, psFormName, MiscUtil.getException(ex));
+        }
+    }
+
     /**
      * *******************************************************
      ************* TRANSACTION ATTACHEMENT PROPERTIES ********
@@ -1047,11 +1023,30 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
         }
     }
 
+    private void initTextFields() {
+        JFXUtil.setFocusListener(txtField_Focus, apRecord);
+        JFXUtil.setKeyPressedListener(this::txtField_KeyPressed, apMainAnchor, apRecord);
+        dpClientSince.focusedProperty().addListener(dPicker_Focus);
+        dpBegBalance.focusedProperty().addListener(dPicker_Focus);
+        JFXUtil.setCommaFormatter(tfAvailBalance, tfOutStandingBalance, tfCreditLimit, tfDiscount);
+        CustomCommonUtil.inputIntegersOnly(tfAccountNumber);
+    }
+
     private void initAttachmentsGrid() {
         JFXUtil.setColumnCenter(tblRowNoAttachment);
         JFXUtil.setColumnLeft(tblFileNameAttachment);
         JFXUtil.setColumnsIndexAndDisableReordering(tblAttachments);
         tblAttachments.setItems(attachment_data);
+    }
+
+    private void initMainGrid() {
+        JFXUtil.setColumnCenter(tblColNo, tblLedgerNo, tblColDate, tblColSourceNo);
+        JFXUtil.setColumnLeft(tblColSourceCode);
+        JFXUtil.setColumnRight(tblColAmountIn, tblColAmountOut);
+        JFXUtil.setColumnsIndexAndDisableReordering(tblMain);
+
+        tblMain.setItems(laAccountsPayable);
+        filteredData = new FilteredList<>(laAccountsPayable, b -> true);
     }
 
     private void initAttachmentPreviewPane() {
