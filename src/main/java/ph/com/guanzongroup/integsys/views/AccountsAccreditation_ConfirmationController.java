@@ -174,7 +174,7 @@ public class AccountsAccreditation_ConfirmationController implements Initializab
                         ShowMessageFX.Information(null, psFormName, "Client saved successfully!");
 
                         if (poController.getModel().getRecordStatus().equals("0")) {
-                            if (ShowMessageFX.YesNo(null, psFormName, "Do you want to Confirm transaction?") == true) {
+                            if (ShowMessageFX.YesNo(null, psFormName, "Do you want to confirm transaction?") == true) {
                                 if (!isJSONSuccess(poController.openRecord(poController.getModel().getTransactionNo()), "Initialize Open Transaction")) {
                                 } else {
                                     if (!isJSONSuccess(poController.CloseTransaction(), "Initialize Close Transaction")) {

@@ -180,7 +180,7 @@ public class AccountsAccreditation_EntryController implements Initializable, Scr
                         if (poController.getModel().getRecordStatus().equals("0")) {
                             if (!isJSONSuccess(poController.openRecord(poController.getModel().getTransactionNo()), "Initialize Open Record")) {
                             } else {
-                                if (ShowMessageFX.YesNo(null, psFormName, "Do you want to Confirm transaction?") == true) {
+                                if (ShowMessageFX.YesNo(null, psFormName, "Do you want to confirm transaction?") == true) {
                                     if (!isJSONSuccess(poController.CloseTransaction(), "Initialize Close Transaction")) {
                                         break;
                                     } else {
