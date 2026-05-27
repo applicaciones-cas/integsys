@@ -113,7 +113,7 @@ public class InvRequest_EntryControllerMonarch_Food implements Initializable, Sc
     private TableView<ModelInvTableListInformation> tableListInformation;
 
     @FXML
-    private Button btnClose, btnSave, btnCancel, btnBrowse, btnUpdate, btnRetrieve, btnNew, btnVoid, btnTransHistory,btnPrint;
+    private Button btnClose, btnSave, btnCancel, btnBrowse, btnUpdate, btnRetrieve, btnNew, btnVoid, btnTransHistory, btnPrint;
 
     @FXML
     private TableColumn<ModelInvOrderDetail, String> tblBrandDetail, tblInvTypeDetail, tblROQDetail, tblClassificationDetail,
@@ -781,21 +781,21 @@ public class InvRequest_EntryControllerMonarch_Food implements Initializable, Sc
         String result = (String) loJSON.get("result");
         if ("error".equals(result)) {
             String message = (String) loJSON.get("message");
-//            poLogWrapper.severe(psFormName + " :" + message);
-            Platform.runLater(() -> {
-                ShowMessageFX.Warning(null, psFormName, message);
-            });
+
+            if (message != null) {
+                Platform.runLater(() -> {
+                    ShowMessageFX.Warning(null, psFormName, message);
+                });
+            }
             return false;
         }
         String message = (String) loJSON.get("message");
 
-//        poLogWrapper.severe(psFormName + " :" + message);
         Platform.runLater(() -> {
             if (message != null) {
                 ShowMessageFX.Information(null, psFormName, message);
             }
         });
-//        poLogWrapper.info(psFormName + " : Success on " + fsModule);
         return true;
 
     }
@@ -1050,7 +1050,7 @@ public class InvRequest_EntryControllerMonarch_Food implements Initializable, Sc
 
     private void initButtonsClickActions() {
         List<Button> buttons = Arrays.asList(btnSave, btnCancel,
-                btnClose, btnBrowse, btnUpdate, btnRetrieve, btnNew, btnVoid, btnTransHistory,btnPrint);
+                btnClose, btnBrowse, btnUpdate, btnRetrieve, btnNew, btnVoid, btnTransHistory, btnPrint);
 
         buttons.forEach(button -> button.setOnAction(this::handleButtonAction));
     }

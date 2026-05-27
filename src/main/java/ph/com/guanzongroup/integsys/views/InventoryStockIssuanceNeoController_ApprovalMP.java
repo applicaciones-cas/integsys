@@ -1216,7 +1216,9 @@ public class InventoryStockIssuanceNeoController_ApprovalMP implements Initializ
             String message = (String) loJSON.get("message");
             poLogWrapper.severe(psFormName + " :" + message);
             Platform.runLater(() -> {
-                ShowMessageFX.Warning(null, psFormName, message);
+                if (message != null) {
+                    ShowMessageFX.Warning(null, psFormName, message);
+                }
             });
             return false;
         }
@@ -1232,7 +1234,6 @@ public class InventoryStockIssuanceNeoController_ApprovalMP implements Initializ
         return true;
 
     }
-
     private LocalDate ParseDate(Date date) {
         if (date == null) {
             return null;

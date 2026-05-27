@@ -778,7 +778,9 @@ public class InventoryStockIssuanceNeoController_HistoryCar implements Initializ
             String message = (String) loJSON.get("message");
             poLogWrapper.severe(psFormName + " :" + message);
             Platform.runLater(() -> {
-                ShowMessageFX.Warning(null, psFormName, message);
+                if (message != null) {
+                    ShowMessageFX.Warning(null, psFormName, message);
+                }
             });
             return false;
         }

@@ -98,7 +98,7 @@ public class InventoryStockIssuanceControllerCar implements Initializable, Scree
     @FXML
     private Button btnBrowse, btnUpdateDelivery, btnSearch, btnUpdate, btnSave,
             btnCancel, btnHistory, btnRetrieve, btnClose,
-            btnSaveDelivery, btnPrintDelivery, btnCancelDelivery, btnNew;
+            btnSaveDelivery, btnPrintDelivery, btnCancelDelivery, btnNew, btnVoid;
 
     @FXML
     private Label lblMainStatus, lblDeliveryStatus;
@@ -159,8 +159,7 @@ public class InventoryStockIssuanceControllerCar implements Initializable, Scree
         try {
             poLogWrapper = new LogWrapper(psFormName, psFormName);
             poAppController = new DeliveryIssuanceControllers(poApp, poLogWrapper).InventoryStockIssuance();
-            poAppController.setTransactionStatus(InventoryStockIssuanceStatus.OPEN);
-
+            poAppController.setTransactionStatus("10");
             //initlalize and validate transaction objects from class controller
             if (!isJSONSuccess(poAppController.initTransaction(), psFormName)) {
                 unloadForm appUnload = new unloadForm();
@@ -169,7 +168,7 @@ public class InventoryStockIssuanceControllerCar implements Initializable, Scree
 
             //background thread
             Platform.runLater(() -> {
-                poAppController.setTransactionStatus("0");
+                poAppController.setTransactionStatus("10");
                 //initialize logged in category
                 poAppController.setIndustryID(psIndustryID);
                 poAppController.setCompanyID(psCompanyID);
@@ -432,7 +431,7 @@ public class InventoryStockIssuanceControllerCar implements Initializable, Scree
                 case "btnCancel":
                     if (ShowMessageFX.OkayCancel(null, psFormName, "Do you want to disregard changes?") == true) {
                         poAppController = new DeliveryIssuanceControllers(poApp, poLogWrapper).InventoryStockIssuance();
-                        poAppController.setTransactionStatus("0");
+                        poAppController.setTransactionStatus("10");
 
                         if (!isJSONSuccess(poAppController.initTransaction(), "Initialize Transaction")) {
                             unloadForm appUnload = new unloadForm();
@@ -441,7 +440,7 @@ public class InventoryStockIssuanceControllerCar implements Initializable, Scree
 
                         Platform.runLater(() -> {
 
-                            poAppController.setTransactionStatus("0");
+                            poAppController.setTransactionStatus("10");
                             poAppController.getMaster().setIndustryId(psIndustryID);
                             poAppController.setIndustryID(psIndustryID);
                             poAppController.setCompanyID(psCompanyID);
@@ -455,8 +454,20 @@ public class InventoryStockIssuanceControllerCar implements Initializable, Scree
                     break;
 
                 case "btnHistory":
-                    ShowMessageFX.Information(null, psFormName,
-                            "This feature is under development and will be available soon.\nThank you for your patience!");
+                    if (pnEditMode != EditMode.READY && pnEditMode != EditMode.UPDATE) {
+                        ShowMessageFX.Warning("No transaction status history to load!", psFormName, null);
+                        return;
+                    }
+
+                    try {
+                        poAppController.ShowStatusHistory();
+                    } catch (NullPointerException npe) {
+                        Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(npe), npe);
+                        ShowMessageFX.Error("No transaction status history to load!", psFormName, null);
+                    } catch (Exception ex) {
+                        Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+                        ShowMessageFX.Error(MiscUtil.getException(ex), psFormName, null);
+                    }
                     break;
 
                 case "btnRetrieve":
@@ -545,6 +556,30 @@ public class InventoryStockIssuanceControllerCar implements Initializable, Scree
 //                    clearAllInputs();
                     pnEditMode = poAppController.getEditMode();
 
+                    break;
+                case "btnVoid":
+                    if (tfTransNo.getText().isEmpty()) {
+                        ShowMessageFX.Information("Please load transaction before proceeding..", null, "Issuance Approval");
+                        return;
+                    }
+
+                    if (ShowMessageFX.YesNo(null, psFormName, "Are you sure you want to Void/Cancel transaction?") == true) {
+                        if (btnVoid.getText().equals("Void")) {
+                            if (!isJSONSuccess(poAppController.VoidTransaction(), "Initialize Void Transaction")) {
+                                return;
+                            }
+                        } else {
+                            if (!isJSONSuccess(poAppController.CancelTransaction(), "Initialize Cancel Transaction")) {
+                                return;
+                            }
+
+                        }
+                        reloadTableDetail();
+
+                        getLoadedTransaction();
+                        pnEditMode = poAppController.getEditMode();
+                        break;
+                    }
                     break;
             }
 
@@ -852,7 +887,11 @@ public class InventoryStockIssuanceControllerCar implements Initializable, Scree
             tfDriver.setText(poAppController.getMaster().CompanyDriver().getCompanyName());
             tfAssistant1.setText(poAppController.getMaster().CompanyEmployee01().getCompanyName());
             tfAssistant2.setText(poAppController.getMaster().CompanyEmployee02().getCompanyName());
-
+            if (poAppController.getMaster().getTransactionStatus().equals(InventoryStockIssuanceStatus.CONFIRMED)) {
+                btnVoid.setText("Cancel");
+            } else {
+                btnVoid.setText("Void");
+            }
             cbDeliveryType.getSelectionModel().select(1);
         } catch (SQLException | GuanzonException e) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(e), e);
@@ -968,17 +1007,28 @@ public class InventoryStockIssuanceControllerCar implements Initializable, Scree
     }
 
     private void initButtonDisplay(int fnEditMode) {
-        boolean lbShow = (fnEditMode == EditMode.ADDNEW || fnEditMode == EditMode.UPDATE);
+        boolean lbEditing = (fnEditMode == EditMode.ADDNEW || fnEditMode == EditMode.UPDATE);
 
-        // Always show these buttons
-        initButtonControls(true, "btnRetrieve", "btnHistory", "btnClose");
+        String lsTransNo = tfTransNo.getText();
+        boolean lbHasTransaction = lsTransNo != null && !lsTransNo.isEmpty();
+        boolean lbIsApproved = lbHasTransaction
+                && "1".equals(poAppController.getMaster().getTransactionStatus());
 
-        // Show-only based on mode
-        initButtonControls(lbShow, "btnSearch", "btnSave", "btnCancel");
-        initButtonControls(!lbShow, "btnBrowse", "btnNew", "btnUpdate");
+        // Always visible
+        initButtonControls(true, "btnRetrieve", "btnClose");
 
-        apMaster.setDisable(!lbShow);
-        apMasterDelivery.setDisable(!lbShow);
+        // Editing mode buttons
+        initButtonControls(lbEditing, "btnSearch", "btnSave", "btnCancel");
+        initButtonControls(!lbEditing, "btnBrowse", "btnNew");
+
+        // Transaction-dependent buttons (only when not editing)
+        initButtonControls(!lbEditing && lbHasTransaction, "btnUpdate", "btnVoid", "btnHistory", "btnPrint");
+        initButtonControls(!lbEditing && lbHasTransaction && !lbIsApproved, "btnUpdate");
+
+        // Disable panes during editing
+        apMaster.setDisable(!lbEditing);
+        apMasterDelivery.setDisable(!lbEditing);
+
     }
 
     private void initButtonControls(boolean visible, String... buttonFxIdsToShow) {
