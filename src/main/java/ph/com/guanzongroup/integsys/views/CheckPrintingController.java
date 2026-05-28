@@ -564,13 +564,18 @@ public class CheckPrintingController implements Initializable, ScreenInterface {
                         try {
                             main_data.clear();
                             if (poController.getMasterList().size() > 0) {
+                                
                                 for (int lnCntr = 0; lnCntr < poController.getMasterList().size(); lnCntr++) {
+                                    String lsSupplier = poController.getMaster(lnCntr).Payee().APClient().getCompanyName();
+                                    if(lsSupplier == null || "".equals(lsSupplier)){
+                                        lsSupplier = poController.getMaster(lnCntr).Payee().Client().getCompanyName();
+                                    }
                                     main_data.add(new ModelCheckPrinting(
                                             String.valueOf(lnCntr + 1),
                                             checkedItem.get(lnCntr),
                                             poController.getMaster(lnCntr).getVoucherNo(),
                                             CustomCommonUtil.formatDateToShortString(poController.getMaster(lnCntr).getTransactionDate()),
-                                            poController.getMaster(lnCntr).Payee().Client().getCompanyName(),
+                                            lsSupplier,
                                             poController.getMaster(lnCntr).Payee().getPayeeName(),
                                             poController.getMaster(lnCntr).CheckPayments().Banks().getBankName(),
                                             poController.getMaster(lnCntr).CheckPayments().Bank_Account_Master().getAccountNo(),

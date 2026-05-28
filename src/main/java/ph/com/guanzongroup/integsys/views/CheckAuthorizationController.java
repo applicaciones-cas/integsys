@@ -398,12 +398,16 @@ public class CheckAuthorizationController implements Initializable, ScreenInterf
                                             break;
                                     }
 
+                                    String lsSupplier = poDisbursementController.getMaster(lnCntr).Payee().APClient().getCompanyName();
+                                    if(lsSupplier == null || "".equals(lsSupplier)){
+                                        lsSupplier = poDisbursementController.getMaster(lnCntr).Payee().Client().getCompanyName();
+                                    }
                                     main_data.add(new ModelDisbursementVoucher_Main(
                                             String.valueOf(lnCntr + 1),
                                             checkedItem.get(lnCntr),// 0 as unchecked, 1 as checked
                                             poDisbursementController.getMaster(lnCntr).getVoucherNo(),
                                             CustomCommonUtil.formatDateToShortString(poDisbursementController.getMaster(lnCntr).getTransactionDate()),
-                                            poDisbursementController.getMaster(lnCntr).Payee().Client().getCompanyName(),
+                                            lsSupplier,
                                             poDisbursementController.getMaster(lnCntr).Payee().getPayeeName(),
                                             lsBankName,
                                             lsBankAccount,

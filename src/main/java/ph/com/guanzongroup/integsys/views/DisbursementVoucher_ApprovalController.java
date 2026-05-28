@@ -824,9 +824,14 @@ public class DisbursementVoucher_ApprovalController implements Initializable, Sc
                                         String lsPaymentForm = "";
                                         lsPaymentForm = JFXUtil.setStatusValue(null, DisbursementStatic.DisbursementType.class, poController.getMaster(lnCtr).getDisbursementType());
                                         lnRowNo += 1;
+                                        
+                                        String lsSupplier = poController.getMaster(lnCtr).Payee().APClient().getCompanyName();
+                                        if(lsSupplier == null || "".equals(lsSupplier)){
+                                            lsSupplier = poController.getMaster(lnCtr).Payee().getPayeeName();
+                                        }
                                         main_data.add(new ModelDisbursementVoucher_Main(
                                                 String.valueOf(lnRowNo),
-                                                poController.getMaster(lnCtr).Payee().getPayeeName(),
+                                                lsSupplier,
                                                 lsPaymentForm,
                                                 CustomCommonUtil.formatDateToShortString(poController.getMaster(lnCtr).getTransactionDate()),
                                                 poController.getMaster(lnCtr).getVoucherNo(),
@@ -2170,7 +2175,12 @@ public class DisbursementVoucher_ApprovalController implements Initializable, Sc
             dpDVTransactionDate.setValue(CustomCommonUtil.parseDateStringToLocalDate(SQLUtil.dateFormat(poController.Master().getTransactionDate(), SQLUtil.FORMAT_SHORT_DATE)));
             JFXUtil.setCmbValue(cmbPaymentMode, !poController.Master().getDisbursementType().equals("") ? Integer.valueOf(poController.Master().getDisbursementType()) : -1);
             tfVoucherNo.setText(poController.Master().getVoucherNo());
-            tfSupplier.setText(poController.Master().Payee().Client().getCompanyName() != null ? poController.Master().Payee().Client().getCompanyName() : "");
+//            tfSupplier.setText(poController.Master().Payee().Client().getCompanyName() != null ? poController.Master().Payee().Client().getCompanyName() : "");
+            String lsSupplier = poController.Master().Payee().APClient().getCompanyName();
+            if(lsSupplier == null || "".equals(lsSupplier)){
+                lsSupplier = poController.Master().Payee().getPayeeName();
+            }
+            tfSupplier.setText(lsSupplier == null ? "" : lsSupplier);
             tfVatAmountMaster.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Master().getVATAmount(), true));
             tfVatExemptSales.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Master().getVATExmpt(), true));
             tfLessWHTax.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Master().getWithTaxTotal(), true));
