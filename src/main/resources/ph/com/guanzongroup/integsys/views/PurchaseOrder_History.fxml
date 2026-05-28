@@ -147,7 +147,7 @@
                             <children>
                         <TabPane layoutX="5.0" layoutY="5.0" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="5.0" AnchorPane.topAnchor="5.0">
                            <tabs>
-                              <Tab text="Information">
+                              <Tab closable="false" text="Information">
                                  <content>
                                             <HBox prefHeight="344.0" prefWidth="1042.0" spacing="5.0">
                                                 <children>
@@ -352,7 +352,7 @@
                                             </HBox>
                                  </content>
                               </Tab>
-                              <Tab fx:id="tabAttachments" text="Attachments">
+                              <Tab fx:id="tabAttachments" closable="false" text="Attachments">
                                  <content>
                                     <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                                        <children>
