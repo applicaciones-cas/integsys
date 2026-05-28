@@ -149,7 +149,7 @@ public class AccountsAccreditation_HistoryController implements Initializable, S
                     }
                     break;
                 case "btnCancel":
-                    if (ShowMessageFX.YesNo(null, psFormName, "Do you want to Cancel this transaction?")) {
+                    if (ShowMessageFX.YesNo(null, psFormName, "Do you want to block this transaction?")) {
                         JSONObject loJSON = new JSONObject();
                         loJSON = poController.BlockTransaction();
                         if (!JFXUtil.isJSONSuccess(loJSON)) {
