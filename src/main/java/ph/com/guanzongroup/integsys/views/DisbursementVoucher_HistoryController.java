@@ -1183,7 +1183,12 @@ public class DisbursementVoucher_HistoryController implements Initializable, Scr
             JFXUtil.setCmbValue(cmbPaymentMode, !poController.Master().getDisbursementType().equals("") ? Integer.valueOf(poController.Master().getDisbursementType()) : -1);
 
             tfVoucherNo.setText(poController.Master().getVoucherNo());
-            tfSupplier.setText(poController.Master().Payee().Client().getCompanyName() != null ? poController.Master().Payee().Client().getCompanyName() : "");
+//            tfSupplier.setText(poController.Master().Payee().Client().getCompanyName() != null ? poController.Master().Payee().Client().getCompanyName() : "");
+            String lsSupplier = poController.Master().Payee().APClient().getCompanyName();
+            if(lsSupplier == null || "".equals(lsSupplier)){
+                lsSupplier = poController.Master().Payee().getPayeeName();
+            }
+            tfSupplier.setText(lsSupplier == null ? "" : lsSupplier);
 
             poJSON = poController.computeFields(true);
             if ("error".equals((String) poJSON.get("result"))) {

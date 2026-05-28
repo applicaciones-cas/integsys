@@ -769,10 +769,13 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                 String lsTransNo = !JFXUtil.isObjectEqualTo(poController.Detail(lnCtr).getSourceNo(), null, "") ? poController.Detail(lnCtr).getSourceNo() : "";
                 String lsTransType = !JFXUtil.isObjectEqualTo(poController.Detail(lnCtr).getSourceCode(), null, "") ? poController.Detail(lnCtr).getSourceCode() : "";
                 String lsHighlightbasis;
+                String lsAPClient = poController.Master().Payee().getAPClientID();
+                if(lsAPClient == null || "".equals(lsAPClient)){
+                    lsAPClient = poController.Master().Payee().getClientID();
+                }
 
                 lsHighlightbasis = lsTransNo + poController.getSourceCodeDescription(poController.Detail(lnCtr).getSourceCode())
-                        + poController.Master().Payee().getPayeeName();
-
+                        + lsAPClient;
                 if (!JFXUtil.isObjectEqualTo(poController.Detail(lnCtr).getAmount(), null, "")) {
                     if (poController.Detail(lnCtr).getAmount() != 0.0000) {
                         plOrderNoPartial.add(new Pair<>(lsHighlightbasis, "1"));
@@ -858,7 +861,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                                         JSONObject obj = (JSONObject) requestObj;
                                         String lsTransBasis = (obj.get("SourceNo") != null ? obj.get("SourceNo").toString() : "")
                                                 + (obj.get("TransactionType") != null ? obj.get("TransactionType").toString() : "")
-                                                + (obj.get("Payee") != null ? obj.get("Payee").toString() : "");
+                                                + (obj.get("ClientId") != null ? obj.get("ClientId").toString() : "");
 
                                         ModelDisbursementVoucher_Main loMain = new ModelDisbursementVoucher_Main(
                                                 String.valueOf(main_data.size() + 1),
@@ -2192,7 +2195,11 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
             dpDVTransactionDate.setValue(CustomCommonUtil.parseDateStringToLocalDate(SQLUtil.dateFormat(poController.Master().getTransactionDate(), SQLUtil.FORMAT_SHORT_DATE)));
             JFXUtil.setCmbValue(cmbPaymentMode, !poController.Master().getDisbursementType().equals("") ? Integer.valueOf(poController.Master().getDisbursementType()) : -1);
             tfVoucherNo.setText(poController.Master().getVoucherNo());
-            tfSupplier.setText(poController.Master().Payee().Client().getCompanyName() != null ? poController.Master().Payee().Client().getCompanyName() : "");
+            String lsSupplier = poController.Master().Payee().APClient().getCompanyName();
+            if(lsSupplier == null || "".equals(lsSupplier)){
+                lsSupplier = poController.Master().Payee().getPayeeName();
+            }
+            tfSupplier.setText(lsSupplier == null ? "" : lsSupplier);
             tfVatAmountMaster.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Master().getVATAmount(), true));
             tfVatExemptSales.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Master().getVATExmpt(), true));
             tfLessWHTax.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Master().getWithTaxTotal(), true));
