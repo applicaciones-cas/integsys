@@ -182,7 +182,6 @@ public class AccountsAccreditation_EntryController implements Initializable, Scr
                             } else {
                                 if (ShowMessageFX.YesNo(null, psFormName, "Do you want to confirm transaction?") == true) {
                                     if (!isJSONSuccess(poController.CloseTransaction(), "Initialize Close Transaction")) {
-                                        break;
                                     } else {
                                         ShowMessageFX.Information(null, psFormName, "Transaction confirmed successfully");
                                     }

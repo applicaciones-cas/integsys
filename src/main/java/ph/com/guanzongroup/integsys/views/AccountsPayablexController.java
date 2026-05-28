@@ -873,6 +873,9 @@ public class AccountsPayablexController implements Initializable, ScreenInterfac
                 case "1":
                     lsStat = "ACTIVE";
                     break;
+                case "3":
+                    lsStat = "BLOCKED";
+                    break;
             }
             if (!JFXUtil.isObjectEqualTo(poController.getEditMode(), EditMode.ADDNEW, EditMode.UPDATE, EditMode.READY)) {
                 lsStat = "UNKNOWN";

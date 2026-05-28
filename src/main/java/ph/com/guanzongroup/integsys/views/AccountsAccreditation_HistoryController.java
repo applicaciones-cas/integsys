@@ -64,7 +64,7 @@ public class AccountsAccreditation_HistoryController implements Initializable, S
     @FXML
     private TextField tfSearchCompany, tfTransactionNo, tfCategory, tfCompany, tfAddress, tfTIN, tfContactPerson, tfContactNo, tfContactEmail, tfContactRole, tfContactDepartment, tfContactPosition;
     @FXML
-    private Button btnBrowse, btnHistory, btnClose, btnAddClompany;
+    private Button btnBrowse, btnHistory, btnClose, btnAddClompany, btnCancel;
     @FXML
     private DatePicker dpTransactionDate;
     @FXML
@@ -146,6 +146,16 @@ public class AccountsAccreditation_HistoryController implements Initializable, S
                     } catch (Exception ex) {
                         Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
                         ShowMessageFX.Error(null, psFormName, MiscUtil.getException(ex));
+                    }
+                    break;
+                case "btnCancel":
+                    if (ShowMessageFX.YesNo(null, psFormName, "Do you want to Cancel this transaction?")) {
+                        JSONObject loJSON = new JSONObject();
+                        loJSON = poController.BlockTransaction();
+                        if (!JFXUtil.isJSONSuccess(loJSON)) {
+                            ShowMessageFX.Information(null, psFormName, JFXUtil.getJSONMessage(loJSON));
+                        }
+                        loadRecordMaster();
                     }
                     break;
                 case "btnClose":
@@ -248,13 +258,22 @@ public class AccountsAccreditation_HistoryController implements Initializable, S
     private void initButtonDisplay(int fnValue) {
         boolean lbShow1 = (fnValue == EditMode.READY);
         boolean lbShow2 = (fnValue == EditMode.UNKNOWN || fnValue == EditMode.READY);
-
+        
         JFXUtil.setButtonsVisibility(lbShow1, btnHistory);
         JFXUtil.setButtonsVisibility(lbShow2, btnClose);
-
+        
         JFXUtil.setDisabled(true, apMaster);
         JFXUtil.setButtonsVisibility(true, btnBrowse);
-        JFXUtil.setButtonsVisibility(false, btnAddClompany);
+        JFXUtil.setButtonsVisibility(false, btnAddClompany, btnCancel);
+        
+        if(fnValue !=EditMode.READY){
+            return;
+        }
+        switch (poController.getModel().getRecordStatus()) {
+            case AccountAccreditationStatus.CONFIRMED:
+                   JFXUtil.setButtonsVisibility(true, btnCancel);
+                break;
+        }
     }
 
     private void initControlEvents() {
