@@ -114,7 +114,7 @@ public class InvRequest_EntryControllerLP_Food implements Initializable, ScreenI
     private TableView<ModelInvTableListInformation> tableListInformation;
 
     @FXML
-    private Button btnClose, btnSave, btnCancel, btnBrowse, btnUpdate, btnRetrieve, btnNew, btnVoid, btnTransHistory,btnPrint;
+    private Button btnClose, btnSave, btnCancel, btnBrowse, btnUpdate, btnRetrieve, btnNew, btnVoid, btnTransHistory, btnPrint;
 
     @FXML
     private TableColumn<ModelInvOrderDetail, String> tblBrandDetail, tblInvTypeDetail, tblROQDetail, tblClassificationDetail,
@@ -669,7 +669,7 @@ public class InvRequest_EntryControllerLP_Food implements Initializable, ScreenI
                                 break;
                             }
                             ShowMessageFX.Information((String) poJSON.get("message"), psFormName, null);
-
+                            btnPrint.fire();
                         } catch (ParseException ex) {
                             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
 
@@ -796,6 +796,7 @@ public class InvRequest_EntryControllerLP_Food implements Initializable, ScreenI
         return true;
 
     }
+
     private void loadTableList() {
         btnRetrieve.setDisable(true);
         ProgressIndicator progressIndicator = new ProgressIndicator();
@@ -1046,7 +1047,7 @@ public class InvRequest_EntryControllerLP_Food implements Initializable, ScreenI
 
     private void initButtonsClickActions() {
         List<Button> buttons = Arrays.asList(btnSave, btnCancel,
-                btnClose, btnBrowse, btnUpdate, btnRetrieve, btnNew, btnVoid, btnTransHistory,btnPrint);
+                btnClose, btnBrowse, btnUpdate, btnRetrieve, btnNew, btnVoid, btnTransHistory, btnPrint);
 
         buttons.forEach(button -> button.setOnAction(this::handleButtonAction));
     }
@@ -1142,8 +1143,16 @@ public class InvRequest_EntryControllerLP_Food implements Initializable, ScreenI
                                 double newQty = currentQty + 1;
                                 tfOrderQuantity.setText(String.valueOf(newQty));
                                 invRequestController.Detail(pnTblInvDetailRow).setQuantity(newQty);
-                            }
 
+                            }
+                            if ("merged".equals(poJSON.get("result"))) {
+
+                                if (poJSON.get("updatedRow") != null) {
+                                    tblViewOrderDetails.getSelectionModel().select((int) poJSON.get("updatedRow"));
+                                    pnTblInvDetailRow = (int) poJSON.get("updatedRow");
+                                    ShowMessageFX.Information(poJSON.get("message").toString(), psFormName, null);
+                                }
+                            }
                             loadTableInvDetail();
                             loadDetail();
                             initDetailFocus();
@@ -1176,6 +1185,15 @@ public class InvRequest_EntryControllerLP_Food implements Initializable, ScreenI
                                 double newQty = currentQty + 1;
                                 tfOrderQuantity.setText(String.valueOf(newQty));
                                 invRequestController.Detail(pnTblInvDetailRow).setQuantity(newQty);
+
+                            }
+                            if ("merged".equals(poJSON.get("result"))) {
+
+                                if (poJSON.get("updatedRow") != null) {
+                                    tblViewOrderDetails.getSelectionModel().select((int) poJSON.get("updatedRow"));
+                                    pnTblInvDetailRow = (int) poJSON.get("updatedRow");
+                                    ShowMessageFX.Information(poJSON.get("message").toString(), psFormName, null);
+                                }
                             }
 
                             loadTableInvDetail();
@@ -1196,7 +1214,7 @@ public class InvRequest_EntryControllerLP_Food implements Initializable, ScreenI
                             }
                             CommonUtils.SetNextFocus((TextField) event.getSource());
                             loadTableInvDetailAndSelectedRow();
-                            
+
                             Platform.runLater(() -> {
                                 tfOrderQuantity.requestFocus();
                                 tfOrderQuantity.selectAll();

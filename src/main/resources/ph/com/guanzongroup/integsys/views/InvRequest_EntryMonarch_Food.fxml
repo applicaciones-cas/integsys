@@ -286,7 +286,7 @@
                                                                   <Font name="System Bold" size="12.0" />
                                                                </font>
                                                             </Text>
-                                                            <TextField fx:id="tfOrderQuantity" promptText="0" GridPane.columnIndex="12" GridPane.rowIndex="3" />
+                                                            <TextField fx:id="tfOrderQuantity"  GridPane.columnIndex="12" GridPane.rowIndex="3" />
                                                             <Text strokeType="OUTSIDE" strokeWidth="0.0" text="QOH" GridPane.columnIndex="7" GridPane.rowIndex="3" />
                                                             <TextField fx:id="tfQOH" GridPane.columnIndex="9" GridPane.rowIndex="3" />
                                                             <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Inv Type" GridPane.rowIndex="3" />

@@ -114,7 +114,7 @@ public class InvRequest_Roq_EntryControllerCar_SP implements Initializable, Scre
     private TableView<ModelInvTableListInformation> tableListInformation;
 
     @FXML
-    private Button btnClose, btnSave, btnCancel, btnBrowse, btnUpdate, btnRetrieve, btnNew, btnVoid, btnTransHistory,btnPrint;
+    private Button btnClose, btnSave, btnCancel, btnBrowse, btnUpdate, btnRetrieve, btnNew, btnVoid, btnTransHistory, btnPrint;
 
     @FXML
     private TableColumn<ModelInvOrderDetail, String> tblBrandDetail, tblModelDetail, tblVariantDetail,
@@ -677,7 +677,7 @@ public class InvRequest_Roq_EntryControllerCar_SP implements Initializable, Scre
                                 break;
                             }
                             ShowMessageFX.Information((String) poJSON.get("message"), psFormName, null);
-
+                            btnPrint.fire();
                         } catch (ParseException ex) {
                             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
 
@@ -761,7 +761,7 @@ public class InvRequest_Roq_EntryControllerCar_SP implements Initializable, Scre
                         ShowMessageFX.Error(MiscUtil.getException(ex), psFormName, null);
                     }
                     break;
-                
+
                 case "btnPrint":
                     if (invRequestController.Master().getTransactionNo() == null || invRequestController.Master().getTransactionNo().isEmpty()) {
                         ShowMessageFX.Information("Please load transaction before proceeding..", "Stock Request Approval", "");
@@ -1056,7 +1056,7 @@ public class InvRequest_Roq_EntryControllerCar_SP implements Initializable, Scre
 
     private void initButtonsClickActions() {
         List<Button> buttons = Arrays.asList(btnSave, btnCancel,
-                btnClose, btnBrowse, btnUpdate, btnRetrieve, btnNew, btnVoid, btnTransHistory,btnPrint);
+                btnClose, btnBrowse, btnUpdate, btnRetrieve, btnNew, btnVoid, btnTransHistory, btnPrint);
 
         buttons.forEach(button -> button.setOnAction(this::handleButtonAction));
     }

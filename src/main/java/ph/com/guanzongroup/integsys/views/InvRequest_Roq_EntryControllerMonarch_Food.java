@@ -115,7 +115,7 @@ public class InvRequest_Roq_EntryControllerMonarch_Food implements Initializable
     private TableView<ModelInvTableListInformation> tableListInformation;
 
     @FXML
-    private Button btnClose, btnSave, btnCancel, btnBrowse, btnUpdate, btnRetrieve, btnNew, btnVoid, btnTransHistory,btnPrint;
+    private Button btnClose, btnSave, btnCancel, btnBrowse, btnUpdate, btnRetrieve, btnNew, btnVoid, btnTransHistory, btnPrint;
 
     @FXML
     private TableColumn<ModelInvOrderDetail, String> tblMeasureDetail, tblBrandDetail, tblModelDetail, tblVariantDetail,
@@ -658,7 +658,7 @@ public class InvRequest_Roq_EntryControllerMonarch_Food implements Initializable
                                 break;
                             }
                             ShowMessageFX.Information((String) poJSON.get("message"), psFormName, null);
-
+                            btnPrint.fire();
                         } catch (ParseException ex) {
                             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
 
@@ -1031,7 +1031,7 @@ public class InvRequest_Roq_EntryControllerMonarch_Food implements Initializable
 
     private void initButtonsClickActions() {
         List<Button> buttons = Arrays.asList(btnSave, btnCancel,
-                btnClose, btnBrowse, btnUpdate, btnRetrieve, btnNew, btnVoid, btnTransHistory,btnPrint);
+                btnClose, btnBrowse, btnUpdate, btnRetrieve, btnNew, btnVoid, btnTransHistory, btnPrint);
 
         buttons.forEach(button -> button.setOnAction(this::handleButtonAction));
     }
