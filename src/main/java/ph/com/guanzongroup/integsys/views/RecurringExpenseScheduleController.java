@@ -109,7 +109,7 @@ public class RecurringExpenseScheduleController implements Initializable, Screen
             initDetailsGrid();
             Platform.runLater(() -> {
                 poController.setIndustryID(psIndustryId);
-//                poController.setCompanyId(psCompanyId);
+                poController.setCompanyID(psCompanyId);
 //                poController.setIndustryId(psIndustryId);
 //                poController.setCompanyId(psCompanyId);
                 poController.setWithUI(true);
@@ -135,7 +135,7 @@ public class RecurringExpenseScheduleController implements Initializable, Screen
 
     @Override
     public void setCompanyID(String fsValue) {
-        //Company is not autoset
+        psCompanyId = fsValue;
     }
 
     @Override
