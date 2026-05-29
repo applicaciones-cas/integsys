@@ -114,7 +114,7 @@ public class InvRequest_Roq_EntryControllerMC_SP implements Initializable, Scree
     private TableView<ModelInvTableListInformation> tableListInformation;
 
     @FXML
-    private Button btnClose, btnSave, btnCancel, btnBrowse, btnUpdate, btnRetrieve, btnNew, btnVoid,btnTransHistory,btnPrint;
+    private Button btnClose, btnSave, btnCancel, btnBrowse, btnUpdate, btnRetrieve, btnNew, btnVoid, btnTransHistory, btnPrint;
 
     @FXML
     private TableColumn<ModelInvOrderDetail, String> tblBrandDetail, tblModelDetail, tblVariantDetail,
@@ -167,7 +167,7 @@ public class InvRequest_Roq_EntryControllerMC_SP implements Initializable, Scree
                     invRequestController.setCompanyID(psCompanyID);
                     invRequestController.setCategoryID(psCategoryID);
                     invRequestController.setIndustryID(psIndustryID);
-                    
+
                     invRequestController.NewTransaction();
                     loadRecordSearch();
 
@@ -678,7 +678,7 @@ public class InvRequest_Roq_EntryControllerMC_SP implements Initializable, Scree
                                 break;
                             }
                             ShowMessageFX.Information((String) poJSON.get("message"), psFormName, null);
-
+                            btnPrint.fire();
                         } catch (ParseException ex) {
                             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
 
@@ -807,6 +807,7 @@ public class InvRequest_Roq_EntryControllerMC_SP implements Initializable, Scree
         return true;
 
     }
+
     private void loadTableList() {
         btnRetrieve.setDisable(true);
         ProgressIndicator progressIndicator = new ProgressIndicator();
@@ -1055,7 +1056,7 @@ public class InvRequest_Roq_EntryControllerMC_SP implements Initializable, Scree
 
     private void initButtonsClickActions() {
         List<Button> buttons = Arrays.asList(btnSave, btnCancel,
-                btnClose, btnBrowse, btnUpdate, btnRetrieve, btnNew, btnVoid,btnTransHistory,btnPrint);
+                btnClose, btnBrowse, btnUpdate, btnRetrieve, btnNew, btnVoid, btnTransHistory, btnPrint);
 
         buttons.forEach(button -> button.setOnAction(this::handleButtonAction));
     }
@@ -1094,7 +1095,7 @@ public class InvRequest_Roq_EntryControllerMC_SP implements Initializable, Scree
                             if (!invOrderDetail_data.isEmpty() && pnTblInvDetailRow < invOrderDetail_data.size() - 1) {
                                 pnTblInvDetailRow++;
                             }//step 9W
-                            
+
                             Platform.runLater(() -> {
                                 tfOrderQuantity.requestFocus();
                                 tfOrderQuantity.selectAll();

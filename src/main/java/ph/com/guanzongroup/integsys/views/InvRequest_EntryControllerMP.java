@@ -684,7 +684,7 @@ public class InvRequest_EntryControllerMP implements Initializable, ScreenInterf
                                 break;
                             }
                             ShowMessageFX.Information((String) poJSON.get("message"), psFormName, null);
-
+                            btnPrint.fire();
                         } catch (ParseException ex) {
                             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
 
@@ -1180,6 +1180,14 @@ public class InvRequest_EntryControllerMP implements Initializable, ScreenInterf
                                 tfOrderQuantity.setText(String.valueOf(newQty));
                                 invRequestController.Detail(pnTblInvDetailRow).setQuantity(newQty);
                             }
+                            if ("merged".equals(poJSON.get("result"))) {
+
+                                if (poJSON.get("updatedRow") != null) {
+                                    tblViewOrderDetails.getSelectionModel().select((int) poJSON.get("updatedRow"));
+                                    pnTblInvDetailRow = (int) poJSON.get("updatedRow");
+                                    ShowMessageFX.Information(poJSON.get("message").toString(), psFormName, null);
+                                }
+                            }
                             loadTableInvDetail();
                             loadDetail();
                             initDetailFocus();
@@ -1213,8 +1221,16 @@ public class InvRequest_EntryControllerMP implements Initializable, ScreenInterf
                                 double newQty = currentQty + 1;
                                 tfOrderQuantity.setText(String.valueOf(newQty));
                                 invRequestController.Detail(pnTblInvDetailRow).setQuantity(newQty);
-                            }
 
+                            }
+                            if ("merged".equals(poJSON.get("result"))) {
+
+                                if (poJSON.get("updatedRow") != null) {
+                                    tblViewOrderDetails.getSelectionModel().select((int) poJSON.get("updatedRow"));
+                                    pnTblInvDetailRow = (int) poJSON.get("updatedRow");
+                                    ShowMessageFX.Information(poJSON.get("message").toString(), psFormName, null);
+                                }
+                            }
                             loadTableInvDetail();
                             loadDetail();
                             initDetailFocus();
@@ -1247,6 +1263,15 @@ public class InvRequest_EntryControllerMP implements Initializable, ScreenInterf
                                 double newQty = currentQty + 1;
                                 tfOrderQuantity.setText(String.valueOf(newQty));
                                 invRequestController.Detail(pnTblInvDetailRow).setQuantity(newQty);
+
+                            }
+                            if ("merged".equals(poJSON.get("result"))) {
+
+                                if (poJSON.get("updatedRow") != null) {
+                                    tblViewOrderDetails.getSelectionModel().select((int) poJSON.get("updatedRow"));
+                                    pnTblInvDetailRow = (int) poJSON.get("updatedRow");
+                                    ShowMessageFX.Information(poJSON.get("message").toString(), psFormName, null);
+                                }
                             }
 
                             loadTableInvDetail();

@@ -115,7 +115,7 @@ public class InvRequest_EntryController implements Initializable, ScreenInterfac
     private TableView<ModelInvTableListInformation> tableListInformation;
 
     @FXML
-    private Button btnClose, btnSave, btnCancel, btnBrowse, btnUpdate, btnRetrieve, btnNew, btnVoid, btnTransHistory,btnPrint;
+    private Button btnClose, btnSave, btnCancel, btnBrowse, btnUpdate, btnRetrieve, btnNew, btnVoid, btnTransHistory, btnPrint;
 
     @FXML
     private TableColumn<ModelInvOrderDetail, String> tblBrandDetail, tblModelDetail, tblVariantDetail,
@@ -690,7 +690,7 @@ public class InvRequest_EntryController implements Initializable, ScreenInterfac
                                 break;
                             }
                             ShowMessageFX.Information((String) poJSON.get("message"), psFormName, null);
-
+                            btnPrint.fire();
                         } catch (ParseException ex) {
                             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
 
@@ -1073,7 +1073,7 @@ public class InvRequest_EntryController implements Initializable, ScreenInterfac
 
     private void initButtonsClickActions() {
         List<Button> buttons = Arrays.asList(btnSave, btnCancel,
-                btnClose, btnBrowse, btnUpdate, btnRetrieve, btnNew, btnVoid, btnTransHistory,btnPrint);
+                btnClose, btnBrowse, btnUpdate, btnRetrieve, btnNew, btnVoid, btnTransHistory, btnPrint);
 
         buttons.forEach(button -> button.setOnAction(this::handleButtonAction));
     }
@@ -1192,8 +1192,16 @@ public class InvRequest_EntryController implements Initializable, ScreenInterfac
                                 double newQty = currentQty + 1;
                                 tfOrderQuantity.setText(String.valueOf(newQty));
                                 invRequestController.Detail(pnTblInvDetailRow).setQuantity(newQty);
-                            }
 
+                            }
+                            if ("merged".equals(poJSON.get("result"))) {
+
+                                if (poJSON.get("updatedRow") != null) {
+                                    tblViewOrderDetails.getSelectionModel().select((int) poJSON.get("updatedRow"));
+                                    pnTblInvDetailRow = (int) poJSON.get("updatedRow");
+                                    ShowMessageFX.Information(poJSON.get("message").toString(), psFormName, null);
+                                }
+                            }
                             loadTableInvDetail();
                             loadDetail();
                             initDetailFocus();
@@ -1226,8 +1234,16 @@ public class InvRequest_EntryController implements Initializable, ScreenInterfac
                                 double newQty = currentQty + 1;
                                 tfOrderQuantity.setText(String.valueOf(newQty));
                                 invRequestController.Detail(pnTblInvDetailRow).setQuantity(newQty);
-                            }
 
+                            }
+                            if ("merged".equals(poJSON.get("result"))) {
+
+                                if (poJSON.get("updatedRow") != null) {
+                                    tblViewOrderDetails.getSelectionModel().select((int) poJSON.get("updatedRow"));
+                                    pnTblInvDetailRow = (int) poJSON.get("updatedRow");
+                                    ShowMessageFX.Information(poJSON.get("message").toString(), psFormName, null);
+                                }
+                            }
                             loadTableInvDetail();
                             loadDetail();
                             initDetailFocus();
