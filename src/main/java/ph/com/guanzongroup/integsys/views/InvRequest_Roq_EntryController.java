@@ -687,7 +687,7 @@ public class InvRequest_Roq_EntryController implements Initializable, ScreenInte
                                 break;
                             }
                             ShowMessageFX.Information((String) poJSON.get("message"), psFormName, null);
-                            Platform.runLater(() -> btnPrint.fire());
+                            btnPrint.fire();
                         } catch (ParseException ex) {
                             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
 
