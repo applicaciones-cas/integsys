@@ -343,12 +343,12 @@
                                               </AnchorPane>
                                                       <AnchorPane maxWidth="1.7976931348623157E308" style="-fx-border-color: FF8201;" VBox.vgrow="ALWAYS">
                                                          <children>
-                                                            <TableView fx:id="tblViewDetails" layoutX="8.0" layoutY="8.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="5.0">
+                                                            <TableView fx:id="tblViewDetail" layoutX="8.0" layoutY="8.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="5.0">
                                                               <columns>
-                                                          <TableColumn fx:id="tblColDetailNo" editable="false" maxWidth="-1.0" minWidth="-1.0" prefWidth="-1.0" resizable="false" sortable="false" style="-fx-font-size: 12;" text="No." />
+                                                          <TableColumn fx:id="tblColDetailNo" editable="false" maxWidth="30.0" minWidth="30.0" prefWidth="30.0" resizable="false" sortable="false" style="-fx-font-size: 12;" text="No." />
                                                           <TableColumn fx:id="tblColDetailReference" editable="false" maxWidth="120.0" minWidth="120.0" prefWidth="120.0" resizable="false" sortable="false" style="-fx-font-size: 12;" text="Reference No." />
                                                           <TableColumn fx:id="tblColDetailBank" editable="false" maxWidth="200.0" minWidth="200.0" prefWidth="200.0" sortable="false" style="-fx-font-size: 12;" text="Bank" />
-                                                                  <TableColumn fx:id="tblColDetailPayee" editable="false" maxWidth="250.0" minWidth="250.0" prefWidth="250.0" resizable="false" sortable="false" style="-fx-font-size: 12;" text="Payee" />
+                                                                  <TableColumn fx:id="tblColDetailPayee" editable="false" maxWidth="220.0" minWidth="220.0" prefWidth="220.0" resizable="false" sortable="false" style="-fx-font-size: 12;" text="Payee" />
                                                                   <TableColumn fx:id="tblColDetailDate" editable="false" maxWidth="120.0" minWidth="120.0" prefWidth="120.0" resizable="false" sortable="false" style="-fx-font-size: 12;" text="Check Date" />
                                                                   <TableColumn fx:id="tblColDetailCheckNo" editable="false" maxWidth="120.0" minWidth="120.0" prefWidth="120.0" resizable="false" sortable="false" style="-fx-font-size: 12;" text="Check No." />
                                                           <TableColumn fx:id="tblColDetailCheckAmount" editable="false" maxWidth="120.0" minWidth="120.0" prefWidth="120.0" resizable="false" sortable="false" style="-fx-font-size: 12;" text="Amount" />
@@ -497,7 +497,7 @@
                                                       <Insets left="5.0" right="5.0" top="5.0" />
                                                   </GridPane.margin>
                                               </AnchorPane>
-                                              <TableView fx:id="tblViewMaster" GridPane.columnSpan="2147483647" GridPane.rowIndex="1">
+                                              <TableView fx:id="tblViewMain" GridPane.columnSpan="2147483647" GridPane.rowIndex="1">
                                                   <columns>
                                                       <TableColumn fx:id="tblColNo" editable="false" maxWidth="30.0" minWidth="30.0" prefWidth="30.0" resizable="false" sortable="false" style="-fx-font-size: 12;" text="No." />
                                                       <TableColumn fx:id="tblColTransNo" editable="false" maxWidth="120.0" minWidth="120.0" prefWidth="120.0" resizable="false" sortable="false" style="-fx-font-size: 12;" text="Transaction No." />
