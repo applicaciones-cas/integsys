@@ -197,7 +197,6 @@ public class CheckDepositInterBranch_EntryController implements Initializable, S
             initAttachmentsGrid();
             initTableOnClick();
             initTabPane();
-            clearTextFields();
             initComboboxes();
             pnEditMode = EditMode.UNKNOWN;
             initButton(pnEditMode);
@@ -788,9 +787,9 @@ public class CheckDepositInterBranch_EntryController implements Initializable, S
                 return;
             }
             if (poController.Detail(pnDetail).getSourceNo().isEmpty()) {
-                JFXUtil.setDisabled(false, tfCheckTransNo, tfCheckNo, cbReverse);
+                JFXUtil.setDisabled(false, tfCheckTransNo, tfCheckNo);
             } else {
-                JFXUtil.setDisabled(true, tfCheckTransNo, tfCheckNo, cbReverse);
+                JFXUtil.setDisabled(true, tfCheckTransNo, tfCheckNo);
             }
             tfCheckTransNo.setText(poController.Detail(pnDetail).CheckPayment().getTransactionNo());
             tfBank.setText(poController.Detail(pnDetail).CheckPayment().Banks().getBankName());
