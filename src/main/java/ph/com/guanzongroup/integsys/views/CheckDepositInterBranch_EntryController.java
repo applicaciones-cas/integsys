@@ -988,7 +988,6 @@ public class CheckDepositInterBranch_EntryController implements Initializable, S
                 } catch (SQLException | GuanzonException ex) {
                     Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
                     ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
-                    ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
                 } catch (CloneNotSupportedException ex) {
                     Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
                     ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
@@ -1102,25 +1101,20 @@ public class CheckDepositInterBranch_EntryController implements Initializable, S
                 () -> {
                     try {
                         main_data.clear();
-                        poJSON = poController.loadTransactionList(tfSearchBank.getText(), psSearchFrom, psSearchThru);
+                        poJSON = poController.loadCheckPayment(tfSearchBank.getText(), psSearchFrom, psSearchThru);
                         if ("success".equals(poJSON.get("result"))) {
                             Platform.runLater(() -> {
-                                if (poController.getTransactionListCount() > 0) {
-                                    for (int lnCntr = 0; lnCntr < poController.getTransactionListCount(); lnCntr++) {
-                                        try {
-                                            String lsTransBasis = poController.TransactionList(lnCntr).getTransactionNo();
-                                            main_data.add(new ModelTableMain(
-                                                    String.valueOf(lnCntr + 1),
-                                                    poController.TransactionList(lnCntr).getTransactionNo(),
-                                                    CustomCommonUtil.formatDateToShortString(poController.TransactionList(lnCntr).getTransactionDate()),
-                                                    poController.TransactionList(lnCntr).BankAccount().getCheckNo(),
-                                                    CustomCommonUtil.setIntegerValueToDecimalFormat(poController.TransactionList(lnCntr).BankAccount().getAccountBalance(), true),
-                                                    "", "", "", "", lsTransBasis
-                                            ));
-                                        } catch (SQLException | GuanzonException ex) {
-                                            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
-                                            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
-                                        }
+                                if (poController.getCheckPaymentCount() > 0) {
+                                    for (int lnCntr = 0; lnCntr < poController.getCheckPaymentCount(); lnCntr++) {
+                                        String lsTransBasis = poController.ChecksPaymentList(lnCntr).getTransactionNo();
+                                        main_data.add(new ModelTableMain(
+                                                String.valueOf(lnCntr + 1),
+                                                poController.ChecksPaymentList(lnCntr).getTransactionNo(),
+                                                CustomCommonUtil.formatDateToShortString(poController.ChecksPaymentList(lnCntr).getTransactionDate()),
+                                                poController.ChecksPaymentList(lnCntr).getCheckNo(),
+                                                CustomCommonUtil.setIntegerValueToDecimalFormat(poController.ChecksPaymentList(lnCntr).getAmount(), true),
+                                                "", "", "", "", lsTransBasis
+                                        ));
                                     }
                                 } else {
                                     main_data.clear();
@@ -1251,7 +1245,6 @@ public class CheckDepositInterBranch_EntryController implements Initializable, S
                             loadRecordMasterJE();
                         } catch (SQLException | GuanzonException | CloneNotSupportedException ex) {
                             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
-                            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
                             ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
                         }
                     });
