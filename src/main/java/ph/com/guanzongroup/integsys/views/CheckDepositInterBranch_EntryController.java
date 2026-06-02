@@ -640,7 +640,6 @@ public class CheckDepositInterBranch_EntryController implements Initializable, S
             }
             if (JFXUtil.isObjectEqualTo(lsButton, "btnSave", "btnCancel", "btnVoid")) {
                 pbIsCheckedJournalTab = false;
-                poController.Detail().clear();
                 poController.resetTransaction();
                 clearTextFields();
                 JFXUtil.clickTabByTitleText(tabPaneMain, "Check Deposit");
@@ -907,8 +906,7 @@ public class CheckDepositInterBranch_EntryController implements Initializable, S
         JFXUtil.setColumnRight(tblColCheckAmount);
         JFXUtil.setColumnsIndexAndDisableReordering(tblViewMain);
 
-        tblViewDetail.setItems(detail_data);
-        JFXUtil.applyRowHighlighting(tblViewMain, item -> ((ModelTableMain) item).getIndex02(), highlightedRowsMain);
+        tblViewMain.setItems(main_data);
     }
 
     private void initDetailGrid() {
@@ -917,8 +915,7 @@ public class CheckDepositInterBranch_EntryController implements Initializable, S
         JFXUtil.setColumnRight(tblColDetailCheckAmount);
         JFXUtil.setColumnsIndexAndDisableReordering(tblViewDetail);
 
-        filteredData = new FilteredList<>(main_data, b -> true);
-        tblViewMain.setItems(filteredData);
+        tblViewDetail.setItems(detail_data);
     }
 
     private void initDetailJEGrid() {
@@ -933,7 +930,7 @@ public class CheckDepositInterBranch_EntryController implements Initializable, S
         try {
             for (int lnCtr = 0; lnCtr < poController.getDetailCount(); lnCtr++) {
                 String lsHighlightbasis = "";
-                lsHighlightbasis = poController.Detail(lnCtr).getSourceNo();
+                lsHighlightbasis = poController.Detail(lnCtr).CheckPayment().getTransactionNo();
                 if (!JFXUtil.isObjectEqualTo(poController.Detail(lnCtr).CheckPayment().getAmount(), null, "")) {
                     if (poController.Detail(lnCtr).CheckPayment().getAmount() != 0.0000) {
                         plOrderNoPartial.add(new Pair<>(lsHighlightbasis, "1"));
@@ -1097,25 +1094,32 @@ public class CheckDepositInterBranch_EntryController implements Initializable, S
                 tblViewMain,
                 main_data,
                 () -> {
+
                     try {
                         main_data.clear();
                         poJSON = poController.loadTransactionList(tfSearchBank.getText(), psSearchFrom, psSearchThru);
                         if ("success".equals(poJSON.get("result"))) {
-                            if (poController.getTransactionListCount() > 0) {
-                                for (int lnCntr = 0; lnCntr < poController.getTransactionListCount(); lnCntr++) {
-                                    String lsTransBasis = "";
-                                    main_data.add(new ModelTableMain(
-                                            String.valueOf(lnCntr + 1),
-                                            poController.TransactionList(lnCntr).getTransactionNo(),
-                                            CustomCommonUtil.formatDateToShortString(poController.TransactionList(lnCntr).getTransactionDate()),
-                                            poController.TransactionList(lnCntr).BankAccount().getCheckNo(),
-                                            CustomCommonUtil.setIntegerValueToDecimalFormat(poController.TransactionList(lnCntr).BankAccount().getAccountBalance(), true),
-                                            "", "", "", "", lsTransBasis
-                                    ));
+                            Platform.runLater(() -> {
+                                if (poController.getTransactionListCount() > 0) {
+                                    for (int lnCntr = 0; lnCntr < poController.getTransactionListCount(); lnCntr++) {
+                                        try {
+                                            String lsTransBasis = poController.TransactionList(lnCntr).getTransactionNo();
+                                            main_data.add(new ModelTableMain(
+                                                    String.valueOf(lnCntr + 1),
+                                                    poController.TransactionList(lnCntr).getTransactionNo(),
+                                                    CustomCommonUtil.formatDateToShortString(poController.TransactionList(lnCntr).getTransactionDate()),
+                                                    poController.TransactionList(lnCntr).BankAccount().getCheckNo(),
+                                                    CustomCommonUtil.setIntegerValueToDecimalFormat(poController.TransactionList(lnCntr).BankAccount().getAccountBalance(), true),
+                                                    "", "", "", "", lsTransBasis
+                                            ));
+                                        } catch (SQLException | GuanzonException ex) {
+                                            Logger.getLogger(CheckDepositInterBranch_EntryController.class.getName()).log(Level.SEVERE, null, ex);
+                                        }
+                                    }
+                                } else {
+                                    main_data.clear();
                                 }
-                            } else {
-                                main_data.clear();
-                            }
+                            });
                         }
                     } catch (SQLException | GuanzonException ex) {
                         Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
@@ -1124,58 +1128,60 @@ public class CheckDepositInterBranch_EntryController implements Initializable, S
 
         loadTableDetail = new JFXUtil.ReloadableTableTask(
                 tblViewDetail,
-                detail_data, new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
-                        poController.ReloadDetail();
-                        if ("error".equals((String) poJSON.get("result"))) {
-                            ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                detail_data, () -> {
+                    Platform.runLater(() -> {
+                        try {
+                            detail_data.clear();
+                            if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
+                                poController.ReloadDetail();
+                                if ("error".equals((String) poJSON.get("result"))) {
+                                    ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                                }
+                            }
+                            int OriginalRow = 0;
+                            for (int lnCtr = 0; lnCtr < poController.getDetailCount(); lnCtr++) {
+                                if (!poController.Detail(lnCtr).isReverse()) {
+                                    continue;
+                                }
+                                OriginalRow += 1;
+                                String lsdate = JFXUtil.isObjectEqualTo(poController.Detail(lnCtr).CheckPayment().getCheckDate(), null, "") ? ""
+                                        : CustomCommonUtil.formatDateToMMDDYYYY(poController.Detail(lnCtr).CheckPayment().getCheckDate());
+                                detail_data.add(new ModelTableDetail(
+                                        String.valueOf(OriginalRow),
+                                        poController.Detail(lnCtr).CheckPayment().getTransactionNo(),
+                                        poController.Detail(lnCtr).CheckPayment().Banks().getBankName(),
+                                        poController.Detail(lnCtr).CheckPayment().Payee().getPayeeName(),
+                                        lsdate,
+                                        poController.Detail(lnCtr).CheckPayment().getCheckNo(),
+                                        CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(lnCtr).CheckPayment().getAmount(), true),
+                                        String.valueOf(lnCtr),
+                                        "", ""));
+                            }
+                            JFXUtil.showRetainedHighlight(false, tblViewMain, "#A7C7E7", plOrderNoPartial, plOrderNoFinal, highlightedRowsMain, true);
+                            loadHighlightFromDetail();
+                            int lnTempRow = JFXUtil.getDetailRow(detail_data, pnDetail, 8); //this method is used only when Reverse is applied
+                            if (lnTempRow < 0 || lnTempRow
+                                    >= detail_data.size()) {
+                                if (!detail_data.isEmpty()) {
+                                    /* FOCUS ON FIRST ROW */
+                                    JFXUtil.selectAndFocusRow(tblViewDetail, 0);
+                                    int lnRow = Integer.parseInt(detail_data.get(0).getIndex08());
+                                    pnDetail = lnRow;
+                                    loadRecordDetail();
+                                }
+                            } else {
+                                /* FOCUS ON THE ROW THAT pnRowDetail POINTS TO */
+                                JFXUtil.selectAndFocusRow(tblViewDetail, lnTempRow);
+                                int lnRow = Integer.parseInt(detail_data.get(tblViewDetail.getSelectionModel().getSelectedIndex()).getIndex08());
+                                pnDetail = lnRow;
+                                loadRecordDetail();
+                            }
+                            loadRecordMaster();
+                        } catch (GuanzonException | SQLException | CloneNotSupportedException ex) {
+                            Logger.getLogger(CheckDepositInterBranch_EntryController.this.getClass().getName()).log(Level.SEVERE, null, ex);
                         }
-                    }
-                    int OriginalRow = 0;
-                    for (int lnCtr = 0; lnCtr < poController.getDetailCount(); lnCtr++) {
-                        if (!poController.Detail(lnCtr).isReverse()) {
-                            continue;
-                        }
-                        OriginalRow += 1;
-                        detail_data.add(new ModelTableDetail(
-                                String.valueOf(OriginalRow),
-                                poController.Detail(lnCtr).CheckPayment().getTransactionNo(),
-                                poController.Detail(lnCtr).CheckPayment().Banks().getBankName(),
-                                poController.Detail(lnCtr).CheckPayment().Payee().getPayeeName(),
-                                CustomCommonUtil.formatDateToMMDDYYYY(poController.Detail(lnCtr).CheckPayment().getCheckDate()),
-                                poController.Detail(lnCtr).CheckPayment().getCheckNo(),
-                                CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(lnCtr).CheckPayment().getAmount(), true),
-                                String.valueOf(lnCtr),
-                                "", ""));
-                    }
-                    JFXUtil.showRetainedHighlight(false, tblViewMain, "#A7C7E7", plOrderNoPartial, plOrderNoFinal, highlightedRowsMain, true);
-                    loadHighlightFromDetail();
-                    int lnTempRow = JFXUtil.getDetailRow(detail_data, pnDetail, 8); //this method is used only when Reverse is applied
-                    if (lnTempRow < 0 || lnTempRow
-                            >= detail_data.size()) {
-                        if (!detail_data.isEmpty()) {
-                            /* FOCUS ON FIRST ROW */
-                            JFXUtil.selectAndFocusRow(tblViewDetail, 0);
-                            int lnRow = Integer.parseInt(detail_data.get(0).getIndex08());
-                            pnDetail = lnRow;
-                            loadRecordDetail();
-                        }
-                    } else {
-                        /* FOCUS ON THE ROW THAT pnRowDetail POINTS TO */
-                        JFXUtil.selectAndFocusRow(tblViewDetail, lnTempRow);
-                        int lnRow = Integer.parseInt(detail_data.get(tblViewDetail.getSelectionModel().getSelectedIndex()).getIndex08());
-                        pnDetail = lnRow;
-                        loadRecordDetail();
-                    }
-                    loadRecordMaster();
-                } catch (GuanzonException | SQLException | CloneNotSupportedException ex) {
-                    Logger.getLogger(CheckDepositInterBranch_EntryController.this.getClass().getName()).log(Level.SEVERE, null, ex);
-                }
-            }
-        });
+                    });
+                });
 
         loadTableDetailJE = new JFXUtil.ReloadableTableTask(
                 tblVwJournalDetails,
@@ -1474,6 +1480,39 @@ public class CheckDepositInterBranch_EntryController implements Initializable, S
                                 }
                                 loadTableDetail.reload();
                                 return;
+                            //apJournalDetails
+                            case "tfAccountCode":
+                                poJSON = poController.Journal().SearchAccountCode(pnDetailJE, lsValue, true, poController.Master().getIndustryId(), null);
+                                if ("error".equals(poJSON.get("result"))) {
+                                    int lnReturned = Integer.parseInt(String.valueOf(poJSON.get("row")));
+                                    JFXUtil.runWithDelay(0.70, () -> {
+                                        pnDetailJE = lnReturned;
+                                        loadTableDetailJE.reload();
+                                    });
+                                    ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                                    break;
+                                } else {
+                                    pnDetailJE = Integer.parseInt(String.valueOf(poJSON.get("row")));
+                                    loadTableDetailJE.reload();
+                                    JFXUtil.textFieldMoveNext(tfDebitAmount);
+                                }
+                                break;
+                            case "tfAccountDescription":
+                                poJSON = poController.Journal().SearchAccountCode(pnDetailJE, lsValue, false, poController.Master().getIndustryId(), null);
+                                if ("error".equals(poJSON.get("result"))) {
+                                    int lnReturned = Integer.parseInt(String.valueOf(poJSON.get("row")));
+                                    JFXUtil.runWithDelay(0.70, () -> {
+                                        pnDetailJE = lnReturned;
+                                        loadTableDetailJE.reload();
+                                    });
+                                    ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                                    break;
+                                } else {
+                                    pnDetailJE = Integer.parseInt(String.valueOf(poJSON.get("row")));
+                                    loadTableDetailJE.reload();
+                                    JFXUtil.textFieldMoveNext(tfDebitAmount);
+                                }
+                                break;
                         }
                         break;
                     case UP:
@@ -1502,10 +1541,10 @@ public class CheckDepositInterBranch_EntryController implements Initializable, S
 
     private void initDatePicker() {
         LocalDate today = LocalDate.now();
-        dpFrom.setValue(today);
-        dpThru.setValue(today.plusDays(7));
         JFXUtil.setDatePickerFormat("MM/dd/yyyy", dpTransactionDate, dpTransactionReferDate, dpCheckDate, dpJournalTransactionDate, dpReportMonthYear, dpFrom, dpThru);
         JFXUtil.setActionListener(datepicker_Action, dpTransactionDate, dpTransactionReferDate, dpCheckDate, dpJournalTransactionDate, dpReportMonthYear, dpFrom, dpThru);
+        dpFrom.setValue(today);
+        dpThru.setValue(today.plusDays(7));
     }
 
     private void initTextFields() {
