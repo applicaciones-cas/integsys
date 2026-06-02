@@ -979,7 +979,7 @@ public class CheckDepositInterBranch_EntryController implements Initializable, S
                     moveNext(false, false);
 
                     JFXUtil.runWithDelay(0.50, () -> {
-                        loadTableMain.reload();
+//                        loadTableMain.reload();
                     });
                 } catch (SQLException | GuanzonException ex) {
                     Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
@@ -1558,25 +1558,36 @@ public class CheckDepositInterBranch_EntryController implements Initializable, S
         JFXUtil.setCommaFormatter(tfDebitAmount, tfCreditAmount);
         JFXUtil.setKeyEventFilter(tableKeyEvents, tblViewDetail, tblVwJournalDetails, tblAttachments, tblViewMain);
         JFXUtil.adjustColumnForScrollbar(tblViewDetail, tblVwJournalDetails, tblAttachments, tblViewMain);
+
+        JFXUtil.handleDisabledNodeClick(apDetail, pnEditMode, nodeID -> {
+            switch (nodeID) {
+                case "tfCheckTransNo":
+                case "tfCheckNo":
+                case "cbReverse":
+                    ShowMessageFX.Warning(null, pxeModuleName,
+                            "This field is disabled when source is existing.");
+                    break;
+            }
+        });
     }
 
     public void initTableOnClick() {
-        tblAttachments.setOnMouseClicked(event -> {
-            pnAttachment = tblAttachments.getSelectionModel().getSelectedIndex();
-            if (pnAttachment >= 0) {
-                imageviewerutil.scaleFactor = 1.0;
-                int lnRow = Integer.parseInt(attachment_data.get(tblAttachments.getSelectionModel().getSelectedIndex()).getIndex03());
-                pnAttachment = lnRow;
-                loadRecordAttachment(true);
-                JFXUtil.resetImageBounds(imageView, stackPane1);
-            }
-        });
+//        tblAttachments.setOnMouseClicked(event -> {
+//            pnAttachment = tblAttachments.getSelectionModel().getSelectedIndex();
+//            if (pnAttachment >= 0) {
+//                imageviewerutil.scaleFactor = 1.0;
+//                int lnRow = Integer.parseInt(attachment_data.get(tblAttachments.getSelectionModel().getSelectedIndex()).getIndex03());
+//                pnAttachment = lnRow;
+//                loadRecordAttachment(true);
+//                JFXUtil.resetImageBounds(imageView, stackPane1);
+//            }
+//        });
 
         tblViewDetail.setOnMouseClicked(event -> {
             if (!detail_data.isEmpty() && event.getClickCount() == 1) {
                 ModelTableDetail selected = (ModelTableDetail) tblViewDetail.getSelectionModel().getSelectedItem();
                 if (selected != null) {
-                    int lnRow = Integer.parseInt(detail_data.get(tblViewDetail.getSelectionModel().getSelectedIndex()).getIndex06());
+                    int lnRow = Integer.parseInt(detail_data.get(tblViewDetail.getSelectionModel().getSelectedIndex()).getIndex08());
                     pnDetail = lnRow;
                     loadRecordDetail();
 //                    moveNext(false, false);
@@ -1609,12 +1620,13 @@ public class CheckDepositInterBranch_EntryController implements Initializable, S
     JFXUtil.TableKeyEvent tableKeyEvents = new JFXUtil.TableKeyEvent() {
         @Override
         protected void onRowMove(TableView<?> currentTable, String currentTableID, boolean isMovedDown) {
-            int newIndex = isMovedDown ? JFXUtil.moveToNextRow(currentTable) : JFXUtil.moveToPreviousRow(currentTable);
+            int newIndex = 0;
             switch (currentTableID) {
                 case "tblViewDetail":
                     if (!detail_data.isEmpty()) {
-                        pnDetail = isMovedDown ? Integer.parseInt(detail_data.get(JFXUtil.moveToNextRow(currentTable)).getIndex08())
+                        newIndex = isMovedDown ? Integer.parseInt(detail_data.get(JFXUtil.moveToNextRow(currentTable)).getIndex08())
                                 : Integer.parseInt(detail_data.get(JFXUtil.moveToPreviousRow(currentTable)).getIndex08());
+                        pnDetail = newIndex;
                         loadRecordDetail();
                     }
                     break;
