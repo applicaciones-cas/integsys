@@ -78,7 +78,7 @@ import ph.com.guanzongroup.integsys.utility.JFXUtil;
 /**
  * FXML Controller class
  *
- * @author User
+ * @author Taem 1
  */
 public class CheckDepositInterBranch_EntryController implements Initializable, ScreenInterface {
 
@@ -640,6 +640,7 @@ public class CheckDepositInterBranch_EntryController implements Initializable, S
             }
             if (JFXUtil.isObjectEqualTo(lsButton, "btnSave", "btnCancel", "btnVoid")) {
                 pbIsCheckedJournalTab = false;
+                poController.Detail().clear();
                 poController.resetTransaction();
                 clearTextFields();
                 JFXUtil.clickTabByTitleText(tabPaneMain, "Check Deposit");
@@ -650,8 +651,8 @@ public class CheckDepositInterBranch_EntryController implements Initializable, S
             } else {
                 loadRecordMaster();
                 loadTableDetail.reload();
-                loadTableDetailJE.reload();
-                loadTableAttachment.reload();
+//                loadTableDetailJE.reload();
+//                loadTableAttachment.reload();
             }
             initButton(pnEditMode);
             if (lsButton.equals("btnUpdate")) {
@@ -763,7 +764,7 @@ public class CheckDepositInterBranch_EntryController implements Initializable, S
 
     private void loadRecordMaster() {
         try {
-//            poController.computeMasterFields();
+            poController.computeFields();
             JFXUtil.setStatusValue(lblStatus, CheckDepositStatus.class, pnEditMode == EditMode.UNKNOWN ? "-1" : poController.Master().getTransactionStatus());
 
             tfTransactionNo.setText(poController.Master().getTransactionNo());
@@ -1098,7 +1099,7 @@ public class CheckDepositInterBranch_EntryController implements Initializable, S
                 () -> {
                     try {
                         main_data.clear();
-                        poJSON = poController.loadTransactionList(tfSearchBank.getText(), dpFrom.getValue().toString(), dpThru.getValue().toString());
+                        poJSON = poController.loadTransactionList(tfSearchBank.getText(), psSearchFrom, psSearchThru);
                         if ("success".equals(poJSON.get("result"))) {
                             if (poController.getTransactionListCount() > 0) {
                                 for (int lnCntr = 0; lnCntr < poController.getTransactionListCount(); lnCntr++) {
@@ -1107,10 +1108,8 @@ public class CheckDepositInterBranch_EntryController implements Initializable, S
                                             String.valueOf(lnCntr + 1),
                                             poController.TransactionList(lnCntr).getTransactionNo(),
                                             CustomCommonUtil.formatDateToShortString(poController.TransactionList(lnCntr).getTransactionDate()),
-                                            //                                            poController.TransactionList(lnCntr).getCheckNo(),
-                                            "",
-                                            "",
-                                            //                                            CustomCommonUtil.setIntegerValueToDecimalFormat(poController.TransactionList(lnCntr).getAmount(), true),
+                                            poController.TransactionList(lnCntr).BankAccount().getCheckNo(),
+                                            CustomCommonUtil.setIntegerValueToDecimalFormat(poController.TransactionList(lnCntr).BankAccount().getAccountBalance(), true),
                                             "", "", "", "", lsTransBasis
                                     ));
                                 }
@@ -1129,13 +1128,10 @@ public class CheckDepositInterBranch_EntryController implements Initializable, S
             @Override
             public void run() {
                 try {
-                    int detailCount = poController.getDetailCount();
-
                     if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
-                        if (poController.Detail(detailCount - 1).getSourceNo() != null
-                                && !poController.Detail(detailCount - 1).getSourceNo().isEmpty()) {
-                            poController.AddDetail();
-                            detailCount++;
+                        poController.ReloadDetail();
+                        if ("error".equals((String) poJSON.get("result"))) {
+                            ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                         }
                     }
                     int OriginalRow = 0;
@@ -1658,7 +1654,7 @@ public class CheckDepositInterBranch_EntryController implements Initializable, S
         JFXUtil.setButtonsVisibility(lbShow2, btnUpdate, btnHistory);
         JFXUtil.setButtonsVisibility(lbShow3, btnBrowse, btnClose);
 
-        JFXUtil.setDisabled(!lbShow1, apBrowse, apMaster, apDetail, apTransaction, apJournalMaster, apJournalDetails, apAttachments);
+        JFXUtil.setDisabled(!lbShow1, apBrowse, apMaster, apDetail, apJournalMaster, apJournalDetails, apAttachments);
         JFXUtil.setButtonsVisibility(true, btnRetrieve);
 
         if (fnValue != EditMode.READY) {
