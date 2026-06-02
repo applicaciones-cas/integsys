@@ -275,7 +275,7 @@ public class DeliverySchedule_ConfirmationControllerLP_Food implements Initializ
                             break;
 
                         default:
-                            if (!isJSONSuccess(poAppController.searchTransaction("%", true, true),
+                            if (!isJSONSuccess(poAppController.searchTransaction("", true, true),
                                     "Search Transaction!")) {
                                 break;
                             }
@@ -312,7 +312,7 @@ public class DeliverySchedule_ConfirmationControllerLP_Food implements Initializ
 
                             if (pnClusterDetail >= 0) {
 
-                                if (!isJSONSuccess(poAppController.searchClusterBranch(pnClusterDetail, "%", false),
+                                if (!isJSONSuccess(poAppController.searchClusterBranch(pnClusterDetail, "", false),
                                         "Search Cluster! ")) {
                                     break;
                                 }
@@ -375,6 +375,9 @@ public class DeliverySchedule_ConfirmationControllerLP_Food implements Initializ
                         break;
                     }
 
+                    if (ShowMessageFX.YesNo(null, psFormName, "Are you sure you want to save transaction?") != true) {
+                        return;
+                    }
                     if (!isJSONSuccess(poAppController.saveTransaction(), "Initialize Save Transaction")) {
                         break;
                     }
@@ -497,7 +500,7 @@ public class DeliverySchedule_ConfirmationControllerLP_Food implements Initializ
                 }
 
                 event.consume();
-                if (!isJSONSuccess(poAppController.openTransaction(tblColDeliveryTransaction.getCellData(pnTransaction)),
+                if (!isJSONSuccess(poAppController.OpenTransaction(tblColDeliveryTransaction.getCellData(pnTransaction)),
                         "Initialize Open Transaction")) {
                     return;
 
@@ -745,11 +748,11 @@ public class DeliverySchedule_ConfirmationControllerLP_Food implements Initializ
                             //Browse Transaction 
                             case "tfSearchCluster":
 
-                                if (tfSearchCluster.getText().isEmpty()) {
-                                    ShowMessageFX.Information(null, psFormName,
-                                            "Search unavailable. Please ensure the selected or focused field is not empty");
-                                    break;
-                                }
+//                                if (tfSearchCluster.getText().isEmpty()) {
+//                                    ShowMessageFX.Information(null, psFormName,
+//                                            "Search unavailable. Please ensure the selected or focused field is not empty");
+//                                    break;
+//                                }
 
                                 if (!tfTransactionNo.getText().isEmpty()) {
                                     if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
@@ -915,23 +918,27 @@ public class DeliverySchedule_ConfirmationControllerLP_Food implements Initializ
             String message = (String) loJSON.get("message");
             if (message != null) {
                 poLogWrapper.severe(psFormName + " :" + message);
-                Platform.runLater(() -> {
+                if (Platform.isFxApplicationThread()) {
                     ShowMessageFX.Warning(null, psFormName, message);
-                });
+                } else {
+                    Platform.runLater(() -> ShowMessageFX.Warning(null, psFormName, message));
+                }
             }
             return false;
         }
-        String message = (String) loJSON.get("message");
 
+        String message = (String) loJSON.get("message");
         poLogWrapper.severe(psFormName + " :" + message);
-        Platform.runLater(() -> {
-            if (message != null) {
+        if (message != null) {
+            if (Platform.isFxApplicationThread()) {
                 ShowMessageFX.Information(null, psFormName, message);
+            } else {
+                Platform.runLater(() -> ShowMessageFX.Information(null, psFormName, message));
             }
-        });
+        }
+
         poLogWrapper.info(psFormName + " : Success on " + fsModule);
         return true;
-
     }
 
     private void loadTransactionMaster() throws SQLException, GuanzonException {
@@ -1011,7 +1018,7 @@ public class DeliverySchedule_ConfirmationControllerLP_Food implements Initializ
                         detail.BranchCluster().loadBranchClusterDeliveryList();
                         if (detail.BranchCluster().getBranchClusterDeliverysCount() > 0) {
                             int index = tblClusterDetail.getItems().indexOf(detail);
-                            int Size = Integer.parseInt(detail.BranchCluster().BranchClusterDelivery(0).getTruckSize() != null ? detail.BranchCluster().BranchClusterDelivery(0).getTruckSize() : "NONE");
+                            int Size = Integer.parseInt(detail.getTruckSize() != null ? detail.getTruckSize() : "NONE");
                             cbTruckSize.getSelectionModel().select(DeliveryScheduleTruck.SIZE.get(Size));
                             return new SimpleStringProperty(DeliveryScheduleTruck.SIZE.get(Size));
 
