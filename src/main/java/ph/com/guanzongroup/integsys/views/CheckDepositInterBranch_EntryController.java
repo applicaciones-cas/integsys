@@ -214,12 +214,14 @@ public class CheckDepositInterBranch_EntryController implements Initializable, S
                     lblSource.setText(poController.Master().Company().getCompanyName() + " - " + poController.Master().Industry().getDescription());
                 } catch (SQLException | GuanzonException ex) {
                     Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+                    ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
                 }
             });
             initAttachmentPreviewPane();
             JFXUtil.initKeyClickObject(AnchorMain, lastFocusedTextField, previousSearchedTextField); // for btnSearch Reference
         } catch (SQLException | GuanzonException ex) {
-            Logger.getLogger(CheckDepositInterBranch_EntryController.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -250,36 +252,52 @@ public class CheckDepositInterBranch_EntryController implements Initializable, S
                         JFXUtil.clearTextFields(apJournalDetails, apJournalMaster);
                         if (DoesContainValidDetail()) {
                             pbIsCheckedJournalTab = true;
+                            populateJE();
                         } else {
                             JFXUtil.clickTabByTitleText(tabPaneMain, "Cash Disbursement");
                             ShowMessageFX.Warning(null, pxeModuleName, lsValidDisbMessage);
                         }
                     }
                     break;
-//                case "Attachments":
-//                    if (pnEditMode == EditMode.READY || pnEditMode == EditMode.UPDATE || pnEditMode == EditMode.ADDNEW) {
-//                        JFXUtil.clearTextFields(apAttachments);
-//                        if (DoesContainValidDetail()) {
+                case "Attachments":
+                    if (pnEditMode == EditMode.READY || pnEditMode == EditMode.UPDATE || pnEditMode == EditMode.ADDNEW) {
+                        JFXUtil.clearTextFields(apAttachments);
+                        if (DoesContainValidDetail()) {
 //                            if (isSourceNoAvailable()) {
 //                                pbIsCheckedAttachmentTab = true;
-//                                try {
-//                                    poController.loadAttachments();
-//                                } catch (GuanzonException | SQLException ex) {
-//                                    Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
-//                                    ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
-//                                }
-//
+                            try {
+                                poController.loadAttachments();
+                            } catch (GuanzonException | SQLException ex) {
+                                Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+                                ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
+                            }
 //                            }
-//                            loadTableAttachment.reload();
-//                        } else {
-//                            JFXUtil.clickTabByTitleText(tabPaneMain, "Cash Disbursement");
-//                            ShowMessageFX.Warning(null, pxeModuleName, lsValidDisbMessage);
-//                        }
-//                    }
-//                    break;
+                            loadTableAttachment.reload();
+                        } else {
+                            JFXUtil.clickTabByTitleText(tabPaneMain, "Cash Disbursement");
+                            ShowMessageFX.Warning(null, pxeModuleName, lsValidDisbMessage);
+                        }
+                    }
+                    break;
             }
         });
+    }
 
+    private void populateJE() {
+        try {
+            poJSON = new JSONObject();
+            JFXUtil.clearTextFields(apJournalMaster, apJournalDetails);
+            poController.getEditMode();
+            poJSON = poController.populateJournal();
+            if (JFXUtil.isJSONSuccess(poJSON)) {
+                loadTableDetailJE.reload();
+            } else {
+                journal_data.clear();
+            }
+        } catch (SQLException | GuanzonException | CloneNotSupportedException | ScriptException ex) {
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
+        }
     }
 
     boolean pbSuccess = true;
@@ -383,7 +401,7 @@ public class CheckDepositInterBranch_EntryController implements Initializable, S
                     }
                 } catch (SQLException ex) {
                     Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
-                    ShowMessageFX.Error(ex.getMessage(), pxeModuleName, null);
+                    ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
                 }
             });
 
@@ -425,13 +443,6 @@ public class CheckDepositInterBranch_EntryController implements Initializable, S
                     JFXUtil.showRetainedHighlight(false, tblViewMain, "#A7C7E7", plOrderNoPartial, plOrderNoFinal, highlightedRowsMain, true);
                     break;
                 case "btnUpdate":
-                    //Recheck transaction status
-//                    poJSON = poController.checkUpdateTransaction(true);
-//                    if (!"success".equals((String) poJSON.get("result"))) {
-//                        ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-//                        return;
-//                    }
-
                     poJSON = poController.UpdateTransaction();
                     if ("error".equals((String) poJSON.get("result"))) {
                         ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
@@ -446,19 +457,9 @@ public class CheckDepositInterBranch_EntryController implements Initializable, S
                     JFXUtil.initiateBtnSearch(pxeModuleName, lastFocusedTextField, previousSearchedTextField, apBrowse, apMaster, apDetail, apJournalDetails, apTransaction);
                     break;
                 case "btnSave":
-                    //Recheck transaction status
-                    if (pnEditMode == EditMode.UPDATE) {
-//                        poJSON = poController.checkUpdateTransaction(true);
-//                        if (!"success".equals((String) poJSON.get("result"))) {
-//                            ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-//                            return;
-//                        }
-                    }
-
                     if (!ShowMessageFX.YesNo(null, pxeModuleName, "Are you sure you want to save the transaction?")) {
                         return;
                     }
-
                     poJSON = poController.SaveTransaction();
                     if (!"success".equals((String) poJSON.get("result"))) {
                         ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
@@ -514,10 +515,10 @@ public class CheckDepositInterBranch_EntryController implements Initializable, S
                         poController.ShowStatusHistory();
                     } catch (NullPointerException npe) {
                         Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(npe), npe);
-                        ShowMessageFX.Error("No transaction status history to load!", pxeModuleName, null);
+                        ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(npe));
                     } catch (Exception ex) {
                         Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
-                        ShowMessageFX.Error(MiscUtil.getException(ex), pxeModuleName, null);
+                        ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
                     }
                     break;
                 case "btnRetrieve":
@@ -593,7 +594,8 @@ public class CheckDepositInterBranch_EntryController implements Initializable, S
                                     return;
                                 }
                             } catch (IOException ex) {
-                                Logger.getLogger(CashDisbursement_EntryController.class.getName()).log(Level.SEVERE, null, ex);
+                                Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+                                ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
                             }
                         }
 
@@ -663,15 +665,9 @@ public class CheckDepositInterBranch_EntryController implements Initializable, S
             if (lsButton.equals("btnUpdate")) {
                 moveNext(false, false);
             }
-        } catch (CloneNotSupportedException | SQLException | GuanzonException ex) {
+        } catch (CloneNotSupportedException | SQLException | GuanzonException | ScriptException | ParseException | IOException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
             ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
-        } catch (ScriptException ex) {
-            Logger.getLogger(CheckDepositInterBranch_EntryController.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (ParseException ex) {
-            Logger.getLogger(CheckDepositInterBranch_EntryController.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IOException ex) {
-            Logger.getLogger(CheckDepositInterBranch_EntryController.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
@@ -771,7 +767,9 @@ public class CheckDepositInterBranch_EntryController implements Initializable, S
             JFXUtil.setStatusValue(lblStatus, CheckDepositStatus.class, pnEditMode == EditMode.UNKNOWN ? "-1" : poController.Master().getTransactionStatus());
 
             tfTransactionNo.setText(poController.Master().getTransactionNo());
-            tfBankMaster.setText(poController.Master().Banks().getBankName());
+            String lsBank = JFXUtil.isObjectEqualTo(poController.Master().Banks().getBankName(), null, "")
+                    ? poController.Master().BankAccount().Banks().getBankName() : poController.Master().Banks().getBankName();
+            tfBankMaster.setText(lsBank);
             tfBankAccountNo.setText(poController.Master().BankAccount().getAccountNo());
             tfBankAccountName.setText(poController.Master().BankAccount().getAccountName());
             taRemarks.setText(poController.Master().getRemarks());
@@ -780,6 +778,7 @@ public class CheckDepositInterBranch_EntryController implements Initializable, S
             JFXUtil.updateCaretPositions(apMaster);
         } catch (GuanzonException | SQLException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -805,6 +804,7 @@ public class CheckDepositInterBranch_EntryController implements Initializable, S
             JFXUtil.updateCaretPositions(apDetail);
         } catch (SQLException | GuanzonException | NullPointerException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -988,8 +988,10 @@ public class CheckDepositInterBranch_EntryController implements Initializable, S
                 } catch (SQLException | GuanzonException ex) {
                     Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
                     ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
+                    ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
                 } catch (CloneNotSupportedException ex) {
-                    Logger.getLogger(CheckDepositInterBranch_EntryController.class.getName()).log(Level.SEVERE, null, ex);
+                    Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+                    ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
                 }
             }
         } else {
@@ -1098,7 +1100,6 @@ public class CheckDepositInterBranch_EntryController implements Initializable, S
                 tblViewMain,
                 main_data,
                 () -> {
-
                     try {
                         main_data.clear();
                         poJSON = poController.loadTransactionList(tfSearchBank.getText(), psSearchFrom, psSearchThru);
@@ -1117,7 +1118,8 @@ public class CheckDepositInterBranch_EntryController implements Initializable, S
                                                     "", "", "", "", lsTransBasis
                                             ));
                                         } catch (SQLException | GuanzonException ex) {
-                                            Logger.getLogger(CheckDepositInterBranch_EntryController.class.getName()).log(Level.SEVERE, null, ex);
+                                            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+                                            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
                                         }
                                     }
                                 } else {
@@ -1127,6 +1129,7 @@ public class CheckDepositInterBranch_EntryController implements Initializable, S
                         }
                     } catch (SQLException | GuanzonException ex) {
                         Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+                        ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
                     }
                 });
 
@@ -1180,6 +1183,7 @@ public class CheckDepositInterBranch_EntryController implements Initializable, S
                             loadRecordMaster();
                         } catch (GuanzonException | SQLException | CloneNotSupportedException ex) {
                             Logger.getLogger(CheckDepositInterBranch_EntryController.this.getClass().getName()).log(Level.SEVERE, null, ex);
+                            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
                         }
                     });
                 });
@@ -1248,25 +1252,20 @@ public class CheckDepositInterBranch_EntryController implements Initializable, S
                         } catch (SQLException | GuanzonException | CloneNotSupportedException ex) {
                             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
                             ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
+                            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
                         }
                     });
                 });
-
     }
     ChangeListener<Boolean> txtBrowse_Focus = JFXUtil.FocusListener(TextField.class,
             (lsID, lsValue) -> {
-                try {
-                    switch (lsID) {
-                        case "tfSearchBank":
-                            if (lsValue.isEmpty()) {
-                                poController.Master().Banks().setBankID("");
-                            }
-                            loadRecordSearch();
-                            break;
-                    }
-                } catch (SQLException | GuanzonException ex) {
-                    Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
-                    ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
+                switch (lsID) {
+                    case "tfSearchBank":
+                        if (lsValue.isEmpty()) {
+                            poController.setSearchBank("");
+                        }
+                        loadRecordSearch();
+                        break;
                 }
             });
 
@@ -1275,18 +1274,18 @@ public class CheckDepositInterBranch_EntryController implements Initializable, S
                 switch (lsID) {
                     case "tfBankMaster":
                         if (lsValue.isEmpty()) {
-                            poController.Master().setBanks(null);
-                            poController.Master().setBankAccount(null);
+                            poController.Master().setBanks("");
+                            poController.Master().setBankAccount("");
                         }
                         break;
                     case "tfBankAccountNo":
                         if (lsValue.isEmpty()) {
-                            poController.Master().setBankAccount(null);
+                            poController.Master().setBankAccount("");
                         }
                         break;
                     case "tfBankAccountName":
                         if (lsValue.isEmpty()) {
-                            poController.Master().setBankAccount(null);
+                            poController.Master().setBankAccount("");
                         }
                         break;
                 }
@@ -1378,7 +1377,6 @@ public class CheckDepositInterBranch_EntryController implements Initializable, S
                                 });
                                 return;
                             } else {
-
                             }
                         }
                         break;
@@ -1532,10 +1530,10 @@ public class CheckDepositInterBranch_EntryController implements Initializable, S
                         break;
                     default:
                         break;
-
                 }
             } catch (SQLException | GuanzonException | ExceptionInInitializerError ex) {
                 Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+                ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
             }
         }
     }
@@ -1670,6 +1668,7 @@ public class CheckDepositInterBranch_EntryController implements Initializable, S
                 {poController.Detail(pnDetail).getRemarks(), tfNote},}, tfNote); // default
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -1696,7 +1695,6 @@ public class CheckDepositInterBranch_EntryController implements Initializable, S
     }
 
     private void initButton(int fnValue) {
-
         boolean lbShow1 = (fnValue == EditMode.ADDNEW || fnValue == EditMode.UPDATE);
         boolean lbShow2 = fnValue == EditMode.READY;
         boolean lbShow3 = (fnValue == EditMode.READY || fnValue == EditMode.UNKNOWN);
