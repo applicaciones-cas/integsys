@@ -189,6 +189,9 @@ public class InventoryStockIssuance_PostingControllerMC_SP implements Initializa
                         return;
                     }
 
+                    if (ShowMessageFX.YesNo(null, psFormName, "Are you sure you want to post transaction?") != true) {
+                        return;
+                    }
                     if (dpReceivedDate.getValue() == null) {
                         ShowMessageFX.Information("Please input date received before proceeding..", "Inventory Stock Issuance Posting", "");
                         return;
@@ -203,10 +206,27 @@ public class InventoryStockIssuance_PostingControllerMC_SP implements Initializa
                     break;
 
                 case "btnHistory":
-                    ShowMessageFX.Information(null, psFormName,
-                            "This feature is under development and will be available soon.\nThank you for your patience!");
-                    return;
+                    if (pnEditMode != EditMode.READY && pnEditMode != EditMode.UPDATE) {
+                        ShowMessageFX.Warning("No transaction status history to load!", psFormName, null);
+                        return;
+                    }
+
+                    try {
+                        poAppController.ShowStatusHistory();
+                    } catch (NullPointerException npe) {
+                        Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(npe), npe);
+                        ShowMessageFX.Error("No transaction status history to load!", psFormName, null);
+                    } catch (Exception ex) {
+                        Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+                        ShowMessageFX.Error(MiscUtil.getException(ex), psFormName, null);
+                    }
+                    break;
                 case "btnRetrieve":
+
+                    if (lastFocusedControl == null) {
+                        loadTransaction("", "d.sBranchNm");
+                        break;
+                    }
                     switch (lastFocusedControl.getId()) {
                         //Master Retrieve
                         case "tfSearchSource":
@@ -215,6 +235,9 @@ public class InventoryStockIssuance_PostingControllerMC_SP implements Initializa
 
                         case "tfSearchTransaction":
                             loadTransaction(tfSearchTransaction.getText(), "a.sTransNox");
+                            break;
+                        default:
+                            loadTransaction(tfSearchSource.getText(), "d.sBranchNm");
                             break;
                     }
                     break;
@@ -260,6 +283,9 @@ public class InventoryStockIssuance_PostingControllerMC_SP implements Initializa
 
                 }
                 getLoadedTransaction();
+
+                poAppController.UpdateTransactionPosting();
+                initButtonDisplay(poAppController.getEditMode());
             } catch (CloneNotSupportedException | SQLException | GuanzonException ex) {
 
                 Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
@@ -675,6 +701,10 @@ public class InventoryStockIssuance_PostingControllerMC_SP implements Initializa
 
         dpReceivedDate.setValue(
                 poAppController.getMaster().getReceivedDate() != null ? ParseDate(poAppController.getMaster().getReceivedDate()) : LocalDate.now());
+
+        if (poAppController.getMaster().getReceivedDate() == null) {
+            poAppController.getMaster().setReceivedDate(LocalDateTime.now());
+        }
         taRemarks.setText(poAppController.getMaster().getRemarks());
         lblStatus.setText(InventoryStockIssuanceStatus.STATUS.get(Integer.parseInt(poAppController.getMaster().getTransactionStatus())));
         lblSource.setText(poAppController.getMaster().Company().getCompanyName() + " - " + poAppController.getMaster().Industry().getDescription());
