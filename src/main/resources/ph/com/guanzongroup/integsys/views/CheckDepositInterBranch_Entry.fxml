@@ -61,7 +61,6 @@
                                           <Font name="System Bold" size="14.0" />
                                        </font>
                                     </Label>
-                                                <TextField fx:id="tfSearchBankAccountNo" promptText="Press F3: Search" visible="false" GridPane.columnIndex="2" />
                                     <Label fx:id="lblSource" maxHeight="1.7976931348623157E308" maxWidth="-Infinity" text="Industry" GridPane.columnIndex="6">
                                        <font>
                                           <Font name="System Bold" size="14.0" />
@@ -194,7 +193,7 @@
                      <children>
                         <HBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" spacing="5.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                            <children>
-                              <TabPane>
+                              <TabPane fx:id="tabPaneMain">
                                  <tabs>
                                     <Tab closable="false" text="Check Deposit">
                                        <content>
@@ -719,9 +718,9 @@
                                                       <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
                                                    </columnResizePolicy>
                                               </TableView>
-                                                                <TextField fx:id="tfFilterBank" maxHeight="25.0" promptText="Press F3: Search" GridPane.columnIndex="2" GridPane.columnSpan="4" GridPane.rowIndex="2" />
-                                                                <DatePicker fx:id="dpFilterFrom" editable="false" GridPane.columnIndex="2" GridPane.rowIndex="3" />
-                                                                <DatePicker fx:id="dpFilterThru" editable="false" GridPane.columnIndex="5" GridPane.rowIndex="3" />
+                                                                <TextField fx:id="tfSearchBank" maxHeight="25.0" promptText="Press F3: Search" GridPane.columnIndex="2" GridPane.columnSpan="4" GridPane.rowIndex="2" />
+                                                                <DatePicker fx:id="dpFrom" editable="false" GridPane.columnIndex="2" GridPane.rowIndex="3" />
+                                                                <DatePicker fx:id="dpThru" editable="false" GridPane.columnIndex="5" GridPane.rowIndex="3" />
                                                             </children>
                                       </GridPane>
                                        </children>
