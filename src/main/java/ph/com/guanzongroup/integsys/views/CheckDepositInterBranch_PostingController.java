@@ -6,11 +6,11 @@ import java.nio.file.Paths;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.animation.PauseTransition;
@@ -62,7 +62,6 @@ import org.guanzon.appdriver.base.SQLUtil;
 import org.guanzon.appdriver.constant.DocumentType;
 import org.guanzon.appdriver.constant.RecordStatus;
 import org.json.simple.JSONObject;
-import org.json.simple.parser.ParseException;
 import ph.com.guanzongroup.cas.cashflow.CheckDeposit;
 import ph.com.guanzongroup.cas.cashflow.services.CashflowControllers;
 import ph.com.guanzongroup.cas.cashflow.status.CheckDepositStatus;
@@ -110,8 +109,6 @@ public class CheckDepositInterBranch_PostingController implements Initializable,
     private boolean pbEnteredJE = false;
     private FilteredList<ModelTableMain> filteredData;
     JFXUtil.ReloadableTableTask loadTableMain, loadTableDetail, loadTableDetailJE, loadTableAttachment;
-    AtomicReference<Object> lastFocusedTextField = new AtomicReference<>();
-    AtomicReference<Object> previousSearchedTextField = new AtomicReference<>();
     private String psSearchDate = "";
 
     @FXML
@@ -177,7 +174,7 @@ public class CheckDepositInterBranch_PostingController implements Initializable,
             if (!"success".equals((String) poJSON.get("result"))) {
                 ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
             }
-            poController.setTransactionStatus("0");
+            poController.setTransactionStatus("12");
             initLoadTable();
             initTextFields();
             initDatePicker();
@@ -207,7 +204,6 @@ public class CheckDepositInterBranch_PostingController implements Initializable,
                 }
             });
             initAttachmentPreviewPane();
-            JFXUtil.initKeyClickObject(AnchorMain, lastFocusedTextField, previousSearchedTextField); // for btnSearch Reference
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
             ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
@@ -215,13 +211,9 @@ public class CheckDepositInterBranch_PostingController implements Initializable,
     }
 
     private boolean DoesContainValidDetail() {
-        String lsParticular = "";
         if (poController.getDetailCount() <= 0) {
             return false;
         }
-//        if (poController.Master().getTransactionTotal() <= 0.0000) {
-//            return false;
-//        }
         return true;
     }
     String lsValidDisbMessage = "Please provide at least one valid disbursement detail with amount to proceed.";
@@ -252,8 +244,6 @@ public class CheckDepositInterBranch_PostingController implements Initializable,
                     if (pnEditMode == EditMode.READY || pnEditMode == EditMode.UPDATE || pnEditMode == EditMode.ADDNEW) {
                         JFXUtil.clearTextFields(apAttachments);
                         if (DoesContainValidDetail()) {
-//                            if (isSourceNoAvailable()) {
-//                                pbIsCheckedAttachmentTab = true;
                             try {
                                 poController.loadAttachments();
                             } catch (GuanzonException | SQLException ex) {
@@ -308,90 +298,41 @@ public class CheckDepositInterBranch_PostingController implements Initializable,
     private void initDatePicker() {
         JFXUtil.setDatePickerFormat("MM/dd/yyyy", dpSearchTransactionDate, dpTransactionDate, dpTransactionReferDate, dpCheckDate, dpJournalTransactionDate, dpReportMonthYear);
         JFXUtil.setActionListener(datepicker_Action, dpSearchTransactionDate, dpTransactionDate, dpTransactionReferDate, dpCheckDate, dpJournalTransactionDate, dpReportMonthYear);
+        dpSearchTransactionDate.focusedProperty().addListener((obs, oldVal, focused) -> {
+            if (!focused) {
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/dd/yyyy");
+                String text = dpSearchTransactionDate.getEditor().getText();
+                if (text == null || text.trim().isEmpty()) {
+                    dpSearchTransactionDate.setValue(null);
+                    psSearchDate = "";
+                    return;
+                }
+                try {
+                    LocalDate date = LocalDate.parse(text, formatter);
+                    dpSearchTransactionDate.setValue(date);
+                } catch (DateTimeParseException e) {
+                    dpSearchTransactionDate.setValue(null);
+                    psSearchDate = "";
+                    dpSearchTransactionDate.requestFocus();
+                }
+            }
+        });
     }
 
     boolean pbSuccess = true;
     EventHandler<ActionEvent> datepicker_Action = JFXUtil.DatePickerAction(
             (datePicker, sdfFormat, lsServerDate, ldCurrentDate, lsSelectedDate, ldSelectedDate) -> {
-                try {
-                    poJSON = new JSONObject();
-                    String lsTransDate;
-                    LocalDate transactionDate;
-                    switch (datePicker.getId()) {
-                        case "dpSearchTransactionDate":
-                            psSearchDate = CustomCommonUtil.formatLocalDateToShortString(ldSelectedDate);
-                            loadTableMain.reload();
-                            break;
-                        case "dpTransactionDate":
-                            lsServerDate = sdfFormat.format(oApp.getServerDate());
-                            lsTransDate = sdfFormat.format(poController.Master().getTransactionDate());
-                            //back date not allowed
-                            if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
-                                lsTransDate = sdfFormat.format(poController.Master().getTransactionDate());
-                                transactionDate = LocalDate.parse(lsTransDate, DateTimeFormatter.ofPattern(SQLUtil.FORMAT_SHORT_DATE));
+                poJSON = new JSONObject();
+                switch (datePicker.getId()) {
+                    case "dpSearchTransactionDate":
+                        psSearchDate = CustomCommonUtil.formatLocalDateToShortString(ldSelectedDate);
+                        loadTableMain.reload();
+                        break;
 
-                                if (pbSuccess && ((!lsTransDate.equals(lsSelectedDate)) || !lsServerDate.equals(lsSelectedDate))) {
-                                    if (ShowMessageFX.YesNo(null, pxeModuleName, "Updating the transaction date requires approval. \nProceed with the change?")) {
-//                                        poController.seekApproval();
-                                    } else {
-                                        pbSuccess = false;
-                                    }
-                                }
-
-                                if (pbSuccess) {
-                                    poJSON = poController.Master().setTransactionDate((SQLUtil.toDate(lsSelectedDate, SQLUtil.FORMAT_SHORT_DATE)));
-                                } else {
-                                    poJSON = poController.Master().setTransactionDate((SQLUtil.toDate(lsServerDate, SQLUtil.FORMAT_SHORT_DATE)));
-                                }
-                                if (!JFXUtil.isJSONSuccess(poJSON)) {
-                                    ShowMessageFX.Warning(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
-                                }
-                                pbSuccess = false; //Set to false to prevent multiple message box: Conflict with server date vs transaction date validation
-                                loadRecordMaster();
-                                pbSuccess = true; //Set to original value
-                            }
-                            break;
-                        case "dpTransactionReferDate":
-                            lsServerDate = sdfFormat.format(oApp.getServerDate());
-                            poJSON = poController.Master().setTransactionReferDate((SQLUtil.toDate(lsSelectedDate, SQLUtil.FORMAT_SHORT_DATE)));
-                            if (!JFXUtil.isJSONSuccess(poJSON)) {
-                                ShowMessageFX.Warning(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
-                            }
-                            break;
-                        case "dpReportMonthYear":
-                            if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
-                                lsTransDate = sdfFormat.format(poController.Master().getTransactionDate());
-                                transactionDate = LocalDate.parse(lsTransDate, DateTimeFormatter.ofPattern(SQLUtil.FORMAT_SHORT_DATE));
-
-                                if (ldSelectedDate.isAfter(ldCurrentDate)) {
-                                    JFXUtil.setJSONError(poJSON, "Future dates are not allowed.");
-                                    pbSuccess = false;
-                                }
-
-                                if (pbSuccess && (ldSelectedDate.isAfter(transactionDate))) {
-                                    JFXUtil.setJSONError(poJSON, "Report date cannot be later than the transaction date.");
-                                    pbSuccess = false;
-                                }
-
-                                if (pbSuccess) {
-                                    poController.Journal().Detail(pnDetailJE).setForMonthOf((SQLUtil.toDate(lsSelectedDate, SQLUtil.FORMAT_SHORT_DATE)));
-                                } else {
-                                    if ("error".equals((String) poJSON.get("result"))) {
-                                        ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-                                    }
-                                }
-                                pbSuccess = false; //Set to false to prevent multiple message box: Conflict with server date vs transaction date validation
-                                loadTableDetailJE.reload();
-                                pbSuccess = true; //Set to original value
-                            }
-                            break;
-                        default:
-                            break;
-                    }
-                } catch (SQLException ex) {
-                    Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
-                    ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
+                    default:
+                        break;
                 }
+
             });
 
     @FXML
@@ -400,59 +341,6 @@ public class CheckDepositInterBranch_PostingController implements Initializable,
             poJSON = new JSONObject();
             String lsButton = ((Button) event.getSource()).getId();
             switch (lsButton) {
-                case "btnUpdate":
-                    poJSON = poController.UpdateTransaction();
-                    if ("error".equals((String) poJSON.get("result"))) {
-                        ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-                        return;
-                    }
-                    pbIsCheckedJournalTab = false;
-                    pnEditMode = poController.getEditMode();
-                    JFXUtil.clickTabByTitleText(tabPaneMain, "Cash Disbursement");
-                    loadTableDetail.reload();
-                    break;
-                case "btnSearch":
-                    JFXUtil.initiateBtnSearch(pxeModuleName, lastFocusedTextField, previousSearchedTextField, apBrowse, apMaster, apDetail, apJournalDetails, apTransaction);
-                    break;
-                case "btnSave":
-                    if (!ShowMessageFX.YesNo(null, pxeModuleName, "Are you sure you want to save the transaction?")) {
-                        return;
-                    }
-                    poJSON = poController.SaveTransaction();
-                    if (!"success".equals((String) poJSON.get("result"))) {
-                        ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-                        return;
-                    }
-                    ShowMessageFX.Information(null, pxeModuleName, (String) poJSON.get("message"));
-                    poJSON = poController.OpenTransaction(poController.Master().getTransactionNo());
-                    if ("success".equals(poJSON.get("result"))) {
-                        pnEditMode = poController.getEditMode();
-                        initButton(pnEditMode);
-                    }
-                    if (pnEditMode == EditMode.READY) {
-                        if (ShowMessageFX.YesNo(null, pxeModuleName, "Do you want to confirm this transaction?")) { //requires to review journal entry
-                            if (!poController.existJournal().equals("")) {
-                                if (!pbIsCheckedJournalTab) {
-                                    ShowMessageFX.Warning(null, pxeModuleName, "Please check the Journal Entry before saving.");
-                                    break;
-                                } else {
-                                    poJSON = poController.ConfirmTransaction();
-                                    if ("error".equals((String) poJSON.get("result"))) {
-                                        ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-                                        break;
-                                    } else {
-                                        ShowMessageFX.Information(null, pxeModuleName, (String) poJSON.get("message"));
-                                        JFXUtil.highlightByKey(tblViewMain, String.valueOf(pnMain + 1), "#C1E1C1", highlightedRowsMain);
-                                    }
-                                }
-                            } else {
-                                ShowMessageFX.Warning(null, pxeModuleName, "No journal entry found. Add a journal entry and save before confirming.");
-                                break;
-                            }
-                        }
-                    }
-                    JFXUtil.disableAllHighlightByColor(tblViewMain, "#A7C7E7", highlightedRowsMain);
-                    break;
                 case "btnCancel":
                     if (ShowMessageFX.YesNo(null, pxeModuleName, "Do you want to disregard changes?")) {
                         JFXUtil.disableAllHighlightByColor(tblViewMain, "#A7C7E7", highlightedRowsMain);
@@ -480,16 +368,16 @@ public class CheckDepositInterBranch_PostingController implements Initializable,
                 case "btnRetrieve":
                     loadTableMain.reload();
                     break;
-                case "btnApprove":
-                    if (ShowMessageFX.YesNo(null, pxeModuleName, "Are you sure you want to confirm transaction?")) {
+                case "btnPost":
+                    if (ShowMessageFX.YesNo(null, pxeModuleName, "Are you sure you want to post transaction?")) {
                         pnEditMode = poController.getEditMode();
                         if (pnEditMode == EditMode.READY) {
                             if (!poController.existJournal().equals("")) {
                                 if (!pbIsCheckedJournalTab) {
-                                    ShowMessageFX.Warning(null, pxeModuleName, "Please check the Journal Entry before confirming.");
+                                    ShowMessageFX.Warning(null, pxeModuleName, "Please check the Journal Entry before posting.");
                                     return;
                                 } else {
-                                    poJSON = poController.ConfirmTransaction();
+                                    poJSON = poController.PostTransaction();
                                     if ("error".equals((String) poJSON.get("result"))) {
                                         ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                         return;
@@ -500,7 +388,7 @@ public class CheckDepositInterBranch_PostingController implements Initializable,
                                     }
                                 }
                             } else {
-                                ShowMessageFX.Warning(null, pxeModuleName, "This transaction has no journal entry. Please add a journal entry by updating the transaction to enable confirmation.");
+                                ShowMessageFX.Warning(null, pxeModuleName, "This transaction has no journal entry. Please add a journal entry by updating the transaction to enable posting.");
                                 return;
                             }
                         }
@@ -519,43 +407,6 @@ public class CheckDepositInterBranch_PostingController implements Initializable,
                     poJSON = poController.PrintDepositSlip();
                     if ("error".equals((String) poJSON.get("result"))) {
                         ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-                    }
-                    break;
-                case "btnVoid":
-                    String lsStat = "";
-                    switch (poController.Master().getTransactionStatus()) {
-                        case CheckDepositStatus.OPEN:
-                            lsStat = "void";
-                            break;
-                        case CheckDepositStatus.CONFIRMED:
-                            lsStat = "cancel";
-                            break;
-                    }
-
-                    if (ShowMessageFX.YesNo(null, pxeModuleName, "Are you sure you want to " + lsStat + " the transaction?")) {
-                        pnEditMode = poController.getEditMode();
-                        if (pnEditMode == EditMode.READY) {
-                            switch (poController.Master().getTransactionStatus()) {
-                                case CheckDepositStatus.OPEN:
-                                    poJSON = poController.VoidTransaction();
-                                    break;
-                                case CheckDepositStatus.CONFIRMED:
-                                    poJSON = poController.CancelTransaction();
-                                    break;
-                            }
-
-                            if ("error".equals((String) poJSON.get("result"))) {
-                                ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-                                return;
-                            } else {
-                                ShowMessageFX.Information(null, pxeModuleName, (String) poJSON.get("message"));
-                                pnEditMode = poController.getEditMode();
-                                JFXUtil.disableAllHighlightByColor(tblViewMain, "#A7C7E7", highlightedRowsMain);
-                                JFXUtil.highlightByKey(tblViewMain, String.valueOf(pnMain + 1), "#FAA0A0", highlightedRowsMain);
-                            }
-                        }
-                    } else {
-                        return;
                     }
                     break;
                 case "btnArrowRight":
@@ -587,7 +438,7 @@ public class CheckDepositInterBranch_PostingController implements Initializable,
             if (lsButton.equals("btnUpdate")) {
                 moveNext(false, false);
             }
-        } catch (CloneNotSupportedException | SQLException | GuanzonException | ParseException | ScriptException ex) {
+        } catch (CloneNotSupportedException | SQLException | GuanzonException | ScriptException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
             ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
@@ -992,7 +843,7 @@ public class CheckDepositInterBranch_PostingController implements Initializable,
                                             if (poController.TransactionList(lnCntr).getTransactionStatus().equals(CheckDepositStatus.VOID)) {
                                                 JFXUtil.highlightByKey(tblViewMain, String.valueOf(lnCntr + 1), "#FAA0A0", highlightedRowsMain);
                                             }
-                                            if (poController.TransactionList(lnCntr).getTransactionStatus().equals(CheckDepositStatus.CONFIRMED)) {
+                                            if (poController.TransactionList(lnCntr).getTransactionStatus().equals(CheckDepositStatus.POSTED)) {
                                                 JFXUtil.highlightByKey(tblViewMain, String.valueOf(lnCntr + 1), "#C1E1C1", highlightedRowsMain);
                                             }
                                         } catch (SQLException | GuanzonException ex) {
@@ -1145,154 +996,6 @@ public class CheckDepositInterBranch_PostingController implements Initializable,
 
             });
 
-    ChangeListener<Boolean> txtMaster_Focus = JFXUtil.FocusListener(TextField.class,
-            (lsID, lsValue) -> {
-                switch (lsID) {
-                    case "tfBankMaster":
-                        if (lsValue.isEmpty()) {
-                            poController.Master().setBanks(null);
-                            poController.Master().setBankAccount(null);
-                        }
-                        break;
-                    case "tfBankAccountNo":
-                        if (lsValue.isEmpty()) {
-                            poController.Master().setBankAccount(null);
-                        }
-                        break;
-                    case "tfBankAccountName":
-                        if (lsValue.isEmpty()) {
-                            poController.Master().setBankAccount(null);
-                        }
-                        break;
-                }
-                loadRecordMaster();
-            });
-
-    ChangeListener<Boolean> txtDetail_Focus = JFXUtil.FocusListener(TextField.class,
-            (lsID, lsValue) -> {
-                switch (lsID) {
-                    case "tfCheckTransNo":
-                        if (!JFXUtil.isJSONSuccess(poJSON)) {
-                            ShowMessageFX.Warning(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
-                        }
-                        break;
-                    case "tfCheckNo":
-                        JFXUtil.inputIntegersOnly(tfCheckNo);
-                        if (!JFXUtil.isJSONSuccess(poJSON)) {
-                            ShowMessageFX.Warning(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
-                        }
-                        break;
-                    case "tfNote":
-                        poJSON = poController.Detail(pnDetail).setRemarks(lsValue.trim());
-                        if (!JFXUtil.isJSONSuccess(poJSON)) {
-                            ShowMessageFX.Warning(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
-                        }
-                        if (pbEntered) {
-                            JFXUtil.runWithDelay(0.50, () -> {
-                                loadTableDetail.reload();
-                                JFXUtil.runWithDelay(0.50, () -> {
-                                    moveNext(false, true);
-                                });
-                                pbEntered = false;
-                            });
-                        }
-                        break;
-                }
-                JFXUtil.runWithDelay(0.50, () -> {
-                    loadTableDetail.reload();
-                });
-            });
-
-    ChangeListener<Boolean> txtArea_Focus = JFXUtil.FocusListener(TextArea.class,
-            (lsID, lsValue) -> {
-                switch (lsID) {
-                    case "taRemarks":
-                        poJSON = poController.Master().setRemarks(lsValue.trim());
-                        if (!JFXUtil.isJSONSuccess(poJSON)) {
-                            ShowMessageFX.Warning(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
-                        }
-                        loadRecordMaster();
-                        break;
-                    case "taJournalRemarks":
-                        poJSON = poController.Journal().Master().setRemarks(lsValue);
-                        if (!JFXUtil.isJSONSuccess(poJSON)) {
-                            ShowMessageFX.Warning(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
-                        }
-                        loadRecordMasterJE();
-                        break;
-                }
-            });
-    ChangeListener<Boolean> txtDetailJE_Focus = JFXUtil.FocusListener(TextField.class,
-            (lsID, lsValue) -> {
-                switch (lsID) {
-                    case "tfAccountCode":
-                        if (lsValue.isEmpty()) {
-                            poController.Journal().Detail(pnDetailJE).setAccountCode("");
-                            loadTableDetailJE.reload();
-                        }
-                        break;
-                    case "tfAccountDescription":
-                        if (lsValue.isEmpty()) {
-                            poController.Journal().Detail(pnDetailJE).setAccountCode("");
-                            loadTableDetailJE.reload();
-                        }
-                        break;
-                    case "tfDebitAmount":
-                        lsValue = JFXUtil.removeComma(lsValue);
-                        if (poController.Journal().Detail(pnDetailJE).getCreditAmount() > 0.0000 && Double.parseDouble(lsValue) > 0) {
-                            ShowMessageFX.Warning(null, pxeModuleName, "Debit and credit amounts cannot both have values at the same time.");
-                            poController.Journal().Detail(pnDetailJE).setDebitAmount(0.0000);
-                            JFXUtil.textFieldMoveNext(tfDebitAmount);
-                            break;
-                        } else {
-                            poJSON = poController.Journal().Detail(pnDetailJE).setDebitAmount((Double.parseDouble(lsValue)));
-                            if ("error".equals((String) poJSON.get("result"))) {
-                                ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-                                int lnReturned = Integer.parseInt(String.valueOf(poJSON.get("row")));
-                                JFXUtil.runWithDelay(0.70, () -> {
-                                    pnDetailJE = lnReturned;
-                                    loadTableDetailJE.reload();
-                                });
-                                return;
-                            } else {
-                            }
-                        }
-                        break;
-                    case "tfCreditAmount":
-                        lsValue = JFXUtil.removeComma(lsValue);
-                        if (poController.Journal().Detail(pnDetailJE).getDebitAmount() > 0.0000 && Double.parseDouble(lsValue) > 0) {
-                            ShowMessageFX.Warning(null, pxeModuleName, "Debit and credit amounts cannot both have values at the same time.");
-                            poController.Journal().Detail(pnDetailJE).setCreditAmount(0.0000);
-                            JFXUtil.textFieldMoveNext(tfCreditAmount);
-                            break;
-                        } else {
-                            poJSON = poController.Journal().Detail(pnDetailJE).setCreditAmount((Double.parseDouble(lsValue)));
-                            if ("error".equals((String) poJSON.get("result"))) {
-                                ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-                                int lnReturned = Integer.parseInt(String.valueOf(poJSON.get("row")));
-                                JFXUtil.runWithDelay(0.70, () -> {
-                                    pnDetailJE = lnReturned;
-                                    loadTableDetailJE.reload();
-                                });
-                                return;
-                            }
-                        }
-                        if (pbEnteredJE) {
-                            JFXUtil.runWithDelay(0.50, () -> {
-                                loadTableDetailJE.reload();
-                                JFXUtil.runWithDelay(0.50, () -> {
-                                    moveNextJE(false, true);
-                                });
-                                pbEnteredJE = false;
-                            });
-                        }
-                        break;
-                }
-                JFXUtil.runWithDelay(0.50, () -> {
-                    loadTableDetailJE.reload();
-                });
-            });
-
     private void txtField_KeyPressed(KeyEvent event) {
         TextField lsTxtField = (TextField) event.getSource();
         String txtFieldID = ((TextField) event.getSource()).getId();
@@ -1326,74 +1029,6 @@ public class CheckDepositInterBranch_PostingController implements Initializable,
                             case "tfSearchTransNo":
                                 loadTableMain.reload();
                                 break;
-                            case "tfBankMaster":
-                                poJSON = poController.SearchBankAccount(lsValue, false, false);
-                                if ("error".equals(poJSON.get("result"))) {
-                                    ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-                                }
-                                loadTableDetail.reload();
-                                break;
-                            case "tfBankAccountNo":
-                                poJSON = poController.SearchBankAccount(lsValue, true, false);
-                                if ("error".equals(poJSON.get("result"))) {
-                                    ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-                                }
-                                loadTableDetail.reload();
-                                return;
-                            case "tfBankAccountName":
-                                poJSON = poController.SearchBankAccount(lsValue, false, false);
-                                if ("error".equals(poJSON.get("result"))) {
-                                    ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-                                }
-                                loadTableDetail.reload();
-                                return;
-                            case "tfCheckTransNo":
-                                poJSON = poController.SearchChecks(lsValue, "", pnDetail, false);
-                                if ("error".equals(poJSON.get("result"))) {
-                                    ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-                                }
-                                loadTableDetail.reload();
-                                return;
-                            case "tfCheckNo":
-                                poJSON = poController.SearchChecks("", lsValue, pnDetail, false);
-                                if ("error".equals(poJSON.get("result"))) {
-                                    ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-                                }
-                                loadTableDetail.reload();
-                                return;
-                            //apJournalDetails
-                            case "tfAccountCode":
-                                poJSON = poController.Journal().SearchAccountCode(pnDetailJE, lsValue, true, poController.Master().getIndustryId(), null);
-                                if ("error".equals(poJSON.get("result"))) {
-                                    int lnReturned = Integer.parseInt(String.valueOf(poJSON.get("row")));
-                                    JFXUtil.runWithDelay(0.70, () -> {
-                                        pnDetailJE = lnReturned;
-                                        loadTableDetailJE.reload();
-                                    });
-                                    ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-                                    break;
-                                } else {
-                                    pnDetailJE = Integer.parseInt(String.valueOf(poJSON.get("row")));
-                                    loadTableDetailJE.reload();
-                                    JFXUtil.textFieldMoveNext(tfDebitAmount);
-                                }
-                                break;
-                            case "tfAccountDescription":
-                                poJSON = poController.Journal().SearchAccountCode(pnDetailJE, lsValue, false, poController.Master().getIndustryId(), null);
-                                if ("error".equals(poJSON.get("result"))) {
-                                    int lnReturned = Integer.parseInt(String.valueOf(poJSON.get("row")));
-                                    JFXUtil.runWithDelay(0.70, () -> {
-                                        pnDetailJE = lnReturned;
-                                        loadTableDetailJE.reload();
-                                    });
-                                    ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-                                    break;
-                                } else {
-                                    pnDetailJE = Integer.parseInt(String.valueOf(poJSON.get("row")));
-                                    loadTableDetailJE.reload();
-                                    JFXUtil.textFieldMoveNext(tfDebitAmount);
-                                }
-                                break;
                         }
                         break;
                     case UP:
@@ -1421,11 +1056,7 @@ public class CheckDepositInterBranch_PostingController implements Initializable,
     }
 
     private void initTextFields() {
-        JFXUtil.setFocusListener(txtArea_Focus, taRemarks, taJournalRemarks);
         JFXUtil.setFocusListener(txtBrowse_Focus, apBrowse);
-        JFXUtil.setFocusListener(txtMaster_Focus, apMaster);
-        JFXUtil.setFocusListener(txtDetail_Focus, apDetail);
-        JFXUtil.setFocusListener(txtDetailJE_Focus, apJournalDetails);
 
         JFXUtil.setKeyPressedListener(this::txtField_KeyPressed, apBrowse, apMaster, apDetail, apJournalMaster, apJournalDetails, apTransaction);
         JFXUtil.setCommaFormatter(tfDebitAmount, tfCreditAmount);
@@ -1563,7 +1194,7 @@ public class CheckDepositInterBranch_PostingController implements Initializable,
         JFXUtil.setButtonsVisibility(lbShow2, btnHistory, btnPost, btnPrint);
         JFXUtil.setButtonsVisibility(lbShow3, btnClose);
 
-        JFXUtil.setDisabled(!lbShow1, apMaster, apDetail, apJournalMaster, apJournalDetails);
+        JFXUtil.setDisabled(true, apMaster, apDetail, apJournalMaster, apJournalDetails);
         JFXUtil.setButtonsVisibility(true, btnRetrieve);
 
         if (fnValue != EditMode.READY) {
@@ -1579,7 +1210,6 @@ public class CheckDepositInterBranch_PostingController implements Initializable,
     }
 
     private void clearTextFields() {
-        JFXUtil.setValueToNull(previousSearchedTextField, lastFocusedTextField);
         JFXUtil.clearTextFields(apTransaction, apMaster, apDetail, apJournalMaster, apJournalDetails, apAttachments);
     }
 }
