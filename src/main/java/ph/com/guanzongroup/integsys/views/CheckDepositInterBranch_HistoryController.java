@@ -177,7 +177,7 @@ public class CheckDepositInterBranch_HistoryController implements Initializable,
             if (!"success".equals((String) poJSON.get("result"))) {
                 ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
             }
-            poController.setTransactionStatus("0");
+            poController.setTransactionStatus("0123");
             initLoadTable();
             initTextFields();
             initDatePicker();

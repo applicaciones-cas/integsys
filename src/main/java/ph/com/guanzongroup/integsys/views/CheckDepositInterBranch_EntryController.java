@@ -58,6 +58,7 @@ import javafx.util.Pair;
 import javax.script.ScriptException;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.rendering.PDFRenderer;
+import org.guanzon.appdriver.agent.ShowDialogFX;
 import org.guanzon.appdriver.agent.ShowMessageFX;
 import org.guanzon.appdriver.base.CommonUtils;
 import org.guanzon.appdriver.base.GRiderCAS;
@@ -68,6 +69,7 @@ import org.guanzon.appdriver.base.MiscUtil;
 import org.guanzon.appdriver.base.SQLUtil;
 import org.guanzon.appdriver.constant.DocumentType;
 import org.guanzon.appdriver.constant.RecordStatus;
+import org.guanzon.appdriver.constant.UserRight;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.ParseException;
 import ph.com.guanzongroup.cas.cashflow.CheckDeposit;
@@ -211,6 +213,11 @@ public class CheckDepositInterBranch_EntryController implements Initializable, S
                     loadRecordSearch();
                     btnNew.fire();
                     lblSource.setText(poController.Master().Company().getCompanyName() + " - " + poController.Master().Industry().getDescription());
+
+                    LocalDate today = LocalDate.now();
+                    String lsDateFrom = CustomCommonUtil.formatDateToShortString(JFXUtil.getFirstDayOfMonth(oApp.getServerDate()));
+                    dpFrom.setValue(CustomCommonUtil.parseDateStringToLocalDate(lsDateFrom, "yyyy-MM-dd"));
+                    dpThru.setValue(today);
                 } catch (SQLException | GuanzonException ex) {
                     Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
                     ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
@@ -229,9 +236,6 @@ public class CheckDepositInterBranch_EntryController implements Initializable, S
         if (poController.getDetailCount() <= 0) {
             return false;
         }
-//        if (poController.Master().getTransactionTotal() <= 0.0000) {
-//            return false;
-//        }
         return true;
     }
     String lsValidDisbMessage = "Please provide at least one valid disbursement detail with amount to proceed.";
@@ -340,21 +344,34 @@ public class CheckDepositInterBranch_EntryController implements Initializable, S
                                 lsTransDate = sdfFormat.format(poController.Master().getTransactionDate());
                                 transactionDate = LocalDate.parse(lsTransDate, DateTimeFormatter.ofPattern(SQLUtil.FORMAT_SHORT_DATE));
 
-                                if (pbSuccess && ((!lsTransDate.equals(lsSelectedDate)) || !lsServerDate.equals(lsSelectedDate))) {
-                                    if (ShowMessageFX.YesNo(null, pxeModuleName, "Updating the transaction date requires approval. \nProceed with the change?")) {
-//                                        poController.seekApproval();
-                                    } else {
-                                        pbSuccess = false;
+                                if (pbSuccess && ((poController.getEditMode() == EditMode.UPDATE && !lsTransDate.equals(lsSelectedDate))
+                                || !lsServerDate.equals(lsSelectedDate))) {
+                                    if (oApp.getUserLevel() <= UserRight.ENCODER) {
+                                        if (ShowMessageFX.YesNo(null, pxeModuleName, "Change in Transaction Date Detected\n\n"
+                                                + "If YES, please seek approval to proceed with the new selected date.\n"
+                                                + "If NO, the previous transaction date will be retained.") == true) {
+                                            poJSON = ShowDialogFX.getUserApproval(oApp);
+                                            if (!"success".equals((String) poJSON.get("result"))) {
+                                                pbSuccess = false;
+                                            } else {
+                                                if (Integer.parseInt(poJSON.get("nUserLevl").toString()) <= UserRight.ENCODER) {
+                                                    poJSON.put("result", "error");
+                                                    poJSON.put("message", "User is not an authorized approving officer.");
+                                                    pbSuccess = false;
+                                                }
+                                            }
+                                        } else {
+                                            pbSuccess = false;
+                                        }
                                     }
                                 }
 
                                 if (pbSuccess) {
                                     poJSON = poController.Master().setTransactionDate((SQLUtil.toDate(lsSelectedDate, SQLUtil.FORMAT_SHORT_DATE)));
                                 } else {
-                                    poJSON = poController.Master().setTransactionDate((SQLUtil.toDate(lsServerDate, SQLUtil.FORMAT_SHORT_DATE)));
-                                }
-                                if (!JFXUtil.isJSONSuccess(poJSON)) {
-                                    ShowMessageFX.Warning(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
+                                    if ("error".equals((String) poJSON.get("result"))) {
+                                        ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                                    }
                                 }
                                 pbSuccess = false; //Set to false to prevent multiple message box: Conflict with server date vs transaction date validation
                                 loadRecordMaster();
@@ -1541,11 +1558,8 @@ public class CheckDepositInterBranch_EntryController implements Initializable, S
     }
 
     private void initDatePicker() {
-        LocalDate today = LocalDate.now();
         JFXUtil.setDatePickerFormat("MM/dd/yyyy", dpTransactionDate, dpTransactionReferDate, dpCheckDate, dpJournalTransactionDate, dpReportMonthYear, dpFrom, dpThru);
         JFXUtil.setActionListener(datepicker_Action, dpTransactionDate, dpTransactionReferDate, dpCheckDate, dpJournalTransactionDate, dpReportMonthYear, dpFrom, dpThru);
-        dpFrom.setValue(today);
-        dpThru.setValue(today.plusDays(7));
     }
 
     private void initTextFields() {
@@ -1722,6 +1736,6 @@ public class CheckDepositInterBranch_EntryController implements Initializable, S
 
     private void clearTextFields() {
         JFXUtil.setValueToNull(previousSearchedTextField, lastFocusedTextField);
-        JFXUtil.clearTextFields(apTransaction, apMaster, apDetail, apJournalMaster, apJournalDetails, apAttachments);
+        JFXUtil.clearTextFields(apMaster, apDetail, apJournalMaster, apJournalDetails, apAttachments);
     }
 }

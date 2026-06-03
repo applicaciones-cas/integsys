@@ -58,6 +58,7 @@ import javafx.util.Pair;
 import javax.script.ScriptException;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.rendering.PDFRenderer;
+import org.guanzon.appdriver.agent.ShowDialogFX;
 import org.guanzon.appdriver.agent.ShowMessageFX;
 import org.guanzon.appdriver.base.CommonUtils;
 import org.guanzon.appdriver.base.GRiderCAS;
@@ -68,6 +69,7 @@ import org.guanzon.appdriver.base.MiscUtil;
 import org.guanzon.appdriver.base.SQLUtil;
 import org.guanzon.appdriver.constant.DocumentType;
 import org.guanzon.appdriver.constant.RecordStatus;
+import org.guanzon.appdriver.constant.UserRight;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.ParseException;
 import ph.com.guanzongroup.cas.cashflow.CheckDeposit;
@@ -228,9 +230,6 @@ public class CheckDepositInterBranch_ConfirmationController implements Initializ
         if (poController.getDetailCount() <= 0) {
             return false;
         }
-//        if (poController.Master().getTransactionTotal() <= 0.0000) {
-//            return false;
-//        }
         return true;
     }
     String lsValidDisbMessage = "Please provide at least one valid disbursement detail with amount to proceed.";
@@ -339,21 +338,34 @@ public class CheckDepositInterBranch_ConfirmationController implements Initializ
                                 lsTransDate = sdfFormat.format(poController.Master().getTransactionDate());
                                 transactionDate = LocalDate.parse(lsTransDate, DateTimeFormatter.ofPattern(SQLUtil.FORMAT_SHORT_DATE));
 
-                                if (pbSuccess && ((!lsTransDate.equals(lsSelectedDate)) || !lsServerDate.equals(lsSelectedDate))) {
-                                    if (ShowMessageFX.YesNo(null, pxeModuleName, "Updating the transaction date requires approval. \nProceed with the change?")) {
-//                                        poController.seekApproval();
-                                    } else {
-                                        pbSuccess = false;
+                                if (pbSuccess && ((poController.getEditMode() == EditMode.UPDATE && !lsTransDate.equals(lsSelectedDate))
+                                || !lsServerDate.equals(lsSelectedDate))) {
+                                    if (oApp.getUserLevel() <= UserRight.ENCODER) {
+                                        if (ShowMessageFX.YesNo(null, pxeModuleName, "Change in Transaction Date Detected\n\n"
+                                                + "If YES, please seek approval to proceed with the new selected date.\n"
+                                                + "If NO, the previous transaction date will be retained.") == true) {
+                                            poJSON = ShowDialogFX.getUserApproval(oApp);
+                                            if (!"success".equals((String) poJSON.get("result"))) {
+                                                pbSuccess = false;
+                                            } else {
+                                                if (Integer.parseInt(poJSON.get("nUserLevl").toString()) <= UserRight.ENCODER) {
+                                                    poJSON.put("result", "error");
+                                                    poJSON.put("message", "User is not an authorized approving officer.");
+                                                    pbSuccess = false;
+                                                }
+                                            }
+                                        } else {
+                                            pbSuccess = false;
+                                        }
                                     }
                                 }
 
                                 if (pbSuccess) {
                                     poJSON = poController.Master().setTransactionDate((SQLUtil.toDate(lsSelectedDate, SQLUtil.FORMAT_SHORT_DATE)));
                                 } else {
-                                    poJSON = poController.Master().setTransactionDate((SQLUtil.toDate(lsServerDate, SQLUtil.FORMAT_SHORT_DATE)));
-                                }
-                                if (!JFXUtil.isJSONSuccess(poJSON)) {
-                                    ShowMessageFX.Warning(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
+                                    if ("error".equals((String) poJSON.get("result"))) {
+                                        ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                                    }
                                 }
                                 pbSuccess = false; //Set to false to prevent multiple message box: Conflict with server date vs transaction date validation
                                 loadRecordMaster();
