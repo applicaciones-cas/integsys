@@ -122,6 +122,8 @@ import javafx.util.Callback;
 import java.io.File;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.logging.Level;
@@ -1733,6 +1735,7 @@ public class JFXUtil {
     }
 
     /*Alternative version of inputDecimalOnly;*/
+ /* call once */
     public static void inputIntegersOnly(TextField... foTxtFields) {
         Pattern pattern = Pattern.compile("[0-9]*");
         for (TextField txtField : foTxtFields) {
@@ -3428,6 +3431,7 @@ public class JFXUtil {
         );
     }
 
+    //alternative datepicker action event listener to lessen code line in controllers
     public static EventHandler<ActionEvent> DatePickerAction(DatePickerCommand command) {
         return event -> {
 
@@ -3533,7 +3537,8 @@ public class JFXUtil {
             radialTimeline.playFromStart();
         });
     }
-    public String[] buttonPackArray = {"btnSave", "btnCancel", "btnApprove", "btnDisapprove", "btnVoid"};
+    public static String[] buttonPackArray1 = {"btnSave", "btnCancel", "btnApprove", "btnDisapprove", "btnVoid", "btnConfirm"};
+    public static String[] buttonPackArray2 = {"btnRetrieve", "btnSearch", "btnUndo", "btnArrowRight", "btnArrowLeft", "btnHistory", "btnPrint"};
 
     public static boolean isNumeric(String str) {
         if (str == null || str.trim().isEmpty()) {
@@ -3573,5 +3578,23 @@ public class JFXUtil {
         });
 
         timeline.play();
+    }
+
+    public static Date getFirstDayOfMonth(Date date) {
+        if (date == null) {
+            return null;
+        }
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
+        // Set to first day of the same month and year
+        calendar.set(Calendar.DAY_OF_MONTH, 1);
+        // Optional: Reset time to start of the day
+        calendar.set(Calendar.HOUR_OF_DAY, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        calendar.set(Calendar.MILLISECOND, 0);
+
+        return calendar.getTime();
     }
 }
