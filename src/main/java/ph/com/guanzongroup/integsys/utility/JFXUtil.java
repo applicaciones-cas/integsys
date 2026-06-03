@@ -152,7 +152,7 @@ import org.guanzon.appdriver.base.SQLUtil;
 import static ph.com.guanzongroup.integsys.GUI.oApp;
 
 /**
- * Date : 4/28/2025 Recent update: 03/30/2026
+ * Date : 4/28/2025 Recent update: 06/03/2026
  *
  * @author Aldrich
  */
@@ -2750,7 +2750,7 @@ public class JFXUtil {
                         if ("WIRED".equals(fieldName)) {
                             fieldName = "BANK TRANSFER";
                         }
-                        valueToNameMap.put((String) value, fieldName);
+                        valueToNameMap.putIfAbsent((String) value, fieldName);
                     }
                 } catch (IllegalAccessException e) {
                     e.printStackTrace();
