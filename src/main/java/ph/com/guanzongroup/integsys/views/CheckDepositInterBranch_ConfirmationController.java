@@ -941,44 +941,38 @@ public class CheckDepositInterBranch_ConfirmationController implements Initializ
         tblVwJournalDetails.setItems(journal_data);
     }
 
-    private void loadTableDetailFromMain() {
+   private void loadTableDetailFromMain() {
         poJSON = new JSONObject();
-        if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {  //Do not allow to link cash advance when edit mode is not equal to add new
 
-            pnMain = tblViewMain.getSelectionModel().getSelectedIndex();
-            ModelTableMain selected = (ModelTableMain) tblViewMain.getSelectionModel().getSelectedItem();
-            if (selected != null) {
-                try {
-                    int pnRowMain = Integer.parseInt(selected.getIndex01()) - 1;
-                    String lsTransactionNo = selected.getIndex02();
-//                    stageAttachment.closeDialog();
-
-                    if (!JFXUtil.loadValidation(pnEditMode, pxeModuleName, poController.Master().getTransactionNo(), lsTransactionNo)) {
-                        return;
-                    }
-                    pnMain = pnRowMain;
-                    JFXUtil.clearTextFields(apMaster, apDetail);
-                    poJSON = poController.populateDetail(lsTransactionNo);
-                    if ("error".equals(poJSON.get("result"))) {
-                        loadTableDetail.reload();
-                        ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-                        return;
-                    }
-                    pnEditMode = poController.getEditMode();
-                    loadTableDetail.reload();
-                    moveNext(false, false);
-
-                    JFXUtil.runWithDelay(0.50, () -> {
-                        loadTableMain.reload();
-                    });
-                } catch (SQLException | GuanzonException | CloneNotSupportedException ex) {
-                    Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
-                    ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
+        pnMain = tblViewMain.getSelectionModel().getSelectedIndex();
+        ModelTableMain selected = (ModelTableMain) tblViewMain.getSelectionModel().getSelectedItem();
+        if (selected != null) {
+            try {
+                int pnRowMain = Integer.parseInt(selected.getIndex01()) - 1;
+                String lsTransactionNo = selected.getIndex06();
+                if (!JFXUtil.loadValidation(pnEditMode, pxeModuleName, poController.Master().getTransactionNo(), lsTransactionNo)) {
+                    return;
                 }
+                pnMain = pnRowMain;
+                JFXUtil.disableAllHighlightByColor(tblViewMain, "#A7C7E7", highlightedRowsMain);
+                JFXUtil.highlightByKey(tblViewMain, String.valueOf(pnRowMain + 1), "#A7C7E7", highlightedRowsMain);
+                JFXUtil.clearTextFields(apMaster);
+                JFXUtil.clickTabByTitleText(tabPaneMain, "Cash Disbursement");
+                poJSON = poController.OpenTransaction(lsTransactionNo);
+                if ("error".equals(poJSON.get("result"))) {
+                    ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                    poController.resetTransaction();
+                    return;
+                }
+                pnEditMode = poController.getEditMode();
+                loadTableDetail.reload();
+                moveNext(false, false);
+            } catch (CloneNotSupportedException | SQLException | GuanzonException | ScriptException ex) {
+                Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+                ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
             }
-        } else {
-            ShowMessageFX.Warning(null, pxeModuleName, "Data can only be inserted when in ADD mode.");
         }
+
     }
 
     @FXML
