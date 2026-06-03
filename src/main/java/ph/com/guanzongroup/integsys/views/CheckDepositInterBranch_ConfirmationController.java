@@ -780,7 +780,9 @@ public class CheckDepositInterBranch_ConfirmationController implements Initializ
             JFXUtil.setStatusValue(lblStatus, CheckDepositStatus.class, pnEditMode == EditMode.UNKNOWN ? "-1" : poController.Master().getTransactionStatus());
 
             tfTransactionNo.setText(poController.Master().getTransactionNo());
-            tfBankMaster.setText(poController.Master().BankAccount().Banks().getBankName());
+            String lsBank = JFXUtil.isObjectEqualTo(poController.Master().Banks().getBankName(), null, "")
+                    ? poController.Master().BankAccount().Banks().getBankName() : poController.Master().Banks().getBankName();
+            tfBankMaster.setText(lsBank);
             tfBankAccountNo.setText(poController.Master().BankAccount().getAccountNo());
             tfBankAccountName.setText(poController.Master().BankAccount().getAccountName());
             taRemarks.setText(poController.Master().getRemarks());
@@ -800,10 +802,11 @@ public class CheckDepositInterBranch_ConfirmationController implements Initializ
                 return;
             }
             if (poController.Detail(pnDetail).getSourceNo().isEmpty()) {
-                JFXUtil.setDisabled(false, tfCheckTransNo, tfCheckNo, cbReverse);
+                JFXUtil.setDisabled(false, tfCheckTransNo, tfCheckNo);
             } else {
-                JFXUtil.setDisabled(true, tfCheckTransNo, tfCheckNo, cbReverse);
+                JFXUtil.setDisabled(true, tfCheckTransNo, tfCheckNo);
             }
+            JFXUtil.setDisabled(true, tfBank, tfPayee, tfCheckAmount);
             tfCheckTransNo.setText(poController.Detail(pnDetail).CheckPayment().getTransactionNo());
             tfBank.setText(poController.Detail(pnDetail).CheckPayment().Banks().getBankName());
             tfPayee.setText(poController.Detail(pnDetail).CheckPayment().Payee().getPayeeName());
@@ -1650,11 +1653,12 @@ public class CheckDepositInterBranch_ConfirmationController implements Initializ
         boolean lbShow3 = (fnValue == EditMode.UNKNOWN || fnValue == EditMode.READY);
 
         JFXUtil.setButtonsVisibility(lbShow1, btnSearch, btnSave, btnCancel);
-        JFXUtil.setButtonsVisibility(lbShow2, btnUpdate, btnHistory, btnVoid);
+        JFXUtil.setButtonsVisibility(lbShow2, btnUpdate, btnHistory, btnVoid, btnPrint);
         JFXUtil.setButtonsVisibility(lbShow3, btnClose);
 
         JFXUtil.setDisabled(!lbShow1, apBrowse, apMaster, apDetail, apJournalMaster, apJournalDetails);
         JFXUtil.setButtonsVisibility(true, btnRetrieve);
+        JFXUtil.setButtonsVisibility(false, btnApprove);
 
         if (fnValue != EditMode.READY) {
             return;
@@ -1662,7 +1666,6 @@ public class CheckDepositInterBranch_ConfirmationController implements Initializ
         switch (poController.Master().getTransactionStatus()) {
             case CheckDepositStatus.CONFIRMED:
                 JFXUtil.setButtonsVisibility(true, btnApprove);
-                JFXUtil.setButtonsVisibility(true, btnPrint);
                 break;
             case CheckDepositStatus.VOID:
             case CheckDepositStatus.CANCELLED:

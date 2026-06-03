@@ -792,6 +792,8 @@ public class CheckDepositInterBranch_EntryController implements Initializable, S
             } else {
                 JFXUtil.setDisabled(true, tfCheckTransNo, tfCheckNo);
             }
+            JFXUtil.setDisabled(true, tfBank, tfPayee, tfCheckAmount);
+            
             tfCheckTransNo.setText(poController.Detail(pnDetail).CheckPayment().getTransactionNo());
             tfBank.setText(poController.Detail(pnDetail).CheckPayment().Banks().getBankName());
             tfPayee.setText(poController.Detail(pnDetail).CheckPayment().Payee().getPayeeName());
