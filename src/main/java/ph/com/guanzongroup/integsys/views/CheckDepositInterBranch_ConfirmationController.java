@@ -522,6 +522,12 @@ public class CheckDepositInterBranch_ConfirmationController implements Initializ
                         return;
                     }
                     break;
+                case "btnPrint":
+                    poJSON = poController.PrintDepositSlip();
+                    if ("error".equals((String) poJSON.get("result"))) {
+                        ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                    }
+                    break;
                 case "btnVoid":
                     String lsStat = "";
                     switch (poController.Master().getTransactionStatus()) {
@@ -654,7 +660,7 @@ public class CheckDepositInterBranch_ConfirmationController implements Initializ
                     ShowMessageFX.Warning(null, pxeModuleName, "Button is not registered, Please contact admin to assist about the unregistered button");
                     break;
             }
-            if (JFXUtil.isObjectEqualTo(lsButton, "btnConfirm", "btnSave", "btnCancel", "btnVoid")) {
+            if (JFXUtil.isObjectEqualTo(lsButton, "btnConfirm", "btnSave", "btnCancel", "btnVoid", "btnApprove")) {
                 pbIsCheckedJournalTab = false;
                 poController.resetTransaction();
                 clearTextFields();
@@ -662,7 +668,7 @@ public class CheckDepositInterBranch_ConfirmationController implements Initializ
                 pnEditMode = EditMode.UNKNOWN;
             }
 
-            if (JFXUtil.isObjectEqualTo(lsButton, "btnRetrieve", "btnSearch", "btnArrowRight", "btnArrowLeft", "btnHistory")) {
+            if (JFXUtil.isObjectEqualTo(lsButton, "btnPrint","btnRetrieve", "btnSearch", "btnArrowRight", "btnArrowLeft", "btnHistory")) {
             } else {
                 loadRecordMaster();
                 loadTableDetail.reload();
@@ -1567,7 +1573,7 @@ public class CheckDepositInterBranch_ConfirmationController implements Initializ
                 moveNextJE(false, false);
             }
         });
-        JFXUtil.applyRowHighlighting(tblViewMain, item -> ((ModelTableMain) item).getIndex02(), highlightedRowsMain);
+        JFXUtil.applyRowHighlighting(tblViewMain, item -> ((ModelTableMain) item).getIndex01(), highlightedRowsMain);
     }
 
     JFXUtil.TableKeyEvent tableKeyEvents = new JFXUtil.TableKeyEvent() {
