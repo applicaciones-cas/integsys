@@ -297,11 +297,11 @@
                                                                      </font>
                                                                   </Label>
                                                                                         <TextField fx:id="tfTransactionNo" disable="true" editable="false" maxHeight="25.0" prefWidth="139.0" style="-fx-font-weight: bold;" styleClass="DisabledTextField" GridPane.columnIndex="2" />
-                                                                                        <DatePicker fx:id="dpTransactionDate" editable="false" GridPane.columnIndex="2" GridPane.rowIndex="2" />
-                                                                                        <DatePicker fx:id="dpTransactionReferDate" editable="false" GridPane.columnIndex="2" GridPane.rowIndex="3" />
-                                                                                        <TextField fx:id="tfBankMaster" editable="false" maxHeight="25.0" promptText="Press F3: Search" GridPane.columnIndex="2" GridPane.columnSpan="5" GridPane.rowIndex="4" />
-                                                                                        <TextField fx:id="tfBankAccountNo" editable="false" maxHeight="25.0" promptText="Press F3: Search" GridPane.columnIndex="2" GridPane.columnSpan="5" GridPane.rowIndex="5" />
-                                                                                        <TextField fx:id="tfBankAccountName" editable="false" maxHeight="25.0" promptText="Press F3: Search" GridPane.columnIndex="2" GridPane.columnSpan="5" GridPane.rowIndex="6" />
+                                                                                        <DatePicker fx:id="dpTransactionDate" GridPane.columnIndex="2" GridPane.rowIndex="2" />
+                                                                                        <DatePicker fx:id="dpTransactionReferDate" GridPane.columnIndex="2" GridPane.rowIndex="3" />
+                                                                                        <TextField fx:id="tfBankMaster" maxHeight="25.0" promptText="Press F3: Search" GridPane.columnIndex="2" GridPane.columnSpan="5" GridPane.rowIndex="4" />
+                                                                                        <TextField fx:id="tfBankAccountNo" maxHeight="25.0" promptText="Press F3: Search" GridPane.columnIndex="2" GridPane.columnSpan="5" GridPane.rowIndex="5" />
+                                                                                        <TextField fx:id="tfBankAccountName" maxHeight="25.0" promptText="Press F3: Search" GridPane.columnIndex="2" GridPane.columnSpan="5" GridPane.rowIndex="6" />
                                                                                         <AnchorPane maxWidth="1.7976931348623157E308" style="-fx-background-color: FF8201;" GridPane.columnIndex="10" GridPane.columnSpan="4">
                                                                      <children>
                                                                                               <Label fx:id="lblStatus" alignment="CENTER" contentDisplay="CENTER" maxWidth="1.7976931348623157E308" text="STATUS" textAlignment="CENTER" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">

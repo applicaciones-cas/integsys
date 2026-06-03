@@ -73,7 +73,7 @@
                                     </Label>
                                                 <TextField fx:id="tfSearchBankAccountNo" promptText="Press F3: Search" GridPane.columnIndex="2" />
                                                 <TextField fx:id="tfSearchTransNo" GridPane.columnIndex="6" />
-                                                <DatePicker fx:id="dpSearchTransactionDate" GridPane.columnIndex="10" />
+                                                <DatePicker fx:id="dpSearchTransactionDate" editable="false" GridPane.columnIndex="10" />
                                     <Label fx:id="lblSource" text="Industry" GridPane.columnIndex="11">
                                        <font>
                                           <Font name="System Bold" size="14.0" />
