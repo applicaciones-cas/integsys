@@ -2,6 +2,7 @@ package ph.com.guanzongroup.integsys.views;
 
 import java.io.IOException;
 import java.net.URL;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.SQLException;
@@ -51,9 +52,12 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.StackPane;
 import javafx.stage.FileChooser;
+import javafx.stage.Stage;
 import javafx.util.Duration;
 import javafx.util.Pair;
 import javax.script.ScriptException;
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.rendering.PDFRenderer;
 import org.guanzon.appdriver.agent.ShowMessageFX;
 import org.guanzon.appdriver.base.CommonUtils;
 import org.guanzon.appdriver.base.GRiderCAS;
@@ -63,6 +67,7 @@ import org.guanzon.appdriver.base.GuanzonException;
 import org.guanzon.appdriver.base.MiscUtil;
 import org.guanzon.appdriver.base.SQLUtil;
 import org.guanzon.appdriver.constant.DocumentType;
+import org.guanzon.appdriver.constant.RecordStatus;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.ParseException;
 import ph.com.guanzongroup.cas.cashflow.CheckDeposit;
@@ -209,14 +214,14 @@ public class CheckDepositInterBranch_ConfirmationController implements Initializ
                     lblSource.setText(poController.Master().Company().getCompanyName() + " - " + poController.Master().Industry().getDescription());
                 } catch (SQLException | GuanzonException ex) {
                     Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+                    ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
                 }
             });
             initAttachmentPreviewPane();
             JFXUtil.initKeyClickObject(AnchorMain, lastFocusedTextField, previousSearchedTextField); // for btnSearch Reference
-        } catch (SQLException ex) {
-            Logger.getLogger(CheckDepositInterBranch_ConfirmationController.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (GuanzonException ex) {
-            Logger.getLogger(CheckDepositInterBranch_ConfirmationController.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (SQLException | GuanzonException ex) {
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -247,36 +252,52 @@ public class CheckDepositInterBranch_ConfirmationController implements Initializ
                         JFXUtil.clearTextFields(apJournalDetails, apJournalMaster);
                         if (DoesContainValidDetail()) {
                             pbIsCheckedJournalTab = true;
+                            populateJE();
                         } else {
                             JFXUtil.clickTabByTitleText(tabPaneMain, "Cash Disbursement");
                             ShowMessageFX.Warning(null, pxeModuleName, lsValidDisbMessage);
                         }
                     }
                     break;
-//                case "Attachments":
-//                    if (pnEditMode == EditMode.READY || pnEditMode == EditMode.UPDATE || pnEditMode == EditMode.ADDNEW) {
-//                        JFXUtil.clearTextFields(apAttachments);
-//                        if (DoesContainValidDetail()) {
+                case "Attachments":
+                    if (pnEditMode == EditMode.READY || pnEditMode == EditMode.UPDATE || pnEditMode == EditMode.ADDNEW) {
+                        JFXUtil.clearTextFields(apAttachments);
+                        if (DoesContainValidDetail()) {
 //                            if (isSourceNoAvailable()) {
 //                                pbIsCheckedAttachmentTab = true;
-//                                try {
-//                                    poController.loadAttachments();
-//                                } catch (GuanzonException | SQLException ex) {
-//                                    Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
-//                                    ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
-//                                }
-//
+                            try {
+                                poController.loadAttachments();
+                            } catch (GuanzonException | SQLException ex) {
+                                Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+                                ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
+                            }
 //                            }
-//                            loadTableAttachment.reload();
-//                        } else {
-//                            JFXUtil.clickTabByTitleText(tabPaneMain, "Cash Disbursement");
-//                            ShowMessageFX.Warning(null, pxeModuleName, lsValidDisbMessage);
-//                        }
-//                    }
-//                    break;
+                            loadTableAttachment.reload();
+                        } else {
+                            JFXUtil.clickTabByTitleText(tabPaneMain, "Cash Disbursement");
+                            ShowMessageFX.Warning(null, pxeModuleName, lsValidDisbMessage);
+                        }
+                    }
+                    break;
             }
         });
+    }
 
+    private void populateJE() {
+        try {
+            poJSON = new JSONObject();
+            JFXUtil.clearTextFields(apJournalMaster, apJournalDetails);
+            poController.getEditMode();
+            poJSON = poController.populateJournal();
+            if (JFXUtil.isJSONSuccess(poJSON)) {
+                loadTableDetailJE.reload();
+            } else {
+                journal_data.clear();
+            }
+        } catch (SQLException | GuanzonException | CloneNotSupportedException | ScriptException ex) {
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
+        }
     }
 
     public void initComboboxes() {
@@ -296,11 +317,8 @@ public class CheckDepositInterBranch_ConfirmationController implements Initializ
     }
 
     private void initDatePicker() {
-        LocalDate today = LocalDate.now();
-
         JFXUtil.setDatePickerFormat("MM/dd/yyyy", dpTransactionDate, dpTransactionReferDate, dpCheckDate, dpJournalTransactionDate, dpReportMonthYear);
         JFXUtil.setActionListener(datepicker_Action, dpTransactionDate, dpTransactionReferDate, dpCheckDate, dpJournalTransactionDate, dpReportMonthYear);
-
     }
 
     boolean pbSuccess = true;
@@ -320,7 +338,7 @@ public class CheckDepositInterBranch_ConfirmationController implements Initializ
                                 transactionDate = LocalDate.parse(lsTransDate, DateTimeFormatter.ofPattern(SQLUtil.FORMAT_SHORT_DATE));
 
                                 if (pbSuccess && ((!lsTransDate.equals(lsSelectedDate)) || !lsServerDate.equals(lsSelectedDate))) {
-                                    if (ShowMessageFX.YesNo("Updating the transaction date requires approval. \nProceed with the change?", pxeModuleName, null)) {
+                                    if (ShowMessageFX.YesNo(null, pxeModuleName, "Updating the transaction date requires approval. \nProceed with the change?")) {
 //                                        poController.seekApproval();
                                     } else {
                                         pbSuccess = false;
@@ -379,7 +397,7 @@ public class CheckDepositInterBranch_ConfirmationController implements Initializ
                     }
                 } catch (SQLException ex) {
                     Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
-                    ShowMessageFX.Error(ex.getMessage(), pxeModuleName, null);
+                    ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
                 }
             });
 
@@ -390,13 +408,6 @@ public class CheckDepositInterBranch_ConfirmationController implements Initializ
             String lsButton = ((Button) event.getSource()).getId();
             switch (lsButton) {
                 case "btnUpdate":
-                    //Recheck transaction status
-//                    poJSON = poController.checkUpdateTransaction(true);
-                    if (!"success".equals((String) poJSON.get("result"))) {
-                        ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-                        return;
-                    }
-
                     poJSON = poController.UpdateTransaction();
                     if ("error".equals((String) poJSON.get("result"))) {
                         ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
@@ -411,42 +422,15 @@ public class CheckDepositInterBranch_ConfirmationController implements Initializ
                     JFXUtil.initiateBtnSearch(pxeModuleName, lastFocusedTextField, previousSearchedTextField, apBrowse, apMaster, apDetail, apJournalDetails, apTransaction);
                     break;
                 case "btnSave":
-                    //Recheck transaction status
-                    if (pnEditMode == EditMode.UPDATE) {
-//                        poJSON = poController.checkUpdateTransaction(true);
-                        if (!"success".equals((String) poJSON.get("result"))) {
-                            ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-                            return;
-                        }
-                    }
-
                     if (!ShowMessageFX.YesNo(null, pxeModuleName, "Are you sure you want to save the transaction?")) {
                         return;
                     }
-
-//                        if (oApp.getUserLevel() > UserRight.ENCODER) {
-//                            if (!pbIsCheckedJournalTab) {
-//                                ShowMessageFX.Warning(null, pxeModuleName, "Please check the Journal Entry before saving."); //only require check this only if higher than encoder
-//                                return;
-//                            }
-//                        }
-//                        if (!pbIsCheckedBIRTab && poController.Master().getVATAmount() > 0.0000) {
-//                            ShowMessageFX.Warning(null, pxeModuleName, "Please check the BIR 2307 before saving."); // check this for encoder or and higher
-//                            return;
-//                        }
                     poJSON = poController.SaveTransaction();
                     if (!"success".equals((String) poJSON.get("result"))) {
                         ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                         return;
                     }
-
                     ShowMessageFX.Information(null, pxeModuleName, (String) poJSON.get("message"));
-
-                    //Arsiela 03-05-2026 Moved to class save others
-//                    poJSON = poController.updatePaymentsStatus();
-//                    if ("error".equals(poJSON.get("result"))) {
-//                        ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-//                    }
                     poJSON = poController.OpenTransaction(poController.Master().getTransactionNo());
                     if ("success".equals(poJSON.get("result"))) {
                         pnEditMode = poController.getEditMode();
@@ -473,7 +457,6 @@ public class CheckDepositInterBranch_ConfirmationController implements Initializ
                                 break;
                             }
                         }
-
                     }
                     JFXUtil.disableAllHighlightByColor(tblViewMain, "#A7C7E7", highlightedRowsMain);
                     break;
@@ -487,7 +470,7 @@ public class CheckDepositInterBranch_ConfirmationController implements Initializ
                     }
                 case "btnHistory":
                     if (pnEditMode != EditMode.READY && pnEditMode != EditMode.UPDATE) {
-                        ShowMessageFX.Warning("No transaction status history to load!", pxeModuleName, null);
+                        ShowMessageFX.Warning(null, pxeModuleName, "No transaction status history to load!");
                         return;
                     }
 
@@ -495,7 +478,7 @@ public class CheckDepositInterBranch_ConfirmationController implements Initializ
                         poController.ShowStatusHistory();
                     } catch (NullPointerException npe) {
                         Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(npe), npe);
-                        ShowMessageFX.Error("No transaction status history to load!", pxeModuleName, null);
+                        ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(npe));
                     } catch (Exception ex) {
                         Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
                         ShowMessageFX.Error(MiscUtil.getException(ex), pxeModuleName, null);
@@ -576,90 +559,91 @@ public class CheckDepositInterBranch_ConfirmationController implements Initializ
                         return;
                     }
                     break;
-//                case "btnAddAttachment":
-//                    fileChooser = new FileChooser();
-//                    fileChooser.setTitle("Choose Image");
-//                    fileChooser.getExtensionFilters().addAll(
-//                            new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg", "*.gif", "*.pdf")
-//                    );
-//                    java.io.File selectedFile = fileChooser.showOpenDialog((Stage) btnAddAttachment.getScene().getWindow());
-//
-//                    if (selectedFile != null) {
-//                        // Read image from the selected file
-//                        Path imgPath = selectedFile.toPath();
-//                        Image loimage = new Image(Files.newInputStream(imgPath));
-//                        imageView.setImage(loimage);
-//
-//                        //Validate attachment
-//                        String imgPath2 = selectedFile.getName().toString();
-//                        for (int lnCtr = 0; lnCtr <= poController.getTransactionAttachmentCount() - 1; lnCtr++) {
-//                            if (imgPath2.equals(poController.TransactionAttachmentList(lnCtr).getModel().getFileName())
-//                                    && RecordStatus.ACTIVE.equals(poController.TransactionAttachmentList(lnCtr).getModel().getRecordStatus())) {
-//                                ShowMessageFX.Warning(null, pxeModuleName, "File name already exists.");
-//                                pnAttachment = lnCtr;
-//                                loadRecordAttachment(true);
-//                                return;
-//                            }
-//                        }
-//                        if (imageinfo_temp.containsKey(selectedFile.getName().toString())) {
-//                            ShowMessageFX.Warning(null, pxeModuleName, "File name already exists.");
-//                            loadRecordAttachment(true);
-//                            return;
-//                        } else {
-//                            imageinfo_temp.put(selectedFile.getName().toString(), imgPath.toString());
-//                        }
-//
-//                        //Limit maximum pages of pdf to add
-//                        if (imgPath2.toLowerCase().endsWith(".pdf")) {
-//                            try (PDDocument document = PDDocument.load(selectedFile)) {
-//                                PDFRenderer pdfRenderer = new PDFRenderer(document);
-//                                int pageCount = document.getNumberOfPages();
-//                                if (pageCount > 5) {
-//                                    ShowMessageFX.Warning(null, pxeModuleName, "PDF exceeds maximum allowed pages.");
-//                                    return;
-//                                }
-//                            } catch (IOException ex) {
-//                                Logger.getLogger(CashDisbursement_EntryController.class.getName()).log(Level.SEVERE, null, ex);
-//                            }
-//                        }
-//
-//                        pnAttachment = poController.addAttachment(imgPath2);
-//                        //Copy file to Attachment path
-//                        poController.copyFile(selectedFile.toString());
-//                        loadTableAttachment.reload();
-//                        tblAttachments.getFocusModel().focus(pnAttachment);
-//                        tblAttachments.getSelectionModel().select(pnAttachment);
-//                    }
-//                    break;
-//                case "btnRemoveAttachment":
-//                    if (poController.getTransactionAttachmentCount() <= 0) {
-//                        return;
-//                    } else {
-//                        for (int lnCtr = 0; lnCtr < poController.getTransactionAttachmentCount(); lnCtr++) {
-//                            if (RecordStatus.INACTIVE.equals(poController.TransactionAttachmentList(lnCtr).getModel().getRecordStatus())) {
-//                                if (pnAttachment == lnCtr) {
-//                                    return;
-//                                }
-//                            }
-//                        }
-//                    }
-//                    poJSON = poController.removeAttachment(pnAttachment);
-//                    if ("error".equals((String) poJSON.get("result"))) {
-//                        ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-//                        return;
-//                    }
-//                    attachment_data.remove(tblAttachments.getSelectionModel().getSelectedIndex());
-//                    if (pnAttachment != 0) {
-//                        pnAttachment -= 1;
-//                    }
-//                    imageinfo_temp.clear();
-//                    loadRecordAttachment(false);
-//                    loadTableAttachment.reload();
-//                    if (attachment_data.size() <= 0) {
-//                        JFXUtil.clearTextFields(apAttachments);
-//                    }
-//                    initAttachmentsGrid();
-//                    break;
+                case "btnAddAttachment":
+                    fileChooser = new FileChooser();
+                    fileChooser.setTitle("Choose Image");
+                    fileChooser.getExtensionFilters().addAll(
+                            new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg", "*.gif", "*.pdf")
+                    );
+                    java.io.File selectedFile = fileChooser.showOpenDialog((Stage) btnAddAttachment.getScene().getWindow());
+
+                    if (selectedFile != null) {
+                        // Read image from the selected file
+                        Path imgPath = selectedFile.toPath();
+                        Image loimage = new Image(Files.newInputStream(imgPath));
+                        imageView.setImage(loimage);
+
+                        //Validate attachment
+                        String imgPath2 = selectedFile.getName().toString();
+                        for (int lnCtr = 0; lnCtr <= poController.getTransactionAttachmentCount() - 1; lnCtr++) {
+                            if (imgPath2.equals(poController.TransactionAttachmentList(lnCtr).getModel().getFileName())
+                                    && RecordStatus.ACTIVE.equals(poController.TransactionAttachmentList(lnCtr).getModel().getRecordStatus())) {
+                                ShowMessageFX.Warning(null, pxeModuleName, "File name already exists.");
+                                pnAttachment = lnCtr;
+                                loadRecordAttachment(true);
+                                return;
+                            }
+                        }
+                        if (imageinfo_temp.containsKey(selectedFile.getName().toString())) {
+                            ShowMessageFX.Warning(null, pxeModuleName, "File name already exists.");
+                            loadRecordAttachment(true);
+                            return;
+                        } else {
+                            imageinfo_temp.put(selectedFile.getName().toString(), imgPath.toString());
+                        }
+
+                        //Limit maximum pages of pdf to add
+                        if (imgPath2.toLowerCase().endsWith(".pdf")) {
+                            try (PDDocument document = PDDocument.load(selectedFile)) {
+                                PDFRenderer pdfRenderer = new PDFRenderer(document);
+                                int pageCount = document.getNumberOfPages();
+                                if (pageCount > 5) {
+                                    ShowMessageFX.Warning(null, pxeModuleName, "PDF exceeds maximum allowed pages.");
+                                    return;
+                                }
+                            } catch (IOException ex) {
+                                Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+                                ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
+                            }
+                        }
+
+                        pnAttachment = poController.addAttachment(imgPath2);
+                        //Copy file to Attachment path
+                        poController.copyFile(selectedFile.toString());
+                        loadTableAttachment.reload();
+                        tblAttachments.getFocusModel().focus(pnAttachment);
+                        tblAttachments.getSelectionModel().select(pnAttachment);
+                    }
+                    break;
+                case "btnRemoveAttachment":
+                    if (poController.getTransactionAttachmentCount() <= 0) {
+                        return;
+                    } else {
+                        for (int lnCtr = 0; lnCtr < poController.getTransactionAttachmentCount(); lnCtr++) {
+                            if (RecordStatus.INACTIVE.equals(poController.TransactionAttachmentList(lnCtr).getModel().getRecordStatus())) {
+                                if (pnAttachment == lnCtr) {
+                                    return;
+                                }
+                            }
+                        }
+                    }
+                    poJSON = poController.removeAttachment(pnAttachment);
+                    if ("error".equals((String) poJSON.get("result"))) {
+                        ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                        return;
+                    }
+                    attachment_data.remove(tblAttachments.getSelectionModel().getSelectedIndex());
+                    if (pnAttachment != 0) {
+                        pnAttachment -= 1;
+                    }
+                    imageinfo_temp.clear();
+                    loadRecordAttachment(false);
+                    loadTableAttachment.reload();
+                    if (attachment_data.size() <= 0) {
+                        JFXUtil.clearTextFields(apAttachments);
+                    }
+                    initAttachmentsGrid();
+                    break;
                 case "btnArrowRight":
                     slideImage(1);
                     break;
@@ -673,7 +657,6 @@ public class CheckDepositInterBranch_ConfirmationController implements Initializ
             if (JFXUtil.isObjectEqualTo(lsButton, "btnConfirm", "btnSave", "btnCancel", "btnVoid")) {
                 pbIsCheckedJournalTab = false;
                 poController.resetTransaction();
-//                poController.Master().setSupplierClientID(psSupplierPayeeId);
                 clearTextFields();
                 JFXUtil.clickTabByTitleText(tabPaneMain, "Cash Disbursement");
                 pnEditMode = EditMode.UNKNOWN;
@@ -690,7 +673,7 @@ public class CheckDepositInterBranch_ConfirmationController implements Initializ
             if (lsButton.equals("btnUpdate")) {
                 moveNext(false, false);
             }
-        } catch (CloneNotSupportedException | SQLException | GuanzonException | ParseException | ScriptException ex) {
+        } catch (CloneNotSupportedException | SQLException | GuanzonException | ParseException | ScriptException | IOException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
             ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
@@ -782,12 +765,13 @@ public class CheckDepositInterBranch_ConfirmationController implements Initializ
     }
 
     private void loadRecordSearch() {
-//        try {
-//            tfSeachTransactionNo.setText(poController.Master().Banks().getBankName());
-//            JFXUtil.updateCaretPositions(apTransaction);
-//        } catch (GuanzonException | SQLException ex) {
-//            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
-//        }
+        try {
+            tfSearchBankAccountNo.setText(poController.Master().BankAccount().getAccountNo());
+            JFXUtil.updateCaretPositions(apBrowse);
+        } catch (GuanzonException | SQLException ex) {
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
+        }
     }
 
     private void loadRecordMaster() {
@@ -802,9 +786,11 @@ public class CheckDepositInterBranch_ConfirmationController implements Initializ
             taRemarks.setText(poController.Master().getRemarks());
             dpTransactionDate.setValue(CustomCommonUtil.parseDateStringToLocalDate(SQLUtil.dateFormat(poController.Master().getTransactionDate(), SQLUtil.FORMAT_SHORT_DATE)));
             dpTransactionReferDate.setValue(CustomCommonUtil.parseDateStringToLocalDate(SQLUtil.dateFormat(poController.Master().getTransactionReferDate(), SQLUtil.FORMAT_SHORT_DATE)));
+            tfTotal.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Master().getTransactionTotalDeposit(), false));
             JFXUtil.updateCaretPositions(apMaster);
         } catch (GuanzonException | SQLException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -823,13 +809,13 @@ public class CheckDepositInterBranch_ConfirmationController implements Initializ
             tfPayee.setText(poController.Detail(pnDetail).CheckPayment().Payee().getPayeeName());
             tfNote.setText(poController.Detail(pnDetail).getRemarks());
             tfCheckNo.setText(poController.Detail(pnDetail).CheckPayment().getCheckNo());
-            tfCheckAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(pnDetail).CheckPayment().getAmount(), true));
-            tfTotal.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Master().getTransactionTotalDeposit(), true));
+            tfCheckAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(pnDetail).CheckPayment().getAmount(), false));
             dpCheckDate.setValue(CustomCommonUtil.parseDateStringToLocalDate(SQLUtil.dateFormat(poController.Detail(pnDetail).CheckPayment().getCheckDate(), SQLUtil.FORMAT_SHORT_DATE)));
             cbReverse.setSelected(poController.Detail(pnDetail) != null && poController.Detail(pnDetail).isReverse());
             JFXUtil.updateCaretPositions(apDetail);
         } catch (SQLException | GuanzonException | NullPointerException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -957,7 +943,7 @@ public class CheckDepositInterBranch_ConfirmationController implements Initializ
 
     private void loadTableDetailFromMain() {
         poJSON = new JSONObject();
-        if (pnEditMode == EditMode.ADDNEW) {  //Do not allow to link cash advance when edit mode is not equal to add new
+        if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {  //Do not allow to link cash advance when edit mode is not equal to add new
 
             pnMain = tblViewMain.getSelectionModel().getSelectedIndex();
             ModelTableMain selected = (ModelTableMain) tblViewMain.getSelectionModel().getSelectedItem();
@@ -985,11 +971,9 @@ public class CheckDepositInterBranch_ConfirmationController implements Initializ
                     JFXUtil.runWithDelay(0.50, () -> {
                         loadTableMain.reload();
                     });
-                } catch (SQLException | GuanzonException ex) {
+                } catch (SQLException | GuanzonException | CloneNotSupportedException ex) {
                     Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
                     ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
-                } catch (CloneNotSupportedException ex) {
-                    Logger.getLogger(CheckDepositInterBranch_ConfirmationController.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
         } else {
@@ -1032,52 +1016,52 @@ public class CheckDepositInterBranch_ConfirmationController implements Initializ
     }
 
     private void initLoadTable() {
-//        loadTableAttachment = new JFXUtil.ReloadableTableTask(
-//                tblAttachments,
-//                attachment_data,
-//                () -> {
-//                    imageviewerutil.scaleFactor = 1.0;
-//                    JFXUtil.resetImageBounds(imageView, stackPane1);
-//                    Platform.runLater(() -> {
-//                        try {
-//                            attachment_data.clear();
-//                            int lnCtr;
-//                            int lnCount = 0;
-//                            for (lnCtr = 0; lnCtr < poController.getTransactionAttachmentCount(); lnCtr++) {
-//                                if (RecordStatus.INACTIVE.equals(poController.TransactionAttachmentList(lnCtr).getModel().getRecordStatus())) {
-//                                    continue;
-//                                }
-//                                lnCount += 1;
-//                                attachment_data.add(
-//                                        new ModelDeliveryAcceptance_Attachment(String.valueOf(lnCount),
-//                                                String.valueOf(poController.TransactionAttachmentList(lnCtr).getModel().getFileName()),
-//                                                String.valueOf(lnCtr)
-//                                        ));
-//                            }
-//                            int lnTempRow = JFXUtil.getDetailRow(attachment_data, pnAttachment, 3); //this method is used only when Reverse is applied
-//                            if (lnTempRow < 0 || lnTempRow
-//                                    >= attachment_data.size()) {
-//                                if (!attachment_data.isEmpty()) {
-//                                    /* FOCUS ON FIRST ROW */
-//                                    JFXUtil.selectAndFocusRow(tblAttachments, 0);
-//                                    int lnRow = Integer.parseInt(attachment_data.get(0).getIndex03());
-//                                    pnAttachment = lnRow;
-//                                    loadRecordAttachment(true);
-//                                }
-//                            } else {
-//                                /* FOCUS ON THE ROW THAT pnRowDetail POINTS TO */
-//                                JFXUtil.selectAndFocusRow(tblAttachments, lnTempRow);
-//                                int lnRow = Integer.parseInt(attachment_data.get(tblAttachments.getSelectionModel().getSelectedIndex()).getIndex03());
-//                                pnAttachment = lnRow;
-//                                loadRecordAttachment(true);
-//                            }
-//                            if (attachment_data.size() <= 0) {
-//                                loadRecordAttachment(false);
-//                            }
-//                        } catch (Exception e) {
-//                        }
-//                    });
-//                });
+        loadTableAttachment = new JFXUtil.ReloadableTableTask(
+                tblAttachments,
+                attachment_data,
+                () -> {
+                    imageviewerutil.scaleFactor = 1.0;
+                    JFXUtil.resetImageBounds(imageView, stackPane1);
+                    Platform.runLater(() -> {
+                        try {
+                            attachment_data.clear();
+                            int lnCtr;
+                            int lnCount = 0;
+                            for (lnCtr = 0; lnCtr < poController.getTransactionAttachmentCount(); lnCtr++) {
+                                if (RecordStatus.INACTIVE.equals(poController.TransactionAttachmentList(lnCtr).getModel().getRecordStatus())) {
+                                    continue;
+                                }
+                                lnCount += 1;
+                                attachment_data.add(
+                                        new ModelDeliveryAcceptance_Attachment(String.valueOf(lnCount),
+                                                String.valueOf(poController.TransactionAttachmentList(lnCtr).getModel().getFileName()),
+                                                String.valueOf(lnCtr)
+                                        ));
+                            }
+                            int lnTempRow = JFXUtil.getDetailRow(attachment_data, pnAttachment, 3); //this method is used only when Reverse is applied
+                            if (lnTempRow < 0 || lnTempRow
+                                    >= attachment_data.size()) {
+                                if (!attachment_data.isEmpty()) {
+                                    /* FOCUS ON FIRST ROW */
+                                    JFXUtil.selectAndFocusRow(tblAttachments, 0);
+                                    int lnRow = Integer.parseInt(attachment_data.get(0).getIndex03());
+                                    pnAttachment = lnRow;
+                                    loadRecordAttachment(true);
+                                }
+                            } else {
+                                /* FOCUS ON THE ROW THAT pnRowDetail POINTS TO */
+                                JFXUtil.selectAndFocusRow(tblAttachments, lnTempRow);
+                                int lnRow = Integer.parseInt(attachment_data.get(tblAttachments.getSelectionModel().getSelectedIndex()).getIndex03());
+                                pnAttachment = lnRow;
+                                loadRecordAttachment(true);
+                            }
+                            if (attachment_data.size() <= 0) {
+                                loadRecordAttachment(false);
+                            }
+                        } catch (Exception e) {
+                        }
+                    });
+                });
         loadTableMain = new JFXUtil.ReloadableTableTask(
                 tblViewMain,
                 main_data,
@@ -1110,64 +1094,62 @@ public class CheckDepositInterBranch_ConfirmationController implements Initializ
                         }
                     } catch (SQLException | GuanzonException ex) {
                         Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+                        ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
                     }
                 });
 
         loadTableDetail = new JFXUtil.ReloadableTableTask(
                 tblViewDetail,
-                detail_data, new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    int detailCount = poController.getDetailCount();
-
-                    if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
-                        if (poController.Detail(detailCount - 1).getSourceNo() != null
-                                && !poController.Detail(detailCount - 1).getSourceNo().isEmpty()) {
-                            poController.AddDetail();
-                            detailCount++;
+                detail_data, () -> {
+                    Platform.runLater(() -> {
+                        try {
+                            detail_data.clear();
+                            if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
+                                poController.ReloadDetail();
+                            }
+                            int OriginalRow = 0;
+                            for (int lnCtr = 0; lnCtr < poController.getDetailCount(); lnCtr++) {
+                                if (!poController.Detail(lnCtr).isReverse()) {
+                                    continue;
+                                }
+                                OriginalRow += 1;
+                                String lsdate = JFXUtil.isObjectEqualTo(poController.Detail(lnCtr).CheckPayment().getCheckDate(), null, "") ? ""
+                                        : CustomCommonUtil.formatDateToMMDDYYYY(poController.Detail(lnCtr).CheckPayment().getCheckDate());
+                                detail_data.add(new ModelTableDetail(
+                                        String.valueOf(OriginalRow),
+                                        poController.Detail(lnCtr).CheckPayment().getTransactionNo(),
+                                        poController.Detail(lnCtr).CheckPayment().Banks().getBankName(),
+                                        poController.Detail(lnCtr).CheckPayment().Payee().getPayeeName(),
+                                        lsdate,
+                                        poController.Detail(lnCtr).CheckPayment().getCheckNo(),
+                                        CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(lnCtr).CheckPayment().getAmount(), false),
+                                        String.valueOf(lnCtr),
+                                        "", ""));
+                            }
+                            int lnTempRow = JFXUtil.getDetailRow(detail_data, pnDetail, 8); //this method is used only when Reverse is applied
+                            if (lnTempRow < 0 || lnTempRow
+                                    >= detail_data.size()) {
+                                if (!detail_data.isEmpty()) {
+                                    /* FOCUS ON FIRST ROW */
+                                    JFXUtil.selectAndFocusRow(tblViewDetail, 0);
+                                    int lnRow = Integer.parseInt(detail_data.get(0).getIndex08());
+                                    pnDetail = lnRow;
+                                    loadRecordDetail();
+                                }
+                            } else {
+                                /* FOCUS ON THE ROW THAT pnRowDetail POINTS TO */
+                                JFXUtil.selectAndFocusRow(tblViewDetail, lnTempRow);
+                                int lnRow = Integer.parseInt(detail_data.get(tblViewDetail.getSelectionModel().getSelectedIndex()).getIndex08());
+                                pnDetail = lnRow;
+                                loadRecordDetail();
+                            }
+                            loadRecordMaster();
+                        } catch (GuanzonException | SQLException | CloneNotSupportedException ex) {
+                            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+                            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
                         }
-                    }
-                    int OriginalRow = 0;
-                    for (int lnCtr = 0; lnCtr < poController.getDetailCount(); lnCtr++) {
-                        if (!poController.Detail(lnCtr).isReverse()) {
-                            continue;
-                        }
-                        OriginalRow += 1;
-                        detail_data.add(new ModelTableDetail(
-                                String.valueOf(OriginalRow),
-                                poController.Detail(lnCtr).CheckPayment().getTransactionNo(),
-                                poController.Detail(lnCtr).CheckPayment().Banks().getBankName(),
-                                poController.Detail(lnCtr).CheckPayment().Payee().getPayeeName(),
-                                CustomCommonUtil.formatDateToMMDDYYYY(poController.Detail(lnCtr).CheckPayment().getCheckDate()),
-                                poController.Detail(lnCtr).CheckPayment().getCheckNo(),
-                                CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(lnCtr).CheckPayment().getAmount(), true),
-                                String.valueOf(lnCtr),
-                                "", ""));
-                    }
-                    int lnTempRow = JFXUtil.getDetailRow(detail_data, pnDetail, 8); //this method is used only when Reverse is applied
-                    if (lnTempRow < 0 || lnTempRow
-                            >= detail_data.size()) {
-                        if (!detail_data.isEmpty()) {
-                            /* FOCUS ON FIRST ROW */
-                            JFXUtil.selectAndFocusRow(tblViewDetail, 0);
-                            int lnRow = Integer.parseInt(detail_data.get(0).getIndex08());
-                            pnDetail = lnRow;
-                            loadRecordDetail();
-                        }
-                    } else {
-                        /* FOCUS ON THE ROW THAT pnRowDetail POINTS TO */
-                        JFXUtil.selectAndFocusRow(tblViewDetail, lnTempRow);
-                        int lnRow = Integer.parseInt(detail_data.get(tblViewDetail.getSelectionModel().getSelectedIndex()).getIndex08());
-                        pnDetail = lnRow;
-                        loadRecordDetail();
-                    }
-                    loadRecordMaster();
-                } catch (GuanzonException | SQLException | CloneNotSupportedException ex) {
-                    Logger.getLogger(CheckDepositInterBranch_ConfirmationController.this.getClass().getName()).log(Level.SEVERE, null, ex);
-                }
-            }
-        });
+                    });
+                });
 
         loadTableDetailJE = new JFXUtil.ReloadableTableTask(
                 tblVwJournalDetails,
@@ -1236,7 +1218,6 @@ public class CheckDepositInterBranch_ConfirmationController implements Initializ
                         }
                     });
                 });
-
     }
     ChangeListener<Boolean> txtBrowse_Focus = JFXUtil.FocusListener(TextField.class,
             (lsID, lsValue) -> {
@@ -1308,7 +1289,9 @@ public class CheckDepositInterBranch_ConfirmationController implements Initializ
                         }
                         break;
                 }
-                loadTableDetail.reload();
+                JFXUtil.runWithDelay(0.50, () -> {
+                    loadTableDetail.reload();
+                });
             });
 
     ChangeListener<Boolean> txtArea_Focus = JFXUtil.FocusListener(TextArea.class,
@@ -1363,7 +1346,6 @@ public class CheckDepositInterBranch_ConfirmationController implements Initializ
                                 });
                                 return;
                             } else {
-
                             }
                         }
                         break;
@@ -1426,7 +1408,7 @@ public class CheckDepositInterBranch_ConfirmationController implements Initializ
                             case "tfSearchBankAccountNo":
                                 poJSON = poController.SearchBanks(tfSearchBankAccountNo.getText(), false, true);
                                 if (!"success".equals((String) poJSON.get("result"))) {
-                                    ShowMessageFX.Warning((String) poJSON.get("message"), pxeModuleName, null);
+                                    ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                     return;
                                 }
                                 loadRecordSearch();
@@ -1435,35 +1417,35 @@ public class CheckDepositInterBranch_ConfirmationController implements Initializ
                             case "tfBankMaster":
                                 poJSON = poController.SearchBankAccount(lsValue, false);
                                 if ("error".equals(poJSON.get("result"))) {
-                                    ShowMessageFX.Warning((String) poJSON.get("message"), lsValue, lsValue);
+                                    ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                 }
                                 loadTableDetail.reload();
                                 break;
                             case "tfBankAccountNo":
                                 poJSON = poController.SearchBankAccount(lsValue, true);
                                 if ("error".equals(poJSON.get("result"))) {
-                                    ShowMessageFX.Warning((String) poJSON.get("message"), lsValue, lsValue);
+                                    ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                 }
                                 loadTableDetail.reload();
                                 return;
                             case "tfBankAccountName":
                                 poJSON = poController.SearchBankAccount(lsValue, false);
                                 if ("error".equals(poJSON.get("result"))) {
-                                    ShowMessageFX.Warning((String) poJSON.get("message"), lsValue, lsValue);
+                                    ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                 }
                                 loadTableDetail.reload();
                                 return;
                             case "tfCheckTransNo":
                                 poJSON = poController.SearchChecks(lsValue, "", pnDetail, false);
                                 if ("error".equals(poJSON.get("result"))) {
-                                    ShowMessageFX.Warning((String) poJSON.get("message"), lsValue, lsValue);
+                                    ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                 }
                                 loadTableDetail.reload();
                                 return;
                             case "tfCheckNo":
                                 poJSON = poController.SearchChecks("", lsValue, pnDetail, false);
                                 if ("error".equals(poJSON.get("result"))) {
-                                    ShowMessageFX.Warning((String) poJSON.get("message"), lsValue, lsValue);
+                                    ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                 }
                                 loadTableDetail.reload();
                                 return;
@@ -1518,10 +1500,10 @@ public class CheckDepositInterBranch_ConfirmationController implements Initializ
                         break;
                     default:
                         break;
-
                 }
             } catch (SQLException | GuanzonException | ExceptionInInitializerError ex) {
                 Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+                ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
             }
         }
     }
@@ -1558,7 +1540,7 @@ public class CheckDepositInterBranch_ConfirmationController implements Initializ
                     int lnRow = Integer.parseInt(detail_data.get(tblViewDetail.getSelectionModel().getSelectedIndex()).getIndex06());
                     pnDetail = lnRow;
                     loadRecordDetail();
-//                    moveNext(false, false);
+                    moveNext(false, false);
                 }
             }
         });
@@ -1622,8 +1604,8 @@ public class CheckDepositInterBranch_ConfirmationController implements Initializ
         try {
             if (continueNext) {
                 apDetail.requestFocus();
-                pnDetail = isUp ? Integer.parseInt(detail_data.get(JFXUtil.moveToPreviousRow(tblViewDetail)).getIndex11())
-                        : Integer.parseInt(detail_data.get(JFXUtil.moveToNextRow(tblViewDetail)).getIndex11());
+                pnDetail = isUp ? Integer.parseInt(detail_data.get(JFXUtil.moveToPreviousRow(tblViewDetail)).getIndex08())
+                        : Integer.parseInt(detail_data.get(JFXUtil.moveToNextRow(tblViewDetail)).getIndex08());
             }
             loadRecordDetail();
             if (pnDetail < 0 || pnDetail > poController.getDetailCount() - 1) {
@@ -1635,6 +1617,7 @@ public class CheckDepositInterBranch_ConfirmationController implements Initializ
                 {poController.Detail(pnDetail).getRemarks(), tfNote},}, tfNote); // default
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
 
@@ -1661,7 +1644,6 @@ public class CheckDepositInterBranch_ConfirmationController implements Initializ
     }
 
     private void initButton(int fnValue) {
-
         boolean lbShow1 = (fnValue == EditMode.UPDATE);
         boolean lbShow2 = (fnValue == EditMode.READY);
         boolean lbShow3 = (fnValue == EditMode.UNKNOWN || fnValue == EditMode.READY);

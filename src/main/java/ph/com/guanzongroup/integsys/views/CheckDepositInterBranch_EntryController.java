@@ -774,7 +774,7 @@ public class CheckDepositInterBranch_EntryController implements Initializable, S
             taRemarks.setText(poController.Master().getRemarks());
             dpTransactionDate.setValue(CustomCommonUtil.parseDateStringToLocalDate(SQLUtil.dateFormat(poController.Master().getTransactionDate(), SQLUtil.FORMAT_SHORT_DATE)));
             dpTransactionReferDate.setValue(CustomCommonUtil.parseDateStringToLocalDate(SQLUtil.dateFormat(poController.Master().getTransactionReferDate(), SQLUtil.FORMAT_SHORT_DATE)));
-            tfTotal.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Master().getTransactionTotalDeposit(), true));
+            tfTotal.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Master().getTransactionTotalDeposit(), false));
             JFXUtil.updateCaretPositions(apMaster);
         } catch (GuanzonException | SQLException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
@@ -797,7 +797,7 @@ public class CheckDepositInterBranch_EntryController implements Initializable, S
             tfPayee.setText(poController.Detail(pnDetail).CheckPayment().Payee().getPayeeName());
             tfNote.setText(poController.Detail(pnDetail).getRemarks());
             tfCheckNo.setText(poController.Detail(pnDetail).CheckPayment().getCheckNo());
-            tfCheckAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(pnDetail).CheckPayment().getAmount(), true));
+            tfCheckAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(pnDetail).CheckPayment().getAmount(), false));
             dpCheckDate.setValue(CustomCommonUtil.parseDateStringToLocalDate(SQLUtil.dateFormat(poController.Detail(pnDetail).CheckPayment().getCheckDate(), SQLUtil.FORMAT_SHORT_DATE)));
             cbReverse.setSelected(poController.Detail(pnDetail) != null && poController.Detail(pnDetail).isReverse());
             JFXUtil.updateCaretPositions(apDetail);
@@ -1111,7 +1111,7 @@ public class CheckDepositInterBranch_EntryController implements Initializable, S
                                                 poController.ChecksPaymentList(lnCntr).getTransactionNo(),
                                                 CustomCommonUtil.formatDateToShortString(poController.ChecksPaymentList(lnCntr).getTransactionDate()),
                                                 poController.ChecksPaymentList(lnCntr).getCheckNo(),
-                                                CustomCommonUtil.setIntegerValueToDecimalFormat(poController.ChecksPaymentList(lnCntr).getAmount(), true),
+                                                CustomCommonUtil.setIntegerValueToDecimalFormat(poController.ChecksPaymentList(lnCntr).getAmount(), false),
                                                 "", "", "", "", lsTransBasis
                                         ));
                                     }
@@ -1150,7 +1150,7 @@ public class CheckDepositInterBranch_EntryController implements Initializable, S
                                         poController.Detail(lnCtr).CheckPayment().Payee().getPayeeName(),
                                         lsdate,
                                         poController.Detail(lnCtr).CheckPayment().getCheckNo(),
-                                        CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(lnCtr).CheckPayment().getAmount(), true),
+                                        CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(lnCtr).CheckPayment().getAmount(), false),
                                         String.valueOf(lnCtr),
                                         "", ""));
                             }
@@ -1175,7 +1175,7 @@ public class CheckDepositInterBranch_EntryController implements Initializable, S
                             }
                             loadRecordMaster();
                         } catch (GuanzonException | SQLException | CloneNotSupportedException ex) {
-                            Logger.getLogger(CheckDepositInterBranch_EntryController.this.getClass().getName()).log(Level.SEVERE, null, ex);
+                            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
                             ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
                         }
                     });
