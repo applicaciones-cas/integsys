@@ -183,7 +183,9 @@ public class InventoryStockIssuanceConfirmationController implements Initializab
             initControlEvents();
             poAppController.getMaster().setIndustryId(psIndustryID);
             poAppController.getMaster().setCompanyID(psCompanyID);
-            lblSource.setText(poAppController.getMaster().Company().getCompanyName() + " - " + poAppController.getMaster().Industry().getDescription());
+            poAppController.getMaster().setCategoryId(psCategoryID);
+            lblSource.setText((poAppController.getMaster().Company().getCompanyName() == null ? "" : (poAppController.getMaster().Company().getCompanyName() + " - "))
+                    + (poAppController.getMaster().Industry().getDescription() == null ? "" : poAppController.getMaster().Industry().getDescription()));
 
         } catch (SQLException | GuanzonException e) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(e), e);
@@ -265,8 +267,7 @@ public class InventoryStockIssuanceConfirmationController implements Initializab
     }
 
     @FXML
-    private void cmdButton_Click(ActionEvent event
-    ) {
+    private void cmdButton_Click(ActionEvent event) {
         try {
             //get button id
             String btnID = ((Button) event.getSource()).getId();
@@ -466,7 +467,9 @@ public class InventoryStockIssuanceConfirmationController implements Initializab
                         ShowMessageFX.Information("Please load transaction before proceeding..", "Stock Request Issuance", "");
                         return;
                     }
-
+                    if (ShowMessageFX.YesNo(null, psFormName, "Are you sure you want to save transaction?") != true) {
+                        return;
+                    }
                     if (!isJSONSuccess(poAppController.SaveTransaction(), "Initialize Save Transaction")) {
                         return;
                     }
@@ -542,7 +545,9 @@ public class InventoryStockIssuanceConfirmationController implements Initializab
                         ShowMessageFX.Information("No Delivery Selected..", "Stock Request Issuance", "");
                         return;
                     }
-
+                    if (ShowMessageFX.YesNo(null, psFormName, "Are you sure you want to save transaction?") != true) {
+                        return;
+                    }
                     if (!isJSONSuccess(poAppController.SaveTransactionDelivery(pnTransactionDetail), "Initialize Save Delivery Transaction")) {
                         return;
                     }
@@ -617,6 +622,43 @@ public class InventoryStockIssuanceConfirmationController implements Initializab
             poLogWrapper.severe(psFormName + " :" + e.getMessage());
         }
     }
+    private final ChangeListener<? super Boolean> txtArea_Focus = (o, ov, nv) -> {
+        TextArea loTextField = (TextArea) ((ReadOnlyBooleanPropertyBase) o).getBean();
+        String lsTextFieldID = loTextField.getId();
+        String lsValue = loTextField.getText();
+        if (lsValue == null) {
+            return;
+        }
+        try {
+            if (!nv) {
+                /*Lost Focus*/
+                switch (lsTextFieldID) {
+                    case "taRemarks":
+                        poAppController.getMaster().setRemarks(lsValue);
+                        loadTransactionMaster();
+                        break;
+                    case "taDeliveryRemarks":
+                        if (tfDelilveryTransNo.getText().trim().isEmpty()) {
+                            return;
+                        }
+
+                        poAppController.getDetail(pnTransactionDetail).InventoryTransfer().getMaster().setRemarks(lsValue);
+                        reloadTableDetail();
+                        loadSelectedTransactionDetail(pnTransactionDetail);
+                        reloadTableDetailOther();
+                        break;
+
+                }
+            } else {
+                loTextField.selectAll();
+            }
+        } catch (SQLException | GuanzonException | CloneNotSupportedException ex) {
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+            ShowMessageFX.Error(MiscUtil.getException(ex), psFormName, null);
+
+            poLogWrapper.severe(psFormName + " :" + ex.getMessage());
+        }
+    };
 
     private final ChangeListener<? super Boolean> txtField_Focus = (o, ov, nv) -> {
         TextField loTextField = (TextField) ((ReadOnlyBooleanPropertyBase) o).getBean();
@@ -919,6 +961,9 @@ public class InventoryStockIssuanceConfirmationController implements Initializab
             } else {
                 btnVoid.setText("Void");
             }
+            if (tfTransNo.getText().trim().isEmpty()) {
+                lblMainStatus.setText("UNKNOWN");
+            }
             cbDeliveryType.getSelectionModel().select(1);
         } catch (SQLException | GuanzonException e) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(e), e);
@@ -977,6 +1022,10 @@ public class InventoryStockIssuanceConfirmationController implements Initializab
                 controllerFocusTracker(loControlField);
                 loControlField.setOnKeyPressed(this::txtField_KeyPressed);
                 loControlField.focusedProperty().addListener(txtField_Focus);
+            } else if (loControl instanceof TextArea) {
+                TextArea loControlField = (TextArea) loControl;
+                controllerFocusTracker(loControlField);
+                loControlField.focusedProperty().addListener(txtArea_Focus);
             } else if (loControl instanceof TableView) {
                 TableView loControlField = (TableView) loControl;
                 controllerFocusTracker(loControlField);
@@ -1020,6 +1069,9 @@ public class InventoryStockIssuanceConfirmationController implements Initializab
         loadDeliveryTypes();
         initButtonDisplay(poAppController.getEditMode());
         initButtonDisplayDetail(EditMode.UNKNOWN);
+        
+        lblMainStatus.setText("UNKNOWN");
+        lblDeliveryStatus.setText("UNKNOWN");
     }
 
     private void initButtonDisplayDetail(int fnEditMode) {
@@ -1325,25 +1377,29 @@ public class InventoryStockIssuanceConfirmationController implements Initializab
         String result = (String) loJSON.get("result");
         if ("error".equals(result)) {
             String message = (String) loJSON.get("message");
-            poLogWrapper.severe(psFormName + " :" + message);
-            Platform.runLater(() -> {
-                if (message != null) {
+            if (message != null) {
+                poLogWrapper.severe(psFormName + " :" + message);
+                if (Platform.isFxApplicationThread()) {
                     ShowMessageFX.Warning(null, psFormName, message);
+                } else {
+                    Platform.runLater(() -> ShowMessageFX.Warning(null, psFormName, message));
                 }
-            });
+            }
             return false;
         }
-        String message = (String) loJSON.get("message");
 
+        String message = (String) loJSON.get("message");
         poLogWrapper.severe(psFormName + " :" + message);
-        Platform.runLater(() -> {
-            if (message != null) {
+        if (message != null) {
+            if (Platform.isFxApplicationThread()) {
                 ShowMessageFX.Information(null, psFormName, message);
+            } else {
+                Platform.runLater(() -> ShowMessageFX.Information(null, psFormName, message));
             }
-        });
+        }
+
         poLogWrapper.info(psFormName + " : Success on " + fsModule);
         return true;
-
     }
 
     private LocalDate ParseDate(Date date) {
