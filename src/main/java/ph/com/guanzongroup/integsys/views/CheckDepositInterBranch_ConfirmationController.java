@@ -1276,18 +1276,18 @@ public class CheckDepositInterBranch_ConfirmationController implements Initializ
                 switch (lsID) {
                     case "tfBankMaster":
                         if (lsValue.isEmpty()) {
-                            poController.Master().setBanks(null);
-                            poController.Master().setBankAccount(null);
+                            poController.Master().setBanks("");
+                            poController.Master().setBankAccount("");
                         }
                         break;
                     case "tfBankAccountNo":
                         if (lsValue.isEmpty()) {
-                            poController.Master().setBankAccount(null);
+                            poController.Master().setBankAccount("");
                         }
                         break;
                     case "tfBankAccountName":
                         if (lsValue.isEmpty()) {
-                            poController.Master().setBankAccount(null);
+                            poController.Master().setBankAccount("");
                         }
                         break;
                 }
@@ -1453,7 +1453,7 @@ public class CheckDepositInterBranch_ConfirmationController implements Initializ
                                 loadTableMain.reload();
                                 break;
                             case "tfBankMaster":
-                                poJSON = poController.SearchBankAccount(lsValue, false, true);
+                                poJSON = poController.SearchBankAccount(lsValue, false, false);
                                 if ("error".equals(poJSON.get("result"))) {
                                     ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                 } else {
@@ -1462,7 +1462,7 @@ public class CheckDepositInterBranch_ConfirmationController implements Initializ
                                 loadTableDetail.reload();
                                 break;
                             case "tfBankAccountNo":
-                                poJSON = poController.SearchBankAccount(lsValue, true, true);
+                                poJSON = poController.SearchBankAccount(lsValue, true, false);
                                 if ("error".equals(poJSON.get("result"))) {
                                     ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                 } else {
@@ -1471,7 +1471,7 @@ public class CheckDepositInterBranch_ConfirmationController implements Initializ
                                 loadTableDetail.reload();
                                 return;
                             case "tfBankAccountName":
-                                poJSON = poController.SearchBankAccount(lsValue, false, true);
+                                poJSON = poController.SearchBankAccount(lsValue, false, false);
                                 if ("error".equals(poJSON.get("result"))) {
                                     ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                 } else {
