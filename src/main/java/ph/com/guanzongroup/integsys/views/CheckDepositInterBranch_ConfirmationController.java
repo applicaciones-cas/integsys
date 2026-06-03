@@ -955,8 +955,8 @@ public class CheckDepositInterBranch_ConfirmationController implements Initializ
     }
 
     private void initMainGrid() {
-        JFXUtil.setColumnCenter(tblColNo, tblColTransNo, tblColTransDate, tblColBankAccountNo);
-        JFXUtil.setColumnLeft(tblColBankAccountNme);
+        JFXUtil.setColumnCenter(tblColNo, tblColTransNo, tblColTransDate);
+        JFXUtil.setColumnLeft(tblColBankAccountNme, tblColBankAccountNo);
         JFXUtil.setColumnsIndexAndDisableReordering(tblViewMain);
 
         tblViewMain.setItems(main_data);

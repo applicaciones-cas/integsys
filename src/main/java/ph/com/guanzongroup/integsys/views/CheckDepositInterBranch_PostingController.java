@@ -829,8 +829,8 @@ public class CheckDepositInterBranch_PostingController implements Initializable,
     }
 
     private void initMainGrid() {
-        JFXUtil.setColumnCenter(tblColNo, tblColTransNo, tblColTransDate, tblColBankAccountNo);
-        JFXUtil.setColumnLeft(tblColBankAccountNme);
+        JFXUtil.setColumnCenter(tblColNo, tblColTransNo, tblColTransDate);
+        JFXUtil.setColumnLeft(tblColBankAccountNme, tblColBankAccountNo);
         JFXUtil.setColumnsIndexAndDisableReordering(tblViewMain);
 
         tblViewMain.setItems(main_data);
@@ -1327,21 +1327,21 @@ public class CheckDepositInterBranch_PostingController implements Initializable,
                                 loadTableMain.reload();
                                 break;
                             case "tfBankMaster":
-                                poJSON = poController.SearchBankAccount(lsValue, false, true);
+                                poJSON = poController.SearchBankAccount(lsValue, false, false);
                                 if ("error".equals(poJSON.get("result"))) {
                                     ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                 }
                                 loadTableDetail.reload();
                                 break;
                             case "tfBankAccountNo":
-                                poJSON = poController.SearchBankAccount(lsValue, true, true);
+                                poJSON = poController.SearchBankAccount(lsValue, true, false);
                                 if ("error".equals(poJSON.get("result"))) {
                                     ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                 }
                                 loadTableDetail.reload();
                                 return;
                             case "tfBankAccountName":
-                                poJSON = poController.SearchBankAccount(lsValue, false, true);
+                                poJSON = poController.SearchBankAccount(lsValue, false, false);
                                 if ("error".equals(poJSON.get("result"))) {
                                     ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                 }
