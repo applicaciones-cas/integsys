@@ -438,13 +438,28 @@ public class InventoryStockIssuance_PostingControllerMonarch_Food implements Ini
         }
     }
 
-    private void initButtonDisplay(int fnEditMode) {
-        boolean lbShow = (fnEditMode == EditMode.ADDNEW || fnEditMode == EditMode.UPDATE);
+      private void initButtonDisplay(int fnEditMode) {
+        boolean lbEditing = (fnEditMode == EditMode.ADDNEW || fnEditMode == EditMode.UPDATE);
 
-        // Always show these buttons
-        initButtonControls(true, "btnHistory", "btnPost", "btnRetrieve", "btnClose");
-        apMaster.setDisable(!lbShow);
-        apDetail.setDisable(!lbShow);
+        String lsTransNo = tfTransactionNo.getText();
+        boolean lbHasTransaction = lsTransNo != null && !lsTransNo.isEmpty();
+        boolean lbIsPosted= lbHasTransaction
+                && "2".equals(poAppController.getMaster().getTransactionStatus());
+
+        // Always visible
+        initButtonControls(true, "btnRetrieve", "btnClose");
+
+        // Editing mode buttons
+        initButtonControls(!lbEditing, "btnBrowse");
+
+        // Transaction-dependent buttons (only when not editing)
+        initButtonControls(lbEditing && lbHasTransaction,  "btnHistory");
+        initButtonControls(lbEditing && lbHasTransaction && !lbIsPosted,  "btnPost");
+
+        // Disable panes during editing
+        apMaster.setDisable(!lbEditing);
+        apDetail.setDisable(!lbEditing);
+        
     }
 
     final ChangeListener<? super Boolean> txtField_Focus = (o, ov, nv) -> {
