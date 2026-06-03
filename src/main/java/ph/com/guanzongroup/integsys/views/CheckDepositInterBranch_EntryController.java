@@ -774,6 +774,7 @@ public class CheckDepositInterBranch_EntryController implements Initializable, S
             taRemarks.setText(poController.Master().getRemarks());
             dpTransactionDate.setValue(CustomCommonUtil.parseDateStringToLocalDate(SQLUtil.dateFormat(poController.Master().getTransactionDate(), SQLUtil.FORMAT_SHORT_DATE)));
             dpTransactionReferDate.setValue(CustomCommonUtil.parseDateStringToLocalDate(SQLUtil.dateFormat(poController.Master().getTransactionReferDate(), SQLUtil.FORMAT_SHORT_DATE)));
+            tfTotal.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Master().getTransactionTotalDeposit(), true));
             JFXUtil.updateCaretPositions(apMaster);
         } catch (GuanzonException | SQLException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
@@ -797,7 +798,6 @@ public class CheckDepositInterBranch_EntryController implements Initializable, S
             tfNote.setText(poController.Detail(pnDetail).getRemarks());
             tfCheckNo.setText(poController.Detail(pnDetail).CheckPayment().getCheckNo());
             tfCheckAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(pnDetail).CheckPayment().getAmount(), true));
-            tfTotal.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Master().getTransactionTotalDeposit(), true));
             dpCheckDate.setValue(CustomCommonUtil.parseDateStringToLocalDate(SQLUtil.dateFormat(poController.Detail(pnDetail).CheckPayment().getCheckDate(), SQLUtil.FORMAT_SHORT_DATE)));
             cbReverse.setSelected(poController.Detail(pnDetail) != null && poController.Detail(pnDetail).isReverse());
             JFXUtil.updateCaretPositions(apDetail);
@@ -956,7 +956,7 @@ public class CheckDepositInterBranch_EntryController implements Initializable, S
 
     private void loadTableDetailFromMain() {
         poJSON = new JSONObject();
-        if (pnEditMode == EditMode.ADDNEW) {  //Do not allow to link cash advance when edit mode is not equal to add new
+        if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {  //Do not allow to link cash advance when edit mode is not equal to add new
 
             pnMain = tblViewMain.getSelectionModel().getSelectedIndex();
             ModelTableMain selected = (ModelTableMain) tblViewMain.getSelectionModel().getSelectedItem();
@@ -993,7 +993,7 @@ public class CheckDepositInterBranch_EntryController implements Initializable, S
                 }
             }
         } else {
-            ShowMessageFX.Warning(null, pxeModuleName, "Data can only be inserted when in ADD mode.");
+            ShowMessageFX.Warning(null, pxeModuleName, "Data can only be inserted when in ADD or UPDATE mode.");
         }
     }
 
