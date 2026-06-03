@@ -811,6 +811,16 @@ public class CheckDepositInterBranch_ConfirmationController implements Initializ
 
     private void loadRecordMaster() {
         try {
+            String lsStat = "";
+            switch (poController.Master().getTransactionStatus()) {
+                case CheckDepositStatus.OPEN:
+                    lsStat = "Void";
+                    break;
+                case CheckDepositStatus.CONFIRMED:
+                    lsStat = "Cancel";
+                    break;
+            }
+            btnVoid.setText(lsStat);
             poController.computeFields();
             JFXUtil.setStatusValue(lblStatus, CheckDepositStatus.class, pnEditMode == EditMode.UNKNOWN ? "-1" : poController.Master().getTransactionStatus());
 
