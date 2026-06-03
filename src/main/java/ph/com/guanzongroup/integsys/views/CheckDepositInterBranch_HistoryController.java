@@ -4,9 +4,7 @@ import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.concurrent.atomic.AtomicReference;
@@ -48,7 +46,6 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.StackPane;
 import javafx.stage.FileChooser;
 import javafx.util.Duration;
-import javafx.util.Pair;
 import javax.script.ScriptException;
 import org.guanzon.appdriver.agent.ShowMessageFX;
 import org.guanzon.appdriver.base.CommonUtils;
@@ -88,17 +85,11 @@ public class CheckDepositInterBranch_HistoryController implements Initializable,
     private String psIndustryId = "";
     private String psCompanyId = "";
     private String psCategoryId = "";
-    private boolean pbIsCheckedJournalTab = false;
-    private int pnMain = 0;
     private int pnDetail = 0;
     private int pnAttachment;
-    private final Map<String, List<String>> highlightedRowsMain = new HashMap<>();
-    List<Pair<String, String>> plOrderNoPartial = new ArrayList<>();
-    List<Pair<String, String>> plOrderNoFinal = new ArrayList<>();
     private final JFXUtil.ImageViewer imageviewerutil = new JFXUtil.ImageViewer();
     private int pnDetailJE = 0;
     private int currentIndex = 0;
-    private ObservableList<ModelTableMain> main_data = FXCollections.observableArrayList();
     private ObservableList<ModelTableDetail> detail_data = FXCollections.observableArrayList();
     private final ObservableList<ModelDeliveryAcceptance_Attachment> attachment_data = FXCollections.observableArrayList();
     private ObservableList<ModelJournalEntry_Detail> journal_data = FXCollections.observableArrayList();
@@ -234,7 +225,7 @@ public class CheckDepositInterBranch_HistoryController implements Initializable,
                     if (pnEditMode == EditMode.READY || pnEditMode == EditMode.UPDATE || pnEditMode == EditMode.ADDNEW) {
                         JFXUtil.clearTextFields(apJournalDetails, apJournalMaster);
                         if (DoesContainValidDetail()) {
-                            pbIsCheckedJournalTab = true;
+                            populateJE();
                         } else {
                             JFXUtil.clickTabByTitleText(tabPaneMain, "Cash Disbursement");
                             ShowMessageFX.Warning(null, pxeModuleName, lsValidDisbMessage);
@@ -245,8 +236,6 @@ public class CheckDepositInterBranch_HistoryController implements Initializable,
                     if (pnEditMode == EditMode.READY || pnEditMode == EditMode.UPDATE || pnEditMode == EditMode.ADDNEW) {
                         JFXUtil.clearTextFields(apAttachments);
                         if (DoesContainValidDetail()) {
-//                            if (isSourceNoAvailable()) {
-//                                pbIsCheckedAttachmentTab = true;
                             try {
                                 poController.loadAttachments();
                             } catch (GuanzonException | SQLException ex) {
@@ -264,6 +253,23 @@ public class CheckDepositInterBranch_HistoryController implements Initializable,
                     break;
             }
         });
+    }
+
+    private void populateJE() {
+        try {
+            poJSON = new JSONObject();
+            JFXUtil.clearTextFields(apJournalMaster, apJournalDetails);
+            poController.getEditMode();
+            poJSON = poController.populateJournal();
+            if (JFXUtil.isJSONSuccess(poJSON)) {
+                loadTableDetailJE.reload();
+            } else {
+                journal_data.clear();
+            }
+        } catch (SQLException | GuanzonException | CloneNotSupportedException | ScriptException ex) {
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
+        }
     }
 
     private void initDatePicker() {
@@ -327,7 +333,6 @@ public class CheckDepositInterBranch_HistoryController implements Initializable,
                     break;
             }
             if (JFXUtil.isObjectEqualTo(lsButton, "btnSave", "btnCancel", "btnVoid")) {
-                pbIsCheckedJournalTab = false;
                 poController.resetTransaction();
                 clearTextFields();
                 JFXUtil.clickTabByTitleText(tabPaneMain, "Cash Disbursement");
@@ -601,36 +606,6 @@ public class CheckDepositInterBranch_HistoryController implements Initializable,
 
     @FXML
     private void cmdCheckBox_Click(ActionEvent event) {
-        poJSON = new JSONObject();
-        Object source = event.getSource();
-        if (source instanceof CheckBox) {
-            CheckBox checkedBox = (CheckBox) source;
-            switch (checkedBox.getId()) {
-                case "cbReverse":
-                    if (poController.Detail(pnDetail).getEditMode() == EditMode.ADDNEW) {
-                        poController.Detail().remove(pnDetail);
-                    } else {
-                        poController.Detail(pnDetail).isReverse(cbReverse.isSelected());
-                    }
-                    loadTableDetail.reload();
-                    if (checkedBox.isSelected()) {
-                        moveNext(false, false);
-                    }
-                    break;
-                case "cbJEReverse":
-                    if (poController.Journal().Detail(pnDetailJE).getEditMode() == EditMode.ADDNEW) {
-                        poController.Journal().Detail().remove(pnDetailJE);
-                    } else {
-                        poController.Journal().Detail(pnDetailJE).isReverse(cbJEReverse.isSelected());
-                    }
-                    loadRecordMasterJE();
-                    loadTableDetailJE.reload();
-                    if (checkedBox.isSelected()) {
-                        moveNextJE(false, false);
-                    }
-                    break;
-            }
-        }
     }
 
     private void initLoadTable() {
