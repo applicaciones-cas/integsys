@@ -1520,7 +1520,7 @@ public class CheckDepositInterBranch_ConfirmationController implements Initializ
 
     private void initTextFields() {
         JFXUtil.setFocusListener(txtArea_Focus, taRemarks, taJournalRemarks);
-        JFXUtil.setFocusListener(txtBrowse_Focus, apTransaction);
+        JFXUtil.setFocusListener(txtBrowse_Focus, apBrowse);
         JFXUtil.setFocusListener(txtMaster_Focus, apMaster);
         JFXUtil.setFocusListener(txtDetail_Focus, apDetail);
         JFXUtil.setFocusListener(txtDetailJE_Focus, apJournalDetails);
@@ -1547,7 +1547,7 @@ public class CheckDepositInterBranch_ConfirmationController implements Initializ
             if (!detail_data.isEmpty() && event.getClickCount() == 1) {
                 ModelTableDetail selected = (ModelTableDetail) tblViewDetail.getSelectionModel().getSelectedItem();
                 if (selected != null) {
-                    int lnRow = Integer.parseInt(detail_data.get(tblViewDetail.getSelectionModel().getSelectedIndex()).getIndex06());
+                    int lnRow = Integer.parseInt(detail_data.get(tblViewDetail.getSelectionModel().getSelectedIndex()).getIndex08());
                     pnDetail = lnRow;
                     loadRecordDetail();
                     moveNext(false, false);
@@ -1662,7 +1662,7 @@ public class CheckDepositInterBranch_ConfirmationController implements Initializ
         JFXUtil.setButtonsVisibility(lbShow2, btnUpdate, btnHistory, btnVoid, btnPrint);
         JFXUtil.setButtonsVisibility(lbShow3, btnClose);
 
-        JFXUtil.setDisabled(!lbShow1, apBrowse, apMaster, apDetail, apJournalMaster, apJournalDetails);
+        JFXUtil.setDisabled(!lbShow1, apMaster, apDetail, apJournalMaster, apJournalDetails);
         JFXUtil.setButtonsVisibility(true, btnRetrieve);
         JFXUtil.setButtonsVisibility(false, btnApprove);
 
