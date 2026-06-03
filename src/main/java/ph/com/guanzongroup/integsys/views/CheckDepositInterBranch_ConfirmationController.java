@@ -773,7 +773,7 @@ public class CheckDepositInterBranch_ConfirmationController implements Initializ
     }
 
     private void loadRecordSearch() {
-        tfSearchBankAccountNo.setText(poController.getSearchBank());
+        tfSearchBankAccountNo.setText(poController.getSearchBankAccountNo());
         JFXUtil.updateCaretPositions(apBrowse);
     }
 
