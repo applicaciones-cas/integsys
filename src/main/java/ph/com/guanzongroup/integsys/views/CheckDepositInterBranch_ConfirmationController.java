@@ -1424,6 +1424,8 @@ public class CheckDepositInterBranch_ConfirmationController implements Initializ
                                 poJSON = poController.SearchBankAccount(lsValue, false, true);
                                 if ("error".equals(poJSON.get("result"))) {
                                     ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                                } else {
+                                    JFXUtil.textFieldMoveNext(tfBankAccountNo);
                                 }
                                 loadTableDetail.reload();
                                 break;
@@ -1431,6 +1433,8 @@ public class CheckDepositInterBranch_ConfirmationController implements Initializ
                                 poJSON = poController.SearchBankAccount(lsValue, true, true);
                                 if ("error".equals(poJSON.get("result"))) {
                                     ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                                } else {
+                                    JFXUtil.textFieldMoveNext(tfBankAccountName);
                                 }
                                 loadTableDetail.reload();
                                 return;
@@ -1438,11 +1442,13 @@ public class CheckDepositInterBranch_ConfirmationController implements Initializ
                                 poJSON = poController.SearchBankAccount(lsValue, false, true);
                                 if ("error".equals(poJSON.get("result"))) {
                                     ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                                } else {
+                                    JFXUtil.textFieldMoveNext(taRemarks);
                                 }
                                 loadTableDetail.reload();
                                 return;
                             case "tfCheckTransNo":
-                                poJSON = poController.SearchChecks(lsValue, "", pnDetail, false);
+                                poJSON = poController.SearchChecks(lsValue, tfCheckNo.getText(), pnDetail, false);
                                 if ("error".equals(poJSON.get("result"))) {
                                     ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                 }
@@ -1666,8 +1672,11 @@ public class CheckDepositInterBranch_ConfirmationController implements Initializ
             return;
         }
         switch (poController.Master().getTransactionStatus()) {
-            case CheckDepositStatus.CONFIRMED:
+            case CheckDepositStatus.OPEN:
                 JFXUtil.setButtonsVisibility(true, btnApprove);
+                break;
+            case CheckDepositStatus.CONFIRMED:
+                JFXUtil.setButtonsVisibility(false, btnApprove);
                 break;
             case CheckDepositStatus.VOID:
             case CheckDepositStatus.CANCELLED:

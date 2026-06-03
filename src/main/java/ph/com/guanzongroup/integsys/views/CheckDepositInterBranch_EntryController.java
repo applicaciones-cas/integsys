@@ -793,7 +793,7 @@ public class CheckDepositInterBranch_EntryController implements Initializable, S
                 JFXUtil.setDisabled(true, tfCheckTransNo, tfCheckNo);
             }
             JFXUtil.setDisabled(true, tfBank, tfPayee, tfCheckAmount);
-            
+
             tfCheckTransNo.setText(poController.Detail(pnDetail).CheckPayment().getTransactionNo());
             tfBank.setText(poController.Detail(pnDetail).CheckPayment().Banks().getBankName());
             tfPayee.setText(poController.Detail(pnDetail).CheckPayment().Payee().getPayeeName());
@@ -1444,6 +1444,8 @@ public class CheckDepositInterBranch_EntryController implements Initializable, S
                                 poJSON = poController.SearchBanks(lsValue, false, false);
                                 if ("error".equals(poJSON.get("result"))) {
                                     ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                                } else {
+                                    JFXUtil.textFieldMoveNext(tfBankAccountNo);
                                 }
                                 loadRecordMaster();
                                 break;
@@ -1451,6 +1453,8 @@ public class CheckDepositInterBranch_EntryController implements Initializable, S
                                 poJSON = poController.SearchBankAccount(lsValue, true, false);
                                 if ("error".equals(poJSON.get("result"))) {
                                     ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                                } else {
+                                    JFXUtil.textFieldMoveNext(tfBankAccountName);
                                 }
                                 loadRecordMaster();
                                 return;
@@ -1458,11 +1462,13 @@ public class CheckDepositInterBranch_EntryController implements Initializable, S
                                 poJSON = poController.SearchBankAccount(lsValue, false, false);
                                 if ("error".equals(poJSON.get("result"))) {
                                     ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                                } else {
+                                    JFXUtil.textFieldMoveNext(taRemarks);
                                 }
                                 loadRecordMaster();
                                 return;
                             case "tfCheckTransNo":
-                                poJSON = poController.SearchChecks(lsValue, "", pnDetail, false);
+                                poJSON = poController.SearchChecks(lsValue, tfCheckNo.getText(), pnDetail, false);
                                 if ("error".equals(poJSON.get("result"))) {
                                     ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                 }
