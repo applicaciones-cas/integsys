@@ -8,6 +8,7 @@ import java.nio.file.Paths;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -316,6 +317,25 @@ public class CheckDepositInterBranch_ConfirmationController implements Initializ
     private void initDatePicker() {
         JFXUtil.setDatePickerFormat("MM/dd/yyyy", dpSearchTransactionDate, dpTransactionDate, dpTransactionReferDate, dpCheckDate, dpJournalTransactionDate, dpReportMonthYear);
         JFXUtil.setActionListener(datepicker_Action, dpSearchTransactionDate, dpTransactionDate, dpTransactionReferDate, dpCheckDate, dpJournalTransactionDate, dpReportMonthYear);
+        dpSearchTransactionDate.focusedProperty().addListener((obs, oldVal, focused) -> {
+            if (!focused) {
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/dd/yyyy");
+                String text = dpSearchTransactionDate.getEditor().getText();
+                if (text == null || text.trim().isEmpty()) {
+                    dpSearchTransactionDate.setValue(null);
+                    psSearchDate = "";
+                    return;
+                }
+                try {
+                    LocalDate date = LocalDate.parse(text, formatter);
+                    dpSearchTransactionDate.setValue(date);
+                } catch (DateTimeParseException e) {
+                    dpSearchTransactionDate.setValue(null);
+                    psSearchDate = "";
+                    dpSearchTransactionDate.requestFocus();
+                }
+            }
+        });
     }
 
     boolean pbSuccess = true;
