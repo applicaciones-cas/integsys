@@ -487,7 +487,7 @@ public class CheckDepositInterBranch_ConfirmationController implements Initializ
                 case "btnRetrieve":
                     loadTableMain.reload();
                     break;
-                case "btnConfirm":
+                case "btnApprove":
                     if (ShowMessageFX.YesNo(null, pxeModuleName, "Are you sure you want to confirm transaction?")) {
                         pnEditMode = poController.getEditMode();
                         if (pnEditMode == EditMode.READY) {
