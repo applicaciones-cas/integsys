@@ -341,7 +341,7 @@ public class CheckDepositInterBranch_EntryController implements Initializable, S
                                 transactionDate = LocalDate.parse(lsTransDate, DateTimeFormatter.ofPattern(SQLUtil.FORMAT_SHORT_DATE));
 
                                 if (pbSuccess && ((!lsTransDate.equals(lsSelectedDate)) || !lsServerDate.equals(lsSelectedDate))) {
-                                    if (ShowMessageFX.YesNo("Updating the transaction date requires approval. \nProceed with the change?", pxeModuleName, null)) {
+                                    if (ShowMessageFX.YesNo(null, pxeModuleName, "Updating the transaction date requires approval. \nProceed with the change?")) {
 //                                        poController.seekApproval();
                                     } else {
                                         pbSuccess = false;
@@ -506,7 +506,7 @@ public class CheckDepositInterBranch_EntryController implements Initializable, S
                     }
                 case "btnHistory":
                     if (pnEditMode != EditMode.READY && pnEditMode != EditMode.UPDATE) {
-                        ShowMessageFX.Warning("No transaction status history to load!", pxeModuleName, null);
+                        ShowMessageFX.Warning(null, pxeModuleName, "No transaction status history to load!");
                         return;
                     }
 
@@ -1314,7 +1314,9 @@ public class CheckDepositInterBranch_EntryController implements Initializable, S
                         }
                         break;
                 }
-                loadTableDetail.reload();
+                JFXUtil.runWithDelay(0.50, () -> {
+                    loadTableDetail.reload();
+                });
             });
 
     ChangeListener<Boolean> txtArea_Focus = JFXUtil.FocusListener(TextArea.class,
@@ -1430,7 +1432,7 @@ public class CheckDepositInterBranch_EntryController implements Initializable, S
                             case "tfSearchBank":
                                 poJSON = poController.SearchBanks(tfSearchBank.getText(), false, true);
                                 if (!"success".equals((String) poJSON.get("result"))) {
-                                    ShowMessageFX.Warning((String) poJSON.get("message"), pxeModuleName, null);
+                                    ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                     return;
                                 }
                                 loadRecordSearch();
@@ -1439,35 +1441,35 @@ public class CheckDepositInterBranch_EntryController implements Initializable, S
                             case "tfBankMaster":
                                 poJSON = poController.SearchBanks(lsValue, false, false);
                                 if ("error".equals(poJSON.get("result"))) {
-                                    ShowMessageFX.Warning((String) poJSON.get("message"), lsValue, lsValue);
+                                    ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                 }
                                 loadRecordMaster();
                                 break;
                             case "tfBankAccountNo":
                                 poJSON = poController.SearchBankAccount(lsValue, true);
                                 if ("error".equals(poJSON.get("result"))) {
-                                    ShowMessageFX.Warning((String) poJSON.get("message"), lsValue, lsValue);
+                                    ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                 }
                                 loadRecordMaster();
                                 return;
                             case "tfBankAccountName":
                                 poJSON = poController.SearchBankAccount(lsValue, false);
                                 if ("error".equals(poJSON.get("result"))) {
-                                    ShowMessageFX.Warning((String) poJSON.get("message"), lsValue, lsValue);
+                                    ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                 }
                                 loadRecordMaster();
                                 return;
                             case "tfCheckTransNo":
                                 poJSON = poController.SearchChecks(lsValue, "", pnDetail, false);
                                 if ("error".equals(poJSON.get("result"))) {
-                                    ShowMessageFX.Warning((String) poJSON.get("message"), lsValue, lsValue);
+                                    ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                 }
                                 loadTableDetail.reload();
                                 return;
                             case "tfCheckNo":
                                 poJSON = poController.SearchChecks("", lsValue, pnDetail, false);
                                 if ("error".equals(poJSON.get("result"))) {
-                                    ShowMessageFX.Warning((String) poJSON.get("message"), lsValue, lsValue);
+                                    ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                 }
                                 loadTableDetail.reload();
                                 return;
@@ -1563,16 +1565,16 @@ public class CheckDepositInterBranch_EntryController implements Initializable, S
     }
 
     public void initTableOnClick() {
-//        tblAttachments.setOnMouseClicked(event -> {
-//            pnAttachment = tblAttachments.getSelectionModel().getSelectedIndex();
-//            if (pnAttachment >= 0) {
-//                imageviewerutil.scaleFactor = 1.0;
-//                int lnRow = Integer.parseInt(attachment_data.get(tblAttachments.getSelectionModel().getSelectedIndex()).getIndex03());
-//                pnAttachment = lnRow;
-//                loadRecordAttachment(true);
-//                JFXUtil.resetImageBounds(imageView, stackPane1);
-//            }
-//        });
+        tblAttachments.setOnMouseClicked(event -> {
+            pnAttachment = tblAttachments.getSelectionModel().getSelectedIndex();
+            if (pnAttachment >= 0) {
+                imageviewerutil.scaleFactor = 1.0;
+                int lnRow = Integer.parseInt(attachment_data.get(tblAttachments.getSelectionModel().getSelectedIndex()).getIndex03());
+                pnAttachment = lnRow;
+                loadRecordAttachment(true);
+                JFXUtil.resetImageBounds(imageView, stackPane1);
+            }
+        });
 
         tblViewDetail.setOnMouseClicked(event -> {
             if (!detail_data.isEmpty() && event.getClickCount() == 1) {
@@ -1581,7 +1583,7 @@ public class CheckDepositInterBranch_EntryController implements Initializable, S
                     int lnRow = Integer.parseInt(detail_data.get(tblViewDetail.getSelectionModel().getSelectedIndex()).getIndex08());
                     pnDetail = lnRow;
                     loadRecordDetail();
-//                    moveNext(false, false);
+                    moveNext(false, false);
                 }
             }
         });
@@ -1647,8 +1649,8 @@ public class CheckDepositInterBranch_EntryController implements Initializable, S
         try {
             if (continueNext) {
                 apDetail.requestFocus();
-                pnDetail = isUp ? Integer.parseInt(detail_data.get(JFXUtil.moveToPreviousRow(tblViewDetail)).getIndex11())
-                        : Integer.parseInt(detail_data.get(JFXUtil.moveToNextRow(tblViewDetail)).getIndex11());
+                pnDetail = isUp ? Integer.parseInt(detail_data.get(JFXUtil.moveToPreviousRow(tblViewDetail)).getIndex08())
+                        : Integer.parseInt(detail_data.get(JFXUtil.moveToNextRow(tblViewDetail)).getIndex08());
             }
             loadRecordDetail();
             if (pnDetail < 0 || pnDetail > poController.getDetailCount() - 1) {
