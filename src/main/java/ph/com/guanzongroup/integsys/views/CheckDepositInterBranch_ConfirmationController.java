@@ -316,7 +316,7 @@ public class CheckDepositInterBranch_ConfirmationController implements Initializ
     }
 
     private void initDatePicker() {
-        JFXUtil.setDatePickerFormat("MM/dd/yyyy", dpSearchTransactionDate,dpTransactionDate, dpTransactionReferDate, dpCheckDate, dpJournalTransactionDate, dpReportMonthYear);
+        JFXUtil.setDatePickerFormat("MM/dd/yyyy", dpSearchTransactionDate, dpTransactionDate, dpTransactionReferDate, dpCheckDate, dpJournalTransactionDate, dpReportMonthYear);
         JFXUtil.setActionListener(datepicker_Action, dpSearchTransactionDate, dpTransactionDate, dpTransactionReferDate, dpCheckDate, dpJournalTransactionDate, dpReportMonthYear);
     }
 
@@ -1234,19 +1234,15 @@ public class CheckDepositInterBranch_ConfirmationController implements Initializ
     }
     ChangeListener<Boolean> txtBrowse_Focus = JFXUtil.FocusListener(TextField.class,
             (lsID, lsValue) -> {
-                try {
-                    switch (lsID) {
-                        case "tfSearchBank":
-                            if (lsValue.isEmpty()) {
-                                poController.Master().Banks().setBankID("");
-                            }
-                            loadRecordSearch();
-                            break;
-                    }
-                } catch (SQLException | GuanzonException ex) {
-                    Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
-                    ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
+                switch (lsID) {
+                    case "tfSearchBankAccountNo":
+                        if (lsValue.isEmpty()) {
+                            poController.setSearchBankAccountNo("");
+                        }
+                        loadRecordSearch();
+                        break;
                 }
+
             });
 
     ChangeListener<Boolean> txtMaster_Focus = JFXUtil.FocusListener(TextField.class,
@@ -1419,7 +1415,7 @@ public class CheckDepositInterBranch_ConfirmationController implements Initializ
                         switch (txtFieldID) {
                             //apBrowse
                             case "tfSearchBankAccountNo":
-                                poJSON = poController.SearchBankAccount(tfSearchBankAccountNo.getText(), false);
+                                poJSON = poController.SearchBankAccount(tfSearchBankAccountNo.getText(), false, true);
                                 if (!"success".equals((String) poJSON.get("result"))) {
                                     ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                     return;
@@ -1427,22 +1423,25 @@ public class CheckDepositInterBranch_ConfirmationController implements Initializ
                                 loadRecordSearch();
                                 loadTableMain.reload();
                                 break;
+                            case "tfSearchTransNo":
+                                loadTableMain.reload();
+                                break;
                             case "tfBankMaster":
-                                poJSON = poController.SearchBankAccount(lsValue, false);
+                                poJSON = poController.SearchBankAccount(lsValue, false, true);
                                 if ("error".equals(poJSON.get("result"))) {
                                     ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                 }
                                 loadTableDetail.reload();
                                 break;
                             case "tfBankAccountNo":
-                                poJSON = poController.SearchBankAccount(lsValue, true);
+                                poJSON = poController.SearchBankAccount(lsValue, true, true);
                                 if ("error".equals(poJSON.get("result"))) {
                                     ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                 }
                                 loadTableDetail.reload();
                                 return;
                             case "tfBankAccountName":
-                                poJSON = poController.SearchBankAccount(lsValue, false);
+                                poJSON = poController.SearchBankAccount(lsValue, false, true);
                                 if ("error".equals(poJSON.get("result"))) {
                                     ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                 }

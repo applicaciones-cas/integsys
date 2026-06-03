@@ -1448,14 +1448,14 @@ public class CheckDepositInterBranch_EntryController implements Initializable, S
                                 loadRecordMaster();
                                 break;
                             case "tfBankAccountNo":
-                                poJSON = poController.SearchBankAccount(lsValue, true);
+                                poJSON = poController.SearchBankAccount(lsValue, true, false);
                                 if ("error".equals(poJSON.get("result"))) {
                                     ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                 }
                                 loadRecordMaster();
                                 return;
                             case "tfBankAccountName":
-                                poJSON = poController.SearchBankAccount(lsValue, false);
+                                poJSON = poController.SearchBankAccount(lsValue, false, false);
                                 if ("error".equals(poJSON.get("result"))) {
                                     ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                 }

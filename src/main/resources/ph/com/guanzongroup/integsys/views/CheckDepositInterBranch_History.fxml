@@ -250,7 +250,7 @@
                                                             <Insets />
                                                          </VBox.margin>
                                               </AnchorPane>
-                                                      <AnchorPane fx:id="apDetail1" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" style="-fx-border-color: FF8201;">
+                                                      <AnchorPane fx:id="apDetail" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" style="-fx-border-color: FF8201;">
                                                          <children>
                                                             <GridPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="5.0">
                                                                <columnConstraints>
