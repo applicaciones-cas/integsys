@@ -122,8 +122,7 @@ public class CheckDepositInterBranch_ConfirmationController implements Initializ
     JFXUtil.ReloadableTableTask loadTableMain, loadTableDetail, loadTableDetailJE, loadTableAttachment;
     AtomicReference<Object> lastFocusedTextField = new AtomicReference<>();
     AtomicReference<Object> previousSearchedTextField = new AtomicReference<>();
-    private String psSearchFrom = "";
-    private String psSearchThru = "";
+    private String psSearchDate = "";
 
     @FXML
     private AnchorPane AnchorMain, apBrowse, apButton, apMaster, apDetail, apJournalMaster, apJournalDetails, apAttachments, apAttachmentButtons, apTransaction;
@@ -317,8 +316,8 @@ public class CheckDepositInterBranch_ConfirmationController implements Initializ
     }
 
     private void initDatePicker() {
-        JFXUtil.setDatePickerFormat("MM/dd/yyyy", dpTransactionDate, dpTransactionReferDate, dpCheckDate, dpJournalTransactionDate, dpReportMonthYear);
-        JFXUtil.setActionListener(datepicker_Action, dpTransactionDate, dpTransactionReferDate, dpCheckDate, dpJournalTransactionDate, dpReportMonthYear);
+        JFXUtil.setDatePickerFormat("MM/dd/yyyy", dpSearchTransactionDate,dpTransactionDate, dpTransactionReferDate, dpCheckDate, dpJournalTransactionDate, dpReportMonthYear);
+        JFXUtil.setActionListener(datepicker_Action, dpSearchTransactionDate, dpTransactionDate, dpTransactionReferDate, dpCheckDate, dpJournalTransactionDate, dpReportMonthYear);
     }
 
     boolean pbSuccess = true;
@@ -329,6 +328,10 @@ public class CheckDepositInterBranch_ConfirmationController implements Initializ
                     String lsTransDate;
                     LocalDate transactionDate;
                     switch (datePicker.getId()) {
+                        case "dpSearchTransactionDate":
+                            psSearchDate = CustomCommonUtil.formatLocalDateToShortString(ldSelectedDate);
+                            loadTableMain.reload();
+                            break;
                         case "dpTransactionDate":
                             lsServerDate = sdfFormat.format(oApp.getServerDate());
                             lsTransDate = sdfFormat.format(poController.Master().getTransactionDate());
@@ -668,7 +671,7 @@ public class CheckDepositInterBranch_ConfirmationController implements Initializ
                 pnEditMode = EditMode.UNKNOWN;
             }
 
-            if (JFXUtil.isObjectEqualTo(lsButton, "btnPrint","btnRetrieve", "btnSearch", "btnArrowRight", "btnArrowLeft", "btnHistory")) {
+            if (JFXUtil.isObjectEqualTo(lsButton, "btnPrint", "btnRetrieve", "btnSearch", "btnArrowRight", "btnArrowLeft", "btnHistory")) {
             } else {
                 loadRecordMaster();
                 loadTableDetail.reload();
@@ -1072,7 +1075,7 @@ public class CheckDepositInterBranch_ConfirmationController implements Initializ
                     try {
                         main_data.clear();
                         JFXUtil.disableAllHighlight(tblViewMain, highlightedRowsMain);
-                        poJSON = poController.loadTransactionList(tfSearchBankAccountNo.getText(), tfSearchTransNo.getText(), "");
+                        poJSON = poController.loadTransactionList(tfSearchTransNo.getText(), tfSearchBankAccountNo.getText(), psSearchDate);
                         Platform.runLater(() -> {
                             if ("success".equals(poJSON.get("result"))) {
                                 if (poController.getTransactionListCount() > 0) {
@@ -1416,7 +1419,7 @@ public class CheckDepositInterBranch_ConfirmationController implements Initializ
                         switch (txtFieldID) {
                             //apBrowse
                             case "tfSearchBankAccountNo":
-                                poJSON = poController.SearchBanks(tfSearchBankAccountNo.getText(), false, true);
+                                poJSON = poController.SearchBankAccount(tfSearchBankAccountNo.getText(), false);
                                 if (!"success".equals((String) poJSON.get("result"))) {
                                     ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                     return;
@@ -1525,7 +1528,7 @@ public class CheckDepositInterBranch_ConfirmationController implements Initializ
         JFXUtil.setFocusListener(txtDetail_Focus, apDetail);
         JFXUtil.setFocusListener(txtDetailJE_Focus, apJournalDetails);
 
-        JFXUtil.setKeyPressedListener(this::txtField_KeyPressed, apTransaction, apMaster, apDetail, apJournalMaster, apJournalDetails, apTransaction);
+        JFXUtil.setKeyPressedListener(this::txtField_KeyPressed, apBrowse, apMaster, apDetail, apJournalMaster, apJournalDetails, apTransaction);
         JFXUtil.setCommaFormatter(tfDebitAmount, tfCreditAmount);
         JFXUtil.setKeyEventFilter(tableKeyEvents, tblViewDetail, tblVwJournalDetails, tblAttachments, tblViewMain);
         JFXUtil.adjustColumnForScrollbar(tblViewDetail, tblVwJournalDetails, tblAttachments, tblViewMain);
