@@ -71,7 +71,6 @@ import org.guanzon.appdriver.constant.RecordStatus;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.ParseException;
 import ph.com.guanzongroup.cas.cashflow.CheckDeposit;
-import ph.com.guanzongroup.cas.cashflow.CheckDeposits;
 import ph.com.guanzongroup.cas.cashflow.services.CashflowControllers;
 import ph.com.guanzongroup.cas.cashflow.status.CheckDepositStatus;
 import ph.com.guanzongroup.cas.cashflow.status.JournalStatus;
@@ -85,7 +84,7 @@ import ph.com.guanzongroup.integsys.utility.JFXUtil;
 /**
  * FXML Controller class
  *
- * @author User
+ * @author Team 1
  */
 public class CheckDepositInterBranch_ConfirmationController implements Initializable, ScreenInterface {
 
@@ -774,13 +773,8 @@ public class CheckDepositInterBranch_ConfirmationController implements Initializ
     }
 
     private void loadRecordSearch() {
-        try {
-            tfSearchBankAccountNo.setText(poController.Master().BankAccount().getAccountNo());
-            JFXUtil.updateCaretPositions(apBrowse);
-        } catch (GuanzonException | SQLException ex) {
-            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
-            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
-        }
+        tfSearchBankAccountNo.setText(poController.getSearchBank());
+        JFXUtil.updateCaretPositions(apBrowse);
     }
 
     private void loadRecordMaster() {

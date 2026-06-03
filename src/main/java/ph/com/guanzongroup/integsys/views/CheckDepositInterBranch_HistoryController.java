@@ -75,7 +75,7 @@ import ph.com.guanzongroup.integsys.utility.JFXUtil;
 /**
  * FXML Controller class
  *
- * @author User
+ * @author Team 1
  */
 public class CheckDepositInterBranch_HistoryController implements Initializable, ScreenInterface {
 
@@ -437,13 +437,8 @@ public class CheckDepositInterBranch_HistoryController implements Initializable,
     }
 
     private void loadRecordSearch() {
-        try {
-            tfSearchBankAccountNo.setText(poController.Master().BankAccount().getAccountNo());
-            JFXUtil.updateCaretPositions(apBrowse);
-        } catch (GuanzonException | SQLException ex) {
-            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
-            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
-        }
+        tfSearchBankAccountNo.setText(poController.getSearchBankAccountNo());
+        JFXUtil.updateCaretPositions(apBrowse);
     }
 
     private void loadRecordMaster() {
