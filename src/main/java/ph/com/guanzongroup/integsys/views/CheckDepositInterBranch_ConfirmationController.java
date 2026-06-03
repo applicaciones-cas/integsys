@@ -1582,7 +1582,7 @@ public class CheckDepositInterBranch_ConfirmationController implements Initializ
     JFXUtil.TableKeyEvent tableKeyEvents = new JFXUtil.TableKeyEvent() {
         @Override
         protected void onRowMove(TableView<?> currentTable, String currentTableID, boolean isMovedDown) {
-            int newIndex = isMovedDown ? JFXUtil.moveToNextRow(currentTable) : JFXUtil.moveToPreviousRow(currentTable);
+            int newIndex = 0;
             switch (currentTableID) {
                 case "tblViewDetail":
                     if (!detail_data.isEmpty()) {
