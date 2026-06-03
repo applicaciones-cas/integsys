@@ -1471,7 +1471,7 @@ public class CheckDepositInterBranch_EntryController implements Initializable, S
                                 if ("error".equals(poJSON.get("result"))) {
                                     ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                 } else {
-                                    JFXUtil.textFieldMoveNext(tfBankAccountName);
+                                    JFXUtil.textFieldMoveNext(taRemarks);
                                 }
                                 loadRecordMaster();
                                 return;
