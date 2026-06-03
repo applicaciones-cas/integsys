@@ -189,7 +189,7 @@ public class CheckDepositInterBranch_ConfirmationController implements Initializ
             if (!"success".equals((String) poJSON.get("result"))) {
                 ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
             }
-            poController.setTransactionStatus("0");
+            poController.setTransactionStatus("01");
             initLoadTable();
             initTextFields();
             initDatePicker();
