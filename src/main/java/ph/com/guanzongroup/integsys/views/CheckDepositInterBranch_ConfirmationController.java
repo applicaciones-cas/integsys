@@ -941,7 +941,7 @@ public class CheckDepositInterBranch_ConfirmationController implements Initializ
         tblVwJournalDetails.setItems(journal_data);
     }
 
-   private void loadTableDetailFromMain() {
+    private void loadTableDetailFromMain() {
         poJSON = new JSONObject();
 
         pnMain = tblViewMain.getSelectionModel().getSelectedIndex();
@@ -949,7 +949,7 @@ public class CheckDepositInterBranch_ConfirmationController implements Initializ
         if (selected != null) {
             try {
                 int pnRowMain = Integer.parseInt(selected.getIndex01()) - 1;
-                String lsTransactionNo = selected.getIndex06();
+                String lsTransactionNo = selected.getIndex02();
                 if (!JFXUtil.loadValidation(pnEditMode, pxeModuleName, poController.Master().getTransactionNo(), lsTransactionNo)) {
                     return;
                 }
@@ -1064,28 +1064,35 @@ public class CheckDepositInterBranch_ConfirmationController implements Initializ
                         main_data.clear();
                         JFXUtil.disableAllHighlight(tblViewMain, highlightedRowsMain);
                         poJSON = poController.loadTransactionList(tfSearchBankAccountNo.getText(), tfSearchTransNo.getText(), "");
-                        if ("success".equals(poJSON.get("result"))) {
-                            if (poController.getTransactionListCount() > 0) {
-                                for (int lnCntr = 0; lnCntr < poController.getTransactionListCount(); lnCntr++) {
-                                    main_data.add(new ModelTableMain(
-                                            String.valueOf(lnCntr + 1),
-                                            poController.TransactionList(lnCntr).getTransactionNo(),
-                                            CustomCommonUtil.formatDateToShortString(poController.TransactionList(lnCntr).getTransactionDate()),
-                                            poController.TransactionList(lnCntr).BankAccount().getAccountNo(),
-                                            poController.TransactionList(lnCntr).BankAccount().getAccountName(),
-                                            "", "", "", "", ""
-                                    ));
-                                    if (poController.TransactionList(lnCntr).getTransactionStatus().equals(CheckDepositStatus.VOID)) {
-                                        JFXUtil.highlightByKey(tblViewMain, String.valueOf(lnCntr + 1), "#FAA0A0", highlightedRowsMain);
+                        Platform.runLater(() -> {
+                            if ("success".equals(poJSON.get("result"))) {
+                                if (poController.getTransactionListCount() > 0) {
+                                    for (int lnCntr = 0; lnCntr < poController.getTransactionListCount(); lnCntr++) {
+                                        try {
+                                            main_data.add(new ModelTableMain(
+                                                    String.valueOf(lnCntr + 1),
+                                                    poController.TransactionList(lnCntr).getTransactionNo(),
+                                                    CustomCommonUtil.formatDateToShortString(poController.TransactionList(lnCntr).getTransactionDate()),
+                                                    poController.TransactionList(lnCntr).BankAccount().getAccountNo(),
+                                                    poController.TransactionList(lnCntr).BankAccount().getAccountName(),
+                                                    "", "", "", "", ""
+                                            ));
+                                            if (poController.TransactionList(lnCntr).getTransactionStatus().equals(CheckDepositStatus.VOID)) {
+                                                JFXUtil.highlightByKey(tblViewMain, String.valueOf(lnCntr + 1), "#FAA0A0", highlightedRowsMain);
+                                            }
+                                            if (poController.TransactionList(lnCntr).getTransactionStatus().equals(CheckDepositStatus.CONFIRMED)) {
+                                                JFXUtil.highlightByKey(tblViewMain, String.valueOf(lnCntr + 1), "#C1E1C1", highlightedRowsMain);
+                                            }
+                                        } catch (SQLException | GuanzonException ex) {
+                                            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+                                            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
+                                        }
                                     }
-                                    if (poController.TransactionList(lnCntr).getTransactionStatus().equals(CheckDepositStatus.CONFIRMED)) {
-                                        JFXUtil.highlightByKey(tblViewMain, String.valueOf(lnCntr + 1), "#C1E1C1", highlightedRowsMain);
-                                    }
+                                } else {
+                                    main_data.clear();
                                 }
-                            } else {
-                                main_data.clear();
                             }
-                        }
+                        });
                     } catch (SQLException | GuanzonException ex) {
                         Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
                         ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
