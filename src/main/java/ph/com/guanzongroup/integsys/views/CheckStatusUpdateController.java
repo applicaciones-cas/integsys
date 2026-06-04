@@ -1,10 +1,12 @@
 package ph.com.guanzongroup.integsys.views;
 
+
 import java.net.URL;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -21,11 +23,14 @@ import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.geometry.Pos;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.Pagination;
+import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
@@ -40,6 +45,7 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.RowConstraints;
+import javafx.scene.layout.StackPane;
 import javafx.util.Pair;
 import javax.script.ScriptException;
 import org.guanzon.appdriver.agent.ShowMessageFX;
@@ -49,6 +55,7 @@ import org.guanzon.appdriver.base.GuanzonException;
 import org.guanzon.appdriver.base.MiscUtil;
 import org.guanzon.appdriver.base.SQLUtil;
 import org.guanzon.appdriver.constant.EditMode;
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.ParseException;
 import ph.com.guanzongroup.cas.cashflow.CheckStatusUpdate;
@@ -97,27 +104,50 @@ public class CheckStatusUpdateController implements Initializable, ScreenInterfa
     List<Pair<String, String>> plOrderNoFinal = new ArrayList<>();
 
     private final Map<String, List<String>> highlightedRowsMain = new HashMap<>();
-    private final Map<Integer, List<String>> highlightedRowsDetail = new HashMap<>();
 
-    private ChangeListener<String> detailSearchListener;
-    private ChangeListener<String> mainSearchListener;
 
-    ObservableList<String> cCheckState = FXCollections.observableArrayList("OPEN", "CLEAR", "CANCELLATION", "STALE", "HOLD",
+    ObservableList<String> cCheckState = FXCollections.observableArrayList(
+            "OPEN", 
+            "CLEAR", 
+            "CANCELLATION", 
+            "STALE", 
+            "HOLD",
             "BOUNCED / DISCHONORED");
     @FXML
-    private AnchorPane AnchorMain, apBrowse, apButton, apMaster;
+    private AnchorPane AnchorMain, 
+            apBrowse, 
+            apButton, 
+            apMaster;
     @FXML
-    private TextField tfSearchBankName, tfSearchBankAccount, tfSearchCheckno;
+    private TextField tfSearchBankName, 
+            tfSearchBankAccount, 
+            tfSearchCheckno;
     @FXML
     private Label lblSource;
     @FXML
     private HBox hbButtons;
     @FXML
-    private Button btnUpdate, btnSave, btnCancel, btnRetrieve, btnHistory, btnClose;
+    private Button btnUpdate, 
+            btnSave, 
+            btnCancel, 
+            btnRetrieve, 
+            btnHistory, 
+            btnClose;
     @FXML
-    private DatePicker dpTransactionDate, dpCheckDate, dpClearDate, dpHoldUntil;
+    private DatePicker dpTransactionDate, 
+            dpCheckDate, 
+            dpClearDate, 
+            dpHoldUntil;
     @FXML
-    private TextField tfTransactionNo, tfBankName, tfBankAccount, tfCheckAmount, tfPayeeName, tfCheckNo, tfVoucherNo;
+    private TextField tfTransactionNo, 
+            tfBankName, 
+            tfBankAccount, 
+            tfCheckAmount, 
+            tfPayeeName, 
+            tfCheckNo, 
+            tfVoucherNo;
+    @FXML
+    private CheckBox cbReplacement;
     @FXML
     private Label lblRemarks;
     @FXML
@@ -125,11 +155,16 @@ public class CheckStatusUpdateController implements Initializable, ScreenInterfa
     @FXML
     private ComboBox<String> cmbCheckState;
     @FXML
-    private Label lblHoldUntil, lblClearingDate;
+    private Label lblHoldUntil, 
+            lblClearingDate;
     @FXML
     private TableView tblVwMain;
     @FXML
-    private TableColumn tblRowNo, tblBankName, tblBankAccount, tblCheckNo, tblReferenceNo;
+    private TableColumn tblRowNo, 
+            tblBankName, 
+            tblBankAccount, 
+            tblCheckNo, 
+            tblReferenceNo;
     @FXML
     private RowConstraints row09;
     @FXML
@@ -238,12 +273,18 @@ public class CheckStatusUpdateController implements Initializable, ScreenInterfa
                 case "btnCancel":
                     if (ShowMessageFX.YesNo(null, pxeModuleName, "Do you want to disregard changes?")) {
                         JFXUtil.disableAllHighlightByColor(tblVwMain, "#A7C7E7", highlightedRowsMain);
+                        poJSON = poCheckStatusUpdateController.InitTransaction();
+                        pnEditMode = poCheckStatusUpdateController.getEditMode();
                         break;
                     } else {
                         return;
                     }
                 case "btnHistory":
-                    ShowMessageFX.Warning("Button History is Underdevelopment.", pxeModuleName, null);
+                    if (pnEditMode != EditMode.READY && pnEditMode != EditMode.UPDATE) {
+                        ShowMessageFX.Warning("No transaction status history to load!", pxeModuleName, null);
+                        return;
+                    }
+                    poCheckStatusUpdateController.CheckPayments().ShowStatusHistory();
                     break;
                 case "btnSave":
                     if (!ShowMessageFX.YesNo(null, pxeModuleName, "Are you sure you want to save the transaction?")) {
@@ -260,13 +301,45 @@ public class CheckStatusUpdateController implements Initializable, ScreenInterfa
                         case CheckStatus.CANCELLED:
                         case CheckStatus.STALED:
                         case CheckStatus.BOUNCED:
-                            poJSON = poCheckStatusUpdateController.ReturnTransaction("");
+                            if(cbReplacement.isSelected()){
+                                poJSON = poCheckStatusUpdateController.ReplaceCheck(taRemarks.getText());
+                                if (!"success".equals((String) poJSON.get("result"))) {
+                                    ShowMessageFX.Warning((String) poJSON.get("message"), pxeModuleName, null);
+                                    return;
+                                }
+                            }else{
+                                poJSON = poCheckStatusUpdateController.ReturnTransaction("", taRemarks.getText());
+                                if (!"success".equals((String) poJSON.get("result"))) {
+                                    ShowMessageFX.Warning((String) poJSON.get("message"), pxeModuleName, null);
+                                    return;
+                                }
+                            }
+                            
+                            JFXUtil.disableAllHighlightByColor(tblVwMain, "#A7C7E7", highlightedRowsMain);
+//                            JFXUtil.highlightByKey(tblVwMain, String.valueOf(pnMain + 1), "#FAA0A0", highlightedRowsMain);
+                            loadTableMain();
+                            break;
+                        case  CheckStatus.CheckState.CLEAR:
+                            LocalDate localDate = dpClearDate.getValue();
+                            java.sql.Date sqlDate = java.sql.Date.valueOf(localDate);
+                            poJSON = poCheckStatusUpdateController.ClearTransaction("",sqlDate);
                             if (!"success".equals((String) poJSON.get("result"))) {
-                                ShowMessageFX.Warning((String) poJSON.get("message"), pxeModuleName, null);
-                                return;
+                                    ShowMessageFX.Warning((String) poJSON.get("message"), pxeModuleName, null);
+                                    return;
                             }
                             JFXUtil.disableAllHighlightByColor(tblVwMain, "#A7C7E7", highlightedRowsMain);
-                            JFXUtil.highlightByKey(tblVwMain, String.valueOf(pnMain + 1), "#FAA0A0", highlightedRowsMain);
+                            JFXUtil.highlightByKey(tblVwMain, String.valueOf(pnMain + 1), "#C1E1C1", highlightedRowsMain);
+                            break;
+                        case  CheckStatus.CheckState.HOLD:
+                            LocalDate dpHoldUntils = dpHoldUntil.getValue();
+                            java.sql.Date sqlDates = java.sql.Date.valueOf(dpHoldUntils);
+                            poJSON = poCheckStatusUpdateController.HoldTransaction(sqlDates);
+                            if (!"success".equals((String) poJSON.get("result"))) {
+                                    ShowMessageFX.Warning((String) poJSON.get("message"), pxeModuleName, null);
+                                    return;
+                            }
+                            JFXUtil.disableAllHighlightByColor(tblVwMain, "#A7C7E7", highlightedRowsMain);
+                            JFXUtil.highlightByKey(tblVwMain, String.valueOf(pnMain + 1), "#C1E1C1", highlightedRowsMain);
                             break;
                         default:
                             poJSON = poCheckStatusUpdateController.SaveTransaction();
@@ -303,23 +376,19 @@ public class CheckStatusUpdateController implements Initializable, ScreenInterfa
             initButton(pnEditMode);
         } catch (CloneNotSupportedException | SQLException | GuanzonException ex) {
             Logger.getLogger(CheckStatusUpdateController.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (ParseException ex) {
+        } catch (ParseException | ScriptException ex) {
             Logger.getLogger(CheckStatusUpdateController.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (ScriptException ex) {
+        } catch (Exception ex) {
             Logger.getLogger(CheckStatusUpdateController.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
     private boolean isSavingValid() {
-//        if (cmbCheckState.getSelectionModel().getSelectedIndex() == 0) {
-//            ShowMessageFX.Warning("", pxeModuleName, null);
-//            return false;
-//        }
-
         switch (poCheckStatusUpdateController.CheckPayments().getModel().getTransactionStatus()) {
             case CheckStatus.CANCELLED:
             case CheckStatus.BOUNCED:
             case CheckStatus.STOP_PAYMENT:
+            case CheckStatus.STALED:
                 if (taRemarks.getText().trim().isEmpty()) {
                     ShowMessageFX.Warning("Please enter remarks", pxeModuleName, null);
                     return false;
@@ -330,7 +399,6 @@ public class CheckStatusUpdateController implements Initializable, ScreenInterfa
     }
 
     private void initTextFields() {
-        //Initialise  TextField KeyPressed
         List<TextField> loTxtFieldKeyPressed = Arrays.asList(tfSearchBankName, tfSearchBankAccount, tfSearchCheckno);
         loTxtFieldKeyPressed.forEach(tf -> tf.setOnKeyPressed(event -> txtField_KeyPressed(event)));
     }
@@ -395,10 +463,7 @@ public class CheckStatusUpdateController implements Initializable, ScreenInterfa
     }
 
     private void initTextAreaFields() {
-        //Initialise  TextArea Focus
         taRemarks.focusedProperty().addListener(txtArea_Focus);
-
-        //Initialise  TextArea KeyPressed
         taRemarks.setOnKeyPressed(event -> txtArea_KeyPressed(event));
     }
 
@@ -406,7 +471,6 @@ public class CheckStatusUpdateController implements Initializable, ScreenInterfa
         TextArea txtArea = (TextArea) ((ReadOnlyBooleanPropertyBase) o).getBean();
         String lsID = (txtArea.getId());
         String lsValue = txtArea.getText();
-
         lastFocusedTextField = txtArea;
         previousSearchedTextField = null;
 
@@ -418,6 +482,7 @@ public class CheckStatusUpdateController implements Initializable, ScreenInterfa
             switch (lsID) {
                 case "taRemarks":
                     poCheckStatusUpdateController.CheckPayments().getModel().setRemarks(lsValue);
+                    System.out.println("REMARKS AFTER SET : " + poCheckStatusUpdateController.CheckPayments().getModel().getRemarks());
                     break;
             }
         } else {
@@ -589,79 +654,120 @@ public class CheckStatusUpdateController implements Initializable, ScreenInterfa
             }
         }
         );
+        
+        dpClearDate.setOnAction(e -> {
+            if (pnEditMode == EditMode.UPDATE) {
+
+                LocalDate clearDate = dpClearDate.getValue();
+
+                Date checkDateObj = poCheckStatusUpdateController
+                        .CheckPayments()
+                        .getModel()
+                        .getCheckDate();
+
+                if (clearDate == null || checkDateObj == null) {
+                    return;
+                }
+
+                LocalDate checkDate = LocalDate.now();
+
+                if (clearDate.isBefore(checkDate)) {
+                    ShowMessageFX.Warning(
+                            "Clear date cannot be earlier than the check date.",
+                            pxeModuleName,
+                            null
+                    );
+
+                    dpClearDate.setValue(checkDate);
+                    return;
+                }
+            }
+        });
     }
 
     private void loadTableMain() {
-        JFXUtil.LoadScreenComponents loading = JFXUtil.createLoadingComponents();
-        tblVwMain.setPlaceholder(loading.loadingPane);
-        loading.progressIndicator.setVisible(true);
 
-        Task<Void> task = new Task<Void>() {
-            @Override
-            protected Void call() throws Exception {
-                Thread.sleep(100);
-                Platform.runLater(() -> {
-                    try {
-                        main_data.clear();
-                        plOrderNoFinal.clear();
-                        plOrderNoPartial.clear();
-                        poJSON = poCheckStatusUpdateController.getDisbursement(psSearchBankName, psSearchBankAccount, psSearchCheckNo);
-                        if ("success".equals(poJSON.get("result"))) {
-                            if (poCheckStatusUpdateController.getDisbursementMasterCount() > 0) {
-                                for (int lnCntr = 0; lnCntr <= poCheckStatusUpdateController.getDisbursementMasterCount() - 1; lnCntr++) {
-                                    main_data.add(new ModelDisbursementVoucher_Main(
-                                            String.valueOf(lnCntr + 1),
-                                            poCheckStatusUpdateController.poDisbursementMaster(lnCntr).CheckPayments().Banks().getBankName(),
-                                            poCheckStatusUpdateController.poDisbursementMaster(lnCntr).CheckPayments().Bank_Account_Master().getAccountNo(),
-                                            poCheckStatusUpdateController.poDisbursementMaster(lnCntr).CheckPayments().getCheckNo(),
-                                            poCheckStatusUpdateController.poDisbursementMaster(lnCntr).getTransactionNo()
-                                    ));
-                                    if (poCheckStatusUpdateController.poDisbursementMaster(lnCntr).CheckPayments().getTransactionStatus().equals(CheckStatus.POSTED)) {
-                                        plOrderNoPartial.add(new Pair<>(String.valueOf(lnCntr + 1), "1"));
-                                    }
-                                }
-                            } else {
-                                main_data.clear();
-                                filteredMain_Data.clear();
-                            }
-                        }
-                        showRetainedHighlight(true);
-                        if (main_data.isEmpty()) {
-                            tblVwMain.setPlaceholder(loading.placeholderLabel);
-                        }
-                        JFXUtil.loadTab(pagination, main_data.size(), ROWS_PER_PAGE, tblVwMain, filteredMain_Data);
-                    } catch (SQLException | GuanzonException ex) {
-                        Logger.getLogger(CheckStatusUpdateController.class
-                                .getName()).log(Level.SEVERE, null, ex);
-                    }
+    btnRetrieve.setDisable(true);
+
+    ProgressIndicator progressIndicator = new ProgressIndicator();
+    progressIndicator.setMaxHeight(50);
+    progressIndicator.setStyle("-fx-progress-color: #FF8201;");
+
+    StackPane loadingPane = new StackPane(progressIndicator);
+    loadingPane.setAlignment(Pos.CENTER);
+
+    tblVwMain.setPlaceholder(loadingPane);
+
+    Task<ObservableList<ModelDisbursementVoucher_Main>> task =
+            new Task<ObservableList<ModelDisbursementVoucher_Main>>() {
+
+        @Override
+        protected ObservableList<ModelDisbursementVoucher_Main> call() throws Exception {
+
+            ObservableList<ModelDisbursementVoucher_Main> tempData =
+                    FXCollections.observableArrayList();
+
+            JSONObject result = poCheckStatusUpdateController.getDisbursementx(
+                    psSearchBankName,
+                    psSearchBankAccount,
+                    psSearchCheckNo
+            );
+
+            if ("success".equals(result.get("result"))) {
+                JSONArray payload = (JSONArray) result.get("payload");
+                for (int i = 0; i < payload.size(); i++) {
+                    JSONObject row = (JSONObject) payload.get(i);
+
+                    tempData.add(new ModelDisbursementVoucher_Main(
+                            String.valueOf(i + 1),
+                            (String) row.get("sBankName"),
+                            (String) row.get("sActNumbr"),
+                            (String) row.get("sCheckNox"),
+                            (String) row.get("sTransNox")
+                    ));
                 }
-                );
-                return null;
             }
 
-            @Override
-            protected void succeeded() {
-                btnRetrieve.setDisable(false);
-                if (main_data == null || main_data.isEmpty()) {
-                    tblVwMain.setPlaceholder(loading.placeholderLabel);
-                } else {
-                    tblVwMain.toFront();
-                }
-                loading.progressIndicator.setVisible(false);
+            return tempData;
+        }
+
+        @Override
+        protected void succeeded() {
+
+            progressIndicator.setVisible(false);
+            btnRetrieve.setDisable(false);
+
+            main_data.clear();
+            main_data.addAll(getValue());
+
+            showRetainedHighlight(true);
+
+            if (main_data.isEmpty()) {
+                tblVwMain.setPlaceholder(new Label("NO RECORD TO LOAD"));
+                ShowMessageFX.Warning("NO RECORD TO LOAD.", pxeModuleName, null);
             }
 
-            @Override
-            protected void failed() {
-                if (main_data == null || main_data.isEmpty()) {
-                    tblVwMain.setPlaceholder(loading.placeholderLabel);
-                }
-                loading.progressIndicator.setVisible(false);
-                btnRetrieve.setDisable(false);
+            JFXUtil.loadTab(
+                    pagination,
+                    main_data.size(),
+                    ROWS_PER_PAGE,
+                    tblVwMain,
+                    filteredMain_Data
+            );
+        }
 
-            }
-        };
-        new Thread(task).start(); // Run task in background
-    }
+        @Override
+        protected void failed() {
+
+            progressIndicator.setVisible(false);
+            btnRetrieve.setDisable(false);
+
+            getException().printStackTrace();
+        }
+    };
+
+    new Thread(task).start();
+}
 
     private void initTableMain() {
         JFXUtil.setColumnCenter(tblRowNo, tblBankName, tblBankAccount, tblCheckNo, tblReferenceNo);
@@ -691,12 +797,22 @@ public class CheckStatusUpdateController implements Initializable, ScreenInterfa
 
     private void initTableOnClick() {
         tblVwMain.setOnMouseClicked(event -> {
-            if (pnEditMode != EditMode.UPDATE) {
-                pnMain = tblVwMain.getSelectionModel().getSelectedIndex();
-                if (pnMain >= 0) {
-                    if (event.getClickCount() == 2) {
-                        loadTableRecordFromMain();
+            pnMain = tblVwMain.getSelectionModel().getSelectedIndex();
+            if (pnMain >= 0) {
+                if (event.getClickCount() == 2) {
+                    if (pnEditMode == EditMode.UPDATE) {
+                        boolean lbProceed = ShowMessageFX.YesNo(
+                                "Loading another transaction will invalidate all current updates on the loaded transaction.\n\nDo you want to proceed?",
+                                pxeModuleName,
+                                "Confirm Action"
+                        );
+
+                        if (!lbProceed) {
+                            return; // Stop loading another transaction
+                        }
+                       
                     }
+                    loadTableRecordFromMain();
                 }
             }
         });
@@ -764,6 +880,7 @@ public class CheckStatusUpdateController implements Initializable, ScreenInterfa
         JFXUtil.setDisabled(!lbShow, apMaster);
         CustomCommonUtil.setVisible(false, dpClearDate, lblClearingDate, lblHoldUntil, dpHoldUntil, lblRemarks, taRemarks);
         CustomCommonUtil.setManaged(false, dpClearDate, lblClearingDate, lblHoldUntil, dpHoldUntil, lblRemarks, taRemarks);
+        cbReplacement.setVisible(false);
         switch (poCheckStatusUpdateController.CheckPayments().getModel().getTransactionStatus()) {
             case CheckStatus.POSTED:
                 row09.setPrefHeight(30);
@@ -775,10 +892,12 @@ public class CheckStatusUpdateController implements Initializable, ScreenInterfa
                 break;
             case CheckStatus.CANCELLED:
             case CheckStatus.BOUNCED:
+            case CheckStatus.STALED:
                 row09.setPrefHeight(5);
                 row09.setMaxHeight(5);
                 CustomCommonUtil.setVisible(true, taRemarks, lblRemarks);
                 CustomCommonUtil.setManaged(true, taRemarks, lblRemarks);
+                cbReplacement.setVisible(true);
                 break;
             case CheckStatus.STOP_PAYMENT:
                 row09.setPrefHeight(30);
@@ -819,9 +938,9 @@ public class CheckStatusUpdateController implements Initializable, ScreenInterfa
         tfSearchBankName.textProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue != null) {
                 if (newValue.isEmpty()) {
-                    tfSearchBankName.setText("");
+                    tfSearchBankName.clear();
                     psSearchBankName = "";
-                    tfSearchBankAccount.setText("");
+                    tfSearchBankAccount.clear();
                     psSearchBankAccount = "";
                     loadTableMain();
                 }
@@ -831,7 +950,7 @@ public class CheckStatusUpdateController implements Initializable, ScreenInterfa
         tfSearchBankAccount.textProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue != null) {
                 if (newValue.isEmpty()) {
-                    tfSearchBankAccount.setText("");
+                    tfSearchBankAccount.clear();
                     psSearchBankAccount = "";
                     loadTableMain();
                 }
@@ -841,7 +960,7 @@ public class CheckStatusUpdateController implements Initializable, ScreenInterfa
         tfSearchCheckno.textProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue != null) {
                 if (newValue.isEmpty()) {
-                    tfSearchCheckno.setText("");
+                    tfSearchCheckno.clear();
                     psSearchCheckNo = "";
                     loadTableMain();
                 }
