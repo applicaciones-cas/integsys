@@ -97,7 +97,6 @@ public class CheckDepositSupplier_EntryController implements Initializable, Scre
     private String psIndustryId = "";
     private String psCompanyId = "";
     private String psCategoryId = "";
-    private boolean pbIsCheckedJournalTab = false;
     private int pnMain = 0;
     private int pnDetail = 0;
     private int pnAttachment;
@@ -200,6 +199,7 @@ public class CheckDepositSupplier_EntryController implements Initializable, Scre
             initButton(pnEditMode);
             Platform.runLater(() -> {
                 try {
+                    poController.isCheckDepositSupplier(true);
                     poController.Master().setIndustryId(psIndustryId);
                     poController.Master().setCompany(psCompanyId);
 //                    poController.setIndustryId(psIndustryId);
@@ -368,33 +368,6 @@ public class CheckDepositSupplier_EntryController implements Initializable, Scre
                             loadRecordMaster();
                             pbSuccess = true; //Set to original value
                             break;
-                        case "dpReportMonthYear":
-                            if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
-                                lsTransDate = sdfFormat.format(poController.Master().getTransactionDate());
-                                transactionDate = LocalDate.parse(lsTransDate, DateTimeFormatter.ofPattern(SQLUtil.FORMAT_SHORT_DATE));
-
-                                if (ldSelectedDate.isAfter(ldCurrentDate)) {
-                                    JFXUtil.setJSONError(poJSON, "Future dates are not allowed.");
-                                    pbSuccess = false;
-                                }
-
-                                if (pbSuccess && (ldSelectedDate.isAfter(transactionDate))) {
-                                    JFXUtil.setJSONError(poJSON, "Report date cannot be later than the transaction date.");
-                                    pbSuccess = false;
-                                }
-
-                                if (pbSuccess) {
-                                    poController.Journal().Detail(pnDetailJE).setForMonthOf((SQLUtil.toDate(lsSelectedDate, SQLUtil.FORMAT_SHORT_DATE)));
-                                } else {
-                                    if ("error".equals((String) poJSON.get("result"))) {
-                                        ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-                                    }
-                                }
-                                pbSuccess = false; //Set to false to prevent multiple message box: Conflict with server date vs transaction date validation
-                                loadTableDetailJE.reload();
-                                pbSuccess = true; //Set to original value
-                            }
-                            break;
                         default:
                             break;
                     }
@@ -422,10 +395,8 @@ public class CheckDepositSupplier_EntryController implements Initializable, Scre
                     }
                     pnEditMode = poController.getEditMode();
                     JFXUtil.showRetainedHighlight(false, tblViewMain, "#A7C7E7", plOrderNoPartial, plOrderNoFinal, highlightedRowsMain, true);
-                    pbIsCheckedJournalTab = false;
                     JFXUtil.clickTabByTitleText(tabPaneMain, "Check Deposit");
                     pnEditMode = poController.getEditMode();
-                    poController.populateJournal();
                     loadTableDetail.reload();
                     break;
                 case "btnNew":
@@ -447,7 +418,6 @@ public class CheckDepositSupplier_EntryController implements Initializable, Scre
                         ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                         return;
                     }
-                    pbIsCheckedJournalTab = false;
                     pnEditMode = poController.getEditMode();
                     JFXUtil.clickTabByTitleText(tabPaneMain, "Check Deposit");
                     loadTableDetail.reload();
@@ -474,23 +444,13 @@ public class CheckDepositSupplier_EntryController implements Initializable, Scre
                         initButton(pnEditMode);
                     }
                     if (pnEditMode == EditMode.READY) {
-                        if (ShowMessageFX.YesNo(null, pxeModuleName, "Do you want to confirm this transaction?")) { //requires to review journal entry
-                            if (!poController.existJournal().equals("")) {
-                                if (!pbIsCheckedJournalTab) {
-                                    ShowMessageFX.Warning(null, pxeModuleName, "Please check the Journal Entry before saving.");
-                                    break;
-                                } else {
-                                    poJSON = poController.ConfirmTransaction();
-                                    if ("error".equals((String) poJSON.get("result"))) {
-                                        ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-                                        break;
-                                    } else {
-                                        ShowMessageFX.Information(null, pxeModuleName, (String) poJSON.get("message"));
-                                    }
-                                }
-                            } else {
-                                ShowMessageFX.Warning(null, pxeModuleName, "No journal entry found. Add a journal entry and save before confirming.");
+                        if (ShowMessageFX.YesNo(null, pxeModuleName, "Do you want to confirm this transaction?")) {
+                            poJSON = poController.ConfirmTransaction();
+                            if ("error".equals((String) poJSON.get("result"))) {
+                                ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                 break;
+                            } else {
+                                ShowMessageFX.Information(null, pxeModuleName, (String) poJSON.get("message"));
                             }
                         }
                     }
@@ -646,7 +606,6 @@ public class CheckDepositSupplier_EntryController implements Initializable, Scre
                     break;
             }
             if (JFXUtil.isObjectEqualTo(lsButton, "btnSave", "btnCancel", "btnVoid")) {
-                pbIsCheckedJournalTab = false;
                 poController.resetTransaction();
                 clearTextFields();
                 JFXUtil.clickTabByTitleText(tabPaneMain, "Check Deposit");

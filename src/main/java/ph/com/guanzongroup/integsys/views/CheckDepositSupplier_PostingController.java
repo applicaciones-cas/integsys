@@ -65,7 +65,6 @@ import org.json.simple.JSONObject;
 import ph.com.guanzongroup.cas.cashflow.CheckDeposit;
 import ph.com.guanzongroup.cas.cashflow.services.CashflowControllers;
 import ph.com.guanzongroup.cas.cashflow.status.CheckDepositStatus;
-import ph.com.guanzongroup.cas.cashflow.status.JournalStatus;
 import ph.com.guanzongroup.integsys.model.ModelDeliveryAcceptance_Attachment;
 import ph.com.guanzongroup.integsys.model.ModelJournalEntry_Detail;
 import ph.com.guanzongroup.integsys.model.ModelTableDetail;
@@ -89,7 +88,6 @@ public class CheckDepositSupplier_PostingController implements Initializable, Sc
     private String psIndustryId = "";
     private String psCompanyId = "";
     private String psCategoryId = "";
-    private boolean pbIsCheckedJournalTab = false;
     private int pnMain = 0;
     private int pnDetail = 0;
     private int pnAttachment;
@@ -100,7 +98,6 @@ public class CheckDepositSupplier_PostingController implements Initializable, Sc
     private ObservableList<ModelTableMain> main_data = FXCollections.observableArrayList();
     private ObservableList<ModelTableDetail> detail_data = FXCollections.observableArrayList();
     private final ObservableList<ModelDeliveryAcceptance_Attachment> attachment_data = FXCollections.observableArrayList();
-    private ObservableList<ModelJournalEntry_Detail> journal_data = FXCollections.observableArrayList();
     ObservableList<String> documentType = ModelDeliveryAcceptance_Attachment.documentType;
     Scene scene = null;
     private FileChooser fileChooser;
@@ -189,6 +186,7 @@ public class CheckDepositSupplier_PostingController implements Initializable, Sc
             initButton(pnEditMode);
             Platform.runLater(() -> {
                 try {
+                    poController.isCheckDepositSupplier(true);
                     poController.Master().setIndustryId(psIndustryId);
                     poController.Master().setCompany(psCompanyId);
 //                    poController.setIndustryId(psIndustryId);
@@ -342,24 +340,14 @@ public class CheckDepositSupplier_PostingController implements Initializable, Sc
                     if (ShowMessageFX.YesNo(null, pxeModuleName, "Are you sure you want to post transaction?")) {
                         pnEditMode = poController.getEditMode();
                         if (pnEditMode == EditMode.READY) {
-                            if (!poController.existJournal().equals("")) {
-                                if (!pbIsCheckedJournalTab) {
-                                    ShowMessageFX.Warning(null, pxeModuleName, "Please check the Journal Entry before posting.");
-                                    return;
-                                } else {
-                                    poJSON = poController.PostTransaction();
-                                    if ("error".equals((String) poJSON.get("result"))) {
-                                        ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-                                        return;
-                                    } else {
-                                        ShowMessageFX.Information(null, pxeModuleName, (String) poJSON.get("message"));
-                                        JFXUtil.disableAllHighlightByColor(tblViewMain, "#A7C7E7", highlightedRowsMain);
-                                        JFXUtil.highlightByKey(tblViewMain, String.valueOf(pnMain + 1), "#C1E1C1", highlightedRowsMain);
-                                    }
-                                }
-                            } else {
-                                ShowMessageFX.Warning(null, pxeModuleName, "This transaction has no journal entry. Please add a journal entry by updating the transaction to enable posting.");
+                            poJSON = poController.PostTransaction();
+                            if ("error".equals((String) poJSON.get("result"))) {
+                                ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                 return;
+                            } else {
+                                ShowMessageFX.Information(null, pxeModuleName, (String) poJSON.get("message"));
+                                JFXUtil.disableAllHighlightByColor(tblViewMain, "#A7C7E7", highlightedRowsMain);
+                                JFXUtil.highlightByKey(tblViewMain, String.valueOf(pnMain + 1), "#C1E1C1", highlightedRowsMain);
                             }
                         }
                     } else {
@@ -390,7 +378,6 @@ public class CheckDepositSupplier_PostingController implements Initializable, Sc
                     break;
             }
             if (JFXUtil.isObjectEqualTo(lsButton, "btnConfirm", "btnSave", "btnCancel", "btnVoid", "btnApprove")) {
-                pbIsCheckedJournalTab = false;
                 poController.resetTransaction();
                 clearTextFields();
                 JFXUtil.clickTabByTitleText(tabPaneMain, "Cash Disbursement");

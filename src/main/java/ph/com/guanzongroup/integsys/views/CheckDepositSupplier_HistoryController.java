@@ -61,9 +61,7 @@ import org.json.simple.JSONObject;
 import ph.com.guanzongroup.cas.cashflow.CheckDeposit;
 import ph.com.guanzongroup.cas.cashflow.services.CashflowControllers;
 import ph.com.guanzongroup.cas.cashflow.status.CheckDepositStatus;
-import ph.com.guanzongroup.cas.cashflow.status.JournalStatus;
 import ph.com.guanzongroup.integsys.model.ModelDeliveryAcceptance_Attachment;
-import ph.com.guanzongroup.integsys.model.ModelJournalEntry_Detail;
 import ph.com.guanzongroup.integsys.model.ModelTableDetail;
 import ph.com.guanzongroup.integsys.model.ModelTableMain;
 import ph.com.guanzongroup.integsys.utility.CustomCommonUtil;
@@ -92,7 +90,6 @@ public class CheckDepositSupplier_HistoryController implements Initializable, Sc
     private int currentIndex = 0;
     private ObservableList<ModelTableDetail> detail_data = FXCollections.observableArrayList();
     private final ObservableList<ModelDeliveryAcceptance_Attachment> attachment_data = FXCollections.observableArrayList();
-    private ObservableList<ModelJournalEntry_Detail> journal_data = FXCollections.observableArrayList();
     ObservableList<String> documentType = ModelDeliveryAcceptance_Attachment.documentType;
     Scene scene = null;
     private FileChooser fileChooser;
@@ -106,27 +103,27 @@ public class CheckDepositSupplier_HistoryController implements Initializable, Sc
     private String psSearchDate = "";
 
     @FXML
-    private AnchorPane AnchorMain, apBrowse, apButton, apMaster, apDetail, apJournalMaster, apJournalDetails, apAttachments;
+    private AnchorPane AnchorMain, apBrowse, apButton, apMaster, apDetail, apAttachments;
     @FXML
-    private TextField tfSearchBankAccountNo, tfSearchTransNo, tfTransactionNo, tfBankMaster, tfBankAccountNo, tfBankAccountName, tfTotal, tfCheckTransNo, tfBank, tfPayee, tfNote, tfCheckNo, tfCheckAmount, tfJournalTransactionNo, tfTotalDebitAmount, tfTotalCreditAmount, tfAccountCode, tfAccountDescription, tfDebitAmount, tfCreditAmount, tfAttachmentNo;
+    private TextField tfSearchBankAccountNo, tfSearchTransNo, tfTransactionNo, tfBankMaster, tfBankAccountNo, tfBankAccountName, tfTotal, tfCheckTransNo, tfBank, tfPayee, tfNote, tfCheckNo, tfCheckAmount, tfAttachmentNo;
     @FXML
-    private DatePicker dpSearchTransactionDate, dpTransactionDate, dpTransactionReferDate, dpCheckDate, dpJournalTransactionDate, dpReportMonthYear;
+    private DatePicker dpSearchTransactionDate, dpTransactionDate, dpTransactionReferDate, dpCheckDate;
     @FXML
-    private Label lblSource, lblStatus, lblJournalTransactionStatus;
+    private Label lblSource, lblStatus;
     @FXML
     private Button btnBrowse, btnPrint, btnHistory, btnClose, btnArrowLeft, btnArrowRight;
     @FXML
     private TabPane tabPaneMain;
     @FXML
-    private TextArea taRemarks, taJournalRemarks;
+    private TextArea taRemarks;
     @FXML
-    private CheckBox cbReverse, cbJEReverse;
+    private CheckBox cbReverse;
     @FXML
-    private TableView tblViewDetail, tblVwJournalDetails, tblAttachments;
+    private TableView tblViewDetail, tblAttachments;
     @FXML
-    private TableColumn tblColDetailNo, tblColDetailReference, tblColDetailBank, tblColDetailPayee, tblColDetailDate, tblColDetailCheckNo, tblColDetailCheckAmount, tblJournalRowNo, tblJournalReportMonthYear, tblJournalAccountCode, tblJournalAccountDescription, tblJournalDebitAmount, tblJournalCreditAmount, tblRowNoAttachment, tblFileNameAttachment;
+    private TableColumn tblColDetailNo, tblColDetailReference, tblColDetailBank, tblColDetailPayee, tblColDetailDate, tblColDetailCheckNo, tblColDetailCheckAmount, tblRowNoAttachment, tblFileNameAttachment;
     @FXML
-    private Tab tabJournal, tabAttachments;
+    private Tab tabAttachments;
     @FXML
     private ComboBox cmbAttachmentType;
     @FXML
@@ -173,7 +170,6 @@ public class CheckDepositSupplier_HistoryController implements Initializable, Sc
             initTextFields();
             initDatePicker();
             initDetailGrid();
-            initDetailJEGrid();
             initAttachmentsGrid();
             initTableOnClick();
             initTabPane();
@@ -182,6 +178,7 @@ public class CheckDepositSupplier_HistoryController implements Initializable, Sc
             initButton(pnEditMode);
             Platform.runLater(() -> {
                 try {
+                    poController.isCheckDepositSupplier(true);
                     poController.Master().setIndustryId(psIndustryId);
                     poController.Master().setCompany(psCompanyId);
 //                    poController.setIndustryId(psIndustryId);
@@ -221,17 +218,6 @@ public class CheckDepositSupplier_HistoryController implements Initializable, Sc
                         loadRecordMaster();
                     }
                     break;
-                case "Journal":
-                    if (pnEditMode == EditMode.READY || pnEditMode == EditMode.UPDATE || pnEditMode == EditMode.ADDNEW) {
-                        JFXUtil.clearTextFields(apJournalDetails, apJournalMaster);
-                        if (DoesContainValidDetail()) {
-                            populateJE();
-                        } else {
-                            JFXUtil.clickTabByTitleText(tabPaneMain, "Cash Disbursement");
-                            ShowMessageFX.Warning(null, pxeModuleName, lsValidDisbMessage);
-                        }
-                    }
-                    break;
                 case "Attachments":
                     if (pnEditMode == EditMode.READY || pnEditMode == EditMode.UPDATE || pnEditMode == EditMode.ADDNEW) {
                         JFXUtil.clearTextFields(apAttachments);
@@ -255,25 +241,8 @@ public class CheckDepositSupplier_HistoryController implements Initializable, Sc
         });
     }
 
-    private void populateJE() {
-        try {
-            poJSON = new JSONObject();
-            JFXUtil.clearTextFields(apJournalMaster, apJournalDetails);
-            poController.getEditMode();
-            poJSON = poController.populateJournal();
-            if (JFXUtil.isJSONSuccess(poJSON)) {
-                loadTableDetailJE.reload();
-            } else {
-                journal_data.clear();
-            }
-        } catch (SQLException | GuanzonException | CloneNotSupportedException | ScriptException ex) {
-            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
-            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
-        }
-    }
-
     private void initDatePicker() {
-        JFXUtil.setDatePickerFormat("MM/dd/yyyy", dpTransactionDate, dpTransactionReferDate, dpCheckDate, dpJournalTransactionDate, dpReportMonthYear);
+        JFXUtil.setDatePickerFormat("MM/dd/yyyy", dpTransactionDate, dpTransactionReferDate, dpCheckDate);
     }
 
     @FXML
@@ -291,7 +260,6 @@ public class CheckDepositSupplier_HistoryController implements Initializable, Sc
                     }
                     JFXUtil.clickTabByTitleText(tabPaneMain, "Cash Disbursement");
                     pnEditMode = poController.getEditMode();
-                    poController.populateJournal();
                     break;
                 case "btnPrint":
                     poJSON = poController.PrintDepositSlip();
@@ -491,50 +459,6 @@ public class CheckDepositSupplier_HistoryController implements Initializable, Sc
         }
     }
 
-    private void loadRecordMasterJE() {
-        JFXUtil.setStatusValue(lblJournalTransactionStatus, JournalStatus.class, pnEditMode == EditMode.UNKNOWN ? "-1" : poController.Journal().Master().getTransactionStatus());
-        tfJournalTransactionNo.setText(poController.Journal().Master().getTransactionNo());
-        dpJournalTransactionDate.setValue(CustomCommonUtil.parseDateStringToLocalDate(SQLUtil.dateFormat(poController.Journal().Master().getTransactionDate(), SQLUtil.FORMAT_SHORT_DATE)));
-        double lnTotalDebit = 0;
-        double lnTotalCredit = 0;
-        for (int lnCtr = 0; lnCtr < poController.Journal().getDetailCount(); lnCtr++) {
-            if (!poController.Journal().Detail(lnCtr).isReverse()) {
-                continue;
-            }
-            lnTotalDebit += poController.Journal().Detail(lnCtr).getDebitAmount();
-            lnTotalCredit += poController.Journal().Detail(lnCtr).getCreditAmount();
-        }
-        tfTotalDebitAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(lnTotalDebit, true));
-        tfTotalCreditAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(lnTotalCredit, true));
-        taJournalRemarks.setText(poController.Journal().Master().getRemarks());
-
-        JFXUtil.updateCaretPositions(apJournalMaster);
-    }
-
-    public void loadRecordDetailJE() {
-        try {
-            if (pnDetailJE < 0 || pnDetailJE > poController.Journal().getDetailCount() - 1) {
-                return;
-            }
-            boolean lbShow = poController.Journal().Detail(pnDetailJE).getEditMode() == EditMode.UPDATE;
-            JFXUtil.setDisabled(lbShow, tfAccountCode, tfAccountDescription);
-
-            cbJEReverse.setSelected(poController.Journal().Detail(pnDetailJE).isReverse());
-
-            tfAccountCode.setText(poController.Journal().Detail(pnDetailJE).getAccountCode());
-            tfAccountDescription.setText(poController.Journal().Detail(pnDetailJE).Account_Chart().getDescription());
-            String lsReportMonth = CustomCommonUtil.formatDateToShortString(poController.Journal().Detail(pnDetailJE).getForMonthOf());
-            JFXUtil.setDateValue(dpReportMonthYear, CustomCommonUtil.parseDateStringToLocalDate(lsReportMonth, "yyyy-MM-dd"));
-            tfDebitAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Journal().Detail(pnDetailJE).getDebitAmount(), true));
-            tfCreditAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Journal().Detail(pnDetailJE).getCreditAmount(), true));
-
-            JFXUtil.updateCaretPositions(apJournalDetails);
-        } catch (SQLException | GuanzonException ex) {
-            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
-            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
-        }
-    }
-
     private void initAttachmentPreviewPane() {
         imageviewerutil.initAttachmentPreviewPane(stackPane1, imageView);
         stackPane1.heightProperty().addListener((observable, oldValue, newHeight) -> {
@@ -594,14 +518,6 @@ public class CheckDepositSupplier_HistoryController implements Initializable, Sc
         JFXUtil.setColumnRight(tblColDetailCheckAmount);
         JFXUtil.setColumnsIndexAndDisableReordering(tblViewDetail);
         tblViewDetail.setItems(detail_data);
-    }
-
-    private void initDetailJEGrid() {
-        JFXUtil.setColumnCenter(tblJournalRowNo, tblJournalReportMonthYear);
-        JFXUtil.setColumnLeft(tblJournalAccountCode, tblJournalAccountDescription);
-        JFXUtil.setColumnRight(tblJournalDebitAmount, tblJournalCreditAmount);
-        JFXUtil.setColumnsIndexAndDisableReordering(tblVwJournalDetails);
-        tblVwJournalDetails.setItems(journal_data);
     }
 
     @FXML
@@ -708,74 +624,6 @@ public class CheckDepositSupplier_HistoryController implements Initializable, Sc
                         }
                     });
                 });
-
-        loadTableDetailJE = new JFXUtil.ReloadableTableTask(
-                tblVwJournalDetails,
-                journal_data,
-                () -> {
-                    Platform.runLater(() -> {
-                        journal_data.clear();
-                        try {
-                            if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
-                                poController.Journal().ReloadDetail();
-                            }
-                            String lsReportMonthYear = "";
-                            String lsAcctCode = "";
-                            String lsAccDesc = "";
-                            int lnRowCount = 0;
-                            for (int lnCtr = 0; lnCtr < poController.Journal().getDetailCount(); lnCtr++) {
-                                lsReportMonthYear = CustomCommonUtil.formatDateToShortString(poController.Journal().Detail(lnCtr).getForMonthOf());
-                                lsAcctCode = poController.Journal().Detail(lnCtr).getAccountCode();
-                                lsAccDesc = poController.Journal().Detail(lnCtr).Account_Chart().getDescription();
-                                if (lsAcctCode == null) {
-                                    lsAcctCode = "";
-                                }
-                                if (lsAccDesc == null) {
-                                    lsAccDesc = "";
-                                }
-                                if (!poController.Journal().Detail(lnCtr).isReverse()) {
-                                    continue;
-                                }
-                                lnRowCount += 1;
-                                journal_data.add(
-                                        new ModelJournalEntry_Detail(
-                                                String.valueOf(lnRowCount),
-                                                String.valueOf(CustomCommonUtil.parseDateStringToLocalDate(lsReportMonthYear, "yyyy-MM-dd")),
-                                                String.valueOf(lsAcctCode),
-                                                String.valueOf(lsAccDesc),
-                                                String.valueOf(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Journal().Detail(lnCtr).getDebitAmount(), true)),
-                                                String.valueOf(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Journal().Detail(lnCtr).getCreditAmount(), true)),
-                                                String.valueOf(lnCtr)
-                                        ));
-
-                                lsReportMonthYear = "";
-                                lsAcctCode = "";
-                                lsAccDesc = "";
-                            }
-                            int lnTempRow = JFXUtil.getDetailRow(journal_data, pnDetailJE, 07); //this method is used only when Reverse is applied
-                            if (lnTempRow < 0 || lnTempRow
-                                    >= journal_data.size()) {
-                                if (!journal_data.isEmpty()) {
-                                    /* FOCUS ON FIRST ROW */
-                                    JFXUtil.selectAndFocusRow(tblVwJournalDetails, 0);
-                                    int lnRow = Integer.parseInt(journal_data.get(0).getIndex07());
-                                    pnDetailJE = lnRow;
-                                    loadRecordDetailJE();
-                                }
-                            } else {
-                                /* FOCUS ON THE ROW THAT pnDetailBIR POINTS TO */
-                                JFXUtil.selectAndFocusRow(tblVwJournalDetails, lnTempRow);
-                                int lnRow = Integer.parseInt(journal_data.get(tblVwJournalDetails.getSelectionModel().getSelectedIndex()).getIndex07());
-                                pnDetailJE = lnRow;
-                                loadRecordDetailJE();
-                            }
-                            loadRecordMasterJE();
-                        } catch (SQLException | GuanzonException | CloneNotSupportedException ex) {
-                            Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
-                            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
-                        }
-                    });
-                });
     }
     ChangeListener<Boolean> txtBrowse_Focus = JFXUtil.FocusListener(TextField.class,
             (lsID, lsValue) -> {
@@ -801,9 +649,6 @@ public class CheckDepositSupplier_HistoryController implements Initializable, Sc
                         if (tfNote.isFocused()) {
                             pbEntered = true;
                         }
-                        if (tfCreditAmount.isFocused()) {
-                            pbEnteredJE = true;
-                        }
                         CommonUtils.SetNextFocus(lsTxtField);
                         event.consume();
                         break;
@@ -818,7 +663,6 @@ public class CheckDepositSupplier_HistoryController implements Initializable, Sc
                                     loadRecordSearch();
                                     JFXUtil.clickTabByTitleText(tabPaneMain, "Check Deposit");
                                     pnEditMode = poController.getEditMode();
-                                    poController.populateJournal();
                                     loadTableDetail.reload();
                                     initButton(pnEditMode);
                                 }
@@ -830,22 +674,20 @@ public class CheckDepositSupplier_HistoryController implements Initializable, Sc
                         break;
                     case UP:
                         JFXUtil.altSwitch(txtFieldID, new Object[][]{
-                            {new String[]{"tfCheckTransNo", "tfNote", "tfCheckNo"}, (Runnable) () -> moveNext(true, true)},
-                            {new String[]{"tfAccountCode", "tfAccountDescription", "tfCreditAmount"}, (Runnable) () -> moveNextJE(true, true)}
+                            {new String[]{"tfCheckTransNo", "tfNote", "tfCheckNo"}, (Runnable) () -> moveNext(true, true)}
                         });
                         event.consume();
                         break;
                     case DOWN:
                         JFXUtil.altSwitch(txtFieldID, new Object[][]{
-                            {new String[]{"tfCheckTransNo", "tfNote", "tfCheckNo"}, (Runnable) () -> moveNext(false, true)},
-                            {new String[]{"tfAccountCode", "tfAccountDescription", "tfCreditAmount"}, (Runnable) () -> moveNextJE(false, true)}
+                            {new String[]{"tfCheckTransNo", "tfNote", "tfCheckNo"}, (Runnable) () -> moveNext(false, true)}
                         });
                         event.consume();
                         break;
                     default:
                         break;
                 }
-            } catch (SQLException | GuanzonException | ExceptionInInitializerError | CloneNotSupportedException | ScriptException ex) {
+            } catch (SQLException | GuanzonException | ExceptionInInitializerError  ex) {
                 Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
                 ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
             }
@@ -856,9 +698,8 @@ public class CheckDepositSupplier_HistoryController implements Initializable, Sc
         JFXUtil.setFocusListener(txtBrowse_Focus, apBrowse);
 
         JFXUtil.setKeyPressedListener(this::txtField_KeyPressed, apBrowse);
-        JFXUtil.setCommaFormatter(tfDebitAmount, tfCreditAmount);
-        JFXUtil.setKeyEventFilter(tableKeyEvents, tblViewDetail, tblVwJournalDetails, tblAttachments);
-        JFXUtil.adjustColumnForScrollbar(tblViewDetail, tblVwJournalDetails, tblAttachments);
+        JFXUtil.setKeyEventFilter(tableKeyEvents, tblViewDetail, tblAttachments);
+        JFXUtil.adjustColumnForScrollbar(tblViewDetail, tblAttachments);
     }
 
     public void initTableOnClick() {
@@ -884,15 +725,6 @@ public class CheckDepositSupplier_HistoryController implements Initializable, Sc
                 }
             }
         });
-
-        tblVwJournalDetails.setOnMouseClicked(event -> {
-            if (!journal_data.isEmpty() && event.getClickCount() == 1) {
-                int lnRow = Integer.parseInt(journal_data.get(tblVwJournalDetails.getSelectionModel().getSelectedIndex()).getIndex07());
-                pnDetailJE = lnRow;
-                loadRecordDetailJE();
-                moveNextJE(false, false);
-            }
-        });
     }
 
     JFXUtil.TableKeyEvent tableKeyEvents = new JFXUtil.TableKeyEvent() {
@@ -906,15 +738,6 @@ public class CheckDepositSupplier_HistoryController implements Initializable, Sc
                                 : Integer.parseInt(detail_data.get(JFXUtil.moveToPreviousRow(currentTable)).getIndex08());
                         loadRecordDetail();
                     }
-                    break;
-                case "tblVwJournalDetails":
-                    if (journal_data.isEmpty()) {
-                        return;
-                    }
-                    newIndex = isMovedDown ? Integer.parseInt(journal_data.get(JFXUtil.moveToNextRow(currentTable)).getIndex07())
-                            : Integer.parseInt(journal_data.get(JFXUtil.moveToPreviousRow(currentTable)).getIndex07());
-                    pnDetailJE = newIndex;
-                    loadRecordDetailJE();
                     break;
                 case "tblAttachments":
                     if (attachment_data.isEmpty()) {
@@ -950,28 +773,6 @@ public class CheckDepositSupplier_HistoryController implements Initializable, Sc
         }
     }
 
-    public void moveNextJE(boolean isUp, boolean continueNext) {
-        try {
-            if (continueNext) {
-                apJournalDetails.requestFocus();
-                pnDetailJE = isUp ? Integer.parseInt(journal_data.get(JFXUtil.moveToPreviousRow(tblVwJournalDetails)).getIndex07())
-                        : Integer.parseInt(journal_data.get(JFXUtil.moveToNextRow(tblVwJournalDetails)).getIndex07());
-            }
-            loadRecordDetailJE();
-            if (pnDetailJE < 0 || pnDetailJE > poController.Journal().getDetailCount() - 1) {
-                return;
-            }
-            JFXUtil.requestFocusNullField(new Object[][]{ // alternative to if , else if
-                {poController.Journal().Detail(pnDetailJE).getAccountCode(), tfAccountCode},
-                {poController.Journal().Detail(pnDetailJE).Account_Chart().getDescription(), tfAccountDescription}, // if null or empty, then requesting focus to the txtfield
-                {poController.Journal().Detail(pnDetailJE).getDebitAmount(), tfDebitAmount},
-                {poController.Journal().Detail(pnDetailJE).getCreditAmount(), tfCreditAmount},}, tfCreditAmount); // default
-        } catch (SQLException | GuanzonException ex) {
-            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
-            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
-        }
-    }
-
     private void initButton(int fnValue) {
         boolean lbShow1 = (fnValue == EditMode.READY);
         boolean lbShow2 = (fnValue == EditMode.UNKNOWN || fnValue == EditMode.READY);
@@ -979,12 +780,12 @@ public class CheckDepositSupplier_HistoryController implements Initializable, Sc
         JFXUtil.setButtonsVisibility(lbShow1, btnHistory, btnPrint);
         JFXUtil.setButtonsVisibility(lbShow2, btnClose);
 
-        JFXUtil.setDisabled(true, apMaster, apDetail, apJournalMaster, apJournalDetails, apAttachments);
+        JFXUtil.setDisabled(true, apMaster, apDetail, apAttachments);
         JFXUtil.setButtonsVisibility(true, btnBrowse);
     }
 
     private void clearTextFields() {
         JFXUtil.setValueToNull(previousSearchedTextField, lastFocusedTextField);
-        JFXUtil.clearTextFields(apMaster, apDetail, apJournalMaster, apJournalDetails, apAttachments);
+        JFXUtil.clearTextFields(apMaster, apDetail, apAttachments);
     }
 }
