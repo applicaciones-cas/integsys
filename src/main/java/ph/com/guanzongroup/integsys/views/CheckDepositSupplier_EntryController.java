@@ -261,7 +261,7 @@ public class CheckDepositSupplier_EntryController implements Initializable, Scre
 //                            }
                             loadTableAttachment.reload();
                         } else {
-                            JFXUtil.clickTabByTitleText(tabPaneMain, "Cash Disbursement");
+                            JFXUtil.clickTabByTitleText(tabPaneMain, "Check Deposit");
                             ShowMessageFX.Warning(null, pxeModuleName, lsValidDisbMessage);
                         }
                     }

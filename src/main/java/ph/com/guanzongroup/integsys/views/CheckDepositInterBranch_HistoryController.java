@@ -228,7 +228,7 @@ public class CheckDepositInterBranch_HistoryController implements Initializable,
                         if (DoesContainValidDetail()) {
                             populateJE();
                         } else {
-                            JFXUtil.clickTabByTitleText(tabPaneMain, "Cash Disbursement");
+                            JFXUtil.clickTabByTitleText(tabPaneMain, "Check Deposit");
                             ShowMessageFX.Warning(null, pxeModuleName, lsValidDisbMessage);
                         }
                     }
@@ -247,7 +247,7 @@ public class CheckDepositInterBranch_HistoryController implements Initializable,
 //                            }
                             loadTableAttachment.reload();
                         } else {
-                            JFXUtil.clickTabByTitleText(tabPaneMain, "Cash Disbursement");
+                            JFXUtil.clickTabByTitleText(tabPaneMain, "Check Deposit");
                             ShowMessageFX.Warning(null, pxeModuleName, lsValidDisbMessage);
                         }
                     }
@@ -290,7 +290,7 @@ public class CheckDepositInterBranch_HistoryController implements Initializable,
                         return;
                     } else {
                     }
-                    JFXUtil.clickTabByTitleText(tabPaneMain, "Cash Disbursement");
+                    JFXUtil.clickTabByTitleText(tabPaneMain, "Check Deposit");
                     pnEditMode = poController.getEditMode();
                     poController.populateJournal();
                     break;
@@ -336,7 +336,7 @@ public class CheckDepositInterBranch_HistoryController implements Initializable,
             if (JFXUtil.isObjectEqualTo(lsButton, "btnSave", "btnCancel", "btnVoid")) {
                 poController.resetTransaction();
                 clearTextFields();
-                JFXUtil.clickTabByTitleText(tabPaneMain, "Cash Disbursement");
+                JFXUtil.clickTabByTitleText(tabPaneMain, "Check Deposit");
                 pnEditMode = EditMode.UNKNOWN;
             }
 

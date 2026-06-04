@@ -236,7 +236,7 @@ public class CheckDepositInterBranch_PostingController implements Initializable,
                             pbIsCheckedJournalTab = true;
                             populateJE();
                         } else {
-                            JFXUtil.clickTabByTitleText(tabPaneMain, "Cash Disbursement");
+                            JFXUtil.clickTabByTitleText(tabPaneMain, "Check Deposit");
                             ShowMessageFX.Warning(null, pxeModuleName, lsValidDisbMessage);
                         }
                     }
@@ -254,7 +254,7 @@ public class CheckDepositInterBranch_PostingController implements Initializable,
 //                            }
                             loadTableAttachment.reload();
                         } else {
-                            JFXUtil.clickTabByTitleText(tabPaneMain, "Cash Disbursement");
+                            JFXUtil.clickTabByTitleText(tabPaneMain, "Check Deposit");
                             ShowMessageFX.Warning(null, pxeModuleName, lsValidDisbMessage);
                         }
                     }
@@ -424,7 +424,7 @@ public class CheckDepositInterBranch_PostingController implements Initializable,
                 pbIsCheckedJournalTab = false;
                 poController.resetTransaction();
                 clearTextFields();
-                JFXUtil.clickTabByTitleText(tabPaneMain, "Cash Disbursement");
+                JFXUtil.clickTabByTitleText(tabPaneMain, "Check Deposit");
                 pnEditMode = EditMode.UNKNOWN;
             }
 

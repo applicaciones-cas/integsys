@@ -232,7 +232,7 @@ public class CheckDepositSupplier_HistoryController implements Initializable, Sc
 //                            }
                             loadTableAttachment.reload();
                         } else {
-                            JFXUtil.clickTabByTitleText(tabPaneMain, "Cash Disbursement");
+                            JFXUtil.clickTabByTitleText(tabPaneMain, "Check Deposit");
                             ShowMessageFX.Warning(null, pxeModuleName, lsValidDisbMessage);
                         }
                     }
@@ -258,7 +258,7 @@ public class CheckDepositSupplier_HistoryController implements Initializable, Sc
                         return;
                     } else {
                     }
-                    JFXUtil.clickTabByTitleText(tabPaneMain, "Cash Disbursement");
+                    JFXUtil.clickTabByTitleText(tabPaneMain, "Check Deposit");
                     pnEditMode = poController.getEditMode();
                     break;
                 case "btnPrint":
@@ -303,7 +303,7 @@ public class CheckDepositSupplier_HistoryController implements Initializable, Sc
             if (JFXUtil.isObjectEqualTo(lsButton, "btnSave", "btnCancel", "btnVoid")) {
                 poController.resetTransaction();
                 clearTextFields();
-                JFXUtil.clickTabByTitleText(tabPaneMain, "Cash Disbursement");
+                JFXUtil.clickTabByTitleText(tabPaneMain, "Check Deposit");
                 pnEditMode = EditMode.UNKNOWN;
             }
 

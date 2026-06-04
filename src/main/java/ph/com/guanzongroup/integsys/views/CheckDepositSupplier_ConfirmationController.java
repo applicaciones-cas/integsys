@@ -256,7 +256,7 @@ public class CheckDepositSupplier_ConfirmationController implements Initializabl
 //                            }
                             loadTableAttachment.reload();
                         } else {
-                            JFXUtil.clickTabByTitleText(tabPaneMain, "Cash Disbursement");
+                            JFXUtil.clickTabByTitleText(tabPaneMain, "Check Deposit");
                             ShowMessageFX.Warning(null, pxeModuleName, lsValidDisbMessage);
                         }
                     }
@@ -632,7 +632,7 @@ public class CheckDepositSupplier_ConfirmationController implements Initializabl
             if (JFXUtil.isObjectEqualTo(lsButton, "btnConfirm", "btnSave", "btnCancel", "btnVoid", "btnApprove")) {
                 poController.resetTransaction();
                 clearTextFields();
-                JFXUtil.clickTabByTitleText(tabPaneMain, "Cash Disbursement");
+                JFXUtil.clickTabByTitleText(tabPaneMain, "Check Deposit");
                 pnEditMode = EditMode.UNKNOWN;
             }
 
