@@ -212,7 +212,7 @@ public class CheckDepositInterBranch_EntryController implements Initializable, S
 //                    poController.Master().setBranchCode(oApp.getBranchCode());
                     loadRecordSearch();
                     btnNew.fire();
-                    lblSource.setText(poController.Master().Company().getCompanyName() + " - " + poController.Master().Industry().getDescription());
+                    lblSource.setText(poController.getCompanyName() + " - " + poController.Master().Industry().getDescription());
 
                     LocalDate today = LocalDate.now();
                     String lsDateFrom = CustomCommonUtil.formatDateToShortString(JFXUtil.getFirstDayOfMonth(oApp.getServerDate()));
