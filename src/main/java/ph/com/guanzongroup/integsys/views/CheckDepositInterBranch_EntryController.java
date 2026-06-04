@@ -691,8 +691,8 @@ public class CheckDepositInterBranch_EntryController implements Initializable, S
             } else {
                 loadRecordMaster();
                 loadTableDetail.reload();
-//                loadTableDetailJE.reload();
-//                loadTableAttachment.reload();
+                loadTableDetailJE.reload();
+                loadTableAttachment.reload();
             }
             initButton(pnEditMode);
             if (lsButton.equals("btnUpdate")) {

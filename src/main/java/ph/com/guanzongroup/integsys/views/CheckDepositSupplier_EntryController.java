@@ -616,8 +616,8 @@ public class CheckDepositSupplier_EntryController implements Initializable, Scre
             } else {
                 loadRecordMaster();
                 loadTableDetail.reload();
-//                loadTableDetailJE.reload();
-//                loadTableAttachment.reload();
+                loadTableDetailJE.reload();
+                loadTableAttachment.reload();
             }
             initButton(pnEditMode);
             if (lsButton.equals("btnUpdate")) {

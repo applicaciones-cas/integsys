@@ -723,8 +723,8 @@ public class CheckDepositInterBranch_ConfirmationController implements Initializ
             } else {
                 loadRecordMaster();
                 loadTableDetail.reload();
-//                loadTableDetailJE.reload();
-//                loadTableAttachment.reload();
+                loadTableDetailJE.reload();
+                loadTableAttachment.reload();
             }
             initButton(pnEditMode);
             if (lsButton.equals("btnUpdate")) {

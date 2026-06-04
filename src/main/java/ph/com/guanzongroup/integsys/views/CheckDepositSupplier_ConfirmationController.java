@@ -640,8 +640,8 @@ public class CheckDepositSupplier_ConfirmationController implements Initializabl
             } else {
                 loadRecordMaster();
                 loadTableDetail.reload();
-//                loadTableDetailJE.reload();
-//                loadTableAttachment.reload();
+                loadTableDetailJE.reload();
+                loadTableAttachment.reload();
             }
             initButton(pnEditMode);
             if (lsButton.equals("btnUpdate")) {
