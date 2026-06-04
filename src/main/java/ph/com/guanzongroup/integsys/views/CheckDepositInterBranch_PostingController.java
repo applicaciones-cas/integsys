@@ -1192,7 +1192,7 @@ public class CheckDepositInterBranch_PostingController implements Initializable,
         boolean lbShow2 = (fnValue == EditMode.READY);
         boolean lbShow3 = (fnValue == EditMode.UNKNOWN || fnValue == EditMode.READY);
 
-        JFXUtil.setButtonsVisibility(lbShow2, btnHistory, btnPost, btnPrint);
+        JFXUtil.setButtonsVisibility(lbShow2, btnHistory, btnPrint);
         JFXUtil.setButtonsVisibility(lbShow3, btnClose);
 
         JFXUtil.setDisabled(true, apMaster, apDetail, apJournalMaster, apJournalDetails, apAttachments);
@@ -1202,10 +1202,13 @@ public class CheckDepositInterBranch_PostingController implements Initializable,
             return;
         }
         switch (poController.Master().getTransactionStatus()) {
+            case CheckDepositStatus.CONFIRMED:
+                JFXUtil.setButtonsVisibility(true, btnPost);
+                break;
             case CheckDepositStatus.POSTED:
             case CheckDepositStatus.VOID:
             case CheckDepositStatus.CANCELLED:
-                JFXUtil.setButtonsVisibility(true, btnPost);
+                JFXUtil.setButtonsVisibility(false, btnPost);
                 break;
         }
     }

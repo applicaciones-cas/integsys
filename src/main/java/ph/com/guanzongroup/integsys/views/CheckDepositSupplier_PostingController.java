@@ -971,7 +971,7 @@ public class CheckDepositSupplier_PostingController implements Initializable, Sc
         boolean lbShow2 = (fnValue == EditMode.READY);
         boolean lbShow3 = (fnValue == EditMode.UNKNOWN || fnValue == EditMode.READY);
 
-        JFXUtil.setButtonsVisibility(lbShow2, btnHistory, btnPost, btnPrint);
+        JFXUtil.setButtonsVisibility(lbShow2, btnHistory, btnPrint);
         JFXUtil.setButtonsVisibility(lbShow3, btnClose);
 
         JFXUtil.setDisabled(true, apMaster, apDetail, apAttachments);
@@ -981,10 +981,13 @@ public class CheckDepositSupplier_PostingController implements Initializable, Sc
             return;
         }
         switch (poController.Master().getTransactionStatus()) {
+            case CheckDepositStatus.CONFIRMED:
+                JFXUtil.setButtonsVisibility(true, btnPost);
+                break;
             case CheckDepositStatus.POSTED:
             case CheckDepositStatus.VOID:
             case CheckDepositStatus.CANCELLED:
-                JFXUtil.setButtonsVisibility(true, btnPost);
+                JFXUtil.setButtonsVisibility(false, btnPost);
                 break;
         }
     }
