@@ -1719,12 +1719,12 @@ public class CheckDepositInterBranch_ConfirmationController implements Initializ
         boolean lbShow3 = (fnValue == EditMode.UNKNOWN || fnValue == EditMode.READY);
 
         JFXUtil.setButtonsVisibility(lbShow1, btnSearch, btnSave, btnCancel);
-        JFXUtil.setButtonsVisibility(lbShow2, btnUpdate, btnHistory, btnVoid, btnPrint);
+        JFXUtil.setButtonsVisibility(lbShow2, btnUpdate, btnHistory, btnVoid);
         JFXUtil.setButtonsVisibility(lbShow3, btnClose);
 
         JFXUtil.setDisabled(!lbShow1, apMaster, apDetail, apJournalMaster, apJournalDetails);
         JFXUtil.setButtonsVisibility(true, btnRetrieve);
-        JFXUtil.setButtonsVisibility(false, btnApprove);
+        JFXUtil.setButtonsVisibility(false, btnApprove, btnPrint);
 
         if (fnValue != EditMode.READY) {
             return;
@@ -1735,6 +1735,7 @@ public class CheckDepositInterBranch_ConfirmationController implements Initializ
                 break;
             case CheckDepositStatus.CONFIRMED:
                 JFXUtil.setButtonsVisibility(false, btnApprove);
+                JFXUtil.setButtonsVisibility(true, btnPrint);
                 break;
             case CheckDepositStatus.VOID:
             case CheckDepositStatus.CANCELLED:
