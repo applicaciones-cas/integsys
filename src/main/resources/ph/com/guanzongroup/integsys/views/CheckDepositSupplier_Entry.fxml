@@ -324,7 +324,7 @@
                                                                   <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="28.0" vgrow="SOMETIMES" />
                                                                </rowConstraints>
                                                                <children>
-                                                               <Label text="Check Reference" GridPane.rowIndex="1">
+                                                               <Label text="DV No" GridPane.rowIndex="1">
                                                                      <font>
                                                                         <Font size="12.0" />
                                                                      </font>
@@ -364,7 +364,7 @@
                                                                                         <TextField fx:id="tfPayee" disable="true" editable="false" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.rowIndex="3" />
                                                                                         <TextField fx:id="tfNote" GridPane.columnIndex="2" GridPane.columnSpan="7" GridPane.rowIndex="4" />
                                                                                         <CheckBox fx:id="cbReverse" mnemonicParsing="false" nodeOrientation="RIGHT_TO_LEFT" onAction="#cmdCheckBox_Click" text="Reverse" textAlignment="RIGHT" GridPane.columnIndex="7" GridPane.columnSpan="2" GridPane.halignment="RIGHT" />
-                                                                                        <TextField fx:id="tfCheckNo" editable="false" maxWidth="-Infinity" prefWidth="145.0" GridPane.columnIndex="7" GridPane.columnSpan="2" GridPane.rowIndex="1" />
+                                                                                        <TextField fx:id="tfCheckNo" editable="false" maxWidth="-Infinity" prefWidth="145.0" promptText="Press F3: Search" GridPane.columnIndex="7" GridPane.columnSpan="2" GridPane.rowIndex="1" />
                                                                                         <DatePicker fx:id="dpCheckDate" disable="true" editable="false" maxWidth="-Infinity" prefWidth="145.0" GridPane.columnIndex="7" GridPane.columnSpan="2" GridPane.rowIndex="2" />
                                                                                         <TextField fx:id="tfCheckAmount" alignment="CENTER_RIGHT" disable="true" editable="false" maxWidth="-Infinity" prefWidth="145.0" promptText="0.0000" GridPane.columnIndex="7" GridPane.columnSpan="2" GridPane.rowIndex="3" />
                                                                                     </children>

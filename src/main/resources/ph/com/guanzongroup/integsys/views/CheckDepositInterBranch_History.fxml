@@ -272,7 +272,7 @@
                                                                   <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="28.0" vgrow="SOMETIMES" />
                                                                </rowConstraints>
                                                                <children>
-                                                               <Label text="Check Reference" GridPane.rowIndex="1">
+                                                               <Label text="DV No" GridPane.rowIndex="1">
                                                                      <font>
                                                                         <Font size="12.0" />
                                                                      </font>
