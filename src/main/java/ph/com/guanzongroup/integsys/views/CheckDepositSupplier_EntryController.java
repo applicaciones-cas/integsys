@@ -830,8 +830,8 @@ public class CheckDepositSupplier_EntryController implements Initializable, Scre
     }
 
     private void initDetailGrid() {
-        JFXUtil.setColumnCenter(tblColDetailNo, tblColDetailDate, tblColDetailCheckNo);
-        JFXUtil.setColumnLeft(tblColDetailReference, tblColDetailBank, tblColDetailPayee);
+        JFXUtil.setColumnCenter(tblColDetailReference,tblColDetailNo, tblColDetailDate, tblColDetailCheckNo);
+        JFXUtil.setColumnLeft( tblColDetailBank, tblColDetailPayee);
         JFXUtil.setColumnRight(tblColDetailCheckAmount);
         JFXUtil.setColumnsIndexAndDisableReordering(tblViewDetail);
 
