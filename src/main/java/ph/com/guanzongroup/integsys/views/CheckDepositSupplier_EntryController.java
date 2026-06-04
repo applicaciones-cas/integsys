@@ -1218,14 +1218,14 @@ public class CheckDepositSupplier_EntryController implements Initializable, Scre
                                 loadRecordMaster();
                                 return;
                             case "tfCheckTransNo":
-                                poJSON = poController.searchCheckPayment(lsValue);
+                                poJSON = poController.searchCheckPayment(lsValue, tfCheckNo.getText(), true);
                                 if ("error".equals(poJSON.get("result"))) {
                                     ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                 }
                                 loadTableDetail.reload();
                                 return;
                             case "tfCheckNo":
-                                poJSON = poController.SearchChecks("", lsValue, pnDetail, false);
+                                poJSON = poController.searchCheckPayment(tfCheckTransNo.getText(), lsValue, false);
                                 if ("error".equals(poJSON.get("result"))) {
                                     ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                 }
@@ -1251,7 +1251,7 @@ public class CheckDepositSupplier_EntryController implements Initializable, Scre
             } catch (SQLException | GuanzonException | ExceptionInInitializerError | CloneNotSupportedException ex) {
                 Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
                 ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
-            } 
+            }
         }
     }
 
