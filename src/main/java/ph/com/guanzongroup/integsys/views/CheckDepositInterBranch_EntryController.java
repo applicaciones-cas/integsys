@@ -828,7 +828,7 @@ public class CheckDepositInterBranch_EntryController implements Initializable, S
             }
             JFXUtil.setDisabled(true, tfBank, tfPayee, tfCheckAmount);
 
-            tfCheckTransNo.setText(poController.Detail(pnDetail).CheckPayment().getTransactionNo());
+            tfCheckTransNo.setText(poController.Detail(pnDetail).Disbursement().getVoucherNo());
             tfBank.setText(poController.Detail(pnDetail).CheckPayment().Banks().getBankName());
             tfPayee.setText(poController.Detail(pnDetail).CheckPayment().Payee().getPayeeName());
             tfNote.setText(poController.Detail(pnDetail).getRemarks());
@@ -1142,13 +1142,13 @@ public class CheckDepositInterBranch_EntryController implements Initializable, S
 
                                 if (poController.getCheckPaymentCount() > 0) {
                                     for (int lnCntr = 0; lnCntr < poController.getCheckPaymentCount(); lnCntr++) {
-                                        String lsTransBasis = poController.ChecksPaymentList(lnCntr).getTransactionNo();
+                                        String lsTransBasis = poController.ChecksPaymentList(lnCntr).CheckPayments().getTransactionNo();
                                         main_data.add(new ModelTableMain(
                                                 String.valueOf(lnCntr + 1),
-                                                poController.ChecksPaymentList(lnCntr).getTransactionNo(),
-                                                CustomCommonUtil.formatDateToShortString(poController.ChecksPaymentList(lnCntr).getTransactionDate()),
-                                                poController.ChecksPaymentList(lnCntr).getCheckNo(),
-                                                CustomCommonUtil.setIntegerValueToDecimalFormat(poController.ChecksPaymentList(lnCntr).getAmount(), false),
+                                                poController.ChecksPaymentList(lnCntr).getVoucherNo(),
+                                                CustomCommonUtil.formatDateToShortString(poController.ChecksPaymentList(lnCntr).CheckPayments().getCheckDate()),
+                                                poController.ChecksPaymentList(lnCntr).CheckPayments().getCheckNo(),
+                                                CustomCommonUtil.setIntegerValueToDecimalFormat(poController.ChecksPaymentList(lnCntr).CheckPayments().getAmount(), false),
                                                 "", "", "", "", lsTransBasis
                                         ));
                                     }
@@ -1182,7 +1182,7 @@ public class CheckDepositInterBranch_EntryController implements Initializable, S
                                         : CustomCommonUtil.formatDateToMMDDYYYY(poController.Detail(lnCtr).CheckPayment().getCheckDate());
                                 detail_data.add(new ModelTableDetail(
                                         String.valueOf(OriginalRow),
-                                        poController.Detail(lnCtr).CheckPayment().getTransactionNo(),
+                                        poController.Detail(lnCtr).Disbursement().getVoucherNo(),
                                         poController.Detail(lnCtr).CheckPayment().Banks().getBankName(),
                                         poController.Detail(lnCtr).CheckPayment().Payee().getPayeeName(),
                                         lsdate,
