@@ -312,7 +312,7 @@
                                                                      </children>
                                                                                         </AnchorPane>
                                                                                         <TextField fx:id="tfTotal" alignment="CENTER_RIGHT" disable="true" promptText="0.00" styleClass="DisabledTextField" GridPane.columnIndex="10" GridPane.rowIndex="8" />
-                                                                                        <TextArea fx:id="taRemarks" disable="true" editable="false" prefHeight="27.0" GridPane.columnIndex="2" GridPane.columnSpan="5" GridPane.rowIndex="7" GridPane.rowSpan="2">
+                                                                                        <TextArea fx:id="taRemarks" prefHeight="27.0" GridPane.columnIndex="2" GridPane.columnSpan="5" GridPane.rowIndex="7" GridPane.rowSpan="2">
                                              <GridPane.margin>
                                                 <Insets top="1.0" />
                                              </GridPane.margin>
