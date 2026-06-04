@@ -190,6 +190,7 @@ public class CheckDepositInterBranch_PostingController implements Initializable,
             initButton(pnEditMode);
             Platform.runLater(() -> {
                 try {
+                    poController.isCheckDepositSupplier(false);
                     poController.Master().setIndustryId(psIndustryId);
                     poController.Master().setCompany(psCompanyId);
 //                    poController.setIndustryId(psIndustryId);
