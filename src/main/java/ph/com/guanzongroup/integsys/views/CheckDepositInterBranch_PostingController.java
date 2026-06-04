@@ -824,11 +824,12 @@ public class CheckDepositInterBranch_PostingController implements Initializable,
                 tblViewMain,
                 main_data,
                 () -> {
-                    try {
-                        main_data.clear();
-                        JFXUtil.disableAllHighlight(tblViewMain, highlightedRowsMain);
-                        poJSON = poController.loadTransactionList(tfSearchTransNo.getText(), tfSearchBankAccountNo.getText(), psSearchDate);
-                        Platform.runLater(() -> {
+                    Platform.runLater(() -> {
+                        try {
+                            main_data.clear();
+                            JFXUtil.disableAllHighlight(tblViewMain, highlightedRowsMain);
+                            poJSON = poController.loadTransactionList(tfSearchTransNo.getText(), tfSearchBankAccountNo.getText(), psSearchDate);
+
                             if ("success".equals(poJSON.get("result"))) {
                                 if (poController.getTransactionListCount() > 0) {
                                     for (int lnCntr = 0; lnCntr < poController.getTransactionListCount(); lnCntr++) {
@@ -856,11 +857,11 @@ public class CheckDepositInterBranch_PostingController implements Initializable,
                                     main_data.clear();
                                 }
                             }
-                        });
-                    } catch (SQLException | GuanzonException ex) {
-                        Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
-                        ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
-                    }
+                        } catch (SQLException | GuanzonException ex) {
+                            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+                            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
+                        }
+                    });
                 });
 
         loadTableDetail = new JFXUtil.ReloadableTableTask(
