@@ -219,7 +219,7 @@
                                                   <ColumnConstraints halignment="LEFT" hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="20.0" />
                               <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="85.0" />
                               <ColumnConstraints halignment="LEFT" hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="10.0" />
-                                                      <ColumnConstraints halignment="LEFT" hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="120.0" />
+                                                      <ColumnConstraints halignment="LEFT" hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="115.0" />
                               <ColumnConstraints halignment="LEFT" hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="20.0" />
                                                       <ColumnConstraints halignment="LEFT" hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="75.0" />
                               <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="85.0" />
@@ -236,7 +236,7 @@
                                                   <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="28.0" vgrow="SOMETIMES" />
                                                   <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="28.0" vgrow="SOMETIMES" />
                                                       <RowConstraints maxHeight="30.0" minHeight="30.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                                      <RowConstraints maxHeight="30.0" minHeight="30.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                      <RowConstraints maxHeight="45.0" minHeight="45.0" prefHeight="45.0" vgrow="SOMETIMES" />
                                               </rowConstraints>
                                               <children>
                               <AnchorPane maxWidth="1.7976931348623157E308" style="-fx-background-color: FF8201;" GridPane.columnIndex="12" GridPane.columnSpan="4" />
@@ -292,7 +292,7 @@
                                                       <TextField fx:id="tfDiscountRate" alignment="CENTER_RIGHT" promptText="0.00" GridPane.columnIndex="12" GridPane.rowIndex="3" />
                                                       <TextField fx:id="tfDiscountAmount" alignment="CENTER_RIGHT" promptText="0.00" GridPane.columnIndex="12" GridPane.rowIndex="4" />
                                                       <TextField fx:id="tfTotal" alignment="CENTER_RIGHT" disable="true" promptText="0.00" styleClass="DisabledTextField" GridPane.columnIndex="12" GridPane.rowIndex="6" />
-                              <TextArea fx:id="taRemarks" prefHeight="27.0" GridPane.columnIndex="2" GridPane.columnSpan="6" GridPane.rowIndex="6">
+                              <TextArea fx:id="taRemarks" maxHeight="40.0" prefHeight="27.0" GridPane.columnIndex="2" GridPane.columnSpan="6" GridPane.rowIndex="6">
                                  <GridPane.margin>
                                     <Insets top="1.0" />
                                  </GridPane.margin>

@@ -173,7 +173,9 @@ public class InventoryRequest_ApprovalControllerCar implements Initializable, Sc
                         ShowMessageFX.Information("Please load transaction before proceeding..", "Stock Request Approval", "");
                         break;
                     }
-
+                    if (ShowMessageFX.YesNo(null, psFormName, "Are you sure you want to save transaction?") != true) {
+                        return;
+                    }
                     if (!isJSONSuccess(poAppController.SaveTransaction(), "Initialize Save Transaction")) {
                         break;
                     }
@@ -370,8 +372,8 @@ public class InventoryRequest_ApprovalControllerCar implements Initializable, Sc
             poAppController.getMaster().setIndustryId(psIndustryID);
             poAppController.getMaster().setCompanyID(psCompanyID);
             poAppController.getMaster().setCategoryId(psCategoryID);
-            lblSource.setText(poAppController.getMaster().Company().getCompanyName() == null ? "" : (poAppController.getMaster().Company().getCompanyName() + " - ")
-                    + poAppController.getMaster().Industry().getDescription() == null ? "" : poAppController.getMaster().Industry().getDescription());
+            lblSource.setText((poAppController.getMaster().Company().getCompanyName() == null ? "" : (poAppController.getMaster().Company().getCompanyName() + " - "))
+                    + (poAppController.getMaster().Industry().getDescription() == null ? "" : poAppController.getMaster().Industry().getDescription()));
 
             tfClusterName.requestFocus();
             lastFocusedControl = tfClusterName;
@@ -450,23 +452,29 @@ public class InventoryRequest_ApprovalControllerCar implements Initializable, Sc
         String result = (String) loJSON.get("result");
         if ("error".equals(result)) {
             String message = (String) loJSON.get("message");
-            poLogWrapper.severe(psFormName + " :" + message);
-            Platform.runLater(() -> {
-                ShowMessageFX.Warning(null, psFormName, message);
-            });
+            if (message != null) {
+                poLogWrapper.severe(psFormName + " :" + message);
+                if (Platform.isFxApplicationThread()) {
+                    ShowMessageFX.Warning(null, psFormName, message);
+                } else {
+                    Platform.runLater(() -> ShowMessageFX.Warning(null, psFormName, message));
+                }
+            }
             return false;
         }
-        String message = (String) loJSON.get("message");
 
+        String message = (String) loJSON.get("message");
         poLogWrapper.severe(psFormName + " :" + message);
-        Platform.runLater(() -> {
-            if (message != null) {
+        if (message != null) {
+            if (Platform.isFxApplicationThread()) {
                 ShowMessageFX.Information(null, psFormName, message);
+            } else {
+                Platform.runLater(() -> ShowMessageFX.Information(null, psFormName, message));
             }
-        });
+        }
+
         poLogWrapper.info(psFormName + " : Success on " + fsModule);
         return true;
-
     }
 
     private boolean isValidQty(String fsVal) {
@@ -797,8 +805,8 @@ public class InventoryRequest_ApprovalControllerCar implements Initializable, Sc
 
     private void getLoadedTransaction() throws CloneNotSupportedException, SQLException, GuanzonException {
         tfClusterName.setText(poAppController.getBranchCluster().getClusterDescription());
-        lblSource.setText(poAppController.getMaster().Company().getCompanyName() == null ? "" : (poAppController.getMaster().Company().getCompanyName() + " - ")
-                + poAppController.getMaster().Industry().getDescription() == null ? "" : poAppController.getMaster().Industry().getDescription());
+        lblSource.setText((poAppController.getMaster().Company().getCompanyName() == null ? "" : (poAppController.getMaster().Company().getCompanyName() + " - "))
+                    + (poAppController.getMaster().Industry().getDescription() == null ? "" : poAppController.getMaster().Industry().getDescription()));
 
         reloadTableDetail();
         loadSelectedDetail(pnCTransactionDetail);
