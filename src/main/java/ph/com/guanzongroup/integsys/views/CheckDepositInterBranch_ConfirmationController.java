@@ -393,11 +393,27 @@ public class CheckDepositInterBranch_ConfirmationController implements Initializ
                             }
                             break;
                         case "dpTransactionReferDate":
-                            lsServerDate = sdfFormat.format(oApp.getServerDate());
-                            poJSON = poController.Master().setTransactionReferDate((SQLUtil.toDate(lsSelectedDate, SQLUtil.FORMAT_SHORT_DATE)));
-                            if (!JFXUtil.isJSONSuccess(poJSON)) {
-                                ShowMessageFX.Warning(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
+                            String lsTransDate1 = sdfFormat.format(poController.Master().getTransactionDate());
+                            LocalDate ldTransactionDate = LocalDate.parse(lsTransDate1,
+                                    DateTimeFormatter.ofPattern(SQLUtil.FORMAT_SHORT_DATE));
+
+                            if (pbSuccess && (ldSelectedDate.isAfter(ldTransactionDate))) {
+                                poJSON.put("result", "error");
+                                poJSON.put("message", "Reference date cannot be later than the Check deposit date.");
+                                pbSuccess = false;
                             }
+
+                            if (pbSuccess) {
+                                poJSON = poController.Master().setTransactionReferDate((SQLUtil.toDate(lsSelectedDate, SQLUtil.FORMAT_SHORT_DATE)));
+                            } else {
+                                if ("error".equals((String) poJSON.get("result"))) {
+                                    ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                                }
+                            }
+
+                            pbSuccess = false; //Set to false to prevent multiple message box: Conflict with server date vs transaction date validation
+                            loadRecordMaster();
+                            pbSuccess = true; //Set to original value
                             break;
                         case "dpReportMonthYear":
                             if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
@@ -449,7 +465,7 @@ public class CheckDepositInterBranch_ConfirmationController implements Initializ
                     }
                     pbIsCheckedJournalTab = false;
                     pnEditMode = poController.getEditMode();
-                    JFXUtil.clickTabByTitleText(tabPaneMain, "Cash Disbursement");
+                    JFXUtil.clickTabByTitleText(tabPaneMain, "Check Deposit");
                     loadTableDetail.reload();
                     break;
                 case "btnSearch":
@@ -706,8 +722,8 @@ public class CheckDepositInterBranch_ConfirmationController implements Initializ
             } else {
                 loadRecordMaster();
                 loadTableDetail.reload();
-                loadTableDetailJE.reload();
-                loadTableAttachment.reload();
+//                loadTableDetailJE.reload();
+//                loadTableAttachment.reload();
             }
             initButton(pnEditMode);
             if (lsButton.equals("btnUpdate")) {
@@ -823,7 +839,6 @@ public class CheckDepositInterBranch_ConfirmationController implements Initializ
             btnVoid.setText(lsStat);
             poController.computeFields();
             JFXUtil.setStatusValue(lblStatus, CheckDepositStatus.class, pnEditMode == EditMode.UNKNOWN ? "-1" : poController.Master().getTransactionStatus());
-
             tfTransactionNo.setText(poController.Master().getTransactionNo());
             String lsBank = JFXUtil.isObjectEqualTo(poController.Master().Banks().getBankName(), null, "")
                     ? poController.Master().BankAccount().Banks().getBankName() : poController.Master().Banks().getBankName();
@@ -1432,7 +1447,7 @@ public class CheckDepositInterBranch_ConfirmationController implements Initializ
     private void txtField_KeyPressed(KeyEvent event) {
         TextField lsTxtField = (TextField) event.getSource();
         String txtFieldID = ((TextField) event.getSource()).getId();
-        String lsValue = lsTxtField.getText();
+        String lsValue = (lsTxtField.getText() == null ? "" : lsTxtField.getText()); //IMPORTANT: as searchRecord does not have null validator in searching instead ""
         if (null != event.getCode()) {
             try {
                 switch (event.getCode()) {
@@ -1462,14 +1477,15 @@ public class CheckDepositInterBranch_ConfirmationController implements Initializ
                             case "tfSearchTransNo":
                                 loadTableMain.reload();
                                 break;
+                            //apMaster
                             case "tfBankMaster":
-                                poJSON = poController.SearchBankAccount(lsValue, false, false);
+                                poJSON = poController.SearchBanks(lsValue, false, false);
                                 if ("error".equals(poJSON.get("result"))) {
                                     ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                 } else {
                                     JFXUtil.textFieldMoveNext(tfBankAccountNo);
                                 }
-                                loadTableDetail.reload();
+                                loadRecordMaster();
                                 break;
                             case "tfBankAccountNo":
                                 poJSON = poController.SearchBankAccount(lsValue, true, false);
@@ -1478,7 +1494,7 @@ public class CheckDepositInterBranch_ConfirmationController implements Initializ
                                 } else {
                                     JFXUtil.textFieldMoveNext(taRemarks);
                                 }
-                                loadTableDetail.reload();
+                                loadRecordMaster();
                                 return;
                             case "tfBankAccountName":
                                 poJSON = poController.SearchBankAccount(lsValue, false, false);
@@ -1487,7 +1503,7 @@ public class CheckDepositInterBranch_ConfirmationController implements Initializ
                                 } else {
                                     JFXUtil.textFieldMoveNext(taRemarks);
                                 }
-                                loadTableDetail.reload();
+                                loadRecordMaster();
                                 return;
                             case "tfCheckTransNo":
                                 poJSON = poController.SearchChecks(lsValue, tfCheckNo.getText(), pnDetail, false);

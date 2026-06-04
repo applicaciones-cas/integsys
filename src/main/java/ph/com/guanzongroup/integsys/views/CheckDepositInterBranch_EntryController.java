@@ -379,11 +379,27 @@ public class CheckDepositInterBranch_EntryController implements Initializable, S
                             }
                             break;
                         case "dpTransactionReferDate":
-                            lsServerDate = sdfFormat.format(oApp.getServerDate());
-                            poJSON = poController.Master().setTransactionReferDate((SQLUtil.toDate(lsSelectedDate, SQLUtil.FORMAT_SHORT_DATE)));
-                            if (!JFXUtil.isJSONSuccess(poJSON)) {
-                                ShowMessageFX.Warning(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
+                            String lsTransDate1 = sdfFormat.format(poController.Master().getTransactionDate());
+                            LocalDate ldTransactionDate = LocalDate.parse(lsTransDate1,
+                                    DateTimeFormatter.ofPattern(SQLUtil.FORMAT_SHORT_DATE));
+
+                            if (pbSuccess && (ldSelectedDate.isAfter(ldTransactionDate))) {
+                                poJSON.put("result", "error");
+                                poJSON.put("message", "Reference date cannot be later than the Check deposit date.");
+                                pbSuccess = false;
                             }
+
+                            if (pbSuccess) {
+                                poJSON = poController.Master().setTransactionReferDate((SQLUtil.toDate(lsSelectedDate, SQLUtil.FORMAT_SHORT_DATE)));
+                            } else {
+                                if ("error".equals((String) poJSON.get("result"))) {
+                                    ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                                }
+                            }
+
+                            pbSuccess = false; //Set to false to prevent multiple message box: Conflict with server date vs transaction date validation
+                            loadRecordMaster();
+                            pbSuccess = true; //Set to original value
                             break;
                         case "dpReportMonthYear":
                             if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
@@ -1431,7 +1447,7 @@ public class CheckDepositInterBranch_EntryController implements Initializable, S
     private void txtField_KeyPressed(KeyEvent event) {
         TextField lsTxtField = (TextField) event.getSource();
         String txtFieldID = ((TextField) event.getSource()).getId();
-        String lsValue = (lsTxtField.getText() == null ? "" : lsTxtField.getText());
+        String lsValue = (lsTxtField.getText() == null ? "" : lsTxtField.getText()); //IMPORTANT: as searchRecord does not have null validator in searching instead ""
         if (null != event.getCode()) {
             try {
                 switch (event.getCode()) {
@@ -1457,6 +1473,7 @@ public class CheckDepositInterBranch_EntryController implements Initializable, S
                                 loadRecordSearch();
                                 loadTableMain.reload();
                                 break;
+                            //apMaster
                             case "tfBankMaster":
                                 poJSON = poController.SearchBanks(lsValue, false, false);
                                 if ("error".equals(poJSON.get("result"))) {

@@ -999,7 +999,7 @@ public class CheckDepositInterBranch_PostingController implements Initializable,
     private void txtField_KeyPressed(KeyEvent event) {
         TextField lsTxtField = (TextField) event.getSource();
         String txtFieldID = ((TextField) event.getSource()).getId();
-        String lsValue = lsTxtField.getText();
+        String lsValue = (lsTxtField.getText() == null ? "" : lsTxtField.getText());
         if (null != event.getCode()) {
             try {
                 switch (event.getCode()) {
