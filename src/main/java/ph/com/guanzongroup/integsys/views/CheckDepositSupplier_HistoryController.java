@@ -444,7 +444,7 @@ public class CheckDepositSupplier_HistoryController implements Initializable, Sc
             } else {
                 JFXUtil.setDisabled(true, tfCheckTransNo, tfCheckNo, cbReverse);
             }
-            tfCheckTransNo.setText(poController.Detail(pnDetail).CheckPayment().getTransactionNo());
+            tfCheckTransNo.setText(poController.Detail(pnDetail).Disbursement().getVoucherNo());
             tfBank.setText(poController.Detail(pnDetail).CheckPayment().Banks().getBankName());
             tfPayee.setText(poController.Detail(pnDetail).CheckPayment().Payee().getPayeeName());
             tfNote.setText(poController.Detail(pnDetail).getRemarks());
@@ -591,7 +591,7 @@ public class CheckDepositSupplier_HistoryController implements Initializable, Sc
                                         : CustomCommonUtil.formatDateToMMDDYYYY(poController.Detail(lnCtr).CheckPayment().getCheckDate());
                                 detail_data.add(new ModelTableDetail(
                                         String.valueOf(OriginalRow),
-                                        poController.Detail(lnCtr).CheckPayment().getTransactionNo(),
+                                        poController.Detail(lnCtr).Disbursement().getVoucherNo(),
                                         poController.Detail(lnCtr).CheckPayment().Banks().getBankName(),
                                         poController.Detail(lnCtr).CheckPayment().Payee().getPayeeName(),
                                         lsdate,
