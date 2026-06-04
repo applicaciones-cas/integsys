@@ -1213,7 +1213,7 @@ public class CheckDepositSupplier_ConfirmationController implements Initializabl
                                 loadRecordMaster();
                                 return;
                             case "tfCheckTransNo":
-                                poJSON = poController.SearchChecks(lsValue, tfCheckNo.getText(), pnDetail, false);
+                                poJSON = poController.searchCheckPayment(lsValue);
                                 if ("error".equals(poJSON.get("result"))) {
                                     ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                 }
@@ -1243,10 +1243,10 @@ public class CheckDepositSupplier_ConfirmationController implements Initializabl
                     default:
                         break;
                 }
-            } catch (SQLException | GuanzonException | ExceptionInInitializerError ex) {
+            } catch (SQLException | GuanzonException | ExceptionInInitializerError | CloneNotSupportedException ex) {
                 Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
                 ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
-            }
+            } 
         }
     }
 
