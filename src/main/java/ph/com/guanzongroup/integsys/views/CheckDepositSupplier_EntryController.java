@@ -872,7 +872,7 @@ public class CheckDepositSupplier_EntryController implements Initializable, Scre
             if (selected != null) {
                 try {
                     int pnRowMain = Integer.parseInt(selected.getIndex01()) - 1;
-                    String lsTransactionNo = selected.getIndex02();
+                    String lsTransactionNo = selected.getIndex10();
 //                    stageAttachment.closeDialog();
 
                     if (!JFXUtil.loadValidation(pnEditMode, pxeModuleName, poController.Master().getTransactionNo(), lsTransactionNo)) {
