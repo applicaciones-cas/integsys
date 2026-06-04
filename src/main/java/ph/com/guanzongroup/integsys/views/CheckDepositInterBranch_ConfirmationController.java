@@ -1722,7 +1722,7 @@ public class CheckDepositInterBranch_ConfirmationController implements Initializ
         JFXUtil.setButtonsVisibility(lbShow2, btnUpdate, btnHistory, btnVoid);
         JFXUtil.setButtonsVisibility(lbShow3, btnClose);
 
-        JFXUtil.setDisabled(!lbShow1, apMaster, apDetail, apJournalMaster, apJournalDetails);
+        JFXUtil.setDisabled(!lbShow1, apMaster, apDetail, apJournalMaster, apJournalDetails, apAttachments);
         JFXUtil.setButtonsVisibility(true, btnRetrieve);
         JFXUtil.setButtonsVisibility(false, btnApprove, btnPrint);
 

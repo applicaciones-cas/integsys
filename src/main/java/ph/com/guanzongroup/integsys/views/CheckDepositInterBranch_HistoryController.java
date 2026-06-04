@@ -979,7 +979,7 @@ public class CheckDepositInterBranch_HistoryController implements Initializable,
         JFXUtil.setButtonsVisibility(lbShow1, btnHistory, btnPrint);
         JFXUtil.setButtonsVisibility(lbShow2, btnClose);
 
-        JFXUtil.setDisabled(true, apMaster, apDetail, apJournalMaster, apJournalDetails);
+        JFXUtil.setDisabled(true, apMaster, apDetail, apJournalMaster, apJournalDetails, apAttachments);
         JFXUtil.setButtonsVisibility(true, btnBrowse);
     }
 

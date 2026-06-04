@@ -1194,7 +1194,7 @@ public class CheckDepositInterBranch_PostingController implements Initializable,
         JFXUtil.setButtonsVisibility(lbShow2, btnHistory, btnPost, btnPrint);
         JFXUtil.setButtonsVisibility(lbShow3, btnClose);
 
-        JFXUtil.setDisabled(true, apMaster, apDetail, apJournalMaster, apJournalDetails);
+        JFXUtil.setDisabled(true, apMaster, apDetail, apJournalMaster, apJournalDetails, apAttachments);
         JFXUtil.setButtonsVisibility(true, btnRetrieve);
 
         if (fnValue != EditMode.READY) {
