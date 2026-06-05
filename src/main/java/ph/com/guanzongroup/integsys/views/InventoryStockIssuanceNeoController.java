@@ -56,6 +56,7 @@ import org.guanzon.cas.inv.warehouse.status.InventoryStockIssuanceStatus;
 import org.guanzon.cas.inv.warehouse.model.Model_Inventory_Transfer_Detail;
 import org.guanzon.cas.inv.warehouse.model.Model_Inventory_Transfer_Master;
 import org.guanzon.cas.inv.warehouse.services.DeliveryIssuanceControllers;
+import org.json.simple.parser.ParseException;
 
 /**
  * FXML Controller class
@@ -164,6 +165,8 @@ public class InventoryStockIssuanceNeoController implements Initializable, Scree
             });
             initializeTableDetail();
             initControlEvents();
+            lblSource.setText(poAppController.getMaster().Company().getCompanyName() + " - " + poAppController.getMaster().Industry().getDescription());
+
         } catch (SQLException | GuanzonException e) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(e), e);
             ShowMessageFX.Error(MiscUtil.getException(e), psFormName, null);
@@ -194,6 +197,8 @@ public class InventoryStockIssuanceNeoController implements Initializable, Scree
                 }
 
                 getLoadedTransaction();
+
+                initButtonDisplay(poAppController.getEditMode());
             } catch (CloneNotSupportedException | SQLException | GuanzonException ex) {
 
                 Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
@@ -548,7 +553,50 @@ public class InventoryStockIssuanceNeoController implements Initializable, Scree
                             loTextField.requestFocus();
                             return;
                         }
+                        if (tfDiscountRate.getText() != null && !tfDiscountRate.getText().isEmpty()) {
+                            try {
+                                double discountRate = Double.parseDouble(tfDiscountRate.getText());
+                                if (discountRate <= 0) {
+                                    ShowMessageFX.Information(
+                                            "Invalid discount amount. Please add freight amount first.",
+                                            psFormName, null
+                                    );
+                                    tfDiscountRate.requestFocus();
+                                    tfDiscountAmount.setText("0.0");
+                                    poAppController.getMaster().setDiscount(0.0);
+                                    return;
+                                }
+                                if (discountRate > 99) {
+                                    ShowMessageFX.Information(
+                                            "Invalid discount amount",
+                                            psFormName, null
+                                    );
+                                    tfDiscountRate.requestFocus();
+                                    tfDiscountAmount.setText("0.0");
+                                    poAppController.getMaster().setDiscount(0.0);
+                                    return;
+                                }
 
+                            } catch (NumberFormatException e) {
+                                ShowMessageFX.Information(
+                                        "Invalid input. Please enter a valid numeric discount rate.",
+                                        psFormName, null
+                                );
+                                tfDiscountRate.requestFocus();
+                                tfDiscountAmount.setText("0.0");
+                                poAppController.getMaster().setDiscount(0.0);
+                                return;
+                            }
+                        } else {
+                            ShowMessageFX.Information(
+                                    "Discount rate cannot be empty. Please enter a value.",
+                                    psFormName, null
+                            );
+                            tfDiscountRate.requestFocus();
+                            tfDiscountAmount.setText("0.0");
+                            poAppController.getMaster().setDiscount(0.0);
+                            return;
+                        }
                         poAppController.getMaster().setDiscount(Double.parseDouble(lsValue));
                         loadTransactionMaster();
                         break;
@@ -855,8 +903,8 @@ public class InventoryStockIssuanceNeoController implements Initializable, Scree
 
     private void loadTransactionMaster() {
         try {
-            lblSource.setText(poAppController.getMaster().Company().getCompanyName() == null ? "" : (poAppController.getMaster().Company().getCompanyName() + " - ")
-                    + poAppController.getMaster().Industry().getDescription() == null ? "" : poAppController.getMaster().Industry().getDescription());
+            lblSource.setText((poAppController.getMaster().Company().getCompanyName() == null ? "" : (poAppController.getMaster().Company().getCompanyName() + " - "))
+                    + (poAppController.getMaster().Industry().getDescription() == null ? "" : poAppController.getMaster().Industry().getDescription()));
             lblStatus.setText(InventoryStockIssuanceStatus.STATUS.get(Integer.parseInt(poAppController.getMaster().getTransactionStatus())) == null ? "STATUS"
                     : InventoryStockIssuanceStatus.STATUS.get(Integer.parseInt(poAppController.getMaster().getTransactionStatus())));
 

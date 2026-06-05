@@ -1307,7 +1307,7 @@ public class InventoryStockIssuanceController implements Initializable, ScreenIn
 
         tblViewDeliveryTrans.getSelectionModel().select(indexToSelect);
 
-        pnTransactionDetail = tblViewDeliveryTrans.getSelectionModel().getSelectedIndex() + 1; // Not focusedIndex
+        pnTransactionDetail = tblViewDeliveryTrans.getSelectionModel().getSelectedIndex(); // Not focusedIndex
         tblViewDeliveryTrans.refresh();
     }
 

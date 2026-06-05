@@ -477,6 +477,11 @@ public class InventoryStockIssuanceConfirmationControllerMP implements Initializ
                     if (!isJSONSuccess(poAppController.SaveTransaction(), "Initialize Save Transaction")) {
                         return;
                     }
+                    if (ShowMessageFX.YesNo(null, psFormName, "Do you want to confirm transaction?") == true) {
+                        if (!isJSONSuccess(poAppController.CloseTransaction(), "Initialize Close Transaction")) {
+                            return;
+                        }
+                    }
                     reloadTableDetail();
                     getLoadedTransaction();
 //                    clearAllInputs();
@@ -944,8 +949,8 @@ public class InventoryStockIssuanceConfirmationControllerMP implements Initializ
 
     private void loadTransactionMaster() {
         try {
-            lblSource.setText(poAppController.getMaster().Company().getCompanyName() == null ? "" : (poAppController.getMaster().Company().getCompanyName() + " - ")
-                    + poAppController.getMaster().Industry().getDescription() == null ? "" : poAppController.getMaster().Industry().getDescription());
+            lblSource.setText((poAppController.getMaster().Company().getCompanyName() == null ? "" : (poAppController.getMaster().Company().getCompanyName() + " - "))
+                    + (poAppController.getMaster().Industry().getDescription() == null ? "" : poAppController.getMaster().Industry().getDescription()));
             lblMainStatus.setText(InventoryStockIssuanceStatus.STATUS.get(Integer.parseInt(poAppController.getMaster().getTransactionStatus())) == null ? "STATUS"
                     : InventoryStockIssuanceStatus.STATUS.get(Integer.parseInt(poAppController.getMaster().getTransactionStatus())));
 
@@ -1073,7 +1078,7 @@ public class InventoryStockIssuanceConfirmationControllerMP implements Initializ
         loadDeliveryTypes();
         initButtonDisplay(poAppController.getEditMode());
         initButtonDisplayDetail(EditMode.UNKNOWN);
-        
+
         lblMainStatus.setText("UNKNOWN");
         lblDeliveryStatus.setText("UNKNOWN");
     }

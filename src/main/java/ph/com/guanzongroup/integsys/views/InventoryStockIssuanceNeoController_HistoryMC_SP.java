@@ -200,6 +200,7 @@ public class InventoryStockIssuanceNeoController_HistoryMC_SP implements Initial
                 }
 
                 getLoadedTransaction();
+                initButtonDisplay(poAppController.getEditMode());
             } catch (CloneNotSupportedException | SQLException | GuanzonException ex) {
                 Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
                 ShowMessageFX.Error(MiscUtil.getException(ex), psFormName, null);
@@ -312,12 +313,12 @@ public class InventoryStockIssuanceNeoController_HistoryMC_SP implements Initial
                     }
                     break;
 
-                 case "btnRetrieve":
+                case "btnRetrieve":
                     if (lastFocusedControl == null) {
                         loadTransactionMasterList(tfSearchSourceno.getText(), "e.sBranchNm");
 //                            getLoadedTransaction();
-                            initButtonDisplay(poAppController.getEditMode());
-                            break;
+                        initButtonDisplay(poAppController.getEditMode());
+                        break;
                     }
 
                     switch (lastFocusedControl.getId()) {
@@ -333,8 +334,8 @@ public class InventoryStockIssuanceNeoController_HistoryMC_SP implements Initial
 //                            getLoadedTransaction();
                             initButtonDisplay(poAppController.getEditMode());
                             break;
-                        default : 
-                             loadTransactionMasterList(tfSearchSourceno.getText(), "e.sBranchNm");
+                        default:
+                            loadTransactionMasterList(tfSearchSourceno.getText(), "e.sBranchNm");
 //                            getLoadedTransaction();
                             initButtonDisplay(poAppController.getEditMode());
                             break;
@@ -514,8 +515,8 @@ public class InventoryStockIssuanceNeoController_HistoryMC_SP implements Initial
 
     private void loadTransactionMaster() {
         try {
-            lblSource.setText(poAppController.getMaster().Company().getCompanyName() == null ? "" : (poAppController.getMaster().Company().getCompanyName() + " - ")
-                    + poAppController.getMaster().Industry().getDescription() == null ? "" : poAppController.getMaster().Industry().getDescription());
+            lblSource.setText((poAppController.getMaster().Company().getCompanyName() == null ? "" : (poAppController.getMaster().Company().getCompanyName() + " - "))
+                    + (poAppController.getMaster().Industry().getDescription() == null ? "" : poAppController.getMaster().Industry().getDescription()));
             lblStatus.setText(InventoryStockIssuanceStatus.STATUS.get(Integer.parseInt(poAppController.getMaster().getTransactionStatus())) == null ? "STATUS"
                     : InventoryStockIssuanceStatus.STATUS.get(Integer.parseInt(poAppController.getMaster().getTransactionStatus())));
 
@@ -527,7 +528,7 @@ public class InventoryStockIssuanceNeoController_HistoryMC_SP implements Initial
             tfDiscountAmount.setText(String.valueOf(poAppController.getMaster().getDiscount()));
             tfTotal.setText(CommonUtils.NumberFormat(poAppController.getMaster().getTransactionTotal(), "###,###,##0.00"));
             taRemarks.setText(poAppController.getMaster().getRemarks());
-            
+
             cbDelType.getSelectionModel().select(Integer.parseInt(poAppController.getMaster().getDeliveryType()));
             if (tfTransNo.getText().trim().isEmpty()) {
                 lblStatus.setText("UNKNOWN");
