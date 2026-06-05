@@ -603,7 +603,7 @@ public class CheckDepositSupplier_EntryController implements Initializable, Scre
                 pnEditMode = EditMode.UNKNOWN;
             }
 
-            if (JFXUtil.isObjectEqualTo(lsButton, "btnRetrieve", "btnSearch", "btnUndo", "btnArrowRight", "btnArrowLeft", "btnHistory")) {
+            if (JFXUtil.isObjectEqualTo(lsButton, "btnRetrieve", "btnSearch", "btnUndo", "btnArrowRight", "btnArrowLeft", "btnHistory", "btnRemoveAttachment", "btnAddAttachment")) {
             } else {
                 loadRecordMaster();
                 loadTableDetail.reload();

@@ -626,7 +626,7 @@ public class CheckDepositSupplier_ConfirmationController implements Initializabl
                 pnEditMode = EditMode.UNKNOWN;
             }
 
-            if (JFXUtil.isObjectEqualTo(lsButton, "btnPrint", "btnRetrieve", "btnSearch", "btnArrowRight", "btnArrowLeft", "btnHistory")) {
+            if (JFXUtil.isObjectEqualTo(lsButton, "btnPrint", "btnRetrieve", "btnSearch", "btnArrowRight", "btnArrowLeft", "btnHistory", "btnRemoveAttachment", "btnAddAttachment")) {
             } else {
                 loadRecordMaster();
                 loadTableDetail.reload();
