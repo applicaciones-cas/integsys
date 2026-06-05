@@ -991,8 +991,8 @@ public class CheckDepositInterBranch_EntryController implements Initializable, S
                     JFXUtil.clearTextFields(apMaster, apDetail);
                     poJSON = poController.populateDetail(lsTransactionNo);
                     if ("error".equals(poJSON.get("result"))) {
-                        ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                         loadTableDetail.reload();
+                        ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                         return;
                     }
                     pnEditMode = poController.getEditMode();
