@@ -861,11 +861,7 @@ public class CheckDepositSupplier_EntryController implements Initializable, Scre
                 try {
                     int pnRowMain = Integer.parseInt(selected.getIndex01()) - 1;
                     String lsTransactionNo = selected.getIndex10();
-//                    stageAttachment.closeDialog();
 
-                    if (!JFXUtil.loadValidation(pnEditMode, pxeModuleName, poController.Master().getTransactionNo(), lsTransactionNo)) {
-                        return;
-                    }
                     pnMain = pnRowMain;
                     JFXUtil.clearTextFields(apMaster, apDetail);
                     poJSON = poController.populateDetail(lsTransactionNo);
@@ -881,6 +877,7 @@ public class CheckDepositSupplier_EntryController implements Initializable, Scre
                     JFXUtil.runWithDelay(0.50, () -> {
 //                        loadTableMain.reload();
                     });
+                    pnEditMode = poController.getEditMode();
                 } catch (SQLException | GuanzonException ex) {
                     Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
                     ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
@@ -1299,7 +1296,6 @@ public class CheckDepositSupplier_EntryController implements Initializable, Scre
                 pnMain = tblViewMain.getSelectionModel().getSelectedIndex();
                 if (pnMain >= 0) {
                     loadTableDetailFromMain();
-                    pnEditMode = poController.getEditMode();
                     initButton(pnEditMode);
                 }
             }
