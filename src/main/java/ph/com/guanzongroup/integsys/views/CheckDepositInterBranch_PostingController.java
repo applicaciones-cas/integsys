@@ -104,7 +104,6 @@ public class CheckDepositInterBranch_PostingController implements Initializable,
     ObservableList<String> documentType = ModelDeliveryAcceptance_Attachment.documentType;
     Scene scene = null;
     private FileChooser fileChooser;
-    Map<String, String> imageinfo_temp = new HashMap<>();
     private boolean pbEntered = false;
     private boolean pbEnteredJE = false;
     private FilteredList<ModelTableMain> filteredData;
@@ -462,15 +461,11 @@ public class CheckDepositInterBranch_PostingController implements Initializable,
                     try {
                         String filePath = (String) attachment_data.get(tblAttachments.getSelectionModel().getSelectedIndex()).getIndex02();
                         String filePath2 = "";
-                        if (imageinfo_temp.containsKey((String) attachment_data.get(tblAttachments.getSelectionModel().getSelectedIndex()).getIndex02())) {
-                            filePath2 = imageinfo_temp.get((String) attachment_data.get(tblAttachments.getSelectionModel().getSelectedIndex()).getIndex02());
+                        // in server
+                        if (poController.TransactionAttachmentList(pnAttachment).getModel().getImagePath() != null && !"".equals(poController.TransactionAttachmentList(pnAttachment).getModel().getImagePath())) {
+                            filePath2 = poController.TransactionAttachmentList(pnAttachment).getModel().getImagePath() + "/" + (String) attachment_data.get(tblAttachments.getSelectionModel().getSelectedIndex()).getIndex02();
                         } else {
-                            // in server
-                            if (poController.TransactionAttachmentList(pnAttachment).getModel().getImagePath() != null && !"".equals(poController.TransactionAttachmentList(pnAttachment).getModel().getImagePath())) {
-                                filePath2 = poController.TransactionAttachmentList(pnAttachment).getModel().getImagePath() + "/" + (String) attachment_data.get(tblAttachments.getSelectionModel().getSelectedIndex()).getIndex02();
-                            } else {
-                                filePath2 = System.getProperty("sys.default.path.temp.attachments") + "/" + (String) attachment_data.get(tblAttachments.getSelectionModel().getSelectedIndex()).getIndex02();
-                            }
+                            filePath2 = System.getProperty("sys.default.path.temp.attachments") + "/" + (String) attachment_data.get(tblAttachments.getSelectionModel().getSelectedIndex()).getIndex02();
                         }
 
                         if (filePath != null && !filePath.isEmpty()) {
@@ -689,8 +684,8 @@ public class CheckDepositInterBranch_PostingController implements Initializable,
     }
 
     private void initDetailGrid() {
-        JFXUtil.setColumnCenter(tblColDetailReference,tblColDetailNo, tblColDetailDate, tblColDetailCheckNo);
-        JFXUtil.setColumnLeft( tblColDetailBank, tblColDetailPayee);
+        JFXUtil.setColumnCenter(tblColDetailReference, tblColDetailNo, tblColDetailDate, tblColDetailCheckNo);
+        JFXUtil.setColumnLeft(tblColDetailBank, tblColDetailPayee);
         JFXUtil.setColumnRight(tblColDetailCheckAmount);
         JFXUtil.setColumnsIndexAndDisableReordering(tblViewDetail);
 
