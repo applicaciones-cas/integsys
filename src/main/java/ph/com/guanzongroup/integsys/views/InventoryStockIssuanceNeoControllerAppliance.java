@@ -164,6 +164,8 @@ public class InventoryStockIssuanceNeoControllerAppliance implements Initializab
             });
             initializeTableDetail();
             initControlEvents();
+            lblSource.setText(poAppController.getMaster().Company().getCompanyName() + " - " + poAppController.getMaster().Industry().getDescription());
+
         } catch (SQLException | GuanzonException e) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(e), e);
             ShowMessageFX.Error(MiscUtil.getException(e), psFormName, null);
@@ -194,6 +196,7 @@ public class InventoryStockIssuanceNeoControllerAppliance implements Initializab
                 }
 
                 getLoadedTransaction();
+                initButtonDisplay(poAppController.getEditMode());
             } catch (CloneNotSupportedException | SQLException | GuanzonException ex) {
 
                 Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
@@ -526,10 +529,42 @@ public class InventoryStockIssuanceNeoControllerAppliance implements Initializab
                             loTextField.requestFocus();
                             return;
                         }
+                        if (tfDiscountRate.getText() != null && !tfDiscountRate.getText().isEmpty()) {
+                            try {
+                                double discountRate = Double.parseDouble(tfDiscountRate.getText());
+                                if (discountRate < 0) {
+                                    ShowMessageFX.Information(
+                                            "Invalid discount amount. Please add freight amount first.",
+                                            psFormName, null
+                                    );
+                                    tfDiscountRate.requestFocus();
+                                    tfDiscountAmount.setText("0.0");
+                                    poAppController.getMaster().setDiscount(0.0);
+                                    return;
+                                }
+                                // Continue with valid discount rate logic here...
 
+                            } catch (NumberFormatException e) {
+                                ShowMessageFX.Information(
+                                        "Invalid input. Please enter a valid numeric discount rate.",
+                                        psFormName, null
+                                );
+                                tfDiscountRate.requestFocus();
+                                tfDiscountAmount.setText("0.0");
+                                poAppController.getMaster().setDiscount(0.0);
+                                return;
+                            }
+                        } else {
+                            ShowMessageFX.Information(
+                                    "Discount rate cannot be empty. Please enter a value.",
+                                    psFormName, null
+                            );
+                            tfDiscountRate.requestFocus();
+                            tfDiscountAmount.setText("0.0");
+                            poAppController.getMaster().setDiscount(0.0);
+                            return;
+                        }
                         poAppController.getMaster().setDiscount(Double.parseDouble(lsValue));
-                        poAppController.getMaster().setTransactionTotal(poAppController.getMaster().getFreight() - computeDiscount(
-                                poAppController.getMaster().getFreight(), poAppController.getMaster().getDiscount()));
                         loadTransactionMaster();
                         break;
 
@@ -835,8 +870,8 @@ public class InventoryStockIssuanceNeoControllerAppliance implements Initializab
 
     private void loadTransactionMaster() {
         try {
-            lblSource.setText(poAppController.getMaster().Company().getCompanyName() == null ? "" : (poAppController.getMaster().Company().getCompanyName() + " - ")
-                    + poAppController.getMaster().Industry().getDescription() == null ? "" : poAppController.getMaster().Industry().getDescription());
+            lblSource.setText((poAppController.getMaster().Company().getCompanyName() == null ? "" : (poAppController.getMaster().Company().getCompanyName() + " - "))
+                    + (poAppController.getMaster().Industry().getDescription() == null ? "" : poAppController.getMaster().Industry().getDescription()));
             lblStatus.setText(InventoryStockIssuanceStatus.STATUS.get(Integer.parseInt(poAppController.getMaster().getTransactionStatus())) == null ? "STATUS"
                     : InventoryStockIssuanceStatus.STATUS.get(Integer.parseInt(poAppController.getMaster().getTransactionStatus())));
 
@@ -848,7 +883,7 @@ public class InventoryStockIssuanceNeoControllerAppliance implements Initializab
             tfDiscountAmount.setText(String.valueOf(poAppController.getMaster().getDiscount()));
             tfTotal.setText(String.valueOf(poAppController.getMaster().getTransactionTotal()));
             taRemarks.setText(poAppController.getMaster().getRemarks());
-            
+
             computeTotal();
             cbDelType.getSelectionModel().select(Integer.parseInt(poAppController.getMaster().getDeliveryType()));
             if (poAppController.getMaster().getTransactionStatus().equals(InventoryStockIssuanceStatus.CONFIRMED)) {
@@ -1160,7 +1195,7 @@ public class InventoryStockIssuanceNeoControllerAppliance implements Initializab
         pnTransactionDetail = tblViewDetails.getSelectionModel().getSelectedIndex() + 1; // Not focusedIndex
         tblViewDetails.refresh();
         computeTotal();
-    
+
     }
 
     private void getLoadedTransaction() throws SQLException, GuanzonException, CloneNotSupportedException {
@@ -1271,7 +1306,6 @@ public class InventoryStockIssuanceNeoControllerAppliance implements Initializab
         }
         return controls;
     }
-    
 
     private void computeTotal() {
         double lnDiscountedFreight = poAppController.getMaster().getFreight() - computeDiscount(

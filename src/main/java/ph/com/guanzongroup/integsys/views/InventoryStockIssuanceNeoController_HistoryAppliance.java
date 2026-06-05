@@ -200,6 +200,7 @@ public class InventoryStockIssuanceNeoController_HistoryAppliance implements Ini
                 }
 
                 getLoadedTransaction();
+                initButtonDisplay(poAppController.getEditMode());
             } catch (CloneNotSupportedException | SQLException | GuanzonException ex) {
                 Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
                 ShowMessageFX.Error(MiscUtil.getException(ex), psFormName, null);
@@ -513,8 +514,8 @@ public class InventoryStockIssuanceNeoController_HistoryAppliance implements Ini
 
     private void loadTransactionMaster() {
         try {
-            lblSource.setText(poAppController.getMaster().Company().getCompanyName() == null ? "" : (poAppController.getMaster().Company().getCompanyName() + " - ")
-                    + poAppController.getMaster().Industry().getDescription() == null ? "" : poAppController.getMaster().Industry().getDescription());
+            lblSource.setText((poAppController.getMaster().Company().getCompanyName() == null ? "" : (poAppController.getMaster().Company().getCompanyName() + " - "))
+                    + (poAppController.getMaster().Industry().getDescription() == null ? "" : poAppController.getMaster().Industry().getDescription()));
             lblStatus.setText(InventoryStockIssuanceStatus.STATUS.get(Integer.parseInt(poAppController.getMaster().getTransactionStatus())) == null ? "STATUS"
                     : InventoryStockIssuanceStatus.STATUS.get(Integer.parseInt(poAppController.getMaster().getTransactionStatus())));
 

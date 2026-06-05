@@ -201,6 +201,7 @@ public class InventoryStockIssuanceNeoController_Approval implements Initializab
                 }
 
                 getLoadedTransaction();
+                initButtonDisplay(poAppController.getEditMode());
             } catch (CloneNotSupportedException | SQLException | GuanzonException ex) {
 
                 Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
@@ -524,12 +525,12 @@ public class InventoryStockIssuanceNeoController_Approval implements Initializab
                     }
                     break;
 
-                 case "btnRetrieve":
+                case "btnRetrieve":
                     if (lastFocusedControl == null) {
                         loadTransactionMasterList(tfSearchSourceno.getText(), "e.sBranchNm");
 //                            getLoadedTransaction();
-                            initButtonDisplay(poAppController.getEditMode());
-                            break;
+                        initButtonDisplay(poAppController.getEditMode());
+                        break;
                     }
 
                     switch (lastFocusedControl.getId()) {
@@ -545,8 +546,8 @@ public class InventoryStockIssuanceNeoController_Approval implements Initializab
 //                            getLoadedTransaction();
                             initButtonDisplay(poAppController.getEditMode());
                             break;
-                        default : 
-                             loadTransactionMasterList(tfSearchSourceno.getText(), "e.sBranchNm");
+                        default:
+                            loadTransactionMasterList(tfSearchSourceno.getText(), "e.sBranchNm");
 //                            getLoadedTransaction();
                             initButtonDisplay(poAppController.getEditMode());
                             break;
@@ -569,7 +570,7 @@ public class InventoryStockIssuanceNeoController_Approval implements Initializab
             poLogWrapper.severe(psFormName + " :" + e.getMessage());
         }
     }
-private final ChangeListener<? super Boolean> txtArea_Focus = (o, ov, nv) -> {
+    private final ChangeListener<? super Boolean> txtArea_Focus = (o, ov, nv) -> {
         TextArea loTextField = (TextArea) ((ReadOnlyBooleanPropertyBase) o).getBean();
         String lsTextFieldID = loTextField.getId();
         String lsValue = loTextField.getText();
@@ -616,16 +617,58 @@ private final ChangeListener<? super Boolean> txtArea_Focus = (o, ov, nv) -> {
 
                     case "tfDiscountAmount":
                         if (lsValue.isEmpty()) {
-                            ShowMessageFX.Information("Imvalid discount amount", psFormName, null);
+                            ShowMessageFX.Information("Invalid discount amount", psFormName, null);
                             loTextField.requestFocus();
                             return;
                         }
+                        if (tfDiscountRate.getText() != null && !tfDiscountRate.getText().isEmpty()) {
+                            try {
+                                double discountRate = Double.parseDouble(tfDiscountRate.getText());
+                                if (discountRate <= 0) {
+                                    ShowMessageFX.Information(
+                                            "Invalid discount amount. Please add freight amount first.",
+                                            psFormName, null
+                                    );
+                                    tfDiscountRate.requestFocus();
+                                    tfDiscountAmount.setText("0.0");
+                                    poAppController.getMaster().setDiscount(0.0);
+                                    return;
+                                }
+                                if (discountRate > 99) {
+                                    ShowMessageFX.Information(
+                                            "Invalid discount amount",
+                                            psFormName, null
+                                    );
+                                    tfDiscountRate.requestFocus();
+                                    tfDiscountAmount.setText("0.0");
+                                    poAppController.getMaster().setDiscount(0.0);
+                                    return;
+                                }
 
+                            } catch (NumberFormatException e) {
+                                ShowMessageFX.Information(
+                                        "Invalid input. Please enter a valid numeric discount rate.",
+                                        psFormName, null
+                                );
+                                tfDiscountRate.requestFocus();
+                                tfDiscountAmount.setText("0.0");
+                                poAppController.getMaster().setDiscount(0.0);
+                                return;
+                            }
+                        } else {
+                            ShowMessageFX.Information(
+                                    "Discount rate cannot be empty. Please enter a value.",
+                                    psFormName, null
+                            );
+                            tfDiscountRate.requestFocus();
+                            tfDiscountAmount.setText("0.0");
+                            poAppController.getMaster().setDiscount(0.0);
+                            return;
+                        }
                         poAppController.getMaster().setDiscount(Double.parseDouble(lsValue));
-                        poAppController.getMaster().setTransactionTotal(poAppController.getMaster().getFreight() - computeDiscount(
-                                poAppController.getMaster().getFreight(), poAppController.getMaster().getDiscount()));
                         loadTransactionMaster();
                         break;
+
                     case "tfIssuedQty":
                         if (poAppController.getDetail(pnTransactionDetail).getStockId() == null
                                 || poAppController.getDetail(pnTransactionDetail).getStockId().isEmpty()) {
@@ -928,8 +971,8 @@ private final ChangeListener<? super Boolean> txtArea_Focus = (o, ov, nv) -> {
 
     private void loadTransactionMaster() {
         try {
-            lblSource.setText(poAppController.getMaster().Company().getCompanyName() == null ? "" : (poAppController.getMaster().Company().getCompanyName() + " - ")
-                    + poAppController.getMaster().Industry().getDescription() == null ? "" : poAppController.getMaster().Industry().getDescription());
+            lblSource.setText((poAppController.getMaster().Company().getCompanyName() == null ? "" : (poAppController.getMaster().Company().getCompanyName() + " - "))
+                    + (poAppController.getMaster().Industry().getDescription() == null ? "" : poAppController.getMaster().Industry().getDescription()));
             lblStatus.setText(InventoryStockIssuanceStatus.STATUS.get(Integer.parseInt(poAppController.getMaster().getTransactionStatus())) == null ? "STATUS"
                     : InventoryStockIssuanceStatus.STATUS.get(Integer.parseInt(poAppController.getMaster().getTransactionStatus())));
 
@@ -941,7 +984,7 @@ private final ChangeListener<? super Boolean> txtArea_Focus = (o, ov, nv) -> {
             tfDiscountAmount.setText(String.valueOf(poAppController.getMaster().getDiscount()));
             tfTotal.setText(String.valueOf(poAppController.getMaster().getTransactionTotal()));
             taRemarks.setText(poAppController.getMaster().getRemarks());
-            
+
             computeTotal();
             cbDelType.getSelectionModel().select(Integer.parseInt(poAppController.getMaster().getDeliveryType()));
 
@@ -1362,7 +1405,6 @@ private final ChangeListener<? super Boolean> txtArea_Focus = (o, ov, nv) -> {
         }
         return controls;
     }
-    
 
     private void computeTotal() {
         double lnDiscountedFreight = poAppController.getMaster().getFreight() - computeDiscount(
