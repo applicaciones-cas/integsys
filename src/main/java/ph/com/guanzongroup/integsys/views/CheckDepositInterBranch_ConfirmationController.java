@@ -487,7 +487,7 @@ public class CheckDepositInterBranch_ConfirmationController implements Initializ
                         initButton(pnEditMode);
                     }
                     if (pnEditMode == EditMode.READY) {
-                        if(CheckDepositStatus.OPEN.equals(poController.Master().getTransactionStatus())){
+                        if (CheckDepositStatus.OPEN.equals(poController.Master().getTransactionStatus())) {
                             if (ShowMessageFX.YesNo(null, pxeModuleName, "Do you want to confirm this transaction?")) { //requires to review journal entry
                                 if (!poController.existJournal().equals("")) {
                                     if (!pbIsCheckedJournalTab) {
@@ -546,6 +546,7 @@ public class CheckDepositInterBranch_ConfirmationController implements Initializ
                             if (!poController.existJournal().equals("")) {
                                 if (!pbIsCheckedJournalTab) {
                                     ShowMessageFX.Warning(null, pxeModuleName, "Please check the Journal Entry before confirming.");
+                                    JFXUtil.clickTabByTitleText(tabPaneMain, "Journal");
                                     return;
                                 } else {
                                     poJSON = poController.ConfirmTransaction();

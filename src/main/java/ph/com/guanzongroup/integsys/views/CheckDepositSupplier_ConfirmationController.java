@@ -474,6 +474,7 @@ public class CheckDepositSupplier_ConfirmationController implements Initializabl
                             poJSON = poController.ConfirmTransaction();
                             if ("error".equals((String) poJSON.get("result"))) {
                                 ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                                JFXUtil.clickTabByTitleText(tabPaneMain, "Journal");
                                 return;
                             } else {
                                 ShowMessageFX.Information(null, pxeModuleName, (String) poJSON.get("message"));

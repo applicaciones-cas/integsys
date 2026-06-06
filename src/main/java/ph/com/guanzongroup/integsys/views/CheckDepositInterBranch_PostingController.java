@@ -419,7 +419,7 @@ public class CheckDepositInterBranch_PostingController implements Initializable,
                     ShowMessageFX.Warning(null, pxeModuleName, "Button is not registered, Please contact admin to assist about the unregistered button");
                     break;
             }
-            if (JFXUtil.isObjectEqualTo(lsButton, "btnConfirm", "btnSave", "btnCancel", "btnVoid", "btnApprove")) {
+            if (JFXUtil.isObjectEqualTo(lsButton, "btnConfirm", "btnSave", "btnCancel", "btnVoid", "btnApprove",  "btnPost")) {
                 pbIsCheckedJournalTab = false;
                 poController.resetTransaction();
                 clearTextFields();
