@@ -983,11 +983,21 @@ public class CheckDepositInterBranch_HistoryController implements Initializable,
         boolean lbShow1 = (fnValue == EditMode.READY);
         boolean lbShow2 = (fnValue == EditMode.UNKNOWN || fnValue == EditMode.READY);
 
-        JFXUtil.setButtonsVisibility(lbShow1, btnHistory, btnPrint);
+        JFXUtil.setButtonsVisibility(lbShow1, btnHistory);
         JFXUtil.setButtonsVisibility(lbShow2, btnClose);
 
         JFXUtil.setDisabled(true, apMaster, apDetail, apJournalMaster, apJournalDetails, apAttachments);
         JFXUtil.setButtonsVisibility(true, btnBrowse);
+        JFXUtil.setButtonsVisibility(false, btnPrint);
+        
+        if (fnValue != EditMode.READY) {
+            return;
+        }
+        switch (poController.Master().getTransactionStatus()) {
+            case CheckDepositStatus.CONFIRMED:
+                JFXUtil.setButtonsVisibility(true, btnPrint);
+                break;
+        }
     }
 
     private void clearTextFields() {

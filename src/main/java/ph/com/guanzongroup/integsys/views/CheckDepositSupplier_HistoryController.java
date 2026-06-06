@@ -96,7 +96,7 @@ public class CheckDepositSupplier_HistoryController implements Initializable, Sc
     private boolean pbEntered = false;
     private boolean pbEnteredJE = false;
     private FilteredList<ModelTableMain> filteredData;
-    JFXUtil.ReloadableTableTask  loadTableDetail, loadTableAttachment;
+    JFXUtil.ReloadableTableTask loadTableDetail, loadTableAttachment;
     AtomicReference<Object> lastFocusedTextField = new AtomicReference<>();
     AtomicReference<Object> previousSearchedTextField = new AtomicReference<>();
     private String psSearchDate = "";
@@ -780,11 +780,21 @@ public class CheckDepositSupplier_HistoryController implements Initializable, Sc
         boolean lbShow1 = (fnValue == EditMode.READY);
         boolean lbShow2 = (fnValue == EditMode.UNKNOWN || fnValue == EditMode.READY);
 
-        JFXUtil.setButtonsVisibility(lbShow1, btnHistory, btnPrint);
+        JFXUtil.setButtonsVisibility(lbShow1, btnHistory);
         JFXUtil.setButtonsVisibility(lbShow2, btnClose);
 
         JFXUtil.setDisabled(true, apMaster, apDetail, apAttachments);
         JFXUtil.setButtonsVisibility(true, btnBrowse);
+        JFXUtil.setButtonsVisibility(false, btnPrint);
+
+        if (fnValue != EditMode.READY) {
+            return;
+        }
+        switch (poController.Master().getTransactionStatus()) {
+            case CheckDepositStatus.CONFIRMED:
+                JFXUtil.setButtonsVisibility(true, btnPrint);
+                break;
+        }
     }
 
     private void clearTextFields() {
