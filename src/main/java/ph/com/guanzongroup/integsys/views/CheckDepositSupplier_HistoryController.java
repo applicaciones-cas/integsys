@@ -4,8 +4,6 @@ import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Level;
@@ -172,6 +170,7 @@ public class CheckDepositSupplier_HistoryController implements Initializable, Sc
             initAttachmentsGrid();
             initTableOnClick();
             initTabPane();
+            initComboboxes();
             clearTextFields();
             pnEditMode = EditMode.UNKNOWN;
             initButton(pnEditMode);
@@ -630,6 +629,12 @@ public class CheckDepositSupplier_HistoryController implements Initializable, Sc
                 }
             });
 
+    public void initComboboxes() {
+        // ComboBox setup
+        cmbAttachmentType.setItems(documentType);
+        JFXUtil.initComboBoxCellDesignColor("#FF8201", cmbAttachmentType);
+    }
+
     private void txtField_KeyPressed(KeyEvent event) {
         TextField lsTxtField = (TextField) event.getSource();
         String txtFieldID = ((TextField) event.getSource()).getId();
@@ -655,9 +660,6 @@ public class CheckDepositSupplier_HistoryController implements Initializable, Sc
                                 } else {
                                     loadRecordSearch();
                                     JFXUtil.clickTabByTitleText(tabPaneMain, "Check Deposit");
-                                    pnEditMode = poController.getEditMode();
-                                    loadTableDetail.reload();
-                                    initButton(pnEditMode);
                                 }
                                 break;
                             case "tfSearchTransNo":
@@ -791,6 +793,7 @@ public class CheckDepositSupplier_HistoryController implements Initializable, Sc
         }
         switch (poController.Master().getTransactionStatus()) {
             case CheckDepositStatus.CONFIRMED:
+            case CheckDepositStatus.POSTED:
                 JFXUtil.setButtonsVisibility(true, btnPrint);
                 break;
         }
