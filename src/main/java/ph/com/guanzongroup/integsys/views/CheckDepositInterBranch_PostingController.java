@@ -216,7 +216,7 @@ public class CheckDepositInterBranch_PostingController implements Initializable,
         }
         return true;
     }
-    String lsValidDisbMessage = "Please provide at least one valid disbursement detail with amount to proceed.";
+    String lsValidDisbMessage = "Please provide at least one valid check deposit detail to proceed.";
 
     public void initTabPane() {
         JFXUtil.onTabSelected(tabPaneMain, tabTitle -> {
@@ -241,7 +241,7 @@ public class CheckDepositInterBranch_PostingController implements Initializable,
                     }
                     break;
                 case "Attachments":
-                    if (pnEditMode == EditMode.READY || pnEditMode == EditMode.UPDATE || pnEditMode == EditMode.ADDNEW) {
+                    if (pnEditMode == EditMode.READY) {
                         JFXUtil.clearTextFields(apAttachments);
                         if (DoesContainValidDetail()) {
                             try {
