@@ -176,6 +176,7 @@ public class CheckDepositInterBranch_HistoryController implements Initializable,
             initAttachmentsGrid();
             initTableOnClick();
             initTabPane();
+            initComboboxes();
             clearTextFields();
             pnEditMode = EditMode.UNKNOWN;
             initButton(pnEditMode);
@@ -274,6 +275,12 @@ public class CheckDepositInterBranch_HistoryController implements Initializable,
 
     private void initDatePicker() {
         JFXUtil.setDatePickerFormat("MM/dd/yyyy", dpTransactionDate, dpTransactionReferDate, dpCheckDate, dpJournalTransactionDate, dpReportMonthYear);
+    }
+    
+    public void initComboboxes() {
+        // ComboBox setup
+        cmbAttachmentType.setItems(documentType);
+        JFXUtil.initComboBoxCellDesignColor("#FF8201", cmbAttachmentType);
     }
 
     @FXML
@@ -814,10 +821,6 @@ public class CheckDepositInterBranch_HistoryController implements Initializable,
                                 } else {
                                     loadRecordSearch();
                                     JFXUtil.clickTabByTitleText(tabPaneMain, "Check Deposit");
-                                    pnEditMode = poController.getEditMode();
-                                    poController.populateJournal();
-                                    loadTableDetail.reload();
-                                    initButton(pnEditMode);
                                 }
                                 break;
                             case "tfSearchTransNo":
