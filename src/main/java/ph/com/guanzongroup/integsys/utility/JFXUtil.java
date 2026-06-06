@@ -2416,7 +2416,9 @@ public class JFXUtil {
             Task<Void> task = new Task<Void>() {
                 @Override
                 protected Void call() throws Exception {
-                    content.run(); // Caller must wrap with Platform.runLater if needed
+                    if (content != null) {
+                        content.run(); // Caller must wrap with Platform.runLater if needed
+                    }
                     return null;
                 }
 
@@ -3538,7 +3540,7 @@ public class JFXUtil {
         });
     }
     public static String[] buttonPackArray1 = {"btnSave", "btnCancel", "btnApprove", "btnDisapprove", "btnVoid", "btnConfirm"};
-    public static String[] buttonPackArray2 = {"btnRetrieve", "btnSearch", "btnUndo", "btnArrowRight", "btnArrowLeft", "btnHistory", "btnPrint"};
+    public static String[] buttonPackArray2 = {"btnRetrieve", "btnSearch", "btnUndo", "btnArrowRight", "btnArrowLeft", "btnHistory", "btnPrint", "btnRemoveAttachment", "btnAddAttachment"};
 
     public static boolean isNumeric(String str) {
         if (str == null || str.trim().isEmpty()) {
