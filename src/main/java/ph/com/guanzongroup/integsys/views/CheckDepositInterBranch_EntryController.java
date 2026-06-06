@@ -268,12 +268,12 @@ public class CheckDepositInterBranch_EntryController implements Initializable, S
                         if (DoesContainValidDetail()) {
 //                            if (isSourceNoAvailable()) {
 //                                pbIsCheckedAttachmentTab = true;
-                            try {
-                                poController.loadAttachments();
-                            } catch (GuanzonException | SQLException ex) {
-                                Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
-                                ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
-                            }
+//                            try {
+//                                poController.loadAttachments();
+//                            } catch (GuanzonException | SQLException ex) {
+//                                Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+//                                ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
+//                            }
 //                            }
                             loadTableAttachment.reload();
                         } else {

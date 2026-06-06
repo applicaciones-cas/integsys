@@ -236,12 +236,12 @@ public class CheckDepositInterBranch_HistoryController implements Initializable,
                     if (pnEditMode == EditMode.READY) {
                         JFXUtil.clearTextFields(apAttachments);
                         if (DoesContainValidDetail()) {
-                            try {
-                                poController.loadAttachments();
-                            } catch (GuanzonException | SQLException ex) {
-                                Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
-                                ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
-                            }
+//                            try {
+//                                poController.loadAttachments();
+//                            } catch (GuanzonException | SQLException ex) {
+//                                Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+//                                ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
+//                            }
 
 //                            }
                             loadTableAttachment.reload();
