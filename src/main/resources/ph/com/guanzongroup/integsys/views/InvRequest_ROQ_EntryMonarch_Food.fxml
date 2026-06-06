@@ -271,7 +271,7 @@
                                                             <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="28.0" vgrow="SOMETIMES" />
                                                          </rowConstraints>
                                                          <children>
-                                                            <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Bar Code" />
+                                                            <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Barcode" />
                                                             <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Description" GridPane.rowIndex="1" />
                                                             <TextField fx:id="tfBarCode" GridPane.columnIndex="2" />
                                                             <TextField fx:id="tfDescription" GridPane.columnIndex="2" GridPane.columnSpan="4" GridPane.rowIndex="1" />
@@ -316,7 +316,7 @@
                                              <children>
                                                 <TableView fx:id="tblViewOrderDetails" maxHeight="1.7976931348623157E308" prefWidth="1176.0">
                                                    <columns>
-                                                      <TableColumn fx:id="tblBarCodeDetail" maxWidth="120.0" minWidth="120.0" prefWidth="120.0" resizable="false" text="Bar Code" />
+                                                      <TableColumn fx:id="tblBarCodeDetail" maxWidth="120.0" minWidth="120.0" prefWidth="120.0" resizable="false" text="Barcode" />
                                                       <TableColumn fx:id="tblDescriptionDetail" maxWidth="260.0" minWidth="260.0" prefWidth="260.0" resizable="false" text="Description" />
                                                       <TableColumn fx:id="tblBrandDetail" maxWidth="120.0" minWidth="120.0" prefWidth="120.0" resizable="false" text="Brand" />
                                                       <TableColumn fx:id="tblInvTypeDetail" maxWidth="120.0" minWidth="120.0" prefWidth="120.0" resizable="false" text="Inv Type" />

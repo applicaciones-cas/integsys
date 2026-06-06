@@ -299,7 +299,7 @@
                                                             <TextField fx:id="tfROQ" maxWidth="70.0" minHeight="70.0" prefHeight="70.0" prefWidth="70.0" GridPane.columnIndex="7" GridPane.hgrow="NEVER" GridPane.rowIndex="4" GridPane.vgrow="NEVER" />
                                                             <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Class" GridPane.columnIndex="9" GridPane.rowIndex="3" />
                                                             <TextField fx:id="tfClassification" GridPane.columnIndex="11" GridPane.rowIndex="3" />
-                                                            <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Bar Code" GridPane.columnIndex="4" />
+                                                            <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Barcode" GridPane.columnIndex="4" />
                                                             <TextField fx:id="tfBarCode" promptText="Press F3: Search" GridPane.columnIndex="7" />
                                                             <TextField fx:id="tfDescription" prefWidth="408.0" promptText="Press F3: Search" GridPane.columnIndex="7" GridPane.columnSpan="5" GridPane.rowIndex="1" />
                                                             <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Description" GridPane.columnIndex="4" GridPane.rowIndex="1" />
@@ -326,7 +326,7 @@
                                                    <columns>
                                                       <TableColumn fx:id="tblBrandDetail" maxWidth="120.0" minWidth="120.0" prefWidth="120.0" resizable="false" text="Brand" />
                                                       <TableColumn fx:id="tblModelDetail" maxWidth="120.0" minWidth="120.0" prefWidth="120.0" resizable="false" text="Model" />
-                                                      <TableColumn fx:id="tblBarCodeDetail" maxWidth="120.0" minWidth="120.0" prefWidth="120.0" resizable="false" text="Bar Code" />
+                                                      <TableColumn fx:id="tblBarCodeDetail" maxWidth="120.0" minWidth="120.0" prefWidth="120.0" resizable="false" text="Barcode" />
                                                       <TableColumn fx:id="tblDescriptionDetail" maxWidth="260.0" minWidth="260.0" prefWidth="260.0" resizable="false" text="Description" />
                                                       <TableColumn fx:id="tblVariantDetail" maxWidth="120.0" minWidth="120.0" prefWidth="120.0" resizable="false" text="Variant" />
                                                       <TableColumn fx:id="tblColorDetail" maxWidth="120.0" minWidth="120.0" prefWidth="120.0" resizable="false" text="Color" />

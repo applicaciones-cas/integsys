@@ -216,7 +216,7 @@
                                                             <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="100.0" minWidth="-Infinity" prefWidth="100.0" />
                                                             <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="10.0" minWidth="-Infinity" prefWidth="10.0" />
                                                             <ColumnConstraints halignment="LEFT" hgrow="SOMETIMES" maxWidth="175.0" minWidth="-Infinity" prefWidth="130.0" />
-                                                            <ColumnConstraints halignment="LEFT" hgrow="SOMETIMES" maxWidth="17.5" minWidth="-Infinity" prefWidth="0.0" />
+                                                            <ColumnConstraints halignment="LEFT" hgrow="SOMETIMES" maxWidth="10.0" minWidth="-Infinity" prefWidth="10.0" />
                                                             <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="80.0" minWidth="-Infinity" prefWidth="80.0" />
                                                             <ColumnConstraints hgrow="NEVER" maxWidth="10.0" minWidth="10.0" prefWidth="10.0" />
                                                             <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="70.0" minWidth="-Infinity" prefWidth="70.0" />
@@ -231,7 +231,7 @@
                                                             <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="28.0" vgrow="SOMETIMES" />
                                                          </rowConstraints>
                                                          <children>
-                                                            <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Bar Code" />
+                                                            <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Barcode" />
                                                             <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Description" GridPane.rowIndex="1" />
                                                             <TextField fx:id="tfBarCode" GridPane.columnIndex="2" />
                                                             <TextField fx:id="tfDescription" GridPane.columnIndex="2" GridPane.columnSpan="4" GridPane.rowIndex="1" />
@@ -255,6 +255,8 @@
                                                             <TextField fx:id="tfROQ" GridPane.columnIndex="9" GridPane.rowIndex="1" />
                                                             <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Class" GridPane.columnIndex="7" GridPane.rowIndex="2" />
                                                             <TextField fx:id="tfClassification" GridPane.columnIndex="9" GridPane.rowIndex="2" />
+                                                            <TextField fx:id="tfCancelledQTY" GridPane.columnIndex="12" GridPane.rowIndex="1" />
+                                                            <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Cancelled Qty" GridPane.columnIndex="10" GridPane.rowIndex="1" />
                                                          </children>
                                                       </GridPane>
                                                    </children>
@@ -263,7 +265,7 @@
                                                         </VBox>
                                                     </children>
                                                 </AnchorPane>
-                                              <AnchorPane maxHeight="1.7976931348623157E308" prefHeight="885.0" prefWidth="975.0" style="-fx-border-color: orange;" VBox.vgrow="ALWAYS">
+                                              <AnchorPane maxHeight="1.7976931348623157E308" prefHeight="887.0" prefWidth="975.0" style="-fx-border-color: orange;" VBox.vgrow="ALWAYS">
                                                   <children>
                                                       <GridPane layoutX="11.0" layoutY="11.0" maxHeight="1.7976931348623157E308" prefWidth="1176.0" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="5.0" GridPane.vgrow="ALWAYS">
                                                           <columnConstraints>
@@ -276,7 +278,7 @@
                                              <children>
                                                 <TableView fx:id="tblViewOrderDetails" maxHeight="1.7976931348623157E308" prefWidth="1176.0">
                                                    <columns>
-                                                      <TableColumn fx:id="tblBarCodeDetail" maxWidth="120.0" minWidth="120.0" prefWidth="120.0" resizable="false" text="Bar Code" />
+                                                      <TableColumn fx:id="tblBarCodeDetail" maxWidth="120.0" minWidth="120.0" prefWidth="120.0" resizable="false" text="Barcode" />
                                                       <TableColumn fx:id="tblDescriptionDetail" maxWidth="260.0" minWidth="260.0" prefWidth="260.0" resizable="false" text="Description" />
                                                       <TableColumn fx:id="tblBrandDetail" maxWidth="120.0" minWidth="120.0" prefWidth="120.0" resizable="false" text="Brand" />
                                                       <TableColumn fx:id="tblInvTypeDetail" maxWidth="120.0" minWidth="120.0" prefWidth="120.0" resizable="false" text="Inv Type" />
