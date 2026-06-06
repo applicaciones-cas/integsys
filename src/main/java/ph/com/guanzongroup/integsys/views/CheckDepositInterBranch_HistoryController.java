@@ -998,6 +998,7 @@ public class CheckDepositInterBranch_HistoryController implements Initializable,
         }
         switch (poController.Master().getTransactionStatus()) {
             case CheckDepositStatus.CONFIRMED:
+            case CheckDepositStatus.POSTED:
                 JFXUtil.setButtonsVisibility(true, btnPrint);
                 break;
         }
