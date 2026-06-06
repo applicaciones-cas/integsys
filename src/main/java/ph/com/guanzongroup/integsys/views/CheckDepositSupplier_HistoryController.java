@@ -668,7 +668,6 @@ public class CheckDepositSupplier_HistoryController implements Initializable, Sc
                                 } else {
                                     JFXUtil.clickTabByTitleText(tabPaneMain, "Check Deposit");
                                     pnEditMode = poController.getEditMode();
-                                    poController.populateJournal();
                                     loadTableDetail.reload();
                                     initButton(pnEditMode);
                                 }
