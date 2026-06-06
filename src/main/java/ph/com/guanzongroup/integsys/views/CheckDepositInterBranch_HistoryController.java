@@ -99,7 +99,7 @@ public class CheckDepositInterBranch_HistoryController implements Initializable,
     private boolean pbEntered = false;
     private boolean pbEnteredJE = false;
     private FilteredList<ModelTableMain> filteredData;
-    JFXUtil.ReloadableTableTask loadTableMain, loadTableDetail, loadTableDetailJE, loadTableAttachment;
+    JFXUtil.ReloadableTableTask loadTableDetail, loadTableDetailJE, loadTableAttachment;
     AtomicReference<Object> lastFocusedTextField = new AtomicReference<>();
     AtomicReference<Object> previousSearchedTextField = new AtomicReference<>();
     private String psSearchDate = "";
@@ -821,7 +821,17 @@ public class CheckDepositInterBranch_HistoryController implements Initializable,
                                 }
                                 break;
                             case "tfSearchTransNo":
-                                loadTableMain.reload();
+                                poJSON = poController.SearchTransaction(tfSearchTransNo.getText(), tfSearchBankAccountNo.getText(), "");
+                                if (!"success".equals((String) poJSON.get("result"))) {
+                                    ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                                    return;
+                                } else {
+                                    JFXUtil.clickTabByTitleText(tabPaneMain, "Check Deposit");
+                                    pnEditMode = poController.getEditMode();
+                                    poController.populateJournal();
+                                    loadTableDetail.reload();
+                                    initButton(pnEditMode);
+                                }
                                 break;
                         }
                         break;

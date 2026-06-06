@@ -104,7 +104,7 @@ public class CheckDepositSupplier_PostingController implements Initializable, Sc
     private boolean pbEntered = false;
     private boolean pbEnteredJE = false;
     private FilteredList<ModelTableMain> filteredData;
-    JFXUtil.ReloadableTableTask loadTableMain, loadTableDetail, loadTableDetailJE, loadTableAttachment;
+    JFXUtil.ReloadableTableTask loadTableMain, loadTableDetail, loadTableAttachment;
     private String psSearchDate = "";
 
     @FXML
@@ -387,7 +387,6 @@ public class CheckDepositSupplier_PostingController implements Initializable, Sc
             } else {
                 loadRecordMaster();
                 loadTableDetail.reload();
-                loadTableDetailJE.reload();
                 loadTableAttachment.reload();
             }
             initButton(pnEditMode);
@@ -595,8 +594,8 @@ public class CheckDepositSupplier_PostingController implements Initializable, Sc
     }
 
     private void initDetailGrid() {
-        JFXUtil.setColumnCenter(tblColDetailReference,tblColDetailNo, tblColDetailDate, tblColDetailCheckNo);
-        JFXUtil.setColumnLeft( tblColDetailBank, tblColDetailPayee);
+        JFXUtil.setColumnCenter(tblColDetailReference, tblColDetailNo, tblColDetailDate, tblColDetailCheckNo);
+        JFXUtil.setColumnLeft(tblColDetailBank, tblColDetailPayee);
         JFXUtil.setColumnRight(tblColDetailCheckAmount);
         JFXUtil.setColumnsIndexAndDisableReordering(tblViewDetail);
 

@@ -116,7 +116,7 @@ public class CheckDepositSupplier_ConfirmationController implements Initializabl
     private boolean pbEntered = false;
     private boolean pbEnteredJE = false;
     private FilteredList<ModelTableMain> filteredData;
-    JFXUtil.ReloadableTableTask loadTableMain, loadTableDetail, loadTableDetailJE, loadTableAttachment;
+    JFXUtil.ReloadableTableTask loadTableMain, loadTableDetail, loadTableAttachment;
     AtomicReference<Object> lastFocusedTextField = new AtomicReference<>();
     AtomicReference<Object> previousSearchedTextField = new AtomicReference<>();
     private String psSearchDate = "";
@@ -630,7 +630,6 @@ public class CheckDepositSupplier_ConfirmationController implements Initializabl
             } else {
                 loadRecordMaster();
                 loadTableDetail.reload();
-                loadTableDetailJE.reload();
                 loadTableAttachment.reload();
             }
             initButton(pnEditMode);

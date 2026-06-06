@@ -96,7 +96,7 @@ public class CheckDepositSupplier_HistoryController implements Initializable, Sc
     private boolean pbEntered = false;
     private boolean pbEnteredJE = false;
     private FilteredList<ModelTableMain> filteredData;
-    JFXUtil.ReloadableTableTask loadTableMain, loadTableDetail, loadTableDetailJE, loadTableAttachment;
+    JFXUtil.ReloadableTableTask  loadTableDetail, loadTableAttachment;
     AtomicReference<Object> lastFocusedTextField = new AtomicReference<>();
     AtomicReference<Object> previousSearchedTextField = new AtomicReference<>();
     private String psSearchDate = "";
@@ -310,7 +310,6 @@ public class CheckDepositSupplier_HistoryController implements Initializable, Sc
             } else {
                 loadRecordMaster();
                 loadTableDetail.reload();
-                loadTableDetailJE.reload();
                 loadTableAttachment.reload();
             }
             initButton(pnEditMode);
@@ -507,8 +506,8 @@ public class CheckDepositSupplier_HistoryController implements Initializable, Sc
     }
 
     private void initDetailGrid() {
-        JFXUtil.setColumnCenter(tblColDetailReference,tblColDetailNo, tblColDetailDate, tblColDetailCheckNo);
-        JFXUtil.setColumnLeft( tblColDetailBank, tblColDetailPayee);
+        JFXUtil.setColumnCenter(tblColDetailReference, tblColDetailNo, tblColDetailDate, tblColDetailCheckNo);
+        JFXUtil.setColumnLeft(tblColDetailBank, tblColDetailPayee);
         JFXUtil.setColumnRight(tblColDetailCheckAmount);
         JFXUtil.setColumnsIndexAndDisableReordering(tblViewDetail);
         tblViewDetail.setItems(detail_data);
@@ -662,7 +661,17 @@ public class CheckDepositSupplier_HistoryController implements Initializable, Sc
                                 }
                                 break;
                             case "tfSearchTransNo":
-                                loadTableMain.reload();
+                                poJSON = poController.SearchTransaction(tfSearchTransNo.getText(), tfSearchBankAccountNo.getText(), "");
+                                if (!"success".equals((String) poJSON.get("result"))) {
+                                    ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                                    return;
+                                } else {
+                                    JFXUtil.clickTabByTitleText(tabPaneMain, "Check Deposit");
+                                    pnEditMode = poController.getEditMode();
+                                    poController.populateJournal();
+                                    loadTableDetail.reload();
+                                    initButton(pnEditMode);
+                                }
                                 break;
                         }
                         break;
@@ -681,7 +690,7 @@ public class CheckDepositSupplier_HistoryController implements Initializable, Sc
                     default:
                         break;
                 }
-            } catch (SQLException | GuanzonException | ExceptionInInitializerError  ex) {
+            } catch (SQLException | GuanzonException | ExceptionInInitializerError | CloneNotSupportedException | ScriptException ex) {
                 Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
                 ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
             }

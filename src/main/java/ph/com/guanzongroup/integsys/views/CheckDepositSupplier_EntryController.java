@@ -115,7 +115,7 @@ public class CheckDepositSupplier_EntryController implements Initializable, Scre
     private boolean pbEntered = false;
     private boolean pbEnteredJE = false;
     private FilteredList<ModelTableMain> filteredData;
-    JFXUtil.ReloadableTableTask loadTableMain, loadTableDetail, loadTableDetailJE, loadTableAttachment;
+    JFXUtil.ReloadableTableTask loadTableMain, loadTableDetail, loadTableAttachment;
     AtomicReference<Object> lastFocusedTextField = new AtomicReference<>();
     AtomicReference<Object> previousSearchedTextField = new AtomicReference<>();
     private String psSearchFrom = "";
@@ -206,9 +206,10 @@ public class CheckDepositSupplier_EntryController implements Initializable, Scre
 //                poController.setCategoryID(psCategoryId);
 //                    poController.Master().setBranchCode(oApp.getBranchCode());
                     loadRecordSearch();
-                    btnNew.fire();
+                    Platform.runLater(() -> {
+                        btnNew.fire();
+                    });
                     lblSource.setText(poController.getCompanyName() + " - " + poController.Master().Industry().getDescription());
-
                     LocalDate today = LocalDate.now();
                     String lsDateFrom = CustomCommonUtil.formatDateToShortString(JFXUtil.getFirstDayOfMonth(oApp.getServerDate()));
                     dpFrom.setValue(CustomCommonUtil.parseDateStringToLocalDate(lsDateFrom, "yyyy-MM-dd"));
@@ -607,7 +608,6 @@ public class CheckDepositSupplier_EntryController implements Initializable, Scre
             } else {
                 loadRecordMaster();
                 loadTableDetail.reload();
-                loadTableDetailJE.reload();
                 loadTableAttachment.reload();
             }
             initButton(pnEditMode);
