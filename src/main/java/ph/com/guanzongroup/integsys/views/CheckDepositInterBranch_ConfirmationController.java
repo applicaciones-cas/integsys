@@ -487,24 +487,26 @@ public class CheckDepositInterBranch_ConfirmationController implements Initializ
                         initButton(pnEditMode);
                     }
                     if (pnEditMode == EditMode.READY) {
-                        if (ShowMessageFX.YesNo(null, pxeModuleName, "Do you want to confirm this transaction?")) { //requires to review journal entry
-                            if (!poController.existJournal().equals("")) {
-                                if (!pbIsCheckedJournalTab) {
-                                    ShowMessageFX.Warning(null, pxeModuleName, "Please check the Journal Entry before saving.");
-                                    break;
-                                } else {
-                                    poJSON = poController.ConfirmTransaction();
-                                    if ("error".equals((String) poJSON.get("result"))) {
-                                        ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                        if(CheckDepositStatus.OPEN.equals(poController.Master().getTransactionStatus())){
+                            if (ShowMessageFX.YesNo(null, pxeModuleName, "Do you want to confirm this transaction?")) { //requires to review journal entry
+                                if (!poController.existJournal().equals("")) {
+                                    if (!pbIsCheckedJournalTab) {
+                                        ShowMessageFX.Warning(null, pxeModuleName, "Please check the Journal Entry before saving.");
                                         break;
                                     } else {
-                                        ShowMessageFX.Information(null, pxeModuleName, (String) poJSON.get("message"));
-                                        JFXUtil.highlightByKey(tblViewMain, String.valueOf(pnMain + 1), "#C1E1C1", highlightedRowsMain);
+                                        poJSON = poController.ConfirmTransaction();
+                                        if ("error".equals((String) poJSON.get("result"))) {
+                                            ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                                            break;
+                                        } else {
+                                            ShowMessageFX.Information(null, pxeModuleName, (String) poJSON.get("message"));
+                                            JFXUtil.highlightByKey(tblViewMain, String.valueOf(pnMain + 1), "#C1E1C1", highlightedRowsMain);
+                                        }
                                     }
+                                } else {
+                                    ShowMessageFX.Warning(null, pxeModuleName, "No journal entry found. Add a journal entry and save before confirming.");
+                                    break;
                                 }
-                            } else {
-                                ShowMessageFX.Warning(null, pxeModuleName, "No journal entry found. Add a journal entry and save before confirming.");
-                                break;
                             }
                         }
                     }
@@ -576,6 +578,8 @@ public class CheckDepositInterBranch_ConfirmationController implements Initializ
                     poJSON = poController.PrintDepositSlip();
                     if ("error".equals((String) poJSON.get("result"))) {
                         ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                    } else {
+                        ShowMessageFX.Information(null, pxeModuleName, (String) poJSON.get("message"));
                     }
                     break;
                 case "btnVoid":
