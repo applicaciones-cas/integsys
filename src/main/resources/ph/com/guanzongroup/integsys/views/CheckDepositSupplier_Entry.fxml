@@ -588,7 +588,7 @@
                                                       <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
                                                    </columnResizePolicy>
                                               </TableView>
-                                                                <TextField fx:id="tfSearchBank" maxHeight="25.0" GridPane.columnIndex="2" GridPane.columnSpan="4" GridPane.rowIndex="2" />
+                                                                <TextField fx:id="tfSearchBank" maxHeight="25.0" promptText="Press F3: Search" GridPane.columnIndex="2" GridPane.columnSpan="4" GridPane.rowIndex="2" />
                                                                 <DatePicker fx:id="dpFrom" editable="false" GridPane.columnIndex="2" GridPane.rowIndex="3" />
                                                                 <DatePicker fx:id="dpThru" editable="false" GridPane.columnIndex="5" GridPane.rowIndex="3" />
                                                             </children>
