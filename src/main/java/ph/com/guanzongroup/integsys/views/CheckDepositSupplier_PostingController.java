@@ -169,7 +169,7 @@ public class CheckDepositSupplier_PostingController implements Initializable, Sc
             if (!"success".equals((String) poJSON.get("result"))) {
                 ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
             }
-            poController.setTransactionStatus("12");
+            poController.setTransactionStatus("1");
             initLoadTable();
             initTextFields();
             initDatePicker();
