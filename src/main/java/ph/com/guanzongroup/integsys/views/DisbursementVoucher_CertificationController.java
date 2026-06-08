@@ -373,8 +373,12 @@ public class DisbursementVoucher_CertificationController implements Initializabl
 
                                     switch (disbursementType) {
                                         case DisbursementStatic.DisbursementType.CHECK:
-                                        case DisbursementStatic.DisbursementType.CHECK_DEPOSIT:
                                             lsPaymentForm = "CHECK";
+                                            lsBankName = poDisbursementController.getMaster(lnCntr).CheckPayments().Banks().getBankName();
+                                            lsBankAccount = poDisbursementController.getMaster(lnCntr).CheckPayments().Bank_Account_Master().getAccountNo();
+                                            break;
+                                        case DisbursementStatic.DisbursementType.CHECK_DEPOSIT:
+                                            lsPaymentForm = "CHECK DEPOSIT";
                                             lsBankName = poDisbursementController.getMaster(lnCntr).CheckPayments().Banks().getBankName();
                                             lsBankAccount = poDisbursementController.getMaster(lnCntr).CheckPayments().Bank_Account_Master().getAccountNo();
                                             break;
