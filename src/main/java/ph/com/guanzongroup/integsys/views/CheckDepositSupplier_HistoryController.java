@@ -404,9 +404,9 @@ public class CheckDepositSupplier_HistoryController implements Initializable, Sc
             JFXUtil.setStatusValue(lblStatus, CheckDepositStatus.class, pnEditMode == EditMode.UNKNOWN ? "-1" : poController.Master().getTransactionStatus());
 
             tfTransactionNo.setText(poController.Master().getTransactionNo());
-            tfBankMaster.setText(poController.Master().BankAccount().Banks().getBankName());
-            tfBankAccountNo.setText(poController.Master().BankAccount().getAccountNo());
-            tfBankAccountName.setText(poController.Master().BankAccount().getAccountName());
+            tfBankMaster.setText(poController.Master().Banks().getBankName());
+            tfBankAccountNo.setText(poController.Master().APClientBankAccount().getAccountNumber());
+            tfBankAccountName.setText(poController.Master().APClientBankAccount().getAccountName());
             taRemarks.setText(poController.Master().getRemarks());
             dpTransactionDate.setValue(CustomCommonUtil.parseDateStringToLocalDate(SQLUtil.dateFormat(poController.Master().getTransactionDate(), SQLUtil.FORMAT_SHORT_DATE)));
             dpTransactionReferDate.setValue(CustomCommonUtil.parseDateStringToLocalDate(SQLUtil.dateFormat(poController.Master().getTransactionReferDate(), SQLUtil.FORMAT_SHORT_DATE)));
