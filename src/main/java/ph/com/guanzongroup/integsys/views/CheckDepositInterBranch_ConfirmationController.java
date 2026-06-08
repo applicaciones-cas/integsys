@@ -63,12 +63,12 @@ import org.guanzon.appdriver.agent.ShowDialogFX;
 import org.guanzon.appdriver.agent.ShowMessageFX;
 import org.guanzon.appdriver.base.CommonUtils;
 import org.guanzon.appdriver.base.GRiderCAS;
-import org.guanzon.appdriver.base.LogWrapper;
-import org.guanzon.appdriver.constant.EditMode;
 import org.guanzon.appdriver.base.GuanzonException;
+import org.guanzon.appdriver.base.LogWrapper;
 import org.guanzon.appdriver.base.MiscUtil;
 import org.guanzon.appdriver.base.SQLUtil;
 import org.guanzon.appdriver.constant.DocumentType;
+import org.guanzon.appdriver.constant.EditMode;
 import org.guanzon.appdriver.constant.RecordStatus;
 import org.guanzon.appdriver.constant.UserRight;
 import org.json.simple.JSONObject;
@@ -120,6 +120,7 @@ public class CheckDepositInterBranch_ConfirmationController implements Initializ
     private boolean pbEntered = false;
     private boolean pbEnteredJE = false;
     private FilteredList<ModelTableMain> filteredData;
+    private boolean tooltipShown = false;
     JFXUtil.ReloadableTableTask loadTableMain, loadTableDetail, loadTableDetailJE, loadTableAttachment;
     AtomicReference<Object> lastFocusedTextField = new AtomicReference<>();
     AtomicReference<Object> previousSearchedTextField = new AtomicReference<>();
@@ -208,7 +209,7 @@ public class CheckDepositInterBranch_ConfirmationController implements Initializ
                     poController.Master().setIndustryId(psIndustryId);
                     poController.Master().setCompany(psCompanyId);
 //                    poController.setIndustryId(psIndustryId);
-//                    poController.setCompanyId(psCompanyId);
+                    poController.setCompanyId(psCompanyId);
 //                poController.setCategoryID(psCategoryId);
 //                    poController.Master().setBranchCode(oApp.getBranchCode());
                     loadRecordSearch();
@@ -648,7 +649,7 @@ public class CheckDepositInterBranch_ConfirmationController implements Initializ
 
                         //Limit maximum pages of pdf to add
                         if (imgPath2.toLowerCase().endsWith(".pdf")) {
-                            try (PDDocument document = PDDocument.load(selectedFile)) {
+                            try ( PDDocument document = PDDocument.load(selectedFile)) {
                                 PDFRenderer pdfRenderer = new PDFRenderer(document);
                                 int pageCount = document.getNumberOfPages();
                                 if (pageCount > 5) {
@@ -1470,6 +1471,10 @@ public class CheckDepositInterBranch_ConfirmationController implements Initializ
                                 loadTableMain.reload();
                                 break;
                             case "tfSearchTransNo":
+                                if (!tooltipShown) {
+                                    JFXUtil.showTooltip("NOTE: Results appear directly in the table view, no pop-up dialog.", tfSearchTransNo);
+                                    tooltipShown = true;
+                                }
                                 loadTableMain.reload();
                                 break;
                             //apMaster
@@ -1503,16 +1508,32 @@ public class CheckDepositInterBranch_ConfirmationController implements Initializ
                             case "tfCheckTransNo":
                                 poJSON = poController.searchCheckPayment(lsValue, tfCheckNo.getText(), true);
                                 if ("error".equals(poJSON.get("result"))) {
+                                    int lnReturned = Integer.parseInt(String.valueOf(poJSON.get("row")));
+                                    JFXUtil.runWithDelay(0.70, () -> {
+                                        pnDetail = lnReturned;
+                                        loadTableDetail.reload();
+                                    });
                                     ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                                    break;
+                                } else {
+                                    pnDetail = Integer.parseInt(String.valueOf(poJSON.get("row")));
+                                    loadTableDetail.reload();
                                 }
-                                loadTableDetail.reload();
                                 return;
                             case "tfCheckNo":
                                 poJSON = poController.searchCheckPayment(tfCheckTransNo.getText(), lsValue, false);
                                 if ("error".equals(poJSON.get("result"))) {
+                                    int lnReturned = Integer.parseInt(String.valueOf(poJSON.get("row")));
+                                    JFXUtil.runWithDelay(0.70, () -> {
+                                        pnDetail = lnReturned;
+                                        loadTableDetail.reload();
+                                    });
                                     ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                                    break;
+                                } else {
+                                    pnDetail = Integer.parseInt(String.valueOf(poJSON.get("row")));
+                                    loadTableDetail.reload();
                                 }
-                                loadTableDetail.reload();
                                 return;
                             //apJournalDetails
                             case "tfAccountCode":

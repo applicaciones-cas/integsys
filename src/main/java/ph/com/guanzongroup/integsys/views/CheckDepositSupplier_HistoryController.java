@@ -14,7 +14,6 @@ import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.collections.transformation.FilteredList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -42,18 +41,17 @@ import static javafx.scene.input.KeyCode.UP;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.StackPane;
-import javafx.stage.FileChooser;
 import javafx.util.Duration;
 import javax.script.ScriptException;
 import org.guanzon.appdriver.agent.ShowMessageFX;
 import org.guanzon.appdriver.base.CommonUtils;
 import org.guanzon.appdriver.base.GRiderCAS;
-import org.guanzon.appdriver.base.LogWrapper;
-import org.guanzon.appdriver.constant.EditMode;
 import org.guanzon.appdriver.base.GuanzonException;
+import org.guanzon.appdriver.base.LogWrapper;
 import org.guanzon.appdriver.base.MiscUtil;
 import org.guanzon.appdriver.base.SQLUtil;
 import org.guanzon.appdriver.constant.DocumentType;
+import org.guanzon.appdriver.constant.EditMode;
 import org.guanzon.appdriver.constant.RecordStatus;
 import org.json.simple.JSONObject;
 import ph.com.guanzongroup.cas.cashflow.CheckDeposit;
@@ -61,7 +59,6 @@ import ph.com.guanzongroup.cas.cashflow.services.CashflowControllers;
 import ph.com.guanzongroup.cas.cashflow.status.CheckDepositStatus;
 import ph.com.guanzongroup.integsys.model.ModelDeliveryAcceptance_Attachment;
 import ph.com.guanzongroup.integsys.model.ModelTableDetail;
-import ph.com.guanzongroup.integsys.model.ModelTableMain;
 import ph.com.guanzongroup.integsys.utility.CustomCommonUtil;
 import ph.com.guanzongroup.integsys.utility.JFXUtil;
 
@@ -84,16 +81,12 @@ public class CheckDepositSupplier_HistoryController implements Initializable, Sc
     private int pnDetail = 0;
     private int pnAttachment;
     private final JFXUtil.ImageViewer imageviewerutil = new JFXUtil.ImageViewer();
-    private int pnDetailJE = 0;
     private int currentIndex = 0;
     private ObservableList<ModelTableDetail> detail_data = FXCollections.observableArrayList();
     private final ObservableList<ModelDeliveryAcceptance_Attachment> attachment_data = FXCollections.observableArrayList();
     ObservableList<String> documentType = ModelDeliveryAcceptance_Attachment.documentType;
     Scene scene = null;
-    private FileChooser fileChooser;
     private boolean pbEntered = false;
-    private boolean pbEnteredJE = false;
-    private FilteredList<ModelTableMain> filteredData;
     JFXUtil.ReloadableTableTask loadTableDetail, loadTableAttachment;
     AtomicReference<Object> lastFocusedTextField = new AtomicReference<>();
     AtomicReference<Object> previousSearchedTextField = new AtomicReference<>();
@@ -180,7 +173,7 @@ public class CheckDepositSupplier_HistoryController implements Initializable, Sc
                     poController.Master().setIndustryId(psIndustryId);
                     poController.Master().setCompany(psCompanyId);
 //                    poController.setIndustryId(psIndustryId);
-//                    poController.setCompanyId(psCompanyId);
+                    poController.setCompanyId(psCompanyId);
 //                poController.setCategoryID(psCategoryId);
 //                    poController.Master().setBranchCode(oApp.getBranchCode());
                     loadRecordSearch();
@@ -211,7 +204,6 @@ public class CheckDepositSupplier_HistoryController implements Initializable, Sc
             switch (tabTitle) {
                 case "Check Deposit":
                     if (pnEditMode == EditMode.UNKNOWN) {
-                        pnDetailJE = 0;
                     } else {
                         loadRecordMaster();
                     }
@@ -497,7 +489,6 @@ public class CheckDepositSupplier_HistoryController implements Initializable, Sc
     }
 
     public void initAttachmentsGrid() {
-        /*FOCUS ON FIRST ROW*/
         JFXUtil.setColumnCenter(tblRowNoAttachment);
         JFXUtil.setColumnLeft(tblFileNameAttachment);
         JFXUtil.setColumnsIndexAndDisableReordering(tblAttachments);

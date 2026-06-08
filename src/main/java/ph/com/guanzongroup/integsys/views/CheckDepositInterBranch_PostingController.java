@@ -54,12 +54,12 @@ import javax.script.ScriptException;
 import org.guanzon.appdriver.agent.ShowMessageFX;
 import org.guanzon.appdriver.base.CommonUtils;
 import org.guanzon.appdriver.base.GRiderCAS;
-import org.guanzon.appdriver.base.LogWrapper;
-import org.guanzon.appdriver.constant.EditMode;
 import org.guanzon.appdriver.base.GuanzonException;
+import org.guanzon.appdriver.base.LogWrapper;
 import org.guanzon.appdriver.base.MiscUtil;
 import org.guanzon.appdriver.base.SQLUtil;
 import org.guanzon.appdriver.constant.DocumentType;
+import org.guanzon.appdriver.constant.EditMode;
 import org.guanzon.appdriver.constant.RecordStatus;
 import org.json.simple.JSONObject;
 import ph.com.guanzongroup.cas.cashflow.CheckDeposit;
@@ -107,6 +107,7 @@ public class CheckDepositInterBranch_PostingController implements Initializable,
     private boolean pbEntered = false;
     private boolean pbEnteredJE = false;
     private FilteredList<ModelTableMain> filteredData;
+    private boolean tooltipShown = false;
     JFXUtil.ReloadableTableTask loadTableMain, loadTableDetail, loadTableDetailJE, loadTableAttachment;
     private String psSearchDate = "";
 
@@ -193,7 +194,7 @@ public class CheckDepositInterBranch_PostingController implements Initializable,
                     poController.Master().setIndustryId(psIndustryId);
                     poController.Master().setCompany(psCompanyId);
 //                    poController.setIndustryId(psIndustryId);
-//                    poController.setCompanyId(psCompanyId);
+                    poController.setCompanyId(psCompanyId);
 //                poController.setCategoryID(psCategoryId);
 //                    poController.Master().setBranchCode(oApp.getBranchCode());
                     loadRecordSearch();
@@ -419,7 +420,7 @@ public class CheckDepositInterBranch_PostingController implements Initializable,
                     ShowMessageFX.Warning(null, pxeModuleName, "Button is not registered, Please contact admin to assist about the unregistered button");
                     break;
             }
-            if (JFXUtil.isObjectEqualTo(lsButton, "btnConfirm", "btnSave", "btnCancel", "btnVoid", "btnApprove",  "btnPost")) {
+            if (JFXUtil.isObjectEqualTo(lsButton, "btnConfirm", "btnSave", "btnCancel", "btnVoid", "btnApprove", "btnPost")) {
                 pbIsCheckedJournalTab = false;
                 poController.resetTransaction();
                 clearTextFields();
@@ -1024,6 +1025,10 @@ public class CheckDepositInterBranch_PostingController implements Initializable,
                                 loadTableMain.reload();
                                 break;
                             case "tfSearchTransNo":
+                                if (!tooltipShown) {
+                                    JFXUtil.showTooltip("NOTE: Results appear directly in the table view, no pop-up dialog.", tfSearchTransNo);
+                                    tooltipShown = true;
+                                }
                                 loadTableMain.reload();
                                 break;
                         }
@@ -1184,7 +1189,6 @@ public class CheckDepositInterBranch_PostingController implements Initializable,
     }
 
     private void initButton(int fnValue) {
-        boolean lbShow1 = (fnValue == EditMode.UPDATE);
         boolean lbShow2 = (fnValue == EditMode.READY);
         boolean lbShow3 = (fnValue == EditMode.UNKNOWN || fnValue == EditMode.READY);
 

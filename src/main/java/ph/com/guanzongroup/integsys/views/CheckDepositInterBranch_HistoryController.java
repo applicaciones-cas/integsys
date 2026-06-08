@@ -4,8 +4,6 @@ import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Level;
@@ -50,12 +48,12 @@ import javax.script.ScriptException;
 import org.guanzon.appdriver.agent.ShowMessageFX;
 import org.guanzon.appdriver.base.CommonUtils;
 import org.guanzon.appdriver.base.GRiderCAS;
-import org.guanzon.appdriver.base.LogWrapper;
-import org.guanzon.appdriver.constant.EditMode;
 import org.guanzon.appdriver.base.GuanzonException;
+import org.guanzon.appdriver.base.LogWrapper;
 import org.guanzon.appdriver.base.MiscUtil;
 import org.guanzon.appdriver.base.SQLUtil;
 import org.guanzon.appdriver.constant.DocumentType;
+import org.guanzon.appdriver.constant.EditMode;
 import org.guanzon.appdriver.constant.RecordStatus;
 import org.json.simple.JSONObject;
 import ph.com.guanzongroup.cas.cashflow.CheckDeposit;
@@ -186,7 +184,7 @@ public class CheckDepositInterBranch_HistoryController implements Initializable,
                     poController.Master().setIndustryId(psIndustryId);
                     poController.Master().setCompany(psCompanyId);
 //                    poController.setIndustryId(psIndustryId);
-//                    poController.setCompanyId(psCompanyId);
+                    poController.setCompanyId(psCompanyId);
 //                poController.setCategoryID(psCategoryId);
 //                    poController.Master().setBranchCode(oApp.getBranchCode());
                     loadRecordSearch();
@@ -276,7 +274,7 @@ public class CheckDepositInterBranch_HistoryController implements Initializable,
     private void initDatePicker() {
         JFXUtil.setDatePickerFormat("MM/dd/yyyy", dpTransactionDate, dpTransactionReferDate, dpCheckDate, dpJournalTransactionDate, dpReportMonthYear);
     }
-    
+
     public void initComboboxes() {
         // ComboBox setup
         cmbAttachmentType.setItems(documentType);
@@ -992,7 +990,7 @@ public class CheckDepositInterBranch_HistoryController implements Initializable,
         JFXUtil.setDisabled(true, apMaster, apDetail, apJournalMaster, apJournalDetails, apAttachments);
         JFXUtil.setButtonsVisibility(true, btnBrowse);
         JFXUtil.setButtonsVisibility(false, btnPrint);
-        
+
         if (fnValue != EditMode.READY) {
             return;
         }

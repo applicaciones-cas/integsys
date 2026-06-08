@@ -22,14 +22,12 @@ import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.collections.transformation.FilteredList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
@@ -62,12 +60,12 @@ import org.guanzon.appdriver.agent.ShowDialogFX;
 import org.guanzon.appdriver.agent.ShowMessageFX;
 import org.guanzon.appdriver.base.CommonUtils;
 import org.guanzon.appdriver.base.GRiderCAS;
-import org.guanzon.appdriver.base.LogWrapper;
-import org.guanzon.appdriver.constant.EditMode;
 import org.guanzon.appdriver.base.GuanzonException;
+import org.guanzon.appdriver.base.LogWrapper;
 import org.guanzon.appdriver.base.MiscUtil;
 import org.guanzon.appdriver.base.SQLUtil;
 import org.guanzon.appdriver.constant.DocumentType;
+import org.guanzon.appdriver.constant.EditMode;
 import org.guanzon.appdriver.constant.RecordStatus;
 import org.guanzon.appdriver.constant.UserRight;
 import org.json.simple.JSONObject;
@@ -104,17 +102,13 @@ public class CheckDepositSupplier_EntryController implements Initializable, Scre
     List<Pair<String, String>> plOrderNoPartial = new ArrayList<>();
     List<Pair<String, String>> plOrderNoFinal = new ArrayList<>();
     private final JFXUtil.ImageViewer imageviewerutil = new JFXUtil.ImageViewer();
-    private int pnDetailJE = 0;
     private int currentIndex = 0;
     private ObservableList<ModelTableMain> main_data = FXCollections.observableArrayList();
     private ObservableList<ModelTableDetail> detail_data = FXCollections.observableArrayList();
     private final ObservableList<ModelDeliveryAcceptance_Attachment> attachment_data = FXCollections.observableArrayList();
     ObservableList<String> documentType = ModelDeliveryAcceptance_Attachment.documentType;
-    Scene scene = null;
     private FileChooser fileChooser;
     private boolean pbEntered = false;
-    private boolean pbEnteredJE = false;
-    private FilteredList<ModelTableMain> filteredData;
     JFXUtil.ReloadableTableTask loadTableMain, loadTableDetail, loadTableAttachment;
     AtomicReference<Object> lastFocusedTextField = new AtomicReference<>();
     AtomicReference<Object> previousSearchedTextField = new AtomicReference<>();
@@ -202,7 +196,7 @@ public class CheckDepositSupplier_EntryController implements Initializable, Scre
                     poController.Master().setIndustryId(psIndustryId);
                     poController.Master().setCompany(psCompanyId);
 //                    poController.setIndustryId(psIndustryId);
-//                    poController.setCompanyId(psCompanyId);
+                    poController.setCompanyId(psCompanyId);
 //                poController.setCategoryID(psCategoryId);
 //                    poController.Master().setBranchCode(oApp.getBranchCode());
                     loadRecordSearch();
@@ -241,7 +235,6 @@ public class CheckDepositSupplier_EntryController implements Initializable, Scre
             switch (tabTitle) {
                 case "Check Deposit":
                     if (pnEditMode == EditMode.UNKNOWN) {
-                        pnDetailJE = 0;
                     } else {
                         loadRecordMaster();
                     }
@@ -538,7 +531,7 @@ public class CheckDepositSupplier_EntryController implements Initializable, Scre
 
                         //Limit maximum pages of pdf to add
                         if (imgPath2.toLowerCase().endsWith(".pdf")) {
-                            try (PDDocument document = PDDocument.load(selectedFile)) {
+                            try ( PDDocument document = PDDocument.load(selectedFile)) {
                                 PDFRenderer pdfRenderer = new PDFRenderer(document);
                                 int pageCount = document.getNumberOfPages();
                                 if (pageCount > 5) {
@@ -1205,16 +1198,32 @@ public class CheckDepositSupplier_EntryController implements Initializable, Scre
                             case "tfCheckTransNo":
                                 poJSON = poController.searchCheckPayment(lsValue, tfCheckNo.getText(), true);
                                 if ("error".equals(poJSON.get("result"))) {
+                                    int lnReturned = Integer.parseInt(String.valueOf(poJSON.get("row")));
+                                    JFXUtil.runWithDelay(0.70, () -> {
+                                        pnDetail = lnReturned;
+                                        loadTableDetail.reload();
+                                    });
                                     ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                                    break;
+                                } else {
+                                    pnDetail = Integer.parseInt(String.valueOf(poJSON.get("row")));
+                                    loadTableDetail.reload();
                                 }
-                                loadTableDetail.reload();
                                 return;
                             case "tfCheckNo":
                                 poJSON = poController.searchCheckPayment(tfCheckTransNo.getText(), lsValue, false);
                                 if ("error".equals(poJSON.get("result"))) {
+                                    int lnReturned = Integer.parseInt(String.valueOf(poJSON.get("row")));
+                                    JFXUtil.runWithDelay(0.70, () -> {
+                                        pnDetail = lnReturned;
+                                        loadTableDetail.reload();
+                                    });
                                     ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                                    break;
+                                } else {
+                                    pnDetail = Integer.parseInt(String.valueOf(poJSON.get("row")));
+                                    loadTableDetail.reload();
                                 }
-                                loadTableDetail.reload();
                                 return;
                         }
                         break;
