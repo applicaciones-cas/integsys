@@ -824,7 +824,7 @@ public class CheckDepositSupplier_PostingController implements Initializable, Sc
                         switch (txtFieldID) {
                             //apBrowse
                             case "tfSearchBankAccountNo":
-                                poJSON = poController.SearchBankAccount(tfSearchBankAccountNo.getText(), false, true);
+                                poJSON = poController.SearchBankAccount(tfSearchBankAccountNo.getText(), true, true);
                                 if (!"success".equals((String) poJSON.get("result"))) {
                                     ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                     return;

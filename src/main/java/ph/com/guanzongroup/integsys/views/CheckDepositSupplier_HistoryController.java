@@ -644,7 +644,7 @@ public class CheckDepositSupplier_HistoryController implements Initializable, Sc
                     case F3:
                         switch (txtFieldID) {
                             case "tfSearchBankAccountNo":
-                                poJSON = poController.SearchBankAccount(tfSearchBankAccountNo.getText(), false, true);
+                                poJSON = poController.SearchBankAccount(tfSearchBankAccountNo.getText(), true, true);
                                 if (!"success".equals((String) poJSON.get("result"))) {
                                     ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                     return;

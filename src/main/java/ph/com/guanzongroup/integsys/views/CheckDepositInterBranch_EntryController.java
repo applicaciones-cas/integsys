@@ -86,7 +86,7 @@ import ph.com.guanzongroup.integsys.utility.JFXUtil;
 /**
  * FXML Controller class
  *
- * @author Taem 1
+ * @author Team 1
  */
 public class CheckDepositInterBranch_EntryController implements Initializable, ScreenInterface {
 
