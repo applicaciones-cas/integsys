@@ -706,7 +706,7 @@ public class CheckDepositSupplier_EntryController implements Initializable, Scre
             JFXUtil.setStatusValue(lblStatus, CheckDepositStatus.class, pnEditMode == EditMode.UNKNOWN ? "-1" : poController.Master().getTransactionStatus());
 
             tfTransactionNo.setText(poController.Master().getTransactionNo());
-            tfBankMaster.setText(poController.Master().APClientBankAccount().Banks().getBankName());
+            tfBankMaster.setText(poController.Master().Banks().getBankName());
             tfBankAccountNo.setText(poController.Master().APClientBankAccount().getAccountNumber());
             tfBankAccountName.setText(poController.Master().APClientBankAccount().getAccountName());
             taRemarks.setText(poController.Master().getRemarks());

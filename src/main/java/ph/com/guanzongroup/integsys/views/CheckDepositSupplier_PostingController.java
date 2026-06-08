@@ -482,7 +482,7 @@ public class CheckDepositSupplier_PostingController implements Initializable, Sc
             JFXUtil.setStatusValue(lblStatus, CheckDepositStatus.class, pnEditMode == EditMode.UNKNOWN ? "-1" : poController.Master().getTransactionStatus());
 
             tfTransactionNo.setText(poController.Master().getTransactionNo());
-            tfBankMaster.setText(poController.Master().APClientBankAccount().Banks().getBankName());
+            tfBankMaster.setText(poController.Master().Banks().getBankName());
             tfBankAccountNo.setText(poController.Master().APClientBankAccount().getAccountNumber());
             tfBankAccountName.setText(poController.Master().APClientBankAccount().getAccountName());
             taRemarks.setText(poController.Master().getRemarks());
@@ -711,8 +711,8 @@ public class CheckDepositSupplier_PostingController implements Initializable, Sc
                                                     String.valueOf(lnCntr + 1),
                                                     poController.TransactionList(lnCntr).getTransactionNo(),
                                                     CustomCommonUtil.formatDateToShortString(poController.TransactionList(lnCntr).getTransactionDate()),
-                                                    poController.TransactionList(lnCntr).BankAccount().getAccountNo(),
-                                                    poController.TransactionList(lnCntr).BankAccount().getAccountName(),
+                                                    poController.TransactionList(lnCntr).APClientBankAccount().getAccountNumber(),
+                                                    poController.TransactionList(lnCntr).APClientBankAccount().getAccountName(),
                                                     "", "", "", "", ""
                                             ));
                                             if (poController.TransactionList(lnCntr).getTransactionStatus().equals(CheckDepositStatus.VOID)) {
