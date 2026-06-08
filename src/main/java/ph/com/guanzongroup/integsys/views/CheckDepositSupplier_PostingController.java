@@ -97,6 +97,7 @@ public class CheckDepositSupplier_PostingController implements Initializable, Sc
     ObservableList<String> documentType = ModelDeliveryAcceptance_Attachment.documentType;
     private boolean pbEntered = false;
     private FilteredList<ModelTableMain> filteredData;
+    private boolean tooltipShown = false;
     JFXUtil.ReloadableTableTask loadTableMain, loadTableDetail, loadTableAttachment;
     private String psSearchDate = "";
 
@@ -833,6 +834,10 @@ public class CheckDepositSupplier_PostingController implements Initializable, Sc
                                 loadTableMain.reload();
                                 break;
                             case "tfSearchTransNo":
+                                if (!tooltipShown) {
+                                    JFXUtil.showTooltip("NOTE: Results appear directly in the table view, no pop-up dialog.", tfSearchTransNo);
+                                    tooltipShown = true;
+                                }
                                 loadTableMain.reload();
                                 break;
                         }
