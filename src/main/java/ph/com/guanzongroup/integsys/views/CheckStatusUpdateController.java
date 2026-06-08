@@ -374,9 +374,7 @@ public class CheckStatusUpdateController implements Initializable, ScreenInterfa
             }
             initFields(pnEditMode);
             initButton(pnEditMode);
-        } catch (CloneNotSupportedException | SQLException | GuanzonException ex) {
-            Logger.getLogger(CheckStatusUpdateController.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (ParseException | ScriptException ex) {
+        } catch (CloneNotSupportedException | SQLException | GuanzonException | ParseException | ScriptException ex) {
             Logger.getLogger(CheckStatusUpdateController.class.getName()).log(Level.SEVERE, null, ex);
         } catch (Exception ex) {
             Logger.getLogger(CheckStatusUpdateController.class.getName()).log(Level.SEVERE, null, ex);
@@ -902,8 +900,8 @@ public class CheckStatusUpdateController implements Initializable, ScreenInterfa
             case CheckStatus.STOP_PAYMENT:
                 row09.setPrefHeight(30);
                 row09.setMaxHeight(30);
-                CustomCommonUtil.setVisible(true, dpHoldUntil, lblHoldUntil, taRemarks, lblRemarks);
-                CustomCommonUtil.setManaged(true, dpHoldUntil, lblHoldUntil, taRemarks, lblRemarks);
+                CustomCommonUtil.setVisible(true,  lblHoldUntil, taRemarks, lblRemarks);
+                CustomCommonUtil.setManaged(true,  lblHoldUntil, taRemarks, lblRemarks);
                 dpHoldUntil.setValue(LocalDate.now());
                 CustomCommonUtil.setDisable(!lbShow, dpHoldUntil);
                 break;
