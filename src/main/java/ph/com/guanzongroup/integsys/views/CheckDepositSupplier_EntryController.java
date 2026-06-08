@@ -706,11 +706,9 @@ public class CheckDepositSupplier_EntryController implements Initializable, Scre
             JFXUtil.setStatusValue(lblStatus, CheckDepositStatus.class, pnEditMode == EditMode.UNKNOWN ? "-1" : poController.Master().getTransactionStatus());
 
             tfTransactionNo.setText(poController.Master().getTransactionNo());
-            String lsBank = JFXUtil.isObjectEqualTo(poController.Master().Banks().getBankName(), null, "")
-                    ? poController.Master().BankAccount().Banks().getBankName() : poController.Master().Banks().getBankName();
-            tfBankMaster.setText(lsBank);
-            tfBankAccountNo.setText(poController.Master().BankAccount().getAccountNo());
-            tfBankAccountName.setText(poController.Master().BankAccount().getAccountName());
+            tfBankMaster.setText(poController.Master().APClientBankAccount().Banks().getBankName());
+            tfBankAccountNo.setText(poController.Master().APClientBankAccount().getAccountNumber());
+            tfBankAccountName.setText(poController.Master().APClientBankAccount().getAccountName());
             taRemarks.setText(poController.Master().getRemarks());
             dpTransactionDate.setValue(CustomCommonUtil.parseDateStringToLocalDate(SQLUtil.dateFormat(poController.Master().getTransactionDate(), SQLUtil.FORMAT_SHORT_DATE)));
             dpTransactionReferDate.setValue(CustomCommonUtil.parseDateStringToLocalDate(SQLUtil.dateFormat(poController.Master().getTransactionReferDate(), SQLUtil.FORMAT_SHORT_DATE)));
