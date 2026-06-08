@@ -302,6 +302,8 @@ public class CheckDepositInterBranch_HistoryController implements Initializable,
                     poJSON = poController.PrintDepositSlip();
                     if ("error".equals((String) poJSON.get("result"))) {
                         ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                    } else {
+                        ShowMessageFX.Information(null, pxeModuleName, (String) poJSON.get("message"));
                     }
                     break;
                 case "btnHistory":

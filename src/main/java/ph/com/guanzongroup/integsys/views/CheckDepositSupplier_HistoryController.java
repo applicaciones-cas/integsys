@@ -255,6 +255,8 @@ public class CheckDepositSupplier_HistoryController implements Initializable, Sc
                     poJSON = poController.PrintDepositSlip();
                     if ("error".equals((String) poJSON.get("result"))) {
                         ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
+                    } else {
+                        ShowMessageFX.Information(null, pxeModuleName, (String) poJSON.get("message"));
                     }
                     break;
                 case "btnHistory":
