@@ -231,30 +231,32 @@
                                                             <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="28.0" vgrow="SOMETIMES" />
                                                          </rowConstraints>
                                                          <children>
-                                                            <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Bar Code" />
+                                                            <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Barcode" />
                                                             <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Description" GridPane.rowIndex="1" />
-                                                            <TextField fx:id="tfBarCode" GridPane.columnIndex="2" />
-                                                            <TextField fx:id="tfDescription" GridPane.columnIndex="2" GridPane.columnSpan="4" GridPane.rowIndex="1" />
                                                             <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Brand" GridPane.rowIndex="2" />
-                                                            <TextField fx:id="tfBrand" GridPane.columnIndex="2" GridPane.rowIndex="2" />
+                                                            <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Inv Type" GridPane.rowIndex="3" />
                                                             <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Measure" GridPane.columnIndex="3" GridPane.rowIndex="3" />
+                                                            <Text strokeType="OUTSIDE" strokeWidth="0.0" text="ROQ" GridPane.columnIndex="7" GridPane.rowIndex="1" />
+                                                            <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Class" GridPane.columnIndex="7" GridPane.rowIndex="2" />
+                                                            <Text strokeType="OUTSIDE" strokeWidth="0.0" text="QOH" GridPane.columnIndex="7" GridPane.rowIndex="3" />
+                                                            <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Cancelled Qty" GridPane.columnIndex="10" GridPane.rowIndex="1" />
                                                             <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Reservation Qty" GridPane.columnIndex="10" GridPane.rowIndex="2" />
-                                                            <TextField fx:id="tfMeasure" GridPane.columnIndex="5" GridPane.rowIndex="3" />
-                                                            <TextField fx:id="tfReservationQTY" GridPane.columnIndex="12" GridPane.rowIndex="2" />
                                                             <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Order Quantity" GridPane.columnIndex="10" GridPane.rowIndex="3">
                                                                <font>
                                                                   <Font name="System Bold" size="12.0" />
                                                                </font>
                                                             </Text>
-                                                            <TextField fx:id="tfOrderQuantity" GridPane.columnIndex="12" GridPane.rowIndex="3" />
-                                                            <Text strokeType="OUTSIDE" strokeWidth="0.0" text="QOH" GridPane.columnIndex="7" GridPane.rowIndex="3" />
-                                                            <TextField fx:id="tfQOH" GridPane.columnIndex="9" GridPane.rowIndex="3" />
-                                                            <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Inv Type" GridPane.rowIndex="3" />
+                                                            <TextField fx:id="tfBarCode" GridPane.columnIndex="2" />
+                                                            <TextField fx:id="tfDescription" GridPane.columnIndex="2" GridPane.columnSpan="4" GridPane.rowIndex="1" />
+                                                            <TextField fx:id="tfBrand" GridPane.columnIndex="2" GridPane.rowIndex="2" />
                                                             <TextField fx:id="tfInvType" GridPane.columnIndex="2" GridPane.rowIndex="3" />
-                                                            <Text strokeType="OUTSIDE" strokeWidth="0.0" text="ROQ" GridPane.columnIndex="7" GridPane.rowIndex="1" />
+                                                            <TextField fx:id="tfMeasure" GridPane.columnIndex="5" GridPane.rowIndex="3" />
                                                             <TextField fx:id="tfROQ" GridPane.columnIndex="9" GridPane.rowIndex="1" />
-                                                            <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Class" GridPane.columnIndex="7" GridPane.rowIndex="2" />
                                                             <TextField fx:id="tfClassification" GridPane.columnIndex="9" GridPane.rowIndex="2" />
+                                                            <TextField fx:id="tfQOH" GridPane.columnIndex="9" GridPane.rowIndex="3" />
+                                                            <TextField fx:id="tfCancelledQTY" GridPane.columnIndex="12" GridPane.rowIndex="1" />
+                                                            <TextField fx:id="tfReservationQTY" GridPane.columnIndex="12" GridPane.rowIndex="2" />
+                                                            <TextField fx:id="tfOrderQuantity" GridPane.columnIndex="12" GridPane.rowIndex="3" />
                                                          </children>
                                                       </GridPane>
                                                    </children>
@@ -276,7 +278,7 @@
                                              <children>
                                                 <TableView fx:id="tblViewOrderDetails" maxHeight="1.7976931348623157E308" prefWidth="1176.0">
                                                    <columns>
-                                                      <TableColumn fx:id="tblBarCodeDetail" maxWidth="120.0" minWidth="120.0" prefWidth="120.0" resizable="false" text="Bar Code" />
+                                                      <TableColumn fx:id="tblBarCodeDetail" maxWidth="120.0" minWidth="120.0" prefWidth="120.0" resizable="false" text="Barcode" />
                                                       <TableColumn fx:id="tblDescriptionDetail" maxWidth="260.0" minWidth="260.0" prefWidth="260.0" resizable="false" text="Description" />
                                                       <TableColumn fx:id="tblBrandDetail" maxWidth="120.0" minWidth="120.0" prefWidth="120.0" resizable="false" text="Brand" />
                                                       <TableColumn fx:id="tblInvTypeDetail" maxWidth="120.0" minWidth="120.0" prefWidth="120.0" resizable="false" text="Inv Type" />

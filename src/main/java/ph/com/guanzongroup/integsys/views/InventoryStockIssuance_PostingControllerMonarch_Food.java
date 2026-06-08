@@ -193,6 +193,9 @@ public class InventoryStockIssuance_PostingControllerMonarch_Food implements Ini
                         ShowMessageFX.Information("Please input date received before proceeding..", "Inventory Stock Issuance Posting", "");
                         return;
                     }
+                    if (ShowMessageFX.YesNo(null, psFormName, "Are you sure you want to post transaction?") != true) {
+                        return;
+                    }
                     if (!isJSONSuccess(poAppController.PostTransaction(), "Initialize Post Transaction")) {
                         return;
                     }
@@ -203,10 +206,27 @@ public class InventoryStockIssuance_PostingControllerMonarch_Food implements Ini
                     break;
 
                 case "btnHistory":
-                    ShowMessageFX.Information(null, psFormName,
-                            "This feature is under development and will be available soon.\nThank you for your patience!");
-                    return;
+                    if (pnEditMode != EditMode.READY && pnEditMode != EditMode.UPDATE) {
+                        ShowMessageFX.Warning("No transaction status history to load!", psFormName, null);
+                        return;
+                    }
+
+                    try {
+                        poAppController.ShowStatusHistory();
+                    } catch (NullPointerException npe) {
+                        Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(npe), npe);
+                        ShowMessageFX.Error("No transaction status history to load!", psFormName, null);
+                    } catch (Exception ex) {
+                        Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
+                        ShowMessageFX.Error(MiscUtil.getException(ex), psFormName, null);
+                    }
+                    break;
                 case "btnRetrieve":
+
+                    if (lastFocusedControl == null) {
+                        loadTransaction("", "d.sBranchNm");
+                        break;
+                    }
                     switch (lastFocusedControl.getId()) {
                         //Master Retrieve
                         case "tfSearchSource":
@@ -215,6 +235,9 @@ public class InventoryStockIssuance_PostingControllerMonarch_Food implements Ini
 
                         case "tfSearchTransaction":
                             loadTransaction(tfSearchTransaction.getText(), "a.sTransNox");
+                            break;
+                        default:
+                            loadTransaction(tfSearchSource.getText(), "d.sBranchNm");
                             break;
                     }
                     break;
@@ -260,6 +283,10 @@ public class InventoryStockIssuance_PostingControllerMonarch_Food implements Ini
 
                 }
                 getLoadedTransaction();
+
+                dpReceivedDate.requestFocus();
+                poAppController.UpdateTransactionPosting();
+                initButtonDisplay(poAppController.getEditMode());
             } catch (CloneNotSupportedException | SQLException | GuanzonException ex) {
 
                 Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
@@ -411,13 +438,28 @@ public class InventoryStockIssuance_PostingControllerMonarch_Food implements Ini
         }
     }
 
-    private void initButtonDisplay(int fnEditMode) {
-        boolean lbShow = (fnEditMode == EditMode.ADDNEW || fnEditMode == EditMode.UPDATE);
+      private void initButtonDisplay(int fnEditMode) {
+        boolean lbEditing = (fnEditMode == EditMode.ADDNEW || fnEditMode == EditMode.UPDATE);
 
-        // Always show these buttons
-        initButtonControls(true, "btnHistory", "btnPost", "btnRetrieve", "btnClose");
-        apMaster.setDisable(!lbShow);
-        apDetail.setDisable(!lbShow);
+        String lsTransNo = tfTransactionNo.getText();
+        boolean lbHasTransaction = lsTransNo != null && !lsTransNo.isEmpty();
+        boolean lbIsPosted= lbHasTransaction
+                && "2".equals(poAppController.getMaster().getTransactionStatus());
+
+        // Always visible
+        initButtonControls(true, "btnRetrieve", "btnClose");
+
+        // Editing mode buttons
+        initButtonControls(!lbEditing, "btnBrowse");
+
+        // Transaction-dependent buttons (only when not editing)
+        initButtonControls(lbEditing && lbHasTransaction,  "btnHistory");
+        initButtonControls(lbEditing && lbHasTransaction && !lbIsPosted,  "btnPost");
+
+        // Disable panes during editing
+        apMaster.setDisable(!lbEditing);
+        apDetail.setDisable(!lbEditing);
+        
     }
 
     final ChangeListener<? super Boolean> txtField_Focus = (o, ov, nv) -> {
@@ -501,6 +543,7 @@ public class InventoryStockIssuance_PostingControllerMonarch_Food implements Ini
                                 }
 
                                 getLoadedTransaction();
+                                dpReceivedDate.requestFocus();
                                 initButtonDisplay(poAppController.getEditMode());
 
                                 return;
@@ -511,6 +554,8 @@ public class InventoryStockIssuance_PostingControllerMonarch_Food implements Ini
                                     return;
                                 }
                                 getLoadedTransaction();
+
+                                dpReceivedDate.requestFocus();
                                 initButtonDisplay(poAppController.getEditMode());
                                 return;
                             default:
@@ -675,6 +720,9 @@ public class InventoryStockIssuance_PostingControllerMonarch_Food implements Ini
 
         dpReceivedDate.setValue(
                 poAppController.getMaster().getReceivedDate() != null ? ParseDate(poAppController.getMaster().getReceivedDate()) : LocalDate.now());
+        if (poAppController.getMaster().getReceivedDate() == null) {
+            poAppController.getMaster().setReceivedDate(LocalDateTime.now());
+        }
         taRemarks.setText(poAppController.getMaster().getRemarks());
         lblStatus.setText(InventoryStockIssuanceStatus.STATUS.get(Integer.parseInt(poAppController.getMaster().getTransactionStatus())));
         lblSource.setText(poAppController.getMaster().Company().getCompanyName() + " - " + poAppController.getMaster().Industry().getDescription());
