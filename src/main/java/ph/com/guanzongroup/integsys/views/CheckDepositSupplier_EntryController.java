@@ -318,6 +318,13 @@ public class CheckDepositSupplier_EntryController implements Initializable, Scre
                                                     poJSON.put("result", "error");
                                                     poJSON.put("message", "User is not an authorized approving officer.");
                                                     pbSuccess = false;
+                                                } else {
+                                                    String lsReferDate = sdfFormat.format(poController.Master().getTransactionDate());
+                                                    LocalDate ldReferDate = LocalDate.parse(lsReferDate,
+                                                            DateTimeFormatter.ofPattern(SQLUtil.FORMAT_SHORT_DATE));
+                                                    if (pbSuccess && (ldReferDate.isBefore(ldSelectedDate))) {
+                                                        poController.Master().setTransactionReferDate((SQLUtil.toDate(lsSelectedDate, SQLUtil.FORMAT_SHORT_DATE)));
+                                                    }
                                                 }
                                             }
                                         } else {
