@@ -343,9 +343,9 @@ public class CheckDepositSupplier_EntryController implements Initializable, Scre
                             LocalDate ldTransactionDate = LocalDate.parse(lsTransDate1,
                                     DateTimeFormatter.ofPattern(SQLUtil.FORMAT_SHORT_DATE));
 
-                            if (pbSuccess && (ldSelectedDate.isAfter(ldTransactionDate))) {
+                            if (pbSuccess && (ldSelectedDate.isBefore(ldTransactionDate))) {
                                 poJSON.put("result", "error");
-                                poJSON.put("message", "Reference date cannot be later than the Check deposit date.");
+                                poJSON.put("message", "Reference date cannot be before the Check deposit date.");
                                 pbSuccess = false;
                             }
 
