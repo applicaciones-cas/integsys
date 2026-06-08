@@ -1209,7 +1209,7 @@ public class CheckDepositSupplier_EntryController implements Initializable, Scre
                                 }
                                 return;
                             case "tfCheckNo":
-                                poJSON = poController.searchCheckPayment(tfCheckTransNo.getText(), lsValue, false);
+                                poJSON = poController.searchCheckPayment(tfCheckNo.getText(), lsValue, false);
                                 if ("error".equals(poJSON.get("result"))) {
                                     int lnReturned = Integer.parseInt(String.valueOf(poJSON.get("row")));
                                     JFXUtil.runWithDelay(0.70, () -> {
