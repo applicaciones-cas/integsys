@@ -49,6 +49,7 @@ import javafx.concurrent.Task;
 import static javafx.scene.input.KeyCode.ENTER;
 import static javafx.scene.input.KeyCode.F3;
 import static javafx.scene.input.KeyCode.TAB;
+import org.guanzon.appdriver.base.CommonUtils;
 import org.guanzon.appdriver.base.GuanzonException;
 import org.guanzon.appdriver.base.MiscUtil;
 import org.json.simple.JSONObject;
@@ -199,6 +200,7 @@ public class InventoryStockIssuanceNeoController_HistoryAppliance implements Ini
                 }
 
                 getLoadedTransaction();
+                initButtonDisplay(poAppController.getEditMode());
             } catch (CloneNotSupportedException | SQLException | GuanzonException ex) {
                 Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
                 ShowMessageFX.Error(MiscUtil.getException(ex), psFormName, null);
@@ -312,9 +314,10 @@ public class InventoryStockIssuanceNeoController_HistoryAppliance implements Ini
                     break;
                 case "btnRetrieve":
                     if (lastFocusedControl == null) {
-                        ShowMessageFX.Information(null, psFormName,
-                                "Search unavailable. Please ensure a searchable field is selected or focused before proceeding..");
-                        return;
+                        loadTransactionMasterList(tfSearchSourceno.getText(), "e.sBranchNm");
+//                            getLoadedTransaction();
+                        initButtonDisplay(poAppController.getEditMode());
+                        break;
                     }
 
                     switch (lastFocusedControl.getId()) {
@@ -327,6 +330,11 @@ public class InventoryStockIssuanceNeoController_HistoryAppliance implements Ini
                         case "tfSearchTransNo":
 
                             loadTransactionMasterList(tfSearchTransNo.getText(), "a.sTransNox");
+//                            getLoadedTransaction();
+                            initButtonDisplay(poAppController.getEditMode());
+                            break;
+                        default:
+                            loadTransactionMasterList(tfSearchSourceno.getText(), "e.sBranchNm");
 //                            getLoadedTransaction();
                             initButtonDisplay(poAppController.getEditMode());
                             break;
@@ -471,7 +479,7 @@ public class InventoryStockIssuanceNeoController_HistoryAppliance implements Ini
                 });
                 tblColBranch.setCellValueFactory(loModel -> {
                     try {
-                        return new SimpleStringProperty(String.valueOf(loModel.getValue().Branch().getBranchName()));
+                        return new SimpleStringProperty(String.valueOf(loModel.getValue().BranchDestination().getBranchName()));
                     } catch (Exception e) {
                         poLogWrapper.severe(psFormName, e.getMessage());
                         return new SimpleStringProperty("");
@@ -506,8 +514,8 @@ public class InventoryStockIssuanceNeoController_HistoryAppliance implements Ini
 
     private void loadTransactionMaster() {
         try {
-            lblSource.setText(poAppController.getMaster().Company().getCompanyName() == null ? "" : (poAppController.getMaster().Company().getCompanyName() + " - ")
-                    + poAppController.getMaster().Industry().getDescription() == null ? "" : poAppController.getMaster().Industry().getDescription());
+            lblSource.setText((poAppController.getMaster().Company().getCompanyName() == null ? "" : (poAppController.getMaster().Company().getCompanyName() + " - "))
+                    + (poAppController.getMaster().Industry().getDescription() == null ? "" : poAppController.getMaster().Industry().getDescription()));
             lblStatus.setText(InventoryStockIssuanceStatus.STATUS.get(Integer.parseInt(poAppController.getMaster().getTransactionStatus())) == null ? "STATUS"
                     : InventoryStockIssuanceStatus.STATUS.get(Integer.parseInt(poAppController.getMaster().getTransactionStatus())));
 
@@ -517,10 +525,14 @@ public class InventoryStockIssuanceNeoController_HistoryAppliance implements Ini
             tfTrucking.setText(poAppController.getMaster().TruckingCompany().getCompanyName());
             tfDiscountRate.setText(String.valueOf(poAppController.getMaster().getFreight()));
             tfDiscountAmount.setText(String.valueOf(poAppController.getMaster().getDiscount()));
-            tfTotal.setText(String.valueOf(poAppController.getMaster().getTransactionTotal()));
-            cbDelType.getSelectionModel().select(Integer.parseInt(poAppController.getMaster().getDeliveryType()));
+            tfTotal.setText(CommonUtils.NumberFormat(poAppController.getMaster().getTransactionTotal(), "###,###,##0.00"));
+            taRemarks.setText(poAppController.getMaster().getRemarks());
 
-            if (tfTransNo.getText().trim().isEmpty()) {
+            cbDelType.getSelectionModel()
+                    .select(Integer.parseInt(poAppController.getMaster().getDeliveryType()));
+
+            if (tfTransNo.getText()
+                    .trim().isEmpty()) {
                 lblStatus.setText("UNKNOWN");
             }
         } catch (SQLException | GuanzonException e) {
@@ -618,6 +630,9 @@ public class InventoryStockIssuanceNeoController_HistoryAppliance implements Ini
         pnEditMode = poAppController.getEditMode();
         loadDeliveryTypes();
         initButtonDisplay(poAppController.getEditMode());
+        if (tfTransNo.getText().trim().isEmpty()) {
+            lblStatus.setText("UNKNOWN");
+        }
     }
 
     private void initButtonDisplay(int fnEditMode) {
@@ -775,25 +790,29 @@ public class InventoryStockIssuanceNeoController_HistoryAppliance implements Ini
         String result = (String) loJSON.get("result");
         if ("error".equals(result)) {
             String message = (String) loJSON.get("message");
-            poLogWrapper.severe(psFormName + " :" + message);
-            Platform.runLater(() -> {
-                if (message != null) {
+            if (message != null) {
+                poLogWrapper.severe(psFormName + " :" + message);
+                if (Platform.isFxApplicationThread()) {
                     ShowMessageFX.Warning(null, psFormName, message);
+                } else {
+                    Platform.runLater(() -> ShowMessageFX.Warning(null, psFormName, message));
                 }
-            });
+            }
             return false;
         }
-        String message = (String) loJSON.get("message");
 
+        String message = (String) loJSON.get("message");
         poLogWrapper.severe(psFormName + " :" + message);
-        Platform.runLater(() -> {
-            if (message != null) {
+        if (message != null) {
+            if (Platform.isFxApplicationThread()) {
                 ShowMessageFX.Information(null, psFormName, message);
+            } else {
+                Platform.runLater(() -> ShowMessageFX.Information(null, psFormName, message));
             }
-        });
+        }
+
         poLogWrapper.info(psFormName + " : Success on " + fsModule);
         return true;
-
     }
 
     private LocalDate ParseDate(Date date) {

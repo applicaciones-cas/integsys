@@ -87,7 +87,7 @@ public class InvRequest_Roq_HistoryControllerMC implements Initializable, Screen
     private int pnEditMode;
 
     @FXML
-    private TextField tfReservationQTY, tfOrderQuantity, tfTransactionNo, tfReferenceNo,
+    private TextField tfReservationQTY, tfOrderQuantity, tfCancelledQTY, tfTransactionNo, tfReferenceNo,
             tfSearchTransNo, tfSearchReferenceNo;
     @FXML
     private TableColumn<ModelInvOrderDetail, String> tblBrandDetail, tblModelDetail, tblVariantDetail, tblColorDetail, tblInvTypeDetail, tblROQDetail, tblClassificationDetail, tblQOHDetail, tblReservationQtyDetail, tblOrderQuantityDetail;
@@ -95,7 +95,7 @@ public class InvRequest_Roq_HistoryControllerMC implements Initializable, Screen
     private TextField tfBrand, tfModel, tfInvType,
             tfVariant, tfColor, tfROQ, tfClassification, tfQOH;
     @FXML
-    private Button btnBrowse, btnRetrieve, btnClose, btnTransHistory,btnPrint;
+    private Button btnBrowse, btnRetrieve, btnClose, btnTransHistory, btnPrint;
     @FXML
     private Label lblTransactionStatus, lblSource;
     @FXML
@@ -180,7 +180,7 @@ public class InvRequest_Roq_HistoryControllerMC implements Initializable, Screen
     private void clearDetailFields() {
         /* Detail Fields*/
         CustomCommonUtil.setText("", tfBrand, tfModel,
-                tfColor, tfReservationQTY, tfQOH, tfInvType, tfVariant, tfROQ, tfClassification);
+                tfColor, tfReservationQTY, tfCancelledQTY, tfQOH, tfInvType, tfVariant, tfROQ, tfClassification);
         CustomCommonUtil.setText("0", tfOrderQuantity);
     }
 
@@ -525,7 +525,7 @@ public class InvRequest_Roq_HistoryControllerMC implements Initializable, Screen
 
     private void initButtonsClickActions() {
         List<Button> buttons = Arrays.asList(btnBrowse,
-                btnRetrieve, btnClose, btnTransHistory,btnPrint);
+                btnRetrieve, btnClose, btnTransHistory, btnPrint);
 
         buttons.forEach(button -> button.setOnAction(this::handleButtonAction));
     }
@@ -726,6 +726,12 @@ public class InvRequest_Roq_HistoryControllerMC implements Initializable, Screen
                 }
                 tfReservationQTY.setText(lsReservationQTY);
 
+                String lsCancelledQty = "0";
+
+                if (invRequestController.Detail(pnTblInvDetailRow).getCancelled() != 0) {
+                    lsCancelledQty = String.valueOf(invRequestController.Detail(pnTblInvDetailRow).getCancelled());
+                }
+                tfCancelledQTY.setText(lsCancelledQty);
                 String lsOrderQuantity = "0";
                 if (invRequestController.Detail(pnTblInvDetailRow).getQuantity() != 0) {
                     lsOrderQuantity = String.valueOf(invRequestController.Detail(pnTblInvDetailRow).getQuantity());
@@ -843,7 +849,7 @@ public class InvRequest_Roq_HistoryControllerMC implements Initializable, Screen
         CustomCommonUtil.setDisable(!lbShow,
                 tfOrderQuantity);
         CustomCommonUtil.setDisable(true,
-                tfInvType, tfVariant, tfColor, tfReservationQTY,
+                tfInvType, tfVariant, tfColor, tfReservationQTY, tfCancelledQTY,
                 tfQOH, tfROQ, tfClassification, tfModel, tfBrand);
         if (!tfReferenceNo.getText().isEmpty()) {
             dpTransactionDate.setDisable(!lbShow);

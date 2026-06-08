@@ -87,7 +87,7 @@ public class InvRequest_HistoryController implements Initializable, ScreenInterf
     private int pnEditMode;
 
     @FXML
-    private TextField tfReservationQTY, tfOrderQuantity, tfTransactionNo, tfReferenceNo,
+    private TextField tfReservationQTY, tfOrderQuantity, tfCancelledQTY, tfTransactionNo, tfReferenceNo,
             tfSearchTransNo, tfSearchReferenceNo, tfBarCode, tfDescription, tfMeasure;
     @FXML
     private TableColumn<ModelInvOrderDetail, String> tblBrandDetail, tblBarCodeDetail, tblDescriptionDetail, tblModelDetail, tblVariantDetail, tblColorDetail, tblInvTypeDetail, tblROQDetail, tblClassificationDetail, tblQOHDetail, tblReservationQtyDetail, tblOrderQuantityDetail;
@@ -95,7 +95,7 @@ public class InvRequest_HistoryController implements Initializable, ScreenInterf
     private TextField tfBrand, tfModel, tfInvType,
             tfVariant, tfColor, tfROQ, tfClassification, tfQOH;
     @FXML
-    private Button btnBrowse, btnRetrieve, btnClose, btnTransHistory,btnPrint;
+    private Button btnBrowse, btnRetrieve, btnClose, btnTransHistory, btnPrint;
     @FXML
     private Label lblTransactionStatus, lblSource;
     @FXML
@@ -183,7 +183,7 @@ public class InvRequest_HistoryController implements Initializable, ScreenInterf
     private void clearDetailFields() {
         /* Detail Fields*/
         CustomCommonUtil.setText("", tfBrand, tfModel,
-                tfColor, tfReservationQTY, tfQOH,
+                tfColor, tfReservationQTY,tfCancelledQTY, tfQOH,
                 tfInvType, tfVariant, tfROQ, tfClassification,
                 tfMeasure);
         CustomCommonUtil.setText("0", tfOrderQuantity);
@@ -530,7 +530,7 @@ public class InvRequest_HistoryController implements Initializable, ScreenInterf
 
     private void initButtonsClickActions() {
         List<Button> buttons = Arrays.asList(btnBrowse,
-                btnRetrieve, btnClose, btnTransHistory,btnPrint);
+                btnRetrieve, btnClose, btnTransHistory, btnPrint);
 
         buttons.forEach(button -> button.setOnAction(this::handleButtonAction));
     }
@@ -728,6 +728,13 @@ public class InvRequest_HistoryController implements Initializable, ScreenInterf
                     lsReservationQTY = String.valueOf(invRequestController.Detail(pnTblInvDetailRow).getReservedOrder());
                 }
                 tfReservationQTY.setText(lsReservationQTY);
+                
+                String lsCancelledQty = "0";
+
+                if (invRequestController.Detail(pnTblInvDetailRow).getCancelled()!= 0) {
+                    lsCancelledQty = String.valueOf(invRequestController.Detail(pnTblInvDetailRow).getCancelled());
+                }
+                tfCancelledQTY.setText(lsCancelledQty);
 
                 String lsOrderQuantity = "0.0";
                 if (invRequestController.Detail(pnTblInvDetailRow).getQuantity() != 0) {
@@ -846,7 +853,7 @@ public class InvRequest_HistoryController implements Initializable, ScreenInterf
         CustomCommonUtil.setDisable(!lbShow,
                 tfOrderQuantity);
         CustomCommonUtil.setDisable(true,
-                tfInvType, tfVariant, tfColor, tfReservationQTY,
+                tfInvType, tfVariant, tfColor, tfReservationQTY,tfCancelledQTY,
                 tfQOH, tfROQ, tfClassification, tfModel, tfBrand, tfDescription, tfBarCode,
                 tfMeasure);
         if (!tfReferenceNo.getText().isEmpty()) {
