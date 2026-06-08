@@ -69,12 +69,10 @@ public class CheckClearingAssignController implements Initializable {
     private Button btnClearAssign, btnClose;
     @FXML
     private AnchorPane AnchorInputs;
+
     @FXML
-    private TextField tfDVNo, tfCheckNo, tfCheckAmount, tfVoucherNo;
-    @FXML
-    private DatePicker dpTransactionDate, dpCheckDate, dpClearDate;
-    @FXML
-    private ComboBox<String> cmbCheckState;
+    private DatePicker  dpClearDate;
+
 
     private List<String> transactionNos;
 
@@ -149,9 +147,7 @@ public class CheckClearingAssignController implements Initializable {
 
     private void loadRecordMaster() {
         try {
-            tfDVNo.setText(poCheckStatusUpdateController.Master().getTransactionNo());
-            dpTransactionDate.setValue(CustomCommonUtil.parseDateStringToLocalDate(SQLUtil.dateFormat(poCheckStatusUpdateController.Master().getTransactionDate(), SQLUtil.FORMAT_SHORT_DATE)));
-            tfVoucherNo.setText(poCheckStatusUpdateController.Master().getVoucherNo());
+           
             poJSON = poCheckStatusUpdateController.setCheckpayment();
             if ("error".equals((String) poJSON.get("message"))) {
                 ShowMessageFX.Warning((String) poJSON.get("message"), pxeModuleName, null);
@@ -164,37 +160,7 @@ public class CheckClearingAssignController implements Initializable {
     }
 
     private void loadRecordMasterCheck() {
-        tfCheckNo.setText(poCheckStatusUpdateController.CheckPayments().getModel().getCheckNo());
-        dpCheckDate.setValue(poCheckStatusUpdateController.CheckPayments().getModel().getCheckDate() != null
-                ? CustomCommonUtil.parseDateStringToLocalDate(SQLUtil.dateFormat(poCheckStatusUpdateController.CheckPayments().getModel().getCheckDate(), SQLUtil.FORMAT_SHORT_DATE))
-                : null);
-        tfCheckAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poCheckStatusUpdateController.CheckPayments().getModel().getAmount(), true));
-        int selectedItem = -1;
-        switch (poCheckStatusUpdateController.CheckPayments().getModel().getTransactionStatus()) {
-            case "1": //OPEN
-                selectedItem = 0;
-                break;
-            case "2": //CLEAR
-                selectedItem = 1;
-                break;
-            case "5": //HOLD
-                selectedItem = 2;
-                break;
-        }
-        cmbCheckState.getSelectionModel().select(selectedItem);
-        lastValidCheckState = cmbCheckState.getSelectionModel().getSelectedItem();
-        switch (poCheckStatusUpdateController.CheckPayments().getModel().getTransactionStatus()) {
-            case CheckStatus.POSTED:
-//                    dpClearDate.setValue(poCheckStatusUpdateController.CheckPayments().getModel().getModifiedDate() != null
-//                            ? CustomCommonUtil.parseDateStringToLocalDate(SQLUtil.dateFormat(poCheckStatusUpdateController.CheckPayments().getModel().getModifiedDate(), SQLUtil.FORMAT_SHORT_DATE))
-//                            : null);
-                break;
-            case CheckStatus.STOP_PAYMENT:
-//                    dpHoldUntil.setValue(poCheckStatusUpdateController.CheckPayments().getModel().getModifiedDate() != null
-//                            ? CustomCommonUtil.parseDateStringToLocalDate(SQLUtil.dateFormat(poCheckStatusUpdateController.CheckPayments().getModel().getModifiedDate(), SQLUtil.FORMAT_SHORT_DATE))
-//                            : null);
-                break;
-        }
+        
     }
 
     private void assignAndCleared() {
@@ -247,10 +213,6 @@ public class CheckClearingAssignController implements Initializable {
             switch (lsButton) {
                 case "btnClearAssign":
                     int totalTransactions = transactionNos.size();
-                    if (cmbCheckState.getSelectionModel().getSelectedIndex() != 1) {
-                        ShowMessageFX.Warning(null, pxeModuleName, "You cannot allowed to assign clear if the selected check state is not clear.");
-                        return;
-                    }
                     if (totalTransactions > 1) {
                         boolean confirmMultiple = ShowMessageFX.YesNo("You are assigning multiple transactions. Do you want to proceed?", pxeModuleName, null);
                         if (confirmMultiple) {
@@ -281,26 +243,6 @@ public class CheckClearingAssignController implements Initializable {
     }
 
     private void initComboBox() {
-        cmbCheckState.setItems(cCheckState);
-        cmbCheckState.setOnAction(e -> {
-            if (pnEditMode == EditMode.UPDATE && cmbCheckState.getSelectionModel().getSelectedIndex() >= 0) {
-                String selectedItem = null;
-                switch (cmbCheckState.getSelectionModel().getSelectedItem()) {
-                    case "OPEN":
-                        selectedItem = "1";
-                        break;
-                    case "CLEAR":
-                        selectedItem = "2";
-                        break;
-                    case "HOLD":
-                        selectedItem = "5";
-                        break;
-                }
-                poCheckStatusUpdateController.CheckPayments().getModel().setTransactionStatus(String.valueOf(selectedItem));
-            }
-            initFields(pnEditMode);
-        });
-
     }
 
     private void initDatePicker() {
@@ -309,20 +251,12 @@ public class CheckClearingAssignController implements Initializable {
     }
 
     private void clearFields() {
-        JFXUtil.setValueToNull(null, dpCheckDate);
         JFXUtil.clearTextFields(apMaster);
     }
 
     private void initFields(int fnEditMode) {
-        boolean lbShow = (fnEditMode == EditMode.UPDATE);
-        JFXUtil.setDisabled(!lbShow, apMaster);
-        if (poCheckStatusUpdateController.CheckPayments().getModel().getTransactionStatus().equals(CheckStatus.POSTED)) {
-            dpClearDate.setDisable(!lbShow);
-            dpClearDate.setValue(LocalDate.now());
-        } else {
-            dpClearDate.setValue(null);
-            dpClearDate.setDisable(true);
-        }
+        dpClearDate.setDisable(false);
+        dpClearDate.setValue(LocalDate.now());
     }
 
     private void initButton(int fnEditMode) {
