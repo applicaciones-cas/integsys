@@ -377,6 +377,8 @@ public class CheckStatusUpdateByBatchController implements Initializable, Screen
 
                 main_data.setAll(getValue());
                 showRetainedHighlight(true);
+                
+                
 
                 if (main_data.isEmpty()) {
                     tblVwMain.setPlaceholder(new Label("NO RECORD TO LOAD"));
@@ -384,14 +386,17 @@ public class CheckStatusUpdateByBatchController implements Initializable, Screen
                 }
 
                 // Load pagination system
-                JFXUtil.loadTab(
-                        pagination,
-                        main_data.size(),
-                        ROWS_PER_PAGE,
-                        tblVwMain,
-                        filteredMain_Data
+                JFXUtil.loadTab(pagination,
+                            main_data.size(),
+                                          ROWS_PER_PAGE,
+                                       tblVwMain,
+                                filteredMain_Data
                 );
-
+                pagination.setVisible(true);
+                pagination.setManaged(true);
+                System.out.println("Page Count = " + pagination.getPageCount());
+                System.out.println("Visible = " + pagination.isVisible());
+                System.out.println("Managed = " + pagination.isManaged());
                 // FIX: Map listeners immediately to the initial page items loaded
                 attachListenersToVisibleTableItems();
 
