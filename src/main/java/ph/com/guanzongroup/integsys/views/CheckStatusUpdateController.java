@@ -322,7 +322,7 @@ public class CheckStatusUpdateController implements Initializable, ScreenInterfa
                         case  CheckStatus.CheckState.CLEAR:
                             LocalDate localDate = dpClearDate.getValue();
                             java.sql.Date sqlDate = java.sql.Date.valueOf(localDate);
-                            poJSON = poCheckStatusUpdateController.ClearTransaction("",sqlDate);
+                            poJSON = poCheckStatusUpdateController.ClearTransaction("",sqlDate,true);
                             if (!"success".equals((String) poJSON.get("result"))) {
                                     ShowMessageFX.Warning((String) poJSON.get("message"), pxeModuleName, null);
                                     return;

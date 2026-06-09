@@ -15,9 +15,7 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
-import javafx.scene.control.TextField;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
@@ -25,12 +23,11 @@ import org.guanzon.appdriver.agent.ShowMessageFX;
 import org.guanzon.appdriver.base.CommonUtils;
 import org.guanzon.appdriver.base.GRiderCAS;
 import org.guanzon.appdriver.base.GuanzonException;
-import org.guanzon.appdriver.base.SQLUtil;
 import org.guanzon.appdriver.constant.EditMode;
 import org.json.simple.JSONObject;
+import org.json.simple.parser.ParseException;
 import ph.com.guanzongroup.cas.cashflow.CheckStatusUpdate;
 import ph.com.guanzongroup.cas.cashflow.services.CashflowControllers;
-import ph.com.guanzongroup.cas.cashflow.status.CheckStatus;
 import ph.com.guanzongroup.cas.cashflow.status.DisbursementStatic;
 import ph.com.guanzongroup.integsys.utility.CustomCommonUtil;
 import ph.com.guanzongroup.integsys.utility.JFXUtil;
@@ -54,10 +51,8 @@ public class CheckClearingAssignController implements Initializable {
     private int checkNoLength = 6;
     private String originalStatus = "";
     private boolean isInternalSelectionChange = false;
-    private EventHandler<ActionEvent> checkStateHandler;
     private String lastValidCheckState = null;
-
-    ObservableList<String> cCheckState = FXCollections.observableArrayList("OPEN", "CLEAR", "HOLD");
+    private boolean isNeedApproval = true;
 
     @FXML
     private AnchorPane AnchorMain, apMaster;
@@ -69,12 +64,10 @@ public class CheckClearingAssignController implements Initializable {
     private Button btnClearAssign, btnClose;
     @FXML
     private AnchorPane AnchorInputs;
+
     @FXML
-    private TextField tfDVNo, tfCheckNo, tfCheckAmount, tfVoucherNo;
-    @FXML
-    private DatePicker dpTransactionDate, dpCheckDate, dpClearDate;
-    @FXML
-    private ComboBox<String> cmbCheckState;
+    private DatePicker  dpClearDate;
+
 
     private List<String> transactionNos;
 
@@ -112,7 +105,10 @@ public class CheckClearingAssignController implements Initializable {
         for (int i = startIndex; i < transactionNos.size(); i++) {
             psTransactionNo = transactionNos.get(i);
             currentTransactionIndex = i; // update current index
-
+            isNeedApproval = true;
+            if (currentTransactionIndex > 0) {
+                isNeedApproval = false;
+            }
             poJSON = poCheckStatusUpdateController.OpenTransaction(psTransactionNo);
             if (!"success".equals((String) poJSON.get("result"))) {
                 ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
@@ -149,9 +145,7 @@ public class CheckClearingAssignController implements Initializable {
 
     private void loadRecordMaster() {
         try {
-            tfDVNo.setText(poCheckStatusUpdateController.Master().getTransactionNo());
-            dpTransactionDate.setValue(CustomCommonUtil.parseDateStringToLocalDate(SQLUtil.dateFormat(poCheckStatusUpdateController.Master().getTransactionDate(), SQLUtil.FORMAT_SHORT_DATE)));
-            tfVoucherNo.setText(poCheckStatusUpdateController.Master().getVoucherNo());
+           
             poJSON = poCheckStatusUpdateController.setCheckpayment();
             if ("error".equals((String) poJSON.get("message"))) {
                 ShowMessageFX.Warning((String) poJSON.get("message"), pxeModuleName, null);
@@ -164,73 +158,34 @@ public class CheckClearingAssignController implements Initializable {
     }
 
     private void loadRecordMasterCheck() {
-        tfCheckNo.setText(poCheckStatusUpdateController.CheckPayments().getModel().getCheckNo());
-        dpCheckDate.setValue(poCheckStatusUpdateController.CheckPayments().getModel().getCheckDate() != null
-                ? CustomCommonUtil.parseDateStringToLocalDate(SQLUtil.dateFormat(poCheckStatusUpdateController.CheckPayments().getModel().getCheckDate(), SQLUtil.FORMAT_SHORT_DATE))
-                : null);
-        tfCheckAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poCheckStatusUpdateController.CheckPayments().getModel().getAmount(), true));
-        int selectedItem = -1;
-        switch (poCheckStatusUpdateController.CheckPayments().getModel().getTransactionStatus()) {
-            case "1": //OPEN
-                selectedItem = 0;
-                break;
-            case "2": //CLEAR
-                selectedItem = 1;
-                break;
-            case "5": //HOLD
-                selectedItem = 2;
-                break;
-        }
-        cmbCheckState.getSelectionModel().select(selectedItem);
-        lastValidCheckState = cmbCheckState.getSelectionModel().getSelectedItem();
-        switch (poCheckStatusUpdateController.CheckPayments().getModel().getTransactionStatus()) {
-            case CheckStatus.POSTED:
-//                    dpClearDate.setValue(poCheckStatusUpdateController.CheckPayments().getModel().getModifiedDate() != null
-//                            ? CustomCommonUtil.parseDateStringToLocalDate(SQLUtil.dateFormat(poCheckStatusUpdateController.CheckPayments().getModel().getModifiedDate(), SQLUtil.FORMAT_SHORT_DATE))
-//                            : null);
-                break;
-            case CheckStatus.STOP_PAYMENT:
-//                    dpHoldUntil.setValue(poCheckStatusUpdateController.CheckPayments().getModel().getModifiedDate() != null
-//                            ? CustomCommonUtil.parseDateStringToLocalDate(SQLUtil.dateFormat(poCheckStatusUpdateController.CheckPayments().getModel().getModifiedDate(), SQLUtil.FORMAT_SHORT_DATE))
-//                            : null);
-                break;
-        }
+        
     }
 
     private void assignAndCleared() {
         try {
-            // Set the updated check payment data
-            poJSON = poCheckStatusUpdateController.setCheckpayment();
-
-            poCheckStatusUpdateController.CheckPayments().getModel().setTransactionStatus("2");
-            poCheckStatusUpdateController.Master().setModifiedDate(oApp.getServerDate());
-            poCheckStatusUpdateController.Master().setModifyingId(oApp.getClientID());
-            poCheckStatusUpdateController.Master().CheckPayments().setModifiedDate(oApp.getServerDate());
-            poCheckStatusUpdateController.Master().CheckPayments().setModifyingId(oApp.getClientID());
-
-            // Save transaction
-            poJSON = poCheckStatusUpdateController.SaveTransaction();
-            if (!"success".equals(poJSON.get("result"))) {
-                ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-                return;
+            LocalDate localDate = dpClearDate.getValue();
+            java.sql.Date sqlDate = java.sql.Date.valueOf(localDate);
+            poJSON = poCheckStatusUpdateController.ClearTransaction("",sqlDate,isNeedApproval);
+            if (!"success".equals((String) poJSON.get("result"))) {
+                    ShowMessageFX.Warning((String) poJSON.get("message"), pxeModuleName, null);
+                    return;
             }
 
-            // Handle multiple or single transaction flow
             if (transactionNos.size() > 1) {
                 currentTransactionIndex++;
                 if (currentTransactionIndex < transactionNos.size()) {
                     loadTransaction(currentTransactionIndex);
                     assignAndCleared();
                 } else {
-                    ShowMessageFX.Information(null, pxeModuleName, "All transactions have been cleared check status.");
+                    ShowMessageFX.Information(null, pxeModuleName, "Check status has been cleared for all selected transactions.");
                     CommonUtils.closeStage(btnClose);
                 }
             } else {
-                ShowMessageFX.Information(null, pxeModuleName, "Transaction has been cleared check status.");
+                ShowMessageFX.Information(null, pxeModuleName, "Transaction check status has been cleared successfully.");
                 CommonUtils.closeStage(btnClose);
             }
 
-        } catch (SQLException | GuanzonException | CloneNotSupportedException ex) {
+        } catch (SQLException | GuanzonException | CloneNotSupportedException | ParseException ex) {
             Logger.getLogger(CheckClearingAssignController.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
@@ -247,19 +202,15 @@ public class CheckClearingAssignController implements Initializable {
             switch (lsButton) {
                 case "btnClearAssign":
                     int totalTransactions = transactionNos.size();
-                    if (cmbCheckState.getSelectionModel().getSelectedIndex() != 1) {
-                        ShowMessageFX.Warning(null, pxeModuleName, "You cannot allowed to assign clear if the selected check state is not clear.");
-                        return;
-                    }
                     if (totalTransactions > 1) {
-                        boolean confirmMultiple = ShowMessageFX.YesNo("You are assigning multiple transactions. Do you want to proceed?", pxeModuleName, null);
+                        boolean confirmMultiple = ShowMessageFX.YesNo("You are about to process check clearing for multiple transactions. Do you want to proceed?", pxeModuleName, null);
                         if (confirmMultiple) {
                             assignAndCleared();
                         } else {
-                            ShowMessageFX.Information(null, pxeModuleName, "Please select only one transaction to assign individually.");
+                            ShowMessageFX.Information(null, pxeModuleName, "Please select at least one transaction to proceed with check clearing.");
                         }
                     } else {
-                        if (ShowMessageFX.YesNo("Are you sure you want to clear check status?", pxeModuleName, null)) {
+                        if (ShowMessageFX.YesNo("Are you sure you want to proceed with clearing the check status?", pxeModuleName, null)) {
                             assignAndCleared();
                         }
                     }
@@ -281,26 +232,6 @@ public class CheckClearingAssignController implements Initializable {
     }
 
     private void initComboBox() {
-        cmbCheckState.setItems(cCheckState);
-        cmbCheckState.setOnAction(e -> {
-            if (pnEditMode == EditMode.UPDATE && cmbCheckState.getSelectionModel().getSelectedIndex() >= 0) {
-                String selectedItem = null;
-                switch (cmbCheckState.getSelectionModel().getSelectedItem()) {
-                    case "OPEN":
-                        selectedItem = "1";
-                        break;
-                    case "CLEAR":
-                        selectedItem = "2";
-                        break;
-                    case "HOLD":
-                        selectedItem = "5";
-                        break;
-                }
-                poCheckStatusUpdateController.CheckPayments().getModel().setTransactionStatus(String.valueOf(selectedItem));
-            }
-            initFields(pnEditMode);
-        });
-
     }
 
     private void initDatePicker() {
@@ -309,20 +240,12 @@ public class CheckClearingAssignController implements Initializable {
     }
 
     private void clearFields() {
-        JFXUtil.setValueToNull(null, dpCheckDate);
         JFXUtil.clearTextFields(apMaster);
     }
 
     private void initFields(int fnEditMode) {
-        boolean lbShow = (fnEditMode == EditMode.UPDATE);
-        JFXUtil.setDisabled(!lbShow, apMaster);
-        if (poCheckStatusUpdateController.CheckPayments().getModel().getTransactionStatus().equals(CheckStatus.POSTED)) {
-            dpClearDate.setDisable(!lbShow);
-            dpClearDate.setValue(LocalDate.now());
-        } else {
-            dpClearDate.setValue(null);
-            dpClearDate.setDisable(true);
-        }
+        dpClearDate.setDisable(false);
+        dpClearDate.setValue(LocalDate.now());
     }
 
     private void initButton(int fnEditMode) {
