@@ -398,6 +398,8 @@ public class InventoryStockIssuanceControllerAppliance implements Initializable,
                     }
                     clearAllInputs();
                     getLoadedTransaction();
+                    
+                    loadSelectedTransactionDetail(pnTransactionDetail);
                     pnEditMode = poAppController.getEditMode();
                     break;
 

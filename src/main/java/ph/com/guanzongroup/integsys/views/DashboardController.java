@@ -2159,7 +2159,7 @@ public class DashboardController implements Initializable {
             method.setAccessible(true);
             method.invoke(this);
             System.out.println(">>> JAVA command executed via reflection: " + command);
-        } catch (NoSuchMethodException e) {
+        } catch (NoSuchMethodException | NullPointerException e) {
             System.out.println("⚠ Unknown JAVA command: " + command);
         } catch (Exception e) {
             e.printStackTrace();
@@ -2324,40 +2324,40 @@ public class DashboardController implements Initializable {
         return () -> {
             try {
 
-//                if (node.getFxmlPath() != null) {
-                openMonitorForm(node);
-//                } else {
-//                    runJavaCommand(node.getCommand());
-//                }
+                if (node.getFxmlPath() != null) {
+                    openMonitorForm(node);
+                } else {
+                    runJavaCommand(node.getCommand());
+                }
 
-//                String menuCode = node.getMenuCode();
-//                String industry = node.getIndustry();
-//                String category = node.getCategory();
-//
-//                if (menuCode.isEmpty()) {
-//                    return;
-//                }
-//                String key = buildMenuKey(menuCode, industry, category);
-//                //loadmenu if never clicked
-//                if (leftSidebarLookup.size() <= 0) {
-//                    loadMenu();
-//                }
-//                TreeNode sidebarNode = leftSidebarLookup.get(key);
-//                if (sidebarNode != null) {
-//                    System.out.println("Triggering left sidebar for: " + key);
-//                    sidebarNode.runAction();
-//
-//                    System.out.println("Transaction no. " + node.getSystemId());
-//                    if (poController != null) {
-//                        Method retrieveMethod = poController.getClass().getMethod("retrieveBySystemMonitor", String.class);
-//                        retrieveMethod.invoke(poController, node.getSystemId());
-//                        System.out.println("Transaction no. " + node.getSystemId());
-//                    } else {
-//                        System.err.println("Controller not found for sidebar: " + key);
-//                    }
-//                } else {
-//                    System.err.println("No sidebar entry found for: " + key);
-//                }
+                String menuCode = node.getMenuCode();
+                String industry = node.getIndustry();
+                String category = node.getCategory();
+
+                if (menuCode.isEmpty()) {
+                    return;
+                }
+                String key = buildMenuKey(menuCode, industry, category);
+                //loadmenu if never clicked
+                if (leftSidebarLookup.size() <= 0) {
+                    loadMenu();
+                }
+                TreeNode sidebarNode = leftSidebarLookup.get(key);
+                if (sidebarNode != null) {
+                    System.out.println("Triggering left sidebar for: " + key);
+                    sidebarNode.runAction();
+
+                    System.out.println("Transaction no. " + node.getSystemId());
+                    if (poController != null) {
+                        Method retrieveMethod = poController.getClass().getMethod("retrieveBySystemMonitor", String.class);
+                        retrieveMethod.invoke(poController, node.getSystemId());
+                        System.out.println("Transaction no. " + node.getSystemId());
+                    } else {
+                        System.err.println("Controller not found for sidebar: " + key);
+                    }
+                } else {
+                    System.err.println("No sidebar entry found for: " + key);
+                }
             } catch (Exception e) {
                 e.printStackTrace();
             }
