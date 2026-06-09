@@ -77,7 +77,6 @@ import org.guanzon.appdriver.constant.DocumentType;
 import org.guanzon.appdriver.constant.EditMode;
 import org.guanzon.appdriver.constant.Logical;
 import org.guanzon.appdriver.constant.RecordStatus;
-import org.guanzon.cas.purchasing.services.PurchaseOrderReceivingControllers;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.ParseException;
 import ph.com.guanzongroup.cas.cashflow.DisbursementVoucher;
@@ -148,29 +147,29 @@ public class DisbursementVoucher_VerificationController implements Initializable
     Scene scene = null;
     /* DV  & Journal */
     @FXML
-    private AnchorPane AnchorMain, apBrowse, apButton, apMasterDetail, apDVMaster1, apMasterDVCheck, apMasterDVBTransfer, apMasterDVOp, apDVMaster2, apDVMaster3, apDVDetail, apJournalMaster, apJournalDetails, apBIRDetail, apAttachments;
+    private AnchorPane AnchorMain, apBrowse, apButton, apMasterDetail, apDVMaster1, apMasterDVCheck, apMasterDVBTransfer, apMasterDVOp, apDVMaster2, apDVMaster3, apDVDetail, apJournalMaster, apJournalDetails, apJournalProposalList, apJournalProposalMaster, apJournalProposalDetails, apBIRDetail, apAttachments;
     @FXML
     private Label lblSource, lblDVTransactionStatus, lblJournalTransactionStatus;
     @FXML
-    private TextField tfAdvancesDetail, tfAdvances, tfSearchIndustry, tfSearchTransaction, tfSearchSupplier, tfDVTransactionNo, tfSupplier, tfVoucherNo, tfBankNameCheck, tfBankAccountCheck, tfPayeeName, tfCheckNo, tfCheckAmount, tfAuthorizedPerson, tfBankNameBTransfer, tfBankAccountBTransfer, tfPaymentAmountBTransfer, tfSupplierBank, tfSupplierAccountNoBTransfer, tfBankTransReferNo, tfPaymentStatusBTransfer, tfBankNameOnlinePayment, tfBankAccountOnlinePayment, tfPaymentAmount, tfSupplierServiceName, tfSupplierAccountNo, tfPaymentReferenceNo, tfOnlinePaymentStatus, tfTotalAmount, tfVatableSales, tfVatAmountMaster, tfVatZeroRatedSales, tfVatExemptSales, tfLessWHTax, tfTotalNetAmount, tfRefNoDetail, tfSourceNoDetail, tfVatableSalesDetail, tfVatExemptDetail, tfVatZeroRatedSalesDetail, tfVatRateDetail, tfVatAmountDetail, tfPurchasedAmountDetail, tfNetAmountDetail, tfJournalTransactionNo, tfTotalDebitAmount, tfTotalCreditAmount, tfAccountCode, tfAccountDescription, tfDebitAmount, tfCreditAmount, tfBIRTransactionNo, tfTaxCode, tfParticular, tfBaseAmount, tfTaxRate, tfTotalTaxAmount, tfAttachmentNo, tfAttachmentSource;
+    private TextField tfSearchIndustry, tfSearchTransaction, tfSearchSupplier, tfDVTransactionNo, tfSupplier, tfVoucherNo, tfBankNameCheck, tfBankAccountCheck, tfPayeeName, tfCheckNo, tfCheckAmount, tfAuthorizedPerson, tfBankNameBTransfer, tfBankAccountBTransfer, tfPaymentAmountBTransfer, tfSupplierBank, tfSupplierAccountNoBTransfer, tfBankTransReferNo, tfPaymentStatusBTransfer, tfBankNameOnlinePayment, tfBankAccountOnlinePayment, tfPaymentAmount, tfSupplierServiceName, tfSupplierAccountNo, tfPaymentReferenceNo, tfOnlinePaymentStatus, tfTotalAmount, tfVatableSales, tfVatAmountMaster, tfVatZeroRatedSales, tfVatExemptSales, tfLessWHTax, tfTotalNetAmount, tfAdvances, tfRefNoDetail, tfVatableSalesDetail, tfVatExemptDetail, tfVatZeroRatedSalesDetail, tfVatRateDetail, tfVatAmountDetail, tfPurchasedAmountDetail, tfNetAmountDetail, tfAdvancesDetail, tfSourceNoDetail, tfJournalTransactionNo, tfTotalDebitAmount, tfTotalCreditAmount, tfAccountCode, tfAccountDescription, tfDebitAmount, tfCreditAmount, tfJournalProposalTransactionNo, tfTotalProposalDebitAmount, tfTotalProposalCreditAmount, tfJournalProposalBranch, tfJournalProposalDepartment, tfJournalProposalAccountCode, tfJournalProposalAccountDescription, tfJournalProposalDebitAmount, tfJournalProposalCreditAmount, tfBIRTransactionNo, tfTaxCode, tfParticular, tfBaseAmount, tfTaxRate, tfTotalTaxAmount, tfAttachmentNo, tfAttachmentSource;
     @FXML
     private Button btnUpdate, btnSave, btnCancel, btnVerify, btnRetrieve, btnHistory, btnClose, btnUndo, btnArrowLeft, btnArrowRight;
     @FXML
     private TabPane tabPaneMain, tabPanePaymentMode;
     @FXML
-    private Tab tabDetails, tabCheck, tabBankTransfer, tabOnlinePayment, tabJournal, tabBIR, tabAttachments;
+    private Tab tabDetails, tabCheck, tabBankTransfer, tabOnlinePayment, tabJournal, tabJournalProposal, tabBIR, tabAttachments;
     @FXML
-    private DatePicker dpDVTransactionDate, dpCheckDate, dpJournalTransactionDate, dpReportMonthYear, dpPeriodFrom, dpPeriodTo;
+    private DatePicker dpDVTransactionDate, dpCheckDate, dpJournalTransactionDate, dpReportMonthYear, dpJournalProposalTransactionDate, dpJournalProposalReportMonthYear, dpPeriodFrom, dpPeriodTo;
     @FXML
-    private ComboBox cmbPaymentMode, cmbPayeeType, cmbDisbursementMode, cmbClaimantType, cmbCheckStatus, cmbAttachmentType;
+    private ComboBox cmbPaymentMode, cmbPayeeType, cmbDisbursementMode, cmbClaimantType, cmbCheckStatus, cmbJournalProposalStatus, cmbAttachmentType;
     @FXML
-    private CheckBox chbkPrintByBank, chbkIsCrossCheck, chbkIsPersonOnly, chbkVatClassification, cbReverse, cbJEReverse, cbBIRReverse;
+    private CheckBox chbkPrintByBank, chbkIsCrossCheck, chbkIsPersonOnly, chbkVatClassification, cbReverse, cbJEReverse, cbJEProposalReverse, cbBIRReverse;
     @FXML
-    private TextArea taDVRemarks, taJournalRemarks;
+    private TextArea taDVRemarks, taJournalRemarks, taJournalProposalRemarks;
     @FXML
-    private TableView tblVwDetails, tblVwJournalDetails, tblVwBIRDetails, tblAttachments, tblViewMainList;
+    private TableView tblVwDetails, tblVwJournalDetails, tblVwJournalProposalList, tblVwJournalProposalDetails, tblVwBIRDetails, tblAttachments, tblViewMainList;
     @FXML
-    private TableColumn tblDVRowNo, tblReferenceNo, tblTransactionTypeDetail, tblPurchasedAmount, tblVatableSales, tblVatAmt, tblVatRate, tblVatZeroRatedSales, tblVatExemptSales, tblNetAmount, tblJournalRowNo, tblJournalReportMonthYear, tblJournalAccountCode, tblJournalAccountDescription, tblJournalDebitAmount, tblJournalCreditAmount, tblBIRRowNo, tblBIRParticular, tblTaxCode, tblBaseAmount, tblTaxRate, tblTaxAmount, tblRowNoAttachment, tblFileNameAttachment, tblRowNo, tblSupplier, tblPaymentForm, tblTransDate, tblReferNo;
+    private TableColumn tblDVRowNo, tblReferenceNo, tblTransactionTypeDetail, tblPurchasedAmount, tblVatableSales, tblVatAmt, tblVatRate, tblVatZeroRatedSales, tblVatExemptSales, tblNetAmount, tblJournalRowNo, tblJournalReportMonthYear, tblJournalAccountCode, tblJournalAccountDescription, tblJournalDebitAmount, tblJournalCreditAmount, tblJournalProposalListRowNo, tblJournalProposalListTransNo, tblJournalProposalListBranch, tblJournalProposalListDepartment, tblJournalProposalListDebitAmt, tblJournalProposalListCreditAmt, tblJournalProposalRowNo, tblJournalProposalReportMonthYear, tblJournalProposalAccountCode, tblJournalProposalAccountDescription, tblJournalProposalDebitAmount, tblJournalProposalCreditAmount, tblBIRRowNo, tblBIRParticular, tblTaxCode, tblBaseAmount, tblTaxRate, tblTaxAmount, tblRowNoAttachment, tblFileNameAttachment, tblRowNo, tblSupplier, tblPaymentForm, tblTransDate, tblReferNo;
     @FXML
     private StackPane stackPane1;
     @FXML
@@ -758,7 +757,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
                                         lsPaymentForm = JFXUtil.setStatusValue(null, DisbursementStatic.DisbursementType.class, poController.getMaster(lnCtr).getDisbursementType());
                                         lnRowNo += 1;
                                         String lsSupplier = poController.getMaster(lnCtr).Payee().APClient().getCompanyName();
-                                        if(lsSupplier == null || "".equals(lsSupplier)){
+                                        if (lsSupplier == null || "".equals(lsSupplier)) {
                                             lsSupplier = poController.getMaster(lnCtr).Payee().getPayeeName();
                                         }
                                         main_data.add(new ModelDisbursementVoucher_Main(
@@ -1113,6 +1112,14 @@ public class DisbursementVoucher_VerificationController implements Initializable
         tblVwJournalDetails.setItems(journal_data);
     }
 
+    private void initDetailJEPGrid() {
+        JFXUtil.setColumnCenter(tblJournalProposalListRowNo, tblJournalProposalListTransNo);
+        JFXUtil.setColumnLeft(tblJournalProposalListBranch, tblJournalProposalListDepartment);
+        JFXUtil.setColumnRight(tblJournalProposalListDebitAmt, tblJournalProposalListCreditAmt);
+        JFXUtil.setColumnsIndexAndDisableReordering(tblVwJournalProposalList);
+        tblVwJournalDetails.setItems(journal_data);
+    }
+
     private void initDetailBIRGrid() {
         JFXUtil.setColumnCenter(tblBIRRowNo);
         JFXUtil.setColumnLeft(tblBIRParticular, tblTaxCode);
@@ -1132,11 +1139,11 @@ public class DisbursementVoucher_VerificationController implements Initializable
                 JFXUtil.resetImageBounds(imageView, stackPane1);
             }
         });
-        
+
         tblVwDetails.setOnMouseClicked(event -> {
             if (!details_data.isEmpty()) {
                 ModelDisbursementVoucher_Detail selected = (ModelDisbursementVoucher_Detail) tblVwDetails.getSelectionModel().getSelectedItem();
-                switch(event.getClickCount()){
+                switch (event.getClickCount()) {
                     case 1:
                         if (selected != null) {
                             int lnRow = Integer.parseInt(details_data.get(tblVwDetails.getSelectionModel().getSelectedIndex()).getIndex11());
@@ -1144,14 +1151,14 @@ public class DisbursementVoucher_VerificationController implements Initializable
                             loadRecordDetail();
                             moveNext(false, false);
                         }
-                    break;
+                        break;
                     case 2:
                         if (selected != null) {
                             int lnRow = Integer.parseInt(details_data.get(tblVwDetails.getSelectionModel().getSelectedIndex()).getIndex11());
                             pnDetail = lnRow;
                             loadDetailView();
                         }
-                    break;
+                        break;
                 }
             }
         });
@@ -1184,24 +1191,24 @@ public class DisbursementVoucher_VerificationController implements Initializable
         JFXUtil.setKeyEventFilter(this::tableKeyEvents, tblVwDetails, tblVwJournalDetails, tblVwBIRDetails, tblAttachments);
         JFXUtil.adjustColumnForScrollbar(tblViewMainList, tblVwDetails, tblVwJournalDetails, tblVwBIRDetails, tblAttachments);
     }
-    
+
     private void loadDetailView() {
         try {
             String lsSourceCode = poController.Detail(pnDetail).getSourceCode();
             String lsSourceNo = poController.Detail(pnDetail).getSourceNo();
-            
-            if(lsSourceCode == null || "".equals(lsSourceCode)){
+
+            if (lsSourceCode == null || "".equals(lsSourceCode)) {
                 return;
             }
-            
-            if (DisbursementStatic.SourceCode.ACCOUNTS_PAYABLE.equals(lsSourceCode) ) {
+
+            if (DisbursementStatic.SourceCode.ACCOUNTS_PAYABLE.equals(lsSourceCode)) {
                 lsSourceCode = poController.Detail(pnDetail).SOADetail().getSourceCode();
                 lsSourceNo = poController.Detail(pnDetail).SOADetail().getSourceNo();
             }
             loadBySourceCode(lsSourceCode, lsSourceNo);
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName())
-                  .log(Level.SEVERE, MiscUtil.getException(ex), ex);
+                    .log(Level.SEVERE, MiscUtil.getException(ex), ex);
             ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
@@ -1209,7 +1216,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
     private void loadBySourceCode(String fsSourceCode, String fsSourceNo) {
         poJSON = new JSONObject();
         stageView.closeDialog();
-        
+
         switch (fsSourceCode) {
             case DisbursementStatic.SourceCode.PAYMENT_REQUEST:
                 PaymentRequest_ViewController loPRFController = new PaymentRequest_ViewController();
@@ -1234,8 +1241,8 @@ public class DisbursementVoucher_VerificationController implements Initializable
                 break;
         }
     }
-    
-    private void showDialog(String fsSource, Object controller ){
+
+    private void showDialog(String fsSource, Object controller) {
         try {
             stageView.showDialog((Stage) AnchorMain.getScene().getWindow(), getClass().getResource(fsSource), controller,
                     "Disbursement Dialog", true, true, false);
@@ -2105,7 +2112,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
             tfVoucherNo.setText(poController.Master().getVoucherNo());
 //            tfSupplier.setText(poController.Master().Payee().Client().getCompanyName() != null ? poController.Master().Payee().Client().getCompanyName() : "");
             String lsSupplier = poController.Master().Payee().APClient().getCompanyName();
-            if(lsSupplier == null || "".equals(lsSupplier)){
+            if (lsSupplier == null || "".equals(lsSupplier)) {
                 lsSupplier = poController.Master().Payee().getPayeeName();
             }
             tfSupplier.setText(lsSupplier == null ? "" : lsSupplier);

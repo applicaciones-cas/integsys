@@ -5,10 +5,6 @@
 package ph.com.guanzongroup.integsys.views;
 
 import java.io.IOException;
-import ph.com.guanzongroup.integsys.model.ModelDisbursementVoucher_Detail;
-import ph.com.guanzongroup.integsys.model.ModelJournalEntry_Detail;
-import ph.com.guanzongroup.integsys.utility.CustomCommonUtil;
-import ph.com.guanzongroup.integsys.utility.JFXUtil;
 import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -79,6 +75,12 @@ import ph.com.guanzongroup.cas.cashflow.status.JournalStatus;
 import ph.com.guanzongroup.cas.cashflow.status.OtherPaymentStatus;
 import ph.com.guanzongroup.integsys.model.ModelBIR_Detail;
 import ph.com.guanzongroup.integsys.model.ModelDeliveryAcceptance_Attachment;
+import ph.com.guanzongroup.integsys.model.ModelDisbursementVoucher_Detail;
+import ph.com.guanzongroup.integsys.model.ModelJournalEntryProposal_Detail;
+import ph.com.guanzongroup.integsys.model.ModelJournalEntryProposal_Main;
+import ph.com.guanzongroup.integsys.model.ModelJournalEntry_Detail;
+import ph.com.guanzongroup.integsys.utility.CustomCommonUtil;
+import ph.com.guanzongroup.integsys.utility.JFXUtil;
 
 /**
  * FXML Controller class
@@ -106,6 +108,8 @@ public class DisbursementVoucher_HistoryController implements Initializable, Scr
     private ObservableList<ModelDisbursementVoucher_Detail> details_data = FXCollections.observableArrayList();
     private ObservableList<ModelJournalEntry_Detail> journal_data = FXCollections.observableArrayList();
     private ObservableList<ModelBIR_Detail> BIR_data = FXCollections.observableArrayList();
+    private ObservableList<ModelJournalEntryProposal_Detail> journalproposal_data = FXCollections.observableArrayList();
+    private ObservableList<ModelJournalEntryProposal_Main> journalproposalmain_data = FXCollections.observableArrayList();
     private final ObservableList<ModelDeliveryAcceptance_Attachment> attachment_data = FXCollections.observableArrayList();
     AtomicReference<Object> lastFocusedTextField = new AtomicReference<>();
     AtomicReference<Object> previousSearchedTextField = new AtomicReference<>();
@@ -127,29 +131,29 @@ public class DisbursementVoucher_HistoryController implements Initializable, Scr
     Scene scene = null;
     /* DV  & Journal */
     @FXML
-    private AnchorPane AnchorMain, apBrowse, apButton, apMasterDetail, apDVMaster1, apMasterDVCheck, apMasterDVBTransfer, apMasterDVOp, apDVMaster2, apDVMaster3, apDVDetail, apJournalMaster, apJournalDetails, apBIRDetail, apAttachments;
+    private AnchorPane AnchorMain, apBrowse, apButton, apMasterDetail, apDVMaster1, apMasterDVCheck, apMasterDVBTransfer, apMasterDVOp, apDVMaster2, apDVMaster3, apDVDetail, apJournalMaster, apJournalDetails, apJournalProposalList, apJournalProposalMaster, apJournalProposalDetails, apBIRDetail, apAttachments;
     @FXML
     private Label lblSource, lblDVTransactionStatus, lblJournalTransactionStatus;
     @FXML
-    private TextField tfSearchTransaction, tfSearchSupplier, tfDVTransactionNo, tfSupplier, tfVoucherNo, tfBankNameCheck, tfBankAccountCheck, tfPayeeName, tfCheckNo, tfCheckAmount, tfAuthorizedPerson, tfBankNameBTransfer, tfBankAccountBTransfer, tfPaymentAmountBTransfer, tfSupplierBank, tfSupplierAccountNoBTransfer, tfBankTransReferNo, tfPaymentStatusBTransfer, tfBankNameOnlinePayment, tfBankAccountOnlinePayment, tfPaymentAmount, tfSupplierServiceName, tfSupplierAccountNo, tfPaymentReferenceNo, tfOnlinePaymentStatus, tfTotalAmount, tfVatableSales, tfVatAmountMaster, tfVatZeroRatedSales, tfVatExemptSales, tfLessWHTax, tfTotalNetAmount, tfAdvances, tfRefNoDetail, tfSourceNoDetail, tfVatableSalesDetail, tfVatExemptDetail, tfVatZeroRatedSalesDetail, tfVatRateDetail, tfVatAmountDetail, tfPurchasedAmountDetail, tfNetAmountDetail, tfAdvancesDetail, tfJournalTransactionNo, tfTotalDebitAmount, tfTotalCreditAmount, tfAccountCode, tfAccountDescription, tfDebitAmount, tfCreditAmount, tfBIRTransactionNo, tfTaxCode, tfParticular, tfBaseAmount, tfTaxRate, tfTotalTaxAmount, tfAttachmentNo, tfAttachmentSource;
+    private TextField tfSearchTransaction, tfSearchSupplier, tfDVTransactionNo, tfSupplier, tfVoucherNo, tfBankNameCheck, tfBankAccountCheck, tfPayeeName, tfCheckNo, tfCheckAmount, tfAuthorizedPerson, tfBankNameBTransfer, tfBankAccountBTransfer, tfPaymentAmountBTransfer, tfSupplierBank, tfSupplierAccountNoBTransfer, tfBankTransReferNo, tfPaymentStatusBTransfer, tfBankNameOnlinePayment, tfBankAccountOnlinePayment, tfPaymentAmount, tfSupplierServiceName, tfSupplierAccountNo, tfPaymentReferenceNo, tfOnlinePaymentStatus, tfTotalAmount, tfVatableSales, tfVatAmountMaster, tfVatZeroRatedSales, tfVatExemptSales, tfLessWHTax, tfTotalNetAmount, tfAdvances, tfRefNoDetail, tfVatableSalesDetail, tfVatExemptDetail, tfVatZeroRatedSalesDetail, tfVatRateDetail, tfVatAmountDetail, tfPurchasedAmountDetail, tfNetAmountDetail, tfAdvancesDetail, tfSourceNoDetail, tfJournalTransactionNo, tfTotalDebitAmount, tfTotalCreditAmount, tfAccountCode, tfAccountDescription, tfDebitAmount, tfCreditAmount, tfJournalProposalTransactionNo, tfTotalProposalDebitAmount, tfTotalProposalCreditAmount, tfJournalProposalBranch, tfJournalProposalDepartment, tfJournalProposalAccountCode, tfJournalProposalAccountDescription, tfJournalProposalDebitAmount, tfJournalProposalCreditAmount, tfBIRTransactionNo, tfTaxCode, tfParticular, tfBaseAmount, tfTaxRate, tfTotalTaxAmount, tfAttachmentNo, tfAttachmentSource;
     @FXML
-    private Button btnBrowse, btnHistory, btnPrint, btnClose, btnArrowLeft, btnArrowRight, btnPrintPaymentSummary, btnPrintCheck;
+    private Button btnBrowse, btnHistory, btnPrint, btnPrintPaymentSummary, btnPrintCheck, btnClose, btnArrowLeft, btnArrowRight;
     @FXML
     private TabPane tabPaneMain, tabPanePaymentMode;
     @FXML
-    private Tab tabDetails, tabCheck, tabBankTransfer, tabOnlinePayment, tabJournal, tabBIR, tabAttachments;
+    private Tab tabDetails, tabCheck, tabBankTransfer, tabOnlinePayment, tabJournal, tabJournalProposal, tabBIR, tabAttachments;
     @FXML
-    private DatePicker dpDVTransactionDate, dpCheckDate, dpJournalTransactionDate, dpReportMonthYear, dpPeriodFrom, dpPeriodTo;
+    private DatePicker dpDVTransactionDate, dpCheckDate, dpJournalTransactionDate, dpReportMonthYear, dpJournalProposalTransactionDate, dpJournalProposalReportMonthYear, dpPeriodFrom, dpPeriodTo;
     @FXML
-    private ComboBox cmbPaymentMode, cmbPayeeType, cmbDisbursementMode, cmbClaimantType, cmbCheckStatus, cmbAttachmentType;
+    private ComboBox cmbPaymentMode, cmbPayeeType, cmbDisbursementMode, cmbClaimantType, cmbCheckStatus, cmbJournalProposalStatus, cmbAttachmentType;
     @FXML
-    private CheckBox chbkPrintByBank, chbkIsCrossCheck, chbkIsPersonOnly, chbkVatClassification;
+    private CheckBox chbkPrintByBank, chbkIsCrossCheck, chbkIsPersonOnly, chbkVatClassification, cbJEProposalReverse;
     @FXML
-    private TextArea taDVRemarks, taJournalRemarks;
+    private TextArea taDVRemarks, taJournalRemarks, taJournalProposalRemarks;
     @FXML
-    private TableView tblVwDetails, tblVwJournalDetails, tblVwBIRDetails, tblAttachments;
+    private TableView tblVwDetails, tblVwJournalDetails, tblVwJournalProposalList, tblVwJournalProposalDetails, tblVwBIRDetails, tblAttachments;
     @FXML
-    private TableColumn tblDVRowNo, tblReferenceNo, tblTransactionTypeDetail, tblPurchasedAmount, tblVatableSales, tblVatAmt, tblVatRate, tblVatZeroRatedSales, tblVatExemptSales, tblNetAmount, tblJournalRowNo, tblJournalReportMonthYear, tblJournalAccountCode, tblJournalAccountDescription, tblJournalDebitAmount, tblJournalCreditAmount, tblBIRRowNo, tblBIRParticular, tblTaxCode, tblBaseAmount, tblTaxRate, tblTaxAmount, tblRowNoAttachment, tblFileNameAttachment;
+    private TableColumn tblDVRowNo, tblReferenceNo, tblTransactionTypeDetail, tblPurchasedAmount, tblVatableSales, tblVatAmt, tblVatRate, tblVatZeroRatedSales, tblVatExemptSales, tblNetAmount, tblJournalRowNo, tblJournalReportMonthYear, tblJournalAccountCode, tblJournalAccountDescription, tblJournalDebitAmount, tblJournalCreditAmount, tblJournalProposalListRowNo, tblJournalProposalListTransNo, tblJournalProposalListBranch, tblJournalProposalListDepartment, tblJournalProposalListDebitAmt, tblJournalProposalListCreditAmt, tblJournalProposalRowNo, tblJournalProposalReportMonthYear, tblJournalProposalAccountCode, tblJournalProposalAccountDescription, tblJournalProposalDebitAmount, tblJournalProposalCreditAmount, tblBIRRowNo, tblBIRParticular, tblTaxCode, tblBaseAmount, tblTaxRate, tblTaxAmount, tblRowNoAttachment, tblFileNameAttachment;
     @FXML
     private StackPane stackPane1;
     @FXML
@@ -433,7 +437,7 @@ public class DisbursementVoucher_HistoryController implements Initializable, Scr
                     poController.Master().setIndustryID(psIndustryId);
                     poController.Master().setCompanyID(psCompanyId);
                     poController.Master().setBranchCode(oApp.getBranchCode());
-                    poJSON = poController.SearchTransaction(tfSearchTransaction.getText(),tfSearchSupplier.getText(),0);
+                    poJSON = poController.SearchTransaction(tfSearchTransaction.getText(), tfSearchSupplier.getText(), 0);
                     if ("error".equalsIgnoreCase((String) poJSON.get("result"))) {
                         ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                         return;
@@ -897,6 +901,14 @@ public class DisbursementVoucher_HistoryController implements Initializable, Scr
         tblVwJournalDetails.setItems(journal_data);
     }
 
+    private void initDetailJEPGrid() {
+        JFXUtil.setColumnCenter(tblJournalProposalListRowNo, tblJournalProposalListTransNo);
+        JFXUtil.setColumnLeft(tblJournalProposalListBranch, tblJournalProposalListDepartment);
+        JFXUtil.setColumnRight(tblJournalProposalListDebitAmt, tblJournalProposalListCreditAmt);
+        JFXUtil.setColumnsIndexAndDisableReordering(tblVwJournalProposalList);
+        tblVwJournalDetails.setItems(journal_data);
+    }
+
     private void initDetailBIRGrid() {
         JFXUtil.setColumnCenter(tblBIRRowNo);
         JFXUtil.setColumnLeft(tblBIRParticular, tblTaxCode);
@@ -919,21 +931,21 @@ public class DisbursementVoucher_HistoryController implements Initializable, Scr
         tblVwDetails.setOnMouseClicked(event -> {
             if (!details_data.isEmpty()) {
                 ModelDisbursementVoucher_Detail selected = (ModelDisbursementVoucher_Detail) tblVwDetails.getSelectionModel().getSelectedItem();
-                switch(event.getClickCount()){
+                switch (event.getClickCount()) {
                     case 1:
                         if (selected != null) {
                             int lnRow = Integer.parseInt(details_data.get(tblVwDetails.getSelectionModel().getSelectedIndex()).getIndex11());
                             pnDetail = lnRow;
                             loadRecordDetail();
                         }
-                    break;
+                        break;
                     case 2:
                         if (selected != null) {
                             int lnRow = Integer.parseInt(details_data.get(tblVwDetails.getSelectionModel().getSelectedIndex()).getIndex11());
                             pnDetail = lnRow;
                             loadDetailView();
                         }
-                    break;
+                        break;
                 }
             }
         });
@@ -955,24 +967,24 @@ public class DisbursementVoucher_HistoryController implements Initializable, Scr
         JFXUtil.setKeyEventFilter(this::tableKeyEvents, tblVwDetails, tblVwJournalDetails, tblAttachments);
         JFXUtil.adjustColumnForScrollbar(tblVwDetails, tblVwJournalDetails, tblAttachments);
     }
-    
+
     private void loadDetailView() {
         try {
             String lsSourceCode = poController.Detail(pnDetail).getSourceCode();
             String lsSourceNo = poController.Detail(pnDetail).getSourceNo();
-            
-            if(lsSourceCode == null || "".equals(lsSourceCode)){
+
+            if (lsSourceCode == null || "".equals(lsSourceCode)) {
                 return;
             }
-            
-            if (DisbursementStatic.SourceCode.ACCOUNTS_PAYABLE.equals(lsSourceCode) ) {
+
+            if (DisbursementStatic.SourceCode.ACCOUNTS_PAYABLE.equals(lsSourceCode)) {
                 lsSourceCode = poController.Detail(pnDetail).SOADetail().getSourceCode();
                 lsSourceNo = poController.Detail(pnDetail).SOADetail().getSourceNo();
             }
             loadBySourceCode(lsSourceCode, lsSourceNo);
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName())
-                  .log(Level.SEVERE, MiscUtil.getException(ex), ex);
+                    .log(Level.SEVERE, MiscUtil.getException(ex), ex);
             ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
@@ -980,7 +992,7 @@ public class DisbursementVoucher_HistoryController implements Initializable, Scr
     private void loadBySourceCode(String fsSourceCode, String fsSourceNo) {
         poJSON = new JSONObject();
         stageView.closeDialog();
-        
+
         switch (fsSourceCode) {
             case DisbursementStatic.SourceCode.PAYMENT_REQUEST:
                 PaymentRequest_ViewController loPRFController = new PaymentRequest_ViewController();
@@ -1005,8 +1017,8 @@ public class DisbursementVoucher_HistoryController implements Initializable, Scr
                 break;
         }
     }
-    
-    private void showDialog(String fsSource, Object controller ){
+
+    private void showDialog(String fsSource, Object controller) {
         try {
             stageView.showDialog((Stage) AnchorMain.getScene().getWindow(), getClass().getResource(fsSource), controller,
                     "Disbursement Dialog", true, true, false);
@@ -1114,7 +1126,7 @@ public class DisbursementVoucher_HistoryController implements Initializable, Scr
                         switch (lsID) {
                             //apBrowse?
                             case "tfSearchTransaction":
-                                poJSON = poController.SearchTransaction(lsValue,tfSearchSupplier.getText(),2);
+                                poJSON = poController.SearchTransaction(lsValue, tfSearchSupplier.getText(), 2);
                                 if ("error".equals((String) poJSON.get("result"))) {
                                     ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                     return;
@@ -1128,7 +1140,7 @@ public class DisbursementVoucher_HistoryController implements Initializable, Scr
                                 }
                                 break;
                             case "tfSearchSupplier":
-                                poJSON = poController.SearchTransaction(tfSearchTransaction.getText(),lsValue,4);
+                                poJSON = poController.SearchTransaction(tfSearchTransaction.getText(), lsValue, 4);
                                 if ("error".equals((String) poJSON.get("result"))) {
                                     ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                     return;
@@ -1185,7 +1197,7 @@ public class DisbursementVoucher_HistoryController implements Initializable, Scr
             tfVoucherNo.setText(poController.Master().getVoucherNo());
 //            tfSupplier.setText(poController.Master().Payee().Client().getCompanyName() != null ? poController.Master().Payee().Client().getCompanyName() : "");
             String lsSupplier = poController.Master().Payee().APClient().getCompanyName();
-            if(lsSupplier == null || "".equals(lsSupplier)){
+            if (lsSupplier == null || "".equals(lsSupplier)) {
                 lsSupplier = poController.Master().Payee().getPayeeName();
             }
             tfSupplier.setText(lsSupplier == null ? "" : lsSupplier);
