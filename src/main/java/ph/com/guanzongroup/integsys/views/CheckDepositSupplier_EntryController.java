@@ -304,8 +304,7 @@ public class CheckDepositSupplier_EntryController implements Initializable, Scre
                                 lsTransDate = sdfFormat.format(poController.Master().getTransactionDate());
                                 transactionDate = LocalDate.parse(lsTransDate, DateTimeFormatter.ofPattern(SQLUtil.FORMAT_SHORT_DATE));
 
-                                if (pbSuccess && ((poController.getEditMode() == EditMode.UPDATE && !lsTransDate.equals(lsSelectedDate))
-                                || !lsServerDate.equals(lsSelectedDate))) {
+                                if (pbSuccess && (!lsTransDate.equals(lsSelectedDate))) {
                                     if (oApp.getUserLevel() <= UserRight.ENCODER) {
                                         if (ShowMessageFX.YesNo(null, pxeModuleName, "Change in Transaction Date Detected\n\n"
                                                 + "If YES, please seek approval to proceed with the new selected date.\n"
@@ -717,8 +716,8 @@ public class CheckDepositSupplier_EntryController implements Initializable, Scre
             tfBankAccountNo.setText(poController.Master().APClientBankAccount().getAccountNumber());
             tfBankAccountName.setText(poController.Master().APClientBankAccount().getAccountName());
             taRemarks.setText(poController.Master().getRemarks());
-            dpTransactionDate.setValue(CustomCommonUtil.parseDateStringToLocalDate(SQLUtil.dateFormat(poController.Master().getTransactionDate(), SQLUtil.FORMAT_SHORT_DATE)));
-            dpTransactionReferDate.setValue(CustomCommonUtil.parseDateStringToLocalDate(SQLUtil.dateFormat(poController.Master().getTransactionReferDate(), SQLUtil.FORMAT_SHORT_DATE)));
+            JFXUtil.setDateValue(dpTransactionDate, CustomCommonUtil.parseDateStringToLocalDate(SQLUtil.dateFormat(poController.Master().getTransactionDate(), SQLUtil.FORMAT_SHORT_DATE)));
+            JFXUtil.setDateValue(dpTransactionReferDate, CustomCommonUtil.parseDateStringToLocalDate(SQLUtil.dateFormat(poController.Master().getTransactionReferDate(), SQLUtil.FORMAT_SHORT_DATE)));
             tfTotal.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Master().getTransactionTotalDeposit(), false));
             JFXUtil.updateCaretPositions(apMaster);
         } catch (GuanzonException | SQLException ex) {
