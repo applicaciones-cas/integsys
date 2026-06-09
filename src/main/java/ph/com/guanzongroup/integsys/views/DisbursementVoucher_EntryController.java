@@ -171,7 +171,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
     @FXML
     private Tab tabDetails, tabCheck, tabBankTransfer, tabOnlinePayment, tabJournal, tabBIR, tabAttachments;
     @FXML
-    private TextField tfDVTransactionNo, tfSupplier, tfVoucherNo, tfBankNameCheck, tfBankAccountCheck, tfPayeeName, tfCheckNo, tfCheckAmount, tfAuthorizedPerson, tfBankNameBTransfer, tfBankAccountBTransfer, tfPaymentAmountBTransfer, tfSupplierBank, tfSupplierAccountNoBTransfer, tfBankTransReferNo, tfPaymentStatusBTransfer, tfBankNameOnlinePayment, tfBankAccountOnlinePayment, tfPaymentAmount, tfSupplierServiceName, tfSupplierAccountNo, tfPaymentReferenceNo, tfOnlinePaymentStatus, tfTotalAmount, tfVatableSales, tfVatAmountMaster, tfVatZeroRatedSales, tfVatExemptSales, tfLessWHTax, tfTotalNetAmount, tfAdvances, tfRefNoDetail, tfSourceNoDetail, tfVatableSalesDetail, tfVatExemptDetail, tfVatZeroRatedSalesDetail, tfVatRateDetail, tfVatAmountDetail, tfPurchasedAmountDetail, tfNetAmountDetail, tfAdvancesDetail, tfSearchBranch, tfSearchPayee, tfJournalTransactionNo, tfTotalDebitAmount, tfTotalCreditAmount, tfAccountCode, tfAccountDescription, tfDebitAmount, tfCreditAmount, tfBIRTransactionNo, tfTaxCode, tfParticular, tfBaseAmount, tfTaxRate, tfTotalTaxAmount, tfAttachmentNo, tfAttachmentSource;
+    private TextField tfDVTransactionNo, tfSupplier, tfVoucherNo, tfBankNameCheck, tfBankAccountCheck, tfPayeeName, tfCheckNo, tfCheckAmount, tfAuthorizedPerson, tfBankNameBTransfer, tfBankAccountBTransfer, tfPaymentAmountBTransfer, tfSupplierBank, tfSupplierAccountNoBTransfer, tfBankTransReferNo, tfPaymentStatusBTransfer, tfBankNameOnlinePayment, tfBankAccountOnlinePayment, tfPaymentAmount, tfSupplierServiceName, tfSupplierAccountNo, tfPaymentReferenceNo, tfOnlinePaymentStatus, tfTotalAmount, tfVatableSales, tfVatAmountMaster, tfVatZeroRatedSales, tfVatExemptSales, tfLessWHTax, tfTotalNetAmount, tfAdvances, tfRefNoDetail, tfVatableSalesDetail, tfVatExemptDetail, tfVatZeroRatedSalesDetail, tfVatRateDetail, tfVatAmountDetail, tfPurchasedAmountDetail, tfNetAmountDetail, tfAdvancesDetail, tfSourceNoDetail, tfSearchBranch, tfSearchPayee, tfJournalTransactionNo, tfTotalDebitAmount, tfTotalCreditAmount, tfAccountCode, tfAccountDescription, tfDebitAmount, tfCreditAmount, tfBIRTransactionNo, tfTaxCode, tfParticular, tfBaseAmount, tfTaxRate, tfTotalTaxAmount, tfAttachmentNo, tfAttachmentSource;
     @FXML
     private DatePicker dpDVTransactionDate, dpCheckDate, dpJournalTransactionDate, dpReportMonthYear, dpPeriodFrom, dpPeriodTo;
     @FXML
@@ -183,7 +183,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
     @FXML
     private TableView tblVwDetails, tblViewMainList, tblVwJournalDetails, tblVwBIRDetails, tblAttachments;
     @FXML
-    private TableColumn tblDVRowNo, tblReferenceNo, tblTransactionTypeDetail, tblPurchasedAmount, tblVatableSales, tblVatAmt, tblVatRate, tblVatZeroRatedSales, tblVatExemptSales, tblNetAmount, tblRowNo, tblTransactionType, tblRefNo, tblAmount, tblDueDate, tblJournalRowNo, tblJournalReportMonthYear, tblJournalAccountCode, tblJournalAccountDescription, tblJournalDebitAmount, tblJournalCreditAmount, tblBIRRowNo, tblBIRParticular, tblTaxCode, tblBaseAmount, tblTaxRate, tblTaxAmount, tblRowNoAttachment, tblFileNameAttachment;
+    private TableColumn tblDVRowNo, tblReferenceNo, tblTransactionTypeDetail, tblPurchasedAmount, tblVatableSales, tblVatAmt, tblVatRate, tblVatZeroRatedSales, tblVatExemptSales, tblNetAmount, tblRowNo, tblTransactionType, tblRefNo, tblPayee, tblAmount, tblDueDate, tblJournalRowNo, tblJournalReportMonthYear, tblJournalAccountCode, tblJournalAccountDescription, tblJournalDebitAmount, tblJournalCreditAmount, tblBIRRowNo, tblBIRParticular, tblTaxCode, tblBaseAmount, tblTaxRate, tblTaxAmount, tblRowNoAttachment, tblFileNameAttachment;
     @FXML
     private Pagination pagination;
     @FXML
@@ -769,10 +769,13 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                 String lsTransNo = !JFXUtil.isObjectEqualTo(poController.Detail(lnCtr).getSourceNo(), null, "") ? poController.Detail(lnCtr).getSourceNo() : "";
                 String lsTransType = !JFXUtil.isObjectEqualTo(poController.Detail(lnCtr).getSourceCode(), null, "") ? poController.Detail(lnCtr).getSourceCode() : "";
                 String lsHighlightbasis;
+                String lsAPClient = poController.Master().Payee().getAPClientID();
+                if(lsAPClient == null || "".equals(lsAPClient)){
+                    lsAPClient = poController.Master().Payee().getClientID();
+                }
 
                 lsHighlightbasis = lsTransNo + poController.getSourceCodeDescription(poController.Detail(lnCtr).getSourceCode())
-                        + poController.Master().Payee().getPayeeName();
-
+                        + lsAPClient;
                 if (!JFXUtil.isObjectEqualTo(poController.Detail(lnCtr).getAmount(), null, "")) {
                     if (poController.Detail(lnCtr).getAmount() != 0.0000) {
                         plOrderNoPartial.add(new Pair<>(lsHighlightbasis, "1"));
@@ -804,8 +807,8 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                     int pnRowMain = Integer.parseInt(selected.getIndex01()) - 1;
                     pnMain = pnRowMain;
                     String lsPayableType = selected.getIndex11();
-                    String lsTransactionNo = selected.getIndex08();
-                    String lsPayee = selected.getIndex09();
+                    String lsTransactionNo = selected.getIndex09();
+                    String lsPayee = selected.getIndex04();
                     poJSON = poController.populateDetail(lsTransactionNo, lsPayableType);
                     if ("error".equals(poJSON.get("result"))) {
                         ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
@@ -858,18 +861,18 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                                         JSONObject obj = (JSONObject) requestObj;
                                         String lsTransBasis = (obj.get("SourceNo") != null ? obj.get("SourceNo").toString() : "")
                                                 + (obj.get("TransactionType") != null ? obj.get("TransactionType").toString() : "")
-                                                + (obj.get("Payee") != null ? obj.get("Payee").toString() : "");
+                                                + (obj.get("ClientId") != null ? obj.get("ClientId").toString() : "");
 
                                         ModelDisbursementVoucher_Main loMain = new ModelDisbursementVoucher_Main(
                                                 String.valueOf(main_data.size() + 1),
                                                 obj.get("TransactionType") != null ? obj.get("TransactionType").toString() : "",
                                                 obj.get("Reference") != null ? obj.get("Reference").toString() : "",
+                                                obj.get("Payee") != null ? obj.get("Payee").toString() : "",
                                                 obj.get("Balance") != null ? CustomCommonUtil.setIntegerValueToDecimalFormat(obj.get("Balance"), true) : "",
                                                 obj.get("dTransact") != null ? obj.get("dTransact").toString() : "",
                                                 "",
                                                 "",
                                                 obj.get("sTransNox") != null ? obj.get("sTransNox").toString() : "",
-                                                obj.get("Payee") != null ? obj.get("Payee").toString() : "",
                                                 lsTransBasis,
                                                 obj.get("PayableType") != null ? obj.get("PayableType").toString() : ""
                                         //                                                obj.get("sBranchNme") != null ? obj.get("sBranchNme").toString() : "",
@@ -1189,7 +1192,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
 
     private void initMainGrid() {
         JFXUtil.setColumnCenter(tblRowNo, tblRefNo, tblDueDate);
-        JFXUtil.setColumnLeft(tblTransactionType);
+        JFXUtil.setColumnLeft(tblTransactionType, tblPayee);
         JFXUtil.setColumnRight(tblAmount);
         JFXUtil.setColumnsIndexAndDisableReordering(tblViewMainList);
 
@@ -2192,7 +2195,11 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
             dpDVTransactionDate.setValue(CustomCommonUtil.parseDateStringToLocalDate(SQLUtil.dateFormat(poController.Master().getTransactionDate(), SQLUtil.FORMAT_SHORT_DATE)));
             JFXUtil.setCmbValue(cmbPaymentMode, !poController.Master().getDisbursementType().equals("") ? Integer.valueOf(poController.Master().getDisbursementType()) : -1);
             tfVoucherNo.setText(poController.Master().getVoucherNo());
-            tfSupplier.setText(poController.Master().Payee().Client().getCompanyName() != null ? poController.Master().Payee().Client().getCompanyName() : "");
+            String lsSupplier = poController.Master().Payee().APClient().getCompanyName();
+            if(lsSupplier == null || "".equals(lsSupplier)){
+                lsSupplier = poController.Master().Payee().getPayeeName();
+            }
+            tfSupplier.setText(lsSupplier == null ? "" : lsSupplier);
             tfVatAmountMaster.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Master().getVATAmount(), true));
             tfVatExemptSales.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Master().getVATExmpt(), true));
             tfLessWHTax.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Master().getWithTaxTotal(), true));

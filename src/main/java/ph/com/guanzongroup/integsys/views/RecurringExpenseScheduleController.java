@@ -109,7 +109,7 @@ public class RecurringExpenseScheduleController implements Initializable, Screen
             initDetailsGrid();
             Platform.runLater(() -> {
                 poController.setIndustryID(psIndustryId);
-//                poController.setCompanyId(psCompanyId);
+                poController.setCompanyID(psCompanyId);
 //                poController.setIndustryId(psIndustryId);
 //                poController.setCompanyId(psCompanyId);
                 poController.setWithUI(true);
@@ -135,7 +135,7 @@ public class RecurringExpenseScheduleController implements Initializable, Screen
 
     @Override
     public void setCompanyID(String fsValue) {
-        //Company is not autoset
+        psCompanyId = fsValue;
     }
 
     @Override
@@ -693,15 +693,15 @@ public class RecurringExpenseScheduleController implements Initializable, Screen
                         break;
                     case "tfBillDay":
                         lsValue = JFXUtil.removeComma(lsValue);
-                        int lnDueDay = poController.Detail(pnDetail).getDueDay();
-                        if (lnDueDay != 0) {
-                            if (Integer.parseInt(lsValue) > lnDueDay) { //bill day cannot be greater than due day
-                                ShowMessageFX.Warning(null, pxeModuleName, "Bill day cannot be greater than Due day.");
-                                tfBillDay.requestFocus();
-                                loadRecordDetail();
-                                return;
-                            }
-                        }
+//                        int lnDueDay = poController.Detail(pnDetail).getDueDay();
+//                        if (lnDueDay != 0) {
+//                            if (Integer.parseInt(lsValue) > lnDueDay) { //bill day cannot be greater than due day
+//                                ShowMessageFX.Warning(null, pxeModuleName, "Bill day cannot be greater than Due day.");
+//                                tfBillDay.requestFocus();
+//                                loadRecordDetail();
+//                                return;
+//                            }
+//                        }
                         if (Integer.parseInt(lsValue) > 31) {
                             ShowMessageFX.Warning(null, pxeModuleName, "Invalid bill day.");
                             tfBillDay.requestFocus();
@@ -715,16 +715,15 @@ public class RecurringExpenseScheduleController implements Initializable, Screen
                         break;
                     case "tfDueDay":
                         lsValue = JFXUtil.removeComma(lsValue);
-                        int lnBillDay = poController.Detail(pnDetail).getBillDay();
-
-                        if (lnBillDay != 0) {
-                            if (lnBillDay > Integer.parseInt(lsValue)) { //bill day cannot be greater than due day
-                                ShowMessageFX.Warning(null, pxeModuleName, "Bill day cannot be greater than Due day.");
-                                tfDueDay.requestFocus();
-                                loadRecordDetail();
-                                return;
-                            }
-                        }
+//                        int lnBillDay = poController.Detail(pnDetail).getBillDay();
+//                        if (lnBillDay != 0) {
+//                            if (lnBillDay > Integer.parseInt(lsValue)) { //bill day cannot be greater than due day
+//                                ShowMessageFX.Warning(null, pxeModuleName, "Bill day cannot be greater than Due day.");
+//                                tfDueDay.requestFocus();
+//                                loadRecordDetail();
+//                                return;
+//                            }
+//                        }
                         if (Integer.parseInt(lsValue) > 31) {
                             ShowMessageFX.Warning(null, pxeModuleName, "Invalid due day.");
                             tfDueDay.requestFocus();
