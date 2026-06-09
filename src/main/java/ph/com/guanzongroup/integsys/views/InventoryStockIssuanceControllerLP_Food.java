@@ -398,6 +398,7 @@ public class InventoryStockIssuanceControllerLP_Food implements Initializable, S
                     }
                     clearAllInputs();
                     getLoadedTransaction();
+                    loadSelectedTransactionDetail(pnTransactionDetail);
                     pnEditMode = poAppController.getEditMode();
                     break;
 

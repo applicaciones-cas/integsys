@@ -398,6 +398,7 @@ public class InventoryStockIssuanceControllerCar_SP implements Initializable, Sc
                     }
                     clearAllInputs();
                     getLoadedTransaction();
+                    loadSelectedTransactionDetail(pnTransactionDetail);
                     pnEditMode = poAppController.getEditMode();
                     break;
 
