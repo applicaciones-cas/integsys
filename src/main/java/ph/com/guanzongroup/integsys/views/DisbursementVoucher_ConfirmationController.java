@@ -2324,7 +2324,7 @@ public class DisbursementVoucher_ConfirmationController implements Initializable
                                 loadTableMain.reload();
                                 break;
                             case "tfJournalProposalDepartment":
-                                poJSON = poController.JournalProposal(pnMainJEP).SearchDepartment(lsValue, false);
+                                poJSON = poController.JournalProposal(pnMainJEP).SearchDepartment(lsValue, false, false);
                                 if (!JFXUtil.isJSONSuccess(poJSON)) {
                                     ShowMessageFX.Warning(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
                                 }
