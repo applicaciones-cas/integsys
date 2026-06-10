@@ -68,8 +68,8 @@
                                           <Font name="System Bold" size="14.0" />
                                        </font>
                                     </Label>
-                                    <TextField fx:id="tfSearchSupplier" promptText="Press F3: Search" GridPane.columnIndex="2" />
-                                    <TextField fx:id="tfSearchReferenceNo" promptText="Press F3: Search" GridPane.columnIndex="6" />
+                                    <TextField fx:id="tfSearchDepartment" promptText="Press F3: Search" GridPane.columnIndex="2" />
+                                    <TextField fx:id="tfSearchTransactionNo" promptText="Press F3: Search" GridPane.columnIndex="6" />
                                  </children>
                               </GridPane>
                            </children>
