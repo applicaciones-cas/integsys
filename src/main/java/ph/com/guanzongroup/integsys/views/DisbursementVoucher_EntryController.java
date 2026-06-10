@@ -745,6 +745,8 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                 loadTableDetailJE.reload();
                 loadTableDetailBIR.reload();
                 loadTableAttachment.reload();
+                loadTableMainJEP.reload();
+                loadTableDetailJEP.reload();
             }
             initButton(pnEditMode);
             if (lsButton.equals("btnUpdate")) {
@@ -881,13 +883,8 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
     }
 
     private void loadTableDetailFromMainJEP() {
-        poJSON = new JSONObject();
-        if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
-            pnMainJEP = tblViewMainList.getSelectionModel().getSelectedIndex();
-            loadTableDetailJEP.reload();
-        } else {
-            ShowMessageFX.Warning(null, pxeModuleName, "Data can only be viewed when in ADD or UPDATE mode.");
-        }
+        pnMainJEP = tblViewMainList.getSelectionModel().getSelectedIndex();
+        loadTableDetailJEP.reload();
     }
 
     public void initLoadTable() {
@@ -1459,7 +1456,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                 int lnRow = Integer.parseInt(journalproposal_data.get(tblVwJournalProposalDetails.getSelectionModel().getSelectedIndex()).getIndex07());
                 pnDetailJEP = lnRow;
                 loadRecordDetailJEP();
-//                moveNextJEP(false, false);
+                moveNextJEP(false, false);
             }
         }
         );
@@ -1615,6 +1612,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
         JFXUtil.setFocusListener(txtMasterOnlinePayment_Focus, tfBankNameOnlinePayment, tfBankAccountOnlinePayment);
         //apJournalDetails
         JFXUtil.setFocusListener(txtDetailJE_Focus, tfAccountCode, tfAccountDescription, tfDebitAmount, tfCreditAmount);
+        //apJournalProposalDetails
         JFXUtil.setFocusListener(txtJournalProposalMaster_Focus, apJournalProposalMaster);
         JFXUtil.setFocusListener(txtJournalProposalDetails_Focus, apJournalProposalDetails);
 
