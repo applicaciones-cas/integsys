@@ -311,6 +311,8 @@ public class DisbursementVoucher_VerificationController implements Initializable
             initDetailGrid();
             initMainGrid();
             initDetailJEGrid();
+            initMainJEPGrid();
+            initDetailJEPGrid();
             initDetailBIRGrid();
             initAttachmentsGrid();
             initTableOnClick();
@@ -1274,6 +1276,14 @@ public class DisbursementVoucher_VerificationController implements Initializable
         JFXUtil.setColumnRight(tblJournalProposalListDebitAmt, tblJournalProposalListCreditAmt);
         JFXUtil.setColumnsIndexAndDisableReordering(tblVwJournalProposalList);
         tblVwJournalDetails.setItems(journal_data);
+    }
+
+    private void initMainJEPGrid() {
+        JFXUtil.setColumnCenter(tblJournalProposalListRowNo, tblJournalProposalListTransNo);
+        JFXUtil.setColumnLeft(tblJournalProposalListBranch, tblJournalProposalListDepartment);
+        JFXUtil.setColumnRight(tblJournalProposalListDebitAmt, tblJournalProposalListCreditAmt);
+        JFXUtil.setColumnsIndexAndDisableReordering(tblVwJournalProposalList);
+        tblVwJournalDetails.setItems(journalproposalmain_data);
     }
 
     private void initDetailBIRGrid() {
