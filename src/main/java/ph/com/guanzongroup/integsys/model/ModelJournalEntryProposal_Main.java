@@ -5,8 +5,6 @@
 package ph.com.guanzongroup.integsys.model;
 
 import javafx.beans.property.SimpleStringProperty;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 
 /**
  *
@@ -29,13 +27,15 @@ public class ModelJournalEntryProposal_Main {
             String index02,
             String index03,
             String index04,
-            String index05) {
+            String index05,
+            String index06) {
 
         this.index01 = new SimpleStringProperty(index01);
         this.index02 = new SimpleStringProperty(index02);
         this.index03 = new SimpleStringProperty(index03);
         this.index04 = new SimpleStringProperty(index04);
         this.index05 = new SimpleStringProperty(index05);
+        this.index06 = new SimpleStringProperty(index06);
     }
 
     public ModelJournalEntryProposal_Main(String index01,
