@@ -1058,7 +1058,7 @@ public class DisbursementVoucher_HistoryController implements Initializable, Scr
         JFXUtil.setColumnLeft(tblJournalProposalListBranch, tblJournalProposalListDepartment);
         JFXUtil.setColumnRight(tblJournalProposalListDebitAmt, tblJournalProposalListCreditAmt);
         JFXUtil.setColumnsIndexAndDisableReordering(tblVwJournalDetails);
-        tblVwJournalDetails.setItems(journalproposal_data);
+        tblVwJournalProposalDetails.setItems(journalproposal_data);
     }
 
     private void initMainJEPGrid() {
@@ -1140,7 +1140,7 @@ public class DisbursementVoucher_HistoryController implements Initializable, Scr
             }
         });
         JFXUtil.setKeyEventFilter(this::tableKeyEvents, tblVwDetails, tblVwJournalDetails, tblAttachments);
-        JFXUtil.adjustColumnForScrollbar(tblVwDetails, tblVwJournalDetails, tblAttachments);
+        JFXUtil.adjustColumnForScrollbar(tblVwDetails, tblVwJournalDetails, tblAttachments,tblVwJournalProposalList, tblVwJournalProposalDetails);
     }
 
     private void loadDetailView() {
@@ -1558,7 +1558,7 @@ public class DisbursementVoucher_HistoryController implements Initializable, Scr
             double lnTotalDebit = 0;
             double lnTotalCredit = 0;
             for (int lnCtr = 0; lnCtr < poController.JournalProposal(pnMainJEP).getDetailCount(); lnCtr++) {
-                if (!poController.Journal().Detail(lnCtr).isReverse()) {
+                if (!poController.JournalProposal(pnMainJEP).Detail(lnCtr).isReverse()) {
                     continue;
                 }
                 lnTotalDebit += poController.JournalProposal(pnMainJEP).Detail(lnCtr).getDebitAmount();
@@ -1566,7 +1566,7 @@ public class DisbursementVoucher_HistoryController implements Initializable, Scr
             }
             tfTotalProposalDebitAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(lnTotalDebit, true));
             tfTotalProposalCreditAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(lnTotalCredit, true));
-            taJournalProposalRemarks.setText(poController.Journal().Master().getRemarks());
+            taJournalProposalRemarks.setText(poController.JournalProposal(pnMainJEP).Master().getRemarks());
             tfJournalProposalBranch.setText(poController.JournalProposal(pnMainJEP).Master().Branch().getDescription());
             tfJournalProposalDepartment.setText(poController.JournalProposal(pnMainJEP).Master().Department().getDescription());
             JFXUtil.updateCaretPositions(apJournalProposalMaster);
