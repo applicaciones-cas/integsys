@@ -329,13 +329,13 @@ public class DocumentMappingController implements Initializable, ScreenInterface
                     switch (psActiveField) {
                         case "txtSeeks01":
                         case "":
-                            poJSON = poCashflowController.DocumentMapping().SearchTransaction(txtSeeks01.getText(), psActiveField);
+                            poJSON = poCashflowController.DocumentMapping().SearchTransaction(txtSeeks01.getText(), psActiveField,true);
                             break;
                         case "txtSeeks02":
-                            poJSON = poCashflowController.DocumentMapping().SearchTransaction(txtSeeks02.getText(), psActiveField);
+                            poJSON = poCashflowController.DocumentMapping().SearchTransaction(txtSeeks02.getText(), psActiveField,false);
                             break;
                         default:
-                            poJSON = poCashflowController.DocumentMapping().SearchTransaction(txtSeeks01.getText(), psActiveField);
+                            poJSON = poCashflowController.DocumentMapping().SearchTransaction(txtSeeks01.getText(), psActiveField,true);
                             break;
                     }
                     if (!"success".equals((String) poJSON.get("result"))) {
@@ -528,10 +528,10 @@ public class DocumentMappingController implements Initializable, ScreenInterface
                     case F3:
                         switch (txtFieldID) {
                             case "txtSeeks01":
-                                poJSON = poCashflowController.DocumentMapping().SearchTransaction(txtSeeks01.getText(), "txtSeeks01");
+                                poJSON = poCashflowController.DocumentMapping().SearchTransaction(txtSeeks01.getText(), "txtSeeks01",true);
                                 break;
                             case "txtSeeks02":
-                                poJSON = poCashflowController.DocumentMapping().SearchTransaction(txtSeeks02.getText(), "txtSeeks02");
+                                poJSON = poCashflowController.DocumentMapping().SearchTransaction(txtSeeks02.getText(), "txtSeeks02",false);
                                 break;
                         }
                         if (!"success".equals((String) poJSON.get("result"))) {
@@ -542,6 +542,7 @@ public class DocumentMappingController implements Initializable, ScreenInterface
                         loadTableDetail();
                         LoadMaster();
                         LoadDetail();
+                        initButtons(pnEditMode);
                         Platform.runLater(() -> {
                             if (!tblDetails.getItems().isEmpty()) {
                                 tblDetails.getSelectionModel().selectFirst();
