@@ -846,7 +846,7 @@ public class DisbursementVoucher_ApprovalController implements Initializable, Sc
     }
 
     private void loadTableDetailFromMainJEP() {
-        pnMainJEP = tblViewMainList.getSelectionModel().getSelectedIndex();
+        pnMainJEP = tblVwJournalProposalList.getSelectionModel().getSelectedIndex();
         loadTableDetailJEP.reload();
     }
 

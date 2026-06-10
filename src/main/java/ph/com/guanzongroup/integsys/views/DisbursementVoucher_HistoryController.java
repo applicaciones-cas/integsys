@@ -620,7 +620,7 @@ public class DisbursementVoucher_HistoryController implements Initializable, Scr
     }
 
     private void loadTableDetailFromMainJEP() {
-        pnMainJEP = tblViewMainList.getSelectionModel().getSelectedIndex();
+        pnMainJEP = tblVwJournalProposalList.getSelectionModel().getSelectedIndex();
         loadTableDetailJEP.reload();
     }
 
@@ -1119,7 +1119,6 @@ public class DisbursementVoucher_HistoryController implements Initializable, Scr
                 int lnRow = Integer.parseInt(journalproposal_data.get(tblVwJournalProposalDetails.getSelectionModel().getSelectedIndex()).getIndex07());
                 pnDetailJEP = lnRow;
                 loadRecordDetailJEP();
-                moveNextJEP(false, false);
             }
         }
         );
