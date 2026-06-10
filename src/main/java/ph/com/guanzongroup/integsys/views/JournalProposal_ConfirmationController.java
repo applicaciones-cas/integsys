@@ -300,8 +300,8 @@ public class JournalProposal_ConfirmationController implements Initializable, Sc
                 case "btnRetrieve":
                     loadTableMain.reload();
                     break;
-                case "btnConfirm":
-                    if (ShowMessageFX.YesNo(null, pxeModuleName, "Are you sure you want to confirm transaction?")) {
+                case "btnPost":
+                    if (ShowMessageFX.YesNo(null, pxeModuleName, "Are you sure you want to post transaction?")) {
                         pnEditMode = poController.getEditMode();
                         if (pnEditMode == EditMode.READY) {
                             poJSON = poController.ConfirmTransaction("");
@@ -366,7 +366,7 @@ public class JournalProposal_ConfirmationController implements Initializable, Sc
                     ShowMessageFX.Warning(null, pxeModuleName, "Button is not registered, Please contact admin to assist about the unregistered button");
                     break;
             }
-            if (JFXUtil.isObjectEqualTo(lsButton, "btnConfirm", "btnSave", "btnCancel", "btnVoid")) {
+            if (JFXUtil.isObjectEqualTo(lsButton, "btnPost", "btnSave", "btnCancel", "btnVoid")) {
                 poController.InitTransaction();
                 clearTextFields();
                 pnEditMode = EditMode.UNKNOWN;
