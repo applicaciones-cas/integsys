@@ -399,6 +399,7 @@ public class InventoryStockIssuanceController implements Initializable, ScreenIn
                     }
                     clearAllInputs();
                     getLoadedTransaction();
+                    loadSelectedTransactionDetail(pnTransactionDetail);
                     pnEditMode = poAppController.getEditMode();
                     break;
 
@@ -954,10 +955,9 @@ public class InventoryStockIssuanceController implements Initializable, ScreenIn
 
     private void loadSelectedTransactionDetail(int fnRow) throws SQLException, GuanzonException, CloneNotSupportedException {
 
-        int tblIndex = fnRow - 1;
-        tfDelilveryTransNo.setText(tblColDelTransNo.getCellData(tblIndex));
-        tfBranch.setText(tblColDelBranch.getCellData(tblIndex));
-        lblDeliveryStatus.setText(tblColDelStatus.getCellData(tblIndex));
+        tfDelilveryTransNo.setText(tblColDelTransNo.getCellData(fnRow - 1));
+        tfBranch.setText(tblColDelBranch.getCellData(fnRow - 1));
+        lblDeliveryStatus.setText(tblColDelStatus.getCellData(-1));
 
         dpDeliveryDate.setValue(ParseDate(poAppController.getDetail(fnRow).InventoryTransfer().getMaster().getTransactionDate()));
         taDeliveryRemarks.setText(poAppController.getDetail(fnRow).InventoryTransfer().getMaster().getRemarks());
@@ -1307,7 +1307,7 @@ public class InventoryStockIssuanceController implements Initializable, ScreenIn
 
         tblViewDeliveryTrans.getSelectionModel().select(indexToSelect);
 
-        pnTransactionDetail = tblViewDeliveryTrans.getSelectionModel().getSelectedIndex(); // Not focusedIndex
+        pnTransactionDetail = tblViewDeliveryTrans.getSelectionModel().getSelectedIndex() + 1; // Not focusedIndex
         tblViewDeliveryTrans.refresh();
     }
 

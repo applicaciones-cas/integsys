@@ -398,6 +398,7 @@ public class InventoryStockIssuanceControllerMP implements Initializable, Screen
                     }
                     clearAllInputs();
                     getLoadedTransaction();
+                    loadSelectedTransactionDetail(pnTransactionDetail);
                     pnEditMode = poAppController.getEditMode();
                     break;
 

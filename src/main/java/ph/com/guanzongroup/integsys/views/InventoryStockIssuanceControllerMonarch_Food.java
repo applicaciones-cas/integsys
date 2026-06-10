@@ -398,6 +398,7 @@ public class InventoryStockIssuanceControllerMonarch_Food implements Initializab
                     }
                     clearAllInputs();
                     getLoadedTransaction();
+                    loadSelectedTransactionDetail(pnTransactionDetail);
                     pnEditMode = poAppController.getEditMode();
                     break;
 

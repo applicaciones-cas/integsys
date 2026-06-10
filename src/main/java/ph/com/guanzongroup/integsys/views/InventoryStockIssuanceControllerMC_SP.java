@@ -398,6 +398,7 @@ public class InventoryStockIssuanceControllerMC_SP implements Initializable, Scr
                     }
                     clearAllInputs();
                     getLoadedTransaction();
+                    loadSelectedTransactionDetail(pnTransactionDetail);
                     pnEditMode = poAppController.getEditMode();
                     break;
 
