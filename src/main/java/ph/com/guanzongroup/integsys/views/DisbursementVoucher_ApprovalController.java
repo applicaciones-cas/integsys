@@ -1343,7 +1343,7 @@ public class DisbursementVoucher_ApprovalController implements Initializable, Sc
         JFXUtil.setColumnLeft(tblJournalProposalListBranch, tblJournalProposalListDepartment);
         JFXUtil.setColumnRight(tblJournalProposalListDebitAmt, tblJournalProposalListCreditAmt);
         JFXUtil.setColumnsIndexAndDisableReordering(tblVwJournalDetails);
-        tblVwJournalDetails.setItems(journalproposal_data);
+        tblVwJournalProposalDetails.setItems(journalproposal_data);
     }
 
     private void initMainJEPGrid() {
@@ -1439,7 +1439,7 @@ public class DisbursementVoucher_ApprovalController implements Initializable, Sc
         });
         JFXUtil.applyRowHighlighting(tblViewMainList, item -> ((ModelDisbursementVoucher_Main) item).getIndex01(), highlightedRowsMain);
         JFXUtil.setKeyEventFilter(this::tableKeyEvents, tblVwDetails, tblVwJournalDetails, tblVwBIRDetails, tblAttachments);
-        JFXUtil.adjustColumnForScrollbar(tblViewMainList, tblVwDetails, tblVwJournalDetails, tblVwBIRDetails, tblAttachments);
+        JFXUtil.adjustColumnForScrollbar(tblViewMainList, tblVwDetails, tblVwJournalDetails, tblVwBIRDetails, tblAttachments,tblVwJournalProposalList, tblVwJournalProposalDetails);
     }
 
     private void loadDetailView() {
@@ -2342,14 +2342,14 @@ public class DisbursementVoucher_ApprovalController implements Initializable, Sc
                                 if (!JFXUtil.isJSONSuccess(poJSON)) {
                                     ShowMessageFX.Warning(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
                                 }
-                                loadTableMain.reload();
+                                loadTableMainJEP.reload();
                                 break;
                             case "tfJournalProposalDepartment":
                                 poJSON = poController.JournalProposal(pnMainJEP).SearchDepartment(lsValue, false, false);
                                 if (!JFXUtil.isJSONSuccess(poJSON)) {
                                     ShowMessageFX.Warning(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
                                 }
-                                loadTableMain.reload();
+                                loadTableMainJEP.reload();
                                 break;
                             //apJournalProposalDetails
                             case "tfJournalProposalAccountCode":
@@ -2755,7 +2755,7 @@ public class DisbursementVoucher_ApprovalController implements Initializable, Sc
             double lnTotalDebit = 0;
             double lnTotalCredit = 0;
             for (int lnCtr = 0; lnCtr < poController.JournalProposal(pnMainJEP).getDetailCount(); lnCtr++) {
-                if (!poController.Journal().Detail(lnCtr).isReverse()) {
+                if (!poController.JournalProposal(pnMainJEP).Detail(lnCtr).isReverse()) {
                     continue;
                 }
                 lnTotalDebit += poController.JournalProposal(pnMainJEP).Detail(lnCtr).getDebitAmount();
@@ -2763,7 +2763,7 @@ public class DisbursementVoucher_ApprovalController implements Initializable, Sc
             }
             tfTotalProposalDebitAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(lnTotalDebit, true));
             tfTotalProposalCreditAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(lnTotalCredit, true));
-            taJournalProposalRemarks.setText(poController.Journal().Master().getRemarks());
+            taJournalProposalRemarks.setText(poController.JournalProposal(pnMainJEP).Master().getRemarks());
             tfJournalProposalBranch.setText(poController.JournalProposal(pnMainJEP).Master().Branch().getDescription());
             tfJournalProposalDepartment.setText(poController.JournalProposal(pnMainJEP).Master().Department().getDescription());
             JFXUtil.updateCaretPositions(apJournalProposalMaster);
@@ -2973,6 +2973,7 @@ public class DisbursementVoucher_ApprovalController implements Initializable, Sc
                         if (!JFXUtil.isJSONSuccess(poJSON)) {
                             ShowMessageFX.Information(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
                         }
+                        loadRecordMaster();
                         break;
                 }
             }
@@ -2986,6 +2987,7 @@ public class DisbursementVoucher_ApprovalController implements Initializable, Sc
         JFXUtil.setComboBoxActionListener(comboBoxActionListener, cmbPaymentMode, cmbPayeeType, cmbDisbursementMode, cmbClaimantType, cmbCheckStatus, cmbJournalProposalStatus);
         JFXUtil.initComboBoxCellDesignColor("#FF8201", cmbPaymentMode, cmbPayeeType, cmbDisbursementMode, cmbClaimantType, cmbCheckStatus, cmbJournalProposalStatus);
 
+        cmbJournalProposalStatus.setItems(statusJEP);
         JFXUtil.handleDisabledNodeClick(apMasterDVCheck, pnEditMode, nodeID -> {
             switch (nodeID) {
                 case "tfAuthorizedPerson":
@@ -3064,7 +3066,7 @@ public class DisbursementVoucher_ApprovalController implements Initializable, Sc
                         break;
                     case "dpReportMonthYear":
                         if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
-                            lsTransDate = sdfFormat.format(poController.Master().getTransactionDate());
+                            lsTransDate = sdfFormat.format(poController.Journal().Master().getTransactionDate());
                             transactionDate = LocalDate.parse(lsTransDate, DateTimeFormatter.ofPattern(SQLUtil.FORMAT_SHORT_DATE));
 
                             if (selectedDate.isAfter(currentDate)) {
