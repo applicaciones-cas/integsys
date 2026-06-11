@@ -719,8 +719,14 @@ public class DisbursementVoucher_VerificationController implements Initializable
         JFXUtil.clearTextFields(apJournalProposalMaster, apJournalProposalDetails);
         poController.getEditMode();
         Platform.runLater(() -> {
-            loadTableMainJEP.reload();
-            loadTableDetailJEP.reload();
+            try {
+                poController.ReloadJournalProposal();
+                loadRecordMasterJEP();
+                loadTableMainJEP.reload();
+                loadTableDetailJEP.reload();
+            } catch (CloneNotSupportedException | SQLException | GuanzonException ex) {
+                Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+            }
         });
     }
 
@@ -988,7 +994,6 @@ public class DisbursementVoucher_VerificationController implements Initializable
                     try {
                         Thread.sleep(100);
                         journalproposalmain_data.clear();
-                        poController.ReloadJournalProposal();
                         Platform.runLater(() -> {
                             for (int lnCtr = 0; lnCtr < poController.getJournalProposalList().size(); lnCtr++) {
                                 try {
@@ -1019,7 +1024,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
                                 JFXUtil.selectAndFocusRow(tblVwJournalProposalList, pnMainJEP);
                             }
                         });
-                    } catch (InterruptedException | CloneNotSupportedException | SQLException | GuanzonException ex) {
+                    } catch (InterruptedException ex) {
                         Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
                         ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
                     }
@@ -1274,7 +1279,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
         JFXUtil.setColumnCenter(tblJournalProposalListRowNo, tblJournalProposalListTransNo);
         JFXUtil.setColumnLeft(tblJournalProposalListBranch, tblJournalProposalListDepartment);
         JFXUtil.setColumnRight(tblJournalProposalListDebitAmt, tblJournalProposalListCreditAmt);
-        JFXUtil.setColumnsIndexAndDisableReordering(tblVwJournalDetails);
+        JFXUtil.setColumnsIndexAndDisableReordering(tblVwJournalProposalDetails);
         tblVwJournalProposalDetails.setItems(journalproposal_data);
     }
 
@@ -2274,14 +2279,20 @@ public class DisbursementVoucher_VerificationController implements Initializable
                                 if (!JFXUtil.isJSONSuccess(poJSON)) {
                                     ShowMessageFX.Warning(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
                                 }
-                                loadTableMainJEP.reload();
+                                loadRecordMasterJEP();
+                                JFXUtil.runWithDelay(0.30, () -> {
+                                    loadTableMainJEP.reload();
+                                });
                                 break;
                             case "tfJournalProposalDepartment":
                                 poJSON = poController.JournalProposal(pnMainJEP).SearchDepartment(lsValue, false, false);
                                 if (!JFXUtil.isJSONSuccess(poJSON)) {
                                     ShowMessageFX.Warning(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
                                 }
-                                loadTableMainJEP.reload();
+                                loadRecordMasterJEP();
+                                JFXUtil.runWithDelay(0.30, () -> {
+                                    loadTableMainJEP.reload();
+                                });
                                 break;
                             //apJournalProposalDetails
                             case "tfJournalProposalAccountCode":
@@ -2296,7 +2307,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
                                     break;
                                 } else {
                                     pnDetailJEP = Integer.parseInt(String.valueOf(poJSON.get("row")));
-                                    loadTableDetailJEP.reload();
+                                    loadRecordDetailJEP();
                                     JFXUtil.textFieldMoveNext(tfJournalProposalDebitAmount);
                                 }
                                 break;
@@ -2312,7 +2323,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
                                     break;
                                 } else {
                                     pnDetailJEP = Integer.parseInt(String.valueOf(poJSON.get("row")));
-                                    loadTableDetailJEP.reload();
+                                    loadRecordDetailJEP();
                                     JFXUtil.textFieldMoveNext(tfJournalProposalDebitAmount);
                                 }
                                 break;
@@ -2705,16 +2716,16 @@ public class DisbursementVoucher_VerificationController implements Initializable
             if (pnDetailJEP < 0 || pnDetailJEP > poController.JournalProposal(pnMainJEP).getDetailCount() - 1) {
                 return;
             }
-            boolean lbShow = poController.Journal().Detail(pnMainJEP).getEditMode() == EditMode.UPDATE;
+            boolean lbShow = poController.JournalProposal(pnMainJEP).Detail(pnDetailJEP).getEditMode() == EditMode.UPDATE;
             JFXUtil.setDisabled(lbShow, tfJournalProposalAccountCode, tfJournalProposalAccountDescription);
 
-            tfJournalProposalAccountCode.setText(poController.JournalProposal(pnMainJEP).Detail(pnMainJEP).getAccountCode());
-            tfJournalProposalAccountDescription.setText(poController.JournalProposal(pnMainJEP).Detail(pnMainJEP).Account_Chart().getDescription());
-            String lsReportMonth = CustomCommonUtil.formatDateToShortString(poController.JournalProposal(pnMainJEP).Detail(pnMainJEP).getForMonthOf());
+            tfJournalProposalAccountCode.setText(poController.JournalProposal(pnMainJEP).Detail(pnDetailJEP).getAccountCode());
+            tfJournalProposalAccountDescription.setText(poController.JournalProposal(pnMainJEP).Detail(pnDetailJEP).Account_Chart().getDescription());
+            String lsReportMonth = CustomCommonUtil.formatDateToShortString(poController.JournalProposal(pnMainJEP).Detail(pnDetailJEP).getForMonthOf());
             JFXUtil.setDateValue(dpJournalProposalReportMonthYear, CustomCommonUtil.parseDateStringToLocalDate(lsReportMonth, "yyyy-MM-dd"));
-            tfJournalProposalDebitAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.JournalProposal(pnMainJEP).Detail(pnMainJEP).getDebitAmount(), true));
-            tfJournalProposalCreditAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.JournalProposal(pnMainJEP).Detail(pnMainJEP).getCreditAmount(), true));
-            cbJEProposalReverse.setSelected(poController.JournalProposal(pnMainJEP).Detail(pnMainJEP).isReverse());
+            tfJournalProposalDebitAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.JournalProposal(pnMainJEP).Detail(pnDetailJEP).getDebitAmount(), true));
+            tfJournalProposalCreditAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.JournalProposal(pnMainJEP).Detail(pnDetailJEP).getCreditAmount(), true));
+            cbJEProposalReverse.setSelected(poController.JournalProposal(pnMainJEP).Detail(pnDetailJEP).isReverse());
 
             JFXUtil.updateCaretPositions(apJournalProposalDetails);
         } catch (SQLException | GuanzonException ex) {

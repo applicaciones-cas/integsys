@@ -781,14 +781,11 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
         Platform.runLater(() -> {
             try {
                 poController.ReloadJournalProposal();
+                loadRecordMasterJEP();
                 loadTableMainJEP.reload();
                 loadTableDetailJEP.reload();
-            } catch (CloneNotSupportedException ex) {
-                Logger.getLogger(DisbursementVoucher_EntryController.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (SQLException ex) {
-                Logger.getLogger(DisbursementVoucher_EntryController.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (GuanzonException ex) {
-                Logger.getLogger(DisbursementVoucher_EntryController.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (CloneNotSupportedException | SQLException | GuanzonException ex) {
+                Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
             }
         });
     }
@@ -2398,7 +2395,6 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                                 } else {
                                     pnDetailJEP = Integer.parseInt(String.valueOf(poJSON.get("row")));
                                     loadRecordDetailJEP();
-//                                    loadTableDetailJEP.reload();
                                     JFXUtil.textFieldMoveNext(tfJournalProposalDebitAmount);
                                 }
                                 break;
@@ -2414,7 +2410,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                                     break;
                                 } else {
                                     pnDetailJEP = Integer.parseInt(String.valueOf(poJSON.get("row")));
-                                    loadTableDetailJEP.reload();
+                                    loadRecordDetailJEP();
                                     JFXUtil.textFieldMoveNext(tfJournalProposalDebitAmount);
                                 }
                                 break;
