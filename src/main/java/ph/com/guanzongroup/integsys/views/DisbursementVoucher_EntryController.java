@@ -1447,7 +1447,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
         );
         tblVwJournalProposalList.setOnMouseClicked(event -> {
             pnMainJEP = tblVwJournalProposalList.getSelectionModel().getSelectedIndex();
-            if (pnMainJEP >= 0 && event.getClickCount() == 2) {
+            if (pnMainJEP >= 0 && event.getClickCount() == 1) {
                 loadTableDetailFromMainJEP();
                 initButton(pnEditMode);
             }
@@ -2106,15 +2106,13 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                         }
                         break;
                 }
-                JFXUtil
-                        .runWithDelay(
-                                0.50, () -> {
-                                    loadTableDetailJEP.reload();
-                                    if (JFXUtil.isObjectEqualTo(lsID, "tfJournalProposalDebitAmount", "tfJournalProposalAccountDescription")) {
-                                        loadTableMainJEP.reload();
-                                    }
-                                }
-                        );
+                JFXUtil.runWithDelay(0.50, () -> {
+                    loadTableDetailJEP.reload();
+                    if (JFXUtil.isObjectEqualTo(lsID, "tfJournalProposalDebitAmount", "tfJournalProposalCreditAmount")) {
+                        loadTableMainJEP.reload();
+                    }
+                }
+                );
             });
     ChangeListener<Boolean> txtBIRDetail_Focus = JFXUtil.FocusListener(TextField.class,
             (lsID, lsValue) -> {
