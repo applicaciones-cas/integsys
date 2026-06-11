@@ -2810,16 +2810,16 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
             if (pnDetailJEP < 0 || pnDetailJEP > poController.JournalProposal(pnMainJEP).getDetailCount() - 1) {
                 return;
             }
-            boolean lbShow = poController.Journal().Detail(pnMainJEP).getEditMode() == EditMode.UPDATE;
+            boolean lbShow = poController.JournalProposal(pnMainJEP).Detail(pnDetailJEP).getEditMode() == EditMode.UPDATE;
             JFXUtil.setDisabled(lbShow, tfJournalProposalAccountCode, tfJournalProposalAccountDescription);
 
-            tfJournalProposalAccountCode.setText(poController.JournalProposal(pnMainJEP).Detail(pnMainJEP).getAccountCode());
-            tfJournalProposalAccountDescription.setText(poController.JournalProposal(pnMainJEP).Detail(pnMainJEP).Account_Chart().getDescription());
-            String lsReportMonth = CustomCommonUtil.formatDateToShortString(poController.JournalProposal(pnMainJEP).Detail(pnMainJEP).getForMonthOf());
+            tfJournalProposalAccountCode.setText(poController.JournalProposal(pnMainJEP).Detail(pnDetailJEP).getAccountCode());
+            tfJournalProposalAccountDescription.setText(poController.JournalProposal(pnMainJEP).Detail(pnDetailJEP).Account_Chart().getDescription());
+            String lsReportMonth = CustomCommonUtil.formatDateToShortString(poController.JournalProposal(pnMainJEP).Detail(pnDetailJEP).getForMonthOf());
             JFXUtil.setDateValue(dpJournalProposalReportMonthYear, CustomCommonUtil.parseDateStringToLocalDate(lsReportMonth, "yyyy-MM-dd"));
-            tfJournalProposalDebitAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.JournalProposal(pnMainJEP).Detail(pnMainJEP).getDebitAmount(), true));
-            tfJournalProposalCreditAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.JournalProposal(pnMainJEP).Detail(pnMainJEP).getCreditAmount(), true));
-            cbJEProposalReverse.setSelected(poController.JournalProposal(pnMainJEP).Detail(pnMainJEP).isReverse());
+            tfJournalProposalDebitAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.JournalProposal(pnMainJEP).Detail(pnDetailJEP).getDebitAmount(), true));
+            tfJournalProposalCreditAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.JournalProposal(pnMainJEP).Detail(pnDetailJEP).getCreditAmount(), true));
+            cbJEProposalReverse.setSelected(poController.JournalProposal(pnMainJEP).Detail(pnDetailJEP).isReverse());
 
             JFXUtil.updateCaretPositions(apJournalProposalDetails);
         } catch (SQLException | GuanzonException ex) {
