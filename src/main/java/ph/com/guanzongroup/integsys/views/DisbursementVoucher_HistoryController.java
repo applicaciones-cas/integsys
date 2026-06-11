@@ -160,7 +160,7 @@ public class DisbursementVoucher_HistoryController implements Initializable, Scr
     @FXML
     private ComboBox cmbPaymentMode, cmbPayeeType, cmbDisbursementMode, cmbClaimantType, cmbCheckStatus, cmbAttachmentType;
     @FXML
-    private CheckBox chbkPrintByBank, chbkIsCrossCheck, chbkIsPersonOnly, chbkVatClassification, cbJEProposalReverse;
+    private CheckBox chbkPrintByBank, chbkIsCrossCheck, chbkIsPersonOnly, chbkVatClassification, cbJEProposalReverse, cbJEMasterProposalReverse;
     @FXML
     private TextArea taDVRemarks, taJournalRemarks, taJournalProposalRemarks;
     @FXML
