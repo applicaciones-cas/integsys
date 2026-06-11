@@ -581,16 +581,17 @@ public class DisbursementVoucher_HistoryController implements Initializable, Scr
     private void populateJEP() {
         JFXUtil.clearTextFields(apJournalProposalMaster, apJournalProposalDetails);
         poController.getEditMode();
-        Platform.runLater(() -> {
+        if (pnEditMode == EditMode.READY) {
             try {
                 poController.ReloadJournalProposal();
-                loadRecordMasterJEP();
-                loadTableMainJEP.reload();
-                loadTableDetailJEP.reload();
+
             } catch (CloneNotSupportedException | SQLException | GuanzonException ex) {
                 Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
             }
-        });
+        }
+        loadRecordMasterJEP();
+        loadTableMainJEP.reload();
+        loadTableDetailJEP.reload();
     }
 
     private void populateJE() {

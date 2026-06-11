@@ -2096,11 +2096,9 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                 }
                 JFXUtil.runWithDelay(0.50, () -> {
                     loadTableDetailJEP.reload();
-                    JFXUtil.runWithDelay(0.50, () -> {
-                        if (JFXUtil.isObjectEqualTo(lsID, "tfJournalProposalDebitAmount", "tfJournalProposalAccountDescription")) {
-                            loadTableMainJEP.reload();
-                        }
-                    });
+                    if (JFXUtil.isObjectEqualTo(lsID, "tfJournalProposalDebitAmount", "tfJournalProposalAccountDescription")) {
+                        loadTableMainJEP.reload();
+                    }
                 });
             });
     ChangeListener<Boolean> txtBIRDetail_Focus = JFXUtil.FocusListener(TextField.class,
