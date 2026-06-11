@@ -2819,7 +2819,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                                 -> !JournalProposalStatus.CANCELLED.equals(status.getCode())
                                 && !JournalProposalStatus.POSTED.equals(status.getCode())
                                 && !JournalProposalStatus.RETURNED.equals(status.getCode())
-                                && !JournalProposalStatus.CONFIRMED.equals(status.getCode())
+                                && !JournalProposalStatus.VOID.equals(status.getCode())
                         );
                         break;
                     case JournalProposalStatus.CONFIRMED:
