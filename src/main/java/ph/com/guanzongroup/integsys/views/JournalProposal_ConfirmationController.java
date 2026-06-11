@@ -90,23 +90,23 @@ public class JournalProposal_ConfirmationController implements Initializable, Sc
     private String psSearchDate = "";
 
     @FXML
-    private AnchorPane AnchorMain, apBrowse, apButton, apJournalMaster, apJournalDetails;
+    private AnchorPane apMainAnchor, apBrowse, apButton, apJournalProposalMaster, apJournalProposalDetails;
     @FXML
-    private TextField tfJournalProposalTransactionNo, tfJournalProposalBranch, tfJournalProposalDepartment, tfJournalProposalDVNo, tfTotalProposalDebitAmount, tfTotalProposalCreditAmount, tfJournalProposalAccountCode, tfJournalProposalAccountDescription, tfJournalProposalDebitAmount, tfJournalProposalCreditAmount, tfSearchDepartment, tfsearchTransactionNo;
+    private TextField tfJournalProposalTransactionNo, tfJournalProposalBranch, tfJournalProposalDepartment, tfJournalProposalDVNo, tfTotalProposalDebitAmount, tfTotalProposalCreditAmount, tfJournalProposalAccountCode, tfJournalProposalAccountDescription, tfJournalProposalDebitAmount, tfJournalProposalCreditAmount, tfSearchDepartment, tfSearchTransactionNo;
     @FXML
-    private DatePicker dpJournalTransactionDate, dpJournalProposalReportMonthYear;
+    private DatePicker dpJournalProposalTransactionDate, dpJournalProposalReportMonthYear;
     @FXML
     private Label lblSource, lblJournalTransactionStatus;
     @FXML
-    private Button btnUpdate, btnSearch, btnSave, btnCancel, btnApprove, btnVoid, btnHistory, btnRetrieve, btnClose;
+    private Button btnPost, btnHistory, btnRetrieve, btnClose;
     @FXML
     private TextArea taJournalProposalRemarks;
     @FXML
     private CheckBox cbJEProposalReverse;
     @FXML
-    private TableView tblVwJournalDetails, tblViewMain;
+    private TableView tblVwJournalProposalDetails, tblViewMainList;
     @FXML
-    private TableColumn tblJournalRowNo, tblJournalReportMonthYear, tblJournalAccountCode, tblJournalAccountDescription, tblJournalDebitAmount, tblJournalCreditAmount, tblRowNo, tblDate, tblTransNo,tblDVNo,tblDepartment;
+    private TableColumn tblJournalProposalRowNo, tblJournalProposalReportMonthYear, tblJournalProposalAccountCode, tblJournalProposalAccountDescription, tblJournalProposalDebitAmount, tblJournalProposalCreditAmount, tblRowNo, tblDate, tblTransNo,tblDVNo,tblDepartment;
     
     @Override
     public void setGRider(GRiderCAS foValue) {
@@ -143,7 +143,7 @@ public class JournalProposal_ConfirmationController implements Initializable, Sc
             if (!"success".equals((String) poJSON.get("result"))) {
                 ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
             }
-            poController.setTransactionStatus("01");
+            poController.setTransactionStatus(JournalProposalStatus.CONFIRMED);
             initLoadTable();
             initTextFields();
             initDatePicker();
@@ -166,7 +166,7 @@ public class JournalProposal_ConfirmationController implements Initializable, Sc
                     ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
                 }
             });
-            JFXUtil.initKeyClickObject(AnchorMain, lastFocusedTextField, previousSearchedTextField); // for btnSearch Reference
+            JFXUtil.initKeyClickObject(apMainAnchor, lastFocusedTextField, previousSearchedTextField); // for btnSearch Reference
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
             ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
@@ -182,8 +182,8 @@ public class JournalProposal_ConfirmationController implements Initializable, Sc
     }
 
     private void initDatePicker() {
-        JFXUtil.setDatePickerFormat("MM/dd/yyyy", dpJournalTransactionDate, dpJournalProposalReportMonthYear);
-        JFXUtil.setActionListener(datepicker_Action, dpJournalTransactionDate, dpJournalProposalReportMonthYear);
+        JFXUtil.setDatePickerFormat("MM/dd/yyyy", dpJournalProposalTransactionDate, dpJournalProposalReportMonthYear);
+        JFXUtil.setActionListener(datepicker_Action, dpJournalProposalTransactionDate, dpJournalProposalReportMonthYear);
     }
 
     boolean pbSuccess = true;
@@ -240,7 +240,7 @@ public class JournalProposal_ConfirmationController implements Initializable, Sc
                     pnEditMode = poController.getEditMode();
                     break;
                 case "btnSearch":
-                    JFXUtil.initiateBtnSearch(pxeModuleName, lastFocusedTextField, previousSearchedTextField, apBrowse,  apJournalDetails);
+                    JFXUtil.initiateBtnSearch(pxeModuleName, lastFocusedTextField, previousSearchedTextField, apBrowse,  apJournalProposalDetails);
                     break;
                 case "btnSave":
                     if (!ShowMessageFX.YesNo(null, pxeModuleName, "Are you sure you want to save the transaction?")) {
@@ -266,16 +266,16 @@ public class JournalProposal_ConfirmationController implements Initializable, Sc
                                     break;
                                 } else {
                                     ShowMessageFX.Information(null, pxeModuleName, (String) poJSON.get("message"));
-                                    JFXUtil.highlightByKey(tblViewMain, String.valueOf(pnMain + 1), "#C1E1C1", highlightedRowsMain);
+                                    JFXUtil.highlightByKey(tblViewMainList, String.valueOf(pnMain + 1), "#C1E1C1", highlightedRowsMain);
                                 }
                             }
                         }
                     }
-                    JFXUtil.disableAllHighlightByColor(tblViewMain, "#A7C7E7", highlightedRowsMain);
+                    JFXUtil.disableAllHighlightByColor(tblViewMainList, "#A7C7E7", highlightedRowsMain);
                     break;
                 case "btnCancel":
                     if (ShowMessageFX.YesNo(null, pxeModuleName, "Do you want to disregard changes?")) {
-                        JFXUtil.disableAllHighlightByColor(tblViewMain, "#A7C7E7", highlightedRowsMain);
+                        JFXUtil.disableAllHighlightByColor(tblViewMainList, "#A7C7E7", highlightedRowsMain);
                         pnEditMode = EditMode.UNKNOWN;
                         break;
                     } else {
@@ -310,8 +310,8 @@ public class JournalProposal_ConfirmationController implements Initializable, Sc
                                 return;
                             } else {
                                 ShowMessageFX.Information(null, pxeModuleName, (String) poJSON.get("message"));
-                                JFXUtil.disableAllHighlightByColor(tblViewMain, "#A7C7E7", highlightedRowsMain);
-                                JFXUtil.highlightByKey(tblViewMain, String.valueOf(pnMain + 1), "#C1E1C1", highlightedRowsMain);
+                                JFXUtil.disableAllHighlightByColor(tblViewMainList, "#A7C7E7", highlightedRowsMain);
+                                JFXUtil.highlightByKey(tblViewMainList, String.valueOf(pnMain + 1), "#C1E1C1", highlightedRowsMain);
                             }
                         }
                     } else {
@@ -320,7 +320,7 @@ public class JournalProposal_ConfirmationController implements Initializable, Sc
                     break;
                 case "btnClose":
                     if (ShowMessageFX.YesNo(null, "Close Tab", "Are you sure you want to close this Tab?")) {
-                        poUnload.unloadForm(AnchorMain, oApp, pxeModuleName);
+                        poUnload.unloadForm(apMainAnchor, oApp, pxeModuleName);
                     } else {
                         return;
                     }
@@ -354,8 +354,8 @@ public class JournalProposal_ConfirmationController implements Initializable, Sc
                             } else {
                                 ShowMessageFX.Information(null, pxeModuleName, (String) poJSON.get("message"));
                                 pnEditMode = poController.getEditMode();
-                                JFXUtil.disableAllHighlightByColor(tblViewMain, "#A7C7E7", highlightedRowsMain);
-                                JFXUtil.highlightByKey(tblViewMain, String.valueOf(pnMain + 1), "#FAA0A0", highlightedRowsMain);
+                                JFXUtil.disableAllHighlightByColor(tblViewMainList, "#A7C7E7", highlightedRowsMain);
+                                JFXUtil.highlightByKey(tblViewMainList, String.valueOf(pnMain + 1), "#FAA0A0", highlightedRowsMain);
                             }
                         }
                     } else {
@@ -394,19 +394,9 @@ public class JournalProposal_ConfirmationController implements Initializable, Sc
 
     private void loadRecordMasterJE() {
         try {
-            String lsStat = "";
-            switch (poController.Master().getTransactionStatus()) {
-                case  JournalProposalStatus.OPEN:
-                    lsStat = "Void";
-                    break;
-                case  JournalProposalStatus.CONFIRMED:
-                    lsStat = "Cancel";
-                    break;
-            }
-            btnVoid.setText(lsStat);
             JFXUtil.setStatusValue(lblJournalTransactionStatus, JournalStatus.class, pnEditMode == EditMode.UNKNOWN ? "-1" : poController.Master().getTransactionStatus());
             tfJournalProposalTransactionNo.setText(poController.Master().getTransactionNo());
-            dpJournalTransactionDate.setValue(CustomCommonUtil.parseDateStringToLocalDate(SQLUtil.dateFormat(poController.Master().getTransactionDate(), SQLUtil.FORMAT_SHORT_DATE)));
+            dpJournalProposalTransactionDate.setValue(CustomCommonUtil.parseDateStringToLocalDate(SQLUtil.dateFormat(poController.Master().getTransactionDate(), SQLUtil.FORMAT_SHORT_DATE)));
             double lnTotalDebit = 0;
             double lnTotalCredit = 0;
             for (int lnCtr = 0; lnCtr < poController.getDetailCount(); lnCtr++) {
@@ -423,7 +413,7 @@ public class JournalProposal_ConfirmationController implements Initializable, Sc
             tfJournalProposalDepartment.setText(poController.Master().Department().getDescription());
             tfJournalProposalDVNo.setText(poController.Master().Disbursement().getVoucherNo());
             
-            JFXUtil.updateCaretPositions(apJournalMaster);
+            JFXUtil.updateCaretPositions(apJournalProposalMaster);
         } catch ( SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
             ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
@@ -447,7 +437,7 @@ public class JournalProposal_ConfirmationController implements Initializable, Sc
             tfJournalProposalDebitAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(pnDetailJE).getDebitAmount(), true));
             tfJournalProposalCreditAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.Detail(pnDetailJE).getCreditAmount(), true));
 
-            JFXUtil.updateCaretPositions(apJournalDetails);
+            JFXUtil.updateCaretPositions(apJournalProposalDetails);
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
             ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
@@ -457,24 +447,24 @@ public class JournalProposal_ConfirmationController implements Initializable, Sc
     private void initMainGrid() {
         JFXUtil.setColumnCenter(tblRowNo, tblDate, tblTransNo,tblDVNo);
         JFXUtil.setColumnLeft(tblDepartment);
-        JFXUtil.setColumnsIndexAndDisableReordering(tblViewMain);
+        JFXUtil.setColumnsIndexAndDisableReordering(tblViewMainList);
 
-        tblViewMain.setItems(main_data);
+        tblViewMainList.setItems(main_data);
     }
 
     private void initDetailJEGrid() {
-        JFXUtil.setColumnCenter(tblJournalRowNo, tblJournalReportMonthYear);
-        JFXUtil.setColumnLeft(tblJournalAccountCode, tblJournalAccountDescription);
-        JFXUtil.setColumnRight(tblJournalDebitAmount, tblJournalCreditAmount);
-        JFXUtil.setColumnsIndexAndDisableReordering(tblVwJournalDetails);
-        tblVwJournalDetails.setItems(journal_data);
+        JFXUtil.setColumnCenter(tblJournalProposalRowNo, tblJournalProposalReportMonthYear);
+        JFXUtil.setColumnLeft(tblJournalProposalAccountCode, tblJournalProposalAccountDescription);
+        JFXUtil.setColumnRight(tblJournalProposalDebitAmount, tblJournalProposalCreditAmount);
+        JFXUtil.setColumnsIndexAndDisableReordering(tblVwJournalProposalDetails);
+        tblVwJournalProposalDetails.setItems(journal_data);
     }
 
     private void loadTableDetailFromMain() {
         poJSON = new JSONObject();
 
-        pnMain = tblViewMain.getSelectionModel().getSelectedIndex();
-        ModelTableMain selected = (ModelTableMain) tblViewMain.getSelectionModel().getSelectedItem();
+        pnMain = tblViewMainList.getSelectionModel().getSelectedIndex();
+        ModelTableMain selected = (ModelTableMain) tblViewMainList.getSelectionModel().getSelectedItem();
         if (selected != null) {
             try {
                 int pnRowMain = Integer.parseInt(selected.getIndex01()) - 1;
@@ -483,9 +473,9 @@ public class JournalProposal_ConfirmationController implements Initializable, Sc
                     return;
                 }
                 pnMain = pnRowMain;
-                JFXUtil.disableAllHighlightByColor(tblViewMain, "#A7C7E7", highlightedRowsMain);
-                JFXUtil.highlightByKey(tblViewMain, String.valueOf(pnRowMain + 1), "#A7C7E7", highlightedRowsMain);
-                JFXUtil.clearTextFields(apJournalMaster);
+                JFXUtil.disableAllHighlightByColor(tblViewMainList, "#A7C7E7", highlightedRowsMain);
+                JFXUtil.highlightByKey(tblViewMainList, String.valueOf(pnRowMain + 1), "#A7C7E7", highlightedRowsMain);
+                JFXUtil.clearTextFields(apJournalProposalMaster);
                 poJSON = poController.OpenTransaction(lsTransactionNo);
                 if ("error".equals(poJSON.get("result"))) {
                     ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
@@ -528,14 +518,14 @@ public class JournalProposal_ConfirmationController implements Initializable, Sc
 
     private void initLoadTable() {
         loadTableMain = new JFXUtil.ReloadableTableTask(
-                tblViewMain,
+                tblViewMainList,
                 main_data,
                 () -> {
                     Platform.runLater(() -> {
                         try {
                             main_data.clear();
-                            JFXUtil.disableAllHighlight(tblViewMain, highlightedRowsMain);
-                            poJSON = poController.loadTransactionList(tfSearchDepartment.getText(), tfsearchTransactionNo.getText());
+                            JFXUtil.disableAllHighlight(tblViewMainList, highlightedRowsMain);
+                            poJSON = poController.loadTransactionList(tfSearchDepartment.getText(), tfSearchTransactionNo.getText());
                             if ("success".equals(poJSON.get("result"))) {
                                 if (poController.getTransactionList().size() > 0) {
                                     for (int lnCntr = 0; lnCntr < poController.getTransactionList().size() - 1; lnCntr++) {
@@ -549,10 +539,10 @@ public class JournalProposal_ConfirmationController implements Initializable, Sc
                                                     "", "", "", "", ""
                                             ));
                                             if (poController.TransactionList(lnCntr).getTransactionStatus().equals( JournalProposalStatus.VOID)) {
-                                                JFXUtil.highlightByKey(tblViewMain, String.valueOf(lnCntr + 1), "#FAA0A0", highlightedRowsMain);
+                                                JFXUtil.highlightByKey(tblViewMainList, String.valueOf(lnCntr + 1), "#FAA0A0", highlightedRowsMain);
                                             }
                                             if (poController.TransactionList(lnCntr).getTransactionStatus().equals( JournalProposalStatus.CONFIRMED)) {
-                                                JFXUtil.highlightByKey(tblViewMain, String.valueOf(lnCntr + 1), "#C1E1C1", highlightedRowsMain);
+                                                JFXUtil.highlightByKey(tblViewMainList, String.valueOf(lnCntr + 1), "#C1E1C1", highlightedRowsMain);
                                             }
                                         } catch (SQLException | GuanzonException ex) {
                                             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
@@ -571,7 +561,7 @@ public class JournalProposal_ConfirmationController implements Initializable, Sc
                 });
 
         loadTableDetailJE = new JFXUtil.ReloadableTableTask(
-                tblVwJournalDetails,
+                tblVwJournalProposalDetails,
                 journal_data,
                 () -> {
                     Platform.runLater(() -> {
@@ -618,15 +608,15 @@ public class JournalProposal_ConfirmationController implements Initializable, Sc
                                     >= journal_data.size()) {
                                 if (!journal_data.isEmpty()) {
                                     /* FOCUS ON FIRST ROW */
-                                    JFXUtil.selectAndFocusRow(tblVwJournalDetails, 0);
+                                    JFXUtil.selectAndFocusRow(tblVwJournalProposalDetails, 0);
                                     int lnRow = Integer.parseInt(journal_data.get(0).getIndex07());
                                     pnDetailJE = lnRow;
                                     loadRecordDetailJE();
                                 }
                             } else {
                                 /* FOCUS ON THE ROW THAT pnDetailBIR POINTS TO */
-                                JFXUtil.selectAndFocusRow(tblVwJournalDetails, lnTempRow);
-                                int lnRow = Integer.parseInt(journal_data.get(tblVwJournalDetails.getSelectionModel().getSelectedIndex()).getIndex07());
+                                JFXUtil.selectAndFocusRow(tblVwJournalProposalDetails, lnTempRow);
+                                int lnRow = Integer.parseInt(journal_data.get(tblVwJournalProposalDetails.getSelectionModel().getSelectedIndex()).getIndex07());
                                 pnDetailJE = lnRow;
                                 loadRecordDetailJE();
                             }
@@ -761,14 +751,14 @@ public class JournalProposal_ConfirmationController implements Initializable, Sc
                                 loadRecordSearch();
                                 loadTableMain.reload();
                                 break;
-                            case "tfsearchTransactionNo":
+                            case "tfSearchTransactionNo":
                                 if (!tooltipShown) {
-                                    JFXUtil.showTooltip("NOTE: Results appear directly in the table view, no pop-up dialog.", tfsearchTransactionNo);
+                                    JFXUtil.showTooltip("NOTE: Results appear directly in the table view, no pop-up dialog.", tfSearchTransactionNo);
                                     tooltipShown = true;
                                 }
                                 loadTableMain.reload();
                                 break;
-                            //apJournalDetails
+                            //apJournalProposalDetails
                             case "tfJournalProposalAccountCode":
                                 poJSON = poController.SearchAccountCode(pnDetailJE, lsValue, true, poController.Master().getIndustryCode(), null);
                                 if ("error".equals(poJSON.get("result"))) {
@@ -830,18 +820,18 @@ public class JournalProposal_ConfirmationController implements Initializable, Sc
     private void initTextFields() {
         JFXUtil.setFocusListener(txtArea_Focus,  taJournalProposalRemarks);
         JFXUtil.setFocusListener(txtBrowse_Focus, apBrowse);
-        JFXUtil.setFocusListener(txtDetailJE_Focus, apJournalDetails);
+        JFXUtil.setFocusListener(txtDetailJE_Focus, apJournalProposalDetails);
 
-        JFXUtil.setKeyPressedListener(this::txtField_KeyPressed, apBrowse, apJournalMaster, apJournalDetails);
+        JFXUtil.setKeyPressedListener(this::txtField_KeyPressed, apBrowse, apJournalProposalMaster, apJournalProposalDetails);
         JFXUtil.setCommaFormatter(tfJournalProposalDebitAmount, tfJournalProposalCreditAmount);
-        JFXUtil.setKeyEventFilter(tableKeyEvents, tblVwJournalDetails, tblViewMain);
-        JFXUtil.adjustColumnForScrollbar(tblVwJournalDetails, tblViewMain);
+        JFXUtil.setKeyEventFilter(tableKeyEvents, tblVwJournalProposalDetails, tblViewMainList);
+        JFXUtil.adjustColumnForScrollbar(tblVwJournalProposalDetails, tblViewMainList);
     }
 
     public void initTableOnClick() {
-        tblViewMain.setOnMouseClicked(event -> {
+        tblViewMainList.setOnMouseClicked(event -> {
             if (event.getClickCount() == 2) {
-                pnMain = tblViewMain.getSelectionModel().getSelectedIndex();
+                pnMain = tblViewMainList.getSelectionModel().getSelectedIndex();
                 if (pnMain >= 0) {
                     loadTableDetailFromMain();
                     pnEditMode = poController.getEditMode();
@@ -849,15 +839,15 @@ public class JournalProposal_ConfirmationController implements Initializable, Sc
                 }
             }
         });
-        tblVwJournalDetails.setOnMouseClicked(event -> {
+        tblVwJournalProposalDetails.setOnMouseClicked(event -> {
             if (!journal_data.isEmpty() && event.getClickCount() == 1) {
-                int lnRow = Integer.parseInt(journal_data.get(tblVwJournalDetails.getSelectionModel().getSelectedIndex()).getIndex07());
+                int lnRow = Integer.parseInt(journal_data.get(tblVwJournalProposalDetails.getSelectionModel().getSelectedIndex()).getIndex07());
                 pnDetailJE = lnRow;
                 loadRecordDetailJE();
                 moveNextJE(false, false);
             }
         });
-        JFXUtil.applyRowHighlighting(tblViewMain, item -> ((ModelTableMain) item).getIndex01(), highlightedRowsMain);
+        JFXUtil.applyRowHighlighting(tblViewMainList, item -> ((ModelTableMain) item).getIndex01(), highlightedRowsMain);
     }
 
     JFXUtil.TableKeyEvent tableKeyEvents = new JFXUtil.TableKeyEvent() {
@@ -865,7 +855,7 @@ public class JournalProposal_ConfirmationController implements Initializable, Sc
         protected void onRowMove(TableView<?> currentTable, String currentTableID, boolean isMovedDown) {
             int newIndex = 0;
             switch (currentTableID) {
-                case "tblVwJournalDetails":
+                case "tblVwJournalProposalDetails":
                     if (journal_data.isEmpty()) {
                         return;
                     }
@@ -881,9 +871,9 @@ public class JournalProposal_ConfirmationController implements Initializable, Sc
     public void moveNextJE(boolean isUp, boolean continueNext) {
         try {
             if (continueNext) {
-                apJournalDetails.requestFocus();
-                pnDetailJE = isUp ? Integer.parseInt(journal_data.get(JFXUtil.moveToPreviousRow(tblVwJournalDetails)).getIndex07())
-                        : Integer.parseInt(journal_data.get(JFXUtil.moveToNextRow(tblVwJournalDetails)).getIndex07());
+                apJournalProposalDetails.requestFocus();
+                pnDetailJE = isUp ? Integer.parseInt(journal_data.get(JFXUtil.moveToPreviousRow(tblVwJournalProposalDetails)).getIndex07())
+                        : Integer.parseInt(journal_data.get(JFXUtil.moveToNextRow(tblVwJournalProposalDetails)).getIndex07());
             }
             loadRecordDetailJE();
             if (pnDetailJE < 0 || pnDetailJE > poController.getDetailCount() - 1) {
@@ -905,33 +895,25 @@ public class JournalProposal_ConfirmationController implements Initializable, Sc
         boolean lbShow2 = (fnValue == EditMode.READY);
         boolean lbShow3 = (fnValue == EditMode.UNKNOWN || fnValue == EditMode.READY);
 
-        JFXUtil.setButtonsVisibility(lbShow1, btnSearch, btnSave, btnCancel);
-        JFXUtil.setButtonsVisibility(lbShow2, btnUpdate, btnHistory, btnVoid);
+        JFXUtil.setButtonsVisibility(lbShow2, btnHistory);
         JFXUtil.setButtonsVisibility(lbShow3, btnClose);
 
-        JFXUtil.setDisabled(!lbShow1, apJournalMaster, apJournalDetails);
+        JFXUtil.setDisabled(!lbShow1, apJournalProposalMaster, apJournalProposalDetails);
         JFXUtil.setButtonsVisibility(true, btnRetrieve);
-        JFXUtil.setButtonsVisibility(false, btnApprove);
+        JFXUtil.setButtonsVisibility(false, btnPost);
 
         if (fnValue != EditMode.READY) {
             return;
         }
         switch (poController.Master().getTransactionStatus()) {
-            case  JournalProposalStatus.OPEN:
-                JFXUtil.setButtonsVisibility(true, btnApprove);
-                break;
             case  JournalProposalStatus.CONFIRMED:
-                JFXUtil.setButtonsVisibility(false, btnApprove);
-                break;
-            case  JournalProposalStatus.VOID:
-            case  JournalProposalStatus.CANCELLED:
-                JFXUtil.setButtonsVisibility(false, btnUpdate, btnVoid, btnApprove);
+                JFXUtil.setButtonsVisibility(true, btnPost);
                 break;
         }
     }
 
     private void clearTextFields() {
         JFXUtil.setValueToNull(previousSearchedTextField, lastFocusedTextField);
-        JFXUtil.clearTextFields(apJournalMaster, apJournalDetails);
+        JFXUtil.clearTextFields(apJournalProposalMaster, apJournalProposalDetails);
     }
 }
