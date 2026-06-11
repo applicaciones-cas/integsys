@@ -2766,7 +2766,7 @@ public class DisbursementVoucher_ConfirmationController implements Initializable
             tfTotalProposalDebitAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(lnTotalDebit, true));
             tfTotalProposalCreditAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(lnTotalCredit, true));
             taJournalProposalRemarks.setText(poController.JournalProposal(pnMainJEP).Master().getRemarks());
-            tfJournalProposalBranch.setText(poController.JournalProposal(pnMainJEP).Master().Branch().getDescription());
+            tfJournalProposalBranch.setText(poController.JournalProposal(pnMainJEP).Master().Branch().getBranchName());
             tfJournalProposalDepartment.setText(poController.JournalProposal(pnMainJEP).Master().Department().getDescription());
             JFXUtil.updateCaretPositions(apJournalProposalMaster);
         } catch (SQLException | GuanzonException ex) {
