@@ -117,7 +117,7 @@ public class DisbursementVoucher_HistoryController implements Initializable, Scr
     AtomicReference<Object> lastFocusedTextField = new AtomicReference<>();
     AtomicReference<Object> previousSearchedTextField = new AtomicReference<>();
     Map<String, String> imageinfo_temp = new HashMap<>();
-    JFXUtil.ReloadableTableTask loadTableDetail, loadTableDetailJE, loadTableDetailBIR, loadTableAttachment, loadTableMainJEP,loadTableDetailJEP;
+    JFXUtil.ReloadableTableTask loadTableDetail, loadTableDetailJE, loadTableDetailBIR, loadTableAttachment, loadTableMainJEP, loadTableDetailJEP;
     private final JFXUtil.ImageViewer imageviewerutil = new JFXUtil.ImageViewer();
     ObservableList<String> cPaymentMode = FXCollections.observableArrayList(
             "CHECK", "CHECK DEPOSIT", "BANK TRANSFER", "DIGITAL PAYMENT");
@@ -446,6 +446,11 @@ public class DisbursementVoucher_HistoryController implements Initializable, Scr
                 break;
         }
         initButton(pnEditMode);
+    }
+
+    @FXML
+    private void cmdCheckBox_Click() {
+
     }
 
     private void initButtonsClickActions() {
@@ -1141,7 +1146,7 @@ public class DisbursementVoucher_HistoryController implements Initializable, Scr
             }
         });
         JFXUtil.setKeyEventFilter(this::tableKeyEvents, tblVwDetails, tblVwJournalDetails, tblAttachments);
-        JFXUtil.adjustColumnForScrollbar(tblVwDetails, tblVwJournalDetails, tblAttachments,tblVwJournalProposalList, tblVwJournalProposalDetails);
+        JFXUtil.adjustColumnForScrollbar(tblVwDetails, tblVwJournalDetails, tblAttachments, tblVwJournalProposalList, tblVwJournalProposalDetails);
     }
 
     private void loadDetailView() {
