@@ -2097,7 +2097,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                 }
                 JFXUtil.runWithDelay(0.50, () -> {
                     loadTableDetailJEP.reload();
-                    if (JFXUtil.isObjectEqualTo(lsID, "tfJournalProposalAccountCode", "tfJournalProposalAccountDescription")) {
+                    if (JFXUtil.isObjectEqualTo(lsID, "tfJournalProposalDebitAmount", "tfJournalProposalCreditAmount")) {
                         loadTableMainJEP.reload();
                     }
                 });
