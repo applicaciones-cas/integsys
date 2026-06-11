@@ -2350,21 +2350,21 @@ public class DisbursementVoucher_ApprovalController implements Initializable, Sc
                                 poJSON = poController.JournalProposal(pnMainJEP).SearchBranch(lsValue, false);
                                 if (!JFXUtil.isJSONSuccess(poJSON)) {
                                     ShowMessageFX.Warning(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
+                                } else {
+                                    JFXUtil.textFieldMoveNext(tfJournalProposalDepartment);
                                 }
                                 loadRecordMasterJEP();
-                                JFXUtil.runWithDelay(0.50, () -> {
-                                    loadTableMainJEP.reload();
-                                });
+                                loadTableMainJEP.reload();
                                 break;
                             case "tfJournalProposalDepartment":
                                 poJSON = poController.JournalProposal(pnMainJEP).SearchDepartment(lsValue, false, false);
                                 if (!JFXUtil.isJSONSuccess(poJSON)) {
                                     ShowMessageFX.Warning(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
+                                } else {
+                                    JFXUtil.textFieldMoveNext(taJournalProposalRemarks);
                                 }
                                 loadRecordMasterJEP();
-                                JFXUtil.runWithDelay(0.50, () -> {
-                                    loadTableMainJEP.reload();
-                                });
+                                loadTableMainJEP.reload();
                                 break;
                             //apJournalProposalDetails
                             case "tfJournalProposalAccountCode":
