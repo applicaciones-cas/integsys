@@ -1086,8 +1086,8 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                 () -> {
                     try {
                         Thread.sleep(100);
-                        journalproposalmain_data.clear();
                         Platform.runLater(() -> {
+                            journalproposalmain_data.clear();
                             try {
                                 if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
                                     poController.ReloadJournalProposal();
@@ -2797,10 +2797,10 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
     private void loadRecordMasterJEP() {
         try {
             String dbValue = poController.JournalProposal(pnMainJEP).Master().getTransactionStatus();
-            statusJEP.stream()
-                    .filter(s -> s.getCode().equals(dbValue))
-                    .findFirst()
-                    .ifPresent(cmbJournalProposalStatus::setValue);
+//            statusJEP.stream()
+//                    .filter(s -> s.getCode().equals(dbValue))
+//                    .findFirst()
+//                    .ifPresent(cmbJournalProposalStatus::setValue);
 
 //            JFXUtil.setCmbValue(cmbJournalProposalStatus, poController.JournalProposal(pnMainJEP).Master().getTransactionStatus());
 //        JFXUtil.setStatusValue(lblJournalTransactionStatus, JournalStatus.class, pnEditMode == EditMode.UNKNOWN ? "-1" : poController.Journal().Master().getTransactionStatus());
