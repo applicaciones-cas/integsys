@@ -2488,7 +2488,7 @@ public class DisbursementVoucher_ApprovalController implements Initializable, Sc
                 pnDetailJEP = isUp ? Integer.parseInt(journalproposal_data.get(JFXUtil.moveToPreviousRow(tblVwJournalProposalDetails)).getIndex07())
                         : Integer.parseInt(journalproposal_data.get(JFXUtil.moveToNextRow(tblVwJournalProposalDetails)).getIndex07());
             }
-            loadRecordDetailJE();
+            loadRecordDetailJEP();
             if (pnDetailJEP < 0 || pnDetailJEP > poController.JournalProposal(pnMainJEP).getDetailCount() - 1) {
                 return;
             }

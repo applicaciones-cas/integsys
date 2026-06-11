@@ -718,16 +718,17 @@ public class DisbursementVoucher_VerificationController implements Initializable
     private void populateJEP() {
         JFXUtil.clearTextFields(apJournalProposalMaster, apJournalProposalDetails);
         poController.getEditMode();
-        Platform.runLater(() -> {
+        if (pnEditMode == EditMode.READY) {
             try {
                 poController.ReloadJournalProposal();
-                loadRecordMasterJEP();
-                loadTableMainJEP.reload();
-                loadTableDetailJEP.reload();
+
             } catch (CloneNotSupportedException | SQLException | GuanzonException ex) {
                 Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
             }
-        });
+        }
+        loadRecordMasterJEP();
+        loadTableMainJEP.reload();
+        loadTableDetailJEP.reload();
     }
 
     private void populateJE() {
@@ -1998,6 +1999,9 @@ public class DisbursementVoucher_VerificationController implements Initializable
                 }
                 JFXUtil.runWithDelay(0.50, () -> {
                     loadTableDetailJEP.reload();
+                    if (JFXUtil.isObjectEqualTo(lsID, "tfJournalProposalDebitAmount", "tfJournalProposalAccountDescription")) {
+                        loadTableMainJEP.reload();
+                    }
                 });
             });
     ChangeListener<Boolean> txtBIRDetail_Focus = JFXUtil.FocusListener(TextField.class,
@@ -2280,7 +2284,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
                                     ShowMessageFX.Warning(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
                                 }
                                 loadRecordMasterJEP();
-                                JFXUtil.runWithDelay(0.30, () -> {
+                                JFXUtil.runWithDelay(0.50, () -> {
                                     loadTableMainJEP.reload();
                                 });
                                 break;
@@ -2290,7 +2294,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
                                     ShowMessageFX.Warning(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
                                 }
                                 loadRecordMasterJEP();
-                                JFXUtil.runWithDelay(0.30, () -> {
+                                JFXUtil.runWithDelay(0.50, () -> {
                                     loadTableMainJEP.reload();
                                 });
                                 break;
@@ -2416,7 +2420,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
                 pnDetailJEP = isUp ? Integer.parseInt(journalproposal_data.get(JFXUtil.moveToPreviousRow(tblVwJournalProposalDetails)).getIndex07())
                         : Integer.parseInt(journalproposal_data.get(JFXUtil.moveToNextRow(tblVwJournalProposalDetails)).getIndex07());
             }
-            loadRecordDetailJE();
+            loadRecordDetailJEP();
             if (pnDetailJEP < 0 || pnDetailJEP > poController.JournalProposal(pnMainJEP).getDetailCount() - 1) {
                 return;
             }
