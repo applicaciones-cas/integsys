@@ -881,7 +881,8 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
     }
 
     private void loadTableDetailFromMainJEP() {
-        pnMainJEP = tblViewMainList.getSelectionModel().getSelectedIndex();
+        pnMainJEP = tblVwJournalProposalList.getSelectionModel().getSelectedIndex();
+        loadRecordMasterJEP();
         loadTableDetailJEP.reload();
     }
 
