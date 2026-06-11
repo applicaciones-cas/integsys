@@ -2120,6 +2120,8 @@ public class DisbursementVoucher_ApprovalController implements Initializable, Sc
         TextField txtField = (TextField) event.getSource();
         String lsID = (((TextField) event.getSource()).getId());
         String lsValue = (txtField.getText() == null ? "" : txtField.getText());
+        String lsBranchCode = "";
+        String lsDeparment = "";
         poJSON = new JSONObject();
         try {
             if (null != event.getCode()) {
@@ -2339,20 +2341,32 @@ public class DisbursementVoucher_ApprovalController implements Initializable, Sc
                                 break;
                             //apJournalProposalMaster
                             case "tfJournalProposalBranch":
+                                lsBranchCode = poController.JournalProposal(pnMainJEP).Master().getBranchCode();
+                                lsDeparment = poController.JournalProposal(pnMainJEP).Master().getDepartmentId();
                                 poJSON = poController.JournalProposal(pnMainJEP).SearchBranch(lsValue, false);
                                 if (!JFXUtil.isJSONSuccess(poJSON)) {
                                     ShowMessageFX.Warning(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
                                 } else {
+                                    poJSON = poController.checkJEPExistBranchDept(pnMainJEP,lsBranchCode,lsDeparment);
+                                    if (!JFXUtil.isJSONSuccess(poJSON)) {
+                                        ShowMessageFX.Warning(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
+                                    }
                                     JFXUtil.textFieldMoveNext(tfJournalProposalDepartment);
                                 }
                                 loadRecordMasterJEP();
                                 loadTableMainJEP.reload();
                                 break;
                             case "tfJournalProposalDepartment":
+                                lsBranchCode = poController.JournalProposal(pnMainJEP).Master().getBranchCode();
+                                lsDeparment = poController.JournalProposal(pnMainJEP).Master().getDepartmentId();
                                 poJSON = poController.JournalProposal(pnMainJEP).SearchDepartment(lsValue, false, false);
                                 if (!JFXUtil.isJSONSuccess(poJSON)) {
                                     ShowMessageFX.Warning(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
                                 } else {
+                                    poJSON = poController.checkJEPExistBranchDept(pnMainJEP,lsBranchCode,lsDeparment);
+                                    if (!JFXUtil.isJSONSuccess(poJSON)) {
+                                        ShowMessageFX.Warning(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
+                                    }
                                     JFXUtil.textFieldMoveNext(taJournalProposalRemarks);
                                 }
                                 loadRecordMasterJEP();
