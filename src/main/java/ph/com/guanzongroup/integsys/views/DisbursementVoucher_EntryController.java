@@ -1123,8 +1123,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                         Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
                         ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
                     }
-                }
-        );
+                });
         loadTableDetailJEP = new JFXUtil.ReloadableTableTask(
                 tblVwJournalProposalDetails,
                 journalproposal_data,

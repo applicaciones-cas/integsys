@@ -785,14 +785,6 @@ public class DisbursementVoucher_ApprovalController implements Initializable, Sc
     private void populateJEP() {
         JFXUtil.clearTextFields(apJournalProposalMaster, apJournalProposalDetails);
         poController.getEditMode();
-        if (pnEditMode == EditMode.READY) {
-            try {
-                poController.ReloadJournalProposal();
-
-            } catch (CloneNotSupportedException | SQLException | GuanzonException ex) {
-                Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
-            }
-        }
         loadRecordMasterJEP();
         loadTableMainJEP.reload();
         loadTableDetailJEP.reload();
@@ -1064,8 +1056,11 @@ public class DisbursementVoucher_ApprovalController implements Initializable, Sc
                         Thread.sleep(100);
                         journalproposalmain_data.clear();
                         Platform.runLater(() -> {
-                            for (int lnCtr = 0; lnCtr < poController.getJournalProposalList().size(); lnCtr++) {
-                                try {
+                            try {
+                                if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
+                                    poController.ReloadJournalProposal();
+                                }
+                                for (int lnCtr = 0; lnCtr < poController.getJournalProposalList().size(); lnCtr++) {
                                     journalproposalmain_data.add(
                                             new ModelJournalEntryProposal_Main(
                                                     String.valueOf(lnCtr + 1),
@@ -1075,22 +1070,22 @@ public class DisbursementVoucher_ApprovalController implements Initializable, Sc
                                                     CustomCommonUtil.setIntegerValueToDecimalFormat(poController.JournalProposal(lnCtr).getTotalDebitAmount(), false),
                                                     CustomCommonUtil.setIntegerValueToDecimalFormat(poController.JournalProposal(lnCtr).getTotalCreditAmount(), false)
                                             ));
-                                } catch (SQLException ex) {
-                                    Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
-                                } catch (GuanzonException ex) {
-                                    Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+
                                 }
-                            }
-                            if (pnMainJEP < 0 || pnMainJEP
-                                    >= journalproposalmain_data.size()) {
-                                if (!journalproposalmain_data.isEmpty()) {
-                                    /* FOCUS ON FIRST ROW */
-                                    JFXUtil.selectAndFocusRow(tblVwJournalProposalList, 0);
-                                    pnMainJEP = tblVwJournalProposalList.getSelectionModel().getSelectedIndex();
+                                if (pnMainJEP < 0 || pnMainJEP
+                                        >= journalproposalmain_data.size()) {
+                                    if (!journalproposalmain_data.isEmpty()) {
+                                        /* FOCUS ON FIRST ROW */
+                                        JFXUtil.selectAndFocusRow(tblVwJournalProposalList, 0);
+                                        pnMainJEP = tblVwJournalProposalList.getSelectionModel().getSelectedIndex();
+                                    }
+                                } else {
+                                    /* FOCUS ON THE ROW THAT pnRowDetail POINTS TO */
+                                    JFXUtil.selectAndFocusRow(tblVwJournalProposalList, pnMainJEP);
                                 }
-                            } else {
-                                /* FOCUS ON THE ROW THAT pnRowDetail POINTS TO */
-                                JFXUtil.selectAndFocusRow(tblVwJournalProposalList, pnMainJEP);
+
+                            } catch (SQLException | GuanzonException | CloneNotSupportedException ex) {
+                                Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
                             }
                         });
                     } catch (InterruptedException ex) {
