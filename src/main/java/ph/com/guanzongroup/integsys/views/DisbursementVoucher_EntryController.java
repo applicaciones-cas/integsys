@@ -2097,6 +2097,9 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                 }
                 JFXUtil.runWithDelay(0.50, () -> {
                     loadTableDetailJEP.reload();
+                    if (JFXUtil.isObjectEqualTo(lsID, "tfJournalProposalAccountCode", "tfJournalProposalAccountDescription")) {
+                        loadTableMainJEP.reload();
+                    }
                 });
             });
     ChangeListener<Boolean> txtBIRDetail_Focus = JFXUtil.FocusListener(TextField.class,
@@ -2818,8 +2821,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
             tfJournalProposalDebitAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.JournalProposal(pnMainJEP).Detail(pnDetailJEP).getDebitAmount(), true));
             tfJournalProposalCreditAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.JournalProposal(pnMainJEP).Detail(pnDetailJEP).getCreditAmount(), true));
             cbJEProposalReverse.setSelected(poController.JournalProposal(pnMainJEP).Detail(pnDetailJEP).isReverse());
-            
-            loadTableMainJEP.reload();
+
             JFXUtil.updateCaretPositions(apJournalProposalDetails);
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
