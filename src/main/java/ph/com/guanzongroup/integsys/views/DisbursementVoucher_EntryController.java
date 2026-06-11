@@ -542,11 +542,11 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                         ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                         return;
                     }
-
                     poController.Master().setDisbursementType(DisbursementStatic.DisbursementType.CHECK);
                     poController.Master().setSupplierClientID(psSupplierPayeeId);
                     JFXUtil.clickTabByTitleText(tabPaneMain, "Disbursement Voucher");
                     loadTableDetail.reload();
+                    poController.ReloadJournalProposal();
                     pnEditMode = poController.getEditMode();
                     JFXUtil.showRetainedHighlight(false, tblViewMainList, "#A7C7E7", plOrderNoPartial, plOrderNoFinal, highlightedRowsMain, true);
                     break;
@@ -778,16 +778,18 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
     private void populateJEP() {
         JFXUtil.clearTextFields(apJournalProposalMaster, apJournalProposalDetails);
         poController.getEditMode();
-        Platform.runLater(() -> {
-            try {
-                poController.ReloadJournalProposal();
-                loadRecordMasterJEP();
-                loadTableMainJEP.reload();
-                loadTableDetailJEP.reload();
-            } catch (CloneNotSupportedException | SQLException | GuanzonException ex) {
-                Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
-            }
-        });
+        if (pnEditMode == EditMode.READY) {
+            Platform.runLater(() -> {
+                try {
+                    poController.ReloadJournalProposal();
+                    loadRecordMasterJEP();
+                    loadTableMainJEP.reload();
+                    loadTableDetailJEP.reload();
+                } catch (CloneNotSupportedException | SQLException | GuanzonException ex) {
+                    Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+                }
+            });
+        }
     }
 
     private void populateJE() {
@@ -2367,7 +2369,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                                     ShowMessageFX.Warning(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
                                 }
                                 loadRecordMasterJEP();
-                                JFXUtil.runWithDelay(0.30, () -> {
+                                JFXUtil.runWithDelay(0.50, () -> {
                                     loadTableMainJEP.reload();
                                 });
                                 break;
@@ -2377,7 +2379,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                                     ShowMessageFX.Warning(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
                                 }
                                 loadRecordMasterJEP();
-                                JFXUtil.runWithDelay(0.30, () -> {
+                                JFXUtil.runWithDelay(0.50, () -> {
                                     loadTableMainJEP.reload();
                                 });
                                 break;
@@ -2816,7 +2818,8 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
             tfJournalProposalDebitAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.JournalProposal(pnMainJEP).Detail(pnDetailJEP).getDebitAmount(), true));
             tfJournalProposalCreditAmount.setText(CustomCommonUtil.setIntegerValueToDecimalFormat(poController.JournalProposal(pnMainJEP).Detail(pnDetailJEP).getCreditAmount(), true));
             cbJEProposalReverse.setSelected(poController.JournalProposal(pnMainJEP).Detail(pnDetailJEP).isReverse());
-
+            
+            loadTableMainJEP.reload();
             JFXUtil.updateCaretPositions(apJournalProposalDetails);
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
