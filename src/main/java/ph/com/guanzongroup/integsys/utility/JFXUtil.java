@@ -3534,7 +3534,7 @@ public class JFXUtil {
             radialTimeline.playFromStart();
         });
     }
-    public static String[] buttonPackArray1 = {"btnSave", "btnCancel", "btnApprove", "btnDisapprove", "btnVoid", "btnConfirm"};
+    public static String[] buttonPackArray1 = {"btnSave", "btnCancel", "btnApprove", "btnDisapprove", "btnVoid", "btnConfirm", "btnPost"};
     public static String[] buttonPackArray2 = {"btnRetrieve", "btnSearch", "btnUndo", "btnArrowRight", "btnArrowLeft", "btnHistory", "btnPrint", "btnRemoveAttachment", "btnAddAttachment"};
 
     public static boolean isNumeric(String str) {
