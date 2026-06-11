@@ -857,9 +857,9 @@
                                                                   <TextField fx:id="tfJournalProposalAccountCode" GridPane.columnIndex="2" />
                                                                   <TextField fx:id="tfJournalProposalAccountDescription" maxWidth="1.7976931348623157E308" GridPane.columnIndex="2" GridPane.columnSpan="3" GridPane.rowIndex="1" />
                                                                   <DatePicker fx:id="dpJournalProposalReportMonthYear" GridPane.columnIndex="2" GridPane.rowIndex="2" />
+                                                                  <CheckBox fx:id="cbJEProposalReverse" mnemonicParsing="false" onAction="#cmdCheckBox_Click" GridPane.columnIndex="8" />
                                                                   <TextField fx:id="tfJournalProposalDebitAmount" alignment="CENTER_RIGHT" maxWidth="1.7976931348623157E308" promptText="0.00" GridPane.columnIndex="8" GridPane.rowIndex="1" />
                                                                   <TextField fx:id="tfJournalProposalCreditAmount" alignment="CENTER_RIGHT" maxWidth="1.7976931348623157E308" promptText="0.00" GridPane.columnIndex="8" GridPane.rowIndex="2" />
-                                                                  <CheckBox fx:id="cbJEProposalReverse" mnemonicParsing="false" onAction="#cmdCheckBox_Click" GridPane.columnIndex="8" />
                                                                   <Label text="Reverse" GridPane.columnIndex="6" />
                                                                </children>
                                                             </GridPane>
