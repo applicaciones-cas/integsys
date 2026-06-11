@@ -1034,8 +1034,8 @@ public class DisbursementVoucher_ConfirmationController implements Initializable
                 () -> {
                     try {
                         Thread.sleep(100);
-                        journalproposalmain_data.clear();
                         Platform.runLater(() -> {
+                            journalproposalmain_data.clear();
                             try {
                                 if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
                                     poController.ReloadJournalProposal();
