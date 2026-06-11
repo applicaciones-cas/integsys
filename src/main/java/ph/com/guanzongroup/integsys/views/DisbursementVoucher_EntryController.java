@@ -167,6 +167,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
             new JFXUtil.Status(JournalProposalStatus.VOID, "VOID"),
             new JFXUtil.Status(JournalProposalStatus.RETURNED, "RETURNED")
     );
+    FilteredList<JFXUtil.Status> filteredStatuses = new FilteredList<>(statusJEP);
 
     JFXUtil.StageManager stageAttachment = new JFXUtil.StageManager();
     AnchorPane root = null;
@@ -2004,12 +2005,9 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                         }
                         break;
                 }
-                JFXUtil
-                        .runWithDelay(
-                                0.50, () -> {
-                                    loadTableDetailJE.reload();
-                                }
-                        );
+                JFXUtil.runWithDelay(0.50, () -> {
+                    loadTableDetailJE.reload();
+                });
             });
     ChangeListener<Boolean> txtJournalProposalMaster_Focus = JFXUtil.FocusListener(TextField.class,
             (lsID, lsValue) -> {
@@ -2025,12 +2023,9 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                         }
                         break;
                 }
-                JFXUtil
-                        .runWithDelay(
-                                0.50, () -> {
-                                    loadTableMainJEP.reload();
-                                }
-                        );
+                JFXUtil.runWithDelay(0.50, () -> {
+                    loadTableMainJEP.reload();
+                });
             });
 
     ChangeListener<Boolean> txtJournalProposalDetails_Focus = JFXUtil.FocusListener(TextField.class,
@@ -2796,11 +2791,38 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
 
     private void loadRecordMasterJEP() {
         try {
+
             String dbValue = poController.JournalProposal(pnMainJEP).Master().getTransactionStatus();
-//            statusJEP.stream()
-//                    .filter(s -> s.getCode().equals(dbValue))
-//                    .findFirst()
-//                    .ifPresent(cmbJournalProposalStatus::setValue);
+            boolean lbEditMode = poController.JournalProposal(pnMainJEP).Master().getEditMode() == EditMode.ADDNEW;
+
+            JFXUtil.setDisabled(lbEditMode, cmbJournalProposalStatus);
+            filteredStatuses.setPredicate(status -> true); //reshow all cmb values
+            if (lbEditMode) {
+            } else {
+                switch (dbValue) {
+                    case JournalProposalStatus.OPEN:
+                        filteredStatuses.setPredicate(status
+                                -> !JournalProposalStatus.CANCELLED.equals(status.getCode())
+                                && !JournalProposalStatus.POSTED.equals(status.getCode())
+                                && !JournalProposalStatus.RETURNED.equals(status.getCode())
+                                && !JournalProposalStatus.CONFIRMED.equals(status.getCode())
+                        );
+                        break;
+                    case JournalProposalStatus.CONFIRMED:
+                        filteredStatuses.setPredicate(status
+                                -> !JournalProposalStatus.VOID.equals(status.getCode())
+                                && !JournalProposalStatus.POSTED.equals(status.getCode())
+                                && !JournalProposalStatus.RETURNED.equals(status.getCode())
+                        );
+                        break;
+
+                }
+            }
+
+            statusJEP.stream()
+                    .filter(s -> s.getCode().equals(dbValue))
+                    .findFirst()
+                    .ifPresent(cmbJournalProposalStatus::setValue);
 
 //            JFXUtil.setCmbValue(cmbJournalProposalStatus, poController.JournalProposal(pnMainJEP).Master().getTransactionStatus());
 //        JFXUtil.setStatusValue(lblJournalTransactionStatus, JournalStatus.class, pnEditMode == EditMode.UNKNOWN ? "-1" : poController.Journal().Master().getTransactionStatus());
@@ -3039,6 +3061,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
     );
 
     private void initComboBoxes() {
+
         JFXUtil.setComboBoxItems(new JFXUtil.Pairs<>(cPaymentMode, cmbPaymentMode), new JFXUtil.Pairs<>(cPayeeType, cmbPayeeType),
                 new JFXUtil.Pairs<>(cDisbursementMode, cmbDisbursementMode), new JFXUtil.Pairs<>(cClaimantType, cmbClaimantType),
                 new JFXUtil.Pairs<>(cCheckStatus, cmbCheckStatus), new JFXUtil.Pairs<>(cTransactionType, cmbTransactionType),
@@ -3046,7 +3069,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
 
         JFXUtil.setComboBoxActionListener(comboBoxActionListener, cmbPaymentMode, cmbPayeeType, cmbDisbursementMode, cmbClaimantType, cmbCheckStatus, cmbTransactionType, cmbJournalProposalStatus);
         JFXUtil.initComboBoxCellDesignColor("#FF8201", cmbPaymentMode, cmbPayeeType, cmbDisbursementMode, cmbClaimantType, cmbCheckStatus, cmbTransactionType, cmbJournalProposalStatus);
-        cmbJournalProposalStatus.setItems(statusJEP);
+        cmbJournalProposalStatus.setItems(filteredStatuses);
         JFXUtil.handleDisabledNodeClick(apMasterDVCheck, pnEditMode, nodeID -> {
             switch (nodeID) {
                 case "tfAuthorizedPerson":
