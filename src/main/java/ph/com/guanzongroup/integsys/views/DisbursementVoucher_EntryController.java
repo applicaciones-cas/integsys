@@ -779,17 +779,16 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
         JFXUtil.clearTextFields(apJournalProposalMaster, apJournalProposalDetails);
         poController.getEditMode();
         if (pnEditMode == EditMode.READY) {
-            Platform.runLater(() -> {
-                try {
-                    poController.ReloadJournalProposal();
-                    loadRecordMasterJEP();
-                    loadTableMainJEP.reload();
-                    loadTableDetailJEP.reload();
-                } catch (CloneNotSupportedException | SQLException | GuanzonException ex) {
-                    Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
-                }
-            });
+            try {
+                poController.ReloadJournalProposal();
+
+            } catch (CloneNotSupportedException | SQLException | GuanzonException ex) {
+                Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+            }
         }
+        loadRecordMasterJEP();
+        loadTableMainJEP.reload();
+        loadTableDetailJEP.reload();
     }
 
     private void populateJE() {
@@ -2097,9 +2096,11 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                 }
                 JFXUtil.runWithDelay(0.50, () -> {
                     loadTableDetailJEP.reload();
-                    if (JFXUtil.isObjectEqualTo(lsID, "tfJournalProposalDebitAmount", "tfJournalProposalCreditAmount")) {
-                        loadTableMainJEP.reload();
-                    }
+                    JFXUtil.runWithDelay(0.50, () -> {
+                        if (JFXUtil.isObjectEqualTo(lsID, "tfJournalProposalDebitAmount", "tfJournalProposalAccountDescription")) {
+                            loadTableMainJEP.reload();
+                        }
+                    });
                 });
             });
     ChangeListener<Boolean> txtBIRDetail_Focus = JFXUtil.FocusListener(TextField.class,
