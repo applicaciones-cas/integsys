@@ -1348,7 +1348,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
         );
         tblVwJournalProposalList.setOnMouseClicked(event -> {
             pnMainJEP = tblVwJournalProposalList.getSelectionModel().getSelectedIndex();
-            if (pnMainJEP >= 0 && event.getClickCount() == 2) {
+            if (pnMainJEP >= 0 && event.getClickCount() == 1) {
                 loadTableDetailFromMainJEP();
                 initButton(pnEditMode);
             }
@@ -1922,16 +1922,13 @@ public class DisbursementVoucher_VerificationController implements Initializable
                     case "tfJournalProposalAccountCode":
                         if (lsValue.isEmpty()) {
                             poController.JournalProposal(pnMainJEP).Detail(pnDetailJEP).setAccountCode("");
-                            loadTableDetailJEP.reload();
                         }
                         break;
                     case "tfJournalProposalAccountDescription":
                         if (lsValue.isEmpty()) {
                             poController.JournalProposal(pnMainJEP).Detail(pnDetailJEP).setAccountCode("");
-                            loadTableDetailJEP.reload();
                         }
                         break;
-
                     case "tfJournalProposalDebitAmount":
                         lsValue = JFXUtil.removeComma(lsValue);
                         if (poController.JournalProposal(pnMainJEP).Detail(pnDetailJEP).getCreditAmount() > 0.0000
@@ -1994,7 +1991,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
                 }
                 JFXUtil.runWithDelay(0.50, () -> {
                     loadTableDetailJEP.reload();
-                    if (JFXUtil.isObjectEqualTo(lsID, "tfJournalProposalDebitAmount", "tfJournalProposalAccountDescription")) {
+                    if (JFXUtil.isObjectEqualTo(lsID, "tfJournalProposalDebitAmount", "tfJournalProposalCreditAmount")) {
                         loadTableMainJEP.reload();
                     }
                 });

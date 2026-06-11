@@ -1120,7 +1120,7 @@ public class DisbursementVoucher_HistoryController implements Initializable, Scr
         );
         tblVwJournalProposalList.setOnMouseClicked(event -> {
             pnMainJEP = tblVwJournalProposalList.getSelectionModel().getSelectedIndex();
-            if (pnMainJEP >= 0 && event.getClickCount() == 2) {
+            if (pnMainJEP >= 0 && event.getClickCount() == 1) {
                 loadTableDetailFromMainJEP();
                 initButton(pnEditMode);
             }

@@ -2111,8 +2111,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                     if (JFXUtil.isObjectEqualTo(lsID, "tfJournalProposalDebitAmount", "tfJournalProposalCreditAmount")) {
                         loadTableMainJEP.reload();
                     }
-                }
-                );
+                });
             });
     ChangeListener<Boolean> txtBIRDetail_Focus = JFXUtil.FocusListener(TextField.class,
             (lsID, lsValue) -> {
