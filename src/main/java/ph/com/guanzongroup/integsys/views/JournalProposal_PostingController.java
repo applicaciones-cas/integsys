@@ -61,7 +61,7 @@ import ph.com.guanzongroup.integsys.utility.JFXUtil;
  *
  * @author Team 1
  */
-public class JournalProposal_ConfirmationController implements Initializable, ScreenInterface {
+public class JournalProposal_PostingController implements Initializable, ScreenInterface {
 
     private GRiderCAS oApp;
     private JournalProposal poController;
