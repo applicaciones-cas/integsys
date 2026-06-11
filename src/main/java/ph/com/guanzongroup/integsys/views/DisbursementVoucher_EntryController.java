@@ -779,8 +779,17 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
         JFXUtil.clearTextFields(apJournalProposalMaster, apJournalProposalDetails);
         poController.getEditMode();
         Platform.runLater(() -> {
-            loadTableMainJEP.reload();
-            loadTableDetailJEP.reload();
+            try {
+                poController.ReloadJournalProposal();
+                loadTableMainJEP.reload();
+                loadTableDetailJEP.reload();
+            } catch (CloneNotSupportedException ex) {
+                Logger.getLogger(DisbursementVoucher_EntryController.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (SQLException ex) {
+                Logger.getLogger(DisbursementVoucher_EntryController.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (GuanzonException ex) {
+                Logger.getLogger(DisbursementVoucher_EntryController.class.getName()).log(Level.SEVERE, null, ex);
+            }
         });
     }
 
@@ -1088,7 +1097,6 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                     try {
                         Thread.sleep(100);
                         journalproposalmain_data.clear();
-                        poController.ReloadJournalProposal();
                         Platform.runLater(() -> {
                             for (int lnCtr = 0; lnCtr < poController.getJournalProposalList().size(); lnCtr++) {
                                 try {
@@ -1119,7 +1127,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                                 JFXUtil.selectAndFocusRow(tblVwJournalProposalList, pnMainJEP);
                             }
                         });
-                    } catch (InterruptedException | CloneNotSupportedException | SQLException | GuanzonException ex) {
+                    } catch (InterruptedException ex) {
                         Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
                         ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
                     }
@@ -1374,7 +1382,7 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
         JFXUtil.setColumnCenter(tblJournalProposalListRowNo, tblJournalProposalListTransNo);
         JFXUtil.setColumnLeft(tblJournalProposalListBranch, tblJournalProposalListDepartment);
         JFXUtil.setColumnRight(tblJournalProposalListDebitAmt, tblJournalProposalListCreditAmt);
-        JFXUtil.setColumnsIndexAndDisableReordering(tblVwJournalDetails);
+        JFXUtil.setColumnsIndexAndDisableReordering(tblVwJournalProposalDetails);
         tblVwJournalProposalDetails.setItems(journalproposal_data);
     }
 
@@ -2002,13 +2010,11 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                     case "tfJournalProposalBranch":
                         if (lsValue.isEmpty()) {
                             poController.JournalProposal(pnMainJEP).Master().setBranchCode("");
-                            loadTableDetailJEP.reload();
                         }
                         break;
                     case "tfJournalProposalDepartment":
                         if (lsValue.isEmpty()) {
                             poController.JournalProposal(pnMainJEP).Master().setDepartmentId("");
-                            loadTableDetailJEP.reload();
                         }
                         break;
                 }
@@ -2023,16 +2029,13 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                     case "tfJournalProposalAccountCode":
                         if (lsValue.isEmpty()) {
                             poController.JournalProposal(pnMainJEP).Detail(pnDetailJEP).setAccountCode("");
-                            loadTableDetailJEP.reload();
                         }
                         break;
                     case "tfJournalProposalAccountDescription":
                         if (lsValue.isEmpty()) {
                             poController.JournalProposal(pnMainJEP).Detail(pnDetailJEP).setAccountCode("");
-                            loadTableDetailJEP.reload();
                         }
                         break;
-
                     case "tfJournalProposalDebitAmount":
                         lsValue = JFXUtil.removeComma(lsValue);
                         if (poController.JournalProposal(pnMainJEP).Detail(pnDetailJEP).getCreditAmount() > 0.0000
@@ -2366,14 +2369,20 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                                 if (!JFXUtil.isJSONSuccess(poJSON)) {
                                     ShowMessageFX.Warning(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
                                 }
-                                loadTableMainJEP.reload();
+                                loadRecordMasterJEP();
+                                JFXUtil.runWithDelay(0.30, () -> {
+                                    loadTableMainJEP.reload();
+                                });
                                 break;
                             case "tfJournalProposalDepartment":
                                 poJSON = poController.JournalProposal(pnMainJEP).SearchDepartment(lsValue, false, false);
                                 if (!JFXUtil.isJSONSuccess(poJSON)) {
                                     ShowMessageFX.Warning(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
                                 }
-                                loadTableMainJEP.reload();
+                                loadRecordMasterJEP();
+                                JFXUtil.runWithDelay(0.30, () -> {
+                                    loadTableMainJEP.reload();
+                                });
                                 break;
                             //apJournalProposalDetails
                             case "tfJournalProposalAccountCode":
@@ -2388,7 +2397,8 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                                     break;
                                 } else {
                                     pnDetailJEP = Integer.parseInt(String.valueOf(poJSON.get("row")));
-                                    loadTableDetailJEP.reload();
+                                    loadRecordDetailJEP();
+//                                    loadTableDetailJEP.reload();
                                     JFXUtil.textFieldMoveNext(tfJournalProposalDebitAmount);
                                 }
                                 break;
