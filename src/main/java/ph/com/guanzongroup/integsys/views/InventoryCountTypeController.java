@@ -105,8 +105,9 @@ public class InventoryCountTypeController implements Initializable, ScreenInterf
     private void initializeObject() throws GuanzonException, SQLException {
         LogWrapper logwrapr = new LogWrapper("CAS", System.getProperty("sys.default.path.temp") + "cas-error.log");
         oParameters = new ParamControllers(oApp, logwrapr).InventoryCountType();
-        oParameters.setRecordStatus("0123");
+        oParameters.setRecordStatus("1230");
         oParameters.getModel().setIndustryCode(oApp.getIndustry());
+        oParameters.setWithUI(true);
 
     }
 
@@ -159,7 +160,7 @@ public class InventoryCountTypeController implements Initializable, ScreenInterf
                         loadRecord();
                         initButton(oParameters.getEditMode());
                         break;
-                        
+
                     case "btnSearch":
                         poJSON = oParameters.searchRecord("", false);
                         if ("error".equals((String) poJSON.get("result"))) {
@@ -171,7 +172,7 @@ public class InventoryCountTypeController implements Initializable, ScreenInterf
                         initButton(oParameters.getEditMode());
                         break;
                     case "btnUpdate":
-                        poJSON = oParameters.updateRecord();
+                        poJSON = oParameters.UpdateRecord();
                         if ("error".equals((String) poJSON.get("result"))) {
                             ShowMessageFX.Information((String) poJSON.get("message"), "Computerized Acounting System", pxeModuleName);
                             break;
@@ -183,8 +184,7 @@ public class InventoryCountTypeController implements Initializable, ScreenInterf
                         if (ShowMessageFX.YesNo("Do you really want to cancel this record? \nAny data collected will not be kept.", "Computerized Acounting System", pxeModuleName)) {
                             clearAllFields();
                             initializeObject();
-                            pnEditMode = EditMode.UNKNOWN;
-                            initButton(oParameters.getEditMode());
+                            initButton(EditMode.UNKNOWN);
                         }
                         break;
                     case "btnSave":
@@ -368,6 +368,7 @@ public class InventoryCountTypeController implements Initializable, ScreenInterf
 
         // Disable panes during editing
         AnchorInputs.setDisable(!lbEditing);
+        cbField02.setDisable(!lbEditing);
 
     }
 
