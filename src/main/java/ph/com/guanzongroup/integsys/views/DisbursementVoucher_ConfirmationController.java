@@ -1081,6 +1081,13 @@ public class DisbursementVoucher_ConfirmationController implements Initializable
                         pbEnteredJEP = false;
                         journalproposal_data.clear();
                         try {
+                            if (poController.getJournalProposalList() == null) {
+                                return;
+                            } else {
+                                if (poController.getJournalProposalList().isEmpty()) {
+                                    return;
+                                }
+                            }
                             if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
                                 poController.JournalProposal(pnMainJEP).ReloadDetail();
                             }
@@ -1548,7 +1555,7 @@ public class DisbursementVoucher_ConfirmationController implements Initializable
     private void initTextFields() {
         //Initialise  TextField Focus
         JFXUtil.setFocusListener(txtSearch_Focus, tfSearchIndustry, tfSearchSupplier, tfSearchTransaction);
-        JFXUtil.setFocusListener(txtArea_Focus, taDVRemarks, taJournalRemarks);
+        JFXUtil.setFocusListener(txtArea_Focus, taDVRemarks, taJournalRemarks, taJournalProposalRemarks);
         //apDVMaster1
         JFXUtil.setFocusListener(txtMaster_Focus, tfSupplier);
         //apDVDetail
@@ -3345,11 +3352,12 @@ public class DisbursementVoucher_ConfirmationController implements Initializable
                     } else {
                         poController.JournalProposal(pnMainJEP).Detail(pnDetailJEP).isReverse(checkedBox.isSelected());
                     }
-                    loadRecordMasterJEP();
-                    loadTableDetailJEP.reload();
-                    if (checkedBox.isSelected()) {
-                        moveNextJEP(false, false);
-                    }
+                    Platform.runLater(() -> {
+                        loadTableDetailJEP.reload();
+                        JFXUtil.runWithDelay(0.50, () -> {
+                            loadTableMainJEP.reload();
+                        });
+                    });
                     break;
                 case "cbBIRReverse":
                     poJSON = poController.removeWTDeduction(pnDetailBIR);

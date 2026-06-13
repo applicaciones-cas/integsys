@@ -1134,6 +1134,13 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                         pbEnteredJEP = false;
                         journalproposal_data.clear();
                         try {
+                            if (poController.getJournalProposalList() == null) {
+                                return;
+                            } else {
+                                if (poController.getJournalProposalList().isEmpty()) {
+                                    return;
+                                }
+                            }
                             if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
                                 poController.JournalProposal(pnMainJEP).ReloadDetail();
                             }
@@ -2110,9 +2117,11 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                 }
                 JFXUtil.runWithDelay(0.50, () -> {
                     loadTableDetailJEP.reload();
-                    if (JFXUtil.isObjectEqualTo(lsID, "tfJournalProposalDebitAmount", "tfJournalProposalCreditAmount")) {
-                        loadTableMainJEP.reload();
-                    }
+                    JFXUtil.runWithDelay(0.50, () -> {
+                        if (JFXUtil.isObjectEqualTo(lsID, "tfJournalProposalDebitAmount", "tfJournalProposalCreditAmount")) {
+                            loadTableMainJEP.reload();
+                        }
+                    });
                 });
             });
     ChangeListener<Boolean> txtBIRDetail_Focus = JFXUtil.FocusListener(TextField.class,
@@ -2396,7 +2405,6 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                                     }
                                     JFXUtil.textFieldMoveNext(tfJournalProposalDepartment);
                                 }
-                                loadRecordMasterJEP();
                                 loadTableMainJEP.reload();
                                 break;
                             case "tfJournalProposalDepartment":
@@ -2412,7 +2420,6 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                                     }
                                     JFXUtil.textFieldMoveNext(taJournalProposalRemarks);
                                 }
-                                loadRecordMasterJEP();
                                 loadTableMainJEP.reload();
                                 break;
                             //apJournalProposalDetails
@@ -3400,11 +3407,12 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                     } else {
                         poController.JournalProposal(pnMainJEP).Detail(pnDetailJEP).isReverse(checkedBox.isSelected());
                     }
-                    loadRecordMasterJEP();
-                    loadTableDetailJEP.reload();
-                    if (checkedBox.isSelected()) {
-                        moveNextJEP(false, false);
-                    }
+                    Platform.runLater(() -> {
+                        loadTableDetailJEP.reload();
+                        JFXUtil.runWithDelay(0.50, () -> {
+                            loadTableMainJEP.reload();
+                        });
+                    });
                     break;
                 case "cbBIRReverse":
                     poJSON = poController.removeWTDeduction(pnDetailBIR);

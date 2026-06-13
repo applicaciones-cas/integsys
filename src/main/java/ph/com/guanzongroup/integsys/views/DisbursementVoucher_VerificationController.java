@@ -12,6 +12,7 @@ import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -109,6 +110,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
     private int pnDetailBIR = 0;
     private int pnAttachment = 0;
     private boolean pbIsCheckedJournalTab = false;
+    private boolean pbIsCheckedJournalProposalTab = false;
     private final String pxeModuleName = "Disbursement Voucher Verification";
     private DisbursementVoucher poController;
     public int pnEditMode;
@@ -373,6 +375,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
                     if (pnEditMode == EditMode.READY || pnEditMode == EditMode.UPDATE || pnEditMode == EditMode.ADDNEW) {
                         JFXUtil.clearTextFields(apJournalProposalMaster, apJournalProposalDetails);
                         if (poController.Detail(0).getSourceNo() != null && !poController.Detail(0).getSourceNo().isEmpty()) {
+                            pbIsCheckedJournalProposalTab = true;
                             populateJEP();
                         } else {
                             JFXUtil.clickTabByTitleText(tabPaneMain, "Disbursement Voucher");
@@ -485,6 +488,53 @@ public class DisbursementVoucher_VerificationController implements Initializable
         buttons.forEach(button -> button.setOnAction(this::cmdButton_Click));
     }
 
+    private List<String> checkJEorJEP() {
+        List<String> titles = new ArrayList<>();
+        try {
+            // allows JE and JEP to have value
+            // require to review, either of two, if one have value then require it to check tab
+            // if two have value require to check it both
+            // if neither have value message that any of JE or JEP or both must have value
+            // question is how to define valid entry for both
+            if (!poController.existJournal().equals("")) {
+                titles.add("Journal Entry");
+            }
+            if (poController.getJournalProposalList().size() >= 1) {
+                if (!JFXUtil.isObjectEqualTo(poController.JournalProposal(0).Detail(0).getAccountCode(), null, "")) {
+                    titles.add("Journal Proposal");
+                }
+            }
+            return titles;
+        } catch (SQLException ex) {
+            Logger.getLogger(DisbursementVoucher_VerificationController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return titles;
+    }
+
+    private boolean checkJEorJEPSaving() {
+        List<String> titles = checkJEorJEP();
+        if ((titles.contains("Journal Entry")) && (titles.contains("Journal Proposal"))) {
+            if (!pbIsCheckedJournalTab && !pbIsCheckedJournalProposalTab) {
+                ShowMessageFX.Warning(null, pxeModuleName, "Please check the Journal Entry & Journal Proposal before saving.");
+                return false;
+            }
+        } else if ((titles.contains("Journal Proposal"))) {
+            if (!pbIsCheckedJournalProposalTab) {
+                ShowMessageFX.Warning(null, pxeModuleName, "Please check the Journal Proposal before saving.");
+                return false;
+            }
+        } else if (titles.contains("Journal Entry")) {
+            if (!pbIsCheckedJournalTab) {
+                ShowMessageFX.Warning(null, pxeModuleName, "Please check the Journal Entry before saving.");
+                return false;
+            }
+        } else {
+            ShowMessageFX.Warning(null, pxeModuleName, "No journal entry or journal proposal found. Add either one or both and save before verifying.");
+            return false;
+        }
+        return true;
+    }
+
     private void cmdButton_Click(ActionEvent event) {
         try {
             poJSON = new JSONObject();
@@ -513,6 +563,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
                         return;
                     }
                     pbIsCheckedJournalTab = false;
+                    pbIsCheckedJournalProposalTab = false;
                     pnEditMode = poController.getEditMode();
                     CustomCommonUtil.switchToTab(tabDetails, tabPaneMain);
                     loadTableDetail.reload();
@@ -534,8 +585,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
                     }
 
                     if (DisbursementStatic.VERIFIED.equals(poController.Master().getTransactionStatus())) {
-                        if (!pbIsCheckedJournalTab) {
-                            ShowMessageFX.Warning(null, pxeModuleName, "Please check the Journal Entry before saving."); //only require check this only if higher than encoder
+                        if (!checkJEorJEPSaving()) {
                             return;
                         }
                     }
@@ -553,24 +603,23 @@ public class DisbursementVoucher_VerificationController implements Initializable
                     }
                     if (pnEditMode == EditMode.READY && !DisbursementStatic.VERIFIED.equals(poController.Master().getTransactionStatus())) {
                         if (ShowMessageFX.YesNo(null, pxeModuleName, "Do you want to verify this transaction?")) { //requires to review journal entry
-                            if (!poController.existJournal().equals("")) {
-                                if (!pbIsCheckedJournalTab) {
-                                    ShowMessageFX.Warning(null, pxeModuleName, "Please check the Journal Entry before saving.");
+//                            if (!poController.existJournal().equals("")) {
+                            if (!checkJEorJEPSaving()) {
+                                break;
+                            } else {
+                                poJSON = poController.VerifyTransaction("");
+                                if ("error".equals((String) poJSON.get("result"))) {
+                                    ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                     break;
                                 } else {
-                                    poJSON = poController.VerifyTransaction("");
-                                    if ("error".equals((String) poJSON.get("result"))) {
-                                        ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-                                        break;
-                                    } else {
-                                        ShowMessageFX.Information(null, pxeModuleName, (String) poJSON.get("message"));
-                                        JFXUtil.highlightByKey(tblViewMainList, String.valueOf(pnMain + 1), "#C1E1C1", highlightedRowsMain);
-                                    }
+                                    ShowMessageFX.Information(null, pxeModuleName, (String) poJSON.get("message"));
+                                    JFXUtil.highlightByKey(tblViewMainList, String.valueOf(pnMain + 1), "#C1E1C1", highlightedRowsMain);
                                 }
-                            } else {
-                                ShowMessageFX.Warning(null, pxeModuleName, "No journal entry found. Add a journal entry and save before verifying.");
-                                break;
                             }
+//                            } else {
+//                                ShowMessageFX.Warning(null, pxeModuleName, "No journal entry found. Add a journal entry and save before verifying.");
+//                                break;
+//                            }
                         }
                     }
                     pnEditMode = poController.getEditMode();
@@ -606,25 +655,24 @@ public class DisbursementVoucher_VerificationController implements Initializable
                     if (ShowMessageFX.YesNo(null, pxeModuleName, "Are you sure you want to verify transaction?")) {
                         pnEditMode = poController.getEditMode();
                         if (pnEditMode == EditMode.READY) {
-                            if (!poController.existJournal().equals("")) {
-                                if (!pbIsCheckedJournalTab) {
-                                    ShowMessageFX.Warning(null, pxeModuleName, "Please check the Journal Entry before verifying.");
+//                            if (!poController.existJournal().equals("")) {
+                            if (!checkJEorJEPSaving()) {
+                                return;
+                            } else {
+                                poJSON = poController.VerifyTransaction("Verified");
+                                if ("error".equals((String) poJSON.get("result"))) {
+                                    ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                     return;
                                 } else {
-                                    poJSON = poController.VerifyTransaction("Verified");
-                                    if ("error".equals((String) poJSON.get("result"))) {
-                                        ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
-                                        return;
-                                    } else {
-                                        ShowMessageFX.Information(null, pxeModuleName, (String) poJSON.get("message"));
-                                        JFXUtil.disableAllHighlightByColor(tblViewMainList, "#A7C7E7", highlightedRowsMain);
-                                        JFXUtil.highlightByKey(tblViewMainList, String.valueOf(pnMain + 1), "#C1E1C1", highlightedRowsMain);
-                                    }
+                                    ShowMessageFX.Information(null, pxeModuleName, (String) poJSON.get("message"));
+                                    JFXUtil.disableAllHighlightByColor(tblViewMainList, "#A7C7E7", highlightedRowsMain);
+                                    JFXUtil.highlightByKey(tblViewMainList, String.valueOf(pnMain + 1), "#C1E1C1", highlightedRowsMain);
                                 }
-                            } else {
-                                ShowMessageFX.Warning(null, pxeModuleName, "This transaction has no journal entry. Please add a journal entry by updating the transaction to enable verification.");
-                                return;
                             }
+//                            } else {
+//                                ShowMessageFX.Warning(null, pxeModuleName, "This transaction has no journal entry. Please add a journal entry by updating the transaction to enable verification.");
+//                                return;
+//                            }
                         }
                     } else {
                         return;
@@ -670,6 +718,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
             }
             if (JFXUtil.isObjectEqualTo(lsButton, "btnSave", "btnCancel", "btnVoid", "btnVerify", "btnDVCancel")) {
                 pbIsCheckedJournalTab = false;
+                pbIsCheckedJournalProposalTab = false;
                 poController.resetTransaction();
                 poController.Master().setIndustryID(psIndustryId);
                 poController.Master().setCompanyID(psCompanyId);
@@ -751,6 +800,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
                     return;
                 }
                 pbIsCheckedJournalTab = false;
+                pbIsCheckedJournalProposalTab = false;
                 int pnRowMain = Integer.parseInt(selected.getIndex01()) - 1;
                 pnMain = pnRowMain;
                 JFXUtil.disableAllHighlightByColor(tblViewMainList, "#A7C7E7", highlightedRowsMain);
@@ -1034,6 +1084,13 @@ public class DisbursementVoucher_VerificationController implements Initializable
                         pbEnteredJEP = false;
                         journalproposal_data.clear();
                         try {
+                            if (poController.getJournalProposalList() == null) {
+                                return;
+                            } else {
+                                if (poController.getJournalProposalList().isEmpty()) {
+                                    return;
+                                }
+                            }
                             if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
                                 poController.JournalProposal(pnMainJEP).ReloadDetail();
                             }
@@ -1373,7 +1430,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
         });
         JFXUtil.applyRowHighlighting(tblViewMainList, item -> ((ModelDisbursementVoucher_Main) item).getIndex01(), highlightedRowsMain);
         JFXUtil.setKeyEventFilter(this::tableKeyEvents, tblVwDetails, tblVwJournalDetails, tblVwBIRDetails, tblAttachments);
-        JFXUtil.adjustColumnForScrollbar(tblViewMainList, tblVwDetails, tblVwJournalDetails, tblVwBIRDetails, tblAttachments,tblVwJournalProposalList, tblVwJournalProposalDetails);
+        JFXUtil.adjustColumnForScrollbar(tblViewMainList, tblVwDetails, tblVwJournalDetails, tblVwBIRDetails, tblAttachments, tblVwJournalProposalList, tblVwJournalProposalDetails);
     }
 
     private void loadDetailView() {
@@ -1502,7 +1559,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
     private void initTextFields() {
         //Initialise  TextField Focus
         JFXUtil.setFocusListener(txtSearch_Focus, tfSearchIndustry, tfSearchSupplier, tfSearchTransaction);
-        JFXUtil.setFocusListener(txtArea_Focus, taDVRemarks, taJournalRemarks);
+        JFXUtil.setFocusListener(txtArea_Focus, taDVRemarks, taJournalRemarks, taJournalProposalRemarks);
         //apDVMaster1
         JFXUtil.setFocusListener(txtMaster_Focus, tfSupplier);
         //apDVDetail
@@ -1533,9 +1590,9 @@ public class DisbursementVoucher_VerificationController implements Initializable
         });
 
         JFXUtil.handleDisabledNodeClick(apJournalProposalMaster, pnEditMode, nodeID -> {
-            boolean lbStat = JFXUtil.isObjectEqualTo(poController.JournalProposal(pnMainJEP).Master().getTransactionStatus(), 
-                    JournalProposalStatus.VOID,JournalProposalStatus.CANCELLED );
-            if(lbStat){
+            boolean lbStat = JFXUtil.isObjectEqualTo(poController.JournalProposal(pnMainJEP).Master().getTransactionStatus(),
+                    JournalProposalStatus.VOID, JournalProposalStatus.CANCELLED);
+            if (lbStat) {
                 ShowMessageFX.Information(null, pxeModuleName, "Only the 'Proposal Reverse' checkbox can be edited.");
             }
         });
@@ -2288,7 +2345,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
                                 if (!JFXUtil.isJSONSuccess(poJSON)) {
                                     ShowMessageFX.Warning(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
                                 } else {
-                                    poJSON = poController.checkJEPExistBranchDept(pnMainJEP,lsBranchCode,lsDeparment);
+                                    poJSON = poController.checkJEPExistBranchDept(pnMainJEP, lsBranchCode, lsDeparment);
                                     if (!JFXUtil.isJSONSuccess(poJSON)) {
                                         ShowMessageFX.Warning(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
                                     }
@@ -2304,7 +2361,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
                                 if (!JFXUtil.isJSONSuccess(poJSON)) {
                                     ShowMessageFX.Warning(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
                                 } else {
-                                    poJSON = poController.checkJEPExistBranchDept(pnMainJEP,lsBranchCode,lsDeparment);
+                                    poJSON = poController.checkJEPExistBranchDept(pnMainJEP, lsBranchCode, lsDeparment);
                                     if (!JFXUtil.isJSONSuccess(poJSON)) {
                                         ShowMessageFX.Warning(null, pxeModuleName, JFXUtil.getJSONMessage(poJSON));
                                     }
@@ -2758,7 +2815,6 @@ public class DisbursementVoucher_VerificationController implements Initializable
             ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
-
 
     public void loadRecordDetailJEP() {
         try {
@@ -3285,11 +3341,12 @@ public class DisbursementVoucher_VerificationController implements Initializable
                     } else {
                         poController.JournalProposal(pnMainJEP).Detail(pnDetailJEP).isReverse(checkedBox.isSelected());
                     }
-                    loadRecordMasterJEP();
-                    loadTableDetailJEP.reload();
-                    if (checkedBox.isSelected()) {
-                        moveNextJEP(false, false);
-                    }
+                    Platform.runLater(() -> {
+                        loadTableDetailJEP.reload();
+                        JFXUtil.runWithDelay(0.50, () -> {
+                            loadTableMainJEP.reload();
+                        });
+                    });
                     break;
                 case "cbBIRReverse":
                     poJSON = poController.removeWTDeduction(pnDetailBIR);
