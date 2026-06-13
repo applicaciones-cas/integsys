@@ -1531,6 +1531,14 @@ public class DisbursementVoucher_VerificationController implements Initializable
             JFXUtil.setVerticalScroll(taJournalRemarks);
             JFXUtil.setVerticalScroll(taJournalProposalRemarks);
         });
+
+        JFXUtil.handleDisabledNodeClick(apJournalProposalMaster, pnEditMode, nodeID -> {
+            boolean lbStat = JFXUtil.isObjectEqualTo(poController.JournalProposal(pnMainJEP).Master().getTransactionStatus(), 
+                    JournalProposalStatus.VOID,JournalProposalStatus.CANCELLED );
+            if(lbStat){
+                ShowMessageFX.Information(null, pxeModuleName, "Only the 'Proposal Reverse' checkbox can be edited.");
+            }
+        });
     }
     ChangeListener<Boolean> txtSearch_Focus = JFXUtil.FocusListener(TextField.class,
             (lsID, lsValue) -> {
