@@ -2767,10 +2767,11 @@ public class DisbursementVoucher_ApprovalController implements Initializable, Sc
         try {
 
             String dbValue = poController.JournalProposal(pnMainJEP).Master().getTransactionStatus();
-            boolean lbEditMode = poController.JournalProposal(pnMainJEP).Master().getEditMode() == EditMode.ADDNEW;
+            boolean lbStat = JFXUtil.isObjectEqualTo(dbValue, JournalProposalStatus.OPEN, JournalProposalStatus.CONFIRMED);
 
-            JFXUtil.setDisabled(lbEditMode, cmbJournalProposalStatus);
-            JFXUtil.setDisabled(JFXUtil.isObjectEqualTo(dbValue, JournalProposalStatus.CANCELLED), apJournalProposalDetails, apJournalProposalMaster);
+            JFXUtil.setDisabled(true, cmbJournalProposalStatus);
+
+            JFXUtil.setDisabled(!lbStat, apJournalProposalDetails, apJournalProposalMaster);
 
             //for hiding purposes
 //            filteredStatuses.setPredicate(status -> true); //reshow all cmb values
@@ -3371,13 +3372,17 @@ public class DisbursementVoucher_ApprovalController implements Initializable, Sc
     private boolean isProceed() {
         String dbValue = poController.JournalProposal(pnMainJEP).Master().getTransactionStatus();
         String lsMessage = "";
+        boolean lbIsCbChecked = cbJEMasterProposalReverse.isSelected();
         switch (dbValue) {
             case JournalProposalStatus.OPEN:
-                lsMessage = cbJEMasterProposalReverse.isSelected() ? "activate" : "void";
-                return ShowMessageFX.YesNo(null, pxeModuleName, "Are you sure you want to " + lsMessage + " transaction?");
+                lsMessage = lbIsCbChecked ? "activate" : "void";
+                return ShowMessageFX.YesNo(null, pxeModuleName, "This action will " + lsMessage + " the selected proposal.\nWould you like to proceed?");
             case JournalProposalStatus.VOID:
-                lsMessage = cbJEMasterProposalReverse.isSelected() ? "activate" : "void";
-                return ShowMessageFX.YesNo(null, pxeModuleName, "Are you sure you want to " + lsMessage + " transaction?");
+                lsMessage = lbIsCbChecked ? "activate" : "void";
+                return ShowMessageFX.YesNo(null, pxeModuleName, "This action will " + lsMessage + " the selected proposal.\nWould you like to proceed?");
+            case JournalProposalStatus.CONFIRMED:
+                lsMessage = lbIsCbChecked ? "" : "cancel";
+                return ShowMessageFX.YesNo(null, pxeModuleName, "This action will " + lsMessage + " the selected proposal.\nWould you like to proceed?");
         }
         return true;
     }
