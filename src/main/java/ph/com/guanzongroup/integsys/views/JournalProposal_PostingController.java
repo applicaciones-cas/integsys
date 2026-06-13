@@ -25,6 +25,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
+import javafx.scene.control.Pagination;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
@@ -49,7 +50,6 @@ import org.json.simple.parser.ParseException;
 import ph.com.guanzongroup.cas.cashflow.JournalProposal;
 import ph.com.guanzongroup.cas.cashflow.services.CashflowControllers;
 import ph.com.guanzongroup.cas.cashflow.status. JournalProposalStatus;
-import ph.com.guanzongroup.cas.cashflow.status.JournalStatus;
 import ph.com.guanzongroup.integsys.model.ModelJournalEntry_Detail;
 import ph.com.guanzongroup.integsys.model.ModelTableDetail;
 import ph.com.guanzongroup.integsys.model.ModelTableMain;
@@ -74,10 +74,12 @@ public class JournalProposal_PostingController implements Initializable, ScreenI
     private int pnMain = 0;
     private int pnDetail = 0;
     private final Map<String, List<String>> highlightedRowsMain = new HashMap<>();
-    private final JFXUtil.ImageViewer imageviewerutil = new JFXUtil.ImageViewer();
+    private static final int ROWS_PER_PAGE = 50;
     private int pnDetailJE = 0;
     private int currentIndex = 0;
+    
     private ObservableList<ModelTableMain> main_data = FXCollections.observableArrayList();
+    private FilteredList<ModelTableMain> filteredMain_Data;
     private ObservableList<ModelTableDetail> detail_data = FXCollections.observableArrayList();
     private ObservableList<ModelJournalEntry_Detail> journal_data = FXCollections.observableArrayList();
     Scene scene = null;
@@ -92,11 +94,11 @@ public class JournalProposal_PostingController implements Initializable, ScreenI
     @FXML
     private AnchorPane apMainAnchor, apBrowse, apButton, apJournalProposalMaster, apJournalProposalDetails;
     @FXML
-    private TextField tfJournalProposalTransactionNo, tfJournalProposalBranch, tfJournalProposalDepartment, tfJournalProposalDVNo, tfTotalProposalDebitAmount, tfTotalProposalCreditAmount, tfJournalProposalAccountCode, tfJournalProposalAccountDescription, tfJournalProposalDebitAmount, tfJournalProposalCreditAmount, tfSearchDepartment, tfSearchTransactionNo;
+    private TextField tfJournalProposalTransactionNo, tfJournalProposalBranch, tfJournalProposalDepartment, tfJournalProposalSrcNo, tfJournalProposalSrcCd, tfTotalProposalDebitAmount, tfTotalProposalCreditAmount, tfJournalProposalAccountCode, tfJournalProposalAccountDescription, tfJournalProposalDebitAmount, tfJournalProposalCreditAmount, tfSearchDepartment, tfSearchTransactionNo;
     @FXML
     private DatePicker dpJournalProposalTransactionDate, dpJournalProposalReportMonthYear;
     @FXML
-    private Label lblSource, lblJournalTransactionStatus;
+    private Label lblSource, lblStatus;
     @FXML
     private Button btnPost, btnHistory, btnRetrieve, btnClose;
     @FXML
@@ -106,8 +108,9 @@ public class JournalProposal_PostingController implements Initializable, ScreenI
     @FXML
     private TableView tblVwJournalProposalDetails, tblViewMainList;
     @FXML
-    private TableColumn tblJournalProposalRowNo, tblJournalProposalReportMonthYear, tblJournalProposalAccountCode, tblJournalProposalAccountDescription, tblJournalProposalDebitAmount, tblJournalProposalCreditAmount, tblRowNo, tblDate, tblTransNo,tblDVNo,tblDepartment;
-    
+    private TableColumn tblJournalProposalRowNo, tblJournalProposalReportMonthYear, tblJournalProposalAccountCode, tblJournalProposalAccountDescription, tblJournalProposalDebitAmount, tblJournalProposalCreditAmount, tblRowNo, tblDate, tblTransNo,tblSrcNo,tblDepartment;
+    @FXML
+    private Pagination pagination;
     @Override
     public void setGRider(GRiderCAS foValue) {
         oApp = foValue;
@@ -153,6 +156,7 @@ public class JournalProposal_PostingController implements Initializable, ScreenI
             clearTextFields();
             pnEditMode = EditMode.UNKNOWN;
             initButton(pnEditMode);
+            pagination.setPageCount(1);
             Platform.runLater(() -> {
                 try {
                     poController.Master().setIndustryCode(psIndustryId);
@@ -304,7 +308,7 @@ public class JournalProposal_PostingController implements Initializable, ScreenI
                     if (ShowMessageFX.YesNo(null, pxeModuleName, "Are you sure you want to post transaction?")) {
                         pnEditMode = poController.getEditMode();
                         if (pnEditMode == EditMode.READY) {
-                            poJSON = poController.ConfirmTransaction("");
+                            poJSON = poController.PostTransaction("");
                             if ("error".equals((String) poJSON.get("result"))) {
                                 ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                 return;
@@ -394,7 +398,7 @@ public class JournalProposal_PostingController implements Initializable, ScreenI
 
     private void loadRecordMasterJE() {
         try {
-            JFXUtil.setStatusValue(lblJournalTransactionStatus, JournalStatus.class, pnEditMode == EditMode.UNKNOWN ? "-1" : poController.Master().getTransactionStatus());
+            JFXUtil.setStatusValue(lblStatus, JournalProposalStatus.class, pnEditMode == EditMode.UNKNOWN ? "-1" : poController.Master().getTransactionStatus());
             tfJournalProposalTransactionNo.setText(poController.Master().getTransactionNo());
             dpJournalProposalTransactionDate.setValue(CustomCommonUtil.parseDateStringToLocalDate(SQLUtil.dateFormat(poController.Master().getTransactionDate(), SQLUtil.FORMAT_SHORT_DATE)));
             double lnTotalDebit = 0;
@@ -411,7 +415,8 @@ public class JournalProposal_PostingController implements Initializable, ScreenI
             taJournalProposalRemarks.setText(poController.Master().getRemarks());
             tfJournalProposalBranch.setText(poController.Master().Branch().getBranchName());
             tfJournalProposalDepartment.setText(poController.Master().Department().getDescription());
-            tfJournalProposalDVNo.setText(poController.Master().Disbursement().getVoucherNo());
+            tfJournalProposalSrcNo.setText(poController.Master().Disbursement().getVoucherNo());
+            tfJournalProposalSrcCd.setText(poController.getSourceDesc());
             
             JFXUtil.updateCaretPositions(apJournalProposalMaster);
         } catch ( SQLException | GuanzonException ex) {
@@ -445,7 +450,7 @@ public class JournalProposal_PostingController implements Initializable, ScreenI
     }
 
     private void initMainGrid() {
-        JFXUtil.setColumnCenter(tblRowNo, tblDate, tblTransNo,tblDVNo);
+        JFXUtil.setColumnCenter(tblRowNo, tblDate, tblTransNo,tblSrcNo);
         JFXUtil.setColumnLeft(tblDepartment);
         JFXUtil.setColumnsIndexAndDisableReordering(tblViewMainList);
 
@@ -468,7 +473,7 @@ public class JournalProposal_PostingController implements Initializable, ScreenI
         if (selected != null) {
             try {
                 int pnRowMain = Integer.parseInt(selected.getIndex01()) - 1;
-                String lsTransactionNo = selected.getIndex02();
+                String lsTransactionNo = selected.getIndex03();
                 if (!JFXUtil.loadValidation(pnEditMode, pxeModuleName, poController.Master().getTransactionNo(), lsTransactionNo)) {
                     return;
                 }
@@ -528,12 +533,12 @@ public class JournalProposal_PostingController implements Initializable, ScreenI
                             poJSON = poController.loadTransactionList(tfSearchDepartment.getText(), tfSearchTransactionNo.getText());
                             if ("success".equals(poJSON.get("result"))) {
                                 if (poController.getTransactionList().size() > 0) {
-                                    for (int lnCntr = 0; lnCntr < poController.getTransactionList().size() - 1; lnCntr++) {
+                                    for (int lnCntr = 0; lnCntr < poController.getTransactionList().size(); lnCntr++) {
                                         try {
                                             main_data.add(new ModelTableMain(
                                                     String.valueOf(lnCntr + 1),
-                                                    poController.TransactionList(lnCntr).getTransactionNo(),
                                                     CustomCommonUtil.formatDateToShortString(poController.TransactionList(lnCntr).getTransactionDate()),
+                                                    poController.TransactionList(lnCntr).getTransactionNo(),
                                                     poController.TransactionList(lnCntr).Disbursement().getVoucherNo(),
                                                     poController.TransactionList(lnCntr).Department().getDescription(),
                                                     "", "", "", "", ""
@@ -541,7 +546,7 @@ public class JournalProposal_PostingController implements Initializable, ScreenI
                                             if (poController.TransactionList(lnCntr).getTransactionStatus().equals( JournalProposalStatus.VOID)) {
                                                 JFXUtil.highlightByKey(tblViewMainList, String.valueOf(lnCntr + 1), "#FAA0A0", highlightedRowsMain);
                                             }
-                                            if (poController.TransactionList(lnCntr).getTransactionStatus().equals( JournalProposalStatus.CONFIRMED)) {
+                                            if (poController.TransactionList(lnCntr).getTransactionStatus().equals( JournalProposalStatus.POSTED)) {
                                                 JFXUtil.highlightByKey(tblViewMainList, String.valueOf(lnCntr + 1), "#C1E1C1", highlightedRowsMain);
                                             }
                                         } catch (SQLException | GuanzonException ex) {
@@ -552,6 +557,7 @@ public class JournalProposal_PostingController implements Initializable, ScreenI
                                 } else {
                                     main_data.clear();
                                 }
+                                JFXUtil.loadTab(pagination, main_data.size(), ROWS_PER_PAGE, tblViewMainList, filteredMain_Data);
                             }
                         } catch (SQLException | GuanzonException ex) {
                             Logger.getLogger(getClass().getName()).log(Level.SEVERE, MiscUtil.getException(ex), ex);
@@ -743,7 +749,7 @@ public class JournalProposal_PostingController implements Initializable, ScreenI
                         switch (txtFieldID) {
                             //apBrowse
                             case "tfSearchDepartment":
-                                poJSON = poController.SearchDepartment(tfSearchDepartment.getText(), true, true);
+                                poJSON = poController.SearchDepartment(tfSearchDepartment.getText(), false, true);
                                 if (!"success".equals((String) poJSON.get("result"))) {
                                     ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
                                     return;
