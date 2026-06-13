@@ -1603,6 +1603,7 @@ public class DisbursementVoucher_HistoryController implements Initializable, Scr
             taJournalProposalRemarks.setText(poController.JournalProposal(pnMainJEP).Master().getRemarks());
             tfJournalProposalBranch.setText(poController.JournalProposal(pnMainJEP).Master().Branch().getBranchName());
             tfJournalProposalDepartment.setText(poController.JournalProposal(pnMainJEP).Master().Department().getDescription());
+            taJournalProposalRemarks.setText(poController.JournalProposal(pnMainJEP).Master().getRemarks());
 
             cbJEMasterProposalReverse.setSelected(poController.JournalProposal(pnMainJEP).Master().isReverse());
             JFXUtil.updateCaretPositions(apJournalProposalMaster);

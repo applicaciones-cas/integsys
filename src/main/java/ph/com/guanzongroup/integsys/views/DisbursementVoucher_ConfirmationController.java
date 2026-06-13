@@ -2804,6 +2804,7 @@ public class DisbursementVoucher_ConfirmationController implements Initializable
             taJournalProposalRemarks.setText(poController.JournalProposal(pnMainJEP).Master().getRemarks());
             tfJournalProposalBranch.setText(poController.JournalProposal(pnMainJEP).Master().Branch().getBranchName());
             tfJournalProposalDepartment.setText(poController.JournalProposal(pnMainJEP).Master().Department().getDescription());
+            taJournalProposalRemarks.setText(poController.JournalProposal(pnMainJEP).Master().getRemarks());
 
             cbJEMasterProposalReverse.setSelected(poController.JournalProposal(pnMainJEP).Master().isReverse());
             JFXUtil.updateCaretPositions(apJournalProposalMaster);
@@ -3323,7 +3324,7 @@ public class DisbursementVoucher_ConfirmationController implements Initializable
                     if (poController.JournalProposal(pnMainJEP).getEditMode() == EditMode.ADDNEW) {
                         poController.getJournalProposalList().remove(pnMainJEP);
                     } else {
-                        poController.JournalProposal(pnMainJEP).Master().isReverse(cbJEMasterProposalReverse.isSelected());
+                        poController.JournalProposal(pnMainJEP).Master().isReverse(checkedBox.isSelected());
                     }
                     loadRecordMasterJEP();
                     loadTableMainJEP.reload();
@@ -3333,7 +3334,7 @@ public class DisbursementVoucher_ConfirmationController implements Initializable
                     if (poController.JournalProposal(pnMainJEP).Detail(pnDetailJEP).getEditMode() == EditMode.ADDNEW) {
                         poController.JournalProposal(pnMainJEP).Detail().remove(pnDetailJEP);
                     } else {
-                        poController.JournalProposal(pnMainJEP).Detail(pnDetailJEP).isReverse(cbJEReverse.isSelected());
+                        poController.JournalProposal(pnMainJEP).Detail(pnDetailJEP).isReverse(checkedBox.isSelected());
                     }
                     loadRecordMasterJEP();
                     loadTableDetailJEP.reload();
