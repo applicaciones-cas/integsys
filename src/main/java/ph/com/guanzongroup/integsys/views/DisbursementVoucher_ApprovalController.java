@@ -2412,7 +2412,6 @@ public class DisbursementVoucher_ApprovalController implements Initializable, Sc
                                     }
                                     JFXUtil.textFieldMoveNext(tfJournalProposalDepartment);
                                 }
-                                loadRecordMasterJEP();
                                 loadTableMainJEP.reload();
                                 break;
                             case "tfJournalProposalDepartment":
@@ -2428,7 +2427,6 @@ public class DisbursementVoucher_ApprovalController implements Initializable, Sc
                                     }
                                     JFXUtil.textFieldMoveNext(taJournalProposalRemarks);
                                 }
-                                loadRecordMasterJEP();
                                 loadTableMainJEP.reload();
                                 break;
                             //apJournalProposalDetails

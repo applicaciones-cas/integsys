@@ -2351,7 +2351,6 @@ public class DisbursementVoucher_VerificationController implements Initializable
                                     }
                                     JFXUtil.textFieldMoveNext(tfJournalProposalDepartment);
                                 }
-                                loadRecordMasterJEP();
                                 loadTableMainJEP.reload();
                                 break;
                             case "tfJournalProposalDepartment":
@@ -2367,7 +2366,6 @@ public class DisbursementVoucher_VerificationController implements Initializable
                                     }
                                     JFXUtil.textFieldMoveNext(taJournalProposalRemarks);
                                 }
-                                loadRecordMasterJEP();
                                 loadTableMainJEP.reload();
                                 break;
                             //apJournalProposalDetails
