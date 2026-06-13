@@ -765,7 +765,6 @@ public class DisbursementVoucher_ConfirmationController implements Initializable
     private void populateJEP() {
         JFXUtil.clearTextFields(apJournalProposalMaster, apJournalProposalDetails);
         poController.getEditMode();
-        loadRecordMasterJEP();
         loadTableMainJEP.reload();
         loadTableDetailJEP.reload();
     }
@@ -1064,7 +1063,7 @@ public class DisbursementVoucher_ConfirmationController implements Initializable
                                     /* FOCUS ON THE ROW THAT pnRowDetail POINTS TO */
                                     JFXUtil.selectAndFocusRow(tblVwJournalProposalList, pnMainJEP);
                                 }
-
+                                loadRecordMasterJEP();
                             } catch (SQLException | GuanzonException | CloneNotSupportedException ex) {
                                 Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
                             }
@@ -2756,9 +2755,9 @@ public class DisbursementVoucher_ConfirmationController implements Initializable
             String dbValue = poController.JournalProposal(pnMainJEP).Master().getTransactionStatus();
             boolean lbStat = JFXUtil.isObjectEqualTo(dbValue, JournalProposalStatus.OPEN, JournalProposalStatus.CONFIRMED);
 
+            JFXUtil.setDisabledExcept(!lbStat, apJournalProposalMaster, cbJEMasterProposalReverse);
+            JFXUtil.setDisabled(!lbStat, apJournalProposalDetails);
             JFXUtil.setDisabled(true, cmbJournalProposalStatus);
-
-            JFXUtil.setDisabled(!lbStat, apJournalProposalDetails, apJournalProposalMaster);
 
             //for hiding purposes
 //            filteredStatuses.setPredicate(status -> true); //reshow all cmb values
@@ -2804,7 +2803,6 @@ public class DisbursementVoucher_ConfirmationController implements Initializable
             tfJournalProposalBranch.setText(poController.JournalProposal(pnMainJEP).Master().Branch().getBranchName());
             tfJournalProposalDepartment.setText(poController.JournalProposal(pnMainJEP).Master().Department().getDescription());
             taJournalProposalRemarks.setText(poController.JournalProposal(pnMainJEP).Master().getRemarks());
-
             cbJEMasterProposalReverse.setSelected(poController.JournalProposal(pnMainJEP).Master().isReverse());
             JFXUtil.updateCaretPositions(apJournalProposalMaster);
         } catch (SQLException | GuanzonException ex) {
@@ -3325,7 +3323,6 @@ public class DisbursementVoucher_ConfirmationController implements Initializable
                     } else {
                         poController.JournalProposal(pnMainJEP).Master().isReverse(checkedBox.isSelected());
                     }
-                    loadRecordMasterJEP();
                     loadTableMainJEP.reload();
                     loadTableDetailJEP.reload();
                     break;
