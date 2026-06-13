@@ -93,11 +93,11 @@ import ph.com.guanzongroup.integsys.utility.JFXUtil;
  *
  * @author User
  */
-public class InventoryCountController implements Initializable, ScreenInterface {
+public class InventoryCount_HistoryController implements Initializable, ScreenInterface {
 
     private GRiderCAS poApp;
     private LogWrapper poLogWrapper;
-    private String psFormName = "Inventory Count Entry";
+    private String psFormName = "Inventory Count History";
     private String psIndustryID, psCompanyID, psCategoryID;
     private Control lastFocusedControl;
     private InventoryCount poAppController;
