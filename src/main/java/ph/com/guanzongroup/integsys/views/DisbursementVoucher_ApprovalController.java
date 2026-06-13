@@ -183,7 +183,7 @@ public class DisbursementVoucher_ApprovalController implements Initializable, Sc
     @FXML
     private ComboBox cmbPaymentMode, cmbPayeeType, cmbDisbursementMode, cmbClaimantType, cmbCheckStatus, cmbAttachmentType;
     @FXML
-    private CheckBox chbkPrintByBank, chbkIsCrossCheck, chbkIsPersonOnly, chbkVatClassification, cbReverse, cbJEReverse, cbJEProposalReverse, cbBIRReverse;
+    private CheckBox chbkPrintByBank, chbkIsCrossCheck, chbkIsPersonOnly, chbkVatClassification, cbReverse, cbJEReverse, cbJEProposalReverse, cbBIRReverse, cbJEMasterProposalReverse;
     @FXML
     private TextArea taDVRemarks, taJournalRemarks, taJournalProposalRemarks;
     @FXML
@@ -847,7 +847,9 @@ public class DisbursementVoucher_ApprovalController implements Initializable, Sc
     }
 
     private void loadTableDetailFromMainJEP() {
-        pnMainJEP = tblVwJournalProposalList.getSelectionModel().getSelectedIndex();
+        JFXUtil.clearTextFields(apJournalProposalMaster, apJournalProposalDetails);
+        pnMainJEP = tblVwJournalProposalList.getSelectionModel().getSelectedIndex();;
+        loadRecordMasterJEP();
         loadTableDetailJEP.reload();
     }
 
@@ -2763,14 +2765,41 @@ public class DisbursementVoucher_ApprovalController implements Initializable, Sc
 
     private void loadRecordMasterJEP() {
         try {
+
             String dbValue = poController.JournalProposal(pnMainJEP).Master().getTransactionStatus();
+            boolean lbEditMode = poController.JournalProposal(pnMainJEP).Master().getEditMode() == EditMode.ADDNEW;
+
+            JFXUtil.setDisabled(lbEditMode, cmbJournalProposalStatus);
+            JFXUtil.setDisabled(JFXUtil.isObjectEqualTo(dbValue, JournalProposalStatus.CANCELLED), apJournalProposalDetails, apJournalProposalMaster);
+
+            //for hiding purposes
+//            filteredStatuses.setPredicate(status -> true); //reshow all cmb values
+//            if (lbEditMode) {
+//            } else {
+//                switch (dbValue) {
+//                    case JournalProposalStatus.OPEN:
+////                        filteredStatuses.setPredicate(status
+////                                -> !JournalProposalStatus.CANCELLED.equals(status.getCode())
+////                                && !JournalProposalStatus.POSTED.equals(status.getCode())
+////                                && !JournalProposalStatus.RETURNED.equals(status.getCode())
+////                                && !JournalProposalStatus.VOID.equals(status.getCode())
+////                        );
+//                        break;
+//                    case JournalProposalStatus.CONFIRMED:
+////                        filteredStatuses.setPredicate(status
+////                                -> !JournalProposalStatus.VOID.equals(status.getCode())
+////                                && !JournalProposalStatus.POSTED.equals(status.getCode())
+////                                && !JournalProposalStatus.RETURNED.equals(status.getCode())
+////                                && !JournalProposalStatus.OPEN.equals(status.getCode())
+////                        );
+//                        break;
+//                }
+//            }
             statusJEP.stream()
                     .filter(s -> s.getCode().equals(dbValue))
                     .findFirst()
                     .ifPresent(cmbJournalProposalStatus::setValue);
 
-//            JFXUtil.setCmbValue(cmbJournalProposalStatus, poController.JournalProposal(pnMainJEP).Master().getTransactionStatus());
-//        JFXUtil.setStatusValue(lblJournalTransactionStatus, JournalStatus.class, pnEditMode == EditMode.UNKNOWN ? "-1" : poController.Journal().Master().getTransactionStatus());
             tfJournalProposalTransactionNo.setText(poController.JournalProposal(pnMainJEP).Master().getTransactionNo());
             dpJournalProposalTransactionDate.setValue(CustomCommonUtil.parseDateStringToLocalDate(SQLUtil.dateFormat(poController.JournalProposal(pnMainJEP).Master().getTransactionDate(), SQLUtil.FORMAT_SHORT_DATE)));
             double lnTotalDebit = 0;
@@ -2787,6 +2816,8 @@ public class DisbursementVoucher_ApprovalController implements Initializable, Sc
             taJournalProposalRemarks.setText(poController.JournalProposal(pnMainJEP).Master().getRemarks());
             tfJournalProposalBranch.setText(poController.JournalProposal(pnMainJEP).Master().Branch().getBranchName());
             tfJournalProposalDepartment.setText(poController.JournalProposal(pnMainJEP).Master().Department().getDescription());
+
+            cbJEMasterProposalReverse.setSelected(poController.JournalProposal(pnMainJEP).Master().isReverse());
             JFXUtil.updateCaretPositions(apJournalProposalMaster);
         } catch (SQLException | GuanzonException ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
@@ -3296,6 +3327,20 @@ public class DisbursementVoucher_ApprovalController implements Initializable, Sc
                         moveNextJE(false, false);
                     }
                     break;
+                case "cbJEMasterProposalReverse":
+                    if (!isProceed()) {
+                        loadRecordMasterJEP();
+                        return;
+                    }
+                    if (poController.JournalProposal(pnMainJEP).getEditMode() == EditMode.ADDNEW) {
+                        poController.getJournalProposalList().remove(pnMainJEP);
+                    } else {
+                        poController.JournalProposal(pnMainJEP).Master().isReverse(cbJEMasterProposalReverse.isSelected());
+                    }
+                    loadRecordMasterJEP();
+                    loadTableMainJEP.reload();
+                    loadTableDetailJEP.reload();
+                    break;
                 case "cbJEProposalReverse":
                     if (poController.JournalProposal(pnMainJEP).Detail(pnDetailJEP).getEditMode() == EditMode.ADDNEW) {
                         poController.JournalProposal(pnMainJEP).Detail().remove(pnDetailJEP);
@@ -3321,6 +3366,20 @@ public class DisbursementVoucher_ApprovalController implements Initializable, Sc
                     break;
             }
         }
+    }
+
+    private boolean isProceed() {
+        String dbValue = poController.JournalProposal(pnMainJEP).Master().getTransactionStatus();
+        String lsMessage = "";
+        switch (dbValue) {
+            case JournalProposalStatus.OPEN:
+                lsMessage = cbJEMasterProposalReverse.isSelected() ? "activate" : "void";
+                return ShowMessageFX.YesNo(null, pxeModuleName, "Are you sure you want to " + lsMessage + " transaction?");
+            case JournalProposalStatus.VOID:
+                lsMessage = cbJEMasterProposalReverse.isSelected() ? "activate" : "void";
+                return ShowMessageFX.YesNo(null, pxeModuleName, "Are you sure you want to " + lsMessage + " transaction?");
+        }
+        return true;
     }
 
     private void initButton(int fnEditMode) {
