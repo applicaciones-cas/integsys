@@ -2761,10 +2761,10 @@ public class DisbursementVoucher_ConfirmationController implements Initializable
         try {
 
             String dbValue = poController.JournalProposal(pnMainJEP).Master().getTransactionStatus();
-            boolean lbStat = JFXUtil.isObjectEqualTo(dbValue, JournalProposalStatus.OPEN, JournalProposalStatus.CONFIRMED);
+            boolean lbStat = JFXUtil.isObjectEqualTo(dbValue, JournalProposalStatus.VOID, JournalProposalStatus.CANCELLED);
 
-            JFXUtil.setDisabledExcept(!lbStat, apJournalProposalMaster, cbJEMasterProposalReverse);
-            JFXUtil.setDisabled(!lbStat, apJournalProposalDetails);
+            JFXUtil.setDisabledExcept(lbStat, apJournalProposalMaster, cbJEMasterProposalReverse);
+            JFXUtil.setDisabled(lbStat, apJournalProposalDetails);
             JFXUtil.setDisabled(true, cmbJournalProposalStatus);
 
             //for hiding purposes
@@ -2818,6 +2818,7 @@ public class DisbursementVoucher_ConfirmationController implements Initializable
             ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
         }
     }
+
 
     public void loadRecordDetailJEP() {
         try {
