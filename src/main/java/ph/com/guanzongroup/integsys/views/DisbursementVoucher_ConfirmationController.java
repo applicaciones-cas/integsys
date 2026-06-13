@@ -3331,8 +3331,12 @@ public class DisbursementVoucher_ConfirmationController implements Initializable
                     } else {
                         poController.JournalProposal(pnMainJEP).Master().isReverse(checkedBox.isSelected());
                     }
-                    loadTableMainJEP.reload();
-                    loadTableDetailJEP.reload();
+                    Platform.runLater(() -> {
+                        loadTableMainJEP.reload();
+                        JFXUtil.runWithDelay(0.50, () -> {
+                            loadTableDetailJEP.reload();
+                        });
+                    });
                     break;
                 case "cbJEProposalReverse":
                     if (poController.JournalProposal(pnMainJEP).Detail(pnDetailJEP).getEditMode() == EditMode.ADDNEW) {

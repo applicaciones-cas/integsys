@@ -1633,9 +1633,9 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
         });
 
         JFXUtil.handleDisabledNodeClick(apJournalProposalMaster, pnEditMode, nodeID -> {
-            boolean lbStat = JFXUtil.isObjectEqualTo(poController.JournalProposal(pnMainJEP).Master().getTransactionStatus(), 
-                    JournalProposalStatus.VOID,JournalProposalStatus.CANCELLED );
-            if(lbStat){
+            boolean lbStat = JFXUtil.isObjectEqualTo(poController.JournalProposal(pnMainJEP).Master().getTransactionStatus(),
+                    JournalProposalStatus.VOID, JournalProposalStatus.CANCELLED);
+            if (lbStat) {
                 ShowMessageFX.Information(null, pxeModuleName, "Only the 'Proposal Reverse' checkbox can be edited.");
             }
         });
@@ -3387,8 +3387,12 @@ public class DisbursementVoucher_EntryController implements Initializable, Scree
                     } else {
                         poController.JournalProposal(pnMainJEP).Master().isReverse(checkedBox.isSelected());
                     }
-                    loadTableMainJEP.reload();
-                    loadTableDetailJEP.reload();
+                    Platform.runLater(() -> {
+                        loadTableMainJEP.reload();
+                        JFXUtil.runWithDelay(0.50, () -> {
+                            loadTableDetailJEP.reload();
+                        });
+                    });
                     break;
                 case "cbJEProposalReverse":
                     if (poController.JournalProposal(pnMainJEP).Detail(pnDetailJEP).getEditMode() == EditMode.ADDNEW) {

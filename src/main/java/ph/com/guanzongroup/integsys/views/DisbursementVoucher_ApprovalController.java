@@ -3344,8 +3344,12 @@ public class DisbursementVoucher_ApprovalController implements Initializable, Sc
                     } else {
                         poController.JournalProposal(pnMainJEP).Master().isReverse(checkedBox.isSelected());
                     }
-                    loadTableMainJEP.reload();
-                    loadTableDetailJEP.reload();
+                    Platform.runLater(() -> {
+                        loadTableMainJEP.reload();
+                        JFXUtil.runWithDelay(0.50, () -> {
+                            loadTableDetailJEP.reload();
+                        });
+                    });
                     break;
                 case "cbJEProposalReverse":
                     if (poController.JournalProposal(pnMainJEP).Detail(pnDetailJEP).getEditMode() == EditMode.ADDNEW) {
