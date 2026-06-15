@@ -3339,8 +3339,12 @@ public class DisbursementVoucher_ConfirmationController implements Initializable
             case JournalProposalStatus.VOID:
                 lsMessage = lbIsCbChecked ? "activate" : "void";
                 return ShowMessageFX.YesNo(null, pxeModuleName, "This action will " + lsMessage + " the selected proposal.\nWould you like to proceed?");
+            case JournalProposalStatus.RETURNED:
             case JournalProposalStatus.CONFIRMED:
-                lsMessage = lbIsCbChecked ? "" : "cancel";
+                lsMessage = lbIsCbChecked ? "activate" : "cancel";
+                return ShowMessageFX.YesNo(null, pxeModuleName, "This action will " + lsMessage + " the selected proposal.\nWould you like to proceed?");
+            case JournalProposalStatus.CANCELLED:
+                lsMessage = lbIsCbChecked ? "activate" : "cancel";
                 return ShowMessageFX.YesNo(null, pxeModuleName, "This action will " + lsMessage + " the selected proposal.\nWould you like to proceed?");
         }
         return true;
