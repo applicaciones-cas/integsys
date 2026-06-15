@@ -375,6 +375,7 @@ public class DisbursementVoucher_ApprovalController implements Initializable, Sc
                     if (pnEditMode == EditMode.READY || pnEditMode == EditMode.UPDATE || pnEditMode == EditMode.ADDNEW) {
                         JFXUtil.clearTextFields(apJournalProposalMaster, apJournalProposalDetails);
                         if (poController.Detail(0).getSourceNo() != null && !poController.Detail(0).getSourceNo().isEmpty()) {
+                            pbIsCheckedJournalProposalTab = true;
                             populateJEP();
                         } else {
                             JFXUtil.clickTabByTitleText(tabPaneMain, "Disbursement Voucher");
