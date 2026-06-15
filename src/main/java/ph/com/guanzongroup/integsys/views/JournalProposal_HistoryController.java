@@ -130,7 +130,6 @@ public class JournalProposal_HistoryController implements Initializable, ScreenI
             if (!"success".equals((String) poJSON.get("result"))) {
                 ShowMessageFX.Warning(null, pxeModuleName, (String) poJSON.get("message"));
             }
-            poController.setTransactionStatus(JournalProposalStatus.CONFIRMED);
             initLoadTable();
             initTextFields();
             initDatePicker();
@@ -456,6 +455,7 @@ public class JournalProposal_HistoryController implements Initializable, ScreenI
                                     return;
                                 }
                                 loadRecordSearch();
+                                loadTableDetail.reload();
                                 break;
                         }
                         break;
