@@ -9,7 +9,6 @@ import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.SQLException;
-import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -44,7 +43,6 @@ import javafx.scene.control.Pagination;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TableColumn;
-import javafx.scene.control.TablePosition;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
@@ -1429,7 +1427,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
             }
         });
         JFXUtil.applyRowHighlighting(tblViewMainList, item -> ((ModelDisbursementVoucher_Main) item).getIndex01(), highlightedRowsMain);
-        JFXUtil.setKeyEventFilter(this::tableKeyEvents, tblVwDetails, tblVwJournalDetails, tblVwBIRDetails, tblAttachments);
+        JFXUtil.setKeyEventFilter(tableKeyEvents, tblVwDetails, tblVwJournalDetails, tblVwBIRDetails, tblAttachments);
         JFXUtil.adjustColumnForScrollbar(tblViewMainList, tblVwDetails, tblVwJournalDetails, tblVwBIRDetails, tblAttachments, tblVwJournalProposalList, tblVwJournalProposalDetails);
     }
 
@@ -1493,24 +1491,16 @@ public class DisbursementVoucher_VerificationController implements Initializable
         }
     }
 
-    private void tableKeyEvents(KeyEvent event) {
-        TableView<?> currentTable = (TableView<?>) event.getSource();
-        TablePosition<?, ?> focusedCell = currentTable.getFocusModel().getFocusedCell();
-        if (focusedCell == null) {
-            return;
-        }
-        boolean moveDown = event.getCode() == KeyCode.TAB || event.getCode() == KeyCode.DOWN;
-        boolean moveUp = event.getCode() == KeyCode.UP;
-        int newIndex = 0;
-
-        if (moveDown || moveUp) {
-            newIndex = moveDown ? JFXUtil.moveToNextRow(currentTable) : JFXUtil.moveToPreviousRow(currentTable);
-            switch (currentTable.getId()) {
+    JFXUtil.TableKeyEvent tableKeyEvents = new JFXUtil.TableKeyEvent() {
+        @Override
+        protected void onRowMove(TableView<?> currentTable, String currentTableID, boolean isMovedDown) {
+            int newIndex = 0;
+            switch (currentTableID) {
                 case "tblVwDetails":
                     if (details_data.isEmpty()) {
                         return;
                     }
-                    newIndex = moveDown ? Integer.parseInt(details_data.get(JFXUtil.moveToNextRow(currentTable)).getIndex11())
+                    newIndex = isMovedDown ? Integer.parseInt(details_data.get(JFXUtil.moveToNextRow(currentTable)).getIndex11())
                             : Integer.parseInt(details_data.get(JFXUtil.moveToPreviousRow(currentTable)).getIndex11());
                     pnDetail = newIndex;
                     loadRecordDetail();
@@ -1519,7 +1509,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
                     if (journal_data.isEmpty()) {
                         return;
                     }
-                    newIndex = moveDown ? Integer.parseInt(journal_data.get(JFXUtil.moveToNextRow(currentTable)).getIndex07())
+                    newIndex = isMovedDown ? Integer.parseInt(journal_data.get(JFXUtil.moveToNextRow(currentTable)).getIndex07())
                             : Integer.parseInt(journal_data.get(JFXUtil.moveToPreviousRow(currentTable)).getIndex07());
                     pnDetailJE = newIndex;
                     loadRecordDetailJE();
@@ -1528,7 +1518,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
                     if (journalproposal_data.isEmpty()) {
                         return;
                     }
-                    newIndex = moveDown ? Integer.parseInt(journalproposal_data.get(JFXUtil.moveToNextRow(currentTable)).getIndex07())
+                    newIndex = isMovedDown ? Integer.parseInt(journalproposal_data.get(JFXUtil.moveToNextRow(currentTable)).getIndex07())
                             : Integer.parseInt(journalproposal_data.get(JFXUtil.moveToPreviousRow(currentTable)).getIndex07());
                     pnDetailJEP = newIndex;
                     loadRecordDetailJEP();
@@ -1537,7 +1527,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
                     if (BIR_data.isEmpty()) {
                         return;
                     }
-                    newIndex = moveDown ? Integer.parseInt(BIR_data.get(JFXUtil.moveToNextRow(currentTable)).getIndex07())
+                    newIndex = isMovedDown ? Integer.parseInt(BIR_data.get(JFXUtil.moveToNextRow(currentTable)).getIndex07())
                             : Integer.parseInt(BIR_data.get(JFXUtil.moveToPreviousRow(currentTable)).getIndex07());
                     pnDetailBIR = newIndex;
                     loadRecordDetailBIR();
@@ -1546,18 +1536,17 @@ public class DisbursementVoucher_VerificationController implements Initializable
                     if (attachment_data.isEmpty()) {
                         return;
                     }
-                    newIndex = moveDown ? Integer.parseInt(attachment_data.get(JFXUtil.moveToNextRow(currentTable)).getIndex03())
+                    newIndex = isMovedDown ? Integer.parseInt(attachment_data.get(JFXUtil.moveToNextRow(currentTable)).getIndex03())
                             : Integer.parseInt(attachment_data.get(JFXUtil.moveToPreviousRow(currentTable)).getIndex03());
                     pnAttachment = newIndex;
                     loadRecordAttachment(true);
                     break;
             }
-            event.consume();
         }
-    }
+    };
 
     private void initTextFields() {
-        //Initialise  TextField Focus
+        //Initialize  TextField Focus
         JFXUtil.setFocusListener(txtSearch_Focus, tfSearchIndustry, tfSearchSupplier, tfSearchTransaction);
         JFXUtil.setFocusListener(txtArea_Focus, taDVRemarks, taJournalRemarks, taJournalProposalRemarks);
         //apDVMaster1
@@ -1816,35 +1805,7 @@ public class DisbursementVoucher_VerificationController implements Initializable
                         break;
                     case "tfSupplierBank":
                         if (lsValue.isEmpty()) {
-//                            if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
-//                                if (!JFXUtil.isObjectEqualTo(poController.Master().getSupplierClientID(), null, "")
-//                                && !JFXUtil.isObjectEqualTo(poController.Master().getPayeeID(), null, "")) {
-//                                    if (poController.getDetailCount() > 1) {
-//                                        if (!pbKeyPressed) {
-//                                            if (ShowMessageFX.YesNo(null, pxeModuleName,
-//                                                    "Are you sure you want to change the supplier name?\nPlease note that this action will delete all Disbursement voucher details.\n\nDo you wish to proceed?") == true) {
-//                                                poController.removeDetails();
-//                                                if (poController.Master().getDisbursementType().equals(DisbursementStatic.DisbursementType.CHECK)) {
-//                                                    poController.CheckPayments().getModel().setPayeeID("");
-//                                                    loadRecordMasterCheck();
-//                                                }
-//                                                poController.Master().setSupplierClientID("");
-//                                                poController.Master().setPayeeID("");
-//                                                tfSupplier.setText("");
-//                                                psSupplierPayeeId = "";
-//                                                loadTableDetail.reload();
-//                                            } else {
-//                                                loadRecordMaster();
-//                                                return;
-//                                            }
-//                                        } else {
-//                                            loadRecordMaster();
-//                                            return;
-//                                        }
-//                                    }
-//                                }
-//                            }
-//                            poController.Master().setSupplierClientID("");
+
                         }
                         break;
                     case "tfSupplierAccountNoBTransfer":
@@ -3066,27 +3027,12 @@ public class DisbursementVoucher_VerificationController implements Initializable
         });
     }
     boolean pbSuccess = true;
-
-    private void datepicker_Action(ActionEvent event) {
-        poJSON = new JSONObject();
-        JFXUtil.setJSONSuccess(poJSON, "success");
-        try {
-            Object source = event.getSource();
-            if (source instanceof DatePicker) {
-                DatePicker datePicker = (DatePicker) source;
+    EventHandler<ActionEvent> datepicker_Action = JFXUtil.DatePickerAction(
+            (datePicker, sdfFormat, lsServerDate, ldCurrentDate, lsSelectedDate, ldSelectedDate) -> {
+                poJSON = new JSONObject();
                 String inputText = datePicker.getEditor().getText();
-                SimpleDateFormat sdfFormat = new SimpleDateFormat(SQLUtil.FORMAT_SHORT_DATE);
                 LocalDate currentDate = null, transactionDate = null, referenceDate = null, selectedDate = null, periodToDate = null, periodFromDate = null;
-                String lsServerDate = "", lsTransDate = "", lsRefDate = "", lsSelectedDate = "", lsPeriodToDate = "", lsPeriodFromDate = "";
-
-                if (inputText == null || "".equals(inputText) || "01/01/1900".equals(inputText)) {
-                    return;
-                }
-
-                lsServerDate = sdfFormat.format(oApp.getServerDate());
-                currentDate = LocalDate.parse(lsServerDate, DateTimeFormatter.ofPattern(SQLUtil.FORMAT_SHORT_DATE));
-                lsSelectedDate = sdfFormat.format(SQLUtil.toDate(JFXUtil.convertToIsoFormat(inputText), SQLUtil.FORMAT_SHORT_DATE));
-                selectedDate = LocalDate.parse(lsSelectedDate, DateTimeFormatter.ofPattern(SQLUtil.FORMAT_SHORT_DATE));
+                String lsTransDate = "", lsRefDate = "", lsPeriodToDate = "", lsPeriodFromDate = "";
                 switch (datePicker.getId()) {
                     case "dpCheckDate":
                         //back date not allowed
@@ -3214,16 +3160,11 @@ public class DisbursementVoucher_VerificationController implements Initializable
 
                         break;
                 }
-            }
-        } catch (SQLException ex) {
-            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
-            ShowMessageFX.Error(null, pxeModuleName, MiscUtil.getException(ex));
-        }
-    }
+            });
 
     private void initDatePicker() {
         JFXUtil.setDatePickerFormat("MM/dd/yyyy", dpDVTransactionDate, dpCheckDate, dpJournalTransactionDate, dpReportMonthYear, dpJournalProposalTransactionDate, dpJournalProposalReportMonthYear, dpPeriodFrom, dpPeriodTo);
-        JFXUtil.setActionListener(this::datepicker_Action, dpDVTransactionDate, dpCheckDate, dpJournalTransactionDate, dpReportMonthYear, dpJournalProposalTransactionDate, dpJournalProposalReportMonthYear, dpPeriodFrom, dpPeriodTo);
+        JFXUtil.setActionListener(datepicker_Action, dpDVTransactionDate, dpCheckDate, dpJournalTransactionDate, dpReportMonthYear, dpJournalProposalTransactionDate, dpJournalProposalReportMonthYear, dpPeriodFrom, dpPeriodTo);
     }
 
     @FXML

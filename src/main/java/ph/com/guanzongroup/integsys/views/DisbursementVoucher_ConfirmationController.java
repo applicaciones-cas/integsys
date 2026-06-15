@@ -1426,7 +1426,7 @@ public class DisbursementVoucher_ConfirmationController implements Initializable
             }
         });
         JFXUtil.applyRowHighlighting(tblViewMainList, item -> ((ModelDisbursementVoucher_Main) item).getIndex01(), highlightedRowsMain);
-        JFXUtil.setKeyEventFilter(this::tableKeyEvents, tblVwDetails, tblVwJournalDetails, tblVwBIRDetails, tblAttachments);
+        JFXUtil.setKeyEventFilter(tableKeyEvents, tblVwDetails, tblVwJournalDetails, tblVwBIRDetails, tblAttachments);
         JFXUtil.adjustColumnForScrollbar(tblViewMainList, tblVwDetails, tblVwJournalDetails, tblVwBIRDetails, tblAttachments, tblVwJournalProposalList, tblVwJournalProposalDetails);
     }
 
@@ -1490,23 +1490,16 @@ public class DisbursementVoucher_ConfirmationController implements Initializable
         }
     }
 
-    private void tableKeyEvents(KeyEvent event) {
-        TableView<?> currentTable = (TableView<?>) event.getSource();
-        TablePosition<?, ?> focusedCell = currentTable.getFocusModel().getFocusedCell();
-        if (focusedCell == null) {
-            return;
-        }
-        boolean moveDown = event.getCode() == KeyCode.TAB || event.getCode() == KeyCode.DOWN;
-        boolean moveUp = event.getCode() == KeyCode.UP;
-        int newIndex = 0;
-
-        if (moveDown || moveUp) {
-            switch (currentTable.getId()) {
+    JFXUtil.TableKeyEvent tableKeyEvents = new JFXUtil.TableKeyEvent() {
+        @Override
+        protected void onRowMove(TableView<?> currentTable, String currentTableID, boolean isMovedDown) {
+            int newIndex = 0;
+            switch (currentTableID) {
                 case "tblVwDetails":
                     if (details_data.isEmpty()) {
                         return;
                     }
-                    newIndex = moveDown ? Integer.parseInt(details_data.get(JFXUtil.moveToNextRow(currentTable)).getIndex11())
+                    newIndex = isMovedDown ? Integer.parseInt(details_data.get(JFXUtil.moveToNextRow(currentTable)).getIndex11())
                             : Integer.parseInt(details_data.get(JFXUtil.moveToPreviousRow(currentTable)).getIndex11());
                     pnDetail = newIndex;
                     loadRecordDetail();
@@ -1515,7 +1508,7 @@ public class DisbursementVoucher_ConfirmationController implements Initializable
                     if (journal_data.isEmpty()) {
                         return;
                     }
-                    newIndex = moveDown ? Integer.parseInt(journal_data.get(JFXUtil.moveToNextRow(currentTable)).getIndex07())
+                    newIndex = isMovedDown ? Integer.parseInt(journal_data.get(JFXUtil.moveToNextRow(currentTable)).getIndex07())
                             : Integer.parseInt(journal_data.get(JFXUtil.moveToPreviousRow(currentTable)).getIndex07());
                     pnDetailJE = newIndex;
                     loadRecordDetailJE();
@@ -1524,7 +1517,7 @@ public class DisbursementVoucher_ConfirmationController implements Initializable
                     if (journalproposal_data.isEmpty()) {
                         return;
                     }
-                    newIndex = moveDown ? Integer.parseInt(journalproposal_data.get(JFXUtil.moveToNextRow(currentTable)).getIndex07())
+                    newIndex = isMovedDown ? Integer.parseInt(journalproposal_data.get(JFXUtil.moveToNextRow(currentTable)).getIndex07())
                             : Integer.parseInt(journalproposal_data.get(JFXUtil.moveToPreviousRow(currentTable)).getIndex07());
                     pnDetailJEP = newIndex;
                     loadRecordDetailJEP();
@@ -1533,7 +1526,7 @@ public class DisbursementVoucher_ConfirmationController implements Initializable
                     if (BIR_data.isEmpty()) {
                         return;
                     }
-                    newIndex = moveDown ? Integer.parseInt(BIR_data.get(JFXUtil.moveToNextRow(currentTable)).getIndex07())
+                    newIndex = isMovedDown ? Integer.parseInt(BIR_data.get(JFXUtil.moveToNextRow(currentTable)).getIndex07())
                             : Integer.parseInt(BIR_data.get(JFXUtil.moveToPreviousRow(currentTable)).getIndex07());
                     pnDetailBIR = newIndex;
                     loadRecordDetailBIR();
@@ -1542,18 +1535,17 @@ public class DisbursementVoucher_ConfirmationController implements Initializable
                     if (attachment_data.isEmpty()) {
                         return;
                     }
-                    newIndex = moveDown ? Integer.parseInt(attachment_data.get(JFXUtil.moveToNextRow(currentTable)).getIndex03())
+                    newIndex = isMovedDown ? Integer.parseInt(attachment_data.get(JFXUtil.moveToNextRow(currentTable)).getIndex03())
                             : Integer.parseInt(attachment_data.get(JFXUtil.moveToPreviousRow(currentTable)).getIndex03());
                     pnAttachment = newIndex;
                     loadRecordAttachment(true);
                     break;
             }
-            event.consume();
         }
-    }
+    };
 
     private void initTextFields() {
-        //Initialise  TextField Focus
+        //Initialize  TextField Focus
         JFXUtil.setFocusListener(txtSearch_Focus, tfSearchIndustry, tfSearchSupplier, tfSearchTransaction);
         JFXUtil.setFocusListener(txtArea_Focus, taDVRemarks, taJournalRemarks, taJournalProposalRemarks);
         //apDVMaster1
@@ -1813,35 +1805,7 @@ public class DisbursementVoucher_ConfirmationController implements Initializable
                         break;
                     case "tfSupplierBank":
                         if (lsValue.isEmpty()) {
-//                            if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
-//                                if (!JFXUtil.isObjectEqualTo(poController.Master().getSupplierClientID(), null, "")
-//                                && !JFXUtil.isObjectEqualTo(poController.Master().getPayeeID(), null, "")) {
-//                                    if (poController.getDetailCount() > 1) {
-//                                        if (!pbKeyPressed) {
-//                                            if (ShowMessageFX.YesNo(null, pxeModuleName,
-//                                                    "Are you sure you want to change the supplier name?\nPlease note that this action will delete all Disbursement voucher details.\n\nDo you wish to proceed?") == true) {
-//                                                poController.removeDetails();
-//                                                if (poController.Master().getDisbursementType().equals(DisbursementStatic.DisbursementType.CHECK)) {
-//                                                    poController.CheckPayments().getModel().setPayeeID("");
-//                                                    loadRecordMasterCheck();
-//                                                }
-//                                                poController.Master().setSupplierClientID("");
-//                                                poController.Master().setPayeeID("");
-//                                                tfSupplier.setText("");
-//                                                psSupplierPayeeId = "";
-//                                                loadTableDetail.reload();
-//                                            } else {
-//                                                loadRecordMaster();
-//                                                return;
-//                                            }
-//                                        } else {
-//                                            loadRecordMaster();
-//                                            return;
-//                                        }
-//                                    }
-//                                }
-//                            }
-//                            poController.Master().setSupplierClientID("");
+
                         }
                         break;
                     case "tfSupplierAccountNoBTransfer":

@@ -1144,7 +1144,7 @@ public class DisbursementVoucher_HistoryController implements Initializable, Scr
                 loadRecordDetailBIR();
             }
         });
-        JFXUtil.setKeyEventFilter(this::tableKeyEvents, tblVwDetails, tblVwJournalDetails, tblAttachments);
+        JFXUtil.setKeyEventFilter(tableKeyEvents, tblVwDetails, tblVwJournalDetails, tblAttachments);
         JFXUtil.adjustColumnForScrollbar(tblVwDetails, tblVwJournalDetails, tblAttachments, tblVwJournalProposalList, tblVwJournalProposalDetails);
     }
 
@@ -1208,23 +1208,16 @@ public class DisbursementVoucher_HistoryController implements Initializable, Scr
         }
     }
 
-    private void tableKeyEvents(KeyEvent event) {
-        TableView<?> currentTable = (TableView<?>) event.getSource();
-        TablePosition<?, ?> focusedCell = currentTable.getFocusModel().getFocusedCell();
-        if (focusedCell == null) {
-            return;
-        }
-        boolean moveDown = event.getCode() == KeyCode.TAB || event.getCode() == KeyCode.DOWN;
-        boolean moveUp = event.getCode() == KeyCode.UP;
-        int newIndex = 0;
-
-        if (moveDown || moveUp) {
-            switch (currentTable.getId()) {
+    JFXUtil.TableKeyEvent tableKeyEvents = new JFXUtil.TableKeyEvent() {
+        @Override
+        protected void onRowMove(TableView<?> currentTable, String currentTableID, boolean isMovedDown) {
+            int newIndex = 0;
+            switch (currentTableID) {
                 case "tblVwDetails":
                     if (details_data.isEmpty()) {
                         return;
                     }
-                    newIndex = moveDown ? Integer.parseInt(details_data.get(JFXUtil.moveToNextRow(currentTable)).getIndex11())
+                    newIndex = isMovedDown ? Integer.parseInt(details_data.get(JFXUtil.moveToNextRow(currentTable)).getIndex11())
                             : Integer.parseInt(details_data.get(JFXUtil.moveToPreviousRow(currentTable)).getIndex11());
                     pnDetail = newIndex;
                     loadRecordDetail();
@@ -1233,7 +1226,7 @@ public class DisbursementVoucher_HistoryController implements Initializable, Scr
                     if (journal_data.isEmpty()) {
                         return;
                     }
-                    newIndex = moveDown ? Integer.parseInt(journal_data.get(JFXUtil.moveToNextRow(currentTable)).getIndex07())
+                    newIndex = isMovedDown ? Integer.parseInt(journal_data.get(JFXUtil.moveToNextRow(currentTable)).getIndex07())
                             : Integer.parseInt(journal_data.get(JFXUtil.moveToPreviousRow(currentTable)).getIndex07());
                     pnDetailJE = newIndex;
                     loadRecordDetailJE();
@@ -1242,7 +1235,7 @@ public class DisbursementVoucher_HistoryController implements Initializable, Scr
                     if (journalproposal_data.isEmpty()) {
                         return;
                     }
-                    newIndex = moveDown ? Integer.parseInt(journalproposal_data.get(JFXUtil.moveToNextRow(currentTable)).getIndex07())
+                    newIndex = isMovedDown ? Integer.parseInt(journalproposal_data.get(JFXUtil.moveToNextRow(currentTable)).getIndex07())
                             : Integer.parseInt(journalproposal_data.get(JFXUtil.moveToPreviousRow(currentTable)).getIndex07());
                     pnDetailJEP = newIndex;
                     loadRecordDetailJEP();
@@ -1251,7 +1244,7 @@ public class DisbursementVoucher_HistoryController implements Initializable, Scr
                     if (BIR_data.isEmpty()) {
                         return;
                     }
-                    newIndex = moveDown ? Integer.parseInt(BIR_data.get(JFXUtil.moveToNextRow(currentTable)).getIndex07())
+                    newIndex = isMovedDown ? Integer.parseInt(BIR_data.get(JFXUtil.moveToNextRow(currentTable)).getIndex07())
                             : Integer.parseInt(BIR_data.get(JFXUtil.moveToPreviousRow(currentTable)).getIndex07());
                     pnDetailBIR = newIndex;
                     loadRecordDetailBIR();
@@ -1260,18 +1253,17 @@ public class DisbursementVoucher_HistoryController implements Initializable, Scr
                     if (attachment_data.isEmpty()) {
                         return;
                     }
-                    newIndex = moveDown ? Integer.parseInt(attachment_data.get(JFXUtil.moveToNextRow(currentTable)).getIndex03())
+                    newIndex = isMovedDown ? Integer.parseInt(attachment_data.get(JFXUtil.moveToNextRow(currentTable)).getIndex03())
                             : Integer.parseInt(attachment_data.get(JFXUtil.moveToPreviousRow(currentTable)).getIndex03());
                     pnAttachment = newIndex;
                     loadRecordAttachment(true);
                     break;
             }
-            event.consume();
         }
-    }
+    };
 
     private void initTextFields() {
-        //Initialise  TextField Focus
+        //Initialize  TextField Focus
         JFXUtil.setFocusListener(txtSearch_Focus, tfSearchTransaction, tfSearchSupplier);
         JFXUtil.setKeyPressedListener(this::txtField_KeyPressed, apBrowse);
         Platform.runLater(() -> {
